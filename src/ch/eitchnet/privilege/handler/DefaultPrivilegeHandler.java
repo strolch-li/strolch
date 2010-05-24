@@ -53,11 +53,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (certificateSessionPair == null)
 			throw new AccessDeniedException("There is no session information for " + certificate.toString());
 
+		// validate certificate has not been tampered with
 		Certificate sessionCertificate = certificateSessionPair.certificate;
 		if (!sessionCertificate.equals(certificate))
 			throw new PrivilegeException("Received illegal certificate for session id " + certificate.getSessionId());
 
-		// get authtoken from certificate using the sessions password
+		// TODO is this maybe overkill?
+		// validate authToken from certificate using the sessions authPassword
 		String authToken = certificate.getAuthToken(certificateSessionPair.session.getAuthPassword());
 		if (authToken == null || !authToken.equals(certificateSessionPair.session.getAuthToken()))
 			throw new PrivilegeException("Received illegal certificate data for session id "
