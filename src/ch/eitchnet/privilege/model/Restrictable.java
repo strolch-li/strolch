@@ -16,7 +16,7 @@ package ch.eitchnet.privilege.model;
  */
 public interface Restrictable {
 
-	public String getRestrictionName();
+	public String getRestrictionKey();
 
 	public Object getRestrictionValue();
 }
