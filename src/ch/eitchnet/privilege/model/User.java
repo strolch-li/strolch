@@ -10,7 +10,9 @@
 
 package ch.eitchnet.privilege.model;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author rvonburg
@@ -18,64 +20,34 @@ import java.util.List;
  */
 public class User {
 
-	private final String sessionId;
-	private final String authToken;
-	private final String authPassword;
-
 	private final String username;
+	private final String password;
+
 	private final String firstname;
 	private final String surname;
 
 	private final UserState userState;
 
-	private List<String> roleList;
+	private final List<String> roleList;
+
+	private final Locale locale;
 
 	/**
 	 * The {@link User} constructor is private to ensure no unauthorized creation of {@link User} objects
-	 * 
-	 * @param sessionId
-	 * @param username
-	 * @param firstname
-	 * @param surname
-	 * @param userState
-	 * @param validated
-	 * @param roleList
 	 */
-	private User(String sessionId, String authToken, String authPassword, String username, String firstname,
-			String surname, UserState userState, List<String> roleList) {
-
-		this.sessionId = sessionId;
-		this.authToken = authToken;
-		this.authPassword = authPassword;
+	private User(String username, String password, String firstname, String surname, UserState userState,
+			List<String> roleList, Locale locale) {
 
 		this.username = username;
+		this.password = password;
 		this.userState = userState;
 
 		this.firstname = firstname;
 		this.surname = surname;
 
 		this.roleList = roleList;
-	}
 
-	/**
-	 * @return the sessionId
-	 */
-	public String getSessionId() {
-		return sessionId;
-	}
-
-	/**
-	 * @return the authToken
-	 */
-	public String getAuthToken() {
-		return authToken;
-	}
-
-	/**
-	 * @return the authPassword
-	 */
-	public String getAuthPassword() {
-		return authPassword;
+		this.locale = locale;
 	}
 
 	/**
@@ -83,6 +55,13 @@ public class User {
 	 */
 	public String getUsername() {
 		return username;
+	}
+
+	/**
+	 * @return the password
+	 */
+	public String getPassword() {
+		return password;
 	}
 
 	/**
@@ -102,7 +81,7 @@ public class User {
 	/**
 	 * @return the userState
 	 */
-	public UserState getUserState() {
+	public UserState getState() {
 		return userState;
 	}
 
@@ -114,23 +93,26 @@ public class User {
 	}
 
 	/**
-	 * @param sessionId
-	 * @param authToken
-	 * @param authPassword
-	 * @param username
-	 * @param firstname
-	 * @param surname
-	 * @param userState
-	 * @param roleList
-	 * 
+	 * @return the locale
+	 */
+	public Locale getLocale() {
+		return locale;
+	}
+
+	/**
 	 * @return a new {@link User} object which is authenticated on the current Java Virtual Machine
 	 */
-	public static User buildUser(String sessionId, String authToken, String authPassword, String username,
-			String firstname, String surname, UserState userState, List<String> roleList) {
+	public static User buildUser(String username, String password, String firstname, String surname,
+			UserState userState, List<String> roleList, Locale locale) {
+
+		// set a default locale
+		if (locale == null)
+			locale = Locale.getDefault();
 
 		// TODO validate who is creating this User object
 
-		User user = new User(sessionId, authToken, authPassword, username, firstname, surname, userState, roleList);
+		User user = new User(username, password, firstname, surname, userState, Collections.unmodifiableList(roleList),
+				locale);
 
 		return user;
 	}

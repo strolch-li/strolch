@@ -8,7 +8,7 @@
  * 
  */
 
-package ch.eitchnet.privilege.base;
+package ch.eitchnet.privilege.i18n;
 
 /**
  * @author rvonburg
@@ -16,13 +16,13 @@ package ch.eitchnet.privilege.base;
  */
 public class PrivilegeException extends RuntimeException {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @param string
 	 */
 	public PrivilegeException(String string) {
 		super(string);
 	}
-
-	private static final long serialVersionUID = 1L;
 
 }

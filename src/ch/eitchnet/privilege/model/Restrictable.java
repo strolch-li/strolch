@@ -14,6 +14,9 @@ package ch.eitchnet.privilege.model;
  * @author rvonburg
  * 
  */
-public interface Permission {
+public interface Restrictable {
 
+	public String getType();
+
+	public Object getValue();
 }

@@ -10,65 +10,27 @@
 
 package ch.eitchnet.privilege.model;
 
-import java.io.Serializable;
-import java.util.Locale;
-
-import ch.eitchnet.privilege.i18n.PrivilegeException;
-
 /**
  * @author rvonburg
  * 
  */
-public class Certificate implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class Session {
 
 	private final String sessionId;
 	private final String username;
+	private final long loginTime;
+
 	private final String authToken;
 	private final String authPassword;
 
-	private Locale locale;
-
 	/**
-	 * @param sessionId
-	 * @param username
-	 * @param authToken
-	 * @param authPassword
-	 * @param locale
 	 */
-	public Certificate(String sessionId, String username, String authToken, String authPassword, Locale locale) {
-
-		// validate arguments are not null
-		if (sessionId == null || username == null || authToken == null || authPassword == null) {
-			throw new PrivilegeException("One of the arguments is null!");
-		}
-
+	public Session(String sessionId, String authToken, String authPassword, String username, long loginTime) {
 		this.sessionId = sessionId;
-		this.username = username;
 		this.authToken = authToken;
 		this.authPassword = authPassword;
-
-		// if no locale is given, set default
-		if (locale == null)
-			this.locale = Locale.getDefault();
-		else
-			this.locale = locale;
-	}
-
-	/**
-	 * @return the locale
-	 */
-	public Locale getLocale() {
-		return locale;
-	}
-
-	/**
-	 * @param locale
-	 *            the locale to set
-	 */
-	public void setLocale(Locale locale) {
-		this.locale = locale;
+		this.username = username;
+		this.loginTime = loginTime;
 	}
 
 	/**
@@ -79,6 +41,20 @@ public class Certificate implements Serializable {
 	}
 
 	/**
+	 * @return the authToken
+	 */
+	public String getAuthToken() {
+		return authToken;
+	}
+
+	/**
+	 * @return the authPassword
+	 */
+	public String getAuthPassword() {
+		return authPassword;
+	}
+
+	/**
 	 * @return the username
 	 */
 	public String getUsername() {
@@ -86,19 +62,10 @@ public class Certificate implements Serializable {
 	}
 
 	/**
-	 * Returns the authToken if the given authPassword is corret, null otherwise
-	 * 
-	 * @param authPassword
-	 *            the auth password with which this certificate was created
-	 * 
-	 * @return the authToken if the given authPassword is corret, null otherwise
+	 * @return the loginTime
 	 */
-	public String getAuthToken(String authPassword) {
-		if (this.authPassword.equals(authPassword)) {
-			return authToken;
-		} else {
-			return null;
-		}
+	public long getLoginTime() {
+		return loginTime;
 	}
 
 	/**
@@ -110,7 +77,7 @@ public class Certificate implements Serializable {
 		int result = 1;
 		result = prime * result + ((authPassword == null) ? 0 : authPassword.hashCode());
 		result = prime * result + ((authToken == null) ? 0 : authToken.hashCode());
-		result = prime * result + ((locale == null) ? 0 : locale.hashCode());
+		result = prime * result + (int) (loginTime ^ (loginTime >>> 32));
 		result = prime * result + ((sessionId == null) ? 0 : sessionId.hashCode());
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
@@ -125,9 +92,9 @@ public class Certificate implements Serializable {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Certificate))
+		if (!(obj instanceof Session))
 			return false;
-		Certificate other = (Certificate) obj;
+		Session other = (Session) obj;
 		if (authPassword == null) {
 			if (other.authPassword != null)
 				return false;
@@ -138,10 +105,7 @@ public class Certificate implements Serializable {
 				return false;
 		} else if (!authToken.equals(other.authToken))
 			return false;
-		if (locale == null) {
-			if (other.locale != null)
-				return false;
-		} else if (!locale.equals(other.locale))
+		if (loginTime != other.loginTime)
 			return false;
 		if (sessionId == null) {
 			if (other.sessionId != null)
@@ -161,6 +125,6 @@ public class Certificate implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "Certificate [locale=" + locale + ", sessionId=" + sessionId + ", username=" + username + "]";
+		return "Session [loginTime=" + loginTime + ", sessionId=" + sessionId + ", username=" + username + "]";
 	}
 }
