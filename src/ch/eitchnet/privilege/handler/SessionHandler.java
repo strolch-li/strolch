@@ -19,7 +19,7 @@ import ch.eitchnet.privilege.model.User;
  * @author rvonburg
  * 
  */
-public interface PrivilegeHandler {
+public interface SessionHandler {
 
 	/**
 	 * @param certificate

@@ -161,6 +161,6 @@ public class Certificate implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "Certificate [locale=" + locale + ", sessionId=" + sessionId + ", username=" + username + "]";
+		return "Certificate [sessionId=" + sessionId + ", username=" + username + ", locale=" + locale + "]";
 	}
 }

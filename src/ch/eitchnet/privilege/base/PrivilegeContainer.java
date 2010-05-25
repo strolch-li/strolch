@@ -13,7 +13,8 @@ package ch.eitchnet.privilege.base;
 import java.io.File;
 
 import ch.eitchnet.privilege.handler.PolicyHandler;
-import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.privilege.handler.SessionHandler;
+import ch.eitchnet.privilege.handler.EncryptionHandler;
 
 /**
  * 
@@ -28,8 +29,9 @@ public class PrivilegeContainer {
 		instance = new PrivilegeContainer();
 	}
 
-	private PrivilegeHandler privilegeHandler;
+	private SessionHandler privilegeHandler;
 	private PolicyHandler policyHandler;
+	private EncryptionHandler encryptionHandler;
 
 	public static PrivilegeContainer getInstance() {
 		return instance;
@@ -45,7 +47,7 @@ public class PrivilegeContainer {
 	/**
 	 * @return the privilegeHandler
 	 */
-	public PrivilegeHandler getPrivilegeHandler() {
+	public SessionHandler getPrivilegeHandler() {
 		return privilegeHandler;
 	}
 
@@ -54,6 +56,13 @@ public class PrivilegeContainer {
 	 */
 	public PolicyHandler getPolicyHandler() {
 		return policyHandler;
+	}
+
+	/**
+	 * @return the encryptionHandler
+	 */
+	public EncryptionHandler getEncryptionHandler() {
+		return encryptionHandler;
 	}
 
 	public void initialize(File privilegeContainerXml) {

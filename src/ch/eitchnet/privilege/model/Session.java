@@ -125,6 +125,6 @@ public class Session {
 	 */
 	@Override
 	public String toString() {
-		return "Session [loginTime=" + loginTime + ", sessionId=" + sessionId + ", username=" + username + "]";
+		return "Session [username=" + username + ", sessionId=" + sessionId + ", loginTime=" + loginTime + "]";
 	}
 }

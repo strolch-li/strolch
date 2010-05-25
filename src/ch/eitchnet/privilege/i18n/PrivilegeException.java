@@ -25,4 +25,12 @@ public class PrivilegeException extends RuntimeException {
 		super(string);
 	}
 
+	/**
+	 * 
+	 * @param string
+	 * @param t
+	 */
+	public PrivilegeException(String string, Throwable t) {
+		super(string, t);
+	}
 }

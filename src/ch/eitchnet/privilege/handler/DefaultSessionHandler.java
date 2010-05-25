@@ -13,6 +13,8 @@ package ch.eitchnet.privilege.handler;
 import java.io.File;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import ch.eitchnet.privilege.base.PrivilegeContainer;
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
@@ -26,14 +28,17 @@ import ch.eitchnet.privilege.model.UserState;
  * @author rvonburg
  * 
  */
-public class DefaultPrivilegeHandler implements PrivilegeHandler {
+public class DefaultSessionHandler implements SessionHandler {
+
+	private static final Logger logger = Logger.getLogger(DefaultSessionHandler.class);
+
+	private static long lastSessionId;
 
 	private Map<String, User> userMap;
-
 	private Map<String, CertificateSessionPair> sessionMap;
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#actionAllowed(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.SessionHandler#actionAllowed(ch.eitchnet.privilege.model.Certificate,
 	 *      ch.eitchnet.privilege.model.Restrictable)
 	 * 
 	 * @throws AccessDeniedException
@@ -58,7 +63,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (!sessionCertificate.equals(certificate))
 			throw new PrivilegeException("Received illegal certificate for session id " + certificate.getSessionId());
 
-		// TODO is this maybe overkill?
+		// TODO is this overkill?
 		// validate authToken from certificate using the sessions authPassword
 		String authToken = certificate.getAuthToken(certificateSessionPair.session.getAuthPassword());
 		if (authToken == null || !authToken.equals(certificateSessionPair.session.getAuthToken()))
@@ -73,14 +78,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// now validate on policy handler
-		PrivilegeContainer.getInstance().getPolicyHandler().actionAllowed(user, restrictable);
-
-		// TODO Auto-generated method stub
-		return false;
+		return PrivilegeContainer.getInstance().getPolicyHandler().actionAllowed(user, restrictable);
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#authenticate(java.lang.String, java.lang.String)
+	 * @see ch.eitchnet.privilege.handler.SessionHandler#authenticate(java.lang.String, java.lang.String)
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user credentials are not valid
@@ -94,8 +96,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		else if (password == null || password.length() < 3)
 			throw new PrivilegeException("The given password is shorter than 3 characters");
 
+		EncryptionHandler encryptionHandler = PrivilegeContainer.getInstance().getEncryptionHandler();
+
 		// we only work with hashed passwords
-		String passwordHash = password; // TODO hash password
+		String passwordHash = encryptionHandler.convertToHash(password);
 
 		// get user object
 		User user = userMap.get(username);
@@ -112,10 +116,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new AccessDeniedException("User " + username + " is not ENABLED. State is: " + user.getState());
 
 		// get 2 auth tokens
-		String authToken = ""; // TODO get auth token
-		String authPassword = ""; // TODO get auth password
+		String authToken = encryptionHandler.nextToken();
+		String authPassword = encryptionHandler.nextToken();
 
-		String sessionId = ""; // TODO get next session id
+		// get next session id
+		String sessionId = nextSessionId();
 
 		// create certificate
 		Certificate certificate = new Certificate(sessionId, username, authToken, authPassword, user.getLocale());
@@ -125,8 +130,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				.currentTimeMillis());
 		sessionMap.put(sessionId, new CertificateSessionPair(session, certificate));
 
+		// log
+		logger.info("Authenticated: " + session);
+
 		// return the certificate
 		return certificate;
+	}
+
+	private String nextSessionId() {
+		return Long.toString(++lastSessionId % Long.MAX_VALUE);
 	}
 
 	public void initialize(File userFile) {
