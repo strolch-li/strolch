@@ -15,9 +15,11 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Map;
 
 import org.dom4j.Element;
 
+import ch.eitchnet.privilege.helper.ConfigurationHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
@@ -26,7 +28,9 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
  */
 public class DefaultEncryptionHandler implements EncryptionHandler {
 
-	public static final String HASH_ALGORITHM = "SHA-1";
+	public static final String XML_PARAM_HASH_ALGORITHM = "hashAlgorithm";
+
+	public String hashAlgorithm;
 
 	/**
 	 * Hex char table for fast calculating of hex value
@@ -42,7 +46,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	public String convertToHash(String string) {
 		try {
 
-			MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
+			MessageDigest digest = MessageDigest.getInstance(hashAlgorithm);
 			byte[] hashArray = digest.digest(string.getBytes());
 
 			byte[] hex = new byte[2 * hashArray.length];
@@ -57,7 +61,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 			return new String(hex, "ASCII");
 
 		} catch (NoSuchAlgorithmException e) {
-			throw new PrivilegeException("Algorithm " + HASH_ALGORITHM + " was not found!", e);
+			throw new PrivilegeException("Algorithm " + hashAlgorithm + " was not found!", e);
 		} catch (UnsupportedEncodingException e) {
 			throw new PrivilegeException("Charset ASCII is not supported!", e);
 		}
@@ -73,7 +77,16 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		return randomString;
 	}
 
+	/**
+	 * @see ch.eitchnet.privilege.base.PrivilegeContainerObject#initialize(org.dom4j.Element)
+	 */
 	public void initialize(Element element) {
-		// TODO implement
+
+		Element parameterElement = element.element("Parameters");
+		Map<String, String> parameterMap = ConfigurationHelper.convertToParameterMap(parameterElement);
+
+		// get and test configured algorithm
+		hashAlgorithm = parameterMap.get(XML_PARAM_HASH_ALGORITHM);
+		convertToHash("test");
 	}
 }

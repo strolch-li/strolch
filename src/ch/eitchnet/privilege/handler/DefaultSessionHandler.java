@@ -10,10 +10,10 @@
 
 package ch.eitchnet.privilege.handler;
 
-import java.io.File;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.dom4j.Element;
 
 import ch.eitchnet.privilege.base.PrivilegeContainer;
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
@@ -48,6 +48,7 @@ public class DefaultSessionHandler implements SessionHandler {
 	@Override
 	public boolean actionAllowed(Certificate certificate, Restrictable restrictable) {
 
+		// certificate and restrictable must not be null
 		if (certificate == null)
 			throw new PrivilegeException("Certificate may not be null!");
 		else if (restrictable == null)
@@ -74,7 +75,7 @@ public class DefaultSessionHandler implements SessionHandler {
 		User user = userMap.get(certificateSessionPair.session.getUsername());
 		if (user == null) {
 			throw new PrivilegeException(
-					"Oh now, how did this happen: No User in user map although certificate is valid!");
+					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
 		}
 
 		// now validate on policy handler
@@ -141,7 +142,10 @@ public class DefaultSessionHandler implements SessionHandler {
 		return Long.toString(++lastSessionId % Long.MAX_VALUE);
 	}
 
-	public void initialize(File userFile) {
+	/**
+	 * @see ch.eitchnet.privilege.base.PrivilegeContainerObject#initialize(org.dom4j.Element)
+	 */
+	public void initialize(Element element) {
 		// TODO implement
 	}
 

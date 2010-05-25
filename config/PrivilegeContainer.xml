@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PrivilegeContainer>
+
+	<SessionHandler class="ch.eitchnet.privilege.handler.DefaultSessionHandler">
+		<Parameters>
+			<Parameter name="userXmlFile" value="PrivilegeUsers.xml" />
+		</Parameters>
+	</SessionHandler>
+	<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
+		<Parameters>
+			<Parameter name="hashAlgorithm" value="SHA-1" />
+		</Parameters>
+	</EncryptionHandler>
+	<PolicyHandler class="ch.eitchnet.privilege.handler.DefaultPolicyHandler">
+		<Parameters>
+			<Parameter name="policyXmlFile" value="RestrictionPolicy.xml" />
+		</Parameters>
+	</PolicyHandler>
+
+</PrivilegeContainer>

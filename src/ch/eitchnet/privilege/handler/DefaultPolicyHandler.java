@@ -10,9 +10,11 @@
 
 package ch.eitchnet.privilege.handler;
 
-import java.io.File;
 import java.util.Map;
 
+import org.dom4j.Element;
+
+import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.RestrictionPolicy;
 import ch.eitchnet.privilege.model.User;
@@ -31,14 +33,36 @@ public class DefaultPolicyHandler implements PolicyHandler {
 	 */
 	@Override
 	public boolean actionAllowed(User user, Restrictable restrictable) {
-		
-		// TODO auth user
-		
-		// TODO Auto-generated method stub
-		return false;
+
+		// user and restrictable must not be null
+		if (user == null)
+			throw new PrivilegeException("User may not be null!");
+		else if (restrictable == null)
+			throw new PrivilegeException("Restrictable may not be null!");
+
+		// validate restriction key for this restrictable
+		String restrictionKey = restrictable.getRestrictionKey();
+		if (restrictionKey == null || restrictionKey.length() < 3) {
+			throw new PrivilegeException(
+					"The RestrictionKey may not be shorter than 3 characters. Invalid Restrictable "
+							+ restrictable.getClass().getName());
+		}
+
+		// get restriction policy
+		RestrictionPolicy policy = policyMap.get(restrictionKey);
+		if (policy == null) {
+			throw new PrivilegeException("No RestrictionPolicy exists for the RestrictionKey " + restrictionKey
+					+ " for Restrictable " + restrictable.getClass().getName());
+		}
+
+		// delegate checking to restriction policy
+		return policy.actionAllowed(user, restrictable);
 	}
 
-	public void initialize(File policyXml) {
+	/**
+	 * @see ch.eitchnet.privilege.base.PrivilegeContainerObject#initialize(org.dom4j.Element)
+	 */
+	public void initialize(Element element) {
 		// TODO implement
 	}
 }

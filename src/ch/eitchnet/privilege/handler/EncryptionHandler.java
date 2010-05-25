@@ -10,11 +10,13 @@
 
 package ch.eitchnet.privilege.handler;
 
+import ch.eitchnet.privilege.base.PrivilegeContainerObject;
+
 /**
  * @author rvonburg
  * 
  */
-public interface EncryptionHandler {
+public interface EncryptionHandler extends PrivilegeContainerObject{
 
 	public String nextToken();
 
