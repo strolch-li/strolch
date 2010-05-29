@@ -16,8 +16,8 @@ import org.dom4j.Element;
 
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
-import ch.eitchnet.privilege.model.RestrictionPolicy;
-import ch.eitchnet.privilege.model.User;
+import ch.eitchnet.privilege.model.internal.RestrictionPolicy;
+import ch.eitchnet.privilege.model.internal.Role;
 
 /**
  * @author rvonburg
@@ -28,15 +28,15 @@ public class DefaultPolicyHandler implements PolicyHandler {
 	private Map<String, RestrictionPolicy> policyMap;
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PolicyHandler#actionAllowed(ch.eitchnet.privilege.model.User,
+	 * @see ch.eitchnet.privilege.handler.PolicyHandler#actionAllowed(ch.eitchnet.privilege.model.internal.Role,
 	 *      ch.eitchnet.privilege.model.Restrictable)
 	 */
 	@Override
-	public boolean actionAllowed(User user, Restrictable restrictable) {
+	public boolean actionAllowed(Role role, Restrictable restrictable) {
 
 		// user and restrictable must not be null
-		if (user == null)
-			throw new PrivilegeException("User may not be null!");
+		if (role == null)
+			throw new PrivilegeException("Role may not be null!");
 		else if (restrictable == null)
 			throw new PrivilegeException("Restrictable may not be null!");
 
@@ -56,7 +56,7 @@ public class DefaultPolicyHandler implements PolicyHandler {
 		}
 
 		// delegate checking to restriction policy
-		return policy.actionAllowed(user, restrictable);
+		return policy.actionAllowed(role, restrictable);
 	}
 
 	/**

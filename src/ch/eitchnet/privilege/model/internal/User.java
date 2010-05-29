@@ -8,11 +8,13 @@
  * 
  */
 
-package ch.eitchnet.privilege.model;
+package ch.eitchnet.privilege.model.internal;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import ch.eitchnet.privilege.model.UserState;
 
 /**
  * @author rvonburg

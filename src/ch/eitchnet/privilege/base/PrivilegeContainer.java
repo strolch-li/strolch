@@ -27,10 +27,6 @@ import ch.eitchnet.privilege.helper.XmlHelper;
  */
 public class PrivilegeContainer {
 
-	public static final String XML_HANDLER_ENCRYPTION = "EncryptionHandler";
-	public static final String XML_HANDLER_SESSION = "SessionHandler";
-	public static final String XML_HANDLER_POLICY = "PolicyHandler";
-
 	private static final PrivilegeContainer instance;
 
 	static {
@@ -79,20 +75,20 @@ public class PrivilegeContainer {
 		Element containerRootElement = XmlHelper.parseDocument(privilegeContainerXml).getRootElement();
 
 		// instantiate session handler
-		Element sessionHandlerElement = containerRootElement.element(XML_HANDLER_SESSION);
-		String sessionHandlerClassName = sessionHandlerElement.attributeValue("class");
+		Element sessionHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_SESSION);
+		String sessionHandlerClassName = sessionHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
 		SessionHandler sessionHandler = ClassHelper.instantiateClass(sessionHandlerClassName);
 		sessionHandler.initialize(sessionHandlerElement);
 
 		// instantiate encryption handler
-		Element encryptionHandlerElement = containerRootElement.element(XML_HANDLER_ENCRYPTION);
-		String encryptionHandlerClassName = encryptionHandlerElement.attributeValue("class");
+		Element encryptionHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_ENCRYPTION);
+		String encryptionHandlerClassName = encryptionHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
 		EncryptionHandler encryptionHandler = ClassHelper.instantiateClass(encryptionHandlerClassName);
 		encryptionHandler.initialize(encryptionHandlerElement);
 
 		// instantiate policy handler
-		Element policyHandlerElement = containerRootElement.element(XML_HANDLER_POLICY);
-		String policyHandlerClassName = policyHandlerElement.attributeValue("class");
+		Element policyHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_POLICY);
+		String policyHandlerClassName = policyHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
 		PolicyHandler policyHandler = ClassHelper.instantiateClass(policyHandlerClassName);
 		policyHandler.initialize(policyHandlerElement);
 

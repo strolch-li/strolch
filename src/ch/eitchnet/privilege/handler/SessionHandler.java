@@ -14,7 +14,7 @@ import ch.eitchnet.privilege.base.PrivilegeContainerObject;
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.Restrictable;
-import ch.eitchnet.privilege.model.User;
+import ch.eitchnet.privilege.model.internal.User;
 
 /**
  * @author rvonburg

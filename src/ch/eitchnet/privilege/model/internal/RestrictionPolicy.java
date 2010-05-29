@@ -8,7 +8,9 @@
  * 
  */
 
-package ch.eitchnet.privilege.model;
+package ch.eitchnet.privilege.model.internal;
+
+import ch.eitchnet.privilege.model.Restrictable;
 
 /**
  * @author rvonburg
@@ -16,5 +18,5 @@ package ch.eitchnet.privilege.model;
  */
 public interface RestrictionPolicy {
 
-	public boolean actionAllowed(User user, Restrictable restrictable);
+	public boolean actionAllowed(Role role, Restrictable restrictable);
 }

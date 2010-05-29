@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.dom4j.Element;
 
+import ch.eitchnet.privilege.base.XmlConstants;
 import ch.eitchnet.privilege.helper.ConfigurationHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 
@@ -27,8 +28,6 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
  * 
  */
 public class DefaultEncryptionHandler implements EncryptionHandler {
-
-	public static final String XML_PARAM_HASH_ALGORITHM = "hashAlgorithm";
 
 	public String hashAlgorithm;
 
@@ -82,11 +81,11 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	 */
 	public void initialize(Element element) {
 
-		Element parameterElement = element.element("Parameters");
+		Element parameterElement = element.element(XmlConstants.XML_PARAMETERS);
 		Map<String, String> parameterMap = ConfigurationHelper.convertToParameterMap(parameterElement);
 
 		// get and test configured algorithm
-		hashAlgorithm = parameterMap.get(XML_PARAM_HASH_ALGORITHM);
+		hashAlgorithm = parameterMap.get(XmlConstants.XML_PARAM_HASH_ALGORITHM);
 		convertToHash("test");
 	}
 }

@@ -12,7 +12,7 @@ package ch.eitchnet.privilege.handler;
 
 import ch.eitchnet.privilege.base.PrivilegeContainerObject;
 import ch.eitchnet.privilege.model.Restrictable;
-import ch.eitchnet.privilege.model.User;
+import ch.eitchnet.privilege.model.internal.Role;
 
 /**
  * @author rvonburg
@@ -20,5 +20,5 @@ import ch.eitchnet.privilege.model.User;
  */
 public interface PolicyHandler extends PrivilegeContainerObject {
 
-	public boolean actionAllowed(User user, Restrictable restrictable);
+	public boolean actionAllowed(Role role, Restrictable restrictable);
 }

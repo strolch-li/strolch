@@ -20,9 +20,10 @@ import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.Restrictable;
-import ch.eitchnet.privilege.model.Session;
-import ch.eitchnet.privilege.model.User;
 import ch.eitchnet.privilege.model.UserState;
+import ch.eitchnet.privilege.model.internal.Role;
+import ch.eitchnet.privilege.model.internal.Session;
+import ch.eitchnet.privilege.model.internal.User;
 
 /**
  * @author rvonburg
@@ -35,6 +36,7 @@ public class DefaultSessionHandler implements SessionHandler {
 	private static long lastSessionId;
 
 	private Map<String, User> userMap;
+	private Map<String, Role> roleMap;
 	private Map<String, CertificateSessionPair> sessionMap;
 
 	/**
@@ -64,7 +66,7 @@ public class DefaultSessionHandler implements SessionHandler {
 		if (!sessionCertificate.equals(certificate))
 			throw new PrivilegeException("Received illegal certificate for session id " + certificate.getSessionId());
 
-		// TODO is this overkill?
+		// TODO is validating authToken overkill since the two certificates have already been checked on equality?
 		// validate authToken from certificate using the sessions authPassword
 		String authToken = certificate.getAuthToken(certificateSessionPair.session.getAuthPassword());
 		if (authToken == null || !authToken.equals(certificateSessionPair.session.getAuthToken()))
@@ -78,8 +80,28 @@ public class DefaultSessionHandler implements SessionHandler {
 					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
 		}
 
-		// now validate on policy handler
-		return PrivilegeContainer.getInstance().getPolicyHandler().actionAllowed(user, restrictable);
+		// default is to not allow the action
+		// TODO should default deny/allow policy be configurable?
+		boolean actionAllowed = false;
+
+		// now iterate roles and validate on policy handler
+		PolicyHandler policyHandler = PrivilegeContainer.getInstance().getPolicyHandler();
+		for (String roleName : user.getRoleList()) {
+
+			Role role = roleMap.get(roleName);
+			if (role == null) {
+				logger.error("No role is defined with name " + roleName + " which is configured for user " + user);
+				continue;
+			}
+
+			actionAllowed = policyHandler.actionAllowed(role, restrictable);
+
+			// if action is allowed, then break iteration as a privilege match has been made
+			if (actionAllowed)
+				break;
+		}
+
+		return actionAllowed;
 	}
 
 	/**
@@ -116,6 +138,11 @@ public class DefaultSessionHandler implements SessionHandler {
 		if (user.getState() != UserState.ENABLED)
 			throw new AccessDeniedException("User " + username + " is not ENABLED. State is: " + user.getState());
 
+		// validate user has at least one role
+		if (user.getRoleList().isEmpty()) {
+			throw new PrivilegeException("User " + username + " does not have any roles defined!");
+		}
+
 		// get 2 auth tokens
 		String authToken = encryptionHandler.nextToken();
 		String authPassword = encryptionHandler.nextToken();
@@ -138,7 +165,7 @@ public class DefaultSessionHandler implements SessionHandler {
 		return certificate;
 	}
 
-	private String nextSessionId() {
+	private synchronized String nextSessionId() {
 		return Long.toString(++lastSessionId % Long.MAX_VALUE);
 	}
 

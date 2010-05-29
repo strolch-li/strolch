@@ -8,7 +8,7 @@
  * 
  */
 
-package ch.eitchnet.privilege.model;
+package ch.eitchnet.privilege.model.internal;
 
 /**
  * @author rvonburg

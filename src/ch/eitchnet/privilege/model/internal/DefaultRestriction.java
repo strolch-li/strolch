@@ -8,14 +8,12 @@
  * 
  */
 
-package ch.eitchnet.privilege.model;
-
-import java.util.List;
-import java.util.Map;
+package ch.eitchnet.privilege.model.internal;
 
 import org.dom4j.Element;
 
 import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.model.Restrictable;
 
 /**
  * @author rvonburg
@@ -25,18 +23,16 @@ public class DefaultRestriction implements RestrictionPolicy {
 
 	private String restrictionKey;
 
-	private Map<String, Restriction> roleRestrictionMap;
-
 	/**
-	 * @see ch.eitchnet.privilege.model.RestrictionPolicy#actionAllowed(ch.eitchnet.privilege.model.User,
+	 * @see ch.eitchnet.privilege.model.internal.RestrictionPolicy#actionAllowed(ch.eitchnet.privilege.model.User,
 	 *      ch.eitchnet.privilege.model.Restrictable)
 	 */
 	@Override
-	public boolean actionAllowed(User user, Restrictable restrictable) {
+	public boolean actionAllowed(Role role, Restrictable restrictable) {
 
 		// validate user is not null
-		if (user == null)
-			throw new PrivilegeException("User may not be null!");
+		if (role == null)
+			throw new PrivilegeException("Role may not be null!");
 
 		// validate Restrictable is set for this RestrictionPolicy
 		if (!restrictionKey.equals(restrictable.getRestrictionKey())) {
@@ -46,38 +42,15 @@ public class DefaultRestriction implements RestrictionPolicy {
 					+ restrictable.getRestrictionKey());
 		}
 
-		// default is that user does not have privilege
-		boolean hasPrivilege = false;
-
-		// iterate user roles and validate role has privilege
-		for (String role : user.getRoleList()) {
-
-			hasPrivilege = internalActionAllowed(role, restrictable);
-
-			// if privilege is found, then stop iterating
-			if (hasPrivilege)
-				break;
-		}
-
-		return hasPrivilege;
-	}
-
-	/**
-	 * @param role
-	 * @param restrictable
-	 * @return
-	 */
-	private boolean internalActionAllowed(String role, Restrictable restrictable) {
-
 		// get restriction object for users role
-		Restriction restriction = roleRestrictionMap.get(role);
+		Privilege privilege = role.getPrivilege(restrictionKey);
 
 		// no restriction object means no privilege
-		if (restriction == null)
+		if (privilege == null)
 			return false;
 
 		// does this role have privilege for any values?
-		if (restriction.anyValue)
+		if (privilege.isAllAllowed())
 			return true;
 
 		// get the value on which the action is to be performed
@@ -92,13 +65,13 @@ public class DefaultRestriction implements RestrictionPolicy {
 		String restrictionValue = (String) object;
 
 		// first check values not allowed
-		for (String notAllowed : restriction.valuesNotAllowed) {
+		for (String notAllowed : privilege.getValuesNotAllowed()) {
 			if (notAllowed.equals(restrictionValue))
 				return false;
 		}
 
 		// now check values allowed
-		for (String allowed : restriction.valuesAllowed) {
+		for (String allowed : privilege.getValuesAllowed()) {
 			if (allowed.equals(restrictionValue))
 				return true;
 		}
@@ -110,22 +83,5 @@ public class DefaultRestriction implements RestrictionPolicy {
 	public void initialize(Element element) {
 
 		// TODO implement
-	}
-
-	private class Restriction {
-		private boolean anyValue;
-		private List<String> valuesAllowed;
-		private List<String> valuesNotAllowed;
-
-		/**
-		 * @param allAllowed
-		 * @param valuesAllowed
-		 * @param valuesNotAllowed
-		 */
-		public Restriction(boolean anyValue, List<String> valuesAllowed, List<String> valuesNotAllowed) {
-			this.anyValue = anyValue;
-			this.valuesAllowed = valuesAllowed;
-			this.valuesNotAllowed = valuesNotAllowed;
-		}
 	}
 }
