@@ -19,9 +19,11 @@ public class XmlConstants {
 	public static final String XML_HANDLER_SESSION = "SessionHandler";
 	public static final String XML_HANDLER_POLICY = "PolicyHandler";
 
+	public static final String XML_POLICY = "Policy";
 	public static final String XML_PARAMETERS = "Parameters";
 
 	public static final String XML_ATTR_CLASS = "class";
+	public static final String XML_ATTR_NAME = "name";
 
 	public static final String XML_PARAM_HASH_ALGORITHM = "hashAlgorithm";
 	public static final String XML_PARAM_POLICY_FILE = "policyXmlFile";

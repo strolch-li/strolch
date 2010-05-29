@@ -20,18 +20,18 @@ import java.util.List;
 public class Privilege {
 
 	private final boolean allAllowed;
-	private final List<String> valuesAllowed;
-	private final List<String> valuesNotAllowed;
+	private final List<String> allowList;
+	private final List<String> denyList;
 
 	/**
 	 * @param allAllowed
-	 * @param valuesAllowed
-	 * @param valuesNotAllowed
+	 * @param allowList
+	 * @param denyList
 	 */
-	public Privilege(boolean allAllowed, List<String> valuesAllowed, List<String> valuesNotAllowed) {
+	public Privilege(boolean allAllowed, List<String> allowList, List<String> denyList) {
 		this.allAllowed = allAllowed;
-		this.valuesAllowed = Collections.unmodifiableList(valuesAllowed);
-		this.valuesNotAllowed = Collections.unmodifiableList(valuesNotAllowed);
+		this.allowList = Collections.unmodifiableList(allowList);
+		this.denyList = Collections.unmodifiableList(denyList);
 	}
 
 	/**
@@ -42,16 +42,17 @@ public class Privilege {
 	}
 
 	/**
-	 * @return the valuesAllowed
+	 * @return the allowList
 	 */
-	public List<String> getValuesAllowed() {
-		return valuesAllowed;
+	public List<String> getAllowList() {
+		return allowList;
 	}
 
 	/**
-	 * @return the valuesNotAllowed
+	 * @return the denyList
 	 */
-	public List<String> getValuesNotAllowed() {
-		return valuesNotAllowed;
+	public List<String> getDenyList() {
+		return denyList;
 	}
+
 }

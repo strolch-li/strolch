@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PrivilegesUsers>
+
+	<User username="" firstname="" surname="" state="">
+		<Roles>
+			<Role></Role>
+		</Roles>
+	</User>
+
+</PrivilegesUsers>

@@ -8,12 +8,12 @@
  * 
  */
 
-package ch.eitchnet.privilege.model.internal;
-
-import org.dom4j.Element;
+package ch.eitchnet.privilege.policy;
 
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
+import ch.eitchnet.privilege.model.internal.Privilege;
+import ch.eitchnet.privilege.model.internal.Role;
 
 /**
  * @author rvonburg
@@ -21,11 +21,9 @@ import ch.eitchnet.privilege.model.Restrictable;
  */
 public class DefaultRestriction implements RestrictionPolicy {
 
-	private String restrictionKey;
-
 	/**
-	 * @see ch.eitchnet.privilege.model.internal.RestrictionPolicy#actionAllowed(ch.eitchnet.privilege.model.User,
-	 *      ch.eitchnet.privilege.model.Restrictable)
+	 * @see ch.eitchnet.privilege.policy.RestrictionPolicy#actionAllowed(java.lang.String,
+	 *      ch.eitchnet.privilege.model.internal.Role, ch.eitchnet.privilege.model.Restrictable)
 	 */
 	@Override
 	public boolean actionAllowed(Role role, Restrictable restrictable) {
@@ -34,18 +32,17 @@ public class DefaultRestriction implements RestrictionPolicy {
 		if (role == null)
 			throw new PrivilegeException("Role may not be null!");
 
-		// validate Restrictable is set for this RestrictionPolicy
-		if (!restrictionKey.equals(restrictable.getRestrictionKey())) {
-			throw new PrivilegeException(RestrictionPolicy.class.getSimpleName() + " "
-					+ DefaultRestriction.class.getSimpleName() + " with restriction key " + restrictionKey
-					+ " can not validate " + Restrictable.class.getSimpleName() + " with key "
-					+ restrictable.getRestrictionKey());
+		// get the restriction key
+		String restrictionKey = restrictable.getRestrictionKey();
+		if (restrictionKey == null || restrictionKey.isEmpty()) {
+			throw new PrivilegeException("The restriction key for the Restrictable is null or empty: " + restrictable);
 		}
 
 		// get restriction object for users role
 		Privilege privilege = role.getPrivilege(restrictionKey);
 
 		// no restriction object means no privilege
+		// TODO should default deny/allow policy be configurable?
 		if (privilege == null)
 			return false;
 
@@ -65,23 +62,18 @@ public class DefaultRestriction implements RestrictionPolicy {
 		String restrictionValue = (String) object;
 
 		// first check values not allowed
-		for (String notAllowed : privilege.getValuesNotAllowed()) {
-			if (notAllowed.equals(restrictionValue))
+		for (String denied : privilege.getDenyList()) {
+			if (denied.equals(restrictionValue))
 				return false;
 		}
 
 		// now check values allowed
-		for (String allowed : privilege.getValuesAllowed()) {
+		for (String allowed : privilege.getAllowList()) {
 			if (allowed.equals(restrictionValue))
 				return true;
 		}
 
 		// default is not allowed
 		return false;
-	}
-
-	public void initialize(Element element) {
-
-		// TODO implement
 	}
 }

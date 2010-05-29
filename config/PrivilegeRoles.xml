@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PrivilegeRoles>
+
+	<Role name="">
+		<Privilege name="">
+			<allAllowed></allAllowed>
+			<deny></deny>
+			<allow></allow>
+		</Privilege>
+	</Role>
+
+</PrivilegeRoles>

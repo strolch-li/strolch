@@ -8,9 +8,10 @@
  * 
  */
 
-package ch.eitchnet.privilege.model.internal;
+package ch.eitchnet.privilege.policy;
 
 import ch.eitchnet.privilege.model.Restrictable;
+import ch.eitchnet.privilege.model.internal.Role;
 
 /**
  * @author rvonburg

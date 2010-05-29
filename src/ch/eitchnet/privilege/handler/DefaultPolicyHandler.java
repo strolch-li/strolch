@@ -11,18 +11,21 @@
 package ch.eitchnet.privilege.handler;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Element;
 
 import ch.eitchnet.privilege.base.PrivilegeContainer;
 import ch.eitchnet.privilege.base.XmlConstants;
+import ch.eitchnet.privilege.helper.ClassHelper;
 import ch.eitchnet.privilege.helper.ConfigurationHelper;
 import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
-import ch.eitchnet.privilege.model.internal.RestrictionPolicy;
 import ch.eitchnet.privilege.model.internal.Role;
+import ch.eitchnet.privilege.policy.RestrictionPolicy;
 
 /**
  * @author rvonburg
@@ -30,7 +33,7 @@ import ch.eitchnet.privilege.model.internal.Role;
  */
 public class DefaultPolicyHandler implements PolicyHandler {
 
-	private Map<String, RestrictionPolicy> policyMap;
+	private Map<String, Class<RestrictionPolicy>> policyMap;
 
 	/**
 	 * @see ch.eitchnet.privilege.handler.PolicyHandler#actionAllowed(ch.eitchnet.privilege.model.internal.Role,
@@ -53,12 +56,15 @@ public class DefaultPolicyHandler implements PolicyHandler {
 							+ restrictable.getClass().getName());
 		}
 
-		// get restriction policy
-		RestrictionPolicy policy = policyMap.get(restrictionKey);
-		if (policy == null) {
+		// get restriction policy class
+		Class<RestrictionPolicy> policyClazz = policyMap.get(restrictionKey);
+		if (policyClazz == null) {
 			throw new PrivilegeException("No RestrictionPolicy exists for the RestrictionKey " + restrictionKey
 					+ " for Restrictable " + restrictable.getClass().getName());
 		}
+
+		// instantiate policy
+		RestrictionPolicy policy = ClassHelper.instantiateClass(policyClazz);
 
 		// delegate checking to restriction policy
 		return policy.actionAllowed(role, restrictable);
@@ -67,6 +73,7 @@ public class DefaultPolicyHandler implements PolicyHandler {
 	/**
 	 * @see ch.eitchnet.privilege.base.PrivilegeContainerObject#initialize(org.dom4j.Element)
 	 */
+	@SuppressWarnings("unchecked")
 	public void initialize(Element element) {
 
 		// get parameters
@@ -88,7 +95,19 @@ public class DefaultPolicyHandler implements PolicyHandler {
 					+ policyFile.getAbsolutePath());
 		}
 
+		policyMap = new HashMap<String, Class<RestrictionPolicy>>();
+
 		// parse policy xml file to XML document
 		Element containerRootElement = XmlHelper.parseDocument(policyFile).getRootElement();
+
+		List<Element> policyElements = containerRootElement.elements(XmlConstants.XML_POLICY);
+		for (Element policyElement : policyElements) {
+			String policyName = policyElement.attributeValue(XmlConstants.XML_ATTR_NAME);
+			String policyClass = policyElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
+
+			Class<RestrictionPolicy> clazz = ClassHelper.loadClass(policyClass);
+
+			policyMap.put(policyName, clazz);
+		}
 	}
 }
