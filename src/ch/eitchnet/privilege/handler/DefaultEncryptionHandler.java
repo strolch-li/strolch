@@ -17,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Element;
 
 import ch.eitchnet.privilege.base.XmlConstants;
@@ -28,6 +29,7 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
  * 
  */
 public class DefaultEncryptionHandler implements EncryptionHandler {
+	private static final Logger logger = Logger.getLogger(DefaultEncryptionHandler.class);
 
 	public String hashAlgorithm;
 
@@ -73,6 +75,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	public String nextToken() {
 		SecureRandom secureRandom = new SecureRandom();
 		String randomString = new BigInteger(130, secureRandom).toString(32);
+		logger.info("Token: " + randomString); // XXX remove this line after testing!!!
 		return randomString;
 	}
 
@@ -81,11 +84,25 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	 */
 	public void initialize(Element element) {
 
+		// get parameters
 		Element parameterElement = element.element(XmlConstants.XML_PARAMETERS);
 		Map<String, String> parameterMap = ConfigurationHelper.convertToParameterMap(parameterElement);
 
-		// get and test configured algorithm
+		// get hash algorithm parameters
 		hashAlgorithm = parameterMap.get(XmlConstants.XML_PARAM_HASH_ALGORITHM);
-		convertToHash("test");
+		if (hashAlgorithm == null || hashAlgorithm.isEmpty()) {
+			throw new PrivilegeException("[" + EncryptionHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_HASH_ALGORITHM + " is invalid");
+		}
+
+		// test hash algorithm
+		try {
+			convertToHash("test");
+			logger.info("Using hashing algorithm " + hashAlgorithm);
+		} catch (Exception e) {
+			throw new PrivilegeException("[" + EncryptionHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_HASH_ALGORITHM + " is invalid because of underlying exception: "
+					+ e.getLocalizedMessage(), e);
+		}
 	}
 }

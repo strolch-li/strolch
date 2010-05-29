@@ -12,6 +12,7 @@ package ch.eitchnet.privilege.base;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Element;
 
 import ch.eitchnet.privilege.handler.EncryptionHandler;
@@ -19,6 +20,7 @@ import ch.eitchnet.privilege.handler.PolicyHandler;
 import ch.eitchnet.privilege.handler.SessionHandler;
 import ch.eitchnet.privilege.helper.ClassHelper;
 import ch.eitchnet.privilege.helper.XmlHelper;
+import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
  * 
@@ -26,6 +28,7 @@ import ch.eitchnet.privilege.helper.XmlHelper;
  * @author rvonburg
  */
 public class PrivilegeContainer {
+	private static final Logger logger = Logger.getLogger(PrivilegeContainer.class);
 
 	private static final PrivilegeContainer instance;
 
@@ -36,6 +39,8 @@ public class PrivilegeContainer {
 	private SessionHandler sessionHandler;
 	private PolicyHandler policyHandler;
 	private EncryptionHandler encryptionHandler;
+
+	private String basePath;
 
 	public static PrivilegeContainer getInstance() {
 		return instance;
@@ -69,7 +74,23 @@ public class PrivilegeContainer {
 		return encryptionHandler;
 	}
 
+	/**
+	 * @return the basePath
+	 */
+	public String getBasePath() {
+		return basePath;
+	}
+
 	public void initialize(File privilegeContainerXml) {
+
+		// make sure file exists
+		if (!privilegeContainerXml.exists()) {
+			throw new PrivilegeException("Privilige file does not exist at path "
+					+ privilegeContainerXml.getAbsolutePath());
+		}
+
+		// set base path from privilege container xml
+		basePath = privilegeContainerXml.getParentFile().getAbsolutePath();
 
 		// parse container xml file to XML document
 		Element containerRootElement = XmlHelper.parseDocument(privilegeContainerXml).getRootElement();
@@ -78,20 +99,38 @@ public class PrivilegeContainer {
 		Element sessionHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_SESSION);
 		String sessionHandlerClassName = sessionHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
 		SessionHandler sessionHandler = ClassHelper.instantiateClass(sessionHandlerClassName);
-		sessionHandler.initialize(sessionHandlerElement);
 
 		// instantiate encryption handler
 		Element encryptionHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_ENCRYPTION);
 		String encryptionHandlerClassName = encryptionHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
 		EncryptionHandler encryptionHandler = ClassHelper.instantiateClass(encryptionHandlerClassName);
-		encryptionHandler.initialize(encryptionHandlerElement);
 
 		// instantiate policy handler
 		Element policyHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_POLICY);
 		String policyHandlerClassName = policyHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
 		PolicyHandler policyHandler = ClassHelper.instantiateClass(policyHandlerClassName);
-		policyHandler.initialize(policyHandlerElement);
 
+		try {
+			sessionHandler.initialize(sessionHandlerElement);
+		} catch (Exception e) {
+			logger.error(e, e);
+			throw new PrivilegeException("SessionHandler " + sessionHandlerClassName + " could not be initialized");
+		}
+		try {
+			encryptionHandler.initialize(encryptionHandlerElement);
+		} catch (Exception e) {
+			logger.error(e, e);
+			throw new PrivilegeException("EncryptionHandler " + encryptionHandlerClassName
+					+ " could not be initialized");
+		}
+		try {
+			policyHandler.initialize(policyHandlerElement);
+		} catch (Exception e) {
+			logger.error(e, e);
+			throw new PrivilegeException("PolicyHandler " + policyHandlerClassName + " could not be initialized");
+		}
+
+		// keep references to the handlers
 		this.sessionHandler = sessionHandler;
 		this.encryptionHandler = encryptionHandler;
 		this.policyHandler = policyHandler;

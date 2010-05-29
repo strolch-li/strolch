@@ -10,10 +10,15 @@
 
 package ch.eitchnet.privilege.handler;
 
+import java.io.File;
 import java.util.Map;
 
 import org.dom4j.Element;
 
+import ch.eitchnet.privilege.base.PrivilegeContainer;
+import ch.eitchnet.privilege.base.XmlConstants;
+import ch.eitchnet.privilege.helper.ConfigurationHelper;
+import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.internal.RestrictionPolicy;
@@ -63,6 +68,27 @@ public class DefaultPolicyHandler implements PolicyHandler {
 	 * @see ch.eitchnet.privilege.base.PrivilegeContainerObject#initialize(org.dom4j.Element)
 	 */
 	public void initialize(Element element) {
-		// TODO implement
+
+		// get parameters
+		Element parameterElement = element.element(XmlConstants.XML_PARAMETERS);
+		Map<String, String> parameterMap = ConfigurationHelper.convertToParameterMap(parameterElement);
+
+		// get policy file name
+		String policyFileName = parameterMap.get(XmlConstants.XML_PARAM_POLICY_FILE);
+		if (policyFileName == null || policyFileName.isEmpty()) {
+			throw new PrivilegeException("[" + PolicyHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_POLICY_FILE + " is invalid");
+		}
+
+		// get policy file
+		File policyFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + policyFileName);
+		if (!policyFile.exists()) {
+			throw new PrivilegeException("[" + PolicyHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_POLICY_FILE + " is invalid as policy file does not exist at path "
+					+ policyFile.getAbsolutePath());
+		}
+
+		// parse policy xml file to XML document
+		Element containerRootElement = XmlHelper.parseDocument(policyFile).getRootElement();
 	}
 }
