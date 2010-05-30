@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PrivilegeRoles>
 
-	<Role name="">
-		<Privilege name="">
-			<allAllowed></allAllowed>
+	<Role name="admin">
+		<Privilege name="Service" policy="default">
+			<allAllowed>true</allAllowed>
 			<deny></deny>
 			<allow></allow>
 		</Privilege>

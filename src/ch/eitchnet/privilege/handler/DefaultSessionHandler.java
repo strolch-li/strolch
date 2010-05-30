@@ -10,12 +10,19 @@
 
 package ch.eitchnet.privilege.handler;
 
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 
 import ch.eitchnet.privilege.base.PrivilegeContainer;
+import ch.eitchnet.privilege.base.XmlConstants;
+import ch.eitchnet.privilege.helper.ConfigurationHelper;
+import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
@@ -173,7 +180,102 @@ public class DefaultSessionHandler implements SessionHandler {
 	 * @see ch.eitchnet.privilege.base.PrivilegeContainerObject#initialize(org.dom4j.Element)
 	 */
 	public void initialize(Element element) {
+
+		// get parameters
+		Element parameterElement = element.element(XmlConstants.XML_PARAMETERS);
+		Map<String, String> parameterMap = ConfigurationHelper.convertToParameterMap(parameterElement);
+
+		// get roles file name
+		String rolesFileName = parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
+		if (rolesFileName == null || rolesFileName.isEmpty()) {
+			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_ROLES_FILE + " is invalid");
+		}
+
+		// get roles file
+		File rolesFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + rolesFileName);
+		if (!rolesFile.exists()) {
+			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_ROLES_FILE + " is invalid as roles file does not exist at path "
+					+ rolesFile.getAbsolutePath());
+		}
+
+		// parse roles xml file to XML document
+		Element rolesRootElement = XmlHelper.parseDocument(rolesFile).getRootElement();
+		readRoles(rolesRootElement);
+
+		// TODO read roles
+
+		// get users file name
+		String usersFileName = parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
+		if (usersFileName == null || usersFileName.isEmpty()) {
+			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_USERS_FILE + " is invalid");
+		}
+
+		// get users file
+		File usersFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + usersFileName);
+		if (!usersFile.exists()) {
+			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_USERS_FILE + " is invalid as users file does not exist at path "
+					+ usersFile.getAbsolutePath());
+		}
+
+		// parse users xml file to XML document
+		Element usersRootElement = XmlHelper.parseDocument(usersFile).getRootElement();
+		readUsers(usersRootElement);
+
+		// TODO read users
+
 		// TODO implement
+	}
+
+	/**
+	 * @param usersRootElement
+	 */
+	private void readUsers(Element usersRootElement) {
+
+		List<Element> userElements = usersRootElement.elements(XmlConstants.XML_USER);
+		for (Element userElement : userElements) {
+
+			String username = userElement.attributeValue(XmlConstants.XML_ATTR_USERNAME);
+			String password = userElement.attributeValue(XmlConstants.XML_ATTR_PASSWORD);
+
+			String firstname = userElement.element(XmlConstants.XML_FIRSTNAME).getTextTrim();
+			String surname = userElement.element(XmlConstants.XML_SURNAME).getTextTrim();
+
+			UserState userState = UserState.valueOf(userElement.element(XmlConstants.XML_STATE).getTextTrim());
+
+			// TODO better handling needed
+			String localeName = userElement.element(XmlConstants.XML_LOCALE).getTextTrim();
+			Locale locale = new Locale(localeName);
+
+			Element rolesElement = userElement.element(XmlConstants.XML_ROLES);
+			List<Element> rolesElementList = rolesElement.elements(XmlConstants.XML_ROLE);
+			List<String> roleList = new LinkedList<String>();
+			for (Element roleElement : rolesElementList) {
+				String roleName = roleElement.getTextTrim();
+				if (roleList.isEmpty()) {
+					logger.warn("User " + username + " has an role defined with empty name, Skipped.");
+				} else {
+					roleList.add(roleName);
+				}
+			}
+
+			// create user
+			User user = User.buildUser(username, password, firstname, surname, userState, roleList, locale);
+
+			// put user in map
+			userMap.put(username, user);
+		}
+	}
+
+	/**
+	 * @param rolesRootElement
+	 */
+	private void readRoles(Element rolesRootElement) {
+		// TODO Auto-generated method stub
+
 	}
 
 	private class CertificateSessionPair {

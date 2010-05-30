@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PrivilegesUsers>
 
-	<User username="" firstname="" surname="" state="">
+	<User username="eitch" password="adc83b19e793491b1c6ea0fd8b46cd9f32e592fc">
+		<firstname>Robert</firstname>
+		<surname>von Burg</surname>
+		<state>NEW</state>
+		<locale>en_GB</locale>
 		<Roles>
-			<Role></Role>
+			<role>admin</role>
 		</Roles>
 	</User>
 

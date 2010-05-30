@@ -3,7 +3,8 @@
 
 	<SessionHandler class="ch.eitchnet.privilege.handler.DefaultSessionHandler">
 		<Parameters>
-			<Parameter name="userXmlFile" value="PrivilegeUsers.xml" />
+			<Parameter name="usersXmlFile" value="PrivilegeUsers.xml" />
+			<Parameter name="rolesXmlFile" value="PrivilegeRoles.xml" />
 		</Parameters>
 	</SessionHandler>
 	<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
@@ -13,7 +14,7 @@
 	</EncryptionHandler>
 	<PolicyHandler class="ch.eitchnet.privilege.handler.DefaultPolicyHandler">
 		<Parameters>
-			<Parameter name="policyXmlFile" value="RestrictionPolicy.xml" />
+			<Parameter name="policyXmlFile" value="RestrictionPolicies.xml" />
 		</Parameters>
 	</PolicyHandler>
 
