@@ -43,7 +43,7 @@ public class TestConfigurationHelper {
 
 		for (int i = 0; i < 10; i++) {
 			// let's authenticate a session
-			auth("eitch", "592038");
+			auth("eitch", "1234567890");
 		}
 	}
 

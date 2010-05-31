@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PrivilegesUsers>
 
-	<User username="eitch" password="4d3827bc9c98f96af0d04145fd0d538bec08adf7f8103d91bf52cc53a6c0d4c6">
+	<User username="eitch" password="c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646">
 		<Firstname>Robert</Firstname>
 		<Surname>von Burg</Surname>
 		<State>ENABLED</State>

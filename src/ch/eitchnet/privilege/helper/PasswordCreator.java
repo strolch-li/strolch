@@ -47,7 +47,7 @@ public class PasswordCreator {
 		}
 
 		System.out.print("Password: ");
-		String password = r.readLine();
+		String password = r.readLine().trim();
 		System.out.print("Hash is: " + EncryptionHelper.encryptString(hashAlgorithm, password));
 	}
 
