@@ -38,7 +38,7 @@ public class XmlHelper {
 			SAXReader reader = new SAXReader();
 			Document document = reader.read(inStream);
 
-			logger.info("Read Xml document " + document.getName());
+			logger.info("Read Xml document " + document.getRootElement().getName());
 			return document;
 
 		} catch (FileNotFoundException e) {

@@ -9,7 +9,7 @@
 	</SessionHandler>
 	<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
 		<Parameters>
-			<Parameter name="hashAlgorithm" value="SHA-1" />
+			<Parameter name="hashAlgorithm" value="SHA-256" />
 		</Parameters>
 	</EncryptionHandler>
 	<PolicyHandler class="ch.eitchnet.privilege.handler.DefaultPolicyHandler">

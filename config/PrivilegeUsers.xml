@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PrivilegesUsers>
 
-	<User username="eitch" password="adc83b19e793491b1c6ea0fd8b46cd9f32e592fc">
-		<firstname>Robert</firstname>
-		<surname>von Burg</surname>
-		<state>NEW</state>
-		<locale>en_GB</locale>
+	<User username="eitch" password="4d3827bc9c98f96af0d04145fd0d538bec08adf7f8103d91bf52cc53a6c0d4c6">
+		<Firstname>Robert</Firstname>
+		<Surname>von Burg</Surname>
+		<State>ENABLED</State>
+		<Locale>en_GB</Locale>
 		<Roles>
-			<role>admin</role>
+			<Role>admin</Role>
 		</Roles>
 	</User>
 

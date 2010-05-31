@@ -184,6 +184,11 @@ public class DefaultSessionHandler implements SessionHandler {
 	 */
 	public void initialize(Element element) {
 
+		lastSessionId = 0l;
+		roleMap = new HashMap<String, Role>();
+		userMap = new HashMap<String, User>();
+		sessionMap = new HashMap<String, CertificateSessionPair>();
+
 		// get parameters
 		Element parameterElement = element.element(XmlConstants.XML_PARAMETERS);
 		Map<String, String> parameterMap = ConfigurationHelper.convertToParameterMap(parameterElement);
@@ -259,8 +264,8 @@ public class DefaultSessionHandler implements SessionHandler {
 			List<String> roleList = new LinkedList<String>();
 			for (Element roleElement : rolesElementList) {
 				String roleName = roleElement.getTextTrim();
-				if (roleList.isEmpty()) {
-					logger.warn("User " + username + " has an role defined with empty name, Skipped.");
+				if (roleName.isEmpty()) {
+					logger.warn("User " + username + " has a role defined with no name, Skipped.");
 				} else {
 					roleList.add(roleName);
 				}

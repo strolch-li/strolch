@@ -20,18 +20,18 @@ public class XmlConstants {
 	public static final String XML_HANDLER_POLICY = "PolicyHandler";
 
 	public static final String XML_ROLES = "Roles";
-	public static final String XML_ROLE = "role";
+	public static final String XML_ROLE = "Role";
 	public static final String XML_USER = "User";
 	public static final String XML_PRIVILEGE = "Privilege";
 	public static final String XML_POLICY = "Policy";
 	public static final String XML_PARAMETERS = "Parameters";
-	public static final String XML_ALL_ALLOWED = "allAllowed";
-	public static final String XML_DENY = "deny";
-	public static final String XML_ALLOW = "allow";
-	public static final String XML_FIRSTNAME = "firstname";
-	public static final String XML_SURNAME = "surname";
-	public static final String XML_STATE = "state";
-	public static final String XML_LOCALE = "locale";
+	public static final String XML_ALL_ALLOWED = "AllAllowed";
+	public static final String XML_DENY = "Deny";
+	public static final String XML_ALLOW = "Allow";
+	public static final String XML_FIRSTNAME = "Firstname";
+	public static final String XML_SURNAME = "Surname";
+	public static final String XML_STATE = "State";
+	public static final String XML_LOCALE = "Locale";
 
 	public static final String XML_ATTR_CLASS = "class";
 	public static final String XML_ATTR_NAME = "name";

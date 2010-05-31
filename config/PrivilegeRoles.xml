@@ -3,9 +3,9 @@
 
 	<Role name="admin">
 		<Privilege name="Service" policy="DefaultRestriction">
-			<allAllowed>true</allAllowed>
-			<deny></deny>
-			<allow></allow>
+			<AllAllowed>true</AllAllowed>
+			<Deny></Deny>
+			<Allow></Allow>
 		</Privilege>
 	</Role>
 
