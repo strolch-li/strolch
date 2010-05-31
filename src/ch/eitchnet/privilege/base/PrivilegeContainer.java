@@ -23,8 +23,6 @@ import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
- * 
- * 
  * @author rvonburg
  */
 public class PrivilegeContainer {

@@ -11,6 +11,8 @@
 package ch.eitchnet.privilege.handler;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +30,7 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.UserState;
+import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.Session;
 import ch.eitchnet.privilege.model.internal.User;
@@ -202,9 +205,9 @@ public class DefaultSessionHandler implements SessionHandler {
 
 		// parse roles xml file to XML document
 		Element rolesRootElement = XmlHelper.parseDocument(rolesFile).getRootElement();
-		readRoles(rolesRootElement);
 
-		// TODO read roles
+		// read roles
+		readRoles(rolesRootElement);
 
 		// get users file name
 		String usersFileName = parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
@@ -223,11 +226,12 @@ public class DefaultSessionHandler implements SessionHandler {
 
 		// parse users xml file to XML document
 		Element usersRootElement = XmlHelper.parseDocument(usersFile).getRootElement();
+
+		// read users
 		readUsers(usersRootElement);
 
-		// TODO read users
-
-		// TODO implement
+		logger.info("Read " + userMap.size() + " Users");
+		logger.info("Read " + roleMap.size() + " Roles");
 	}
 
 	/**
@@ -274,8 +278,53 @@ public class DefaultSessionHandler implements SessionHandler {
 	 * @param rolesRootElement
 	 */
 	private void readRoles(Element rolesRootElement) {
-		// TODO Auto-generated method stub
 
+		List<Element> roleElements = rolesRootElement.elements(XmlConstants.XML_ROLE);
+		for (Element roleElement : roleElements) {
+
+			String roleName = roleElement.attributeValue(XmlConstants.XML_ATTR_NAME);
+
+			List<Element> privilegeElements = roleElement.elements(XmlConstants.XML_PRIVILEGE);
+			Map<String, Privilege> privilegeMap = new HashMap<String, Privilege>();
+			for (Element privilegeElement : privilegeElements) {
+
+				String privilegeName = privilegeElement.attributeValue(XmlConstants.XML_ATTR_NAME);
+				String privilegePolicy = privilegeElement.attributeValue(XmlConstants.XML_ATTR_POLICY);
+
+				String allAllowedS = privilegeElement.element(XmlConstants.XML_ALL_ALLOWED).getTextTrim();
+				boolean allAllowed = Boolean.valueOf(allAllowedS);
+
+				List<Element> denyElements = privilegeElement.elements(XmlConstants.XML_DENY);
+				List<String> denyList = new ArrayList<String>(denyElements.size());
+				for (Element denyElement : denyElements) {
+					String denyValue = denyElement.getTextTrim();
+					if (denyValue.isEmpty()) {
+						logger.error("Role " + roleName + " has privilege " + privilegeName
+								+ " with an empty deny value!");
+					} else {
+						denyList.add(denyValue);
+					}
+				}
+
+				List<Element> allowElements = privilegeElement.elements(XmlConstants.XML_ALLOW);
+				List<String> allowList = new ArrayList<String>(allowElements.size());
+				for (Element allowElement : allowElements) {
+					String allowValue = allowElement.getTextTrim();
+					if (allowValue.isEmpty()) {
+						logger.error("Role " + roleName + " has privilege " + privilegeName
+								+ " with an empty allow value!");
+					} else {
+						allowList.add(allowValue);
+					}
+				}
+
+				Privilege privilege = new Privilege(privilegeName, privilegePolicy, allAllowed, denyList, allowList);
+				privilegeMap.put(privilegeName, privilege);
+			}
+
+			Role role = new Role(roleName, privilegeMap);
+			roleMap.put(roleName, role);
+		}
 	}
 
 	private class CertificateSessionPair {

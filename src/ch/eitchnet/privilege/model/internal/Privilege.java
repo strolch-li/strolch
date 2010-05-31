@@ -17,21 +17,39 @@ import java.util.List;
  * @author rvonburg
  * 
  */
-public class Privilege {
+public final class Privilege {
 
+	private final String name;
+	private final String policy;
 	private final boolean allAllowed;
-	private final List<String> allowList;
 	private final List<String> denyList;
+	private final List<String> allowList;
 
 	/**
 	 * @param allAllowed
-	 * @param allowList
 	 * @param denyList
+	 * @param allowList
 	 */
-	public Privilege(boolean allAllowed, List<String> allowList, List<String> denyList) {
+	public Privilege(String name, String policy, boolean allAllowed, List<String> denyList, List<String> allowList) {
+		this.name = name;
+		this.policy = policy;
 		this.allAllowed = allAllowed;
-		this.allowList = Collections.unmodifiableList(allowList);
 		this.denyList = Collections.unmodifiableList(denyList);
+		this.allowList = Collections.unmodifiableList(allowList);
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @return the policy
+	 */
+	public String getPolicy() {
+		return policy;
 	}
 
 	/**

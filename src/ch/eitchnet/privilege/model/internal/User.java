@@ -14,13 +14,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.UserState;
 
 /**
  * @author rvonburg
  * 
  */
-public class User {
+public final class User {
 
 	private final String username;
 	private final String password;
@@ -112,6 +113,18 @@ public class User {
 			locale = Locale.getDefault();
 
 		// TODO validate who is creating this User object
+		
+		if (username.length() < 3) {
+			throw new PrivilegeException("The given username is shorter than 3 characters");
+		}
+
+		if (firstname.isEmpty()) {
+			throw new PrivilegeException("The given firstname is empty");
+		}
+
+		if (surname.isEmpty()) {
+			throw new PrivilegeException("The given firstname is empty");
+		}
 
 		User user = new User(username, password, firstname, surname, userState, Collections.unmodifiableList(roleList),
 				locale);

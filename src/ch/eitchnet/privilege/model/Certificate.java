@@ -19,7 +19,7 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
  * @author rvonburg
  * 
  */
-public class Certificate implements Serializable {
+public final class Certificate implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

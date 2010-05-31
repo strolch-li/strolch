@@ -17,15 +17,24 @@ import java.util.Map;
  * @author rvonburg
  * 
  */
-public class Role {
+public final class Role {
 
+	private final String roleName;
 	private final Map<String, Privilege> privilegeMap;
 
 	/**
 	 * @param privilegeMap
 	 */
-	public Role(Map<String, Privilege> privilegeMap) {
+	public Role(String roleName, Map<String, Privilege> privilegeMap) {
+		this.roleName = roleName;
 		this.privilegeMap = Collections.unmodifiableMap(privilegeMap);
+	}
+
+	/**
+	 * @return the roleName
+	 */
+	public String getRoleName() {
+		return roleName;
 	}
 
 	/**

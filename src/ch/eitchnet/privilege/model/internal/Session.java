@@ -14,7 +14,7 @@ package ch.eitchnet.privilege.model.internal;
  * @author rvonburg
  * 
  */
-public class Session {
+public final class Session {
 
 	private final String sessionId;
 	private final String username;

@@ -2,7 +2,7 @@
 <PrivilegeRoles>
 
 	<Role name="admin">
-		<Privilege name="Service" policy="default">
+		<Privilege name="Service" policy="DefaultRestriction">
 			<allAllowed>true</allAllowed>
 			<deny></deny>
 			<allow></allow>

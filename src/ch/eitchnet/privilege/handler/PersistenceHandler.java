@@ -17,11 +17,13 @@ import ch.eitchnet.privilege.policy.RestrictionPolicy;
 
 /**
  * @author rvonburg
- *
+ * 
  */
 public interface PersistenceHandler {
 
 	public List<User> getAllUsers();
+
 	public void saveUsers(List<User> users);
+
 	public List<RestrictionPolicy> getAllRestrictionPolicies();
 }

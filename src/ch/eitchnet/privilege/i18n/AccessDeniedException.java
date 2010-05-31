@@ -16,14 +16,12 @@ package ch.eitchnet.privilege.i18n;
  */
 public class AccessDeniedException extends PrivilegeException {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @param string
 	 */
 	public AccessDeniedException(String string) {
 		super(string);
-		// TODO Auto-generated constructor stub
 	}
-
-	private static final long serialVersionUID = 1L;
-
 }
