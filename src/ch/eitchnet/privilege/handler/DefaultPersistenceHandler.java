@@ -79,7 +79,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public void addUser(Certificate certificate, User user) {
-		// TODO Auto-generated method stub
+		// TODO validate who is doing this
 
 		userMap.put(user.getUsername(), user);
 		transientUserMap.put(user.getUsername(), user);
@@ -115,7 +115,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	@Override
 	public void persist(Certificate certificate) {
 
-		// TODO Auto-generated method stub
+		// TODO validate who is doing this
 
 		// TODO Auto-generated method stub
 
