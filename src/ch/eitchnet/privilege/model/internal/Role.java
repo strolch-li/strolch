@@ -11,7 +11,7 @@
 package ch.eitchnet.privilege.model.internal;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * @author rvonburg
@@ -20,14 +20,14 @@ import java.util.Map;
 public final class Role {
 
 	private final String roleName;
-	private final Map<String, Privilege> privilegeMap;
+	private final Set<String> privileges;
 
 	/**
 	 * @param privilegeMap
 	 */
-	public Role(String roleName, Map<String, Privilege> privilegeMap) {
+	public Role(String roleName, Set<String> privileges) {
 		this.roleName = roleName;
-		this.privilegeMap = Collections.unmodifiableMap(privilegeMap);
+		this.privileges = Collections.unmodifiableSet(privileges);
 	}
 
 	/**
@@ -38,11 +38,17 @@ public final class Role {
 	}
 
 	/**
+	 * @return
+	 */
+	public Set<String> getPrivileges() {
+		return privileges;
+	}
+
+	/**
 	 * @param key
 	 * @return
-	 * @see java.util.Map#get(java.lang.Object)
 	 */
-	public Privilege getPrivilege(String key) {
-		return privilegeMap.get(key);
+	public boolean hasPrivilege(String key) {
+		return privileges.contains(key);
 	}
 }

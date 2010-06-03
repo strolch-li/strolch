@@ -10,6 +10,7 @@
 
 package ch.eitchnet.privilege.policy;
 
+import ch.eitchnet.privilege.base.PrivilegeContainer;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.internal.Privilege;
@@ -39,7 +40,7 @@ public class DefaultRestriction implements RestrictionPolicy {
 		}
 
 		// get restriction object for users role
-		Privilege privilege = role.getPrivilege(restrictionKey);
+		Privilege privilege = PrivilegeContainer.getInstance().getPersistenceHandler().getPrivilege(restrictionKey);
 
 		// no restriction object means no privilege
 		// TODO should default deny/allow policy be configurable?

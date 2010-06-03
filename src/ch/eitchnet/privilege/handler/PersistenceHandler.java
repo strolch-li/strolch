@@ -10,20 +10,29 @@
 
 package ch.eitchnet.privilege.handler;
 
-import java.util.List;
-
+import ch.eitchnet.privilege.base.PrivilegeContainerObject;
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.internal.Privilege;
+import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
-import ch.eitchnet.privilege.policy.RestrictionPolicy;
 
 /**
  * @author rvonburg
  * 
  */
-public interface PersistenceHandler {
+public interface PersistenceHandler extends PrivilegeContainerObject {
 
-	public List<User> getAllUsers();
+	public User getUser(String username);
 
-	public void saveUsers(List<User> users);
+	public void addUser(Certificate certificate, User user);
 
-	public List<RestrictionPolicy> getAllRestrictionPolicies();
+	public Role getRole(String roleName);
+
+	public void addRole(Certificate certificate, Role role);
+
+	public Privilege getPrivilege(String privilegeName);
+
+	public void addPrivilege(Certificate certificate, Privilege privilege);
+
+	public void persist(Certificate certificate);
 }

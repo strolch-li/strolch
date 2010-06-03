@@ -15,6 +15,7 @@ package ch.eitchnet.privilege.base;
  * 
  */
 public class XmlConstants {
+	public static final String XML_HANDLER_PERSISTENCE = "PersistenceHandler";
 	public static final String XML_HANDLER_ENCRYPTION = "EncryptionHandler";
 	public static final String XML_HANDLER_SESSION = "SessionHandler";
 	public static final String XML_HANDLER_POLICY = "PolicyHandler";
@@ -43,4 +44,5 @@ public class XmlConstants {
 	public static final String XML_PARAM_POLICY_FILE = "policyXmlFile";
 	public static final String XML_PARAM_ROLES_FILE = "rolesXmlFile";
 	public static final String XML_PARAM_USERS_FILE = "usersXmlFile";
+	public static final String XML_PARAM_PRIVILEGES_FILE = "privilegesXmlFile";
 }

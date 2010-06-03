@@ -11,8 +11,8 @@
 package ch.eitchnet.privilege.model.internal;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.UserState;
@@ -31,7 +31,7 @@ public final class User {
 
 	private final UserState userState;
 
-	private final List<String> roleList;
+	private final Set<String> roles;
 
 	private final Locale locale;
 
@@ -39,7 +39,7 @@ public final class User {
 	 * The {@link User} constructor is private to ensure no unauthorized creation of {@link User} objects
 	 */
 	private User(String username, String password, String firstname, String surname, UserState userState,
-			List<String> roleList, Locale locale) {
+			Set<String> roles, Locale locale) {
 
 		this.username = username;
 		this.password = password;
@@ -48,7 +48,7 @@ public final class User {
 		this.firstname = firstname;
 		this.surname = surname;
 
-		this.roleList = roleList;
+		this.roles = roles;
 
 		this.locale = locale;
 	}
@@ -89,10 +89,10 @@ public final class User {
 	}
 
 	/**
-	 * @return the roleList
+	 * @return the roles
 	 */
-	public List<String> getRoleList() {
-		return roleList;
+	public Set<String> getRoles() {
+		return roles;
 	}
 
 	/**
@@ -106,14 +106,14 @@ public final class User {
 	 * @return a new {@link User} object which is authenticated on the current Java Virtual Machine
 	 */
 	public static User buildUser(String username, String password, String firstname, String surname,
-			UserState userState, List<String> roleList, Locale locale) {
+			UserState userState, Set<String> roles, Locale locale) {
 
 		// set a default locale
 		if (locale == null)
 			locale = Locale.getDefault();
 
 		// TODO validate who is creating this User object
-		
+
 		if (username.length() < 3) {
 			throw new PrivilegeException("The given username is shorter than 3 characters");
 		}
@@ -126,7 +126,7 @@ public final class User {
 			throw new PrivilegeException("The given firstname is empty");
 		}
 
-		User user = new User(username, password, firstname, surname, userState, Collections.unmodifiableList(roleList),
+		User user = new User(username, password, firstname, surname, userState, Collections.unmodifiableSet(roles),
 				locale);
 
 		return user;

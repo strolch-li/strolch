@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PrivilegeContainer>
 
-	<SessionHandler class="ch.eitchnet.privilege.handler.DefaultSessionHandler">
+	<PersistenceHandler class="ch.eitchnet.privilege.handler.DefaultPersistenceHandler">
 		<Parameters>
 			<Parameter name="usersXmlFile" value="PrivilegeUsers.xml" />
 			<Parameter name="rolesXmlFile" value="PrivilegeRoles.xml" />
+			<Parameter name="privilegesXmlFile" value="Privileges.xml" />
 		</Parameters>
-	</SessionHandler>
+	</PersistenceHandler>
+	<SessionHandler class="ch.eitchnet.privilege.handler.DefaultSessionHandler" />
 	<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
 		<Parameters>
 			<Parameter name="hashAlgorithm" value="SHA-256" />

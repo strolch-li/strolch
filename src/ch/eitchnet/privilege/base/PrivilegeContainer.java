@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Element;
 
 import ch.eitchnet.privilege.handler.EncryptionHandler;
+import ch.eitchnet.privilege.handler.PersistenceHandler;
 import ch.eitchnet.privilege.handler.PolicyHandler;
 import ch.eitchnet.privilege.handler.SessionHandler;
 import ch.eitchnet.privilege.helper.ClassHelper;
@@ -37,6 +38,7 @@ public class PrivilegeContainer {
 	private SessionHandler sessionHandler;
 	private PolicyHandler policyHandler;
 	private EncryptionHandler encryptionHandler;
+	private PersistenceHandler persistenceHandler;
 
 	private String basePath;
 
@@ -73,6 +75,13 @@ public class PrivilegeContainer {
 	}
 
 	/**
+	 * @return the persistenceHandler
+	 */
+	public PersistenceHandler getPersistenceHandler() {
+		return persistenceHandler;
+	}
+
+	/**
 	 * @return the basePath
 	 */
 	public String getBasePath() {
@@ -93,6 +102,11 @@ public class PrivilegeContainer {
 		// parse container xml file to XML document
 		Element containerRootElement = XmlHelper.parseDocument(privilegeContainerXml).getRootElement();
 
+		// instantiate persistence handler
+		Element persistenceHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_PERSISTENCE);
+		String persistenceHandlerClassName = persistenceHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
+		PersistenceHandler persistenceHandler = ClassHelper.instantiateClass(persistenceHandlerClassName);
+
 		// instantiate session handler
 		Element sessionHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_SESSION);
 		String sessionHandlerClassName = sessionHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
@@ -108,6 +122,13 @@ public class PrivilegeContainer {
 		String policyHandlerClassName = policyHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
 		PolicyHandler policyHandler = ClassHelper.instantiateClass(policyHandlerClassName);
 
+		try {
+			persistenceHandler.initialize(persistenceHandlerElement);
+		} catch (Exception e) {
+			logger.error(e, e);
+			throw new PrivilegeException("PersistenceHandler " + persistenceHandlerElement
+					+ " could not be initialized");
+		}
 		try {
 			sessionHandler.initialize(sessionHandlerElement);
 		} catch (Exception e) {
@@ -129,6 +150,7 @@ public class PrivilegeContainer {
 		}
 
 		// keep references to the handlers
+		this.persistenceHandler = persistenceHandler;
 		this.sessionHandler = sessionHandler;
 		this.encryptionHandler = encryptionHandler;
 		this.policyHandler = policyHandler;
