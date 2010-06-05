@@ -24,6 +24,8 @@ import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
+ * TODO make persistence handle not accessible
+ * 
  * @author rvonburg
  */
 public class PrivilegeContainer {
