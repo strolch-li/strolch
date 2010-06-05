@@ -391,7 +391,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 			boolean allAllowed = Boolean.valueOf(allAllowedS);
 
 			List<Element> denyElements = privilegeElement.elements(XmlConstants.XML_DENY);
-			List<String> denyList = new ArrayList<String>(denyElements.size());
+			Set<String> denyList = new HashSet<String>(denyElements.size());
 			for (Element denyElement : denyElements) {
 				String denyValue = denyElement.getTextTrim();
 				if (denyValue.isEmpty()) {
@@ -402,7 +402,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 			}
 
 			List<Element> allowElements = privilegeElement.elements(XmlConstants.XML_ALLOW);
-			List<String> allowList = new ArrayList<String>(allowElements.size());
+			Set<String> allowList = new HashSet<String>(allowElements.size());
 			for (Element allowElement : allowElements) {
 				String allowValue = allowElement.getTextTrim();
 				if (allowValue.isEmpty()) {

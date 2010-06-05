@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 
 /**
@@ -110,6 +111,35 @@ public final class User {
 	 */
 	public Locale getLocale() {
 		return locale;
+	}
+
+	/**
+	 * @return a {@link UserRep} which is a representation of this object used to serialize and view on clients
+	 */
+	public UserRep asUserRep() {
+		return new UserRep(username, firstname, surname, userState, roles, locale);
+	}
+
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("User [username=");
+		builder.append(username);
+		builder.append(", firstname=");
+		builder.append(firstname);
+		builder.append(", surname=");
+		builder.append(surname);
+		builder.append(", locale=");
+		builder.append(locale);
+		builder.append(", userState=");
+		builder.append(userState);
+		builder.append(", roles=");
+		builder.append(roles);
+		builder.append("]");
+		return builder.toString();
 	}
 
 	/**

@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 import ch.eitchnet.privilege.base.PrivilegeContainer;
+import ch.eitchnet.privilege.handler.PersistenceHandler;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
@@ -39,12 +40,23 @@ public class TestConfigurationHelper {
 		// initialize container
 		String pwd = System.getProperty("user.dir");
 		File privilegeContainerXml = new File(pwd + "/config/PrivilegeContainer.xml");
-		PrivilegeContainer.getInstance().initialize(privilegeContainerXml);
+		PrivilegeContainer privilegeContainer = PrivilegeContainer.getInstance();
+		privilegeContainer.initialize(privilegeContainerXml);
+
+		PersistenceHandler persistenceHandler = privilegeContainer.getPersistenceHandler();
 
 		for (int i = 0; i < 10; i++) {
 			// let's authenticate a session
 			auth("eitch", "1234567890");
 		}
+
+		// TODO let's add a user
+		// persistenceHandler.addUser(certificate, user);
+
+		// TODO let's add a role
+
+		// TODO let's add a privilege
+
 	}
 
 	/**

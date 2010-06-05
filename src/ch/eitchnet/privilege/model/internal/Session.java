@@ -125,6 +125,15 @@ public final class Session {
 	 */
 	@Override
 	public String toString() {
-		return "Session [username=" + username + ", sessionId=" + sessionId + ", loginTime=" + loginTime + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("Session [sessionId=");
+		builder.append(sessionId);
+		builder.append(", username=");
+		builder.append(username);
+		builder.append(", loginTime=");
+		builder.append(loginTime);
+		builder.append("]");
+		return builder.toString();
 	}
+
 }

@@ -161,6 +161,15 @@ public final class Certificate implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "Certificate [sessionId=" + sessionId + ", username=" + username + ", locale=" + locale + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("Certificate [sessionId=");
+		builder.append(sessionId);
+		builder.append(", username=");
+		builder.append(username);
+		builder.append(", locale=");
+		builder.append(locale);
+		builder.append("]");
+		return builder.toString();
 	}
+
 }
