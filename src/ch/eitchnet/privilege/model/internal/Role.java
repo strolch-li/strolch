@@ -19,22 +19,24 @@ import java.util.Set;
  */
 public final class Role {
 
-	private final String roleName;
+	private final String name;
 	private final Set<String> privileges;
 
 	/**
-	 * @param privilegeMap
+	 * 
+	 * @param name
+	 * @param privileges
 	 */
-	public Role(String roleName, Set<String> privileges) {
-		this.roleName = roleName;
+	public Role(String name, Set<String> privileges) {
+		this.name = name;
 		this.privileges = Collections.unmodifiableSet(privileges);
 	}
 
 	/**
-	 * @return the roleName
+	 * @return the name
 	 */
-	public String getRoleName() {
-		return roleName;
+	public String getName() {
+		return name;
 	}
 
 	/**

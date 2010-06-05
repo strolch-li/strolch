@@ -20,11 +20,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 
 import ch.eitchnet.privilege.base.PrivilegeContainer;
 import ch.eitchnet.privilege.base.XmlConstants;
 import ch.eitchnet.privilege.helper.ConfigurationHelper;
+import ch.eitchnet.privilege.helper.PrivilegeHelper;
 import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
@@ -43,11 +45,13 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 
 	private Map<String, User> userMap;
 	private Map<String, Role> roleMap;
-	private Map<String, Privilege> privilegesMap;
+	private Map<String, Privilege> privilegeMap;
 
-	private Map<String, User> transientUserMap;
-	private Map<String, Role> transientRoleMap;
-	private Map<String, Privilege> transientPrivilegesMap;
+	private boolean userMapDirty;
+	private boolean roleMapDirty;
+	private boolean privilegeMapDirty;
+
+	private Map<String, String> parameterMap;
 
 	/**
 	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addPrivilege(ch.eitchnet.privilege.model.Certificate,
@@ -55,10 +59,12 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public void addPrivilege(Certificate certificate, Privilege privilege) {
-		// TODO validate who is doing this
 
-		privilegesMap.put(privilege.getName(), privilege);
-		transientPrivilegesMap.put(privilege.getName(), privilege);
+		// validate who is doing this
+		PrivilegeHelper.isUserPrivilegeAdmin(certificate);
+
+		privilegeMap.put(privilege.getName(), privilege);
+		privilegeMapDirty = true;
 	}
 
 	/**
@@ -67,10 +73,12 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public void addRole(Certificate certificate, Role role) {
-		// TODO validate who is doing this
 
-		roleMap.put(role.getRoleName(), role);
-		transientRoleMap.put(role.getRoleName(), role);
+		// validate who is doing this
+		PrivilegeHelper.isUserPrivilegeAdmin(certificate);
+
+		roleMap.put(role.getName(), role);
+		roleMapDirty = true;
 	}
 
 	/**
@@ -79,10 +87,12 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public void addUser(Certificate certificate, User user) {
-		// TODO validate who is doing this
+
+		// validate who is doing this
+		PrivilegeHelper.isUserPrivilegeAdmin(certificate);
 
 		userMap.put(user.getUsername(), user);
-		transientUserMap.put(user.getUsername(), user);
+		userMapDirty = true;
 	}
 
 	/**
@@ -90,7 +100,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public Privilege getPrivilege(String privilegeName) {
-		return privilegesMap.get(privilegeName);
+		return privilegeMap.get(privilegeName);
 	}
 
 	/**
@@ -115,10 +125,93 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	@Override
 	public void persist(Certificate certificate) {
 
-		// TODO validate who is doing this
+		// validate who is doing this
+		PrivilegeHelper.isUserPrivilegeAdmin(certificate);
 
-		// TODO Auto-generated method stub
+		// USERS
+		if (!userMapDirty) {
+			logger.warn("No users unpersisted.");
+		} else {
+			logger.info("Persisting users...");
 
+			// build XML DOM of users
+			List<Element> users = toDomUsers();
+			Element rootElement = DocumentFactory.getInstance().createElement(XmlConstants.XML_USERS);
+			for (Element userElement : users) {
+				rootElement.add(userElement);
+			}
+
+			// get users file name
+			String usersFileName = parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
+			if (usersFileName == null || usersFileName.isEmpty()) {
+				throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+						+ XmlConstants.XML_PARAM_USERS_FILE + " is invalid");
+			}
+
+			// get users file
+			File usersFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + usersFileName);
+
+			// write DOM to file
+			XmlHelper.writeDocument(rootElement, usersFile);
+		}
+
+		// ROLES
+		if (!roleMapDirty) {
+			logger.warn("No roles unpersisted.");
+		} else {
+			logger.info("Persisting roles...");
+
+			// build XML DOM of roles
+			List<Element> roles = toDomRoles();
+			Element rootElement = DocumentFactory.getInstance().createElement(XmlConstants.XML_ROLES);
+			for (Element roleElement : roles) {
+				rootElement.add(roleElement);
+			}
+
+			// get roles file name
+			String rolesFileName = parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
+			if (rolesFileName == null || rolesFileName.isEmpty()) {
+				throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+						+ XmlConstants.XML_PARAM_ROLES_FILE + " is invalid");
+			}
+
+			// get roles file
+			File rolesFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + rolesFileName);
+
+			// write DOM to file
+			XmlHelper.writeDocument(rootElement, rolesFile);
+		}
+
+		// PRIVILEGES
+		if (!privilegeMapDirty) {
+			logger.warn("No privileges unpersisted.");
+		} else {
+			logger.info("Persisting privileges...");
+
+			// build XML DOM of privileges
+			List<Element> privileges = toDomPrivileges();
+			Element rootElement = DocumentFactory.getInstance().createElement(XmlConstants.XML_PRIVILEGES);
+			for (Element privilegeElement : privileges) {
+				rootElement.add(privilegeElement);
+			}
+
+			// get privileges file name
+			String privilegesFileName = parameterMap.get(XmlConstants.XML_PARAM_PRIVILEGES_FILE);
+			if (privilegesFileName == null || privilegesFileName.isEmpty()) {
+				throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+						+ XmlConstants.XML_PARAM_PRIVILEGES_FILE + " is invalid");
+			}
+
+			// get privileges file
+			File privilegesFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + privilegesFileName);
+
+			// write DOM to file
+			XmlHelper.writeDocument(rootElement, privilegesFile);
+		}
+
+		userMapDirty = false;
+		roleMapDirty = false;
+		privilegeMapDirty = false;
 	}
 
 	/**
@@ -129,11 +222,11 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 
 		roleMap = new HashMap<String, Role>();
 		userMap = new HashMap<String, User>();
-		privilegesMap = new HashMap<String, Privilege>();
+		privilegeMap = new HashMap<String, Privilege>();
 
 		// get parameters
 		Element parameterElement = element.element(XmlConstants.XML_PARAMETERS);
-		Map<String, String> parameterMap = ConfigurationHelper.convertToParameterMap(parameterElement);
+		parameterMap = ConfigurationHelper.convertToParameterMap(parameterElement);
 
 		// get roles file name
 		String rolesFileName = parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
@@ -198,9 +291,26 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		// read privileges
 		readPrivileges(privilegesRootElement);
 
+		userMapDirty = false;
+		roleMapDirty = false;
+		privilegeMapDirty = false;
+
 		logger.info("Read " + userMap.size() + " Users");
 		logger.info("Read " + roleMap.size() + " Roles");
-		logger.info("Read " + privilegesMap.size() + " Privileges");
+		logger.info("Read " + privilegeMap.size() + " Privileges");
+
+		// validate we have a user with PrivilegeAdmin access
+		boolean privilegeAdminExists = false;
+		for (String username : userMap.keySet()) {
+			User user = userMap.get(username);
+			if (user.hasRole(PrivilegeContainer.PRIVILEGE_ADMIN_ROLE)) {
+				privilegeAdminExists = true;
+				break;
+			}
+		}
+		if (!privilegeAdminExists) {
+			logger.warn("No User with PrivilegeAdmin role exists. Privilege modifications will not be possible!");
+		}
 	}
 
 	/**
@@ -229,7 +339,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 			for (Element roleElement : rolesElementList) {
 				String roleName = roleElement.getTextTrim();
 				if (roleName.isEmpty()) {
-					logger.warn("User " + username + " has a role defined with no name, Skipped.");
+					logger.error("User " + username + " has a role defined with no name, Skipped.");
 				} else {
 					roles.add(roleName);
 				}
@@ -303,7 +413,127 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 			}
 
 			Privilege privilege = new Privilege(privilegeName, privilegePolicy, allAllowed, denyList, allowList);
-			privilegesMap.put(privilegeName, privilege);
+			privilegeMap.put(privilegeName, privilege);
 		}
+	}
+
+	private List<Element> toDomPrivileges() {
+
+		List<Element> privilegesAsElements = new ArrayList<Element>(privilegeMap.size());
+
+		DocumentFactory documentFactory = DocumentFactory.getInstance();
+		for (String privilegeName : privilegeMap.keySet()) {
+
+			// get the privilege object
+			Privilege privilege = privilegeMap.get(privilegeName);
+
+			// create the privilege element
+			Element privilegeElement = documentFactory.createElement(XmlConstants.XML_PRIVILEGE);
+			privilegeElement.addAttribute(XmlConstants.XML_ATTR_NAME, privilege.getName());
+			privilegeElement.addAttribute(XmlConstants.XML_ATTR_POLICY, privilege.getPolicy());
+
+			// add the all allowed element
+			Element allAllowedElement = documentFactory.createElement(XmlConstants.XML_ALL_ALLOWED);
+			allAllowedElement.setText(Boolean.toString(privilege.isAllAllowed()));
+			privilegeElement.add(allAllowedElement);
+
+			// add all the deny values
+			for (String denyValue : privilege.getDenyList()) {
+				Element denyValueElement = documentFactory.createElement(XmlConstants.XML_DENY);
+				denyValueElement.setText(denyValue);
+				privilegeElement.add(denyValueElement);
+			}
+
+			// add all the allow values
+			for (String allowValue : privilege.getAllowList()) {
+				Element allowValueElement = documentFactory.createElement(XmlConstants.XML_ALLOW);
+				allowValueElement.setText(allowValue);
+				privilegeElement.add(allowValueElement);
+			}
+
+			// add element to return list
+			privilegesAsElements.add(privilegeElement);
+		}
+
+		return privilegesAsElements;
+	}
+
+	private List<Element> toDomRoles() {
+
+		List<Element> rolesAsElements = new ArrayList<Element>(roleMap.size());
+
+		DocumentFactory documentFactory = DocumentFactory.getInstance();
+		for (String roleName : roleMap.keySet()) {
+
+			// get the role object
+			Role role = roleMap.get(roleName);
+
+			// create the role element
+			Element roleElement = documentFactory.createElement(XmlConstants.XML_ROLE);
+			roleElement.addAttribute(XmlConstants.XML_ATTR_NAME, role.getName());
+
+			// add all the privileges
+			for (String privilegeName : role.getPrivileges()) {
+				Element privilegeElement = documentFactory.createElement(XmlConstants.XML_PRIVILEGE);
+				privilegeElement.addAttribute(XmlConstants.XML_ATTR_NAME, privilegeName);
+				roleElement.add(privilegeElement);
+			}
+
+			// add element to return list
+			rolesAsElements.add(roleElement);
+		}
+
+		return rolesAsElements;
+	}
+
+	private List<Element> toDomUsers() {
+
+		List<Element> usersAsElements = new ArrayList<Element>(userMap.size());
+
+		DocumentFactory documentFactory = DocumentFactory.getInstance();
+		for (String userName : userMap.keySet()) {
+
+			// get the user object
+			User user = userMap.get(userName);
+
+			// create the user element
+			Element userElement = documentFactory.createElement(XmlConstants.XML_USER);
+			userElement.addAttribute(XmlConstants.XML_ATTR_USERNAME, user.getUsername());
+			userElement.addAttribute(XmlConstants.XML_ATTR_PASSWORD, user.getPassword());
+
+			// add first name element
+			Element firstnameElement = documentFactory.createElement(XmlConstants.XML_FIRSTNAME);
+			firstnameElement.setText(user.getFirstname());
+			userElement.add(firstnameElement);
+
+			// add surname element
+			Element surnameElement = documentFactory.createElement(XmlConstants.XML_SURNAME);
+			surnameElement.setText(user.getSurname());
+			userElement.add(surnameElement);
+
+			// add state element
+			Element stateElement = documentFactory.createElement(XmlConstants.XML_STATE);
+			stateElement.setText(user.getState().toString());
+			userElement.add(stateElement);
+
+			// add locale element
+			Element localeElement = documentFactory.createElement(XmlConstants.XML_LOCALE);
+			localeElement.setText(user.getLocale().toString());
+			userElement.add(localeElement);
+
+			// add all the role elements
+			Element rolesElement = documentFactory.createElement(XmlConstants.XML_ROLES);
+			userElement.add(rolesElement);
+			for (String roleName : user.getRoles()) {
+				Element roleElement = documentFactory.createElement(XmlConstants.XML_ROLE);
+				roleElement.setText(roleName);
+				rolesElement.add(roleElement);
+			}
+
+			// add element to return list
+			usersAsElements.add(userElement);
+		}
+
+		return usersAsElements;
 	}
 }

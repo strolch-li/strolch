@@ -22,10 +22,13 @@ public class XmlConstants {
 
 	public static final String XML_ROLES = "Roles";
 	public static final String XML_ROLE = "Role";
+	public static final String XML_USERS = "Users";
 	public static final String XML_USER = "User";
+	public static final String XML_PRIVILEGES = "Privileges";
 	public static final String XML_PRIVILEGE = "Privilege";
 	public static final String XML_POLICY = "Policy";
 	public static final String XML_PARAMETERS = "Parameters";
+	public static final String XML_PARAMETER = "Parameter";
 	public static final String XML_ALL_ALLOWED = "AllAllowed";
 	public static final String XML_DENY = "Deny";
 	public static final String XML_ALLOW = "Allow";
@@ -36,6 +39,7 @@ public class XmlConstants {
 
 	public static final String XML_ATTR_CLASS = "class";
 	public static final String XML_ATTR_NAME = "name";
+	public static final String XML_ATTR_VALUE = "value";
 	public static final String XML_ATTR_POLICY = "policy";
 	public static final String XML_ATTR_USERNAME = "username";
 	public static final String XML_ATTR_PASSWORD = "password";

@@ -16,6 +16,8 @@ import java.util.Map;
 
 import org.dom4j.Element;
 
+import ch.eitchnet.privilege.base.XmlConstants;
+
 /**
  * @author rvonburg
  * 
@@ -27,10 +29,10 @@ public class ConfigurationHelper {
 
 		Map<String, String> parameterMap = new HashMap<String, String>();
 
-		List<Element> elements = element.elements("Parameter");
+		List<Element> elements = element.elements(XmlConstants.XML_PARAMETER);
 		for (Element parameter : elements) {
-			String name = parameter.attributeValue("name");
-			String value = parameter.attributeValue("value");
+			String name = parameter.attributeValue(XmlConstants.XML_ATTR_NAME);
+			String value = parameter.attributeValue(XmlConstants.XML_ATTR_VALUE);
 			parameterMap.put(name, value);
 		}
 

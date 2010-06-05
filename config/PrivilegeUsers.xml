@@ -8,6 +8,7 @@
 		<Locale>en_GB</Locale>
 		<Roles>
 			<Role>admin</Role>
+			<Role>PrivilegeAdmin</Role>
 		</Roles>
 	</User>
 

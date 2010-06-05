@@ -96,6 +96,16 @@ public final class User {
 	}
 
 	/**
+	 * Returns true if this user has the specified role
+	 * 
+	 * @param role
+	 * @return true if the this user has the specified role
+	 */
+	public boolean hasRole(String role) {
+		return roles.contains(role);
+	}
+
+	/**
 	 * @return the locale
 	 */
 	public Locale getLocale() {

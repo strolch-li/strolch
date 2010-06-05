@@ -27,6 +27,12 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
  * @author rvonburg
  */
 public class PrivilegeContainer {
+
+	/**
+	 * This is the role users must have, if they can modify the {@link PrivilegeContainer} and its objects
+	 */
+	public static final String PRIVILEGE_ADMIN_ROLE = "PrivilegeAdmin";
+
 	private static final Logger logger = Logger.getLogger(PrivilegeContainer.class);
 
 	private static final PrivilegeContainer instance;

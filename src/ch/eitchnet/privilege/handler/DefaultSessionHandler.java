@@ -51,11 +51,60 @@ public class DefaultSessionHandler implements SessionHandler {
 	@Override
 	public boolean actionAllowed(Certificate certificate, Restrictable restrictable) {
 
-		// certificate and restrictable must not be null
+		// first validate certificate
+		if (!isCertificateValid(certificate)) {
+			logger.info("Certificate is not valid, so action is not allowed: " + certificate + " for restrictable: "
+					+ restrictable);
+			return false;
+		}
+
+		// restrictable must not be null
+		if (restrictable == null)
+			throw new PrivilegeException("Restrictable may not be null!");
+
+		PrivilegeContainer privilegeContainer = PrivilegeContainer.getInstance();
+		PersistenceHandler persistenceHandler = privilegeContainer.getPersistenceHandler();
+
+		// get user object
+		User user = persistenceHandler.getUser(certificate.getUsername());
+		if (user == null) {
+			throw new PrivilegeException(
+					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
+		}
+
+		// default is to not allow the action
+		// TODO should default deny/allow policy be configurable?
+		boolean actionAllowed = false;
+
+		// now iterate roles and validate on policy handler
+		PolicyHandler policyHandler = privilegeContainer.getPolicyHandler();
+		for (String roleName : user.getRoles()) {
+
+			Role role = privilegeContainer.getPersistenceHandler().getRole(roleName);
+			if (role == null) {
+				logger.error("No role is defined with name " + roleName + " which is configured for user " + user);
+				continue;
+			}
+
+			actionAllowed = policyHandler.actionAllowed(role, restrictable);
+
+			// if action is allowed, then break iteration as a privilege match has been made
+			if (actionAllowed)
+				break;
+		}
+
+		return actionAllowed;
+	}
+
+	/**
+	 * @see ch.eitchnet.privilege.handler.SessionHandler#isCertificateValid(ch.eitchnet.privilege.model.Certificate)
+	 */
+	@Override
+	public boolean isCertificateValid(Certificate certificate) {
+
+		// certificate  must not be null
 		if (certificate == null)
 			throw new PrivilegeException("Certificate may not be null!");
-		else if (restrictable == null)
-			throw new PrivilegeException("Restrictable may not be null!");
 
 		// first see if a session exists for this certificate
 		CertificateSessionPair certificateSessionPair = sessionMap.get(certificate.getSessionId());
@@ -77,33 +126,14 @@ public class DefaultSessionHandler implements SessionHandler {
 		// get user object
 		User user = PrivilegeContainer.getInstance().getPersistenceHandler().getUser(
 				certificateSessionPair.session.getUsername());
+
+		// if user exists, then certificate is valid
 		if (user == null) {
 			throw new PrivilegeException(
 					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
+		} else {
+			return true;
 		}
-
-		// default is to not allow the action
-		// TODO should default deny/allow policy be configurable?
-		boolean actionAllowed = false;
-
-		// now iterate roles and validate on policy handler
-		PolicyHandler policyHandler = PrivilegeContainer.getInstance().getPolicyHandler();
-		for (String roleName : user.getRoles()) {
-
-			Role role = PrivilegeContainer.getInstance().getPersistenceHandler().getRole(roleName);
-			if (role == null) {
-				logger.error("No role is defined with name " + roleName + " which is configured for user " + user);
-				continue;
-			}
-
-			actionAllowed = policyHandler.actionAllowed(role, restrictable);
-
-			// if action is allowed, then break iteration as a privilege match has been made
-			if (actionAllowed)
-				break;
-		}
-
-		return actionAllowed;
 	}
 
 	/**
