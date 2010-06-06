@@ -33,6 +33,7 @@ import ch.eitchnet.privilege.policy.RestrictionPolicy;
  */
 public class DefaultPolicyHandler implements PolicyHandler {
 
+	private PersistenceHandler persistenceHandler;
 	private Map<String, Class<RestrictionPolicy>> policyMap;
 
 	/**

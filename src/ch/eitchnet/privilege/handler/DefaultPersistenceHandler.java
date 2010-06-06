@@ -51,14 +51,15 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	private boolean roleMapDirty;
 	private boolean privilegeMapDirty;
 
+	private PersistenceHandler persistenceHandler;
 	private Map<String, String> parameterMap;
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addPrivilege(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplacePrivilege(ch.eitchnet.privilege.model.Certificate,
 	 *      ch.eitchnet.privilege.model.internal.Privilege)
 	 */
 	@Override
-	public void addPrivilege(Certificate certificate, Privilege privilege) {
+	public void addOrReplacePrivilege(Certificate certificate, Privilege privilege) {
 
 		// validate who is doing this
 		PrivilegeHelper.isUserPrivilegeAdmin(certificate);
@@ -68,11 +69,11 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addRole(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplaceRole(ch.eitchnet.privilege.model.Certificate,
 	 *      ch.eitchnet.privilege.model.internal.Role)
 	 */
 	@Override
-	public void addRole(Certificate certificate, Role role) {
+	public void addOrReplaceRole(Certificate certificate, Role role) {
 
 		// validate who is doing this
 		PrivilegeHelper.isUserPrivilegeAdmin(certificate);
@@ -82,11 +83,11 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addUser(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplaceUser(ch.eitchnet.privilege.model.Certificate,
 	 *      ch.eitchnet.privilege.model.internal.User)
 	 */
 	@Override
-	public void addUser(Certificate certificate, User user) {
+	public void addOrReplaceUser(Certificate certificate, User user) {
 
 		// validate who is doing this
 		PrivilegeHelper.isUserPrivilegeAdmin(certificate);

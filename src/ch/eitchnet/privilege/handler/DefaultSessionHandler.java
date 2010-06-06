@@ -36,6 +36,7 @@ public class DefaultSessionHandler implements SessionHandler {
 
 	private static long lastSessionId;
 
+	private PersistenceHandler persistenceHandler;
 	private Map<String, CertificateSessionPair> sessionMap;
 
 	/**
@@ -63,7 +64,6 @@ public class DefaultSessionHandler implements SessionHandler {
 			throw new PrivilegeException("Restrictable may not be null!");
 
 		PrivilegeContainer privilegeContainer = PrivilegeContainer.getInstance();
-		PersistenceHandler persistenceHandler = privilegeContainer.getPersistenceHandler();
 
 		// get user object
 		User user = persistenceHandler.getUser(certificate.getUsername());
@@ -80,7 +80,7 @@ public class DefaultSessionHandler implements SessionHandler {
 		PolicyHandler policyHandler = privilegeContainer.getPolicyHandler();
 		for (String roleName : user.getRoles()) {
 
-			Role role = privilegeContainer.getPersistenceHandler().getRole(roleName);
+			Role role = persistenceHandler.getRole(roleName);
 			if (role == null) {
 				logger.error("No role is defined with name " + roleName + " which is configured for user " + user);
 				continue;
@@ -124,8 +124,7 @@ public class DefaultSessionHandler implements SessionHandler {
 					+ certificate.getSessionId());
 
 		// get user object
-		User user = PrivilegeContainer.getInstance().getPersistenceHandler().getUser(
-				certificateSessionPair.session.getUsername());
+		User user = persistenceHandler.getUser(certificateSessionPair.session.getUsername());
 
 		// if user exists, then certificate is valid
 		if (user == null) {
@@ -157,7 +156,7 @@ public class DefaultSessionHandler implements SessionHandler {
 		String passwordHash = encryptionHandler.convertToHash(password);
 
 		// get user object
-		User user = PrivilegeContainer.getInstance().getPersistenceHandler().getUser(username);
+		User user = persistenceHandler.getUser(username);
 		// no user means no authentication
 		if (user == null)
 			throw new AccessDeniedException("There is no user defined with the credentials: " + username + " / ***...");

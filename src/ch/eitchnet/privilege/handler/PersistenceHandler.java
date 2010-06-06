@@ -26,17 +26,16 @@ import ch.eitchnet.privilege.model.internal.User;
 public interface PersistenceHandler extends PrivilegeContainerObject {
 
 	public User getUser(String username);
-	// public void setUserPassword(String username, String password);
-	// public void setUserState(String username, UserState state);
-	public void addUser(Certificate certificate, User user);
+
+	public void addOrReplaceUser(Certificate certificate, User user);
 
 	public Role getRole(String roleName);
 
-	public void addRole(Certificate certificate, Role role);
+	public void addOrReplaceRole(Certificate certificate, Role role);
 
 	public Privilege getPrivilege(String privilegeName);
 
-	public void addPrivilege(Certificate certificate, Privilege privilege);
+	public void addOrReplacePrivilege(Certificate certificate, Privilege privilege);
 
 	public void persist(Certificate certificate);
 }

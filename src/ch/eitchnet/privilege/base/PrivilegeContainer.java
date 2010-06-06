@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Element;
 
 import ch.eitchnet.privilege.handler.EncryptionHandler;
+import ch.eitchnet.privilege.handler.ModificationHandler;
 import ch.eitchnet.privilege.handler.PersistenceHandler;
 import ch.eitchnet.privilege.handler.PolicyHandler;
 import ch.eitchnet.privilege.handler.SessionHandler;
@@ -46,9 +47,7 @@ public class PrivilegeContainer {
 	private SessionHandler sessionHandler;
 	private PolicyHandler policyHandler;
 	private EncryptionHandler encryptionHandler;
-	private PersistenceHandler persistenceHandler;
-
-	private String basePath;
+	private ModificationHandler modificationHandler;
 
 	public static PrivilegeContainer getInstance() {
 		return instance;
@@ -83,17 +82,10 @@ public class PrivilegeContainer {
 	}
 
 	/**
-	 * @return the persistenceHandler
+	 * @return the modificationHandler
 	 */
-	public PersistenceHandler getPersistenceHandler() {
-		return persistenceHandler;
-	}
-
-	/**
-	 * @return the basePath
-	 */
-	public String getBasePath() {
-		return basePath;
+	public ModificationHandler getModificationHandler() {
+		return modificationHandler;
 	}
 
 	public void initialize(File privilegeContainerXml) {
@@ -105,7 +97,7 @@ public class PrivilegeContainer {
 		}
 
 		// set base path from privilege container xml
-		basePath = privilegeContainerXml.getParentFile().getAbsolutePath();
+		String basePath = privilegeContainerXml.getParentFile().getAbsolutePath();
 
 		// parse container xml file to XML document
 		Element containerRootElement = XmlHelper.parseDocument(privilegeContainerXml).getRootElement();
@@ -129,9 +121,14 @@ public class PrivilegeContainer {
 		Element policyHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_POLICY);
 		String policyHandlerClassName = policyHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
 		PolicyHandler policyHandler = ClassHelper.instantiateClass(policyHandlerClassName);
+		
+		// instantiate modification handler
+		Element modificationHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_MODIFICATION);
+		String modificationHandlerClassName = modificationHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
+		ModificationHandler modificationHandler = ClassHelper.instantiateClass(policyHandlerClassName);
 
 		try {
-			persistenceHandler.initialize(persistenceHandlerElement);
+			persistenceHandler.initialize(basePath, persistenceHandlerElement);
 		} catch (Exception e) {
 			logger.error(e, e);
 			throw new PrivilegeException("PersistenceHandler " + persistenceHandlerElement
@@ -156,9 +153,15 @@ public class PrivilegeContainer {
 			logger.error(e, e);
 			throw new PrivilegeException("PolicyHandler " + policyHandlerClassName + " could not be initialized");
 		}
+		try {
+			modificationHandler.initialize(modificationHandlerElement);
+		} catch (Exception e) {
+			logger.error(e, e);
+			throw new PrivilegeException("ModificationHandler " + modificationHandlerClassName + " could not be initialized");
+		}
 
 		// keep references to the handlers
-		this.persistenceHandler = persistenceHandler;
+		this.modificationHandler = modificationHandler;
 		this.sessionHandler = sessionHandler;
 		this.encryptionHandler = encryptionHandler;
 		this.policyHandler = policyHandler;
