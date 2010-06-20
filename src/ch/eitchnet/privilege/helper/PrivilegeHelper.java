@@ -18,7 +18,7 @@ import ch.eitchnet.privilege.model.internal.User;
 
 /**
  * @author rvonburg
- *
+ * 
  */
 public class PrivilegeHelper {
 
@@ -29,7 +29,7 @@ public class PrivilegeHelper {
 		}
 
 		// get user object
-		User user = PrivilegeContainer.getInstance().getPersistenceHandler().getUser(certificate.getUsername());
+		User user = PrivilegeContainer.getInstance().getModelHandler().getUser(certificate.getUsername());
 		if (user == null) {
 			throw new PrivilegeException(
 					"Oh boy, how did this happen: No User in user map although the certificate is valid!");

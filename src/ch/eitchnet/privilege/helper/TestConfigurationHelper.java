@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 import ch.eitchnet.privilege.base.PrivilegeContainer;
-import ch.eitchnet.privilege.handler.PersistenceHandler;
+import ch.eitchnet.privilege.handler.ModelHandler;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
@@ -43,7 +43,7 @@ public class TestConfigurationHelper {
 		PrivilegeContainer privilegeContainer = PrivilegeContainer.getInstance();
 		privilegeContainer.initialize(privilegeContainerXml);
 
-		PersistenceHandler persistenceHandler = privilegeContainer.getPersistenceHandler();
+		ModelHandler modelHandler = privilegeContainer.getModelHandler();
 
 		for (int i = 0; i < 10; i++) {
 			// let's authenticate a session

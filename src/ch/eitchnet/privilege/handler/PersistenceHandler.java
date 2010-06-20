@@ -27,15 +27,21 @@ public interface PersistenceHandler extends PrivilegeContainerObject {
 
 	public User getUser(String username);
 
-	public void addOrReplaceUser(Certificate certificate, User user);
+	public void addOrReplaceUser(User user);
+
+	public User removeUser(String username);
 
 	public Role getRole(String roleName);
 
-	public void addOrReplaceRole(Certificate certificate, Role role);
+	public void addOrReplaceRole(Role role);
+
+	public Role removeRole(String roleName);
 
 	public Privilege getPrivilege(String privilegeName);
 
-	public void addOrReplacePrivilege(Certificate certificate, Privilege privilege);
+	public void addOrReplacePrivilege(Privilege privilege);
 
-	public void persist(Certificate certificate);
+	public Privilege removePrivilege(String privilegeName);
+
+	public boolean persist(Certificate certificate);
 }

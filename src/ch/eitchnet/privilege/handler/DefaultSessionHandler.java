@@ -36,7 +36,6 @@ public class DefaultSessionHandler implements SessionHandler {
 
 	private static long lastSessionId;
 
-	private PersistenceHandler persistenceHandler;
 	private Map<String, CertificateSessionPair> sessionMap;
 
 	/**
@@ -66,7 +65,7 @@ public class DefaultSessionHandler implements SessionHandler {
 		PrivilegeContainer privilegeContainer = PrivilegeContainer.getInstance();
 
 		// get user object
-		User user = persistenceHandler.getUser(certificate.getUsername());
+		User user = PrivilegeContainer.getInstance().getModelHandler().getUser(certificate.getUsername());
 		if (user == null) {
 			throw new PrivilegeException(
 					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
@@ -80,7 +79,7 @@ public class DefaultSessionHandler implements SessionHandler {
 		PolicyHandler policyHandler = privilegeContainer.getPolicyHandler();
 		for (String roleName : user.getRoles()) {
 
-			Role role = persistenceHandler.getRole(roleName);
+			Role role = PrivilegeContainer.getInstance().getModelHandler().getRole(roleName);
 			if (role == null) {
 				logger.error("No role is defined with name " + roleName + " which is configured for user " + user);
 				continue;
@@ -124,7 +123,8 @@ public class DefaultSessionHandler implements SessionHandler {
 					+ certificate.getSessionId());
 
 		// get user object
-		User user = persistenceHandler.getUser(certificateSessionPair.session.getUsername());
+		User user = PrivilegeContainer.getInstance().getModelHandler().getUser(
+				certificateSessionPair.session.getUsername());
 
 		// if user exists, then certificate is valid
 		if (user == null) {
@@ -156,13 +156,13 @@ public class DefaultSessionHandler implements SessionHandler {
 		String passwordHash = encryptionHandler.convertToHash(password);
 
 		// get user object
-		User user = persistenceHandler.getUser(username);
+		User user = PrivilegeContainer.getInstance().getModelHandler().getUser(username);
 		// no user means no authentication
 		if (user == null)
 			throw new AccessDeniedException("There is no user defined with the credentials: " + username + " / ***...");
 
 		// validate password
-		if (!user.getPassword().equals(passwordHash))
+		if (!user.isPassword(passwordHash))
 			throw new AccessDeniedException("Password is incorrect for " + username + " / ***...");
 
 		// validate if user is allowed to login

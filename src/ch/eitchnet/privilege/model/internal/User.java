@@ -14,7 +14,9 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
+import ch.eitchnet.privilege.helper.PrivilegeHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 
@@ -64,8 +66,18 @@ public final class User {
 	/**
 	 * @return the password
 	 */
-	public String getPassword() {
-		return password;
+	public String getPassword(Certificate certificate) {
+		if (PrivilegeHelper.isUserPrivilegeAdmin(certificate))
+			return password;
+		else
+			return null;
+	}
+
+	/**
+	 * @return the password
+	 */
+	public boolean isPassword(String password) {
+		return this.password.equals(password);
 	}
 
 	/**

@@ -40,7 +40,7 @@ public class DefaultRestriction implements RestrictionPolicy {
 		}
 
 		// get restriction object for users role
-		Privilege privilege = PrivilegeContainer.getInstance().getPersistenceHandler().getPrivilege(restrictionKey);
+		Privilege privilege = PrivilegeContainer.getInstance().getModelHandler().getPrivilege(restrictionKey);
 
 		// no restriction object means no privilege
 		// TODO should default deny/allow policy be configurable?
