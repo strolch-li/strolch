@@ -9,6 +9,7 @@
 		</Parameters>
 	</PersistenceHandler>
 	<SessionHandler class="ch.eitchnet.privilege.handler.DefaultSessionHandler" />
+	<ModelHandler class="ch.eitchnet.privilege.handler.DefaultModelHandler" />
 	<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
 		<Parameters>
 			<Parameter name="hashAlgorithm" value="SHA-256" />

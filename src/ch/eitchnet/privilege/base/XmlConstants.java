@@ -19,7 +19,7 @@ public class XmlConstants {
 	public static final String XML_HANDLER_ENCRYPTION = "EncryptionHandler";
 	public static final String XML_HANDLER_SESSION = "SessionHandler";
 	public static final String XML_HANDLER_POLICY = "PolicyHandler";
-	public static final String XML_HANDLER_MODEL = "ModificationHandler";
+	public static final String XML_HANDLER_MODEL = "ModelHandler";
 
 	public static final String XML_ROLES = "Roles";
 	public static final String XML_ROLE = "Role";

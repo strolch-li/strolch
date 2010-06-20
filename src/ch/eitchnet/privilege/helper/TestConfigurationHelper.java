@@ -43,7 +43,7 @@ public class TestConfigurationHelper {
 		PrivilegeContainer privilegeContainer = PrivilegeContainer.getInstance();
 		privilegeContainer.initialize(privilegeContainerXml);
 
-		ModelHandler modelHandler = privilegeContainer.getModelHandler();
+		// ModelHandler modelHandler = privilegeContainer.getModelHandler();
 
 		for (int i = 0; i < 10; i++) {
 			// let's authenticate a session

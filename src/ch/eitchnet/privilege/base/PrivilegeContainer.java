@@ -164,6 +164,7 @@ public class PrivilegeContainer {
 		}
 		try {
 			modelHandler.initialize(modificationHandlerElement);
+			modelHandler.setPersistenceHandler(persistenceHandler);
 		} catch (Exception e) {
 			logger.error(e, e);
 			throw new PrivilegeException("ModificationHandler " + modificationHandlerClassName
