@@ -12,6 +12,7 @@ package ch.eitchnet.privilege.handler;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -379,7 +380,8 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 			}
 
 			// create user
-			User user = User.buildUser(username, password, firstname, surname, userState, roles, locale);
+			User user = new User(username, password, firstname, surname, userState, Collections.unmodifiableSet(roles),
+					locale);
 
 			// put user in map
 			userMap.put(username, user);

@@ -10,8 +10,8 @@
 
 package ch.eitchnet.privilege.handler;
 
-import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import ch.eitchnet.privilege.base.PrivilegeContainerObject;
 import ch.eitchnet.privilege.model.Certificate;
@@ -33,21 +33,21 @@ public interface ModelHandler extends PrivilegeContainerObject {
 
 	public User getUser(String username);
 
-	public void addOrReplaceUser(Certificate certificate, UserRep userRep);
+	public void addOrReplaceUser(Certificate certificate, UserRep userRep, String password);
 
 	public UserRep removeUser(Certificate certificate, String username);
 
 	public void setUserPassword(Certificate certificate, String username, String password);
 
-	public void setUserNamePassword(Certificate certificate, String username, String firstname, String surname);
+	public void setUserName(Certificate certificate, String username, String firstname, String surname);
 
 	public void setUserState(Certificate certificate, String username, UserState state);
 
 	public void setUserLocaleState(Certificate certificate, String username, Locale locale);
 
-	public void addRoleToUser(Certificate certificate, String username, String rolename);
+	public void addRoleToUser(Certificate certificate, String username, String roleName);
 
-	public void removeRoleFromUser(Certificate certificate, String username, String rolename);
+	public void removeRoleFromUser(Certificate certificate, String username, String roleName);
 
 	public void addOrReplaceRole(Certificate certificate, RoleRep roleRep);
 
@@ -69,9 +69,9 @@ public interface ModelHandler extends PrivilegeContainerObject {
 
 	public void setPrivilegeAllAllowed(Certificate certificate, String privilegeName, boolean allAllowed);
 
-	public void setPrivilegeDenyList(Certificate certificate, String privilegeName, List<String> denyList);
+	public void setPrivilegeDenyList(Certificate certificate, String privilegeName, Set<String> denyList);
 
-	public void setPrivilegeAllowList(Certificate certificate, String privilegeName, List<String> allowList);
+	public void setPrivilegeAllowList(Certificate certificate, String privilegeName, Set<String> allowList);
 
 	public boolean persist(Certificate certificate);
 }

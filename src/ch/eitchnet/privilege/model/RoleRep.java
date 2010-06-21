@@ -21,8 +21,8 @@ public class RoleRep implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public final String name;
-	public final Set<String> privileges;
+	private String name;
+	private Set<String> privileges;
 
 	/**
 	 * @param name
@@ -30,6 +30,36 @@ public class RoleRep implements Serializable {
 	 */
 	public RoleRep(String name, Set<String> privileges) {
 		this.name = name;
+		this.privileges = privileges;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the privileges
+	 */
+	public Set<String> getPrivileges() {
+		return privileges;
+	}
+
+	/**
+	 * @param privileges
+	 *            the privileges to set
+	 */
+	public void setPrivileges(Set<String> privileges) {
 		this.privileges = privileges;
 	}
 }

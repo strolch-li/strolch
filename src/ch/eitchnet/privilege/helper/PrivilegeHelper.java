@@ -32,12 +32,14 @@ public class PrivilegeHelper {
 		User user = PrivilegeContainer.getInstance().getModelHandler().getUser(certificate.getUsername());
 		if (user == null) {
 			throw new PrivilegeException(
-					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
+					"Oh boy, how did this happen: No User in user map although the certificate is valid! Certificate: "
+							+ certificate);
 		}
 
 		// validate user has PrivilegeAdmin role
 		if (!user.hasRole(PrivilegeContainer.PRIVILEGE_ADMIN_ROLE)) {
-			throw new AccessDeniedException("User does not have " + PrivilegeContainer.PRIVILEGE_ADMIN_ROLE + " role!");
+			throw new AccessDeniedException("User does not have " + PrivilegeContainer.PRIVILEGE_ADMIN_ROLE
+					+ " role! Certificate: " + certificate);
 		} else {
 			return true;
 		}

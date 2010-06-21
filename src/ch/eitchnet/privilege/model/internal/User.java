@@ -10,12 +10,10 @@
 
 package ch.eitchnet.privilege.model.internal;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
 import ch.eitchnet.privilege.helper.PrivilegeHelper;
-import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
@@ -39,9 +37,16 @@ public final class User {
 	private final Locale locale;
 
 	/**
-	 * The {@link User} constructor is private to ensure no unauthorized creation of {@link User} objects
+	 * 
+	 * @param username
+	 * @param password
+	 * @param firstname
+	 * @param surname
+	 * @param userState
+	 * @param roles
+	 * @param locale
 	 */
-	private User(String username, String password, String firstname, String surname, UserState userState,
+	public User(String username, String password, String firstname, String surname, UserState userState,
 			Set<String> roles, Locale locale) {
 
 		this.username = username;
@@ -152,35 +157,5 @@ public final class User {
 		builder.append(roles);
 		builder.append("]");
 		return builder.toString();
-	}
-
-	/**
-	 * @return a new {@link User} object which is authenticated on the current Java Virtual Machine
-	 */
-	public static User buildUser(String username, String password, String firstname, String surname,
-			UserState userState, Set<String> roles, Locale locale) {
-
-		// set a default locale
-		if (locale == null)
-			locale = Locale.getDefault();
-
-		// TODO validate who is creating this User object
-
-		if (username.length() < 3) {
-			throw new PrivilegeException("The given username is shorter than 3 characters");
-		}
-
-		if (firstname.isEmpty()) {
-			throw new PrivilegeException("The given firstname is empty");
-		}
-
-		if (surname.isEmpty()) {
-			throw new PrivilegeException("The given firstname is empty");
-		}
-
-		User user = new User(username, password, firstname, surname, userState, Collections.unmodifiableSet(roles),
-				locale);
-
-		return user;
 	}
 }

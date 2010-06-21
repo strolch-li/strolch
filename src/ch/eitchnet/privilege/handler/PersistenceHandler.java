@@ -10,7 +10,6 @@
 
 package ch.eitchnet.privilege.handler;
 
-import ch.eitchnet.privilege.base.PrivilegeContainer;
 import ch.eitchnet.privilege.base.PrivilegeContainerObject;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.internal.Privilege;
@@ -18,8 +17,6 @@ import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
 
 /**
- * TODO {@link PersistenceHandler} may not be freely accessible via {@link PrivilegeContainer}
- * 
  * @author rvonburg
  * 
  */
