@@ -33,6 +33,7 @@ public class PrivilegeContainer {
 	 * This is the role users must have, if they can modify the {@link PrivilegeContainer} and its objects
 	 */
 	public static final String PRIVILEGE_ADMIN_ROLE = "PrivilegeAdmin";
+	public static final String PRIVILEGE_CONTAINER_FILE = "PrivilegeContainer.xml";
 
 	private static final Logger logger = Logger.getLogger(PrivilegeContainer.class);
 

@@ -18,7 +18,7 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.eitchnet.privilege.base.PrivilegeContainer;
@@ -40,8 +40,8 @@ public class PrivilegeTest {
 	/**
 	 * @throws java.lang.Exception
 	 */
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public static void init() throws Exception {
 
 		// set up log4j
 		BasicConfigurator.resetConfiguration();
@@ -64,14 +64,14 @@ public class PrivilegeTest {
 	}
 
 	@Test(expected = AccessDeniedException.class)
-	public void testAuthenticationNOk() throws Exception {
+	public void testFailAuthenticationNOk() throws Exception {
 
 		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch", "123");
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 	}
 
 	@Test(expected = PrivilegeException.class)
-	public void testAuthenticationPWNull() throws Exception {
+	public void testFailAuthenticationPWNull() throws Exception {
 
 		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch", null);
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
@@ -101,7 +101,7 @@ public class PrivilegeTest {
 	 * @throws Exception
 	 */
 	@Test(expected = AccessDeniedException.class)
-	public void testAuthAsBob() throws Exception {
+	public void testFailAuthAsBob() throws Exception {
 
 		PrivilegeContainer.getInstance().getSessionHandler().authenticate("bob", "12345678901");
 	}
@@ -117,12 +117,41 @@ public class PrivilegeTest {
 	}
 
 	/**
+	 * Will fail as user bob has no role
+	 * 
+	 * @throws Exception
+	 */
+	@Test(expected = PrivilegeException.class)
+	public void testFailAuthUserBob() throws Exception {
+
+		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("bob",
+				"12345678901");
+		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+	}
+
+	@Test
+	public void testAddUserRoleToBob() throws Exception {
+
+		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch",
+				"1234567890");
+
+		ModelHandler modelHandler = PrivilegeContainer.getInstance().getModelHandler();
+		modelHandler.addRoleToUser(certificate, "bob", "user");
+	}
+
+	@Test
+	public void testAuthAsBob() throws Exception {
+
+		PrivilegeContainer.getInstance().getSessionHandler().authenticate("bob", "12345678901");
+	}
+
+	/**
 	 * Will fail because user bob does not have admin rights
 	 * 
 	 * @throws Exception
 	 */
 	@Test(expected = AccessDeniedException.class)
-	public void testAddUserTedAsBob() throws Exception {
+	public void testFailAddUserTedAsBob() throws Exception {
 
 		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("bob",
 				"12345678901");
@@ -130,6 +159,29 @@ public class PrivilegeTest {
 
 		// let's add a new user bob
 		UserRep userRep = new UserRep("bob", "Bob", "Newman", UserState.NEW, new HashSet<String>(), null);
+		PrivilegeContainer.getInstance().getModelHandler().addOrReplaceUser(certificate, userRep, null);
+		logger.info("Added user bob");
+	}
+
+	@Test
+	public void testAddAdminRoleToBob() throws Exception {
+
+		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch",
+				"1234567890");
+
+		ModelHandler modelHandler = PrivilegeContainer.getInstance().getModelHandler();
+		modelHandler.addRoleToUser(certificate, "bob", PrivilegeContainer.PRIVILEGE_ADMIN_ROLE);
+	}
+
+	@Test
+	public void testAddUserTedAsBob() throws Exception {
+
+		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("bob",
+				"12345678901");
+		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+
+		// let's add a new user ted
+		UserRep userRep = new UserRep("ted", "Ted", "Newman", UserState.NEW, new HashSet<String>(), null);
 		PrivilegeContainer.getInstance().getModelHandler().addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user bob");
 	}

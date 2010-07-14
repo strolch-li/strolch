@@ -195,7 +195,7 @@ public class DefaultModelHandler implements ModelHandler {
 
 		// create new user
 		Set<String> newRoles = new HashSet<String>(currentRoles);
-		currentRoles.add(roleName);
+		newRoles.add(roleName);
 
 		User newUser = new User(user.getUsername(), user.getPassword(certificate), user.getFirstname(), user
 				.getSurname(), user.getState(), newRoles, user.getLocale());

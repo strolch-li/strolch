@@ -35,6 +35,8 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
  */
 public class XmlHelper {
 
+	public static final String DEFAULT_ENCODING = "UTF-8";
+
 	private static final Logger logger = Logger.getLogger(XmlHelper.class);
 
 	public static Document parseDocument(File xmlFile) {
@@ -56,19 +58,20 @@ public class XmlHelper {
 		}
 	}
 
-	public static void writeDocument(Element rootElement, File file) {
+	public static void writeDocument(Document document, File file) {
 
-		logger.info("Exporting root element " + rootElement.getName() + " to " + file.getAbsolutePath());
+		logger.info("Exporting document element " + document.getName() + " to " + file.getAbsolutePath());
 
 		OutputStream fileOutputStream = null;
 
 		try {
-			Document document = DocumentFactory.getInstance().createDocument();
-			document.setRootElement(rootElement);
 
 			fileOutputStream = new FileOutputStream(file);
 
-			String aEncodingScheme = "UTF-8";
+			String aEncodingScheme = document.getXMLEncoding();
+			if (aEncodingScheme == null || aEncodingScheme.isEmpty()) {
+				aEncodingScheme = DEFAULT_ENCODING;
+			}
 			OutputFormat outformat = OutputFormat.createPrettyPrint();
 			outformat.setEncoding(aEncodingScheme);
 			XMLWriter writer = new XMLWriter(fileOutputStream, outformat);
@@ -89,5 +92,14 @@ public class XmlHelper {
 				}
 			}
 		}
+	}
+
+	public static void writeDocument(Element rootElement, File file) {
+
+		Document document = DocumentFactory.getInstance().createDocument(DEFAULT_ENCODING);
+		document.setRootElement(rootElement);
+		document.setName(rootElement.getName());
+
+		writeDocument(document, file);
 	}
 }

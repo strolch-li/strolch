@@ -10,6 +10,7 @@
 
 package ch.eitchnet.privilege.model.internal;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
@@ -56,7 +57,7 @@ public final class User {
 		this.firstname = firstname;
 		this.surname = surname;
 
-		this.roles = roles;
+		this.roles = Collections.unmodifiableSet(roles);
 
 		this.locale = locale;
 	}
