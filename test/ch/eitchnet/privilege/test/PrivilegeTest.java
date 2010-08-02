@@ -26,6 +26,7 @@ import ch.eitchnet.privilege.handler.ModelHandler;
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 
@@ -184,5 +185,19 @@ public class PrivilegeTest {
 		UserRep userRep = new UserRep("ted", "Ted", "Newman", UserState.NEW, new HashSet<String>(), null);
 		PrivilegeContainer.getInstance().getModelHandler().addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user bob");
+	}
+
+	@Test
+	public void testPerformRestrictable() throws Exception {
+
+		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch",
+				"1234567890");
+		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+
+		// see if eitch can perform restrictable
+		Restrictable restrictable = new TestRestrictable();
+		boolean actionAllowed = PrivilegeContainer.getInstance().getSessionHandler().actionAllowed(certificate,
+				restrictable);
+		org.junit.Assert.assertTrue("eitch may not perform restrictable!", actionAllowed);
 	}
 }

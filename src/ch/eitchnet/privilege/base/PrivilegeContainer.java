@@ -130,10 +130,10 @@ public class PrivilegeContainer {
 		String policyHandlerClassName = policyHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
 		PolicyHandler policyHandler = ClassHelper.instantiateClass(policyHandlerClassName);
 
-		// instantiate modification handler
-		Element modificationHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_MODEL);
-		String modificationHandlerClassName = modificationHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
-		ModelHandler modelHandler = ClassHelper.instantiateClass(modificationHandlerClassName);
+		// instantiate model handler
+		Element modelHandlerElement = containerRootElement.element(XmlConstants.XML_HANDLER_MODEL);
+		String modelHandlerClassName = modelHandlerElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
+		ModelHandler modelHandler = ClassHelper.instantiateClass(modelHandlerClassName);
 
 		try {
 			persistenceHandler.initialize(persistenceHandlerElement);
@@ -162,11 +162,11 @@ public class PrivilegeContainer {
 			throw new PrivilegeException("PolicyHandler " + policyHandlerClassName + " could not be initialized");
 		}
 		try {
-			modelHandler.initialize(modificationHandlerElement);
+			modelHandler.initialize(modelHandlerElement);
 			modelHandler.setPersistenceHandler(persistenceHandler);
 		} catch (Exception e) {
 			logger.error(e, e);
-			throw new PrivilegeException("ModificationHandler " + modificationHandlerClassName
+			throw new PrivilegeException("ModificationHandler " + modelHandlerClassName
 					+ " could not be initialized");
 		}
 

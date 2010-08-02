@@ -7,8 +7,9 @@
 		<State>ENABLED</State>
 		<Locale>en_GB</Locale>
 		<Roles>
-			<Role>admin</Role>
 			<Role>PrivilegeAdmin</Role>
+			<Role>admin</Role>
+			<Role>serviceExecutor</Role>
 		</Roles>
 	</User>
 

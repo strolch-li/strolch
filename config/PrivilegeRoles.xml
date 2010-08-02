@@ -3,8 +3,11 @@
 
 	<Role name="PrivilegeAdmin" />
 	<Role name="admin">
-		<Privilege name="Service" />
+		<Privilege name="NoRestriction" />
 	</Role>
 	<Role name="user" />
+	<Role name="serviceExecutor">
+		<Privilege name="Service" />
+	</Role>
 
 </PrivilegeRoles>

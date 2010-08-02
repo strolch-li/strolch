@@ -49,7 +49,7 @@ public class BootstrapConfigurationHelper {
 
 	private static String hashAlgorithm = "SHA-256";
 
-	private static String policyXmlFile = "RestrictionPolicies.xml";
+	private static String policyXmlFile = "PrivilegePolicies.xml";
 
 	private static String defaultPersistenceHandler = "ch.eitchnet.privilege.handler.DefaultPersistenceHandler";
 	private static String defaultSessionHandler = "ch.eitchnet.privilege.handler.DefaultSessionHandler";

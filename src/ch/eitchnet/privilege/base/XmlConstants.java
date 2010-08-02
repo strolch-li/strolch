@@ -19,7 +19,7 @@ public class XmlConstants {
 	public static final String XML_ROOT_PRIVILEGE_ROLES = "PrivilegeRoles";
 	public static final String XML_ROOT_PRIVILEGES = "Privileges";
 	public static final String XML_ROOT_PRIVILEGE_USERS = "PrivilegesUsers";
-	public static final String XML_ROOT_RESTRICTION_POLICIES = "RestrictionPolicies";
+	public static final String XML_ROOT_PRIVILEGE_POLICIES = "PrivilegePolicies";
 
 	public static final String XML_HANDLER_PERSISTENCE = "PersistenceHandler";
 	public static final String XML_HANDLER_ENCRYPTION = "EncryptionHandler";

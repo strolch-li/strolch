@@ -24,8 +24,9 @@ import ch.eitchnet.privilege.helper.ConfigurationHelper;
 import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
+import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
-import ch.eitchnet.privilege.policy.RestrictionPolicy;
+import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
  * @author rvonburg
@@ -33,7 +34,7 @@ import ch.eitchnet.privilege.policy.RestrictionPolicy;
  */
 public class DefaultPolicyHandler implements PolicyHandler {
 
-	private Map<String, Class<RestrictionPolicy>> policyMap;
+	private Map<String, Class<PrivilegePolicy>> policyMap;
 
 	/**
 	 * @see ch.eitchnet.privilege.handler.PolicyHandler#actionAllowed(ch.eitchnet.privilege.model.internal.Role,
@@ -48,26 +49,38 @@ public class DefaultPolicyHandler implements PolicyHandler {
 		else if (restrictable == null)
 			throw new PrivilegeException("Restrictable may not be null!");
 
-		// validate restriction key for this restrictable
-		String restrictionKey = restrictable.getRestrictionKey();
-		if (restrictionKey == null || restrictionKey.length() < 3) {
+		// validate PrivilegeName for this restrictable
+		String privilegeName = restrictable.getPrivilegeName();
+		if (privilegeName == null || privilegeName.length() < 3) {
 			throw new PrivilegeException(
-					"The RestrictionKey may not be shorter than 3 characters. Invalid Restrictable "
+					"The PrivilegeName may not be shorter than 3 characters. Invalid Restrictable "
 							+ restrictable.getClass().getName());
 		}
 
-		// get restriction policy class
-		Class<RestrictionPolicy> policyClazz = policyMap.get(restrictionKey);
-		if (policyClazz == null) {
-			throw new PrivilegeException("No RestrictionPolicy exists for the RestrictionKey " + restrictionKey
-					+ " for Restrictable " + restrictable.getClass().getName());
+		// If the role does not have this privilege, then stop as another role might have this privilege
+		if (!role.hasPrivilege(privilegeName)) {
+			return false;
 		}
 
-		// instantiate policy
-		RestrictionPolicy policy = ClassHelper.instantiateClass(policyClazz);
+		// get the privilege for this restrictable
+		Privilege privilege = PrivilegeContainer.getInstance().getModelHandler().getPrivilege(privilegeName);
+		if (privilege == null) {
+			throw new PrivilegeException("No Privilege exists with the name " + privilegeName + " for Restrictable "
+					+ restrictable.getClass().getName());
+		}
 
-		// delegate checking to restriction policy
-		return policy.actionAllowed(role, restrictable);
+		// get the policy class configured for this privilege
+		Class<PrivilegePolicy> policyClazz = policyMap.get(privilege.getPolicy());
+		if (policyClazz == null) {
+			throw new PrivilegeException("PrivilegePolicy " + privilege.getPolicy() + " does not exist for Privilege "
+					+ privilegeName);
+		}
+
+		// instantiate the policy
+		PrivilegePolicy policy = ClassHelper.instantiateClass(policyClazz);
+
+		// delegate checking to privilege policy
+		return policy.actionAllowed(role, privilege, restrictable);
 	}
 
 	/**
@@ -95,7 +108,7 @@ public class DefaultPolicyHandler implements PolicyHandler {
 					+ policyFile.getAbsolutePath());
 		}
 
-		policyMap = new HashMap<String, Class<RestrictionPolicy>>();
+		policyMap = new HashMap<String, Class<PrivilegePolicy>>();
 
 		// parse policy xml file to XML document
 		Element containerRootElement = XmlHelper.parseDocument(policyFile).getRootElement();
@@ -105,7 +118,7 @@ public class DefaultPolicyHandler implements PolicyHandler {
 			String policyName = policyElement.attributeValue(XmlConstants.XML_ATTR_NAME);
 			String policyClass = policyElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
 
-			Class<RestrictionPolicy> clazz = ClassHelper.loadClass(policyClass);
+			Class<PrivilegePolicy> clazz = ClassHelper.loadClass(policyClass);
 
 			policyMap.put(policyName, clazz);
 		}

@@ -49,7 +49,7 @@ public interface SessionHandler extends PrivilegeContainerObject {
 	public boolean isCertificateValid(Certificate certificate);
 
 	/**
-	 * @param user
+	 * @param username
 	 * @param password
 	 * 
 	 * @return
@@ -57,5 +57,5 @@ public interface SessionHandler extends PrivilegeContainerObject {
 	 * @throws AccessDeniedException
 	 *             if the user credentials are not valid
 	 */
-	public Certificate authenticate(String user, String password);
+	public Certificate authenticate(String username, String password);
 }

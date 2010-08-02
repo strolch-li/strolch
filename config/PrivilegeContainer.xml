@@ -17,7 +17,7 @@
 	</EncryptionHandler>
 	<PolicyHandler class="ch.eitchnet.privilege.handler.DefaultPolicyHandler">
 		<Parameters>
-			<Parameter name="policyXmlFile" value="RestrictionPolicies.xml" />
+			<Parameter name="policyXmlFile" value="PrivilegePolicies.xml" />
 		</Parameters>
 	</PolicyHandler>
 
