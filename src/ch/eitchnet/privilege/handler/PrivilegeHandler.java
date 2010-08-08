@@ -13,23 +13,75 @@ package ch.eitchnet.privilege.handler;
 import java.util.Locale;
 import java.util.Set;
 
-import ch.eitchnet.privilege.base.PrivilegeContainerObject;
+import org.dom4j.Element;
+
+import ch.eitchnet.privilege.i18n.AccessDeniedException;
+import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeRep;
+import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.RoleRep;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
+import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
  * @author rvonburg
  * 
  */
-public interface ModelHandler extends PrivilegeContainerObject {
+public interface PrivilegeHandler {
 
-	public void setPersistenceHandler(PersistenceHandler persistenceHandler);
+	/**
+	 * @param certificate
+	 * @param restrictable
+	 * 
+	 * @return
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the {@link Certificate} is not for a currently logged in {@link User} or if the user may not
+	 *             perform the action defined by the {@link Restrictable} implementation
+	 * @throws PrivilegeException
+	 *             if there is anything wrong with this certificate
+	 */
+	public boolean actionAllowed(Certificate certificate, Restrictable restrictable);
+
+	/**
+	 * @param role
+	 * @param restrictable
+	 * @return
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the {@link Certificate} is not for a currently logged in {@link User} or if the user may not
+	 *             perform the action defined by the {@link Restrictable} implementation
+	 * @throws PrivilegeException
+	 *             if there is anything wrong with this certificate
+	 */
+	public boolean actionAllowed(Role role, Restrictable restrictable);
+
+	/**
+	 * @param certificate
+	 * @return
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the {@link Certificate} is not for a currently logged in {@link User}
+	 * @throws PrivilegeException
+	 *             if there is anything wrong with this certificate
+	 */
+	public boolean isCertificateValid(Certificate certificate);
+
+	/**
+	 * @param username
+	 * @param password
+	 * 
+	 * @return
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the user credentials are not valid
+	 */
+	public Certificate authenticate(String username, String password);
 
 	public User getUser(String username);
 
@@ -73,5 +125,9 @@ public interface ModelHandler extends PrivilegeContainerObject {
 
 	public void setPrivilegeAllowList(Certificate certificate, String privilegeName, Set<String> allowList);
 
+	public PrivilegePolicy getPolicy(String policyName);
+
 	public boolean persist(Certificate certificate);
+
+	public void initialize(Element element);
 }

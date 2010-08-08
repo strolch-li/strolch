@@ -10,17 +10,19 @@
 
 package ch.eitchnet.privilege.handler;
 
-import ch.eitchnet.privilege.base.PrivilegeContainerObject;
+import org.dom4j.Element;
+
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
+import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
  * @author rvonburg
  * 
  */
-public interface PersistenceHandler extends PrivilegeContainerObject {
+public interface PersistenceHandler {
 
 	public User getUser(String username);
 
@@ -40,5 +42,9 @@ public interface PersistenceHandler extends PrivilegeContainerObject {
 
 	public Privilege removePrivilege(String privilegeName);
 
+	public PrivilegePolicy getPolicy(String policyName);
+
 	public boolean persist(Certificate certificate);
+
+	public void initialize(Element element);
 }

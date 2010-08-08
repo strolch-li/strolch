@@ -26,6 +26,7 @@ import org.dom4j.Element;
 
 import ch.eitchnet.privilege.base.PrivilegeContainer;
 import ch.eitchnet.privilege.base.XmlConstants;
+import ch.eitchnet.privilege.helper.ClassHelper;
 import ch.eitchnet.privilege.helper.ConfigurationHelper;
 import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
@@ -34,6 +35,7 @@ import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
+import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
  * @author rvonburg
@@ -46,6 +48,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	private Map<String, User> userMap;
 	private Map<String, Role> roleMap;
 	private Map<String, Privilege> privilegeMap;
+	private Map<String, Class<PrivilegePolicy>> policyMap;
 
 	private long usersFileDate;
 	private boolean userMapDirty;
@@ -141,6 +144,24 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
+	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#getPolicy(java.lang.String)
+	 */
+	@Override
+	public PrivilegePolicy getPolicy(String policyName) {
+
+		// get the policies class
+		Class<PrivilegePolicy> policyClazz = policyMap.get(policyName);
+		if (policyClazz == null) {
+			return null;
+		}
+
+		// instantiate the policy
+		PrivilegePolicy policy = ClassHelper.instantiateClass(policyClazz);
+
+		return policy;
+	}
+
+	/**
 	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#persist(ch.eitchnet.privilege.model.Certificate)
 	 */
 	@Override
@@ -150,7 +171,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		// get users file name
 		String usersFileName = parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
 		if (usersFileName == null || usersFileName.isEmpty()) {
-			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_USERS_FILE + " is invalid");
 		}
 		// get users file
@@ -177,7 +198,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		// get roles file name
 		String rolesFileName = parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
 		if (rolesFileName == null || rolesFileName.isEmpty()) {
-			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_ROLES_FILE + " is invalid");
 		}
 		// get roles file
@@ -204,7 +225,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		// get privileges file name
 		String privilegesFileName = parameterMap.get(XmlConstants.XML_PARAM_PRIVILEGES_FILE);
 		if (privilegesFileName == null || privilegesFileName.isEmpty()) {
-			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_PRIVILEGES_FILE + " is invalid");
 		}
 		// get privileges file
@@ -254,6 +275,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		roleMap = new HashMap<String, Role>();
 		userMap = new HashMap<String, User>();
 		privilegeMap = new HashMap<String, Privilege>();
+		policyMap = new HashMap<String, Class<PrivilegePolicy>>();
 
 		// get parameters
 		Element parameterElement = element.element(XmlConstants.XML_PARAMETERS);
@@ -262,14 +284,14 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		// get roles file name
 		String rolesFileName = parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
 		if (rolesFileName == null || rolesFileName.isEmpty()) {
-			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_ROLES_FILE + " is invalid");
 		}
 
 		// get roles file
 		File rolesFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + rolesFileName);
 		if (!rolesFile.exists()) {
-			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_ROLES_FILE + " is invalid as roles file does not exist at path "
 					+ rolesFile.getAbsolutePath());
 		}
@@ -284,14 +306,14 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		// get users file name
 		String usersFileName = parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
 		if (usersFileName == null || usersFileName.isEmpty()) {
-			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_USERS_FILE + " is invalid");
 		}
 
 		// get users file
 		File usersFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + usersFileName);
 		if (!usersFile.exists()) {
-			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_USERS_FILE + " is invalid as users file does not exist at path "
 					+ usersFile.getAbsolutePath());
 		}
@@ -306,14 +328,14 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		// get privileges file name
 		String privilegesFileName = parameterMap.get(XmlConstants.XML_PARAM_PRIVILEGES_FILE);
 		if (privilegesFileName == null || privilegesFileName.isEmpty()) {
-			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_PRIVILEGES_FILE + " is invalid");
 		}
 
 		// get privileges file
 		File privilegesFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + privilegesFileName);
 		if (!privilegesFile.exists()) {
-			throw new PrivilegeException("[" + SessionHandler.class.getName() + "] Defined parameter "
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_PRIVILEGES_FILE + " is invalid as privileges file does not exist at path "
 					+ privilegesFile.getAbsolutePath());
 		}
@@ -324,6 +346,27 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		// read privileges
 		readPrivileges(privilegesRootElement);
 		privilegesFileDate = privilegesFile.lastModified();
+
+		// get policy file name
+		String policyFileName = parameterMap.get(XmlConstants.XML_PARAM_POLICY_FILE);
+		if (policyFileName == null || policyFileName.isEmpty()) {
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_POLICY_FILE + " is invalid");
+		}
+
+		// get policy file
+		File policyFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + policyFileName);
+		if (!policyFile.exists()) {
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_POLICY_FILE + " is invalid as policy file does not exist at path "
+					+ policyFile.getAbsolutePath());
+		}
+
+		// parse policy xml file to XML document
+		Element policiesRootElement = XmlHelper.parseDocument(policyFile).getRootElement();
+
+		// read policies
+		readPolicies(policiesRootElement);
 
 		userMapDirty = false;
 		roleMapDirty = false;
@@ -449,6 +492,22 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 
 			Privilege privilege = new Privilege(privilegeName, privilegePolicy, allAllowed, denyList, allowList);
 			privilegeMap.put(privilegeName, privilege);
+		}
+	}
+
+	/**
+	 * @param policiesRootElement
+	 */
+	private void readPolicies(Element policiesRootElement) {
+
+		List<Element> policyElements = policiesRootElement.elements(XmlConstants.XML_POLICY);
+		for (Element policyElement : policyElements) {
+			String policyName = policyElement.attributeValue(XmlConstants.XML_ATTR_NAME);
+			String policyClass = policyElement.attributeValue(XmlConstants.XML_ATTR_CLASS);
+
+			Class<PrivilegePolicy> clazz = ClassHelper.loadClass(policyClass);
+
+			policyMap.put(policyName, clazz);
 		}
 	}
 

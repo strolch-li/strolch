@@ -22,7 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.eitchnet.privilege.base.PrivilegeContainer;
-import ch.eitchnet.privilege.handler.ModelHandler;
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
@@ -59,7 +59,7 @@ public class PrivilegeTest {
 	@Test
 	public void testAuthenticationOk() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch",
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("eitch",
 				"1234567890");
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 	}
@@ -67,24 +67,24 @@ public class PrivilegeTest {
 	@Test(expected = AccessDeniedException.class)
 	public void testFailAuthenticationNOk() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch", "123");
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("eitch", "123");
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 	}
 
 	@Test(expected = PrivilegeException.class)
 	public void testFailAuthenticationPWNull() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch", null);
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("eitch", null);
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 	}
 
 	@Test
 	public void testAddUserBobWithPW() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch",
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("eitch",
 				"1234567890");
 
-		ModelHandler modelHandler = PrivilegeContainer.getInstance().getModelHandler();
+		PrivilegeHandler modelHandler = PrivilegeContainer.getInstance().getModelHandler();
 
 		// let's add a new user bob
 		UserRep userRep = new UserRep("bob", "Bob", "Newman", UserState.NEW, new HashSet<String>(), null);
@@ -104,16 +104,16 @@ public class PrivilegeTest {
 	@Test(expected = AccessDeniedException.class)
 	public void testFailAuthAsBob() throws Exception {
 
-		PrivilegeContainer.getInstance().getSessionHandler().authenticate("bob", "12345678901");
+		PrivilegeContainer.getInstance().getModelHandler().authenticate("bob", "12345678901");
 	}
 
 	@Test
 	public void testEnableUserBob() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch",
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("eitch",
 				"1234567890");
 
-		ModelHandler modelHandler = PrivilegeContainer.getInstance().getModelHandler();
+		PrivilegeHandler modelHandler = PrivilegeContainer.getInstance().getModelHandler();
 		modelHandler.setUserState(certificate, "bob", UserState.ENABLED);
 	}
 
@@ -125,7 +125,7 @@ public class PrivilegeTest {
 	@Test(expected = PrivilegeException.class)
 	public void testFailAuthUserBob() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("bob",
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("bob",
 				"12345678901");
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 	}
@@ -133,17 +133,17 @@ public class PrivilegeTest {
 	@Test
 	public void testAddUserRoleToBob() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch",
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("eitch",
 				"1234567890");
 
-		ModelHandler modelHandler = PrivilegeContainer.getInstance().getModelHandler();
+		PrivilegeHandler modelHandler = PrivilegeContainer.getInstance().getModelHandler();
 		modelHandler.addRoleToUser(certificate, "bob", "user");
 	}
 
 	@Test
 	public void testAuthAsBob() throws Exception {
 
-		PrivilegeContainer.getInstance().getSessionHandler().authenticate("bob", "12345678901");
+		PrivilegeContainer.getInstance().getModelHandler().authenticate("bob", "12345678901");
 	}
 
 	/**
@@ -154,7 +154,7 @@ public class PrivilegeTest {
 	@Test(expected = AccessDeniedException.class)
 	public void testFailAddUserTedAsBob() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("bob",
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("bob",
 				"12345678901");
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
@@ -167,17 +167,17 @@ public class PrivilegeTest {
 	@Test
 	public void testAddAdminRoleToBob() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch",
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("eitch",
 				"1234567890");
 
-		ModelHandler modelHandler = PrivilegeContainer.getInstance().getModelHandler();
+		PrivilegeHandler modelHandler = PrivilegeContainer.getInstance().getModelHandler();
 		modelHandler.addRoleToUser(certificate, "bob", PrivilegeContainer.PRIVILEGE_ADMIN_ROLE);
 	}
 
 	@Test
 	public void testAddUserTedAsBob() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("bob",
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("bob",
 				"12345678901");
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
@@ -190,13 +190,13 @@ public class PrivilegeTest {
 	@Test
 	public void testPerformRestrictable() throws Exception {
 
-		Certificate certificate = PrivilegeContainer.getInstance().getSessionHandler().authenticate("eitch",
+		Certificate certificate = PrivilegeContainer.getInstance().getModelHandler().authenticate("eitch",
 				"1234567890");
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// see if eitch can perform restrictable
 		Restrictable restrictable = new TestRestrictable();
-		boolean actionAllowed = PrivilegeContainer.getInstance().getSessionHandler().actionAllowed(certificate,
+		boolean actionAllowed = PrivilegeContainer.getInstance().getModelHandler().actionAllowed(certificate,
 				restrictable);
 		org.junit.Assert.assertTrue("eitch may not perform restrictable!", actionAllowed);
 	}

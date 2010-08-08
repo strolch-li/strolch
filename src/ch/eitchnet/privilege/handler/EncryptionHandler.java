@@ -10,15 +10,17 @@
 
 package ch.eitchnet.privilege.handler;
 
-import ch.eitchnet.privilege.base.PrivilegeContainerObject;
+import org.dom4j.Element;
 
 /**
  * @author rvonburg
  * 
  */
-public interface EncryptionHandler extends PrivilegeContainerObject{
+public interface EncryptionHandler {
 
 	public String nextToken();
 
 	public String convertToHash(String string);
+
+	public void initialize(Element element);
 }

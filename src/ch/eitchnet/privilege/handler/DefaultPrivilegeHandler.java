@@ -10,8 +10,10 @@
 
 package ch.eitchnet.privilege.handler;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -19,35 +21,234 @@ import org.dom4j.Element;
 
 import ch.eitchnet.privilege.base.PrivilegeContainer;
 import ch.eitchnet.privilege.helper.PrivilegeHelper;
+import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeRep;
+import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.RoleRep;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
+import ch.eitchnet.privilege.model.internal.Session;
 import ch.eitchnet.privilege.model.internal.User;
+import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
  * @author rvonburg
  * 
  */
-public class DefaultModelHandler implements ModelHandler {
+public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
-	private static final Logger logger = Logger.getLogger(DefaultModelHandler.class);
+	private static final Logger logger = Logger.getLogger(DefaultPrivilegeHandler.class);
+
+	private static long lastSessionId;
+
+	private Map<String, CertificateSessionPair> sessionMap;
 
 	private PersistenceHandler persistenceHandler;
+	private EncryptionHandler encryptionHandler;
+	private PrivilegeHandler modelHandler;
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.SessionHandler#setPersistenceHandler(ch.eitchnet.privilege.handler.PersistenceHandler)
+	 * TODO What is better, validate from {@link Restrictable} to {@link User} or the opposite direction?
+	 * 
+	 * @see ch.eitchnet.privilege.handler.SessionHandler#actionAllowed(ch.eitchnet.privilege.model.Certificate,
+	 *      ch.eitchnet.privilege.model.Restrictable)
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the {@link Certificate} is not for a currently logged in {@link User} or if the user may not
+	 *             perform the action defined by the {@link Restrictable} implementation
 	 */
-	public void setPersistenceHandler(PersistenceHandler persistenceHandler) {
-		this.persistenceHandler = persistenceHandler;
+	@Override
+	public boolean actionAllowed(Certificate certificate, Restrictable restrictable) {
+
+		// first validate certificate
+		if (!isCertificateValid(certificate)) {
+			logger.info("Certificate is not valid, so action is not allowed: " + certificate + " for restrictable: "
+					+ restrictable);
+			return false;
+		}
+
+		// restrictable must not be null
+		if (restrictable == null)
+			throw new PrivilegeException("Restrictable may not be null!");
+
+		// get user object
+		User user = modelHandler.getUser(certificate.getUsername());
+		if (user == null) {
+			throw new PrivilegeException(
+					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
+		}
+
+		// default is to not allow the action
+		// TODO should default deny/allow policy be configurable?
+		boolean actionAllowed = false;
+
+		// now iterate roles and validate on policies
+		for (String roleName : user.getRoles()) {
+
+			Role role = modelHandler.getRole(roleName);
+			if (role == null) {
+				logger.error("No role is defined with name " + roleName + " which is configured for user " + user);
+				continue;
+			}
+
+			actionAllowed = actionAllowed(role, restrictable);
+
+			// if action is allowed, then break iteration as a privilege match has been made
+			if (actionAllowed)
+				break;
+		}
+
+		return actionAllowed;
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#addOrReplacePrivilege(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PolicyHandler#actionAllowed(ch.eitchnet.privilege.model.internal.Role,
+	 *      ch.eitchnet.privilege.model.Restrictable)
+	 */
+	@Override
+	public boolean actionAllowed(Role role, Restrictable restrictable) {
+
+		// user and restrictable must not be null
+		if (role == null)
+			throw new PrivilegeException("Role may not be null!");
+		else if (restrictable == null)
+			throw new PrivilegeException("Restrictable may not be null!");
+
+		// validate PrivilegeName for this restrictable
+		String privilegeName = restrictable.getPrivilegeName();
+		if (privilegeName == null || privilegeName.length() < 3) {
+			throw new PrivilegeException(
+					"The PrivilegeName may not be shorter than 3 characters. Invalid Restrictable "
+							+ restrictable.getClass().getName());
+		}
+
+		// If the role does not have this privilege, then stop as another role might have this privilege
+		if (!role.hasPrivilege(privilegeName)) {
+			return false;
+		}
+
+		// get the privilege for this restrictable
+		Privilege privilege = modelHandler.getPrivilege(privilegeName);
+		if (privilege == null) {
+			throw new PrivilegeException("No Privilege exists with the name " + privilegeName + " for Restrictable "
+					+ restrictable.getClass().getName());
+		}
+
+		// get the policy configured for this privilege
+		PrivilegePolicy policy = modelHandler.getPolicy(privilege.getPolicy());
+		if (policy == null) {
+			throw new PrivilegeException("PrivilegePolicy " + privilege.getPolicy() + " does not exist for Privilege "
+					+ privilegeName);
+		}
+
+		// delegate checking to privilege policy
+		return policy.actionAllowed(role, privilege, restrictable);
+	}
+
+	/**
+	 * @see ch.eitchnet.privilege.handler.SessionHandler#isCertificateValid(ch.eitchnet.privilege.model.Certificate)
+	 */
+	@Override
+	public boolean isCertificateValid(Certificate certificate) {
+
+		// certificate  must not be null
+		if (certificate == null)
+			throw new PrivilegeException("Certificate may not be null!");
+
+		// first see if a session exists for this certificate
+		CertificateSessionPair certificateSessionPair = sessionMap.get(certificate.getSessionId());
+		if (certificateSessionPair == null)
+			throw new AccessDeniedException("There is no session information for " + certificate.toString());
+
+		// validate certificate has not been tampered with
+		Certificate sessionCertificate = certificateSessionPair.certificate;
+		if (!sessionCertificate.equals(certificate))
+			throw new PrivilegeException("Received illegal certificate for session id " + certificate.getSessionId());
+
+		// TODO is validating authToken overkill since the two certificates have already been checked on equality?
+		// validate authToken from certificate using the sessions authPassword
+		String authToken = certificate.getAuthToken(certificateSessionPair.session.getAuthPassword());
+		if (authToken == null || !authToken.equals(certificateSessionPair.session.getAuthToken()))
+			throw new PrivilegeException("Received illegal certificate data for session id "
+					+ certificate.getSessionId());
+
+		// get user object
+		User user = modelHandler.getUser(certificateSessionPair.session.getUsername());
+
+		// if user exists, then certificate is valid
+		if (user == null) {
+			throw new PrivilegeException(
+					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
+		} else {
+			return true;
+		}
+	}
+
+	/**
+	 * @see ch.eitchnet.privilege.handler.SessionHandler#authenticate(java.lang.String, java.lang.String)
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the user credentials are not valid
+	 */
+	@Override
+	public Certificate authenticate(String username, String password) {
+
+		// both username and password must at least have 3 characters in length
+		if (username == null || username.length() < 3)
+			throw new PrivilegeException("The given username is shorter than 3 characters");
+		else if (password == null || password.length() < 3)
+			throw new PrivilegeException("The given password is shorter than 3 characters");
+
+		// we only work with hashed passwords
+		String passwordHash = encryptionHandler.convertToHash(password);
+
+		// get user object
+		User user = modelHandler.getUser(username);
+		// no user means no authentication
+		if (user == null)
+			throw new AccessDeniedException("There is no user defined with the credentials: " + username + " / ***...");
+
+		// validate password
+		if (!user.isPassword(passwordHash))
+			throw new AccessDeniedException("Password is incorrect for " + username + " / ***...");
+
+		// validate if user is allowed to login
+		if (user.getState() != UserState.ENABLED)
+			throw new AccessDeniedException("User " + username + " is not ENABLED. State is: " + user.getState());
+
+		// validate user has at least one role
+		if (user.getRoles().isEmpty()) {
+			throw new PrivilegeException("User " + username + " does not have any roles defined!");
+		}
+
+		// get 2 auth tokens
+		String authToken = encryptionHandler.nextToken();
+		String authPassword = encryptionHandler.nextToken();
+
+		// get next session id
+		String sessionId = nextSessionId();
+
+		// create certificate
+		Certificate certificate = new Certificate(sessionId, username, authToken, authPassword, user.getLocale());
+
+		// create and save a new session
+		Session session = new Session(sessionId, authToken, authPassword, user.getUsername(), System
+				.currentTimeMillis());
+		sessionMap.put(sessionId, new CertificateSessionPair(session, certificate));
+
+		// log
+		logger.info("Authenticated: " + session);
+
+		// return the certificate
+		return certificate;
+	}
+
+	/**
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplacePrivilege(ch.eitchnet.privilege.model.Certificate,
 	 *      ch.eitchnet.privilege.model.PrivilegeRep)
 	 */
 	@Override
@@ -69,7 +270,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#addOrReplaceRole(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplaceRole(ch.eitchnet.privilege.model.Certificate,
 	 *      ch.eitchnet.privilege.model.RoleRep)
 	 */
 	@Override
@@ -90,7 +291,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#addOrReplaceUser(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplaceUser(ch.eitchnet.privilege.model.Certificate,
 	 *      ch.eitchnet.privilege.model.UserRep, java.lang.String)
 	 */
 	@Override
@@ -108,7 +309,7 @@ public class DefaultModelHandler implements ModelHandler {
 		if (password == null)
 			passwordHash = null;
 		else
-			passwordHash = PrivilegeContainer.getInstance().getEncryptionHandler().convertToHash(password);
+			passwordHash = encryptionHandler.convertToHash(password);
 
 		// create new user
 		User user = new User(userRep.getUsername(), passwordHash, userRep.getFirstname(), userRep.getSurname(), userRep
@@ -119,7 +320,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#addPrivilegeToRole(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addPrivilegeToRole(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -162,7 +363,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#addRoleToUser(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addRoleToUser(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -205,7 +406,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#persist(ch.eitchnet.privilege.model.Certificate)
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#persist(ch.eitchnet.privilege.model.Certificate)
 	 */
 	@Override
 	public boolean persist(Certificate certificate) {
@@ -221,7 +422,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#removePrivilege(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removePrivilege(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String)
 	 */
 	@Override
@@ -245,7 +446,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#removePrivilegeFromRole(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removePrivilegeFromRole(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -281,7 +482,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#removeRole(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removeRole(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String)
 	 */
 	@Override
@@ -305,7 +506,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#removeRoleFromUser(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removeRoleFromUser(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -342,7 +543,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#removeUser(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removeUser(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String)
 	 */
 	@Override
@@ -366,7 +567,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#setPrivilegeAllAllowed(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setPrivilegeAllAllowed(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, boolean)
 	 */
 	@Override
@@ -401,7 +602,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#setPrivilegeAllowList(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setPrivilegeAllowList(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.util.Set)
 	 */
 	@Override
@@ -429,7 +630,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#setPrivilegeDenyList(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setPrivilegeDenyList(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.util.Set)
 	 */
 	@Override
@@ -457,7 +658,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#setPrivilegePolicy(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setPrivilegePolicy(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -485,7 +686,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#setUserLocaleState(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserLocaleState(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.util.Locale)
 	 */
 	@Override
@@ -513,7 +714,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#setUserName(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserName(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -541,7 +742,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#setUserPassword(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserPassword(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -561,7 +762,7 @@ public class DefaultModelHandler implements ModelHandler {
 		}
 
 		// hash password
-		String passwordHash = PrivilegeContainer.getInstance().getEncryptionHandler().convertToHash(password);
+		String passwordHash = encryptionHandler.convertToHash(password);
 
 		// create new user
 		User newUser = new User(user.getUsername(), passwordHash, user.getFirstname(), user.getSurname(), user
@@ -572,7 +773,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#setUserState(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserState(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, ch.eitchnet.privilege.model.UserState)
 	 */
 	@Override
@@ -600,15 +801,17 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.base.PrivilegeContainerObject#initialize(org.dom4j.Element)
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#initialize(org.dom4j.Element)
 	 */
 	@Override
 	public void initialize(Element element) {
-		// nothing to initialize
+
+		lastSessionId = 0l;
+		sessionMap = new HashMap<String, CertificateSessionPair>();
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#getPrivilege(java.lang.String)
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getPrivilege(java.lang.String)
 	 */
 	@Override
 	public Privilege getPrivilege(String privilegeName) {
@@ -616,7 +819,7 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#getRole(java.lang.String)
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getRole(java.lang.String)
 	 */
 	@Override
 	public Role getRole(String roleName) {
@@ -624,10 +827,40 @@ public class DefaultModelHandler implements ModelHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.ModelHandler#getUser(java.lang.String)
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getUser(java.lang.String)
 	 */
 	@Override
 	public User getUser(String username) {
 		return persistenceHandler.getUser(username);
+	}
+
+	/**
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getPolicy(java.lang.String)
+	 */
+	@Override
+	public PrivilegePolicy getPolicy(String policyName) {
+		return persistenceHandler.getPolicy(policyName);
+	}
+
+	/**
+	 * @return a new session id
+	 */
+	private synchronized String nextSessionId() {
+		return Long.toString(++lastSessionId % Long.MAX_VALUE);
+	}
+
+	/**
+	 * An internal class used to keep a record of sessions with the certificate
+	 * 
+	 * @author rvonburg
+	 */
+	private class CertificateSessionPair {
+		private Session session;
+		private Certificate certificate;
+
+		public CertificateSessionPair(Session session, Certificate certificate) {
+			this.session = session;
+			this.certificate = certificate;
+		}
 	}
 }

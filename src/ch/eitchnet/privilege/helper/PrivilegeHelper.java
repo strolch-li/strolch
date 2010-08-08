@@ -24,7 +24,7 @@ public class PrivilegeHelper {
 
 	public static boolean isUserPrivilegeAdmin(Certificate certificate) {
 		// validate certificate
-		if (!PrivilegeContainer.getInstance().getSessionHandler().isCertificateValid(certificate)) {
+		if (!PrivilegeContainer.getInstance().getModelHandler().isCertificateValid(certificate)) {
 			throw new PrivilegeException("Certificate " + certificate + " is not valid!");
 		}
 
