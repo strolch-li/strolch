@@ -285,6 +285,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 					+ XmlConstants.XML_PARAM_BASE_PATH + " is invalid");
 		}
 
+		// ROLES
 		// get roles file name
 		String rolesFileName = parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
 		if (rolesFileName == null || rolesFileName.isEmpty()) {
@@ -307,6 +308,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		readRoles(rolesRootElement);
 		rolesFileDate = rolesFile.lastModified();
 
+		// USERS
 		// get users file name
 		String usersFileName = parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
 		if (usersFileName == null || usersFileName.isEmpty()) {
@@ -329,6 +331,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		readUsers(usersRootElement);
 		usersFileDate = usersFile.lastModified();
 
+		// PRIVILEGES
 		// get privileges file name
 		String privilegesFileName = parameterMap.get(XmlConstants.XML_PARAM_PRIVILEGES_FILE);
 		if (privilegesFileName == null || privilegesFileName.isEmpty()) {
@@ -351,6 +354,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		readPrivileges(privilegesRootElement);
 		privilegesFileDate = privilegesFile.lastModified();
 
+		// POLICIES
 		// get policy file name
 		String policyFileName = parameterMap.get(XmlConstants.XML_PARAM_POLICY_FILE);
 		if (policyFileName == null || policyFileName.isEmpty()) {
