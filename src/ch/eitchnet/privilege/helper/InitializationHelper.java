@@ -27,14 +27,14 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
  * @author rvonburg
  * 
  */
-public class ConfigurationHelper {
+public class InitializationHelper {
 
-	private static final Logger logger = Logger.getLogger(ConfigurationHelper.class);
+	private static final Logger logger = Logger.getLogger(InitializationHelper.class);
 
 	/**
 	 * @param privilegeContainerXmlFile
 	 */
-	public static void initializeFromXml(File privilegeContainerXmlFile) {
+	public static PrivilegeHandler initializeFromXml(File privilegeContainerXmlFile) {
 
 		// make sure file exists
 		if (!privilegeContainerXmlFile.exists()) {
@@ -103,6 +103,8 @@ public class ConfigurationHelper {
 			logger.error(e, e);
 			throw new PrivilegeException("PrivilegeHandler " + privilegeHandlerClassName + " could not be initialized");
 		}
+
+		return privilegeHandler;
 	}
 
 	/**
@@ -114,7 +116,16 @@ public class ConfigurationHelper {
 
 		Map<String, String> parameterMap = new HashMap<String, String>();
 
+		// if element is null then there are no parameters, so return empty map
+		if (element == null)
+			return parameterMap;
+
 		List<Element> elements = element.elements(XmlConstants.XML_PARAMETER);
+
+		// if elements is null or empty then there are no parameters, so return empty map
+		if (elements == null || elements.isEmpty())
+			return parameterMap;
+
 		for (Element parameter : elements) {
 			String name = parameter.attributeValue(XmlConstants.XML_ATTR_NAME);
 			String value = parameter.attributeValue(XmlConstants.XML_ATTR_VALUE);
