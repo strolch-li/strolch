@@ -3,22 +3,22 @@
 
 	<PersistenceHandler class="ch.eitchnet.privilege.handler.DefaultPersistenceHandler">
 		<Parameters>
+			<Parameter name="basePath" value="./config" />
 			<Parameter name="usersXmlFile" value="PrivilegeUsers.xml" />
 			<Parameter name="rolesXmlFile" value="PrivilegeRoles.xml" />
 			<Parameter name="privilegesXmlFile" value="Privileges.xml" />
+			<Parameter name="policyXmlFile" value="PrivilegePolicies.xml" />
 		</Parameters>
 	</PersistenceHandler>
+
 	<SessionHandler class="ch.eitchnet.privilege.handler.DefaultSessionHandler" />
+
 	<ModelHandler class="ch.eitchnet.privilege.handler.DefaultModelHandler" />
+
 	<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
 		<Parameters>
 			<Parameter name="hashAlgorithm" value="SHA-256" />
 		</Parameters>
 	</EncryptionHandler>
-	<PolicyHandler class="ch.eitchnet.privilege.handler.DefaultPolicyHandler">
-		<Parameters>
-			<Parameter name="policyXmlFile" value="PrivilegePolicies.xml" />
-		</Parameters>
-	</PolicyHandler>
 
 </PrivilegeContainer>
