@@ -11,6 +11,7 @@
 package ch.eitchnet.privilege.model.internal;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import ch.eitchnet.privilege.model.PrivilegeRep;
@@ -79,7 +80,7 @@ public final class Privilege {
 	 * @return a {@link PrivilegeRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public PrivilegeRep asPrivilegeRep() {
-		return new PrivilegeRep(name, policy, allAllowed, denyList, allowList);
+		return new PrivilegeRep(name, policy, allAllowed, new HashSet<String>(denyList), new HashSet<String>(allowList));
 	}
 
 	/**

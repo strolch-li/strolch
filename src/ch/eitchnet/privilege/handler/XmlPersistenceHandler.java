@@ -24,10 +24,8 @@ import org.apache.log4j.Logger;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 
-import ch.eitchnet.privilege.base.PrivilegeContainer;
-import ch.eitchnet.privilege.base.XmlConstants;
 import ch.eitchnet.privilege.helper.ClassHelper;
-import ch.eitchnet.privilege.helper.ConfigurationHelper;
+import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
@@ -41,9 +39,9 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
  * @author rvonburg
  * 
  */
-public class DefaultPersistenceHandler implements PersistenceHandler {
+public class XmlPersistenceHandler implements PersistenceHandler {
 
-	private static final Logger logger = Logger.getLogger(DefaultPersistenceHandler.class);
+	private static final Logger logger = Logger.getLogger(XmlPersistenceHandler.class);
 
 	private Map<String, User> userMap;
 	private Map<String, Role> roleMap;
@@ -58,6 +56,8 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	private boolean privilegeMapDirty;
 
 	private Map<String, String> parameterMap;
+
+	private String basePath;
 
 	/**
 	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplacePrivilege(ch.eitchnet.privilege.model.Certificate,
@@ -175,7 +175,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 					+ XmlConstants.XML_PARAM_USERS_FILE + " is invalid");
 		}
 		// get users file
-		File usersFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + usersFileName);
+		File usersFile = new File(basePath + "/" + usersFileName);
 		boolean usersFileUnchanged = usersFile.exists() && usersFile.lastModified() == usersFileDate;
 		if (!userMapDirty && usersFileUnchanged) {
 			logger.warn("No users unpersisted and user file unchanged on file system");
@@ -202,7 +202,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 					+ XmlConstants.XML_PARAM_ROLES_FILE + " is invalid");
 		}
 		// get roles file
-		File rolesFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + rolesFileName);
+		File rolesFile = new File(basePath + "/" + rolesFileName);
 		boolean rolesFileUnchanged = rolesFile.exists() && rolesFile.lastModified() == rolesFileDate;
 		if (!roleMapDirty && rolesFileUnchanged) {
 			logger.warn("No roles unpersisted and roles file unchanged on file system");
@@ -229,7 +229,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 					+ XmlConstants.XML_PARAM_PRIVILEGES_FILE + " is invalid");
 		}
 		// get privileges file
-		File privilegesFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + privilegesFileName);
+		File privilegesFile = new File(basePath + "/" + privilegesFileName);
 		boolean privilegesFileUnchanged = privilegesFile.exists()
 				&& privilegesFile.lastModified() == privilegesFileDate;
 		if (!privilegeMapDirty && privilegesFileUnchanged) {
@@ -267,19 +267,23 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.base.PrivilegeContainerObject#initialize(org.dom4j.Element)
+	 * @see ch.eitchnet.privilege.handler.EncryptionHandler#initialize(java.util.Map)
 	 */
 	@Override
-	public void initialize(Element element) {
+	public void initialize(Map<String, String> parameterMap) {
 
 		roleMap = new HashMap<String, Role>();
 		userMap = new HashMap<String, User>();
 		privilegeMap = new HashMap<String, Privilege>();
 		policyMap = new HashMap<String, Class<PrivilegePolicy>>();
 
-		// get parameters
-		Element parameterElement = element.element(XmlConstants.XML_PARAMETERS);
-		parameterMap = ConfigurationHelper.convertToParameterMap(parameterElement);
+		// get and validate base bath
+		basePath = parameterMap.get(XmlConstants.XML_PARAM_BASE_PATH);
+		File basePathF = new File(basePath);
+		if (!basePathF.exists() && !basePathF.isDirectory()) {
+			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
+					+ XmlConstants.XML_PARAM_BASE_PATH + " is invalid");
+		}
 
 		// get roles file name
 		String rolesFileName = parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
@@ -289,7 +293,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get roles file
-		File rolesFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + rolesFileName);
+		File rolesFile = new File(basePath + "/" + rolesFileName);
 		if (!rolesFile.exists()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_ROLES_FILE + " is invalid as roles file does not exist at path "
@@ -311,7 +315,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get users file
-		File usersFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + usersFileName);
+		File usersFile = new File(basePath + "/" + usersFileName);
 		if (!usersFile.exists()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_USERS_FILE + " is invalid as users file does not exist at path "
@@ -333,7 +337,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get privileges file
-		File privilegesFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + privilegesFileName);
+		File privilegesFile = new File(basePath + "/" + privilegesFileName);
 		if (!privilegesFile.exists()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_PRIVILEGES_FILE + " is invalid as privileges file does not exist at path "
@@ -355,7 +359,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get policy file
-		File policyFile = new File(PrivilegeContainer.getInstance().getBasePath() + "/" + policyFileName);
+		File policyFile = new File(basePath + "/" + policyFileName);
 		if (!policyFile.exists()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_POLICY_FILE + " is invalid as policy file does not exist at path "
@@ -380,7 +384,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 		boolean privilegeAdminExists = false;
 		for (String username : userMap.keySet()) {
 			User user = userMap.get(username);
-			if (user.hasRole(PrivilegeContainer.PRIVILEGE_ADMIN_ROLE)) {
+			if (user.hasRole(PrivilegeHandler.PRIVILEGE_ADMIN_ROLE)) {
 				privilegeAdminExists = true;
 				break;
 			}
@@ -395,6 +399,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	 */
 	private void readUsers(Element usersRootElement) {
 
+		@SuppressWarnings("unchecked")
 		List<Element> userElements = usersRootElement.elements(XmlConstants.XML_USER);
 		for (Element userElement : userElements) {
 
@@ -406,11 +411,12 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 
 			UserState userState = UserState.valueOf(userElement.element(XmlConstants.XML_STATE).getTextTrim());
 
-			// TODO better handling needed
+			// TODO better parsing needed
 			String localeName = userElement.element(XmlConstants.XML_LOCALE).getTextTrim();
 			Locale locale = new Locale(localeName);
 
 			Element rolesElement = userElement.element(XmlConstants.XML_ROLES);
+			@SuppressWarnings("unchecked")
 			List<Element> rolesElementList = rolesElement.elements(XmlConstants.XML_ROLE);
 			Set<String> roles = new HashSet<String>();
 			for (Element roleElement : rolesElementList) {
@@ -436,11 +442,13 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	 */
 	private void readRoles(Element rolesRootElement) {
 
+		@SuppressWarnings("unchecked")
 		List<Element> roleElements = rolesRootElement.elements(XmlConstants.XML_ROLE);
 		for (Element roleElement : roleElements) {
 
 			String roleName = roleElement.attributeValue(XmlConstants.XML_ATTR_NAME);
 
+			@SuppressWarnings("unchecked")
 			List<Element> privilegeElements = roleElement.elements(XmlConstants.XML_PRIVILEGE);
 			Set<String> privileges = new HashSet<String>();
 			for (Element privilegeElement : privilegeElements) {
@@ -459,6 +467,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	 */
 	private void readPrivileges(Element privilegesRootElement) {
 
+		@SuppressWarnings("unchecked")
 		List<Element> privilegeElements = privilegesRootElement.elements(XmlConstants.XML_PRIVILEGE);
 		for (Element privilegeElement : privilegeElements) {
 
@@ -468,6 +477,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 			String allAllowedS = privilegeElement.element(XmlConstants.XML_ALL_ALLOWED).getTextTrim();
 			boolean allAllowed = Boolean.valueOf(allAllowedS);
 
+			@SuppressWarnings("unchecked")
 			List<Element> denyElements = privilegeElement.elements(XmlConstants.XML_DENY);
 			Set<String> denyList = new HashSet<String>(denyElements.size());
 			for (Element denyElement : denyElements) {
@@ -479,6 +489,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 				}
 			}
 
+			@SuppressWarnings("unchecked")
 			List<Element> allowElements = privilegeElement.elements(XmlConstants.XML_ALLOW);
 			Set<String> allowList = new HashSet<String>(allowElements.size());
 			for (Element allowElement : allowElements) {
@@ -500,6 +511,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 	 */
 	private void readPolicies(Element policiesRootElement) {
 
+		@SuppressWarnings("unchecked")
 		List<Element> policyElements = policiesRootElement.elements(XmlConstants.XML_POLICY);
 		for (Element policyElement : policyElements) {
 			String policyName = policyElement.attributeValue(XmlConstants.XML_ATTR_NAME);
@@ -593,7 +605,7 @@ public class DefaultPersistenceHandler implements PersistenceHandler {
 			// create the user element
 			Element userElement = documentFactory.createElement(XmlConstants.XML_USER);
 			userElement.addAttribute(XmlConstants.XML_ATTR_USERNAME, user.getUsername());
-			userElement.addAttribute(XmlConstants.XML_ATTR_PASSWORD, user.getPassword(certificate));
+			userElement.addAttribute(XmlConstants.XML_ATTR_PASSWORD, user.getPassword());
 
 			// add first name element
 			Element firstnameElement = documentFactory.createElement(XmlConstants.XML_FIRSTNAME);

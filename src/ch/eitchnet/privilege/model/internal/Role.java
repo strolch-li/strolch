@@ -11,6 +11,7 @@
 package ch.eitchnet.privilege.model.internal;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import ch.eitchnet.privilege.model.RoleRep;
@@ -60,7 +61,7 @@ public final class Role {
 	 * @return a {@link RoleRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public RoleRep asRoleRep() {
-		return new RoleRep(name, privileges);
+		return new RoleRep(name, new HashSet<String>(privileges));
 	}
 
 	/**

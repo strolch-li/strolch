@@ -11,7 +11,6 @@
 package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -39,8 +38,8 @@ public class PrivilegeRep implements Serializable {
 		this.name = name;
 		this.policy = policy;
 		this.allAllowed = allAllowed;
-		this.denyList = new HashSet<String>(denyList);
-		this.allowList = new HashSet<String>(allowList);
+		this.denyList = denyList;
+		this.allowList = allowList;
 	}
 
 	/**

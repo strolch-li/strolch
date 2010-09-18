@@ -21,8 +21,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 
-import ch.eitchnet.privilege.base.PrivilegeContainer;
-import ch.eitchnet.privilege.base.XmlConstants;
 
 /**
  * <p>
@@ -43,6 +41,8 @@ public class BootstrapConfigurationHelper {
 
 	private static String path;
 
+	private static String defaultPrivilegeContainerXmlFile = "PrivilegeContainer.xml";
+
 	private static String usersFileName = "PrivilegeUsers.xml";
 	private static String rolesFileName = "PrivilegeRoles.xml";
 	private static String privilegesFileName = "Privileges.xml";
@@ -51,10 +51,9 @@ public class BootstrapConfigurationHelper {
 
 	private static String policyXmlFile = "PrivilegePolicies.xml";
 
+	private static String defaultPrivilegeHandler = "ch.eitchnet.privilege.handler.DefaultPrivilegeHandler";
 	private static String defaultPersistenceHandler = "ch.eitchnet.privilege.handler.DefaultPersistenceHandler";
-	private static String defaultSessionHandler = "ch.eitchnet.privilege.handler.DefaultSessionHandler";
 	private static String defaultEncryptionHandler = "ch.eitchnet.privilege.handler.DefaultEncryptionHandler";
-	private static String defaultPolicyHandler = "ch.eitchnet.privilege.handler.DefaultPolicyHandler";
 
 	/**
 	 * @param args
@@ -67,7 +66,7 @@ public class BootstrapConfigurationHelper {
 		// get current directory
 		path = System.getProperty("user.dir") + "/newConfig";
 
-		// ask user where to save configuration, default is pwd/newConfig/....
+		// TODO ask user where to save configuration, default is pwd/newConfig/....
 
 		// see if path already exists
 		File pathF = new File(path);
@@ -79,7 +78,7 @@ public class BootstrapConfigurationHelper {
 			}
 		}
 
-		// ask other questions...
+		// TODO ask other questions...
 
 		// now perform work:
 		createXmlPrivilegeContainer();
@@ -139,15 +138,16 @@ public class BootstrapConfigurationHelper {
 		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_PRIVILEGES_FILE);
 		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, privilegesFileName);
 		parametersElement.add(parameterElement);
+		// Parameter policyXmlFile
+		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
+		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_POLICY_FILE);
+		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, policyXmlFile);
+		parametersElement.add(parameterElement);
 
-		// create SessionHandler
-		Element sessionHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_SESSION);
-		sessionHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, defaultSessionHandler);
-
-		// create ModelHandler
-		Element modelHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_MODEL);
-		rootElement.add(modelHandlerElem);
-		modelHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, "ch.eitchnet.privilege.handler.DefaultModelHandler");
+		// create PrivilegeHandler
+		Element privilegeHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_PRIVILEGE);
+		rootElement.add(privilegeHandlerElem);
+		privilegeHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, defaultPrivilegeHandler);
 
 		// create EncryptionHandler
 		Element encryptionHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_ENCRYPTION);
@@ -161,19 +161,8 @@ public class BootstrapConfigurationHelper {
 		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, hashAlgorithm);
 		parametersElement.add(parameterElement);
 
-		// create PolicyHandler
-		Element policyHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_POLICY);
-		rootElement.add(policyHandlerElem);
-		policyHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, defaultPolicyHandler);
-		parametersElement = factory.createElement(XmlConstants.XML_PARAMETERS);
-		policyHandlerElem.add(parametersElement);
-		// Parameter policyXmlFile
-		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_POLICY_FILE);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, policyXmlFile);
-		parametersElement.add(parameterElement);
-
-		File privilegeContainerFile = new File(path + "/" + PrivilegeContainer.PRIVILEGE_CONTAINER_FILE);
+		// write the container file to disk
+		File privilegeContainerFile = new File(path + "/" + defaultPrivilegeContainerXmlFile);
 		XmlHelper.writeDocument(doc, privilegeContainerFile);
 	}
 }

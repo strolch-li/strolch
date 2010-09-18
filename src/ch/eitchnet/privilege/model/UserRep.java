@@ -55,7 +55,8 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param username the username to set
+	 * @param username
+	 *            the username to set
 	 */
 	public void setUsername(String username) {
 		this.username = username;
@@ -69,7 +70,8 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param firstname the firstname to set
+	 * @param firstname
+	 *            the firstname to set
 	 */
 	public void setFirstname(String firstname) {
 		this.firstname = firstname;
@@ -83,7 +85,8 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param surname the surname to set
+	 * @param surname
+	 *            the surname to set
 	 */
 	public void setSurname(String surname) {
 		this.surname = surname;
@@ -97,7 +100,8 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param userState the userState to set
+	 * @param userState
+	 *            the userState to set
 	 */
 	public void setUserState(UserState userState) {
 		this.userState = userState;
@@ -111,7 +115,8 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param roles the roles to set
+	 * @param roles
+	 *            the roles to set
 	 */
 	public void setRoles(Set<String> roles) {
 		this.roles = roles;
@@ -125,7 +130,8 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param locale the locale to set
+	 * @param locale
+	 *            the locale to set
 	 */
 	public void setLocale(Locale locale) {
 		this.locale = locale;

@@ -11,11 +11,10 @@
 package ch.eitchnet.privilege.model.internal;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import ch.eitchnet.privilege.helper.PrivilegeHelper;
-import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 
@@ -70,13 +69,19 @@ public final class User {
 	}
 
 	/**
-	 * @return the password
+	 * 
+	 * @param privilegeHandler
+	 * @param certificate
+	 * 
+	 * @return
 	 */
-	public String getPassword(Certificate certificate) {
-		if (PrivilegeHelper.isUserPrivilegeAdmin(certificate))
-			return password;
-		else
-			return null;
+	public String getPassword() {
+
+		// TODO is it possible that there is a hidden way of accessing this 
+		// field even though? The User object should be private, but maybe I 
+		// forgot something?
+
+		return password;
 	}
 
 	/**
@@ -135,7 +140,7 @@ public final class User {
 	 * @return a {@link UserRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public UserRep asUserRep() {
-		return new UserRep(username, firstname, surname, userState, roles, locale);
+		return new UserRep(username, firstname, surname, userState, new HashSet<String>(roles), locale);
 	}
 
 	/**

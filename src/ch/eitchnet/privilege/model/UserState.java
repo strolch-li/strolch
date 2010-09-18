@@ -18,5 +18,5 @@ public enum UserState {
 	NEW,
 	ENABLED,
 	DISABLED,
-	DEACTIVATED;
+	EXPIRED;
 }

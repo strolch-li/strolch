@@ -10,7 +10,7 @@
 
 package ch.eitchnet.privilege.handler;
 
-import org.dom4j.Element;
+import java.util.Map;
 
 /**
  * @author rvonburg
@@ -18,9 +18,19 @@ import org.dom4j.Element;
  */
 public interface EncryptionHandler {
 
+	/**
+	 * @return
+	 */
 	public String nextToken();
 
+	/**
+	 * @param string
+	 * @return
+	 */
 	public String convertToHash(String string);
 
-	public void initialize(Element element);
+	/**
+	 * @param parameterMap
+	 */
+	public void initialize(Map<String, String> parameterMap);
 }

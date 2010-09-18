@@ -16,11 +16,9 @@ import java.security.SecureRandom;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Element;
 
-import ch.eitchnet.privilege.base.XmlConstants;
-import ch.eitchnet.privilege.helper.ConfigurationHelper;
 import ch.eitchnet.privilege.helper.EncryptionHelper;
+import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
@@ -62,15 +60,12 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.base.PrivilegeContainerObject#initialize(org.dom4j.Element)
+	 * @see ch.eitchnet.privilege.handler.EncryptionHandler#initialize(java.util.Map)
 	 */
-	public void initialize(Element element) {
+	@Override
+	public void initialize(Map<String, String> parameterMap) {
 
 		secureRandom = new SecureRandom();
-
-		// get parameters
-		Element parameterElement = element.element(XmlConstants.XML_PARAMETERS);
-		Map<String, String> parameterMap = ConfigurationHelper.convertToParameterMap(parameterElement);
 
 		// get hash algorithm parameters
 		hashAlgorithm = parameterMap.get(XmlConstants.XML_PARAM_HASH_ALGORITHM);
