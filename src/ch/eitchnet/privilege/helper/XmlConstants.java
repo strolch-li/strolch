@@ -46,6 +46,7 @@ public class XmlConstants {
 	public static final String XML_ATTR_NAME = "name";
 	public static final String XML_ATTR_VALUE = "value";
 	public static final String XML_ATTR_POLICY = "policy";
+	public static final String XML_ATTR_USER_ID = "userId";
 	public static final String XML_ATTR_USERNAME = "username";
 	public static final String XML_ATTR_PASSWORD = "password";
 

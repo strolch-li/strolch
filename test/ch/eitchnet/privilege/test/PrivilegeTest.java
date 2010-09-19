@@ -90,7 +90,7 @@ public class PrivilegeTest {
 		Certificate certificate = privilegeHandler.authenticate("eitch", "1234567890");
 
 		// let's add a new user bob
-		UserRep userRep = new UserRep("bob", "Bob", "Newman", UserState.NEW, new HashSet<String>(), null);
+		UserRep userRep = new UserRep("1", "bob", "Bob", "Newman", UserState.NEW, new HashSet<String>(), null);
 		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user bob");
 
@@ -154,7 +154,7 @@ public class PrivilegeTest {
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// let's add a new user bob
-		UserRep userRep = new UserRep("bob", "Bob", "Newman", UserState.NEW, new HashSet<String>(), null);
+		UserRep userRep = new UserRep("1", "bob", "Bob", "Newman", UserState.NEW, new HashSet<String>(), null);
 		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user bob");
 	}
@@ -173,7 +173,7 @@ public class PrivilegeTest {
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// let's add a new user ted
-		UserRep userRep = new UserRep("ted", "Ted", "Newman", UserState.NEW, new HashSet<String>(), null);
+		UserRep userRep = new UserRep("2", "ted", "Ted", "Newman", UserState.NEW, new HashSet<String>(), null);
 		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user bob");
 	}

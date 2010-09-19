@@ -11,6 +11,7 @@
 package ch.eitchnet.privilege.handler;
 
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Map;
@@ -22,13 +23,34 @@ import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
+ * <p>
+ * This default {@link EncryptionHandler} creates nokens by using a {@link SecureRandom} object. Hashing is done by
+ * using {@link MessageDigest} and the configured algorithm which is passed in the parameters
+ * </p>
+ * 
+ * Required parameters:
+ * <ul>
+ * <li> {@link XmlConstants#XML_PARAM_HASH_ALGORITHM}</li>
+ * </ul>
+ * 
  * @author rvonburg
  * 
  */
 public class DefaultEncryptionHandler implements EncryptionHandler {
+
+	/**
+	 * The log4j logger used in this instance
+	 */
 	private static final Logger logger = Logger.getLogger(DefaultEncryptionHandler.class);
 
+	/**
+	 * The {@link SecureRandom} which is used to create new tokens
+	 */
 	private SecureRandom secureRandom;
+
+	/**
+	 * The configured hash algorithm for this instance
+	 */
 	private String hashAlgorithm;
 
 	/**

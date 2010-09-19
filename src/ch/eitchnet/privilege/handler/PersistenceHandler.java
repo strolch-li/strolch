@@ -12,7 +12,6 @@ package ch.eitchnet.privilege.handler;
 
 import java.util.Map;
 
-import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
@@ -136,14 +135,18 @@ public interface PersistenceHandler {
 	public void addOrReplacePrivilege(Privilege privilege);
 
 	/**
-	 * @param certificate
+	 * Informs this {@link PersistenceHandler} to persist any changes which need to be saved
 	 * 
-	 * @return
+	 * @return true if changes were persisted successfully, false if something went wrong
 	 */
-	public boolean persist(Certificate certificate);
+	public boolean persist();
 
 	/**
+	 * Initialize the concrete {@link PersistenceHandler}. The passed parameter map contains any configuration the
+	 * concrete {@link PersistenceHandler} might need
+	 * 
 	 * @param parameterMap
+	 *            a map containing configuration properties
 	 */
 	public void initialize(Map<String, String> parameterMap);
 }

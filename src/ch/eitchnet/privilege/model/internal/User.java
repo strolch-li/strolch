@@ -24,6 +24,8 @@ import ch.eitchnet.privilege.model.UserState;
  */
 public final class User {
 
+	private final String userId;
+
 	private final String username;
 	private final String password;
 
@@ -37,7 +39,7 @@ public final class User {
 	private final Locale locale;
 
 	/**
-	 * 
+	 * @param userId
 	 * @param username
 	 * @param password
 	 * @param firstname
@@ -46,8 +48,10 @@ public final class User {
 	 * @param roles
 	 * @param locale
 	 */
-	public User(String username, String password, String firstname, String surname, UserState userState,
+	public User(String userId, String username, String password, String firstname, String surname, UserState userState,
 			Set<String> roles, Locale locale) {
+
+		this.userId = userId;
 
 		this.username = username;
 		this.password = password;
@@ -59,6 +63,13 @@ public final class User {
 		this.roles = Collections.unmodifiableSet(roles);
 
 		this.locale = locale;
+	}
+
+	/**
+	 * @return the userId
+	 */
+	public String getUserId() {
+		return userId;
 	}
 
 	/**
@@ -101,7 +112,7 @@ public final class User {
 	/**
 	 * @return the userState
 	 */
-	public UserState getState() {
+	public UserState getUserState() {
 		return this.userState;
 	}
 
@@ -133,7 +144,7 @@ public final class User {
 	 * @return a {@link UserRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public UserRep asUserRep() {
-		return new UserRep(this.username, this.firstname, this.surname, this.userState,
+		return new UserRep(this.userId, this.username, this.firstname, this.surname, this.userState,
 				new HashSet<String>(this.roles), this.locale);
 	}
 
@@ -143,7 +154,9 @@ public final class User {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("User [username=");
+		builder.append("User [userId=");
+		builder.append(this.userId);
+		builder.append(", username=");
 		builder.append(this.username);
 		builder.append(", firstname=");
 		builder.append(this.firstname);

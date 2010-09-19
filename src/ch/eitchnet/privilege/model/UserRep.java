@@ -22,6 +22,7 @@ public class UserRep implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private final String userId;
 	private String username;
 	private String firstname;
 	private String surname;
@@ -30,6 +31,7 @@ public class UserRep implements Serializable {
 	private Locale locale;
 
 	/**
+	 * @param userId
 	 * @param username
 	 * @param firstname
 	 * @param surname
@@ -37,14 +39,22 @@ public class UserRep implements Serializable {
 	 * @param roles
 	 * @param locale
 	 */
-	public UserRep(String username, String firstname, String surname, UserState userState, Set<String> roles,
-			Locale locale) {
+	public UserRep(String userId, String username, String firstname, String surname, UserState userState,
+			Set<String> roles, Locale locale) {
+		this.userId = userId;
 		this.username = username;
 		this.firstname = firstname;
 		this.surname = surname;
 		this.userState = userState;
 		this.roles = roles;
 		this.locale = locale;
+	}
+
+	/**
+	 * @return the userId
+	 */
+	public String getUserId() {
+		return this.userId;
 	}
 
 	/**

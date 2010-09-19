@@ -28,7 +28,6 @@ import ch.eitchnet.privilege.helper.ClassHelper;
 import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
-import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
@@ -159,10 +158,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#persist(ch.eitchnet.privilege.model.Certificate)
+	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#persist()
 	 */
 	@Override
-	public boolean persist(Certificate certificate) {
+	public boolean persist() {
 
 		// USERS
 		// get users file name
@@ -404,6 +403,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		List<Element> userElements = usersRootElement.elements(XmlConstants.XML_USER);
 		for (Element userElement : userElements) {
 
+			String userId = userElement.attributeValue(XmlConstants.XML_ATTR_USER_ID);
+
 			String username = userElement.attributeValue(XmlConstants.XML_ATTR_USERNAME);
 			String password = userElement.attributeValue(XmlConstants.XML_ATTR_PASSWORD);
 
@@ -430,8 +431,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			}
 
 			// create user
-			User user = new User(username, password, firstname, surname, userState, Collections.unmodifiableSet(roles),
-					locale);
+			User user = new User(userId, username, password, firstname, surname, userState, Collections
+					.unmodifiableSet(roles), locale);
 
 			// put user in map
 			this.userMap.put(username, user);
@@ -605,6 +606,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 			// create the user element
 			Element userElement = documentFactory.createElement(XmlConstants.XML_USER);
+			userElement.addAttribute(XmlConstants.XML_ATTR_USER_ID, user.getUserId());
 			userElement.addAttribute(XmlConstants.XML_ATTR_USERNAME, user.getUsername());
 			userElement.addAttribute(XmlConstants.XML_ATTR_PASSWORD, user.getPassword());
 
@@ -620,7 +622,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 			// add state element
 			Element stateElement = documentFactory.createElement(XmlConstants.XML_STATE);
-			stateElement.setText(user.getState().toString());
+			stateElement.setText(user.getUserState().toString());
 			userElement.add(stateElement);
 
 			// add locale element

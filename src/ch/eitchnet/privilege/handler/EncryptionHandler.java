@@ -38,8 +38,8 @@ public interface EncryptionHandler {
 	public String convertToHash(String string);
 
 	/**
-	 * Initialize the concrete {@link EncryptionHandler}. The passed parameter map contains any configuration this map
-	 * might need
+	 * Initialize the concrete {@link EncryptionHandler}. The passed parameter map contains any configuration the
+	 * concrete {@link EncryptionHandler} might need
 	 * 
 	 * @param parameterMap
 	 *            a map containing configuration properties

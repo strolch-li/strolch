@@ -151,8 +151,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User user = new User(userRep.getUsername(), passwordHash, userRep.getFirstname(), userRep.getSurname(), userRep
-				.getUserState(), userRep.getRoles(), userRep.getLocale());
+		User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(), userRep
+				.getSurname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale());
 
 		// delegate to persistence handler
 		this.persistenceHandler.addOrReplaceUser(user);
@@ -229,8 +229,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Set<String> newRoles = new HashSet<String>(currentRoles);
 		newRoles.add(roleName);
 
-		User newUser = new User(user.getUsername(), user.getPassword(), user.getFirstname(), user.getSurname(), user
-				.getState(), newRoles, user.getLocale());
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(), user
+				.getSurname(), user.getUserState(), newRoles, user.getLocale());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -334,8 +334,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// create new user
 		Set<String> newRoles = new HashSet<String>(currentRoles);
 		newRoles.remove(roleName);
-		User newUser = new User(user.getUsername(), user.getPassword(), user.getFirstname(), user.getSurname(), user
-				.getState(), newRoles, user.getLocale());
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(), user
+				.getSurname(), user.getUserState(), newRoles, user.getLocale());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -483,8 +483,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User newUser = new User(user.getUsername(), user.getPassword(), user.getFirstname(), user.getSurname(), user
-				.getState(), user.getRoles(), locale);
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(), user
+				.getSurname(), user.getUserState(), user.getRoles(), locale);
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -507,8 +507,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User newUser = new User(user.getUsername(), user.getPassword(), firstname, surname, user.getState(), user
-				.getRoles(), user.getLocale());
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), firstname, surname, user
+				.getUserState(), user.getRoles(), user.getLocale());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -541,8 +541,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User newUser = new User(user.getUsername(), passwordHash, user.getFirstname(), user.getSurname(), user
-				.getState(), user.getRoles(), user.getLocale());
+		User newUser = new User(user.getUserId(), user.getUsername(), passwordHash, user.getFirstname(), user
+				.getSurname(), user.getUserState(), user.getRoles(), user.getLocale());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -565,8 +565,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User newUser = new User(user.getUsername(), user.getPassword(), user.getFirstname(), user.getSurname(), state,
-				user.getRoles(), user.getLocale());
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(), user
+				.getSurname(), state, user.getRoles(), user.getLocale());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -604,8 +604,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new AccessDeniedException("Password is incorrect for " + username + " / ***...");
 
 		// validate if user is allowed to login
-		if (user.getState() != UserState.ENABLED)
-			throw new AccessDeniedException("User " + username + " is not ENABLED. State is: " + user.getState());
+		if (user.getUserState() != UserState.ENABLED)
+			throw new AccessDeniedException("User " + username + " is not ENABLED. State is: " + user.getUserState());
 
 		// validate user has at least one role
 		if (user.getRoles().isEmpty()) {
@@ -819,7 +819,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// validate who is doing this
 		validateIsPrivilegeAdmin(certificate);
 
-		return this.persistenceHandler.persist(certificate);
+		return this.persistenceHandler.persist();
 	}
 
 	/**
@@ -850,12 +850,22 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @author rvonburg
 	 */
 	private class CertificateSessionPair {
+		/**
+		 * The {@link Session}
+		 */
 		public final Session session;
+		/**
+		 * The {@link Certificate}
+		 */
 		public final Certificate certificate;
 
 		/**
+		 * Creates a new {@link CertificateSessionPair} with the given session and certificate
+		 * 
 		 * @param session
+		 *            the session
 		 * @param certificate
+		 *            the certificate
 		 */
 		public CertificateSessionPair(Session session, Certificate certificate) {
 			this.session = session;
