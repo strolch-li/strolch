@@ -12,7 +12,7 @@ package ch.eitchnet.privilege.model;
 
 /**
  * @author rvonburg
- *
+ * 
  */
 public enum UserState {
 	NEW,

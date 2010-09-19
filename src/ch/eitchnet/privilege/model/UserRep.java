@@ -51,7 +51,7 @@ public class UserRep implements Serializable {
 	 * @return the username
 	 */
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class UserRep implements Serializable {
 	 * @return the firstname
 	 */
 	public String getFirstname() {
-		return firstname;
+		return this.firstname;
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class UserRep implements Serializable {
 	 * @return the surname
 	 */
 	public String getSurname() {
-		return surname;
+		return this.surname;
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class UserRep implements Serializable {
 	 * @return the userState
 	 */
 	public UserState getUserState() {
-		return userState;
+		return this.userState;
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class UserRep implements Serializable {
 	 * @return the roles
 	 */
 	public Set<String> getRoles() {
-		return roles;
+		return this.roles;
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class UserRep implements Serializable {
 	 * @return the locale
 	 */
 	public Locale getLocale() {
-		return locale;
+		return this.locale;
 	}
 
 	/**

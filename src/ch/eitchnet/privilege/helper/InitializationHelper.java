@@ -33,6 +33,7 @@ public class InitializationHelper {
 
 	/**
 	 * @param privilegeContainerXmlFile
+	 * @return
 	 */
 	public static PrivilegeHandler initializeFromXml(File privilegeContainerXmlFile) {
 

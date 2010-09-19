@@ -21,7 +21,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 
-
 /**
  * <p>
  * This class is a simple application which can be used to bootstrap a new configuration for the
@@ -72,10 +71,10 @@ public class BootstrapConfigurationHelper {
 		File pathF = new File(path);
 		if (pathF.exists()) {
 			throw new RuntimeException("Path already exists: " + pathF.getAbsolutePath());
-		} else {
-			if (!pathF.mkdirs()) {
-				throw new RuntimeException("Could not create path " + pathF.getAbsolutePath());
-			}
+		}
+
+		if (!pathF.mkdirs()) {
+			throw new RuntimeException("Could not create path " + pathF.getAbsolutePath());
 		}
 
 		// TODO ask other questions...

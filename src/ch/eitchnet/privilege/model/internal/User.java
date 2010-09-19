@@ -65,7 +65,7 @@ public final class User {
 	 * @return the username
 	 */
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	/**
@@ -81,42 +81,35 @@ public final class User {
 		// field even though? The User object should be private, but maybe I 
 		// forgot something?
 
-		return password;
-	}
-
-	/**
-	 * @return the password
-	 */
-	public boolean isPassword(String password) {
-		return this.password.equals(password);
+		return this.password;
 	}
 
 	/**
 	 * @return the firstname
 	 */
 	public String getFirstname() {
-		return firstname;
+		return this.firstname;
 	}
 
 	/**
 	 * @return the surname
 	 */
 	public String getSurname() {
-		return surname;
+		return this.surname;
 	}
 
 	/**
 	 * @return the userState
 	 */
 	public UserState getState() {
-		return userState;
+		return this.userState;
 	}
 
 	/**
 	 * @return the roles
 	 */
 	public Set<String> getRoles() {
-		return roles;
+		return this.roles;
 	}
 
 	/**
@@ -126,21 +119,22 @@ public final class User {
 	 * @return true if the this user has the specified role
 	 */
 	public boolean hasRole(String role) {
-		return roles.contains(role);
+		return this.roles.contains(role);
 	}
 
 	/**
 	 * @return the locale
 	 */
 	public Locale getLocale() {
-		return locale;
+		return this.locale;
 	}
 
 	/**
 	 * @return a {@link UserRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public UserRep asUserRep() {
-		return new UserRep(username, firstname, surname, userState, new HashSet<String>(roles), locale);
+		return new UserRep(this.username, this.firstname, this.surname, this.userState,
+				new HashSet<String>(this.roles), this.locale);
 	}
 
 	/**
@@ -150,17 +144,17 @@ public final class User {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("User [username=");
-		builder.append(username);
+		builder.append(this.username);
 		builder.append(", firstname=");
-		builder.append(firstname);
+		builder.append(this.firstname);
 		builder.append(", surname=");
-		builder.append(surname);
+		builder.append(this.surname);
 		builder.append(", locale=");
-		builder.append(locale);
+		builder.append(this.locale);
 		builder.append(", userState=");
-		builder.append(userState);
+		builder.append(this.userState);
 		builder.append(", roles=");
-		builder.append(roles);
+		builder.append(this.roles);
 		builder.append("]");
 		return builder.toString();
 	}

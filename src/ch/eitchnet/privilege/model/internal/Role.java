@@ -39,14 +39,14 @@ public final class Role {
 	 * @return the name
 	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
 	 * @return
 	 */
 	public Set<String> getPrivileges() {
-		return privileges;
+		return this.privileges;
 	}
 
 	/**
@@ -54,14 +54,14 @@ public final class Role {
 	 * @return
 	 */
 	public boolean hasPrivilege(String key) {
-		return privileges.contains(key);
+		return this.privileges.contains(key);
 	}
 
 	/**
 	 * @return a {@link RoleRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public RoleRep asRoleRep() {
-		return new RoleRep(name, new HashSet<String>(privileges));
+		return new RoleRep(this.name, new HashSet<String>(this.privileges));
 	}
 
 	/**
@@ -71,9 +71,9 @@ public final class Role {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Role [name=");
-		builder.append(name);
+		builder.append(this.name);
 		builder.append(", privileges=");
-		builder.append(privileges);
+		builder.append(this.privileges);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -85,8 +85,8 @@ public final class Role {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((privileges == null) ? 0 : privileges.hashCode());
+		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
+		result = prime * result + ((this.privileges == null) ? 0 : this.privileges.hashCode());
 		return result;
 	}
 
@@ -102,15 +102,15 @@ public final class Role {
 		if (getClass() != obj.getClass())
 			return false;
 		Role other = (Role) obj;
-		if (name == null) {
+		if (this.name == null) {
 			if (other.name != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!this.name.equals(other.name))
 			return false;
-		if (privileges == null) {
+		if (this.privileges == null) {
 			if (other.privileges != null)
 				return false;
-		} else if (!privileges.equals(other.privileges))
+		} else if (!this.privileges.equals(other.privileges))
 			return false;
 		return true;
 	}

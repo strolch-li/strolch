@@ -14,18 +14,20 @@ import ch.eitchnet.privilege.model.Restrictable;
 
 /**
  * @author rvonburg
- *
+ * 
  */
 public class TestRestrictable implements Restrictable {
 
-	/**@see ch.eitchnet.privilege.model.Restrictable#getPrivilegeName()
+	/**
+	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeName()
 	 */
 	@Override
 	public String getPrivilegeName() {
 		return "Service";
 	}
 
-	/**@see ch.eitchnet.privilege.model.Restrictable#getPrivilegeValue()
+	/**
+	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeValue()
 	 */
 	@Override
 	public Object getPrivilegeValue() {

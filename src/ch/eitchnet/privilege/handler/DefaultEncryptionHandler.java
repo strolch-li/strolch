@@ -38,10 +38,10 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	public String convertToHash(String string) {
 		try {
 
-			return EncryptionHelper.encryptString(hashAlgorithm, string);
+			return EncryptionHelper.encryptString(this.hashAlgorithm, string);
 
 		} catch (NoSuchAlgorithmException e) {
-			throw new PrivilegeException("Algorithm " + hashAlgorithm + " was not found!", e);
+			throw new PrivilegeException("Algorithm " + this.hashAlgorithm + " was not found!", e);
 		} catch (UnsupportedEncodingException e) {
 			throw new PrivilegeException("Charset ASCII is not supported!", e);
 		}
@@ -53,7 +53,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	@Override
 	public String nextToken() {
 		byte[] bytes = new byte[16];
-		secureRandom.nextBytes(bytes);
+		this.secureRandom.nextBytes(bytes);
 		String randomString = new String(bytes);
 		//String randomString = new BigInteger(80, secureRandom).toString(32); // 80 big integer bits = 16 chars
 		return randomString;
@@ -65,11 +65,11 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	@Override
 	public void initialize(Map<String, String> parameterMap) {
 
-		secureRandom = new SecureRandom();
+		this.secureRandom = new SecureRandom();
 
 		// get hash algorithm parameters
-		hashAlgorithm = parameterMap.get(XmlConstants.XML_PARAM_HASH_ALGORITHM);
-		if (hashAlgorithm == null || hashAlgorithm.isEmpty()) {
+		this.hashAlgorithm = parameterMap.get(XmlConstants.XML_PARAM_HASH_ALGORITHM);
+		if (this.hashAlgorithm == null || this.hashAlgorithm.isEmpty()) {
 			throw new PrivilegeException("[" + EncryptionHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_HASH_ALGORITHM + " is invalid");
 		}
@@ -77,7 +77,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		// test hash algorithm
 		try {
 			convertToHash("test");
-			logger.info("Using hashing algorithm " + hashAlgorithm);
+			logger.info("Using hashing algorithm " + this.hashAlgorithm);
 		} catch (Exception e) {
 			throw new PrivilegeException("[" + EncryptionHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_HASH_ALGORITHM + " is invalid because of underlying exception: "

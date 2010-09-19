@@ -38,13 +38,29 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
  */
 public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
+	/**
+	 * log4j logger
+	 */
 	private static final Logger logger = Logger.getLogger(DefaultPrivilegeHandler.class);
 
+	/**
+	 * last assigned id for the {@link Session}s
+	 */
 	private static long lastSessionId;
 
+	/**
+	 * Map keeping a reference to all active sessions with their certificates
+	 */
 	private Map<String, CertificateSessionPair> sessionMap;
 
+	/**
+	 * The persistence handler is used for getting objects and saving changes
+	 */
 	private PersistenceHandler persistenceHandler;
+
+	/**
+	 * The encryption handler is used for generating hashes and tokens
+	 */
 	private EncryptionHandler encryptionHandler;
 
 	/**
@@ -52,7 +68,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 */
 	@Override
 	public PrivilegeRep getPrivilege(String privilegeName) {
-		return persistenceHandler.getPrivilege(privilegeName).asPrivilegeRep();
+		return this.persistenceHandler.getPrivilege(privilegeName).asPrivilegeRep();
 	}
 
 	/**
@@ -60,7 +76,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 */
 	@Override
 	public RoleRep getRole(String roleName) {
-		return persistenceHandler.getRole(roleName).asRoleRep();
+		return this.persistenceHandler.getRole(roleName).asRoleRep();
 	}
 
 	/**
@@ -68,7 +84,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 */
 	@Override
 	public UserRep getUser(String username) {
-		return persistenceHandler.getUser(username).asUserRep();
+		return this.persistenceHandler.getUser(username).asUserRep();
 	}
 
 	/**
@@ -76,7 +92,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 */
 	@Override
 	public PrivilegePolicy getPolicy(String policyName) {
-		return persistenceHandler.getPolicy(policyName);
+		return this.persistenceHandler.getPolicy(policyName);
 	}
 
 	/**
@@ -94,7 +110,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				.isAllAllowed(), privilegeRep.getDenyList(), privilegeRep.getAllowList());
 
 		// delegate to persistence handler
-		persistenceHandler.addOrReplacePrivilege(privilege);
+		this.persistenceHandler.addOrReplacePrivilege(privilege);
 	}
 
 	/**
@@ -111,7 +127,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Role role = new Role(roleRep.getName(), roleRep.getPrivileges());
 
 		// delegate to persistence handler
-		persistenceHandler.addOrReplaceRole(role);
+		this.persistenceHandler.addOrReplaceRole(role);
 	}
 
 	/**
@@ -124,22 +140,22 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// validate who is doing this
 		validateIsPrivilegeAdmin(certificate);
 
-		// validate password meets basic requirements
-		validatePassword(password);
+		String passwordHash = null;
+		if (password != null) {
 
-		// hash password
-		String passwordHash;
-		if (password == null)
-			passwordHash = null;
-		else
-			passwordHash = encryptionHandler.convertToHash(password);
+			// validate password meets basic requirements
+			validatePassword(password);
+
+			// hash password
+			passwordHash = this.encryptionHandler.convertToHash(password);
+		}
 
 		// create new user
 		User user = new User(userRep.getUsername(), passwordHash, userRep.getFirstname(), userRep.getSurname(), userRep
 				.getUserState(), userRep.getRoles(), userRep.getLocale());
 
 		// delegate to persistence handler
-		persistenceHandler.addOrReplaceUser(user);
+		this.persistenceHandler.addOrReplaceUser(user);
 	}
 
 	/**
@@ -153,7 +169,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get role
-		Role role = persistenceHandler.getRole(roleName);
+		Role role = this.persistenceHandler.getRole(roleName);
 		if (role == null) {
 			throw new PrivilegeException("Role " + roleName + " does not exist!");
 		}
@@ -178,7 +194,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Role newRole = new Role(role.getName(), newPrivileges);
 
 		// delegate role replacement to persistence handler
-		persistenceHandler.addOrReplaceRole(newRole);
+		this.persistenceHandler.addOrReplaceRole(newRole);
 	}
 
 	/**
@@ -192,7 +208,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get user
-		User user = persistenceHandler.getUser(username);
+		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
 			throw new PrivilegeException("User " + username + " does not exist!");
 		}
@@ -217,7 +233,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				.getState(), newRoles, user.getLocale());
 
 		// delegate user replacement to persistence handler
-		persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
 	/**
@@ -231,13 +247,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// delegate privilege removal to persistence handler
-		Privilege removedPrivilege = persistenceHandler.removePrivilege(privilegeName);
+		Privilege removedPrivilege = this.persistenceHandler.removePrivilege(privilegeName);
+
+		if (removedPrivilege == null)
+			return null;
 
 		// return privilege rep if it was removed
-		if (removedPrivilege != null)
-			return removedPrivilege.asPrivilegeRep();
-		else
-			return null;
+		return removedPrivilege.asPrivilegeRep();
 	}
 
 	/**
@@ -251,7 +267,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get role
-		Role role = persistenceHandler.getRole(roleName);
+		Role role = this.persistenceHandler.getRole(roleName);
 		if (role == null) {
 			throw new PrivilegeException("Role " + roleName + " does not exist!");
 		}
@@ -269,7 +285,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Role newRole = new Role(role.getName(), newPrivileges);
 
 		// delegate user replacement to persistence handler
-		persistenceHandler.addOrReplaceRole(newRole);
+		this.persistenceHandler.addOrReplaceRole(newRole);
 	}
 
 	/**
@@ -283,13 +299,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// delegate role removal to persistence handler
-		Role removedRole = persistenceHandler.removeRole(roleName);
+		Role removedRole = this.persistenceHandler.removeRole(roleName);
 
-		// return role rep if it was removed
-		if (removedRole != null)
-			return removedRole.asRoleRep();
-		else
+		if (removedRole == null)
 			return null;
+
+		// return role rep if it was removed	
+		return removedRole.asRoleRep();
 	}
 
 	/**
@@ -303,7 +319,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get User
-		User user = persistenceHandler.getUser(username);
+		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
 			throw new PrivilegeException("User " + username + " does not exist!");
 		}
@@ -322,7 +338,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				.getState(), newRoles, user.getLocale());
 
 		// delegate user replacement to persistence handler
-		persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
 	/**
@@ -336,13 +352,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// delegate user removal to persistence handler
-		User removedUser = persistenceHandler.removeUser(username);
+		User removedUser = this.persistenceHandler.removeUser(username);
 
 		// return user rep if it was removed
-		if (removedUser != null)
-			return removedUser.asUserRep();
-		else
+		if (removedUser == null)
 			return null;
+
+		// return user rep if it was removed
+		return removedUser.asUserRep();
+
 	}
 
 	/**
@@ -356,7 +374,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get Privilege
-		Privilege privilege = persistenceHandler.getPrivilege(privilegeName);
+		Privilege privilege = this.persistenceHandler.getPrivilege(privilegeName);
 		if (privilege == null) {
 			throw new PrivilegeException("Privilege " + privilegeName + " does not exist!");
 		}
@@ -373,7 +391,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				.getDenyList(), privilege.getAllowList());
 
 		// delegate privilege replacement to persistence handler
-		persistenceHandler.addOrReplacePrivilege(newPrivilege);
+		this.persistenceHandler.addOrReplacePrivilege(newPrivilege);
 	}
 
 	/**
@@ -387,7 +405,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get Privilege
-		Privilege privilege = persistenceHandler.getPrivilege(privilegeName);
+		Privilege privilege = this.persistenceHandler.getPrivilege(privilegeName);
 		if (privilege == null) {
 			throw new PrivilegeException("Privilege " + privilegeName + " does not exist!");
 		}
@@ -397,7 +415,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				privilege.getDenyList(), allowList);
 
 		// delegate privilege replacement to persistence handler
-		persistenceHandler.addOrReplacePrivilege(newPrivilege);
+		this.persistenceHandler.addOrReplacePrivilege(newPrivilege);
 	}
 
 	/**
@@ -411,7 +429,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get Privilege
-		Privilege privilege = persistenceHandler.getPrivilege(privilegeName);
+		Privilege privilege = this.persistenceHandler.getPrivilege(privilegeName);
 		if (privilege == null) {
 			throw new PrivilegeException("Privilege " + privilegeName + " does not exist!");
 		}
@@ -421,7 +439,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				denyList, privilege.getAllowList());
 
 		// delegate privilege replacement to persistence handler
-		persistenceHandler.addOrReplacePrivilege(newPrivilege);
+		this.persistenceHandler.addOrReplacePrivilege(newPrivilege);
 	}
 
 	/**
@@ -435,7 +453,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get Privilege
-		Privilege privilege = persistenceHandler.getPrivilege(privilegeName);
+		Privilege privilege = this.persistenceHandler.getPrivilege(privilegeName);
 		if (privilege == null) {
 			throw new PrivilegeException("Privilege " + privilegeName + " does not exist!");
 		}
@@ -445,7 +463,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				.getDenyList(), privilege.getAllowList());
 
 		// delegate privilege replacement to persistence handler
-		persistenceHandler.addOrReplacePrivilege(newPrivilege);
+		this.persistenceHandler.addOrReplacePrivilege(newPrivilege);
 	}
 
 	/**
@@ -459,7 +477,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get User
-		User user = persistenceHandler.getUser(username);
+		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
 			throw new PrivilegeException("User " + username + " does not exist!");
 		}
@@ -469,7 +487,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				.getState(), user.getRoles(), locale);
 
 		// delegate user replacement to persistence handler
-		persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
 	/**
@@ -483,7 +501,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get User
-		User user = persistenceHandler.getUser(username);
+		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
 			throw new PrivilegeException("User " + username + " does not exist!");
 		}
@@ -493,7 +511,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				.getRoles(), user.getLocale());
 
 		// delegate user replacement to persistence handler
-		persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
 	/**
@@ -507,20 +525,27 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get User
-		User user = persistenceHandler.getUser(username);
+		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
 			throw new PrivilegeException("User " + username + " does not exist!");
 		}
 
-		// hash password
-		String passwordHash = encryptionHandler.convertToHash(password);
+		String passwordHash = null;
+		if (password != null) {
+
+			// validate password meets basic requirements
+			validatePassword(password);
+
+			// hash password
+			passwordHash = this.encryptionHandler.convertToHash(password);
+		}
 
 		// create new user
 		User newUser = new User(user.getUsername(), passwordHash, user.getFirstname(), user.getSurname(), user
 				.getState(), user.getRoles(), user.getLocale());
 
 		// delegate user replacement to persistence handler
-		persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
 	/**
@@ -534,7 +559,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// get User
-		User user = persistenceHandler.getUser(username);
+		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
 			throw new PrivilegeException("User " + username + " does not exist!");
 		}
@@ -544,11 +569,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				user.getRoles(), user.getLocale());
 
 		// delegate user replacement to persistence handler
-		persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.SessionHandler#authenticate(java.lang.String, java.lang.String)
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#authenticate(java.lang.String, java.lang.String)
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user credentials are not valid
@@ -563,16 +588,19 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException("The given password is shorter than 3 characters");
 
 		// we only work with hashed passwords
-		String passwordHash = encryptionHandler.convertToHash(password);
+		String passwordHash = this.encryptionHandler.convertToHash(password);
 
 		// get user object
-		User user = persistenceHandler.getUser(username);
+		User user = this.persistenceHandler.getUser(username);
 		// no user means no authentication
 		if (user == null)
 			throw new AccessDeniedException("There is no user defined with the credentials: " + username + " / ***...");
 
 		// validate password
-		if (!user.isPassword(passwordHash))
+		String pwHash = user.getPassword();
+		if (pwHash == null)
+			throw new AccessDeniedException("User has no password and may not login!");
+		if (!pwHash.equals(passwordHash))
 			throw new AccessDeniedException("Password is incorrect for " + username + " / ***...");
 
 		// validate if user is allowed to login
@@ -585,8 +613,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// get 2 auth tokens
-		String authToken = encryptionHandler.nextToken();
-		String authPassword = encryptionHandler.nextToken();
+		String authToken = this.encryptionHandler.nextToken();
+		String authPassword = this.encryptionHandler.nextToken();
 
 		// get next session id
 		String sessionId = nextSessionId();
@@ -597,7 +625,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// create and save a new session
 		Session session = new Session(sessionId, authToken, authPassword, user.getUsername(), System
 				.currentTimeMillis());
-		sessionMap.put(sessionId, new CertificateSessionPair(session, certificate));
+		this.sessionMap.put(sessionId, new CertificateSessionPair(session, certificate));
 
 		// log
 		logger.info("Authenticated: " + session);
@@ -609,12 +637,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * TODO What is better, validate from {@link Restrictable} to {@link User} or the opposite direction?
 	 * 
-	 * @see ch.eitchnet.privilege.handler.SessionHandler#actionAllowed(ch.eitchnet.privilege.model.Certificate,
-	 *      ch.eitchnet.privilege.model.Restrictable)
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the {@link Certificate} is not for a currently logged in {@link User} or if the user may not
 	 *             perform the action defined by the {@link Restrictable} implementation
+	 * 
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#actionAllowed(ch.eitchnet.privilege.model.Certificate,
+	 *      ch.eitchnet.privilege.model.Restrictable)
 	 */
 	@Override
 	public boolean actionAllowed(Certificate certificate, Restrictable restrictable) {
@@ -631,7 +660,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException("Restrictable may not be null!");
 
 		// get user object
-		User user = persistenceHandler.getUser(certificate.getUsername());
+		User user = this.persistenceHandler.getUser(certificate.getUsername());
 		if (user == null) {
 			throw new PrivilegeException(
 					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
@@ -644,7 +673,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// now iterate roles and validate on policies
 		for (String roleName : user.getRoles()) {
 
-			Role role = persistenceHandler.getRole(roleName);
+			Role role = this.persistenceHandler.getRole(roleName);
 			if (role == null) {
 				logger.error("No role is defined with name " + roleName + " which is configured for user " + user);
 				continue;
@@ -661,7 +690,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PolicyHandler#actionAllowed(ch.eitchnet.privilege.model.internal.Role,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#actionAllowed(ch.eitchnet.privilege.model.internal.Role,
 	 *      ch.eitchnet.privilege.model.Restrictable)
 	 */
 	@Override
@@ -687,7 +716,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// get the privilege for this restrictable
-		Privilege privilege = persistenceHandler.getPrivilege(privilegeName);
+		Privilege privilege = this.persistenceHandler.getPrivilege(privilegeName);
 		if (privilege == null) {
 			throw new PrivilegeException("No Privilege exists with the name " + privilegeName + " for Restrictable "
 					+ restrictable.getClass().getName());
@@ -705,7 +734,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.SessionHandler#isCertificateValid(ch.eitchnet.privilege.model.Certificate)
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#isCertificateValid(ch.eitchnet.privilege.model.Certificate)
 	 */
 	@Override
 	public boolean isCertificateValid(Certificate certificate) {
@@ -715,7 +744,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException("Certificate may not be null!");
 
 		// first see if a session exists for this certificate
-		CertificateSessionPair certificateSessionPair = sessionMap.get(certificate.getSessionId());
+		CertificateSessionPair certificateSessionPair = this.sessionMap.get(certificate.getSessionId());
 		if (certificateSessionPair == null)
 			throw new AccessDeniedException("There is no session information for " + certificate.toString());
 
@@ -732,15 +761,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					+ certificate.getSessionId());
 
 		// get user object
-		User user = persistenceHandler.getUser(certificateSessionPair.session.getUsername());
+		User user = this.persistenceHandler.getUser(certificateSessionPair.session.getUsername());
 
 		// if user exists, then certificate is valid
 		if (user == null) {
 			throw new PrivilegeException(
 					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
-		} else {
-			return true;
 		}
+
+		// everything is ok, so return true as the certificate must be valid
+		return true;
 	}
 
 	/**
@@ -755,7 +785,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// get user object
-		User user = persistenceHandler.getUser(certificate.getUsername());
+		User user = this.persistenceHandler.getUser(certificate.getUsername());
 		if (user == null) {
 			throw new PrivilegeException(
 					"Oh boy, how did this happen: No User in user map although the certificate is valid! Certificate: "
@@ -789,7 +819,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// validate who is doing this
 		validateIsPrivilegeAdmin(certificate);
 
-		return persistenceHandler.persist(certificate);
+		return this.persistenceHandler.persist(certificate);
 	}
 
 	/**
@@ -804,7 +834,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler = persistenceHandler;
 
 		lastSessionId = 0l;
-		sessionMap = new HashMap<String, CertificateSessionPair>();
+		this.sessionMap = new HashMap<String, CertificateSessionPair>();
 	}
 
 	/**
@@ -820,9 +850,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @author rvonburg
 	 */
 	private class CertificateSessionPair {
-		private Session session;
-		private Certificate certificate;
+		public final Session session;
+		public final Certificate certificate;
 
+		/**
+		 * @param session
+		 * @param certificate
+		 */
 		public CertificateSessionPair(Session session, Certificate certificate) {
 			this.session = session;
 			this.certificate = certificate;

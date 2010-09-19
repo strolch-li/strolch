@@ -46,7 +46,7 @@ public class PrivilegeRep implements Serializable {
 	 * @return the name
 	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class PrivilegeRep implements Serializable {
 	 * @return the policy
 	 */
 	public String getPolicy() {
-		return policy;
+		return this.policy;
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class PrivilegeRep implements Serializable {
 	 * @return the allAllowed
 	 */
 	public boolean isAllAllowed() {
-		return allAllowed;
+		return this.allAllowed;
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class PrivilegeRep implements Serializable {
 	 * @return the denyList
 	 */
 	public Set<String> getDenyList() {
-		return denyList;
+		return this.denyList;
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class PrivilegeRep implements Serializable {
 	 * @return the allowList
 	 */
 	public Set<String> getAllowList() {
-		return allowList;
+		return this.allowList;
 	}
 
 	/**

@@ -37,7 +37,7 @@ public class RoleRep implements Serializable {
 	 * @return the name
 	 */
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class RoleRep implements Serializable {
 	 * @return the privileges
 	 */
 	public Set<String> getPrivileges() {
-		return privileges;
+		return this.privileges;
 	}
 
 	/**

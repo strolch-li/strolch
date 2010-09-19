@@ -60,7 +60,7 @@ public final class Certificate implements Serializable {
 	 * @return the locale
 	 */
 	public Locale getLocale() {
-		return locale;
+		return this.locale;
 	}
 
 	/**
@@ -75,14 +75,14 @@ public final class Certificate implements Serializable {
 	 * @return the sessionId
 	 */
 	public String getSessionId() {
-		return sessionId;
+		return this.sessionId;
 	}
 
 	/**
 	 * @return the username
 	 */
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	/**
@@ -94,11 +94,10 @@ public final class Certificate implements Serializable {
 	 * @return the authToken if the given authPassword is corret, null otherwise
 	 */
 	public String getAuthToken(String authPassword) {
-		if (this.authPassword.equals(authPassword)) {
-			return authToken;
-		} else {
-			return null;
-		}
+		if (this.authPassword.equals(authPassword))
+			return this.authToken;
+
+		return null;
 	}
 
 	/**
@@ -108,11 +107,11 @@ public final class Certificate implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((authPassword == null) ? 0 : authPassword.hashCode());
-		result = prime * result + ((authToken == null) ? 0 : authToken.hashCode());
-		result = prime * result + ((locale == null) ? 0 : locale.hashCode());
-		result = prime * result + ((sessionId == null) ? 0 : sessionId.hashCode());
-		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		result = prime * result + ((this.authPassword == null) ? 0 : this.authPassword.hashCode());
+		result = prime * result + ((this.authToken == null) ? 0 : this.authToken.hashCode());
+		result = prime * result + ((this.locale == null) ? 0 : this.locale.hashCode());
+		result = prime * result + ((this.sessionId == null) ? 0 : this.sessionId.hashCode());
+		result = prime * result + ((this.username == null) ? 0 : this.username.hashCode());
 		return result;
 	}
 
@@ -128,30 +127,30 @@ public final class Certificate implements Serializable {
 		if (!(obj instanceof Certificate))
 			return false;
 		Certificate other = (Certificate) obj;
-		if (authPassword == null) {
+		if (this.authPassword == null) {
 			if (other.authPassword != null)
 				return false;
-		} else if (!authPassword.equals(other.authPassword))
+		} else if (!this.authPassword.equals(other.authPassword))
 			return false;
-		if (authToken == null) {
+		if (this.authToken == null) {
 			if (other.authToken != null)
 				return false;
-		} else if (!authToken.equals(other.authToken))
+		} else if (!this.authToken.equals(other.authToken))
 			return false;
-		if (locale == null) {
+		if (this.locale == null) {
 			if (other.locale != null)
 				return false;
-		} else if (!locale.equals(other.locale))
+		} else if (!this.locale.equals(other.locale))
 			return false;
-		if (sessionId == null) {
+		if (this.sessionId == null) {
 			if (other.sessionId != null)
 				return false;
-		} else if (!sessionId.equals(other.sessionId))
+		} else if (!this.sessionId.equals(other.sessionId))
 			return false;
-		if (username == null) {
+		if (this.username == null) {
 			if (other.username != null)
 				return false;
-		} else if (!username.equals(other.username))
+		} else if (!this.username.equals(other.username))
 			return false;
 		return true;
 	}
@@ -163,11 +162,11 @@ public final class Certificate implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Certificate [sessionId=");
-		builder.append(sessionId);
+		builder.append(this.sessionId);
 		builder.append(", username=");
-		builder.append(username);
+		builder.append(this.username);
 		builder.append(", locale=");
-		builder.append(locale);
+		builder.append(this.locale);
 		builder.append("]");
 		return builder.toString();
 	}

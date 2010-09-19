@@ -24,6 +24,12 @@ public final class Session {
 	private final String authPassword;
 
 	/**
+	 * 
+	 * @param sessionId
+	 * @param authToken
+	 * @param authPassword
+	 * @param username
+	 * @param loginTime
 	 */
 	public Session(String sessionId, String authToken, String authPassword, String username, long loginTime) {
 		this.sessionId = sessionId;
@@ -37,35 +43,35 @@ public final class Session {
 	 * @return the sessionId
 	 */
 	public String getSessionId() {
-		return sessionId;
+		return this.sessionId;
 	}
 
 	/**
 	 * @return the authToken
 	 */
 	public String getAuthToken() {
-		return authToken;
+		return this.authToken;
 	}
 
 	/**
 	 * @return the authPassword
 	 */
 	public String getAuthPassword() {
-		return authPassword;
+		return this.authPassword;
 	}
 
 	/**
 	 * @return the username
 	 */
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	/**
 	 * @return the loginTime
 	 */
 	public long getLoginTime() {
-		return loginTime;
+		return this.loginTime;
 	}
 
 	/**
@@ -75,11 +81,11 @@ public final class Session {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((authPassword == null) ? 0 : authPassword.hashCode());
-		result = prime * result + ((authToken == null) ? 0 : authToken.hashCode());
-		result = prime * result + (int) (loginTime ^ (loginTime >>> 32));
-		result = prime * result + ((sessionId == null) ? 0 : sessionId.hashCode());
-		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		result = prime * result + ((this.authPassword == null) ? 0 : this.authPassword.hashCode());
+		result = prime * result + ((this.authToken == null) ? 0 : this.authToken.hashCode());
+		result = prime * result + (int) (this.loginTime ^ (this.loginTime >>> 32));
+		result = prime * result + ((this.sessionId == null) ? 0 : this.sessionId.hashCode());
+		result = prime * result + ((this.username == null) ? 0 : this.username.hashCode());
 		return result;
 	}
 
@@ -95,27 +101,27 @@ public final class Session {
 		if (!(obj instanceof Session))
 			return false;
 		Session other = (Session) obj;
-		if (authPassword == null) {
+		if (this.authPassword == null) {
 			if (other.authPassword != null)
 				return false;
-		} else if (!authPassword.equals(other.authPassword))
+		} else if (!this.authPassword.equals(other.authPassword))
 			return false;
-		if (authToken == null) {
+		if (this.authToken == null) {
 			if (other.authToken != null)
 				return false;
-		} else if (!authToken.equals(other.authToken))
+		} else if (!this.authToken.equals(other.authToken))
 			return false;
-		if (loginTime != other.loginTime)
+		if (this.loginTime != other.loginTime)
 			return false;
-		if (sessionId == null) {
+		if (this.sessionId == null) {
 			if (other.sessionId != null)
 				return false;
-		} else if (!sessionId.equals(other.sessionId))
+		} else if (!this.sessionId.equals(other.sessionId))
 			return false;
-		if (username == null) {
+		if (this.username == null) {
 			if (other.username != null)
 				return false;
-		} else if (!username.equals(other.username))
+		} else if (!this.username.equals(other.username))
 			return false;
 		return true;
 	}
@@ -127,11 +133,11 @@ public final class Session {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Session [sessionId=");
-		builder.append(sessionId);
+		builder.append(this.sessionId);
 		builder.append(", username=");
-		builder.append(username);
+		builder.append(this.username);
 		builder.append(", loginTime=");
-		builder.append(loginTime);
+		builder.append(this.loginTime);
 		builder.append("]");
 		return builder.toString();
 	}

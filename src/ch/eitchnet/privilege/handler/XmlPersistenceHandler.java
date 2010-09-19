@@ -60,13 +60,12 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private String basePath;
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplacePrivilege(ch.eitchnet.privilege.model.Certificate,
-	 *      ch.eitchnet.privilege.model.internal.Privilege)
+	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplacePrivilege(ch.eitchnet.privilege.model.internal.Privilege)
 	 */
 	@Override
 	public void addOrReplacePrivilege(Privilege privilege) {
-		privilegeMap.put(privilege.getName(), privilege);
-		privilegeMapDirty = true;
+		this.privilegeMap.put(privilege.getName(), privilege);
+		this.privilegeMapDirty = true;
 	}
 
 	/**
@@ -74,19 +73,18 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public Privilege removePrivilege(String privilegeName) {
-		Privilege privilege = privilegeMap.remove(privilegeName);
-		privilegeMapDirty = privilege != null;
+		Privilege privilege = this.privilegeMap.remove(privilegeName);
+		this.privilegeMapDirty = privilege != null;
 		return privilege;
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplaceRole(ch.eitchnet.privilege.model.Certificate,
-	 *      ch.eitchnet.privilege.model.internal.Role)
+	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplaceRole(ch.eitchnet.privilege.model.internal.Role)
 	 */
 	@Override
 	public void addOrReplaceRole(Role role) {
-		roleMap.put(role.getName(), role);
-		roleMapDirty = true;
+		this.roleMap.put(role.getName(), role);
+		this.roleMapDirty = true;
 	}
 
 	/**
@@ -94,19 +92,18 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public Role removeRole(String roleName) {
-		Role role = roleMap.remove(roleName);
-		roleMapDirty = role != null;
+		Role role = this.roleMap.remove(roleName);
+		this.roleMapDirty = role != null;
 		return role;
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplaceUser(ch.eitchnet.privilege.model.Certificate,
-	 *      ch.eitchnet.privilege.model.internal.User)
+	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplaceUser(ch.eitchnet.privilege.model.internal.User)
 	 */
 	@Override
 	public void addOrReplaceUser(User user) {
-		userMap.put(user.getUsername(), user);
-		userMapDirty = true;
+		this.userMap.put(user.getUsername(), user);
+		this.userMapDirty = true;
 	}
 
 	/**
@@ -114,8 +111,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public User removeUser(String username) {
-		User user = userMap.remove(username);
-		userMapDirty = user != null;
+		User user = this.userMap.remove(username);
+		this.userMapDirty = user != null;
 		return user;
 	}
 
@@ -124,7 +121,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public Privilege getPrivilege(String privilegeName) {
-		return privilegeMap.get(privilegeName);
+		return this.privilegeMap.get(privilegeName);
 	}
 
 	/**
@@ -132,7 +129,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public Role getRole(String roleName) {
-		return roleMap.get(roleName);
+		return this.roleMap.get(roleName);
 	}
 
 	/**
@@ -140,7 +137,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public User getUser(String username) {
-		return userMap.get(username);
+		return this.userMap.get(username);
 	}
 
 	/**
@@ -150,7 +147,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	public PrivilegePolicy getPolicy(String policyName) {
 
 		// get the policies class
-		Class<PrivilegePolicy> policyClazz = policyMap.get(policyName);
+		Class<PrivilegePolicy> policyClazz = this.policyMap.get(policyName);
 		if (policyClazz == null) {
 			return null;
 		}
@@ -169,21 +166,21 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		// USERS
 		// get users file name
-		String usersFileName = parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
+		String usersFileName = this.parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
 		if (usersFileName == null || usersFileName.isEmpty()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_USERS_FILE + " is invalid");
 		}
 		// get users file
-		File usersFile = new File(basePath + "/" + usersFileName);
-		boolean usersFileUnchanged = usersFile.exists() && usersFile.lastModified() == usersFileDate;
-		if (!userMapDirty && usersFileUnchanged) {
+		File usersFile = new File(this.basePath + "/" + usersFileName);
+		boolean usersFileUnchanged = usersFile.exists() && usersFile.lastModified() == this.usersFileDate;
+		if (!this.userMapDirty && usersFileUnchanged) {
 			logger.warn("No users unpersisted and user file unchanged on file system");
 		} else {
 			logger.info("Persisting users...");
 
 			// build XML DOM of users
-			List<Element> users = toDomUsers(certificate);
+			List<Element> users = toDomUsers();
 			Element rootElement = DocumentFactory.getInstance().createElement(XmlConstants.XML_USERS);
 			for (Element userElement : users) {
 				rootElement.add(userElement);
@@ -191,20 +188,20 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 			// write DOM to file
 			XmlHelper.writeDocument(rootElement, usersFile);
-			userMapDirty = true;
+			this.userMapDirty = true;
 		}
 
 		// ROLES
 		// get roles file name
-		String rolesFileName = parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
+		String rolesFileName = this.parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
 		if (rolesFileName == null || rolesFileName.isEmpty()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_ROLES_FILE + " is invalid");
 		}
 		// get roles file
-		File rolesFile = new File(basePath + "/" + rolesFileName);
-		boolean rolesFileUnchanged = rolesFile.exists() && rolesFile.lastModified() == rolesFileDate;
-		if (!roleMapDirty && rolesFileUnchanged) {
+		File rolesFile = new File(this.basePath + "/" + rolesFileName);
+		boolean rolesFileUnchanged = rolesFile.exists() && rolesFile.lastModified() == this.rolesFileDate;
+		if (!this.roleMapDirty && rolesFileUnchanged) {
 			logger.warn("No roles unpersisted and roles file unchanged on file system");
 		} else {
 			logger.info("Persisting roles...");
@@ -218,21 +215,21 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 			// write DOM to file
 			XmlHelper.writeDocument(rootElement, rolesFile);
-			roleMapDirty = true;
+			this.roleMapDirty = true;
 		}
 
 		// PRIVILEGES
 		// get privileges file name
-		String privilegesFileName = parameterMap.get(XmlConstants.XML_PARAM_PRIVILEGES_FILE);
+		String privilegesFileName = this.parameterMap.get(XmlConstants.XML_PARAM_PRIVILEGES_FILE);
 		if (privilegesFileName == null || privilegesFileName.isEmpty()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_PRIVILEGES_FILE + " is invalid");
 		}
 		// get privileges file
-		File privilegesFile = new File(basePath + "/" + privilegesFileName);
+		File privilegesFile = new File(this.basePath + "/" + privilegesFileName);
 		boolean privilegesFileUnchanged = privilegesFile.exists()
-				&& privilegesFile.lastModified() == privilegesFileDate;
-		if (!privilegeMapDirty && privilegesFileUnchanged) {
+				&& privilegesFile.lastModified() == this.privilegesFileDate;
+		if (!this.privilegeMapDirty && privilegesFileUnchanged) {
 			logger.warn("No privileges unpersisted and privileges file unchanged on file system");
 		} else {
 			logger.info("Persisting privileges...");
@@ -246,24 +243,24 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 			// write DOM to file
 			XmlHelper.writeDocument(rootElement, privilegesFile);
-			privilegeMapDirty = true;
+			this.privilegeMapDirty = true;
 		}
 
 		// reset dirty states and return if something was dirty, false otherwise
-		if (userMapDirty || roleMapDirty || privilegeMapDirty) {
-			userMapDirty = false;
-			roleMapDirty = false;
-			privilegeMapDirty = false;
+		if (this.userMapDirty || this.roleMapDirty || this.privilegeMapDirty) {
+			this.userMapDirty = false;
+			this.roleMapDirty = false;
+			this.privilegeMapDirty = false;
 
 			return true;
 
-		} else {
-			userMapDirty = false;
-			roleMapDirty = false;
-			privilegeMapDirty = false;
-
-			return false;
 		}
+
+		this.userMapDirty = false;
+		this.roleMapDirty = false;
+		this.privilegeMapDirty = false;
+
+		return false;
 	}
 
 	/**
@@ -272,14 +269,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public void initialize(Map<String, String> parameterMap) {
 
-		roleMap = new HashMap<String, Role>();
-		userMap = new HashMap<String, User>();
-		privilegeMap = new HashMap<String, Privilege>();
-		policyMap = new HashMap<String, Class<PrivilegePolicy>>();
+		this.roleMap = new HashMap<String, Role>();
+		this.userMap = new HashMap<String, User>();
+		this.privilegeMap = new HashMap<String, Privilege>();
+		this.policyMap = new HashMap<String, Class<PrivilegePolicy>>();
 
 		// get and validate base bath
-		basePath = parameterMap.get(XmlConstants.XML_PARAM_BASE_PATH);
-		File basePathF = new File(basePath);
+		this.basePath = parameterMap.get(XmlConstants.XML_PARAM_BASE_PATH);
+		File basePathF = new File(this.basePath);
 		if (!basePathF.exists() && !basePathF.isDirectory()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_BASE_PATH + " is invalid");
@@ -294,7 +291,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get roles file
-		File rolesFile = new File(basePath + "/" + rolesFileName);
+		File rolesFile = new File(this.basePath + "/" + rolesFileName);
 		if (!rolesFile.exists()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_ROLES_FILE + " is invalid as roles file does not exist at path "
@@ -306,7 +303,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		// read roles
 		readRoles(rolesRootElement);
-		rolesFileDate = rolesFile.lastModified();
+		this.rolesFileDate = rolesFile.lastModified();
 
 		// USERS
 		// get users file name
@@ -317,7 +314,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get users file
-		File usersFile = new File(basePath + "/" + usersFileName);
+		File usersFile = new File(this.basePath + "/" + usersFileName);
 		if (!usersFile.exists()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_USERS_FILE + " is invalid as users file does not exist at path "
@@ -329,7 +326,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		// read users
 		readUsers(usersRootElement);
-		usersFileDate = usersFile.lastModified();
+		this.usersFileDate = usersFile.lastModified();
 
 		// PRIVILEGES
 		// get privileges file name
@@ -340,7 +337,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get privileges file
-		File privilegesFile = new File(basePath + "/" + privilegesFileName);
+		File privilegesFile = new File(this.basePath + "/" + privilegesFileName);
 		if (!privilegesFile.exists()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_PRIVILEGES_FILE + " is invalid as privileges file does not exist at path "
@@ -352,7 +349,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		// read privileges
 		readPrivileges(privilegesRootElement);
-		privilegesFileDate = privilegesFile.lastModified();
+		this.privilegesFileDate = privilegesFile.lastModified();
 
 		// POLICIES
 		// get policy file name
@@ -363,7 +360,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get policy file
-		File policyFile = new File(basePath + "/" + policyFileName);
+		File policyFile = new File(this.basePath + "/" + policyFileName);
 		if (!policyFile.exists()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_POLICY_FILE + " is invalid as policy file does not exist at path "
@@ -376,18 +373,18 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// read policies
 		readPolicies(policiesRootElement);
 
-		userMapDirty = false;
-		roleMapDirty = false;
-		privilegeMapDirty = false;
+		this.userMapDirty = false;
+		this.roleMapDirty = false;
+		this.privilegeMapDirty = false;
 
-		logger.info("Read " + userMap.size() + " Users");
-		logger.info("Read " + roleMap.size() + " Roles");
-		logger.info("Read " + privilegeMap.size() + " Privileges");
+		logger.info("Read " + this.userMap.size() + " Users");
+		logger.info("Read " + this.roleMap.size() + " Roles");
+		logger.info("Read " + this.privilegeMap.size() + " Privileges");
 
 		// validate we have a user with PrivilegeAdmin access
 		boolean privilegeAdminExists = false;
-		for (String username : userMap.keySet()) {
-			User user = userMap.get(username);
+		for (String username : this.userMap.keySet()) {
+			User user = this.userMap.get(username);
 			if (user.hasRole(PrivilegeHandler.PRIVILEGE_ADMIN_ROLE)) {
 				privilegeAdminExists = true;
 				break;
@@ -437,7 +434,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 					locale);
 
 			// put user in map
-			userMap.put(username, user);
+			this.userMap.put(username, user);
 		}
 	}
 
@@ -462,7 +459,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			}
 
 			Role role = new Role(roleName, privileges);
-			roleMap.put(roleName, role);
+			this.roleMap.put(roleName, role);
 		}
 	}
 
@@ -479,7 +476,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			String privilegePolicy = privilegeElement.attributeValue(XmlConstants.XML_ATTR_POLICY);
 
 			String allAllowedS = privilegeElement.element(XmlConstants.XML_ALL_ALLOWED).getTextTrim();
-			boolean allAllowed = Boolean.valueOf(allAllowedS);
+			boolean allAllowed = Boolean.valueOf(allAllowedS).booleanValue();
 
 			@SuppressWarnings("unchecked")
 			List<Element> denyElements = privilegeElement.elements(XmlConstants.XML_DENY);
@@ -506,7 +503,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			}
 
 			Privilege privilege = new Privilege(privilegeName, privilegePolicy, allAllowed, denyList, allowList);
-			privilegeMap.put(privilegeName, privilege);
+			this.privilegeMap.put(privilegeName, privilege);
 		}
 	}
 
@@ -523,19 +520,19 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 			Class<PrivilegePolicy> clazz = ClassHelper.loadClass(policyClass);
 
-			policyMap.put(policyName, clazz);
+			this.policyMap.put(policyName, clazz);
 		}
 	}
 
 	private List<Element> toDomPrivileges() {
 
-		List<Element> privilegesAsElements = new ArrayList<Element>(privilegeMap.size());
+		List<Element> privilegesAsElements = new ArrayList<Element>(this.privilegeMap.size());
 
 		DocumentFactory documentFactory = DocumentFactory.getInstance();
-		for (String privilegeName : privilegeMap.keySet()) {
+		for (String privilegeName : this.privilegeMap.keySet()) {
 
 			// get the privilege object
-			Privilege privilege = privilegeMap.get(privilegeName);
+			Privilege privilege = this.privilegeMap.get(privilegeName);
 
 			// create the privilege element
 			Element privilegeElement = documentFactory.createElement(XmlConstants.XML_PRIVILEGE);
@@ -570,13 +567,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	private List<Element> toDomRoles() {
 
-		List<Element> rolesAsElements = new ArrayList<Element>(roleMap.size());
+		List<Element> rolesAsElements = new ArrayList<Element>(this.roleMap.size());
 
 		DocumentFactory documentFactory = DocumentFactory.getInstance();
-		for (String roleName : roleMap.keySet()) {
+		for (String roleName : this.roleMap.keySet()) {
 
 			// get the role object
-			Role role = roleMap.get(roleName);
+			Role role = this.roleMap.get(roleName);
 
 			// create the role element
 			Element roleElement = documentFactory.createElement(XmlConstants.XML_ROLE);
@@ -596,15 +593,15 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		return rolesAsElements;
 	}
 
-	private List<Element> toDomUsers(Certificate certificate) {
+	private List<Element> toDomUsers() {
 
-		List<Element> usersAsElements = new ArrayList<Element>(userMap.size());
+		List<Element> usersAsElements = new ArrayList<Element>(this.userMap.size());
 
 		DocumentFactory documentFactory = DocumentFactory.getInstance();
-		for (String userName : userMap.keySet()) {
+		for (String userName : this.userMap.keySet()) {
 
 			// get the user object
-			User user = userMap.get(userName);
+			User user = this.userMap.get(userName);
 
 			// create the user element
 			Element userElement = documentFactory.createElement(XmlConstants.XML_USER);
