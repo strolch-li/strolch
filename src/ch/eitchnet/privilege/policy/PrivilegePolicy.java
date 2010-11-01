@@ -20,5 +20,11 @@ import ch.eitchnet.privilege.model.internal.Role;
  */
 public interface PrivilegePolicy {
 
+	/**
+	 * @param role
+	 * @param privilege
+	 * @param restrictable
+	 * @return
+	 */
 	public boolean actionAllowed(Role role, Privilege privilege, Restrictable restrictable);
 }
