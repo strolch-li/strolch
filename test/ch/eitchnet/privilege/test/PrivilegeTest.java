@@ -41,7 +41,8 @@ public class PrivilegeTest {
 	private static PrivilegeHandler privilegeHandler;
 
 	/**
-	 * @throws java.lang.Exception
+	 * @throws Exception
+	 *             if something goes wrong
 	 */
 	@BeforeClass
 	public static void init() throws Exception {
@@ -63,6 +64,10 @@ public class PrivilegeTest {
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
 	@Test
 	public void testAuthenticationOk() throws Exception {
 
@@ -70,6 +75,10 @@ public class PrivilegeTest {
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 	}
 
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
 	@Test(expected = AccessDeniedException.class)
 	public void testFailAuthenticationNOk() throws Exception {
 
@@ -77,6 +86,10 @@ public class PrivilegeTest {
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 	}
 
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
 	@Test(expected = PrivilegeException.class)
 	public void testFailAuthenticationPWNull() throws Exception {
 
@@ -84,6 +97,10 @@ public class PrivilegeTest {
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 	}
 
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
 	@Test
 	public void testAddUserBobWithPW() throws Exception {
 
@@ -103,6 +120,7 @@ public class PrivilegeTest {
 	 * Will fail because user bob is not yet enabled
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 */
 	@Test(expected = AccessDeniedException.class)
 	public void testFailAuthAsBob() throws Exception {
@@ -110,6 +128,10 @@ public class PrivilegeTest {
 		privilegeHandler.authenticate("bob", "12345678901");
 	}
 
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
 	@Test
 	public void testEnableUserBob() throws Exception {
 
@@ -121,6 +143,7 @@ public class PrivilegeTest {
 	 * Will fail as user bob has no role
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 */
 	@Test(expected = PrivilegeException.class)
 	public void testFailAuthUserBob() throws Exception {
@@ -129,6 +152,10 @@ public class PrivilegeTest {
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 	}
 
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
 	@Test
 	public void testAddUserRoleToBob() throws Exception {
 
@@ -136,6 +163,10 @@ public class PrivilegeTest {
 		privilegeHandler.addRoleToUser(certificate, "bob", "user");
 	}
 
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
 	@Test
 	public void testAuthAsBob() throws Exception {
 
@@ -146,6 +177,7 @@ public class PrivilegeTest {
 	 * Will fail because user bob does not have admin rights
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 */
 	@Test(expected = AccessDeniedException.class)
 	public void testFailAddUserTedAsBob() throws Exception {
@@ -159,6 +191,10 @@ public class PrivilegeTest {
 		logger.info("Added user bob");
 	}
 
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
 	@Test
 	public void testAddAdminRoleToBob() throws Exception {
 
@@ -166,6 +202,10 @@ public class PrivilegeTest {
 		privilegeHandler.addRoleToUser(certificate, "bob", PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
 	}
 
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
 	@Test
 	public void testAddUserTedAsBob() throws Exception {
 
@@ -178,6 +218,10 @@ public class PrivilegeTest {
 		logger.info("Added user bob");
 	}
 
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
 	@Test
 	public void testPerformRestrictable() throws Exception {
 
