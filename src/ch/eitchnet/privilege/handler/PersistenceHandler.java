@@ -12,6 +12,7 @@ package ch.eitchnet.privilege.handler;
 
 import java.util.Map;
 
+import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
@@ -67,17 +68,20 @@ public interface PersistenceHandler {
 
 	/**
 	 * <p>
-	 * Thus this method instantiates a {@link PrivilegePolicy} object from the given policyName. The
-	 * {@link PrivilegePolicy} is not stored in a database, but rather behind a privilege name a class name is stored
-	 * which then is used to instantiate a new object
+	 * This method instantiates a {@link PrivilegePolicy} object from the given policyName. The {@link PrivilegePolicy}
+	 * is not stored in a database. The privilege name is a class name and is then used to instantiate a new
+	 * {@link PrivilegePolicy} object
 	 * </p>
 	 * 
 	 * @param policyName
-	 *            the name/id of the {@link PrivilegePolicy} object to return
+	 *            the class name of the {@link PrivilegePolicy} object to return
 	 * 
-	 * @return the {@link PrivilegePolicy} object, or null if no class is defined for the given policy name
+	 * @return the {@link PrivilegePolicy} object
+	 * 
+	 * @throws PrivilegeException
+	 *             if the {@link PrivilegePolicy} object for the given policy name could not be instantiated
 	 */
-	public PrivilegePolicy getPolicy(String policyName);
+	public PrivilegePolicy getPolicy(String policyName) throws PrivilegeException;
 
 	/**
 	 * Removes a {@link User} with the given name and returns the removed object if it existed

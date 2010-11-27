@@ -24,7 +24,7 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
  * <p>
- * This default {@link EncryptionHandler} creates nokens by using a {@link SecureRandom} object. Hashing is done by
+ * This default {@link EncryptionHandler} creates tokens using a {@link SecureRandom} object. Hashing is done by
  * using {@link MessageDigest} and the configured algorithm which is passed in the parameters
  * </p>
  * 

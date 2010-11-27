@@ -152,7 +152,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// instantiate the policy
-		PrivilegePolicy policy = ClassHelper.instantiateClass(policyClazz);
+		PrivilegePolicy policy;
+		try {
+			policy = ClassHelper.instantiateClass(policyClazz);
+		} catch (Exception e) {
+			throw new PrivilegeException("The class for the policy with the name " + policyName + " does not exist!"
+					+ policyName, e);
+		}
 
 		return policy;
 	}
@@ -431,8 +437,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			}
 
 			// create user
-			User user = new User(userId, username, password, firstname, surname, userState, Collections
-					.unmodifiableSet(roles), locale);
+			User user = new User(userId, username, password, firstname, surname, userState,
+					Collections.unmodifiableSet(roles), locale);
 
 			// put user in map
 			this.userMap.put(username, user);

@@ -33,6 +33,21 @@ import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
+ * <p>
+ * This is default implementation of the {@link PrivilegeHandler}
+ * </p>
+ * 
+ * The following list describes implementation details:
+ * <ul>
+ * <li>any methods which change the model are first validated by checking if the certificate is for an admin user by
+ * calling {@link #validateIsPrivilegeAdmin(Certificate)}</li>
+ * <li>all model requests are delegated to the configured {@link PrivilegeHandler}, except for the session id to
+ * {@link Certificate} map, no model data is kept in this implementation. This also means that to return the
+ * representation objects, for every new model query, a new representation object is created</li>
+ * <li>when creating new users, or editing users then a null password is understood as no password set</li>
+ * <li>Password requirements are simple: Non null and non empty/length 0</li>
+ * </ul>
+ * 
  * @author rvonburg
  * 
  */
@@ -106,8 +121,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validateIsPrivilegeAdmin(certificate);
 
 		// create a new privilege
-		Privilege privilege = new Privilege(privilegeRep.getName(), privilegeRep.getPolicy(), privilegeRep
-				.isAllAllowed(), privilegeRep.getDenyList(), privilegeRep.getAllowList());
+		Privilege privilege = new Privilege(privilegeRep.getName(), privilegeRep.getPolicy(),
+				privilegeRep.isAllAllowed(), privilegeRep.getDenyList(), privilegeRep.getAllowList());
 
 		// delegate to persistence handler
 		this.persistenceHandler.addOrReplacePrivilege(privilege);
@@ -151,8 +166,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(), userRep
-				.getSurname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale());
+		User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(),
+				userRep.getSurname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale());
 
 		// delegate to persistence handler
 		this.persistenceHandler.addOrReplaceUser(user);
@@ -229,8 +244,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Set<String> newRoles = new HashSet<String>(currentRoles);
 		newRoles.add(roleName);
 
-		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(), user
-				.getSurname(), user.getUserState(), newRoles, user.getLocale());
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
+				user.getSurname(), user.getUserState(), newRoles, user.getLocale());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -334,8 +349,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// create new user
 		Set<String> newRoles = new HashSet<String>(currentRoles);
 		newRoles.remove(roleName);
-		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(), user
-				.getSurname(), user.getUserState(), newRoles, user.getLocale());
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
+				user.getSurname(), user.getUserState(), newRoles, user.getLocale());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -387,8 +402,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new privilege
-		Privilege newPrivilege = new Privilege(privilege.getName(), privilege.getPolicy(), allAllowed, privilege
-				.getDenyList(), privilege.getAllowList());
+		Privilege newPrivilege = new Privilege(privilege.getName(), privilege.getPolicy(), allAllowed,
+				privilege.getDenyList(), privilege.getAllowList());
 
 		// delegate privilege replacement to persistence handler
 		this.persistenceHandler.addOrReplacePrivilege(newPrivilege);
@@ -458,20 +473,26 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException("Privilege " + privilegeName + " does not exist!");
 		}
 
+		// validate that the policy exists
+		PrivilegePolicy policy = this.persistenceHandler.getPolicy(policyName);
+		if (policy == null) {
+			throw new PrivilegeException("No privilege policy exists for the name " + policyName);
+		}
+
 		// create new privilege
-		Privilege newPrivilege = new Privilege(privilege.getName(), policyName, privilege.isAllAllowed(), privilege
-				.getDenyList(), privilege.getAllowList());
+		Privilege newPrivilege = new Privilege(privilege.getName(), policyName, privilege.isAllAllowed(),
+				privilege.getDenyList(), privilege.getAllowList());
 
 		// delegate privilege replacement to persistence handler
 		this.persistenceHandler.addOrReplacePrivilege(newPrivilege);
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserLocaleState(ch.eitchnet.privilege.model.Certificate,
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserLocale(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.util.Locale)
 	 */
 	@Override
-	public void setUserLocaleState(Certificate certificate, String username, Locale locale) {
+	public void setUserLocale(Certificate certificate, String username, Locale locale) {
 
 		// validate who is doing this
 		validateIsPrivilegeAdmin(certificate);
@@ -483,8 +504,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(), user
-				.getSurname(), user.getUserState(), user.getRoles(), locale);
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
+				user.getSurname(), user.getUserState(), user.getRoles(), locale);
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -507,8 +528,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), firstname, surname, user
-				.getUserState(), user.getRoles(), user.getLocale());
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), firstname, surname,
+				user.getUserState(), user.getRoles(), user.getLocale());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -541,8 +562,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User newUser = new User(user.getUserId(), user.getUsername(), passwordHash, user.getFirstname(), user
-				.getSurname(), user.getUserState(), user.getRoles(), user.getLocale());
+		User newUser = new User(user.getUserId(), user.getUsername(), passwordHash, user.getFirstname(),
+				user.getSurname(), user.getUserState(), user.getRoles(), user.getLocale());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -565,8 +586,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(), user
-				.getSurname(), state, user.getRoles(), user.getLocale());
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
+				user.getSurname(), state, user.getRoles(), user.getLocale());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -623,8 +644,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Certificate certificate = new Certificate(sessionId, username, authToken, authPassword, user.getLocale());
 
 		// create and save a new session
-		Session session = new Session(sessionId, authToken, authPassword, user.getUsername(), System
-				.currentTimeMillis());
+		Session session = new Session(sessionId, authToken, authPassword, user.getUsername(),
+				System.currentTimeMillis());
 		this.sessionMap.put(sessionId, new CertificateSessionPair(session, certificate));
 
 		// log
@@ -635,8 +656,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * TODO What is better, validate from {@link Restrictable} to {@link User} or the opposite direction?
-	 * 
+	 * Checks if the action is allowed by iterating the roles of the certificates user and then delegating to
+	 * {@link #actionAllowed(Role, Restrictable)}
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the {@link Certificate} is not for a currently logged in {@link User} or if the user may not
@@ -647,6 +668,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 */
 	@Override
 	public boolean actionAllowed(Certificate certificate, Restrictable restrictable) {
+
+		// TODO What is better, validate from {@link Restrictable} to {@link User} or the opposite direction?
 
 		// first validate certificate
 		if (!isCertificateValid(certificate)) {
@@ -690,17 +713,42 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#actionAllowed(ch.eitchnet.privilege.model.internal.Role,
+	 * Checks if the {@link RoleRep} has access to the {@link Restrictable} by delegating to
+	 * {@link PrivilegePolicy#actionAllowed(Role, Privilege, Restrictable)}
+	 * 
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#actionAllowed(ch.eitchnet.privilege.model.RoleRep,
 	 *      ch.eitchnet.privilege.model.Restrictable)
 	 */
 	@Override
-	public boolean actionAllowed(Role role, Restrictable restrictable) {
+	public boolean actionAllowed(RoleRep roleRep, Restrictable restrictable) {
 
 		// user and restrictable must not be null
-		if (role == null)
+		if (roleRep == null)
 			throw new PrivilegeException("Role may not be null!");
 		else if (restrictable == null)
 			throw new PrivilegeException("Restrictable may not be null!");
+
+		// get role for the roleRep
+		Role role = this.persistenceHandler.getRole(roleRep.getName());
+
+		// validate that the role exists
+		if (role == null) {
+			throw new PrivilegeException("No Role exists with the name " + roleRep.getName());
+		}
+
+		return actionAllowed(role, restrictable);
+	}
+
+	/**
+	 * Checks if the {@link Role} has access to the {@link Restrictable} by delegating to
+	 * {@link PrivilegePolicy#actionAllowed(Role, Privilege, Restrictable)}
+	 * 
+	 * @param role
+	 * @param restrictable
+	 * 
+	 * @return true if the privilege is granted, false otherwise
+	 */
+	protected boolean actionAllowed(Role role, Restrictable restrictable) {
 
 		// validate PrivilegeName for this restrictable
 		String privilegeName = restrictable.getPrivilegeName();
@@ -800,6 +848,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
+	 * This simple implementation validates that the password is not null, and that the password string is not empty
+	 * 
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#validatePassword(java.lang.String)
 	 */
 	@Override
