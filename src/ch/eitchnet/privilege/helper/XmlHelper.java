@@ -35,10 +35,21 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
  */
 public class XmlHelper {
 
+	/**
+	 * DEFAULT_ENCODING = "UTF-8" : defines the default UTF-8 encoding expected of XML files
+	 */
 	public static final String DEFAULT_ENCODING = "UTF-8";
 
 	private static final Logger logger = Logger.getLogger(XmlHelper.class);
 
+	/**
+	 * Parses an XML file on the file system using dom4j and returns the resulting {@link Document} object
+	 * 
+	 * @param xmlFile
+	 *            the {@link File} which has the path to the XML file to read
+	 * 
+	 * @return a {@link Document} object containing the dom4j {@link Element}s of the XML file
+	 */
 	public static Document parseDocument(File xmlFile) {
 
 		try {
@@ -58,6 +69,14 @@ public class XmlHelper {
 		}
 	}
 
+	/**
+	 * Writes a dom4j {@link Document} to an XML file on the file system
+	 * 
+	 * @param document
+	 *            the {@link Document} to write to the file system
+	 * @param file
+	 *            the {@link File} describing the path on the file system where the XML file should be written to
+	 */
 	public static void writeDocument(Document document, File file) {
 
 		logger.info("Exporting document element " + document.getName() + " to " + file.getAbsolutePath());
@@ -94,7 +113,15 @@ public class XmlHelper {
 		}
 	}
 
-	public static void writeDocument(Element rootElement, File file) {
+	/**
+	 * Writes a dom4j {@link Element} to an XML file on the file system
+	 * 
+	 * @param rootElement
+	 *            the {@link Element} to write to the file system
+	 * @param file
+	 *            the {@link File} describing the path on the file system where the XML file should be written to
+	 */
+	public static void writeElement(Element rootElement, File file) {
 
 		Document document = DocumentFactory.getInstance().createDocument(DEFAULT_ENCODING);
 		document.setRootElement(rootElement);

@@ -24,7 +24,8 @@ public interface PrivilegePolicy {
 	 * @param role
 	 * @param privilege
 	 * @param restrictable
-	 * @return
+	 * 
+	 * @return return true if the action is allowed, false if not
 	 */
 	public boolean actionAllowed(Role role, Privilege privilege, Restrictable restrictable);
 }

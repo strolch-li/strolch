@@ -43,18 +43,24 @@ public final class Role {
 	}
 
 	/**
-	 * @return
+	 * Returns the {@link Set} of {@link Privilege} names which is granted to this {@link Role}
+	 * 
+	 * @return the {@link Set} of {@link Privilege} names which is granted to this
 	 */
 	public Set<String> getPrivileges() {
 		return this.privileges;
 	}
 
 	/**
-	 * @param key
-	 * @return
+	 * Determines if this {@link Role} has the {@link Privilege} with the given name
+	 * 
+	 * @param name
+	 *            the name of the {@link Privilege}
+	 * 
+	 * @return true if this {@link Role} has the {@link Privilege} with the given name
 	 */
-	public boolean hasPrivilege(String key) {
-		return this.privileges.contains(key);
+	public boolean hasPrivilege(String name) {
+		return this.privileges.contains(name);
 	}
 
 	/**

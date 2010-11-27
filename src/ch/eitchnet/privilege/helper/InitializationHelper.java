@@ -33,7 +33,8 @@ public class InitializationHelper {
 
 	/**
 	 * @param privilegeContainerXmlFile
-	 * @return
+	 * 
+	 * @return the {@link PrivilegeHandler} instance loaded from the configuration file
 	 */
 	public static PrivilegeHandler initializeFromXml(File privilegeContainerXmlFile) {
 
@@ -110,7 +111,8 @@ public class InitializationHelper {
 
 	/**
 	 * @param element
-	 * @return
+	 * 
+	 * @return the {@link Map} of the parameter name/value combinations from the given {@link Element}
 	 */
 	@SuppressWarnings("unchecked")
 	public static Map<String, String> convertToParameterMap(Element element) {

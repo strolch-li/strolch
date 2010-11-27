@@ -69,7 +69,7 @@ public final class User {
 	 * @return the userId
 	 */
 	public String getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	/**
@@ -80,11 +80,9 @@ public final class User {
 	}
 
 	/**
+	 * Returns the hashed password for this {@link User}
 	 * 
-	 * @param privilegeHandler
-	 * @param certificate
-	 * 
-	 * @return
+	 * @return the hashed password for this {@link User}
 	 */
 	public String getPassword() {
 

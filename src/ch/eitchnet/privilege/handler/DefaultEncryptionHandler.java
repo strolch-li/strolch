@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import ch.eitchnet.privilege.helper.EncryptionHelper;
+import ch.eitchnet.privilege.helper.HashHelper;
 import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 
@@ -60,7 +60,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	public String convertToHash(String string) {
 		try {
 
-			return EncryptionHelper.encryptString(this.hashAlgorithm, string);
+			return HashHelper.stringToHash(this.hashAlgorithm, string);
 
 		} catch (NoSuchAlgorithmException e) {
 			throw new PrivilegeException("Algorithm " + this.hashAlgorithm + " was not found!", e);

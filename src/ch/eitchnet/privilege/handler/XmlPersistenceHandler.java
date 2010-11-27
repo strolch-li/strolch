@@ -192,7 +192,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			}
 
 			// write DOM to file
-			XmlHelper.writeDocument(rootElement, usersFile);
+			XmlHelper.writeElement(rootElement, usersFile);
 			this.userMapDirty = true;
 		}
 
@@ -219,7 +219,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			}
 
 			// write DOM to file
-			XmlHelper.writeDocument(rootElement, rolesFile);
+			XmlHelper.writeElement(rootElement, rolesFile);
 			this.roleMapDirty = true;
 		}
 
@@ -247,7 +247,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			}
 
 			// write DOM to file
-			XmlHelper.writeDocument(rootElement, privilegesFile);
+			XmlHelper.writeElement(rootElement, privilegesFile);
 			this.privilegeMapDirty = true;
 		}
 

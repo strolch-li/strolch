@@ -21,15 +21,17 @@ import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
+
 /**
  * <p>
  * This class is a simple application which can be used to bootstrap a new configuration for the
- * {@link PrivilegeContainer}
+ * {@link PrivilegeHandler}
  * </p>
  * 
  * <p>
  * Simple execute the application and it will ask a few questions and then write a new set of configuration files which
- * can be used to run the {@link PrivilegeContainer}
+ * can be used to run the {@link PrivilegeHandler}
  * </p>
  * 
  * @author rvonburg

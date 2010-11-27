@@ -22,6 +22,7 @@ public class PasswordCreator {
 
 	/**
 	 * @param args
+	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
 
@@ -48,7 +49,7 @@ public class PasswordCreator {
 
 		System.out.print("Password: ");
 		String password = r.readLine().trim();
-		System.out.print("Hash is: " + EncryptionHelper.encryptString(hashAlgorithm, password));
+		System.out.print("Hash is: " + HashHelper.stringToHash(hashAlgorithm, password));
 	}
 
 }

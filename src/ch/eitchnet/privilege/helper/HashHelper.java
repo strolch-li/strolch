@@ -18,16 +18,31 @@ import java.security.NoSuchAlgorithmException;
  * @author rvonburg
  * 
  */
-public class EncryptionHelper {
+public class HashHelper {
 
 	/**
-	 * Hex char table for fast calculating of hex value
+	 * Hex char table for fast calculating of hex values
 	 */
 	private static final byte[] HEX_CHAR_TABLE = { (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4',
 			(byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd',
 			(byte) 'e', (byte) 'f' };
 
-	public static String encryptString(String hashAlgorithm, String string) throws NoSuchAlgorithmException,
+	/**
+	 * Creates the hash of the given string using {@link MessageDigest} and the defined hash algorithm
+	 * 
+	 * @param hashAlgorithm
+	 *            the algorithm to use for hashing
+	 * @param string
+	 *            the string to hash
+	 * 
+	 * @return a new string encrypted by the defined algorithm
+	 * 
+	 * @throws NoSuchAlgorithmException
+	 *             if the algorithm is not found
+	 * @throws UnsupportedEncodingException
+	 *             if something is wrong with the given string to hash
+	 */
+	public static String stringToHash(String hashAlgorithm, String string) throws NoSuchAlgorithmException,
 			UnsupportedEncodingException {
 
 		MessageDigest digest = MessageDigest.getInstance(hashAlgorithm);
