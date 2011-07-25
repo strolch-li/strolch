@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Build Jar" default="dist">
+
+	<!-- define export names -->
+	<property name="projectName" value="Privilege" />
+	<property name="jar" value="${projectName}.jar" />
+
+	<!-- define locations -->
+	<property name="buildFolder" location="${basedir}/bin" />
+	<property name="distJar" location="${basedir}/${jar}" />
+	
+	<!-- define class path with eclipse plugins -->
+	<path id="project.class.path">
+		<pathelement path="${java.class.path}" />
+		<fileset dir="${basedir}/lib" includes="*.jar" />
+	</path>
+
+	<target name="dist" description="generate the distribution">
+
+		<!-- compile classes -->
+		<javac srcdir="${basedir}/src" destdir="${buildFolder}" classpathref="project.class.path" debug="yes" source="1.6" target="1.6" />
+
+		<!-- copy resources -->
+		<copy todir="${buildFolder}">
+			<fileset dir="${basedir}/src" defaultexcludes="true" />
+			<!--fileset dir="${basedir}/i18n" defaultexcludes="true" /-->
+		</copy>
+
+		<!-- create the jar -->
+		<jar jarfile="${distJar}" basedir="${buildFolder}" manifest="${basedir}/MANIFEST.MF" />
+
+	</target>
+
+</project>

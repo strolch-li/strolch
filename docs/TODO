@@ -8,6 +8,8 @@ A list of TODOs for Privilege
   actionAllowed(Role, Privilege, Restrictable)-method. Maybe the Privilege
   argument is not needed, as this should be on the Role anyhow...
 
+- i18n for any messages and exceptions!
+
 - Finish the JavaDoc
 
 - Set up a website =)
