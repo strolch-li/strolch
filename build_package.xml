@@ -7,7 +7,8 @@
 
 	<!-- define locations -->
 	<property name="buildFolder" location="${basedir}/bin" />
-	<property name="distJar" location="${basedir}/${jar}" />
+	<property name="distFolder" location="${basedir}/dist" />
+	<property name="distJar" location="${distFolder}/${jar}" />
 	
 	<!-- define class path with eclipse plugins -->
 	<path id="project.class.path">
@@ -16,6 +17,14 @@
 	</path>
 
 	<target name="dist" description="generate the distribution">
+		
+		<!-- clean up old data -->
+		<!--delete includeemptydirs="true" verbose="true">
+			<fileset dir="${distFolder}" includes="**/*" />
+		</delete-->
+		
+		<!-- create dist directory if it does not exist -->
+		<mkdir dir="${distFolder}"  />
 
 		<!-- compile classes -->
 		<javac srcdir="${basedir}/src" destdir="${buildFolder}" classpathref="project.class.path" debug="yes" source="1.6" target="1.6" />
