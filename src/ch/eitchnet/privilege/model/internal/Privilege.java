@@ -14,11 +14,25 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.model.PrivilegeRep;
+import ch.eitchnet.privilege.model.Restrictable;
+import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
- * @author rvonburg
+ * <p>
+ * {@link Privilege} is the main model object for Privilege. A {@link Role} has a set of Privileges assigned to it which
+ * defines the privileges a logged in user with that role has. For every privilege a {@link PrivilegePolicy} is
+ * configured which is used to evaluate if privilege is granted to a {@link Restrictable}
+ * </p>
  * 
+ * <p>
+ * {@link Privilege}s have allow and deny rules which the configured {@link PrivilegeHandler} uses to
+ * </p>
+ * 
+ * <p>Note: This is an internal object which is not to be serialized or passed to clients, {@link PrivilegeRep}s are used for that</p>
+ * 
+ * @author rvonburg
  */
 public final class Privilege {
 
@@ -29,12 +43,19 @@ public final class Privilege {
 	private final Set<String> allowList;
 
 	/**
+	 * Default constructor
 	 * 
 	 * @param name
+	 *            the name of this privilege, which is unique to all privileges known in the {@link PrivilegeHandler}
 	 * @param policy
+	 *            the {@link PrivilegePolicy} configured to evaluate if the privilege is granted
 	 * @param allAllowed
+	 *            a boolean defining if a {@link Role} with this {@link Privilege} has unrestricted access to a
+	 *            {@link Restrictable}
 	 * @param denyList
+	 *            a list of deny rules for this {@link Privilege}
 	 * @param allowList
+	 *            a list of allow rules for this {@link Privilege}
 	 */
 	public Privilege(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
 		this.name = name;

@@ -17,8 +17,17 @@ import java.util.Set;
 import ch.eitchnet.privilege.model.RoleRep;
 
 /**
- * @author rvonburg
+ * <p>
+ * A {@link User} is assigned a set of roles. These roles have a set of privileges assigned to them by name and they
+ * define the privileges granted to a user with this role
+ * </p>
  * 
+ * <p>
+ * Note: This is an internal object which is not to be serialized or passed to clients, {@link RoleRep}s are used for
+ * that
+ * </p>
+ * 
+ * @author rvonburg
  */
 public final class Role {
 
@@ -26,9 +35,12 @@ public final class Role {
 	private final Set<String> privileges;
 
 	/**
+	 * Default constructor
 	 * 
 	 * @param name
+	 *            the name of the role
 	 * @param privileges
+	 *            a set of names of privileges granted to this role
 	 */
 	public Role(String name, Set<String> privileges) {
 		this.name = name;

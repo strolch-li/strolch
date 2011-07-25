@@ -19,6 +19,14 @@ import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 
 /**
+ * This class defines the actual login information for a given user which can be granted privileges. Every user is
+ * granted a set of {@link Role}s and has a {@link UserState} including detail information like first name and surname
+ * 
+ * <p>
+ * Note: This is an internal object which is not to be serialized or passed to clients, {@link UserRep}s are used for
+ * that
+ * </p>
+ * 
  * @author rvonburg
  * 
  */
@@ -39,14 +47,24 @@ public final class User {
 	private final Locale locale;
 
 	/**
+	 * Default constructor
+	 * 
 	 * @param userId
+	 *            the user's id
 	 * @param username
+	 *            the user's login name
 	 * @param password
+	 *            the user's password (hashed)
 	 * @param firstname
+	 *            the user's first name
 	 * @param surname
+	 *            the user's surname
 	 * @param userState
+	 *            the user's {@link UserState}
 	 * @param roles
+	 *            the set of {@link Role}s assigned to this user
 	 * @param locale
+	 *            the user's {@link Locale}
 	 */
 	public User(String userId, String username, String password, String firstname, String surname, UserState userState,
 			Set<String> roles, Locale locale) {
@@ -125,6 +143,8 @@ public final class User {
 	 * Returns true if this user has the specified role
 	 * 
 	 * @param role
+	 *            the name of the {@link Role} to check for
+	 * 
 	 * @return true if the this user has the specified role
 	 */
 	public boolean hasRole(String role) {

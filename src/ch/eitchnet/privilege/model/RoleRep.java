@@ -13,9 +13,14 @@ package ch.eitchnet.privilege.model;
 import java.io.Serializable;
 import java.util.Set;
 
+import ch.eitchnet.privilege.model.internal.Role;
+
 /**
- * @author rvonburg
+ * To keep certain details of the {@link Role} itself hidden from remote clients and make sure instances are only edited
+ * by users with the correct privilege, this representational version is allowed to be viewed by remote clients and
+ * simply wraps all public data from the {@link Role}
  * 
+ * @author rvonburg
  */
 public class RoleRep implements Serializable {
 
@@ -25,8 +30,12 @@ public class RoleRep implements Serializable {
 	private Set<String> privileges;
 
 	/**
+	 * Default constructor
+	 * 
 	 * @param name
+	 *            the name of this role
 	 * @param privileges
+	 *            the set of privileges granted to this role
 	 */
 	public RoleRep(String name, Set<String> privileges) {
 		this.name = name;

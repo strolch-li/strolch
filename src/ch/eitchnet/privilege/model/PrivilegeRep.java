@@ -13,9 +13,17 @@ package ch.eitchnet.privilege.model;
 import java.io.Serializable;
 import java.util.Set;
 
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.privilege.model.internal.Privilege;
+import ch.eitchnet.privilege.model.internal.Role;
+import ch.eitchnet.privilege.policy.PrivilegePolicy;
+
 /**
- * @author rvonburg
+ * To keep certain details of the {@link Privilege} itself hidden from remote clients and make sure instances are only
+ * edited by users with the correct privilege, this representational version is allowed to be viewed by remote clients
+ * and simply wraps all public data from the {@link Privilege}
  * 
+ * @author rvonburg
  */
 public class PrivilegeRep implements Serializable {
 
@@ -28,11 +36,19 @@ public class PrivilegeRep implements Serializable {
 	private Set<String> allowList;
 
 	/**
+	 * Default constructor
+	 * 
 	 * @param name
+	 *            the name of this privilege, which is unique to all privileges known in the {@link PrivilegeHandler}
 	 * @param policy
+	 *            the {@link PrivilegePolicy} configured to evaluate if the privilege is granted
 	 * @param allAllowed
+	 *            a boolean defining if a {@link Role} with this {@link Privilege} has unrestricted access to a
+	 *            {@link Restrictable}
 	 * @param denyList
+	 *            a list of deny rules for this {@link Privilege}
 	 * @param allowList
+	 *            a list of allow rules for this {@link Privilege}
 	 */
 	public PrivilegeRep(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
 		this.name = name;

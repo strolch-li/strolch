@@ -13,11 +13,16 @@ package ch.eitchnet.privilege.model;
 import java.io.Serializable;
 import java.util.Locale;
 
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.model.internal.Session;
 
 /**
- * @author rvonburg
+ * The {@link Certificate} is the object a client keeps when accessing a Privilege enabled system. This object is the
+ * instance which is always used when performing an access and is returned when a user performs a login through
+ * {@link PrivilegeHandler#authenticate(String, String)}
  * 
+ * @author rvonburg
  */
 public final class Certificate implements Serializable {
 
@@ -31,11 +36,22 @@ public final class Certificate implements Serializable {
 	private Locale locale;
 
 	/**
+	 * Default constructor initializing with all information needed for this certificate
+	 * 
+	 * <p>Note, both the authentication token and password are private fields which are generated on login and only known by the {@link PrivilegeHandler}</p>
+	 * 
 	 * @param sessionId
+	 *            the users session id
 	 * @param username
+	 *            the users login name
 	 * @param authToken
+	 *            the authentication token defining the users unique session and is a private field of this certificate.
+	 *            It corresponds with the authentication token on the {@link Session}
 	 * @param authPassword
+	 *            the password to access the authentication token, this is not known to the client but set by the
+	 *            {@link PrivilegeHandler} on authentication. It corresponds with the authentication password on the {@link Session}
 	 * @param locale
+	 *            the users {@link Locale}
 	 */
 	public Certificate(String sessionId, String username, String authToken, String authPassword, Locale locale) {
 
@@ -86,12 +102,12 @@ public final class Certificate implements Serializable {
 	}
 
 	/**
-	 * Returns the authToken if the given authPassword is corret, null otherwise
+	 * Returns the authToken if the given authPassword is correct, null otherwise
 	 * 
 	 * @param authPassword
-	 *            the auth password with which this certificate was created
+	 *            the authentication password with which this certificate was created
 	 * 
-	 * @return the authToken if the given authPassword is corret, null otherwise
+	 * @return the authToken if the given authPassword is correct, null otherwise
 	 */
 	public String getAuthToken(String authPassword) {
 		if (this.authPassword.equals(authPassword))
@@ -170,5 +186,4 @@ public final class Certificate implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
-
 }

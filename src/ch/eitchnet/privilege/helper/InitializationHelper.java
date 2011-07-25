@@ -24,15 +24,20 @@ import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
- * @author rvonburg
+ * This class implements the initializing of the {@link PrivilegeHandler} by loading an XML file containing the
+ * configuration
  * 
+ * @author rvonburg
  */
 public class InitializationHelper {
 
 	private static final Logger logger = Logger.getLogger(InitializationHelper.class);
 
 	/**
+	 * Initializes the {@link PrivilegeHandler} from the configuration file
+	 * 
 	 * @param privilegeContainerXmlFile
+	 *            a {@link File} reference to the XML file containing the configuration for Privilege
 	 * 
 	 * @return the {@link PrivilegeHandler} instance loaded from the configuration file
 	 */
@@ -110,7 +115,12 @@ public class InitializationHelper {
 	}
 
 	/**
+	 * Converts an {@link XmlConstants#XML_PARAMETERS} element containing {@link XmlConstants#XML_PARAMETER} elements to
+	 * a {@link Map} of String key/value pairs
+	 * 
 	 * @param element
+	 *            the XML {@link Element} with name {@link XmlConstants#XML_PARAMETERS} containing
+	 *            {@link XmlConstants#XML_PARAMETER} elements
 	 * 
 	 * @return the {@link Map} of the parameter name/value combinations from the given {@link Element}
 	 */

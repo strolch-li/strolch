@@ -30,8 +30,9 @@ import org.dom4j.io.XMLWriter;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
- * @author rvonburg
+ * Helper class for performing XML based tasks using Dom4J
  * 
+ * @author rvonburg
  */
 public class XmlHelper {
 

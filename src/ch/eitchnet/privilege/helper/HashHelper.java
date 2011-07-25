@@ -15,8 +15,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * @author rvonburg
+ * Helper class to hash a String for a certain hash algorithm, using the Java {@link MessageDigest} classes
  * 
+ * @author rvonburg
  */
 public class HashHelper {
 

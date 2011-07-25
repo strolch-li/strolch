@@ -16,7 +16,6 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
  * The {@link ClassHelper} class is a helper to instantiate classes using reflection
  * 
  * @author rvonburg
- * 
  */
 public class ClassHelper {
 

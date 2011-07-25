@@ -10,9 +10,22 @@
 
 package ch.eitchnet.privilege.model.internal;
 
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.privilege.model.Certificate;
+
 /**
- * @author rvonburg
+ * <p>
+ * A {@link Session} is linked to currently logged in user. The {@link PrivilegeHandler} creates an instance of this
+ * class once a {@link User} has successfully logged in and keeps this object private but hands out a
+ * {@link Certificate} which the user must use every time a privilege needs to be granted
+ * </p>
  * 
+ * <p>
+ * Note: This is an internal object which is not to be serialized or passed to clients, the client must keep his
+ * {@link Certificate} which is used for accessing privileges
+ * </p>
+ * 
+ * @author rvonburg
  */
 public final class Session {
 
@@ -24,18 +37,32 @@ public final class Session {
 	private final String authPassword;
 
 	/**
+	 * Default constructor
+	 * 
+	 * <p>
+	 * Note, both the authentication token and password are private fields which are generated on login and only known
+	 * by the {@link PrivilegeHandler}
+	 * </p>
 	 * 
 	 * @param sessionId
-	 * @param authToken
-	 * @param authPassword
+	 *            the users session id
 	 * @param username
+	 *            the users login name
+	 * @param authToken
+	 *            the authentication token defining the users unique session and is a private field of this session. It
+	 *            corresponds with the authentication token on the {@link Certificate}
+	 * @param authPassword
+	 *            the password to access the authentication token, this is not known to the client but set by the
+	 *            {@link PrivilegeHandler} on authentication. It corresponds with the authentication password on the
+	 *            {@link Certificate}
 	 * @param loginTime
+	 *            the time the user logged in
 	 */
-	public Session(String sessionId, String authToken, String authPassword, String username, long loginTime) {
+	public Session(String sessionId, String username, String authToken, String authPassword, long loginTime) {
 		this.sessionId = sessionId;
+		this.username = username;
 		this.authToken = authToken;
 		this.authPassword = authPassword;
-		this.username = username;
 		this.loginTime = loginTime;
 	}
 

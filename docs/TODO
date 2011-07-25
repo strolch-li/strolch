@@ -1,0 +1,14 @@
+A list of TODOs for Privilege
+============================================
+
+- Write up a proper explanation on the idea on how Privilege, PrivilegePolicy,
+  Restrictable and Roles fit together to grant privileges to Users
+
+- Re-think the PrivilegePolicy and its 
+  actionAllowed(Role, Privilege, Restrictable)-method. Maybe the Privilege
+  argument is not needed, as this should be on the Role anyhow...
+
+- Finish the JavaDoc
+
+- Set up a website =)
+

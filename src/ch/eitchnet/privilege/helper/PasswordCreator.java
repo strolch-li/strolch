@@ -15,14 +15,23 @@ import java.io.InputStreamReader;
 import java.security.MessageDigest;
 
 /**
- * @author rvonburg
+ * <p>
+ * Simple main class which can be used to create a hash from a password which the user must type in at the command line
+ * </p>
  * 
+ * <p>
+ * TODO: Note: currently the password input is echoed which is a security risk. This is a TODO
+ * </p>
+ * 
+ * @author rvonburg
  */
 public class PasswordCreator {
 
 	/**
 	 * @param args
-	 * @throws Exception 
+	 *            the args from the command line, NOT USED
+	 * @throws Exception
+	 *             thrown if anything goes wrong
 	 */
 	public static void main(String[] args) throws Exception {
 

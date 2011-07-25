@@ -11,9 +11,15 @@
 package ch.eitchnet.privilege.model;
 
 import ch.eitchnet.privilege.model.internal.Privilege;
+import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
- * TODO javadoc
+ * <p>
+ * Objects implementing this interface are used to grant/restrict privileges to them. A {@link PrivilegePolicy}
+ * implements the logic on granting/restricting privileges for a {@link Restrictable} and the
+ * {@link #getPrivilegeName()} is used to find the {@link Privilege} which has the associated {@link PrivilegePolicy}
+ * for evaluating access
+ * </p>
  * 
  * @author rvonburg
  * 

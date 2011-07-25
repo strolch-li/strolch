@@ -11,8 +11,9 @@
 package ch.eitchnet.privilege.helper;
 
 /**
- * @author rvonburg
+ * The constants used in parsing XML documents which contain the configuration for Privilege
  * 
+ * @author rvonburg
  */
 public class XmlConstants {
 	/**

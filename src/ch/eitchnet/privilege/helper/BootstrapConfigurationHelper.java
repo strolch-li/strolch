@@ -34,11 +34,15 @@ import ch.eitchnet.privilege.handler.PrivilegeHandler;
  * can be used to run the {@link PrivilegeHandler}
  * </p>
  * 
- * @author rvonburg
+ * <p>
+ * <b>Note:</b>This class is not yet implemented!
+ * </p>
  * 
+ * @author rvonburg
  */
 public class BootstrapConfigurationHelper {
-//	private static final Logger logger = Logger.getLogger(BootstrapConfigurationHelper.class);
+
+	// private static final Logger logger = Logger.getLogger(BootstrapConfigurationHelper.class);
 
 	private static String path;
 
@@ -58,6 +62,7 @@ public class BootstrapConfigurationHelper {
 
 	/**
 	 * @param args
+	 *            the args from the command line
 	 */
 	public static void main(String[] args) {
 		BasicConfigurator.resetConfiguration();

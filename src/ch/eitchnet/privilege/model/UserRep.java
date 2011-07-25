@@ -14,9 +14,15 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
 
+import ch.eitchnet.privilege.model.internal.Role;
+import ch.eitchnet.privilege.model.internal.User;
+
 /**
- * @author rvonburg
+ * To keep certain details of the {@link User} itself hidden from remote clients and make sure instances are only edited
+ * by users with the correct privilege, this representational version is allowed to be viewed by remote clients and
+ * simply wraps all public data from the {@link User}
  * 
+ * @author rvonburg
  */
 public class UserRep implements Serializable {
 
@@ -31,13 +37,22 @@ public class UserRep implements Serializable {
 	private Locale locale;
 
 	/**
+	 * Default constructor
+	 * 
 	 * @param userId
+	 *            the user's id
 	 * @param username
+	 *            the user's login name
 	 * @param firstname
+	 *            the user's first name
 	 * @param surname
+	 *            the user's surname
 	 * @param userState
+	 *            the user's {@link UserState}
 	 * @param roles
+	 *            the set of {@link Role}s assigned to this user
 	 * @param locale
+	 *            the user's {@link Locale}
 	 */
 	public UserRep(String userId, String username, String firstname, String surname, UserState userState,
 			Set<String> roles, Locale locale) {
