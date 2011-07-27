@@ -31,7 +31,10 @@
 		</copy>
 
 		<!-- create the jar -->
-		<jar jarfile="${distJar}" basedir="${buildFolder}" manifest="${basedir}/MANIFEST.MF" />
+		<jar jarfile="${distJar}" basedir="${buildFolder}" manifest="${basedir}/MANIFEST.MF">
+			<fileset dir="${basedir}" defaultexcludes="true" includes="docs/" />
+			<fileset dir="${basedir}" defaultexcludes="true" includes="config/" />
+		</jar>
 
 	</target>
 
