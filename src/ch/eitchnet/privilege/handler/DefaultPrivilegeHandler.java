@@ -10,6 +10,7 @@
 
 package ch.eitchnet.privilege.handler;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -656,6 +657,25 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#invalidateSession(ch.eitchnet.privilege.model.Certificate)
+	 */
+	@Override
+	public boolean invalidateSession(Certificate certificate) {
+
+		// first validate certificate
+		if (!isCertificateValid(certificate)) {
+			logger.info("Certificate is not valid, so no session to invalidate: " + certificate.toString());
+			return false;
+		}
+
+		// remove registration
+		CertificateSessionPair certificateSessionPair = this.sessionMap.remove(certificate.getSessionId());
+
+		// return true if object was really removed
+		return certificateSessionPair != null;
+	}
+
+	/**
 	 * Checks if the action is allowed by iterating the roles of the certificates user and then delegating to
 	 * {@link #actionAllowed(Role, Restrictable)}
 	 * 
@@ -884,7 +904,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler = persistenceHandler;
 
 		lastSessionId = 0l;
-		this.sessionMap = new HashMap<String, CertificateSessionPair>();
+		this.sessionMap = Collections.synchronizedMap(new HashMap<String, CertificateSessionPair>());
 	}
 
 	/**

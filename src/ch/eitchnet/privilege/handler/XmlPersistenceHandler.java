@@ -35,8 +35,10 @@ import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
- * @author rvonburg
+ * {@link PersistenceHandler} implementation which reads the configuration from XML files. These configuration is passed
+ * in {@link #initialize(Map)}
  * 
+ * @author rvonburg
  */
 public class XmlPersistenceHandler implements PersistenceHandler {
 
@@ -274,10 +276,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public void initialize(Map<String, String> parameterMap) {
 
-		this.roleMap = new HashMap<String, Role>();
-		this.userMap = new HashMap<String, User>();
-		this.privilegeMap = new HashMap<String, Privilege>();
-		this.policyMap = new HashMap<String, Class<PrivilegePolicy>>();
+		this.roleMap = Collections.synchronizedMap(new HashMap<String, Role>());
+		this.userMap = Collections.synchronizedMap(new HashMap<String, User>());
+		this.privilegeMap = Collections.synchronizedMap(new HashMap<String, Privilege>());
+		this.policyMap = Collections.synchronizedMap(new HashMap<String, Class<PrivilegePolicy>>());
 
 		// get and validate base bath
 		this.basePath = parameterMap.get(XmlConstants.XML_PARAM_BASE_PATH);
@@ -536,37 +538,39 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		List<Element> privilegesAsElements = new ArrayList<Element>(this.privilegeMap.size());
 
 		DocumentFactory documentFactory = DocumentFactory.getInstance();
-		for (String privilegeName : this.privilegeMap.keySet()) {
+		synchronized (this.privilegeMap) {
+			for (String privilegeName : this.privilegeMap.keySet()) {
 
-			// get the privilege object
-			Privilege privilege = this.privilegeMap.get(privilegeName);
+				// get the privilege object
+				Privilege privilege = this.privilegeMap.get(privilegeName);
 
-			// create the privilege element
-			Element privilegeElement = documentFactory.createElement(XmlConstants.XML_PRIVILEGE);
-			privilegeElement.addAttribute(XmlConstants.XML_ATTR_NAME, privilege.getName());
-			privilegeElement.addAttribute(XmlConstants.XML_ATTR_POLICY, privilege.getPolicy());
+				// create the privilege element
+				Element privilegeElement = documentFactory.createElement(XmlConstants.XML_PRIVILEGE);
+				privilegeElement.addAttribute(XmlConstants.XML_ATTR_NAME, privilege.getName());
+				privilegeElement.addAttribute(XmlConstants.XML_ATTR_POLICY, privilege.getPolicy());
 
-			// add the all allowed element
-			Element allAllowedElement = documentFactory.createElement(XmlConstants.XML_ALL_ALLOWED);
-			allAllowedElement.setText(Boolean.toString(privilege.isAllAllowed()));
-			privilegeElement.add(allAllowedElement);
+				// add the all allowed element
+				Element allAllowedElement = documentFactory.createElement(XmlConstants.XML_ALL_ALLOWED);
+				allAllowedElement.setText(Boolean.toString(privilege.isAllAllowed()));
+				privilegeElement.add(allAllowedElement);
 
-			// add all the deny values
-			for (String denyValue : privilege.getDenyList()) {
-				Element denyValueElement = documentFactory.createElement(XmlConstants.XML_DENY);
-				denyValueElement.setText(denyValue);
-				privilegeElement.add(denyValueElement);
+				// add all the deny values
+				for (String denyValue : privilege.getDenyList()) {
+					Element denyValueElement = documentFactory.createElement(XmlConstants.XML_DENY);
+					denyValueElement.setText(denyValue);
+					privilegeElement.add(denyValueElement);
+				}
+
+				// add all the allow values
+				for (String allowValue : privilege.getAllowList()) {
+					Element allowValueElement = documentFactory.createElement(XmlConstants.XML_ALLOW);
+					allowValueElement.setText(allowValue);
+					privilegeElement.add(allowValueElement);
+				}
+
+				// add element to return list
+				privilegesAsElements.add(privilegeElement);
 			}
-
-			// add all the allow values
-			for (String allowValue : privilege.getAllowList()) {
-				Element allowValueElement = documentFactory.createElement(XmlConstants.XML_ALLOW);
-				allowValueElement.setText(allowValue);
-				privilegeElement.add(allowValueElement);
-			}
-
-			// add element to return list
-			privilegesAsElements.add(privilegeElement);
 		}
 
 		return privilegesAsElements;
@@ -577,24 +581,26 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		List<Element> rolesAsElements = new ArrayList<Element>(this.roleMap.size());
 
 		DocumentFactory documentFactory = DocumentFactory.getInstance();
-		for (String roleName : this.roleMap.keySet()) {
+		synchronized (this.roleMap) {
+			for (String roleName : this.roleMap.keySet()) {
 
-			// get the role object
-			Role role = this.roleMap.get(roleName);
+				// get the role object
+				Role role = this.roleMap.get(roleName);
 
-			// create the role element
-			Element roleElement = documentFactory.createElement(XmlConstants.XML_ROLE);
-			roleElement.addAttribute(XmlConstants.XML_ATTR_NAME, role.getName());
+				// create the role element
+				Element roleElement = documentFactory.createElement(XmlConstants.XML_ROLE);
+				roleElement.addAttribute(XmlConstants.XML_ATTR_NAME, role.getName());
 
-			// add all the privileges
-			for (String privilegeName : role.getPrivileges()) {
-				Element privilegeElement = documentFactory.createElement(XmlConstants.XML_PRIVILEGE);
-				privilegeElement.addAttribute(XmlConstants.XML_ATTR_NAME, privilegeName);
-				roleElement.add(privilegeElement);
+				// add all the privileges
+				for (String privilegeName : role.getPrivileges()) {
+					Element privilegeElement = documentFactory.createElement(XmlConstants.XML_PRIVILEGE);
+					privilegeElement.addAttribute(XmlConstants.XML_ATTR_NAME, privilegeName);
+					roleElement.add(privilegeElement);
+				}
+
+				// add element to return list
+				rolesAsElements.add(roleElement);
 			}
-
-			// add element to return list
-			rolesAsElements.add(roleElement);
 		}
 
 		return rolesAsElements;
@@ -605,48 +611,50 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		List<Element> usersAsElements = new ArrayList<Element>(this.userMap.size());
 
 		DocumentFactory documentFactory = DocumentFactory.getInstance();
-		for (String userName : this.userMap.keySet()) {
+		synchronized (this.userMap) {
+			for (String userName : this.userMap.keySet()) {
 
-			// get the user object
-			User user = this.userMap.get(userName);
+				// get the user object
+				User user = this.userMap.get(userName);
 
-			// create the user element
-			Element userElement = documentFactory.createElement(XmlConstants.XML_USER);
-			userElement.addAttribute(XmlConstants.XML_ATTR_USER_ID, user.getUserId());
-			userElement.addAttribute(XmlConstants.XML_ATTR_USERNAME, user.getUsername());
-			userElement.addAttribute(XmlConstants.XML_ATTR_PASSWORD, user.getPassword());
+				// create the user element
+				Element userElement = documentFactory.createElement(XmlConstants.XML_USER);
+				userElement.addAttribute(XmlConstants.XML_ATTR_USER_ID, user.getUserId());
+				userElement.addAttribute(XmlConstants.XML_ATTR_USERNAME, user.getUsername());
+				userElement.addAttribute(XmlConstants.XML_ATTR_PASSWORD, user.getPassword());
 
-			// add first name element
-			Element firstnameElement = documentFactory.createElement(XmlConstants.XML_FIRSTNAME);
-			firstnameElement.setText(user.getFirstname());
-			userElement.add(firstnameElement);
+				// add first name element
+				Element firstnameElement = documentFactory.createElement(XmlConstants.XML_FIRSTNAME);
+				firstnameElement.setText(user.getFirstname());
+				userElement.add(firstnameElement);
 
-			// add surname element
-			Element surnameElement = documentFactory.createElement(XmlConstants.XML_SURNAME);
-			surnameElement.setText(user.getSurname());
-			userElement.add(surnameElement);
+				// add surname element
+				Element surnameElement = documentFactory.createElement(XmlConstants.XML_SURNAME);
+				surnameElement.setText(user.getSurname());
+				userElement.add(surnameElement);
 
-			// add state element
-			Element stateElement = documentFactory.createElement(XmlConstants.XML_STATE);
-			stateElement.setText(user.getUserState().toString());
-			userElement.add(stateElement);
+				// add state element
+				Element stateElement = documentFactory.createElement(XmlConstants.XML_STATE);
+				stateElement.setText(user.getUserState().toString());
+				userElement.add(stateElement);
 
-			// add locale element
-			Element localeElement = documentFactory.createElement(XmlConstants.XML_LOCALE);
-			localeElement.setText(user.getLocale().toString());
-			userElement.add(localeElement);
+				// add locale element
+				Element localeElement = documentFactory.createElement(XmlConstants.XML_LOCALE);
+				localeElement.setText(user.getLocale().toString());
+				userElement.add(localeElement);
 
-			// add all the role elements
-			Element rolesElement = documentFactory.createElement(XmlConstants.XML_ROLES);
-			userElement.add(rolesElement);
-			for (String roleName : user.getRoles()) {
-				Element roleElement = documentFactory.createElement(XmlConstants.XML_ROLE);
-				roleElement.setText(roleName);
-				rolesElement.add(roleElement);
+				// add all the role elements
+				Element rolesElement = documentFactory.createElement(XmlConstants.XML_ROLES);
+				userElement.add(rolesElement);
+				for (String roleName : user.getRoles()) {
+					Element roleElement = documentFactory.createElement(XmlConstants.XML_ROLE);
+					roleElement.setText(roleName);
+					rolesElement.add(roleElement);
+				}
+
+				// add element to return list
+				usersAsElements.add(userElement);
 			}
-
-			// add element to return list
-			usersAsElements.add(userElement);
 		}
 
 		return usersAsElements;

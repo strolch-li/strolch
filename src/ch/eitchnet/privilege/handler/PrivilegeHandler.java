@@ -25,6 +25,7 @@ import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
+import ch.eitchnet.privilege.model.internal.Session;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
@@ -440,6 +441,16 @@ public interface PrivilegeHandler {
 	 *             if the user credentials are not valid
 	 */
 	public Certificate authenticate(String username, String password) throws AccessDeniedException;
+
+	/**
+	 * Invalidates the {@link Session} for the given {@link Certificate}, effectively logging out the user who was
+	 * authenticated with the credentials associated to the given {@link Certificate}
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} for which the {@link Session} is to be invalidated
+	 * @return true if the {@link Session} was still valid and is now invalidated, false otherwise
+	 */
+	public boolean invalidateSession(Certificate certificate);
 
 	/**
 	 * Checks if the {@link User} registered to the given {@link Certificate} is allowed to access the
