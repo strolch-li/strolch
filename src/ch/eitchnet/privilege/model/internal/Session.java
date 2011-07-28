@@ -11,6 +11,7 @@
 package ch.eitchnet.privilege.model.internal;
 
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
@@ -59,6 +60,20 @@ public final class Session {
 	 *            the time the user logged in
 	 */
 	public Session(String sessionId, String username, String authToken, String authPassword, long loginTime) {
+
+		if (sessionId == null || sessionId.isEmpty()) {
+			throw new PrivilegeException("No sessionId defined!");
+		}
+		if (username == null || username.isEmpty()) {
+			throw new PrivilegeException("No username defined!");
+		}
+		if (authToken == null || authToken.isEmpty()) {
+			throw new PrivilegeException("No authToken defined!");
+		}
+		if (authPassword == null || authPassword.isEmpty()) {
+			throw new PrivilegeException("No authPassword defined!");
+		}
+
 		this.sessionId = sessionId;
 		this.username = username;
 		this.authToken = authToken;

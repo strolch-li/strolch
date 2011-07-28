@@ -645,8 +645,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Certificate certificate = new Certificate(sessionId, username, authToken, authPassword, user.getLocale());
 
 		// create and save a new session
-		Session session = new Session(sessionId, authToken, authPassword, user.getUsername(),
-				System.currentTimeMillis());
+		Session session = new Session(sessionId, username, authToken, authPassword, System.currentTimeMillis());
 		this.sessionMap.put(sessionId, new CertificateSessionPair(session, certificate));
 
 		// log

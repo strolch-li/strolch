@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 
@@ -68,6 +69,29 @@ public final class User {
 	 */
 	public User(String userId, String username, String password, String firstname, String surname, UserState userState,
 			Set<String> roles, Locale locale) {
+
+		if (userId == null || userId.isEmpty()) {
+			throw new PrivilegeException("No UserId defined!");
+		}
+		if (username == null || username.isEmpty()) {
+			throw new PrivilegeException("No username defined!");
+		}
+
+		// password may be null, meaning not able to login
+
+		if (firstname == null || firstname.isEmpty()) {
+			throw new PrivilegeException("No firstname defined!");
+		}
+		if (surname == null || surname.isEmpty()) {
+			throw new PrivilegeException("No surname defined!");
+		}
+		if (userState == null) {
+			throw new PrivilegeException("No userState defined!");
+		}
+
+		// roles may be null, meaning not able to login and must be added later
+
+		// local may be null, meaning use system default
 
 		this.userId = userId;
 

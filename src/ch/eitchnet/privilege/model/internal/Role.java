@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.RoleRep;
 
 /**
@@ -43,6 +44,14 @@ public final class Role {
 	 *            a set of names of privileges granted to this role
 	 */
 	public Role(String name, Set<String> privileges) {
+
+		if (name == null || name.isEmpty()) {
+			throw new PrivilegeException("No name defined!");
+		}
+		if (privileges == null) {
+			throw new PrivilegeException("No privileges defined!");
+		}
+
 		this.name = name;
 		this.privileges = Collections.unmodifiableSet(privileges);
 	}

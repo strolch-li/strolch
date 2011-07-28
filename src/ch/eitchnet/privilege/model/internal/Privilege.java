@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.PrivilegeRep;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
@@ -30,7 +31,10 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
  * {@link Privilege}s have allow and deny rules which the configured {@link PrivilegeHandler} uses to
  * </p>
  * 
- * <p>Note: This is an internal object which is not to be serialized or passed to clients, {@link PrivilegeRep}s are used for that</p>
+ * <p>
+ * Note: This is an internal object which is not to be serialized or passed to clients, {@link PrivilegeRep}s are used
+ * for that
+ * </p>
  * 
  * @author rvonburg
  */
@@ -58,6 +62,20 @@ public final class Privilege {
 	 *            a list of allow rules for this {@link Privilege}
 	 */
 	public Privilege(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
+
+		if (name == null || name.isEmpty()) {
+			throw new PrivilegeException("No name defined!");
+		}
+		if (policy == null || policy.isEmpty()) {
+			throw new PrivilegeException("No policy defined!");
+		}
+		if (denyList == null) {
+			throw new PrivilegeException("No denyList defined!");
+		}
+		if (allowList == null) {
+			throw new PrivilegeException("No allowList defined!");
+		}
+
 		this.name = name;
 		this.policy = policy;
 		this.allAllowed = allAllowed;

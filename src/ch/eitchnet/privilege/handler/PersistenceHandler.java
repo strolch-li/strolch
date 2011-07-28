@@ -151,6 +151,8 @@ public interface PersistenceHandler {
 	 * 
 	 * @param parameterMap
 	 *            a map containing configuration properties
+	 * @param policyMap
+	 *            map of policy key/policy class pairs
 	 */
-	public void initialize(Map<String, String> parameterMap);
+	public void initialize(Map<String, String> parameterMap, Map<String, Class<PrivilegePolicy>> policyMap);
 }

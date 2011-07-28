@@ -55,7 +55,7 @@ public class PrivilegeTest {
 
 			// initialize container
 			String pwd = System.getProperty("user.dir");
-			File privilegeContainerXmlFile = new File(pwd + "/config/PrivilegeContainer.xml");
+			File privilegeContainerXmlFile = new File(pwd + "/config/Privilege.xml");
 			privilegeHandler = InitializationHelper.initializeFromXml(privilegeContainerXmlFile);
 		} catch (Exception e) {
 			logger.error(e, e);

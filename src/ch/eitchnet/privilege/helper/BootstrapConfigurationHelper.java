@@ -46,17 +46,13 @@ public class BootstrapConfigurationHelper {
 
 	private static String path;
 
-	private static String defaultPrivilegeContainerXmlFile = "PrivilegeContainer.xml";
+	private static String defaultPrivilegeContainerXmlFile = "Privilege.xml";
 
-	private static String usersFileName = "PrivilegeUsers.xml";
-	private static String rolesFileName = "PrivilegeRoles.xml";
-	private static String privilegesFileName = "Privileges.xml";
+	private static String basePath = "";
+	private static String modelFileName = "PrivilegeUsers.xml";
 
 	private static String hashAlgorithm = "SHA-256";
 
-	private static String policyXmlFile = "PrivilegePolicies.xml";
-
-	private static String defaultPrivilegeHandler = "ch.eitchnet.privilege.handler.DefaultPrivilegeHandler";
 	private static String defaultPersistenceHandler = "ch.eitchnet.privilege.handler.DefaultPersistenceHandler";
 	private static String defaultEncryptionHandler = "ch.eitchnet.privilege.handler.DefaultEncryptionHandler";
 
@@ -116,48 +112,35 @@ public class BootstrapConfigurationHelper {
 		// create document root
 		DocumentFactory factory = DocumentFactory.getInstance();
 		Document doc = factory.createDocument(XmlHelper.DEFAULT_ENCODING);
-		doc.setName(XmlConstants.XML_ROOT_PRIVILEGE_CONTAINER);
-		Element rootElement = factory.createElement(XmlConstants.XML_ROOT_PRIVILEGE_CONTAINER);
+		doc.setName(XmlConstants.XML_ROOT_PRIVILEGE);
+		Element rootElement = factory.createElement(XmlConstants.XML_ROOT_PRIVILEGE);
 		doc.setRootElement(rootElement);
+
+		Element containerElement = factory.createElement(XmlConstants.XML_CONTAINER);
 
 		Element parameterElement;
 		Element parametersElement;
 
 		// create PersistenceHandler
 		Element persistenceHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_PERSISTENCE);
-		rootElement.add(persistenceHandlerElem);
+		containerElement.add(persistenceHandlerElem);
 		persistenceHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, defaultPersistenceHandler);
 		parametersElement = factory.createElement(XmlConstants.XML_PARAMETERS);
 		persistenceHandlerElem.add(parametersElement);
-		// Parameter usersXmlFile
+		// Parameter basePath
 		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_USERS_FILE);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, usersFileName);
+		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_BASE_PATH);
+		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, basePath);
 		parametersElement.add(parameterElement);
-		// Parameter rolesXmlFile
+		// Parameter modelXmlFile
 		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_ROLES_FILE);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, rolesFileName);
+		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_MODEL_FILE);
+		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, modelFileName);
 		parametersElement.add(parameterElement);
-		// Parameter privilegesXmlFile
-		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_PRIVILEGES_FILE);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, privilegesFileName);
-		parametersElement.add(parameterElement);
-		// Parameter policyXmlFile
-		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_POLICY_FILE);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, policyXmlFile);
-		parametersElement.add(parameterElement);
-
-		// create PrivilegeHandler
-		Element privilegeHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_PRIVILEGE);
-		rootElement.add(privilegeHandlerElem);
-		privilegeHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, defaultPrivilegeHandler);
 
 		// create EncryptionHandler
 		Element encryptionHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_ENCRYPTION);
-		rootElement.add(encryptionHandlerElem);
+		containerElement.add(encryptionHandlerElem);
 		encryptionHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, defaultEncryptionHandler);
 		parametersElement = factory.createElement(XmlConstants.XML_PARAMETERS);
 		encryptionHandlerElem.add(parametersElement);
