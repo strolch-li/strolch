@@ -16,6 +16,7 @@ package ch.eitchnet.privilege.helper;
  * @author rvonburg
  */
 public class XmlConstants {
+
 	/**
 	 * XML_ROOT_PRIVILEGE_CONTAINER = "PrivilegeContainer" :
 	 */

@@ -57,27 +57,32 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * log4j logger
 	 */
-	private static final Logger logger = Logger.getLogger(DefaultPrivilegeHandler.class);
+	protected static final Logger logger = Logger.getLogger(DefaultPrivilegeHandler.class);
 
 	/**
 	 * last assigned id for the {@link Session}s
 	 */
-	private static long lastSessionId;
+	protected long lastSessionId;
 
 	/**
 	 * Map keeping a reference to all active sessions with their certificates
 	 */
-	private Map<String, CertificateSessionPair> sessionMap;
+	protected Map<String, CertificateSessionPair> sessionMap;
 
 	/**
 	 * The persistence handler is used for getting objects and saving changes
 	 */
-	private PersistenceHandler persistenceHandler;
+	protected PersistenceHandler persistenceHandler;
 
 	/**
 	 * The encryption handler is used for generating hashes and tokens
 	 */
-	private EncryptionHandler encryptionHandler;
+	protected EncryptionHandler encryptionHandler;
+
+	/**
+	 * flag to define if already initialized
+	 */
+	protected boolean initialized;
 
 	/**
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getPrivilege(java.lang.String)
@@ -899,18 +904,22 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
 			PersistenceHandler persistenceHandler) {
 
+		if (this.initialized)
+			throw new PrivilegeException("Already initialized!");
+
 		this.encryptionHandler = encryptionHandler;
 		this.persistenceHandler = persistenceHandler;
 
-		lastSessionId = 0l;
+		this.lastSessionId = 0l;
 		this.sessionMap = Collections.synchronizedMap(new HashMap<String, CertificateSessionPair>());
+		this.initialized = true;
 	}
 
 	/**
 	 * @return a new session id
 	 */
 	private synchronized String nextSessionId() {
-		return Long.toString(++lastSessionId % Long.MAX_VALUE);
+		return Long.toString(++this.lastSessionId % Long.MAX_VALUE);
 	}
 
 	/**
