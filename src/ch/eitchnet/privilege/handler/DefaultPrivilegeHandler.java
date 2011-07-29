@@ -608,53 +608,62 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	@Override
 	public Certificate authenticate(String username, String password) {
 
-		// both username and password must at least have 3 characters in length
-		if (username == null || username.length() < 3)
-			throw new PrivilegeException("The given username is shorter than 3 characters");
-		else if (password == null || password.length() < 3)
-			throw new PrivilegeException("The given password is shorter than 3 characters");
-
-		// we only work with hashed passwords
-		String passwordHash = this.encryptionHandler.convertToHash(password);
-
-		// get user object
-		User user = this.persistenceHandler.getUser(username);
-		// no user means no authentication
-		if (user == null)
-			throw new AccessDeniedException("There is no user defined with the credentials: " + username + " / ***...");
-
-		// validate password
-		String pwHash = user.getPassword();
-		if (pwHash == null)
-			throw new AccessDeniedException("User has no password and may not login!");
-		if (!pwHash.equals(passwordHash))
-			throw new AccessDeniedException("Password is incorrect for " + username + " / ***...");
-
-		// validate if user is allowed to login
-		if (user.getUserState() != UserState.ENABLED)
-			throw new AccessDeniedException("User " + username + " is not ENABLED. State is: " + user.getUserState());
-
-		// validate user has at least one role
-		if (user.getRoles().isEmpty()) {
-			throw new PrivilegeException("User " + username + " does not have any roles defined!");
-		}
-
-		// get 2 auth tokens
-		String authToken = this.encryptionHandler.nextToken();
-		String authPassword = this.encryptionHandler.nextToken();
-
-		// get next session id
-		String sessionId = nextSessionId();
-
 		// create certificate
-		Certificate certificate = new Certificate(sessionId, username, authToken, authPassword, user.getLocale());
+		Certificate certificate;
+		try {
+			// both username and password must at least have 3 characters in length
+			if (username == null || username.length() < 3)
+				throw new PrivilegeException("The given username is shorter than 3 characters");
+			else if (password == null || password.length() < 3)
+				throw new PrivilegeException("The given password is shorter than 3 characters");
 
-		// create and save a new session
-		Session session = new Session(sessionId, username, authToken, authPassword, System.currentTimeMillis());
-		this.sessionMap.put(sessionId, new CertificateSessionPair(session, certificate));
+			// we only work with hashed passwords
+			String passwordHash = this.encryptionHandler.convertToHash(password);
 
-		// log
-		logger.info("Authenticated: " + session);
+			// get user object
+			User user = this.persistenceHandler.getUser(username);
+			// no user means no authentication
+			if (user == null)
+				throw new AccessDeniedException("There is no user defined with the credentials: " + username
+						+ " / ***...");
+
+			// validate password
+			String pwHash = user.getPassword();
+			if (pwHash == null)
+				throw new AccessDeniedException("User has no password and may not login!");
+			if (!pwHash.equals(passwordHash))
+				throw new AccessDeniedException("Password is incorrect for " + username + " / ***...");
+
+			// validate if user is allowed to login
+			if (user.getUserState() != UserState.ENABLED)
+				throw new AccessDeniedException("User " + username + " is not ENABLED. State is: "
+						+ user.getUserState());
+
+			// validate user has at least one role
+			if (user.getRoles().isEmpty()) {
+				throw new PrivilegeException("User " + username + " does not have any roles defined!");
+			}
+
+			// get 2 auth tokens
+			String authToken = this.encryptionHandler.nextToken();
+			String authPassword = this.encryptionHandler.nextToken();
+
+			// get next session id
+			String sessionId = nextSessionId();
+
+			certificate = new Certificate(sessionId, username, authToken, authPassword, user.getLocale());
+
+			// create and save a new session
+			Session session = new Session(sessionId, username, authToken, authPassword, System.currentTimeMillis());
+			this.sessionMap.put(sessionId, new CertificateSessionPair(session, certificate));
+
+			// log
+			logger.info("User " + username + " authenticated: " + session);
+
+		} catch (RuntimeException e) {
+			logger.error("User " + username + " Failed to authenticate: " + e.getLocalizedMessage());
+			throw e;
+		}
 
 		// return the certificate
 		return certificate;
