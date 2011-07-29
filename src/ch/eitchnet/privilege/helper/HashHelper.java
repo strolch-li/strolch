@@ -45,9 +45,29 @@ public class HashHelper {
 	 */
 	public static String stringToHash(String hashAlgorithm, String string) throws NoSuchAlgorithmException,
 			UnsupportedEncodingException {
+		return stringToHash(hashAlgorithm, string.getBytes());
+	}
+
+	/**
+	 * Creates the hash of the given string using {@link MessageDigest} and the defined hash algorithm
+	 * 
+	 * @param hashAlgorithm
+	 *            the algorithm to use for hashing
+	 * @param bytes
+	 *            the bytes to hash
+	 * 
+	 * @return a new string encrypted by the defined algorithm
+	 * 
+	 * @throws NoSuchAlgorithmException
+	 *             if the algorithm is not found
+	 * @throws UnsupportedEncodingException
+	 *             if something is wrong with the given string to hash
+	 */
+	public static String stringToHash(String hashAlgorithm, byte[] bytes) throws NoSuchAlgorithmException,
+			UnsupportedEncodingException {
 
 		MessageDigest digest = MessageDigest.getInstance(hashAlgorithm);
-		byte[] hashArray = digest.digest(string.getBytes());
+		byte[] hashArray = digest.digest(bytes);
 
 		byte[] hex = new byte[2 * hashArray.length];
 		int index = 0;
