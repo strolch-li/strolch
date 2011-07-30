@@ -572,7 +572,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		CertificateSessionPair certificateSessionPair = this.sessionMap.remove(certificate.getSessionId());
 
 		// return true if object was really removed
-		return certificateSessionPair != null;
+		boolean loggedOut = certificateSessionPair != null;
+		if (loggedOut)
+			logger.info("User " + certificate.getUsername() + " logged out.");
+		else
+			logger.warn("User already logged out!");
+		return loggedOut;
 	}
 
 	/**
