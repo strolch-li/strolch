@@ -23,8 +23,9 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
 /**
  * <p>
  * {@link Privilege} is the main model object for Privilege. A {@link Role} has a set of Privileges assigned to it which
- * defines the privileges a logged in user with that role has. For every privilege a {@link PrivilegePolicy} is
- * configured which is used to evaluate if privilege is granted to a {@link Restrictable}
+ * defines the privileges a logged in user with that role has. If the {@link Privilege} has a {@link PrivilegePolicy}
+ * defined, then that policy will be used for finer granularity and with the deny and allow lists configured which is
+ * used to evaluate if privilege is granted to a {@link Restrictable}
  * </p>
  * 
  * <p>
@@ -52,35 +53,64 @@ public final class Privilege {
 	 * @param name
 	 *            the name of this privilege, which is unique to all privileges known in the {@link PrivilegeHandler}
 	 * @param policy
-	 *            the {@link PrivilegePolicy} configured to evaluate if the privilege is granted
+	 *            the {@link PrivilegePolicy} configured to evaluate if the privilege is granted. If null, then
+	 *            privilege is granted
 	 * @param allAllowed
 	 *            a boolean defining if a {@link Role} with this {@link Privilege} has unrestricted access to a
-	 *            {@link Restrictable}
+	 *            {@link Restrictable} in which case the deny and allow lists are ignored and can be null
 	 * @param denyList
-	 *            a list of deny rules for this {@link Privilege}
+	 *            a list of deny rules for this {@link Privilege}, can be null if all allowed
 	 * @param allowList
-	 *            a list of allow rules for this {@link Privilege}
+	 *            a list of allow rules for this {@link Privilege}, can be null if all allowed
 	 */
 	public Privilege(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
 
 		if (name == null || name.isEmpty()) {
 			throw new PrivilegeException("No name defined!");
 		}
-		if (policy == null || policy.isEmpty()) {
-			throw new PrivilegeException("No policy defined!");
-		}
-		if (denyList == null) {
-			throw new PrivilegeException("No denyList defined!");
-		}
-		if (allowList == null) {
-			throw new PrivilegeException("No allowList defined!");
-		}
-
 		this.name = name;
-		this.policy = policy;
-		this.allAllowed = allAllowed;
-		this.denyList = Collections.unmodifiableSet(denyList);
-		this.allowList = Collections.unmodifiableSet(allowList);
+
+		// if not all allowed, then validate that deny and allow lists are defined
+		if (allAllowed) {
+
+			this.allAllowed = true;
+
+			// all allowed means no policy will be used
+			this.policy = null;
+
+			this.denyList = Collections.emptySet();
+			this.allowList = Collections.emptySet();
+		} else {
+
+			this.allAllowed = false;
+
+			// not all allowed, so policy must be set
+			if (policy == null || policy.isEmpty()) {
+				throw new PrivilegeException("No Policy defined!");
+			}
+			this.policy = policy;
+
+			if (denyList == null) {
+				throw new PrivilegeException("No denyList defined!");
+			}
+			this.denyList = Collections.unmodifiableSet(denyList);
+
+			if (allowList == null) {
+				throw new PrivilegeException("No allowList defined!");
+			}
+			this.allowList = Collections.unmodifiableSet(allowList);
+		}
+	}
+
+	/**
+	 * Constructs a {@link Privilege} from the {@link PrivilegeRep}
+	 * 
+	 * @param privilegeRep
+	 *            the {@link PrivilegeRep} from which to create the {@link Privilege}
+	 */
+	public Privilege(PrivilegeRep privilegeRep) {
+		this(privilegeRep.getName(), privilegeRep.getPolicy(), privilegeRep.isAllAllowed(), privilegeRep.getDenyList(),
+				privilegeRep.getDenyList());
 	}
 
 	/**
@@ -136,12 +166,6 @@ public final class Privilege {
 		builder.append(this.name);
 		builder.append(", policy=");
 		builder.append(this.policy);
-		builder.append(", allAllowed=");
-		builder.append(this.allAllowed);
-		builder.append(", denyList=");
-		builder.append(this.denyList);
-		builder.append(", allowList=");
-		builder.append(this.allowList);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -153,11 +177,7 @@ public final class Privilege {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (this.allAllowed ? 1231 : 1237);
-		result = prime * result + ((this.allowList == null) ? 0 : this.allowList.hashCode());
-		result = prime * result + ((this.denyList == null) ? 0 : this.denyList.hashCode());
 		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
-		result = prime * result + ((this.policy == null) ? 0 : this.policy.hashCode());
 		return result;
 	}
 
@@ -173,28 +193,12 @@ public final class Privilege {
 		if (getClass() != obj.getClass())
 			return false;
 		Privilege other = (Privilege) obj;
-		if (this.allAllowed != other.allAllowed)
-			return false;
-		if (this.allowList == null) {
-			if (other.allowList != null)
-				return false;
-		} else if (!this.allowList.equals(other.allowList))
-			return false;
-		if (this.denyList == null) {
-			if (other.denyList != null)
-				return false;
-		} else if (!this.denyList.equals(other.denyList))
-			return false;
 		if (this.name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!this.name.equals(other.name))
 			return false;
-		if (this.policy == null) {
-			if (other.policy != null)
-				return false;
-		} else if (!this.policy.equals(other.policy))
-			return false;
 		return true;
 	}
+
 }

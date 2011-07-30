@@ -11,10 +11,11 @@
 package ch.eitchnet.privilege.model.internal;
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.model.PrivilegeRep;
 import ch.eitchnet.privilege.model.RoleRep;
 
 /**
@@ -33,27 +34,54 @@ import ch.eitchnet.privilege.model.RoleRep;
 public final class Role {
 
 	private final String name;
-	private final Set<String> privileges;
+	private final Map<String, Privilege> privilegeMap;
 
 	/**
 	 * Default constructor
 	 * 
 	 * @param name
 	 *            the name of the role
-	 * @param privileges
-	 *            a set of names of privileges granted to this role
+	 * @param privilegeMap
+	 *            a map of {@link Privilege}s granted to this role
 	 */
-	public Role(String name, Set<String> privileges) {
+	public Role(String name, Map<String, Privilege> privilegeMap) {
 
 		if (name == null || name.isEmpty()) {
 			throw new PrivilegeException("No name defined!");
 		}
-		if (privileges == null) {
+		if (privilegeMap == null) {
 			throw new PrivilegeException("No privileges defined!");
 		}
 
 		this.name = name;
-		this.privileges = Collections.unmodifiableSet(privileges);
+		this.privilegeMap = Collections.unmodifiableMap(privilegeMap);
+	}
+
+	/**
+	 * Construct {@link Role} from its representation {@link RoleRep}
+	 * 
+	 * @param roleRep
+	 *            the representation from which to create the {@link Role}
+	 */
+	public Role(RoleRep roleRep) {
+
+		String name = roleRep.getName();
+		if (name == null || name.isEmpty()) {
+			throw new PrivilegeException("No name defined!");
+		}
+
+		if (roleRep.getPrivilegeMap() == null) {
+			throw new PrivilegeException("No privileges defined!");
+		}
+
+		// build privileges from reps
+		Map<String, Privilege> privilegeMap = new HashMap<String, Privilege>(roleRep.getPrivilegeMap().size());
+		for (String privilegeName : roleRep.getPrivilegeMap().keySet()) {
+			privilegeMap.put(privilegeName, new Privilege(roleRep.getPrivilegeMap().get(privilegeName)));
+		}
+
+		this.name = name;
+		this.privilegeMap = Collections.unmodifiableMap(privilegeMap);
 	}
 
 	/**
@@ -64,12 +92,12 @@ public final class Role {
 	}
 
 	/**
-	 * Returns the {@link Set} of {@link Privilege} names which is granted to this {@link Role}
+	 * Returns the {@link Map} of {@link Privilege}s which are granted to this {@link Role}
 	 * 
-	 * @return the {@link Set} of {@link Privilege} names which is granted to this
+	 * @return the {@link Map} of {@link Privilege}s which are granted to this {@link Role}
 	 */
-	public Set<String> getPrivileges() {
-		return this.privileges;
+	public Map<String, Privilege> getPrivilegeMap() {
+		return this.privilegeMap;
 	}
 
 	/**
@@ -81,14 +109,18 @@ public final class Role {
 	 * @return true if this {@link Role} has the {@link Privilege} with the given name
 	 */
 	public boolean hasPrivilege(String name) {
-		return this.privileges.contains(name);
+		return this.privilegeMap.containsKey(name);
 	}
 
 	/**
 	 * @return a {@link RoleRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public RoleRep asRoleRep() {
-		return new RoleRep(this.name, new HashSet<String>(this.privileges));
+		Map<String, PrivilegeRep> privilegeMap = new HashMap<String, PrivilegeRep>();
+		for (String privilegeName : this.privilegeMap.keySet()) {
+			privilegeMap.put(privilegeName, this.privilegeMap.get(privilegeName).asPrivilegeRep());
+		}
+		return new RoleRep(this.name, privilegeMap);
 	}
 
 	/**
@@ -100,7 +132,7 @@ public final class Role {
 		builder.append("Role [name=");
 		builder.append(this.name);
 		builder.append(", privileges=");
-		builder.append(this.privileges);
+		builder.append(this.privilegeMap.keySet());
 		builder.append("]");
 		return builder.toString();
 	}
@@ -113,7 +145,6 @@ public final class Role {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
-		result = prime * result + ((this.privileges == null) ? 0 : this.privileges.hashCode());
 		return result;
 	}
 
@@ -134,12 +165,6 @@ public final class Role {
 				return false;
 		} else if (!this.name.equals(other.name))
 			return false;
-		if (this.privileges == null) {
-			if (other.privileges != null)
-				return false;
-		} else if (!this.privileges.equals(other.privileges))
-			return false;
 		return true;
 	}
-
 }

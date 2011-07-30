@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import ch.eitchnet.privilege.helper.ClassHelper;
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
@@ -65,6 +66,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected long lastSessionId;
 
 	/**
+	 * Map of {@link PrivilegePolicy} classes
+	 */
+	private Map<String, Class<PrivilegePolicy>> policyMap;
+
+	/**
 	 * Map keeping a reference to all active sessions with their certificates
 	 */
 	protected Map<String, CertificateSessionPair> sessionMap;
@@ -85,19 +91,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected boolean initialized;
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getPrivilege(java.lang.String)
-	 */
-	@Override
-	public PrivilegeRep getPrivilege(String privilegeName) {
-		return this.persistenceHandler.getPrivilege(privilegeName).asPrivilegeRep();
-	}
-
-	/**
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getRole(java.lang.String)
 	 */
 	@Override
 	public RoleRep getRole(String roleName) {
-		return this.persistenceHandler.getRole(roleName).asRoleRep();
+		Role role = this.persistenceHandler.getRole(roleName);
+		if (role == null)
+			throw new PrivilegeException("Role " + roleName + " does not exist!");
+		return role.asRoleRep();
 	}
 
 	/**
@@ -105,33 +106,45 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 */
 	@Override
 	public UserRep getUser(String username) {
-		return this.persistenceHandler.getUser(username).asUserRep();
+		User user = this.persistenceHandler.getUser(username);
+		if (user == null)
+			throw new PrivilegeException("User " + username + " does not exist!");
+		return user.asUserRep();
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getPolicy(java.lang.String)
+	 * <p>
+	 * This method instantiates a {@link PrivilegePolicy} object from the given policyName. The {@link PrivilegePolicy}
+	 * is not stored in a database. The privilege name is a class name and is then used to instantiate a new
+	 * {@link PrivilegePolicy} object
+	 * </p>
+	 * 
+	 * @param policyName
+	 *            the class name of the {@link PrivilegePolicy} object to return
+	 * 
+	 * @return the {@link PrivilegePolicy} object
+	 * 
+	 * @throws PrivilegeException
+	 *             if the {@link PrivilegePolicy} object for the given policy name could not be instantiated
 	 */
-	@Override
-	public PrivilegePolicy getPolicy(String policyName) {
-		return this.persistenceHandler.getPolicy(policyName);
-	}
+	protected PrivilegePolicy getPolicy(String policyName) {
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplacePrivilege(ch.eitchnet.privilege.model.Certificate,
-	 *      ch.eitchnet.privilege.model.PrivilegeRep)
-	 */
-	@Override
-	public void addOrReplacePrivilege(Certificate certificate, PrivilegeRep privilegeRep) {
+		// get the policies class
+		Class<PrivilegePolicy> policyClazz = this.policyMap.get(policyName);
+		if (policyClazz == null) {
+			return null;
+		}
 
-		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		// instantiate the policy
+		PrivilegePolicy policy;
+		try {
+			policy = ClassHelper.instantiateClass(policyClazz);
+		} catch (Exception e) {
+			throw new PrivilegeException("The class for the policy with the name " + policyName + " does not exist!"
+					+ policyName, e);
+		}
 
-		// create a new privilege
-		Privilege privilege = new Privilege(privilegeRep.getName(), privilegeRep.getPolicy(),
-				privilegeRep.isAllAllowed(), privilegeRep.getDenyList(), privilegeRep.getAllowList());
-
-		// delegate to persistence handler
-		this.persistenceHandler.addOrReplacePrivilege(privilege);
+		return policy;
 	}
 
 	/**
@@ -144,8 +157,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// validate who is doing this
 		validateIsPrivilegeAdmin(certificate);
 
-		// create new role
-		Role role = new Role(roleRep.getName(), roleRep.getPrivileges());
+		// create new role from RoleRep
+		Role role = new Role(roleRep);
+
+		// validate policy if not null
+		validatePolicies(role);
 
 		// delegate to persistence handler
 		this.persistenceHandler.addOrReplaceRole(role);
@@ -180,14 +196,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addPrivilegeToRole(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, java.lang.String)
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplacePrivilegeOnRole(ch.eitchnet.privilege.model.Certificate,
+	 *      java.lang.String, ch.eitchnet.privilege.model.PrivilegeRep)
 	 */
 	@Override
-	public void addPrivilegeToRole(Certificate certificate, String roleName, String privilegeName) {
+	public void addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep) {
 
 		// validate who is doing this
 		validateIsPrivilegeAdmin(certificate);
+
+		// validate PrivilegeRep
+		privilegeRep.validate();
 
 		// get role
 		Role role = this.persistenceHandler.getRole(roleName);
@@ -195,24 +214,19 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException("Role " + roleName + " does not exist!");
 		}
 
-		// ignore if role already has this privilege
-		Set<String> currentPrivileges = role.getPrivileges();
-		if (currentPrivileges.contains(roleName)) {
-			logger.error("Role " + roleName + " already has privilege " + privilegeName);
-			return;
-		}
-
-		// validate that privilege exists
-		if (getPrivilege(privilegeName) == null) {
-			throw new PrivilegeException("Privilege " + privilegeName + " does not exist and can not be added to role "
-					+ roleName);
+		// validate that policy exists if needed
+		String policy = privilegeRep.getPolicy();
+		if (policy != null && !this.policyMap.containsKey(policy)) {
+			throw new PrivilegeException("Policy " + policy + " for Privilege " + privilegeRep.getName()
+					+ " does not exist");
 		}
 
 		// create new role with the additional privilege
-		Set<String> newPrivileges = new HashSet<String>(currentPrivileges);
-		newPrivileges.add(roleName);
+		Privilege newPrivilege = new Privilege(privilegeRep);
+		Map<String, Privilege> privilegeMap = new HashMap<String, Privilege>(role.getPrivilegeMap());
+		privilegeMap.put(newPrivilege.getName(), newPrivilege);
 
-		Role newRole = new Role(role.getName(), newPrivileges);
+		Role newRole = new Role(role.getName(), privilegeMap);
 
 		// delegate role replacement to persistence handler
 		this.persistenceHandler.addOrReplaceRole(newRole);
@@ -258,26 +272,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removePrivilege(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String)
-	 */
-	@Override
-	public PrivilegeRep removePrivilege(Certificate certificate, String privilegeName) {
-
-		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
-
-		// delegate privilege removal to persistence handler
-		Privilege removedPrivilege = this.persistenceHandler.removePrivilege(privilegeName);
-
-		if (removedPrivilege == null)
-			return null;
-
-		// return privilege rep if it was removed
-		return removedPrivilege.asPrivilegeRep();
-	}
-
-	/**
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removePrivilegeFromRole(ch.eitchnet.privilege.model.Certificate,
 	 *      java.lang.String, java.lang.String)
 	 */
@@ -294,15 +288,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// ignore if role does not have privilege
-		Set<String> currentPrivileges = role.getPrivileges();
-		if (!currentPrivileges.contains(privilegeName)) {
-			logger.error("Role " + roleName + " doest not have privilege " + privilegeName);
-			return;
+		if (!role.hasPrivilege(privilegeName))
+			throw new PrivilegeException("Role " + roleName + " does not have Privilege " + privilegeName);
+
+		// create new set of privileges with out the to remove privilege
+		Map<String, Privilege> newPrivileges = new HashMap<String, Privilege>(role.getPrivilegeMap().size() - 1);
+		for (Privilege privilege : role.getPrivilegeMap().values()) {
+			if (!privilege.getName().equals(privilegeName))
+				newPrivileges.put(privilege.getName(), privilege);
 		}
 
 		// create new role
-		Set<String> newPrivileges = new HashSet<String>(currentPrivileges);
-		newPrivileges.remove(privilegeName);
 		Role newRole = new Role(role.getName(), newPrivileges);
 
 		// delegate user replacement to persistence handler
@@ -382,115 +378,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// return user rep if it was removed
 		return removedUser.asUserRep();
 
-	}
-
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setPrivilegeAllAllowed(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, boolean)
-	 */
-	@Override
-	public void setPrivilegeAllAllowed(Certificate certificate, String privilegeName, boolean allAllowed) {
-
-		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
-
-		// get Privilege
-		Privilege privilege = this.persistenceHandler.getPrivilege(privilegeName);
-		if (privilege == null) {
-			throw new PrivilegeException("Privilege " + privilegeName + " does not exist!");
-		}
-
-		// ignore if privilege is already set to argument
-		if (privilege.isAllAllowed() == allAllowed) {
-			logger.error("Privilege " + privilegeName + " is already set to "
-					+ (allAllowed ? "all allowed" : "not all allowed"));
-			return;
-		}
-
-		// create new privilege
-		Privilege newPrivilege = new Privilege(privilege.getName(), privilege.getPolicy(), allAllowed,
-				privilege.getDenyList(), privilege.getAllowList());
-
-		// delegate privilege replacement to persistence handler
-		this.persistenceHandler.addOrReplacePrivilege(newPrivilege);
-	}
-
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setPrivilegeAllowList(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, java.util.Set)
-	 */
-	@Override
-	public void setPrivilegeAllowList(Certificate certificate, String privilegeName, Set<String> allowList) {
-
-		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
-
-		// get Privilege
-		Privilege privilege = this.persistenceHandler.getPrivilege(privilegeName);
-		if (privilege == null) {
-			throw new PrivilegeException("Privilege " + privilegeName + " does not exist!");
-		}
-
-		// create new privilege
-		Privilege newPrivilege = new Privilege(privilege.getName(), privilege.getPolicy(), privilege.isAllAllowed(),
-				privilege.getDenyList(), allowList);
-
-		// delegate privilege replacement to persistence handler
-		this.persistenceHandler.addOrReplacePrivilege(newPrivilege);
-	}
-
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setPrivilegeDenyList(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, java.util.Set)
-	 */
-	@Override
-	public void setPrivilegeDenyList(Certificate certificate, String privilegeName, Set<String> denyList) {
-
-		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
-
-		// get Privilege
-		Privilege privilege = this.persistenceHandler.getPrivilege(privilegeName);
-		if (privilege == null) {
-			throw new PrivilegeException("Privilege " + privilegeName + " does not exist!");
-		}
-
-		// create new privilege
-		Privilege newPrivilege = new Privilege(privilege.getName(), privilege.getPolicy(), privilege.isAllAllowed(),
-				denyList, privilege.getAllowList());
-
-		// delegate privilege replacement to persistence handler
-		this.persistenceHandler.addOrReplacePrivilege(newPrivilege);
-	}
-
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setPrivilegePolicy(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void setPrivilegePolicy(Certificate certificate, String privilegeName, String policyName) {
-
-		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
-
-		// get Privilege
-		Privilege privilege = this.persistenceHandler.getPrivilege(privilegeName);
-		if (privilege == null) {
-			throw new PrivilegeException("Privilege " + privilegeName + " does not exist!");
-		}
-
-		// validate that the policy exists
-		PrivilegePolicy policy = this.persistenceHandler.getPolicy(policyName);
-		if (policy == null) {
-			throw new PrivilegeException("No privilege policy exists for the name " + policyName);
-		}
-
-		// create new privilege
-		Privilege newPrivilege = new Privilege(privilege.getName(), policyName, privilege.isAllAllowed(),
-				privilege.getDenyList(), privilege.getAllowList());
-
-		// delegate privilege replacement to persistence handler
-		this.persistenceHandler.addOrReplacePrivilege(newPrivilege);
 	}
 
 	/**
@@ -706,9 +593,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// first validate certificate
 		if (!isCertificateValid(certificate)) {
-			logger.info("Certificate is not valid, so action is not allowed: " + certificate + " for restrictable: "
-					+ restrictable);
-			return false;
+			throw new PrivilegeException("Certificate is not valid, so action is not allowed: " + certificate
+					+ " for restrictable: " + restrictable);
 		}
 
 		// restrictable must not be null
@@ -797,13 +683,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// get the privilege for this restrictable
-		Privilege privilege = this.persistenceHandler.getPrivilege(privilegeName);
-		if (privilege == null) {
-			throw new PrivilegeException("No Privilege exists with the name " + privilegeName + " for Restrictable "
-					+ restrictable.getClass().getName());
-		}
+		Privilege privilege = role.getPrivilegeMap().get(privilegeName);
 
-		// get the policy configured for this privilege
+		// check if all is allowed
+		if (privilege.isAllAllowed())
+			return true;
+
+		// otherwise delegate checking to the policy configured for this privilege
 		PrivilegePolicy policy = this.getPolicy(privilege.getPolicy());
 		if (policy == null) {
 			throw new PrivilegeException("PrivilegePolicy " + privilege.getPolicy() + " does not exist for Privilege "
@@ -906,22 +792,56 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#initialize(java.util.Map,
-	 *      ch.eitchnet.privilege.handler.EncryptionHandler, ch.eitchnet.privilege.handler.PersistenceHandler)
+	 * Initializes the concrete {@link EncryptionHandler}. The passed parameter map contains any configuration this
+	 * {@link PrivilegeHandler} might need. This method may only be called once and this must be enforced by the
+	 * concrete implementation
+	 * 
+	 * @param parameterMap
+	 *            a map containing configuration properties
+	 * @param encryptionHandler
+	 *            the {@link EncryptionHandler} instance for this {@link PrivilegeHandler}
+	 * @param persistenceHandler
+	 *            the {@link PersistenceHandler} instance for this {@link PrivilegeHandler}
+	 * @param policyMap
+	 *            map of {@link PrivilegePolicy} classes
+	 * 
+	 * @throws PrivilegeException
+	 *             if the this method is called multiple times or an initialization exception occurs
 	 */
-	@Override
 	public void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
-			PersistenceHandler persistenceHandler) {
+			PersistenceHandler persistenceHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
 
 		if (this.initialized)
 			throw new PrivilegeException("Already initialized!");
 
+		this.policyMap = policyMap;
 		this.encryptionHandler = encryptionHandler;
 		this.persistenceHandler = persistenceHandler;
+
+		// validate policies on privileges of Roles
+		for (Role role : persistenceHandler.getAllRoles()) {
+			validatePolicies(role);
+		}
 
 		this.lastSessionId = 0l;
 		this.sessionMap = Collections.synchronizedMap(new HashMap<String, CertificateSessionPair>());
 		this.initialized = true;
+	}
+
+	/**
+	 * Validates that the policies which are not null on the privileges of the role exist
+	 * 
+	 * @param role
+	 *            the role for which the policies are to be checked
+	 */
+	private void validatePolicies(Role role) {
+		for (Privilege privilege : role.getPrivilegeMap().values()) {
+			String policy = privilege.getPolicy();
+			if (policy != null && !this.policyMap.containsKey(policy)) {
+				throw new PrivilegeException("Policy " + policy + " for Privilege " + privilege.getName()
+						+ " does not exist on role " + role);
+			}
+		}
 	}
 
 	/**

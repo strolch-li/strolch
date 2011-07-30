@@ -213,4 +213,35 @@ public final class User {
 		builder.append("]");
 		return builder.toString();
 	}
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.userId == null) ? 0 : this.userId.hashCode());
+		return result;
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (this.userId == null) {
+			if (other.userId != null)
+				return false;
+		} else if (!this.userId.equals(other.userId))
+			return false;
+		return true;
+	}
 }

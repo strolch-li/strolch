@@ -36,7 +36,7 @@ public class InitializationHelper {
 	private static final Logger logger = Logger.getLogger(InitializationHelper.class);
 
 	/**
-	 * Initializes the {@link PrivilegeHandler} from the configuration file
+	 * Initializes the {@link DefaultPrivilegeHandler} from the configuration file
 	 * 
 	 * @param privilegeXmlFile
 	 *            a {@link File} reference to the XML file containing the configuration for Privilege
@@ -65,7 +65,7 @@ public class InitializationHelper {
 		PersistenceHandler persistenceHandler = ClassHelper.instantiateClass(persistenceHandlerClassName);
 
 		// instantiate privilege handler
-		PrivilegeHandler privilegeHandler = new DefaultPrivilegeHandler();
+		DefaultPrivilegeHandler privilegeHandler = new DefaultPrivilegeHandler();
 
 		// get policies
 		Element policiesElement = rootElement.element(XmlConstants.XML_POLICIES);
@@ -93,7 +93,7 @@ public class InitializationHelper {
 			Map<String, String> parameterMap = convertToParameterMap(parameterElement);
 
 			// initialize persistence handler
-			persistenceHandler.initialize(parameterMap, policyMap);
+			persistenceHandler.initialize(parameterMap);
 
 		} catch (Exception e) {
 			logger.error(e, e);
@@ -108,7 +108,7 @@ public class InitializationHelper {
 			Map<String, String> parameterMap = convertToParameterMap(parameterElement);
 
 			// initialize privilege handler
-			privilegeHandler.initialize(parameterMap, encryptionHandler, persistenceHandler);
+			privilegeHandler.initialize(parameterMap, encryptionHandler, persistenceHandler, policyMap);
 
 		} catch (Exception e) {
 			logger.error(e, e);

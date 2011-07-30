@@ -11,7 +11,7 @@
 package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.Map;
 
 import ch.eitchnet.privilege.model.internal.Role;
 
@@ -27,19 +27,19 @@ public class RoleRep implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String name;
-	private Set<String> privileges;
+	private Map<String, PrivilegeRep> privilegeMap;
 
 	/**
 	 * Default constructor
 	 * 
 	 * @param name
 	 *            the name of this role
-	 * @param privileges
-	 *            the set of privileges granted to this role
+	 * @param privilegeMap
+	 *            the map of privileges granted to this role
 	 */
-	public RoleRep(String name, Set<String> privileges) {
+	public RoleRep(String name, Map<String, PrivilegeRep> privilegeMap) {
 		this.name = name;
-		this.privileges = privileges;
+		this.privilegeMap = privilegeMap;
 	}
 
 	/**
@@ -58,17 +58,17 @@ public class RoleRep implements Serializable {
 	}
 
 	/**
-	 * @return the privileges
+	 * @return the privilegeMap
 	 */
-	public Set<String> getPrivileges() {
-		return this.privileges;
+	public Map<String, PrivilegeRep> getPrivilegeMap() {
+		return this.privilegeMap;
 	}
 
 	/**
-	 * @param privileges
-	 *            the privileges to set
+	 * @param privilegeMap
+	 *            the privilegeMap to set
 	 */
-	public void setPrivileges(Set<String> privileges) {
-		this.privileges = privileges;
+	public void setPrivileges(Map<String, PrivilegeRep> privilegeMap) {
+		this.privilegeMap = privilegeMap;
 	}
 }

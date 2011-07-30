@@ -10,10 +10,7 @@
 
 package ch.eitchnet.privilege.handler;
 
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
@@ -27,7 +24,6 @@ import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.Session;
 import ch.eitchnet.privilege.model.internal.User;
-import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
  * The {@link PrivilegeHandler} is the centrally exposed API for accessing the privilege library. It exposes all needed
@@ -63,26 +59,6 @@ public interface PrivilegeHandler {
 	 * @return the {@link RoleRep} for the given roleName, or null if it was not found
 	 */
 	public RoleRep getRole(String roleName);
-
-	/**
-	 * Returns a {@link PrivilegeRep} for the given privilegeName
-	 * 
-	 * @param privilegeName
-	 *            the name of the {@link PrivilegeRep} to return
-	 * 
-	 * @return the {@link PrivilegeRep} for the given privilegeName, or null if it was not found
-	 */
-	public PrivilegeRep getPrivilege(String privilegeName);
-
-	/**
-	 * Returns a {@link PrivilegePolicy} for the given policyName
-	 * 
-	 * @param policyName
-	 *            the name of the {@link PrivilegePolicy} to return
-	 * 
-	 * @return the {@link PrivilegePolicy} for the given policyName, or null if it was not found
-	 */
-	public PrivilegePolicy getPolicy(String policyName);
 
 	/**
 	 * Removes the user with the given username
@@ -157,24 +133,6 @@ public interface PrivilegeHandler {
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
-	 * Removes the privilege with the given privilegeName
-	 * 
-	 * @param certificate
-	 *            the {@link Certificate} of the user which has the privilege to perform this action
-	 * @param privilegeName
-	 *            the privilegeName of the privilege to remove
-	 * 
-	 * @return the {@link PrivilegeRep} of the privilege removed, or null if the privilege did not exist
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the user for this certificate may not perform the action
-	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
-	 */
-	public PrivilegeRep removePrivilege(Certificate certificate, String privilegeName) throws AccessDeniedException,
-			PrivilegeException;
-
-	/**
 	 * <p>
 	 * Adds a new user, or replaces the user with the information from this {@link UserRep} if the user already exists
 	 * </p>
@@ -218,23 +176,6 @@ public interface PrivilegeHandler {
 			PrivilegeException;
 
 	/**
-	 * Adds a new privilege, or replaces the privilege with the information from this {@link PrivilegeRep} if the
-	 * privilege already exists
-	 * 
-	 * @param certificate
-	 *            the {@link Certificate} of the user which has the privilege to perform this action
-	 * @param privilegeRep
-	 *            the {@link PrivilegeRep} containing the information to create the new {@link Privilege}
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the user for this certificate may not perform the action
-	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
-	 */
-	public void addOrReplacePrivilege(Certificate certificate, PrivilegeRep privilegeRep) throws AccessDeniedException,
-			PrivilegeException;
-
-	/**
 	 * Adds the role with the given roleName to the {@link User} with the given username
 	 * 
 	 * @param certificate
@@ -253,21 +194,21 @@ public interface PrivilegeHandler {
 			PrivilegeException;
 
 	/**
-	 * Adds the privilege with the given privilegeName to the {@link Role} with the given roleName
+	 * Adds the {@link PrivilegeRep} to the {@link Role} with the given roleName
 	 * 
 	 * @param certificate
 	 *            the {@link Certificate} of the user which has the privilege to perform this action
 	 * @param roleName
 	 *            the roleName of the {@link Role} to which the privilege should be added
-	 * @param privilegeName
-	 *            the privilegeName of the {@link Privilege} which should be added to the {@link Role}
+	 * @param privilegeRep
+	 *            the representation of the {@link Privilege} which should be added to the {@link Role}
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public void addPrivilegeToRole(Certificate certificate, String roleName, String privilegeName)
+	public void addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
@@ -348,82 +289,6 @@ public interface PrivilegeHandler {
 	 */
 	public void setUserLocale(Certificate certificate, String username, Locale locale) throws AccessDeniedException,
 			PrivilegeException;
-
-	/**
-	 * Sets the class name of the {@link PrivilegePolicy} object for the {@link Privilege} registered for the given
-	 * privilegeName
-	 * 
-	 * @param certificate
-	 *            the {@link Certificate} of the user which has the privilege to perform this action
-	 * @param privilegeName
-	 *            the name of the {@link Privilege} for which the policy is to be changed
-	 * @param policyName
-	 *            class name of the {@link PrivilegePolicy} to be registered for this {@link Privilege}
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the user for this certificate may not perform the action
-	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate or if the class name of the policy is invalid
-	 */
-	public void setPrivilegePolicy(Certificate certificate, String privilegeName, String policyName)
-			throws AccessDeniedException, PrivilegeException;
-
-	/**
-	 * Sets the special flag on the given {@link Privilege} defined by the privilegeName argument so that all is allowed
-	 * and thus the allow and deny list of the privilege are ignored
-	 * 
-	 * @param certificate
-	 *            the {@link Certificate} of the user which has the privilege to perform this action
-	 * @param privilegeName
-	 *            the name of the {@link Privilege} for which the allAllowed value is to be changed
-	 * @param allAllowed
-	 *            the boolean defining if all privileges are granted for the value true, or not for the value false
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the user for this certificate may not perform the action
-	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
-	 */
-	public void setPrivilegeAllAllowed(Certificate certificate, String privilegeName, boolean allAllowed)
-			throws AccessDeniedException, PrivilegeException;
-
-	/**
-	 * Sets the {@link List} of strings which represent values which denies finer grained privilege rights for the
-	 * {@link Privilege} defined by the privilegeName argument
-	 * 
-	 * @param certificate
-	 *            the {@link Certificate} of the user which has the privilege to perform this action
-	 * @param privilegeName
-	 *            the name of the {@link Privilege} for which the deny list is to be changed
-	 * @param denyList
-	 *            the {@link List} of strings which represent values which denies finer grained privilege rights
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the user for this certificate may not perform the action
-	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
-	 */
-	public void setPrivilegeDenyList(Certificate certificate, String privilegeName, Set<String> denyList)
-			throws AccessDeniedException, PrivilegeException;
-
-	/**
-	 * Sets the {@link List} of strings which represent values which grants finer grained privilege rights for the
-	 * {@link Privilege} defined by the privilegeName argument
-	 * 
-	 * @param certificate
-	 *            the {@link Certificate} of the user which has the privilege to perform this action
-	 * @param privilegeName
-	 *            the name of the {@link Privilege} for which the allow list is to be changed
-	 * @param allowList
-	 *            the {@link List} of strings which represent values which grants finer grained privilege rights
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the user for this certificate may not perform the action
-	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
-	 */
-	public void setPrivilegeAllowList(Certificate certificate, String privilegeName, Set<String> allowList)
-			throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * Authenticates a user by validating that a {@link User} for the given username and password exist and then returns
@@ -548,22 +413,4 @@ public interface PrivilegeHandler {
 	 *             if the users of the given certificate does not have the privilege to perform this action
 	 */
 	public boolean persist(Certificate certificate) throws AccessDeniedException;
-
-	/**
-	 * Initializes the concrete {@link EncryptionHandler}. The passed parameter map contains any configuration this
-	 * {@link PrivilegeHandler} might need. This method may only be called once and this must be enforced by the
-	 * concrete implementation
-	 * 
-	 * @param parameterMap
-	 *            a map containing configuration properties
-	 * @param encryptionHandler
-	 *            the {@link EncryptionHandler} instance for this {@link PrivilegeHandler}
-	 * @param persistenceHandler
-	 *            the {@link PersistenceHandler} instance for this {@link PrivilegeHandler}
-	 * 
-	 * @throws PrivilegeException
-	 *             if the this method is called multiple times or an initialization exception occurs
-	 */
-	public void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
-			PersistenceHandler persistenceHandler) throws PrivilegeException;
 }

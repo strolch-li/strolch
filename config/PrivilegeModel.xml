@@ -1,31 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UsersAndRoles>
 
-	<Privileges>
-		<Privilege name="NoRestriction" policy="DefaultPrivilege">
-			<AllAllowed>true</AllAllowed>
-			<Deny></Deny>
-			<Allow></Allow>
-		</Privilege>
-
-		<Privilege name="Service" policy="DefaultPrivilege">
-			<AllAllowed>false</AllAllowed>
-			<Deny></Deny>
-			<Allow>ch.eitchnet.privilege.test.TestRestrictable</Allow>
-		</Privilege>
-	</Privileges>
-
 	<Users>
 
-		<User userId="1" username="eitch" password="c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646">
-			<Firstname>Robert</Firstname>
-			<Surname>von Burg</Surname>
+		<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
+			<Firstname>Featherlite</Firstname>
+			<Surname>Administrator</Surname>
 			<State>ENABLED</State>
 			<Locale>en_GB</Locale>
 			<Roles>
 				<Role>PrivilegeAdmin</Role>
-				<Role>admin</Role>
-				<Role>serviceExecutor</Role>
+				<Role>FeatherliteUser</Role>
 			</Roles>
 		</User>
 
@@ -35,14 +20,16 @@
 
 		<Role name="PrivilegeAdmin" />
 
-		<Role name="admin">
-			<Privilege name="NoRestriction" />
-		</Role>
-
-		<Role name="user" />
-
-		<Role name="serviceExecutor">
-			<Privilege name="Service" />
+		<Role name="FeatherliteUser">
+			<Privilege name="com.rsp.core.base.service.Service">
+				<AllAllowed>true</AllAllowed>
+			</Privilege>
+			<Privilege name="com.rsp.core.base.query.RSPQuery">
+				<AllAllowed>true</AllAllowed>
+			</Privilege>
+			<Privilege name="RegisterObservers">
+				<AllAllowed>true</AllAllowed>
+			</Privilege>
 		</Role>
 
 	</Roles>

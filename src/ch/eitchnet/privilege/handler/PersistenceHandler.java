@@ -10,9 +10,9 @@
 
 package ch.eitchnet.privilege.handler;
 
+import java.util.List;
 import java.util.Map;
 
-import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
@@ -37,6 +37,20 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
 public interface PersistenceHandler {
 
 	/**
+	 * Returns all currently known {@link User}s
+	 * 
+	 * @return all currently known {@link User}s
+	 */
+	public List<User> getAllUsers();
+
+	/**
+	 * Returns all currently known {@link Role}s
+	 * 
+	 * @return all currently known {@link Role}s
+	 */
+	public List<Role> getAllRoles();
+
+	/**
 	 * Returns a {@link User} object from the underlying database
 	 * 
 	 * @param username
@@ -55,33 +69,6 @@ public interface PersistenceHandler {
 	 * @return the {@link Role} object, or null if it was not found
 	 */
 	public Role getRole(String roleName);
-
-	/**
-	 * Returns a {@link Privilege} object from the underlying database
-	 * 
-	 * @param privilegeName
-	 *            the name/id of the {@link Privilege} object to return
-	 * 
-	 * @return the {@link Privilege} object, or null if it was not found
-	 */
-	public Privilege getPrivilege(String privilegeName);
-
-	/**
-	 * <p>
-	 * This method instantiates a {@link PrivilegePolicy} object from the given policyName. The {@link PrivilegePolicy}
-	 * is not stored in a database. The privilege name is a class name and is then used to instantiate a new
-	 * {@link PrivilegePolicy} object
-	 * </p>
-	 * 
-	 * @param policyName
-	 *            the class name of the {@link PrivilegePolicy} object to return
-	 * 
-	 * @return the {@link PrivilegePolicy} object
-	 * 
-	 * @throws PrivilegeException
-	 *             if the {@link PrivilegePolicy} object for the given policy name could not be instantiated
-	 */
-	public PrivilegePolicy getPolicy(String policyName) throws PrivilegeException;
 
 	/**
 	 * Removes a {@link User} with the given name and returns the removed object if it existed
@@ -104,16 +91,6 @@ public interface PersistenceHandler {
 	public Role removeRole(String roleName);
 
 	/**
-	 * Removes a {@link Privilege} with the given name and returns the removed object if it existed
-	 * 
-	 * @param privilegeName
-	 *            the name of the {@link Privilege} to remove
-	 * 
-	 * @return the {@link Privilege} removed, or null if it did not exist
-	 */
-	public Privilege removePrivilege(String privilegeName);
-
-	/**
 	 * Adds a {@link User} object to the underlying database. If the {@link User} already exists, it is replaced
 	 * 
 	 * @param user
@@ -130,15 +107,6 @@ public interface PersistenceHandler {
 	public void addOrReplaceRole(Role role);
 
 	/**
-	 * Adds a {@link Privilege} object to the underlying database. If the {@link Privilege} already exists, it is
-	 * replaced
-	 * 
-	 * @param privilege
-	 *            the {@link Privilege} object to add
-	 */
-	public void addOrReplacePrivilege(Privilege privilege);
-
-	/**
 	 * Informs this {@link PersistenceHandler} to persist any changes which need to be saved
 	 * 
 	 * @return true if changes were persisted successfully, false if something went wrong
@@ -146,13 +114,18 @@ public interface PersistenceHandler {
 	public boolean persist();
 
 	/**
+	 * Informs this {@link PersistenceHandler} to reload the data from the backend
+	 * 
+	 * @return true if the reload was successful, false if something went wrong
+	 */
+	public boolean reload();
+
+	/**
 	 * Initialize the concrete {@link PersistenceHandler}. The passed parameter map contains any configuration the
 	 * concrete {@link PersistenceHandler} might need
 	 * 
 	 * @param parameterMap
 	 *            a map containing configuration properties
-	 * @param policyMap
-	 *            map of policy key/policy class pairs
 	 */
-	public void initialize(Map<String, String> parameterMap, Map<String, Class<PrivilegePolicy>> policyMap);
+	public void initialize(Map<String, String> parameterMap);
 }

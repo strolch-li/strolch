@@ -23,7 +23,7 @@ public class TestRestrictable implements Restrictable {
 	 */
 	@Override
 	public String getPrivilegeName() {
-		return "Service";
+		return "com.rsp.core.base.service.Service";
 	}
 
 	/**
