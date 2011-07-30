@@ -47,6 +47,7 @@ public class PrivilegeTest {
 	private static final String BOB = "bob";
 	private static final String TED = "ted";
 	private static final String PASS_BOB = "admin1";
+	private static final String ROLE_FEATHERLITE_USER = "FeatherliteUser";
 	private static final String ROLE_USER = "user";
 	private static final String PASS_BAD = "123";
 
@@ -87,6 +88,7 @@ public class PrivilegeTest {
 
 		Certificate certificate = privilegeHandler.authenticate(ADMIN, PASS_ADMIN);
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -98,6 +100,7 @@ public class PrivilegeTest {
 
 		Certificate certificate = privilegeHandler.authenticate(ADMIN, PASS_BAD);
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -109,6 +112,7 @@ public class PrivilegeTest {
 
 		Certificate certificate = privilegeHandler.authenticate(ADMIN, null);
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -128,6 +132,7 @@ public class PrivilegeTest {
 		// set bob's password
 		privilegeHandler.setUserPassword(certificate, BOB, PASS_BOB);
 		logger.info("Set Bob's password");
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -138,7 +143,8 @@ public class PrivilegeTest {
 	 */
 	@Test(expected = AccessDeniedException.class)
 	public void testFailAuthAsBob() throws Exception {
-		privilegeHandler.authenticate(BOB, PASS_BOB);
+		Certificate certificate = privilegeHandler.authenticate(BOB, PASS_BOB);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -149,6 +155,7 @@ public class PrivilegeTest {
 	public void testEnableUserBob() throws Exception {
 		Certificate certificate = privilegeHandler.authenticate(ADMIN, PASS_ADMIN);
 		privilegeHandler.setUserState(certificate, BOB, UserState.ENABLED);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -162,6 +169,7 @@ public class PrivilegeTest {
 
 		Certificate certificate = privilegeHandler.authenticate(BOB, PASS_BOB);
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -176,6 +184,7 @@ public class PrivilegeTest {
 		RoleRep roleRep = new RoleRep(ROLE_USER, privilegeMap);
 
 		privilegeHandler.addOrReplaceRole(certificate, roleRep);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -186,6 +195,7 @@ public class PrivilegeTest {
 	public void testAddRoleToBob() throws Exception {
 		Certificate certificate = privilegeHandler.authenticate(ADMIN, PASS_ADMIN);
 		privilegeHandler.addRoleToUser(certificate, BOB, ROLE_USER);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -194,7 +204,8 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testAuthAsBob() throws Exception {
-		privilegeHandler.authenticate(BOB, PASS_BOB);
+		Certificate certificate = privilegeHandler.authenticate(BOB, PASS_BOB);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -214,6 +225,7 @@ public class PrivilegeTest {
 		UserRep userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<String>(), null);
 		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user " + TED);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -226,6 +238,7 @@ public class PrivilegeTest {
 		Certificate certificate = privilegeHandler.authenticate(ADMIN, PASS_ADMIN);
 		privilegeHandler.addRoleToUser(certificate, BOB, PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
 		logger.info("Added " + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE + " to " + ADMIN);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -242,6 +255,7 @@ public class PrivilegeTest {
 		UserRep userRep = new UserRep("2", TED, "Ted", "Newman", UserState.NEW, new HashSet<String>(), null);
 		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user " + TED);
+		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -249,14 +263,67 @@ public class PrivilegeTest {
 	 *             if something goes wrong
 	 */
 	@Test
-	public void testPerformRestrictable() throws Exception {
+	public void testPerformRestrictableAsAdmin() throws Exception {
 
 		Certificate certificate = privilegeHandler.authenticate(ADMIN, PASS_ADMIN);
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// see if eitch can perform restrictable
 		Restrictable restrictable = new TestRestrictable();
-		boolean actionAllowed = privilegeHandler.actionAllowed(certificate, restrictable);
-		org.junit.Assert.assertTrue(ADMIN + " may not perform restrictable!", actionAllowed);
+		privilegeHandler.actionAllowed(certificate, restrictable);
+		privilegeHandler.invalidateSession(certificate);
+	}
+
+	/**
+	 * Tests if the user bob, who does not have FeatherliteUser role can perform restrictable
+	 * 
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@Test(expected = AccessDeniedException.class)
+	public void testFailPerformRestrictableAsBob() throws Exception {
+		Certificate certificate = privilegeHandler.authenticate(BOB, PASS_BOB);
+		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+
+		// see if bob can perform restrictable
+		Restrictable restrictable = new TestRestrictable();
+		try {
+			privilegeHandler.actionAllowed(certificate, restrictable);
+		} finally {
+			privilegeHandler.invalidateSession(certificate);
+		}
+	}
+
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@Test
+	public void testAddFeatherliteRoleToBob() throws Exception {
+
+		Certificate certificate = privilegeHandler.authenticate(ADMIN, PASS_ADMIN);
+		privilegeHandler.addRoleToUser(certificate, BOB, ROLE_FEATHERLITE_USER);
+		logger.info("Added " + ROLE_FEATHERLITE_USER + " to " + BOB);
+		privilegeHandler.invalidateSession(certificate);
+	}
+
+	/**
+	 * Tests if the user bob, who now has FeatherliteUser role can perform restrictable
+	 * 
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@Test
+	public void testPerformRestrictableAsBob() throws Exception {
+		Certificate certificate = privilegeHandler.authenticate(BOB, PASS_BOB);
+		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+
+		// see if bob can perform restrictable
+		Restrictable restrictable = new TestRestrictable();
+		try {
+			privilegeHandler.actionAllowed(certificate, restrictable);
+		} finally {
+			privilegeHandler.invalidateSession(certificate);
+		}
 	}
 }

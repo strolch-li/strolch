@@ -10,6 +10,7 @@
 
 package ch.eitchnet.privilege.policy;
 
+import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.internal.Privilege;
@@ -27,7 +28,7 @@ public class DefaultPrivilege implements PrivilegePolicy {
 	 *      ch.eitchnet.privilege.model.internal.Privilege, ch.eitchnet.privilege.model.Restrictable)
 	 */
 	@Override
-	public boolean actionAllowed(Role role, Privilege privilege, Restrictable restrictable) {
+	public void actionAllowed(Role role, Privilege privilege, Restrictable restrictable) {
 
 		// validate user is not null
 		if (role == null)
@@ -38,10 +39,6 @@ public class DefaultPrivilege implements PrivilegePolicy {
 		if (privilegeName == null || privilegeName.isEmpty()) {
 			throw new PrivilegeException("The PrivilegeName for the Restrictable is null or empty: " + restrictable);
 		}
-
-		// does this role have privilege for any values?
-		if (privilege.isAllAllowed())
-			return true;
 
 		// get the value on which the action is to be performed
 		Object object = restrictable.getPrivilegeValue();
@@ -56,17 +53,24 @@ public class DefaultPrivilege implements PrivilegePolicy {
 
 		// first check values not allowed
 		for (String denied : privilege.getDenyList()) {
-			if (denied.equals(privilegeValue))
-				return false;
+
+			// if value in deny list
+			if (denied.equals(privilegeValue)) {
+
+				// then throw access denied
+				throw new AccessDeniedException("Role " + role.getName() + " does not have Privilege " + privilegeName
+						+ " needed for Restrictable " + restrictable.getClass().getName());
+			}
 		}
 
 		// now check values allowed
 		for (String allowed : privilege.getAllowList()) {
 			if (allowed.equals(privilegeValue))
-				return true;
+				return;
 		}
 
 		// default is not allowed
-		return false;
+		throw new AccessDeniedException("Role " + role.getName() + " does not have Privilege " + privilegeName
+				+ " needed for Restrictable " + restrictable.getClass().getName());
 	}
 }

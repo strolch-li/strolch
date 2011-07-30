@@ -10,6 +10,7 @@
 
 package ch.eitchnet.privilege.policy;
 
+import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
@@ -40,7 +41,8 @@ public interface PrivilegePolicy {
 	 * @param restrictable
 	 *            the {@link Restrictable} to which the user wants access
 	 * 
-	 * @return return true if the action is allowed, false if not
+	 * @throws AccessDeniedException
+	 *             if action not allowed
 	 */
-	public boolean actionAllowed(Role role, Privilege privilege, Restrictable restrictable);
+	public void actionAllowed(Role role, Privilege privilege, Restrictable restrictable) throws AccessDeniedException;
 }

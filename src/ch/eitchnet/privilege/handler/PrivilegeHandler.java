@@ -326,15 +326,13 @@ public interface PrivilegeHandler {
 	 * @param restrictable
 	 *            the {@link Restrictable} to which the user wants access
 	 * 
-	 * @return true if the access is allowed, false otherwise
-	 * 
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action defined by the {@link Restrictable}
 	 *             implementation
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public boolean actionAllowed(Certificate certificate, Restrictable restrictable) throws AccessDeniedException,
+	public void actionAllowed(Certificate certificate, Restrictable restrictable) throws AccessDeniedException,
 			PrivilegeException;
 
 	/**
@@ -345,12 +343,13 @@ public interface PrivilegeHandler {
 	 * @param restrictable
 	 *            the {@link Restrictable} to which access is to be checked
 	 * 
-	 * @return true if the {@link RoleRep} has access, false otherwise
-	 * 
+	 * @throws PrivilegeException
+	 *             if the {@link Role} does not exist
 	 * @throws AccessDeniedException
 	 *             if the role may not perform the action defined by the {@link Restrictable} implementation
 	 */
-	public boolean actionAllowed(RoleRep roleRep, Restrictable restrictable) throws AccessDeniedException;
+	public void actionAllowed(RoleRep roleRep, Restrictable restrictable) throws PrivilegeException,
+			AccessDeniedException;
 
 	/**
 	 * Checks if the given {@link Certificate} is valid. This means that the certificate is for a valid session and that
@@ -359,12 +358,10 @@ public interface PrivilegeHandler {
 	 * @param certificate
 	 *            the {@link Certificate} to check
 	 * 
-	 * @return true if the {@link Certificate} is valid, false otherwise
-	 * 
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public boolean isCertificateValid(Certificate certificate) throws PrivilegeException;
+	public void isCertificateValid(Certificate certificate) throws PrivilegeException;
 
 	/**
 	 * <p>

@@ -563,10 +563,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public boolean invalidateSession(Certificate certificate) {
 
 		// first validate certificate
-		if (!isCertificateValid(certificate)) {
-			logger.info("Certificate is not valid, so no session to invalidate: " + certificate.toString());
-			return false;
-		}
+		isCertificateValid(certificate);
 
 		// remove registration
 		CertificateSessionPair certificateSessionPair = this.sessionMap.remove(certificate.getSessionId());
@@ -592,15 +589,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 *      ch.eitchnet.privilege.model.Restrictable)
 	 */
 	@Override
-	public boolean actionAllowed(Certificate certificate, Restrictable restrictable) {
+	public void actionAllowed(Certificate certificate, Restrictable restrictable) {
 
 		// TODO What is better, validate from {@link Restrictable} to {@link User} or the opposite direction?
 
 		// first validate certificate
-		if (!isCertificateValid(certificate)) {
-			throw new PrivilegeException("Certificate is not valid, so action is not allowed: " + certificate
-					+ " for restrictable: " + restrictable);
-		}
+		isCertificateValid(certificate);
 
 		// restrictable must not be null
 		if (restrictable == null)
@@ -613,9 +607,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
 		}
 
-		// default is to not allow the action
-		// TODO should default deny/allow policy be configurable?
-		boolean actionAllowed = false;
+		String privilegeName = restrictable.getPrivilegeName();
 
 		// now iterate roles and validate on policies
 		for (String roleName : user.getRoles()) {
@@ -626,14 +618,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				continue;
 			}
 
-			actionAllowed = actionAllowed(role, restrictable);
+			// ignore if this role does not have the privilege
+			if (!role.hasPrivilege(privilegeName))
+				continue;
 
 			// if action is allowed, then break iteration as a privilege match has been made
-			if (actionAllowed)
-				break;
+			if (actionAllowed(role, restrictable))
+				return;
 		}
 
-		return actionAllowed;
+		throw new AccessDeniedException("User " + user.getUsername() + " does not have Privilege " + privilegeName
+				+ " needed for Restrictable " + restrictable.getClass().getName());
 	}
 
 	/**
@@ -644,7 +639,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 *      ch.eitchnet.privilege.model.Restrictable)
 	 */
 	@Override
-	public boolean actionAllowed(RoleRep roleRep, Restrictable restrictable) {
+	public void actionAllowed(RoleRep roleRep, Restrictable restrictable) {
 
 		// user and restrictable must not be null
 		if (roleRep == null)
@@ -660,7 +655,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException("No Role exists with the name " + roleRep.getName());
 		}
 
-		return actionAllowed(role, restrictable);
+		// delegate to method with Role
+		actionAllowed(role, restrictable);
 	}
 
 	/**
@@ -669,8 +665,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * 
 	 * @param role
 	 * @param restrictable
-	 * 
-	 * @return true if the privilege is granted, false otherwise
 	 */
 	protected boolean actionAllowed(Role role, Restrictable restrictable) {
 
@@ -691,8 +685,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Privilege privilege = role.getPrivilegeMap().get(privilegeName);
 
 		// check if all is allowed
-		if (privilege.isAllAllowed())
+		if (privilege.isAllAllowed()) {
 			return true;
+		}
 
 		// otherwise delegate checking to the policy configured for this privilege
 		PrivilegePolicy policy = this.getPolicy(privilege.getPolicy());
@@ -702,14 +697,18 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// delegate checking to privilege policy
-		return policy.actionAllowed(role, privilege, restrictable);
+		policy.actionAllowed(role, privilege, restrictable);
+
+		// the policy must throw an exception if action not allowed,
+		// so return true if we arrive here
+		return true;
 	}
 
 	/**
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#isCertificateValid(ch.eitchnet.privilege.model.Certificate)
 	 */
 	@Override
-	public boolean isCertificateValid(Certificate certificate) {
+	public void isCertificateValid(Certificate certificate) {
 
 		// certificate  must not be null
 		if (certificate == null)
@@ -741,8 +740,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
 		}
 
-		// everything is ok, so return true as the certificate must be valid
-		return true;
+		// everything is ok
 	}
 
 	/**
@@ -752,9 +750,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void validateIsPrivilegeAdmin(Certificate certificate) throws PrivilegeException {
 
 		// validate certificate
-		if (!this.isCertificateValid(certificate)) {
-			throw new PrivilegeException("Certificate " + certificate + " is not valid!");
-		}
+		this.isCertificateValid(certificate);
 
 		// get user object
 		User user = this.persistenceHandler.getUser(certificate.getUsername());
