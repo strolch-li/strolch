@@ -857,7 +857,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * 
 	 * @author rvonburg
 	 */
-	private class CertificateSessionPair {
+	protected class CertificateSessionPair {
 		/**
 		 * The {@link Session}
 		 */

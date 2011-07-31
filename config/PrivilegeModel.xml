@@ -27,9 +27,6 @@
 			<Privilege name="com.rsp.core.base.query.RSPQuery">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
-			<Privilege name="RegisterObservers">
-				<AllAllowed>true</AllAllowed>
-			</Privilege>
 		</Role>
 
 	</Roles>
