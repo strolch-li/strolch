@@ -452,8 +452,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	@Override
 	public void setUserPassword(Certificate certificate, String username, String password) {
 
-		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		// check if certificate is for same user, in which case user is changing their own password
+		if (certificate.getUsername().equals(username)) {
+
+			// validate the certificate
+			isCertificateValid(certificate);
+
+		} else {
+
+			// otherwise validate the the certificate is for a privilege admin
+			validateIsPrivilegeAdmin(certificate);
+		}
 
 		// get User
 		User user = this.persistenceHandler.getUser(username);

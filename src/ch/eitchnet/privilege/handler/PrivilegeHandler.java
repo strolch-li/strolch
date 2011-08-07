@@ -227,9 +227,15 @@ public interface PrivilegeHandler {
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
+	 * <p>
 	 * Changes the password for the {@link User} with the given username. If the password is null, then the {@link User}
 	 * can not login anymore. Otherwise the password must meet the requirements of the implementation under
 	 * {@link PrivilegeHandler#validatePassword(String)}
+	 * </p>
+	 * 
+	 * <p>
+	 * It should be possible for a user to change their own password
+	 * </p>
 	 * 
 	 * @param certificate
 	 *            the {@link Certificate} of the user which has the privilege to perform this action

@@ -64,7 +64,9 @@ public class PrivilegeTest {
 	private static final String PASS_BOB = "admin1";
 	private static final String ROLE_FEATHERLITE_USER = "FeatherliteUser";
 	private static final String ROLE_USER = "user";
+	private static final String PASS_DEF = "def";
 	private static final String PASS_BAD = "123";
+	private static final String PASS_TED = "12345";
 
 	private static final Logger logger = Logger.getLogger(PrivilegeTest.class);
 
@@ -269,10 +271,50 @@ public class PrivilegeTest {
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// let's add a new user ted
-		UserRep userRep = new UserRep("2", TED, "Ted", "Newman", UserState.NEW, new HashSet<String>(), null,
+		HashSet<String> roles = new HashSet<String>();
+		roles.add(ROLE_USER);
+		UserRep userRep = new UserRep("2", TED, "Ted", "Newman", UserState.ENABLED, roles, null,
 				new HashMap<String, String>());
 		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user " + TED);
+
+		privilegeHandler.invalidateSession(certificate);
+	}
+
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@Test
+	public void testSetTedPwdAsBob() throws Exception {
+
+		Certificate certificate = privilegeHandler.authenticate(BOB, PASS_BOB);
+		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+
+		// set ted's password to default
+		privilegeHandler.setUserPassword(certificate, TED, PASS_DEF);
+
+		privilegeHandler.invalidateSession(certificate);
+	}
+
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@Test
+	public void testTedChangesOwnPwd() throws Exception {
+		Certificate certificate = privilegeHandler.authenticate(TED, PASS_DEF);
+		privilegeHandler.setUserPassword(certificate, TED, PASS_TED);
+		privilegeHandler.invalidateSession(certificate);
+	}
+
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@Test
+	public void testAuthAsTed() throws Exception {
+		Certificate certificate = privilegeHandler.authenticate(TED, PASS_TED);
 		privilegeHandler.invalidateSession(certificate);
 	}
 
