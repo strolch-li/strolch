@@ -1,10 +1,25 @@
 /*
- * Copyright (c) 2010
+ * Copyright (c) 2010, 2011
  * 
- * Robert von Burg
- * eitch@eitchnet.ch
+ * Robert von Burg <eitch@eitchnet.ch>
  * 
- * All rights reserved.
+ */
+
+/*
+ * This file is part of Privilege.
+ *
+ * Privilege is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Privilege is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
 
@@ -22,7 +37,7 @@ import ch.eitchnet.privilege.model.internal.Session;
  * instance which is always used when performing an access and is returned when a user performs a login through
  * {@link PrivilegeHandler#authenticate(String, String)}
  * 
- * @author rvonburg
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public final class Certificate implements Serializable {
 
@@ -38,7 +53,10 @@ public final class Certificate implements Serializable {
 	/**
 	 * Default constructor initializing with all information needed for this certificate
 	 * 
-	 * <p>Note, both the authentication token and password are private fields which are generated on login and only known by the {@link PrivilegeHandler}</p>
+	 * <p>
+	 * Note, both the authentication token and password are private fields which are generated on login and only known
+	 * by the {@link PrivilegeHandler}
+	 * </p>
 	 * 
 	 * @param sessionId
 	 *            the users session id
@@ -49,7 +67,8 @@ public final class Certificate implements Serializable {
 	 *            It corresponds with the authentication token on the {@link Session}
 	 * @param authPassword
 	 *            the password to access the authentication token, this is not known to the client but set by the
-	 *            {@link PrivilegeHandler} on authentication. It corresponds with the authentication password on the {@link Session}
+	 *            {@link PrivilegeHandler} on authentication. It corresponds with the authentication password on the
+	 *            {@link Session}
 	 * @param locale
 	 *            the users {@link Locale}
 	 */

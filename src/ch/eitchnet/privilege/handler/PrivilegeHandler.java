@@ -1,10 +1,25 @@
 /*
- * Copyright (c) 2010
+ * Copyright (c) 2010, 2011
  * 
- * Robert von Burg
- * eitch@eitchnet.ch
+ * Robert von Burg <eitch@eitchnet.ch>
  * 
- * All rights reserved.
+ */
+
+/*
+ * This file is part of Privilege.
+ *
+ * Privilege is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Privilege is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
 
@@ -30,7 +45,7 @@ import ch.eitchnet.privilege.model.internal.User;
  * methods to access Privilege data model objects, modify them and validate if users or roles have privileges to perform
  * an action
  * 
- * @author rvonburg
+ * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
 public interface PrivilegeHandler {

@@ -1,10 +1,25 @@
 /*
- * Copyright (c) 2010
+ * Copyright (c) 2010, 2011
  * 
- * Robert von Burg
- * eitch@eitchnet.ch
+ * Robert von Burg <eitch@eitchnet.ch>
  * 
- * All rights reserved.
+ */
+
+/*
+ * This file is part of Privilege.
+ *
+ * Privilege is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Privilege is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
 
@@ -24,8 +39,8 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
  * <p>
- * This default {@link EncryptionHandler} creates tokens using a {@link SecureRandom} object. Hashing is done by
- * using {@link MessageDigest} and the configured algorithm which is passed in the parameters
+ * This default {@link EncryptionHandler} creates tokens using a {@link SecureRandom} object. Hashing is done by using
+ * {@link MessageDigest} and the configured algorithm which is passed in the parameters
  * </p>
  * 
  * Required parameters:
@@ -33,7 +48,7 @@ import ch.eitchnet.privilege.i18n.PrivilegeException;
  * <li> {@link XmlConstants#XML_PARAM_HASH_ALGORITHM}</li>
  * </ul>
  * 
- * @author rvonburg
+ * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
 public class DefaultEncryptionHandler implements EncryptionHandler {

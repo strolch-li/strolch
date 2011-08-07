@@ -1,10 +1,25 @@
 /*
- * Copyright (c) 2010
+ * Copyright (c) 2010, 2011
  * 
- * Robert von Burg
- * eitch@eitchnet.ch
+ * Robert von Burg <eitch@eitchnet.ch>
  * 
- * All rights reserved.
+ */
+
+/*
+ * This file is part of Privilege.
+ *
+ * Privilege is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Privilege is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
 
@@ -37,7 +52,7 @@ import ch.eitchnet.privilege.model.internal.User;
  * {@link PersistenceHandler} implementation which reads the configuration from XML files. These configuration is passed
  * in {@link #initialize(Map)}
  * 
- * @author rvonburg
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class XmlPersistenceHandler implements PersistenceHandler {
 
@@ -155,7 +170,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		// USERS
 		// build XML DOM of users
-		List<Element> users = toDomUsers();
+		List<Element> users = toDomUsers(this.userMap);
 		Element usersElement = docFactory.createElement(XmlConstants.XML_USERS);
 		for (Element userElement : users) {
 			usersElement.add(userElement);
@@ -164,7 +179,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		// ROLES
 		// build XML DOM of roles
-		List<Element> roles = toDomRoles();
+		List<Element> roles = toDomRoles(this.roleMap);
 		Element rolesElement = docFactory.createElement(XmlConstants.XML_ROLES);
 		for (Element roleElement : roles) {
 			rolesElement.add(roleElement);
@@ -211,13 +226,15 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// get roles element
 		Element rolesElement = modelsRootElement.element(XmlConstants.XML_ROLES);
 		// read roles
-		readRoles(rolesElement);
+		Map<String, Role> roles = readRoles(rolesElement);
+		this.roleMap = roles;
 
 		// USERS
 		// get users element
 		Element usersElement = modelsRootElement.element(XmlConstants.XML_USERS);
 		// read users
-		readUsers(usersElement);
+		Map<String, User> users = readUsers(usersElement);
+		this.userMap = users;
 
 		this.userMapDirty = false;
 		this.roleMapDirty = false;
@@ -274,7 +291,9 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	/**
 	 * @param usersRootElement
 	 */
-	private void readUsers(Element usersRootElement) {
+	private static Map<String, User> readUsers(Element usersRootElement) {
+
+		Map<String, User> userMap = new HashMap<String, User>();
 
 		@SuppressWarnings("unchecked")
 		List<Element> userElements = usersRootElement.elements(XmlConstants.XML_USER);
@@ -313,14 +332,18 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			logger.info("Added user " + user);
 
 			// put user in map
-			this.userMap.put(username, user);
+			userMap.put(username, user);
 		}
+
+		return userMap;
 	}
 
 	/**
 	 * @param rolesRootElement
 	 */
-	private void readRoles(Element rolesRootElement) {
+	private static Map<String, Role> readRoles(Element rolesRootElement) {
+
+		Map<String, Role> roleMap = new HashMap<String, Role>();
 
 		@SuppressWarnings("unchecked")
 		List<Element> roleElements = rolesRootElement.elements(XmlConstants.XML_ROLE);
@@ -331,64 +354,23 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			Map<String, Privilege> privilegeMap = readPrivileges(roleElement);
 
 			Role role = new Role(roleName, privilegeMap);
-			this.roleMap.put(roleName, role);
-		}
-	}
-
-	/**
-	 * @param roleParentElement
-	 * @return
-	 */
-	private Map<String, Privilege> readPrivileges(Element roleParentElement) {
-
-		Map<String, Privilege> privilegeMap = new HashMap<String, Privilege>();
-
-		@SuppressWarnings("unchecked")
-		List<Element> privilegeElements = roleParentElement.elements(XmlConstants.XML_PRIVILEGE);
-		for (Element privilegeElement : privilegeElements) {
-
-			String privilegeName = privilegeElement.attributeValue(XmlConstants.XML_ATTR_NAME);
-			String privilegePolicy = privilegeElement.attributeValue(XmlConstants.XML_ATTR_POLICY);
-
-			String allAllowedS = privilegeElement.element(XmlConstants.XML_ALL_ALLOWED).getTextTrim();
-			boolean allAllowed = Boolean.valueOf(allAllowedS).booleanValue();
-
-			@SuppressWarnings("unchecked")
-			List<Element> denyElements = privilegeElement.elements(XmlConstants.XML_DENY);
-			Set<String> denyList = new HashSet<String>(denyElements.size());
-			for (Element denyElement : denyElements) {
-				String denyValue = denyElement.getTextTrim();
-				if (!denyValue.isEmpty())
-					denyList.add(denyValue);
-			}
-
-			@SuppressWarnings("unchecked")
-			List<Element> allowElements = privilegeElement.elements(XmlConstants.XML_ALLOW);
-			Set<String> allowList = new HashSet<String>(allowElements.size());
-			for (Element allowElement : allowElements) {
-				String allowValue = allowElement.getTextTrim();
-				if (!allowValue.isEmpty())
-					allowList.add(allowValue);
-			}
-
-			Privilege privilege = new Privilege(privilegeName, privilegePolicy, allAllowed, denyList, allowList);
-			privilegeMap.put(privilegeName, privilege);
+			roleMap.put(roleName, role);
 		}
 
-		return privilegeMap;
+		return roleMap;
 	}
 
-	private List<Element> toDomUsers() {
+	private static List<Element> toDomUsers(Map<String, User> userMap) {
 
-		List<Element> usersAsElements = new ArrayList<Element>(this.userMap.size());
+		List<Element> usersAsElements = new ArrayList<Element>(userMap.size());
 
 		DocumentFactory documentFactory = DocumentFactory.getInstance();
 
-		synchronized (this.userMap) {
-			for (String userName : this.userMap.keySet()) {
+		synchronized (userMap) {
+			for (String userName : userMap.keySet()) {
 
 				// get the user object
-				User user = this.userMap.get(userName);
+				User user = userMap.get(userName);
 
 				// create the user element
 				Element userElement = documentFactory.createElement(XmlConstants.XML_USER);
@@ -433,17 +415,17 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		return usersAsElements;
 	}
 
-	private List<Element> toDomRoles() {
+	private static List<Element> toDomRoles(Map<String, Role> roleMap) {
 
-		List<Element> rolesAsElements = new ArrayList<Element>(this.roleMap.size());
+		List<Element> rolesAsElements = new ArrayList<Element>(roleMap.size());
 
 		DocumentFactory documentFactory = DocumentFactory.getInstance();
 
-		synchronized (this.roleMap) {
-			for (String roleName : this.roleMap.keySet()) {
+		synchronized (roleMap) {
+			for (String roleName : roleMap.keySet()) {
 
 				// get the role object
-				Role role = this.roleMap.get(roleName);
+				Role role = roleMap.get(roleName);
 
 				// create the role element
 				Element roleElement = documentFactory.createElement(XmlConstants.XML_ROLE);
@@ -460,7 +442,50 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		return rolesAsElements;
 	}
 
-	private void toDomPrivileges(Element roleParentElement, Map<String, Privilege> privilegeMap) {
+	/**
+	 * @param roleParentElement
+	 * @return
+	 */
+	private static Map<String, Privilege> readPrivileges(Element roleParentElement) {
+
+		Map<String, Privilege> privilegeMap = new HashMap<String, Privilege>();
+
+		@SuppressWarnings("unchecked")
+		List<Element> privilegeElements = roleParentElement.elements(XmlConstants.XML_PRIVILEGE);
+		for (Element privilegeElement : privilegeElements) {
+
+			String privilegeName = privilegeElement.attributeValue(XmlConstants.XML_ATTR_NAME);
+			String privilegePolicy = privilegeElement.attributeValue(XmlConstants.XML_ATTR_POLICY);
+
+			String allAllowedS = privilegeElement.element(XmlConstants.XML_ALL_ALLOWED).getTextTrim();
+			boolean allAllowed = Boolean.valueOf(allAllowedS).booleanValue();
+
+			@SuppressWarnings("unchecked")
+			List<Element> denyElements = privilegeElement.elements(XmlConstants.XML_DENY);
+			Set<String> denyList = new HashSet<String>(denyElements.size());
+			for (Element denyElement : denyElements) {
+				String denyValue = denyElement.getTextTrim();
+				if (!denyValue.isEmpty())
+					denyList.add(denyValue);
+			}
+
+			@SuppressWarnings("unchecked")
+			List<Element> allowElements = privilegeElement.elements(XmlConstants.XML_ALLOW);
+			Set<String> allowList = new HashSet<String>(allowElements.size());
+			for (Element allowElement : allowElements) {
+				String allowValue = allowElement.getTextTrim();
+				if (!allowValue.isEmpty())
+					allowList.add(allowValue);
+			}
+
+			Privilege privilege = new Privilege(privilegeName, privilegePolicy, allAllowed, denyList, allowList);
+			privilegeMap.put(privilegeName, privilege);
+		}
+
+		return privilegeMap;
+	}
+
+	private static void toDomPrivileges(Element roleParentElement, Map<String, Privilege> privilegeMap) {
 
 		DocumentFactory documentFactory = DocumentFactory.getInstance();
 
