@@ -34,6 +34,10 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 				<Role>PrivilegeAdmin</Role>
 				<Role>FeatherliteUser</Role>
 			</Roles>
+			<Properties>
+				<Property name="organization" value="eitchnet.ch" />
+				<Property name="organizationalUnit" value="Development" />
+			</Properties>
 		</User>
 
 	</Users>

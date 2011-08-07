@@ -27,6 +27,7 @@ package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import ch.eitchnet.privilege.model.internal.Role;
@@ -50,6 +51,7 @@ public class UserRep implements Serializable {
 	private UserState userState;
 	private Set<String> roles;
 	private Locale locale;
+	private Map<String, String> propertyMap;
 
 	/**
 	 * Default constructor
@@ -68,9 +70,11 @@ public class UserRep implements Serializable {
 	 *            the set of {@link Role}s assigned to this user
 	 * @param locale
 	 *            the user's {@link Locale}
+	 * @param propertyMap
+	 *            a {@link Map} containing string value pairs of properties for this user
 	 */
 	public UserRep(String userId, String username, String firstname, String surname, UserState userState,
-			Set<String> roles, Locale locale) {
+			Set<String> roles, Locale locale, Map<String, String> propertyMap) {
 		this.userId = userId;
 		this.username = username;
 		this.firstname = firstname;
@@ -78,6 +82,7 @@ public class UserRep implements Serializable {
 		this.userState = userState;
 		this.roles = roles;
 		this.locale = locale;
+		this.propertyMap = propertyMap;
 	}
 
 	/**
@@ -175,5 +180,47 @@ public class UserRep implements Serializable {
 	 */
 	public void setLocale(Locale locale) {
 		this.locale = locale;
+	}
+
+	/**
+	 * Returns the property with the given key
+	 * 
+	 * @param key
+	 *            the key for which the property is to be returned
+	 * 
+	 * @return the property with the given key, or null if the property is not defined
+	 */
+	public String getProperty(String key) {
+		return this.propertyMap.get(key);
+	}
+
+	/**
+	 * Set the property with the key to the value
+	 * 
+	 * @param key
+	 *            the key of the property to set
+	 * @param value
+	 *            the value of the property to set
+	 */
+	public void setProperty(String key, String value) {
+		this.propertyMap.put(key, value);
+	}
+
+	/**
+	 * Returns the {@link Set} of keys of all properties
+	 * 
+	 * @return the {@link Set} of keys of all properties
+	 */
+	public Set<String> getPropertyKeySet() {
+		return this.propertyMap.keySet();
+	}
+
+	/**
+	 * Returns the map of properties
+	 * 
+	 * @return the map of properties
+	 */
+	public Map<String, String> getProperties() {
+		return this.propertyMap;
 	}
 }

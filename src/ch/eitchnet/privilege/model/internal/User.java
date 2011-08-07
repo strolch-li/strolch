@@ -26,8 +26,10 @@
 package ch.eitchnet.privilege.model.internal;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import ch.eitchnet.privilege.i18n.PrivilegeException;
@@ -60,6 +62,8 @@ public final class User {
 
 	private final Set<String> roles;
 
+	private final Map<String, String> propertyMap;
+
 	private final Locale locale;
 
 	/**
@@ -81,9 +85,11 @@ public final class User {
 	 *            the set of {@link Role}s assigned to this user
 	 * @param locale
 	 *            the user's {@link Locale}
+	 * @param propertyMap
+	 *            a {@link Map} containing string value pairs of properties for this user
 	 */
 	public User(String userId, String username, String password, String firstname, String surname, UserState userState,
-			Set<String> roles, Locale locale) {
+			Set<String> roles, Locale locale, Map<String, String> propertyMap) {
 
 		if (userId == null || userId.isEmpty()) {
 			throw new PrivilegeException("No UserId defined!");
@@ -120,6 +126,8 @@ public final class User {
 		this.roles = Collections.unmodifiableSet(roles);
 
 		this.locale = locale;
+
+		this.propertyMap = Collections.unmodifiableMap(propertyMap);
 	}
 
 	/**
@@ -202,7 +210,7 @@ public final class User {
 	 */
 	public UserRep asUserRep() {
 		return new UserRep(this.userId, this.username, this.firstname, this.surname, this.userState,
-				new HashSet<String>(this.roles), this.locale);
+				new HashSet<String>(this.roles), this.locale, new HashMap<String, String>(this.propertyMap));
 	}
 
 	/**
@@ -258,5 +266,35 @@ public final class User {
 		} else if (!this.userId.equals(other.userId))
 			return false;
 		return true;
+	}
+
+	/**
+	 * Returns the property with the given key
+	 * 
+	 * @param key
+	 *            the key for which the property is to be returned
+	 * 
+	 * @return the property with the given key, or null if the property is not defined
+	 */
+	public String getProperty(String key) {
+		return this.propertyMap.get(key);
+	}
+
+	/**
+	 * Returns the {@link Set} of keys of all properties
+	 * 
+	 * @return the {@link Set} of keys of all properties
+	 */
+	public Set<String> getPropertyKeySet() {
+		return this.propertyMap.keySet();
+	}
+
+	/**
+	 * Returns the map of properties
+	 * 
+	 * @return the map of properties
+	 */
+	public Map<String, String> getProperties() {
+		return this.propertyMap;
 	}
 }

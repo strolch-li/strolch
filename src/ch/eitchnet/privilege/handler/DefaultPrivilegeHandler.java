@@ -203,8 +203,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
+		// XXX should the collections be recreated and the getRoles() and getProperties() methods be removed?
 		User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(),
-				userRep.getSurname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale());
+				userRep.getSurname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
+				userRep.getProperties());
 
 		// delegate to persistence handler
 		this.persistenceHandler.addOrReplaceUser(user);
@@ -280,7 +282,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		newRoles.add(roleName);
 
 		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
-				user.getSurname(), user.getUserState(), newRoles, user.getLocale());
+				user.getSurname(), user.getUserState(), newRoles, user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -367,7 +369,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Set<String> newRoles = new HashSet<String>(currentRoles);
 		newRoles.remove(roleName);
 		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
-				user.getSurname(), user.getUserState(), newRoles, user.getLocale());
+				user.getSurname(), user.getUserState(), newRoles, user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -413,7 +415,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
-				user.getSurname(), user.getUserState(), user.getRoles(), locale);
+				user.getSurname(), user.getUserState(), user.getRoles(), locale, user.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -437,7 +439,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), firstname, surname,
-				user.getUserState(), user.getRoles(), user.getLocale());
+				user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -471,7 +473,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(user.getUserId(), user.getUsername(), passwordHash, user.getFirstname(),
-				user.getSurname(), user.getUserState(), user.getRoles(), user.getLocale());
+				user.getSurname(), user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -495,7 +497,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
-				user.getSurname(), state, user.getRoles(), user.getLocale());
+				user.getSurname(), state, user.getRoles(), user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);

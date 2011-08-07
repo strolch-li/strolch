@@ -26,6 +26,7 @@
 package ch.eitchnet.privilege.helper;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,17 +148,17 @@ public class InitializationHelper {
 	@SuppressWarnings("unchecked")
 	public static Map<String, String> convertToParameterMap(Element element) {
 
-		Map<String, String> parameterMap = new HashMap<String, String>();
-
 		// if element is null then there are no parameters, so return empty map
 		if (element == null)
-			return parameterMap;
+			return Collections.emptyMap();
 
 		List<Element> elements = element.elements(XmlConstants.XML_PARAMETER);
 
 		// if elements is null or empty then there are no parameters, so return empty map
 		if (elements == null || elements.isEmpty())
-			return parameterMap;
+			return Collections.emptyMap();
+
+		Map<String, String> parameterMap = new HashMap<String, String>();
 
 		for (Element parameter : elements) {
 			String name = parameter.attributeValue(XmlConstants.XML_ATTR_NAME);

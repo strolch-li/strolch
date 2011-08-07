@@ -113,6 +113,16 @@ public class XmlConstants {
 	public static final String XML_PARAMETER = "Parameter";
 
 	/**
+	 * XML_PROPERTIES = "Properties" :
+	 */
+	public static final String XML_PROPERTIES = "Properties";
+
+	/**
+	 * XML_PROPERTY = "Property" :
+	 */
+	public static final String XML_PROPERTY = "Property";
+
+	/**
 	 * XML_ALL_ALLOWED = "AllAllowed" :
 	 */
 	public static final String XML_ALL_ALLOWED = "AllAllowed";

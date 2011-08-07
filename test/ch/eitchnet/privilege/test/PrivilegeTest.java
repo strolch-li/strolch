@@ -140,7 +140,8 @@ public class PrivilegeTest {
 		Certificate certificate = privilegeHandler.authenticate(ADMIN, PASS_ADMIN);
 
 		// let's add a new user bob
-		UserRep userRep = new UserRep("1", BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(), null);
+		UserRep userRep = new UserRep("1", BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(), null,
+				new HashMap<String, String>());
 		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user " + BOB);
 
@@ -237,7 +238,8 @@ public class PrivilegeTest {
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// let's add a new user Ted
-		UserRep userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<String>(), null);
+		UserRep userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<String>(), null,
+				new HashMap<String, String>());
 		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user " + TED);
 		privilegeHandler.invalidateSession(certificate);
@@ -267,7 +269,8 @@ public class PrivilegeTest {
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// let's add a new user ted
-		UserRep userRep = new UserRep("2", TED, "Ted", "Newman", UserState.NEW, new HashSet<String>(), null);
+		UserRep userRep = new UserRep("2", TED, "Ted", "Newman", UserState.NEW, new HashSet<String>(), null,
+				new HashMap<String, String>());
 		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 		logger.info("Added user " + TED);
 		privilegeHandler.invalidateSession(certificate);

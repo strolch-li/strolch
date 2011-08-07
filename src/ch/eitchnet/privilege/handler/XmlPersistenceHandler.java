@@ -56,7 +56,7 @@ import ch.eitchnet.privilege.model.internal.User;
  */
 public class XmlPersistenceHandler implements PersistenceHandler {
 
-	private static final Logger logger = Logger.getLogger(XmlPersistenceHandler.class);
+	protected static final Logger logger = Logger.getLogger(XmlPersistenceHandler.class);
 
 	private Map<String, User> userMap;
 	private Map<String, Role> roleMap;
@@ -289,9 +289,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
+	 * Parses {@link User} objects from their XML representations
+	 * 
 	 * @param usersRootElement
+	 *            the element containing suer elements
+	 * 
+	 * @return the map of converted {@link User} objects
 	 */
-	private static Map<String, User> readUsers(Element usersRootElement) {
+	protected static Map<String, User> readUsers(Element usersRootElement) {
 
 		Map<String, User> userMap = new HashMap<String, User>();
 
@@ -313,6 +318,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			String localeName = userElement.element(XmlConstants.XML_LOCALE).getTextTrim();
 			Locale locale = new Locale(localeName);
 
+			// read roles
 			Element rolesElement = userElement.element(XmlConstants.XML_ROLES);
 			@SuppressWarnings("unchecked")
 			List<Element> rolesElementList = rolesElement.elements(XmlConstants.XML_ROLE);
@@ -326,9 +332,12 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 				}
 			}
 
+			// read properties
+			Element propertiesElement = userElement.element(XmlConstants.XML_PROPERTIES);
+			Map<String, String> propertyMap = convertToPropertyMap(propertiesElement);
+
 			// create user
-			User user = new User(userId, username, password, firstname, surname, userState,
-					Collections.unmodifiableSet(roles), locale);
+			User user = new User(userId, username, password, firstname, surname, userState, roles, locale, propertyMap);
 			logger.info("Added user " + user);
 
 			// put user in map
@@ -339,9 +348,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
+	 * Parses {@link Role} objects from their XML representations
+	 * 
 	 * @param rolesRootElement
+	 *            the element containing role elements
+	 * 
+	 * @return the map of converted {@link Role} objects
 	 */
-	private static Map<String, Role> readRoles(Element rolesRootElement) {
+	protected static Map<String, Role> readRoles(Element rolesRootElement) {
 
 		Map<String, Role> roleMap = new HashMap<String, Role>();
 
@@ -360,7 +374,15 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		return roleMap;
 	}
 
-	private static List<Element> toDomUsers(Map<String, User> userMap) {
+	/**
+	 * Converts {@link User} objects to their XML representations
+	 * 
+	 * @param userMap
+	 *            the map of users to convert
+	 * 
+	 * @return the list of XML User elements
+	 */
+	protected static List<Element> toDomUsers(Map<String, User> userMap) {
 
 		List<Element> usersAsElements = new ArrayList<Element>(userMap.size());
 
@@ -415,7 +437,15 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		return usersAsElements;
 	}
 
-	private static List<Element> toDomRoles(Map<String, Role> roleMap) {
+	/**
+	 * Converts {@link Role} objects to their XML representations
+	 * 
+	 * @param roleMap
+	 *            the roles to convert
+	 * 
+	 * @return the list of XML Role elements
+	 */
+	protected static List<Element> toDomRoles(Map<String, Role> roleMap) {
 
 		List<Element> rolesAsElements = new ArrayList<Element>(roleMap.size());
 
@@ -443,10 +473,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
+	 * Parses {@link Privilege} objects from their XML representation to their objects
+	 * 
 	 * @param roleParentElement
-	 * @return
+	 *            the parent on which the Privilege XML elements are
+	 * 
+	 * @return the map of {@link Privilege} objects
 	 */
-	private static Map<String, Privilege> readPrivileges(Element roleParentElement) {
+	protected static Map<String, Privilege> readPrivileges(Element roleParentElement) {
 
 		Map<String, Privilege> privilegeMap = new HashMap<String, Privilege>();
 
@@ -485,7 +519,15 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		return privilegeMap;
 	}
 
-	private static void toDomPrivileges(Element roleParentElement, Map<String, Privilege> privilegeMap) {
+	/**
+	 * Converts {@link Privilege} objects to their XML representation
+	 * 
+	 * @param roleParentElement
+	 *            the XML element of the parent {@link Role}
+	 * @param privilegeMap
+	 *            the map of {@link Privilege}s to convert
+	 */
+	protected static void toDomPrivileges(Element roleParentElement, Map<String, Privilege> privilegeMap) {
 
 		DocumentFactory documentFactory = DocumentFactory.getInstance();
 
@@ -518,5 +560,39 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			// add element to parent
 			roleParentElement.add(privilegeElement);
 		}
+	}
+
+	/**
+	 * Converts an {@link XmlConstants#XML_PROPERTIES} element containing {@link XmlConstants#XML_PROPERTY} elements to
+	 * a {@link Map} of String key/value pairs
+	 * 
+	 * @param element
+	 *            the XML {@link Element} with name {@link XmlConstants#XML_PROPERTIES} containing
+	 *            {@link XmlConstants#XML_PROPERTY} elements
+	 * 
+	 * @return the {@link Map} of the property name/value combinations from the given {@link Element}
+	 */
+	@SuppressWarnings("unchecked")
+	protected static Map<String, String> convertToPropertyMap(Element element) {
+
+		// if element is null then there are no properties, so return empty map
+		if (element == null)
+			return Collections.emptyMap();
+
+		List<Element> elements = element.elements(XmlConstants.XML_PROPERTY);
+
+		// if elements is null or empty then there are no properties, so return empty map
+		if (elements == null || elements.isEmpty())
+			return Collections.emptyMap();
+
+		Map<String, String> propertyMap = new HashMap<String, String>();
+
+		for (Element property : elements) {
+			String name = property.attributeValue(XmlConstants.XML_ATTR_NAME);
+			String value = property.attributeValue(XmlConstants.XML_ATTR_VALUE);
+			propertyMap.put(name, value);
+		}
+
+		return propertyMap;
 	}
 }
