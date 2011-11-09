@@ -101,17 +101,17 @@ public final class Privilege {
 
 			// not all allowed, so policy must be set
 			if (policy == null || policy.isEmpty()) {
-				throw new PrivilegeException("No Policy defined!");
+				throw new PrivilegeException("All is not allowed and no Policy defined!");
 			}
 			this.policy = policy;
 
 			if (denyList == null) {
-				throw new PrivilegeException("No denyList defined!");
+				throw new PrivilegeException("All is not allowed and no denyList defined!");
 			}
 			this.denyList = Collections.unmodifiableSet(denyList);
 
 			if (allowList == null) {
-				throw new PrivilegeException("No allowList defined!");
+				throw new PrivilegeException("All is not allowed and no allowList defined!");
 			}
 			this.allowList = Collections.unmodifiableSet(allowList);
 		}
