@@ -491,8 +491,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			String privilegeName = privilegeElement.attributeValue(XmlConstants.XML_ATTR_NAME);
 			String privilegePolicy = privilegeElement.attributeValue(XmlConstants.XML_ATTR_POLICY);
 
-			String allAllowedS = privilegeElement.element(XmlConstants.XML_ALL_ALLOWED).getTextTrim();
-			boolean allAllowed = Boolean.valueOf(allAllowedS).booleanValue();
+			Element allAllowedE = privilegeElement.element(XmlConstants.XML_ALL_ALLOWED);
+			boolean allAllowed = false;
+			if (allAllowedE != null) {
+				allAllowed = Boolean.valueOf(allAllowedE.getTextTrim()).booleanValue();
+			}
 
 			@SuppressWarnings("unchecked")
 			List<Element> denyElements = privilegeElement.elements(XmlConstants.XML_DENY);
