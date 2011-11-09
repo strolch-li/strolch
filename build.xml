@@ -59,6 +59,7 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 			<fileset dir="${basedir}" defaultexcludes="true" includes="docs/" />
 			<fileset dir="${basedir}" defaultexcludes="true" includes="config/" />
 			<fileset dir="${basedir}" defaultexcludes="true" includes="COPYING*" />
+			<fileset dir="${basedir}" defaultexcludes="true" includes="README" />
 		</jar>
 
 	</target>

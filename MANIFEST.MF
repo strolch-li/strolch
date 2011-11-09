@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Implementation-Vendor: eitchnet.ch
 Implementation-Title: eitchnet Java Privilege implementation
-Implementation-Version: 0.0.1
+Implementation-Version: 0.0.2
 Specification-Vendor: eitchnet.ch
 Specification-Title: eitchnet Java Privilege implementation
-Specification-Version: 1.6
+Specification-Version: 0.1
