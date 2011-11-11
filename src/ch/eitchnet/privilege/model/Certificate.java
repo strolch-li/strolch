@@ -27,6 +27,7 @@ package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
 import java.util.Locale;
+import java.util.Map;
 
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
@@ -50,6 +51,8 @@ public final class Certificate implements Serializable {
 
 	private Locale locale;
 
+	private Map<String, String> propertyMap;
+
 	/**
 	 * Default constructor initializing with all information needed for this certificate
 	 * 
@@ -71,8 +74,12 @@ public final class Certificate implements Serializable {
 	 *            {@link Session}
 	 * @param locale
 	 *            the users {@link Locale}
+	 * @param propertyMap
+	 *            a {@link Map} containing string value pairs of properties for the logged in user. These properties can
+	 *            be edited and can be used for the user to change settings of this session
 	 */
-	public Certificate(String sessionId, String username, String authToken, String authPassword, Locale locale) {
+	public Certificate(String sessionId, String username, String authToken, String authPassword, Locale locale,
+			Map<String, String> propertyMap) {
 
 		// validate arguments are not null
 		if (sessionId == null || username == null || authToken == null || authPassword == null) {
@@ -89,6 +96,15 @@ public final class Certificate implements Serializable {
 			this.locale = Locale.getDefault();
 		else
 			this.locale = locale;
+
+		this.propertyMap = propertyMap;
+	}
+
+	/**
+	 * @return the propertyMap
+	 */
+	public Map<String, String> getPropertyMap() {
+		return this.propertyMap;
 	}
 
 	/**
