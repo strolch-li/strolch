@@ -22,13 +22,27 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.xmlpers;
+package ch.eitchnet.java.xmlpers.test.impl;
+
+import ch.eitchnet.xmlpers.XmlDao;
+import ch.eitchnet.xmlpers.XmlDaoFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
+ * 
  */
-public interface XmlDaoFactory {
+public class MyDaoFactory implements XmlDaoFactory {
 
-	public <T> XmlDao<T> getDao(String type);
+	/**
+	 * @see ch.eitchnet.xmlpers.XmlDaoFactory#getDao(java.lang.String)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> XmlDao<T> getDao(String type) {
+		if (type.equals(MyClass.class.getName()))
+			return (XmlDao<T>) new MyClassDao();
+
+		throw new RuntimeException("Class with type " + type + " is unknown!");
+	}
+
 }
