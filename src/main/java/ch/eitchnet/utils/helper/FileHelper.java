@@ -60,9 +60,11 @@ public class FileHelper {
 	 * @return the contents of a file as a string
 	 */
 	public static final String readFileToString(File file) {
+		
+		BufferedReader bufferedReader = null;
 		try {
 
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+			bufferedReader = new BufferedReader(new FileReader(file));
 			StringBuilder sb = new StringBuilder();
 
 			String line;
@@ -77,6 +79,14 @@ public class FileHelper {
 			throw new RuntimeException("Filed does not exist " + file.getAbsolutePath());
 		} catch (IOException e) {
 			throw new RuntimeException("Could not read file " + file.getAbsolutePath());
+		} finally {
+			if (bufferedReader != null) {
+				try {
+					bufferedReader.close();
+				} catch (IOException e) {
+					logger.error("Failed to close BufferedReader: " + e.getLocalizedMessage());
+				}
+			}
 		}
 	}
 
