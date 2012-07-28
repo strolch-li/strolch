@@ -22,7 +22,7 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.java.xmlpers.test;
+package ch.eitchnet.xmlpers.test;
 
 import java.io.File;
 import java.util.List;
@@ -33,13 +33,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ch.eitchnet.featherlite.plugin.xmlpers.test.impl.MyClass;
-import ch.eitchnet.featherlite.plugin.xmlpers.test.impl.MyDaoFactory;
 import ch.eitchnet.utils.helper.Log4jConfigurator;
 import ch.eitchnet.utils.objectfilter.ITransactionObject;
 import ch.eitchnet.xmlpers.XmlPersistenceExecption;
 import ch.eitchnet.xmlpers.XmlPersistenceHandler;
 import ch.eitchnet.xmlpers.XmlPersistenceTransaction;
+import ch.eitchnet.xmlpers.test.impl.MyClass;
+import ch.eitchnet.xmlpers.test.impl.MyClassDao;
+import ch.eitchnet.xmlpers.test.impl.MyDaoFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

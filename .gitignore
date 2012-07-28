@@ -1,9 +1,11 @@
 *.class
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# Maven target
+target/
 
 # Project files
-tmp
+tmp/
+logs/
+
+# External libraries
+lib/

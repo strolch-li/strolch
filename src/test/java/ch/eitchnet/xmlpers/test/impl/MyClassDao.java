@@ -22,7 +22,7 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.java.xmlpers.test.impl;
+package ch.eitchnet.xmlpers.test.impl;
 
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;

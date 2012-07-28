@@ -22,7 +22,7 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.java.xmlpers.test.impl;
+package ch.eitchnet.xmlpers.test.impl;
 
 import ch.eitchnet.xmlpers.XmlDao;
 import ch.eitchnet.xmlpers.XmlDaoFactory;
