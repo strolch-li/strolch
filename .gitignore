@@ -7,5 +7,10 @@ target/
 tmp/
 logs/
 
+# Eclipse settings
+.classpath
+.project
+.settings/
+
 # External libraries
 lib/
