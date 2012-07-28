@@ -4,3 +4,8 @@ dist
 # Maven target
 target/
 
+# Eclipse settings
+.classpath
+.project
+.settings/
+
