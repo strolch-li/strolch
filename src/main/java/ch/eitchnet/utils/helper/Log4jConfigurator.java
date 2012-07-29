@@ -1,25 +1,20 @@
 /*
  * Copyright (c) 2012
  * 
- * Robert von Burg <eitch@eitchnet.ch>
- * 
- */
-
-/*
  * This file is part of ch.eitchnet.java.utils
  *
- * Privilege is free software: you can redistribute it and/or modify
+ * ch.eitchnet.java.utils is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Privilege is distributed in the hope that it will be useful,
+ * ch.eitchnet.java.utils is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
+ * along with ch.eitchnet.java.utils.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
 package ch.eitchnet.utils.helper;
@@ -28,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Properties;
 
@@ -96,37 +92,80 @@ public class Log4jConfigurator {
 	 * <p>
 	 * Any properties in the properties are substituted using
 	 * {@link StringHelper#replaceProperties(Properties, Properties)} and then the configuration file is written to a
-	 * new file <user.dir>/tmp/{@link Log4jConfigurator#FILE_LOG4J_TEMP} and then finally
+	 * new file <user.dir>/tmp/ {@link Log4jConfigurator#FILE_LOG4J_TEMP} and then finally
 	 * {@link PropertyConfigurator#configureAndWatch(String)} is called so that the configuration is loaded and log4j
 	 * watches the temporary file for configuration changes
 	 * </p>
 	 */
 	public static synchronized void loadLog4jConfiguration() {
 
-		// first clean up any old watch dog in case of a programmatic re-load of hte configuration
-		cleanupOldWatchdog();
-
-		// get a configured log4j properties file, or use default RSPConfigConstants.FILE_LOG4J
+		// get a configured log4j properties file, or use default
+		// RSPConfigConstants.FILE_LOG4J
 		String fileLog4j = SystemHelper.getProperty(Log4jConfigurator.class.getName(),
 				Log4jConfigurator.PROP_FILE_LOG4J, Log4jConfigurator.FILE_LOG4J);
 
 		// get the root directory
 		String userDir = System.getProperty("user.dir");
 		String configDir = userDir + "/config/";
-		String tmpDir = userDir + "/tmp/";
 
-		// load the log4j.properties file
 		String pathNameToLog4j = configDir + fileLog4j;
 		File log4JPath = new File(pathNameToLog4j);
-		if (!log4JPath.exists())
-			throw new RuntimeException("The log4j configuration file does not exist at " + log4JPath.getAbsolutePath());
+
+		try {
+
+			// load the log4j.properties file
+			if (!log4JPath.exists())
+				throw new RuntimeException("The log4j configuration file does not exist at "
+						+ log4JPath.getAbsolutePath());
+
+			// now perform the loading
+			loadLog4jConfiguration(log4JPath);
+
+		} catch (Exception e) {
+
+			Log4jConfigurator.configure();
+			logger.error(e, e);
+			logger.error("Log4j COULD NOT BE INITIALIZED. Please check the log4j configuration file exists at "
+					+ log4JPath.getAbsolutePath());
+
+		}
+	}
+
+	/**
+	 * <p>
+	 * Loads the given log4j configuration
+	 * </p>
+	 * 
+	 * <p>
+	 * Any properties in the properties are substituted using
+	 * {@link StringHelper#replaceProperties(Properties, Properties)} and then the configuration file is written to a
+	 * new file <user.dir>/tmp/ {@link Log4jConfigurator#FILE_LOG4J_TEMP} and then finally
+	 * {@link PropertyConfigurator#configureAndWatch(String)} is called so that the configuration is loaded and log4j
+	 * watches the temporary file for configuration changes
+	 * </p>
+	 * 
+	 * @param log4jConfigPath
+	 */
+	public static synchronized void loadLog4jConfiguration(File log4jConfigPath) {
+
+		if (log4jConfigPath == null)
+			throw new RuntimeException("log4jConfigPath may not be null!");
+
+		// first clean up any old watch dog in case of a programmatic re-load of the configuration
+		cleanupOldWatchdog();
+
+		// get the root directory
+		String userDir = System.getProperty("user.dir");
+		String tmpDir = userDir + "/tmp/";
 
 		String pathNameToLog4jTemp = tmpDir + Log4jConfigurator.FILE_LOG4J_TEMP;
 		Properties log4jProperties = new Properties();
 		FileInputStream fin = null;
 		FileOutputStream fout = null;
+
 		try {
-			fin = new FileInputStream(pathNameToLog4j);
+
+			fin = new FileInputStream(log4jConfigPath);
 			log4jProperties.load(fin);
 			fin.close();
 
@@ -142,7 +181,8 @@ public class Log4jConfigurator {
 			log4jProperties.store(fout, "Running instance log4j configuration " + new Date());
 			fout.close();
 
-			// XXX if the server is in a web context, then we may not use the FileWatchDog
+			// XXX if the server is in a web context, then we may not use the
+			// FileWatchDog
 			BasicConfigurator.resetConfiguration();
 			watchDog = new Log4jPropertyWatchDog(pathNameToLog4jTemp);
 			watchDog.start();
@@ -150,10 +190,12 @@ public class Log4jConfigurator {
 			logger.info("Log4j is configured to use and watch file " + pathNameToLog4jTemp);
 
 		} catch (Exception e) {
+
 			Log4jConfigurator.configure();
 			logger.error(e, e);
-			logger.error("Log4j COULD NOT BE INITIALIZED. Please check the " + fileLog4j + " file at "
-					+ pathNameToLog4j);
+			logger.error("Log4j COULD NOT BE INITIALIZED. Please check the log4j configuration file at "
+					+ log4jConfigPath);
+
 		} finally {
 			if (fin != null) {
 				try {
@@ -169,6 +211,80 @@ public class Log4jConfigurator {
 					logger.error("Exception closing output file: " + e, e);
 				}
 			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Loads the log4j configuration file as a class resource by calling {@link Class#getResourceAsStream(String)} for
+	 * the given class
+	 * </p>
+	 * 
+	 * @param clazz
+	 */
+	public static synchronized void loadLog4jConfigurationAsResource(Class<?> clazz) {
+
+		try {
+
+			if (clazz == null)
+				throw new RuntimeException("clazz may not be null!");
+
+			InputStream resourceAsStream = clazz.getResourceAsStream("/" + FILE_LOG4J);
+			if (resourceAsStream == null) {
+				throw new RuntimeException("The resource '" + FILE_LOG4J + "' could not be found for class "
+						+ clazz.getName());
+			}
+
+			// load the properties from the input stream
+			Properties log4jProperties = new Properties();
+			log4jProperties.load(resourceAsStream);
+
+			// and then 
+			loadLog4jConfiguration(log4jProperties);
+
+		} catch (Exception e) {
+			Log4jConfigurator.configure();
+			logger.error(e, e);
+			logger.error("Log4j COULD NOT BE INITIALIZED. Please check that the log4j configuration file '"
+					+ FILE_LOG4J + "' exists as a resource for class " + clazz.getName()
+					+ " and is a valid properties configuration");
+		}
+	}
+
+	/**
+	 * <p>
+	 * Loads the given log4j configuration. Log4j is configured with the given properties. The only change is that
+	 * {@link StringHelper#replaceProperties(Properties, Properties)} is used to replace any properties
+	 * </p>
+	 * 
+	 * <p>
+	 * No property watch dog is loaded
+	 * </p>
+	 * 
+	 * @param log4jProperties
+	 *            the properties to use for the log4j configuration
+	 */
+	public static synchronized void loadLog4jConfiguration(Properties log4jProperties) {
+
+		try {
+
+			if (log4jProperties == null)
+				throw new RuntimeException("log4jProperties may not be null!");
+
+			// first clean up any old watch dog in case of a programmatic re-load of the configuration
+			cleanupOldWatchdog();
+
+			// replace any variables
+			StringHelper.replaceProperties(log4jProperties, System.getProperties());
+
+			// now configure log4j
+			PropertyConfigurator.configure(log4jProperties);
+			logger.info("Log4j is configured using the given properties.");
+
+		} catch (Exception e) {
+			Log4jConfigurator.configure();
+			logger.error(e, e);
+			logger.error("Log4j COULD NOT BE INITIALIZED. The given log4jProperties seem not to be valid!");
 		}
 	}
 
