@@ -1,11 +1,6 @@
 /*
- * Copyright (c) 2010, 2011
+ * Copyright (c) 2010 - 2012
  * 
- * Robert von Burg <eitch@eitchnet.ch>
- * 
- */
-
-/*
  * This file is part of Privilege.
  *
  * Privilege is free software: you can redistribute it and/or modify
@@ -22,7 +17,6 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-
 package ch.eitchnet.privilege.helper;
 
 import java.io.File;
@@ -40,6 +34,8 @@ import ch.eitchnet.privilege.handler.PersistenceHandler;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
+import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.utils.helper.SystemHelper;
 
 /**
  * This class implements the initializing of the {@link PrivilegeHandler} by loading an XML file containing the
@@ -163,6 +159,10 @@ public class InitializationHelper {
 		for (Element parameter : elements) {
 			String name = parameter.attributeValue(XmlConstants.XML_ATTR_NAME);
 			String value = parameter.attributeValue(XmlConstants.XML_ATTR_VALUE);
+			
+			// replace any defined system properties
+			value = StringHelper.replaceSystemPropertiesIn(value);
+			
 			parameterMap.put(name, value);
 		}
 

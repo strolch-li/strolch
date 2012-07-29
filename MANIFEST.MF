@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Implementation-Vendor: eitchnet.ch
-Implementation-Title: eitchnet Java Privilege implementation
-Implementation-Version: 0.0.3
-Specification-Vendor: eitchnet.ch
-Specification-Title: eitchnet Java Privilege implementation
-Specification-Version: 0.1

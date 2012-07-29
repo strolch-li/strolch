@@ -1,11 +1,6 @@
 /*
- * Copyright (c) 2010, 2011
+ * Copyright (c) 2010 - 2012
  * 
- * Robert von Burg <eitch@eitchnet.ch>
- * 
- */
-
-/*
  * This file is part of Privilege.
  *
  * Privilege is free software: you can redistribute it and/or modify
@@ -22,7 +17,6 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-
 package ch.eitchnet.privilege.model;
 
 import ch.eitchnet.privilege.model.internal.User;

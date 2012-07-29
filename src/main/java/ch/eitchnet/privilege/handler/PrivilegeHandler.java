@@ -1,11 +1,6 @@
 /*
- * Copyright (c) 2010, 2011
+ * Copyright (c) 2010 - 2012
  * 
- * Robert von Burg <eitch@eitchnet.ch>
- * 
- */
-
-/*
  * This file is part of Privilege.
  *
  * Privilege is free software: you can redistribute it and/or modify
@@ -22,9 +17,9 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-
 package ch.eitchnet.privilege.handler;
 
+import java.util.List;
 import java.util.Locale;
 
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
@@ -74,6 +69,17 @@ public interface PrivilegeHandler {
 	 * @return the {@link RoleRep} for the given roleName, or null if it was not found
 	 */
 	public RoleRep getRole(String roleName);
+
+	/**
+	 * Method to query {@link UserRep} which meet the criteria set in the given {@link UserRep}. Null fields mean the
+	 * fields are not relevant.
+	 * 
+	 * @param selectorRep
+	 *            the {@link UserRep} to use as criteria selection
+	 * 
+	 * @return a list of {@link UserRep}s which fit the given criteria
+	 */
+	public List<UserRep> queryUsers(UserRep selectorRep);
 
 	/**
 	 * Removes the user with the given username
@@ -171,7 +177,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public void addOrReplaceUser(Certificate certificate, UserRep userRep, String password)
+	public void addOrReplaceUser(Certificate certificate, UserRep userRep, byte[] password)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
@@ -251,7 +257,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public void setUserPassword(Certificate certificate, String username, String password)
+	public void setUserPassword(Certificate certificate, String username, byte[] password)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
@@ -326,7 +332,7 @@ public interface PrivilegeHandler {
 	 * @throws AccessDeniedException
 	 *             if the user credentials are not valid
 	 */
-	public Certificate authenticate(String username, String password) throws AccessDeniedException;
+	public Certificate authenticate(String username, byte[] password) throws AccessDeniedException;
 
 	/**
 	 * Invalidates the {@link Session} for the given {@link Certificate}, effectively logging out the user who was
@@ -416,7 +422,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if the password does not implement the requirement of the concrete implementation
 	 */
-	public void validatePassword(String password) throws PrivilegeException;
+	public void validatePassword(byte[] password) throws PrivilegeException;
 
 	/**
 	 * Persists any changes to the privilege data model. Changes are thus not persisted immediately, but must be

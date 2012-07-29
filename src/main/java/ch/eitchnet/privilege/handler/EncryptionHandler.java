@@ -1,11 +1,6 @@
 /*
- * Copyright (c) 2010, 2011
+ * Copyright (c) 2010 - 2012
  * 
- * Robert von Burg <eitch@eitchnet.ch>
- * 
- */
-
-/*
  * This file is part of Privilege.
  *
  * Privilege is free software: you can redistribute it and/or modify
@@ -22,7 +17,6 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-
 package ch.eitchnet.privilege.handler;
 
 import java.util.Map;
@@ -51,6 +45,15 @@ public interface EncryptionHandler {
 	 * @return the hash of the string after converting
 	 */
 	public String convertToHash(String string);
+	
+	/**
+	 * Converts a given byte array, e.g. a password to a hash which is defined by the concrete implementation
+	 * 
+	 * @param bytes
+	 *            the bytes to convert
+	 * @return the hash of the string after converting
+	 */
+	public String convertToHash(byte[] bytes);
 
 	/**
 	 * Initialize the concrete {@link EncryptionHandler}. The passed parameter map contains any configuration the

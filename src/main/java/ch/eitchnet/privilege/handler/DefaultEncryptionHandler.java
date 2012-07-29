@@ -1,11 +1,6 @@
 /*
- * Copyright (c) 2010, 2011
+ * Copyright (c) 2010 - 2012
  * 
- * Robert von Burg <eitch@eitchnet.ch>
- * 
- */
-
-/*
  * This file is part of Privilege.
  *
  * Privilege is free software: you can redistribute it and/or modify
@@ -22,7 +17,6 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-
 package ch.eitchnet.privilege.handler;
 
 import java.io.UnsupportedEncodingException;
@@ -76,6 +70,22 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		try {
 
 			return HashHelper.stringToHash(this.hashAlgorithm, string);
+
+		} catch (NoSuchAlgorithmException e) {
+			throw new PrivilegeException("Algorithm " + this.hashAlgorithm + " was not found!", e);
+		} catch (UnsupportedEncodingException e) {
+			throw new PrivilegeException("Charset ASCII is not supported!", e);
+		}
+	}
+
+	/**
+	 * @see ch.eitchnet.privilege.handler.EncryptionHandler#convertToHash(java.lang.String)
+	 */
+	@Override
+	public String convertToHash(byte[] bytes) {
+		try {
+
+			return HashHelper.stringToHash(this.hashAlgorithm, bytes);
 
 		} catch (NoSuchAlgorithmException e) {
 			throw new PrivilegeException("Algorithm " + this.hashAlgorithm + " was not found!", e);

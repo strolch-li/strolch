@@ -1,11 +1,6 @@
 /*
- * Copyright (c) 2010, 2011
+ * Copyright (c) 2010 - 2012
  * 
- * Robert von Burg <eitch@eitchnet.ch>
- * 
- */
-
-/*
  * This file is part of Privilege.
  *
  * Privilege is free software: you can redistribute it and/or modify
@@ -22,12 +17,13 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-
 package ch.eitchnet.privilege.handler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -112,7 +108,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public RoleRep getRole(String roleName) {
 		Role role = this.persistenceHandler.getRole(roleName);
 		if (role == null)
-			throw new PrivilegeException("Role " + roleName + " does not exist!");
+			return null;
 		return role.asRoleRep();
 	}
 
@@ -123,7 +119,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public UserRep getUser(String username) {
 		User user = this.persistenceHandler.getUser(username);
 		if (user == null)
-			throw new PrivilegeException("User " + username + " does not exist!");
+			return null;
 		return user.asUserRep();
 	}
 
@@ -163,6 +159,135 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#queryUsers(ch.eitchnet.privilege.model.UserRep)
+	 */
+	@Override
+	public List<UserRep> queryUsers(UserRep selectorRep) {
+
+		String selUserId = selectorRep.getUserId();
+		String selUsername = selectorRep.getUsername();
+		String selFirstname = selectorRep.getFirstname();
+		String selSurname = selectorRep.getSurname();
+		UserState selUserState = selectorRep.getUserState();
+		Locale selLocale = selectorRep.getLocale();
+		Set<String> selRoles = selectorRep.getRoles();
+		Map<String, String> selPropertyMap = selectorRep.getProperties();
+
+		List<UserRep> result = new ArrayList<UserRep>();
+		List<User> allUsers = this.persistenceHandler.getAllUsers();
+		for (User user : allUsers) {
+
+			// selections
+			boolean userIdSelected;
+			boolean usernameSelected;
+			boolean firstnameSelected;
+			boolean surnameSelected;
+			boolean userStateSelected;
+			boolean localeSelected;
+			boolean roleSelected;
+			boolean propertySelected;
+
+			// userId
+			if (selUserId == null)
+				userIdSelected = true;
+			else if (selUserId.equals(user.getUserId()))
+				userIdSelected = true;
+			else
+				userIdSelected = false;
+
+			// username
+			if (selUsername == null)
+				usernameSelected = true;
+			else if (selUsername.equals(user.getUsername()))
+				usernameSelected = true;
+			else
+				usernameSelected = false;
+
+			// firstname
+			if (selFirstname == null)
+				firstnameSelected = true;
+			else if (selFirstname.equals(user.getFirstname()))
+				firstnameSelected = true;
+			else
+				firstnameSelected = false;
+
+			// surname
+			if (selSurname == null)
+				surnameSelected = true;
+			else if (selSurname.equals(user.getSurname()))
+				surnameSelected = true;
+			else
+				surnameSelected = false;
+
+			// user state
+			if (selUserState == null)
+				userStateSelected = true;
+			else if (selUserState.equals(user.getUserState()))
+				userStateSelected = true;
+			else
+				userStateSelected = false;
+
+			// locale
+			if (selLocale == null)
+				localeSelected = true;
+			else if (selLocale.equals(user.getLocale()))
+				localeSelected = true;
+			else
+				localeSelected = false;
+
+			// roles
+			roleSelected = isSelectedByRole(selRoles, user.getRoles());
+
+			// properties
+			propertySelected = isSelectedByProperty(selPropertyMap, user.getProperties());
+
+			boolean selected = userIdSelected && usernameSelected && firstnameSelected && surnameSelected
+					&& userStateSelected && localeSelected && roleSelected && propertySelected;
+
+			if (selected)
+				result.add(user.asUserRep());
+		}
+
+		return result;
+	}
+
+	/**
+	 * @param selPropertyMap
+	 * @param properties
+	 * @return
+	 */
+	private boolean isSelectedByProperty(Map<String, String> selPropertyMap, Map<String, String> properties) {
+
+		if (selPropertyMap == null)
+			return true;
+
+		if (selPropertyMap.isEmpty() && properties.isEmpty())
+			return true;
+
+		for (String selKey : selPropertyMap.keySet()) {
+
+			String value = properties.get(selKey);
+			if (value == null || !value.equals(selPropertyMap.get(selKey)))
+				return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param selRoles
+	 * @param roles
+	 * @return
+	 */
+	private boolean isSelectedByRole(Set<String> selRoles, Set<String> roles) {
+
+		if (selRoles == null)
+			return true;
+
+		return roles.containsAll(selRoles);
+	}
+
+	/**
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplaceRole(ch.eitchnet.privilege.model.Certificate,
 	 *      ch.eitchnet.privilege.model.RoleRep)
 	 */
@@ -187,29 +312,34 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 *      ch.eitchnet.privilege.model.UserRep, java.lang.String)
 	 */
 	@Override
-	public void addOrReplaceUser(Certificate certificate, UserRep userRep, String password) {
+	public void addOrReplaceUser(Certificate certificate, UserRep userRep, byte[] password) {
+		try {
 
-		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+			// validate who is doing this
+			validateIsPrivilegeAdmin(certificate);
 
-		String passwordHash = null;
-		if (password != null) {
+			String passwordHash = null;
+			if (password != null) {
 
-			// validate password meets basic requirements
-			validatePassword(password);
+				// validate password meets basic requirements
+				validatePassword(password);
 
-			// hash password
-			passwordHash = this.encryptionHandler.convertToHash(password);
+				// hash password
+				passwordHash = this.encryptionHandler.convertToHash(password);
+			}
+
+			// create new user
+			// XXX should the collections be recreated and the getRoles() and getProperties() methods be removed?
+			User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(),
+					userRep.getSurname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
+					userRep.getProperties());
+
+			// delegate to persistence handler
+			this.persistenceHandler.addOrReplaceUser(user);
+
+		} finally {
+			clearPassword(password);
 		}
-
-		// create new user
-		// XXX should the collections be recreated and the getRoles() and getProperties() methods be removed?
-		User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(),
-				userRep.getSurname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
-				userRep.getProperties());
-
-		// delegate to persistence handler
-		this.persistenceHandler.addOrReplaceUser(user);
 	}
 
 	/**
@@ -450,42 +580,47 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void setUserPassword(Certificate certificate, String username, String password) {
+	public void setUserPassword(Certificate certificate, String username, byte[] password) {
+		try {
 
-		// check if certificate is for same user, in which case user is changing their own password
-		if (certificate.getUsername().equals(username)) {
+			// check if certificate is for same user, in which case user is changing their own password
+			if (certificate.getUsername().equals(username)) {
 
-			// validate the certificate
-			isCertificateValid(certificate);
+				// validate the certificate
+				isCertificateValid(certificate);
 
-		} else {
+			} else {
 
-			// otherwise validate the the certificate is for a privilege admin
-			validateIsPrivilegeAdmin(certificate);
+				// otherwise validate the the certificate is for a privilege admin
+				validateIsPrivilegeAdmin(certificate);
+			}
+
+			// get User
+			User user = this.persistenceHandler.getUser(username);
+			if (user == null) {
+				throw new PrivilegeException("User " + username + " does not exist!");
+			}
+
+			String passwordHash = null;
+			if (password != null) {
+
+				// validate password meets basic requirements
+				validatePassword(password);
+
+				// hash password
+				passwordHash = this.encryptionHandler.convertToHash(password);
+			}
+
+			// create new user
+			User newUser = new User(user.getUserId(), user.getUsername(), passwordHash, user.getFirstname(),
+					user.getSurname(), user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties());
+
+			// delegate user replacement to persistence handler
+			this.persistenceHandler.addOrReplaceUser(newUser);
+
+		} finally {
+			clearPassword(password);
 		}
-
-		// get User
-		User user = this.persistenceHandler.getUser(username);
-		if (user == null) {
-			throw new PrivilegeException("User " + username + " does not exist!");
-		}
-
-		String passwordHash = null;
-		if (password != null) {
-
-			// validate password meets basic requirements
-			validatePassword(password);
-
-			// hash password
-			passwordHash = this.encryptionHandler.convertToHash(password);
-		}
-
-		// create new user
-		User newUser = new User(user.getUserId(), user.getUsername(), passwordHash, user.getFirstname(),
-				user.getSurname(), user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties());
-
-		// delegate user replacement to persistence handler
-		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
 	/**
@@ -519,16 +654,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 *             if the user credentials are not valid
 	 */
 	@Override
-	public Certificate authenticate(String username, String password) {
+	public Certificate authenticate(String username, byte[] password) {
 
 		// create certificate
 		Certificate certificate;
 		try {
-			// both username and password must at least have 3 characters in length
+			// username must be at least 3 characters in length
 			if (username == null || username.length() < 3)
 				throw new PrivilegeException("The given username is shorter than 3 characters");
-			else if (password == null || password.length() < 3)
-				throw new PrivilegeException("The given password is shorter than 3 characters");
+
+			// and validate the password
+			validatePassword(password);
 
 			// we only work with hashed passwords
 			String passwordHash = this.encryptionHandler.convertToHash(password);
@@ -578,6 +714,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		} catch (RuntimeException e) {
 			logger.error("User " + username + " Failed to authenticate: " + e.getLocalizedMessage());
 			throw e;
+		} finally {
+			clearPassword(password);
 		}
 
 		// return the certificate
@@ -801,10 +939,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#validatePassword(java.lang.String)
 	 */
 	@Override
-	public void validatePassword(String password) throws PrivilegeException {
+	public void validatePassword(byte[] password) throws PrivilegeException {
 
-		if (password == null || password.isEmpty()) {
+		if (password == null || password.length == 0) {
 			throw new PrivilegeException("A password may not be empty!");
+		}
+
+		if (password.length < 3) {
+			throw new PrivilegeException("The given password is shorter than 3 characters");
 		}
 	}
 
@@ -909,4 +1051,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
+	/**
+	 * @param password
+	 */
+	private void clearPassword(byte[] password) {
+		if (password != null) {
+			for (int i = 0; i < password.length; i++) {
+				password[i] = 0;
+			}
+		}
+	}
 }

@@ -17,7 +17,7 @@ a LDAP repository with only the Privilege JAR.
 Privilege is distributed under the GNU Lesser General Public License on 
 Github.com and can be downloaded at 
 
-   https://github.com/eitch/Privilege
+   https://github.com/eitch/ch.eitchnet.privilege
 
 The main developer is Robert von Burg <eitch@eitchnet.ch> who also maintains the
 Github repository. He is available for all questions regarding Privilege
@@ -72,20 +72,10 @@ directory of the Repository
 Compiling
 ################################
 
-Since Privilege is a Java library, it is built using Apache Ant. The build.xml
-file is configured to build Privilege directly from the root directory by simply
-calling ant at the command line:
+Privilege is a Maven3 project and can be built by simply performing the
+following command:
 
-$ ant
-Buildfile: /data/src/apixxo_WS/Privilege/build.xml
-
-dist:
-    [mkdir] Created dir: /data/src/apixxo_WS/Privilege/dist
-    [copy] Copying 28 files to /data/src/apixxo_WS/Privilege/bin
-    [jar] Building jar: /data/src/apixxo_WS/Privilege/dist/Privilege.jar
-
-BUILD SUCCESSFUL
-Total time: 0 seconds
+$ mvn compile
 
 Using
 ################################
@@ -96,7 +86,7 @@ which contains a few test cases including showing how to load Privilege.
 This documentation is still in need of more work, but for any questions please
 don't hesitate to write an e-mail to the developer and we'll find a solution.
 
-	Switzerland, the 7. August 2011
+	Switzerland, the 29. July 2012
 	Robert von Burg
 
 
