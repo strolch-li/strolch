@@ -1018,7 +1018,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * @return a new session id
 	 */
-	private synchronized String nextSessionId() {
+	protected synchronized String nextSessionId() {
 		return Long.toString(++this.lastSessionId % Long.MAX_VALUE);
 	}
 
