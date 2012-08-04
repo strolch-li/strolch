@@ -46,7 +46,7 @@ import ch.eitchnet.privilege.model.internal.User;
 public interface PrivilegeHandler {
 
 	/**
-	 * value = PrivilegeAdmin: This is the role users must have, if they are allowed to modify objects
+	 * PRIVILEGE_ADMIN_ROLE = PrivilegeAdmin: This is the role users must have, if they are allowed to modify objects
 	 */
 	public static final String PRIVILEGE_ADMIN_ROLE = "PrivilegeAdmin";
 
@@ -437,4 +437,16 @@ public interface PrivilegeHandler {
 	 *             if the users of the given certificate does not have the privilege to perform this action
 	 */
 	public boolean persist(Certificate certificate) throws AccessDeniedException;
+
+	/**
+	 * Special method to perform work as a System user, meaning the given systemUsername corresponds to an account which
+	 * has the state {@link UserState#SYSTEM} and this user must have privilege to perform the concrete implementation
+	 * of the given {@link SystemUserAction} instance
+	 * 
+	 * @param systemUsername
+	 *            the username of the system user to perform the action as
+	 * @param action
+	 *            the action to be performed as the system user
+	 */
+	public void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException;
 }

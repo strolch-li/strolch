@@ -26,18 +26,29 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 	<Users>
 
 		<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
-			<Firstname>Featherlite</Firstname>
+			<Firstname>Application</Firstname>
 			<Surname>Administrator</Surname>
 			<State>ENABLED</State>
 			<Locale>en_GB</Locale>
 			<Roles>
 				<Role>PrivilegeAdmin</Role>
-				<Role>FeatherliteUser</Role>
+				<Role>AppUser</Role>
 			</Roles>
 			<Properties>
 				<Property name="organization" value="eitchnet.ch" />
 				<Property name="organizationalUnit" value="Development" />
 			</Properties>
+		</User>
+		
+		<User userId="2" username="system_admin" password="bb06d5caae150999027a8cb68956564d3ae0f3662aee02eea96253df3dc49bf7">
+			<Firstname>System User</Firstname>
+			<Surname>Administrator</Surname>
+			<State>SYSTEM</State>
+			<Locale>en_GB</Locale>
+			<Roles>
+				<Role>system_admin_privileges</Role>
+			</Roles>
+			
 		</User>
 
 	</Users>
@@ -46,11 +57,17 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 
 		<Role name="PrivilegeAdmin" />
 
-		<Role name="FeatherliteUser">
-			<Privilege name="com.rsp.core.base.service.Service">
+		<Role name="AppUser">
+			<Privilege name="ch.eitchnet.privilege.test.model.TestRestrictable">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
-			<Privilege name="com.rsp.core.base.query.RSPQuery">
+		</Role>
+		
+		<Role name="system_admin_privileges">
+			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemUserAction">
+				<AllAllowed>true</AllAllowed>
+			</Privilege>
+			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemRestrictable">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>

@@ -74,7 +74,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * last assigned id for the {@link Session}s
 	 */
-	protected long lastSessionId;
+	private long lastSessionId;
+
+	/**
+	 * This map stores certificates for system users as a cache
+	 */
+	private Map<String, Certificate> systemUserCertificateMap;
+
+	/**
+	 * Map keeping a reference to all active sessions with their certificates
+	 */
+	private Map<String, CertificateSessionPair> sessionMap;
 
 	/**
 	 * Map of {@link PrivilegePolicy} classes
@@ -82,24 +92,19 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private Map<String, Class<PrivilegePolicy>> policyMap;
 
 	/**
-	 * Map keeping a reference to all active sessions with their certificates
-	 */
-	protected Map<String, CertificateSessionPair> sessionMap;
-
-	/**
 	 * The persistence handler is used for getting objects and saving changes
 	 */
-	protected PersistenceHandler persistenceHandler;
+	private PersistenceHandler persistenceHandler;
 
 	/**
 	 * The encryption handler is used for generating hashes and tokens
 	 */
-	protected EncryptionHandler encryptionHandler;
+	private EncryptionHandler encryptionHandler;
 
 	/**
 	 * flag to define if already initialized
 	 */
-	protected boolean initialized;
+	private boolean initialized;
 
 	/**
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getRole(java.lang.String)
@@ -138,7 +143,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if the {@link PrivilegePolicy} object for the given policy name could not be instantiated
 	 */
-	protected PrivilegePolicy getPolicy(String policyName) {
+	private PrivilegePolicy getPolicy(String policyName) {
 
 		// get the policies class
 		Class<PrivilegePolicy> policyClazz = this.policyMap.get(policyName);
@@ -673,20 +678,20 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			User user = this.persistenceHandler.getUser(username);
 			// no user means no authentication
 			if (user == null)
-				throw new AccessDeniedException("There is no user defined with the credentials: " + username
-						+ " / ***...");
+				throw new AccessDeniedException("There is no user defined with the username " + username);
 
 			// validate password
 			String pwHash = user.getPassword();
 			if (pwHash == null)
 				throw new AccessDeniedException("User has no password and may not login!");
 			if (!pwHash.equals(passwordHash))
-				throw new AccessDeniedException("Password is incorrect for " + username + " / ***...");
+				throw new AccessDeniedException("Password is incorrect for " + username);
 
 			// validate if user is allowed to login
+			// this also capture the trying to login of SYSTEM user
 			if (user.getUserState() != UserState.ENABLED)
-				throw new AccessDeniedException("User " + username + " is not ENABLED. State is: "
-						+ user.getUserState());
+				throw new AccessDeniedException("User " + username + " does not have state " + UserState.ENABLED
+						+ " and can not login!");
 
 			// validate user has at least one role
 			if (user.getRoles().isEmpty()) {
@@ -832,7 +837,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @param role
 	 * @param restrictable
 	 */
-	protected boolean actionAllowed(Role role, Restrictable restrictable) {
+	private boolean actionAllowed(Role role, Restrictable restrictable) {
 
 		// validate PrivilegeName for this restrictable
 		String privilegeName = restrictable.getPrivilegeName();
@@ -979,7 +984,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if the this method is called multiple times or an initialization exception occurs
 	 */
-	public void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
+	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
 			PersistenceHandler persistenceHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
 
 		if (this.initialized)
@@ -996,6 +1001,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		this.lastSessionId = 0l;
 		this.sessionMap = Collections.synchronizedMap(new HashMap<String, CertificateSessionPair>());
+		this.systemUserCertificateMap = Collections.synchronizedMap(new HashMap<String, Certificate>());
 		this.initialized = true;
 	}
 
@@ -1018,7 +1024,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * @return a new session id
 	 */
-	protected synchronized String nextSessionId() {
+	private synchronized String nextSessionId() {
 		return Long.toString(++this.lastSessionId % Long.MAX_VALUE);
 	}
 
@@ -1060,5 +1066,129 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				password[i] = 0;
 			}
 		}
+	}
+
+	/**
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#runAsSystem(java.lang.String,
+	 *      ch.eitchnet.privilege.handler.SystemUserAction)
+	 */
+	@Override
+	public void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException {
+
+		if (systemUsername == null)
+			throw new PrivilegeException("systemUsername may not be null!");
+		if (action == null)
+			throw new PrivilegeException("action may not be null!");
+
+		// get the system user
+		User systemUser = this.persistenceHandler.getUser(systemUsername);
+		if (systemUser == null)
+			throw new PrivilegeException("System user " + systemUsername + " does not exist!");
+
+		// validate this is a system user
+		if (systemUser.getUserState() != UserState.SYSTEM)
+			throw new PrivilegeException("User " + systemUsername + " is not a System user!");
+
+		// validate this system user may perform the given action
+		String actionClassname = action.getClass().getName();
+		checkPrivilege(actionClassname, systemUser);
+
+		// get certificate for this system user
+		Certificate systemUserCertificate = getSystemUserCertificate(systemUsername);
+
+		// perform the action
+		action.execute(systemUserCertificate);
+	}
+
+	/**
+	 * Checks if the given user has the given privilege
+	 * 
+	 * @param privilegeName
+	 *            the name of the privilege to check on the user
+	 * @param user
+	 *            the user to check for the given privilege
+	 * 
+	 * @throws PrivilegeException
+	 *             if the user does not have the privilege
+	 */
+	private void checkPrivilege(String privilegeName, User user) throws PrivilegeException {
+
+		// check each role if it has the privilege
+		for (String roleName : user.getRoles()) {
+
+			Role role = this.persistenceHandler.getRole(roleName);
+
+			// on the first occurrence of our privilege, stop
+			if (role.hasPrivilege(privilegeName))
+				return;
+		}
+
+		// default throw exception, as the user does not have the privilege
+		throw new PrivilegeException("User " + user.getUsername() + " does not have Privilege " + privilegeName);
+	}
+
+	/**
+	 * Returns the {@link Certificate} for the given system username. If it does not yet exist, then it is created by
+	 * authenticating the system user
+	 * 
+	 * @param systemUsername
+	 *            the name of the system user
+	 * 
+	 * @return the {@link Certificate} for this system user
+	 */
+	private Certificate getSystemUserCertificate(String systemUsername) {
+
+		// see if a certificate has already been created for this system user
+		Certificate systemUserCertificate = systemUserCertificateMap.get(systemUsername);
+		if (systemUserCertificate != null)
+			return systemUserCertificate;
+
+		// otherwise log this system user in, by performing a slightly different authentication
+
+		// we only work with hashed passwords
+		String passwordHash = this.encryptionHandler.convertToHash(systemUsername.getBytes());
+
+		// get user object
+		User user = this.persistenceHandler.getUser(systemUsername);
+		// no user means no authentication
+		if (user == null)
+			throw new AccessDeniedException("The system user with username " + systemUsername + " does not exist!");
+
+		// validate password
+		String pwHash = user.getPassword();
+		if (pwHash == null)
+			throw new AccessDeniedException("System user " + systemUsername + " has no password and may not login!");
+		if (!pwHash.equals(passwordHash))
+			throw new AccessDeniedException("System user " + systemUsername + " has an incorrect password defined!");
+
+		// validate user state is system
+		if (user.getUserState() != UserState.SYSTEM)
+			throw new PrivilegeException("The system " + systemUsername + " user does not have expected user state "
+					+ UserState.SYSTEM);
+
+		// validate user has at least one role
+		if (user.getRoles().isEmpty()) {
+			throw new PrivilegeException("The system user " + systemUsername + " does not have any roles defined!");
+		}
+
+		// get 2 auth tokens
+		String authToken = this.encryptionHandler.nextToken();
+		String authPassword = this.encryptionHandler.nextToken();
+
+		// get next session id
+		String sessionId = nextSessionId();
+
+		// create a new certificate, with details of the user
+		systemUserCertificate = new Certificate(sessionId, systemUsername, authToken, authPassword, user.getLocale(),
+				new HashMap<String, String>(user.getProperties()));
+
+		// create and save a new session
+		Session session = new Session(sessionId, systemUsername, authToken, authPassword, System.currentTimeMillis());
+		this.sessionMap.put(sessionId, new CertificateSessionPair(session, systemUserCertificate));
+
+		// log
+		logger.info("The system user " + systemUsername + " is logged in with session " + session);
+
+		return systemUserCertificate;
 	}
 }

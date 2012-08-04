@@ -33,6 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.privilege.helper.CertificateThreadLocal;
 import ch.eitchnet.privilege.helper.InitializationHelper;
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
@@ -42,6 +43,9 @@ import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.RoleRep;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
+import ch.eitchnet.privilege.test.model.TestRestrictable;
+import ch.eitchnet.privilege.test.model.TestSystemUserAction;
+import ch.eitchnet.privilege.test.model.TestSystemUserActionDeny;
 
 /**
  * JUnit for performing Privilege tests. This JUnit is by no means complete, but checks the bare minimum. TODO add more
@@ -55,8 +59,9 @@ public class PrivilegeTest {
 	private static final byte[] PASS_ADMIN = "admin".getBytes();
 	private static final String BOB = "bob";
 	private static final String TED = "ted";
+	private static final String SYSTEM_USER_ADMIN = "system_admin";
 	private static final byte[] PASS_BOB = "admin1".getBytes();
-	private static final String ROLE_FEATHERLITE_USER = "FeatherliteUser";
+	private static final String ROLE_APP_USER = "AppUser";
 	private static final String ROLE_USER = "user";
 	private static final byte[] PASS_DEF = "def".getBytes();
 	private static final byte[] PASS_BAD = "123".getBytes();
@@ -335,7 +340,7 @@ public class PrivilegeTest {
 	}
 
 	/**
-	 * Tests if the user bob, who does not have FeatherliteUser role can perform restrictable
+	 * Tests if the user bob, who does not have AppUser role can perform restrictable
 	 * 
 	 * @throws Exception
 	 *             if something goes wrong
@@ -359,16 +364,16 @@ public class PrivilegeTest {
 	 *             if something goes wrong
 	 */
 	@Test
-	public void testAddFeatherliteRoleToBob() throws Exception {
+	public void testAddAppRoleToBob() throws Exception {
 
 		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
-		privilegeHandler.addRoleToUser(certificate, BOB, ROLE_FEATHERLITE_USER);
-		logger.info("Added " + ROLE_FEATHERLITE_USER + " to " + BOB);
+		privilegeHandler.addRoleToUser(certificate, BOB, ROLE_APP_USER);
+		logger.info("Added " + ROLE_APP_USER + " to " + BOB);
 		privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
-	 * Tests if the user bob, who now has FeatherliteUser role can perform restrictable
+	 * Tests if the user bob, who now has AppUser role can perform restrictable
 	 * 
 	 * @throws Exception
 	 *             if something goes wrong
@@ -382,6 +387,68 @@ public class PrivilegeTest {
 		Restrictable restrictable = new TestRestrictable();
 		try {
 			privilegeHandler.actionAllowed(certificate, restrictable);
+		} finally {
+			privilegeHandler.invalidateSession(certificate);
+		}
+	}
+
+	/**
+	 * Tests if an action can be performed as a system user
+	 * 
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@Test
+	public void testPerformSystemRestrictable() throws Exception {
+
+		// create the action to be performed as a system user
+		TestSystemUserAction action = new TestSystemUserAction(privilegeHandler);
+
+		// and then perform the action
+		privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN, action);
+	}
+
+	/**
+	 * Checks that the system user can not perform a valid action, but illegal privilege
+	 * 
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@Test(expected = PrivilegeException.class)
+	public void testPerformSystemRestrictableFailPrivilege() throws Exception {
+
+		// create the action to be performed as a system user
+		TestSystemUserActionDeny action = new TestSystemUserActionDeny(privilegeHandler);
+
+		// and then perform the action
+		privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN, action);
+	}
+
+	/**
+	 * System user may not login
+	 * 
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@Test(expected = AccessDeniedException.class)
+	public void testLoginSystemUser() throws Exception {
+
+		privilegeHandler.authenticate(SYSTEM_USER_ADMIN, SYSTEM_USER_ADMIN.getBytes());
+	}
+
+	@Test
+	public void testCertificateThreadLocal() {
+
+		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
+		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+
+		// set certificate into thread local
+		CertificateThreadLocal.getInstance().set(certificate);
+
+		// see if bob can perform restrictable by returning certificate from CertificateThreadLocal
+		Restrictable restrictable = new TestRestrictable();
+		try {
+			privilegeHandler.actionAllowed(CertificateThreadLocal.getInstance().get(), restrictable);
 		} finally {
 			privilegeHandler.invalidateSession(certificate);
 		}

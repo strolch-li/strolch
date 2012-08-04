@@ -290,7 +290,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 * 
 	 * @return the map of converted {@link User} objects
 	 */
-	protected static Map<String, User> readUsers(Element usersRootElement) {
+	protected Map<String, User> readUsers(Element usersRootElement) {
 
 		Map<String, User> userMap = new HashMap<String, User>();
 
@@ -321,6 +321,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 				String roleName = roleElement.getTextTrim();
 				if (roleName.isEmpty()) {
 					logger.error("User " + username + " has a role defined with no name, Skipped.");
+				} else if (!this.roleMap.containsKey(roleName)) {
+					logger.error("User " + username + " has a inexistant role " + roleName + ", Skipped.");
 				} else {
 					roles.add(roleName);
 				}
@@ -332,10 +334,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 			// create user
 			User user = new User(userId, username, password, firstname, surname, userState, roles, locale, propertyMap);
-			logger.info("Added user " + user);
 
 			// put user in map
 			userMap.put(username, user);
+			logger.info("Loaded user " + user);
 		}
 
 		return userMap;
@@ -349,7 +351,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 * 
 	 * @return the map of converted {@link Role} objects
 	 */
-	protected static Map<String, Role> readRoles(Element rolesRootElement) {
+	protected Map<String, Role> readRoles(Element rolesRootElement) {
 
 		Map<String, Role> roleMap = new HashMap<String, Role>();
 
@@ -366,6 +368,56 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		return roleMap;
+	}
+
+	/**
+	 * Parses {@link Privilege} objects from their XML representation to their objects
+	 * 
+	 * @param roleParentElement
+	 *            the parent on which the Privilege XML elements are
+	 * 
+	 * @return the map of {@link Privilege} objects
+	 */
+	protected Map<String, Privilege> readPrivileges(Element roleParentElement) {
+
+		Map<String, Privilege> privilegeMap = new HashMap<String, Privilege>();
+
+		@SuppressWarnings("unchecked")
+		List<Element> privilegeElements = roleParentElement.elements(XmlConstants.XML_PRIVILEGE);
+		for (Element privilegeElement : privilegeElements) {
+
+			String privilegeName = privilegeElement.attributeValue(XmlConstants.XML_ATTR_NAME);
+			String privilegePolicy = privilegeElement.attributeValue(XmlConstants.XML_ATTR_POLICY);
+
+			Element allAllowedE = privilegeElement.element(XmlConstants.XML_ALL_ALLOWED);
+			boolean allAllowed = false;
+			if (allAllowedE != null) {
+				allAllowed = Boolean.valueOf(allAllowedE.getTextTrim()).booleanValue();
+			}
+
+			@SuppressWarnings("unchecked")
+			List<Element> denyElements = privilegeElement.elements(XmlConstants.XML_DENY);
+			Set<String> denyList = new HashSet<String>(denyElements.size());
+			for (Element denyElement : denyElements) {
+				String denyValue = denyElement.getTextTrim();
+				if (!denyValue.isEmpty())
+					denyList.add(denyValue);
+			}
+
+			@SuppressWarnings("unchecked")
+			List<Element> allowElements = privilegeElement.elements(XmlConstants.XML_ALLOW);
+			Set<String> allowList = new HashSet<String>(allowElements.size());
+			for (Element allowElement : allowElements) {
+				String allowValue = allowElement.getTextTrim();
+				if (!allowValue.isEmpty())
+					allowList.add(allowValue);
+			}
+
+			Privilege privilege = new Privilege(privilegeName, privilegePolicy, allAllowed, denyList, allowList);
+			privilegeMap.put(privilegeName, privilege);
+		}
+
+		return privilegeMap;
 	}
 
 	/**
@@ -464,56 +516,6 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		return rolesAsElements;
-	}
-
-	/**
-	 * Parses {@link Privilege} objects from their XML representation to their objects
-	 * 
-	 * @param roleParentElement
-	 *            the parent on which the Privilege XML elements are
-	 * 
-	 * @return the map of {@link Privilege} objects
-	 */
-	protected static Map<String, Privilege> readPrivileges(Element roleParentElement) {
-
-		Map<String, Privilege> privilegeMap = new HashMap<String, Privilege>();
-
-		@SuppressWarnings("unchecked")
-		List<Element> privilegeElements = roleParentElement.elements(XmlConstants.XML_PRIVILEGE);
-		for (Element privilegeElement : privilegeElements) {
-
-			String privilegeName = privilegeElement.attributeValue(XmlConstants.XML_ATTR_NAME);
-			String privilegePolicy = privilegeElement.attributeValue(XmlConstants.XML_ATTR_POLICY);
-
-			Element allAllowedE = privilegeElement.element(XmlConstants.XML_ALL_ALLOWED);
-			boolean allAllowed = false;
-			if (allAllowedE != null) {
-				allAllowed = Boolean.valueOf(allAllowedE.getTextTrim()).booleanValue();
-			}
-
-			@SuppressWarnings("unchecked")
-			List<Element> denyElements = privilegeElement.elements(XmlConstants.XML_DENY);
-			Set<String> denyList = new HashSet<String>(denyElements.size());
-			for (Element denyElement : denyElements) {
-				String denyValue = denyElement.getTextTrim();
-				if (!denyValue.isEmpty())
-					denyList.add(denyValue);
-			}
-
-			@SuppressWarnings("unchecked")
-			List<Element> allowElements = privilegeElement.elements(XmlConstants.XML_ALLOW);
-			Set<String> allowList = new HashSet<String>(allowElements.size());
-			for (Element allowElement : allowElements) {
-				String allowValue = allowElement.getTextTrim();
-				if (!allowValue.isEmpty())
-					allowList.add(allowValue);
-			}
-
-			Privilege privilege = new Privilege(privilegeName, privilegePolicy, allAllowed, denyList, allowList);
-			privilegeMap.put(privilegeName, privilege);
-		}
-
-		return privilegeMap;
 	}
 
 	/**

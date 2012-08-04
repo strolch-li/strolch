@@ -51,5 +51,10 @@ public enum UserState {
 	/**
 	 * the user has automatically expired through a predefined time
 	 */
-	EXPIRED;
+	EXPIRED,
+	
+	/**
+	 * This is the System user state which is special and thus exempted from normal uses
+	 */
+	SYSTEM;
 }

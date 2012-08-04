@@ -17,7 +17,7 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.privilege.test;
+package ch.eitchnet.privilege.test.model;
 
 import ch.eitchnet.privilege.model.Restrictable;
 
@@ -32,7 +32,7 @@ public class TestRestrictable implements Restrictable {
 	 */
 	@Override
 	public String getPrivilegeName() {
-		return "com.rsp.core.base.service.Service";
+		return TestRestrictable.class.getName();
 	}
 
 	/**
