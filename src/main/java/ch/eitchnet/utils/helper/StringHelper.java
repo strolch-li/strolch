@@ -449,4 +449,16 @@ public class StringHelper {
 			return nanos + "ns"; //$NON-NLS-1$
 		}
 	}
+
+	/**
+	 * Simply returns true if the value is null, or empty
+	 * 
+	 * @param value
+	 *            the value to check
+	 * 
+	 * @return true if the value is null, or empty
+	 */
+	public static boolean isEmpty(String value) {
+		return value == null || value.isEmpty();
+	}
 }
