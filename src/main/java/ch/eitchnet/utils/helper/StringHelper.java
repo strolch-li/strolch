@@ -413,4 +413,40 @@ public class StringHelper {
 
 		return sb.toString();
 	}
+
+	/**
+	 * Formats the given number of milliseconds to a time like 0.000s/ms
+	 * 
+	 * @param millis
+	 *            the number of milliseconds
+	 * 
+	 * @return format the given number of milliseconds to a time like 0.000s/ms
+	 */
+	public static String formatMillisecondsDuration(final long millis) {
+		if (millis > 1000) {
+			return String.format("%.3fs", (((double) millis) / 1000)); //$NON-NLS-1$
+		}
+
+		return millis + "ms"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Formats the given number of nanoseconds to a time like 0.000s/ms/us/ns
+	 * 
+	 * @param nanos
+	 *            the number of nanoseconds
+	 * 
+	 * @return format the given number of nanoseconds to a time like 0.000s/ms/us/ns
+	 */
+	public static String formatNanoDuration(final long nanos) {
+		if (nanos > 1000000000) {
+			return String.format("%.3fs", (((double) nanos) / 1000000000)); //$NON-NLS-1$
+		} else if (nanos > 1000000) {
+			return String.format("%.3fms", (((double) nanos) / 1000000)); //$NON-NLS-1$
+		} else if (nanos > 1000) {
+			return String.format("%.3fus", (((double) nanos) / 1000)); //$NON-NLS-1$
+		} else {
+			return nanos + "ns"; //$NON-NLS-1$
+		}
+	}
 }
