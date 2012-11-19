@@ -54,7 +54,7 @@ public class HashHelper {
 	 */
 	public static String stringToHash(String hashAlgorithm, String string) throws NoSuchAlgorithmException,
 			UnsupportedEncodingException {
-		return stringToHash(hashAlgorithm, string.getBytes());
+		return HashHelper.stringToHash(hashAlgorithm, string.getBytes());
 	}
 
 	/**
@@ -83,8 +83,8 @@ public class HashHelper {
 
 		for (byte b : hashArray) {
 			int v = b & 0xFF;
-			hex[index++] = HEX_CHAR_TABLE[v >>> 4];
-			hex[index++] = HEX_CHAR_TABLE[v & 0xF];
+			hex[index++] = HashHelper.HEX_CHAR_TABLE[v >>> 4];
+			hex[index++] = HashHelper.HEX_CHAR_TABLE[v & 0xF];
 		}
 
 		return new String(hex, "ASCII");

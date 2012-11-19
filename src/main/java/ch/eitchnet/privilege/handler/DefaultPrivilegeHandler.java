@@ -403,7 +403,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// ignore if user already has role
 		Set<String> currentRoles = user.getRoles();
 		if (currentRoles.contains(roleName)) {
-			logger.error("User " + username + " already has role " + roleName);
+			DefaultPrivilegeHandler.logger.error("User " + username + " already has role " + roleName);
 			return;
 		}
 
@@ -496,7 +496,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// ignore if user does not have role
 		Set<String> currentRoles = user.getRoles();
 		if (!currentRoles.contains(roleName)) {
-			logger.error("User " + user + " does not have role " + roleName);
+			DefaultPrivilegeHandler.logger.error("User " + user + " does not have role " + roleName);
 			return;
 		}
 
@@ -714,10 +714,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			this.sessionMap.put(sessionId, new CertificateSessionPair(session, certificate));
 
 			// log
-			logger.info("User " + username + " authenticated: " + session);
+			DefaultPrivilegeHandler.logger.info("User " + username + " authenticated: " + session);
 
 		} catch (RuntimeException e) {
-			logger.error("User " + username + " Failed to authenticate: " + e.getLocalizedMessage());
+			DefaultPrivilegeHandler.logger.error("User " + username + " Failed to authenticate: " + e.getLocalizedMessage());
 			throw e;
 		} finally {
 			clearPassword(password);
@@ -742,9 +742,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// return true if object was really removed
 		boolean loggedOut = certificateSessionPair != null;
 		if (loggedOut)
-			logger.info("User " + certificate.getUsername() + " logged out.");
+			DefaultPrivilegeHandler.logger.info("User " + certificate.getUsername() + " logged out.");
 		else
-			logger.warn("User already logged out!");
+			DefaultPrivilegeHandler.logger.warn("User already logged out!");
 		return loggedOut;
 	}
 
@@ -785,7 +785,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			Role role = this.persistenceHandler.getRole(roleName);
 			if (role == null) {
-				logger.error("No role is defined with name " + roleName + " which is configured for user " + user);
+				DefaultPrivilegeHandler.logger.error("No role is defined with name " + roleName + " which is configured for user " + user);
 				continue;
 			}
 
@@ -861,7 +861,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// otherwise delegate checking to the policy configured for this privilege
-		PrivilegePolicy policy = this.getPolicy(privilege.getPolicy());
+		PrivilegePolicy policy = getPolicy(privilege.getPolicy());
 		if (policy == null) {
 			throw new PrivilegeException("PrivilegePolicy " + privilege.getPolicy() + " does not exist for Privilege "
 					+ privilegeName);
@@ -921,7 +921,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void validateIsPrivilegeAdmin(Certificate certificate) throws PrivilegeException {
 
 		// validate certificate
-		this.isCertificateValid(certificate);
+		isCertificateValid(certificate);
 
 		// get user object
 		User user = this.persistenceHandler.getUser(certificate.getUsername());
@@ -1139,7 +1139,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private Certificate getSystemUserCertificate(String systemUsername) {
 
 		// see if a certificate has already been created for this system user
-		Certificate systemUserCertificate = systemUserCertificateMap.get(systemUsername);
+		Certificate systemUserCertificate = this.systemUserCertificateMap.get(systemUsername);
 		if (systemUserCertificate != null)
 			return systemUserCertificate;
 
@@ -1187,7 +1187,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.sessionMap.put(sessionId, new CertificateSessionPair(session, systemUserCertificate));
 
 		// log
-		logger.info("The system user " + systemUsername + " is logged in with session " + session);
+		DefaultPrivilegeHandler.logger.info("The system user " + systemUsername + " is logged in with session " + session);
 
 		return systemUserCertificate;
 	}

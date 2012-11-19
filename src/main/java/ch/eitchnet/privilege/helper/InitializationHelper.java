@@ -35,7 +35,6 @@ import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
 import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.helper.SystemHelper;
 
 /**
  * This class implements the initializing of the {@link PrivilegeHandler} by loading an XML file containing the
@@ -81,19 +80,19 @@ public class InitializationHelper {
 
 		// get policies
 		Element policiesElement = rootElement.element(XmlConstants.XML_POLICIES);
-		Map<String, Class<PrivilegePolicy>> policyMap = convertToPolicyMap(policiesElement);
+		Map<String, Class<PrivilegePolicy>> policyMap = InitializationHelper.convertToPolicyMap(policiesElement);
 
 		try {
 
 			// get parameters
 			Element parameterElement = encryptionHandlerElement.element(XmlConstants.XML_PARAMETERS);
-			Map<String, String> parameterMap = convertToParameterMap(parameterElement);
+			Map<String, String> parameterMap = InitializationHelper.convertToParameterMap(parameterElement);
 
 			// initialize encryption handler
 			encryptionHandler.initialize(parameterMap);
 
 		} catch (Exception e) {
-			logger.error(e, e);
+			InitializationHelper.logger.error(e, e);
 			throw new PrivilegeException("EncryptionHandler " + encryptionHandlerClassName
 					+ " could not be initialized");
 		}
@@ -102,13 +101,13 @@ public class InitializationHelper {
 
 			// get parameters
 			Element parameterElement = persistenceHandlerElement.element(XmlConstants.XML_PARAMETERS);
-			Map<String, String> parameterMap = convertToParameterMap(parameterElement);
+			Map<String, String> parameterMap = InitializationHelper.convertToParameterMap(parameterElement);
 
 			// initialize persistence handler
 			persistenceHandler.initialize(parameterMap);
 
 		} catch (Exception e) {
-			logger.error(e, e);
+			InitializationHelper.logger.error(e, e);
 			throw new PrivilegeException("PersistenceHandler " + persistenceHandlerElement
 					+ " could not be initialized");
 		}
@@ -117,13 +116,13 @@ public class InitializationHelper {
 
 			// get parameters
 			Element parameterElement = containerElement.element(XmlConstants.XML_PARAMETERS);
-			Map<String, String> parameterMap = convertToParameterMap(parameterElement);
+			Map<String, String> parameterMap = InitializationHelper.convertToParameterMap(parameterElement);
 
 			// initialize privilege handler
 			privilegeHandler.initialize(parameterMap, encryptionHandler, persistenceHandler, policyMap);
 
 		} catch (Exception e) {
-			logger.error(e, e);
+			InitializationHelper.logger.error(e, e);
 			throw new PrivilegeException("PrivilegeHandler " + privilegeHandler.getClass().getName()
 					+ " could not be initialized");
 		}

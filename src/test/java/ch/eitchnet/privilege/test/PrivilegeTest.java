@@ -87,9 +87,9 @@ public class PrivilegeTest {
 			// initialize container
 			String pwd = System.getProperty("user.dir");
 			File privilegeContainerXmlFile = new File(pwd + "/config/Privilege.xml");
-			privilegeHandler = InitializationHelper.initializeFromXml(privilegeContainerXmlFile);
+			PrivilegeTest.privilegeHandler = InitializationHelper.initializeFromXml(privilegeContainerXmlFile);
 		} catch (Exception e) {
-			logger.error(e, e);
+			PrivilegeTest.logger.error(e, e);
 
 			throw new RuntimeException("Initialization failed: " + e.getLocalizedMessage(), e);
 		}
@@ -102,9 +102,9 @@ public class PrivilegeTest {
 	@Test
 	public void testAuthenticationOk() throws Exception {
 
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, copyBytes(PrivilegeTest.PASS_ADMIN));
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
-		privilegeHandler.invalidateSession(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	private byte[] copyBytes(byte[] bytes) {
@@ -120,9 +120,9 @@ public class PrivilegeTest {
 	@Test(expected = AccessDeniedException.class)
 	public void testFailAuthenticationNOk() throws Exception {
 
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_BAD));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, copyBytes(PrivilegeTest.PASS_BAD));
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
-		privilegeHandler.invalidateSession(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -132,9 +132,9 @@ public class PrivilegeTest {
 	@Test(expected = PrivilegeException.class)
 	public void testFailAuthenticationPWNull() throws Exception {
 
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, null);
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, null);
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
-		privilegeHandler.invalidateSession(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -144,18 +144,18 @@ public class PrivilegeTest {
 	@Test
 	public void testAddUserBobAsAdmin() throws Exception {
 
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, copyBytes(PrivilegeTest.PASS_ADMIN));
 
 		// let's add a new user bob
-		UserRep userRep = new UserRep("1", BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(), null,
+		UserRep userRep = new UserRep("1", PrivilegeTest.BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(), null,
 				new HashMap<String, String>());
-		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
-		logger.info("Added user " + BOB);
+		PrivilegeTest.privilegeHandler.addOrReplaceUser(certificate, userRep, null);
+		PrivilegeTest.logger.info("Added user " + PrivilegeTest.BOB);
 
 		// set bob's password
-		privilegeHandler.setUserPassword(certificate, BOB, copyBytes(PASS_BOB));
-		logger.info("Set Bob's password");
-		privilegeHandler.invalidateSession(certificate);
+		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+		PrivilegeTest.logger.info("Set Bob's password");
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -166,8 +166,8 @@ public class PrivilegeTest {
 	 */
 	@Test(expected = AccessDeniedException.class)
 	public void testFailAuthAsBob() throws Exception {
-		Certificate certificate = privilegeHandler.authenticate(BOB, copyBytes(PASS_BOB));
-		privilegeHandler.invalidateSession(certificate);
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -176,9 +176,9 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testEnableUserBob() throws Exception {
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
-		privilegeHandler.setUserState(certificate, BOB, UserState.ENABLED);
-		privilegeHandler.invalidateSession(certificate);
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, copyBytes(PrivilegeTest.PASS_ADMIN));
+		PrivilegeTest.privilegeHandler.setUserState(certificate, PrivilegeTest.BOB, UserState.ENABLED);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -190,9 +190,9 @@ public class PrivilegeTest {
 	@Test(expected = PrivilegeException.class)
 	public void testFailAuthUserBob() throws Exception {
 
-		Certificate certificate = privilegeHandler.authenticate(BOB, copyBytes(PASS_BOB));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
-		privilegeHandler.invalidateSession(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -201,13 +201,13 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testAddRole() throws Exception {
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, copyBytes(PrivilegeTest.PASS_ADMIN));
 
 		Map<String, PrivilegeRep> privilegeMap = new HashMap<String, PrivilegeRep>();
-		RoleRep roleRep = new RoleRep(ROLE_USER, privilegeMap);
+		RoleRep roleRep = new RoleRep(PrivilegeTest.ROLE_USER, privilegeMap);
 
-		privilegeHandler.addOrReplaceRole(certificate, roleRep);
-		privilegeHandler.invalidateSession(certificate);
+		PrivilegeTest.privilegeHandler.addOrReplaceRole(certificate, roleRep);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -216,9 +216,9 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testAddRoleToBob() throws Exception {
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
-		privilegeHandler.addRoleToUser(certificate, BOB, ROLE_USER);
-		privilegeHandler.invalidateSession(certificate);
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, copyBytes(PrivilegeTest.PASS_ADMIN));
+		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB, PrivilegeTest.ROLE_USER);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -227,8 +227,8 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testAuthAsBob() throws Exception {
-		Certificate certificate = privilegeHandler.authenticate(BOB, copyBytes(PASS_BOB));
-		privilegeHandler.invalidateSession(certificate);
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -241,15 +241,15 @@ public class PrivilegeTest {
 	public void testFailAddUserTedAsBob() throws Exception {
 
 		// auth as Bog
-		Certificate certificate = privilegeHandler.authenticate(BOB, copyBytes(PASS_BOB));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// let's add a new user Ted
-		UserRep userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<String>(), null,
+		UserRep userRep = new UserRep("1", PrivilegeTest.TED, "Ted", "And then Some", UserState.NEW, new HashSet<String>(), null,
 				new HashMap<String, String>());
-		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
-		logger.info("Added user " + TED);
-		privilegeHandler.invalidateSession(certificate);
+		PrivilegeTest.privilegeHandler.addOrReplaceUser(certificate, userRep, null);
+		PrivilegeTest.logger.info("Added user " + PrivilegeTest.TED);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -259,10 +259,10 @@ public class PrivilegeTest {
 	@Test
 	public void testAddAdminRoleToBob() throws Exception {
 
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
-		privilegeHandler.addRoleToUser(certificate, BOB, PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
-		logger.info("Added " + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE + " to " + ADMIN);
-		privilegeHandler.invalidateSession(certificate);
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, copyBytes(PrivilegeTest.PASS_ADMIN));
+		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB, PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
+		PrivilegeTest.logger.info("Added " + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE + " to " + PrivilegeTest.ADMIN);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -272,18 +272,18 @@ public class PrivilegeTest {
 	@Test
 	public void testAddUserTedAsBob() throws Exception {
 
-		Certificate certificate = privilegeHandler.authenticate(BOB, copyBytes(PASS_BOB));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// let's add a new user ted
 		HashSet<String> roles = new HashSet<String>();
-		roles.add(ROLE_USER);
-		UserRep userRep = new UserRep("2", TED, "Ted", "Newman", UserState.ENABLED, roles, null,
+		roles.add(PrivilegeTest.ROLE_USER);
+		UserRep userRep = new UserRep("2", PrivilegeTest.TED, "Ted", "Newman", UserState.ENABLED, roles, null,
 				new HashMap<String, String>());
-		privilegeHandler.addOrReplaceUser(certificate, userRep, null);
-		logger.info("Added user " + TED);
+		PrivilegeTest.privilegeHandler.addOrReplaceUser(certificate, userRep, null);
+		PrivilegeTest.logger.info("Added user " + PrivilegeTest.TED);
 
-		privilegeHandler.invalidateSession(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -293,13 +293,13 @@ public class PrivilegeTest {
 	@Test
 	public void testSetTedPwdAsBob() throws Exception {
 
-		Certificate certificate = privilegeHandler.authenticate(BOB, copyBytes(PASS_BOB));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// set ted's password to default
-		privilegeHandler.setUserPassword(certificate, TED, copyBytes(PASS_DEF));
+		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.TED, copyBytes(PrivilegeTest.PASS_DEF));
 
-		privilegeHandler.invalidateSession(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -308,9 +308,9 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testTedChangesOwnPwd() throws Exception {
-		Certificate certificate = privilegeHandler.authenticate(TED, copyBytes(PASS_DEF));
-		privilegeHandler.setUserPassword(certificate, TED, copyBytes(PASS_TED));
-		privilegeHandler.invalidateSession(certificate);
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.TED, copyBytes(PrivilegeTest.PASS_DEF));
+		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.TED, copyBytes(PrivilegeTest.PASS_TED));
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -319,8 +319,8 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testAuthAsTed() throws Exception {
-		Certificate certificate = privilegeHandler.authenticate(TED, copyBytes(PASS_TED));
-		privilegeHandler.invalidateSession(certificate);
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.TED, copyBytes(PrivilegeTest.PASS_TED));
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -330,13 +330,13 @@ public class PrivilegeTest {
 	@Test
 	public void testPerformRestrictableAsAdmin() throws Exception {
 
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, copyBytes(PrivilegeTest.PASS_ADMIN));
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// see if eitch can perform restrictable
 		Restrictable restrictable = new TestRestrictable();
-		privilegeHandler.actionAllowed(certificate, restrictable);
-		privilegeHandler.invalidateSession(certificate);
+		PrivilegeTest.privilegeHandler.actionAllowed(certificate, restrictable);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -347,15 +347,15 @@ public class PrivilegeTest {
 	 */
 	@Test(expected = AccessDeniedException.class)
 	public void testFailPerformRestrictableAsBob() throws Exception {
-		Certificate certificate = privilegeHandler.authenticate(BOB, copyBytes(PASS_BOB));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// see if bob can perform restrictable
 		Restrictable restrictable = new TestRestrictable();
 		try {
-			privilegeHandler.actionAllowed(certificate, restrictable);
+			PrivilegeTest.privilegeHandler.actionAllowed(certificate, restrictable);
 		} finally {
-			privilegeHandler.invalidateSession(certificate);
+			PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 		}
 	}
 
@@ -366,10 +366,10 @@ public class PrivilegeTest {
 	@Test
 	public void testAddAppRoleToBob() throws Exception {
 
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
-		privilegeHandler.addRoleToUser(certificate, BOB, ROLE_APP_USER);
-		logger.info("Added " + ROLE_APP_USER + " to " + BOB);
-		privilegeHandler.invalidateSession(certificate);
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, copyBytes(PrivilegeTest.PASS_ADMIN));
+		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB, PrivilegeTest.ROLE_APP_USER);
+		PrivilegeTest.logger.info("Added " + PrivilegeTest.ROLE_APP_USER + " to " + PrivilegeTest.BOB);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -380,15 +380,15 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testPerformRestrictableAsBob() throws Exception {
-		Certificate certificate = privilegeHandler.authenticate(BOB, copyBytes(PASS_BOB));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// see if bob can perform restrictable
 		Restrictable restrictable = new TestRestrictable();
 		try {
-			privilegeHandler.actionAllowed(certificate, restrictable);
+			PrivilegeTest.privilegeHandler.actionAllowed(certificate, restrictable);
 		} finally {
-			privilegeHandler.invalidateSession(certificate);
+			PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 		}
 	}
 
@@ -402,10 +402,10 @@ public class PrivilegeTest {
 	public void testPerformSystemRestrictable() throws Exception {
 
 		// create the action to be performed as a system user
-		TestSystemUserAction action = new TestSystemUserAction(privilegeHandler);
+		TestSystemUserAction action = new TestSystemUserAction(PrivilegeTest.privilegeHandler);
 
 		// and then perform the action
-		privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN, action);
+		PrivilegeTest.privilegeHandler.runAsSystem(PrivilegeTest.SYSTEM_USER_ADMIN, action);
 	}
 
 	/**
@@ -418,10 +418,10 @@ public class PrivilegeTest {
 	public void testPerformSystemRestrictableFailPrivilege() throws Exception {
 
 		// create the action to be performed as a system user
-		TestSystemUserActionDeny action = new TestSystemUserActionDeny(privilegeHandler);
+		TestSystemUserActionDeny action = new TestSystemUserActionDeny(PrivilegeTest.privilegeHandler);
 
 		// and then perform the action
-		privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN, action);
+		PrivilegeTest.privilegeHandler.runAsSystem(PrivilegeTest.SYSTEM_USER_ADMIN, action);
 	}
 
 	/**
@@ -433,13 +433,13 @@ public class PrivilegeTest {
 	@Test(expected = AccessDeniedException.class)
 	public void testLoginSystemUser() throws Exception {
 
-		privilegeHandler.authenticate(SYSTEM_USER_ADMIN, SYSTEM_USER_ADMIN.getBytes());
+		PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.SYSTEM_USER_ADMIN, PrivilegeTest.SYSTEM_USER_ADMIN.getBytes());
 	}
 
 	@Test
 	public void testCertificateThreadLocal() {
 
-		Certificate certificate = privilegeHandler.authenticate(ADMIN, copyBytes(PASS_ADMIN));
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, copyBytes(PrivilegeTest.PASS_ADMIN));
 		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// set certificate into thread local
@@ -448,9 +448,9 @@ public class PrivilegeTest {
 		// see if bob can perform restrictable by returning certificate from CertificateThreadLocal
 		Restrictable restrictable = new TestRestrictable();
 		try {
-			privilegeHandler.actionAllowed(CertificateThreadLocal.getInstance().get(), restrictable);
+			PrivilegeTest.privilegeHandler.actionAllowed(CertificateThreadLocal.getInstance().get(), restrictable);
 		} finally {
-			privilegeHandler.invalidateSession(certificate);
+			PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 		}
 	}
 }

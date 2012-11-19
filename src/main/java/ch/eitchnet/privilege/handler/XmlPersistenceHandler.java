@@ -153,7 +153,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		File modelFile = new File(this.modelPath);
 		boolean modelFileUnchanged = modelFile.exists() && modelFile.lastModified() == this.modelsFileDate;
 		if (!(modelFileUnchanged && this.roleMapDirty && this.userMapDirty)) {
-			logger.warn("Not persisting as current file is unchanged and model data is not dirty");
+			XmlPersistenceHandler.logger.warn("Not persisting as current file is unchanged and model data is not dirty");
 			return false;
 		}
 
@@ -164,7 +164,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		// USERS
 		// build XML DOM of users
-		List<Element> users = toDomUsers(this.userMap);
+		List<Element> users = XmlPersistenceHandler.toDomUsers(this.userMap);
 		Element usersElement = docFactory.createElement(XmlConstants.XML_USERS);
 		for (Element userElement : users) {
 			usersElement.add(userElement);
@@ -173,7 +173,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		// ROLES
 		// build XML DOM of roles
-		List<Element> roles = toDomRoles(this.roleMap);
+		List<Element> roles = XmlPersistenceHandler.toDomRoles(this.roleMap);
 		Element rolesElement = docFactory.createElement(XmlConstants.XML_ROLES);
 		for (Element roleElement : roles) {
 			rolesElement.add(roleElement);
@@ -233,8 +233,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.userMapDirty = false;
 		this.roleMapDirty = false;
 
-		logger.info("Read " + this.userMap.size() + " Users");
-		logger.info("Read " + this.roleMap.size() + " Roles");
+		XmlPersistenceHandler.logger.info("Read " + this.userMap.size() + " Users");
+		XmlPersistenceHandler.logger.info("Read " + this.roleMap.size() + " Roles");
 
 		// validate we have a user with PrivilegeAdmin access
 		boolean privilegeAdminExists = false;
@@ -247,7 +247,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		if (!privilegeAdminExists) {
-			logger.warn("No User with role '" + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE
+			XmlPersistenceHandler.logger.warn("No User with role '" + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE
 					+ "' exists. Privilege modifications will not be possible!");
 		}
 
@@ -279,7 +279,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.modelPath = basePath + "/" + modelFileName;
 
 		if (reload())
-			logger.info("Privilege Data loaded.");
+			XmlPersistenceHandler.logger.info("Privilege Data loaded.");
 	}
 
 	/**
@@ -320,9 +320,9 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			for (Element roleElement : rolesElementList) {
 				String roleName = roleElement.getTextTrim();
 				if (roleName.isEmpty()) {
-					logger.error("User " + username + " has a role defined with no name, Skipped.");
+					XmlPersistenceHandler.logger.error("User " + username + " has a role defined with no name, Skipped.");
 				} else if (!this.roleMap.containsKey(roleName)) {
-					logger.error("User " + username + " has a inexistant role " + roleName + ", Skipped.");
+					XmlPersistenceHandler.logger.error("User " + username + " has a inexistant role " + roleName + ", Skipped.");
 				} else {
 					roles.add(roleName);
 				}
@@ -330,14 +330,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 			// read properties
 			Element propertiesElement = userElement.element(XmlConstants.XML_PROPERTIES);
-			Map<String, String> propertyMap = convertToPropertyMap(propertiesElement);
+			Map<String, String> propertyMap = XmlPersistenceHandler.convertToPropertyMap(propertiesElement);
 
 			// create user
 			User user = new User(userId, username, password, firstname, surname, userState, roles, locale, propertyMap);
 
 			// put user in map
 			userMap.put(username, user);
-			logger.info("Loaded user " + user);
+			XmlPersistenceHandler.logger.info("Loaded user " + user);
 		}
 
 		return userMap;
@@ -508,7 +508,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 				roleElement.addAttribute(XmlConstants.XML_ATTR_NAME, role.getName());
 
 				// add all the privileges
-				toDomPrivileges(roleElement, role.getPrivilegeMap());
+				XmlPersistenceHandler.toDomPrivileges(roleElement, role.getPrivilegeMap());
 
 				// add element to return list
 				rolesAsElements.add(roleElement);

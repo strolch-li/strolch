@@ -75,12 +75,12 @@ public class BootstrapConfigurationHelper {
 		Logger.getRootLogger().setLevel(Level.INFO);
 
 		// get current directory
-		path = System.getProperty("user.dir") + "/newConfig";
+		BootstrapConfigurationHelper.path = System.getProperty("user.dir") + "/newConfig";
 
 		// TODO ask user where to save configuration, default is pwd/newConfig/....
 
 		// see if path already exists
-		File pathF = new File(path);
+		File pathF = new File(BootstrapConfigurationHelper.path);
 		if (pathF.exists()) {
 			throw new RuntimeException("Path already exists: " + pathF.getAbsolutePath());
 		}
@@ -92,9 +92,9 @@ public class BootstrapConfigurationHelper {
 		// TODO ask other questions...
 
 		// now perform work:
-		createXmlPrivilegeContainer();
-		createPolicyConfiguration();
-		createModel();
+		BootstrapConfigurationHelper.createXmlPrivilegeContainer();
+		BootstrapConfigurationHelper.createPolicyConfiguration();
+		BootstrapConfigurationHelper.createModel();
 	}
 
 	/**
@@ -133,34 +133,34 @@ public class BootstrapConfigurationHelper {
 		// create PersistenceHandler
 		Element persistenceHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_PERSISTENCE);
 		containerElement.add(persistenceHandlerElem);
-		persistenceHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, defaultPersistenceHandler);
+		persistenceHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, BootstrapConfigurationHelper.defaultPersistenceHandler);
 		parametersElement = factory.createElement(XmlConstants.XML_PARAMETERS);
 		persistenceHandlerElem.add(parametersElement);
 		// Parameter basePath
 		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
 		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_BASE_PATH);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, basePath);
+		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, BootstrapConfigurationHelper.basePath);
 		parametersElement.add(parameterElement);
 		// Parameter modelXmlFile
 		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
 		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_MODEL_FILE);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, modelFileName);
+		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, BootstrapConfigurationHelper.modelFileName);
 		parametersElement.add(parameterElement);
 
 		// create EncryptionHandler
 		Element encryptionHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_ENCRYPTION);
 		containerElement.add(encryptionHandlerElem);
-		encryptionHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, defaultEncryptionHandler);
+		encryptionHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, BootstrapConfigurationHelper.defaultEncryptionHandler);
 		parametersElement = factory.createElement(XmlConstants.XML_PARAMETERS);
 		encryptionHandlerElem.add(parametersElement);
 		// Parameter hashAlgorithm
 		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
 		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_HASH_ALGORITHM);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, hashAlgorithm);
+		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, BootstrapConfigurationHelper.hashAlgorithm);
 		parametersElement.add(parameterElement);
 
 		// write the container file to disk
-		File privilegeContainerFile = new File(path + "/" + defaultPrivilegeContainerXmlFile);
+		File privilegeContainerFile = new File(BootstrapConfigurationHelper.path + "/" + BootstrapConfigurationHelper.defaultPrivilegeContainerXmlFile);
 		XmlHelper.writeDocument(doc, privilegeContainerFile);
 	}
 }

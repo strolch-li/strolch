@@ -33,14 +33,14 @@ public class CertificateThreadLocal extends ThreadLocal<Certificate> {
 	}
 
 	public static CertificateThreadLocal getInstance() {
-		return instance;
+		return CertificateThreadLocal.instance;
 	}
 
 	public static Certificate getCert() {
-		return instance.get();
+		return CertificateThreadLocal.instance.get();
 	}
 
 	public static void setCert(Certificate certificate) {
-		instance.set(certificate);
+		CertificateThreadLocal.instance.set(certificate);
 	}
 }

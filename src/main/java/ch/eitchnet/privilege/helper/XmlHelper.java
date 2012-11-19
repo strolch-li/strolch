@@ -69,7 +69,7 @@ public class XmlHelper {
 			SAXReader reader = new SAXReader();
 			Document document = reader.read(inStream);
 
-			logger.info("Read XML document " + document.getRootElement().getName());
+			XmlHelper.logger.info("Read XML document " + document.getRootElement().getName());
 			return document;
 
 		} catch (FileNotFoundException e) {
@@ -89,7 +89,7 @@ public class XmlHelper {
 	 */
 	public static void writeDocument(Document document, File file) {
 
-		logger.info("Exporting document element " + document.getName() + " to " + file.getAbsolutePath());
+		XmlHelper.logger.info("Exporting document element " + document.getName() + " to " + file.getAbsolutePath());
 
 		OutputStream fileOutputStream = null;
 
@@ -99,7 +99,7 @@ public class XmlHelper {
 
 			String aEncodingScheme = document.getXMLEncoding();
 			if (aEncodingScheme == null || aEncodingScheme.isEmpty()) {
-				aEncodingScheme = DEFAULT_ENCODING;
+				aEncodingScheme = XmlHelper.DEFAULT_ENCODING;
 			}
 			OutputFormat outformat = OutputFormat.createPrettyPrint();
 			outformat.setEncoding(aEncodingScheme);
@@ -117,7 +117,7 @@ public class XmlHelper {
 				try {
 					fileOutputStream.close();
 				} catch (IOException e) {
-					logger.error("Could not close file output stream: " + e, e);
+					XmlHelper.logger.error("Could not close file output stream: " + e, e);
 				}
 			}
 		}
@@ -133,10 +133,10 @@ public class XmlHelper {
 	 */
 	public static void writeElement(Element rootElement, File file) {
 
-		Document document = DocumentFactory.getInstance().createDocument(DEFAULT_ENCODING);
+		Document document = DocumentFactory.getInstance().createDocument(XmlHelper.DEFAULT_ENCODING);
 		document.setRootElement(rootElement);
 		document.setName(rootElement.getName());
 
-		writeDocument(document, file);
+		XmlHelper.writeDocument(document, file);
 	}
 }

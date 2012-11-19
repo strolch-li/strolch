@@ -124,7 +124,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		// test hash algorithm
 		try {
 			convertToHash("test");
-			logger.info("Using hashing algorithm " + this.hashAlgorithm);
+			DefaultEncryptionHandler.logger.info("Using hashing algorithm " + this.hashAlgorithm);
 		} catch (Exception e) {
 			throw new PrivilegeException("[" + EncryptionHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_HASH_ALGORITHM + " is invalid because of underlying exception: "

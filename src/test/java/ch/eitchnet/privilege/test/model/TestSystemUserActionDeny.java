@@ -45,6 +45,6 @@ public class TestSystemUserActionDeny implements SystemUserAction {
 	public void execute(Certificate certificate) {
 
 		TestRestrictable restrictable = new TestRestrictable();
-		handler.actionAllowed(certificate, restrictable);
+		this.handler.actionAllowed(certificate, restrictable);
 	}
 }

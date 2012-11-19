@@ -46,7 +46,7 @@ public class TestSystemUserAction implements SystemUserAction {
 		
 		TestSystemRestrictable restrictable = new TestSystemRestrictable();
 		
-		handler.actionAllowed(certificate, restrictable);
+		this.handler.actionAllowed(certificate, restrictable);
 	}
 
 }
