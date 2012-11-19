@@ -44,7 +44,7 @@ public class Log4jPropertyWatchDog extends Thread {
 	/**
 	 * The delay to observe between every check. By default set {@link #DEFAULT_DELAY}.
 	 */
-	protected long delay = DEFAULT_DELAY;
+	protected long delay = Log4jPropertyWatchDog.DEFAULT_DELAY;
 
 	protected File file;
 	protected long lastModif = 0;
@@ -57,7 +57,7 @@ public class Log4jPropertyWatchDog extends Thread {
 	protected Log4jPropertyWatchDog(String filename) {
 		super("FileWatchdog");
 		this.filename = filename;
-		file = new File(filename);
+		this.file = new File(filename);
 		setDaemon(true);
 		checkAndConfigure();
 	}
@@ -75,24 +75,24 @@ public class Log4jPropertyWatchDog extends Thread {
 	protected void checkAndConfigure() {
 		boolean fileExists;
 		try {
-			fileExists = file.exists();
+			fileExists = this.file.exists();
 		} catch (SecurityException e) {
-			LogLog.warn("Was not allowed to read check file existance, file:[" + filename + "].");
-			interrupted = true; // there is no point in continuing
+			LogLog.warn("Was not allowed to read check file existance, file:[" + this.filename + "].");
+			this.interrupted = true; // there is no point in continuing
 			return;
 		}
 
 		if (fileExists) {
-			long l = file.lastModified(); // this can also throw a SecurityException
-			if (l > lastModif) { // however, if we reached this point this
-				lastModif = l; // is very unlikely.
+			long l = this.file.lastModified(); // this can also throw a SecurityException
+			if (l > this.lastModif) { // however, if we reached this point this
+				this.lastModif = l; // is very unlikely.
 				doOnChange();
-				warnedAlready = false;
+				this.warnedAlready = false;
 			}
 		} else {
-			if (!warnedAlready) {
-				LogLog.debug("[" + filename + "] does not exist.");
-				warnedAlready = true;
+			if (!this.warnedAlready) {
+				LogLog.debug("[" + this.filename + "] does not exist.");
+				this.warnedAlready = true;
 			}
 		}
 	}
@@ -102,7 +102,7 @@ public class Log4jPropertyWatchDog extends Thread {
 	 */
 	public void doOnChange() {
 		PropertyConfigurator propertyConfigurator = new PropertyConfigurator();
-		propertyConfigurator.doConfigure(filename, LogManager.getLoggerRepository());
+		propertyConfigurator.doConfigure(this.filename, LogManager.getLoggerRepository());
 	}
 
 	/**
@@ -110,12 +110,12 @@ public class Log4jPropertyWatchDog extends Thread {
 	 */
 	@Override
 	public void run() {
-		while (!interrupted) {
+		while (!this.interrupted) {
 			try {
-				Thread.sleep(delay);
+				Thread.sleep(this.delay);
 			} catch (InterruptedException e) {
 				// no interruption expected
-				interrupted = true;
+				this.interrupted = true;
 			}
 			checkAndConfigure();
 		}

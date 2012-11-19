@@ -47,13 +47,13 @@ public class RmiFileDeletion implements Serializable {
 	 * @return the fileType
 	 */
 	public String getFileType() {
-		return fileType;
+		return this.fileType;
 	}
 
 	/**
 	 * @return the fileName
 	 */
 	public String getFileName() {
-		return fileName;
+		return this.fileName;
 	}
 }

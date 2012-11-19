@@ -117,11 +117,11 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public void add(String key, T objectToAdd) {
 
-		if (logger.isDebugEnabled())
-			logger.debug("add object " + objectToAdd + " with key " + key);
+		if (ObjectFilter.logger.isDebugEnabled())
+			ObjectFilter.logger.debug("add object " + objectToAdd + " with key " + key);
 
 		// add the key to the set
-		keySet.add(key);
+		this.keySet.add(key);
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		long id = objectToAdd.getTransactionID();
@@ -131,14 +131,14 @@ public class ObjectFilter<T extends ITransactionObject> {
 			id = dispenseID();
 			objectToAdd.setTransactionID(id);
 			ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToAdd, Operation.ADD);
-			cache.put(id, cacheObj);
+			this.cache.put(id, cacheObj);
 		} else {
-			ObjectCache<T> cached = cache.get(Long.valueOf(objectToAdd.getTransactionID()));
+			ObjectCache<T> cached = this.cache.get(Long.valueOf(objectToAdd.getTransactionID()));
 			if (cached == null) {
 				// The object got an ID during this run, but was not added to the cache.
 				// Hence, we add it now, with the current operation.
 				ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToAdd, Operation.ADD);
-				cache.put(id, cacheObj);
+				this.cache.put(id, cacheObj);
 			} else {
 				String existingKey = cached.getKey();
 				if (!existingKey.equals(key)) {
@@ -197,11 +197,11 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public void update(String key, T objectToUpdate) {
 
-		if (logger.isDebugEnabled())
-			logger.debug("update object " + objectToUpdate + " with key " + key);
+		if (ObjectFilter.logger.isDebugEnabled())
+			ObjectFilter.logger.debug("update object " + objectToUpdate + " with key " + key);
 
 		// add the key to the keyset
-		keySet.add(key);
+		this.keySet.add(key);
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 
 		long id = objectToUpdate.getTransactionID();
@@ -209,14 +209,14 @@ public class ObjectFilter<T extends ITransactionObject> {
 			id = dispenseID();
 			objectToUpdate.setTransactionID(id);
 			ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToUpdate, Operation.MODIFY);
-			cache.put(id, cacheObj);
+			this.cache.put(id, cacheObj);
 		} else {
-			ObjectCache<T> cached = cache.get(Long.valueOf(objectToUpdate.getTransactionID()));
+			ObjectCache<T> cached = this.cache.get(Long.valueOf(objectToUpdate.getTransactionID()));
 			if (cached == null) {
 				// The object got an ID during this run, but was not added to this cache.
 				// Hence, we add it now, with the current operation.
 				ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToUpdate, Operation.MODIFY);
-				cache.put(id, cacheObj);
+				this.cache.put(id, cacheObj);
 			} else {
 				String existingKey = cached.getKey();
 				if (!existingKey.equals(key)) {
@@ -275,25 +275,25 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public void remove(String key, T objectToRemove) {
 
-		if (logger.isDebugEnabled())
-			logger.debug("remove object " + objectToRemove + " with key " + key);
+		if (ObjectFilter.logger.isDebugEnabled())
+			ObjectFilter.logger.debug("remove object " + objectToRemove + " with key " + key);
 
 		// add the key to the keyset
-		keySet.add(key);
+		this.keySet.add(key);
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		long id = objectToRemove.getTransactionID();
 		if (id == ITransactionObject.UNSET) {
 			id = dispenseID();
 			objectToRemove.setTransactionID(id);
 			ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToRemove, Operation.REMOVE);
-			cache.put(id, cacheObj);
+			this.cache.put(id, cacheObj);
 		} else {
-			ObjectCache<T> cached = cache.get(Long.valueOf(id));
+			ObjectCache<T> cached = this.cache.get(Long.valueOf(id));
 			if (cached == null) {
 				// The object got an ID during this run, but was not added to this cache.
 				// Hence, we add it now, with the current operation.
 				ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToRemove, Operation.REMOVE);
-				cache.put(id, cacheObj);
+				this.cache.put(id, cacheObj);
 			} else {
 				String existingKey = cached.getKey();
 				if (!existingKey.equals(key)) {
@@ -315,7 +315,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 				case ADD:
 					// this is a case where we're removing the object from the cache, since we are
 					// removing it now and it was added previously.
-					cache.remove(Long.valueOf(id));
+					this.cache.remove(Long.valueOf(id));
 					break;
 				case MODIFY:
 					cached.setObject(objectToRemove);
@@ -448,7 +448,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public List<T> getAdded(String key) {
 		List<T> addedObjects = new LinkedList<T>();
-		Collection<ObjectCache<T>> allObjs = cache.values();
+		Collection<ObjectCache<T>> allObjs = this.cache.values();
 		for (ObjectCache<T> objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.ADD && (objectCache.getKey().equals(key))) {
 				addedObjects.add(objectCache.getObject());
@@ -468,7 +468,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public <V extends T> List<V> getAdded(Class<V> clazz, String key) {
 		List<V> addedObjects = new LinkedList<V>();
-		Collection<ObjectCache<T>> allObjs = cache.values();
+		Collection<ObjectCache<T>> allObjs = this.cache.values();
 		for (ObjectCache<T> objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.ADD && (objectCache.getKey().equals(key))) {
 				if (objectCache.getObject().getClass() == clazz) {
@@ -490,7 +490,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public List<T> getUpdated(String key) {
 		List<T> updatedObjects = new LinkedList<T>();
-		Collection<ObjectCache<T>> allObjs = cache.values();
+		Collection<ObjectCache<T>> allObjs = this.cache.values();
 		for (ObjectCache<T> objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.MODIFY && (objectCache.getKey().equals(key))) {
 				updatedObjects.add(objectCache.getObject());
@@ -508,7 +508,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public <V extends T> List<V> getUpdated(Class<V> clazz, String key) {
 		List<V> updatedObjects = new LinkedList<V>();
-		Collection<ObjectCache<T>> allObjs = cache.values();
+		Collection<ObjectCache<T>> allObjs = this.cache.values();
 		for (ObjectCache<T> objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.MODIFY && (objectCache.getKey().equals(key))) {
 				if (objectCache.getObject().getClass() == clazz) {
@@ -530,7 +530,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public List<T> getRemoved(String key) {
 		List<T> removedObjects = new LinkedList<T>();
-		Collection<ObjectCache<T>> allObjs = cache.values();
+		Collection<ObjectCache<T>> allObjs = this.cache.values();
 		for (ObjectCache<T> objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.REMOVE && (objectCache.getKey().equals(key))) {
 				removedObjects.add(objectCache.getObject());
@@ -548,7 +548,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public <V extends T> List<V> getRemoved(Class<V> clazz, String key) {
 		List<V> removedObjects = new LinkedList<V>();
-		Collection<ObjectCache<T>> allObjs = cache.values();
+		Collection<ObjectCache<T>> allObjs = this.cache.values();
 		for (ObjectCache<T> objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.REMOVE && (objectCache.getKey().equals(key))) {
 				if (objectCache.getObject().getClass() == clazz) {
@@ -571,7 +571,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public List<T> getAll(String key) {
 		List<T> allObjects = new LinkedList<T>();
-		Collection<ObjectCache<T>> allObjs = cache.values();
+		Collection<ObjectCache<T>> allObjs = this.cache.values();
 		for (ObjectCache<T> objectCache : allObjs) {
 			if (objectCache.getKey().equals(key)) {
 				allObjects.add(objectCache.getObject());
@@ -590,7 +590,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 */
 	public List<ObjectCache<T>> getCache(String key) {
 		List<ObjectCache<T>> allCache = new LinkedList<ObjectCache<T>>();
-		Collection<ObjectCache<T>> allObjs = cache.values();
+		Collection<ObjectCache<T>> allObjs = this.cache.values();
 		for (ObjectCache<T> objectCache : allObjs) {
 			if (objectCache.getKey().equals(key)) {
 				allCache.add(objectCache);
@@ -605,26 +605,26 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @return The set containing the keys of that have been added to the filter.
 	 */
 	public Set<String> keySet() {
-		return keySet;
+		return this.keySet;
 	}
 
 	/**
 	 * Clear the cache.
 	 */
 	public void clearCache() {
-		cache.clear();
-		keySet.clear();
+		this.cache.clear();
+		this.keySet.clear();
 	}
 
 	/**
 	 * @return get a unique transaction ID
 	 */
 	public synchronized long dispenseID() {
-		id++;
-		if (id == Long.MAX_VALUE) {
-			logger.error("Rolling IDs of objectFilter back to 1. Hope this is fine.");
-			id = 1;
+		ObjectFilter.id++;
+		if (ObjectFilter.id == Long.MAX_VALUE) {
+			ObjectFilter.logger.error("Rolling IDs of objectFilter back to 1. Hope this is fine.");
+			ObjectFilter.id = 1;
 		}
-		return id;
+		return ObjectFilter.id;
 	}
 }

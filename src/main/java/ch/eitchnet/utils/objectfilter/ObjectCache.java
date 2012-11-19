@@ -71,8 +71,8 @@ public class ObjectCache<T extends ITransactionObject> {
 		this.object = object;
 		this.operation = operation;
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("Instanciated Cache: ID" + this.id + " / " + key + " OP: " + this.operation + " / "
+		if (ObjectCache.logger.isDebugEnabled()) {
+			ObjectCache.logger.debug("Instanciated Cache: ID" + this.id + " / " + key + " OP: " + this.operation + " / "
 					+ object.toString());
 		}
 	}
@@ -83,8 +83,8 @@ public class ObjectCache<T extends ITransactionObject> {
 	 * @param object
 	 */
 	public void setObject(T object) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Updating ID " + this.id + " to value " + object.toString());
+		if (ObjectCache.logger.isDebugEnabled()) {
+			ObjectCache.logger.debug("Updating ID " + this.id + " to value " + object.toString());
 		}
 		this.object = object;
 	}
@@ -95,8 +95,8 @@ public class ObjectCache<T extends ITransactionObject> {
 	 * @param newOperation
 	 */
 	public void setOperation(Operation newOperation) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Updating Operation of ID " + this.id + " from " + this.operation + " to " + newOperation);
+		if (ObjectCache.logger.isDebugEnabled()) {
+			ObjectCache.logger.debug("Updating Operation of ID " + this.id + " from " + this.operation + " to " + newOperation);
 		}
 		this.operation = newOperation;
 	}
@@ -105,27 +105,27 @@ public class ObjectCache<T extends ITransactionObject> {
 	 * @return the id
 	 */
 	public long getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
 	 * @return the key
 	 */
 	public String getKey() {
-		return key;
+		return this.key;
 	}
 
 	/**
 	 * @return the object
 	 */
 	public T getObject() {
-		return object;
+		return this.object;
 	}
 
 	/**
 	 * @return the operation
 	 */
 	public Operation getOperation() {
-		return operation;
+		return this.operation;
 	}
 }

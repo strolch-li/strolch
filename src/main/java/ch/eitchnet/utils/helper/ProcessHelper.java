@@ -45,7 +45,7 @@ public class ProcessHelper {
 			Thread errorIn = new Thread("errorIn") {
 				@Override
 				public void run() {
-					readStream(sb, "[ERROR] ", errorStream);
+					ProcessHelper.readStream(sb, "[ERROR] ", errorStream);
 				}
 			};
 			errorIn.start();
@@ -55,7 +55,7 @@ public class ProcessHelper {
 			Thread infoIn = new Thread("infoIn") {
 				@Override
 				public void run() {
-					readStream(sb, "[INFO] ", inputStream);
+					ProcessHelper.readStream(sb, "[INFO] ", inputStream);
 				}
 			};
 			infoIn.start();
@@ -72,7 +72,7 @@ public class ProcessHelper {
 			throw new RuntimeException("Failed to perform command: "
 					+ e.getLocalizedMessage(), e);
 		} catch (InterruptedException e) {
-			logger.error("Interrupted!");
+			ProcessHelper.logger.error("Interrupted!");
 			sb.append("[FATAL] Interrupted");
 			return new ProcessResult(-1, sb.toString(), e);
 		}
@@ -102,7 +102,7 @@ public class ProcessHelper {
 			Thread errorIn = new Thread("errorIn") {
 				@Override
 				public void run() {
-					readStream(sb, "[ERROR] ", errorStream);
+					ProcessHelper.readStream(sb, "[ERROR] ", errorStream);
 				}
 			};
 			errorIn.start();
@@ -112,7 +112,7 @@ public class ProcessHelper {
 			Thread infoIn = new Thread("infoIn") {
 				@Override
 				public void run() {
-					readStream(sb, "[INFO] ", inputStream);
+					ProcessHelper.readStream(sb, "[INFO] ", inputStream);
 				}
 			};
 			infoIn.start();
@@ -129,7 +129,7 @@ public class ProcessHelper {
 			throw new RuntimeException("Failed to perform command: "
 					+ e.getLocalizedMessage(), e);
 		} catch (InterruptedException e) {
-			logger.error("Interrupted!");
+			ProcessHelper.logger.error("Interrupted!");
 			sb.append("[FATAL] Interrupted");
 			return new ProcessResult(-1, sb.toString(), e);
 		}
@@ -165,33 +165,33 @@ public class ProcessHelper {
 
 		ProcessResult processResult;
 		if (SystemHelper.isLinux()) {
-			processResult = runCommand("xdg-open " + pdfPath.getAbsolutePath());
+			processResult = ProcessHelper.runCommand("xdg-open " + pdfPath.getAbsolutePath());
 		} else if (SystemHelper.isMacOS()) {
-			processResult = runCommand("open " + pdfPath.getAbsolutePath());
+			processResult = ProcessHelper.runCommand("open " + pdfPath.getAbsolutePath());
 		} else if (SystemHelper.isWindows()) {
 			// remove the first char (/) from the report path (/D:/temp.....)
 			String pdfFile = pdfPath.getAbsolutePath();
 			if (pdfFile.charAt(0) == '/')
 				pdfFile = pdfFile.substring(1);
-			processResult = runCommand("rundll32 url.dll,FileProtocolHandler "
+			processResult = ProcessHelper.runCommand("rundll32 url.dll,FileProtocolHandler "
 					+ pdfFile);
 		} else {
 			throw new UnsupportedOperationException("Unexpected OS: "
 					+ SystemHelper.osName);
 		}
 
-		logProcessResult(processResult);
+		ProcessHelper.logProcessResult(processResult);
 	}
 
 	public static void logProcessResult(ProcessResult processResult) {
 		if (processResult.returnValue == 0) {
-			logger.info("Process executed successfully");
+			ProcessHelper.logger.info("Process executed successfully");
 		} else if (processResult.returnValue == -1) {
-			logger.error("Process execution failed:\n"
+			ProcessHelper.logger.error("Process execution failed:\n"
 					+ processResult.processOutput);
-			logger.error(processResult.t, processResult.t);
+			ProcessHelper.logger.error(processResult.t, processResult.t);
 		} else {
-			logger.info("Process execution was not successful with return value:"
+			ProcessHelper.logger.info("Process execution was not successful with return value:"
 					+ processResult.returnValue
 					+ "\n"
 					+ processResult.processOutput);

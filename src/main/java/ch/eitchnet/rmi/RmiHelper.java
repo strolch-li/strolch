@@ -40,10 +40,10 @@ public class RmiHelper {
 
 	/**
 	 * @param rmiFileClient
-	 * @param filePart
+	 * @param origFilePart
 	 * @param dstFile
 	 */
-	public static void downloadFile(RMIFileClient rmiFileClient, RmiFilePart filePart, File dstFile) {
+	public static void downloadFile(RMIFileClient rmiFileClient, RmiFilePart origFilePart, File dstFile) {
 
 		// here we don't overwrite, the caller must make sure the destination file does not exist
 		if (dstFile.exists())
@@ -51,56 +51,59 @@ public class RmiHelper {
 					+ " already exists. Delete it first, if you want to overwrite it!");
 
 		try {
+
+			RmiFilePart tmpPart = origFilePart;
+
 			int loops = 0;
-			int startLength = filePart.getPartLength();
+			int startLength = tmpPart.getPartLength();
 			while (true) {
 				loops += 1;
 
 				// get the next part
-				filePart = rmiFileClient.requestFile(filePart);
+				tmpPart = rmiFileClient.requestFile(tmpPart);
 
 				// validate length of data
-				if (filePart.getPartLength() != filePart.getPartBytes().length)
-					throw new RuntimeException("Invalid FilePart. Part length is not as long as the bytes passed "
-							+ filePart.getPartLength() + " / " + filePart.getPartBytes().length);
+				if (tmpPart.getPartLength() != tmpPart.getPartBytes().length)
+					throw new RuntimeException("Invalid tmpPart. Part length is not as long as the bytes passed "
+							+ tmpPart.getPartLength() + " / " + tmpPart.getPartBytes().length);
 
 				// validate offset is size of file
-				if (filePart.getPartOffset() != dstFile.length()) {
+				if (tmpPart.getPartOffset() != dstFile.length()) {
 					throw new RuntimeException("The part offset $offset is not at the end of the file "
-							+ filePart.getPartOffset() + " / " + dstFile.length());
+							+ tmpPart.getPartOffset() + " / " + dstFile.length());
 				}
 
 				// append the part
-				FileHelper.appendFilePart(dstFile, filePart.getPartBytes());
+				FileHelper.appendFilePart(dstFile, tmpPart.getPartBytes());
 
 				// update the offset
-				filePart.setPartOffset(filePart.getPartOffset() + filePart.getPartBytes().length);
+				tmpPart.setPartOffset(tmpPart.getPartOffset() + tmpPart.getPartBytes().length);
 
 				// break if the offset is past the length of the file
-				if (filePart.getPartOffset() >= filePart.getFileLength())
+				if (tmpPart.getPartOffset() >= tmpPart.getFileLength())
 					break;
 			}
-			logger.info(filePart.getFileType() + ": " + filePart.getFileName() + ": Requested " + loops
-					+ " parts. StartSize: " + startLength + " EndSize: " + filePart.getPartLength());
+			RmiHelper.logger.info(tmpPart.getFileType() + ": " + tmpPart.getFileName() + ": Requested " + loops
+					+ " parts. StartSize: " + startLength + " EndSize: " + tmpPart.getPartLength());
 
 			// validate that the offset is at the end of the file
-			if (filePart.getPartOffset() != filePart.getFileLength()) {
-				throw new RuntimeException("Offset " + filePart.getPartOffset() + " is not at file length "
-						+ filePart.getFileLength() + " after reading all the file parts!");
+			if (tmpPart.getPartOffset() != origFilePart.getFileLength()) {
+				throw new RuntimeException("Offset " + tmpPart.getPartOffset() + " is not at file length "
+						+ origFilePart.getFileLength() + " after reading all the file parts!");
 			}
 
 			// now validate hashes
 			String dstFileHash = StringHelper.getHexString(FileHelper.hashFileSha256(dstFile));
-			if (!dstFileHash.equals(filePart.getFileHash())) {
-				throw new RuntimeException("Downloading the file " + filePart.getFileName()
-						+ " failed because the hashes don't match. Expected: " + filePart.getFileHash() + " / Actual: "
-						+ dstFileHash);
+			if (!dstFileHash.equals(origFilePart.getFileHash())) {
+				throw new RuntimeException("Downloading the file " + origFilePart.getFileName()
+						+ " failed because the hashes don't match. Expected: " + origFilePart.getFileHash()
+						+ " / Actual: " + dstFileHash);
 			}
 
 		} catch (Exception e) {
 			if (e instanceof RuntimeException)
 				throw (RuntimeException) e;
-			throw new RuntimeException("Downloading the file " + filePart.getFileName()
+			throw new RuntimeException("Downloading the file " + origFilePart.getFileName()
 					+ " failed because of an underlying exception " + e.getLocalizedMessage());
 		}
 	}
@@ -194,7 +197,7 @@ public class RmiHelper {
 				offset = nextOffset;
 			}
 
-			logger.info(filePart.getFileType() + ": " + filePart.getFileName() + ": Sent " + loops
+			RmiHelper.logger.info(filePart.getFileType() + ": " + filePart.getFileName() + ": Sent " + loops
 					+ " parts. StartSize: " + startLength + " EndSize: " + filePart.getPartLength());
 
 		} catch (Exception e) {
@@ -207,7 +210,7 @@ public class RmiHelper {
 				try {
 					inputStream.close();
 				} catch (IOException e) {
-					logger.error("Exception while closing FileInputStream " + e.getLocalizedMessage());
+					RmiHelper.logger.error("Exception while closing FileInputStream " + e.getLocalizedMessage());
 				}
 			}
 		}

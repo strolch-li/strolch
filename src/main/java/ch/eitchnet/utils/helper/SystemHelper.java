@@ -34,7 +34,7 @@ public class SystemHelper {
 	}
 
 	public static SystemHelper getInstance() {
-		return instance;
+		return SystemHelper.instance;
 	}
 
 	public static final String osName = System.getProperty("os.name");
@@ -55,7 +55,7 @@ public class SystemHelper {
 	 */
 	@Override
 	public String toString() {
-		return asString();
+		return SystemHelper.asString();
 	}
 
 	/**
@@ -63,15 +63,15 @@ public class SystemHelper {
 	 */
 	public static String asString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(osName);
+		sb.append(SystemHelper.osName);
 		sb.append(" ");
-		sb.append(osArch);
+		sb.append(SystemHelper.osArch);
 		sb.append(" ");
-		sb.append(osVersion);
+		sb.append(SystemHelper.osVersion);
 		sb.append(" ");
-		sb.append("on Java " + javaVendor);
+		sb.append("on Java " + SystemHelper.javaVendor);
 		sb.append(" version ");
-		sb.append(javaVersion);
+		sb.append(SystemHelper.javaVersion);
 		return sb.toString();
 	}
 	
@@ -80,23 +80,23 @@ public class SystemHelper {
 	}
 
 	public static boolean isMacOS() {
-		return osName.startsWith("Mac");
+		return SystemHelper.osName.startsWith("Mac");
 	}
 
 	public static boolean isWindows() {
-		return osName.startsWith("Win");
+		return SystemHelper.osName.startsWith("Win");
 	}
 
 	public static boolean isLinux() {
-		return osName.startsWith("Lin");
+		return SystemHelper.osName.startsWith("Lin");
 	}
 
 	public static boolean is32bit() {
-		return osArch.equals("x86") || osArch.equals("i386") || osArch.equals("i686");
+		return SystemHelper.osArch.equals("x86") || SystemHelper.osArch.equals("i386") || SystemHelper.osArch.equals("i686");
 	}
 
 	public static boolean is64bit() {
-		return osArch.equals("x86_64") || osArch.equals("amd64");
+		return SystemHelper.osArch.equals("x86_64") || SystemHelper.osArch.equals("amd64");
 	}
 
 	public static String getMaxMemory() {
@@ -112,7 +112,7 @@ public class SystemHelper {
 	}
 
 	public static String getMemorySummary() {
-		return "Memory available " + getMaxMemory() + " / Used: " + getUsedMemory() + " / Free:" + getFreeMemory();
+		return "Memory available " + SystemHelper.getMaxMemory() + " / Used: " + SystemHelper.getUsedMemory() + " / Free:" + SystemHelper.getFreeMemory();
 	}
 
 	/**
@@ -150,7 +150,7 @@ public class SystemHelper {
 	 *             if the property is not set and def is null
 	 */
 	public static Boolean getPropertyBool(String context, String key, Boolean def) throws RuntimeException {
-		return Boolean.valueOf(getProperty(context, key, def == null ? null : def.toString()));
+		return Boolean.valueOf(SystemHelper.getProperty(context, key, def == null ? null : def.toString()));
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class SystemHelper {
 	 *             if the property is not set and def is null
 	 */
 	public static Integer getPropertyInt(String context, String key, Integer def) throws RuntimeException {
-		return Integer.valueOf(getProperty(context, key, def == null ? null : def.toString()));
+		return Integer.valueOf(SystemHelper.getProperty(context, key, def == null ? null : def.toString()));
 	}
 
 	/**
@@ -176,6 +176,6 @@ public class SystemHelper {
 	 *             if the property is not set and def is null
 	 */
 	public static Double getPropertyDouble(String context, String key, Double def) throws RuntimeException {
-		return Double.valueOf(getProperty(context, key, def == null ? null : def.toString()));
+		return Double.valueOf(SystemHelper.getProperty(context, key, def == null ? null : def.toString()));
 	}
 }

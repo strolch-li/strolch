@@ -59,8 +59,8 @@ public class StringHelper {
 
 			for (byte b : raw) {
 				int v = b & 0xFF;
-				hex[index++] = HEX_CHAR_TABLE[v >>> 4];
-				hex[index++] = HEX_CHAR_TABLE[v & 0xF];
+				hex[index++] = StringHelper.HEX_CHAR_TABLE[v >>> 4];
+				hex[index++] = StringHelper.HEX_CHAR_TABLE[v & 0xF];
 			}
 
 			return new String(hex, "ASCII");
@@ -103,7 +103,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashMd5(String string) {
-		return hashMd5(string.getBytes());
+		return StringHelper.hashMd5(string.getBytes());
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashMd5(byte[] bytes) {
-		return hash("MD5", bytes);
+		return StringHelper.hash("MD5", bytes);
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha1(String string) {
-		return hashSha1(string.getBytes());
+		return StringHelper.hashSha1(string.getBytes());
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha1(byte[] bytes) {
-		return hash("SHA-1", bytes);
+		return StringHelper.hash("SHA-1", bytes);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha256(String string) {
-		return hashSha256(string.getBytes());
+		return StringHelper.hashSha256(string.getBytes());
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha256(byte[] bytes) {
-		return hash("SHA-256", bytes);
+		return StringHelper.hash("SHA-256", bytes);
 	}
 
 	/**
@@ -209,7 +209,7 @@ public class StringHelper {
 	 * @return the new string
 	 */
 	public static String normalizeLength(String value, int length, boolean beginning, char c) {
-		return normalizeLength(value, length, beginning, false, c);
+		return StringHelper.normalizeLength(value, length, beginning, false, c);
 	}
 
 	/**
@@ -235,20 +235,21 @@ public class StringHelper {
 
 		if (value.length() < length) {
 
-			while (value.length() != length) {
+			String tmp = value;
+			while (tmp.length() != length) {
 				if (beginning) {
-					value = c + value;
+					tmp = c + tmp;
 				} else {
-					value = value + c;
+					tmp = tmp + c;
 				}
 			}
 
-			return value;
+			return tmp;
 
 		} else if (shorten) {
 
-			logger.warn("Shortening length of value: " + value);
-			logger.warn("Length is: " + value.length() + " max: " + length);
+			StringHelper.logger.warn("Shortening length of value: " + value);
+			StringHelper.logger.warn("Length is: " + value.length() + " max: " + length);
 
 			return value.substring(0, length);
 		}
@@ -263,7 +264,7 @@ public class StringHelper {
 	 *         returned
 	 */
 	public static String replaceSystemPropertiesIn(String value) {
-		return replacePropertiesIn(System.getProperties(), value);
+		return StringHelper.replacePropertiesIn(System.getProperties(), value);
 	}
 
 	/**
@@ -278,41 +279,41 @@ public class StringHelper {
 	 * 
 	 * @return a new string with all defined properties replaced or if an error occurred the original value is returned
 	 */
-	public static String replacePropertiesIn(Properties properties, String value) {
+	public static String replacePropertiesIn(Properties properties, String alue) {
 
-		// keep copy of original value
-		String origValue = value;
+		// get a copy of the value
+		String tmpValue = alue;
 
 		// get first occurrence of $ character
 		int pos = -1;
 		int stop = 0;
 
 		// loop on $ character positions
-		while ((pos = value.indexOf('$', pos + 1)) != -1) {
+		while ((pos = tmpValue.indexOf('$', pos + 1)) != -1) {
 
 			// if pos+1 is not { character then continue
-			if (value.charAt(pos + 1) != '{') {
+			if (tmpValue.charAt(pos + 1) != '{') {
 				continue;
 			}
 
 			// find end of sequence with } character
-			stop = value.indexOf('}', pos + 1);
+			stop = tmpValue.indexOf('}', pos + 1);
 
 			// if no stop found, then break as another sequence should be able to start
 			if (stop == -1) {
-				logger.error("Sequence starts at offset " + pos + " but does not end!");
-				value = origValue;
+				StringHelper.logger.error("Sequence starts at offset " + pos + " but does not end!");
+				tmpValue = alue;
 				break;
 			}
 
 			// get sequence enclosed by pos and stop
-			String sequence = value.substring(pos + 2, stop);
+			String sequence = tmpValue.substring(pos + 2, stop);
 
 			// make sure sequence doesn't contain $ { } characters
 			if (sequence.contains("$") || sequence.contains("{") || sequence.contains("}")) {
-				logger.error("Enclosed sequence in offsets " + pos + " - " + stop
+				StringHelper.logger.error("Enclosed sequence in offsets " + pos + " - " + stop
 						+ " contains one of the illegal chars: $ { }: " + sequence);
-				value = origValue;
+				tmpValue = alue;
 				break;
 			}
 
@@ -326,10 +327,10 @@ public class StringHelper {
 			}
 
 			// property exists, so replace in value
-			value = value.replace("${" + sequence + "}", property);
+			tmpValue = tmpValue.replace("${" + sequence + "}", property);
 		}
 
-		return value;
+		return tmpValue;
 	}
 
 	/**
@@ -340,7 +341,7 @@ public class StringHelper {
 	 *            the properties in which the values must have any ${...} replaced by values of the respective key
 	 */
 	public static void replaceProperties(Properties properties) {
-		replaceProperties(properties, null);
+		StringHelper.replaceProperties(properties, null);
 	}
 
 	/**

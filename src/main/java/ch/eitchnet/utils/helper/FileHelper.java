@@ -79,7 +79,7 @@ public class FileHelper {
 				try {
 					bufferedReader.close();
 				} catch (IOException e) {
-					logger.error("Failed to close BufferedReader: " + e.getLocalizedMessage());
+					FileHelper.logger.error("Failed to close BufferedReader: " + e.getLocalizedMessage());
 				}
 			}
 		}
@@ -115,7 +115,7 @@ public class FileHelper {
 	 * @return true if all went well, and false if it did not work. The log will contain the problems encountered
 	 */
 	public final static boolean deleteFile(File file, boolean log) {
-		return deleteFiles(new File[] { file }, log);
+		return FileHelper.deleteFiles(new File[] { file }, log);
 	}
 
 	/**
@@ -132,28 +132,28 @@ public class FileHelper {
 		for (int i = 0; i < files.length; i++) {
 			File file = files[i];
 			if (file.isDirectory()) {
-				boolean done = deleteFiles(file.listFiles(), log);
+				boolean done = FileHelper.deleteFiles(file.listFiles(), log);
 				if (!done) {
 					worked = false;
-					logger.warn("Could not empty the directory: " + file.getAbsolutePath());
+					FileHelper.logger.warn("Could not empty the directory: " + file.getAbsolutePath());
 				} else {
 					done = file.delete();
 					if (done) {
 						if (log)
-							logger.info("Deleted DIR  " + file.getAbsolutePath());
+							FileHelper.logger.info("Deleted DIR  " + file.getAbsolutePath());
 					} else {
 						worked = false;
-						logger.warn("Could not delete the directory: " + file.getAbsolutePath());
+						FileHelper.logger.warn("Could not delete the directory: " + file.getAbsolutePath());
 					}
 				}
 			} else {
 				boolean done = file.delete();
 				if (done) {
 					if (log)
-						logger.info("Deleted FILE " + file.getAbsolutePath());
+						FileHelper.logger.info("Deleted FILE " + file.getAbsolutePath());
 				} else {
 					worked = false;
-					logger.warn(("Could not delete the file: " + file.getAbsolutePath()));
+					FileHelper.logger.warn(("Could not delete the file: " + file.getAbsolutePath()));
 				}
 			}
 		}
@@ -195,7 +195,7 @@ public class FileHelper {
 				String fromFileMD5 = StringHelper.getHexString(FileHelper.hashFileMd5(fromFile));
 				String toFileMD5 = StringHelper.getHexString(FileHelper.hashFileMd5(toFile));
 				if (!fromFileMD5.equals(toFileMD5)) {
-					logger.error("Copying failed, as MD5 sums are not equal: " + fromFileMD5 + " / " + toFileMD5);
+					FileHelper.logger.error("Copying failed, as MD5 sums are not equal: " + fromFileMD5 + " / " + toFileMD5);
 					toFile.delete();
 
 					return false;
@@ -204,7 +204,7 @@ public class FileHelper {
 
 			// cleanup if files are not the same length
 			if (fromFile.length() != toFile.length()) {
-				logger.error("Copying failed, as new files are not the same length: " + fromFile.length() + " / "
+				FileHelper.logger.error("Copying failed, as new files are not the same length: " + fromFile.length() + " / "
 						+ toFile.length());
 				toFile.delete();
 
@@ -213,7 +213,7 @@ public class FileHelper {
 
 		} catch (Exception e) {
 
-			logger.error(e, e);
+			FileHelper.logger.error(e, e);
 			return false;
 
 		} finally {
@@ -222,7 +222,7 @@ public class FileHelper {
 				try {
 					inBuffer.close();
 				} catch (IOException e) {
-					logger.error("Error closing BufferedInputStream" + e);
+					FileHelper.logger.error("Error closing BufferedInputStream" + e);
 				}
 			}
 
@@ -230,7 +230,7 @@ public class FileHelper {
 				try {
 					outBuffer.close();
 				} catch (IOException e) {
-					logger.error("Error closing BufferedOutputStream" + e);
+					FileHelper.logger.error("Error closing BufferedOutputStream" + e);
 				}
 			}
 		}
@@ -254,11 +254,11 @@ public class FileHelper {
 			return true;
 		}
 
-		logger.warn("Simple File.renameTo failed, trying copy/delete...");
+		FileHelper.logger.warn("Simple File.renameTo failed, trying copy/delete...");
 
 		// delete if copy was successful, otherwise move will fail
 		if (FileHelper.copy(fromFile, toFile, true)) {
-			logger.info("Deleting fromFile: " + fromFile.getAbsolutePath());
+			FileHelper.logger.info("Deleting fromFile: " + fromFile.getAbsolutePath());
 			return fromFile.delete();
 		}
 
@@ -372,7 +372,7 @@ public class FileHelper {
 	 * @return the humanized form of the files size
 	 */
 	public final static String humanizeFileSize(File file) {
-		return humanizeFileSize(file.length());
+		return FileHelper.humanizeFileSize(file.length());
 	}
 
 	/**
@@ -407,7 +407,7 @@ public class FileHelper {
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileMd5(File file) {
-		return hashFile(file, "MD5");
+		return FileHelper.hashFile(file, "MD5");
 	}
 
 	/**
@@ -420,7 +420,7 @@ public class FileHelper {
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileSha1(File file) {
-		return hashFile(file, "SHA-1");
+		return FileHelper.hashFile(file, "SHA-1");
 	}
 
 	/**
@@ -433,7 +433,7 @@ public class FileHelper {
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileSha256(File file) {
-		return hashFile(file, "SHA-256");
+		return FileHelper.hashFile(file, "SHA-256");
 	}
 
 	/**
@@ -492,7 +492,7 @@ public class FileHelper {
 				try {
 					outputStream.close();
 				} catch (IOException e) {
-					logger.error("Exception while closing FileOutputStream " + e.getLocalizedMessage());
+					FileHelper.logger.error("Exception while closing FileOutputStream " + e.getLocalizedMessage());
 				}
 			}
 		}

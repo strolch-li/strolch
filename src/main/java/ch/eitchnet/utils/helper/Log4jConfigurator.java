@@ -63,9 +63,9 @@ public class Log4jConfigurator {
 	 * Configures log4j with the default {@link ConsoleAppender}
 	 */
 	public static synchronized void configure() {
-		cleanupOldWatchdog();
+		Log4jConfigurator.cleanupOldWatchdog();
 		BasicConfigurator.resetConfiguration();
-		BasicConfigurator.configure(new ConsoleAppender(getDefaulLayout()));
+		BasicConfigurator.configure(new ConsoleAppender(Log4jConfigurator.getDefaulLayout()));
 		Logger.getRootLogger().setLevel(Level.INFO);
 	}
 
@@ -119,13 +119,13 @@ public class Log4jConfigurator {
 						+ log4JPath.getAbsolutePath());
 
 			// now perform the loading
-			loadLog4jConfiguration(log4JPath);
+			Log4jConfigurator.loadLog4jConfiguration(log4JPath);
 
 		} catch (Exception e) {
 
 			Log4jConfigurator.configure();
-			logger.error(e, e);
-			logger.error("Log4j COULD NOT BE INITIALIZED. Please check the log4j configuration file exists at "
+			Log4jConfigurator.logger.error(e, e);
+			Log4jConfigurator.logger.error("Log4j COULD NOT BE INITIALIZED. Please check the log4j configuration file exists at "
 					+ log4JPath.getAbsolutePath());
 
 		}
@@ -152,7 +152,7 @@ public class Log4jConfigurator {
 			throw new RuntimeException("log4jConfigPath may not be null!");
 
 		// first clean up any old watch dog in case of a programmatic re-load of the configuration
-		cleanupOldWatchdog();
+		Log4jConfigurator.cleanupOldWatchdog();
 
 		// get the root directory
 		String userDir = System.getProperty("user.dir");
@@ -184,16 +184,16 @@ public class Log4jConfigurator {
 			// XXX if the server is in a web context, then we may not use the
 			// FileWatchDog
 			BasicConfigurator.resetConfiguration();
-			watchDog = new Log4jPropertyWatchDog(pathNameToLog4jTemp);
-			watchDog.start();
+			Log4jConfigurator.watchDog = new Log4jPropertyWatchDog(pathNameToLog4jTemp);
+			Log4jConfigurator.watchDog.start();
 
-			logger.info("Log4j is configured to use and watch file " + pathNameToLog4jTemp);
+			Log4jConfigurator.logger.info("Log4j is configured to use and watch file " + pathNameToLog4jTemp);
 
 		} catch (Exception e) {
 
 			Log4jConfigurator.configure();
-			logger.error(e, e);
-			logger.error("Log4j COULD NOT BE INITIALIZED. Please check the log4j configuration file at "
+			Log4jConfigurator.logger.error(e, e);
+			Log4jConfigurator.logger.error("Log4j COULD NOT BE INITIALIZED. Please check the log4j configuration file at "
 					+ log4jConfigPath);
 
 		} finally {
@@ -201,14 +201,14 @@ public class Log4jConfigurator {
 				try {
 					fin.close();
 				} catch (IOException e) {
-					logger.error("Exception closing input file: " + e, e);
+					Log4jConfigurator.logger.error("Exception closing input file: " + e, e);
 				}
 			}
 			if (fout != null) {
 				try {
 					fout.close();
 				} catch (IOException e) {
-					logger.error("Exception closing output file: " + e, e);
+					Log4jConfigurator.logger.error("Exception closing output file: " + e, e);
 				}
 			}
 		}
@@ -229,9 +229,9 @@ public class Log4jConfigurator {
 			if (clazz == null)
 				throw new RuntimeException("clazz may not be null!");
 
-			InputStream resourceAsStream = clazz.getResourceAsStream("/" + FILE_LOG4J);
+			InputStream resourceAsStream = clazz.getResourceAsStream("/" + Log4jConfigurator.FILE_LOG4J);
 			if (resourceAsStream == null) {
-				throw new RuntimeException("The resource '" + FILE_LOG4J + "' could not be found for class "
+				throw new RuntimeException("The resource '" + Log4jConfigurator.FILE_LOG4J + "' could not be found for class "
 						+ clazz.getName());
 			}
 
@@ -240,13 +240,13 @@ public class Log4jConfigurator {
 			log4jProperties.load(resourceAsStream);
 
 			// and then 
-			loadLog4jConfiguration(log4jProperties);
+			Log4jConfigurator.loadLog4jConfiguration(log4jProperties);
 
 		} catch (Exception e) {
 			Log4jConfigurator.configure();
-			logger.error(e, e);
-			logger.error("Log4j COULD NOT BE INITIALIZED. Please check that the log4j configuration file '"
-					+ FILE_LOG4J + "' exists as a resource for class " + clazz.getName()
+			Log4jConfigurator.logger.error(e, e);
+			Log4jConfigurator.logger.error("Log4j COULD NOT BE INITIALIZED. Please check that the log4j configuration file '"
+					+ Log4jConfigurator.FILE_LOG4J + "' exists as a resource for class " + clazz.getName()
 					+ " and is a valid properties configuration");
 		}
 	}
@@ -272,19 +272,19 @@ public class Log4jConfigurator {
 				throw new RuntimeException("log4jProperties may not be null!");
 
 			// first clean up any old watch dog in case of a programmatic re-load of the configuration
-			cleanupOldWatchdog();
+			Log4jConfigurator.cleanupOldWatchdog();
 
 			// replace any variables
 			StringHelper.replaceProperties(log4jProperties, System.getProperties());
 
 			// now configure log4j
 			PropertyConfigurator.configure(log4jProperties);
-			logger.info("Log4j is configured using the given properties.");
+			Log4jConfigurator.logger.info("Log4j is configured using the given properties.");
 
 		} catch (Exception e) {
 			Log4jConfigurator.configure();
-			logger.error(e, e);
-			logger.error("Log4j COULD NOT BE INITIALIZED. The given log4jProperties seem not to be valid!");
+			Log4jConfigurator.logger.error(e, e);
+			Log4jConfigurator.logger.error("Log4j COULD NOT BE INITIALIZED. The given log4jProperties seem not to be valid!");
 		}
 	}
 
@@ -293,17 +293,17 @@ public class Log4jConfigurator {
 	 */
 	public static synchronized void cleanupOldWatchdog() {
 		// clean up an old watch dog
-		if (watchDog != null) {
-			logger.info("Stopping old Log4j watchdog.");
-			watchDog.interrupt();
+		if (Log4jConfigurator.watchDog != null) {
+			Log4jConfigurator.logger.info("Stopping old Log4j watchdog.");
+			Log4jConfigurator.watchDog.interrupt();
 			try {
-				watchDog.join(1000l);
+				Log4jConfigurator.watchDog.join(1000l);
 			} catch (InterruptedException e) {
-				logger.error("Oops. Could not terminate an old WatchDog.");
+				Log4jConfigurator.logger.error("Oops. Could not terminate an old WatchDog.");
 			} finally {
-				watchDog = null;
+				Log4jConfigurator.watchDog = null;
 			}
-			logger.info("Done.");
+			Log4jConfigurator.logger.info("Done.");
 		}
 	}
 }

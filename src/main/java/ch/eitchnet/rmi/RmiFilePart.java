@@ -64,7 +64,7 @@ public class RmiFilePart implements Serializable {
 	 * @return the fileLength
 	 */
 	public long getFileLength() {
-		return fileLength;
+		return this.fileLength;
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class RmiFilePart implements Serializable {
 	 * @return the fileHash
 	 */
 	public String getFileHash() {
-		return fileHash;
+		return this.fileHash;
 	}
 
 	/**
@@ -94,14 +94,14 @@ public class RmiFilePart implements Serializable {
 	 * @return the fileType
 	 */
 	public String getFileType() {
-		return fileType;
+		return this.fileType;
 	}
 
 	/**
 	 * @return the partOffset
 	 */
 	public long getPartOffset() {
-		return partOffset;
+		return this.partOffset;
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class RmiFilePart implements Serializable {
 	 * @return the partLength
 	 */
 	public int getPartLength() {
-		return partLength;
+		return this.partLength;
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class RmiFilePart implements Serializable {
 	 * @return the partBytes
 	 */
 	public byte[] getPartBytes() {
-		return partBytes;
+		return this.partBytes;
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class RmiFilePart implements Serializable {
 	 * @return the lastPart
 	 */
 	public boolean isLastPart() {
-		return lastPart;
+		return this.lastPart;
 	}
 
 	/**
@@ -161,6 +161,6 @@ public class RmiFilePart implements Serializable {
 	 * @return the fileName
 	 */
 	public String getFileName() {
-		return fileName;
+		return this.fileName;
 	}
 }

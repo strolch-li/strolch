@@ -80,7 +80,7 @@ public class RmiFileHandler {
 		validateFileType(fileType);
 
 		// evaluate the path where the file should reside
-		File file = new File(basePath + "/" + fileType, filePart.getFileName());
+		File file = new File(this.basePath + "/" + fileType, filePart.getFileName());
 
 		// now evaluate the file exists
 		if (!file.canRead()) {
@@ -102,9 +102,9 @@ public class RmiFileHandler {
 		// variables defining the part of the file we're going to return
 		long requestOffset = filePart.getPartOffset();
 		int requestSize = filePart.getPartLength();
-		if (requestSize > MAX_PART_SIZE) {
+		if (requestSize > RmiFileHandler.MAX_PART_SIZE) {
 			throw new RuntimeException("The requested part size " + requestSize + " is greater than the allowed "
-					+ MAX_PART_SIZE);
+					+ RmiFileHandler.MAX_PART_SIZE);
 		}
 
 		// validate lengths and offsets
@@ -125,7 +125,7 @@ public class RmiFileHandler {
 			long l = Math.min(requestSize, remaining);
 
 			// this is a fail safe
-			if (l > MAX_PART_SIZE)
+			if (l > RmiFileHandler.MAX_PART_SIZE)
 				throw new RuntimeException("Something went wrong. Min of requestSize and remaining is > MAX_PART_SIZE!");
 
 			// this is the size of the array we want to return
@@ -163,7 +163,7 @@ public class RmiFileHandler {
 				try {
 					fin.close();
 				} catch (IOException e) {
-					logger.error("Error while closing FileInputStream: " + e.getLocalizedMessage());
+					RmiFileHandler.logger.error("Error while closing FileInputStream: " + e.getLocalizedMessage());
 				}
 			}
 		}
@@ -190,7 +190,7 @@ public class RmiFileHandler {
 		validateFileType(fileType);
 
 		// evaluate the path where the file should reside
-		File dstFile = new File(basePath + "/" + fileType, filePart.getFileName());
+		File dstFile = new File(this.basePath + "/" + fileType, filePart.getFileName());
 
 		// if the file already exists, then this may not be a start part
 		if (filePart.getPartOffset() == 0 && dstFile.exists()) {
@@ -231,7 +231,7 @@ public class RmiFileHandler {
 		validateFileType(fileType);
 
 		// evaluate the path where the file should reside
-		File fileToDelete = new File(basePath + "/" + fileType, fileDeletion.getFileName());
+		File fileToDelete = new File(this.basePath + "/" + fileType, fileDeletion.getFileName());
 
 		// delete the file
 		return FileHelper.deleteFiles(new File[] { fileToDelete }, true);
