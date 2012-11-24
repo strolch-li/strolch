@@ -25,8 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.handler.DefaultPrivilegeHandler;
 import ch.eitchnet.privilege.handler.EncryptionHandler;
@@ -44,7 +45,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class InitializationHelper {
 
-	private static final Logger logger = Logger.getLogger(InitializationHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(InitializationHelper.class);
 
 	/**
 	 * Initializes the {@link DefaultPrivilegeHandler} from the configuration file
@@ -92,7 +93,7 @@ public class InitializationHelper {
 			encryptionHandler.initialize(parameterMap);
 
 		} catch (Exception e) {
-			InitializationHelper.logger.error(e, e);
+			InitializationHelper.logger.error(e.getMessage(), e);
 			throw new PrivilegeException("EncryptionHandler " + encryptionHandlerClassName
 					+ " could not be initialized");
 		}
@@ -107,7 +108,7 @@ public class InitializationHelper {
 			persistenceHandler.initialize(parameterMap);
 
 		} catch (Exception e) {
-			InitializationHelper.logger.error(e, e);
+			InitializationHelper.logger.error(e.getMessage(), e);
 			throw new PrivilegeException("PersistenceHandler " + persistenceHandlerElement
 					+ " could not be initialized");
 		}
@@ -122,7 +123,7 @@ public class InitializationHelper {
 			privilegeHandler.initialize(parameterMap, encryptionHandler, persistenceHandler, policyMap);
 
 		} catch (Exception e) {
-			InitializationHelper.logger.error(e, e);
+			InitializationHelper.logger.error(e.getMessage(), e);
 			throw new PrivilegeException("PrivilegeHandler " + privilegeHandler.getClass().getName()
 					+ " could not be initialized");
 		}

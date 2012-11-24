@@ -30,9 +30,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.helper.XmlHelper;
@@ -50,7 +51,7 @@ import ch.eitchnet.privilege.model.internal.User;
  */
 public class XmlPersistenceHandler implements PersistenceHandler {
 
-	protected static final Logger logger = Logger.getLogger(XmlPersistenceHandler.class);
+	protected static final Logger logger = LoggerFactory.getLogger(XmlPersistenceHandler.class);
 
 	private Map<String, User> userMap;
 	private Map<String, Role> roleMap;

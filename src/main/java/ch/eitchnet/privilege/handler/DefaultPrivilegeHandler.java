@@ -28,7 +28,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.helper.ClassHelper;
 import ch.eitchnet.privilege.i18n.AccessDeniedException;
@@ -69,7 +70,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * log4j logger
 	 */
-	protected static final Logger logger = Logger.getLogger(DefaultPrivilegeHandler.class);
+	protected static final Logger logger = LoggerFactory.getLogger(DefaultPrivilegeHandler.class);
 
 	/**
 	 * last assigned id for the {@link Session}s

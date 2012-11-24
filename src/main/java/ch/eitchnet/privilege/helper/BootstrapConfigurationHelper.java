@@ -21,16 +21,12 @@ package ch.eitchnet.privilege.helper;
 
 import java.io.File;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.utils.helper.Log4jConfigurator;
 
 /**
  * <p>
@@ -51,7 +47,7 @@ import ch.eitchnet.privilege.handler.PrivilegeHandler;
  */
 public class BootstrapConfigurationHelper {
 
-	// private static final Logger logger = Logger.getLogger(BootstrapConfigurationHelper.class);
+	// private static final Logger logger = LoggerFactory.getLogger(BootstrapConfigurationHelper.class);
 
 	private static String path;
 
@@ -70,9 +66,7 @@ public class BootstrapConfigurationHelper {
 	 *            the args from the command line
 	 */
 	public static void main(String[] args) {
-		BasicConfigurator.resetConfiguration();
-		BasicConfigurator.configure(new ConsoleAppender(new PatternLayout("%d %5p [%t] %C{1} %M - %m%n")));
-		Logger.getRootLogger().setLevel(Level.INFO);
+		Log4jConfigurator.configure();
 
 		// get current directory
 		BootstrapConfigurationHelper.path = System.getProperty("user.dir") + "/newConfig";
@@ -133,7 +127,8 @@ public class BootstrapConfigurationHelper {
 		// create PersistenceHandler
 		Element persistenceHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_PERSISTENCE);
 		containerElement.add(persistenceHandlerElem);
-		persistenceHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, BootstrapConfigurationHelper.defaultPersistenceHandler);
+		persistenceHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS,
+				BootstrapConfigurationHelper.defaultPersistenceHandler);
 		parametersElement = factory.createElement(XmlConstants.XML_PARAMETERS);
 		persistenceHandlerElem.add(parametersElement);
 		// Parameter basePath
@@ -150,7 +145,8 @@ public class BootstrapConfigurationHelper {
 		// create EncryptionHandler
 		Element encryptionHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_ENCRYPTION);
 		containerElement.add(encryptionHandlerElem);
-		encryptionHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS, BootstrapConfigurationHelper.defaultEncryptionHandler);
+		encryptionHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS,
+				BootstrapConfigurationHelper.defaultEncryptionHandler);
 		parametersElement = factory.createElement(XmlConstants.XML_PARAMETERS);
 		encryptionHandlerElem.add(parametersElement);
 		// Parameter hashAlgorithm
@@ -160,7 +156,8 @@ public class BootstrapConfigurationHelper {
 		parametersElement.add(parameterElement);
 
 		// write the container file to disk
-		File privilegeContainerFile = new File(BootstrapConfigurationHelper.path + "/" + BootstrapConfigurationHelper.defaultPrivilegeContainerXmlFile);
+		File privilegeContainerFile = new File(BootstrapConfigurationHelper.path + "/"
+				+ BootstrapConfigurationHelper.defaultPrivilegeContainerXmlFile);
 		XmlHelper.writeDocument(doc, privilegeContainerFile);
 	}
 }

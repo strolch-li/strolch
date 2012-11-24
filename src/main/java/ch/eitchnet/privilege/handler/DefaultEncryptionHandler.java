@@ -25,7 +25,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.helper.HashHelper;
 import ch.eitchnet.privilege.helper.XmlConstants;
@@ -50,7 +51,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	/**
 	 * The log4j logger used in this instance
 	 */
-	private static final Logger logger = Logger.getLogger(DefaultEncryptionHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultEncryptionHandler.class);
 
 	/**
 	 * The {@link SecureRandom} which is used to create new tokens

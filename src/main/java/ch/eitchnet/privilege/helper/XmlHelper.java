@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
@@ -35,6 +34,8 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.i18n.PrivilegeException;
 
@@ -50,7 +51,7 @@ public class XmlHelper {
 	 */
 	public static final String DEFAULT_ENCODING = "UTF-8";
 
-	private static final Logger logger = Logger.getLogger(XmlHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlHelper.class);
 
 	/**
 	 * Parses an XML file on the file system using dom4j and returns the resulting {@link Document} object
