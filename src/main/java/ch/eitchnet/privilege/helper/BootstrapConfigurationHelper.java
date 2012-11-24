@@ -26,7 +26,6 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
-import ch.eitchnet.utils.helper.Log4jConfigurator;
 
 /**
  * <p>
@@ -66,7 +65,6 @@ public class BootstrapConfigurationHelper {
 	 *            the args from the command line
 	 */
 	public static void main(String[] args) {
-		Log4jConfigurator.configure();
 
 		// get current directory
 		BootstrapConfigurationHelper.path = System.getProperty("user.dir") + "/newConfig";

@@ -43,7 +43,6 @@ import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.test.model.TestRestrictable;
 import ch.eitchnet.privilege.test.model.TestSystemUserAction;
 import ch.eitchnet.privilege.test.model.TestSystemUserActionDeny;
-import ch.eitchnet.utils.helper.Log4jConfigurator;
 
 /**
  * JUnit for performing Privilege tests. This JUnit is by no means complete, but checks the bare minimum. TODO add more
@@ -75,11 +74,7 @@ public class PrivilegeTest {
 	 */
 	@BeforeClass
 	public static void init() throws Exception {
-
 		try {
-			// set up log4j
-			Log4jConfigurator.configure();
-
 			// initialize container
 			String pwd = System.getProperty("user.dir");
 			File privilegeContainerXmlFile = new File(pwd + "/config/Privilege.xml");
