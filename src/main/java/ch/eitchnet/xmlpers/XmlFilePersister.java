@@ -31,7 +31,8 @@ import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -50,7 +51,7 @@ public class XmlFilePersister {
 	//
 	private static final String XML_DEFAULT_ENCODING = "UTF-8";
 
-	private static final Logger logger = Logger.getLogger(XmlFilePersister.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlFilePersister.class);
 
 	private boolean verbose;
 	private XmlPersistencePathBuilder xmlPathHelper;
@@ -74,9 +75,9 @@ public class XmlFilePersister {
 
 		File pathF;
 		if (subType != null)
-			pathF = xmlPathHelper.getPathF(type, subType, id);
+			pathF = this.xmlPathHelper.getPathF(type, subType, id);
 		else
-			pathF = xmlPathHelper.getPathF(type, id);
+			pathF = this.xmlPathHelper.getPathF(type, id);
 
 		// if this is a new file, then check create parents, if the don't exist
 		if (!pathF.exists()) {
@@ -87,15 +88,15 @@ public class XmlFilePersister {
 			}
 		}
 
-		if (verbose)
-			logger.info("Persisting " + type + " / " + subType + " / " + id + " to " + pathF.getAbsolutePath() + "...");
+		if (this.verbose)
+			XmlFilePersister.logger.info("Persisting " + type + " / " + subType + " / " + id + " to " + pathF.getAbsolutePath() + "...");
 
 		BufferedOutputStream outStream = null;
 		try {
 
 			outStream = new BufferedOutputStream(new FileOutputStream(pathF));
 
-			OutputFormat outputFormat = new OutputFormat("XML", XML_DEFAULT_ENCODING, true);
+			OutputFormat outputFormat = new OutputFormat("XML", XmlFilePersister.XML_DEFAULT_ENCODING, true);
 			outputFormat.setIndent(1);
 			outputFormat.setIndenting(true);
 			//of.setDoctype(null, null);
@@ -113,13 +114,13 @@ public class XmlFilePersister {
 				try {
 					outStream.close();
 				} catch (IOException e) {
-					logger.error(e, e);
+					XmlFilePersister.logger.error(e.getMessage(), e);
 				}
 			}
 		}
 
-		if (verbose)
-			logger.info("Done.");
+		if (this.verbose)
+			XmlFilePersister.logger.info("Done.");
 	}
 
 	/**
@@ -131,24 +132,24 @@ public class XmlFilePersister {
 
 		File pathF;
 		if (subType != null)
-			pathF = xmlPathHelper.getPathF(type, subType, id);
+			pathF = this.xmlPathHelper.getPathF(type, subType, id);
 		else
-			pathF = xmlPathHelper.getPathF(type, id);
+			pathF = this.xmlPathHelper.getPathF(type, id);
 
-		if (verbose)
-			logger.info("Remove persistence file for " + type + " / " + subType + " / " + id + " from "
+		if (this.verbose)
+			XmlFilePersister.logger.info("Remove persistence file for " + type + " / " + subType + " / " + id + " from "
 					+ pathF.getAbsolutePath() + "...");
 
 		if (!pathF.exists()) {
-			logger.error("Persistence file for " + type + " / " + subType + " / " + id + " does not exist at "
+			XmlFilePersister.logger.error("Persistence file for " + type + " / " + subType + " / " + id + " does not exist at "
 					+ pathF.getAbsolutePath());
 		} else if (!pathF.delete()) {
 			throw new XmlPersistenceExecption("Could not delete persistence file for " + type + " / " + subType + " / "
 					+ id + " at " + pathF.getAbsolutePath());
 		}
 
-		if (verbose)
-			logger.info("Done.");
+		if (this.verbose)
+			XmlFilePersister.logger.info("Done.");
 	}
 
 	/**
@@ -159,22 +160,22 @@ public class XmlFilePersister {
 
 		File pathF;
 		if (subType == null)
-			pathF = xmlPathHelper.getPathF(type);
+			pathF = this.xmlPathHelper.getPathF(type);
 		else
-			pathF = xmlPathHelper.getPathF(type, subType);
+			pathF = this.xmlPathHelper.getPathF(type, subType);
 
 		if (!pathF.exists()) {
 			if (subType == null)
-				logger.error("Path for " + type + " at " + pathF.getAbsolutePath()
+				XmlFilePersister.logger.error("Path for " + type + " at " + pathF.getAbsolutePath()
 						+ " does not exist, so removing not possible!");
 			else
-				logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
+				XmlFilePersister.logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
 						+ " does not exist, so removing not possible!");
 
 		} else {
 
 			File[] filesToRemove = pathF.listFiles();
-			boolean removed = FileHelper.deleteFiles(filesToRemove, verbose);
+			boolean removed = FileHelper.deleteFiles(filesToRemove, this.verbose);
 
 			if (!removed) {
 				if (subType == null)
@@ -201,7 +202,7 @@ public class XmlFilePersister {
 
 			File pathF = this.xmlPathHelper.getPathF(type, subType);
 			if (!pathF.exists()) {
-				logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
+				XmlFilePersister.logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
 						+ " does not exist, so no objects exist!");
 				return Collections.emptySet();
 			}
@@ -212,8 +213,8 @@ public class XmlFilePersister {
 				keySet.add(name.substring(0, name.length() - XmlPersistencePathBuilder.FILE_EXT.length()));
 			}
 
-			if (verbose)
-				logger.info("Found " + keySet.size() + " elements for " + type + " / " + subType);
+			if (this.verbose)
+				XmlFilePersister.logger.info("Found " + keySet.size() + " elements for " + type + " / " + subType);
 
 			return keySet;
 		}
@@ -221,7 +222,7 @@ public class XmlFilePersister {
 		// otherwise we need to iterate any existing subTypes and create a combined key set
 		File pathF = this.xmlPathHelper.getPathF(type);
 		if (!pathF.exists()) {
-			logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
+			XmlFilePersister.logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
 					+ " does not exist, so no objects exist!");
 			return Collections.emptySet();
 		}
@@ -232,17 +233,17 @@ public class XmlFilePersister {
 		for (File subTypeFile : subTypeFiles) {
 
 			if (subTypeFile.isFile()) {
-				keySet.add(xmlPathHelper.getId(subTypeFile.getName()));
+				keySet.add(this.xmlPathHelper.getId(subTypeFile.getName()));
 			} else {
 
 				for (File f : subTypeFile.listFiles()) {
-					keySet.add(xmlPathHelper.getId(f.getName()));
+					keySet.add(this.xmlPathHelper.getId(f.getName()));
 				}
 			}
 		}
 
-		if (verbose)
-			logger.info("Found " + keySet.size() + " elements for " + type);
+		if (this.verbose)
+			XmlFilePersister.logger.info("Found " + keySet.size() + " elements for " + type);
 
 		return keySet;
 	}
@@ -261,15 +262,15 @@ public class XmlFilePersister {
 
 			File pathF = this.xmlPathHelper.getPathF(type, subType);
 			if (!pathF.exists()) {
-				logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
+				XmlFilePersister.logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
 						+ " does not exist, so no objects exist!");
 				return 0l;
 			}
 
 			int length = pathF.listFiles().length;
 
-			if (verbose)
-				logger.info("Found " + length + " elements for " + type + " / " + subType);
+			if (this.verbose)
+				XmlFilePersister.logger.info("Found " + length + " elements for " + type + " / " + subType);
 
 			return length;
 		}
@@ -279,7 +280,7 @@ public class XmlFilePersister {
 
 		File pathF = this.xmlPathHelper.getPathF(type);
 		if (!pathF.exists()) {
-			logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
+			XmlFilePersister.logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
 					+ " does not exist, so no objects exist!");
 			return 0l;
 		}
@@ -296,8 +297,8 @@ public class XmlFilePersister {
 			}
 		}
 
-		if (verbose)
-			logger.info("Found " + numberOfFiles + " elements for " + type);
+		if (this.verbose)
+			XmlFilePersister.logger.info("Found " + numberOfFiles + " elements for " + type);
 
 		return numberOfFiles;
 	}
@@ -361,7 +362,7 @@ public class XmlFilePersister {
 
 			File pathF = this.xmlPathHelper.getPathF(type, subType);
 			if (!pathF.exists()) {
-				logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
+				XmlFilePersister.logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
 						+ " does not exist, so no objects exist!");
 				return Collections.emptyList();
 			}
@@ -371,8 +372,8 @@ public class XmlFilePersister {
 				list.add(parseFile(subTypeF, docBuilder));
 			}
 
-			if (verbose)
-				logger.info("Loaded " + list.size() + " elements for " + type + " / " + subType);
+			if (this.verbose)
+				XmlFilePersister.logger.info("Loaded " + list.size() + " elements for " + type + " / " + subType);
 
 			return list;
 		}
@@ -382,7 +383,7 @@ public class XmlFilePersister {
 
 		File pathF = this.xmlPathHelper.getPathF(type);
 		if (!pathF.exists()) {
-			logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
+			XmlFilePersister.logger.error("Path for " + type + " / " + subType + " at " + pathF.getAbsolutePath()
 					+ " does not exist, so no objects exist!");
 			return Collections.emptyList();
 		}
@@ -402,8 +403,8 @@ public class XmlFilePersister {
 			}
 		}
 
-		if (verbose)
-			logger.info("Loaded " + list.size() + " elements for " + type);
+		if (this.verbose)
+			XmlFilePersister.logger.info("Loaded " + list.size() + " elements for " + type);
 
 		return list;
 	}
@@ -420,7 +421,7 @@ public class XmlFilePersister {
 
 		File pathF = this.xmlPathHelper.getPathF(type, subType, id);
 		if (!pathF.exists()) {
-			logger.error("Path for " + type + " / " + subType + " / " + id + " at " + pathF.getAbsolutePath()
+			XmlFilePersister.logger.error("Path for " + type + " / " + subType + " / " + id + " at " + pathF.getAbsolutePath()
 					+ " does not exist, so object does not exist!");
 			return null;
 		}

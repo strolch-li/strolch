@@ -23,7 +23,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,7 +43,7 @@ import ch.eitchnet.xmlpers.test.impl.MyDaoFactory;
  */
 public class XmlPersistenceTest {
 
-	private static final Logger logger = Logger.getLogger(XmlPersistenceTest.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(XmlPersistenceTest.class.getName());
 
 	private static XmlPersistenceHandler persistenceHandler;
 
@@ -67,13 +68,13 @@ public class XmlPersistenceTest {
 			System.setProperty(XmlPersistenceHandler.CONFIG_VERBOSE, "true");
 			System.setProperty(XmlPersistenceHandler.CONFIG_DAO_FACTORY_CLASS, MyDaoFactory.class.getName());
 
-			persistenceHandler = new XmlPersistenceHandler();
-			persistenceHandler.initialize();
+			XmlPersistenceTest.persistenceHandler = new XmlPersistenceHandler();
+			XmlPersistenceTest.persistenceHandler.initialize();
 
-			logger.info("Initialized persistence handler.");
+			XmlPersistenceTest.logger.info("Initialized persistence handler.");
 
 		} catch (Exception e) {
-			logger.error(e, e);
+			XmlPersistenceTest.logger.error(e.getMessage(), e);
 
 			throw new RuntimeException("Initialization failed: " + e.getLocalizedMessage(), e);
 		}
@@ -86,20 +87,20 @@ public class XmlPersistenceTest {
 	public void testCreate() {
 
 		try {
-			logger.info("Trying to create...");
+			XmlPersistenceTest.logger.info("Trying to create...");
 
 			// new instance
 			MyClass myClass = new MyClass("@id", "@name", "@subtype");
 
 			// persist instance
-			XmlPersistenceTransaction tx = persistenceHandler.openTx();
+			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
 			tx.add(myClass);
-			persistenceHandler.commitTx();
+			XmlPersistenceTest.persistenceHandler.commitTx();
 
-			logger.info("Done creating.");
+			XmlPersistenceTest.logger.info("Done creating.");
 
 		} catch (Exception e) {
-			logger.error(e, e);
+			XmlPersistenceTest.logger.error(e.getMessage(), e);
 			Assert.fail("Failed: " + e.getLocalizedMessage());
 		}
 	}
@@ -111,18 +112,18 @@ public class XmlPersistenceTest {
 	public void testRead() {
 
 		try {
-			logger.info("Trying to read...");
+			XmlPersistenceTest.logger.info("Trying to read...");
 
 			// query MyClass with id @id
-			XmlPersistenceTransaction tx = persistenceHandler.openTx();
+			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
 			MyClass myClass = tx.queryById(MyClass.class.getName(), "@subtype", "@id");
-			logger.info("Found MyClass: " + myClass);
-			persistenceHandler.commitTx();
+			XmlPersistenceTest.logger.info("Found MyClass: " + myClass);
+			XmlPersistenceTest.persistenceHandler.commitTx();
 
-			logger.info("Done reading.");
+			XmlPersistenceTest.logger.info("Done reading.");
 
 		} catch (Exception e) {
-			logger.error(e, e);
+			XmlPersistenceTest.logger.error(e.getMessage(), e);
 			Assert.fail("Failed: " + e.getLocalizedMessage());
 		}
 	}
@@ -134,24 +135,24 @@ public class XmlPersistenceTest {
 	public void testUpdate() {
 
 		try {
-			logger.info("Trying to update an object...");
+			XmlPersistenceTest.logger.info("Trying to update an object...");
 
 			// query the instance
-			XmlPersistenceTransaction tx = persistenceHandler.openTx();
+			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
 			MyClass myClass = tx.queryById(MyClass.class.getName(), "@subtype", "@id");
-			logger.info("Found MyClass: " + myClass);
+			XmlPersistenceTest.logger.info("Found MyClass: " + myClass);
 
 			// modify the instance
 			myClass.setName("@name_modified");
 
 			// update the instance
 			tx.update(myClass);
-			persistenceHandler.commitTx();
+			XmlPersistenceTest.persistenceHandler.commitTx();
 
-			logger.info("Done updating.");
+			XmlPersistenceTest.logger.info("Done updating.");
 
 		} catch (Exception e) {
-			logger.error(e, e);
+			XmlPersistenceTest.logger.error(e.getMessage(), e);
 			Assert.fail("Failed: " + e.getLocalizedMessage());
 		}
 	}
@@ -162,17 +163,17 @@ public class XmlPersistenceTest {
 	@Test
 	public void testRemove() {
 
-		logger.info("Trying to remove...");
+		XmlPersistenceTest.logger.info("Trying to remove...");
 
 		// query the instance
-		XmlPersistenceTransaction tx = persistenceHandler.openTx();
+		XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
 		MyClass myClass = tx.queryById(MyClass.class.getName(), "@subtype", "@id");
-		logger.info("Found MyClass: " + myClass);
+		XmlPersistenceTest.logger.info("Found MyClass: " + myClass);
 
 		tx.remove(myClass);
-		persistenceHandler.commitTx();
+		XmlPersistenceTest.persistenceHandler.commitTx();
 
-		logger.info("Done removing.");
+		XmlPersistenceTest.logger.info("Done removing.");
 	}
 
 	/**
@@ -182,13 +183,13 @@ public class XmlPersistenceTest {
 	public void testQueryFail() {
 
 		try {
-			logger.info("Trying to query removed object...");
-			XmlPersistenceTransaction tx = persistenceHandler.openTx();
+			XmlPersistenceTest.logger.info("Trying to query removed object...");
+			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
 			MyClass myClass = tx.queryById(MyClass.class.getName(), "@subtype", "@id");
-			logger.info("Found MyClass: " + myClass);
-			logger.info("Done querying removed object");
+			XmlPersistenceTest.logger.info("Found MyClass: " + myClass);
+			XmlPersistenceTest.logger.info("Done querying removed object");
 		} finally {
-			persistenceHandler.commitTx();
+			XmlPersistenceTest.persistenceHandler.commitTx();
 		}
 	}
 
@@ -199,20 +200,20 @@ public class XmlPersistenceTest {
 	public void testReCreate() {
 
 		try {
-			logger.info("Trying to recreate...");
+			XmlPersistenceTest.logger.info("Trying to recreate...");
 
 			// new instance
 			MyClass myClass = new MyClass("@id", "@name", "@subtype");
 
 			// persist instance
-			XmlPersistenceTransaction tx = persistenceHandler.openTx();
+			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
 			tx.add(myClass);
-			persistenceHandler.commitTx();
+			XmlPersistenceTest.persistenceHandler.commitTx();
 
-			logger.info("Done creating.");
+			XmlPersistenceTest.logger.info("Done creating.");
 
 		} catch (Exception e) {
-			logger.error(e, e);
+			XmlPersistenceTest.logger.error(e.getMessage(), e);
 			Assert.fail("Failed: " + e.getLocalizedMessage());
 		}
 	}
@@ -233,10 +234,10 @@ public class XmlPersistenceTest {
 
 		try {
 
-			logger.info("Trying to query all...");
+			XmlPersistenceTest.logger.info("Trying to query all...");
 
 			// query all
-			XmlPersistenceTransaction tx = persistenceHandler.openTx();
+			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
 			List<Object> list = tx.queryAll(MyClass.class.getName());
 			Assert.assertTrue("Expected only one object, found " + list.size(), list.size() == 1);
 
@@ -248,10 +249,10 @@ public class XmlPersistenceTest {
 			list = tx.queryAll(MyClass.class.getName(), "@inexistant");
 			Assert.assertTrue("Expected no objects, found " + list.size(), list.size() == 0);
 
-			logger.info("Done querying.");
+			XmlPersistenceTest.logger.info("Done querying.");
 
 		} finally {
-			persistenceHandler.commitTx();
+			XmlPersistenceTest.persistenceHandler.commitTx();
 		}
 	}
 
@@ -262,7 +263,7 @@ public class XmlPersistenceTest {
 	public void testKeySet() {
 
 		try {
-			XmlPersistenceTransaction tx = persistenceHandler.openTx();
+			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
 
 			Set<String> keySet = tx.queryKeySet(MyClass.class.getName());
 			Assert.assertTrue("Expected one key, found " + keySet.size(), keySet.size() == 1);
@@ -276,7 +277,7 @@ public class XmlPersistenceTest {
 			Assert.assertTrue("Expected no keys, found " + keySet, keySet.size() == 0);
 
 		} finally {
-			persistenceHandler.commitTx();
+			XmlPersistenceTest.persistenceHandler.commitTx();
 		}
 	}
 
@@ -287,13 +288,13 @@ public class XmlPersistenceTest {
 	public void testRemoveAll() {
 
 		try {
-			XmlPersistenceTransaction tx = persistenceHandler.openTx();
+			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
 
 			List<ITransactionObject> objects = tx.queryAll(MyClass.class.getName(), "@subType");
 			tx.removeAll(objects);
 
 		} finally {
-			persistenceHandler.commitTx();
+			XmlPersistenceTest.persistenceHandler.commitTx();
 		}
 	}
 
@@ -304,13 +305,13 @@ public class XmlPersistenceTest {
 	public void testSize() {
 
 		try {
-			XmlPersistenceTransaction tx = persistenceHandler.openTx();
+			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
 
 			long size = tx.querySize(MyClass.class.getName(), "@subType");
 			Assert.assertTrue("Expected size = 0, found: " + size, size == 0);
 
 		} finally {
-			persistenceHandler.commitTx();
+			XmlPersistenceTest.persistenceHandler.commitTx();
 		}
 	}
 }

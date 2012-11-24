@@ -19,7 +19,8 @@
  */
 package ch.eitchnet.xmlpers;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.SystemHelper;
 import ch.eitchnet.utils.objectfilter.ITransactionObject;
@@ -46,7 +47,7 @@ public class XmlPersistenceHandler {
 	 */
 	public static final String CONFIG_DAO_FACTORY_CLASS = "ch.eitchnet.xmlpers.config.daoFactoryClass";
 
-	protected static final Logger logger = Logger.getLogger(XmlPersistenceHandler.class);
+	protected static final Logger logger = LoggerFactory.getLogger(XmlPersistenceHandler.class);
 
 	protected boolean verbose;
 	protected ThreadLocal<XmlPersistenceTransaction> xmlPersistenceTxThreadLocal;
@@ -58,18 +59,18 @@ public class XmlPersistenceHandler {
 	 */
 	public void initialize() {
 
-		String basePath = SystemHelper.getProperty(XmlPersistenceHandler.class.getSimpleName(), CONFIG_BASEPATH, null);
-		verbose = SystemHelper.getPropertyBool(XmlPersistenceHandler.class.getSimpleName(), CONFIG_VERBOSE,
+		String basePath = SystemHelper.getProperty(XmlPersistenceHandler.class.getSimpleName(), XmlPersistenceHandler.CONFIG_BASEPATH, null);
+		this.verbose = SystemHelper.getPropertyBool(XmlPersistenceHandler.class.getSimpleName(), XmlPersistenceHandler.CONFIG_VERBOSE,
 				Boolean.FALSE).booleanValue();
 
 		// get class to use as transaction
 		String daoFactoryClassName = SystemHelper.getProperty(XmlPersistenceHandler.class.getSimpleName(),
-				CONFIG_DAO_FACTORY_CLASS, null);
+				XmlPersistenceHandler.CONFIG_DAO_FACTORY_CLASS, null);
 		try {
 			@SuppressWarnings("unchecked")
 			Class<XmlDaoFactory> xmlDaoFactoryClass = (Class<XmlDaoFactory>) Class.forName(daoFactoryClassName);
 
-			xmlDaoFactory = xmlDaoFactoryClass.newInstance();
+			this.xmlDaoFactory = xmlDaoFactoryClass.newInstance();
 
 		} catch (ClassNotFoundException e) {
 			throw new XmlPersistenceExecption("XmlDaoFactory class does not exist " + daoFactoryClassName, e);
@@ -78,10 +79,10 @@ public class XmlPersistenceHandler {
 		}
 
 		XmlPersistencePathBuilder pathBuilder = new XmlPersistencePathBuilder(basePath);
-		persister = new XmlFilePersister(pathBuilder, verbose);
+		this.persister = new XmlFilePersister(pathBuilder, this.verbose);
 
 		// initialize the Thread local object which is used per transaction
-		xmlPersistenceTxThreadLocal = new ThreadLocal<XmlPersistenceTransaction>();
+		this.xmlPersistenceTxThreadLocal = new ThreadLocal<XmlPersistenceTransaction>();
 	}
 
 	/**
@@ -89,8 +90,8 @@ public class XmlPersistenceHandler {
 	 */
 	public XmlPersistenceTransaction openTx() {
 
-		if (verbose)
-			logger.info("Opening new transaction...");
+		if (this.verbose)
+			XmlPersistenceHandler.logger.info("Opening new transaction...");
 
 		// make sure no previous filter exists
 		XmlPersistenceTransaction xmlPersistenceTx = this.xmlPersistenceTxThreadLocal.get();
@@ -100,7 +101,7 @@ public class XmlPersistenceHandler {
 		// set a new persistence transaction object
 		ObjectFilter<ITransactionObject> objectFilter = new ObjectFilter<ITransactionObject>();
 		xmlPersistenceTx = new XmlPersistenceTransaction();
-		xmlPersistenceTx.initialize(persister, xmlDaoFactory, objectFilter, verbose);
+		xmlPersistenceTx.initialize(this.persister, this.xmlDaoFactory, objectFilter, this.verbose);
 
 		this.xmlPersistenceTxThreadLocal.set(xmlPersistenceTx);
 
@@ -123,8 +124,8 @@ public class XmlPersistenceHandler {
 	 */
 	public void commitTx() {
 
-		if (verbose)
-			logger.info("Committing transaction...");
+		if (this.verbose)
+			XmlPersistenceHandler.logger.info("Committing transaction...");
 
 		try {
 			XmlPersistenceTransaction xmlPersistenceTx = this.xmlPersistenceTxThreadLocal.get();

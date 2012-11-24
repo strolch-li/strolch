@@ -27,7 +27,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -41,7 +42,7 @@ import ch.eitchnet.utils.objectfilter.ObjectFilter;
  */
 public class XmlPersistenceTransaction {
 
-	private static final Logger logger = Logger.getLogger(XmlPersistenceTransaction.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlPersistenceTransaction.class);
 
 	private boolean verbose;
 	private XmlFilePersister persister;
@@ -64,23 +65,23 @@ public class XmlPersistenceTransaction {
 	}
 
 	private DocumentBuilder getDocBuilder() {
-		if (docBuilder == null) {
+		if (this.docBuilder == null) {
 			try {
-				docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+				this.docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			} catch (ParserConfigurationException e) {
 				throw new XmlPersistenceExecption("Failed to load document builder: " + e.getLocalizedMessage(), e);
 			}
 		}
-		return docBuilder;
+		return this.docBuilder;
 	}
 
 	/**
 	 * @return
 	 */
 	protected DOMImplementation getDomImpl() {
-		if (domImplementation == null)
-			domImplementation = getDocBuilder().getDOMImplementation();
-		return domImplementation;
+		if (this.domImplementation == null)
+			this.domImplementation = getDocBuilder().getDOMImplementation();
+		return this.domImplementation;
 	}
 
 	/*
@@ -183,7 +184,7 @@ public class XmlPersistenceTransaction {
 	public <T> List<T> queryAll(String type, String subType) {
 
 		// XXX ok, this is very ugly, but for starters it will have to do
-		XmlDao<Object> dao = xmlDaoFactory.getDao(type);
+		XmlDao<Object> dao = this.xmlDaoFactory.getDao(type);
 
 		List<Element> elements = this.persister.queryAll(type, subType, getDocBuilder());
 		List<T> objects = new ArrayList<T>(elements.size());
@@ -214,7 +215,7 @@ public class XmlPersistenceTransaction {
 	 */
 	public <T> T queryById(String type, String subType, String id) {
 
-		XmlDao<Object> dao = xmlDaoFactory.getDao(type);
+		XmlDao<Object> dao = this.xmlDaoFactory.getDao(type);
 
 		Element element = this.persister.queryById(type, subType, id, getDocBuilder());
 		if (element == null)
@@ -235,24 +236,24 @@ public class XmlPersistenceTransaction {
 	 */
 	void commitTx() {
 
-		if (verbose)
-			logger.info("Committing...");
+		if (this.verbose)
+			XmlPersistenceTransaction.logger.info("Committing...");
 
-		Set<String> keySet = objectFilter.keySet();
+		Set<String> keySet = this.objectFilter.keySet();
 		if (keySet.isEmpty())
 			return;
 
 		for (String key : keySet) {
 
-			XmlDao<Object> dao = xmlDaoFactory.getDao(key);
+			XmlDao<Object> dao = this.xmlDaoFactory.getDao(key);
 
-			List<ITransactionObject> removed = objectFilter.getRemoved(key);
+			List<ITransactionObject> removed = this.objectFilter.getRemoved(key);
 			if (removed.isEmpty()) {
-				if (verbose)
-					logger.info("No objects removed in this tx.");
+				if (this.verbose)
+					XmlPersistenceTransaction.logger.info("No objects removed in this tx.");
 			} else {
-				if (verbose)
-					logger.info(removed.size() + " objects removed in this tx.");
+				if (this.verbose)
+					XmlPersistenceTransaction.logger.info(removed.size() + " objects removed in this tx.");
 
 				for (ITransactionObject object : removed) {
 
@@ -260,17 +261,17 @@ public class XmlPersistenceTransaction {
 					String subType = dao.getSubType(object);
 					String id = dao.getId(object);
 
-					persister.remove(type, subType, id);
+					this.persister.remove(type, subType, id);
 				}
 			}
 
-			List<ITransactionObject> updated = objectFilter.getUpdated(key);
+			List<ITransactionObject> updated = this.objectFilter.getUpdated(key);
 			if (updated.isEmpty()) {
-				if (verbose)
-					logger.info("No objects updated in this tx.");
+				if (this.verbose)
+					XmlPersistenceTransaction.logger.info("No objects updated in this tx.");
 			} else {
-				if (verbose)
-					logger.info(updated.size() + " objects updated in this tx.");
+				if (this.verbose)
+					XmlPersistenceTransaction.logger.info(updated.size() + " objects updated in this tx.");
 
 				for (ITransactionObject object : updated) {
 
@@ -279,17 +280,17 @@ public class XmlPersistenceTransaction {
 					String id = dao.getId(object);
 
 					Document asDom = dao.serializeToDom(object, getDomImpl());
-					persister.saveOrUpdate(type, subType, id, asDom);
+					this.persister.saveOrUpdate(type, subType, id, asDom);
 				}
 			}
 
-			List<ITransactionObject> added = objectFilter.getAdded(key);
+			List<ITransactionObject> added = this.objectFilter.getAdded(key);
 			if (added.isEmpty()) {
-				if (verbose)
-					logger.info("No objects added in this tx.");
+				if (this.verbose)
+					XmlPersistenceTransaction.logger.info("No objects added in this tx.");
 			} else {
-				if (verbose)
-					logger.info(updated.size() + " objects added in this tx.");
+				if (this.verbose)
+					XmlPersistenceTransaction.logger.info(updated.size() + " objects added in this tx.");
 
 				for (ITransactionObject object : added) {
 
@@ -298,12 +299,12 @@ public class XmlPersistenceTransaction {
 					String id = dao.getId(object);
 
 					Document asDom = dao.serializeToDom(object, getDomImpl());
-					persister.saveOrUpdate(type, subType, id, asDom);
+					this.persister.saveOrUpdate(type, subType, id, asDom);
 				}
 			}
 		}
 
-		objectFilter.clearCache();
-		logger.info("Completed TX");
+		this.objectFilter.clearCache();
+		XmlPersistenceTransaction.logger.info("Completed TX");
 	}
 }

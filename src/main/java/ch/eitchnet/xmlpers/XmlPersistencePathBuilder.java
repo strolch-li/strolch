@@ -22,14 +22,15 @@ package ch.eitchnet.xmlpers;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
 public class XmlPersistencePathBuilder {
-	private static final Logger logger = Logger.getLogger(XmlPersistencePathBuilder.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlPersistencePathBuilder.class);
 
 	/**
 	 * 
@@ -39,7 +40,7 @@ public class XmlPersistencePathBuilder {
 	/**
 	 * 
 	 */
-	public static final int EXT_LENGTH = FILE_EXT.length();
+	public static final int EXT_LENGTH = XmlPersistencePathBuilder.FILE_EXT.length();
 
 	private String basePath;
 
@@ -61,7 +62,7 @@ public class XmlPersistencePathBuilder {
 			throw new XmlPersistenceExecption("Failed to build canonical path from " + basePath, e);
 		}
 
-		logger.info("Using base path " + basePath);
+		XmlPersistencePathBuilder.logger.info("Using base path " + basePath);
 	}
 
 	/**
@@ -69,7 +70,7 @@ public class XmlPersistencePathBuilder {
 	 * @return
 	 */
 	public String getFilename(String id) {
-		return id.concat(FILE_EXT);
+		return id.concat(XmlPersistencePathBuilder.FILE_EXT);
 	}
 
 	/**
@@ -77,11 +78,11 @@ public class XmlPersistencePathBuilder {
 	 * @return
 	 */
 	public String getId(String filename) {
-		if (filename.charAt(filename.length() - EXT_LENGTH) != '.')
+		if (filename.charAt(filename.length() - XmlPersistencePathBuilder.EXT_LENGTH) != '.')
 			throw new XmlPersistenceExecption("The filename does not have a . at index "
-					+ (filename.length() - EXT_LENGTH));
+					+ (filename.length() - XmlPersistencePathBuilder.EXT_LENGTH));
 
-		return filename.substring(0, filename.length() - EXT_LENGTH);
+		return filename.substring(0, filename.length() - XmlPersistencePathBuilder.EXT_LENGTH);
 	}
 
 	/**
@@ -91,7 +92,7 @@ public class XmlPersistencePathBuilder {
 	 */
 	public String getPath(String type) {
 
-		StringBuilder sb = new StringBuilder(basePath);
+		StringBuilder sb = new StringBuilder(this.basePath);
 		sb.append("/");
 		sb.append(type);
 
@@ -114,7 +115,7 @@ public class XmlPersistencePathBuilder {
 	 */
 	public String getPath(String type, String subType) {
 
-		StringBuilder sb = new StringBuilder(basePath);
+		StringBuilder sb = new StringBuilder(this.basePath);
 		sb.append("/");
 		sb.append(type);
 		sb.append("/");
@@ -140,7 +141,7 @@ public class XmlPersistencePathBuilder {
 	 */
 	public String getPath(String type, String subType, String id) {
 
-		StringBuilder sb = new StringBuilder(basePath);
+		StringBuilder sb = new StringBuilder(this.basePath);
 		sb.append("/");
 		sb.append(type);
 		sb.append("/");
