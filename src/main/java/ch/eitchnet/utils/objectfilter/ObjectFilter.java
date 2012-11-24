@@ -26,7 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements a filter where modifications to an object are collected, and only the most recent action and
@@ -79,10 +80,10 @@ import org.apache.log4j.Logger;
  * @param <T>
  */
 public class ObjectFilter<T extends ITransactionObject> {
-	
+
 	// XXX think about removing the generic T, as there is no sense in it
 
-	private final static Logger logger = Logger.getLogger(ObjectFilter.class);
+	private final static Logger logger = LoggerFactory.getLogger(ObjectFilter.class);
 
 	private HashMap<Long, ObjectCache<T>> cache = new HashMap<Long, ObjectCache<T>>();
 	private HashSet<String> keySet = new HashSet<String>();

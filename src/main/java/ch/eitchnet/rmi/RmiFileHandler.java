@@ -24,7 +24,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.FileHelper;
 import ch.eitchnet.utils.helper.StringHelper;
@@ -37,7 +38,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class RmiFileHandler {
 
-	private static final Logger logger = Logger.getLogger(RmiFileHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(RmiFileHandler.class);
 
 	/**
 	 * DEF_PART_SIZE = default part size which is set to 1048576 bytes (1 MiB)

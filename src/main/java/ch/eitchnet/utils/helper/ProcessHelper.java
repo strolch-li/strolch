@@ -24,14 +24,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ProcessHelper {
 
-	private static final Logger logger = Logger.getLogger(ProcessHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProcessHelper.class);
 
 	public static ProcessResult runCommand(String command) {
 		final StringBuffer sb = new StringBuffer();
@@ -40,8 +41,7 @@ public class ProcessHelper {
 
 			final Process process = Runtime.getRuntime().exec(command);
 
-			final BufferedReader errorStream = new BufferedReader(
-					new InputStreamReader(process.getErrorStream()));
+			final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			Thread errorIn = new Thread("errorIn") {
 				@Override
 				public void run() {
@@ -50,8 +50,7 @@ public class ProcessHelper {
 			};
 			errorIn.start();
 
-			final BufferedReader inputStream = new BufferedReader(
-					new InputStreamReader(process.getInputStream()));
+			final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			Thread infoIn = new Thread("infoIn") {
 				@Override
 				public void run() {
@@ -69,8 +68,7 @@ public class ProcessHelper {
 			return new ProcessResult(returnValue, sb.toString(), null);
 
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to perform command: "
-					+ e.getLocalizedMessage(), e);
+			throw new RuntimeException("Failed to perform command: " + e.getLocalizedMessage(), e);
 		} catch (InterruptedException e) {
 			ProcessHelper.logger.error("Interrupted!");
 			sb.append("[FATAL] Interrupted");
@@ -78,12 +76,10 @@ public class ProcessHelper {
 		}
 	}
 
-	public static ProcessResult runCommand(File workingDirectory,
-			String... commandAndArgs) {
+	public static ProcessResult runCommand(File workingDirectory, String... commandAndArgs) {
 
 		if (!workingDirectory.exists())
-			throw new RuntimeException("Working directory does not exist at "
-					+ workingDirectory.getAbsolutePath());
+			throw new RuntimeException("Working directory does not exist at " + workingDirectory.getAbsolutePath());
 		if (commandAndArgs == null || commandAndArgs.length == 0)
 			throw new RuntimeException("No command passed!");
 
@@ -97,8 +93,7 @@ public class ProcessHelper {
 
 			final Process process = processBuilder.start();
 
-			final BufferedReader errorStream = new BufferedReader(
-					new InputStreamReader(process.getErrorStream()));
+			final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			Thread errorIn = new Thread("errorIn") {
 				@Override
 				public void run() {
@@ -107,8 +102,7 @@ public class ProcessHelper {
 			};
 			errorIn.start();
 
-			final BufferedReader inputStream = new BufferedReader(
-					new InputStreamReader(process.getInputStream()));
+			final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			Thread infoIn = new Thread("infoIn") {
 				@Override
 				public void run() {
@@ -126,8 +120,7 @@ public class ProcessHelper {
 			return new ProcessResult(returnValue, sb.toString(), null);
 
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to perform command: "
-					+ e.getLocalizedMessage(), e);
+			throw new RuntimeException("Failed to perform command: " + e.getLocalizedMessage(), e);
 		} catch (InterruptedException e) {
 			ProcessHelper.logger.error("Interrupted!");
 			sb.append("[FATAL] Interrupted");
@@ -147,16 +140,14 @@ public class ProcessHelper {
 		}
 	}
 
-	private static void readStream(StringBuffer sb, String prefix,
-			BufferedReader bufferedReader) {
+	private static void readStream(StringBuffer sb, String prefix, BufferedReader bufferedReader) {
 		String line;
 		try {
 			while ((line = bufferedReader.readLine()) != null) {
 				sb.append(prefix + line + "\n");
 			}
 		} catch (IOException e) {
-			String msg = "Faild to read from " + prefix + " stream: "
-					+ e.getLocalizedMessage();
+			String msg = "Faild to read from " + prefix + " stream: " + e.getLocalizedMessage();
 			sb.append("[FATAL] " + msg + "\n");
 		}
 	}
@@ -173,11 +164,9 @@ public class ProcessHelper {
 			String pdfFile = pdfPath.getAbsolutePath();
 			if (pdfFile.charAt(0) == '/')
 				pdfFile = pdfFile.substring(1);
-			processResult = ProcessHelper.runCommand("rundll32 url.dll,FileProtocolHandler "
-					+ pdfFile);
+			processResult = ProcessHelper.runCommand("rundll32 url.dll,FileProtocolHandler " + pdfFile);
 		} else {
-			throw new UnsupportedOperationException("Unexpected OS: "
-					+ SystemHelper.osName);
+			throw new UnsupportedOperationException("Unexpected OS: " + SystemHelper.osName);
 		}
 
 		ProcessHelper.logProcessResult(processResult);
@@ -187,14 +176,11 @@ public class ProcessHelper {
 		if (processResult.returnValue == 0) {
 			ProcessHelper.logger.info("Process executed successfully");
 		} else if (processResult.returnValue == -1) {
-			ProcessHelper.logger.error("Process execution failed:\n"
-					+ processResult.processOutput);
-			ProcessHelper.logger.error(processResult.t, processResult.t);
+			ProcessHelper.logger.error("Process execution failed:\n" + processResult.processOutput);
+			ProcessHelper.logger.error(processResult.t.getMessage(), processResult.t);
 		} else {
 			ProcessHelper.logger.info("Process execution was not successful with return value:"
-					+ processResult.returnValue
-					+ "\n"
-					+ processResult.processOutput);
+					+ processResult.returnValue + "\n" + processResult.processOutput);
 		}
 	}
 }

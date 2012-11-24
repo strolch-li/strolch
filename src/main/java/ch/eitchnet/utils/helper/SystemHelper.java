@@ -19,7 +19,6 @@
  */
 package ch.eitchnet.utils.helper;
 
-
 /**
  * A helper class for {@link System} methods
  * 
@@ -74,7 +73,7 @@ public class SystemHelper {
 		sb.append(SystemHelper.javaVersion);
 		return sb.toString();
 	}
-	
+
 	public static String getUserDir() {
 		return System.getProperty("user.dir");
 	}
@@ -92,7 +91,8 @@ public class SystemHelper {
 	}
 
 	public static boolean is32bit() {
-		return SystemHelper.osArch.equals("x86") || SystemHelper.osArch.equals("i386") || SystemHelper.osArch.equals("i686");
+		return SystemHelper.osArch.equals("x86") || SystemHelper.osArch.equals("i386")
+				|| SystemHelper.osArch.equals("i686");
 	}
 
 	public static boolean is64bit() {
@@ -112,7 +112,8 @@ public class SystemHelper {
 	}
 
 	public static String getMemorySummary() {
-		return "Memory available " + SystemHelper.getMaxMemory() + " / Used: " + SystemHelper.getUsedMemory() + " / Free:" + SystemHelper.getFreeMemory();
+		return "Memory available " + SystemHelper.getMaxMemory() + " / Used: " + SystemHelper.getUsedMemory()
+				+ " / Free:" + SystemHelper.getFreeMemory();
 	}
 
 	/**

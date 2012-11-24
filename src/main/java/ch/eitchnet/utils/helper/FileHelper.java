@@ -36,7 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for dealing with files
@@ -45,7 +46,7 @@ import org.apache.log4j.Logger;
  */
 public class FileHelper {
 
-	private static final Logger logger = Logger.getLogger(FileHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(FileHelper.class);
 
 	/**
 	 * Reads the contents of a file into a string. Note, no encoding is checked. It is expected to be UTF-8
@@ -55,7 +56,7 @@ public class FileHelper {
 	 * @return the contents of a file as a string
 	 */
 	public static final String readFileToString(File file) {
-		
+
 		BufferedReader bufferedReader = null;
 		try {
 
@@ -195,7 +196,8 @@ public class FileHelper {
 				String fromFileMD5 = StringHelper.getHexString(FileHelper.hashFileMd5(fromFile));
 				String toFileMD5 = StringHelper.getHexString(FileHelper.hashFileMd5(toFile));
 				if (!fromFileMD5.equals(toFileMD5)) {
-					FileHelper.logger.error("Copying failed, as MD5 sums are not equal: " + fromFileMD5 + " / " + toFileMD5);
+					FileHelper.logger.error("Copying failed, as MD5 sums are not equal: " + fromFileMD5 + " / "
+							+ toFileMD5);
 					toFile.delete();
 
 					return false;
@@ -204,8 +206,8 @@ public class FileHelper {
 
 			// cleanup if files are not the same length
 			if (fromFile.length() != toFile.length()) {
-				FileHelper.logger.error("Copying failed, as new files are not the same length: " + fromFile.length() + " / "
-						+ toFile.length());
+				FileHelper.logger.error("Copying failed, as new files are not the same length: " + fromFile.length()
+						+ " / " + toFile.length());
 				toFile.delete();
 
 				return false;
@@ -213,7 +215,7 @@ public class FileHelper {
 
 		} catch (Exception e) {
 
-			FileHelper.logger.error(e, e);
+			FileHelper.logger.error(e.getMessage(), e);
 			return false;
 
 		} finally {

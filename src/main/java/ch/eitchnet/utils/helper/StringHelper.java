@@ -24,7 +24,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A helper class to perform different actions on {@link String}s
@@ -33,7 +34,7 @@ import org.apache.log4j.Logger;
  */
 public class StringHelper {
 
-	private static final Logger logger = Logger.getLogger(StringHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(StringHelper.class);
 
 	/**
 	 * Hex char table for fast calculating of hex value

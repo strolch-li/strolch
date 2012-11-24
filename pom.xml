@@ -7,6 +7,7 @@
 	<packaging>jar</packaging>
 	<version>0.1.0-SNAPSHOT</version>
 	<name>ch.eitchnet.utils</name>
+	<description>These utils contain project independent helper classes and utilities for reuse</description>
 	<url>https://github.com/eitch/ch.eitchnet.utils</url>
 
 	<properties>
@@ -82,9 +83,15 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.2</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -132,7 +139,6 @@
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-							<!--mainClass>ch.eitchnet.App</mainClass -->
 						</manifest>
 					</archive>
 				</configuration>

@@ -19,7 +19,8 @@
  */
 package ch.eitchnet.utils.objectfilter;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is a cache for objects whose operations (additions, modifications, removals) are first collected and then
@@ -40,7 +41,7 @@ import org.apache.log4j.Logger;
  */
 public class ObjectCache<T extends ITransactionObject> {
 
-	private final static Logger logger = Logger.getLogger(ObjectCache.class);
+	private final static Logger logger = LoggerFactory.getLogger(ObjectCache.class);
 
 	/**
 	 * id The unique ID of this object in this session
@@ -72,8 +73,8 @@ public class ObjectCache<T extends ITransactionObject> {
 		this.operation = operation;
 
 		if (ObjectCache.logger.isDebugEnabled()) {
-			ObjectCache.logger.debug("Instanciated Cache: ID" + this.id + " / " + key + " OP: " + this.operation + " / "
-					+ object.toString());
+			ObjectCache.logger.debug("Instanciated Cache: ID" + this.id + " / " + key + " OP: " + this.operation
+					+ " / " + object.toString());
 		}
 	}
 
@@ -96,7 +97,8 @@ public class ObjectCache<T extends ITransactionObject> {
 	 */
 	public void setOperation(Operation newOperation) {
 		if (ObjectCache.logger.isDebugEnabled()) {
-			ObjectCache.logger.debug("Updating Operation of ID " + this.id + " from " + this.operation + " to " + newOperation);
+			ObjectCache.logger.debug("Updating Operation of ID " + this.id + " from " + this.operation + " to "
+					+ newOperation);
 		}
 		this.operation = newOperation;
 	}
