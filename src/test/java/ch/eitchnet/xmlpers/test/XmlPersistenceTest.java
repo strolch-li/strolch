@@ -23,13 +23,12 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.utils.helper.Log4jConfigurator;
 import ch.eitchnet.utils.objectfilter.ITransactionObject;
 import ch.eitchnet.xmlpers.XmlPersistenceExecption;
 import ch.eitchnet.xmlpers.XmlPersistenceHandler;
@@ -53,11 +52,7 @@ public class XmlPersistenceTest {
 	 */
 	@BeforeClass
 	public static void init() throws Exception {
-
 		try {
-			// set up log4j
-			Log4jConfigurator.configure();
-
 			String userDir = System.getProperty("user.dir");
 			String basePath = userDir + "/tmp/testdb";
 			File basePathF = new File(basePath);
