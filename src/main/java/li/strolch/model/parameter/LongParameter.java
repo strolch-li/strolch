@@ -19,9 +19,10 @@
  *  along with li.strolch.model.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.model;
+package li.strolch.model.parameter;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Parameter;
 
 import org.dom4j.Element;
 
@@ -31,25 +32,24 @@ import ch.eitchnet.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class FloatParameter extends AbstractParameter<Double> {
+public class LongParameter extends AbstractParameter<Long> {
 
-	public static final String TYPE = "Float";
+	public static final String TYPE = "Long";
 	private static final long serialVersionUID = 0L;
 
-	private Double value = Double.MAX_VALUE;
+	protected Long value;
 
 	/**
-	 * Empty constructor
-	 * 
+	 * Default constructor
 	 */
-	public FloatParameter() {
+	public LongParameter() {
 		//
 	}
 
 	/**
 	 * @param element
 	 */
-	public FloatParameter(Element element) {
+	public LongParameter(Element element) {
 		super.fromDom(element);
 
 		String valueS = element.attributeValue("Value");
@@ -57,7 +57,7 @@ public class FloatParameter extends AbstractParameter<Double> {
 			throw new StrolchException("No value defined for " + this.id);
 		}
 
-		setValue(Double.valueOf(valueS));
+		setValue(Long.valueOf(valueS));
 	}
 
 	/**
@@ -65,36 +65,36 @@ public class FloatParameter extends AbstractParameter<Double> {
 	 * @param name
 	 * @param value
 	 */
-	public FloatParameter(String id, String name, Double value) {
+	public LongParameter(String id, String name, Long value) {
 		setId(id);
 		setName(name);
-		setValue(value);
+		setValue(Long.valueOf(value));
 	}
 
 	@Override
 	public String getValueAsString() {
-		return Double.toString(this.value);
+		return this.value.toString();
 	}
 
 	@Override
-	public Double getValue() {
+	public Long getValue() {
 		return this.value;
 	}
 
 	@Override
-	public void setValue(Double value) {
+	public void setValue(Long value) {
 		validateValue(value);
 		this.value = value;
 	}
 
 	@Override
 	public String getType() {
-		return FloatParameter.TYPE;
+		return LongParameter.TYPE;
 	}
 
 	@Override
-	public Parameter<Double> getClone() {
-		FloatParameter clone = new FloatParameter();
+	public Parameter<Long> getClone() {
+		LongParameter clone = new LongParameter();
 
 		super.fillClone(clone);
 

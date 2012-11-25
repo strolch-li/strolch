@@ -30,7 +30,7 @@ import org.dom4j.tree.DefaultElement;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class Resource extends ParameterizedElement {
+public class Resource extends GroupedParameterizedElement {
 
 	private static final long serialVersionUID = 0L;
 	public static final String PREFIX_RESOURCE = "ResourcePrefix";
@@ -63,7 +63,7 @@ public class Resource extends ParameterizedElement {
 	public Element toDom() {
 
 		Element element = new DefaultElement("Resource");
-		fromDom(element);
+		fillElement(element);
 
 		return element;
 	}

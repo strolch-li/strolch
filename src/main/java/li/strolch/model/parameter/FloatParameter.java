@@ -19,11 +19,10 @@
  *  along with li.strolch.model.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.model;
-
-import java.text.DateFormat;
+package li.strolch.model.parameter;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Parameter;
 
 import org.dom4j.Element;
 
@@ -33,24 +32,25 @@ import ch.eitchnet.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class DateParameter extends AbstractParameter<Long> {
+public class FloatParameter extends AbstractParameter<Double> {
 
-	public static final String TYPE = "Date";
+	public static final String TYPE = "Float";
 	private static final long serialVersionUID = 0L;
 
-	private Long value;
+	private Double value = Double.MAX_VALUE;
 
 	/**
-	 * Default constructor
+	 * Empty constructor
+	 * 
 	 */
-	public DateParameter() {
+	public FloatParameter() {
 		//
 	}
 
 	/**
 	 * @param element
 	 */
-	public DateParameter(Element element) {
+	public FloatParameter(Element element) {
 		super.fromDom(element);
 
 		String valueS = element.attributeValue("Value");
@@ -58,7 +58,7 @@ public class DateParameter extends AbstractParameter<Long> {
 			throw new StrolchException("No value defined for " + this.id);
 		}
 
-		setValue(Long.valueOf(valueS));
+		setValue(Double.valueOf(valueS));
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class DateParameter extends AbstractParameter<Long> {
 	 * @param name
 	 * @param value
 	 */
-	public DateParameter(String id, String name, Long value) {
+	public FloatParameter(String id, String name, Double value) {
 		setId(id);
 		setName(name);
 		setValue(value);
@@ -74,30 +74,28 @@ public class DateParameter extends AbstractParameter<Long> {
 
 	@Override
 	public String getValueAsString() {
-		// TODO the format should be globally configured
-		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-		return dateFormat.format(this.value);
+		return Double.toString(this.value);
 	}
 
 	@Override
-	public Long getValue() {
+	public Double getValue() {
 		return this.value;
 	}
 
 	@Override
-	public void setValue(Long value) {
+	public void setValue(Double value) {
 		validateValue(value);
 		this.value = value;
 	}
 
 	@Override
 	public String getType() {
-		return DateParameter.TYPE;
+		return FloatParameter.TYPE;
 	}
 
 	@Override
-	public Parameter<Long> getClone() {
-		DateParameter clone = new DateParameter();
+	public Parameter<Double> getClone() {
+		FloatParameter clone = new FloatParameter();
 
 		super.fillClone(clone);
 

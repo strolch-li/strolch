@@ -19,10 +19,14 @@
  *  along with li.strolch.model.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.model;
+package li.strolch.model.parameter;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.AbstractStrolchElement;
+import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.Parameter;
+import li.strolch.model.ParameterizedElement;
 
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
@@ -42,7 +46,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	protected String interpretation;
 	protected String uom;
 
-	protected ParameterBag parent;
+	protected ParameterizedElement parent;
 
 	@Override
 	public boolean isHidden() {
@@ -83,12 +87,12 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	}
 
 	@Override
-	public ParameterBag getParent() {
+	public ParameterizedElement getParent() {
 		return this.parent;
 	}
 
 	@Override
-	public void setParent(ParameterBag parent) {
+	public void setParent(ParameterizedElement parent) {
 		this.parent = parent;
 	}
 

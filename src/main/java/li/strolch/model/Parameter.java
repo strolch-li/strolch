@@ -99,16 +99,16 @@ public interface Parameter<T> extends StrolchElement {
 	public void setUom(String uom);
 
 	/**
-	 * The {@link ParameterBag} parent to which this {@link Parameter} belongs
+	 * The {@link ParameterizedElement} parent to which this {@link Parameter} belongs
 	 * 
 	 * @return
 	 */
-	public ParameterBag getParent();
+	public ParameterizedElement getParent();
 
 	/**
 	 * Sets the parent for this {@link Parameter}
 	 */
-	public void setParent(ParameterBag parent);
+	public void setParent(ParameterizedElement parent);
 
 	/**
 	 * Returns the interpretation of this {@link Parameter}. The interpretation semantic describes what the value of

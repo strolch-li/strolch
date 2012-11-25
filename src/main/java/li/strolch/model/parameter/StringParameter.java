@@ -19,9 +19,10 @@
  *  along with li.strolch.model.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.model;
+package li.strolch.model.parameter;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Parameter;
 
 import org.dom4j.Element;
 
@@ -31,25 +32,25 @@ import ch.eitchnet.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class IntegerParameter extends AbstractParameter<Integer> {
+public class StringParameter extends AbstractParameter<String> {
 
-	public static final String TYPE = "Integer";
 	private static final long serialVersionUID = 0L;
+	public static final String TYPE = "String";
 
-	private Integer value = Integer.MAX_VALUE;
+	private String value = "-";
 
 	/**
-	 * Default constructor
+	 * Empty constructor
 	 * 
 	 */
-	public IntegerParameter() {
+	public StringParameter() {
 		//
 	}
 
 	/**
 	 * @param element
 	 */
-	public IntegerParameter(Element element) {
+	public StringParameter(Element element) {
 		super.fromDom(element);
 
 		String valueS = element.attributeValue("Value");
@@ -57,7 +58,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 			throw new StrolchException("No value defined for " + this.id);
 		}
 
-		setValue(Integer.valueOf(valueS));
+		setValue(valueS);
 	}
 
 	/**
@@ -65,7 +66,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	 * @param name
 	 * @param value
 	 */
-	public IntegerParameter(String id, String name, Integer value) {
+	public StringParameter(String id, String name, String value) {
 		setId(id);
 		setName(name);
 		setValue(value);
@@ -73,28 +74,28 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 
 	@Override
 	public String getType() {
-		return IntegerParameter.TYPE;
+		return StringParameter.TYPE;
 	}
 
 	@Override
-	public String getValueAsString() {
-		return Integer.toString(this.value);
-	}
-
-	@Override
-	public Integer getValue() {
+	public String getValue() {
 		return this.value;
 	}
 
 	@Override
-	public void setValue(Integer value) {
+	public String getValueAsString() {
+		return this.value;
+	}
+
+	@Override
+	public void setValue(String value) {
 		validateValue(value);
 		this.value = value;
 	}
 
 	@Override
-	public Parameter<Integer> getClone() {
-		IntegerParameter clone = new IntegerParameter();
+	public Parameter<String> getClone() {
+		StringParameter clone = new StringParameter();
 
 		super.fillClone(clone);
 

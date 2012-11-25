@@ -21,6 +21,8 @@
  */
 package li.strolch.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +30,13 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.parameter.BooleanParameter;
+import li.strolch.model.parameter.DateParameter;
+import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.IntegerParameter;
+import li.strolch.model.parameter.LongParameter;
+import li.strolch.model.parameter.StringParameter;
 
 import org.dom4j.Element;
 
@@ -35,20 +44,20 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	private static final long serialVersionUID = 0L;
 
-	protected Map<String, ParameterBag> parameterBagMap = new HashMap<String, ParameterBag>();
+	protected GroupedParameterizedElement parent;
+	protected Map<String, Parameter<?>> parameterMap;
 	protected String type;
 
 	/**
-	 * Default constructor
+	 * Empty constructor
 	 */
 	protected ParameterizedElement() {
-		this.parameterBagMap = new HashMap<String, ParameterBag>();
+		//
 	}
 
 	/**
@@ -56,12 +65,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * @param name
 	 * @param type
 	 */
-	protected ParameterizedElement(String id, String name, String type) {
+	public ParameterizedElement(String id, String name, String type) {
 		setId(id);
 		setName(name);
 		setType(type);
-
-		this.parameterBagMap = new HashMap<String, ParameterBag>();
 	}
 
 	@Override
@@ -83,140 +90,151 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	}
 
 	/**
-	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the given bagId, or null if
-	 * the {@link Parameter} or the {@link ParameterBag} does not exist
+	 * Returns this {@link ParameterizedElement}'s parent
 	 * 
-	 * @param bagKey
-	 *            the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
-	 * @param paramKey
-	 *            the key of the {@link Parameter} which is to be returned
-	 * 
-	 * @return the found {@link Parameter} or null if it was not found
+	 * @return the parent
 	 */
-	public <T> Parameter<T> getParameter(String bagKey, String paramKey) {
-		ParameterBag bag = this.parameterBagMap.get(bagKey);
-		if (bag == null)
-			return null;
-
-		return bag.getParameter(paramKey);
+	public GroupedParameterizedElement getParent() {
+		return this.parent;
 	}
 
 	/**
-	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key
+	 * Set the parent for this {@link ParameterizedElement}
 	 * 
-	 * @param bagKey
-	 *            the key of the {@link ParameterBag} to which the {@link Parameter} should be added
+	 * @param parent
+	 *            the parent to set
+	 */
+	public void setParent(GroupedParameterizedElement parent) {
+		this.parent = parent;
+	}
+
+	/**
+	 * Returns the {@link Parameter} with the given id, or null if it does not exist
+	 * 
+	 * @param key
+	 *            the id of the parameter to return
+	 * 
+	 * @return the {@link Parameter} with the given id, or null if it does not exist
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T getParameter(String key) {
+		if (this.parameterMap == null)
+			return null;
+		return (T) this.parameterMap.get(key);
+	}
+
+	/**
+	 * Adds the given {@link Parameter} to the {@link ParameterizedElement}
+	 * 
 	 * @param parameter
-	 *            the {@link Parameter} to be added to the {@link ParameterBag}
-	 * 
-	 * @throws StrolchException
-	 *             if the {@link ParameterBag} does not exist
+	 *            the {@link Parameter} to add
 	 */
-	public void addParameter(String bagKey, Parameter<?> parameter) throws StrolchException {
-		ParameterBag bag = this.parameterBagMap.get(bagKey);
-		if (bag == null) {
-			throw new StrolchException("No parameter bag exists with key " + bagKey);
-		}
-
-		bag.addParameter(parameter);
+	public void addParameter(Parameter<?> parameter) {
+		if (this.parameterMap == null)
+			this.parameterMap = new HashMap<String, Parameter<?>>();
+		this.parameterMap.put(parameter.getId(), parameter);
+		parameter.setParent(this);
 	}
 
 	/**
-	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
+	 * Removes the {@link Parameter} with the given key
 	 * 
-	 * @param bagKey
-	 *            the key of the {@link ParameterBag} from which the {@link Parameter} is to be removed
-	 * @param paramKey
-	 *            the key of the {@link Parameter} which is to be removed
+	 * @param key
+	 *            the key of the {@link Parameter} to remove
 	 * 
-	 * @return the removed {@link Parameter} or null if it did not exist
+	 * @return the removed {@link Parameter}, or null if it does not exist
 	 */
-	public <T> Parameter<T> removeParameter(String bagKey, String paramKey) {
-		ParameterBag bag = this.parameterBagMap.get(bagKey);
-		if (bag == null)
+	@SuppressWarnings("unchecked")
+	public <T> Parameter<T> removeParameter(String key) {
+		if (this.parameterMap == null)
 			return null;
-
-		return bag.removeParameter(paramKey);
+		return (Parameter<T>) this.parameterMap.remove(key);
 	}
 
 	/**
-	 * Returns the {@link ParameterBag} with the given key, or null if it does not exist
+	 * Returns a list of all the {@link Parameter}s in this {@link ParameterizedElement}
+	 * 
+	 * @return a list of all the {@link Parameter}s in this {@link ParameterizedElement}
+	 */
+	public List<Parameter<?>> getParameters() {
+		if (this.parameterMap == null)
+			return Collections.emptyList();
+		return new ArrayList<Parameter<?>>(this.parameterMap.values());
+	}
+
+	/**
+	 * Returns true, if the {@link Parameter} exists with the given key, false otherwise
 	 * 
 	 * @param key
-	 *            the key of the {@link ParameterBag} to return
+	 *            the key of the {@link Parameter} to check for
 	 * 
-	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
+	 * @return true, if the {@link Parameter} exists with the given key, false otherwise
 	 */
-	public ParameterBag getParameterBag(String key) {
-		return this.parameterBagMap.get(key);
-	}
-
-	/**
-	 * Adds the given {@link ParameterBag} to this {@link ParameterizedElement}
-	 * 
-	 * @param bag
-	 *            the {@link ParameterBag} to add
-	 */
-	public void addParameterBag(ParameterBag bag) {
-		this.parameterBagMap.put(bag.getId(), bag);
-		bag.setParent(this);
-	}
-
-	/**
-	 * Removes the {@link ParameterBag} with the given key
-	 * 
-	 * @param key
-	 *            the key of the {@link ParameterBag} to remove
-	 * 
-	 * @return the removed {@link ParameterBag}, or null if it does not exist
-	 */
-	public ParameterBag removeParameterBag(String key) {
-		return this.parameterBagMap.remove(key);
-	}
-
-	/**
-	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
-	 * bagKey
-	 * 
-	 * @param bagKey
-	 *            the key of the {@link ParameterBag} on which to find the {@link Parameter}
-	 * @param paramKey
-	 *            the key of the {@link Parameter} to be found
-	 * 
-	 * @return true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
-	 *         bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not
-	 *         exist on the {@link ParameterBag}
-	 */
-	public boolean hasParameter(String bagKey, String paramKey) {
-		ParameterBag bag = this.parameterBagMap.get(bagKey);
-		if (bag == null)
+	public boolean hasParameter(String key) {
+		if (this.parameterMap == null)
 			return false;
-
-		return bag.hasParameter(paramKey);
+		return this.parameterMap.containsKey(key);
 	}
 
 	/**
-	 * Returns the {@link Set} of keys for the {@link ParameterBag}s on this {@link ParameterizedElement}
+	 * Returns a {@link Set} of all the {@link Parameter} keys in this {@link ParameterizedElement}
 	 * 
-	 * @return the {@link Set} of keys for the {@link ParameterBag}s on this {@link ParameterizedElement}
+	 * @return a {@link Set} of all the {@link Parameter} keys in this {@link ParameterizedElement}
 	 */
-	public Set<String> getParameterBagKeySet() {
-		return new HashSet<String>(this.parameterBagMap.keySet());
+	public Set<String> getParameterKeySet() {
+		if (this.parameterMap == null)
+			return Collections.emptySet();
+		return new HashSet<String>(this.parameterMap.keySet());
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void fromDom(Element element) {
+	public void fillLocator(LocatorBuilder lb) {
+		lb.append("ParameterizedElement").append(this.id);
+	}
+
+	@Override
+	public Locator getLocator() {
+		LocatorBuilder lb = new LocatorBuilder();
+		this.parent.fillLocator(lb);
+		fillLocator(lb);
+		return lb.build();
+	}
+
+	@Override
+	protected void fromDom(Element element) {
 		super.fromDom(element);
 
 		String type = element.attributeValue("Type");
 		setType(type);
 
-		List<Element> bags = element.elements("ParameterBag");
-		for (Element bagElement : bags) {
+		// add all the parameters
+		@SuppressWarnings("unchecked")
+		List<Element> parameterElements = element.elements("Parameter");
+		for (Object object : parameterElements) {
+			Element paramElement = (Element) object;
+			String paramtype = paramElement.attributeValue("Type");
 
-			ParameterBag bag = new ParameterBag(bagElement);
-			addParameterBag(bag);
+			if (paramtype.equals(StringParameter.TYPE)) {
+				StringParameter param = new StringParameter(paramElement);
+				addParameter(param);
+			} else if (paramtype.equals(IntegerParameter.TYPE)) {
+				IntegerParameter param = new IntegerParameter(paramElement);
+				addParameter(param);
+			} else if (paramtype.equals(FloatParameter.TYPE)) {
+				FloatParameter param = new FloatParameter(paramElement);
+				addParameter(param);
+			} else if (paramtype.equals(LongParameter.TYPE)) {
+				LongParameter param = new LongParameter(paramElement);
+				addParameter(param);
+			} else if (paramtype.equals(DateParameter.TYPE)) {
+				DateParameter param = new DateParameter(paramElement);
+				addParameter(param);
+			} else if (paramtype.equals(BooleanParameter.TYPE)) {
+				BooleanParameter param = new BooleanParameter(paramElement);
+				addParameter(param);
+			} else {
+				throw new StrolchException("What kind of parameter is this: " + paramtype);
+			}
 		}
 	}
 
@@ -224,21 +242,32 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	protected void fillElement(Element element) {
 		super.fillElement(element);
 
-		for (ParameterBag bag : this.parameterBagMap.values()) {
-			element.add(bag.toDom());
+		if (this.parameterMap != null) {
+			for (Parameter<?> parameter : this.parameterMap.values()) {
+				element.add(parameter.toDom());
+			}
 		}
 	}
 
-	/**
-	 * Fills {@link ParameterizedElement} properties of this clone
-	 * 
-	 * @param clone
-	 */
-	protected void fillClone(ParameterizedElement clone) {
+	@Override
+	protected void fillClone(StrolchElement clone) {
 		super.fillClone(clone);
+		((ParameterizedElement) clone).setType(this.type);
+	}
 
-		for (ParameterBag bag : this.parameterBagMap.values()) {
-			clone.addParameterBag(bag.getClone());
-		}
+	@Override
+	public String toString() {
+
+		StringBuilder builder = new StringBuilder();
+
+		builder.append("ParameterizedElement [id=");
+		builder.append(this.id);
+		builder.append(", name=");
+		builder.append(this.name);
+		builder.append(", type=");
+		builder.append(this.type);
+		builder.append("]");
+
+		return builder.toString();
 	}
 }

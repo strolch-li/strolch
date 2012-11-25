@@ -37,7 +37,7 @@ import org.dom4j.tree.DefaultElement;
  * @author eitch
  * 
  */
-public class Order extends ParameterizedElement {
+public class Order extends GroupedParameterizedElement {
 
 	private static final long serialVersionUID = 0L;
 
@@ -50,11 +50,11 @@ public class Order extends ParameterizedElement {
 	 * Empty constructor
 	 */
 	public Order() {
-		super();
+		//
 	}
 
 	/**
-	 * Build an Order
+	 * Default constructor for an {@link Order}
 	 * 
 	 * @param id
 	 * @param name
@@ -68,7 +68,7 @@ public class Order extends ParameterizedElement {
 	}
 
 	/**
-	 * Build an Order
+	 * Constructor with date and {@link State}
 	 * 
 	 * @param id
 	 * @param name
@@ -84,7 +84,7 @@ public class Order extends ParameterizedElement {
 	}
 
 	/**
-	 * Builds this Order from a Dom4j element
+	 * From DOM Constructor
 	 * 
 	 * @param element
 	 */

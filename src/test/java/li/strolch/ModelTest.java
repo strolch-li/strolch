@@ -1,11 +1,11 @@
 package li.strolch;
 
-import li.strolch.model.FloatParameter;
 import li.strolch.model.Order;
 import li.strolch.model.Parameter;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
+import li.strolch.model.parameter.FloatParameter;
 
 import org.junit.Test;
 

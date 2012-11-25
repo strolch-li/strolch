@@ -19,9 +19,10 @@
  *  along with li.strolch.model.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.model;
+package li.strolch.model.parameter;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Parameter;
 
 import org.dom4j.Element;
 
@@ -29,26 +30,26 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public class LongParameter extends AbstractParameter<Long> {
+public class BooleanParameter extends AbstractParameter<Boolean> {
 
-	public static final String TYPE = "Long";
+	public static final String TYPE = "Boolean";
 	private static final long serialVersionUID = 0L;
-
-	protected Long value;
+	
+	private Boolean value = Boolean.FALSE;
 
 	/**
-	 * Default constructor
+	 * Empty constructor
+	 * 
 	 */
-	public LongParameter() {
+	public BooleanParameter() {
 		//
 	}
 
 	/**
 	 * @param element
 	 */
-	public LongParameter(Element element) {
+	public BooleanParameter(Element element) {
 		super.fromDom(element);
 
 		String valueS = element.attributeValue("Value");
@@ -56,7 +57,7 @@ public class LongParameter extends AbstractParameter<Long> {
 			throw new StrolchException("No value defined for " + this.id);
 		}
 
-		setValue(Long.valueOf(valueS));
+		setValue(Boolean.valueOf(valueS));
 	}
 
 	/**
@@ -64,10 +65,10 @@ public class LongParameter extends AbstractParameter<Long> {
 	 * @param name
 	 * @param value
 	 */
-	public LongParameter(String id, String name, Long value) {
+	public BooleanParameter(String id, String name, Boolean value) {
 		setId(id);
 		setName(name);
-		setValue(Long.valueOf(value));
+		setValue(value);
 	}
 
 	@Override
@@ -76,24 +77,24 @@ public class LongParameter extends AbstractParameter<Long> {
 	}
 
 	@Override
-	public Long getValue() {
+	public Boolean getValue() {
 		return this.value;
 	}
 
 	@Override
-	public void setValue(Long value) {
+	public void setValue(Boolean value) {
 		validateValue(value);
 		this.value = value;
 	}
 
 	@Override
 	public String getType() {
-		return LongParameter.TYPE;
+		return BooleanParameter.TYPE;
 	}
 
 	@Override
-	public Parameter<Long> getClone() {
-		LongParameter clone = new LongParameter();
+	public Parameter<Boolean> getClone() {
+		BooleanParameter clone = new BooleanParameter();
 
 		super.fillClone(clone);
 

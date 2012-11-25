@@ -19,9 +19,12 @@
  *  along with li.strolch.model.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.model;
+package li.strolch.model.parameter;
+
+import java.text.DateFormat;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Parameter;
 
 import org.dom4j.Element;
 
@@ -29,26 +32,26 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
  */
-public class BooleanParameter extends AbstractParameter<Boolean> {
+public class DateParameter extends AbstractParameter<Long> {
 
-	public static final String TYPE = "Boolean";
+	public static final String TYPE = "Date";
 	private static final long serialVersionUID = 0L;
-	
-	private Boolean value = Boolean.FALSE;
+
+	private Long value;
 
 	/**
-	 * Empty constructor
-	 * 
+	 * Default constructor
 	 */
-	public BooleanParameter() {
+	public DateParameter() {
 		//
 	}
 
 	/**
 	 * @param element
 	 */
-	public BooleanParameter(Element element) {
+	public DateParameter(Element element) {
 		super.fromDom(element);
 
 		String valueS = element.attributeValue("Value");
@@ -56,7 +59,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 			throw new StrolchException("No value defined for " + this.id);
 		}
 
-		setValue(Boolean.valueOf(valueS));
+		setValue(Long.valueOf(valueS));
 	}
 
 	/**
@@ -64,7 +67,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	 * @param name
 	 * @param value
 	 */
-	public BooleanParameter(String id, String name, Boolean value) {
+	public DateParameter(String id, String name, Long value) {
 		setId(id);
 		setName(name);
 		setValue(value);
@@ -72,28 +75,30 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 
 	@Override
 	public String getValueAsString() {
-		return this.value.toString();
+		// TODO the format should be globally configured
+		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+		return dateFormat.format(this.value);
 	}
 
 	@Override
-	public Boolean getValue() {
+	public Long getValue() {
 		return this.value;
 	}
 
 	@Override
-	public void setValue(Boolean value) {
+	public void setValue(Long value) {
 		validateValue(value);
 		this.value = value;
 	}
 
 	@Override
 	public String getType() {
-		return BooleanParameter.TYPE;
+		return DateParameter.TYPE;
 	}
 
 	@Override
-	public Parameter<Boolean> getClone() {
-		BooleanParameter clone = new BooleanParameter();
+	public Parameter<Long> getClone() {
+		DateParameter clone = new DateParameter();
 
 		super.fillClone(clone);
 
