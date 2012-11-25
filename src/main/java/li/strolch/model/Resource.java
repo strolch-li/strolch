@@ -28,7 +28,6 @@ import org.dom4j.tree.DefaultElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class Resource extends GroupedParameterizedElement {
 
@@ -37,13 +36,14 @@ public class Resource extends GroupedParameterizedElement {
 
 	/**
 	 * Empty constructor
-	 * 
 	 */
-	protected Resource() {
-		super();
+	public Resource() {
+		//
 	}
 
 	/**
+	 * Default constructor
+	 * 
 	 * @param id
 	 * @param name
 	 * @param type
@@ -53,6 +53,8 @@ public class Resource extends GroupedParameterizedElement {
 	}
 
 	/**
+	 * DOM Constructor
+	 * 
 	 * @param element
 	 */
 	public Resource(Element element) {

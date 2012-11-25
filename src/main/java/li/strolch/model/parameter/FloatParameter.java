@@ -41,13 +41,27 @@ public class FloatParameter extends AbstractParameter<Double> {
 
 	/**
 	 * Empty constructor
-	 * 
 	 */
 	public FloatParameter() {
 		//
 	}
 
 	/**
+	 * Default constructor
+	 * 
+	 * @param id
+	 * @param name
+	 * @param value
+	 */
+	public FloatParameter(String id, String name, Double value) {
+		super(id, name);
+
+		setValue(value);
+	}
+
+	/**
+	 * DOM Constructor
+	 * 
 	 * @param element
 	 */
 	public FloatParameter(Element element) {
@@ -59,17 +73,6 @@ public class FloatParameter extends AbstractParameter<Double> {
 		}
 
 		setValue(Double.valueOf(valueS));
-	}
-
-	/**
-	 * @param id
-	 * @param name
-	 * @param value
-	 */
-	public FloatParameter(String id, String name, Double value) {
-		setId(id);
-		setName(name);
-		setValue(value);
 	}
 
 	@Override

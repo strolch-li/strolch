@@ -48,6 +48,23 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	protected ParameterizedElement parent;
 
+	/**
+	 * Empty constructor
+	 */
+	protected AbstractParameter() {
+		//
+	}
+
+	/**
+	 * Default constructor
+	 * 
+	 * @param id
+	 * @param name
+	 */
+	public AbstractParameter(String id, String name) {
+		super(id, name);
+	}
+
 	@Override
 	public boolean isHidden() {
 		return this.hidden;

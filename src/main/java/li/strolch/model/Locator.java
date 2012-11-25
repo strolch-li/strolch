@@ -55,6 +55,9 @@ public class Locator {
 	 */
 	public static final String PATH_SEPARATOR = "/";
 
+	/**
+	 * {@link List} of path elements, with the first being the top level or root element
+	 */
 	private final List<String> pathElements;
 
 	/**

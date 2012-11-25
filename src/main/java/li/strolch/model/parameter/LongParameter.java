@@ -40,13 +40,27 @@ public class LongParameter extends AbstractParameter<Long> {
 	protected Long value;
 
 	/**
-	 * Default constructor
+	 * Empty constructor
 	 */
 	public LongParameter() {
 		//
 	}
 
 	/**
+	 * Default constructor
+	 * 
+	 * @param id
+	 * @param name
+	 * @param value
+	 */
+	public LongParameter(String id, String name, Long value) {
+		super(id, name);
+		setValue(Long.valueOf(value));
+	}
+
+	/**
+	 * DOM Constructor
+	 * 
 	 * @param element
 	 */
 	public LongParameter(Element element) {
@@ -58,17 +72,6 @@ public class LongParameter extends AbstractParameter<Long> {
 		}
 
 		setValue(Long.valueOf(valueS));
-	}
-
-	/**
-	 * @param id
-	 * @param name
-	 * @param value
-	 */
-	public LongParameter(String id, String name, Long value) {
-		setId(id);
-		setName(name);
-		setValue(Long.valueOf(value));
 	}
 
 	@Override

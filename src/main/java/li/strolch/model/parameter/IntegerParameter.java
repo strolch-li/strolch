@@ -40,14 +40,27 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	private Integer value = Integer.MAX_VALUE;
 
 	/**
-	 * Default constructor
-	 * 
+	 * Empty constructor
 	 */
 	public IntegerParameter() {
 		//
 	}
 
 	/**
+	 * Default constructor
+	 * 
+	 * @param id
+	 * @param name
+	 * @param value
+	 */
+	public IntegerParameter(String id, String name, Integer value) {
+		super(id, name);
+		setValue(value);
+	}
+
+	/**
+	 * DOM Constructor
+	 * 
 	 * @param element
 	 */
 	public IntegerParameter(Element element) {
@@ -59,17 +72,6 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		}
 
 		setValue(Integer.valueOf(valueS));
-	}
-
-	/**
-	 * @param id
-	 * @param name
-	 * @param value
-	 */
-	public IntegerParameter(String id, String name, Integer value) {
-		setId(id);
-		setName(name);
-		setValue(value);
 	}
 
 	@Override

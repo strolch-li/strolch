@@ -22,10 +22,17 @@
 package li.strolch.model.parameter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchElement;
+
+import org.dom4j.Element;
+
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -36,6 +43,50 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	private static final long serialVersionUID = 1L;
 
 	protected List<String> value;
+
+	/**
+	 * Empty constructor
+	 */
+	public StringListParameter() {
+		//
+	}
+
+	/**
+	 * Default constructor
+	 * 
+	 * @param id
+	 * @param name
+	 * @param value
+	 */
+	public StringListParameter(String id, String name, List<String> value) {
+		super(id, name);
+
+		setValue(value);
+	}
+
+	/**
+	 * DOM Constructor
+	 * 
+	 * @param element
+	 */
+	public StringListParameter(Element element) {
+		super.fromDom(element);
+
+		String valueS = element.attributeValue("Value");
+		if (StringHelper.isEmpty(valueS)) {
+			throw new StrolchException("No value defined for " + this.id);
+		}
+
+		setValue(parse(valueS));
+	}
+
+	private List<String> parse(String value) {
+		if (value.isEmpty())
+			return Collections.emptyList();
+
+		String[] valueArr = value.split(";");
+		return Arrays.asList(valueArr);
+	}
 
 	@Override
 	public String getValueAsString() {

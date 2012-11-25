@@ -23,21 +23,23 @@ package li.strolch.model;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public enum State {
 
-	CREATED("Created"),
-	OPEN("Open"),
-	EXECUTION("Execution"),
-	CLOSED("Closed");
+	CREATED("Created"), OPEN("Open"), EXECUTION("Execution"), CLOSED("Closed");
 
 	private String state;
 
+	/**
+	 * @param state
+	 */
 	private State(String state) {
 		this.state = state;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getStateName() {
 		return this.state;
 	}

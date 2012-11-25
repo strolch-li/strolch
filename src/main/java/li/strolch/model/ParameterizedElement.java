@@ -54,13 +54,15 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	protected String type;
 
 	/**
-	 * Empty constructor
+	 * Empty Constructor
 	 */
 	protected ParameterizedElement() {
 		//
 	}
 
 	/**
+	 * Default Constructor
+	 * 
 	 * @param id
 	 * @param name
 	 * @param type

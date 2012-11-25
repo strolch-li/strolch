@@ -48,6 +48,20 @@ public class StringParameter extends AbstractParameter<String> {
 	}
 
 	/**
+	 * Default constructor
+	 * 
+	 * @param id
+	 * @param name
+	 * @param value
+	 */
+	public StringParameter(String id, String name, String value) {
+		super(id, name);
+		setValue(value);
+	}
+
+	/**
+	 * DOM Constructor
+	 * 
 	 * @param element
 	 */
 	public StringParameter(Element element) {
@@ -59,17 +73,6 @@ public class StringParameter extends AbstractParameter<String> {
 		}
 
 		setValue(valueS);
-	}
-
-	/**
-	 * @param id
-	 * @param name
-	 * @param value
-	 */
-	public StringParameter(String id, String name, String value) {
-		setId(id);
-		setName(name);
-		setValue(value);
 	}
 
 	@Override

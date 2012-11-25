@@ -37,7 +37,7 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 * @param value
 	 *            the value to add
 	 */
-	public abstract void addValue(E value);
+	public void addValue(E value);
 
 	/**
 	 * Removes a single value from the {@link List} of values
@@ -47,5 +47,5 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 * 
 	 * @return true if the value was removed, false if it did not exist
 	 */
-	public abstract boolean removeValue(E value);
+	public boolean removeValue(E value);
 }

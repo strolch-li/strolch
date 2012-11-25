@@ -35,18 +35,31 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 
 	public static final String TYPE = "Boolean";
 	private static final long serialVersionUID = 0L;
-	
+
 	private Boolean value = Boolean.FALSE;
 
 	/**
 	 * Empty constructor
-	 * 
 	 */
 	public BooleanParameter() {
 		//
 	}
 
 	/**
+	 * Default constructors
+	 * 
+	 * @param id
+	 * @param name
+	 * @param value
+	 */
+	public BooleanParameter(String id, String name, Boolean value) {
+		super(id, name);
+		setValue(value);
+	}
+
+	/**
+	 * DOM Constructor
+	 * 
 	 * @param element
 	 */
 	public BooleanParameter(Element element) {
@@ -58,17 +71,6 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 		}
 
 		setValue(Boolean.valueOf(valueS));
-	}
-
-	/**
-	 * @param id
-	 * @param name
-	 * @param value
-	 */
-	public BooleanParameter(String id, String name, Boolean value) {
-		setId(id);
-		setName(name);
-		setValue(value);
 	}
 
 	@Override

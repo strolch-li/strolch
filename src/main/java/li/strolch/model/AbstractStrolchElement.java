@@ -44,6 +44,19 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 		//
 	}
 
+	/**
+	 * Default constructor
+	 * 
+	 * @param id
+	 *            id of this {@link StrolchElement}
+	 * @param name
+	 *            name of this {@link StrolchElement}
+	 */
+	public AbstractStrolchElement(String id, String name) {
+		setId(id);
+		setName(name);
+	}
+
 	@Override
 	public long getDbid() {
 		return this.dbid;

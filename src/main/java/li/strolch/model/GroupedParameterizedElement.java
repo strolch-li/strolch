@@ -46,20 +46,21 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	protected String type;
 
 	/**
-	 * Default constructor
+	 * Empty constructor
 	 */
 	protected GroupedParameterizedElement() {
 		//
 	}
 
 	/**
+	 * Default Constructor
+	 * 
 	 * @param id
 	 * @param name
 	 * @param type
 	 */
 	protected GroupedParameterizedElement(String id, String name, String type) {
-		setId(id);
-		setName(name);
+		super(id, name);
 		setType(type);
 	}
 
@@ -82,8 +83,8 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	/**
-	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the given bagKey, or
-	 * null if the {@link Parameter} or the {@link ParameterBag} does not exist
+	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the given bagKey, or null if
+	 * the {@link Parameter} or the {@link ParameterBag} does not exist
 	 * 
 	 * @param bagKey
 	 *            the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
@@ -186,17 +187,17 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	/**
-	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the
-	 * given bagKey
+	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
+	 * bagKey
 	 * 
 	 * @param bagKey
 	 *            the key of the {@link ParameterBag} on which to find the {@link Parameter}
 	 * @param paramKey
 	 *            the key of the {@link Parameter} to be found
 	 * 
-	 * @return true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the
-	 *         given bagKey. False is returned if the {@link ParameterBag} does not exist, or the
-	 *         {@link Parameter} does not exist on the {@link ParameterBag}
+	 * @return true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
+	 *         bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not
+	 *         exist on the {@link ParameterBag}
 	 */
 	public boolean hasParameter(String bagKey, String paramKey) {
 		if (this.parameterBagMap == null)

@@ -42,13 +42,27 @@ public class DateParameter extends AbstractParameter<Long> {
 	private Long value;
 
 	/**
-	 * Default constructor
+	 * Empty constructor
 	 */
 	public DateParameter() {
 		//
 	}
 
 	/**
+	 * Default Constructor
+	 * 
+	 * @param id
+	 * @param name
+	 * @param value
+	 */
+	public DateParameter(String id, String name, Long value) {
+		super(id, name);
+		setValue(value);
+	}
+
+	/**
+	 * DOM Constructor
+	 * 
 	 * @param element
 	 */
 	public DateParameter(Element element) {
@@ -60,17 +74,6 @@ public class DateParameter extends AbstractParameter<Long> {
 		}
 
 		setValue(Long.valueOf(valueS));
-	}
-
-	/**
-	 * @param id
-	 * @param name
-	 * @param value
-	 */
-	public DateParameter(String id, String name, Long value) {
-		setId(id);
-		setName(name);
-		setValue(value);
 	}
 
 	@Override

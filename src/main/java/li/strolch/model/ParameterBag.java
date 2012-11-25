@@ -31,7 +31,7 @@ public class ParameterBag extends ParameterizedElement {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructor for special cases
+	 * Empty Constructor
 	 */
 	public ParameterBag() {
 		// 
@@ -49,7 +49,7 @@ public class ParameterBag extends ParameterizedElement {
 	}
 
 	/**
-	 * Constructor from DOM
+	 * DOM Constructor
 	 * 
 	 * @param bagElement
 	 */

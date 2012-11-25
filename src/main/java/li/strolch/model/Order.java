@@ -54,7 +54,7 @@ public class Order extends GroupedParameterizedElement {
 	}
 
 	/**
-	 * Default constructor for an {@link Order}
+	 * Default Constructor
 	 * 
 	 * @param id
 	 * @param name
@@ -68,7 +68,7 @@ public class Order extends GroupedParameterizedElement {
 	}
 
 	/**
-	 * Constructor with date and {@link State}
+	 * Extended Constructor for date and {@link State}
 	 * 
 	 * @param id
 	 * @param name
@@ -84,7 +84,7 @@ public class Order extends GroupedParameterizedElement {
 	}
 
 	/**
-	 * From DOM Constructor
+	 * DOM Constructor
 	 * 
 	 * @param element
 	 */
