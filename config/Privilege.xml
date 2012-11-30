@@ -28,6 +28,7 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 
 		<Parameters>
 			<!-- parameters for the container itself -->
+			<Parameter name="autoPersistOnPasswordChange" value="true" />
 		</Parameters>
 
 		<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
@@ -38,7 +39,7 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 
 		<PersistenceHandler class="ch.eitchnet.privilege.handler.XmlPersistenceHandler">
 			<Parameters>
-				<Parameter name="basePath" value="./config" />
+				<Parameter name="basePath" value="./target/test" />
 				<Parameter name="modelXmlFile" value="PrivilegeModel.xml" />
 			</Parameters>
 		</PersistenceHandler>

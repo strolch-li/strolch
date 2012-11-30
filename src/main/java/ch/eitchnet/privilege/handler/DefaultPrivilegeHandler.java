@@ -68,6 +68,11 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
 public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	/**
+	 * configuration parameter to define automatic persisting on password change
+	 */
+	private static final String PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE = "autoPersistOnPasswordChange";
+
+	/**
 	 * log4j logger
 	 */
 	protected static final Logger logger = LoggerFactory.getLogger(DefaultPrivilegeHandler.class);
@@ -106,6 +111,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * flag to define if already initialized
 	 */
 	private boolean initialized;
+
+	/**
+	 * flag to define if a persist should be performed after a user changes their password
+	 */
+	private boolean autoPersistOnPasswordChange;
 
 	/**
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getRole(java.lang.String)
@@ -624,6 +634,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// delegate user replacement to persistence handler
 			this.persistenceHandler.addOrReplaceUser(newUser);
 
+			// perform automatic persisting, if enabled
+			if (this.autoPersistOnPasswordChange) {
+				this.persistenceHandler.persist();
+			}
+
 		} finally {
 			clearPassword(password);
 		}
@@ -996,6 +1011,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.policyMap = policyMap;
 		this.encryptionHandler = encryptionHandler;
 		this.persistenceHandler = persistenceHandler;
+
+		String autoPersistS = parameterMap.get(PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE);
+		if (autoPersistS == null || autoPersistS.equals(Boolean.FALSE.toString())) {
+			this.autoPersistOnPasswordChange = false;
+		} else if (autoPersistS.equals(Boolean.TRUE.toString())) {
+			this.autoPersistOnPasswordChange = true;
+			logger.info("Enabling automatic persistence on password change.");
+		} else {
+			logger.error("Parameter " + PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE + " has illegal value " + autoPersistS
+					+ ". Overriding with " + Boolean.FALSE.toString());
+		}
 
 		// validate policies on privileges of Roles
 		for (Role role : persistenceHandler.getAllRoles()) {
