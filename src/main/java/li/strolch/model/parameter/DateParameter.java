@@ -24,7 +24,6 @@ package li.strolch.model.parameter;
 import java.text.DateFormat;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.model.Parameter;
 
 import org.dom4j.Element;
 
@@ -32,7 +31,6 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class DateParameter extends AbstractParameter<Long> {
 

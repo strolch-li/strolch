@@ -22,7 +22,6 @@
 package li.strolch.model.parameter;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.model.Parameter;
 
 import org.dom4j.Element;
 

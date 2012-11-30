@@ -19,7 +19,12 @@
  *  along with li.strolch.model.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.model;
+package li.strolch.model.parameter;
+
+import li.strolch.model.Order;
+import li.strolch.model.ParameterizedElement;
+import li.strolch.model.Resource;
+import li.strolch.model.StrolchElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

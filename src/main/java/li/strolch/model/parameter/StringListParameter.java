@@ -113,6 +113,9 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 
 	@Override
 	public void setValue(List<String> value) {
+		validateValue(value);
+		if (this.value == null)
+			this.value = new ArrayList<String>(value.size());
 		this.value.clear();
 		this.value.addAll(value);
 	}

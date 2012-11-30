@@ -23,7 +23,6 @@ package li.strolch.model.parameter;
 
 import java.util.List;
 
-import li.strolch.model.Parameter;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

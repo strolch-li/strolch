@@ -25,7 +25,6 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.Parameter;
 import li.strolch.model.ParameterizedElement;
 
 import org.dom4j.Element;

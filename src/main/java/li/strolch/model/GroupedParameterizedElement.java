@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.parameter.Parameter;
 
 import org.dom4j.Element;
 

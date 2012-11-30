@@ -36,6 +36,7 @@ import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.LongParameter;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 
 import org.dom4j.Element;
