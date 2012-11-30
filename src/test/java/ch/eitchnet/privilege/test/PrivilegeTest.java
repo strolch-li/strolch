@@ -24,16 +24,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import junit.framework.Assert;
+
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.base.AccessDeniedException;
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.helper.CertificateThreadLocal;
 import ch.eitchnet.privilege.helper.InitializationHelper;
-import ch.eitchnet.privilege.i18n.AccessDeniedException;
-import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeRep;
 import ch.eitchnet.privilege.model.Restrictable;
@@ -43,10 +46,12 @@ import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.test.model.TestRestrictable;
 import ch.eitchnet.privilege.test.model.TestSystemUserAction;
 import ch.eitchnet.privilege.test.model.TestSystemUserActionDeny;
+import ch.eitchnet.utils.helper.FileHelper;
 
 /**
- * JUnit for performing Privilege tests. This JUnit is by no means complete, but checks the bare minimum. TODO add more
- * tests, especially with deny and allow lists
+ * JUnit for performing Privilege tests. This JUnit is by no means complete, but checks the bare minimum.br />
+ * 
+ * TODO add more tests, especially with deny and allow lists
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -75,14 +80,47 @@ public class PrivilegeTest {
 	@BeforeClass
 	public static void init() throws Exception {
 		try {
-			// initialize container
+			// copy configuration to tmp
 			String pwd = System.getProperty("user.dir");
-			File privilegeContainerXmlFile = new File(pwd + "/config/Privilege.xml");
-			PrivilegeTest.privilegeHandler = InitializationHelper.initializeFromXml(privilegeContainerXmlFile);
+
+			File origPrivilegeModelFile = new File(pwd + "/config/PrivilegeModel.xml");
+			File tmpPrivilegeModelFile = new File(pwd + "/target/test/PrivilegeModel.xml");
+			if (tmpPrivilegeModelFile.exists() && !tmpPrivilegeModelFile.delete()) {
+				throw new RuntimeException("Tmp configuration still exists and can not be deleted at "
+						+ tmpPrivilegeModelFile.getAbsolutePath());
+			}
+
+			File parentFile = tmpPrivilegeModelFile.getParentFile();
+			if (!parentFile.exists()) {
+				if (!parentFile.mkdirs())
+					throw new RuntimeException("Could not create parent for tmp " + tmpPrivilegeModelFile);
+			}
+
+			if (!FileHelper.copy(origPrivilegeModelFile, tmpPrivilegeModelFile, true))
+				throw new RuntimeException("Failed to copy " + origPrivilegeModelFile + " to " + tmpPrivilegeModelFile);
+
 		} catch (Exception e) {
 			PrivilegeTest.logger.error(e.getMessage(), e);
 
 			throw new RuntimeException("Initialization failed: " + e.getLocalizedMessage(), e);
+		}
+	}
+
+	@Before
+	public void setup() throws Exception {
+		try {
+
+			String pwd = System.getProperty("user.dir");
+
+			File privilegeConfigFile = new File(pwd + "/config/Privilege.xml");
+
+			// initialize privilege
+			PrivilegeTest.privilegeHandler = InitializationHelper.initializeFromXml(privilegeConfigFile);
+
+		} catch (Exception e) {
+			PrivilegeTest.logger.error(e.getMessage(), e);
+
+			throw new RuntimeException("Setup failed: " + e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -95,7 +133,7 @@ public class PrivilegeTest {
 
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
 				copyBytes(PrivilegeTest.PASS_ADMIN));
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -114,7 +152,7 @@ public class PrivilegeTest {
 
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
 				copyBytes(PrivilegeTest.PASS_BAD));
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -126,7 +164,7 @@ public class PrivilegeTest {
 	public void testFailAuthenticationPWNull() throws Exception {
 
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN, null);
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -150,6 +188,7 @@ public class PrivilegeTest {
 		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.BOB,
 				copyBytes(PrivilegeTest.PASS_BOB));
 		PrivilegeTest.logger.info("Set Bob's password");
+		privilegeHandler.persist(certificate);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -175,6 +214,7 @@ public class PrivilegeTest {
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
 				copyBytes(PrivilegeTest.PASS_ADMIN));
 		PrivilegeTest.privilegeHandler.setUserState(certificate, PrivilegeTest.BOB, UserState.ENABLED);
+		privilegeHandler.persist(certificate);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -189,7 +229,7 @@ public class PrivilegeTest {
 
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
 				copyBytes(PrivilegeTest.PASS_BOB));
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -206,6 +246,7 @@ public class PrivilegeTest {
 		RoleRep roleRep = new RoleRep(PrivilegeTest.ROLE_USER, privilegeMap);
 
 		PrivilegeTest.privilegeHandler.addOrReplaceRole(certificate, roleRep);
+		privilegeHandler.persist(certificate);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -218,6 +259,7 @@ public class PrivilegeTest {
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
 				copyBytes(PrivilegeTest.PASS_ADMIN));
 		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB, PrivilegeTest.ROLE_USER);
+		privilegeHandler.persist(certificate);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -244,7 +286,7 @@ public class PrivilegeTest {
 		// auth as Bog
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
 				copyBytes(PrivilegeTest.PASS_BOB));
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// let's add a new user Ted
 		UserRep userRep = new UserRep("1", PrivilegeTest.TED, "Ted", "And then Some", UserState.NEW,
@@ -266,6 +308,7 @@ public class PrivilegeTest {
 		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB,
 				PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
 		PrivilegeTest.logger.info("Added " + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE + " to " + PrivilegeTest.ADMIN);
+		privilegeHandler.persist(certificate);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -278,7 +321,7 @@ public class PrivilegeTest {
 
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
 				copyBytes(PrivilegeTest.PASS_BOB));
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// let's add a new user ted
 		HashSet<String> roles = new HashSet<String>();
@@ -287,7 +330,7 @@ public class PrivilegeTest {
 				new HashMap<String, String>());
 		PrivilegeTest.privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 		PrivilegeTest.logger.info("Added user " + PrivilegeTest.TED);
-
+		privilegeHandler.persist(certificate);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -300,12 +343,12 @@ public class PrivilegeTest {
 
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
 				copyBytes(PrivilegeTest.PASS_BOB));
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// set ted's password to default
 		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.TED,
 				copyBytes(PrivilegeTest.PASS_DEF));
-
+		privilegeHandler.persist(certificate);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -342,7 +385,7 @@ public class PrivilegeTest {
 
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
 				copyBytes(PrivilegeTest.PASS_ADMIN));
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// see if eitch can perform restrictable
 		Restrictable restrictable = new TestRestrictable();
@@ -360,7 +403,7 @@ public class PrivilegeTest {
 	public void testFailPerformRestrictableAsBob() throws Exception {
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
 				copyBytes(PrivilegeTest.PASS_BOB));
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// see if bob can perform restrictable
 		Restrictable restrictable = new TestRestrictable();
@@ -382,6 +425,7 @@ public class PrivilegeTest {
 				copyBytes(PrivilegeTest.PASS_ADMIN));
 		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB, PrivilegeTest.ROLE_APP_USER);
 		PrivilegeTest.logger.info("Added " + PrivilegeTest.ROLE_APP_USER + " to " + PrivilegeTest.BOB);
+		privilegeHandler.persist(certificate);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -395,7 +439,7 @@ public class PrivilegeTest {
 	public void testPerformRestrictableAsBob() throws Exception {
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
 				copyBytes(PrivilegeTest.PASS_BOB));
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// see if bob can perform restrictable
 		Restrictable restrictable = new TestRestrictable();
@@ -456,7 +500,7 @@ public class PrivilegeTest {
 
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
 				copyBytes(PrivilegeTest.PASS_ADMIN));
-		org.junit.Assert.assertTrue("Certificate is null!", certificate != null);
+		Assert.assertTrue("Certificate is null!", certificate != null);
 
 		// set certificate into thread local
 		CertificateThreadLocal.getInstance().set(certificate);
