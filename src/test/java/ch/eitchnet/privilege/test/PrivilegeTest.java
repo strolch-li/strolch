@@ -26,6 +26,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -103,6 +104,25 @@ public class PrivilegeTest {
 			PrivilegeTest.logger.error(e.getMessage(), e);
 
 			throw new RuntimeException("Initialization failed: " + e.getLocalizedMessage(), e);
+		}
+	}
+
+	@AfterClass
+	public static void destroy() throws Exception {
+
+		// delete temporary file
+		String pwd = System.getProperty("user.dir");
+
+		File tmpPrivilegeModelFile = new File(pwd + "/target/test/PrivilegeModel.xml");
+		if (tmpPrivilegeModelFile.exists() && !tmpPrivilegeModelFile.delete()) {
+			throw new RuntimeException("Tmp configuration still exists and can not be deleted at "
+					+ tmpPrivilegeModelFile.getAbsolutePath());
+		}
+
+		// and temporary parent
+		File parentFile = tmpPrivilegeModelFile.getParentFile();
+		if (parentFile.exists() && !parentFile.delete()) {
+			throw new RuntimeException("Could not remove temporary parent for tmp " + tmpPrivilegeModelFile);
 		}
 	}
 
