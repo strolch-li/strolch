@@ -22,8 +22,8 @@ package ch.eitchnet.privilege.handler;
 import java.util.List;
 import java.util.Locale;
 
-import ch.eitchnet.privilege.i18n.AccessDeniedException;
-import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.base.AccessDeniedException;
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeRep;
 import ch.eitchnet.privilege.model.Restrictable;
@@ -401,7 +401,7 @@ public interface PrivilegeHandler {
 	 * </p>
 	 * 
 	 * <p>
-	 * If the user is not the administrator, then a {@link ch.eitchnet.privilege.i18n.PrivilegeException} is thrown
+	 * If the user is not the administrator, then a {@link ch.eitchnet.privilege.base.PrivilegeException} is thrown
 	 * </p>
 	 * 
 	 * @param certificate

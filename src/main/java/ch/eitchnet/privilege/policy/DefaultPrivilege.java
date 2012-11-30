@@ -19,8 +19,8 @@
  */
 package ch.eitchnet.privilege.policy;
 
-import ch.eitchnet.privilege.i18n.AccessDeniedException;
-import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.base.AccessDeniedException;
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;

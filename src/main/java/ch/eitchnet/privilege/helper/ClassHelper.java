@@ -19,7 +19,7 @@
  */
 package ch.eitchnet.privilege.helper;
 
-import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.base.PrivilegeException;
 
 /**
  * The {@link ClassHelper} class is a helper to instantiate classes using reflection

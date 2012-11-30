@@ -118,7 +118,7 @@ public interface PersistenceHandler {
 	/**
 	 * Informs this {@link PersistenceHandler} to persist any changes which need to be saved
 	 * 
-	 * @return true if changes were persisted successfully, false if something went wrong
+	 * @return true if changes were persisted successfully, false if nothing needed to be persisted
 	 */
 	public boolean persist();
 

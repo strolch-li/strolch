@@ -28,9 +28,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.helper.HashHelper;
 import ch.eitchnet.privilege.helper.XmlConstants;
-import ch.eitchnet.privilege.i18n.PrivilegeException;
 
 /**
  * <p>

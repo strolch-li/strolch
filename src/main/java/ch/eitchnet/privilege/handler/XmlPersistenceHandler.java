@@ -35,9 +35,9 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.helper.XmlHelper;
-import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
@@ -150,11 +150,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_MODEL_FILE + " is invalid");
 		}
+
 		// get model file
 		File modelFile = new File(this.modelPath);
 		boolean modelFileUnchanged = modelFile.exists() && modelFile.lastModified() == this.modelsFileDate;
-		if (!(modelFileUnchanged && this.roleMapDirty && this.userMapDirty)) {
-			XmlPersistenceHandler.logger.warn("Not persisting as current file is unchanged and model data is not dirty");
+		if (modelFileUnchanged && !this.roleMapDirty && !this.userMapDirty) {
+			XmlPersistenceHandler.logger
+					.warn("Not persisting as current file is unchanged and model data is not dirty");
 			return false;
 		}
 
@@ -181,19 +183,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 		rootElement.add(rolesElement);
 
-		// reset dirty states and return if something was dirty, false otherwise
-		if (this.userMapDirty || this.roleMapDirty) {
-			this.userMapDirty = false;
-			this.roleMapDirty = false;
+		// now write the file
+		XmlHelper.writeElement(rootElement, modelFile);
 
-			return true;
-
-		}
-
+		// reset dirty states
 		this.userMapDirty = false;
 		this.roleMapDirty = false;
 
-		return false;
+		return true;
 	}
 
 	/**
@@ -259,10 +256,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#initialize(java.util.Map)
 	 */
 	@Override
-	public void initialize(Map<String, String> parameterMap) {
+	public void initialize(Map<String, String> paramsMap) {
+
+		// copy parameter map
+		this.parameterMap = Collections.unmodifiableMap(new HashMap<String, String>(paramsMap));
 
 		// get and validate base bath
-		String basePath = parameterMap.get(XmlConstants.XML_PARAM_BASE_PATH);
+		String basePath = this.parameterMap.get(XmlConstants.XML_PARAM_BASE_PATH);
 		File basePathF = new File(basePath);
 		if (!basePathF.exists() && !basePathF.isDirectory()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
@@ -270,7 +270,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get model file name
-		String modelFileName = parameterMap.get(XmlConstants.XML_PARAM_MODEL_FILE);
+		String modelFileName = this.parameterMap.get(XmlConstants.XML_PARAM_MODEL_FILE);
 		if (modelFileName == null || modelFileName.isEmpty()) {
 			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
 					+ XmlConstants.XML_PARAM_MODEL_FILE + " is invalid");
@@ -321,9 +321,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			for (Element roleElement : rolesElementList) {
 				String roleName = roleElement.getTextTrim();
 				if (roleName.isEmpty()) {
-					XmlPersistenceHandler.logger.error("User " + username + " has a role defined with no name, Skipped.");
+					XmlPersistenceHandler.logger.error("User " + username
+							+ " has a role defined with no name, Skipped.");
 				} else if (!this.roleMap.containsKey(roleName)) {
-					XmlPersistenceHandler.logger.error("User " + username + " has a inexistant role " + roleName + ", Skipped.");
+					XmlPersistenceHandler.logger.error("User " + username + " has a inexistant role " + roleName
+							+ ", Skipped.");
 				} else {
 					roles.add(roleName);
 				}

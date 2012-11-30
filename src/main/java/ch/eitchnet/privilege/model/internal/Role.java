@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.PrivilegeRep;
 import ch.eitchnet.privilege.model.RoleRep;
 

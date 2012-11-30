@@ -22,8 +22,8 @@ package ch.eitchnet.privilege.model;
 import java.io.Serializable;
 import java.util.Set;
 
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
-import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;

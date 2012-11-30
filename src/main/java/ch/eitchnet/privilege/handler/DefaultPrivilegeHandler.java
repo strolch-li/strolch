@@ -31,9 +31,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.base.AccessDeniedException;
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.helper.ClassHelper;
-import ch.eitchnet.privilege.i18n.AccessDeniedException;
-import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeRep;
 import ch.eitchnet.privilege.model.Restrictable;
@@ -718,7 +718,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			DefaultPrivilegeHandler.logger.info("User " + username + " authenticated: " + session);
 
 		} catch (RuntimeException e) {
-			DefaultPrivilegeHandler.logger.error("User " + username + " Failed to authenticate: " + e.getLocalizedMessage());
+			DefaultPrivilegeHandler.logger.error("User " + username + " Failed to authenticate: "
+					+ e.getLocalizedMessage());
 			throw e;
 		} finally {
 			clearPassword(password);
@@ -786,7 +787,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			Role role = this.persistenceHandler.getRole(roleName);
 			if (role == null) {
-				DefaultPrivilegeHandler.logger.error("No role is defined with name " + roleName + " which is configured for user " + user);
+				DefaultPrivilegeHandler.logger.error("No role is defined with name " + roleName
+						+ " which is configured for user " + user);
 				continue;
 			}
 
@@ -1188,7 +1190,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.sessionMap.put(sessionId, new CertificateSessionPair(session, systemUserCertificate));
 
 		// log
-		DefaultPrivilegeHandler.logger.info("The system user " + systemUsername + " is logged in with session " + session);
+		DefaultPrivilegeHandler.logger.info("The system user " + systemUsername + " is logged in with session "
+				+ session);
 
 		return systemUserCertificate;
 	}

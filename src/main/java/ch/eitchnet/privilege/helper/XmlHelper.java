@@ -37,7 +37,7 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.base.PrivilegeException;
 
 /**
  * Helper class for performing XML based tasks using Dom4J

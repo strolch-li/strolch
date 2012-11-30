@@ -26,7 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import ch.eitchnet.privilege.i18n.PrivilegeException;
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 
@@ -91,9 +91,6 @@ public final class User {
 		if (username == null || username.isEmpty()) {
 			throw new PrivilegeException("No username defined!");
 		}
-
-		// password may be null, meaning not able to login
-
 		if (firstname == null || firstname.isEmpty()) {
 			throw new PrivilegeException("No firstname defined!");
 		}
@@ -104,9 +101,10 @@ public final class User {
 			throw new PrivilegeException("No userState defined!");
 		}
 
+		// password may be null, meaning not able to login
 		// roles may be null, meaning not able to login and must be added later
-
-		// local may be null, meaning use system default
+		// locale may be null, meaning use system default
+		// properties may be null, meaning no properties
 
 		this.userId = userId;
 
@@ -117,11 +115,20 @@ public final class User {
 		this.firstname = firstname;
 		this.surname = surname;
 
-		this.roles = Collections.unmodifiableSet(roles);
+		if (roles == null)
+			this.roles = Collections.emptySet();
+		else
+			this.roles = Collections.unmodifiableSet(roles);
 
-		this.locale = locale;
+		if (locale == null)
+			this.locale = Locale.getDefault();
+		else
+			this.locale = locale;
 
-		this.propertyMap = Collections.unmodifiableMap(propertyMap);
+		if (propertyMap == null)
+			this.propertyMap = Collections.emptyMap();
+		else
+			this.propertyMap = Collections.unmodifiableMap(propertyMap);
 	}
 
 	/**

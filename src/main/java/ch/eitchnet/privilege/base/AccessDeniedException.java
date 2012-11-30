@@ -17,36 +17,22 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.privilege.i18n;
+package ch.eitchnet.privilege.base;
 
 /**
- * Main {@link RuntimeException} thrown if something goes wrong in Privilege
+ * Exception thrown if access is denied during login, or if a certain privilege is not granted
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeException extends RuntimeException {
+public class AccessDeniedException extends PrivilegeException {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Default constructor
-	 * 
-	 * @param string
-	 *            message to go with the exception
+	 * @param msg
+	 *            detail on why and where access was denied
 	 */
-	public PrivilegeException(String string) {
-		super(string);
-	}
-
-	/**
-	 * Constructor with underlying exception
-	 * 
-	 * @param string
-	 *            message to go with the exception
-	 * @param t
-	 *            throwable to wrap with this exception which is the underlying exception of this exception
-	 */
-	public PrivilegeException(String string, Throwable t) {
-		super(string, t);
+	public AccessDeniedException(String msg) {
+		super(msg);
 	}
 }

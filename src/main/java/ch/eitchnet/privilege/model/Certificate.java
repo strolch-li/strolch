@@ -23,8 +23,8 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Map;
 
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
-import ch.eitchnet.privilege.i18n.PrivilegeException;
 import ch.eitchnet.privilege.model.internal.Session;
 
 /**
