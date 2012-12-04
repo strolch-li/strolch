@@ -1,0 +1,103 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.eitchnet.ch/dev/privilege/PrivilegeModel"
+	xmlns:pr="http://www.eitchnet.ch/dev/privilege/PrivilegeModels" elementFormDefault="qualified">
+
+	<element name="UsersAndRoles">
+		<annotation>
+			<documentation>
+Copyright (c) 2010, 2011
+
+Robert von Burg &lt;eitch@eitchnet.ch>
+
+This file is part of Privilege.
+
+Privilege is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Privilege is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Privilege.  If not, see &lt;http://www.gnu.org/licenses/>.
+			</documentation>
+		</annotation>
+
+	<complexType>
+		<sequence>
+			<element name="Users">
+				<complexType>
+					<sequence>
+						<element name="User" type="pr:User" minOccurs="0" maxOccurs="unbounded" />
+					</sequence>
+				</complexType>
+			</element>
+
+			<element name="Roles">
+				<complexType>
+					<sequence>
+						<element name="Role" type="pr:Role" minOccurs="0" maxOccurs="unbounded" />
+					</sequence>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+	</element>
+
+	<complexType name="User">
+		<sequence>
+			
+			<element type="string" name="Firstname" minOccurs="1" maxOccurs="1" />
+			<element type="string" name="Surname" minOccurs="1" maxOccurs="1" />
+			<element type="string" name="State" minOccurs="1" maxOccurs="1" />
+			<element type="string" name="Locale" minOccurs="0" maxOccurs="1" />
+			
+			<element name="Roles" minOccurs="1" maxOccurs="1">
+				<complexType>
+					<sequence>
+						<element type="string" name="Role" minOccurs="0" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			
+			<element name="Properties" type="pr:Properties" minOccurs="0" maxOccurs="1" />
+		</sequence>
+		<attribute type="long" name="userId" use="required" />
+		<attribute type="string" name="username" use="required" />
+		<attribute type="string" name="password" use="required" />
+	</complexType>
+
+	<complexType name="Properties">
+		<sequence>
+			<element name="Property" minOccurs="0" maxOccurs="unbounded">
+				<complexType>
+					<simpleContent>
+						<extension base="string">
+							<attribute type="string" name="name" use="required" />
+							<attribute type="string" name="value" use="required" />
+						</extension>
+					</simpleContent>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="Role" mixed="true">
+		<sequence>
+			<element name="Privilege"  minOccurs="0" maxOccurs="unbounded">
+				<complexType>
+					<sequence>
+						<element type="string" name="AllAllowed" minOccurs="0" maxOccurs="1"/>
+						<element type="string" name="Allow"  minOccurs="0" maxOccurs="unbounded" />
+						<element type="string" name="Deny" minOccurs="0" maxOccurs="unbounded"  />
+					</sequence>
+					<attribute type="string" name="name" use="required" />
+				</complexType>
+			</element>
+		</sequence>
+		<attribute type="string" name="name" use="required" />
+	</complexType>
+
+</schema>

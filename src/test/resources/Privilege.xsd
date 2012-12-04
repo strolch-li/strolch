@@ -1,0 +1,88 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.eitchnet.ch/dev/privilege/Privilege"
+	xmlns:pr="http://www.eitchnet.ch/dev/privilege/Privilege" elementFormDefault="qualified">
+
+	<element name="Privilege">
+		<annotation>
+			<documentation>
+Copyright (c) 2010, 2011
+
+Robert von Burg &lt;eitch@eitchnet.ch>
+
+This file is part of Privilege.
+
+Privilege is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Privilege is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Privilege.  If not, see &lt;http://www.gnu.org/licenses/>.
+			</documentation>
+		</annotation>
+
+	<complexType>
+		<sequence>
+			<element name="Container" minOccurs="1" maxOccurs="1">
+				<complexType>
+					<sequence>
+						<element name="Parameters" type="pr:Parameters" minOccurs="1" maxOccurs="1" />
+						<element name="EncryptionHandler" type="pr:EncryptionHandler" minOccurs="1" maxOccurs="1" />
+						<element name="PersistenceHandler" type="pr:PersistenceHandler" minOccurs="1" maxOccurs="1" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="Policies" type="pr:Policies" minOccurs="1" maxOccurs="1" />
+		</sequence>
+	</complexType>
+	</element>
+
+	<complexType name="Parameters">
+		<sequence>
+			<element name="Parameter" minOccurs="0" maxOccurs="unbounded">
+				<complexType>
+					<simpleContent>
+						<extension base="string">
+							<attribute type="string" name="name" use="required" />
+							<attribute type="string" name="value" use="required" />
+						</extension>
+					</simpleContent>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="EncryptionHandler">
+		<sequence>
+			<element name="Parameters" type="pr:Parameters" minOccurs="0" maxOccurs="1" />
+		</sequence>
+		<attribute type="string" name="class" use="required" />
+	</complexType>
+
+	<complexType name="PersistenceHandler">
+		<sequence>
+			<element name="Parameters" type="pr:Parameters" minOccurs="0" maxOccurs="1" />
+		</sequence>
+		<attribute type="string" name="class" use="required" />
+	</complexType>
+
+	<complexType name="Policies">
+		<sequence>
+			<element name="Policy" minOccurs="0" maxOccurs="1">
+				<complexType>
+					<simpleContent>
+						<extension base="string">
+							<attribute type="string" name="name" use="required" />
+							<attribute type="string" name="class" use="required" />
+						</extension>
+					</simpleContent>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+
+</schema>
