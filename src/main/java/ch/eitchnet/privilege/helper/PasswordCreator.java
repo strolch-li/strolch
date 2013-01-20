@@ -29,7 +29,7 @@ import java.security.MessageDigest;
  * </p>
  * 
  * <p>
- * TODO: Note: currently the password input is echoed which is a security risk. This is a TODO
+ * TODO: Note: currently the password input is echoed which is a security risk
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
