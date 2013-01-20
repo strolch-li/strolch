@@ -31,9 +31,9 @@ import ch.eitchnet.privilege.handler.EncryptionHandler;
 import ch.eitchnet.privilege.handler.PersistenceHandler;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.helper.ClassHelper;
-import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
+import ch.eitchnet.utils.helper.XmlHelper;
 
 /**
  * This class implements the initializing of the {@link PrivilegeHandler} by loading an XML file containing the

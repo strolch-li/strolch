@@ -31,11 +31,11 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.helper.XmlConstants;
-import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.privilege.xml.PrivilegeModelDomWriter;
 import ch.eitchnet.privilege.xml.PrivilegeModelSaxReader;
+import ch.eitchnet.utils.helper.XmlHelper;
 
 /**
  * {@link PersistenceHandler} implementation which reads the configuration from XML files. These configuration is passed

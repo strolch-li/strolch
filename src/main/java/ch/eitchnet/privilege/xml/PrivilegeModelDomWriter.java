@@ -29,10 +29,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ch.eitchnet.privilege.helper.XmlConstants;
-import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
+import ch.eitchnet.utils.helper.XmlHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

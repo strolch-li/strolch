@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.handler.DefaultEncryptionHandler;
 import ch.eitchnet.privilege.handler.XmlPersistenceHandler;
-import ch.eitchnet.privilege.helper.XmlHelper;
 import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
@@ -52,6 +51,7 @@ import ch.eitchnet.privilege.xml.PrivilegeModelDomWriter;
 import ch.eitchnet.privilege.xml.PrivilegeModelSaxReader;
 import ch.eitchnet.utils.helper.FileHelper;
 import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.utils.helper.XmlHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
