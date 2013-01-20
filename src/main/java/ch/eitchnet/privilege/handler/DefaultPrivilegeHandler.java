@@ -420,7 +420,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate that role exists
 		if (getRole(roleName) == null) {
-			throw new PrivilegeException("Role " + roleName + " doest not exist!");
+			throw new PrivilegeException("Role " + roleName + " does not exist!");
 		}
 
 		// create new user
@@ -680,9 +680,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// create certificate
 		Certificate certificate;
 		try {
-			// username must be at least 3 characters in length
-			if (username == null || username.length() < 3)
-				throw new PrivilegeException("The given username is shorter than 3 characters");
+			// username must be at least 2 characters in length
+			if (username == null || username.length() < 2)
+				throw new PrivilegeException("The given username '" + username + "' is shorter than 2 characters");
 
 			// and validate the password
 			validatePassword(password);
@@ -699,7 +699,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// validate password
 			String pwHash = user.getPassword();
 			if (pwHash == null)
-				throw new AccessDeniedException("User has no password and may not login!");
+				throw new AccessDeniedException("User " + username + " has no password and may not login!");
 			if (!pwHash.equals(passwordHash))
 				throw new AccessDeniedException("Password is incorrect for " + username);
 

@@ -65,6 +65,7 @@ public class PrivilegeTest {
 	private static final String SYSTEM_USER_ADMIN = "system_admin";
 	private static final byte[] PASS_BOB = "admin1".getBytes();
 	private static final String ROLE_APP_USER = "AppUser";
+	private static final String ROLE_TEMP = "temp";
 	private static final String ROLE_USER = "user";
 	private static final byte[] PASS_DEF = "def".getBytes();
 	private static final byte[] PASS_BAD = "123".getBytes();
@@ -144,6 +145,12 @@ public class PrivilegeTest {
 		}
 	}
 
+	private byte[] copyBytes(byte[] bytes) {
+		byte[] copy = new byte[bytes.length];
+		System.arraycopy(bytes, 0, copy, 0, bytes.length);
+		return copy;
+	}
+
 	/**
 	 * @throws Exception
 	 *             if something goes wrong
@@ -155,12 +162,6 @@ public class PrivilegeTest {
 				copyBytes(PrivilegeTest.PASS_ADMIN));
 		Assert.assertTrue("Certificate is null!", certificate != null);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	private byte[] copyBytes(byte[] bytes) {
-		byte[] copy = new byte[bytes.length];
-		System.arraycopy(bytes, 0, copy, 0, bytes.length);
-		return copy;
 	}
 
 	/**
@@ -193,206 +194,15 @@ public class PrivilegeTest {
 	 *             if something goes wrong
 	 */
 	@Test
-	public void testAddUserBobAsAdmin() throws Exception {
-
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
-				copyBytes(PrivilegeTest.PASS_ADMIN));
-
-		// let's add a new user bob
-		UserRep userRep = new UserRep("1", PrivilegeTest.BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(),
-				null, new HashMap<String, String>());
-		PrivilegeTest.privilegeHandler.addOrReplaceUser(certificate, userRep, null);
-		PrivilegeTest.logger.info("Added user " + PrivilegeTest.BOB);
-
-		// set bob's password
-		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.BOB,
-				copyBytes(PrivilegeTest.PASS_BOB));
-		PrivilegeTest.logger.info("Set Bob's password");
-		privilegeHandler.persist(certificate);
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * Will fail because user bob is not yet enabled
-	 * 
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test(expected = AccessDeniedException.class)
-	public void testFailAuthAsBob() throws Exception {
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
-				copyBytes(PrivilegeTest.PASS_BOB));
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testEnableUserBob() throws Exception {
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
-				copyBytes(PrivilegeTest.PASS_ADMIN));
-		PrivilegeTest.privilegeHandler.setUserState(certificate, PrivilegeTest.BOB, UserState.ENABLED);
-		privilegeHandler.persist(certificate);
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * Will fail as user bob has no role
-	 * 
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test(expected = PrivilegeException.class)
-	public void testFailAuthUserBob() throws Exception {
-
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
-				copyBytes(PrivilegeTest.PASS_BOB));
-		Assert.assertTrue("Certificate is null!", certificate != null);
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testAddRole() throws Exception {
+	public void testAddRoleTemp() throws Exception {
 		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
 				copyBytes(PrivilegeTest.PASS_ADMIN));
 
 		Map<String, PrivilegeRep> privilegeMap = new HashMap<String, PrivilegeRep>();
-		RoleRep roleRep = new RoleRep(PrivilegeTest.ROLE_USER, privilegeMap);
+		RoleRep roleRep = new RoleRep(PrivilegeTest.ROLE_TEMP, privilegeMap);
 
 		PrivilegeTest.privilegeHandler.addOrReplaceRole(certificate, roleRep);
 		privilegeHandler.persist(certificate);
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testAddRoleToBob() throws Exception {
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
-				copyBytes(PrivilegeTest.PASS_ADMIN));
-		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB, PrivilegeTest.ROLE_USER);
-		privilegeHandler.persist(certificate);
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testAuthAsBob() throws Exception {
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
-				copyBytes(PrivilegeTest.PASS_BOB));
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * Will fail because user bob does not have admin rights
-	 * 
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test(expected = AccessDeniedException.class)
-	public void testFailAddUserTedAsBob() throws Exception {
-
-		// auth as Bog
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
-				copyBytes(PrivilegeTest.PASS_BOB));
-		Assert.assertTrue("Certificate is null!", certificate != null);
-
-		// let's add a new user Ted
-		UserRep userRep = new UserRep("1", PrivilegeTest.TED, "Ted", "And then Some", UserState.NEW,
-				new HashSet<String>(), null, new HashMap<String, String>());
-		PrivilegeTest.privilegeHandler.addOrReplaceUser(certificate, userRep, null);
-		PrivilegeTest.logger.info("Added user " + PrivilegeTest.TED);
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testAddAdminRoleToBob() throws Exception {
-
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
-				copyBytes(PrivilegeTest.PASS_ADMIN));
-		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB,
-				PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
-		PrivilegeTest.logger.info("Added " + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE + " to " + PrivilegeTest.ADMIN);
-		privilegeHandler.persist(certificate);
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testAddUserTedAsBob() throws Exception {
-
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
-				copyBytes(PrivilegeTest.PASS_BOB));
-		Assert.assertTrue("Certificate is null!", certificate != null);
-
-		// let's add a new user ted
-		HashSet<String> roles = new HashSet<String>();
-		roles.add(PrivilegeTest.ROLE_USER);
-		UserRep userRep = new UserRep("2", PrivilegeTest.TED, "Ted", "Newman", UserState.ENABLED, roles, null,
-				new HashMap<String, String>());
-		PrivilegeTest.privilegeHandler.addOrReplaceUser(certificate, userRep, null);
-		PrivilegeTest.logger.info("Added user " + PrivilegeTest.TED);
-		privilegeHandler.persist(certificate);
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testSetTedPwdAsBob() throws Exception {
-
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
-				copyBytes(PrivilegeTest.PASS_BOB));
-		Assert.assertTrue("Certificate is null!", certificate != null);
-
-		// set ted's password to default
-		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.TED,
-				copyBytes(PrivilegeTest.PASS_DEF));
-		privilegeHandler.persist(certificate);
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testTedChangesOwnPwd() throws Exception {
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.TED,
-				copyBytes(PrivilegeTest.PASS_DEF));
-		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.TED,
-				copyBytes(PrivilegeTest.PASS_TED));
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testAuthAsTed() throws Exception {
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.TED,
-				copyBytes(PrivilegeTest.PASS_TED));
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -411,63 +221,6 @@ public class PrivilegeTest {
 		Restrictable restrictable = new TestRestrictable();
 		PrivilegeTest.privilegeHandler.actionAllowed(certificate, restrictable);
 		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * Tests if the user bob, who does not have AppUser role can perform restrictable
-	 * 
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test(expected = AccessDeniedException.class)
-	public void testFailPerformRestrictableAsBob() throws Exception {
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
-				copyBytes(PrivilegeTest.PASS_BOB));
-		Assert.assertTrue("Certificate is null!", certificate != null);
-
-		// see if bob can perform restrictable
-		Restrictable restrictable = new TestRestrictable();
-		try {
-			PrivilegeTest.privilegeHandler.actionAllowed(certificate, restrictable);
-		} finally {
-			PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-		}
-	}
-
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testAddAppRoleToBob() throws Exception {
-
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
-				copyBytes(PrivilegeTest.PASS_ADMIN));
-		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB, PrivilegeTest.ROLE_APP_USER);
-		PrivilegeTest.logger.info("Added " + PrivilegeTest.ROLE_APP_USER + " to " + PrivilegeTest.BOB);
-		privilegeHandler.persist(certificate);
-		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-	}
-
-	/**
-	 * Tests if the user bob, who now has AppUser role can perform restrictable
-	 * 
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
-	@Test
-	public void testPerformRestrictableAsBob() throws Exception {
-		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB,
-				copyBytes(PrivilegeTest.PASS_BOB));
-		Assert.assertTrue("Certificate is null!", certificate != null);
-
-		// see if bob can perform restrictable
-		Restrictable restrictable = new TestRestrictable();
-		try {
-			PrivilegeTest.privilegeHandler.actionAllowed(certificate, restrictable);
-		} finally {
-			PrivilegeTest.privilegeHandler.invalidateSession(certificate);
-		}
 	}
 
 	/**
@@ -532,5 +285,265 @@ public class PrivilegeTest {
 		} finally {
 			PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 		}
+	}
+
+	/**
+	 * This test performs multiple tests which are dependent on each other as the following is done:
+	 * <ul>
+	 * <li>add user bob</li>
+	 * <li>fail to auth as bob as user is not enabled</li>
+	 * <li>enable bob</li>
+	 * <li>fail to auth as bot as bob has no role</li>
+	 * <li>add role user to bob</li>
+	 * <li>auth as bob</li>
+	 * <li>fail to add user ted as bob as bob is not admin</li>
+	 * <li>add admin role to bob</li>
+	 * <li>add user ted as bob</li>
+	 * <li>fail to auth as ted as ted has no password</li>
+	 * <li>set ted's password as bob</li>
+	 * <li>ted changes own password</li>
+	 * <li>auth as ted</li>
+	 * <li>fail to perform restrictable as bob as no app role</li>
+	 * <li>add app role to bob</li>
+	 * <li>perform restrictable as bob</li>
+	 * </ul>
+	 * 
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@Test
+	public void testUserStory() throws Exception {
+
+		addBobAsAdmin();
+		failAuthAsBobNotEnabled();
+		enableBob();
+		failAuthAsBobNoRole();
+		addRoleUser();
+		addRoleUserToBob();
+		authAsBob();
+		failAddTedAsBobNotAdmin();
+		addRoleAdminToBob();
+		addTedAsBob();
+		failAuthAsTedNoPass();
+		setPassForTedAsBob();
+		tedChangesOwnPass();
+		authAsTed();
+		failPerformRestrictableAsBobNoRoleApp();
+		addRoleAppToBob();
+		performRestrictableAsBob();
+	}
+
+	private void performRestrictableAsBob() {
+		Certificate certificate;
+		// testPerformRestrictableAsBob
+		// Tests if the user bob, who now has AppUser role can perform restrictable
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+		Assert.assertTrue("Certificate is null!", certificate != null);
+		// see if bob can perform restrictable
+		Restrictable restrictable = new TestRestrictable();
+		PrivilegeTest.privilegeHandler.actionAllowed(certificate, restrictable);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void addRoleAppToBob() {
+		Certificate certificate;
+		// testAddAppRoleToBob
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
+				copyBytes(PrivilegeTest.PASS_ADMIN));
+		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB, PrivilegeTest.ROLE_APP_USER);
+		PrivilegeTest.logger.info("Added " + PrivilegeTest.ROLE_APP_USER + " to " + PrivilegeTest.BOB);
+		privilegeHandler.persist(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void failPerformRestrictableAsBobNoRoleApp() {
+		Certificate certificate;
+		// testFailPerformRestrictableAsBob
+		// Tests if the user bob, who does not have AppUser role can perform restrictable
+		// this will fail as bob does not have role app
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+		Assert.assertTrue("Certificate is null!", certificate != null);
+		// see if bob can perform restrictable
+		Restrictable restrictable = new TestRestrictable();
+		try {
+			PrivilegeTest.privilegeHandler.actionAllowed(certificate, restrictable);
+			Assert.fail("Should fail as bob does not have role app");
+		} catch (AccessDeniedException e) {
+			String msg = "User bob does not have Privilege ch.eitchnet.privilege.test.model.TestRestrictable needed for Restrictable ch.eitchnet.privilege.test.model.TestRestrictable";
+			Assert.assertEquals(msg, e.getLocalizedMessage());
+		} finally {
+			PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+		}
+	}
+
+	private void authAsTed() {
+		Certificate certificate;
+		// testAuthAsTed
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.TED, copyBytes(PrivilegeTest.PASS_TED));
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void tedChangesOwnPass() {
+		Certificate certificate;
+		// testTedChangesOwnPwd
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.TED, copyBytes(PrivilegeTest.PASS_DEF));
+		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.TED,
+				copyBytes(PrivilegeTest.PASS_TED));
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void setPassForTedAsBob() {
+		Certificate certificate;
+		// testSetTedPwdAsBob
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+		Assert.assertTrue("Certificate is null!", certificate != null);
+		// set ted's password to default
+		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.TED,
+				copyBytes(PrivilegeTest.PASS_DEF));
+		privilegeHandler.persist(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void failAuthAsTedNoPass() {
+		// testFailAuthAsTedNoPass
+		// Will fail because user ted has no password
+		try {
+			PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.TED, copyBytes(PrivilegeTest.PASS_TED));
+			org.junit.Assert.fail("User Ted may not authenticate because the user has no password!");
+		} catch (PrivilegeException e) {
+			String msg = "User ted has no password and may not login!";
+			Assert.assertEquals(msg, e.getMessage());
+		}
+	}
+
+	private void addTedAsBob() {
+		Certificate certificate;
+		UserRep userRep;
+		// testAddUserTedAsBob
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+		Assert.assertTrue("Certificate is null!", certificate != null);
+		// let's add a new user ted
+		HashSet<String> roles = new HashSet<String>();
+		roles.add(PrivilegeTest.ROLE_USER);
+		userRep = new UserRep("2", PrivilegeTest.TED, "Ted", "Newman", UserState.ENABLED, roles, null,
+				new HashMap<String, String>());
+		PrivilegeTest.privilegeHandler.addOrReplaceUser(certificate, userRep, null);
+		PrivilegeTest.logger.info("Added user " + PrivilegeTest.TED);
+		privilegeHandler.persist(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void addRoleAdminToBob() {
+		Certificate certificate;
+		// testAddAdminRoleToBob
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
+				copyBytes(PrivilegeTest.PASS_ADMIN));
+		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB,
+				PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
+		PrivilegeTest.logger.info("Added " + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE + " to " + PrivilegeTest.ADMIN);
+		privilegeHandler.persist(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void failAddTedAsBobNotAdmin() {
+		Certificate certificate;
+		UserRep userRep;
+		// testFailAddUserTedAsBob
+		// Will fail because user bob does not have admin rights		
+		// auth as Bob
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+		// let's add a new user Ted
+		userRep = new UserRep("1", PrivilegeTest.TED, "Ted", "And then Some", UserState.NEW, new HashSet<String>(),
+				null, new HashMap<String, String>());
+		try {
+			PrivilegeTest.privilegeHandler.addOrReplaceUser(certificate, userRep, null);
+			Assert.fail("User bob may not add a user as bob does not have admin rights!");
+		} catch (PrivilegeException e) {
+			String msg = "User does not have PrivilegeAdmin role! Certificate: " + certificate.toString();
+			Assert.assertEquals(msg, e.getMessage());
+		} finally {
+			PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+		}
+	}
+
+	private void authAsBob() {
+		Certificate certificate;
+		// testAuthAsBob
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void addRoleUserToBob() {
+		Certificate certificate;
+		// testAddRoleUserToBob
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
+				copyBytes(PrivilegeTest.PASS_ADMIN));
+		PrivilegeTest.privilegeHandler.addRoleToUser(certificate, PrivilegeTest.BOB, PrivilegeTest.ROLE_USER);
+		privilegeHandler.persist(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void addRoleUser() {
+		Certificate certificate;
+		// add role user
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
+				copyBytes(PrivilegeTest.PASS_ADMIN));
+		Map<String, PrivilegeRep> privilegeMap = new HashMap<String, PrivilegeRep>();
+		RoleRep roleRep = new RoleRep(PrivilegeTest.ROLE_USER, privilegeMap);
+		PrivilegeTest.privilegeHandler.addOrReplaceRole(certificate, roleRep);
+		privilegeHandler.persist(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void failAuthAsBobNoRole() {
+		// testFailAuthUserBob
+		// Will fail as user bob has no role
+		try {
+			PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+			org.junit.Assert.fail("User Bob may not authenticate because the user has no role");
+		} catch (PrivilegeException e) {
+			String msg = "User bob does not have any roles defined!";
+			Assert.assertEquals(msg, e.getMessage());
+		}
+	}
+
+	private void enableBob() {
+		Certificate certificate;
+		// testEnableUserBob
+		certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
+				copyBytes(PrivilegeTest.PASS_ADMIN));
+		PrivilegeTest.privilegeHandler.setUserState(certificate, PrivilegeTest.BOB, UserState.ENABLED);
+		privilegeHandler.persist(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
+	}
+
+	private void failAuthAsBobNotEnabled() {
+		// testFailAuthAsBob
+		// Will fail because user bob is not yet enabled
+		try {
+			PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.BOB, copyBytes(PrivilegeTest.PASS_BOB));
+			org.junit.Assert.fail("User Bob may not authenticate because the user is not yet enabled!");
+		} catch (PrivilegeException e) {
+			String msg = "User bob does not have state ENABLED and can not login!";
+			Assert.assertEquals(msg, e.getMessage());
+		}
+	}
+
+	private void addBobAsAdmin() {
+		Certificate certificate = PrivilegeTest.privilegeHandler.authenticate(PrivilegeTest.ADMIN,
+				copyBytes(PrivilegeTest.PASS_ADMIN));
+
+		// let's add a new user bob
+		UserRep userRep = new UserRep("1", PrivilegeTest.BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(),
+				null, new HashMap<String, String>());
+		PrivilegeTest.privilegeHandler.addOrReplaceUser(certificate, userRep, null);
+		PrivilegeTest.logger.info("Added user " + PrivilegeTest.BOB);
+
+		// set bob's password
+		PrivilegeTest.privilegeHandler.setUserPassword(certificate, PrivilegeTest.BOB,
+				copyBytes(PrivilegeTest.PASS_BOB));
+		PrivilegeTest.logger.info("Set Bob's password");
+		privilegeHandler.persist(certificate);
+		PrivilegeTest.privilegeHandler.invalidateSession(certificate);
 	}
 }
