@@ -118,7 +118,7 @@ public final class User {
 		if (roles == null)
 			this.roles = Collections.emptySet();
 		else
-			this.roles = Collections.unmodifiableSet(roles);
+			this.roles = Collections.unmodifiableSet(new HashSet<String>(roles));
 
 		if (locale == null)
 			this.locale = Locale.getDefault();
@@ -128,7 +128,7 @@ public final class User {
 		if (propertyMap == null)
 			this.propertyMap = Collections.emptyMap();
 		else
-			this.propertyMap = Collections.unmodifiableMap(propertyMap);
+			this.propertyMap = Collections.unmodifiableMap(new HashMap<String, String>(propertyMap));
 	}
 
 	/**
@@ -151,11 +151,6 @@ public final class User {
 	 * @return the hashed password for this {@link User}
 	 */
 	public String getPassword() {
-
-		// TODO is it possible that there is a hidden way of accessing this 
-		// field even though? The User object should be private, but maybe I 
-		// forgot something?
-
 		return this.password;
 	}
 
@@ -204,6 +199,36 @@ public final class User {
 	 */
 	public Locale getLocale() {
 		return this.locale;
+	}
+
+	/**
+	 * Returns the property with the given key
+	 * 
+	 * @param key
+	 *            the key for which the property is to be returned
+	 * 
+	 * @return the property with the given key, or null if the property is not defined
+	 */
+	public String getProperty(String key) {
+		return this.propertyMap.get(key);
+	}
+
+	/**
+	 * Returns the {@link Set} of keys of all properties
+	 * 
+	 * @return the {@link Set} of keys of all properties
+	 */
+	public Set<String> getPropertyKeySet() {
+		return this.propertyMap.keySet();
+	}
+
+	/**
+	 * Returns the map of properties
+	 * 
+	 * @return the map of properties
+	 */
+	public Map<String, String> getProperties() {
+		return this.propertyMap;
 	}
 
 	/**
@@ -267,35 +292,5 @@ public final class User {
 		} else if (!this.userId.equals(other.userId))
 			return false;
 		return true;
-	}
-
-	/**
-	 * Returns the property with the given key
-	 * 
-	 * @param key
-	 *            the key for which the property is to be returned
-	 * 
-	 * @return the property with the given key, or null if the property is not defined
-	 */
-	public String getProperty(String key) {
-		return this.propertyMap.get(key);
-	}
-
-	/**
-	 * Returns the {@link Set} of keys of all properties
-	 * 
-	 * @return the {@link Set} of keys of all properties
-	 */
-	public Set<String> getPropertyKeySet() {
-		return this.propertyMap.keySet();
-	}
-
-	/**
-	 * Returns the map of properties
-	 * 
-	 * @return the map of properties
-	 */
-	public Map<String, String> getProperties() {
-		return this.propertyMap;
 	}
 }

@@ -345,7 +345,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			// create new user
-			// XXX should the collections be recreated and the getRoles() and getProperties() methods be removed?
 			User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(),
 					userRep.getSurname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
 					userRep.getProperties());

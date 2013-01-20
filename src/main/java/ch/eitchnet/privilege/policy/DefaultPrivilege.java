@@ -26,8 +26,6 @@ import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 
 /**
- * XXX re-think this implementation...
- * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DefaultPrivilege implements PrivilegePolicy {
