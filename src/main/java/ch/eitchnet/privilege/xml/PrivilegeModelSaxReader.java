@@ -287,30 +287,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 				User user = new User(this.userId, this.username, this.password, this.firstName, this.surname,
 						this.userState, this.userRoles, this.locale, this.parameters);
 
-				StringBuilder builder = new StringBuilder();
-				builder.append("UserParser [userId=");
-				builder.append(this.userId);
-				builder.append(", username=");
-				builder.append(this.username);
-				builder.append(", password=");
-				builder.append(this.password);
-				builder.append(", firstName=");
-				builder.append(this.firstName);
-				builder.append(", surname=");
-				builder.append(this.surname);
-				builder.append(", userState=");
-				builder.append(this.userState);
-				builder.append(", locale=");
-				builder.append(this.locale);
-				builder.append(", userRoles=");
-				builder.append(this.userRoles.size());
-				builder.append(", parameters=");
-				builder.append(this.parameters.size());
-				builder.append("]");
-				PrivilegeModelSaxReader.logger.info(builder.toString());
-
 				PrivilegeModelSaxReader.this.users.add(user);
-
 			}
 		}
 
