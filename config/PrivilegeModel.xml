@@ -71,6 +71,13 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>
+		
+		<Role name="restrictedRole">
+			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemUserAction" policy="DefaultPrivilege">
+				<Allow>hello</Allow>
+				<Deny>goodbye</Deny>
+			</Privilege>
+		</Role>
 
 	</Roles>
 </UsersAndRoles>

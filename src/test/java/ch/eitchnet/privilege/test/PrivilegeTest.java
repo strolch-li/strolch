@@ -37,7 +37,6 @@ import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.helper.CertificateThreadLocal;
-import ch.eitchnet.privilege.helper.InitializationHelper;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeRep;
 import ch.eitchnet.privilege.model.Restrictable;
@@ -47,6 +46,7 @@ import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.test.model.TestRestrictable;
 import ch.eitchnet.privilege.test.model.TestSystemUserAction;
 import ch.eitchnet.privilege.test.model.TestSystemUserActionDeny;
+import ch.eitchnet.privilege.xml.InitializationHelper;
 import ch.eitchnet.utils.helper.FileHelper;
 
 /**
