@@ -463,4 +463,36 @@ public class StringHelper {
 	public static boolean isEmpty(String value) {
 		return value == null || value.isEmpty();
 	}
+
+	/**
+	 * <p>
+	 * Parses the given string value to a boolean. This extends the default {@link Boolean#parseBoolean(String)} as it
+	 * throws an exception if the string value is not equal to "true" or "false" being case insensitive.
+	 * </p>
+	 * 
+	 * <p>
+	 * This additional restriction is important where false should really be caught, not any random vaue for false
+	 * </p>
+	 * 
+	 * @param value
+	 *            the value to check
+	 * 
+	 * @return true or false, depending on the string value
+	 * 
+	 * @throws RuntimeException
+	 *             if the value is empty, or not equal to the case insensitive value "true" or "false"
+	 */
+	public static boolean parseBoolean(String value) throws RuntimeException {
+		if (isEmpty(value))
+			throw new RuntimeException("Value to parse to boolean is empty! Expected case insensitive true or false");
+		String tmp = value.toLowerCase();
+		if (tmp.equals(Boolean.TRUE.toString())) {
+			return true;
+		} else if (tmp.equals(Boolean.FALSE.toString())) {
+			return false;
+		} else {
+			throw new RuntimeException("Value " + value
+					+ " can not be parsed to boolean! Expected case insensitive true or false");
+		}
+	}
 }
