@@ -20,24 +20,30 @@
 package ch.eitchnet.privilege.helper;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
+import ch.eitchnet.utils.exceptions.XmlException;
 
 /**
  * Helper class for performing XML based tasks using Dom4J
@@ -61,22 +67,22 @@ public class XmlHelper {
 	 * 
 	 * @return a {@link Document} object containing the dom4j {@link Element}s of the XML file
 	 */
-	public static Document parseDocument(File xmlFile) {
+	public static void parseDocument(File xmlFile, DefaultHandler xmlHandler) {
 
 		try {
 
-			InputStream inStream = new FileInputStream(xmlFile);
+			SAXParserFactory spf = SAXParserFactory.newInstance();
 
-			SAXReader reader = new SAXReader();
-			Document document = reader.read(inStream);
+			SAXParser sp = spf.newSAXParser();
+			XmlHelper.logger.info("Parsing XML document " + xmlFile.getAbsolutePath());
+			sp.parse(xmlFile, xmlHandler);
 
-			XmlHelper.logger.info("Read XML document " + document.getRootElement().getName());
-			return document;
-
-		} catch (FileNotFoundException e) {
-			throw new PrivilegeException("The XML file does not exist or is not readable: " + xmlFile.getAbsolutePath());
-		} catch (DocumentException e) {
-			throw new PrivilegeException("the XML file " + xmlFile.getAbsolutePath() + " is not parseable:", e);
+		} catch (ParserConfigurationException e) {
+			throw new PrivilegeException("Failed to initialize a SAX Parser: " + e.getLocalizedMessage(), e);
+		} catch (SAXException e) {
+			throw new PrivilegeException("The XML file " + xmlFile.getAbsolutePath() + " is not parseable:", e);
+		} catch (IOException e) {
+			throw new PrivilegeException("The XML could not be read: " + xmlFile.getAbsolutePath());
 		}
 	}
 
@@ -87,40 +93,40 @@ public class XmlHelper {
 	 *            the {@link Document} to write to the file system
 	 * @param file
 	 *            the {@link File} describing the path on the file system where the XML file should be written to
+	 * 
+	 * @throws RuntimeException
+	 *             if something went wrong while creating the XML configuration, or writing the element
 	 */
-	public static void writeDocument(Document document, File file) {
+	public static void writeDocument(Document document, File file) throws RuntimeException {
 
-		XmlHelper.logger.info("Exporting document element " + document.getName() + " to " + file.getAbsolutePath());
-
-		OutputStream fileOutputStream = null;
+		XmlHelper.logger.info("Exporting document element " + document.getNodeName() + " to " + file.getAbsolutePath());
 
 		try {
 
-			fileOutputStream = new FileOutputStream(file);
-
-			String aEncodingScheme = document.getXMLEncoding();
-			if (aEncodingScheme == null || aEncodingScheme.isEmpty()) {
-				aEncodingScheme = XmlHelper.DEFAULT_ENCODING;
+			String encoding = document.getInputEncoding();
+			if (encoding == null || encoding.isEmpty()) {
+				encoding = XmlHelper.DEFAULT_ENCODING;
 			}
-			OutputFormat outformat = OutputFormat.createPrettyPrint();
-			outformat.setEncoding(aEncodingScheme);
-			XMLWriter writer = new XMLWriter(fileOutputStream, outformat);
-			writer.write(document);
-			writer.flush();
+
+			// Set up a transformer
+			TransformerFactory transfac = TransformerFactory.newInstance();
+			Transformer transformer = transfac.newTransformer();
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
+			//transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
+
+			// Transform to file
+			StreamResult result = new StreamResult(file);
+			Source xmlSource = new DOMSource(document);
+			transformer.transform(xmlSource, result);
 
 		} catch (Exception e) {
 
 			throw new PrivilegeException("Exception while exporting to file: " + e, e);
 
-		} finally {
-
-			if (fileOutputStream != null) {
-				try {
-					fileOutputStream.close();
-				} catch (IOException e) {
-					XmlHelper.logger.error("Could not close file output stream: " + e, e);
-				}
-			}
 		}
 	}
 
@@ -131,13 +137,40 @@ public class XmlHelper {
 	 *            the {@link Element} to write to the file system
 	 * @param file
 	 *            the {@link File} describing the path on the file system where the XML file should be written to
+	 * @param encoding
+	 *            encoding to use to write the file
+	 * 
+	 * @throws RuntimeException
+	 *             if something went wrong while creating the XML configuration, or writing the element
 	 */
-	public static void writeElement(Element rootElement, File file) {
+	public static void writeElement(Element rootElement, File file, String encoding) throws RuntimeException {
 
-		Document document = DocumentFactory.getInstance().createDocument(XmlHelper.DEFAULT_ENCODING);
-		document.setRootElement(rootElement);
-		document.setName(rootElement.getName());
-
+		Document document = createDocument();
+		document.appendChild(rootElement);
 		XmlHelper.writeDocument(document, file);
+	}
+
+	/**
+	 * Returns a new document instance
+	 * 
+	 * @return a new document instance
+	 * 
+	 * @throws RuntimeException
+	 *             if something went wrong while creating the XML configuration
+	 */
+	public static Document createDocument() throws RuntimeException {
+		try {
+
+			DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+			Document document = docBuilder.newDocument();
+
+			return document;
+
+		} catch (DOMException e) {
+			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e);
+		} catch (ParserConfigurationException e) {
+			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e);
+		}
 	}
 }

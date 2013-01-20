@@ -20,12 +20,12 @@
 package ch.eitchnet.privilege.helper;
 
 import java.io.File;
-
-import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
+import java.util.HashMap;
+import java.util.Map;
 
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
+import ch.eitchnet.privilege.xml.PrivilegeConfigDomWriter;
 
 /**
  * <p>
@@ -46,7 +46,7 @@ import ch.eitchnet.privilege.handler.PrivilegeHandler;
  */
 public class BootstrapConfigurationHelper {
 
-	// private static final Logger logger = LoggerFactory.getLogger(BootstrapConfigurationHelper.class);
+	// private static final Logger logger = Loggerdoc.getLogger(BootstrapConfigurationHelper.class);
 
 	private static String path;
 
@@ -81,81 +81,29 @@ public class BootstrapConfigurationHelper {
 			throw new RuntimeException("Could not create path " + pathF.getAbsolutePath());
 		}
 
+		Map<String, String> parameterMap = new HashMap<String, String>();
+		Map<String, String> encryptionHandlerParameterMap = new HashMap<String, String>();
+		Map<String, String> persistenceHandlerParameterMap = new HashMap<String, String>();
+
 		// TODO ask other questions...
+		parameterMap.put("autoPersistOnPasswordChange", "true");
+		encryptionHandlerParameterMap.put("hashAlgorithm", "SHA-256");
+		persistenceHandlerParameterMap.put("basePath", "./target/test");
+		persistenceHandlerParameterMap.put("modelXmlFile", "PrivilegeModel.xml");
+
+		PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
+		containerModel.setParameterMap(parameterMap);
+		containerModel.setEncryptionHandlerClassName(defaultEncryptionHandler);
+		containerModel.setEncryptionHandlerParameterMap(encryptionHandlerParameterMap);
+		containerModel.setPersistenceHandlerClassName(defaultPersistenceHandler);
+		containerModel.setPersistenceHandlerParameterMap(persistenceHandlerParameterMap);
+
+		containerModel.addPolicy("DefaultPrivilege", "ch.eitchnet.privilege.policy.DefaultPrivilege");
 
 		// now perform work:
-		BootstrapConfigurationHelper.createXmlPrivilegeContainer();
-		BootstrapConfigurationHelper.createPolicyConfiguration();
-		BootstrapConfigurationHelper.createModel();
-	}
-
-	/**
-	 * 
-	 */
-	private static void createModel() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * 
-	 */
-	private static void createPolicyConfiguration() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * 
-	 */
-	private static void createXmlPrivilegeContainer() {
-
-		// create document root
-		DocumentFactory factory = DocumentFactory.getInstance();
-		Document doc = factory.createDocument(XmlHelper.DEFAULT_ENCODING);
-		doc.setName(XmlConstants.XML_ROOT_PRIVILEGE);
-		Element rootElement = factory.createElement(XmlConstants.XML_ROOT_PRIVILEGE);
-		doc.setRootElement(rootElement);
-
-		Element containerElement = factory.createElement(XmlConstants.XML_CONTAINER);
-
-		Element parameterElement;
-		Element parametersElement;
-
-		// create PersistenceHandler
-		Element persistenceHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_PERSISTENCE);
-		containerElement.add(persistenceHandlerElem);
-		persistenceHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS,
-				BootstrapConfigurationHelper.defaultPersistenceHandler);
-		parametersElement = factory.createElement(XmlConstants.XML_PARAMETERS);
-		persistenceHandlerElem.add(parametersElement);
-		// Parameter basePath
-		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_BASE_PATH);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, BootstrapConfigurationHelper.basePath);
-		parametersElement.add(parameterElement);
-		// Parameter modelXmlFile
-		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_MODEL_FILE);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, BootstrapConfigurationHelper.modelFileName);
-		parametersElement.add(parameterElement);
-
-		// create EncryptionHandler
-		Element encryptionHandlerElem = factory.createElement(XmlConstants.XML_HANDLER_ENCRYPTION);
-		containerElement.add(encryptionHandlerElem);
-		encryptionHandlerElem.addAttribute(XmlConstants.XML_ATTR_CLASS,
-				BootstrapConfigurationHelper.defaultEncryptionHandler);
-		parametersElement = factory.createElement(XmlConstants.XML_PARAMETERS);
-		encryptionHandlerElem.add(parametersElement);
-		// Parameter hashAlgorithm
-		parameterElement = factory.createElement(XmlConstants.XML_PARAMETER);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_NAME, XmlConstants.XML_PARAM_HASH_ALGORITHM);
-		parameterElement.addAttribute(XmlConstants.XML_ATTR_VALUE, BootstrapConfigurationHelper.hashAlgorithm);
-		parametersElement.add(parameterElement);
-
-		// write the container file to disk
-		File privilegeContainerFile = new File(BootstrapConfigurationHelper.path + "/"
+		File configFile = new File(BootstrapConfigurationHelper.path + "/"
 				+ BootstrapConfigurationHelper.defaultPrivilegeContainerXmlFile);
-		XmlHelper.writeDocument(doc, privilegeContainerFile);
+		PrivilegeConfigDomWriter configSaxWriter = new PrivilegeConfigDomWriter(containerModel, configFile);
+		configSaxWriter.write();
 	}
 }
