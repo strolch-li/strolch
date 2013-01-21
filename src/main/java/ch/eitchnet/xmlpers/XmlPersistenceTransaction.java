@@ -293,7 +293,7 @@ public class XmlPersistenceTransaction {
 					XmlPersistenceTransaction.logger.info("No objects added in this tx.");
 			} else {
 				if (this.verbose)
-					XmlPersistenceTransaction.logger.info(updated.size() + " objects added in this tx.");
+					XmlPersistenceTransaction.logger.info(added.size() + " objects added in this tx.");
 
 				for (ITransactionObject object : added) {
 
