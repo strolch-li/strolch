@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.exception.StrolchException;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**

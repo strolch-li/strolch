@@ -21,10 +21,9 @@
  */
 package li.strolch.model.parameter;
 
+import org.w3c.dom.Element;
+
 import li.strolch.exception.StrolchException;
-
-import org.dom4j.Element;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -65,7 +64,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	public IntegerParameter(Element element) {
 		super.fromDom(element);
 
-		String valueS = element.attributeValue("Value");
+		String valueS = element.getAttribute("Value");
 		if (StringHelper.isEmpty(valueS)) {
 			throw new StrolchException("No value defined for " + this.id);
 		}

@@ -23,10 +23,9 @@ package li.strolch.model.parameter;
 
 import java.text.DateFormat;
 
+import org.w3c.dom.Element;
+
 import li.strolch.exception.StrolchException;
-
-import org.dom4j.Element;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -66,7 +65,7 @@ public class DateParameter extends AbstractParameter<Long> {
 	public DateParameter(Element element) {
 		super.fromDom(element);
 
-		String valueS = element.attributeValue("Value");
+		String valueS = element.getAttribute("Value");
 		if (StringHelper.isEmpty(valueS)) {
 			throw new StrolchException("No value defined for " + this.id);
 		}

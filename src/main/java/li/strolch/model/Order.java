@@ -21,10 +21,10 @@
  */
 package li.strolch.model;
 
-import li.strolch.model.Locator.LocatorBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import org.dom4j.Element;
-import org.dom4j.tree.DefaultElement;
+import li.strolch.model.Locator.LocatorBuilder;
 
 /**
  * The Order is an object used in the EDF to transfer data from one range to another. Orders are not to be thought of as
@@ -91,8 +91,8 @@ public class Order extends GroupedParameterizedElement {
 	public Order(Element element) {
 		super.fromDom(element);
 
-		String date = element.attributeValue("Date");
-		String state = element.attributeValue("State");
+		String date = element.getAttribute("Date");
+		String state = element.getAttribute("State");
 
 		// TODO the format should be globally configured
 		if (date == null || date.isEmpty()) {
@@ -139,17 +139,17 @@ public class Order extends GroupedParameterizedElement {
 	}
 
 	/**
-	 * @see li.strolch.StrolchElement.datalandscape.element.IEdpElement#toDom()
+	 * @see li.strolch.StrolchElement.datalandscape.element.IEdpElement#toDom(Document)
 	 */
 	@Override
-	public Element toDom() {
+	public Element toDom(Document doc) {
 
-		Element orderElement = new DefaultElement("Order");
+		Element orderElement = doc.createElement("Order");
 		fillElement(orderElement);
 
 		// TODO the format should be globally configured
-		orderElement.addAttribute("Date", Long.toString(this.date));
-		orderElement.addAttribute("State", this.state.toString());
+		orderElement.setAttribute("Date", Long.toString(this.date));
+		orderElement.setAttribute("State", this.state.toString());
 
 		return orderElement;
 	}

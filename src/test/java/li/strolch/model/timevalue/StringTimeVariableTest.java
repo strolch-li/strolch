@@ -8,9 +8,6 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import junit.framework.Assert;
-import li.strolch.model.timevalue.ITimeValue;
-import li.strolch.model.timevalue.IValue;
-import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.AString;
 import li.strolch.model.timevalue.impl.StringSetValue;
 import li.strolch.model.timevalue.impl.TimeVariable;

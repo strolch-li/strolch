@@ -96,13 +96,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Reading XML -->
-		<dependency>
-			<groupId>dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<version>1.6</version>
-		</dependency>
-
 		<!-- testing -->
 		<dependency>
 			<groupId>junit</groupId>

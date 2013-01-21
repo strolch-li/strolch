@@ -24,14 +24,14 @@ package li.strolch.model;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.parameter.Parameter;
 
-import org.dom4j.Element;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import ch.eitchnet.utils.helper.StringHelper;
 
@@ -222,16 +222,15 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void fromDom(Element element) {
 		super.fromDom(element);
 
-		String type = element.attributeValue("Type");
+		String type = element.getAttribute("Type");
 		setType(type);
 
-		List<Element> bags = element.elements("ParameterBag");
-		for (Element bagElement : bags) {
-
+		NodeList bags = element.getElementsByTagName("ParameterBag");
+		for (int i = 0; i < bags.getLength(); i++) {
+			Element bagElement = (Element) bags.item(i);
 			ParameterBag bag = new ParameterBag(bagElement);
 			addParameterBag(bag);
 		}
@@ -243,7 +242,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 		if (this.parameterBagMap != null) {
 			for (ParameterBag bag : this.parameterBagMap.values()) {
-				element.add(bag.toDom());
+				element.appendChild(bag.toDom(element.getOwnerDocument()));
 			}
 		}
 	}

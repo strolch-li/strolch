@@ -21,8 +21,9 @@
  */
 package li.strolch.model;
 
-import org.dom4j.Element;
-import org.dom4j.tree.DefaultElement;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -65,9 +66,9 @@ public class ParameterBag extends ParameterizedElement {
 	}
 
 	@Override
-	public Element toDom() {
+	public Element toDom(Document doc) {
 
-		Element element = new DefaultElement("ParameterBag");
+		Element element = doc.createElement("ParameterBag");
 
 		fillElement(element);
 

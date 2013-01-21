@@ -1,8 +1,6 @@
 package li.strolch.model.timedstate;
 
 import junit.framework.Assert;
-import li.strolch.model.timedstate.ITimedState;
-import li.strolch.model.timedstate.TimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.DoubleValue;

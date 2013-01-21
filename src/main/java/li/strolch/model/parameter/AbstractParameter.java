@@ -21,15 +21,14 @@
  */
 package li.strolch.model.parameter;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import li.strolch.exception.StrolchException;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.ParameterizedElement;
-
-import org.dom4j.Element;
-import org.dom4j.tree.DefaultElement;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -113,18 +112,18 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	}
 
 	@Override
-	public Element toDom() {
-		Element element = new DefaultElement("Parameter");
+	public Element toDom(Document doc) {
+		Element element = doc.createElement("Parameter");
 		fillElement(element);
 
-		element.addAttribute("Value", getValueAsString());
+		element.setAttribute("Value", getValueAsString());
 
 		if (!this.interpretation.equals(Parameter.INTERPRETATION_NONE))
-			element.addAttribute("Interpretation", this.interpretation);
+			element.setAttribute("Interpretation", this.interpretation);
 		if (!this.uom.equals(Parameter.UOM_NONE))
-			element.addAttribute("Uom", this.uom);
+			element.setAttribute("Uom", this.uom);
 		if (this.hidden)
-			element.addAttribute("Hidden", Boolean.toString(this.hidden));
+			element.setAttribute("Hidden", Boolean.toString(this.hidden));
 
 		return element;
 	}
@@ -134,16 +133,16 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 		super.fromDom(element);
 
-		String typeS = element.attributeValue("Type");
+		String typeS = element.getAttribute("Type");
 		if (StringHelper.isEmpty(typeS)) {
 			throw new StrolchException("Type must be set on element with id " + this.id);
 		} else if (!typeS.equals(getType())) {
 			throw new StrolchException(getClass().getSimpleName() + " must have type " + getType() + ", not: " + typeS);
 		}
 
-		String interpretation = element.attributeValue("Interpretation");
-		String isHidden = element.attributeValue("Hidden");
-		String uom = element.attributeValue("Uom");
+		String interpretation = element.getAttribute("Interpretation");
+		String isHidden = element.getAttribute("Hidden");
+		String uom = element.getAttribute("Uom");
 
 		setInterpretation(interpretation);
 		setUom(uom);

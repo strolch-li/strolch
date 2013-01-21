@@ -21,10 +21,10 @@
  */
 package li.strolch.model;
 
-import li.strolch.model.Locator.LocatorBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import org.dom4j.Element;
-import org.dom4j.tree.DefaultElement;
+import li.strolch.model.Locator.LocatorBuilder;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -62,9 +62,9 @@ public class Resource extends GroupedParameterizedElement {
 	}
 
 	@Override
-	public Element toDom() {
+	public Element toDom(Document doc) {
 
-		Element element = new DefaultElement("Resource");
+		Element element = doc.createElement("Resource");
 		fillElement(element);
 
 		return element;

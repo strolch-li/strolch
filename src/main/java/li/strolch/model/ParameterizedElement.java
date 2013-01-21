@@ -39,7 +39,8 @@ import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 
-import org.dom4j.Element;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import ch.eitchnet.utils.helper.StringHelper;
 
@@ -207,15 +208,14 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	protected void fromDom(Element element) {
 		super.fromDom(element);
 
-		String type = element.attributeValue("Type");
+		String type = element.getAttribute("Type");
 		setType(type);
 
 		// add all the parameters
-		@SuppressWarnings("unchecked")
-		List<Element> parameterElements = element.elements("Parameter");
-		for (Object object : parameterElements) {
-			Element paramElement = (Element) object;
-			String paramtype = paramElement.attributeValue("Type");
+		NodeList parameterElements = element.getElementsByTagName("Parameter");
+		for (int i = 0; i < parameterElements.getLength(); i++) {
+			Element paramElement = (Element) parameterElements.item(i);
+			String paramtype = paramElement.getAttribute("Type");
 
 			if (paramtype.equals(StringParameter.TYPE)) {
 				StringParameter param = new StringParameter(paramElement);
@@ -247,7 +247,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 		if (this.parameterMap != null) {
 			for (Parameter<?> parameter : this.parameterMap.values()) {
-				element.add(parameter.toDom());
+				element.appendChild(parameter.toDom(element.getOwnerDocument()));
 			}
 		}
 	}

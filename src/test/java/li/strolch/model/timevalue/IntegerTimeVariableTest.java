@@ -6,9 +6,6 @@ import java.util.Map;
 import java.util.SortedSet;
 
 import junit.framework.Assert;
-import li.strolch.model.timevalue.ITimeValue;
-import li.strolch.model.timevalue.IValue;
-import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.TimeVariable;
 import li.strolch.model.timevalue.impl.ValueChange;

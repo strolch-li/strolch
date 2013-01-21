@@ -24,7 +24,7 @@ package li.strolch.model;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator.LocatorBuilder;
 
-import org.dom4j.Element;
+import org.w3c.dom.Element;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -113,9 +113,9 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	}
 
 	protected void fillElement(Element element) {
-		element.addAttribute("Id", getId());
-		element.addAttribute("Name", getName());
-		element.addAttribute("Type", getType());
+		element.setAttribute("Id", getId());
+		element.setAttribute("Name", getName());
+		element.setAttribute("Type", getType());
 	}
 
 	/**
@@ -124,14 +124,14 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	 * @param element
 	 */
 	protected void fromDom(Element element) {
-		String id = element.attributeValue("Id");
-		String name = element.attributeValue("Name");
+		String id = element.getAttribute("Id");
+		String name = element.getAttribute("Name");
 
 		if (id != null && name != null) {
 			setId(id);
 			setName(name);
 		} else {
-			throw new StrolchException("Check the values of the element: " + element.getName()
+			throw new StrolchException("Check the values of the element: " + element.getNodeName()
 					+ " either id or name attribute is null!");
 		}
 	}
