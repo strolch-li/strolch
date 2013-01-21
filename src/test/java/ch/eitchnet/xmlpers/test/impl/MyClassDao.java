@@ -19,7 +19,6 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -35,39 +34,25 @@ import ch.eitchnet.xmlpers.XmlDao;
  */
 public class MyClassDao implements XmlDao<MyClass> {
 
-	/**
-	 * @see ch.eitchnet.xmlpers.XmlDao#getType(java.lang.Object)
-	 */
 	@Override
 	public String getType(MyClass object) {
 		return MyClass.class.getName();
 	}
 
-	/**
-	 * @see ch.eitchnet.xmlpers.XmlDao#getSubType(java.lang.Object)
-	 */
 	@Override
 	public String getSubType(MyClass object) {
 		return object.getType();
 	}
 
-	/**
-	 * @see ch.eitchnet.xmlpers.XmlDao#getId(java.lang.Object)
-	 */
 	@Override
 	public String getId(MyClass object) {
 		return object.getId();
 	}
 
-	/**
-	 * @see ch.eitchnet.xmlpers.XmlDao#serializeToDom(java.lang.Object, org.w3c.dom.DOMImplementation)
-	 */
 	@Override
-	public Document serializeToDom(MyClass object, DOMImplementation domImplementation) {
+	public Element serializeToDom(MyClass object, Document document) {
 
-		Document document = domImplementation.createDocument(null, null, null);
 		Element element = document.createElement("MyClass");
-		document.appendChild(element);
 
 		element.setAttribute("id", object.getId());
 		element.setAttribute("type", object.getType());
@@ -77,7 +62,7 @@ public class MyClassDao implements XmlDao<MyClass> {
 		Text textNode = document.createTextNode(object.getName());
 		nameElement.appendChild(textNode);
 
-		return document;
+		return element;
 	}
 
 	/**
@@ -131,5 +116,4 @@ public class MyClassDao implements XmlDao<MyClass> {
 			throw new RuntimeException("Failed to serialize " + object + " to SAX", e);
 		}
 	}
-
 }

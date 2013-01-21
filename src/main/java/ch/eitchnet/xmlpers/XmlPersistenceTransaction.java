@@ -33,6 +33,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import ch.eitchnet.utils.helper.XmlHelper;
 import ch.eitchnet.utils.objectfilter.ITransactionObject;
 import ch.eitchnet.utils.objectfilter.ObjectFilter;
 
@@ -279,8 +280,10 @@ public class XmlPersistenceTransaction {
 					String subType = dao.getSubType(object);
 					String id = dao.getId(object);
 
-					Document asDom = dao.serializeToDom(object, getDomImpl());
-					this.persister.saveOrUpdate(type, subType, id, asDom);
+					Document doc = XmlHelper.createDocument();
+					Element asDom = dao.serializeToDom(object, doc);
+					doc.appendChild(asDom);
+					this.persister.saveOrUpdate(type, subType, id, doc);
 				}
 			}
 
@@ -298,8 +301,10 @@ public class XmlPersistenceTransaction {
 					String subType = dao.getSubType(object);
 					String id = dao.getId(object);
 
-					Document asDom = dao.serializeToDom(object, getDomImpl());
-					this.persister.saveOrUpdate(type, subType, id, asDom);
+					Document doc = XmlHelper.createDocument();
+					Element asDom = dao.serializeToDom(object, doc);
+					doc.appendChild(asDom);
+					this.persister.saveOrUpdate(type, subType, id, doc);
 				}
 			}
 		}

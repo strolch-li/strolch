@@ -54,12 +54,12 @@ public class XmlPersistenceTest {
 	public static void init() throws Exception {
 		try {
 			String userDir = System.getProperty("user.dir");
-			String basePath = userDir + "/tmp/testdb";
+			String basePath = userDir + "/target/testdb";
 			File basePathF = new File(basePath);
 			if (!basePathF.exists() && !basePathF.mkdirs())
 				Assert.fail("Could not create temporaray database store in " + basePathF.getAbsolutePath());
 
-			System.setProperty(XmlPersistenceHandler.CONFIG_BASEPATH, "tmp/testdb");
+			System.setProperty(XmlPersistenceHandler.CONFIG_BASEPATH, "target/testdb");
 			System.setProperty(XmlPersistenceHandler.CONFIG_VERBOSE, "true");
 			System.setProperty(XmlPersistenceHandler.CONFIG_DAO_FACTORY_CLASS, MyDaoFactory.class.getName());
 

@@ -19,9 +19,7 @@
  */
 package ch.eitchnet.xmlpers;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,18 +36,13 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import ch.eitchnet.utils.helper.FileHelper;
-
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import ch.eitchnet.utils.helper.XmlHelper;
 
 /**
- *@author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
 public class XmlFilePersister {
-
-	//
-	private static final String XML_DEFAULT_ENCODING = "UTF-8";
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlFilePersister.class);
 
@@ -89,34 +82,16 @@ public class XmlFilePersister {
 		}
 
 		if (this.verbose)
-			XmlFilePersister.logger.info("Persisting " + type + " / " + subType + " / " + id + " to " + pathF.getAbsolutePath() + "...");
+			XmlFilePersister.logger.info("Persisting " + type + " / " + subType + " / " + id + " to "
+					+ pathF.getAbsolutePath() + "...");
 
-		BufferedOutputStream outStream = null;
 		try {
 
-			outStream = new BufferedOutputStream(new FileOutputStream(pathF));
-
-			OutputFormat outputFormat = new OutputFormat("XML", XmlFilePersister.XML_DEFAULT_ENCODING, true);
-			outputFormat.setIndent(1);
-			outputFormat.setIndenting(true);
-			//of.setDoctype(null, null);
-
-			XMLSerializer serializer = new XMLSerializer(outStream, outputFormat);
-			serializer.asDOMSerializer();
-			serializer.serialize(document);
-			outStream.flush();
+			XmlHelper.writeDocument(document, pathF);
 
 		} catch (Exception e) {
 			throw new XmlPersistenceExecption("Could not persist object " + type + " / " + subType + " / " + id
 					+ " to " + pathF.getAbsolutePath(), e);
-		} finally {
-			if (outStream != null) {
-				try {
-					outStream.close();
-				} catch (IOException e) {
-					XmlFilePersister.logger.error(e.getMessage(), e);
-				}
-			}
 		}
 
 		if (this.verbose)
@@ -137,12 +112,12 @@ public class XmlFilePersister {
 			pathF = this.xmlPathHelper.getPathF(type, id);
 
 		if (this.verbose)
-			XmlFilePersister.logger.info("Remove persistence file for " + type + " / " + subType + " / " + id + " from "
-					+ pathF.getAbsolutePath() + "...");
+			XmlFilePersister.logger.info("Remove persistence file for " + type + " / " + subType + " / " + id
+					+ " from " + pathF.getAbsolutePath() + "...");
 
 		if (!pathF.exists()) {
-			XmlFilePersister.logger.error("Persistence file for " + type + " / " + subType + " / " + id + " does not exist at "
-					+ pathF.getAbsolutePath());
+			XmlFilePersister.logger.error("Persistence file for " + type + " / " + subType + " / " + id
+					+ " does not exist at " + pathF.getAbsolutePath());
 		} else if (!pathF.delete()) {
 			throw new XmlPersistenceExecption("Could not delete persistence file for " + type + " / " + subType + " / "
 					+ id + " at " + pathF.getAbsolutePath());
@@ -421,8 +396,8 @@ public class XmlFilePersister {
 
 		File pathF = this.xmlPathHelper.getPathF(type, subType, id);
 		if (!pathF.exists()) {
-			XmlFilePersister.logger.error("Path for " + type + " / " + subType + " / " + id + " at " + pathF.getAbsolutePath()
-					+ " does not exist, so object does not exist!");
+			XmlFilePersister.logger.error("Path for " + type + " / " + subType + " / " + id + " at "
+					+ pathF.getAbsolutePath() + " does not exist, so object does not exist!");
 			return null;
 		}
 

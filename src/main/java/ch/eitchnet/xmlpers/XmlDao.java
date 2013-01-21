@@ -19,7 +19,6 @@
  */
 package ch.eitchnet.xmlpers;
 
-import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.ContentHandler;
@@ -51,11 +50,10 @@ public interface XmlDao<T> {
 	/**
 	 * 
 	 * @param object
-	 * @param domImplementation
+	 * @param document
 	 * @return
 	 */
-	// XXX think about returning a document, instead of an element, or use document as input
-	public Document serializeToDom(T object, DOMImplementation domImplementation);
+	public Element serializeToDom(T object, Document document);
 
 	/**
 	 * @param element
