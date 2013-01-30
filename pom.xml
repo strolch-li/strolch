@@ -73,6 +73,19 @@
 		</snapshots> <id>codehausSnapshots</id> <name>Codehaus Snapshots</name> <url>http://snapshots.maven.codehaus.org/maven2</url> 
 		<layout>default</layout> </repository> </repositories> <pluginRepositories> 
 		... </pluginRepositories> -->
+	
+	<distributionManagement>
+		<repository>
+			<id>deployment</id>
+			<name>Internal Releases</name>
+			<url>http://nexus.eitchnet.ch/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>deployment</id>
+			<name>Internal Releases</name>
+			<url>http://nexus.eitchnet.ch/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<dependencies>
 		<dependency>
