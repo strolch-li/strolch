@@ -45,7 +45,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import ch.eitchnet.utils.exceptions.XmlException;
 
 /**
- * Helper class for performing XML based tasks using Dom4J
+ * Helper class for performing XML based tasks
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -59,12 +59,12 @@ public class XmlHelper {
 	private static final Logger logger = LoggerFactory.getLogger(XmlHelper.class);
 
 	/**
-	 * Parses an XML file on the file system using dom4j and returns the resulting {@link Document} object
+	 * Parses an XML file on the file system and returns the resulting {@link Document} object
 	 * 
 	 * @param xmlFile
 	 *            the {@link File} which has the path to the XML file to read
 	 * 
-	 * @return a {@link Document} object containing the dom4j {@link Element}s of the XML file
+	 * @return a {@link Document} object containing the {@link Element}s of the XML file
 	 */
 	public static void parseDocument(File xmlFile, DefaultHandler xmlHandler) {
 
@@ -86,7 +86,7 @@ public class XmlHelper {
 	}
 
 	/**
-	 * Writes a dom4j {@link Document} to an XML file on the file system
+	 * Writes a {@link Document} to an XML file on the file system
 	 * 
 	 * @param document
 	 *            the {@link Document} to write to the file system
@@ -130,7 +130,7 @@ public class XmlHelper {
 	}
 
 	/**
-	 * Writes a dom4j {@link Element} to an XML file on the file system
+	 * Writes an {@link Element} to an XML file on the file system
 	 * 
 	 * @param rootElement
 	 *            the {@link Element} to write to the file system
