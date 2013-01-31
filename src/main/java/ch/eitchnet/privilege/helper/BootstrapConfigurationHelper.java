@@ -52,10 +52,9 @@ public class BootstrapConfigurationHelper {
 
 	private static String defaultPrivilegeContainerXmlFile = "Privilege.xml";
 
-	private static String basePath = "";
-	private static String modelFileName = "PrivilegeUsers.xml";
-
-	private static String hashAlgorithm = "SHA-256";
+	//private static String basePath = "";
+	//private static String modelFileName = "PrivilegeUsers.xml";
+	//private static String hashAlgorithm = "SHA-256";
 
 	private static String defaultPersistenceHandler = "ch.eitchnet.privilege.handler.DefaultPersistenceHandler";
 	private static String defaultEncryptionHandler = "ch.eitchnet.privilege.handler.DefaultEncryptionHandler";
