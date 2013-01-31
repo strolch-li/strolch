@@ -3,7 +3,7 @@
  *
  * All rights reserved.
  *
- * This file is part of the XXX.
+ * This file is part of the li.strolch.model.
  *
  *  li.strolch.model is free software: you can redistribute 
  *  it and/or modify it under the terms of the GNU General Public License as 

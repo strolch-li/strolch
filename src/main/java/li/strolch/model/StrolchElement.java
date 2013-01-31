@@ -84,7 +84,7 @@ public interface StrolchElement extends Serializable, Comparable<StrolchElement>
 	public long getDbid();
 
 	/**
-	 * Returns a dom4j {@link Element} object which is an XML representation of this object
+	 * Returns an {@link Element} object which is an XML representation of this object
 	 * 
 	 * @param doc
 	 *            the document to which this element is being written. The client should not append to the document, the

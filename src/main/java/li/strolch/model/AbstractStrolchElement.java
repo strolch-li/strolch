@@ -119,7 +119,7 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	}
 
 	/**
-	 * Builds the fields of this {@link StrolchElement} from a Dom4j {@link Element}
+	 * Builds the fields of this {@link StrolchElement} from a {@link Element}
 	 * 
 	 * @param element
 	 */
