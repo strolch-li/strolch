@@ -55,6 +55,9 @@ public class BaseEncoding {
 	private static final byte[] BASE_32_HEX = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
 			'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V' };
 
+	private static final byte[] BASE_32_DMEDIA = { '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+			'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y' };
+
 	private static final byte[] BASE_32_CROCKFORD = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C',
 			'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z' };
 
@@ -67,30 +70,6 @@ public class BaseEncoding {
 			'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
 			'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
 			'4', '5', '6', '7', '8', '9', '-', '_' };
-
-	static {
-		if (BASE_16.length != 16) {
-			throw new RuntimeException("BASE_16 alphabet does not have expected size 16 but is " + BASE_16.length);
-		}
-		if (BASE_32.length != 32) {
-			throw new RuntimeException("BASE_32 alphabet does not have expected size 32 but is " + BASE_32.length);
-		}
-		if (BASE_32_HEX.length != 32) {
-			throw new RuntimeException("BASE_32_HEX alphabet does not have expected size 32 but is "
-					+ BASE_32_HEX.length);
-		}
-		if (BASE_32_CROCKFORD.length != 32) {
-			throw new RuntimeException("BASE_32_CROCKFORD alphabet does not have expected size 32 but is "
-					+ BASE_32_CROCKFORD.length);
-		}
-		if (BASE_64.length != 64) {
-			throw new RuntimeException("BASE_64 alphabet does not have expected size 64 but is " + BASE_64.length);
-		}
-		if (BASE_64_SAFE.length != 64) {
-			throw new RuntimeException("BASE_64_SAFE alphabet does not have expected size 64 but is "
-					+ BASE_64_SAFE.length);
-		}
-	}
 
 	public static byte[] toBase64(byte[] bytes) {
 		return toBase64(BASE_64, bytes);
@@ -108,6 +87,10 @@ public class BaseEncoding {
 		return toBase32(BASE_32_HEX, bytes);
 	}
 
+	public static byte[] toBase32Dmedia(byte[] bytes) {
+		return toBase32(BASE_32_DMEDIA, bytes);
+	}
+
 	public static byte[] toBase32Crockford(byte[] bytes) {
 		return toBase32(BASE_32_CROCKFORD, bytes);
 	}
@@ -116,9 +99,22 @@ public class BaseEncoding {
 		return toBase16(bytes, BASE_16);
 	}
 
+	/**
+	 * Encodes the given data to a 64-bit alphabet encoding. Thus the passed alphabet can be any arbitrary alphabet
+	 * 
+	 * @param bytes
+	 *            the bytes to encode
+	 * @param alphabet
+	 *            the 64-bit alphabet to use
+	 * 
+	 * @return the encoded data
+	 */
 	private static byte[] toBase64(byte[] alphabet, byte[] bytes) {
 		if (bytes.length == 0) {
 			return new byte[0];
+		}
+		if (alphabet.length != 64) {
+			throw new RuntimeException("Alphabet does not have expected size 64 but is " + alphabet.length);
 		}
 
 		// 6 bits input for every 8 bits (1 byte) output
@@ -213,9 +209,22 @@ public class BaseEncoding {
 		return txt;
 	}
 
-	private static byte[] toBase32(byte[] alphabet, byte[] bytes) {
+	/**
+	 * Encodes the given data to a 32-bit alphabet encoding. Thus the passed alphabet can be any arbitrary alphabet
+	 * 
+	 * @param bytes
+	 *            the bytes to encode
+	 * @param alphabet
+	 *            the 32-bit alphabet to use
+	 * 
+	 * @return the encoded data
+	 */
+	public static byte[] toBase32(byte[] alphabet, byte[] bytes) {
 		if (bytes.length == 0) {
 			return new byte[0];
+		}
+		if (alphabet.length != 32) {
+			throw new RuntimeException("Alphabet does not have expected size 32 but is " + alphabet.length);
 		}
 
 		// 5 bits input for every 8 bits (1 byte) output
@@ -324,9 +333,22 @@ public class BaseEncoding {
 		return txt;
 	}
 
-	private static byte[] toBase16(byte[] bytes, byte[] alphabet) {
+	/**
+	 * Encodes the given data to a 16-bit alphabet encoding. Thus the passed alphabet can be any arbitrary alphabet
+	 * 
+	 * @param bytes
+	 *            the bytes to encode
+	 * @param alphabet
+	 *            the 16-bit alphabet to use
+	 * 
+	 * @return the encoded data
+	 */
+	public static byte[] toBase16(byte[] bytes, byte[] alphabet) {
 		if (bytes.length == 0) {
 			return new byte[0];
+		}
+		if (alphabet.length != 32) {
+			throw new RuntimeException("Alphabet does not have expected size 32 but is " + alphabet.length);
 		}
 
 		// calculate output text length
@@ -363,11 +385,4 @@ public class BaseEncoding {
 
 		return txt;
 	}
-	//                       8                       7                       6                       5
-	// 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32
-	//  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
-	//                       4                       3                       2                       1
-	// 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
-	//  0  0  0  0  0  0  0  1  0  0  0  0  1  1  0  1  0  1  1  0  0  0  0  0  1  0  0  0  0  0  0  0
-
 }
