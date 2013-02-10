@@ -80,5 +80,4 @@ public class BaseEncodingTest {
 		Assert.assertEquals("666F6F6261", new String(toBase16("fooba".getBytes())));
 		Assert.assertEquals("666F6F626172", new String(toBase16("foobar".getBytes())));
 	}
-
 }

@@ -46,30 +46,29 @@ public class BaseEncoding {
 
 	private static final byte PAD = '=';
 
-	private static final byte[] BASE_16 = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
-			'F' };
+	static final byte[] BASE_16 = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-	private static final byte[] BASE_32 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-			'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7' };
+	static final byte[] BASE_32 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+			'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7' };
 
-	private static final byte[] BASE_32_HEX = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
-			'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V' };
+	static final byte[] BASE_32_HEX = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+			'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V' };
 
-	private static final byte[] BASE_32_DMEDIA = { '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
-			'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y' };
+	static final byte[] BASE_32_DMEDIA = { '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+			'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y' };
 
-	private static final byte[] BASE_32_CROCKFORD = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C',
-			'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z' };
+	static final byte[] BASE_32_CROCKFORD = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
+			'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z' };
 
-	private static final byte[] BASE_64 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+	static final byte[] BASE_64 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+			'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+			'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5',
+			'6', '7', '8', '9', '+', '/' };
+
+	static final byte[] BASE_64_SAFE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
 			'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
 			'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4',
-			'5', '6', '7', '8', '9', '+', '/' };
-
-	private static final byte[] BASE_64_SAFE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-			'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-			'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
-			'4', '5', '6', '7', '8', '9', '-', '_' };
+			'5', '6', '7', '8', '9', '-', '_' };
 
 	public static byte[] toBase64(byte[] bytes) {
 		return toBase64(BASE_64, bytes);
@@ -96,26 +95,24 @@ public class BaseEncoding {
 	}
 
 	public static byte[] toBase16(byte[] bytes) {
-		return toBase16(bytes, BASE_16);
+		return toBase16(BASE_16, bytes);
 	}
 
 	/**
 	 * Encodes the given data to a 64-bit alphabet encoding. Thus the passed alphabet can be any arbitrary alphabet
 	 * 
-	 * @param bytes
-	 *            the bytes to encode
 	 * @param alphabet
 	 *            the 64-bit alphabet to use
+	 * @param bytes
+	 *            the bytes to encode
 	 * 
 	 * @return the encoded data
 	 */
-	private static byte[] toBase64(byte[] alphabet, byte[] bytes) {
-		if (bytes.length == 0) {
+	public static byte[] toBase64(byte[] alphabet, byte[] bytes) {
+		if (bytes.length == 0)
 			return new byte[0];
-		}
-		if (alphabet.length != 64) {
+		if (alphabet.length != 64)
 			throw new RuntimeException("Alphabet does not have expected size 64 but is " + alphabet.length);
-		}
 
 		// 6 bits input for every 8 bits (1 byte) output
 		// least common multiple of 6 bits input and 8 bits output = 24
@@ -212,20 +209,18 @@ public class BaseEncoding {
 	/**
 	 * Encodes the given data to a 32-bit alphabet encoding. Thus the passed alphabet can be any arbitrary alphabet
 	 * 
-	 * @param bytes
-	 *            the bytes to encode
 	 * @param alphabet
 	 *            the 32-bit alphabet to use
+	 * @param bytes
+	 *            the bytes to encode
 	 * 
 	 * @return the encoded data
 	 */
 	public static byte[] toBase32(byte[] alphabet, byte[] bytes) {
-		if (bytes.length == 0) {
+		if (bytes.length == 0)
 			return new byte[0];
-		}
-		if (alphabet.length != 32) {
+		if (alphabet.length != 32)
 			throw new RuntimeException("Alphabet does not have expected size 32 but is " + alphabet.length);
-		}
 
 		// 5 bits input for every 8 bits (1 byte) output
 		// least common multiple of 5 bits input and 8 bits output = 40
@@ -336,20 +331,18 @@ public class BaseEncoding {
 	/**
 	 * Encodes the given data to a 16-bit alphabet encoding. Thus the passed alphabet can be any arbitrary alphabet
 	 * 
-	 * @param bytes
-	 *            the bytes to encode
 	 * @param alphabet
 	 *            the 16-bit alphabet to use
+	 * @param bytes
+	 *            the bytes to encode
 	 * 
 	 * @return the encoded data
 	 */
-	public static byte[] toBase16(byte[] bytes, byte[] alphabet) {
-		if (bytes.length == 0) {
+	public static byte[] toBase16( byte[] alphabet, byte[] bytes) {
+		if (bytes.length == 0)
 			return new byte[0];
-		}
-		if (alphabet.length != 32) {
-			throw new RuntimeException("Alphabet does not have expected size 32 but is " + alphabet.length);
-		}
+		if (alphabet.length != 16)
+			throw new RuntimeException("Alphabet does not have expected size 16 but is " + alphabet.length);
 
 		// calculate output text length
 		int nrOfInputBytes = bytes.length;
