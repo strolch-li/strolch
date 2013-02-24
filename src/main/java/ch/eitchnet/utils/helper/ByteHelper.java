@@ -96,6 +96,25 @@ public class ByteHelper {
 	}
 
 	/**
+	 * Formats the given byte array to a binary string, separating each byte by a space
+	 * 
+	 * @param b
+	 *            the byte to format to a binary string
+	 * 
+	 * @return the binary string
+	 */
+	public static String asBinary(byte[] bytes) {
+		StringBuilder sb = new StringBuilder();
+
+		for (byte b : bytes) {
+			sb.append(asBinary(b));
+			sb.append(" ");
+		}
+
+		return sb.toString();
+	}
+
+	/**
 	 * Formats the given integer to a binary string, each byte is separated by a space
 	 * 
 	 * @param i

@@ -28,6 +28,8 @@ import static ch.eitchnet.utils.helper.BaseEncoding.toBase64;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -35,7 +37,7 @@ import org.junit.Test;
  */
 public class BaseEncodingTest {
 
-	// private static final Logger logger = LoggerFactory.getLogger(BaseEncodingTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(BaseEncodingTest.class);
 
 	@Test
 	public void testBase64() {
@@ -46,6 +48,14 @@ public class BaseEncodingTest {
 		Assert.assertEquals("Zm9vYg==", new String(toBase64("foob".getBytes())));
 		Assert.assertEquals("Zm9vYmE=", new String(toBase64("fooba".getBytes())));
 		Assert.assertEquals("Zm9vYmFy", new String(toBase64("foobar".getBytes())));
+
+		long start = System.nanoTime();
+		byte[] bytes = new byte[1024 * 1024];
+		for (int i = 0; i < 200; i++) {
+			toBase64(bytes);
+		}
+		long end = System.nanoTime();
+		logger.info("Encoding 200MB Base64 took " + StringHelper.formatNanoDuration(end - start));
 	}
 
 	@Test
@@ -57,6 +67,14 @@ public class BaseEncodingTest {
 		Assert.assertEquals("MZXW6YQ=", new String(toBase32("foob".getBytes())));
 		Assert.assertEquals("MZXW6YTB", new String(toBase32("fooba".getBytes())));
 		Assert.assertEquals("MZXW6YTBOI======", new String(toBase32("foobar".getBytes())));
+
+		long start = System.nanoTime();
+		byte[] bytes = new byte[1024 * 1024];
+		for (int i = 0; i < 200; i++) {
+			toBase32(bytes);
+		}
+		long end = System.nanoTime();
+		logger.info("Encoding 200MB Base32 took " + StringHelper.formatNanoDuration(end - start));
 	}
 
 	@Test
@@ -68,6 +86,14 @@ public class BaseEncodingTest {
 		Assert.assertEquals("CPNMUOG=", new String(toBase32Hex("foob".getBytes())));
 		Assert.assertEquals("CPNMUOJ1", new String(toBase32Hex("fooba".getBytes())));
 		Assert.assertEquals("CPNMUOJ1E8======", new String(toBase32Hex("foobar".getBytes())));
+
+		long start = System.nanoTime();
+		byte[] bytes = new byte[1024 * 1024];
+		for (int i = 0; i < 200; i++) {
+			toBase32Hex(bytes);
+		}
+		long end = System.nanoTime();
+		logger.info("Encoding 200MB Base32Hex took " + StringHelper.formatNanoDuration(end - start));
 	}
 
 	@Test
@@ -79,5 +105,13 @@ public class BaseEncodingTest {
 		Assert.assertEquals("666F6F62", new String(toBase16("foob".getBytes())));
 		Assert.assertEquals("666F6F6261", new String(toBase16("fooba".getBytes())));
 		Assert.assertEquals("666F6F626172", new String(toBase16("foobar".getBytes())));
+
+		long start = System.nanoTime();
+		byte[] bytes = new byte[1024 * 1024];
+		for (int i = 0; i < 200; i++) {
+			toBase16(bytes);
+		}
+		long end = System.nanoTime();
+		logger.info("Encoding 200MB Base16 took " + StringHelper.formatNanoDuration(end - start));
 	}
 }

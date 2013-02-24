@@ -172,7 +172,7 @@ public class BaseEncoding {
 			// always start at 24. bit
 			int bitPos = 23;
 
-			// always write 24 bits (6 bytes * 4 multiples), but this will also write into the padding
+			// always write 24 bits (6 bits * 4), but this will also write into the padding
 			// we will fix this by writing the padding as has been calculated previously
 			while (bitPos >= 0) {
 
