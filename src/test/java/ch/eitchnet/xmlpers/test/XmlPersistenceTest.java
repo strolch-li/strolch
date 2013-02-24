@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,10 +77,25 @@ public class XmlPersistenceTest {
 	}
 
 	/**
+	 * Tests the following story:
+	 * <ul>
+	 * <li>create object</li>
+	 * <li>read object</li>
+	 * <li>update object</li>
+	 * <li>remove object</li>
+	 * </ul>
 	 * 
 	 */
 	@Test
-	public void testCreate() {
+	public void testPersistenceStory() {
+
+		createObject();
+		readObject();
+		updateObject();
+		removeObject();
+	}
+
+	private void createObject() {
 
 		try {
 			XmlPersistenceTest.logger.info("Trying to create...");
@@ -100,11 +116,7 @@ public class XmlPersistenceTest {
 		}
 	}
 
-	/**
-	 * 
-	 */
-	@Test
-	public void testRead() {
+	private void readObject() {
 
 		try {
 			XmlPersistenceTest.logger.info("Trying to read...");
@@ -123,11 +135,7 @@ public class XmlPersistenceTest {
 		}
 	}
 
-	/**
-	 * 
-	 */
-	@Test
-	public void testUpdate() {
+	private void updateObject() {
 
 		try {
 			XmlPersistenceTest.logger.info("Trying to update an object...");
@@ -152,11 +160,7 @@ public class XmlPersistenceTest {
 		}
 	}
 
-	/**
-	 * 
-	 */
-	@Test
-	public void testRemove() {
+	private void removeObject() {
 
 		XmlPersistenceTest.logger.info("Trying to remove...");
 
@@ -174,7 +178,7 @@ public class XmlPersistenceTest {
 	/**
 	 * 
 	 */
-	@Test(expected = XmlPersistenceExecption.class)
+	@Test
 	public void testQueryFail() {
 
 		try {
@@ -183,6 +187,10 @@ public class XmlPersistenceTest {
 			MyClass myClass = tx.queryById(MyClass.class.getName(), "@subtype", "@id");
 			XmlPersistenceTest.logger.info("Found MyClass: " + myClass);
 			XmlPersistenceTest.logger.info("Done querying removed object");
+		} catch (XmlPersistenceExecption e) {
+			Assert.assertEquals("Wrong error message. Expected error that object does not exist",
+					"No object exists for ch.eitchnet.xmlpers.test.impl.MyClass / @subtype / @id",
+					e.getLocalizedMessage());
 		} finally {
 			XmlPersistenceTest.persistenceHandler.commitTx();
 		}
@@ -213,13 +221,14 @@ public class XmlPersistenceTest {
 		}
 	}
 
-//	/**
-//	 * 
-//	 */
-//	@Test
-//	public void testQueryFromTo() {
-//		Assert.fail("Not yet implemented");
-//	}
+	/**
+	 * 
+	 */
+	@Test
+	@Ignore
+	public void testQueryFromTo() {
+		Assert.fail("Not yet implemented");
+	}
 
 	/**
 	 * 
