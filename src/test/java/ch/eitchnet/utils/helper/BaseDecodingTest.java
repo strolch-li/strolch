@@ -23,8 +23,10 @@ package ch.eitchnet.utils.helper;
 
 import static ch.eitchnet.utils.helper.BaseDecoding.fromBase16;
 import static ch.eitchnet.utils.helper.BaseDecoding.fromBase32;
+import static ch.eitchnet.utils.helper.BaseDecoding.fromBase32Dmedia;
 import static ch.eitchnet.utils.helper.BaseDecoding.fromBase32Hex;
 import static ch.eitchnet.utils.helper.BaseDecoding.fromBase64;
+import static ch.eitchnet.utils.helper.BaseEncoding.toBase32Hex;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -102,6 +104,27 @@ public class BaseDecodingTest {
 		}
 		long end = System.nanoTime();
 		logger.info("Decoding 200MB Base32Hex took " + StringHelper.formatNanoDuration(end - start));
+	}
+
+	@Test
+	public void testBase32Dmedia() {
+
+		Assert.assertEquals("", new String(fromBase32Dmedia("".getBytes())));
+		Assert.assertEquals("binary foo", new String(fromBase32Dmedia("FCNPVRELI7J9FUUI".getBytes())));
+		Assert.assertEquals("f", new String(fromBase32Dmedia("FR======".getBytes())));
+		Assert.assertEquals("fo", new String(fromBase32Dmedia("FSQJ====".getBytes())));
+		Assert.assertEquals("foo", new String(fromBase32Dmedia("FSQPX===".getBytes())));
+		Assert.assertEquals("foob", new String(fromBase32Dmedia("FSQPXRJ=".getBytes())));
+		Assert.assertEquals("fooba", new String(fromBase32Dmedia("FSQPXRM4".getBytes())));
+		Assert.assertEquals("foobar", new String(fromBase32Dmedia("FSQPXRM4HB======".getBytes())));
+
+		long start = System.nanoTime();
+		byte[] bytes = new byte[1024 * 1024];
+		for (int i = 0; i < 200; i++) {
+			toBase32Hex(bytes);
+		}
+		long end = System.nanoTime();
+		logger.info("Encoding 200MB Base32Dmedia took " + StringHelper.formatNanoDuration(end - start));
 	}
 
 	@Test
