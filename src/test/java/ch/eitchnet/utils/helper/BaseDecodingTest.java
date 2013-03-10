@@ -21,11 +21,11 @@
  */
 package ch.eitchnet.utils.helper;
 
-import static ch.eitchnet.utils.helper.BaseDecoding.fromBase16;
-import static ch.eitchnet.utils.helper.BaseDecoding.fromBase32;
-import static ch.eitchnet.utils.helper.BaseDecoding.fromBase32Dmedia;
-import static ch.eitchnet.utils.helper.BaseDecoding.fromBase32Hex;
-import static ch.eitchnet.utils.helper.BaseDecoding.fromBase64;
+import static ch.eitchnet.utils.helper.BaseEncoding.fromBase16;
+import static ch.eitchnet.utils.helper.BaseEncoding.fromBase32;
+import static ch.eitchnet.utils.helper.BaseEncoding.fromBase32Dmedia;
+import static ch.eitchnet.utils.helper.BaseEncoding.fromBase32Hex;
+import static ch.eitchnet.utils.helper.BaseEncoding.fromBase64;
 import static ch.eitchnet.utils.helper.BaseEncoding.toBase32Hex;
 import junit.framework.Assert;
 
@@ -42,13 +42,13 @@ public class BaseDecodingTest {
 
 	@Test
 	public void testBase64() {
-		Assert.assertEquals("", new String(fromBase64("".getBytes())));
-		Assert.assertEquals("f", new String(fromBase64("Zg==".getBytes())));
-		Assert.assertEquals("fo", new String(fromBase64("Zm8=".getBytes())));
-		Assert.assertEquals("foo", new String(fromBase64("Zm9v".getBytes())));
-		Assert.assertEquals("foob", new String(fromBase64("Zm9vYg==".getBytes())));
-		Assert.assertEquals("fooba", new String(fromBase64("Zm9vYmE=".getBytes())));
-		Assert.assertEquals("foobar", new String(fromBase64("Zm9vYmFy".getBytes())));
+		Assert.assertEquals("", fromBase64(""));
+		Assert.assertEquals("f", fromBase64("Zg=="));
+		Assert.assertEquals("fo", fromBase64("Zm8="));
+		Assert.assertEquals("foo", fromBase64("Zm9v"));
+		Assert.assertEquals("foob", fromBase64("Zm9vYg=="));
+		Assert.assertEquals("fooba", fromBase64("Zm9vYmE="));
+		Assert.assertEquals("foobar", fromBase64("Zm9vYmFy"));
 
 		byte[] bytes = new byte[1024 * 1024];
 		for (int i = 0; i < bytes.length; i++) {
@@ -64,13 +64,13 @@ public class BaseDecodingTest {
 
 	@Test
 	public void testBase32() {
-		Assert.assertEquals("", new String(fromBase32("".getBytes())));
-		Assert.assertEquals("f", new String(fromBase32("MY======".getBytes())));
-		Assert.assertEquals("fo", new String(fromBase32("MZXQ====".getBytes())));
-		Assert.assertEquals("foo", new String(fromBase32("MZXW6===".getBytes())));
-		Assert.assertEquals("foob", new String(fromBase32("MZXW6YQ=".getBytes())));
-		Assert.assertEquals("fooba", new String(fromBase32("MZXW6YTB".getBytes())));
-		Assert.assertEquals("foobar", new String(fromBase32("MZXW6YTBOI======".getBytes())));
+		Assert.assertEquals("", fromBase32(""));
+		Assert.assertEquals("f", fromBase32("MY======"));
+		Assert.assertEquals("fo", fromBase32("MZXQ===="));
+		Assert.assertEquals("foo", fromBase32("MZXW6==="));
+		Assert.assertEquals("foob", fromBase32("MZXW6YQ="));
+		Assert.assertEquals("fooba", fromBase32("MZXW6YTB"));
+		Assert.assertEquals("foobar", fromBase32("MZXW6YTBOI======"));
 
 		byte[] bytes = new byte[1024 * 1024];
 		for (int i = 0; i < bytes.length; i++) {
@@ -86,13 +86,13 @@ public class BaseDecodingTest {
 
 	@Test
 	public void testBase32Hex() {
-		Assert.assertEquals("", new String(fromBase32Hex("".getBytes())));
-		Assert.assertEquals("f", new String(fromBase32Hex("CO======".getBytes())));
-		Assert.assertEquals("fo", new String(fromBase32Hex("CPNG====".getBytes())));
-		Assert.assertEquals("foo", new String(fromBase32Hex("CPNMU===".getBytes())));
-		Assert.assertEquals("foob", new String(fromBase32Hex("CPNMUOG=".getBytes())));
-		Assert.assertEquals("fooba", new String(fromBase32Hex("CPNMUOJ1".getBytes())));
-		Assert.assertEquals("foobar", new String(fromBase32Hex("CPNMUOJ1E8======".getBytes())));
+		Assert.assertEquals("", fromBase32Hex(""));
+		Assert.assertEquals("f", fromBase32Hex("CO======"));
+		Assert.assertEquals("fo", fromBase32Hex("CPNG===="));
+		Assert.assertEquals("foo", fromBase32Hex("CPNMU==="));
+		Assert.assertEquals("foob", fromBase32Hex("CPNMUOG="));
+		Assert.assertEquals("fooba", fromBase32Hex("CPNMUOJ1"));
+		Assert.assertEquals("foobar", fromBase32Hex("CPNMUOJ1E8======"));
 
 		byte[] bytes = new byte[1024 * 1024];
 		for (int i = 0; i < bytes.length; i++) {
@@ -109,14 +109,14 @@ public class BaseDecodingTest {
 	@Test
 	public void testBase32Dmedia() {
 
-		Assert.assertEquals("", new String(fromBase32Dmedia("".getBytes())));
-		Assert.assertEquals("binary foo", new String(fromBase32Dmedia("FCNPVRELI7J9FUUI".getBytes())));
-		Assert.assertEquals("f", new String(fromBase32Dmedia("FR======".getBytes())));
-		Assert.assertEquals("fo", new String(fromBase32Dmedia("FSQJ====".getBytes())));
-		Assert.assertEquals("foo", new String(fromBase32Dmedia("FSQPX===".getBytes())));
-		Assert.assertEquals("foob", new String(fromBase32Dmedia("FSQPXRJ=".getBytes())));
-		Assert.assertEquals("fooba", new String(fromBase32Dmedia("FSQPXRM4".getBytes())));
-		Assert.assertEquals("foobar", new String(fromBase32Dmedia("FSQPXRM4HB======".getBytes())));
+		Assert.assertEquals("", fromBase32Dmedia(""));
+		Assert.assertEquals("binary foo", fromBase32Dmedia("FCNPVRELI7J9FUUI"));
+		Assert.assertEquals("f", fromBase32Dmedia("FR======"));
+		Assert.assertEquals("fo", fromBase32Dmedia("FSQJ===="));
+		Assert.assertEquals("foo", fromBase32Dmedia("FSQPX==="));
+		Assert.assertEquals("foob", fromBase32Dmedia("FSQPXRJ="));
+		Assert.assertEquals("fooba", fromBase32Dmedia("FSQPXRM4"));
+		Assert.assertEquals("foobar", fromBase32Dmedia("FSQPXRM4HB======"));
 
 		long start = System.nanoTime();
 		byte[] bytes = new byte[1024 * 1024];
@@ -129,13 +129,13 @@ public class BaseDecodingTest {
 
 	@Test
 	public void testBase16() {
-		Assert.assertEquals("", new String(fromBase16("".getBytes())));
-		Assert.assertEquals("f", new String(fromBase16("66".getBytes())));
-		Assert.assertEquals("fo", new String(fromBase16("666F".getBytes())));
-		Assert.assertEquals("foo", new String(fromBase16("666F6F".getBytes())));
-		Assert.assertEquals("foob", new String(fromBase16("666F6F62".getBytes())));
-		Assert.assertEquals("fooba", new String(fromBase16("666F6F6261".getBytes())));
-		Assert.assertEquals("foobar", new String(fromBase16("666F6F626172".getBytes())));
+		Assert.assertEquals("", fromBase16(""));
+		Assert.assertEquals("f", fromBase16("66"));
+		Assert.assertEquals("fo", fromBase16("666F"));
+		Assert.assertEquals("foo", fromBase16("666F6F"));
+		Assert.assertEquals("foob", fromBase16("666F6F62"));
+		Assert.assertEquals("fooba", fromBase16("666F6F6261"));
+		Assert.assertEquals("foobar", fromBase16("666F6F626172"));
 
 		byte[] bytes = new byte[1024 * 1024];
 		for (int i = 0; i < bytes.length; i++) {

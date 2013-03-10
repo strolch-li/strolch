@@ -42,13 +42,13 @@ public class BaseEncodingTest {
 
 	@Test
 	public void testBase64() {
-		Assert.assertEquals("", new String(toBase64("".getBytes())));
-		Assert.assertEquals("Zg==", new String(toBase64("f".getBytes())));
-		Assert.assertEquals("Zm8=", new String(toBase64("fo".getBytes())));
-		Assert.assertEquals("Zm9v", new String(toBase64("foo".getBytes())));
-		Assert.assertEquals("Zm9vYg==", new String(toBase64("foob".getBytes())));
-		Assert.assertEquals("Zm9vYmE=", new String(toBase64("fooba".getBytes())));
-		Assert.assertEquals("Zm9vYmFy", new String(toBase64("foobar".getBytes())));
+		Assert.assertEquals("", toBase64(""));
+		Assert.assertEquals("Zg==", toBase64("f"));
+		Assert.assertEquals("Zm8=", toBase64("fo"));
+		Assert.assertEquals("Zm9v", toBase64("foo"));
+		Assert.assertEquals("Zm9vYg==", toBase64("foob"));
+		Assert.assertEquals("Zm9vYmE=", toBase64("fooba"));
+		Assert.assertEquals("Zm9vYmFy", toBase64("foobar"));
 
 		long start = System.nanoTime();
 		byte[] bytes = new byte[1024 * 1024];
@@ -61,13 +61,13 @@ public class BaseEncodingTest {
 
 	@Test
 	public void testBase32() {
-		Assert.assertEquals("", new String(toBase32("".getBytes())));
-		Assert.assertEquals("MY======", new String(toBase32("f".getBytes())));
-		Assert.assertEquals("MZXQ====", new String(toBase32("fo".getBytes())));
-		Assert.assertEquals("MZXW6===", new String(toBase32("foo".getBytes())));
-		Assert.assertEquals("MZXW6YQ=", new String(toBase32("foob".getBytes())));
-		Assert.assertEquals("MZXW6YTB", new String(toBase32("fooba".getBytes())));
-		Assert.assertEquals("MZXW6YTBOI======", new String(toBase32("foobar".getBytes())));
+		Assert.assertEquals("", toBase32(""));
+		Assert.assertEquals("MY======", toBase32("f"));
+		Assert.assertEquals("MZXQ====", toBase32("fo"));
+		Assert.assertEquals("MZXW6===", toBase32("foo"));
+		Assert.assertEquals("MZXW6YQ=", toBase32("foob"));
+		Assert.assertEquals("MZXW6YTB", toBase32("fooba"));
+		Assert.assertEquals("MZXW6YTBOI======", toBase32("foobar"));
 
 		long start = System.nanoTime();
 		byte[] bytes = new byte[1024 * 1024];
@@ -80,13 +80,13 @@ public class BaseEncodingTest {
 
 	@Test
 	public void testBase32Hex() {
-		Assert.assertEquals("", new String(toBase32Hex("".getBytes())));
-		Assert.assertEquals("CO======", new String(toBase32Hex("f".getBytes())));
-		Assert.assertEquals("CPNG====", new String(toBase32Hex("fo".getBytes())));
-		Assert.assertEquals("CPNMU===", new String(toBase32Hex("foo".getBytes())));
-		Assert.assertEquals("CPNMUOG=", new String(toBase32Hex("foob".getBytes())));
-		Assert.assertEquals("CPNMUOJ1", new String(toBase32Hex("fooba".getBytes())));
-		Assert.assertEquals("CPNMUOJ1E8======", new String(toBase32Hex("foobar".getBytes())));
+		Assert.assertEquals("", toBase32Hex(""));
+		Assert.assertEquals("CO======", toBase32Hex("f"));
+		Assert.assertEquals("CPNG====", toBase32Hex("fo"));
+		Assert.assertEquals("CPNMU===", toBase32Hex("foo"));
+		Assert.assertEquals("CPNMUOG=", toBase32Hex("foob"));
+		Assert.assertEquals("CPNMUOJ1", toBase32Hex("fooba"));
+		Assert.assertEquals("CPNMUOJ1E8======", toBase32Hex("foobar"));
 
 		long start = System.nanoTime();
 		byte[] bytes = new byte[1024 * 1024];
@@ -96,18 +96,18 @@ public class BaseEncodingTest {
 		long end = System.nanoTime();
 		logger.info("Encoding 200MB Base32Hex took " + StringHelper.formatNanoDuration(end - start));
 	}
-	
+
 	@Test
 	public void testBase32Dmedia() {
-		
-		Assert.assertEquals("", new String(toBase32Dmedia("".getBytes())));
-		Assert.assertEquals("FCNPVRELI7J9FUUI", new String(toBase32Dmedia("binary foo".getBytes())));
-		Assert.assertEquals("FR======", new String(toBase32Dmedia("f".getBytes())));
-		Assert.assertEquals("FSQJ====", new String(toBase32Dmedia("fo".getBytes())));
-		Assert.assertEquals("FSQPX===", new String(toBase32Dmedia("foo".getBytes())));
-		Assert.assertEquals("FSQPXRJ=", new String(toBase32Dmedia("foob".getBytes())));
-		Assert.assertEquals("FSQPXRM4", new String(toBase32Dmedia("fooba".getBytes())));
-		Assert.assertEquals("FSQPXRM4HB======", new String(toBase32Dmedia("foobar".getBytes())));
+
+		Assert.assertEquals("", toBase32Dmedia(""));
+		Assert.assertEquals("FCNPVRELI7J9FUUI", toBase32Dmedia("binary foo"));
+		Assert.assertEquals("FR======", toBase32Dmedia("f"));
+		Assert.assertEquals("FSQJ====", toBase32Dmedia("fo"));
+		Assert.assertEquals("FSQPX===", toBase32Dmedia("foo"));
+		Assert.assertEquals("FSQPXRJ=", toBase32Dmedia("foob"));
+		Assert.assertEquals("FSQPXRM4", toBase32Dmedia("fooba"));
+		Assert.assertEquals("FSQPXRM4HB======", toBase32Dmedia("foobar"));
 
 		long start = System.nanoTime();
 		byte[] bytes = new byte[1024 * 1024];
@@ -120,13 +120,13 @@ public class BaseEncodingTest {
 
 	@Test
 	public void testBase16() {
-		Assert.assertEquals("", new String(toBase16("".getBytes())));
-		Assert.assertEquals("66", new String(toBase16("f".getBytes())));
-		Assert.assertEquals("666F", new String(toBase16("fo".getBytes())));
-		Assert.assertEquals("666F6F", new String(toBase16("foo".getBytes())));
-		Assert.assertEquals("666F6F62", new String(toBase16("foob".getBytes())));
-		Assert.assertEquals("666F6F6261", new String(toBase16("fooba".getBytes())));
-		Assert.assertEquals("666F6F626172", new String(toBase16("foobar".getBytes())));
+		Assert.assertEquals("", toBase16(""));
+		Assert.assertEquals("66", toBase16("f"));
+		Assert.assertEquals("666F", toBase16("fo"));
+		Assert.assertEquals("666F6F", toBase16("foo"));
+		Assert.assertEquals("666F6F62", toBase16("foob"));
+		Assert.assertEquals("666F6F6261", toBase16("fooba"));
+		Assert.assertEquals("666F6F626172", toBase16("foobar"));
 
 		long start = System.nanoTime();
 		byte[] bytes = new byte[1024 * 1024];
