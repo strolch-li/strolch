@@ -39,8 +39,8 @@ public class StringHelper {
 	/**
 	 * Hex char table for fast calculating of hex value
 	 */
-	private static final byte[] HEX_CHAR_TABLE = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
-			'f' };
+	private static final byte[] HEX_CHAR_TABLE = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c',
+			'd', 'e', 'f' };
 
 	/**
 	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
@@ -94,7 +94,19 @@ public class StringHelper {
 	}
 
 	/**
-	 * Generates the MD5 Hash of a string Use {@link StringHelper#getHexString(byte[])} to convert the byte array to a
+	 * Generates the MD5 Hash of a string and converts it to a HEX string
+	 * 
+	 * @param string
+	 *            the string to hash
+	 * 
+	 * @return the hash or null, if an exception was thrown
+	 */
+	public static String hashMd5AsHex(String string) {
+		return getHexString(StringHelper.hashMd5(string.getBytes()));
+	}
+
+	/**
+	 * Generates the MD5 Hash of a string. Use {@link StringHelper#getHexString(byte[])} to convert the byte array to a
 	 * Hex String which is printable
 	 * 
 	 * @param string
@@ -117,6 +129,18 @@ public class StringHelper {
 	 */
 	public static byte[] hashMd5(byte[] bytes) {
 		return StringHelper.hash("MD5", bytes);
+	}
+
+	/**
+	 * Generates the SHA1 Hash of a string and converts it to a HEX String
+	 * 
+	 * @param string
+	 *            the string to hash
+	 * 
+	 * @return the hash or null, if an exception was thrown
+	 */
+	public static String hashSha1AsHex(String string) {
+		return getHexString(StringHelper.hashSha1(string.getBytes()));
 	}
 
 	/**
@@ -143,6 +167,18 @@ public class StringHelper {
 	 */
 	public static byte[] hashSha1(byte[] bytes) {
 		return StringHelper.hash("SHA-1", bytes);
+	}
+
+	/**
+	 * Generates the SHA-256 Hash of a string and converts it to a HEX String
+	 * 
+	 * @param string
+	 *            the string to hash
+	 * 
+	 * @return the hash or null, if an exception was thrown
+	 */
+	public static String hashSha256AsHex(String string) {
+		return getHexString(StringHelper.hashSha256(string.getBytes()));
 	}
 
 	/**
