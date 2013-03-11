@@ -46,13 +46,57 @@ import org.slf4j.LoggerFactory;
  */
 public class FileHelper {
 
+	private static final int MAX_FILE_SIZE = 50 * 1024 * 1024;
 	private static final Logger logger = LoggerFactory.getLogger(FileHelper.class);
+
+	/**
+	 * Reads the contents of a file into a byte array.
+	 * 
+	 * @param file
+	 *            the file to read
+	 * 
+	 * @return the contents of a file as a string
+	 */
+	public static final byte[] readFile(File file) {
+		if (file.length() > MAX_FILE_SIZE)
+			throw new RuntimeException(String.format("Only allowed to read files up to %s. File too large: %s",
+					humanizeFileSize(MAX_FILE_SIZE), humanizeFileSize(file.length())));
+
+		byte[] data = new byte[(int) file.length()];
+		int pos = 0;
+
+		BufferedInputStream in = null;
+		try {
+			in = new BufferedInputStream(new FileInputStream(file));
+			byte[] bytes = new byte[8192];
+			int read;
+			while ((read = in.read(bytes)) != -1) {
+				System.arraycopy(bytes, 0, data, pos, read);
+				pos += read;
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Filed does not exist " + file.getAbsolutePath());
+		} catch (IOException e) {
+			throw new RuntimeException("Could not read file " + file.getAbsolutePath());
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					FileHelper.logger.error("Failed to close InputStream: " + e.getLocalizedMessage());
+				}
+			}
+		}
+
+		return data;
+	}
 
 	/**
 	 * Reads the contents of a file into a string. Note, no encoding is checked. It is expected to be UTF-8
 	 * 
 	 * @param file
 	 *            the file to read
+	 * 
 	 * @return the contents of a file as a string
 	 */
 	public static final String readFileToString(File file) {
@@ -87,15 +131,50 @@ public class FileHelper {
 	}
 
 	/**
+	 * Writes the given byte array to the given file
+	 * 
+	 * @param bytes
+	 *            the data to write to the file
+	 * @param dstFile
+	 *            the path to which to write the data
+	 */
+	public static final void writeToFile(byte[] bytes, File dstFile) {
+
+		BufferedOutputStream out = null;
+		try {
+
+			out = new BufferedOutputStream(new FileOutputStream(dstFile));
+			out.write(bytes);
+
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath());
+		} catch (IOException e) {
+			throw new RuntimeException("Could not write to file " + dstFile.getAbsolutePath());
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					FileHelper.logger.error("Failed to close OutputStream: " + e.getLocalizedMessage());
+				}
+			}
+		}
+	}
+
+	/**
 	 * Writes the string to dstFile
 	 * 
+	 * @param string
+	 *            string to write to file
 	 * @param dstFile
 	 *            the file to write to
 	 */
 	public static final void writeStringToFile(String string, File dstFile) {
+
+		BufferedWriter bufferedwriter = null;
 		try {
 
-			BufferedWriter bufferedwriter = new BufferedWriter(new FileWriter(dstFile));
+			bufferedwriter = new BufferedWriter(new FileWriter(dstFile));
 			bufferedwriter.write(string);
 
 			bufferedwriter.close();
@@ -104,6 +183,14 @@ public class FileHelper {
 			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath());
 		} catch (IOException e) {
 			throw new RuntimeException("Could not write to file " + dstFile.getAbsolutePath());
+		} finally {
+			if (bufferedwriter != null) {
+				try {
+					bufferedwriter.close();
+				} catch (IOException e) {
+					FileHelper.logger.error("Failed to close BufferedWriter: " + e.getLocalizedMessage());
+				}
+			}
 		}
 	}
 
