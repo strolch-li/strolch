@@ -39,8 +39,8 @@ public class StringHelper {
 	/**
 	 * Hex char table for fast calculating of hex value
 	 */
-	private static final byte[] HEX_CHAR_TABLE = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c',
-			'd', 'e', 'f' };
+	private static final byte[] HEX_CHAR_TABLE = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C',
+			'D', 'E', 'F' };
 
 	/**
 	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
