@@ -126,8 +126,23 @@ public final class Session {
 	}
 
 	/**
-	 * @see java.lang.Object#hashCode()
+	 * Returns a string representation of this object displaying its concrete type and its values
+	 * 
+	 * @see java.lang.Object#toString()
 	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Session [sessionId=");
+		builder.append(this.sessionId);
+		builder.append(", username=");
+		builder.append(this.username);
+		builder.append(", loginTime=");
+		builder.append(this.loginTime);
+		builder.append("]");
+		return builder.toString();
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -140,16 +155,13 @@ public final class Session {
 		return result;
 	}
 
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Session))
+		if (getClass() != obj.getClass())
 			return false;
 		Session other = (Session) obj;
 		if (this.authPassword == null) {
@@ -176,21 +188,4 @@ public final class Session {
 			return false;
 		return true;
 	}
-
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Session [sessionId=");
-		builder.append(this.sessionId);
-		builder.append(", username=");
-		builder.append(this.username);
-		builder.append(", loginTime=");
-		builder.append(this.loginTime);
-		builder.append("]");
-		return builder.toString();
-	}
-
 }

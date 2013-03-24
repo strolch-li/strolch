@@ -29,13 +29,19 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 public class PrivilegeContainerModel {
 
-	String encryptionHandlerClassName;
-	Map<String, String> encryptionHandlerParameterMap;
-	String persistenceHandlerClassName;
-	Map<String, String> persistenceHandlerParameterMap;
-	Map<String, String> parameterMap;
+	private String encryptionHandlerClassName;
+	private Map<String, String> encryptionHandlerParameterMap;
+	private String persistenceHandlerClassName;
+	private Map<String, String> persistenceHandlerParameterMap;
+	private Map<String, String> parameterMap;
+	private Map<String, Class<PrivilegePolicy>> policies;
 
-	private Map<String, Class<PrivilegePolicy>> policies = new HashMap<String, Class<PrivilegePolicy>>();
+	/**
+	 * Default constructor
+	 */
+	public PrivilegeContainerModel() {
+		this.policies = new HashMap<String, Class<PrivilegePolicy>>();
+	}
 
 	/**
 	 * @return the parameterMap
@@ -146,6 +152,11 @@ public class PrivilegeContainerModel {
 		return this.policies;
 	}
 
+	/**
+	 * Returns a string representation of this object displaying its concrete type and its values
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

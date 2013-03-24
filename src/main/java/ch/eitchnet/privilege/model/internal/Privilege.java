@@ -166,6 +166,8 @@ public final class Privilege {
 	}
 
 	/**
+	 * Returns a string representation of this object displaying its concrete type and its values
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -179,9 +181,6 @@ public final class Privilege {
 		return builder.toString();
 	}
 
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -190,9 +189,6 @@ public final class Privilege {
 		return result;
 	}
 
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -209,5 +205,4 @@ public final class Privilege {
 			return false;
 		return true;
 	}
-
 }
