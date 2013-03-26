@@ -74,10 +74,43 @@ public class RoleRep implements Serializable {
 	}
 
 	/**
-	 * @param privilegeMap
-	 *            the privilegeMap to set
+	 * Returns a string representation of this object displaying its concrete type and its values
+	 * 
+	 * @see java.lang.Object#toString()
 	 */
-	public void setPrivileges(Map<String, PrivilegeRep> privilegeMap) {
-		this.privilegeMap = privilegeMap;
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("RoleRep [name=");
+		builder.append(this.name);
+		builder.append(", privilegeMap=");
+		builder.append((this.privilegeMap == null ? "null" : this.privilegeMap));
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RoleRep other = (RoleRep) obj;
+		if (this.name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!this.name.equals(other.name))
+			return false;
+		return true;
 	}
 }

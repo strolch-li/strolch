@@ -26,7 +26,6 @@ import java.util.Map;
  * for certificates and so forth
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface EncryptionHandler {
 

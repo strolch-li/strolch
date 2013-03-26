@@ -217,4 +217,55 @@ public class UserRep implements Serializable {
 	public Map<String, String> getProperties() {
 		return this.propertyMap;
 	}
+
+	/**
+	 * Returns a string representation of this object displaying its concrete type and its values
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("UserRep [userId=");
+		builder.append(this.userId);
+		builder.append(", username=");
+		builder.append(this.username);
+		builder.append(", firstname=");
+		builder.append(this.firstname);
+		builder.append(", surname=");
+		builder.append(this.surname);
+		builder.append(", userState=");
+		builder.append(this.userState);
+		builder.append(", locale=");
+		builder.append(this.locale);
+		builder.append(", roles=");
+		builder.append(this.roles);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.username == null) ? 0 : this.username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserRep other = (UserRep) obj;
+		if (this.username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!this.username.equals(other.username))
+			return false;
+		return true;
+	}
 }

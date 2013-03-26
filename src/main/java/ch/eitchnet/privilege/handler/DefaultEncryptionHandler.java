@@ -44,7 +44,6 @@ import ch.eitchnet.privilege.helper.XmlConstants;
  * </ul>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class DefaultEncryptionHandler implements EncryptionHandler {
 
@@ -63,9 +62,6 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	 */
 	private String hashAlgorithm;
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.EncryptionHandler#convertToHash(java.lang.String)
-	 */
 	@Override
 	public String convertToHash(String string) {
 		try {
@@ -79,9 +75,6 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		}
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.EncryptionHandler#convertToHash(java.lang.String)
-	 */
 	@Override
 	public String convertToHash(byte[] bytes) {
 		try {
@@ -95,21 +88,14 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		}
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.EncryptionHandler#nextToken()
-	 */
 	@Override
 	public String nextToken() {
 		byte[] bytes = new byte[16];
 		this.secureRandom.nextBytes(bytes);
 		String randomString = new String(bytes);
-		//String randomString = new BigInteger(80, secureRandom).toString(32); // 80 big integer bits = 16 chars
 		return randomString;
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.EncryptionHandler#initialize(java.util.Map)
-	 */
 	@Override
 	public void initialize(Map<String, String> parameterMap) {
 

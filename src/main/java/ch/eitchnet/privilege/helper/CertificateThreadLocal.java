@@ -22,8 +22,10 @@ package ch.eitchnet.privilege.helper;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * This {@link ThreadLocal} holds a reference to the {@link Certificate} which allows any code segment to perform
+ * further authorization before executing
  * 
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class CertificateThreadLocal extends ThreadLocal<Certificate> {
 
@@ -36,11 +38,11 @@ public class CertificateThreadLocal extends ThreadLocal<Certificate> {
 		return CertificateThreadLocal.instance;
 	}
 
-	public static Certificate getCert() {
+	public static Certificate getCertificate() {
 		return CertificateThreadLocal.instance.get();
 	}
 
-	public static void setCert(Certificate certificate) {
+	public static void setCertificate(Certificate certificate) {
 		CertificateThreadLocal.instance.set(certificate);
 	}
 }

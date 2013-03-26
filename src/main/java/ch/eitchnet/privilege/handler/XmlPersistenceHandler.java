@@ -58,9 +58,6 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	private String modelPath;
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#getAllUsers()
-	 */
 	@Override
 	public List<User> getAllUsers() {
 		synchronized (this.userMap) {
@@ -68,9 +65,6 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#getAllRoles()
-	 */
 	@Override
 	public List<Role> getAllRoles() {
 		synchronized (this.roleMap) {
@@ -78,25 +72,16 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#getUser(java.lang.String)
-	 */
 	@Override
 	public User getUser(String username) {
 		return this.userMap.get(username);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#getRole(java.lang.String)
-	 */
 	@Override
 	public Role getRole(String roleName) {
 		return this.roleMap.get(roleName);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#removeUser(java.lang.String)
-	 */
 	@Override
 	public User removeUser(String username) {
 		User user = this.userMap.remove(username);
@@ -104,9 +89,6 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		return user;
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#removeRole(java.lang.String)
-	 */
 	@Override
 	public Role removeRole(String roleName) {
 		Role role = this.roleMap.remove(roleName);
@@ -114,18 +96,12 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		return role;
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplaceUser(ch.eitchnet.privilege.model.internal.User)
-	 */
 	@Override
 	public void addOrReplaceUser(User user) {
 		this.userMap.put(user.getUsername(), user);
 		this.userMapDirty = true;
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#addOrReplaceRole(ch.eitchnet.privilege.model.internal.Role)
-	 */
 	@Override
 	public void addOrReplaceRole(Role role) {
 		this.roleMap.put(role.getName(), role);
@@ -133,7 +109,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#initialize(java.util.Map)
+	 * Initializes this {@link XmlPersistenceHandler} by reading the following parameters:
+	 * <ul>
+	 * <li>{@link XmlConstants#XML_PARAM_BASE_PATH}</li>
+	 * <li>{@link XmlConstants#XML_PARAM_MODEL_FILE}</li>
+	 * </ul>
 	 */
 	@Override
 	public void initialize(Map<String, String> paramsMap) {
@@ -164,7 +144,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#reload()
+	 * Reads the XML configuration files which contain the model. Which configuration files are parsed was defined in
+	 * the while calling {@link #initialize(Map)}
+	 * 
+	 * @see #initialize(Map)
 	 */
 	@Override
 	public boolean reload() {
@@ -223,7 +206,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PersistenceHandler#persist()
+	 * Writes the model to the XML files. Where the files are written to was defined in the {@link #initialize(Map)}
 	 */
 	@Override
 	public boolean persist() {

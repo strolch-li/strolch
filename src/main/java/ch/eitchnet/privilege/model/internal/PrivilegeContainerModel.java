@@ -25,8 +25,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
+/**
+ * This class is used during XML parsing to hold the model before it is properly validated and made accessible through
+ * the {@link PrivilegeHandler}
+ * 
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
 public class PrivilegeContainerModel {
 
 	private String encryptionHandlerClassName;

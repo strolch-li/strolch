@@ -40,7 +40,6 @@ import ch.eitchnet.privilege.model.UserState;
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public final class User {
 

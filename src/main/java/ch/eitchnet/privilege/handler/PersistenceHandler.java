@@ -41,7 +41,6 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface PersistenceHandler {
 

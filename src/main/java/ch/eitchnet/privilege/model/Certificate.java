@@ -146,8 +146,23 @@ public final class Certificate implements Serializable {
 	}
 
 	/**
-	 * @see java.lang.Object#hashCode()
+	 * Returns a string representation of this object displaying its concrete type and its values
+	 * 
+	 * @see java.lang.Object#toString()
 	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Certificate [sessionId=");
+		builder.append(this.sessionId);
+		builder.append(", username=");
+		builder.append(this.username);
+		builder.append(", locale=");
+		builder.append(this.locale);
+		builder.append("]");
+		return builder.toString();
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -160,9 +175,6 @@ public final class Certificate implements Serializable {
 		return result;
 	}
 
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -198,21 +210,5 @@ public final class Certificate implements Serializable {
 		} else if (!this.username.equals(other.username))
 			return false;
 		return true;
-	}
-
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Certificate [sessionId=");
-		builder.append(this.sessionId);
-		builder.append(", username=");
-		builder.append(this.username);
-		builder.append(", locale=");
-		builder.append(this.locale);
-		builder.append("]");
-		return builder.toString();
 	}
 }

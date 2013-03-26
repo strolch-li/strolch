@@ -26,11 +26,16 @@ import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 
 /**
+ * This is a simple implementation of {@link PrivilegePolicy} which uses the {@link Restrictable#getPrivilegeName()} to
+ * see if a given {@link Role} has the privilege required by the value from {@link Restrictable#getPrivilegeValue()}
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DefaultPrivilege implements PrivilegePolicy {
 
 	/**
+	 * The value of {@link Restrictable#getPrivilegeValue()} is used to check if the {@link Role} has this privilege
+	 * 
 	 * @see ch.eitchnet.privilege.policy.PrivilegePolicy#actionAllowed(ch.eitchnet.privilege.model.internal.Role,
 	 *      ch.eitchnet.privilege.model.internal.Privilege, ch.eitchnet.privilege.model.Restrictable)
 	 */

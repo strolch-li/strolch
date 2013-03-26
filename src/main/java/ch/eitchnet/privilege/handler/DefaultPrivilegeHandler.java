@@ -63,7 +63,6 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
  * </ul>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
@@ -117,9 +116,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 */
 	private boolean autoPersistOnPasswordChange;
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getRole(java.lang.String)
-	 */
 	@Override
 	public RoleRep getRole(String roleName) {
 		Role role = this.persistenceHandler.getRole(roleName);
@@ -128,9 +124,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return role.asRoleRep();
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getUser(java.lang.String)
-	 */
 	@Override
 	public UserRep getUser(String username) {
 		User user = this.persistenceHandler.getUser(username);
@@ -174,9 +167,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return policy;
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#queryUsers(ch.eitchnet.privilege.model.UserRep)
-	 */
 	@Override
 	public List<UserRep> queryUsers(UserRep selectorRep) {
 
@@ -268,22 +258,30 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * @param selPropertyMap
+	 * Checks if the given properties contains values which are contained in the selectionMap. If the selectionMap is
+	 * null or empty, then true is returned. If a key/value pair from the selectionMap is not in the properties, then
+	 * false is returned
+	 * 
+	 * @param selectionMap
+	 *            the map defining the expected properties
 	 * @param properties
-	 * @return
+	 *            the properties which must be a sub set of selectionMap to have this method return true
+	 * 
+	 * @return If the selectionMap is null or empty, then true is returned. If a key/value pair from the selectionMap is
+	 *         not in the properties, then false is returned
 	 */
-	private boolean isSelectedByProperty(Map<String, String> selPropertyMap, Map<String, String> properties) {
+	private boolean isSelectedByProperty(Map<String, String> selectionMap, Map<String, String> properties) {
 
-		if (selPropertyMap == null)
+		if (selectionMap == null)
 			return true;
 
-		if (selPropertyMap.isEmpty() && properties.isEmpty())
+		if (selectionMap.isEmpty() && properties.isEmpty())
 			return true;
 
-		for (String selKey : selPropertyMap.keySet()) {
+		for (String selKey : selectionMap.keySet()) {
 
 			String value = properties.get(selKey);
-			if (value == null || !value.equals(selPropertyMap.get(selKey)))
+			if (value == null || !value.equals(selectionMap.get(selKey)))
 				return false;
 		}
 
@@ -291,22 +289,25 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * @param selRoles
+	 * Checks if the given roles contains the given selectionRoles, if this is the case, or selectionRoles is null or
+	 * empty, then true is returned, otherwise false
+	 * 
+	 * @param selectionRoles
+	 *            the required roles
 	 * @param roles
-	 * @return
+	 *            the roles to check if they contain the selectionRoles
+	 * 
+	 * @return Checks if the given roles contains the given selectionRoles, if this is the case, or selectionRoles is
+	 *         null or empty, then true is returned, otherwise false
 	 */
-	private boolean isSelectedByRole(Set<String> selRoles, Set<String> roles) {
+	private boolean isSelectedByRole(Set<String> selectionRoles, Set<String> roles) {
 
-		if (selRoles == null)
+		if (selectionRoles == null)
 			return true;
 
-		return roles.containsAll(selRoles);
+		return roles.containsAll(selectionRoles);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplaceRole(ch.eitchnet.privilege.model.Certificate,
-	 *      ch.eitchnet.privilege.model.RoleRep)
-	 */
 	@Override
 	public void addOrReplaceRole(Certificate certificate, RoleRep roleRep) {
 
@@ -323,10 +324,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler.addOrReplaceRole(role);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplaceUser(ch.eitchnet.privilege.model.Certificate,
-	 *      ch.eitchnet.privilege.model.UserRep, java.lang.String)
-	 */
 	@Override
 	public void addOrReplaceUser(Certificate certificate, UserRep userRep, byte[] password) {
 		try {
@@ -357,10 +354,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplacePrivilegeOnRole(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, ch.eitchnet.privilege.model.PrivilegeRep)
-	 */
 	@Override
 	public void addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep) {
 
@@ -394,10 +387,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler.addOrReplaceRole(newRole);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addRoleToUser(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, java.lang.String)
-	 */
 	@Override
 	public void addRoleToUser(Certificate certificate, String username, String roleName) {
 
@@ -433,10 +422,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removePrivilegeFromRole(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, java.lang.String)
-	 */
 	@Override
 	public void removePrivilegeFromRole(Certificate certificate, String roleName, String privilegeName) {
 
@@ -467,10 +452,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler.addOrReplaceRole(newRole);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removeRole(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String)
-	 */
 	@Override
 	public RoleRep removeRole(Certificate certificate, String roleName) {
 
@@ -487,10 +468,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return removedRole.asRoleRep();
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removeRoleFromUser(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, java.lang.String)
-	 */
 	@Override
 	public void removeRoleFromUser(Certificate certificate, String username, String roleName) {
 
@@ -520,10 +497,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#removeUser(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String)
-	 */
 	@Override
 	public UserRep removeUser(Certificate certificate, String username) {
 
@@ -542,10 +515,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserLocale(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, java.util.Locale)
-	 */
 	@Override
 	public void setUserLocale(Certificate certificate, String username, Locale locale) {
 
@@ -566,10 +535,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserName(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
 	public void setUserName(Certificate certificate, String username, String firstname, String surname) {
 
@@ -590,10 +555,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserPassword(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, java.lang.String)
-	 */
 	@Override
 	public void setUserPassword(Certificate certificate, String username, byte[] password) {
 		try {
@@ -643,10 +604,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserState(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, ch.eitchnet.privilege.model.UserState)
-	 */
 	@Override
 	public void setUserState(Certificate certificate, String username, UserState state) {
 
@@ -743,9 +700,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return certificate;
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#invalidateSession(ch.eitchnet.privilege.model.Certificate)
-	 */
 	@Override
 	public boolean invalidateSession(Certificate certificate) {
 
@@ -852,7 +806,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * {@link PrivilegePolicy#actionAllowed(Role, Privilege, Restrictable)}
 	 * 
 	 * @param role
+	 *            the role which wants to perform the action
 	 * @param restrictable
+	 *            the {@link Restrictable} which is to be checked for authorization
 	 */
 	private boolean actionAllowed(Role role, Restrictable restrictable) {
 
@@ -892,9 +848,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return true;
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#isCertificateValid(ch.eitchnet.privilege.model.Certificate)
-	 */
 	@Override
 	public void isCertificateValid(Certificate certificate) {
 
@@ -931,9 +884,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// everything is ok
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#validateIsPrivilegeAdmin(ch.eitchnet.privilege.model.Certificate)
-	 */
 	@Override
 	public void validateIsPrivilegeAdmin(Certificate certificate) throws PrivilegeException {
 
@@ -972,9 +922,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#persist(ch.eitchnet.privilege.model.Certificate)
-	 */
 	@Override
 	public boolean persist(Certificate certificate) {
 
@@ -1062,10 +1009,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @author Robert von Burg <eitch@eitchnet.ch>
 	 */
 	protected class CertificateSessionPair {
+
 		/**
 		 * The {@link Session}
 		 */
 		public final Session session;
+
 		/**
 		 * The {@link Certificate}
 		 */
@@ -1086,7 +1035,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
+	 * Passwords should not be kept as strings, as string are immutable, this method thus clears the byte array so that
+	 * the password is not in memory anymore
+	 * 
 	 * @param password
+	 *            the byte array containing the passwort which is to be set to zeroes
 	 */
 	private void clearPassword(byte[] password) {
 		if (password != null) {
@@ -1096,10 +1049,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#runAsSystem(java.lang.String,
-	 *      ch.eitchnet.privilege.handler.SystemUserAction)
-	 */
 	@Override
 	public void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException {
 
