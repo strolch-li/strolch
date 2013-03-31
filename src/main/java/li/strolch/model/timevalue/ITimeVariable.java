@@ -1,12 +1,13 @@
 package li.strolch.model.timevalue;
 
 import java.util.Collection;
+import java.util.SortedSet;
 
 /**
  * A timed variable storing a ordered sequence of {@link ITimeValue} objects
  * modeling a time evolution of a quantity.
  * 
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  * 
  * @param <T>
  *            the backing value of the timed value object
@@ -59,6 +60,13 @@ public interface ITimeVariable<T extends IValue> {
 	 */
 	Collection<ITimeValue<T>> getPastValues(final Long time);
 
+	/**
+	 * Get all {@link ITimeValue} objects
+	 * 
+	 * @return a defensive copy of the {@link ITimeValue}s
+	 */
+	SortedSet<ITimeValue<T>> getValues();
+	
 	/**
 	 * removes {@link ITimeValue} objects from the sequence, where the successor
 	 * matches value. I.e considering a pair of adjacent {@link ITimeValue}

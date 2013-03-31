@@ -1,14 +1,18 @@
 package li.strolch.model.timevalue.impl;
 
+import java.io.Serializable;
+
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 
 /**
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("rawtypes")
-public class ValueChange<T extends IValue> implements IValueChange<T> {
+public class ValueChange<T extends IValue> implements IValueChange<T>, Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	protected final Long time;
 	protected final T value;
 

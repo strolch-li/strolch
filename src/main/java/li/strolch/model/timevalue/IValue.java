@@ -4,7 +4,7 @@ package li.strolch.model.timevalue;
  * A value object defining some basic algebraic operations. Mathematically
  * speaking {@link IValue} objects define a group with a addition operation.
  * 
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  * 
  * @param <T>
  *            any object for which a (generalized) add operation can be defined.

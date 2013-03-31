@@ -1,13 +1,17 @@
 package li.strolch.model.timevalue.impl;
 
+import java.io.Serializable;
+
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 
 /**
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("rawtypes")
-public class TimeValue<T extends IValue> implements ITimeValue <T> {
+public class TimeValue<T extends IValue> implements ITimeValue <T>, Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	protected final Long time; 
 	protected T value; 

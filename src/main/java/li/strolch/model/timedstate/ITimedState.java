@@ -8,7 +8,7 @@ import li.strolch.model.timevalue.IValueChange;
 /**
  * A time based state characterized by a {@link IValue} object implementation.
  * 
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  * 
  * @param <T>
  *            IValue implementation representing the state at a given time

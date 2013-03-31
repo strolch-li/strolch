@@ -1,5 +1,6 @@
 package li.strolch.model.timevalue.impl;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -8,15 +9,16 @@ import java.util.Set;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 
-
 /**
  * {@link IValue} implementation to work with String valued {@link ITimeValue}
  * objects. Since a java.util.String object does not define a inverse, a
  * algebraic {@link AString} wrapper is used.
  * 
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
-public class StringSetValue implements IValue<Set<AString>> {
+public class StringSetValue implements IValue<Set<AString>>, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private static Set<AString> neu = Collections.emptySet();
 	public static final IValue<Set<AString>> NEUTRAL = new StringSetValue(neu);
