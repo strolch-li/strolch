@@ -22,10 +22,13 @@ package ch.eitchnet.privilege.model.internal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
+import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.PrivilegeRep;
 import ch.eitchnet.privilege.model.RoleRep;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * <p>
@@ -43,7 +46,7 @@ import ch.eitchnet.privilege.model.RoleRep;
 public final class Role {
 
 	private final String name;
-	private final Map<String, Privilege> privilegeMap;
+	private final Map<String, IPrivilege> privilegeMap;
 
 	/**
 	 * Default constructor
@@ -51,11 +54,11 @@ public final class Role {
 	 * @param name
 	 *            the name of the role
 	 * @param privilegeMap
-	 *            a map of {@link Privilege}s granted to this role
+	 *            a map of {@link IPrivilege}s granted to this role
 	 */
-	public Role(String name, Map<String, Privilege> privilegeMap) {
+	public Role(String name, Map<String, IPrivilege> privilegeMap) {
 
-		if (name == null || name.isEmpty()) {
+		if (StringHelper.isEmpty(name)) {
 			throw new PrivilegeException("No name defined!");
 		}
 		if (privilegeMap == null) {
@@ -75,7 +78,7 @@ public final class Role {
 	public Role(RoleRep roleRep) {
 
 		String name = roleRep.getName();
-		if (name == null || name.isEmpty()) {
+		if (StringHelper.isEmpty(name)) {
 			throw new PrivilegeException("No name defined!");
 		}
 
@@ -84,9 +87,9 @@ public final class Role {
 		}
 
 		// build privileges from reps
-		Map<String, Privilege> privilegeMap = new HashMap<String, Privilege>(roleRep.getPrivilegeMap().size());
+		Map<String, IPrivilege> privilegeMap = new HashMap<String, IPrivilege>(roleRep.getPrivilegeMap().size());
 		for (String privilegeName : roleRep.getPrivilegeMap().keySet()) {
-			privilegeMap.put(privilegeName, new Privilege(roleRep.getPrivilegeMap().get(privilegeName)));
+			privilegeMap.put(privilegeName, new PrivilegeImpl(roleRep.getPrivilegeMap().get(privilegeName)));
 		}
 
 		this.name = name;
@@ -101,21 +104,30 @@ public final class Role {
 	}
 
 	/**
-	 * Returns the {@link Map} of {@link Privilege}s which are granted to this {@link Role}
+	 * Returns the {@link Set} of names for the currently stored {@link IPrivilege Privileges}
 	 * 
-	 * @return the {@link Map} of {@link Privilege}s which are granted to this {@link Role}
+	 * @return the {@link Set} of names for the currently stored {@link IPrivilege Privileges}
 	 */
-	public Map<String, Privilege> getPrivilegeMap() {
-		return this.privilegeMap;
+	public Set<String> getPrivilegeNames() {
+		return this.privilegeMap.keySet();
 	}
 
 	/**
-	 * Determines if this {@link Role} has the {@link Privilege} with the given name
+	 * Returns the {@link IPrivilege} for the given name, null if it does not exist
+	 * 
+	 * @return the {@link IPrivilege} for the given name, null if it does not exist
+	 */
+	public IPrivilege getPrivilege(String name) {
+		return this.privilegeMap.get(name);
+	}
+
+	/**
+	 * Determines if this {@link Role} has the {@link IPrivilege} with the given name
 	 * 
 	 * @param name
-	 *            the name of the {@link Privilege}
+	 *            the name of the {@link IPrivilege}
 	 * 
-	 * @return true if this {@link Role} has the {@link Privilege} with the given name
+	 * @return true if this {@link Role} has the {@link IPrivilege} with the given name
 	 */
 	public boolean hasPrivilege(String name) {
 		return this.privilegeMap.containsKey(name);

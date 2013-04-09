@@ -24,14 +24,14 @@ import java.util.Set;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
-import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
- * To keep certain details of the {@link Privilege} itself hidden from remote clients and make sure instances are only
+ * To keep certain details of the {@link IPrivilege} itself hidden from remote clients and make sure instances are only
  * edited by users with the correct privilege, this representational version is allowed to be viewed by remote clients
- * and simply wraps all public data from the {@link Privilege}
+ * and simply wraps all public data from the {@link IPrivilege}
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -53,12 +53,12 @@ public class PrivilegeRep implements Serializable {
 	 * @param policy
 	 *            the {@link PrivilegePolicy} configured to evaluate if the privilege is granted
 	 * @param allAllowed
-	 *            a boolean defining if a {@link Role} with this {@link Privilege} has unrestricted access to a
+	 *            a boolean defining if a {@link Role} with this {@link IPrivilege} has unrestricted access to a
 	 *            {@link Restrictable}
 	 * @param denyList
-	 *            a list of deny rules for this {@link Privilege}
+	 *            a list of deny rules for this {@link IPrivilege}
 	 * @param allowList
-	 *            a list of allow rules for this {@link Privilege}
+	 *            a list of allow rules for this {@link IPrivilege}
 	 */
 	public PrivilegeRep(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
 		this.name = name;
@@ -66,6 +66,29 @@ public class PrivilegeRep implements Serializable {
 		this.allAllowed = allAllowed;
 		this.denyList = denyList;
 		this.allowList = allowList;
+
+		validate();
+	}
+
+	/**
+	 * Validates that all required fields are set
+	 */
+	public void validate() {
+
+		if (StringHelper.isEmpty(this.name)) {
+			throw new PrivilegeException("No name defined!");
+		}
+
+		if (StringHelper.isEmpty(this.policy)) {
+			throw new PrivilegeException("policy is null!");
+		}
+
+		if (this.denyList == null) {
+			throw new PrivilegeException("denyList is null");
+		}
+		if (this.allowList == null) {
+			throw new PrivilegeException("allowList is null");
+		}
 	}
 
 	/**
@@ -141,48 +164,6 @@ public class PrivilegeRep implements Serializable {
 	 */
 	public void setAllowList(Set<String> allowList) {
 		this.allowList = allowList;
-	}
-
-	/**
-	 * <p>
-	 * Validates this {@link PrivilegeRep} so that a {@link Privilege} object can later be created from it
-	 * </p>
-	 * 
-	 * TODO write comment on how validation is done
-	 */
-	public void validate() {
-
-		if (this.name == null || this.name.isEmpty()) {
-			throw new PrivilegeException("No name defined!");
-		}
-
-		// if not all allowed, then validate that deny and allow lists are defined
-		if (this.allAllowed) {
-
-			// all allowed means no policy will be used
-			if (this.policy != null && !this.policy.isEmpty()) {
-				throw new PrivilegeException("All is allowed, so Policy may not be set!");
-			}
-
-			if (this.denyList != null && !this.denyList.isEmpty())
-				throw new PrivilegeException("All is allowed, so deny list must be null");
-			if (this.allowList != null && !this.allowList.isEmpty())
-				throw new PrivilegeException("All is allowed, so allow list must be null");
-
-		} else {
-
-			// not all allowed, so policy must be set
-			if (this.policy == null || this.policy.isEmpty()) {
-				throw new PrivilegeException("All is not allowed, so Policy must be defined!");
-			}
-
-			if (this.denyList == null) {
-				throw new PrivilegeException("All is not allowed, so deny list must be set, even if empty");
-			}
-			if (this.allowList == null) {
-				throw new PrivilegeException("All is not allowed, so allow list must be set, even if empty");
-			}
-		}
 	}
 
 	/**

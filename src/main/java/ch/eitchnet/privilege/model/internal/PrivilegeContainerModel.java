@@ -32,6 +32,10 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
  * This class is used during XML parsing to hold the model before it is properly validated and made accessible through
  * the {@link PrivilegeHandler}
  * 
+ * <p>
+ * Note: This is an internal object which is not to be serialized or passed to clients
+ * </p>
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PrivilegeContainerModel {

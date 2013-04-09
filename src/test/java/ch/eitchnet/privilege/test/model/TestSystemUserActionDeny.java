@@ -19,9 +19,8 @@
  */
 package ch.eitchnet.privilege.test.model;
 
-import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.handler.SystemUserAction;
-import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -29,22 +28,9 @@ import ch.eitchnet.privilege.model.Certificate;
  */
 public class TestSystemUserActionDeny implements SystemUserAction {
 
-	private PrivilegeHandler handler;
-
-	/**
-	 * 
-	 */
-	public TestSystemUserActionDeny(PrivilegeHandler handler) {
-		this.handler = handler;
-	}
-
-	/**
-	 * @see ch.eitchnet.privilege.handler.SystemUserAction#execute(ch.eitchnet.privilege.model.Certificate)
-	 */
 	@Override
-	public void execute(Certificate certificate) {
-
+	public void execute(PrivilegeContext privilegeContext) {
 		TestRestrictable restrictable = new TestRestrictable();
-		this.handler.actionAllowed(certificate, restrictable);
+		privilegeContext.validateAction(restrictable);
 	}
 }

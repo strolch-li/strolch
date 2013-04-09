@@ -39,7 +39,7 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 
 		<PersistenceHandler class="ch.eitchnet.privilege.handler.XmlPersistenceHandler">
 			<Parameters>
-				<Parameter name="basePath" value="./target/test" />
+				<Parameter name="basePath" value="./target/testPrivilege" />
 				<Parameter name="modelXmlFile" value="PrivilegeModel.xml" />
 			</Parameters>
 		</PersistenceHandler>

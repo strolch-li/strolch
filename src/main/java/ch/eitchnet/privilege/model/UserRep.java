@@ -24,8 +24,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * To keep certain details of the {@link User} itself hidden from remote clients and make sure instances are only edited
@@ -77,6 +79,32 @@ public class UserRep implements Serializable {
 		this.roles = roles;
 		this.locale = locale;
 		this.propertyMap = propertyMap;
+
+		validate();
+	}
+
+	/**
+	 * Validates that all required fields are set
+	 */
+	public void validate() {
+
+		if (StringHelper.isEmpty(this.userId))
+			throw new PrivilegeException("userId is null or empty");
+
+		if (StringHelper.isEmpty(this.username))
+			throw new PrivilegeException("username is null or empty");
+
+		if (StringHelper.isEmpty(this.firstname))
+			throw new PrivilegeException("firstname is null or empty");
+
+		if (StringHelper.isEmpty(this.surname))
+			throw new PrivilegeException("surname is null or empty");
+
+		if (this.userState == null)
+			throw new PrivilegeException("userState is null");
+
+		if (this.roles == null)
+			throw new PrivilegeException("roles is null");
 	}
 
 	/**

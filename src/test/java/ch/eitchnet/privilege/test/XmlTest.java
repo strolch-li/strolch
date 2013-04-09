@@ -23,6 +23,7 @@ package ch.eitchnet.privilege.test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,9 +41,10 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.handler.DefaultEncryptionHandler;
 import ch.eitchnet.privilege.handler.XmlPersistenceHandler;
+import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.UserState;
-import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
+import ch.eitchnet.privilege.model.internal.PrivilegeImpl;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.privilege.xml.PrivilegeConfigDomWriter;
@@ -71,6 +73,7 @@ public class XmlTest {
 	 */
 	@BeforeClass
 	public static void init() throws Exception {
+		destroy();
 
 		File tmpDir = new File("target/test");
 		if (tmpDir.exists())
@@ -179,7 +182,7 @@ public class XmlTest {
 
 		Map<String, String> propertyMap;
 		Set<String> userRoles;
-		Map<String, Privilege> privilegeMap;
+		Map<String, IPrivilege> privilegeMap;
 
 		List<User> users = new ArrayList<User>();
 		propertyMap = new HashMap<String, String>();
@@ -197,16 +200,17 @@ public class XmlTest {
 				propertyMap));
 
 		List<Role> roles = new ArrayList<Role>();
-		privilegeMap = new HashMap<String, Privilege>();
-		privilegeMap.put("priv1", new Privilege("priv1", "DefaultPrivilege", true, null, null));
+		Set<String> list = Collections.emptySet();
+		privilegeMap = new HashMap<String, IPrivilege>();
+		privilegeMap.put("priv1", new PrivilegeImpl("priv1", "DefaultPrivilege", true, list, list));
 		roles.add(new Role("role1", privilegeMap));
 
-		privilegeMap = new HashMap<String, Privilege>();
+		privilegeMap = new HashMap<String, IPrivilege>();
 		Set<String> denyList = new HashSet<String>();
 		denyList.add("myself");
 		Set<String> allowList = new HashSet<String>();
 		allowList.add("other");
-		privilegeMap.put("priv2", new Privilege("priv2", "DefaultPrivilege", false, denyList, allowList));
+		privilegeMap.put("priv2", new PrivilegeImpl("priv2", "DefaultPrivilege", false, denyList, allowList));
 		roles.add(new Role("role2", privilegeMap));
 
 		File modelFile = new File("./target/test/PrivilegeModelTest.xml");
@@ -214,6 +218,6 @@ public class XmlTest {
 		configSaxWriter.write();
 
 		String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(modelFile));
-		Assert.assertEquals("8E1E82278162F21B1654C2E059570BBCB3CB63B053C1DD784BC8E225E8CFD04F", fileHash);
+		Assert.assertEquals("9007F172BBD7BA51BA3E67199CE0AFCBC8645AF0AC02028ABE54BA6A2FC134B0", fileHash);
 	}
 }

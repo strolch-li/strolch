@@ -20,6 +20,7 @@
 package ch.eitchnet.privilege.handler;
 
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
 
 /**
  * With this interface system actions, which are to be performed in an automated fashion, i.e. by cron jobs, can be
@@ -34,8 +35,11 @@ public interface SystemUserAction {
 	 * This method will be called by the {@link PrivilegeHandler} when an authorized {@link Certificate} has been
 	 * generated to allow this action to properly validate its execution
 	 * 
-	 * @param certificate
-	 *            the {@link Certificate} which was generated for a valid system user
+	 * TODO: I'm not really happy with this... we might want to pass the certificate and then force the action to
+	 * validate it to get the {@link PrivilegeContext} - we don't want the {@link PrivilegeContext} to live forever...
+	 * 
+	 * @param privilegeContext
+	 *            the {@link PrivilegeContext} which was generated for a valid system user
 	 */
-	public void execute(Certificate certificate);
+	public void execute(PrivilegeContext privilegeContext);
 }

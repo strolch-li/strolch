@@ -19,6 +19,7 @@
  */
 package ch.eitchnet.privilege.handler;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,14 +36,14 @@ import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.helper.ClassHelper;
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.IPrivilege;
+import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.PrivilegeRep;
-import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.RoleRep;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
-import ch.eitchnet.privilege.model.internal.Privilege;
+import ch.eitchnet.privilege.model.internal.PrivilegeImpl;
 import ch.eitchnet.privilege.model.internal.Role;
-import ch.eitchnet.privilege.model.internal.Session;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
@@ -72,7 +73,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private static final String PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE = "autoPersistOnPasswordChange";
 
 	/**
-	 * log4j logger
+	 * slf4j logger
 	 */
 	protected static final Logger logger = LoggerFactory.getLogger(DefaultPrivilegeHandler.class);
 
@@ -82,14 +83,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private long lastSessionId;
 
 	/**
-	 * This map stores certificates for system users as a cache
+	 * Map keeping a reference to all active sessions
 	 */
-	private Map<String, Certificate> systemUserCertificateMap;
-
-	/**
-	 * Map keeping a reference to all active sessions with their certificates
-	 */
-	private Map<String, CertificateSessionPair> sessionMap;
+	private Map<String, PrivilegeContext> privilegeContextMap;
 
 	/**
 	 * Map of {@link PrivilegePolicy} classes
@@ -130,41 +126,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (user == null)
 			return null;
 		return user.asUserRep();
-	}
-
-	/**
-	 * <p>
-	 * This method instantiates a {@link PrivilegePolicy} object from the given policyName. The {@link PrivilegePolicy}
-	 * is not stored in a database. The privilege name is a class name and is then used to instantiate a new
-	 * {@link PrivilegePolicy} object
-	 * </p>
-	 * 
-	 * @param policyName
-	 *            the class name of the {@link PrivilegePolicy} object to return
-	 * 
-	 * @return the {@link PrivilegePolicy} object
-	 * 
-	 * @throws PrivilegeException
-	 *             if the {@link PrivilegePolicy} object for the given policy name could not be instantiated
-	 */
-	private PrivilegePolicy getPolicy(String policyName) {
-
-		// get the policies class
-		Class<PrivilegePolicy> policyClazz = this.policyMap.get(policyName);
-		if (policyClazz == null) {
-			return null;
-		}
-
-		// instantiate the policy
-		PrivilegePolicy policy;
-		try {
-			policy = ClassHelper.instantiateClass(policyClazz);
-		} catch (Exception e) {
-			throw new PrivilegeException("The class for the policy with the name " + policyName + " does not exist!"
-					+ policyName, e);
-		}
-
-		return policy;
 	}
 
 	@Override
@@ -377,8 +338,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new role with the additional privilege
-		Privilege newPrivilege = new Privilege(privilegeRep);
-		Map<String, Privilege> privilegeMap = new HashMap<String, Privilege>(role.getPrivilegeMap());
+		IPrivilege newPrivilege = new PrivilegeImpl(privilegeRep);
+		// copy existing privileges
+		Set<String> existingPrivilegeNames = role.getPrivilegeNames();
+		Map<String, IPrivilege> privilegeMap = new HashMap<String, IPrivilege>(existingPrivilegeNames.size() + 1);
+		for (String name : existingPrivilegeNames) {
+			IPrivilege privilege = role.getPrivilege(name);
+			privilegeMap.put(name, privilege);
+		}
+		// add new one
 		privilegeMap.put(newPrivilege.getName(), newPrivilege);
 
 		Role newRole = new Role(role.getName(), privilegeMap);
@@ -438,9 +406,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (!role.hasPrivilege(privilegeName))
 			throw new PrivilegeException("Role " + roleName + " does not have Privilege " + privilegeName);
 
-		// create new set of privileges with out the to remove privilege
-		Map<String, Privilege> newPrivileges = new HashMap<String, Privilege>(role.getPrivilegeMap().size() - 1);
-		for (Privilege privilege : role.getPrivilegeMap().values()) {
+		// create new set of privileges with out the to removed privilege
+		Set<String> privilegeNames = role.getPrivilegeNames();
+		Map<String, IPrivilege> newPrivileges = new HashMap<String, IPrivilege>(privilegeNames.size() - 1);
+		for (String name : privilegeNames) {
+			IPrivilege privilege = role.getPrivilege(name);
 			if (!privilege.getName().equals(privilegeName))
 				newPrivileges.put(privilege.getName(), privilege);
 		}
@@ -666,7 +636,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 						+ " and can not login!");
 
 			// validate user has at least one role
-			if (user.getRoles().isEmpty()) {
+			Set<String> userRoles = user.getRoles();
+			if (userRoles.isEmpty()) {
 				throw new PrivilegeException("User " + username + " does not have any roles defined!");
 			}
 
@@ -678,15 +649,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String sessionId = nextSessionId();
 
 			// create a new certificate, with details of the user
-			certificate = new Certificate(sessionId, username, authToken, authPassword, user.getLocale(),
-					new HashMap<String, String>(user.getProperties()));
+			certificate = new Certificate(sessionId, System.currentTimeMillis(), username, authToken, authPassword,
+					user.getLocale(), new HashMap<String, String>(user.getProperties()));
 
-			// create and save a new session
-			Session session = new Session(sessionId, username, authToken, authPassword, System.currentTimeMillis());
-			this.sessionMap.put(sessionId, new CertificateSessionPair(session, certificate));
+			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
+			this.privilegeContextMap.put(sessionId, privilegeContext);
 
 			// log
-			DefaultPrivilegeHandler.logger.info("User " + username + " authenticated: " + session);
+			DefaultPrivilegeHandler.logger.info("User " + username + " authenticated: " + certificate);
 
 		} catch (RuntimeException e) {
 			DefaultPrivilegeHandler.logger.error("User " + username + " Failed to authenticate: "
@@ -700,6 +670,56 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return certificate;
 	}
 
+	/**
+	 * Builds a {@link PrivilegeContext} for the given {@link User} and its {@link Certificate}
+	 * 
+	 * @param certificate
+	 * @param user
+	 * 
+	 * @return
+	 */
+	private PrivilegeContext buildPrivilegeContext(Certificate certificate, User user) {
+
+		Set<String> userRoles = user.getRoles();
+		Map<String, IPrivilege> privileges = new HashMap<String, IPrivilege>();
+		Map<String, PrivilegePolicy> policies = new HashMap<String, PrivilegePolicy>();
+
+		// get a cache of the privileges and policies for this user
+		for (String roleName : userRoles) {
+			Role role = this.persistenceHandler.getRole(roleName);
+			Set<String> privilegeNames = role.getPrivilegeNames();
+			for (String privilegeName : privilegeNames) {
+
+				// cache the privilege
+				if (privileges.containsKey(privilegeName))
+					continue;
+
+				IPrivilege privilege = role.getPrivilege(privilegeName);
+				if (privilege == null) {
+					throw new PrivilegeException(MessageFormat.format("The Privilege {0} does not exist for role {1}",
+							privilegeName, roleName));
+				}
+				privileges.put(privilegeName, privilege);
+
+				// cache the policy for the privilege
+				String policyName = privilege.getPolicy();
+				if (policies.containsKey(policyName))
+					continue;
+
+				PrivilegePolicy policy = getPolicy(policyName);
+				if (policy == null) {
+					throw new PrivilegeException(MessageFormat.format(
+							"The Policy {0} does not exist for Privilege {1}", policyName, privilegeName));
+				}
+				policies.put(policyName, policy);
+			}
+		}
+
+		UserRep userRep = user.asUserRep();
+		PrivilegeContext privilegeContext = new PrivilegeContext(userRep, certificate, privileges, policies);
+		return privilegeContext;
+	}
+
 	@Override
 	public boolean invalidateSession(Certificate certificate) {
 
@@ -707,145 +727,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		isCertificateValid(certificate);
 
 		// remove registration
-		CertificateSessionPair certificateSessionPair = this.sessionMap.remove(certificate.getSessionId());
+		PrivilegeContext privilegeContext = this.privilegeContextMap.remove(certificate.getSessionId());
 
 		// return true if object was really removed
-		boolean loggedOut = certificateSessionPair != null;
+		boolean loggedOut = privilegeContext != null;
 		if (loggedOut)
 			DefaultPrivilegeHandler.logger.info("User " + certificate.getUsername() + " logged out.");
 		else
 			DefaultPrivilegeHandler.logger.warn("User already logged out!");
 		return loggedOut;
-	}
-
-	/**
-	 * Checks if the action is allowed by iterating the roles of the certificates user and then delegating to
-	 * {@link #actionAllowed(Role, Restrictable)}
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the {@link Certificate} is not for a currently logged in {@link User} or if the user may not
-	 *             perform the action defined by the {@link Restrictable} implementation
-	 * 
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#actionAllowed(ch.eitchnet.privilege.model.Certificate,
-	 *      ch.eitchnet.privilege.model.Restrictable)
-	 */
-	@Override
-	public void actionAllowed(Certificate certificate, Restrictable restrictable) {
-
-		// TODO What is better, validate from {@link Restrictable} to {@link User} or the opposite direction?
-
-		// first validate certificate
-		isCertificateValid(certificate);
-
-		// restrictable must not be null
-		if (restrictable == null)
-			throw new PrivilegeException("Restrictable may not be null!");
-
-		// get user object
-		User user = this.persistenceHandler.getUser(certificate.getUsername());
-		if (user == null) {
-			throw new PrivilegeException(
-					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
-		}
-
-		String privilegeName = restrictable.getPrivilegeName();
-
-		// now iterate roles and validate on policies
-		for (String roleName : user.getRoles()) {
-
-			Role role = this.persistenceHandler.getRole(roleName);
-			if (role == null) {
-				DefaultPrivilegeHandler.logger.error("No role is defined with name " + roleName
-						+ " which is configured for user " + user);
-				continue;
-			}
-
-			// ignore if this role does not have the privilege
-			if (!role.hasPrivilege(privilegeName))
-				continue;
-
-			// if action is allowed, then break iteration as a privilege match has been made
-			if (actionAllowed(role, restrictable))
-				return;
-		}
-
-		throw new AccessDeniedException("User " + user.getUsername() + " does not have Privilege " + privilegeName
-				+ " needed for Restrictable " + restrictable.getClass().getName());
-	}
-
-	/**
-	 * Checks if the {@link RoleRep} has access to the {@link Restrictable} by delegating to
-	 * {@link PrivilegePolicy#actionAllowed(Role, Privilege, Restrictable)}
-	 * 
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#actionAllowed(ch.eitchnet.privilege.model.RoleRep,
-	 *      ch.eitchnet.privilege.model.Restrictable)
-	 */
-	@Override
-	public void actionAllowed(RoleRep roleRep, Restrictable restrictable) {
-
-		// user and restrictable must not be null
-		if (roleRep == null)
-			throw new PrivilegeException("Role may not be null!");
-		else if (restrictable == null)
-			throw new PrivilegeException("Restrictable may not be null!");
-
-		// get role for the roleRep
-		Role role = this.persistenceHandler.getRole(roleRep.getName());
-
-		// validate that the role exists
-		if (role == null) {
-			throw new PrivilegeException("No Role exists with the name " + roleRep.getName());
-		}
-
-		// delegate to method with Role
-		actionAllowed(role, restrictable);
-	}
-
-	/**
-	 * Checks if the {@link Role} has access to the {@link Restrictable} by delegating to
-	 * {@link PrivilegePolicy#actionAllowed(Role, Privilege, Restrictable)}
-	 * 
-	 * @param role
-	 *            the role which wants to perform the action
-	 * @param restrictable
-	 *            the {@link Restrictable} which is to be checked for authorization
-	 */
-	private boolean actionAllowed(Role role, Restrictable restrictable) {
-
-		// validate PrivilegeName for this restrictable
-		String privilegeName = restrictable.getPrivilegeName();
-		if (privilegeName == null || privilegeName.length() < 3) {
-			throw new PrivilegeException(
-					"The PrivilegeName may not be shorter than 3 characters. Invalid Restrictable "
-							+ restrictable.getClass().getName());
-		}
-
-		// If the role does not have this privilege, then stop as another role might have this privilege
-		if (!role.hasPrivilege(privilegeName)) {
-			return false;
-		}
-
-		// get the privilege for this restrictable
-		Privilege privilege = role.getPrivilegeMap().get(privilegeName);
-
-		// check if all is allowed
-		if (privilege.isAllAllowed()) {
-			return true;
-		}
-
-		// otherwise delegate checking to the policy configured for this privilege
-		PrivilegePolicy policy = getPolicy(privilege.getPolicy());
-		if (policy == null) {
-			throw new PrivilegeException("PrivilegePolicy " + privilege.getPolicy() + " does not exist for Privilege "
-					+ privilegeName);
-		}
-
-		// delegate checking to privilege policy
-		policy.actionAllowed(role, privilege, restrictable);
-
-		// the policy must throw an exception if action not allowed,
-		// so return true if we arrive here
-		return true;
 	}
 
 	@Override
@@ -856,24 +746,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException("Certificate may not be null!");
 
 		// first see if a session exists for this certificate
-		CertificateSessionPair certificateSessionPair = this.sessionMap.get(certificate.getSessionId());
-		if (certificateSessionPair == null)
+		PrivilegeContext privilegeContext = this.privilegeContextMap.get(certificate.getSessionId());
+		if (privilegeContext == null)
 			throw new AccessDeniedException("There is no session information for " + certificate.toString());
 
 		// validate certificate has not been tampered with
-		Certificate sessionCertificate = certificateSessionPair.certificate;
+		Certificate sessionCertificate = privilegeContext.getCertificate();
 		if (!sessionCertificate.equals(certificate))
 			throw new PrivilegeException("Received illegal certificate for session id " + certificate.getSessionId());
 
-		// TODO is validating authToken overkill since the two certificates have already been checked on equality?
-		// validate authToken from certificate using the sessions authPassword
-		String authToken = certificate.getAuthToken(certificateSessionPair.session.getAuthPassword());
-		if (authToken == null || !authToken.equals(certificateSessionPair.session.getAuthToken()))
-			throw new PrivilegeException("Received illegal certificate data for session id "
-					+ certificate.getSessionId());
-
 		// get user object
-		User user = this.persistenceHandler.getUser(certificateSessionPair.session.getUsername());
+		User user = this.persistenceHandler.getUser(privilegeContext.getUsername());
 
 		// if user exists, then certificate is valid
 		if (user == null) {
@@ -882,6 +765,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// everything is ok
+	}
+
+	@Override
+	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException {
+
+		// first validate certificate
+		isCertificateValid(certificate);
+
+		return this.privilegeContextMap.get(certificate.getSessionId());
 	}
 
 	@Override
@@ -975,8 +867,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		this.lastSessionId = 0l;
-		this.sessionMap = Collections.synchronizedMap(new HashMap<String, CertificateSessionPair>());
-		this.systemUserCertificateMap = Collections.synchronizedMap(new HashMap<String, Certificate>());
+		this.privilegeContextMap = Collections.synchronizedMap(new HashMap<String, PrivilegeContext>());
 		this.initialized = true;
 	}
 
@@ -987,7 +878,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 *            the role for which the policies are to be checked
 	 */
 	private void validatePolicies(Role role) {
-		for (Privilege privilege : role.getPrivilegeMap().values()) {
+		for (String privilegeName : role.getPrivilegeNames()) {
+			IPrivilege privilege = role.getPrivilege(privilegeName);
 			String policy = privilege.getPolicy();
 			if (policy != null && !this.policyMap.containsKey(policy)) {
 				throw new PrivilegeException("Policy " + policy + " for Privilege " + privilege.getName()
@@ -1001,37 +893,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 */
 	private synchronized String nextSessionId() {
 		return Long.toString(++this.lastSessionId % Long.MAX_VALUE);
-	}
-
-	/**
-	 * An internal class used to keep a record of sessions with the certificate
-	 * 
-	 * @author Robert von Burg <eitch@eitchnet.ch>
-	 */
-	protected class CertificateSessionPair {
-
-		/**
-		 * The {@link Session}
-		 */
-		public final Session session;
-
-		/**
-		 * The {@link Certificate}
-		 */
-		public final Certificate certificate;
-
-		/**
-		 * Creates a new {@link CertificateSessionPair} with the given session and certificate
-		 * 
-		 * @param session
-		 *            the session
-		 * @param certificate
-		 *            the certificate
-		 */
-		public CertificateSessionPair(Session session, Certificate certificate) {
-			this.session = session;
-			this.certificate = certificate;
-		}
 	}
 
 	/**
@@ -1071,10 +932,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		checkPrivilege(actionClassname, systemUser);
 
 		// get certificate for this system user
-		Certificate systemUserCertificate = getSystemUserCertificate(systemUsername);
+		PrivilegeContext systemUserPrivilegeContext = getSystemUserPrivilegeContext(systemUsername);
 
 		// perform the action
-		action.execute(systemUserCertificate);
+		action.execute(systemUserPrivilegeContext);
 	}
 
 	/**
@@ -1113,14 +974,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * 
 	 * @return the {@link Certificate} for this system user
 	 */
-	private Certificate getSystemUserCertificate(String systemUsername) {
-
-		// see if a certificate has already been created for this system user
-		Certificate systemUserCertificate = this.systemUserCertificateMap.get(systemUsername);
-		if (systemUserCertificate != null)
-			return systemUserCertificate;
-
-		// otherwise log this system user in, by performing a slightly different authentication
+	private PrivilegeContext getSystemUserPrivilegeContext(String systemUsername) {
 
 		// we only work with hashed passwords
 		String passwordHash = this.encryptionHandler.convertToHash(systemUsername.getBytes());
@@ -1156,17 +1010,51 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String sessionId = nextSessionId();
 
 		// create a new certificate, with details of the user
-		systemUserCertificate = new Certificate(sessionId, systemUsername, authToken, authPassword, user.getLocale(),
-				new HashMap<String, String>(user.getProperties()));
+		Certificate systemUserCertificate = new Certificate(sessionId, System.currentTimeMillis(), systemUsername,
+				authToken, authPassword, user.getLocale(), new HashMap<String, String>(user.getProperties()));
 
-		// create and save a new session
-		Session session = new Session(sessionId, systemUsername, authToken, authPassword, System.currentTimeMillis());
-		this.sessionMap.put(sessionId, new CertificateSessionPair(session, systemUserCertificate));
+		// create and save a new privilege context
+		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);
 
 		// log
 		DefaultPrivilegeHandler.logger.info("The system user " + systemUsername + " is logged in with session "
-				+ session);
+				+ systemUserCertificate);
 
-		return systemUserCertificate;
+		return privilegeContext;
+	}
+
+	/**
+	 * <p>
+	 * This method instantiates a {@link PrivilegePolicy} object from the given policyName. The {@link PrivilegePolicy}
+	 * is not stored in a database. The privilege name is a class name and is then used to instantiate a new
+	 * {@link PrivilegePolicy} object
+	 * </p>
+	 * 
+	 * @param policyName
+	 *            the class name of the {@link PrivilegePolicy} object to return
+	 * 
+	 * @return the {@link PrivilegePolicy} object
+	 * 
+	 * @throws PrivilegeException
+	 *             if the {@link PrivilegePolicy} object for the given policy name could not be instantiated
+	 */
+	private PrivilegePolicy getPolicy(String policyName) {
+
+		// get the policies class
+		Class<PrivilegePolicy> policyClazz = this.policyMap.get(policyName);
+		if (policyClazz == null) {
+			return null;
+		}
+
+		// instantiate the policy
+		PrivilegePolicy policy;
+		try {
+			policy = ClassHelper.instantiateClass(policyClazz);
+		} catch (Exception e) {
+			throw new PrivilegeException("The class for the policy with the name " + policyName + " does not exist!"
+					+ policyName, e);
+		}
+
+		return policy;
 	}
 }

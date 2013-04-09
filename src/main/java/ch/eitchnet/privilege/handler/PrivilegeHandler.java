@@ -25,14 +25,13 @@ import java.util.Locale;
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.IPrivilege;
+import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.PrivilegeRep;
-import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.RoleRep;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
-import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
-import ch.eitchnet.privilege.model.internal.Session;
 import ch.eitchnet.privilege.model.internal.User;
 
 /**
@@ -222,7 +221,7 @@ public interface PrivilegeHandler {
 	 * @param roleName
 	 *            the roleName of the {@link Role} to which the privilege should be added
 	 * @param privilegeRep
-	 *            the representation of the {@link Privilege} which should be added to the {@link Role}
+	 *            the representation of the {@link IPrivilege} which should be added to the {@link Role}
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
@@ -335,48 +334,14 @@ public interface PrivilegeHandler {
 	public Certificate authenticate(String username, byte[] password) throws AccessDeniedException;
 
 	/**
-	 * Invalidates the {@link Session} for the given {@link Certificate}, effectively logging out the user who was
-	 * authenticated with the credentials associated to the given {@link Certificate}
+	 * Invalidates the session for the given {@link Certificate}, effectively logging out the user who was authenticated
+	 * with the credentials associated to the given {@link Certificate}
 	 * 
 	 * @param certificate
-	 *            the {@link Certificate} for which the {@link Session} is to be invalidated
-	 * @return true if the {@link Session} was still valid and is now invalidated, false otherwise
+	 *            the {@link Certificate} for which the session is to be invalidated
+	 * @return true if the session was still valid and is now invalidated, false otherwise
 	 */
 	public boolean invalidateSession(Certificate certificate);
-
-	/**
-	 * Checks if the {@link User} registered to the given {@link Certificate} is allowed to access the
-	 * {@link Restrictable}
-	 * 
-	 * @param certificate
-	 *            the {@link Certificate} of the user which has the privilege to perform this action
-	 * @param restrictable
-	 *            the {@link Restrictable} to which the user wants access
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the user for this certificate may not perform the action defined by the {@link Restrictable}
-	 *             implementation
-	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
-	 */
-	public void actionAllowed(Certificate certificate, Restrictable restrictable) throws AccessDeniedException,
-			PrivilegeException;
-
-	/**
-	 * Checks if the {@link RoleRep} is allowed to access the {@link Restrictable}
-	 * 
-	 * @param roleRep
-	 *            the {@link RoleRep} for which access to the {@link Restrictable} is to be checked
-	 * @param restrictable
-	 *            the {@link Restrictable} to which access is to be checked
-	 * 
-	 * @throws PrivilegeException
-	 *             if the {@link Role} does not exist
-	 * @throws AccessDeniedException
-	 *             if the role may not perform the action defined by the {@link Restrictable} implementation
-	 */
-	public void actionAllowed(RoleRep roleRep, Restrictable restrictable) throws PrivilegeException,
-			AccessDeniedException;
 
 	/**
 	 * Checks if the given {@link Certificate} is valid. This means that the certificate is for a valid session and that
@@ -389,6 +354,20 @@ public interface PrivilegeHandler {
 	 *             if there is anything wrong with this certificate
 	 */
 	public void isCertificateValid(Certificate certificate) throws PrivilegeException;
+
+	/**
+	 * Returns the {@link PrivilegeContext} for the given {@link Certificate}. The {@link PrivilegeContext} is an
+	 * encapsulated state of a user's privileges so that for the duration of a user's call, the user can perform their
+	 * actions and do not need to access the {@link PrivilegeHandler} anymore
+	 * 
+	 * @param certificate
+	 *            a valid {@link Certificate} for which a {@link PrivilegeContext} is to be returned
+	 * @return the {@link PrivilegeContext} for the given {@link Certificate}
+	 * 
+	 * @throws PrivilegeException
+	 *             if there is a configuration error or the {@link Certificate} is invalid
+	 */
+	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException;
 
 	/**
 	 * <p>

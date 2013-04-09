@@ -29,6 +29,7 @@ import java.util.Set;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * This class defines the actual login information for a given user which can be granted privileges. Every user is
@@ -84,16 +85,16 @@ public final class User {
 	public User(String userId, String username, String password, String firstname, String surname, UserState userState,
 			Set<String> roles, Locale locale, Map<String, String> propertyMap) {
 
-		if (userId == null || userId.isEmpty()) {
+		if (StringHelper.isEmpty(userId)) {
 			throw new PrivilegeException("No UserId defined!");
 		}
-		if (username == null || username.isEmpty()) {
+		if (StringHelper.isEmpty(username)) {
 			throw new PrivilegeException("No username defined!");
 		}
-		if (firstname == null || firstname.isEmpty()) {
+		if (StringHelper.isEmpty(firstname)) {
 			throw new PrivilegeException("No firstname defined!");
 		}
-		if (surname == null || surname.isEmpty()) {
+		if (StringHelper.isEmpty(surname)) {
 			throw new PrivilegeException("No surname defined!");
 		}
 		if (userState == null) {

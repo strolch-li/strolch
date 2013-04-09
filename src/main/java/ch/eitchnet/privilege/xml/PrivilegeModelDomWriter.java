@@ -29,7 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ch.eitchnet.privilege.helper.XmlConstants;
-import ch.eitchnet.privilege.model.internal.Privilege;
+import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.utils.helper.XmlHelper;
@@ -124,7 +124,8 @@ public class PrivilegeModelDomWriter {
 
 			roleElement.setAttribute(XmlConstants.XML_ATTR_NAME, role.getName());
 
-			for (Privilege privilege : role.getPrivilegeMap().values()) {
+			for (String privilegeName : role.getPrivilegeNames()) {
+				IPrivilege privilege = role.getPrivilege(privilegeName);
 
 				// create the privilege element
 				Element privilegeElement = doc.createElement(XmlConstants.XML_PRIVILEGE);

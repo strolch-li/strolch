@@ -25,7 +25,7 @@ import java.util.Map;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
-import ch.eitchnet.privilege.model.internal.Session;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * The {@link Certificate} is the object a client keeps when accessing a Privilege enabled system. This object is the
@@ -39,6 +39,7 @@ public final class Certificate implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private final String sessionId;
+	private final long loginTime;
 	private final String username;
 	private final String authToken;
 	private final String authPassword;
@@ -72,15 +73,25 @@ public final class Certificate implements Serializable {
 	 *            a {@link Map} containing string value pairs of properties for the logged in user. These properties can
 	 *            be edited and can be used for the user to change settings of this session
 	 */
-	public Certificate(String sessionId, String username, String authToken, String authPassword, Locale locale,
-			Map<String, String> propertyMap) {
+	public Certificate(String sessionId, long loginTime, String username, String authToken, String authPassword,
+			Locale locale, Map<String, String> propertyMap) {
 
 		// validate arguments are not null
-		if (sessionId == null || username == null || authToken == null || authPassword == null) {
-			throw new PrivilegeException("One of the arguments is null!");
+		if (StringHelper.isEmpty(sessionId)) {
+			throw new PrivilegeException("sessionId is null!");
+		}
+		if (StringHelper.isEmpty(username)) {
+			throw new PrivilegeException("username is null!");
+		}
+		if (StringHelper.isEmpty(authToken)) {
+			throw new PrivilegeException("authToken is null!");
+		}
+		if (StringHelper.isEmpty(authPassword)) {
+			throw new PrivilegeException("authPassword is null!");
 		}
 
 		this.sessionId = sessionId;
+		this.loginTime = loginTime;
 		this.username = username;
 		this.authToken = authToken;
 		this.authPassword = authPassword;
@@ -128,6 +139,13 @@ public final class Certificate implements Serializable {
 	 */
 	public String getUsername() {
 		return this.username;
+	}
+
+	/**
+	 * @return the loginTime
+	 */
+	public long getLoginTime() {
+		return this.loginTime;
 	}
 
 	/**

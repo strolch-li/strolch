@@ -19,11 +19,16 @@
  */
 package ch.eitchnet.privilege.policy;
 
+import java.text.MessageFormat;
+
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
+import ch.eitchnet.privilege.i18n.PrivilegeMessages;
+import ch.eitchnet.privilege.model.IPrivilege;
+import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.Restrictable;
-import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * This is a simple implementation of {@link PrivilegePolicy} which uses the {@link Restrictable#getPrivilegeName()} to
@@ -36,53 +41,62 @@ public class DefaultPrivilege implements PrivilegePolicy {
 	/**
 	 * The value of {@link Restrictable#getPrivilegeValue()} is used to check if the {@link Role} has this privilege
 	 * 
-	 * @see ch.eitchnet.privilege.policy.PrivilegePolicy#actionAllowed(ch.eitchnet.privilege.model.internal.Role,
-	 *      ch.eitchnet.privilege.model.internal.Privilege, ch.eitchnet.privilege.model.Restrictable)
+	 * @see ch.eitchnet.privilege.policy.PrivilegePolicy#validateAction(PrivilegeContext, Restrictable)
 	 */
 	@Override
-	public void actionAllowed(Role role, Privilege privilege, Restrictable restrictable) {
+	public void validateAction(IPrivilege privilege, Restrictable restrictable) {
 
-		// validate user is not null
-		if (role == null)
-			throw new PrivilegeException("Role may not be null!");
+		if (privilege == null)
+			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.privilegeNull")); //$NON-NLS-1$
+		if (restrictable == null)
+			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.restrictableNull")); //$NON-NLS-1$
 
 		// get the PrivilegeName
 		String privilegeName = restrictable.getPrivilegeName();
-		if (privilegeName == null || privilegeName.isEmpty()) {
-			throw new PrivilegeException("The PrivilegeName for the Restrictable is null or empty: " + restrictable);
+		if (StringHelper.isEmpty(privilegeName)) {
+			String msg = PrivilegeMessages.getString("Privilege.privilegeNameEmpty"); //$NON-NLS-1$
+			throw new PrivilegeException(MessageFormat.format(msg, restrictable));
 		}
+
+		// we want the privileges names to match
+		if (!privilege.getName().equals(privilegeName)) {
+			throw new PrivilegeException(MessageFormat.format(
+					PrivilegeMessages.getString("Privilege.illegalArgument.privilegeNameMismatch"), //$NON-NLS-1$
+					privilege.getName(), privilegeName));
+		}
+
+		// if everything is allowed, then no need to carry on
+		if (privilege.isAllAllowed())
+			return;
 
 		// get the value on which the action is to be performed
 		Object object = restrictable.getPrivilegeValue();
 
 		// DefaultPrivilege policy expects the privilege value to be a string
 		if (!(object instanceof String)) {
-			throw new PrivilegeException(Restrictable.class.getName() + " " + restrictable.getClass().getSimpleName()
-					+ " has returned a non-string privilege value!");
+			String msg = Restrictable.class.getName()
+					+ PrivilegeMessages.getString("Privilege.illegalArgument.nonstring"); //$NON-NLS-1$
+			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
+			throw new PrivilegeException(msg);
 		}
 
 		String privilegeValue = (String) object;
 
 		// first check values not allowed
-		for (String denied : privilege.getDenyList()) {
-
-			// if value in deny list
-			if (denied.equals(privilegeValue)) {
-
-				// then throw access denied
-				throw new AccessDeniedException("Role " + role.getName() + " does not have Privilege " + privilegeName
-						+ " needed for Restrictable " + restrictable.getClass().getName());
-			}
+		if (privilege.isDenied(privilegeValue)) {
+			// then throw access denied
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"),
+					PrivilegeContext.get().getUsername(), privilegeName, restrictable.getClass().getName());
+			throw new AccessDeniedException(msg);
 		}
 
 		// now check values allowed
-		for (String allowed : privilege.getAllowList()) {
-			if (allowed.equals(privilegeValue))
-				return;
-		}
+		if (privilege.isAllowed(privilegeValue))
+			return;
 
 		// default is not allowed
-		throw new AccessDeniedException("Role " + role.getName() + " does not have Privilege " + privilegeName
-				+ " needed for Restrictable " + restrictable.getClass().getName());
+		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"),
+				PrivilegeContext.get().getUsername(), privilegeName, restrictable.getClass().getName());
+		throw new AccessDeniedException(msg);
 	}
 }

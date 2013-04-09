@@ -1,26 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-Copyright (c) 2010, 2011
-
-Robert von Burg <eitch@eitchnet.ch>
-
-This file is part of Privilege.
-
-Privilege is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Privilege is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
-
--->
+<!-- Copyright (c) 2010, 2011 Robert von Burg <eitch@eitchnet.ch> This file is part of Privilege. Privilege is free software: 
+	you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free 
+	Software Foundation, either version 3 of the License, or (at your option) any later version. Privilege is distributed in 
+	the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+	FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. You should have received a copy of 
+	the GNU Lesser General Public License along with Privilege. If not, see <http://www.gnu.org/licenses/>. -->
 <UsersAndRoles>
 
 	<Users>
@@ -39,7 +23,7 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 				<Property name="organizationalUnit" value="Development" />
 			</Properties>
 		</User>
-		
+
 		<User userId="2" username="system_admin" password="bb06d5caae150999027a8cb68956564d3ae0f3662aee02eea96253df3dc49bf7">
 			<Firstname>System User</Firstname>
 			<Surname>Administrator</Surname>
@@ -48,7 +32,7 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 			<Roles>
 				<Role>system_admin_privileges</Role>
 			</Roles>
-			
+
 		</User>
 
 	</Users>
@@ -58,20 +42,20 @@ along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
 		<Role name="PrivilegeAdmin" />
 
 		<Role name="AppUser">
-			<Privilege name="ch.eitchnet.privilege.test.model.TestRestrictable">
+			<Privilege name="ch.eitchnet.privilege.test.model.TestRestrictable" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>
-		
+
 		<Role name="system_admin_privileges">
-			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemUserAction">
+			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemUserAction" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
-			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemRestrictable">
+			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemRestrictable" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>
-		
+
 		<Role name="restrictedRole">
 			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemUserAction" policy="DefaultPrivilege">
 				<Allow>hello</Allow>

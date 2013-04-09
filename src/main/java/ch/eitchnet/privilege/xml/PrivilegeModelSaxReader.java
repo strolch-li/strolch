@@ -36,8 +36,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.UserState;
-import ch.eitchnet.privilege.model.internal.Privilege;
+import ch.eitchnet.privilege.model.internal.PrivilegeImpl;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.utils.helper.StringHelper;
@@ -149,7 +150,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 		private Set<String> denyList;
 		private Set<String> allowList;
 
-		private Map<String, Privilege> privileges;
+		private Map<String, IPrivilege> privileges;
 
 		/**
 		 * 
@@ -162,7 +163,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 		 * 
 		 */
 		private void init() {
-			this.privileges = new HashMap<String, Privilege>();
+			this.privileges = new HashMap<String, IPrivilege>();
 
 			this.text = null;
 
@@ -204,7 +205,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 				this.denyList.add(this.text.toString().trim());
 			} else if (qName.equals("Privilege")) {
 
-				Privilege privilege = new Privilege(this.privilegeName, this.privilegePolicy, this.allAllowed,
+				IPrivilege privilege = new PrivilegeImpl(this.privilegeName, this.privilegePolicy, this.allAllowed,
 						this.denyList, this.allowList);
 				this.privileges.put(this.privilegeName, privilege);
 

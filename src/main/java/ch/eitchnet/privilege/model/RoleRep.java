@@ -22,7 +22,9 @@ package ch.eitchnet.privilege.model;
 import java.io.Serializable;
 import java.util.Map;
 
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.internal.Role;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * To keep certain details of the {@link Role} itself hidden from remote clients and make sure instances are only edited
@@ -47,8 +49,19 @@ public class RoleRep implements Serializable {
 	 *            the map of privileges granted to this role
 	 */
 	public RoleRep(String name, Map<String, PrivilegeRep> privilegeMap) {
+
 		this.name = name;
 		this.privilegeMap = privilegeMap;
+
+		validate();
+	}
+
+	/**
+	 * validates that all required fields are set
+	 */
+	public void validate() {
+		if (StringHelper.isEmpty(this.name))
+			throw new PrivilegeException("name is null");
 	}
 
 	/**

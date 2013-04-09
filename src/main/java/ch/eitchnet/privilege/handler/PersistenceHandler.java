@@ -22,8 +22,8 @@ package ch.eitchnet.privilege.handler;
 import java.util.List;
 import java.util.Map;
 
+import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.Restrictable;
-import ch.eitchnet.privilege.model.internal.Privilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
@@ -37,7 +37,7 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
  * <p>
  * The {@link PersistenceHandler} also serves the special {@link PrivilegePolicy} objects. These policies are special
  * objects which implement an algorithm to define if an action is allowed on a {@link Restrictable} by a {@link Role}
- * and {@link Privilege}
+ * and {@link IPrivilege}
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
