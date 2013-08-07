@@ -39,7 +39,6 @@ import ch.eitchnet.utils.objectfilter.ObjectFilter;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class XmlPersistenceTransaction {
 
@@ -48,7 +47,7 @@ public class XmlPersistenceTransaction {
 	private boolean verbose;
 	private XmlFilePersister persister;
 	private XmlDaoFactory xmlDaoFactory;
-	private ObjectFilter<ITransactionObject> objectFilter;
+	private ObjectFilter objectFilter;
 	private DocumentBuilder docBuilder;
 	private DOMImplementation domImplementation;
 
@@ -58,7 +57,7 @@ public class XmlPersistenceTransaction {
 	 * @param objectFilter
 	 */
 	public void initialize(XmlFilePersister persister, XmlDaoFactory xmlDaoFactory,
-			ObjectFilter<ITransactionObject> objectFilter, boolean verbose) {
+			ObjectFilter objectFilter, boolean verbose) {
 		this.persister = persister;
 		this.xmlDaoFactory = xmlDaoFactory;
 		this.objectFilter = objectFilter;

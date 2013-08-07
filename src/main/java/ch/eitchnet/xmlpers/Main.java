@@ -24,6 +24,8 @@ package ch.eitchnet.xmlpers;
 import java.io.File;
 import java.io.FileWriter;
 
+import javanet.staxutils.IndentingXMLStreamWriter;
+
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -41,15 +43,16 @@ public class Main {
 		XMLStreamWriter writer = factory.createXMLStreamWriter(new FileWriter(file));
 		System.out.println("writer: " + writer.getClass().getName());
 		
-		//writer = new com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter(writer);
-		writer = new FormattingXmlStreamWriter(writer);
+		writer = new IndentingXMLStreamWriter(writer);
 
 		writer.writeStartDocument();
 		writer.writeStartElement("document");
-		writer.writeStartElement("data");
+		writer.writeEmptyElement("data");
 		writer.writeAttribute("name", "value");
-		writer.writeEndElement();
-		writer.writeEndElement();
+		//writer.writeEndElement();
+		writer.writeEmptyElement("stuff");
+		writer.writeAttribute("attr", "attrVal");
+		//writer.writeEndElement();
 		writer.writeEndDocument();
 
 		writer.flush();

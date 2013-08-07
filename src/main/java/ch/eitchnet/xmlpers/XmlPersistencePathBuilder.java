@@ -32,14 +32,7 @@ import org.slf4j.LoggerFactory;
 public class XmlPersistencePathBuilder {
 	private static final Logger logger = LoggerFactory.getLogger(XmlPersistencePathBuilder.class);
 
-	/**
-	 * 
-	 */
 	public static final String FILE_EXT = ".xml";
-
-	/**
-	 * 
-	 */
 	public static final int EXT_LENGTH = XmlPersistencePathBuilder.FILE_EXT.length();
 
 	private String basePath;

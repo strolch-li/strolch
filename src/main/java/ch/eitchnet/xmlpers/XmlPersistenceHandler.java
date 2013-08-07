@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.SystemHelper;
-import ch.eitchnet.utils.objectfilter.ITransactionObject;
 import ch.eitchnet.utils.objectfilter.ObjectFilter;
 
 /**
@@ -32,19 +31,8 @@ import ch.eitchnet.utils.objectfilter.ObjectFilter;
  */
 public class XmlPersistenceHandler {
 
-	/**
-	 * 
-	 */
 	public static final String CONFIG_VERBOSE = "ch.eitchnet.xmlpers.config.verbose";
-
-	/**
-	 * 
-	 */
 	public static final String CONFIG_BASEPATH = "ch.eitchnet.xmlpers.config.basepath";
-
-	/**
-	 * 
-	 */
 	public static final String CONFIG_DAO_FACTORY_CLASS = "ch.eitchnet.xmlpers.config.daoFactoryClass";
 
 	protected static final Logger logger = LoggerFactory.getLogger(XmlPersistenceHandler.class);
@@ -54,9 +42,6 @@ public class XmlPersistenceHandler {
 	protected XmlFilePersister persister;
 	protected XmlDaoFactory xmlDaoFactory;
 
-	/**
-	 * 
-	 */
 	public void initialize() {
 
 		String basePath = SystemHelper.getProperty(XmlPersistenceHandler.class.getSimpleName(), XmlPersistenceHandler.CONFIG_BASEPATH, null);
@@ -85,9 +70,6 @@ public class XmlPersistenceHandler {
 		this.xmlPersistenceTxThreadLocal = new ThreadLocal<XmlPersistenceTransaction>();
 	}
 
-	/**
-	 * 
-	 */
 	public XmlPersistenceTransaction openTx() {
 
 		if (this.verbose)
@@ -99,7 +81,7 @@ public class XmlPersistenceHandler {
 			throw new XmlPersistenceExecption("Previous transaction not properly closed");
 
 		// set a new persistence transaction object
-		ObjectFilter<ITransactionObject> objectFilter = new ObjectFilter<ITransactionObject>();
+		ObjectFilter objectFilter = new ObjectFilter();
 		xmlPersistenceTx = new XmlPersistenceTransaction();
 		xmlPersistenceTx.initialize(this.persister, this.xmlDaoFactory, objectFilter, this.verbose);
 
@@ -108,9 +90,6 @@ public class XmlPersistenceHandler {
 		return xmlPersistenceTx;
 	}
 
-	/**
-	 * 
-	 */
 	public XmlPersistenceTransaction getTx() {
 		XmlPersistenceTransaction xmlPersistenceTx = this.xmlPersistenceTxThreadLocal.get();
 		if (xmlPersistenceTx == null)
@@ -119,9 +98,6 @@ public class XmlPersistenceHandler {
 		return xmlPersistenceTx;
 	}
 
-	/**
-	 * 
-	 */
 	public void commitTx() {
 
 		if (this.verbose)
