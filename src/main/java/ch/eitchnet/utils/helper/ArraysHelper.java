@@ -21,18 +21,41 @@
  */
 package ch.eitchnet.utils.helper;
 
+import java.util.Arrays;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
 public class ArraysHelper {
 
+	/**
+	 * Returns true if the byte array contains the given byte value
+	 * 
+	 * @param bytes
+	 *            the array to search in
+	 * @param searchByte
+	 *            the value to search for
+	 * 
+	 * @return true if found, false if not
+	 */
 	public static boolean contains(byte[] bytes, byte searchByte) {
 		for (byte b : bytes) {
 			if (b == searchByte)
 				return true;
 		}
-
 		return false;
+	}
+
+	/**
+	 * Creates a simple copy of the given array
+	 * 
+	 * @param bytes
+	 *            the array to copy
+	 * 
+	 * @return the copy
+	 */
+	public static byte[] copyOf(byte[] bytes) {
+		return Arrays.copyOf(bytes, bytes.length);
 	}
 }
