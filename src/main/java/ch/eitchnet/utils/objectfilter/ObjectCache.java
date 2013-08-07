@@ -36,10 +36,8 @@ import org.slf4j.LoggerFactory;
  * </p>
  * 
  * @author Michael Gatto <michael@gatto.ch>
- * 
- * @param <T>
  */
-public class ObjectCache<T extends ITransactionObject> {
+public class ObjectCache {
 
 	private final static Logger logger = LoggerFactory.getLogger(ObjectCache.class);
 
@@ -54,7 +52,7 @@ public class ObjectCache<T extends ITransactionObject> {
 	/**
 	 * object The object that shall be cached
 	 */
-	private T object;
+	private ITransactionObject object;
 	/**
 	 * operation The operation that has occurred on this object.
 	 */
@@ -65,7 +63,7 @@ public class ObjectCache<T extends ITransactionObject> {
 	 * @param object
 	 * @param operation
 	 */
-	public ObjectCache(String key, T object, Operation operation) {
+	public ObjectCache(String key, ITransactionObject object, Operation operation) {
 
 		this.id = object.getTransactionID();
 		this.key = key;
@@ -83,7 +81,7 @@ public class ObjectCache<T extends ITransactionObject> {
 	 * 
 	 * @param object
 	 */
-	public void setObject(T object) {
+	public void setObject(ITransactionObject object) {
 		if (ObjectCache.logger.isDebugEnabled()) {
 			ObjectCache.logger.debug("Updating ID " + this.id + " to value " + object.toString());
 		}
@@ -120,7 +118,7 @@ public class ObjectCache<T extends ITransactionObject> {
 	/**
 	 * @return the object
 	 */
-	public T getObject() {
+	public ITransactionObject getObject() {
 		return this.object;
 	}
 

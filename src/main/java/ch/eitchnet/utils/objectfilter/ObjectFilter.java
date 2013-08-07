@@ -19,6 +19,7 @@
  */
 package ch.eitchnet.utils.objectfilter;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,16 +77,12 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Michael Gatto <michael@gatto.ch> (initial version)
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
- * @param <T>
  */
-public class ObjectFilter<T extends ITransactionObject> {
-
-	// XXX think about removing the generic T, as there is no sense in it
+public class ObjectFilter {
 
 	private final static Logger logger = LoggerFactory.getLogger(ObjectFilter.class);
 
-	private HashMap<Long, ObjectCache<T>> cache = new HashMap<Long, ObjectCache<T>>();
+	private HashMap<Long, ObjectCache> cache = new HashMap<Long, ObjectCache>();
 	private HashSet<String> keySet = new HashSet<String>();
 
 	private static long id = ITransactionObject.UNSET;
@@ -116,7 +113,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param objectToAdd
 	 *            The object for which addition shall be registered.
 	 */
-	public void add(String key, T objectToAdd) {
+	public void add(String key, ITransactionObject objectToAdd) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger.debug("add object " + objectToAdd + " with key " + key);
@@ -131,29 +128,21 @@ public class ObjectFilter<T extends ITransactionObject> {
 			// run. Hence, we create an ID and add it to the cache.
 			id = dispenseID();
 			objectToAdd.setTransactionID(id);
-			ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToAdd, Operation.ADD);
+			ObjectCache cacheObj = new ObjectCache(key, objectToAdd, Operation.ADD);
 			this.cache.put(id, cacheObj);
 		} else {
-			ObjectCache<T> cached = this.cache.get(Long.valueOf(objectToAdd.getTransactionID()));
+			ObjectCache cached = this.cache.get(Long.valueOf(objectToAdd.getTransactionID()));
 			if (cached == null) {
 				// The object got an ID during this run, but was not added to the cache.
 				// Hence, we add it now, with the current operation.
-				ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToAdd, Operation.ADD);
+				ObjectCache cacheObj = new ObjectCache(key, objectToAdd, Operation.ADD);
 				this.cache.put(id, cacheObj);
 			} else {
 				String existingKey = cached.getKey();
 				if (!existingKey.equals(key)) {
-					throw new RuntimeException(
-							"Invalid key provided for object with transaction ID "
-									+ Long.toString(id)
-									+ " and operation "
-									+ Operation.ADD.toString()
-									+ ":  existing key is "
-									+ existingKey
-									+ ", new key is "
-									+ key
-									+ ". Object may be present in the same filter instance only once, registered using one key only. Object:"
-									+ objectToAdd.toString());
+					String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}";
+					throw new RuntimeException(MessageFormat.format(msg, Long.toString(id), Operation.ADD.toString(),
+							existingKey, key, objectToAdd.toString()));
 				}
 				// The object is in cache: update the version as required, keeping in mind that most
 				// of the cases here will be mistakes...
@@ -196,7 +185,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param objectToUpdate
 	 *            The object for which update shall be registered.
 	 */
-	public void update(String key, T objectToUpdate) {
+	public void update(String key, ITransactionObject objectToUpdate) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger.debug("update object " + objectToUpdate + " with key " + key);
@@ -209,14 +198,14 @@ public class ObjectFilter<T extends ITransactionObject> {
 		if (id == ITransactionObject.UNSET) {
 			id = dispenseID();
 			objectToUpdate.setTransactionID(id);
-			ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToUpdate, Operation.MODIFY);
+			ObjectCache cacheObj = new ObjectCache(key, objectToUpdate, Operation.MODIFY);
 			this.cache.put(id, cacheObj);
 		} else {
-			ObjectCache<T> cached = this.cache.get(Long.valueOf(objectToUpdate.getTransactionID()));
+			ObjectCache cached = this.cache.get(Long.valueOf(objectToUpdate.getTransactionID()));
 			if (cached == null) {
 				// The object got an ID during this run, but was not added to this cache.
 				// Hence, we add it now, with the current operation.
-				ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToUpdate, Operation.MODIFY);
+				ObjectCache cacheObj = new ObjectCache(key, objectToUpdate, Operation.MODIFY);
 				this.cache.put(id, cacheObj);
 			} else {
 				String existingKey = cached.getKey();
@@ -274,7 +263,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param objectToRemove
 	 *            The object for which removal shall be registered.
 	 */
-	public void remove(String key, T objectToRemove) {
+	public void remove(String key, ITransactionObject objectToRemove) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger.debug("remove object " + objectToRemove + " with key " + key);
@@ -286,14 +275,14 @@ public class ObjectFilter<T extends ITransactionObject> {
 		if (id == ITransactionObject.UNSET) {
 			id = dispenseID();
 			objectToRemove.setTransactionID(id);
-			ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToRemove, Operation.REMOVE);
+			ObjectCache cacheObj = new ObjectCache(key, objectToRemove, Operation.REMOVE);
 			this.cache.put(id, cacheObj);
 		} else {
-			ObjectCache<T> cached = this.cache.get(Long.valueOf(id));
+			ObjectCache cached = this.cache.get(Long.valueOf(id));
 			if (cached == null) {
 				// The object got an ID during this run, but was not added to this cache.
 				// Hence, we add it now, with the current operation.
-				ObjectCache<T> cacheObj = new ObjectCache<T>(key, objectToRemove, Operation.REMOVE);
+				ObjectCache cacheObj = new ObjectCache(key, objectToRemove, Operation.REMOVE);
 				this.cache.put(id, cacheObj);
 			} else {
 				String existingKey = cached.getKey();
@@ -337,8 +326,8 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param addedObjects
 	 *            The objects for which addition shall be registered.
 	 */
-	public void addAll(String key, Collection<T> addedObjects) {
-		for (T addObj : addedObjects) {
+	public void addAll(String key, Collection<ITransactionObject> addedObjects) {
+		for (ITransactionObject addObj : addedObjects) {
 			add(key, addObj);
 		}
 	}
@@ -351,8 +340,8 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param updatedObjects
 	 *            The objects for which update shall be registered.
 	 */
-	public void updateAll(String key, Collection<T> updatedObjects) {
-		for (T update : updatedObjects) {
+	public void updateAll(String key, Collection<ITransactionObject> updatedObjects) {
+		for (ITransactionObject update : updatedObjects) {
 			update(key, update);
 		}
 	}
@@ -365,8 +354,8 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param removedObjects
 	 *            The objects for which removal shall be registered.
 	 */
-	public void removeAll(String key, Collection<T> removedObjects) {
-		for (T removed : removedObjects) {
+	public void removeAll(String key, Collection<ITransactionObject> removedObjects) {
+		for (ITransactionObject removed : removedObjects) {
 			remove(key, removed);
 		}
 	}
@@ -377,7 +366,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param object
 	 *            The object that shall be registered for addition
 	 */
-	public void add(T object) {
+	public void add(ITransactionObject object) {
 		add(object.getClass().getName(), object);
 	}
 
@@ -387,7 +376,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param object
 	 *            The object that shall be registered for updating
 	 */
-	public void update(T object) {
+	public void update(ITransactionObject object) {
 		update(object.getClass().getName(), object);
 	}
 
@@ -397,7 +386,7 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param object
 	 *            The object that shall be registered for removal
 	 */
-	public void remove(T object) {
+	public void remove(ITransactionObject object) {
 		remove(object.getClass().getName(), object);
 	}
 
@@ -408,8 +397,8 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param objects
 	 *            The objects that shall be registered for addition
 	 */
-	public void addAll(List<T> objects) {
-		for (T addedObj : objects) {
+	public void addAll(List<ITransactionObject> objects) {
+		for (ITransactionObject addedObj : objects) {
 			add(addedObj.getClass().getName(), addedObj);
 		}
 	}
@@ -421,8 +410,8 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param updateObjects
 	 *            The objects that shall be registered for updating
 	 */
-	public void updateAll(List<T> updateObjects) {
-		for (T update : updateObjects) {
+	public void updateAll(List<ITransactionObject> updateObjects) {
+		for (ITransactionObject update : updateObjects) {
 			update(update.getClass().getName(), update);
 		}
 	}
@@ -434,8 +423,8 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 * @param removedObjects
 	 *            The objects that shall be registered for removal
 	 */
-	public void removeAll(List<T> removedObjects) {
-		for (T removed : removedObjects) {
+	public void removeAll(List<ITransactionObject> removedObjects) {
+		for (ITransactionObject removed : removedObjects) {
 			remove(removed.getClass().getName(), removed);
 		}
 	}
@@ -447,10 +436,10 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 *            The registration key of the objects to match
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
-	public List<T> getAdded(String key) {
-		List<T> addedObjects = new LinkedList<T>();
-		Collection<ObjectCache<T>> allObjs = this.cache.values();
-		for (ObjectCache<T> objectCache : allObjs) {
+	public List<ITransactionObject> getAdded(String key) {
+		List<ITransactionObject> addedObjects = new LinkedList<ITransactionObject>();
+		Collection<ObjectCache> allObjs = this.cache.values();
+		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.ADD && (objectCache.getKey().equals(key))) {
 				addedObjects.add(objectCache.getObject());
 			}
@@ -467,10 +456,10 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 *            The registration key of the objects to match
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
-	public <V extends T> List<V> getAdded(Class<V> clazz, String key) {
+	public <V extends ITransactionObject> List<V> getAdded(Class<V> clazz, String key) {
 		List<V> addedObjects = new LinkedList<V>();
-		Collection<ObjectCache<T>> allObjs = this.cache.values();
-		for (ObjectCache<T> objectCache : allObjs) {
+		Collection<ObjectCache> allObjs = this.cache.values();
+		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.ADD && (objectCache.getKey().equals(key))) {
 				if (objectCache.getObject().getClass() == clazz) {
 					@SuppressWarnings("unchecked")
@@ -489,10 +478,10 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 *            registration key of the objects to match
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
-	public List<T> getUpdated(String key) {
-		List<T> updatedObjects = new LinkedList<T>();
-		Collection<ObjectCache<T>> allObjs = this.cache.values();
-		for (ObjectCache<T> objectCache : allObjs) {
+	public List<ITransactionObject> getUpdated(String key) {
+		List<ITransactionObject> updatedObjects = new LinkedList<ITransactionObject>();
+		Collection<ObjectCache> allObjs = this.cache.values();
+		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.MODIFY && (objectCache.getKey().equals(key))) {
 				updatedObjects.add(objectCache.getObject());
 			}
@@ -507,10 +496,10 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 *            registration key of the objects to match
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
-	public <V extends T> List<V> getUpdated(Class<V> clazz, String key) {
+	public <V extends ITransactionObject> List<V> getUpdated(Class<V> clazz, String key) {
 		List<V> updatedObjects = new LinkedList<V>();
-		Collection<ObjectCache<T>> allObjs = this.cache.values();
-		for (ObjectCache<T> objectCache : allObjs) {
+		Collection<ObjectCache> allObjs = this.cache.values();
+		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.MODIFY && (objectCache.getKey().equals(key))) {
 				if (objectCache.getObject().getClass() == clazz) {
 					@SuppressWarnings("unchecked")
@@ -529,10 +518,10 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 *            The registration key of the objects to match
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
-	public List<T> getRemoved(String key) {
-		List<T> removedObjects = new LinkedList<T>();
-		Collection<ObjectCache<T>> allObjs = this.cache.values();
-		for (ObjectCache<T> objectCache : allObjs) {
+	public List<ITransactionObject> getRemoved(String key) {
+		List<ITransactionObject> removedObjects = new LinkedList<ITransactionObject>();
+		Collection<ObjectCache> allObjs = this.cache.values();
+		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.REMOVE && (objectCache.getKey().equals(key))) {
 				removedObjects.add(objectCache.getObject());
 			}
@@ -547,10 +536,10 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 *            The registration key of the objects to match
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
-	public <V extends T> List<V> getRemoved(Class<V> clazz, String key) {
+	public <V extends ITransactionObject> List<V> getRemoved(Class<V> clazz, String key) {
 		List<V> removedObjects = new LinkedList<V>();
-		Collection<ObjectCache<T>> allObjs = this.cache.values();
-		for (ObjectCache<T> objectCache : allObjs) {
+		Collection<ObjectCache> allObjs = this.cache.values();
+		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.REMOVE && (objectCache.getKey().equals(key))) {
 				if (objectCache.getObject().getClass() == clazz) {
 					@SuppressWarnings("unchecked")
@@ -570,10 +559,10 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 *            The registration key for which the objects shall be retrieved
 	 * @return The list of objects matching the given key.
 	 */
-	public List<T> getAll(String key) {
-		List<T> allObjects = new LinkedList<T>();
-		Collection<ObjectCache<T>> allObjs = this.cache.values();
-		for (ObjectCache<T> objectCache : allObjs) {
+	public List<ITransactionObject> getAll(String key) {
+		List<ITransactionObject> allObjects = new LinkedList<ITransactionObject>();
+		Collection<ObjectCache> allObjs = this.cache.values();
+		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getKey().equals(key)) {
 				allObjects.add(objectCache.getObject());
 			}
@@ -589,10 +578,10 @@ public class ObjectFilter<T extends ITransactionObject> {
 	 *            The registration key for which the objects shall be retrieved
 	 * @return The list of objects matching the given key.
 	 */
-	public List<ObjectCache<T>> getCache(String key) {
-		List<ObjectCache<T>> allCache = new LinkedList<ObjectCache<T>>();
-		Collection<ObjectCache<T>> allObjs = this.cache.values();
-		for (ObjectCache<T> objectCache : allObjs) {
+	public List<ObjectCache> getCache(String key) {
+		List<ObjectCache> allCache = new LinkedList<ObjectCache>();
+		Collection<ObjectCache> allObjs = this.cache.values();
+		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getKey().equals(key)) {
 				allCache.add(objectCache);
 			}
