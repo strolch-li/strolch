@@ -45,7 +45,6 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class PrivilegeModelSaxReader extends DefaultHandler {
 
@@ -58,9 +57,6 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 
 	private boolean insideUser;
 
-	/**
-	 * 
-	 */
 	public PrivilegeModelSaxReader() {
 		this.users = new ArrayList<User>();
 		this.roles = new ArrayList<Role>();

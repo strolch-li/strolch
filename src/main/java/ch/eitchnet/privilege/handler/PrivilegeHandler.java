@@ -159,7 +159,7 @@ public interface PrivilegeHandler {
 	 * 
 	 * <p>
 	 * If the password given is null, then the user is created, but can not not login! Otherwise the password must meet
-	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(String)}
+	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(byte[])}
 	 * </p>
 	 * 
 	 * @param certificate
@@ -169,7 +169,7 @@ public interface PrivilegeHandler {
 	 * @param password
 	 *            the password of the new user. If the password is null, then this is accepted but the user can not
 	 *            login, otherwise the password must be validated against
-	 *            {@link PrivilegeHandler#validatePassword(String)}
+	 *            {@link PrivilegeHandler#validatePassword(byte[])}
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
@@ -235,7 +235,7 @@ public interface PrivilegeHandler {
 	 * <p>
 	 * Changes the password for the {@link User} with the given username. If the password is null, then the {@link User}
 	 * can not login anymore. Otherwise the password must meet the requirements of the implementation under
-	 * {@link PrivilegeHandler#validatePassword(String)}
+	 * {@link PrivilegeHandler#validatePassword(byte[])}
 	 * </p>
 	 * 
 	 * <p>
@@ -249,7 +249,7 @@ public interface PrivilegeHandler {
 	 * @param password
 	 *            the new password for this user. If the password is null, then the {@link User} can not login anymore.
 	 *            Otherwise the password must meet the requirements of the implementation under
-	 *            {@link PrivilegeHandler#validatePassword(String)}
+	 *            {@link PrivilegeHandler#validatePassword(byte[])}
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
@@ -324,7 +324,7 @@ public interface PrivilegeHandler {
 	 *            the username of the {@link User} which is registered in the {@link PersistenceHandler}
 	 * @param password
 	 *            the password with which this user is to be authenticated. Null passwords are not accepted and they
-	 *            must meet the requirements of the {@link #validatePassword(String)}-method
+	 *            must meet the requirements of the {@link #validatePassword(byte[])}-method
 	 * 
 	 * @return a {@link Certificate} with which this user may then perform actions
 	 * 

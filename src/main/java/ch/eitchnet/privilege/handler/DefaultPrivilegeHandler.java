@@ -78,7 +78,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected static final Logger logger = LoggerFactory.getLogger(DefaultPrivilegeHandler.class);
 
 	/**
-	 * last assigned id for the {@link Session}s
+	 * last assigned id for the {@link Certificate}s
 	 */
 	private long lastSessionId;
 
@@ -285,6 +285,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler.addOrReplaceRole(role);
 	}
 
+	/**
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplaceUser(ch.eitchnet.privilege.model.Certificate,
+	 *      ch.eitchnet.privilege.model.UserRep, byte[])
+	 */
 	@Override
 	public void addOrReplaceUser(Certificate certificate, UserRep userRep, byte[] password) {
 		try {
@@ -525,6 +529,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
+	/**
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserPassword(ch.eitchnet.privilege.model.Certificate,
+	 *      java.lang.String, byte[])
+	 */
 	@Override
 	public void setUserPassword(Certificate certificate, String username, byte[] password) {
 		try {
@@ -595,7 +603,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#authenticate(java.lang.String, java.lang.String)
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#authenticate(java.lang.String, byte[])
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user credentials are not valid
@@ -800,7 +808,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * This simple implementation validates that the password is not null, and that the password string is not empty
 	 * 
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#validatePassword(java.lang.String)
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#validatePassword(byte[])
 	 */
 	@Override
 	public void validatePassword(byte[] password) throws PrivilegeException {

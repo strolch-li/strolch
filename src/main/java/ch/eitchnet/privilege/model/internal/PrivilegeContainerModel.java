@@ -130,8 +130,8 @@ public class PrivilegeContainerModel {
 	}
 
 	/**
-	 * @param name
-	 * @param policyClass
+	 * @param privilegeName
+	 * @param policyClassName
 	 */
 	public void addPolicy(String privilegeName, String policyClassName) {
 

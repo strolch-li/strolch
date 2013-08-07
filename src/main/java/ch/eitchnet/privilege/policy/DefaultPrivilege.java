@@ -41,7 +41,7 @@ public class DefaultPrivilege implements PrivilegePolicy {
 	/**
 	 * The value of {@link Restrictable#getPrivilegeValue()} is used to check if the {@link Role} has this privilege
 	 * 
-	 * @see ch.eitchnet.privilege.policy.PrivilegePolicy#validateAction(PrivilegeContext, Restrictable)
+	 * @see ch.eitchnet.privilege.policy.PrivilegePolicy#validateAction(IPrivilege, Restrictable)
 	 */
 	@Override
 	public void validateAction(IPrivilege privilege, Restrictable restrictable) {

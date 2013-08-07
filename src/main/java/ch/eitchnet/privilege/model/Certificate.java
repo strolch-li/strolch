@@ -30,7 +30,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 /**
  * The {@link Certificate} is the object a client keeps when accessing a Privilege enabled system. This object is the
  * instance which is always used when performing an access and is returned when a user performs a login through
- * {@link PrivilegeHandler#authenticate(String, String)}
+ * {@link PrivilegeHandler#authenticate(String, byte[])}
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -62,11 +62,9 @@ public final class Certificate implements Serializable {
 	 *            the users login name
 	 * @param authToken
 	 *            the authentication token defining the users unique session and is a private field of this certificate.
-	 *            It corresponds with the authentication token on the {@link Session}
 	 * @param authPassword
 	 *            the password to access the authentication token, this is not known to the client but set by the
-	 *            {@link PrivilegeHandler} on authentication. It corresponds with the authentication password on the
-	 *            {@link Session}
+	 *            {@link PrivilegeHandler} on authentication.
 	 * @param locale
 	 *            the users {@link Locale}
 	 * @param propertyMap
