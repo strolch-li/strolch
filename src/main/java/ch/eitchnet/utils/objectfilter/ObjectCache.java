@@ -36,42 +36,52 @@ import org.slf4j.LoggerFactory;
  * </p>
  * 
  * @author Michael Gatto <michael@gatto.ch>
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ObjectCache {
 
 	private final static Logger logger = LoggerFactory.getLogger(ObjectCache.class);
 
 	/**
+	 * UNSET Marker to determine if ids have not been set.
+	 */
+	public static final long UNSET = 0;
+
+	/**
 	 * id The unique ID of this object in this session
 	 */
 	private final long id;
+
 	/**
 	 * key The key defining who's registered for this object's state
 	 */
 	private final String key;
-	/**
-	 * object The object that shall be cached
-	 */
-	private ITransactionObject object;
+
 	/**
 	 * operation The operation that has occurred on this object.
 	 */
 	private Operation operation;
 
 	/**
+	 * object The object that shall be cached
+	 */
+	private Object object;
+
+	/**
+	 * @param id
 	 * @param key
 	 * @param object
 	 * @param operation
 	 */
-	public ObjectCache(String key, ITransactionObject object, Operation operation) {
+	public ObjectCache(long id, String key, Object object, Operation operation) {
 
-		this.id = object.getTransactionID();
+		this.id = id;
 		this.key = key;
 		this.object = object;
 		this.operation = operation;
 
-		if (ObjectCache.logger.isDebugEnabled()) {
-			ObjectCache.logger.debug("Instanciated Cache: ID" + this.id + " / " + key + " OP: " + this.operation
+		if (logger.isDebugEnabled()) {
+			logger.debug("Instanciated Cache: ID" + this.id + " / " + key + " OP: " + this.operation
 					+ " / " + object.toString());
 		}
 	}
@@ -81,9 +91,9 @@ public class ObjectCache {
 	 * 
 	 * @param object
 	 */
-	public void setObject(ITransactionObject object) {
-		if (ObjectCache.logger.isDebugEnabled()) {
-			ObjectCache.logger.debug("Updating ID " + this.id + " to value " + object.toString());
+	public void setObject(Object object) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Updating ID " + this.id + " to value " + object.toString());
 		}
 		this.object = object;
 	}
@@ -114,18 +124,18 @@ public class ObjectCache {
 	public String getKey() {
 		return this.key;
 	}
-
-	/**
-	 * @return the object
-	 */
-	public ITransactionObject getObject() {
-		return this.object;
-	}
-
+	
 	/**
 	 * @return the operation
 	 */
 	public Operation getOperation() {
 		return this.operation;
+	}
+
+	/**
+	 * @return the object
+	 */
+	public Object getObject() {
+		return this.object;
 	}
 }
