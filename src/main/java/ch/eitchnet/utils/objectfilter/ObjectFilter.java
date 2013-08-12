@@ -118,9 +118,6 @@ public class ObjectFilter {
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger.debug("add object " + objectToAdd + " with key " + key);
 
-		// add the key to the set
-		this.keySet.add(key);
-
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.get(objectToAdd);
 		if (cached == null) {
@@ -148,11 +145,30 @@ public class ObjectFilter {
 			case MODIFY:
 				throw new IllegalStateException("Stale State exception: Invalid + after +=");
 			case REMOVE:
+				// replace key if necessary
+				replaceKey(cached.getObject(), objectToAdd);
+
+				// update operation's object
 				cached.setObject(objectToAdd);
 				cached.setOperation(Operation.MODIFY);
 				break;
 			} // switch
 		}// else of object not in cache
+
+		// register the key
+		this.keySet.add(key);
+	}
+
+	private void replaceKey(Object oldObject, Object newObject) {
+		if (oldObject != newObject) {
+			if (ObjectFilter.logger.isDebugEnabled()) {
+				String msg = "Replacing key for object as they are not the same reference: old: {0} / new: {1}";
+				msg = MessageFormat.format(msg, oldObject, newObject);
+				ObjectFilter.logger.warn(msg);
+			}
+			ObjectCache objectCache = this.cache.remove(oldObject);
+			this.cache.put(newObject, objectCache);
+		}
 	}
 
 	/**
@@ -184,9 +200,6 @@ public class ObjectFilter {
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger.debug("update object " + objectToUpdate + " with key " + key);
 
-		// add the key to the keyset
-		this.keySet.add(key);
-
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.get(objectToUpdate);
 		if (cached == null) {
@@ -209,15 +222,20 @@ public class ObjectFilter {
 			Operation op = cached.getOperation();
 			switch (op) {
 			case ADD:
-				cached.setObject(objectToUpdate);
-				break;
 			case MODIFY:
+				// replace key if necessary
+				replaceKey(cached.getObject(), objectToUpdate);
+
+				// update operation's object
 				cached.setObject(objectToUpdate);
 				break;
 			case REMOVE:
 				throw new IllegalStateException("Stale State exception: Invalid += after -");
 			} // switch
 		}// else of object not in cache
+
+		// register the key
+		this.keySet.add(key);
 	}
 
 	/**
@@ -249,9 +267,6 @@ public class ObjectFilter {
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger.debug("remove object " + objectToRemove + " with key " + key);
 
-		// add the key to the keyset
-		this.keySet.add(key);
-
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.get(objectToRemove);
 		if (cached == null) {
@@ -277,6 +292,10 @@ public class ObjectFilter {
 				this.cache.remove(objectToRemove);
 				break;
 			case MODIFY:
+				// replace key if necessary
+				replaceKey(cached.getObject(), objectToRemove);
+
+				// update operation's object
 				cached.setObject(objectToRemove);
 				cached.setOperation(Operation.REMOVE);
 				break;
@@ -284,6 +303,9 @@ public class ObjectFilter {
 				throw new IllegalStateException("Stale State exception: Invalid - after -");
 			} // switch
 		}
+
+		// register the key
+		this.keySet.add(key);
 	}
 
 	/**
