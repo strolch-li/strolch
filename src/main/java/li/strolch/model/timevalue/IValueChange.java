@@ -4,7 +4,7 @@ package li.strolch.model.timevalue;
  * Interface for operators to be used to change the values of {@link ITimeValue}
  * in a {@link ITimeVariable}.
  * 
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("rawtypes")
 public interface IValueChange<T extends IValue> {

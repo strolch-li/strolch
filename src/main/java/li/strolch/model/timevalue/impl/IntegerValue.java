@@ -1,5 +1,7 @@
 package li.strolch.model.timevalue.impl;
 
+import java.io.Serializable;
+
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 
@@ -7,9 +9,11 @@ import li.strolch.model.timevalue.IValue;
  * {@link IValue} implementation to work with Integer valued {@link ITimeValue}
  * objects
  * 
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
-public class IntegerValue implements IValue<Integer> {
+public class IntegerValue implements IValue<Integer>, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public static final IntegerValue NEUTRAL = new IntegerValue(0);
 

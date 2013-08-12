@@ -1,13 +1,17 @@
 package li.strolch.model.timevalue.impl;
 
+import java.io.Serializable;
+
 /**
  * Wrapper for java.util.String object defining a inverse to support algebraic
  * operations.
  * 
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
-public class AString {
-
+public class AString implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
 	private final String string;
 	private final boolean inverse;
 

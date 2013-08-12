@@ -1,5 +1,6 @@
 package li.strolch.model.timedstate;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,13 +12,14 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.TimeVariable;
 
-
 /**
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("rawtypes")
-public class TimedState<T extends IValue> implements ITimedState<T> {
+public class TimedState<T extends IValue> implements ITimedState<T>, Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private ITimeVariable<T> timeVariable = new TimeVariable<T>();
 
 	@Override

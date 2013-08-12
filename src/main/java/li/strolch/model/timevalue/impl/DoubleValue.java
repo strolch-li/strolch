@@ -1,14 +1,18 @@
 package li.strolch.model.timevalue.impl;
 
+import java.io.Serializable;
+
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 
 /**
  * {@link IValue} implementation to work with Double valued {@link ITimeValue} objects
  * 
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
-public class DoubleValue implements IValue<Double> {
+public class DoubleValue implements IValue<Double>, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public static final DoubleValue NEUTRAL = new DoubleValue(0.0d);
 

@@ -1,5 +1,6 @@
 package li.strolch.model.timevalue.impl;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -12,11 +13,13 @@ import li.strolch.model.timevalue.IValueChange;
 
 
 /**
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("rawtypes")
-public class TimeVariable<T extends IValue> implements ITimeVariable<T> {
+public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	public SortedSet<ITimeValue<T>> container = new TreeSet<ITimeValue<T>>();
 
 	@Override
@@ -52,6 +55,11 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T> {
 	public Collection<ITimeValue<T>> getPastValues(final Long time) {
 		TimeValue<T> picker = new TimeValue<T>(time, null);
 		return new TreeSet<ITimeValue<T>>(container.headSet(picker));
+	}
+	
+	@Override
+	public SortedSet<ITimeValue<T>> getValues() {
+		return new TreeSet<ITimeValue<T>>(container);
 	}
 
 	@Override

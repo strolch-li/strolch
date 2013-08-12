@@ -5,7 +5,7 @@ import li.strolch.model.timevalue.impl.TimeVariable;
 /**
  * Interface for timed value objects to be used with the {@link TimeVariable}
  * 
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  * 
  * @param <T>
  *            the backing value of the timed value object
