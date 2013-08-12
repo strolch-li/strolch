@@ -20,7 +20,10 @@
 package ch.eitchnet.utils.helper;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -52,6 +55,16 @@ import ch.eitchnet.utils.exceptions.XmlException;
 public class XmlHelper {
 
 	/**
+	 * PROP_LINE_SEPARATOR = "line.separator" : the system property to fetch defined line separator
+	 */
+	public static final String PROP_LINE_SEPARATOR = "line.separator";
+
+	/**
+	 * UNIX_LINE_SEP = "\n" : mostly we want this line separator, instead of the windows version
+	 */
+	public static final String UNIX_LINE_SEP = "\n";
+
+	/**
 	 * DEFAULT_ENCODING = "UTF-8" : defines the default UTF-8 encoding expected of XML files
 	 */
 	public static final String DEFAULT_ENCODING = "UTF-8";
@@ -63,25 +76,38 @@ public class XmlHelper {
 	 * 
 	 * @param xmlFile
 	 *            the {@link File} which has the path to the XML file to read
-	 * 
-	 * @return a {@link Document} object containing the {@link Element}s of the XML file
 	 */
 	public static void parseDocument(File xmlFile, DefaultHandler xmlHandler) {
+
+		try {
+			XmlHelper.logger.info("Parsing XML document " + xmlFile.getAbsolutePath());
+			parseDocument(new FileInputStream(xmlFile), xmlHandler);
+		} catch (FileNotFoundException e) {
+			throw new XmlException("The XML file could not be read: " + xmlFile.getAbsolutePath(), e);
+		}
+	}
+
+	/**
+	 * Parses an XML file on the file system and returns the resulting {@link Document} object
+	 * 
+	 * @param xmlFileInputStream
+	 *            the XML {@link InputStream} which is to be parsed
+	 */
+	public static void parseDocument(InputStream xmlFileInputStream, DefaultHandler xmlHandler) {
 
 		try {
 
 			SAXParserFactory spf = SAXParserFactory.newInstance();
 
 			SAXParser sp = spf.newSAXParser();
-			XmlHelper.logger.info("Parsing XML document " + xmlFile.getAbsolutePath());
-			sp.parse(xmlFile, xmlHandler);
+			sp.parse(xmlFileInputStream, xmlHandler);
 
 		} catch (ParserConfigurationException e) {
-			throw new XmlException("Failed to initialize a SAX Parser: " + e.getLocalizedMessage(), e);
+			throw new XmlException("Failed to initialize a SAX Parser: " + e.getMessage(), e);
 		} catch (SAXException e) {
-			throw new XmlException("The XML file " + xmlFile.getAbsolutePath() + " is not parseable:", e);
+			throw new XmlException("The XML stream is not parseable: " + e.getMessage(), e);
 		} catch (IOException e) {
-			throw new XmlException("The XML could not be read: " + xmlFile.getAbsolutePath());
+			throw new XmlException("The XML stream not be read: " + e.getMessage(), e);
 		}
 	}
 
@@ -100,11 +126,18 @@ public class XmlHelper {
 
 		XmlHelper.logger.info("Exporting document element " + document.getNodeName() + " to " + file.getAbsolutePath());
 
+		String lineSep = System.getProperty(PROP_LINE_SEPARATOR);
 		try {
 
 			String encoding = document.getInputEncoding();
 			if (encoding == null || encoding.isEmpty()) {
+				XmlHelper.logger.info("No encoding passed. Using default encoding " + XmlHelper.DEFAULT_ENCODING);
 				encoding = XmlHelper.DEFAULT_ENCODING;
+			}
+
+			if (!lineSep.equals("\n")) {
+				XmlHelper.logger.info("Overriding line separator to \\n");
+				System.setProperty(PROP_LINE_SEPARATOR, UNIX_LINE_SEP);
 			}
 
 			// Set up a transformer
@@ -115,7 +148,7 @@ public class XmlHelper {
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
 			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
-			//transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
+			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
 			StreamResult result = new StreamResult(file);
@@ -126,6 +159,9 @@ public class XmlHelper {
 
 			throw new XmlException("Exception while exporting to file: " + e, e);
 
+		} finally {
+
+			System.setProperty(PROP_LINE_SEPARATOR, lineSep);
 		}
 	}
 
