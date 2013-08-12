@@ -76,16 +76,16 @@ import org.slf4j.LoggerFactory;
  * </table>
  * 
  * @author Michael Gatto <michael@gatto.ch> (initial version)
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg <eitch@eitchnet.ch> (minor modifications, refactorings)
  */
 public class ObjectFilter {
 
 	private final static Logger logger = LoggerFactory.getLogger(ObjectFilter.class);
 
-	private HashMap<Long, ObjectCache> cache = new HashMap<Long, ObjectCache>();
+	private HashMap<Object, ObjectCache> cache = new HashMap<Object, ObjectCache>();
 	private HashSet<String> keySet = new HashSet<String>();
 
-	private static long id = ITransactionObject.UNSET;
+	private static long id = ObjectCache.UNSET;
 
 	/**
 	 * Register, under the given key, the addition of the given object.
@@ -113,7 +113,7 @@ public class ObjectFilter {
 	 * @param objectToAdd
 	 *            The object for which addition shall be registered.
 	 */
-	public void add(String key, ITransactionObject objectToAdd) {
+	public void add(String key, Object objectToAdd) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger.debug("add object " + objectToAdd + " with key " + key);
@@ -122,43 +122,37 @@ public class ObjectFilter {
 		this.keySet.add(key);
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
-		long id = objectToAdd.getTransactionID();
-		if (id == ITransactionObject.UNSET) {
-			// The ID of the object has not been set, so it has not been in the cache during this
-			// run. Hence, we create an ID and add it to the cache.
-			id = dispenseID();
-			objectToAdd.setTransactionID(id);
-			ObjectCache cacheObj = new ObjectCache(key, objectToAdd, Operation.ADD);
-			this.cache.put(id, cacheObj);
+		ObjectCache cached = this.cache.get(objectToAdd);
+		if (cached == null) {
+
+			// The object has not yet been added to the cache.
+			// Hence, we add it now, with the ADD operation.
+			ObjectCache cacheObj = new ObjectCache(dispenseID(), key, objectToAdd, Operation.ADD);
+			this.cache.put(objectToAdd, cacheObj);
+
 		} else {
-			ObjectCache cached = this.cache.get(Long.valueOf(objectToAdd.getTransactionID()));
-			if (cached == null) {
-				// The object got an ID during this run, but was not added to the cache.
-				// Hence, we add it now, with the current operation.
-				ObjectCache cacheObj = new ObjectCache(key, objectToAdd, Operation.ADD);
-				this.cache.put(id, cacheObj);
-			} else {
-				String existingKey = cached.getKey();
-				if (!existingKey.equals(key)) {
-					String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}";
-					throw new RuntimeException(MessageFormat.format(msg, Long.toString(id), Operation.ADD.toString(),
-							existingKey, key, objectToAdd.toString()));
-				}
-				// The object is in cache: update the version as required, keeping in mind that most
-				// of the cases here will be mistakes...
-				Operation op = cached.getOperation();
-				switch (op) {
-				case ADD:
-					throw new RuntimeException("Stale State exception. Invalid + after +");
-				case MODIFY:
-					throw new RuntimeException("Stale State exception. Invalid + after +=");
-				case REMOVE:
-					cached.setObject(objectToAdd);
-					cached.setOperation(Operation.MODIFY);
-					break;
-				} // switch
-			}// else of object not in cache
-		}// else of ID not set
+
+			String existingKey = cached.getKey();
+			if (!existingKey.equals(key)) {
+				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}";
+				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
+						Operation.ADD.toString(), existingKey, key, objectToAdd.toString()));
+			}
+
+			// The object is in cache: update the version as required, keeping in mind that most
+			// of the cases here will be mistakes...
+			Operation op = cached.getOperation();
+			switch (op) {
+			case ADD:
+				throw new IllegalStateException("Stale State exception: Invalid + after +");
+			case MODIFY:
+				throw new IllegalStateException("Stale State exception: Invalid + after +=");
+			case REMOVE:
+				cached.setObject(objectToAdd);
+				cached.setOperation(Operation.MODIFY);
+				break;
+			} // switch
+		}// else of object not in cache
 	}
 
 	/**
@@ -185,58 +179,45 @@ public class ObjectFilter {
 	 * @param objectToUpdate
 	 *            The object for which update shall be registered.
 	 */
-	public void update(String key, ITransactionObject objectToUpdate) {
+	public void update(String key, Object objectToUpdate) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger.debug("update object " + objectToUpdate + " with key " + key);
 
 		// add the key to the keyset
 		this.keySet.add(key);
+
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
+		ObjectCache cached = this.cache.get(objectToUpdate);
+		if (cached == null) {
 
-		long id = objectToUpdate.getTransactionID();
-		if (id == ITransactionObject.UNSET) {
-			id = dispenseID();
-			objectToUpdate.setTransactionID(id);
-			ObjectCache cacheObj = new ObjectCache(key, objectToUpdate, Operation.MODIFY);
-			this.cache.put(id, cacheObj);
+			// The object got an ID during this run, but was not added to this cache.
+			// Hence, we add it now, with the current operation.
+			ObjectCache cacheObj = new ObjectCache(dispenseID(), key, objectToUpdate, Operation.MODIFY);
+			this.cache.put(objectToUpdate, cacheObj);
+
 		} else {
-			ObjectCache cached = this.cache.get(Long.valueOf(objectToUpdate.getTransactionID()));
-			if (cached == null) {
-				// The object got an ID during this run, but was not added to this cache.
-				// Hence, we add it now, with the current operation.
-				ObjectCache cacheObj = new ObjectCache(key, objectToUpdate, Operation.MODIFY);
-				this.cache.put(id, cacheObj);
-			} else {
-				String existingKey = cached.getKey();
-				if (!existingKey.equals(key)) {
 
-					throw new RuntimeException(
-							"Invalid key provided for object with transaction ID "
-									+ Long.toString(id)
-									+ " and operation "
-									+ Operation.MODIFY.toString()
-									+ ":  existing key is "
-									+ existingKey
-									+ ", new key is "
-									+ key
-									+ ". Object may be present in the same filter instance only once, registered using one key only. Object:"
-									+ objectToUpdate.toString());
-				}
-				// The object is in cache: update the version as required.
-				Operation op = cached.getOperation();
-				switch (op) {
-				case ADD:
-					cached.setObject(objectToUpdate);
-					break;
-				case MODIFY:
-					cached.setObject(objectToUpdate);
-					break;
-				case REMOVE:
-					throw new RuntimeException("Stale State exception: Invalid += after -");
-				} // switch
-			}// else of object not in cache
-		}// else of ID not set
+			String existingKey = cached.getKey();
+			if (!existingKey.equals(key)) {
+				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}";
+				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
+						Operation.MODIFY.toString(), existingKey, key, objectToUpdate.toString()));
+			}
+
+			// The object is in cache: update the version as required.
+			Operation op = cached.getOperation();
+			switch (op) {
+			case ADD:
+				cached.setObject(objectToUpdate);
+				break;
+			case MODIFY:
+				cached.setObject(objectToUpdate);
+				break;
+			case REMOVE:
+				throw new IllegalStateException("Stale State exception: Invalid += after -");
+			} // switch
+		}// else of object not in cache
 	}
 
 	/**
@@ -263,58 +244,45 @@ public class ObjectFilter {
 	 * @param objectToRemove
 	 *            The object for which removal shall be registered.
 	 */
-	public void remove(String key, ITransactionObject objectToRemove) {
+	public void remove(String key, Object objectToRemove) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger.debug("remove object " + objectToRemove + " with key " + key);
 
 		// add the key to the keyset
 		this.keySet.add(key);
+
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
-		long id = objectToRemove.getTransactionID();
-		if (id == ITransactionObject.UNSET) {
-			id = dispenseID();
-			objectToRemove.setTransactionID(id);
-			ObjectCache cacheObj = new ObjectCache(key, objectToRemove, Operation.REMOVE);
-			this.cache.put(id, cacheObj);
+		ObjectCache cached = this.cache.get(objectToRemove);
+		if (cached == null) {
+			// The object got an ID during this run, but was not added to this cache.
+			// Hence, we add it now, with the current operation.
+			ObjectCache cacheObj = new ObjectCache(dispenseID(), key, objectToRemove, Operation.REMOVE);
+			this.cache.put(objectToRemove, cacheObj);
 		} else {
-			ObjectCache cached = this.cache.get(Long.valueOf(id));
-			if (cached == null) {
-				// The object got an ID during this run, but was not added to this cache.
-				// Hence, we add it now, with the current operation.
-				ObjectCache cacheObj = new ObjectCache(key, objectToRemove, Operation.REMOVE);
-				this.cache.put(id, cacheObj);
-			} else {
-				String existingKey = cached.getKey();
-				if (!existingKey.equals(key)) {
-					throw new RuntimeException(
-							"Invalid key provided for object with transaction ID "
-									+ Long.toString(id)
-									+ " and operation "
-									+ Operation.REMOVE.toString()
-									+ ":  existing key is "
-									+ existingKey
-									+ ", new key is "
-									+ key
-									+ ". Object may be present in the same filter instance only once, registered using one key only. Object:"
-									+ objectToRemove.toString());
-				}
-				// The object is in cache: update the version as required.
-				Operation op = cached.getOperation();
-				switch (op) {
-				case ADD:
-					// this is a case where we're removing the object from the cache, since we are
-					// removing it now and it was added previously.
-					this.cache.remove(Long.valueOf(id));
-					break;
-				case MODIFY:
-					cached.setObject(objectToRemove);
-					cached.setOperation(Operation.REMOVE);
-					break;
-				case REMOVE:
-					throw new RuntimeException("Stale State exception. Invalid - after -");
-				} // switch
+
+			String existingKey = cached.getKey();
+			if (!existingKey.equals(key)) {
+				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}";
+				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
+						Operation.REMOVE.toString(), existingKey, key, objectToRemove.toString()));
 			}
+
+			// The object is in cache: update the version as required.
+			Operation op = cached.getOperation();
+			switch (op) {
+			case ADD:
+				// this is a case where we're removing the object from the cache, since we are
+				// removing it now and it was added previously.
+				this.cache.remove(objectToRemove);
+				break;
+			case MODIFY:
+				cached.setObject(objectToRemove);
+				cached.setOperation(Operation.REMOVE);
+				break;
+			case REMOVE:
+				throw new IllegalStateException("Stale State exception: Invalid - after -");
+			} // switch
 		}
 	}
 
@@ -326,8 +294,8 @@ public class ObjectFilter {
 	 * @param addedObjects
 	 *            The objects for which addition shall be registered.
 	 */
-	public void addAll(String key, Collection<ITransactionObject> addedObjects) {
-		for (ITransactionObject addObj : addedObjects) {
+	public void addAll(String key, Collection<Object> addedObjects) {
+		for (Object addObj : addedObjects) {
 			add(key, addObj);
 		}
 	}
@@ -340,8 +308,8 @@ public class ObjectFilter {
 	 * @param updatedObjects
 	 *            The objects for which update shall be registered.
 	 */
-	public void updateAll(String key, Collection<ITransactionObject> updatedObjects) {
-		for (ITransactionObject update : updatedObjects) {
+	public void updateAll(String key, Collection<Object> updatedObjects) {
+		for (Object update : updatedObjects) {
 			update(key, update);
 		}
 	}
@@ -354,8 +322,8 @@ public class ObjectFilter {
 	 * @param removedObjects
 	 *            The objects for which removal shall be registered.
 	 */
-	public void removeAll(String key, Collection<ITransactionObject> removedObjects) {
-		for (ITransactionObject removed : removedObjects) {
+	public void removeAll(String key, Collection<Object> removedObjects) {
+		for (Object removed : removedObjects) {
 			remove(key, removed);
 		}
 	}
@@ -366,7 +334,7 @@ public class ObjectFilter {
 	 * @param object
 	 *            The object that shall be registered for addition
 	 */
-	public void add(ITransactionObject object) {
+	public void add(Object object) {
 		add(object.getClass().getName(), object);
 	}
 
@@ -376,7 +344,7 @@ public class ObjectFilter {
 	 * @param object
 	 *            The object that shall be registered for updating
 	 */
-	public void update(ITransactionObject object) {
+	public void update(Object object) {
 		update(object.getClass().getName(), object);
 	}
 
@@ -386,7 +354,7 @@ public class ObjectFilter {
 	 * @param object
 	 *            The object that shall be registered for removal
 	 */
-	public void remove(ITransactionObject object) {
+	public void remove(Object object) {
 		remove(object.getClass().getName(), object);
 	}
 
@@ -397,8 +365,8 @@ public class ObjectFilter {
 	 * @param objects
 	 *            The objects that shall be registered for addition
 	 */
-	public void addAll(List<ITransactionObject> objects) {
-		for (ITransactionObject addedObj : objects) {
+	public void addAll(List<Object> objects) {
+		for (Object addedObj : objects) {
 			add(addedObj.getClass().getName(), addedObj);
 		}
 	}
@@ -410,8 +378,8 @@ public class ObjectFilter {
 	 * @param updateObjects
 	 *            The objects that shall be registered for updating
 	 */
-	public void updateAll(List<ITransactionObject> updateObjects) {
-		for (ITransactionObject update : updateObjects) {
+	public void updateAll(List<Object> updateObjects) {
+		for (Object update : updateObjects) {
 			update(update.getClass().getName(), update);
 		}
 	}
@@ -423,8 +391,8 @@ public class ObjectFilter {
 	 * @param removedObjects
 	 *            The objects that shall be registered for removal
 	 */
-	public void removeAll(List<ITransactionObject> removedObjects) {
-		for (ITransactionObject removed : removedObjects) {
+	public void removeAll(List<Object> removedObjects) {
+		for (Object removed : removedObjects) {
 			remove(removed.getClass().getName(), removed);
 		}
 	}
@@ -436,8 +404,8 @@ public class ObjectFilter {
 	 *            The registration key of the objects to match
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
-	public List<ITransactionObject> getAdded(String key) {
-		List<ITransactionObject> addedObjects = new LinkedList<ITransactionObject>();
+	public List<Object> getAdded(String key) {
+		List<Object> addedObjects = new LinkedList<Object>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.ADD && (objectCache.getKey().equals(key))) {
@@ -456,7 +424,7 @@ public class ObjectFilter {
 	 *            The registration key of the objects to match
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
-	public <V extends ITransactionObject> List<V> getAdded(Class<V> clazz, String key) {
+	public <V extends Object> List<V> getAdded(Class<V> clazz, String key) {
 		List<V> addedObjects = new LinkedList<V>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
@@ -478,8 +446,8 @@ public class ObjectFilter {
 	 *            registration key of the objects to match
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
-	public List<ITransactionObject> getUpdated(String key) {
-		List<ITransactionObject> updatedObjects = new LinkedList<ITransactionObject>();
+	public List<Object> getUpdated(String key) {
+		List<Object> updatedObjects = new LinkedList<Object>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.MODIFY && (objectCache.getKey().equals(key))) {
@@ -496,7 +464,7 @@ public class ObjectFilter {
 	 *            registration key of the objects to match
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
-	public <V extends ITransactionObject> List<V> getUpdated(Class<V> clazz, String key) {
+	public <V extends Object> List<V> getUpdated(Class<V> clazz, String key) {
 		List<V> updatedObjects = new LinkedList<V>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
@@ -518,8 +486,8 @@ public class ObjectFilter {
 	 *            The registration key of the objects to match
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
-	public List<ITransactionObject> getRemoved(String key) {
-		List<ITransactionObject> removedObjects = new LinkedList<ITransactionObject>();
+	public List<Object> getRemoved(String key) {
+		List<Object> removedObjects = new LinkedList<Object>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.REMOVE && (objectCache.getKey().equals(key))) {
@@ -536,7 +504,7 @@ public class ObjectFilter {
 	 *            The registration key of the objects to match
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
-	public <V extends ITransactionObject> List<V> getRemoved(Class<V> clazz, String key) {
+	public <V extends Object> List<V> getRemoved(Class<V> clazz, String key) {
 		List<V> removedObjects = new LinkedList<V>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
@@ -559,8 +527,8 @@ public class ObjectFilter {
 	 *            The registration key for which the objects shall be retrieved
 	 * @return The list of objects matching the given key.
 	 */
-	public List<ITransactionObject> getAll(String key) {
-		List<ITransactionObject> allObjects = new LinkedList<ITransactionObject>();
+	public List<Object> getAll(String key) {
+		List<Object> allObjects = new LinkedList<Object>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getKey().equals(key)) {
@@ -604,6 +572,14 @@ public class ObjectFilter {
 	public void clearCache() {
 		this.cache.clear();
 		this.keySet.clear();
+	}
+
+	public int sizeKeySet() {
+		return this.keySet.size();
+	}
+
+	public int sizeCache() {
+		return this.cache.size();
 	}
 
 	/**
