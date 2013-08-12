@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.privilege.helper.PrivilegeInitializationHelper;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.PrivilegeRep;
@@ -46,7 +47,6 @@ import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.test.model.TestRestrictable;
 import ch.eitchnet.privilege.test.model.TestSystemUserAction;
 import ch.eitchnet.privilege.test.model.TestSystemUserActionDeny;
-import ch.eitchnet.privilege.xml.InitializationHelper;
 import ch.eitchnet.utils.helper.ArraysHelper;
 import ch.eitchnet.utils.helper.FileHelper;
 
@@ -139,7 +139,7 @@ public class PrivilegeTest {
 			File privilegeConfigFile = new File(pwd + "/config/Privilege.xml");
 
 			// initialize privilege
-			privilegeHandler = InitializationHelper.initializeFromXml(privilegeConfigFile);
+			privilegeHandler = PrivilegeInitializationHelper.initializeFromXml(privilegeConfigFile);
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

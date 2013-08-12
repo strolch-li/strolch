@@ -17,9 +17,11 @@
  * along with Privilege.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.privilege.xml;
+package ch.eitchnet.privilege.helper;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -30,9 +32,9 @@ import ch.eitchnet.privilege.handler.DefaultPrivilegeHandler;
 import ch.eitchnet.privilege.handler.EncryptionHandler;
 import ch.eitchnet.privilege.handler.PersistenceHandler;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
-import ch.eitchnet.privilege.helper.ClassHelper;
 import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
+import ch.eitchnet.privilege.xml.PrivilegeConfigSaxReader;
 import ch.eitchnet.utils.helper.XmlHelper;
 
 /**
@@ -41,9 +43,9 @@ import ch.eitchnet.utils.helper.XmlHelper;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InitializationHelper {
+public class PrivilegeInitializationHelper {
 
-	private static final Logger logger = LoggerFactory.getLogger(InitializationHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(PrivilegeInitializationHelper.class);
 
 	/**
 	 * Initializes the {@link DefaultPrivilegeHandler} from the configuration file
@@ -51,7 +53,8 @@ public class InitializationHelper {
 	 * @param privilegeXmlFile
 	 *            a {@link File} reference to the XML file containing the configuration for Privilege
 	 * 
-	 * @return the {@link PrivilegeHandler} instance loaded from the configuration file
+	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
+	 *         {@link PersistenceHandler} are set and initialized as well
 	 */
 	public static PrivilegeHandler initializeFromXml(File privilegeXmlFile) {
 
@@ -60,10 +63,31 @@ public class InitializationHelper {
 			throw new PrivilegeException("Privilege file does not exist at path " + privilegeXmlFile.getAbsolutePath());
 		}
 
+		// delegate using input stream
+		try {
+			return initializeFromXml(new FileInputStream(privilegeXmlFile));
+		} catch (Exception e) {
+			PrivilegeInitializationHelper.logger.error(e.getMessage(), e);
+			throw new PrivilegeException("Failed to load configuration from " + privilegeXmlFile.getAbsolutePath());
+		}
+	}
+
+	/**
+	 * Initializes the {@link PrivilegeHandler} by loading from the given input stream. This stream must be a valid XML
+	 * source
+	 * 
+	 * @param privilegeConfigInputStream
+	 *            the XML stream containing the privilege configuration
+	 * 
+	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
+	 *         {@link PersistenceHandler} are set and initialized as well
+	 */
+	public static PrivilegeHandler initializeFromXml(InputStream privilegeConfigInputStream) {
+
 		// parse configuration file
 		PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
 		PrivilegeConfigSaxReader xmlHandler = new PrivilegeConfigSaxReader(containerModel);
-		XmlHelper.parseDocument(privilegeXmlFile, xmlHandler);
+		XmlHelper.parseDocument(privilegeConfigInputStream, xmlHandler);
 
 		// initialize encryption handler
 		String encryptionHandlerClassName = containerModel.getEncryptionHandlerClassName();
@@ -72,7 +96,7 @@ public class InitializationHelper {
 		try {
 			encryptionHandler.initialize(parameterMap);
 		} catch (Exception e) {
-			InitializationHelper.logger.error(e.getMessage(), e);
+			PrivilegeInitializationHelper.logger.error(e.getMessage(), e);
 			throw new PrivilegeException("EncryptionHandler " + encryptionHandlerClassName
 					+ " could not be initialized");
 		}
@@ -84,7 +108,7 @@ public class InitializationHelper {
 		try {
 			persistenceHandler.initialize(parameterMap);
 		} catch (Exception e) {
-			InitializationHelper.logger.error(e.getMessage(), e);
+			PrivilegeInitializationHelper.logger.error(e.getMessage(), e);
 			throw new PrivilegeException("PersistenceHandler " + persistenceHandlerClassName
 					+ " could not be initialized");
 		}
@@ -96,7 +120,7 @@ public class InitializationHelper {
 		try {
 			privilegeHandler.initialize(parameterMap, encryptionHandler, persistenceHandler, policyMap);
 		} catch (Exception e) {
-			InitializationHelper.logger.error(e.getMessage(), e);
+			PrivilegeInitializationHelper.logger.error(e.getMessage(), e);
 			throw new PrivilegeException("PrivilegeHandler " + privilegeHandler.getClass().getName()
 					+ " could not be initialized");
 		}
