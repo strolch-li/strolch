@@ -82,10 +82,18 @@ public class ObjectFilter {
 
 	private final static Logger logger = LoggerFactory.getLogger(ObjectFilter.class);
 
-	private HashMap<Object, ObjectCache> cache = new HashMap<Object, ObjectCache>();
-	private HashSet<String> keySet = new HashSet<String>();
-
 	private static long id = ObjectCache.UNSET;
+
+	private final HashMap<Object, ObjectCache> cache;
+	private final HashSet<String> keySet;
+
+	/**
+	 * Default constructor initializing the filter
+	 */
+	public ObjectFilter() {
+		this.cache = new HashMap<Object, ObjectCache>();
+		this.keySet = new HashSet<String>();
+	}
 
 	/**
 	 * Register, under the given key, the addition of the given object.
