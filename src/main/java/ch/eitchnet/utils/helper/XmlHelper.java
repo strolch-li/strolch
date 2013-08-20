@@ -65,9 +65,9 @@ public class XmlHelper {
 	public static final String UNIX_LINE_SEP = "\n";
 
 	/**
-	 * DEFAULT_ENCODING = "UTF-8" : defines the default UTF-8 encoding expected of XML files
+	 * DEFAULT_ENCODING = "utf-8" : defines the default UTF-8 encoding expected of XML files
 	 */
-	public static final String DEFAULT_ENCODING = "UTF-8";
+	public static final String DEFAULT_ENCODING = "utf-8";
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlHelper.class);
 
