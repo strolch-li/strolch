@@ -17,57 +17,32 @@
  * along with ch.eitchnet.java.xmlpers.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.xmlpers;
+package ch.eitchnet.xmlpers.api;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.ContentHandler;
+import java.util.Set;
+
+import ch.eitchnet.xmlpers.impl.XmlPersistenceFileDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public interface XmlDao<T> {
+public interface XmlPersistenceMetadataDao {
 
-	/**
-	 * @param object
-	 * @return
-	 */
-	public String getType(T object);
+	public void setXmlPersistenceFileDao(XmlPersistenceFileDao fileDao);
 
-	/**
-	 * @param object
-	 * @return
-	 */
-	public String getSubType(T object);
+	public void setXmlPersistenceFileHandler(XmlPersistenceFileHandler fileHandler);
 
-	/**
-	 * @param object
-	 * @return
-	 */
-	public String getId(T object);
+	public void removeAll();
 
-	/**
-	 * 
-	 * @param object
-	 * @param document
-	 * @return
-	 */
-	public Element serializeToDom(T object, Document document);
+	public Set<String> queryKeySet();
 
-	/**
-	 * @param element
-	 * @return
-	 */
-	public T parseFromDom(Element element);
+	public Set<String> queryKeySet(String type);
 
-	/**
-	 * @param object
-	 * @param contentHandler
-	 */
-	// XXX Use the XMLSerializer object for serializing to SAX...
-	public void serializeToSax(T object, ContentHandler contentHandler);
+	public Set<String> queryKeySet(String type, String subType);
 
-	// XXX parse from SAX is missing...
+	public long querySize();
 
+	public long querySize(String type);
+
+	public long querySize(String type, String subType);
 }

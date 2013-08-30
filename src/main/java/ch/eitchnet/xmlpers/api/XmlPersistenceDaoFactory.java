@@ -17,13 +17,24 @@
  * along with ch.eitchnet.java.xmlpers.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.xmlpers;
+package ch.eitchnet.xmlpers.api;
+
+import java.util.Properties;
+
+import ch.eitchnet.xmlpers.impl.XmlPersistenceFileDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
-public interface XmlDaoFactory {
+public interface XmlPersistenceDaoFactory {
 
-	public <T> XmlDao<T> getDao(String type);
+	public void initialize(XmlPersistenceFileDao fileDao, Properties properties);
+
+	public <T> XmlPersistenceMetadataDao getMetadataDao();
+
+	public <T> XmlPersistenceDao<T> getDao(T object);
+
+	public <T> XmlPersistenceDao<T> getDao(String type);
+
+	public <T> XmlPersistenceDao<T> getDao(String type, String subType);
 }

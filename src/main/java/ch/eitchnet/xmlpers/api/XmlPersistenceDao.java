@@ -17,26 +17,37 @@
  * along with ch.eitchnet.java.xmlpers.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.xmlpers;
+package ch.eitchnet.xmlpers.api;
+
+import java.util.List;
+import java.util.Set;
+
+import ch.eitchnet.xmlpers.impl.XmlPersistenceFileDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class XmlPersistenceExecption extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+public interface XmlPersistenceDao<T> {
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public XmlPersistenceExecption(String message, Throwable cause) {
-		super(message, cause);
-	}
+	public void setXmlPersistenceFileDao(XmlPersistenceFileDao fileDao);
 
-	/**
-	 * @param message
-	 */
-	public XmlPersistenceExecption(String message) {
-		super(message);
-	}
+	public void setXmlPersistenceFileHandler(XmlPersistenceFileHandler fileHandler);
+
+	public void add(T object);
+
+	public void update(T object);
+
+	public void remove(T object);
+
+	public void removeById(String id);
+
+	public void removeAll();
+
+	public T queryById(String id);
+
+	public List<T> queryAll();
+
+	public Set<String> queryKeySet();
+
+	public long querySize();
 }

@@ -19,83 +19,29 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import ch.eitchnet.xmlpers.XmlDao;
+import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class MyClassDao implements XmlDao<MyClass> {
+public class ResourceSaxDao extends ResourceDao {
 
-	@Override
-	public String getType(MyClass object) {
-		return MyClass.class.getName();
-	}
-
-	@Override
-	public String getSubType(MyClass object) {
-		return object.getType();
-	}
-
-	@Override
-	public String getId(MyClass object) {
-		return object.getId();
-	}
-
-	@Override
-	public Element serializeToDom(MyClass object, Document document) {
-
-		Element element = document.createElement("MyClass");
-
-		element.setAttribute("id", object.getId());
-		element.setAttribute("type", object.getType());
-
-		Element nameElement = document.createElement("Name");
-		element.appendChild(nameElement);
-		Text textNode = document.createTextNode(object.getName());
-		nameElement.appendChild(textNode);
-
-		return element;
-	}
-
-	/**
-	 * @see ch.eitchnet.xmlpers.XmlDao#parseFromDom(org.w3c.dom.Element)
-	 */
-	@Override
-	public MyClass parseFromDom(Element element) {
-
-		String id = element.getAttribute("id");
-		String type = element.getAttribute("type");
-		Element nameElement = (Element) element.getElementsByTagName("Name").item(0);
-		String name = nameElement.getTextContent();
-
-		MyClass myClass = new MyClass(id, name, type);
-
-		return myClass;
-	}
-
-	/**
-	 * @see ch.eitchnet.xmlpers.XmlDao#serializeToSax(java.lang.Object, org.xml.sax.ContentHandler)
-	 */
-	@Override
-	public void serializeToSax(MyClass object, ContentHandler contentHandler) {
+	public void serializeToSax(Resource object, ContentHandler contentHandler) {
 
 		try {
 			contentHandler.startDocument();
 
-			// MyClass element / root
+			// Resource element / root
 			{
 				AttributesImpl atts = new AttributesImpl();
 				atts.addAttribute("", "", "id", "", object.getId());
 				atts.addAttribute("", "", "type", "", object.getType());
-				contentHandler.startElement("", "", "MyClass", atts);
+				contentHandler.startElement("", "", "Resource", atts);
 
 				// name element
 				{
@@ -105,8 +51,8 @@ public class MyClassDao implements XmlDao<MyClass> {
 					contentHandler.endElement("", "", "name");
 				}
 
-				// MyClass end
-				contentHandler.endElement("", "", "MyClass");
+				// Resource end
+				contentHandler.endElement("", "", "Resource");
 			}
 
 			// end document

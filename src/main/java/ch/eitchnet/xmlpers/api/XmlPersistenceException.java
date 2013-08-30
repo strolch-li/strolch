@@ -17,27 +17,26 @@
  * along with ch.eitchnet.java.xmlpers.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.xmlpers.test.impl;
-
-import ch.eitchnet.xmlpers.XmlDao;
-import ch.eitchnet.xmlpers.XmlDaoFactory;
+package ch.eitchnet.xmlpers.api;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public class MyDaoFactory implements XmlDaoFactory {
+public class XmlPersistenceException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @see ch.eitchnet.xmlpers.XmlDaoFactory#getDao(java.lang.String)
+	 * @param message
+	 * @param cause
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> XmlDao<T> getDao(String type) {
-		if (type.equals(MyClass.class.getName()))
-			return (XmlDao<T>) new MyClassDao();
-
-		throw new RuntimeException("Class with type " + type + " is unknown!");
+	public XmlPersistenceException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
+	/**
+	 * @param message
+	 */
+	public XmlPersistenceException(String message) {
+		super(message);
+	}
 }

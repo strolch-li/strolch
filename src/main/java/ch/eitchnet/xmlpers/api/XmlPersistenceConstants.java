@@ -19,13 +19,15 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers;
-
+package ch.eitchnet.xmlpers.api;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
+ * 
  */
-public interface XmlSaxWriter {
+public class XmlPersistenceConstants {
 
+	public static final String PROP_VERBOSE = "ch.eitchnet.xmlpers.verbose";
+	public static final String PROP_BASEPATH = "ch.eitchnet.xmlpers.basepath";
+	public static final String PROP_DAO_FACTORY_CLASS = "ch.eitchnet.xmlpers.daoFactoryClass";
 }

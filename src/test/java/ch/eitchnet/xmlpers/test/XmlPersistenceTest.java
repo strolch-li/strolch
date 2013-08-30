@@ -21,6 +21,7 @@ package ch.eitchnet.xmlpers.test;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -30,12 +31,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.utils.objectfilter.ITransactionObject;
-import ch.eitchnet.xmlpers.XmlPersistenceExecption;
-import ch.eitchnet.xmlpers.XmlPersistenceHandler;
-import ch.eitchnet.xmlpers.XmlPersistenceTransaction;
-import ch.eitchnet.xmlpers.test.impl.MyClass;
-import ch.eitchnet.xmlpers.test.impl.MyDaoFactory;
+import ch.eitchnet.xmlpers.api.XmlPersistenceConstants;
+import ch.eitchnet.xmlpers.api.XmlPersistenceException;
+import ch.eitchnet.xmlpers.api.XmlPersistenceHandler;
+import ch.eitchnet.xmlpers.api.XmlPersistenceTransaction;
+import ch.eitchnet.xmlpers.test.impl.TestModelDaoFactory;
+import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -44,6 +45,12 @@ import ch.eitchnet.xmlpers.test.impl.MyDaoFactory;
 public class XmlPersistenceTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlPersistenceTest.class.getName());
+
+	private static final String RES_TYPE = "@subType";
+	private static final String RES_TYPE_INEXISTANT = "@inexistant";
+	private static final String RES_NAME = "@name";
+	private static final String RES_NAME_MODIFIED = "@name_modified";
+	private static final String RES_ID = "@id";
 
 	private static XmlPersistenceHandler persistenceHandler;
 
@@ -60,13 +67,13 @@ public class XmlPersistenceTest {
 			if (!basePathF.exists() && !basePathF.mkdirs())
 				Assert.fail("Could not create temporaray database store in " + basePathF.getAbsolutePath());
 
-			System.setProperty(XmlPersistenceHandler.CONFIG_BASEPATH, "target/testdb");
-			System.setProperty(XmlPersistenceHandler.CONFIG_VERBOSE, "true");
-			System.setProperty(XmlPersistenceHandler.CONFIG_DAO_FACTORY_CLASS, MyDaoFactory.class.getName());
+			Properties props = new Properties();
+			props.setProperty(XmlPersistenceConstants.PROP_BASEPATH, "target/testdb");
+			props.setProperty(XmlPersistenceConstants.PROP_VERBOSE, "true");
+			props.setProperty(XmlPersistenceConstants.PROP_DAO_FACTORY_CLASS, TestModelDaoFactory.class.getName());
 
 			XmlPersistenceTest.persistenceHandler = new XmlPersistenceHandler();
-			XmlPersistenceTest.persistenceHandler.initialize();
-
+			XmlPersistenceTest.persistenceHandler.initialize(props);
 			XmlPersistenceTest.logger.info("Initialized persistence handler.");
 
 		} catch (Exception e) {
@@ -101,12 +108,12 @@ public class XmlPersistenceTest {
 			XmlPersistenceTest.logger.info("Trying to create...");
 
 			// new instance
-			MyClass myClass = new MyClass("@id", "@name", "@subtype");
+			Resource resource = new Resource(RES_ID, RES_NAME, RES_TYPE);
 
 			// persist instance
 			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
-			tx.add(myClass);
-			XmlPersistenceTest.persistenceHandler.commitTx();
+			tx.add(resource);
+			tx.commit();
 
 			XmlPersistenceTest.logger.info("Done creating.");
 
@@ -121,11 +128,11 @@ public class XmlPersistenceTest {
 		try {
 			XmlPersistenceTest.logger.info("Trying to read...");
 
-			// query MyClass with id @id
+			// query Resource with id @id
 			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
-			MyClass myClass = tx.queryById(MyClass.class.getName(), "@subtype", "@id");
-			XmlPersistenceTest.logger.info("Found MyClass: " + myClass);
-			XmlPersistenceTest.persistenceHandler.commitTx();
+			Resource resource = tx.queryById(Resource.class.getName(), RES_TYPE, RES_ID);
+			XmlPersistenceTest.logger.info("Found Resource: " + resource);
+			tx.commit();
 
 			XmlPersistenceTest.logger.info("Done reading.");
 
@@ -142,15 +149,15 @@ public class XmlPersistenceTest {
 
 			// query the instance
 			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
-			MyClass myClass = tx.queryById(MyClass.class.getName(), "@subtype", "@id");
-			XmlPersistenceTest.logger.info("Found MyClass: " + myClass);
+			Resource resource = tx.queryById(Resource.class.getName(), RES_TYPE, RES_ID);
+			XmlPersistenceTest.logger.info("Found Resource: " + resource);
 
 			// modify the instance
-			myClass.setName("@name_modified");
+			resource.setName(RES_NAME_MODIFIED);
 
 			// update the instance
-			tx.update(myClass);
-			XmlPersistenceTest.persistenceHandler.commitTx();
+			tx.update(resource);
+			tx.commit();
 
 			XmlPersistenceTest.logger.info("Done updating.");
 
@@ -166,39 +173,35 @@ public class XmlPersistenceTest {
 
 		// query the instance
 		XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
-		MyClass myClass = tx.queryById(MyClass.class.getName(), "@subtype", "@id");
-		XmlPersistenceTest.logger.info("Found MyClass: " + myClass);
+		Resource resource = tx.queryById(Resource.class.getName(), RES_TYPE, RES_ID);
+		XmlPersistenceTest.logger.info("Found Resource: " + resource);
 
-		tx.remove(myClass);
-		XmlPersistenceTest.persistenceHandler.commitTx();
+		tx.remove(resource);
+		tx.commit();
 
 		XmlPersistenceTest.logger.info("Done removing.");
 	}
 
-	/**
-	 * 
-	 */
 	@Test
 	public void testQueryFail() {
 
+		XmlPersistenceTransaction tx = null;
 		try {
 			XmlPersistenceTest.logger.info("Trying to query removed object...");
-			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
-			MyClass myClass = tx.queryById(MyClass.class.getName(), "@subtype", "@id");
-			XmlPersistenceTest.logger.info("Found MyClass: " + myClass);
+			tx = XmlPersistenceTest.persistenceHandler.openTx();
+			Resource resource = tx.queryById(Resource.class.getName(), RES_TYPE, RES_ID);
+			XmlPersistenceTest.logger.info("Found Resource: " + resource);
 			XmlPersistenceTest.logger.info("Done querying removed object");
-		} catch (XmlPersistenceExecption e) {
+		} catch (XmlPersistenceException e) {
 			Assert.assertEquals("Wrong error message. Expected error that object does not exist",
-					"No object exists for ch.eitchnet.xmlpers.test.impl.MyClass / @subtype / @id",
+					"No object exists for ch.eitchnet.xmlpers.test.impl.Resource / @subtype / @id",
 					e.getLocalizedMessage());
 		} finally {
-			XmlPersistenceTest.persistenceHandler.commitTx();
+			if (tx != null)
+				tx.commit();
 		}
 	}
 
-	/**
-	 * 
-	 */
 	@Test
 	public void testReCreate() {
 
@@ -206,12 +209,12 @@ public class XmlPersistenceTest {
 			XmlPersistenceTest.logger.info("Trying to recreate...");
 
 			// new instance
-			MyClass myClass = new MyClass("@id", "@name", "@subtype");
+			Resource resource = new Resource(RES_ID, RES_NAME, RES_TYPE);
 
 			// persist instance
 			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
-			tx.add(myClass);
-			XmlPersistenceTest.persistenceHandler.commitTx();
+			tx.add(resource);
+			tx.commit();
 
 			XmlPersistenceTest.logger.info("Done creating.");
 
@@ -221,101 +224,94 @@ public class XmlPersistenceTest {
 		}
 	}
 
-	/**
-	 * 
-	 */
 	@Test
 	@Ignore
 	public void testQueryFromTo() {
 		Assert.fail("Not yet implemented");
 	}
 
-	/**
-	 * 
-	 */
 	@Test
 	public void testQueryAll() {
 
+		XmlPersistenceTransaction tx = null;
 		try {
 
 			XmlPersistenceTest.logger.info("Trying to query all...");
 
 			// query all
-			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
-			List<Object> list = tx.queryAll(MyClass.class.getName());
+			tx = XmlPersistenceTest.persistenceHandler.openTx();
+			List<Object> list = tx.queryAll(Resource.class.getName());
 			Assert.assertTrue("Expected only one object, found " + list.size(), list.size() == 1);
 
 			// also with subtype
-			list = tx.queryAll(MyClass.class.getName(), "@subtype");
+			list = tx.queryAll(Resource.class.getName(), RES_TYPE);
 			Assert.assertTrue("Expected only one object, found " + list.size(), list.size() == 1);
 
 			// and now something useless
-			list = tx.queryAll(MyClass.class.getName(), "@inexistant");
+			list = tx.queryAll(Resource.class.getName(), RES_TYPE_INEXISTANT);
 			Assert.assertTrue("Expected no objects, found " + list.size(), list.size() == 0);
 
 			XmlPersistenceTest.logger.info("Done querying.");
 
 		} finally {
-			XmlPersistenceTest.persistenceHandler.commitTx();
+			if (tx != null)
+				tx.commit();
 		}
 	}
 
-	/**
-	 * 
-	 */
 	@Test
 	public void testKeySet() {
 
+		XmlPersistenceTransaction tx = null;
 		try {
-			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
+			tx = XmlPersistenceTest.persistenceHandler.openTx();
 
-			Set<String> keySet = tx.queryKeySet(MyClass.class.getName());
+			Set<String> keySet = tx.queryKeySet(Resource.class.getName());
 			Assert.assertTrue("Expected one key, found " + keySet.size(), keySet.size() == 1);
 
 			// also with subtype
-			keySet = tx.queryKeySet(MyClass.class.getName(), "@subtype");
+			keySet = tx.queryKeySet(Resource.class.getName(), RES_TYPE);
 			Assert.assertTrue("Expected one key, found " + keySet.size(), keySet.size() == 1);
 
 			// and now something useless
-			keySet = tx.queryKeySet(MyClass.class.getName(), "@inexistant");
+			keySet = tx.queryKeySet(Resource.class.getName(), RES_TYPE_INEXISTANT);
 			Assert.assertTrue("Expected no keys, found " + keySet, keySet.size() == 0);
 
 		} finally {
-			XmlPersistenceTest.persistenceHandler.commitTx();
+			if (tx != null)
+				tx.commit();
 		}
 	}
 
-	/**
-	 * 
-	 */
 	@Test
 	public void testRemoveAll() {
 
+		XmlPersistenceTransaction tx = null;
 		try {
-			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
+			tx = XmlPersistenceTest.persistenceHandler.openTx();
 
-			List<ITransactionObject> objects = tx.queryAll(MyClass.class.getName(), "@subType");
+			List<Resource> objects = tx.queryAll(Resource.class.getName(), RES_TYPE);
 			tx.removeAll(objects);
 
 		} finally {
-			XmlPersistenceTest.persistenceHandler.commitTx();
+			if (tx != null)
+				tx.commit();
 		}
 	}
 
-	/**
-	 * 
-	 */
 	@Test
 	public void testSize() {
 
+		XmlPersistenceTransaction tx = null;
 		try {
-			XmlPersistenceTransaction tx = XmlPersistenceTest.persistenceHandler.openTx();
+			tx = XmlPersistenceTest.persistenceHandler.openTx();
 
-			long size = tx.querySize(MyClass.class.getName(), "@subType");
+			long size = tx.querySize(Resource.class.getName(), RES_TYPE);
 			Assert.assertTrue("Expected size = 0, found: " + size, size == 0);
 
 		} finally {
-			XmlPersistenceTest.persistenceHandler.commitTx();
+			if (tx != null)
+				tx.commit();
 		}
 	}
 }
