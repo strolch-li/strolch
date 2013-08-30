@@ -135,14 +135,25 @@
 				<executions>
 					<execution>
 						<id>attach-sources</id>
-						<phase>verify</phase>
+						<phase>package</phase>
 						<goals>
-							<goal>jar-no-fork</goal>
+							<goal>jar</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
-
+			<plugin> 
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId> 
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<phase>deploy</phase>
+						<goals><goal>jar</goal></goals>
+					</execution> 
+				</executions> 
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -156,7 +167,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
@@ -164,6 +174,19 @@
 				<configuration>
 					<outputEncoding>UTF-8</outputEncoding>
 				</configuration>
+			</plugin>		
+			<plugin> 
+				<!-- explicitly define maven-deploy-plugin after other to force exec order -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId> 
+				<version>2.7</version>
+				<executions> 
+					<execution> 
+						<id>deploy</id>
+						<phase>deploy</phase>
+						<goals><goal>deploy</goal></goals> 
+					</execution> 
+				</executions> 
 			</plugin>
 		</plugins>
 	</build>
