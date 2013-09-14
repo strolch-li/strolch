@@ -19,7 +19,7 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.impl;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -41,7 +41,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import ch.eitchnet.utils.exceptions.XmlException;
-import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
+import ch.eitchnet.xmlpers.api.XmlPersistenceContextData;
+import ch.eitchnet.xmlpers.api.XmlPersistenceException;
+import ch.eitchnet.xmlpers.api.XmlPersistenceFileHandler;
+import ch.eitchnet.xmlpers.api.XmlPersistenceSaxContextData;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

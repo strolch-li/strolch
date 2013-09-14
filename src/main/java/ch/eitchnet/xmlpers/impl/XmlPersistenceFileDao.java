@@ -21,6 +21,7 @@ package ch.eitchnet.xmlpers.impl;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -28,7 +29,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.utils.helper.FileHelper;
 import ch.eitchnet.utils.helper.PropertiesHelper;
 import ch.eitchnet.xmlpers.api.XmlPersistenceConstants;
 import ch.eitchnet.xmlpers.api.XmlPersistenceException;
@@ -56,52 +56,98 @@ public class XmlPersistenceFileDao {
 	}
 
 	/**
-	 * @return the pathBuilder
+	 * Does a recursive and complete deletion of all objects, types and sub-types
 	 */
-	public XmlPersistencePathBuilder getPathBuilder() {
-		return this.pathBuilder;
-	}
-
 	public void removeAll() {
 
-		File removePath = this.pathBuilder.getRemovePath();
-		String failMsg = "Deletion of persistence units at {1} failed! Check file permissions!";
-		remove(removePath, failMsg, removePath);
+		Set<String> types = queryTypeSet();
+		for (String type : types) {
+
+			Set<String> idsByType = queryKeySet(type);
+			for (String id : idsByType) {
+				remove(type, id);
+			}
+
+			Set<String> subTypes = queryTypeSet(type);
+			for (String subType : subTypes) {
+
+				Set<String> idsBySubType = queryKeySet(type, subType);
+				for (String id : idsBySubType) {
+					remove(type, subType, id);
+				}
+			}
+		}
 	}
-	
+
 	public void removeAll(String type) {
 
-		File removePath = this.pathBuilder.getRemovePath(type);
-		String failMsg = "Deletion of persistence units for {0} at {1} failed! Check file permissions!";
-		remove(removePath, failMsg, type, removePath);
+		Set<String> idsByType = queryKeySet(type);
+		for (String id : idsByType) {
+			remove(type, id);
+		}
+
+		Set<String> subTypes = queryTypeSet(type);
+		for (String subType : subTypes) {
+
+			Set<String> idsBySubType = queryKeySet(type, subType);
+			for (String id : idsBySubType) {
+				remove(type, subType, id);
+			}
+		}
 	}
 
 	public void removeAll(String type, String subType) {
 
-		File removePath = this.pathBuilder.getRemovePath(type, subType);
-		String failMsg = "Deletion of persistence units for {0} / {1} at {2} failed! Check file permissions!";
-		remove(removePath, failMsg, type, subType, removePath);
+		Set<String> idsBySubType = queryKeySet(type, subType);
+		for (String id : idsBySubType) {
+			remove(type, subType, id);
+		}
 	}
 
 	public void remove(String type, String id) {
 		File removePath = this.pathBuilder.getRemovePath(type, id);
 		String failMsg = "Deletion of persistence units for {0} / {1} at {2} failed! Check file permissions!";
 		remove(removePath, failMsg, type, id, removePath);
+
+		// if no more objects with this type exist, then delete the path
+		failMsg = "Deletion of empty directory for {0} at {2} failed! Check file permissions!";
+		File parentFile = removePath.getParentFile();
+		deleteEmptyDirectory(parentFile, failMsg, type, parentFile);
 	}
 
 	public void remove(String type, String subType, String id) {
 		File removePath = this.pathBuilder.getRemovePath(type, subType, id);
 		String failMsg = "Deletion of persistence units for {0} / {1} / {2} at {3} failed! Check file permissions!";
 		remove(removePath, failMsg, type, subType, id, removePath);
+
+		// if no more objects with this subType exist, then delete the path
+		failMsg = "Deletion of empty directory for {0} / {1} at {2} failed! Check file permissions!";
+		File parentFile = removePath.getParentFile();
+		deleteEmptyDirectory(parentFile, failMsg, type, subType, parentFile);
 	}
 
-	private void remove(File removePath, String failMsg, Object... msgParts) {
-		File[] removePaths = new File[] { removePath };
-		boolean removed = FileHelper.deleteFiles(removePaths, this.verbose);
-		if (!removed) {
-			String msg = MessageFormat.format(failMsg, msgParts);
-			throw new XmlPersistenceException(msg);
-		}
+	public File getAddPath(String type, String id) {
+		return this.pathBuilder.getAddPath(type, id);
+	}
+
+	public File getAddPath(String type, String subType, String id) {
+		return this.pathBuilder.getAddPath(type, subType, id);
+	}
+
+	public File getReadPath(String type, String id) {
+		return this.pathBuilder.getReadPath(type, id);
+	}
+
+	public File getReadPath(String type, String subType, String id) {
+		return this.pathBuilder.getReadPath(type, subType, id);
+	}
+
+	public File getUpdatePath(String type, String id) {
+		return this.pathBuilder.getUpdatePath(type, id);
+	}
+
+	public File getUpdatePath(String type, String subType, String id) {
+		return this.pathBuilder.getUpdatePath(type, subType, id);
 	}
 
 	/**
@@ -109,9 +155,9 @@ public class XmlPersistenceFileDao {
 	 * 
 	 * @return
 	 */
-	public Set<String> queryKeySet() {
+	public Set<String> queryTypeSet() {
 		File queryPath = this.pathBuilder.getQueryPath();
-		Set<String> keySet = queryKeySet(queryPath);
+		Set<String> keySet = queryTypeSet(queryPath);
 		if (this.verbose)
 			XmlPersistenceFileDao.logger.info("Found " + keySet.size() + " types");
 		return keySet;
@@ -119,6 +165,19 @@ public class XmlPersistenceFileDao {
 
 	/**
 	 * Returns the set of sub types for the given type
+	 * 
+	 * @return
+	 */
+	public Set<String> queryTypeSet(String type) {
+		File queryPath = this.pathBuilder.getQueryPath(type);
+		Set<String> keySet = queryTypeSet(queryPath);
+		if (this.verbose)
+			XmlPersistenceFileDao.logger.info("Found " + keySet.size() + " subTypes of type " + type);
+		return keySet;
+	}
+
+	/**
+	 * Returns the object ids for the given type
 	 * 
 	 * @param type
 	 * 
@@ -133,7 +192,7 @@ public class XmlPersistenceFileDao {
 	}
 
 	/**
-	 * Returns the set of ids for the objects with the give type and sub type
+	 * Returns the object ids for the give type and sub type
 	 * 
 	 * @param type
 	 * @param subType
@@ -148,27 +207,19 @@ public class XmlPersistenceFileDao {
 		return keySet;
 	}
 
-	/**
-	 * @param queryPath
-	 * @return
-	 */
-	private Set<String> queryKeySet(File queryPath) {
-		Set<String> keySet = new HashSet<String>();
-
-		File[] subTypeFiles = queryPath.listFiles();
-		for (File subTypeFile : subTypeFiles) {
-			if (subTypeFile.isFile())
-				keySet.add(this.pathBuilder.getId(subTypeFile.getName()));
-		}
-
-		return keySet;
-	}
-
-	public long querySize() {
+	public long queryTypeSize() {
 		File queryPath = this.pathBuilder.getQueryPath();
-		long numberOfFiles = querySize(queryPath);
+		long numberOfFiles = queryTypeSize(queryPath);
 		if (this.verbose)
 			XmlPersistenceFileDao.logger.info("Found " + numberOfFiles + " types");
+		return numberOfFiles;
+	}
+
+	public long queryTypeSize(String type) {
+		File queryPath = this.pathBuilder.getQueryPath(type);
+		long numberOfFiles = queryTypeSize(queryPath);
+		if (this.verbose)
+			XmlPersistenceFileDao.logger.info("Found " + numberOfFiles + " elements for " + type);
 		return numberOfFiles;
 	}
 
@@ -188,7 +239,99 @@ public class XmlPersistenceFileDao {
 		return numberOfFiles;
 	}
 
+	/**
+	 * Returns the types, i.e. directories in the given query path
+	 * 
+	 * @param queryPath
+	 *            the path for which the types should be gathered
+	 * 
+	 * @return a set of types in the given query path
+	 */
+	private Set<String> queryTypeSet(File queryPath) {
+		Set<String> keySet = new HashSet<String>();
+
+		File[] subTypeFiles = queryPath.listFiles();
+		for (File subTypeFile : subTypeFiles) {
+			if (subTypeFile.isFile()) {
+				String filename = subTypeFile.getName();
+				String id = this.pathBuilder.getId(filename);
+				keySet.add(id);
+			}
+		}
+
+		return keySet;
+	}
+
+	/**
+	 * Returns the ids of all objects in the given query path, i.e. the id part of all the files in the given query path
+	 * 
+	 * @param queryPath
+	 *            the path for which the ids should be gathered
+	 * 
+	 * @return a set of ids for the objects in the given query path
+	 */
+	private Set<String> queryKeySet(File queryPath) {
+		if (!queryPath.exists())
+			return Collections.emptySet();
+		if (!queryPath.isDirectory())
+			throw new IllegalArgumentException("The path is not a directory, thus can not query key set for it: "
+					+ queryPath.getAbsolutePath());
+
+		Set<String> keySet = new HashSet<String>();
+
+		File[] subTypeFiles = queryPath.listFiles();
+		for (File subTypeFile : subTypeFiles) {
+			if (subTypeFile.isFile()) {
+				String filename = subTypeFile.getName();
+				String id = this.pathBuilder.getId(filename);
+				keySet.add(id);
+			}
+		}
+
+		return keySet;
+	}
+
+	/**
+	 * Returns the number of all types, i.e. directories in the given query path
+	 * 
+	 * @param queryPath
+	 *            the path in which to count the types
+	 * 
+	 * @return the number of types in the given query path
+	 */
+	private long queryTypeSize(File queryPath) {
+		if (!queryPath.exists())
+			return 0L;
+		if (!queryPath.isDirectory())
+			throw new IllegalArgumentException("The path is not a directory, thus can not query type size for it: "
+					+ queryPath.getAbsolutePath());
+
+		long numberOfFiles = 0l;
+
+		File[] subTypeFiles = queryPath.listFiles();
+		for (File subTypeFile : subTypeFiles) {
+
+			if (subTypeFile.isDirectory())
+				numberOfFiles++;
+		}
+		return numberOfFiles;
+	}
+
+	/**
+	 * Returns the number of all objects in the given query path
+	 * 
+	 * @param queryPath
+	 *            the path in which to count the objects
+	 * 
+	 * @return the number of objects in the given query path
+	 */
 	private long querySize(File queryPath) {
+		if (!queryPath.exists())
+			return 0L;
+		if (!queryPath.isDirectory())
+			throw new IllegalArgumentException("The path is not a directory, thus can not query key size for it: "
+					+ queryPath.getAbsolutePath());
+
 		long numberOfFiles = 0l;
 
 		File[] subTypeFiles = queryPath.listFiles();
@@ -198,5 +341,31 @@ public class XmlPersistenceFileDao {
 				numberOfFiles++;
 		}
 		return numberOfFiles;
+	}
+
+	private void remove(File removePath, String failMsg, Object... msgParts) {
+		if (!removePath.isFile())
+			throw new IllegalArgumentException("The given path for deletion is not a file:"
+					+ removePath.getAbsolutePath());
+		if (!removePath.delete()) {
+			String msg = MessageFormat.format(failMsg, msgParts);
+			throw new XmlPersistenceException(msg);
+		}
+	}
+
+	private void deleteEmptyDirectory(File directoryPath, String failMsg, Object... msgArgs) {
+		if (!directoryPath.isDirectory())
+			throw new IllegalArgumentException("The given path for deletion when empty is not a directory:"
+					+ directoryPath.getAbsolutePath());
+		if (directoryPath.list().length == 0) {
+			if (this.verbose) {
+				String msg = "Deleting empty directory for type {0} at {1}";
+				logger.info(MessageFormat.format(msg, directoryPath.getName(), directoryPath));
+			}
+			if (!directoryPath.delete()) {
+				String msg = MessageFormat.format(failMsg, msgArgs);
+				throw new XmlPersistenceException(msg);
+			}
+		}
 	}
 }

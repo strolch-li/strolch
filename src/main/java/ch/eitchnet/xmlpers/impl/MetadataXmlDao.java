@@ -23,36 +23,22 @@ package ch.eitchnet.xmlpers.impl;
 
 import java.util.Set;
 
-import ch.eitchnet.xmlpers.api.XmlPersistenceFileHandler;
 import ch.eitchnet.xmlpers.api.XmlPersistenceMetadataDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public abstract class MetadataXmlDao implements XmlPersistenceMetadataDao {
+public class MetadataXmlDao implements XmlPersistenceMetadataDao {
 
 	private XmlPersistenceFileDao fileDao;
-	private XmlPersistenceFileHandler fileHandler;
 
-	// TODO think about setting some methods to final
-	// TODO maybe decouple the write and load method into their own class
-
-	@Override
-	public void setXmlPersistenceFileDao(XmlPersistenceFileDao fileDao) {
+	public void initialize(XmlPersistenceFileDao fileDao) {
+		if (fileDao == null)
+			throw new IllegalArgumentException("fileDao may not be null!");
+		if (this.fileDao != null)
+			throw new IllegalStateException("DAO is already initialized!");
 		this.fileDao = fileDao;
-	}
-
-	@Override
-	public void setXmlPersistenceFileHandler(XmlPersistenceFileHandler fileHandler) {
-		this.fileHandler = fileHandler;
-	}
-
-	/**
-	 * @return the fileHandler
-	 */
-	protected XmlPersistenceFileHandler getFileHandler() {
-		return this.fileHandler;
 	}
 
 	/**
@@ -61,15 +47,15 @@ public abstract class MetadataXmlDao implements XmlPersistenceMetadataDao {
 	protected XmlPersistenceFileDao getFileDao() {
 		return this.fileDao;
 	}
-	
+
 	@Override
-	public void removeAll() {
-		this.fileDao.removeAll();
+	public Set<String> queryTypeSet() {
+		return this.fileDao.queryTypeSet();
 	}
 
 	@Override
-	public Set<String> queryKeySet(String type, String subType) {
-		return this.fileDao.queryKeySet(type, subType);
+	public Set<String> queryTypeSet(String type) {
+		return this.fileDao.queryTypeSet(type);
 	}
 
 	@Override
@@ -78,13 +64,18 @@ public abstract class MetadataXmlDao implements XmlPersistenceMetadataDao {
 	}
 
 	@Override
-	public Set<String> queryKeySet() {
-		return this.fileDao.queryKeySet();
+	public Set<String> queryKeySet(String type, String subType) {
+		return this.fileDao.queryKeySet(type, subType);
 	}
 
 	@Override
-	public long querySize(String type, String subType) {
-		return this.fileDao.querySize(type, subType);
+	public long queryTypeSize() {
+		return this.fileDao.queryTypeSize();
+	}
+
+	@Override
+	public long querySubTypeSize(String type) {
+		return this.fileDao.queryTypeSize(type);
 	}
 
 	@Override
@@ -93,7 +84,7 @@ public abstract class MetadataXmlDao implements XmlPersistenceMetadataDao {
 	}
 
 	@Override
-	public long querySize() {
-		return this.fileDao.querySize();
+	public long querySize(String type, String subType) {
+		return this.fileDao.querySize(type, subType);
 	}
 }

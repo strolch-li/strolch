@@ -21,41 +21,70 @@ package ch.eitchnet.xmlpers.test.impl;
 
 import java.io.File;
 
+import javax.xml.parsers.DocumentBuilder;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import org.w3c.dom.NodeList;
 
+import ch.eitchnet.xmlpers.api.DomUtil;
+import ch.eitchnet.xmlpers.api.XmlPersistenceDomContextData;
+import ch.eitchnet.xmlpers.test.model.Parameter;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public abstract class ResourceDomDao extends ResourceDao {
+public class ResourceDomDao extends ResourceDao {
+
+	/**
+	 * @param subType
+	 */
+	public ResourceDomDao(String subType) {
+		super(subType);
+	}
 
 	@Override
 	protected Resource read(File filePath) {
-		// TODO Auto-generated method stub
-		return null;
+
+		XmlPersistenceDomContextData cd = new XmlPersistenceDomContextData();
+		cd.setFile(filePath);
+		getFileHandler().read(cd);
+		Document document = cd.getDocument();
+		Resource resource = parseFromDom(document.getDocumentElement());
+		return resource;
 	}
 
 	@Override
-	protected void write(Resource object, File filePath) {
-		// TODO Auto-generated method stub
+	protected void write(Resource resource, File filePath) {
 
+		XmlPersistenceDomContextData cd = new XmlPersistenceDomContextData();
+		cd.setFile(filePath);
+		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
+		Document document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
+		serializeToDom(resource, document);
+		cd.setDocument(document);
+		getFileHandler().write(cd);
 	}
 
-	public Element serializeToDom(Resource object, Document document) {
+	public Element serializeToDom(Resource resource, Document document) {
 
 		Element element = document.createElement("Resource");
 
-		element.setAttribute("id", object.getId());
-		element.setAttribute("type", object.getType());
+		element.setAttribute("id", resource.getId());
+		element.setAttribute("name", resource.getName());
+		element.setAttribute("type", resource.getType());
 
-		Element nameElement = document.createElement("Name");
-		element.appendChild(nameElement);
-		Text textNode = document.createTextNode(object.getName());
-		nameElement.appendChild(textNode);
+		for (String paramId : resource.getParameterKeySet()) {
+			Parameter param = resource.getParameterBy(paramId);
+			Element paramElement = document.createElement("Parameter");
+
+			paramElement.setAttribute("id", param.getId());
+			paramElement.setAttribute("name", param.getName());
+			paramElement.setAttribute("type", param.getType());
+			paramElement.setAttribute("value", param.getType());
+		}
 
 		return element;
 	}
@@ -63,12 +92,22 @@ public abstract class ResourceDomDao extends ResourceDao {
 	public Resource parseFromDom(Element element) {
 
 		String id = element.getAttribute("id");
+		String name = element.getAttribute("name");
 		String type = element.getAttribute("type");
-		Element nameElement = (Element) element.getElementsByTagName("Name").item(0);
-		String name = nameElement.getTextContent();
 
-		Resource Resource = new Resource(id, name, type);
+		Resource resource = new Resource(id, name, type);
 
-		return Resource;
+		NodeList paramElements = element.getElementsByTagName("Parameter");
+		for (int i = 0; i < paramElements.getLength(); i++) {
+			String paramId = element.getAttribute("id");
+			String paramName = element.getAttribute("name");
+			String paramType = element.getAttribute("type");
+			String paramValue = element.getAttribute("value");
+
+			Parameter param = new Parameter(paramId, paramName, paramType, paramValue);
+			resource.addParameter(param);
+		}
+
+		return resource;
 	}
 }

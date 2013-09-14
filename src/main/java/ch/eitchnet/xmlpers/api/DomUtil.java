@@ -19,16 +19,25 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.test.impl;
+package ch.eitchnet.xmlpers.api;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class MyTypeResourceDao extends ResourceDao {
+public class DomUtil {
 
-	@Override
-	public String getSubType() {
-		return "MyType";
+	public static DocumentBuilder createDocumentBuilder() {
+		try {
+			DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+			return docBuilder;
+		} catch (ParserConfigurationException e) {
+			throw new XmlPersistenceException("No Xml Parser could be loaded: " + e.getMessage(), e);
+		}
 	}
 }

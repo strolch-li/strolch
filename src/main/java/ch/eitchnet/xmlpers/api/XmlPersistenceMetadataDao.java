@@ -21,26 +21,22 @@ package ch.eitchnet.xmlpers.api;
 
 import java.util.Set;
 
-import ch.eitchnet.xmlpers.impl.XmlPersistenceFileDao;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface XmlPersistenceMetadataDao {
 
-	public void setXmlPersistenceFileDao(XmlPersistenceFileDao fileDao);
+	public Set<String> queryTypeSet();
 
-	public void setXmlPersistenceFileHandler(XmlPersistenceFileHandler fileHandler);
-
-	public void removeAll();
-
-	public Set<String> queryKeySet();
+	public Set<String> queryTypeSet(String type);
 
 	public Set<String> queryKeySet(String type);
 
 	public Set<String> queryKeySet(String type, String subType);
 
-	public long querySize();
+	public long queryTypeSize();
+
+	public long querySubTypeSize(String type);
 
 	public long querySize(String type);
 

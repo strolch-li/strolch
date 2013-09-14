@@ -34,6 +34,22 @@ public class Book {
 	private double price;
 
 	/**
+	 * @param id
+	 * @param title
+	 * @param author
+	 * @param press
+	 * @param price
+	 */
+	public Book(Long id, String title, String author, String press, double price) {
+		super();
+		this.id = id;
+		this.title = title;
+		this.author = author;
+		this.press = press;
+		this.price = price;
+	}
+
+	/**
 	 * 
 	 */
 	public Book(Long id) {

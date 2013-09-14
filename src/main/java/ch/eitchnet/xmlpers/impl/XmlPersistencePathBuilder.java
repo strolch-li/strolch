@@ -56,25 +56,26 @@ public class XmlPersistencePathBuilder {
 		// validate base path exists and is writable
 		File basePathF = new File(basePath);
 		if (!basePathF.exists())
-			throw new XmlPersistenceException("The database store path does not exist at "
-					+ basePathF.getAbsolutePath());
+			throw new XmlPersistenceException(MessageFormat.format("The database store path does not exist at {0}",
+					basePathF.getAbsolutePath()));
 		if (!basePathF.canWrite())
-			throw new XmlPersistenceException("The database store path is not writeable at "
-					+ basePathF.getAbsolutePath());
+			throw new XmlPersistenceException(MessageFormat.format("The database store path is not writeable at {0}",
+					basePathF.getAbsolutePath()));
 
 		// we want a clean base path
 		String canonicalBasePath;
 		try {
 			canonicalBasePath = basePathF.getCanonicalPath();
 		} catch (IOException e) {
-			throw new XmlPersistenceException("Failed to build canonical path from " + basePath, e);
+			throw new XmlPersistenceException(
+					MessageFormat.format("Failed to build canonical path from {0}", basePath), e);
 		}
 
 		// this.basePathF = basePathF;
 		this.basePath = canonicalBasePath;
 		this.verbose = verbose;
 
-		logger.info("Using base path " + basePath);
+		logger.info(MessageFormat.format("Using base path {0}", basePath));
 	}
 
 	String getFilename(String id) {
@@ -105,26 +106,21 @@ public class XmlPersistencePathBuilder {
 		return sb.toString();
 	}
 
-	File getPath() {
-		return new File(getPathAsString(null, null, null));
-	}
-
-	File getPath(String type) {
+	File getAddPath(String type, String id) {
 		assertType(type);
-		return new File(getPathAsString(type, null, null));
-	}
-
-	File getPath(String type, String subType) {
-		assertType(type);
-		assertSubType(subType);
-		return new File(getPathAsString(type, subType, null));
-	}
-
-	File getPath(String type, String subType, String id) {
-		assertType(type);
-		assertSubType(subType);
 		assertId(id);
-		return new File(getPathAsString(type, subType, id));
+
+		File path = new File(getPathAsString(type, null, id));
+
+		// assert path exists
+		String msg = "Persistence unit already exists for {0} / {1} at {2}";
+		assertPathNotExists(path, msg, type, id, path.getAbsolutePath());
+
+		// check if parent path exists
+		msg = "Could not create parent path for {0} / {1} at {2}";
+		createMissingParents(path, msg, type, id, path.getAbsolutePath());
+
+		return path;
 	}
 
 	File getAddPath(String type, String subType, String id) {
@@ -132,20 +128,51 @@ public class XmlPersistencePathBuilder {
 		assertSubType(subType);
 		assertId(id);
 
-		File path = getPath(type, subType, id);
+		File path = new File(getPathAsString(type, subType, id));
 
-		if (path.exists()) {
-			String msg = "Persistence unit already exists for {0} / {1} / {2} at {3}";
-			throw new XmlPersistenceException(MessageFormat.format(msg, type, subType, id, path.getAbsolutePath()));
-		}
+		// assert path exists
+		String msg = "Persistence unit already exists for {0} / {1} / {2} at {3}";
+		assertPathNotExists(path, msg, type, subType, id, path.getAbsolutePath());
 
 		// check if parent path exists
+		msg = "Could not create parent path for {0} / {1} / {2} at {3}";
+		createMissingParents(path, msg, type, subType, id, path.getAbsolutePath());
+
+		return path;
+	}
+
+	File getReadPath(String type, String id) {
+		assertType(type);
+		assertId(id);
+		File path = new File(getPathAsString(type, null, id));
+		if (this.verbose) {
+			String msg = "Query path for {0} / {1} is {2}...";
+			logger.info(MessageFormat.format(msg, type, id, path.getAbsolutePath()));
+		}
+		return path;
+	}
+
+	File getReadPath(String type, String subType, String id) {
+		assertType(type);
+		assertSubType(subType);
+		assertId(id);
+		File path = new File(getPathAsString(type, subType, id));
+		if (this.verbose) {
+			String msg = "Query path for {0} / {1} / {2} is {3}...";
+			logger.info(MessageFormat.format(msg, type, subType, id, path.getAbsolutePath()));
+		}
+		return path;
+	}
+
+	File getUpdatePath(String type, String id) {
+		assertType(type);
+		assertId(id);
+
+		File path = new File(getPathAsString(type, null, id));
+
 		if (!path.exists()) {
-			File parentFile = path.getParentFile();
-			if (!parentFile.exists() && !parentFile.mkdirs()) {
-				String msg = "Could not create parent path for {0} / {1} / {2} at {3}";
-				throw new XmlPersistenceException(MessageFormat.format(msg, type, subType, id, path.getAbsolutePath()));
-			}
+			String msg = "Persistence unit does not exist for {0} / {1} at {2}";
+			throw new XmlPersistenceException(MessageFormat.format(msg, type, id, path.getAbsolutePath()));
 		}
 
 		return path;
@@ -156,7 +183,7 @@ public class XmlPersistencePathBuilder {
 		assertSubType(subType);
 		assertId(id);
 
-		File path = getPath(type, subType, id);
+		File path = new File(getPathAsString(type, subType, id));
 
 		if (!path.exists()) {
 			String msg = "Persistence unit does not exist for {0} / {1} / {2} at {3}";
@@ -166,52 +193,19 @@ public class XmlPersistencePathBuilder {
 		return path;
 	}
 
-	File getRemovePath() {
-
-		File path = getPath();
-		if (!path.exists()) {
-			String msg = "No Persistence units exist at {0}";
-			throw new XmlPersistenceException(MessageFormat.format(msg, path.getAbsolutePath()));
-		}
-
-		if (this.verbose) {
-			String msg = "Remove path for all is {0}...";
-			logger.info(MessageFormat.format(msg, path.getAbsolutePath()));
-		}
-
-		return path;
-	}
-
-	File getRemovePath(String type) {
+	File getRemovePath(String type, String id) {
 		assertType(type);
+		assertId(id);
 
-		File path = getPath(type);
-		if (!path.exists()) {
-			String msg = "No Persistence units exist for {0} at {1}";
-			throw new XmlPersistenceException(MessageFormat.format(msg, type, path.getAbsolutePath()));
-		}
-
-		if (this.verbose) {
-			String msg = "Remove path for {0} is {1}...";
-			logger.info(MessageFormat.format(msg, type, path.getAbsolutePath()));
-		}
-
-		return path;
-	}
-
-	File getRemovePath(String type, String subType) {
-		assertType(type);
-		assertSubType(subType);
-
-		File path = getPath(type, subType);
+		File path = new File(getPathAsString(type, null, id));
 		if (!path.exists()) {
 			String msg = "No Persistence units exist for {0} / {1}  at {2}";
-			throw new XmlPersistenceException(MessageFormat.format(msg, type, subType, path.getAbsolutePath()));
+			throw new XmlPersistenceException(MessageFormat.format(msg, type, id, path.getAbsolutePath()));
 		}
 
 		if (this.verbose) {
 			String msg = "Remove path for {0} / {1} is {2}...";
-			logger.info(MessageFormat.format(msg, type, subType, path.getAbsolutePath()));
+			logger.info(MessageFormat.format(msg, type, id, path.getAbsolutePath()));
 		}
 
 		return path;
@@ -222,7 +216,7 @@ public class XmlPersistencePathBuilder {
 		assertSubType(subType);
 		assertId(id);
 
-		File path = getPath(type, subType, id);
+		File path = new File(getPathAsString(type, subType, id));
 		if (!path.exists()) {
 			String msg = "Persistence unit for {0} / {1} / {2} does not exist at {3}";
 			throw new XmlPersistenceException(MessageFormat.format(msg, type, subType, id, path.getAbsolutePath()));
@@ -237,12 +231,12 @@ public class XmlPersistencePathBuilder {
 	}
 
 	File getQueryPath() {
-		return getPath();
+		return new File(getPathAsString(null, null, null));
 	}
 
 	File getQueryPath(String type) {
 		assertType(type);
-		File path = getPath(type);
+		File path = new File(getPathAsString(type, null, null));
 		if (this.verbose) {
 			String msg = "Query path for {0} is {1}...";
 			logger.info(MessageFormat.format(msg, type, path.getAbsolutePath()));
@@ -253,22 +247,10 @@ public class XmlPersistencePathBuilder {
 	File getQueryPath(String type, String subType) {
 		assertType(type);
 		assertSubType(subType);
-		File path = getPath(type, subType);
+		File path = new File(getPathAsString(type, subType, null));
 		if (this.verbose) {
 			String msg = "Query path for {0} / {1} is {2}...";
 			logger.info(MessageFormat.format(msg, type, subType, path.getAbsolutePath()));
-		}
-		return path;
-	}
-
-	File getQueryPath(String type, String subType, String id) {
-		assertType(type);
-		assertSubType(subType);
-		assertId(id);
-		File path = getPath(type, subType, id);
-		if (this.verbose) {
-			String msg = "Query path for {0} / {1} / {2} is {3}...";
-			logger.info(MessageFormat.format(msg, type, subType, id, path.getAbsolutePath()));
 		}
 		return path;
 	}
@@ -294,5 +276,18 @@ public class XmlPersistencePathBuilder {
 		if (filename.charAt(filename.length() - XmlPersistencePathBuilder.EXT_LENGTH) != '.')
 			throw new XmlPersistenceException("The filename does not have a . at index "
 					+ (filename.length() - XmlPersistencePathBuilder.EXT_LENGTH));
+	}
+
+	private void assertPathNotExists(File path, String msg, Object... args) {
+		if (path.exists()) {
+			throw new XmlPersistenceException(MessageFormat.format(msg, args));
+		}
+	}
+
+	private void createMissingParents(File path, String msg, Object... args) {
+		File parentFile = path.getParentFile();
+		if (!parentFile.exists() && !parentFile.mkdirs()) {
+			throw new XmlPersistenceException(MessageFormat.format(msg, args));
+		}
 	}
 }

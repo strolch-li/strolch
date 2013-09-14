@@ -21,7 +21,7 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import ch.eitchnet.xmlpers.impl.AbstractXmlDao;
+import ch.eitchnet.xmlpers.api.AbstractXmlDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -19,59 +19,79 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import java.util.Properties;
+import java.text.MessageFormat;
 
+import ch.eitchnet.xmlpers.api.AbstractDaoFactory;
+import ch.eitchnet.xmlpers.api.XmlIoMode;
 import ch.eitchnet.xmlpers.api.XmlPersistenceDao;
-import ch.eitchnet.xmlpers.api.XmlPersistenceDaoFactory;
-import ch.eitchnet.xmlpers.impl.XmlPersistenceFileDao;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class TestModelDaoFactory implements XmlPersistenceDaoFactory {
+public class TestModelDaoFactory extends AbstractDaoFactory {
 
 	@Override
-	public void initialize(XmlPersistenceFileDao fileDao, Properties properties) {
-		// TODO Auto-generated method stub
+	public <T> XmlPersistenceDao<T> getDao(T object) {
 
-	}
-
-	@Override
-	public <T> XmlPersistenceDao<T> createDaoInstance(T object) {
-
-		if (object.getClass() != Resource.class)
-			throw new IllegalArgumentException("The object with class " + object.getClass() + " is not handled!");
-
-		Resource resource = (Resource) object;
-		String type = resource.getType();
-		XmlPersistenceDao<Resource> dao;
-		switch (type) {
-		case "MyType":
-			dao = new MyTypeResourceDao();
-			break;
-		default:
-			throw new IllegalArgumentException("The resource with type " + type + " is not handled!");
+		XmlPersistenceDao<T> dao;
+		if (object instanceof Resource) {
+			dao = getDaoBy(object.getClass().getSimpleName(), ((Resource) object).getType());
+		} else if (object instanceof Book) {
+			dao = getDaoBy(Book.class.getSimpleName());
+		} else {
+			String msg = "The object with class {0} is not handled!";
+			msg = MessageFormat.format(msg, object.getClass());
+			throw new IllegalArgumentException(msg);
 		}
 
-		// inject the DAO or SAX handler...
-
-		@SuppressWarnings("unchecked")
-		XmlPersistenceDao<T> xmlDao = (XmlPersistenceDao<T>) dao;
-		return xmlDao;
+		return dao;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public <T> XmlPersistenceDao<T> createDaoInstance(String type) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> XmlPersistenceDao<T> getDaoBy(String type) {
+
+		XmlPersistenceDao<T> dao;
+		if (TestConstants.TYPE_BOOK.equals(type)) {
+			XmlIoMode ioMode = getXmlIoMode();
+			if (ioMode == XmlIoMode.DOM) {
+				dao = (XmlPersistenceDao<T>) new BookDomDao();
+			} else if (ioMode == XmlIoMode.SAX) {
+				dao = (XmlPersistenceDao<T>) new BookSaxDao();
+			} else {
+				throw new IllegalArgumentException("The XmlIoMode " + ioMode + " is not yet supported!");
+			}
+		} else {
+			String msg = "The object with type {0} is not handled!";
+			msg = MessageFormat.format(msg, type);
+			throw new IllegalArgumentException(msg);
+		}
+
+		return initializeDao(dao);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public <T> XmlPersistenceDao<T> createDaoInstance(String type, String subType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public <T> XmlPersistenceDao<T> getDaoBy(String type, String subType) {
 
+		XmlPersistenceDao<T> dao;
+		if (TestConstants.TYPE_RES.equals(type)) {
+			XmlIoMode ioMode = getXmlIoMode();
+			if (ioMode == XmlIoMode.DOM) {
+				dao = (XmlPersistenceDao<T>) new ResourceDomDao(subType);
+			} else if (ioMode == XmlIoMode.SAX) {
+				dao = (XmlPersistenceDao<T>) new ResourceSaxDao(subType);
+			} else {
+				throw new IllegalArgumentException("The XmlIoMode " + ioMode + " is not yet supported!");
+			}
+		} else {
+			String msg = "The object with type {0} and subType {1} is not handled!";
+			msg = MessageFormat.format(msg, type, subType);
+			throw new IllegalArgumentException(msg);
+		}
+
+		return initializeDao(dao);
+	}
 }

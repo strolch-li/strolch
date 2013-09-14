@@ -25,8 +25,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -43,6 +41,7 @@ import org.xml.sax.SAXException;
 
 import ch.eitchnet.utils.exceptions.XmlException;
 import ch.eitchnet.utils.helper.XmlHelper;
+import ch.eitchnet.xmlpers.api.DomUtil;
 import ch.eitchnet.xmlpers.api.XmlPersistenceContextData;
 import ch.eitchnet.xmlpers.api.XmlPersistenceDomContextData;
 import ch.eitchnet.xmlpers.api.XmlPersistenceException;
@@ -56,12 +55,6 @@ public class XmlPersistenceDomHandler implements XmlPersistenceFileHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlPersistenceDomHandler.class);
 
-	public DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
-		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-		return docBuilder;
-	}
-
 	@Override
 	public void read(XmlPersistenceContextData contextData) {
 
@@ -72,11 +65,11 @@ public class XmlPersistenceDomHandler implements XmlPersistenceFileHandler {
 			throw new IllegalStateException("No file has been set on the context data!");
 
 		try {
-			DocumentBuilder docBuilder = createDocumentBuilder();
+			DocumentBuilder docBuilder = DomUtil.createDocumentBuilder();
 			File file = cd.getFile();
 			Document document = docBuilder.parse(file);
 			cd.setDocument(document);
-		} catch (ParserConfigurationException | SAXException | IOException e) {
+		} catch (SAXException | IOException e) {
 			throw new XmlPersistenceException("Parsing failed due to internal error: " + e.getMessage(), e);
 		}
 
@@ -119,12 +112,11 @@ public class XmlPersistenceDomHandler implements XmlPersistenceFileHandler {
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
-			File file = new File("target/res_dom.xml");
-			StreamResult result = new StreamResult(file);
+			StreamResult result = new StreamResult(cd.getFile());
 			Source xmlSource = new DOMSource(document);
 			transformer.transform(xmlSource, result);
 
-			logger.info("Wrote DOM to " + file.getAbsolutePath());
+			logger.info("Wrote DOM to " + cd.getFile().getAbsolutePath());
 
 		} catch (TransformerFactoryConfigurationError | TransformerException e) {
 			throw new XmlException("Writing to file failed due to internal error: " + e.getMessage(), e);

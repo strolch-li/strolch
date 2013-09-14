@@ -21,7 +21,7 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import ch.eitchnet.xmlpers.impl.AbstractXmlDao;
+import ch.eitchnet.xmlpers.api.AbstractXmlDao;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**
@@ -30,13 +30,21 @@ import ch.eitchnet.xmlpers.test.model.Resource;
  */
 public abstract class ResourceDao extends AbstractXmlDao<Resource> {
 
+	private final String subType;
+
+	public ResourceDao(String subType) {
+		this.subType = subType;
+	}
+
 	@Override
 	public String getType() {
 		return Resource.class.getSimpleName();
 	}
 
 	@Override
-	public abstract String getSubType();
+	public String getSubType() {
+		return this.subType;
+	}
 
 	@Override
 	public String getId(Resource object) {

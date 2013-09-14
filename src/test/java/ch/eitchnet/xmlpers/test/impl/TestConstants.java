@@ -19,17 +19,16 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test.impl;
+
+import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class XmlPersistenceConstants {
+public class TestConstants {
 
-	private static final String PROP_PREFIX = "ch.eitchnet.xmlpers.";
-	public static final String PROP_VERBOSE = "ch.eitchnet.xmlpers." + "verbose";
-	public static final String PROP_BASEPATH = "ch.eitchnet.xmlpers." + "basePath";
-	public static final String PROP_DAO_FACTORY_CLASS = "ch.eitchnet.xmlpers." + "daoFactoryClass";
-	public static final String PROP_XML_IO_MOD = PROP_PREFIX + "ioMode";
+	public static final String TYPE_RES = Resource.class.getSimpleName();
+	public static final String TYPE_BOOK = Book.class.getSimpleName();
 }

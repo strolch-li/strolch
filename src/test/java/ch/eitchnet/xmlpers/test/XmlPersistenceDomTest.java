@@ -17,24 +17,35 @@
  * along with ch.eitchnet.java.xmlpers.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test;
 
 import java.util.Properties;
 
-import ch.eitchnet.xmlpers.impl.XmlPersistenceFileDao;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+
+import ch.eitchnet.xmlpers.api.XmlPersistenceConstants;
+import ch.eitchnet.xmlpers.test.impl.TestModelDaoFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface XmlPersistenceDaoFactory {
+@Ignore
+public class XmlPersistenceDomTest extends AbstractXmlPersistenceTest {
 
-	public void initialize(XmlPersistenceFileDao fileDao, Properties properties);
+	/**
+	 * @throws Exception
+	 *             if something goes wrong
+	 */
+	@BeforeClass
+	public static void init() throws Exception {
 
-	public XmlPersistenceMetadataDao getMetadataDao();
-	
-	public <T> XmlPersistenceDao<T> getDao(T object);
+		Properties props = new Properties();
+		props.setProperty(XmlPersistenceConstants.PROP_BASEPATH, "target/testdb");
+		props.setProperty(XmlPersistenceConstants.PROP_VERBOSE, "true");
+		props.setProperty(XmlPersistenceConstants.PROP_XML_IO_MOD, "dom");
+		props.setProperty(XmlPersistenceConstants.PROP_DAO_FACTORY_CLASS, TestModelDaoFactory.class.getName());
 
-	public <T> XmlPersistenceDao<T> getDaoBy(String type);
-
-	public <T> XmlPersistenceDao<T> getDaoBy(String type, String subType);
+		init(props);
+	}
 }

@@ -19,10 +19,18 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
+import java.io.File;
 
+import javax.xml.stream.XMLStreamException;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import ch.eitchnet.xmlpers.api.XmlPersistenceSaxContextData;
+import ch.eitchnet.xmlpers.api.XmlPersistenceSaxWriter;
+import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
+import ch.eitchnet.xmlpers.test.model.Parameter;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**
@@ -31,35 +39,91 @@ import ch.eitchnet.xmlpers.test.model.Resource;
  */
 public class ResourceSaxDao extends ResourceDao {
 
-	public void serializeToSax(Resource object, ContentHandler contentHandler) {
+	/**
+	 * @param subType
+	 */
+	public ResourceSaxDao(String subType) {
+		super(subType);
+	}
 
-		try {
-			contentHandler.startDocument();
+	@Override
+	protected Resource read(File filePath) {
 
-			// Resource element / root
-			{
-				AttributesImpl atts = new AttributesImpl();
-				atts.addAttribute("", "", "id", "", object.getId());
-				atts.addAttribute("", "", "type", "", object.getType());
-				contentHandler.startElement("", "", "Resource", atts);
+		XmlPersistenceSaxContextData cd = new XmlPersistenceSaxContextData();
+		cd.setFile(filePath);
+		ResourceDefaultHandler bookDefaultHandler = new ResourceDefaultHandler();
+		cd.setDefaultHandler(bookDefaultHandler);
 
-				// name element
-				{
-					contentHandler.startElement("", "", "Name", null);
-					char[] nameArr = object.getName().toCharArray();
-					contentHandler.characters(nameArr, 0, nameArr.length);
-					contentHandler.endElement("", "", "name");
-				}
+		getFileHandler().read(cd);
 
-				// Resource end
-				contentHandler.endElement("", "", "Resource");
+		return bookDefaultHandler.getResource();
+	}
+
+	@Override
+	protected void write(Resource resource, File filePath) {
+
+		XmlPersistenceSaxContextData cd = new XmlPersistenceSaxContextData();
+		cd.setFile(filePath);
+		cd.setXmlWriter(new ResourceSaxWriter(resource));
+
+		getFileHandler().write(cd);
+	}
+
+	private class ResourceSaxWriter implements XmlPersistenceSaxWriter {
+
+		private final Resource resource;
+
+		public ResourceSaxWriter(Resource resource) {
+			this.resource = resource;
+		}
+
+		@Override
+		public void write(XmlPersistenceStreamWriter writer) throws XMLStreamException {
+			writer.writeElement("Resource");
+			writer.writeAttribute("id", this.resource.getId());
+			writer.writeAttribute("name", this.resource.getName());
+			writer.writeAttribute("type", this.resource.getType());
+			for (String paramId : this.resource.getParameterKeySet()) {
+				Parameter param = this.resource.getParameterBy(paramId);
+				writer.writeElement("Parameter");
+				writer.writeAttribute("id", param.getId());
+				writer.writeAttribute("name", param.getName());
+				writer.writeAttribute("type", param.getType());
+				writer.writeAttribute("value", param.getValue());
 			}
+		}
+	}
 
-			// end document
-			contentHandler.endDocument();
+	private class ResourceDefaultHandler extends DefaultHandler {
 
-		} catch (SAXException e) {
-			throw new RuntimeException("Failed to serialize " + object + " to SAX", e);
+		private Resource resource;
+
+		public Resource getResource() {
+			return this.resource;
+		}
+
+		@Override
+		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+
+			switch (qName) {
+			case "Resource":
+				String id = attributes.getValue("id");
+				String name = attributes.getValue("name");
+				String type = attributes.getValue("type");
+				Resource resource = new Resource(id, name, type);
+				this.resource = resource;
+				break;
+			case "Parameter":
+				id = attributes.getValue("id");
+				name = attributes.getValue("name");
+				type = attributes.getValue("type");
+				String value = attributes.getValue("value");
+				Parameter param = new Parameter(id, name, type, value);
+				this.resource.addParameter(param);
+				break;
+			default:
+				throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
+			}
 		}
 	}
 }

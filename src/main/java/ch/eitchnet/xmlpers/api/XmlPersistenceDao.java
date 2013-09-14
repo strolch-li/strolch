@@ -22,16 +22,10 @@ package ch.eitchnet.xmlpers.api;
 import java.util.List;
 import java.util.Set;
 
-import ch.eitchnet.xmlpers.impl.XmlPersistenceFileDao;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface XmlPersistenceDao<T> {
-
-	public void setXmlPersistenceFileDao(XmlPersistenceFileDao fileDao);
-
-	public void setXmlPersistenceFileHandler(XmlPersistenceFileHandler fileHandler);
 
 	public void add(T object);
 
