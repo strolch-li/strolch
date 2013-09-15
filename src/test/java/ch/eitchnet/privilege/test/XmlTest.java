@@ -33,6 +33,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -72,7 +73,8 @@ public class XmlTest {
 	 */
 	@BeforeClass
 	public static void init() throws Exception {
-		destroy();
+
+		cleanUp();
 
 		File tmpDir = new File("target/test");
 		if (tmpDir.exists())
@@ -80,8 +82,8 @@ public class XmlTest {
 		tmpDir.mkdirs();
 	}
 
-	//@AfterClass
-	public static void destroy() throws Exception {
+	@AfterClass
+	public static void cleanUp() throws Exception {
 
 		File tmpDir = new File("target/test");
 		if (!tmpDir.exists())
@@ -135,7 +137,6 @@ public class XmlTest {
 		Map<String, String> encryptionHandlerParameterMap = new HashMap<String, String>();
 		Map<String, String> persistenceHandlerParameterMap = new HashMap<String, String>();
 
-		// TODO ask other questions...
 		parameterMap.put("autoPersistOnPasswordChange", "true");
 		encryptionHandlerParameterMap.put("hashAlgorithm", "SHA-256");
 		persistenceHandlerParameterMap.put("basePath", TARGET_TEST);
@@ -155,7 +156,7 @@ public class XmlTest {
 		configSaxWriter.write();
 
 		String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(configFile));
-		Assert.assertEquals("22D4BA39605D49C758184D9BD63BEAE5CCF8786F3DABBAB45CD9F59C2AFBCBD0", fileHash);
+		Assert.assertEquals("2ABD3442EEC8BCEC5BEE365AAB6DB2FD4E1789325425CB1E017E900582525685", fileHash);
 	}
 
 	@Test
@@ -217,6 +218,6 @@ public class XmlTest {
 		configSaxWriter.write();
 
 		String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(modelFile));
-		Assert.assertEquals("9007F172BBD7BA51BA3E67199CE0AFCBC8645AF0AC02028ABE54BA6A2FC134B0", fileHash);
+		Assert.assertEquals("A2127D20A61E00BCDBB61569CD2B200C4F0F111C972BAC3B1E54DF3B2FCDC8BE", fileHash);
 	}
 }
