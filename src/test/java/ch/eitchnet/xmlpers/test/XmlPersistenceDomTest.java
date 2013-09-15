@@ -22,7 +22,6 @@ package ch.eitchnet.xmlpers.test;
 import java.util.Properties;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 
 import ch.eitchnet.xmlpers.api.XmlPersistenceConstants;
 import ch.eitchnet.xmlpers.test.impl.TestModelDaoFactory;
