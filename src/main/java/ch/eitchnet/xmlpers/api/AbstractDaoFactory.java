@@ -31,7 +31,6 @@ import ch.eitchnet.xmlpers.impl.MetadataXmlDao;
 import ch.eitchnet.xmlpers.impl.XmlPersistenceDomHandler;
 import ch.eitchnet.xmlpers.impl.XmlPersistenceFileDao;
 import ch.eitchnet.xmlpers.impl.XmlPersistenceSaxHandler;
-import ch.eitchnet.xmlpers.test.impl.TestModelDaoFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -47,7 +46,7 @@ public abstract class AbstractDaoFactory implements XmlPersistenceDaoFactory {
 	public void initialize(XmlPersistenceFileDao fileDao, Properties properties) {
 		this.fileDao = fileDao;
 		// TODO catch and throw proper exception
-		String xmlIoModeS = PropertiesHelper.getProperty(properties, TestModelDaoFactory.class.getName(),
+		String xmlIoModeS = PropertiesHelper.getProperty(properties, AbstractDaoFactory.class.getName(),
 				XmlPersistenceConstants.PROP_XML_IO_MOD, XmlIoMode.SAX.name());
 		this.xmlIoMode = XmlIoMode.valueOf(xmlIoModeS.toUpperCase());
 		logger.info("Defaut Xml IO Mode is " + this.xmlIoMode.name());
