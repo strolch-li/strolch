@@ -78,7 +78,11 @@ public abstract class AbstractXmlPersistenceTest {
 	 *             if something goes wrong
 	 */
 	public static void init(Properties props) throws Exception {
+
 		try {
+
+			cleanUpDb();
+
 			String userDir = System.getProperty("user.dir");
 			String basePath = userDir + "/target/testdb";
 			File basePathF = new File(basePath);
@@ -90,14 +94,14 @@ public abstract class AbstractXmlPersistenceTest {
 			AbstractXmlPersistenceTest.logger.info("Initialized persistence handler.");
 
 		} catch (Exception e) {
-			AbstractXmlPersistenceTest.logger.error(e.getMessage(), e);
 
+			AbstractXmlPersistenceTest.logger.error(e.getMessage(), e);
 			throw new RuntimeException("Initialization failed: " + e.getLocalizedMessage(), e);
 		}
 	}
 
 	@AfterClass
-	public static void afterClass() {
+	public static void cleanUpDb() {
 		String userDir = System.getProperty("user.dir");
 		String basePath = userDir + "/target/testdb";
 		File basePathF = new File(basePath);

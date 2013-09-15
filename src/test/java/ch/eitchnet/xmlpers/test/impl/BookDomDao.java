@@ -63,7 +63,7 @@ public class BookDomDao extends BookDao {
 	public Element serializeToDom(Book book, Document document) {
 
 		Element element = document.createElement("Book");
-
+		document.appendChild(element);
 		element.setAttribute("id", Long.toString(book.getId()));
 		element.setAttribute("title", book.getTitle());
 		element.setAttribute("author", book.getAuthor());

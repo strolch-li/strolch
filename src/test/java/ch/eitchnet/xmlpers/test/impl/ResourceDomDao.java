@@ -25,6 +25,7 @@ import javax.xml.parsers.DocumentBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ch.eitchnet.xmlpers.api.DomUtil;
@@ -71,6 +72,7 @@ public class ResourceDomDao extends ResourceDao {
 	public Element serializeToDom(Resource resource, Document document) {
 
 		Element element = document.createElement("Resource");
+		document.appendChild(element);
 
 		element.setAttribute("id", resource.getId());
 		element.setAttribute("name", resource.getName());
@@ -79,11 +81,12 @@ public class ResourceDomDao extends ResourceDao {
 		for (String paramId : resource.getParameterKeySet()) {
 			Parameter param = resource.getParameterBy(paramId);
 			Element paramElement = document.createElement("Parameter");
+			element.appendChild(paramElement);
 
 			paramElement.setAttribute("id", param.getId());
 			paramElement.setAttribute("name", param.getName());
 			paramElement.setAttribute("type", param.getType());
-			paramElement.setAttribute("value", param.getType());
+			paramElement.setAttribute("value", param.getValue());
 		}
 
 		return element;
@@ -97,12 +100,17 @@ public class ResourceDomDao extends ResourceDao {
 
 		Resource resource = new Resource(id, name, type);
 
-		NodeList paramElements = element.getElementsByTagName("Parameter");
-		for (int i = 0; i < paramElements.getLength(); i++) {
-			String paramId = element.getAttribute("id");
-			String paramName = element.getAttribute("name");
-			String paramType = element.getAttribute("type");
-			String paramValue = element.getAttribute("value");
+		NodeList children = element.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node item = children.item(i);
+			if (!item.getNodeName().equals("Parameter"))
+				continue;
+
+			Element paramElement = (Element) item;
+			String paramId = paramElement.getAttribute("id");
+			String paramName = paramElement.getAttribute("name");
+			String paramType = paramElement.getAttribute("type");
+			String paramValue = paramElement.getAttribute("value");
 
 			Parameter param = new Parameter(paramId, paramName, paramType, paramValue);
 			resource.addParameter(param);

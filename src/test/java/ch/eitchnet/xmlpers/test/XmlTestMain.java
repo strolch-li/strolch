@@ -59,9 +59,9 @@ import ch.eitchnet.xmlpers.test.model.Resource;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class Main {
+public class XmlTestMain {
 
-	private static final Logger logger = LoggerFactory.getLogger(Main.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlTestMain.class);
 
 	private static Resource res;
 

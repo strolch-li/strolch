@@ -30,7 +30,6 @@ import ch.eitchnet.xmlpers.test.impl.TestModelDaoFactory;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@Ignore
 public class XmlPersistenceDomTest extends AbstractXmlPersistenceTest {
 
 	/**
