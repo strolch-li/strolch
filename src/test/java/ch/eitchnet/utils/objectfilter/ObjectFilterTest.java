@@ -19,13 +19,13 @@
  */
 package ch.eitchnet.utils.objectfilter;
 
-import java.util.List;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.List;
+
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -412,7 +412,7 @@ public class ObjectFilterTest {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + getOuterType().hashCode();
-			result = prime * result + id;
+			result = prime * result + this.id;
 			return result;
 		}
 
@@ -427,7 +427,7 @@ public class ObjectFilterTest {
 			TestObject other = (TestObject) obj;
 			if (!getOuterType().equals(other.getOuterType()))
 				return false;
-			if (id != other.id)
+			if (this.id != other.id)
 				return false;
 			return true;
 		}
