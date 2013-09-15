@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -84,8 +85,8 @@ public class ObjectFilter {
 
 	private static long id = ObjectCache.UNSET;
 
-	private final HashMap<Object, ObjectCache> cache;
-	private final HashSet<String> keySet;
+	private final Map<Object, ObjectCache> cache;
+	private final Set<String> keySet;
 
 	/**
 	 * Default constructor initializing the filter
