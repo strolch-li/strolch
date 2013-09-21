@@ -21,10 +21,12 @@
  */
 package ch.eitchnet.utils.helper;
 
+import static ch.eitchnet.utils.helper.BaseDecodingTest.PROP_RUN_PERF_TESTS;
+import static ch.eitchnet.utils.helper.BaseDecodingTest.isSkipPerfTests;
 import static ch.eitchnet.utils.helper.BaseEncoding.toBase16;
 import static ch.eitchnet.utils.helper.BaseEncoding.toBase32;
-import static ch.eitchnet.utils.helper.BaseEncoding.toBase32Hex;
 import static ch.eitchnet.utils.helper.BaseEncoding.toBase32Dmedia;
+import static ch.eitchnet.utils.helper.BaseEncoding.toBase32Hex;
 import static ch.eitchnet.utils.helper.BaseEncoding.toBase64;
 import junit.framework.Assert;
 
@@ -49,14 +51,6 @@ public class BaseEncodingTest {
 		Assert.assertEquals("Zm9vYg==", toBase64("foob"));
 		Assert.assertEquals("Zm9vYmE=", toBase64("fooba"));
 		Assert.assertEquals("Zm9vYmFy", toBase64("foobar"));
-
-		long start = System.nanoTime();
-		byte[] bytes = new byte[1024 * 1024];
-		for (int i = 0; i < 200; i++) {
-			toBase64(bytes);
-		}
-		long end = System.nanoTime();
-		logger.info("Encoding 200MB Base64 took " + StringHelper.formatNanoDuration(end - start));
 	}
 
 	@Test
@@ -68,14 +62,6 @@ public class BaseEncodingTest {
 		Assert.assertEquals("MZXW6YQ=", toBase32("foob"));
 		Assert.assertEquals("MZXW6YTB", toBase32("fooba"));
 		Assert.assertEquals("MZXW6YTBOI======", toBase32("foobar"));
-
-		long start = System.nanoTime();
-		byte[] bytes = new byte[1024 * 1024];
-		for (int i = 0; i < 200; i++) {
-			toBase32(bytes);
-		}
-		long end = System.nanoTime();
-		logger.info("Encoding 200MB Base32 took " + StringHelper.formatNanoDuration(end - start));
 	}
 
 	@Test
@@ -87,19 +73,10 @@ public class BaseEncodingTest {
 		Assert.assertEquals("CPNMUOG=", toBase32Hex("foob"));
 		Assert.assertEquals("CPNMUOJ1", toBase32Hex("fooba"));
 		Assert.assertEquals("CPNMUOJ1E8======", toBase32Hex("foobar"));
-
-		long start = System.nanoTime();
-		byte[] bytes = new byte[1024 * 1024];
-		for (int i = 0; i < 200; i++) {
-			toBase32Hex(bytes);
-		}
-		long end = System.nanoTime();
-		logger.info("Encoding 200MB Base32Hex took " + StringHelper.formatNanoDuration(end - start));
 	}
 
 	@Test
 	public void testBase32Dmedia() {
-
 		Assert.assertEquals("", toBase32Dmedia(""));
 		Assert.assertEquals("FCNPVRELI7J9FUUI", toBase32Dmedia("binary foo"));
 		Assert.assertEquals("FR======", toBase32Dmedia("f"));
@@ -108,14 +85,6 @@ public class BaseEncodingTest {
 		Assert.assertEquals("FSQPXRJ=", toBase32Dmedia("foob"));
 		Assert.assertEquals("FSQPXRM4", toBase32Dmedia("fooba"));
 		Assert.assertEquals("FSQPXRM4HB======", toBase32Dmedia("foobar"));
-
-		long start = System.nanoTime();
-		byte[] bytes = new byte[1024 * 1024];
-		for (int i = 0; i < 200; i++) {
-			toBase32Hex(bytes);
-		}
-		long end = System.nanoTime();
-		logger.info("Encoding 200MB Base32Dmedia took " + StringHelper.formatNanoDuration(end - start));
 	}
 
 	@Test
@@ -127,6 +96,78 @@ public class BaseEncodingTest {
 		Assert.assertEquals("666F6F62", toBase16("foob"));
 		Assert.assertEquals("666F6F6261", toBase16("fooba"));
 		Assert.assertEquals("666F6F626172", toBase16("foobar"));
+	}
+
+	@Test
+	public void testBase64Perf() {
+		if (isSkipPerfTests()) {
+			logger.info("Not running performance tests as not enabled by system property " + PROP_RUN_PERF_TESTS);
+			return;
+		}
+
+		long start = System.nanoTime();
+		byte[] bytes = new byte[1024 * 1024];
+		for (int i = 0; i < 200; i++) {
+			toBase64(bytes);
+		}
+		long end = System.nanoTime();
+		logger.info("Encoding 200MB Base64 took " + StringHelper.formatNanoDuration(end - start));
+	}
+
+	@Test
+	public void testBase32Perf() {
+		if (isSkipPerfTests()) {
+			logger.info("Not running performance tests as not enabled by system property " + PROP_RUN_PERF_TESTS);
+			return;
+		}
+
+		long start = System.nanoTime();
+		byte[] bytes = new byte[1024 * 1024];
+		for (int i = 0; i < 200; i++) {
+			toBase32(bytes);
+		}
+		long end = System.nanoTime();
+		logger.info("Encoding 200MB Base32 took " + StringHelper.formatNanoDuration(end - start));
+	}
+
+	@Test
+	public void testBase32HexPerf() {
+		if (isSkipPerfTests()) {
+			logger.info("Not running performance tests as not enabled by system property " + PROP_RUN_PERF_TESTS);
+			return;
+		}
+
+		long start = System.nanoTime();
+		byte[] bytes = new byte[1024 * 1024];
+		for (int i = 0; i < 200; i++) {
+			toBase32Hex(bytes);
+		}
+		long end = System.nanoTime();
+		logger.info("Encoding 200MB Base32Hex took " + StringHelper.formatNanoDuration(end - start));
+	}
+
+	@Test
+	public void testBase32DmediaPerf() {
+		if (isSkipPerfTests()) {
+			logger.info("Not running performance tests as not enabled by system property " + PROP_RUN_PERF_TESTS);
+			return;
+		}
+
+		long start = System.nanoTime();
+		byte[] bytes = new byte[1024 * 1024];
+		for (int i = 0; i < 200; i++) {
+			toBase32Hex(bytes);
+		}
+		long end = System.nanoTime();
+		logger.info("Encoding 200MB Base32Dmedia took " + StringHelper.formatNanoDuration(end - start));
+	}
+
+	@Test
+	public void testBase16Perf() {
+		if (isSkipPerfTests()) {
+			logger.info("Not running performance tests as not enabled by system property " + PROP_RUN_PERF_TESTS);
+			return;
+		}
 
 		long start = System.nanoTime();
 		byte[] bytes = new byte[1024 * 1024];

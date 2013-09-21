@@ -30,6 +30,7 @@ import static ch.eitchnet.utils.helper.BaseEncoding.toBase32Hex;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,15 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class BaseDecodingTest {
+	public static final String PROP_RUN_PERF_TESTS = "ch.eitchnet.utils.test.runPerfTests"; //$NON-NLS-1$
 	private static final Logger logger = LoggerFactory.getLogger(BaseDecodingTest.class);
+
+	public static boolean isSkipPerfTests() {
+		String context = BaseDecodingTest.class.getSimpleName();
+		String key = PROP_RUN_PERF_TESTS;
+		boolean runPerfTests = PropertiesHelper.getPropertyBool(context, key, Boolean.FALSE);
+		return !runPerfTests;
+	}
 
 	@Test
 	public void testBase64() {
@@ -49,6 +58,59 @@ public class BaseDecodingTest {
 		Assert.assertEquals("foob", fromBase64("Zm9vYg=="));
 		Assert.assertEquals("fooba", fromBase64("Zm9vYmE="));
 		Assert.assertEquals("foobar", fromBase64("Zm9vYmFy"));
+	}
+
+	@Test
+	public void testBase32() {
+		Assert.assertEquals("", fromBase32(""));
+		Assert.assertEquals("f", fromBase32("MY======"));
+		Assert.assertEquals("fo", fromBase32("MZXQ===="));
+		Assert.assertEquals("foo", fromBase32("MZXW6==="));
+		Assert.assertEquals("foob", fromBase32("MZXW6YQ="));
+		Assert.assertEquals("fooba", fromBase32("MZXW6YTB"));
+		Assert.assertEquals("foobar", fromBase32("MZXW6YTBOI======"));
+	}
+
+	@Test
+	public void testBase32Hex() {
+		Assert.assertEquals("", fromBase32Hex(""));
+		Assert.assertEquals("f", fromBase32Hex("CO======"));
+		Assert.assertEquals("fo", fromBase32Hex("CPNG===="));
+		Assert.assertEquals("foo", fromBase32Hex("CPNMU==="));
+		Assert.assertEquals("foob", fromBase32Hex("CPNMUOG="));
+		Assert.assertEquals("fooba", fromBase32Hex("CPNMUOJ1"));
+		Assert.assertEquals("foobar", fromBase32Hex("CPNMUOJ1E8======"));
+	}
+
+	@Test
+	public void testBase32Dmedia() {
+
+		Assert.assertEquals("", fromBase32Dmedia(""));
+		Assert.assertEquals("binary foo", fromBase32Dmedia("FCNPVRELI7J9FUUI"));
+		Assert.assertEquals("f", fromBase32Dmedia("FR======"));
+		Assert.assertEquals("fo", fromBase32Dmedia("FSQJ===="));
+		Assert.assertEquals("foo", fromBase32Dmedia("FSQPX==="));
+		Assert.assertEquals("foob", fromBase32Dmedia("FSQPXRJ="));
+		Assert.assertEquals("fooba", fromBase32Dmedia("FSQPXRM4"));
+		Assert.assertEquals("foobar", fromBase32Dmedia("FSQPXRM4HB======"));
+	}
+
+	@Test
+	public void testBase16() {
+		Assert.assertEquals("", fromBase16(""));
+		Assert.assertEquals("f", fromBase16("66"));
+		Assert.assertEquals("fo", fromBase16("666F"));
+		Assert.assertEquals("foo", fromBase16("666F6F"));
+		Assert.assertEquals("foob", fromBase16("666F6F62"));
+		Assert.assertEquals("fooba", fromBase16("666F6F6261"));
+		Assert.assertEquals("foobar", fromBase16("666F6F626172"));
+	}
+
+	@Test
+	public void testBase64Perf() {
+		if (isSkipPerfTests()) {
+			return;
+		}
 
 		byte[] bytes = new byte[1024 * 1024];
 		for (int i = 0; i < bytes.length; i++) {
@@ -63,14 +125,11 @@ public class BaseDecodingTest {
 	}
 
 	@Test
-	public void testBase32() {
-		Assert.assertEquals("", fromBase32(""));
-		Assert.assertEquals("f", fromBase32("MY======"));
-		Assert.assertEquals("fo", fromBase32("MZXQ===="));
-		Assert.assertEquals("foo", fromBase32("MZXW6==="));
-		Assert.assertEquals("foob", fromBase32("MZXW6YQ="));
-		Assert.assertEquals("fooba", fromBase32("MZXW6YTB"));
-		Assert.assertEquals("foobar", fromBase32("MZXW6YTBOI======"));
+	public void testBase32Perf() {
+		if (isSkipPerfTests()) {
+			logger.info("Not running performance tests as not enabled by system property " + PROP_RUN_PERF_TESTS);
+			return;
+		}
 
 		byte[] bytes = new byte[1024 * 1024];
 		for (int i = 0; i < bytes.length; i++) {
@@ -85,14 +144,11 @@ public class BaseDecodingTest {
 	}
 
 	@Test
-	public void testBase32Hex() {
-		Assert.assertEquals("", fromBase32Hex(""));
-		Assert.assertEquals("f", fromBase32Hex("CO======"));
-		Assert.assertEquals("fo", fromBase32Hex("CPNG===="));
-		Assert.assertEquals("foo", fromBase32Hex("CPNMU==="));
-		Assert.assertEquals("foob", fromBase32Hex("CPNMUOG="));
-		Assert.assertEquals("fooba", fromBase32Hex("CPNMUOJ1"));
-		Assert.assertEquals("foobar", fromBase32Hex("CPNMUOJ1E8======"));
+	public void testBase32HexPerf() {
+		if (isSkipPerfTests()) {
+			logger.info("Not running performance tests as not enabled by system property " + PROP_RUN_PERF_TESTS);
+			return;
+		}
 
 		byte[] bytes = new byte[1024 * 1024];
 		for (int i = 0; i < bytes.length; i++) {
@@ -107,16 +163,11 @@ public class BaseDecodingTest {
 	}
 
 	@Test
-	public void testBase32Dmedia() {
-
-		Assert.assertEquals("", fromBase32Dmedia(""));
-		Assert.assertEquals("binary foo", fromBase32Dmedia("FCNPVRELI7J9FUUI"));
-		Assert.assertEquals("f", fromBase32Dmedia("FR======"));
-		Assert.assertEquals("fo", fromBase32Dmedia("FSQJ===="));
-		Assert.assertEquals("foo", fromBase32Dmedia("FSQPX==="));
-		Assert.assertEquals("foob", fromBase32Dmedia("FSQPXRJ="));
-		Assert.assertEquals("fooba", fromBase32Dmedia("FSQPXRM4"));
-		Assert.assertEquals("foobar", fromBase32Dmedia("FSQPXRM4HB======"));
+	public void testBase32DmediaPerf() {
+		if (isSkipPerfTests()) {
+			logger.info("Not running performance tests as not enabled by system property " + PROP_RUN_PERF_TESTS);
+			return;
+		}
 
 		long start = System.nanoTime();
 		byte[] bytes = new byte[1024 * 1024];
@@ -128,14 +179,11 @@ public class BaseDecodingTest {
 	}
 
 	@Test
-	public void testBase16() {
-		Assert.assertEquals("", fromBase16(""));
-		Assert.assertEquals("f", fromBase16("66"));
-		Assert.assertEquals("fo", fromBase16("666F"));
-		Assert.assertEquals("foo", fromBase16("666F6F"));
-		Assert.assertEquals("foob", fromBase16("666F6F62"));
-		Assert.assertEquals("fooba", fromBase16("666F6F6261"));
-		Assert.assertEquals("foobar", fromBase16("666F6F626172"));
+	public void testBase16Perf() {
+		if (isSkipPerfTests()) {
+			logger.info("Not running performance tests as not enabled by system property " + PROP_RUN_PERF_TESTS);
+			return;
+		}
 
 		byte[] bytes = new byte[1024 * 1024];
 		for (int i = 0; i < bytes.length; i++) {
