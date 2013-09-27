@@ -19,6 +19,18 @@
  */
 package ch.eitchnet.xmlpers.test;
 
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.BOOK_ID;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.RES_ID;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.RES_TYPE;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.RES_TYPE_INEXISTANT;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.assertBook;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.assertBookUpdated;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.assertResource;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.assertResourceUpdated;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.createBook;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.createResource;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.updateBook;
+
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
@@ -40,7 +52,7 @@ import ch.eitchnet.xmlpers.api.XmlPersistenceTransaction;
 import ch.eitchnet.xmlpers.impl.XmlPersistenceHandlerImpl;
 import ch.eitchnet.xmlpers.test.impl.Book;
 import ch.eitchnet.xmlpers.test.impl.TestConstants;
-import ch.eitchnet.xmlpers.test.model.Parameter;
+import ch.eitchnet.xmlpers.test.model.ModelBuilder;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**
@@ -49,28 +61,7 @@ import ch.eitchnet.xmlpers.test.model.Resource;
 public abstract class AbstractXmlPersistenceTest {
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractXmlPersistenceTest.class.getName());
-
-	protected static final String RES_TYPE = "@subType";
-	protected static final String RES_TYPE_INEXISTANT = "@inexistant";
-	protected static final String RES_NAME = "@name";
-	protected static final String RES_NAME_MODIFIED = "@name_modified";
-	protected static final String RES_ID = "@id";
-
-	protected static final String PARAM_TYPE = "@paramType";
-	protected static final String PARAM_NAME = "@paramName";
-	protected static final String PARAM_ID = "@paramId";
-	protected static final String PARAM_VALUE_1 = "@paramValue1";
-	protected static final String PARAM_VALUE_2 = "@paramValue2";
-
-	protected static final long BOOK_ID = 10L;
-	protected static final String BOOK_TITLE = "Nick Hornby";
-	protected static final String BOOK_AUTHOR = "A long way down";
-	protected static final String BOOK_PRESS_1 = "Some press";
-	protected static final String BOOK_PRESS_2 = "Another press";
-	protected static final double BOOK_PRICE = 45.55D;
-
 	protected static XmlPersistenceHandler persistenceHandler;
-
 	protected XmlPersistenceTransaction tx;
 
 	/**
@@ -141,7 +132,7 @@ public abstract class AbstractXmlPersistenceTest {
 		assertBook(persistedBook);
 
 		// update
-		persistedBook.setPress(BOOK_PRESS_2);
+		updateBook(persistedBook);
 		this.tx.update(persistedBook);
 		this.tx.commit();
 
@@ -236,8 +227,7 @@ public abstract class AbstractXmlPersistenceTest {
 			assertResource(resource);
 
 			// modify the instance
-			resource.setName(RES_NAME_MODIFIED);
-			resource.getParameterBy(PARAM_ID).setValue(PARAM_VALUE_2);
+			ModelBuilder.updateResource(resource);
 
 			// update the instance
 			this.tx.update(resource);
@@ -378,61 +368,5 @@ public abstract class AbstractXmlPersistenceTest {
 		long size = metadataDao.querySize(TestConstants.TYPE_RES, RES_TYPE);
 		this.tx.commit();
 		Assert.assertEquals("Expected size = 0, found: " + size, 0, size);
-	}
-
-	private Book createBook() {
-		Book book = new Book(BOOK_ID, BOOK_TITLE, BOOK_AUTHOR, BOOK_PRESS_1, BOOK_PRICE);
-		return book;
-	}
-
-	private void assertBook(Book book) {
-		Assert.assertNotNull(book);
-		Assert.assertEquals(BOOK_ID, book.getId().longValue());
-		Assert.assertEquals(BOOK_TITLE, book.getTitle());
-		Assert.assertEquals(BOOK_AUTHOR, book.getAuthor());
-		Assert.assertEquals(BOOK_PRESS_1, book.getPress());
-		Assert.assertEquals(BOOK_PRICE, book.getPrice(), 0.0);
-	}
-
-	private void assertBookUpdated(Book book) {
-		Assert.assertNotNull(book);
-		Assert.assertEquals(BOOK_ID, book.getId().longValue());
-		Assert.assertEquals(BOOK_TITLE, book.getTitle());
-		Assert.assertEquals(BOOK_AUTHOR, book.getAuthor());
-		Assert.assertEquals(BOOK_PRESS_2, book.getPress());
-		Assert.assertEquals(BOOK_PRICE, book.getPrice(), 0.0);
-	}
-
-	private Resource createResource() {
-		Resource resource = new Resource(RES_ID, RES_NAME, RES_TYPE);
-		Parameter param = new Parameter(PARAM_ID, PARAM_NAME, PARAM_TYPE, PARAM_VALUE_1);
-		resource.addParameter(param);
-		return resource;
-	}
-
-	private void assertResource(Resource resource) {
-		Assert.assertNotNull(resource);
-		Assert.assertEquals(RES_ID, resource.getId());
-		Assert.assertEquals(RES_NAME, resource.getName());
-		Assert.assertEquals(RES_TYPE, resource.getType());
-		Parameter param = resource.getParameterBy(PARAM_ID);
-		Assert.assertNotNull(param);
-		Assert.assertEquals(PARAM_ID, param.getId());
-		Assert.assertEquals(PARAM_NAME, param.getName());
-		Assert.assertEquals(PARAM_TYPE, param.getType());
-		Assert.assertEquals(PARAM_VALUE_1, param.getValue());
-	}
-
-	private void assertResourceUpdated(Resource resource) {
-		Assert.assertNotNull(resource);
-		Assert.assertEquals(RES_ID, resource.getId());
-		Assert.assertEquals(RES_NAME_MODIFIED, resource.getName());
-		Assert.assertEquals(RES_TYPE, resource.getType());
-		Parameter param = resource.getParameterBy(PARAM_ID);
-		Assert.assertNotNull(param);
-		Assert.assertEquals(PARAM_ID, param.getId());
-		Assert.assertEquals(PARAM_NAME, param.getName());
-		Assert.assertEquals(PARAM_TYPE, param.getType());
-		Assert.assertEquals(PARAM_VALUE_2, param.getValue());
 	}
 }

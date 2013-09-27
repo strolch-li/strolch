@@ -19,13 +19,17 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test.impl.rewrite;
 
-/**
- * @author Robert von Burg <eitch@eitchnet.ch>
- * 
- */
-public enum XmlIoMode {
+import org.w3c.dom.Document;
 
-	DEFAULT, DOM, SAX;
+public interface DomParser<T> {
+
+	public T getObject();
+
+	public void setObject(T object);
+
+	public Document toDom();
+
+	public void fromDom(Document document);
 }

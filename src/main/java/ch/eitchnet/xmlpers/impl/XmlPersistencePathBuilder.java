@@ -31,6 +31,7 @@ import ch.eitchnet.utils.helper.PropertiesHelper;
 import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.xmlpers.api.XmlPersistenceConstants;
 import ch.eitchnet.xmlpers.api.XmlPersistenceException;
+import ch.eitchnet.xmlpers.test.impl.rewrite.PersistenceContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -43,6 +44,8 @@ public class XmlPersistencePathBuilder {
 
 	private final boolean verbose;
 	private final String basePath;
+
+	private File path;
 
 	public XmlPersistencePathBuilder(Properties properties) {
 
@@ -289,5 +292,103 @@ public class XmlPersistencePathBuilder {
 		if (!parentFile.exists() && !parentFile.mkdirs()) {
 			throw new XmlPersistenceException(MessageFormat.format(msg, args));
 		}
+	}
+
+	private void logPath(String operation, File path, PersistenceContext<?> context) {
+		if (this.verbose) {
+			String msg;
+			if (StringHelper.isEmpty(context.getSubType())) {
+				msg = "Path for operation {0} for {1} / {2} / is at {3}";
+				msg = MessageFormat.format(msg, operation, context.getType(), context.getId(), path.getAbsolutePath());
+			} else {
+				msg = "Path for operation {0} for {1} / {2} / {3} / is at {4}";
+				msg = MessageFormat.format(msg, operation, context.getType(), context.getSubType(), context.getId(),
+						path.getAbsolutePath());
+			}
+		}
+	}
+
+	private void createMissingParents(File path, PersistenceContext<?> context) {
+		File parentFile = path.getParentFile();
+		if (!parentFile.exists() && !parentFile.mkdirs()) {
+			String msg;
+			if (StringHelper.isEmpty(context.getSubType())) {
+				msg = "Could not create parent path for {0} / {1} / at {2}";
+				msg = MessageFormat.format(msg, context.getType(), context.getId(), path.getAbsolutePath());
+			} else {
+				msg = "Could not create parent path for {0} / {1} / {2} at {3}";
+				msg = MessageFormat.format(msg, context.getType(), context.getSubType(), context.getId(),
+						path.getAbsolutePath());
+			}
+	
+			throw new XmlPersistenceException(msg);
+		}
+	}
+
+	private void assertPathExists(File path, PersistenceContext<?> context) {
+		if (!path.exists()) {
+			String msg;
+			if (StringHelper.isEmpty(context.getSubType())) {
+				msg = "Persistence unit does not exist for {0} / {1} at {2}";
+				msg = MessageFormat.format(msg, context.getType(), context.getId(), path.getAbsolutePath());
+			} else {
+				msg = "Persistence unit does not exist for {0} / {1} / {2} at {3}";
+				msg = MessageFormat.format(msg, context.getType(), context.getSubType(), context.getId(),
+						path.getAbsolutePath());
+			}
+	
+			throw new XmlPersistenceException(msg);
+		}
+	}
+
+	private void assertPathNotExists(File path, PersistenceContext<?> context) {
+		if (path.exists()) {
+			String msg;
+			if (StringHelper.isEmpty(context.getSubType())) {
+				msg = "Persistence unit already exists for {0} / {1} at {2}";
+				msg = MessageFormat.format(msg, context.getType(), context.getId(), path.getAbsolutePath());
+			} else {
+				msg = "Persistence unit already exists for {0} / {1} / {2} at {3}";
+				msg = MessageFormat.format(msg, context.getType(), context.getSubType(), context.getId(),
+						path.getAbsolutePath());
+			}
+	
+			throw new XmlPersistenceException(msg);
+		}
+	}
+
+	public File getCreatePath(PersistenceContext<?> context) {
+		File path = getPath(context);
+		logPath("CREATE", path, context);
+		assertPathNotExists(path, context);
+		createMissingParents(path, context);
+		return path;
+	}
+
+	public File getDeletePath(PersistenceContext<?> context) {
+		File path = getPath(context);
+		logPath("DELETE", path, context);
+		assertPathExists(path, context);
+		return path;
+	}
+
+	public File getUpdatePath(PersistenceContext<?> context) {
+		File path = getPath(context);
+		logPath("UPDATE", path, context);
+		assertPathExists(path, context);
+		return path;
+	}
+
+	public File getReadPath(PersistenceContext<?> context) {
+		File path = getPath(context);
+		logPath("READ", path, context);
+		if (!path.exists())
+			return null;
+		return path;
+	}
+
+	private File getPath(PersistenceContext<?> context) {
+		File path = new File(getPathAsString(context.getType(), context.getSubType(), context.getId()));
+		return path;
 	}
 }

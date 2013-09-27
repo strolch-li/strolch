@@ -19,13 +19,19 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.impl;
+
+import java.io.File;
+
+import ch.eitchnet.xmlpers.api.DaoContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public enum XmlIoMode {
+public interface XmlPersistenceFileIoHandler {
 
-	DEFAULT, DOM, SAX;
+	public <T> void read(DaoContext<T> context, File file);
+
+	public <T> void write(DaoContext<T> context, File file);
 }

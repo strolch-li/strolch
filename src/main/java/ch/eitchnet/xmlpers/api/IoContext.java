@@ -23,9 +23,9 @@ package ch.eitchnet.xmlpers.api;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
-public enum XmlIoMode {
+public interface IoContext {
 
-	DEFAULT, DOM, SAX;
+	// marker interface
 }

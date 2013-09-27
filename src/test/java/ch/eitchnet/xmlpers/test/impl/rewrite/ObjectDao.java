@@ -19,13 +19,33 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test.impl.rewrite;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
-public enum XmlIoMode {
+public class ObjectDao<T> {
+	
+	public void add(PersistenceContext<T> context){}
 
-	DEFAULT, DOM, SAX;
+	public void update(PersistenceContext<T> context){}
+
+	public void remove(PersistenceContext<T> context){}
+
+	public void removeById(PersistenceContext<T> context){}
+
+	public void removeAll(PersistenceContext<T> context){}
+
+	public T queryById(PersistenceContext<T> context){return null;}
+
+	public List<T> queryAll(PersistenceContext<T> context){return null;}
+
+	public Set<String> queryKeySet(PersistenceContext<T> context){return null;}
+
+	public long querySize(PersistenceContext<T> context){return 0L;}
+
 }

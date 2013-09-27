@@ -24,8 +24,19 @@ package ch.eitchnet.xmlpers.api;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
+ * @param <T>
  */
-public enum XmlIoMode {
+public interface DaoContext<T> {
 
-	DEFAULT, DOM, SAX;
+	public String getType();
+
+	public String getSubType();
+
+	public String getId();
+
+	public boolean hasSubType();
+
+	public T getObject();
+	
+	public <U extends IoContext> U getIoContext();
 }

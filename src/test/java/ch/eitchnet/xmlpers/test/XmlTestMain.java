@@ -52,6 +52,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import ch.eitchnet.utils.exceptions.XmlException;
 import ch.eitchnet.utils.helper.XmlHelper;
+import ch.eitchnet.xmlpers.test.model.ModelBuilder;
 import ch.eitchnet.xmlpers.test.model.Parameter;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
@@ -67,31 +68,7 @@ public class XmlTestMain {
 
 	public static void main(String[] args) throws Exception {
 
-		res = new Resource();
-		res.setId("id1");
-		res.setName("name1");
-		res.setType("type1");
-
-		Parameter param1 = new Parameter();
-		param1.setId("paramId1");
-		param1.setName("paramName1");
-		param1.setType("paramType1");
-		param1.setValue("paramValue1");
-		res.addParameter(param1);
-
-		Parameter param2 = new Parameter();
-		param2.setId("paramId2");
-		param2.setName("paramName2");
-		param2.setType("paramType2");
-		param2.setValue("paramValue2");
-		res.addParameter(param2);
-
-		Parameter param3 = new Parameter();
-		param3.setId("paramId3");
-		param3.setName("paramName3");
-		param3.setType("paramType3");
-		param3.setValue("paramValue3");
-		res.addParameter(param3);
+		res = ModelBuilder.createResource();
 
 		logger.info("Writing Res:\n" + res);
 

@@ -19,13 +19,21 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test.impl.rewrite;
 
-/**
- * @author Robert von Burg <eitch@eitchnet.ch>
- * 
- */
-public enum XmlIoMode {
+import javax.xml.stream.XMLStreamException;
 
-	DEFAULT, DOM, SAX;
+import org.xml.sax.helpers.DefaultHandler;
+
+import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
+
+public interface SaxParser<T> {
+
+	public T getObject();
+
+	public void setObject(T object);
+
+	public DefaultHandler getDefaultHandler();
+
+	public void write(XmlPersistenceStreamWriter xmlWriter) throws XMLStreamException;
 }
