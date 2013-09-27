@@ -19,9 +19,9 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.test.impl.rewrite;
+package ch.eitchnet.xmlpers.api;
 
-import ch.eitchnet.xmlpers.api.XmlIoMode;
+import ch.eitchnet.xmlpers.test.impl.rewrite.ParserFactory;
 
 public class PersistenceContext<T> {
 

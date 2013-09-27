@@ -23,6 +23,7 @@ package ch.eitchnet.xmlpers.test.impl.rewrite;
 
 import java.io.File;
 
+import ch.eitchnet.xmlpers.api.PersistenceContext;
 import ch.eitchnet.xmlpers.impl.XmlPersistencePathBuilder;
 
 public class FileDao {

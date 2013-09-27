@@ -35,6 +35,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.eitchnet.utils.helper.FileHelper;
+import ch.eitchnet.xmlpers.api.PersistenceContext;
 import ch.eitchnet.xmlpers.api.XmlIoMode;
 import ch.eitchnet.xmlpers.api.XmlPersistenceConstants;
 import ch.eitchnet.xmlpers.impl.XmlPersistencePathBuilder;

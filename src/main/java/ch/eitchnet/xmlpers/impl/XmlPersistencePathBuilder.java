@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.PropertiesHelper;
 import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.xmlpers.api.PersistenceContext;
 import ch.eitchnet.xmlpers.api.XmlPersistenceConstants;
 import ch.eitchnet.xmlpers.api.XmlPersistenceException;
-import ch.eitchnet.xmlpers.test.impl.rewrite.PersistenceContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

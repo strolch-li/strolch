@@ -24,6 +24,8 @@ package ch.eitchnet.xmlpers.test.impl.rewrite;
 import java.util.List;
 import java.util.Set;
 
+import ch.eitchnet.xmlpers.api.PersistenceContext;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  *
