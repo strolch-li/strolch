@@ -21,7 +21,6 @@
  */
 package ch.eitchnet.xmlpers.api;
 
-import ch.eitchnet.xmlpers.test.impl.rewrite.ParserFactory;
 
 public class PersistenceContext<T> {
 

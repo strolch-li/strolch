@@ -19,11 +19,17 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.test.impl.rewrite;
+package ch.eitchnet.xmlpers.api;
 
-public interface ParserFactory<T> {
+import org.w3c.dom.Document;
 
-	public DomParser<T> getDomParser();
+public interface DomParser<T> {
 
-	public SaxParser<T> getSaxParser();
+	public T getObject();
+
+	public void setObject(T object);
+
+	public Document toDom();
+
+	public void fromDom(Document document);
 }

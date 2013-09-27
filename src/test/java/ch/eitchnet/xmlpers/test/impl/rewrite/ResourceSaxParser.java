@@ -27,6 +27,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import ch.eitchnet.xmlpers.api.SaxParser;
 import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
 import ch.eitchnet.xmlpers.test.model.Parameter;
 import ch.eitchnet.xmlpers.test.model.Resource;

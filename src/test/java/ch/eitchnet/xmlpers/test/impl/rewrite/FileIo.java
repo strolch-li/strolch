@@ -53,8 +53,10 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import ch.eitchnet.utils.exceptions.XmlException;
 import ch.eitchnet.utils.helper.XmlHelper;
+import ch.eitchnet.xmlpers.api.DomParser;
 import ch.eitchnet.xmlpers.api.DomUtil;
 import ch.eitchnet.xmlpers.api.PersistenceContext;
+import ch.eitchnet.xmlpers.api.SaxParser;
 import ch.eitchnet.xmlpers.api.XmlPersistenceException;
 import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
 

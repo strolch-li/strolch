@@ -19,21 +19,12 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.test.impl.rewrite;
+package ch.eitchnet.xmlpers.api;
 
-import javax.xml.stream.XMLStreamException;
 
-import org.xml.sax.helpers.DefaultHandler;
+public interface ParserFactory<T> {
 
-import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
+	public DomParser<T> getDomParser();
 
-public interface SaxParser<T> {
-
-	public T getObject();
-
-	public void setObject(T object);
-
-	public DefaultHandler getDefaultHandler();
-
-	public void write(XmlPersistenceStreamWriter xmlWriter) throws XMLStreamException;
+	public SaxParser<T> getSaxParser();
 }
