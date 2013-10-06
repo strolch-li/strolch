@@ -21,6 +21,8 @@
  */
 package ch.eitchnet.xmlpers.test.impl.rewrite;
 
+import ch.eitchnet.xmlpers.api.XmlIoMode;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
@@ -31,9 +33,13 @@ public interface PersistenceTransaction {
 
 	public void rollback();
 
-	public boolean isClosed();
+	public boolean isOpen();
 
 	public ObjectDao getObjectDao();
-	
+
 	public MetadataDao getMetadataDao();
+
+	public XmlIoMode getIoMode();
+
+	public void setIoMode(XmlIoMode ioMode);
 }

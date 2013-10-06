@@ -21,6 +21,8 @@
  */
 package ch.eitchnet.xmlpers.test.impl.rewrite;
 
+import java.text.MessageFormat;
+
 import ch.eitchnet.xmlpers.api.ParserFactory;
 import ch.eitchnet.xmlpers.api.PersistenceContext;
 import ch.eitchnet.xmlpers.test.impl.Book;
@@ -34,41 +36,44 @@ import ch.eitchnet.xmlpers.test.model.Resource;
 public class TestPersistenceContextFactory implements PersistenceContextFactory {
 
 	@Override
-	public <T> PersistenceContext<T> createPersistenceContext(String type, String subType, String id) {
-		return buildPersistenceContext(type, subType, id);
+	public <T> PersistenceContext<T> createCtx(PersistenceTransaction tx, String type, String subType, String id) {
+		return buildPersistenceContext(tx, type, subType, id);
 	}
 
 	@Override
-	public <T> PersistenceContext<T> createPersistenceContext(String type, String subType) {
-		return buildPersistenceContext(type, subType, null);
+	public <T> PersistenceContext<T> createCtx(PersistenceTransaction tx, String type, String subType) {
+		return buildPersistenceContext(tx, type, subType, null);
 	}
 
 	@Override
-	public <T> PersistenceContext<T> createPersistenceContext(String type) {
-		return buildPersistenceContext(type, null, null);
+	public <T> PersistenceContext<T> createCtx(PersistenceTransaction tx, String type) {
+		return buildPersistenceContext(tx, type, null, null);
 	}
 
 	@Override
-	public <T> PersistenceContext<T> createPersistenceContext(T t) {
+	public <T> PersistenceContext<T> createCtx(PersistenceTransaction tx, T t) {
 		if (t == null)
-			throw new RuntimeException("T may not be null!");
+			throw new RuntimeException("T may not be null!"); //$NON-NLS-1$
 
 		PersistenceContext<T> context;
 
 		if (t instanceof Resource) {
 			Resource resource = (Resource) t;
-			context = buildPersistenceContext(TestConstants.TYPE_RES, resource.getType(), resource.getId());
+			context = buildPersistenceContext(tx, TestConstants.TYPE_RES, resource.getType(), resource.getId());
 		} else if (t instanceof Book) {
-			context = buildPersistenceContext(TestConstants.TYPE_BOOK, null, ((Book) t).getId().toString());
+			context = buildPersistenceContext(tx, TestConstants.TYPE_BOOK, null, ((Book) t).getId().toString());
 		} else {
-			throw new UnsupportedOperationException("Handling of " + t.getClass().getName() + " is not implemented!");
+			String msg = "Handling of {0} is not implemented!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, t.getClass().getName());
+			throw new UnsupportedOperationException(msg);
 		}
 
 		context.setObject(t);
 		return context;
 	}
 
-	private <T> PersistenceContext<T> buildPersistenceContext(String type, String subType, String id) {
+	private <T> PersistenceContext<T> buildPersistenceContext(PersistenceTransaction tx, String type, String subType,
+			String id) {
 
 		PersistenceContext<T> context = new PersistenceContext<>();
 
@@ -76,6 +81,7 @@ public class TestPersistenceContextFactory implements PersistenceContextFactory 
 		context.setSubType(subType);
 		context.setId(id);
 
+		context.setIoMode(tx.getIoMode());
 		context.setParserFactory(this.<T> getParserFactoryInstance(type));
 
 		return context;
@@ -93,8 +99,11 @@ public class TestPersistenceContextFactory implements PersistenceContextFactory 
 			parserFactory = (ParserFactory<T>) new ResourceParserFactory();
 		else if (type.equals(TestConstants.TYPE_BOOK))
 			parserFactory = (ParserFactory<T>) new BookParserFactory();
-		else
-			throw new UnsupportedOperationException("No ParserFactory can be returned for type " + type);
+		else {
+			String msg = "No ParserFactory can be returned for type {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, type);
+			throw new UnsupportedOperationException(msg);
+		}
 
 		return parserFactory;
 	}

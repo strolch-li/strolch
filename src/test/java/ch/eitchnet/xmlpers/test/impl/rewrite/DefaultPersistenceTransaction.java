@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.objectfilter.ObjectFilter;
 import ch.eitchnet.xmlpers.api.PersistenceContext;
+import ch.eitchnet.xmlpers.api.XmlIoMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -45,7 +46,10 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 	private final ObjectFilter objectFilter;
 	private final boolean verbose;
 
+	private boolean committed;
 	private boolean closed;
+
+	private XmlIoMode ioMode;
 
 	public DefaultPersistenceTransaction(FileDao fileDao, boolean verbose) {
 		this.fileDao = fileDao;
@@ -67,9 +71,13 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 	@Override
 	public void rollback() {
-		this.closed = true;
-		this.objectDao.rollback();
-		this.objectFilter.clearCache();
+		if (this.committed)
+			throw new IllegalStateException("Transaction has already been committed!"); //$NON-NLS-1$
+		if (!this.closed) {
+			this.closed = true;
+			this.objectDao.rollback();
+			this.objectFilter.clearCache();
+		}
 	}
 
 	@Override
@@ -95,7 +103,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 						logger.info(removed.size() + " objects removed in this tx."); //$NON-NLS-1$
 
 					for (Object object : removed) {
-						PersistenceContext<Object> context = persistenceContextFactory.createPersistenceContext(object);
+						PersistenceContext<Object> context = persistenceContextFactory.createCtx(this, object);
 						this.fileDao.performDelete(context);
 					}
 				}
@@ -110,7 +118,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 					for (Object object : updated) {
 
-						PersistenceContext<Object> context = persistenceContextFactory.createPersistenceContext(object);
+						PersistenceContext<Object> context = persistenceContextFactory.createCtx(this, object);
 						this.fileDao.performUpdate(context);
 					}
 				}
@@ -125,7 +133,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 					for (Object object : added) {
 
-						PersistenceContext<Object> context = persistenceContextFactory.createPersistenceContext(object);
+						PersistenceContext<Object> context = persistenceContextFactory.createCtx(this, object);
 						this.fileDao.performCreate(context);
 					}
 				}
@@ -137,12 +145,22 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 		} finally {
 			// clean up
 			this.objectFilter.clearCache();
-			this.closed = true;
+			this.committed = true;
 		}
 	}
 
 	@Override
-	public boolean isClosed() {
-		return this.closed;
+	public boolean isOpen() {
+		return !this.closed && !this.committed;
+	}
+
+	@Override
+	public void setIoMode(XmlIoMode ioMode) {
+		this.ioMode = ioMode;
+	}
+
+	@Override
+	public XmlIoMode getIoMode() {
+		return this.ioMode;
 	}
 }

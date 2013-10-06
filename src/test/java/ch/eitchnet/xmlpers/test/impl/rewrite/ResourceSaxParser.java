@@ -60,7 +60,7 @@ class ResourceSaxParser extends DefaultHandler implements SaxParser<Resource> {
 		writer.writeAttribute("type", this.resource.getType());
 		for (String paramId : this.resource.getParameterKeySet()) {
 			Parameter param = this.resource.getParameterBy(paramId);
-			writer.writeElement("Parameter");
+			writer.writeEmptyElement("Parameter");
 			writer.writeAttribute("id", param.getId());
 			writer.writeAttribute("name", param.getName());
 			writer.writeAttribute("type", param.getType());

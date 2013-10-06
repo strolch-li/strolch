@@ -78,7 +78,7 @@ public class MetadataDao {
 	}
 
 	private void assertNotClosed() {
-		if (this.tx.isClosed())
+		if (!this.tx.isOpen())
 			throw new IllegalStateException("Transaction has been closed and thus no operation can be performed!");
 	}
 }

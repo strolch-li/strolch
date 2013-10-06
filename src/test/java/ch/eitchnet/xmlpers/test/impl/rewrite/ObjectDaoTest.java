@@ -21,18 +21,26 @@
  */
 package ch.eitchnet.xmlpers.test.impl.rewrite;
 
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.RES_ID;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.RES_TYPE;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.assertResource;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.assertResourceUpdated;
 import static ch.eitchnet.xmlpers.test.model.ModelBuilder.createResource;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.updateResource;
+import static org.junit.Assert.assertNull;
 
+import java.io.File;
 import java.util.Properties;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.utils.helper.FileHelper;
+import ch.eitchnet.xmlpers.api.PersistenceContext;
+import ch.eitchnet.xmlpers.api.XmlIoMode;
+import ch.eitchnet.xmlpers.api.XmlPersistenceConstants;
+import ch.eitchnet.xmlpers.test.impl.TestConstants;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**
@@ -41,41 +49,110 @@ import ch.eitchnet.xmlpers.test.model.Resource;
  */
 public class ObjectDaoTest {
 
-	private static final Logger logger = LoggerFactory.getLogger(ObjectDaoTest.class);
+	private static final String BASEPATH = "target/dbTest/rewrite"; //$NON-NLS-1$
 
-	private PersistenceContextFactory persistenceContextFactory;
+	private PersistenceContextFactory ctxFactory;
 	private XmlPersistenceManager persistenceManager;
 	private PersistenceTransaction tx;
 
 	@BeforeClass
 	public static void beforeClass() {
-	}
 
-	@Before
-	public void setUp() {
+		File basePath = new File(BASEPATH);
+		if (basePath.exists()) {
+			if (!FileHelper.deleteFile(basePath, true)) {
+				throw new RuntimeException("Faile to delete base path " + BASEPATH); //$NON-NLS-1$
+			}
+		}
 
-		this.persistenceContextFactory = new TestPersistenceContextFactory();
+		if (!basePath.mkdirs()) {
+			throw new RuntimeException("Failed to create base path " + BASEPATH); //$NON-NLS-1$
+		}
 
-		Properties properties = new Properties();
-		this.persistenceManager = XmlPersistenceManagerLoader.load(properties);
+		new File(BASEPATH + "/sax").mkdir(); //$NON-NLS-1$
+		new File(BASEPATH + "/dom").mkdir(); //$NON-NLS-1$
 	}
 
 	@After
 	public void tearDown() {
-		if (this.tx != null) {
+		if (this.tx != null && this.tx.isOpen()) {
 			this.tx.rollback();
 		}
 	}
 
 	@Test
-	@Ignore
-	public void testObjectDao() {
+	public void testSaxObjectDao() {
+		this.ctxFactory = new TestPersistenceContextFactory();
+		Properties properties = new Properties();
+		properties.setProperty(XmlPersistenceConstants.PROP_BASEPATH, BASEPATH + "/sax"); //$NON-NLS-1$
+		this.persistenceManager = XmlPersistenceManagerLoader.load(properties);
+
+		testCrud(XmlIoMode.SAX);
+	}
+
+	@Test
+	public void testDomObjectDao() {
+		this.ctxFactory = new TestPersistenceContextFactory();
+		Properties properties = new Properties();
+		properties.setProperty(XmlPersistenceConstants.PROP_BASEPATH, BASEPATH + "/dom"); //$NON-NLS-1$
+		this.persistenceManager = XmlPersistenceManagerLoader.load(properties);
+
+		testCrud(XmlIoMode.DOM);
+	}
+
+	private PersistenceTransaction freshTx(XmlIoMode ioMode) {
+		if (this.tx != null && this.tx.isOpen())
+			this.tx.rollback();
 
 		this.tx = this.persistenceManager.openTx();
+		this.tx.setIoMode(ioMode);
 
+		return this.tx;
+	}
+
+	private void testCrud(XmlIoMode ioMode) {
+
+		ObjectDao objectDao;
+
+		// create new resource
 		Resource resource = createResource();
+		objectDao = freshTx(ioMode).getObjectDao();
+		objectDao.add(resource);
+		this.tx.commit(this.ctxFactory);
 
-		this.tx.getObjectDao().add(resource);
-		this.tx.commit(this.persistenceContextFactory);
+		// read resource
+		PersistenceContext<Resource> ctx = this.ctxFactory.createCtx(this.tx, TestConstants.TYPE_RES, RES_TYPE, RES_ID);
+		objectDao = freshTx(ioMode).getObjectDao();
+		resource = objectDao.queryById(ctx);
+		assertResource(resource);
+
+		// modify resource
+		updateResource(resource);
+		objectDao = freshTx(ioMode).getObjectDao();
+		objectDao.update(resource);
+		this.tx.commit(this.ctxFactory);
+
+		// read modified resource
+		objectDao = freshTx(ioMode).getObjectDao();
+		resource = objectDao.queryById(ctx);
+		assertResourceUpdated(resource);
+		this.tx.commit(this.ctxFactory);
+
+		// delete resource
+		objectDao = freshTx(ioMode).getObjectDao();
+		objectDao.remove(resource);
+		this.tx.commit(this.ctxFactory);
+
+		// fail to read
+		objectDao = freshTx(ioMode).getObjectDao();
+		resource = objectDao.queryById(ctx);
+		assertNull(resource);
+
+		// and create again
+		resource = createResource();
+		assertResource(resource);
+		objectDao = freshTx(ioMode).getObjectDao();
+		objectDao.add(resource);
+		this.tx.commit(this.ctxFactory);
 	}
 }

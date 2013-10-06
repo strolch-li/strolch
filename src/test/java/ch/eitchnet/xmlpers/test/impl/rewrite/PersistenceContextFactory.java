@@ -29,11 +29,11 @@ import ch.eitchnet.xmlpers.api.PersistenceContext;
  */
 public interface PersistenceContextFactory {
 
-	public <T> PersistenceContext<T> createPersistenceContext(String type, String subType, String id);
+	public <T> PersistenceContext<T> createCtx(PersistenceTransaction tx, String type, String subType, String id);
 
-	public <T> PersistenceContext<T> createPersistenceContext(String type, String subType);
+	public <T> PersistenceContext<T> createCtx(PersistenceTransaction tx, String type, String subType);
 
-	public <T> PersistenceContext<T> createPersistenceContext(String type);
+	public <T> PersistenceContext<T> createCtx(PersistenceTransaction tx, String type);
 
-	public <T> PersistenceContext<T> createPersistenceContext(T t);
+	public <T> PersistenceContext<T> createCtx(PersistenceTransaction tx, T t);
 }

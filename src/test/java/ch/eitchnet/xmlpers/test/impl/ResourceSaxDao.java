@@ -98,6 +98,10 @@ public class ResourceSaxDao extends ResourceDao {
 
 		private Resource resource;
 
+		public ResourceDefaultHandler() {
+			// default constructor
+		}
+
 		public Resource getResource() {
 			return this.resource;
 		}

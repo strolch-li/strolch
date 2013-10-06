@@ -32,6 +32,10 @@ public class PersistenceContext<T> {
 
 	private XmlIoMode ioMode;
 	private ParserFactory<T> parserFactory;
+	
+	public PersistenceContext() {
+		this.ioMode = XmlIoMode.DEFAULT;
+	}
 
 	public String getType() {
 		return this.type;

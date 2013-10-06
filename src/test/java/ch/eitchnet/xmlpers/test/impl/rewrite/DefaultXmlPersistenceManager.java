@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import ch.eitchnet.utils.helper.PropertiesHelper;
 import ch.eitchnet.xmlpers.api.XmlPersistenceConstants;
 import ch.eitchnet.xmlpers.impl.XmlPersistenceHandlerImpl;
+import ch.eitchnet.xmlpers.impl.XmlPersistencePathBuilder;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -41,6 +42,8 @@ public class DefaultXmlPersistenceManager implements XmlPersistenceManager {
 	protected boolean initialized;
 	protected boolean verbose;
 
+	private XmlPersistencePathBuilder pathBuilder;
+
 	public void initialize(Properties properties) {
 		if (this.initialized)
 			throw new IllegalStateException("Already initialized!"); //$NON-NLS-1$
@@ -51,12 +54,15 @@ public class DefaultXmlPersistenceManager implements XmlPersistenceManager {
 				Boolean.FALSE).booleanValue();
 
 		this.verbose = verbose;
+
+		this.pathBuilder = new XmlPersistencePathBuilder(properties);
 	}
 
 	@Override
 	public PersistenceTransaction openTx() {
 
-		PersistenceTransaction tx = null;
+		FileDao fileDao = new FileDao(this.pathBuilder);
+		PersistenceTransaction tx = new DefaultPersistenceTransaction(fileDao, this.verbose);
 
 		return tx;
 	}

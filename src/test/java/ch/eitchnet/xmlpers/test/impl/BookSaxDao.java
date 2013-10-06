@@ -85,6 +85,10 @@ public class BookSaxDao extends BookDao {
 
 		private Book book;
 
+		public BookDefaultHandler() {
+			// default constructor
+		}
+
 		public Book getBook() {
 			return this.book;
 		}
