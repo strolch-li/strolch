@@ -19,17 +19,20 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test.impl.rewrite;
+
+import java.util.Properties;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class XmlPersistenceConstants {
+public class XmlPersistenceManagerLoader {
 
-	private static final String PROP_PREFIX = "ch.eitchnet.xmlpers.";
-	public static final String PROP_VERBOSE = PROP_PREFIX + "verbose";
-	public static final String PROP_BASEPATH = PROP_PREFIX + "basePath";
-	public static final String PROP_DAO_FACTORY_CLASS = PROP_PREFIX + "daoFactoryClass";
-	public static final String PROP_XML_IO_MOD = PROP_PREFIX + "ioMode";
+	public static XmlPersistenceManager load(Properties properties) {
+
+		DefaultXmlPersistenceManager persistenceManager = new DefaultXmlPersistenceManager();
+		persistenceManager.initialize(properties);
+		return persistenceManager;
+	}
 }

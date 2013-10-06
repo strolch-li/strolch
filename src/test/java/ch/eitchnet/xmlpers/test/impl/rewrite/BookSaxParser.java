@@ -19,17 +19,44 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test.impl.rewrite;
+
+import javax.xml.stream.XMLStreamException;
+
+import org.xml.sax.helpers.DefaultHandler;
+
+import ch.eitchnet.xmlpers.api.SaxParser;
+import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
+import ch.eitchnet.xmlpers.test.impl.Book;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
-public class XmlPersistenceConstants {
+public class BookSaxParser implements SaxParser<Book> {
 
-	private static final String PROP_PREFIX = "ch.eitchnet.xmlpers.";
-	public static final String PROP_VERBOSE = PROP_PREFIX + "verbose";
-	public static final String PROP_BASEPATH = PROP_PREFIX + "basePath";
-	public static final String PROP_DAO_FACTORY_CLASS = PROP_PREFIX + "daoFactoryClass";
-	public static final String PROP_XML_IO_MOD = PROP_PREFIX + "ioMode";
+	@Override
+	public Book getObject() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setObject(Book object) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public DefaultHandler getDefaultHandler() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void write(XmlPersistenceStreamWriter xmlWriter) throws XMLStreamException {
+		// TODO Auto-generated method stub
+
+	}
+
 }

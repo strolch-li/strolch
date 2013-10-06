@@ -19,17 +19,41 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test.impl.rewrite;
+
+import org.w3c.dom.Document;
+
+import ch.eitchnet.xmlpers.api.DomParser;
+import ch.eitchnet.xmlpers.test.impl.Book;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
-public class XmlPersistenceConstants {
+public class BookDomParser implements DomParser<Book> {
 
-	private static final String PROP_PREFIX = "ch.eitchnet.xmlpers.";
-	public static final String PROP_VERBOSE = PROP_PREFIX + "verbose";
-	public static final String PROP_BASEPATH = PROP_PREFIX + "basePath";
-	public static final String PROP_DAO_FACTORY_CLASS = PROP_PREFIX + "daoFactoryClass";
-	public static final String PROP_XML_IO_MOD = PROP_PREFIX + "ioMode";
+	@Override
+	public Book getObject() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setObject(Book object) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Document toDom() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void fromDom(Document document) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

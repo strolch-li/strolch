@@ -21,6 +21,7 @@
  */
 package ch.eitchnet.xmlpers.api;
 
+import ch.eitchnet.utils.helper.StringHelper;
 
 public class PersistenceContext<T> {
 
@@ -78,5 +79,21 @@ public class PersistenceContext<T> {
 
 	public void setParserFactory(ParserFactory<T> parserFactory) {
 		this.parserFactory = parserFactory;
+	}
+
+	public boolean hasSubType() {
+		return !StringHelper.isEmpty(this.subType);
+	}
+
+	@Override
+	public PersistenceContext<T> clone() {
+		PersistenceContext<T> clone = new PersistenceContext<>();
+		clone.type = this.type;
+		clone.subType = this.subType;
+		clone.id = this.id;
+		clone.ioMode = this.ioMode;
+		clone.parserFactory = this.parserFactory;
+		clone.object = this.object;
+		return clone;
 	}
 }

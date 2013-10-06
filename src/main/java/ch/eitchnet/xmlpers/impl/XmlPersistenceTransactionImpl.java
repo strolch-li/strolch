@@ -25,6 +25,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.objectfilter.ObjectFilter;
 import ch.eitchnet.xmlpers.api.XmlPersistenceDao;
 import ch.eitchnet.xmlpers.api.XmlPersistenceDaoFactory;
@@ -126,6 +127,7 @@ public class XmlPersistenceTransactionImpl implements XmlPersistenceTransaction 
 	public void commit() {
 
 		try {
+			long start = System.nanoTime();
 			if (this.verbose)
 				XmlPersistenceTransactionImpl.logger.info("Committing TX...");
 			Set<String> keySet = this.objectFilter.keySet();
@@ -178,7 +180,8 @@ public class XmlPersistenceTransactionImpl implements XmlPersistenceTransaction 
 				}
 			}
 
-			XmlPersistenceTransactionImpl.logger.info("Completed TX");
+			long end = System.nanoTime();
+			logger.info("Completed TX in " + StringHelper.formatNanoDuration(end - start)); //$NON-NLS-1$
 
 		} finally {
 			// clean up

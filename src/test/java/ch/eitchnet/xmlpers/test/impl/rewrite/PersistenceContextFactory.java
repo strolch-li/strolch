@@ -19,17 +19,21 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test.impl.rewrite;
+
+import ch.eitchnet.xmlpers.api.PersistenceContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class XmlPersistenceConstants {
+public interface PersistenceContextFactory {
 
-	private static final String PROP_PREFIX = "ch.eitchnet.xmlpers.";
-	public static final String PROP_VERBOSE = PROP_PREFIX + "verbose";
-	public static final String PROP_BASEPATH = PROP_PREFIX + "basePath";
-	public static final String PROP_DAO_FACTORY_CLASS = PROP_PREFIX + "daoFactoryClass";
-	public static final String PROP_XML_IO_MOD = PROP_PREFIX + "ioMode";
+	public <T> PersistenceContext<T> createPersistenceContext(String type, String subType, String id);
+
+	public <T> PersistenceContext<T> createPersistenceContext(String type, String subType);
+
+	public <T> PersistenceContext<T> createPersistenceContext(String type);
+
+	public <T> PersistenceContext<T> createPersistenceContext(T t);
 }
