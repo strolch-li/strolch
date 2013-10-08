@@ -17,11 +17,11 @@
 	</appender>
 
 	<logger name="ch.eitchnet">
-		<level value="info" />
+		<level value="INFO" />
 	</logger>
 
 	<root>
-		<priority value="info" />
+		<priority value="INFO" />
 		<appender-ref ref="CONSOLE" />
 		<!-- appender-ref ref="FILE" / -->
 	</root>

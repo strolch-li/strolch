@@ -46,9 +46,11 @@ import ch.eitchnet.xmlpers.test.model.Resource;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
+@SuppressWarnings("nls")
 public class FileDaoTest {
 
 	private static final String TEST_PATH = "target/dbTest";
+	private static final boolean VERBOSE = true;
 
 	private FileDao fileDao;
 	private Properties properties;
@@ -82,7 +84,7 @@ public class FileDaoTest {
 	public void testCrudSax() {
 		this.properties.setProperty(XmlPersistenceConstants.PROP_BASEPATH, TEST_PATH + "/sax/");
 		XmlPersistencePathBuilder pathBuilder = new XmlPersistencePathBuilder(this.properties);
-		this.fileDao = new FileDao(pathBuilder);
+		this.fileDao = new FileDao(pathBuilder, VERBOSE);
 
 		Resource resource = createResource();
 		assertResource(resource);
@@ -95,7 +97,7 @@ public class FileDaoTest {
 	public void testCrudDom() {
 		this.properties.setProperty(XmlPersistenceConstants.PROP_BASEPATH, TEST_PATH + "/dom/");
 		XmlPersistencePathBuilder pathBuilder = new XmlPersistencePathBuilder(this.properties);
-		this.fileDao = new FileDao(pathBuilder);
+		this.fileDao = new FileDao(pathBuilder, VERBOSE);
 
 		Resource resource = createResource();
 		assertResource(resource);

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import ch.eitchnet.utils.helper.PropertiesHelper;
 import ch.eitchnet.xmlpers.api.XmlPersistenceConstants;
 import ch.eitchnet.xmlpers.api.XmlPersistenceException;
+import ch.eitchnet.xmlpers.test.impl.rewrite.FilenameUtility;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -254,7 +255,7 @@ public class XmlPersistenceFileDao {
 		for (File subTypeFile : subTypeFiles) {
 			if (subTypeFile.isFile()) {
 				String filename = subTypeFile.getName();
-				String id = this.pathBuilder.getId(filename);
+				String id = FilenameUtility.getId(filename);
 				keySet.add(id);
 			}
 		}
@@ -283,7 +284,7 @@ public class XmlPersistenceFileDao {
 		for (File subTypeFile : subTypeFiles) {
 			if (subTypeFile.isFile()) {
 				String filename = subTypeFile.getName();
-				String id = this.pathBuilder.getId(filename);
+				String id = FilenameUtility.getId(filename);
 				keySet.add(id);
 			}
 		}

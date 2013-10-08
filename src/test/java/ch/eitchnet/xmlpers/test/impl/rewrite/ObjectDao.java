@@ -21,12 +21,15 @@
  */
 package ch.eitchnet.xmlpers.test.impl.rewrite;
 
-import java.text.MessageFormat;
+import static ch.eitchnet.xmlpers.test.impl.rewrite.AssertionUtil.assertHasId;
+import static ch.eitchnet.xmlpers.test.impl.rewrite.AssertionUtil.assertHasType;
+import static ch.eitchnet.xmlpers.test.impl.rewrite.AssertionUtil.assertNotNull;
+import static ch.eitchnet.xmlpers.test.impl.rewrite.AssertionUtil.assertObjectRead;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.objectfilter.ObjectFilter;
 import ch.eitchnet.xmlpers.api.PersistenceContext;
 
@@ -47,22 +50,46 @@ public class ObjectDao {
 		this.objectFilter = objectFilter;
 	}
 
-	public void add(Object object) {
+	public <T> void add(T object) {
 		assertNotClosed();
 		assertNotNull(object);
 		this.objectFilter.add(object);
 	}
 
-	public <T> void update(Object object) {
+	@SuppressWarnings("unchecked")
+	public <T> void addAll(List<T> objects) {
+		assertNotClosed();
+		assertNotNull(objects);
+		if (!objects.isEmpty())
+			this.objectFilter.addAll((List<Object>) objects);
+	}
+
+	public <T> void update(T object) {
 		assertNotClosed();
 		assertNotNull(object);
 		this.objectFilter.update(object);
 	}
 
-	public <T> void remove(Object object) {
+	@SuppressWarnings("unchecked")
+	public <T> void updateAll(List<T> objects) {
+		assertNotClosed();
+		assertNotNull(objects);
+		if (!objects.isEmpty())
+			this.objectFilter.updateAll((List<Object>) objects);
+	}
+
+	public <T> void remove(T object) {
 		assertNotClosed();
 		assertNotNull(object);
 		this.objectFilter.remove(object);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> void removeAll(List<T> objects) {
+		assertNotClosed();
+		assertNotNull(objects);
+		if (!objects.isEmpty())
+			this.objectFilter.removeAll((List<Object>) objects);
 	}
 
 	public <T> void removeById(PersistenceContext<T> context) {
@@ -97,11 +124,7 @@ public class ObjectDao {
 		assertHasType(context);
 
 		MetadataDao metadataDao = this.tx.getMetadataDao();
-		Set<String> keySet;
-		if (context.hasSubType())
-			keySet = metadataDao.queryKeySet(context.getType(), context.getSubType());
-		else
-			keySet = metadataDao.queryKeySet(context.getType());
+		Set<String> keySet = metadataDao.queryKeySet(context);
 
 		List<T> result = new ArrayList<>();
 		PersistenceContext<T> readContext = context.clone();
@@ -123,12 +146,7 @@ public class ObjectDao {
 		assertHasType(context);
 
 		MetadataDao metadataDao = this.tx.getMetadataDao();
-		Set<String> keySet;
-		if (context.hasSubType())
-			keySet = metadataDao.queryKeySet(context.getType(), context.getSubType());
-		else
-			keySet = metadataDao.queryKeySet(context.getType());
-
+		Set<String> keySet = metadataDao.queryKeySet(context);
 		return keySet;
 	}
 
@@ -140,41 +158,13 @@ public class ObjectDao {
 		assertHasType(context);
 
 		MetadataDao metadataDao = this.tx.getMetadataDao();
-		long size;
-		if (context.hasSubType())
-			size = metadataDao.querySize(context.getType(), context.getSubType());
-		else
-			size = metadataDao.querySize(context.getType());
-
+		long size = metadataDao.querySize(context);
 		return size;
 	}
 
 	public void rollback() {
 		this.objectFilter.clearCache();
 		this.closed = true;
-	}
-
-	private <T> void assertNotNull(Object object) {
-		if (object == null)
-			throw new RuntimeException("Object may not be null!"); //$NON-NLS-1$
-	}
-
-	private <T> void assertObjectRead(PersistenceContext<T> context) {
-		if (context.getObject() == null) {
-			String msg = "Failed to read object with for {0} / {1} / {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, context.getType(), context.getSubType(), context.getId());
-			throw new RuntimeException(msg);
-		}
-	}
-
-	private <T> void assertHasType(PersistenceContext<T> context) {
-		if (StringHelper.isEmpty(context.getType()))
-			throw new RuntimeException("Type is always needed on a persistence context!"); //$NON-NLS-1$
-	}
-
-	private <T> void assertHasId(PersistenceContext<T> context) {
-		if (StringHelper.isEmpty(context.getId()))
-			throw new RuntimeException("Id is not set on persistence context!"); //$NON-NLS-1$
 	}
 
 	private void assertNotClosed() {

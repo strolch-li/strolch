@@ -32,7 +32,7 @@ public class PersistenceContext<T> {
 
 	private XmlIoMode ioMode;
 	private ParserFactory<T> parserFactory;
-	
+
 	public PersistenceContext() {
 		this.ioMode = XmlIoMode.DEFAULT;
 	}
@@ -85,8 +85,16 @@ public class PersistenceContext<T> {
 		this.parserFactory = parserFactory;
 	}
 
+	public boolean hasType() {
+		return !StringHelper.isEmpty(this.type);
+	}
+
 	public boolean hasSubType() {
 		return !StringHelper.isEmpty(this.subType);
+	}
+
+	public boolean hasId() {
+		return !StringHelper.isEmpty(this.id);
 	}
 
 	@Override

@@ -27,9 +27,12 @@ import static ch.eitchnet.xmlpers.test.model.ModelBuilder.assertResource;
 import static ch.eitchnet.xmlpers.test.model.ModelBuilder.assertResourceUpdated;
 import static ch.eitchnet.xmlpers.test.model.ModelBuilder.createResource;
 import static ch.eitchnet.xmlpers.test.model.ModelBuilder.updateResource;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.junit.After;
@@ -81,7 +84,7 @@ public class ObjectDaoTest {
 	}
 
 	@Test
-	public void testSaxObjectDao() {
+	public void testCrudSax() {
 		this.ctxFactory = new TestPersistenceContextFactory();
 		Properties properties = new Properties();
 		properties.setProperty(XmlPersistenceConstants.PROP_BASEPATH, BASEPATH + "/sax"); //$NON-NLS-1$
@@ -91,7 +94,7 @@ public class ObjectDaoTest {
 	}
 
 	@Test
-	public void testDomObjectDao() {
+	public void testCrudDom() {
 		this.ctxFactory = new TestPersistenceContextFactory();
 		Properties properties = new Properties();
 		properties.setProperty(XmlPersistenceConstants.PROP_BASEPATH, BASEPATH + "/dom"); //$NON-NLS-1$
@@ -153,6 +156,73 @@ public class ObjectDaoTest {
 		assertResource(resource);
 		objectDao = freshTx(ioMode).getObjectDao();
 		objectDao.add(resource);
+		this.tx.commit(this.ctxFactory);
+	}
+
+	@Test
+	public void testBulkSax() {
+
+		this.ctxFactory = new TestPersistenceContextFactory();
+		Properties properties = new Properties();
+		properties.setProperty(XmlPersistenceConstants.PROP_BASEPATH, BASEPATH + "/sax"); //$NON-NLS-1$
+		properties.setProperty(XmlPersistenceConstants.PROP_VERBOSE, "true"); //$NON-NLS-1$
+		this.persistenceManager = XmlPersistenceManagerLoader.load(properties);
+
+		XmlIoMode ioMode = XmlIoMode.SAX;
+		testBulk(ioMode);
+	}
+
+	@Test
+	public void testBulkDom() {
+
+		this.ctxFactory = new TestPersistenceContextFactory();
+		Properties properties = new Properties();
+		properties.setProperty(XmlPersistenceConstants.PROP_BASEPATH, BASEPATH + "/sax"); //$NON-NLS-1$
+		properties.setProperty(XmlPersistenceConstants.PROP_VERBOSE, "true"); //$NON-NLS-1$
+		this.persistenceManager = XmlPersistenceManagerLoader.load(properties);
+
+		XmlIoMode ioMode = XmlIoMode.DOM;
+		testBulk(ioMode);
+	}
+
+	private void testBulk(XmlIoMode ioMode) {
+
+		// context
+		String type = "testBulk" + ioMode.name(); //$NON-NLS-1$
+
+		// create a list of resources
+		List<Resource> resources = new ArrayList<>(10);
+		for (int i = 0; i < 10; i++) {
+			String id = RES_ID + "_" + i; //$NON-NLS-1$
+			String name = "Bulk Test Object. " + i; //$NON-NLS-1$
+
+			Resource resource = createResource(id, name, type);
+			resources.add(resource);
+		}
+
+		ObjectDao objectDao;
+
+		// save all
+		objectDao = freshTx(ioMode).getObjectDao();
+		objectDao.addAll(resources);
+		resources.clear();
+		this.tx.commit(this.ctxFactory);
+
+		// query all
+		objectDao = freshTx(ioMode).getObjectDao();
+		PersistenceContext<Resource> ctx = this.ctxFactory.createCtx(this.tx, TestConstants.TYPE_RES, type);
+		resources = objectDao.queryAll(ctx);
+		assertEquals("Expected to find 10 entries!", 10, resources.size()); //$NON-NLS-1$
+
+		// delete them all
+		objectDao.removeAll(resources);
+		this.tx.commit(this.ctxFactory);
+
+		// now query them again
+		objectDao = freshTx(ioMode).getObjectDao();
+		ctx = this.ctxFactory.createCtx(this.tx, TestConstants.TYPE_RES, type);
+		resources = objectDao.queryAll(ctx);
+		assertEquals("Expected to find 0 entries!", 0, resources.size()); //$NON-NLS-1$
 		this.tx.commit(this.ctxFactory);
 	}
 }

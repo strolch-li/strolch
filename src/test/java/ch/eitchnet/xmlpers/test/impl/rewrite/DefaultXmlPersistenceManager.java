@@ -61,7 +61,7 @@ public class DefaultXmlPersistenceManager implements XmlPersistenceManager {
 	@Override
 	public PersistenceTransaction openTx() {
 
-		FileDao fileDao = new FileDao(this.pathBuilder);
+		FileDao fileDao = new FileDao(this.pathBuilder, this.verbose);
 		PersistenceTransaction tx = new DefaultPersistenceTransaction(fileDao, this.verbose);
 
 		return tx;

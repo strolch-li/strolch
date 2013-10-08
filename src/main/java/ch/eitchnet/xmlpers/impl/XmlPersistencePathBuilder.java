@@ -85,12 +85,6 @@ public class XmlPersistencePathBuilder {
 		return id.concat(XmlPersistencePathBuilder.FILE_EXT);
 	}
 
-	String getId(String filename) {
-		assertFilename(filename);
-
-		return filename.substring(0, filename.length() - XmlPersistencePathBuilder.EXT_LENGTH);
-	}
-
 	String getPathAsString(String type, String subType, String id) {
 		StringBuilder sb = new StringBuilder(this.basePath);
 		if (!StringHelper.isEmpty(type)) {
@@ -275,14 +269,6 @@ public class XmlPersistencePathBuilder {
 			throw new XmlPersistenceException("The subType can not be empty!"); //$NON-NLS-1$
 	}
 
-	private void assertFilename(String filename) {
-		if (filename.charAt(filename.length() - XmlPersistencePathBuilder.EXT_LENGTH) != '.') {
-			String msg = "The filename does not have a . (dot) at index {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, (filename.length() - XmlPersistencePathBuilder.EXT_LENGTH));
-			throw new XmlPersistenceException(msg);
-		}
-	}
-
 	private void assertPathNotExists(File path, String msg, Object... args) {
 		if (path.exists()) {
 			throw new XmlPersistenceException(MessageFormat.format(msg, args));
@@ -327,7 +313,7 @@ public class XmlPersistencePathBuilder {
 		}
 	}
 
-	private void assertPathExists(File path, PersistenceContext<?> context) {
+	private void assertPathIsFileAndWritable(File path, PersistenceContext<?> context) {
 		if (!path.exists()) {
 			String msg;
 			if (StringHelper.isEmpty(context.getSubType())) {
@@ -335,6 +321,20 @@ public class XmlPersistencePathBuilder {
 				msg = MessageFormat.format(msg, context.getType(), context.getId(), path.getAbsolutePath());
 			} else {
 				msg = "Persistence unit does not exist for {0} / {1} / {2} at {3}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, context.getType(), context.getSubType(), context.getId(),
+						path.getAbsolutePath());
+			}
+
+			throw new XmlPersistenceException(msg);
+		}
+
+		if (!path.isFile() || !path.canWrite()) {
+			String msg;
+			if (StringHelper.isEmpty(context.getSubType())) {
+				msg = "Persistence unit is not a file or is not readable for {0} / {1} at {2}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, context.getType(), context.getId(), path.getAbsolutePath());
+			} else {
+				msg = "Persistence unit is not a file or is not readable for {0} / {1} / {2} at {3}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, context.getType(), context.getSubType(), context.getId(),
 						path.getAbsolutePath());
 			}
@@ -370,14 +370,14 @@ public class XmlPersistencePathBuilder {
 	public File getDeletePath(PersistenceContext<?> context) {
 		File path = getPath(context);
 		logPath("DELETE", path, context); //$NON-NLS-1$
-		assertPathExists(path, context);
+		assertPathIsFileAndWritable(path, context);
 		return path;
 	}
 
 	public File getUpdatePath(PersistenceContext<?> context) {
 		File path = getPath(context);
 		logPath("UPDATE", path, context); //$NON-NLS-1$
-		assertPathExists(path, context);
+		assertPathIsFileAndWritable(path, context);
 		return path;
 	}
 
@@ -389,7 +389,7 @@ public class XmlPersistencePathBuilder {
 		return path;
 	}
 
-	private File getPath(PersistenceContext<?> context) {
+	public File getPath(PersistenceContext<?> context) {
 		File path = new File(getPathAsString(context.getType(), context.getSubType(), context.getId()));
 		return path;
 	}

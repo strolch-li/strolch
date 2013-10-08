@@ -56,7 +56,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 		this.verbose = verbose;
 		this.objectFilter = new ObjectFilter();
 		this.objectDao = new ObjectDao(this, this.fileDao, this.objectFilter);
-		this.metadataDao = new MetadataDao(this, this.fileDao);
+		this.metadataDao = new MetadataDao(this, this.fileDao, verbose);
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 	}
 
 	@Override
-	public void commit(PersistenceContextFactory persistenceContextFactory) {
+	public void commit(PersistenceContextFactory ctxFactory) {
 
 		try {
 
@@ -90,8 +90,6 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 				logger.info("Committing TX..."); //$NON-NLS-1$
 
 			Set<String> keySet = this.objectFilter.keySet();
-			if (keySet.isEmpty())
-				return;
 			for (String key : keySet) {
 
 				List<Object> removed = this.objectFilter.getRemoved(key);
@@ -103,7 +101,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 						logger.info(removed.size() + " objects removed in this tx."); //$NON-NLS-1$
 
 					for (Object object : removed) {
-						PersistenceContext<Object> context = persistenceContextFactory.createCtx(this, object);
+						PersistenceContext<Object> context = ctxFactory.createCtx(this, object);
 						this.fileDao.performDelete(context);
 					}
 				}
@@ -118,7 +116,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 					for (Object object : updated) {
 
-						PersistenceContext<Object> context = persistenceContextFactory.createCtx(this, object);
+						PersistenceContext<Object> context = ctxFactory.createCtx(this, object);
 						this.fileDao.performUpdate(context);
 					}
 				}
@@ -133,7 +131,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 					for (Object object : added) {
 
-						PersistenceContext<Object> context = persistenceContextFactory.createCtx(this, object);
+						PersistenceContext<Object> context = ctxFactory.createCtx(this, object);
 						this.fileDao.performCreate(context);
 					}
 				}

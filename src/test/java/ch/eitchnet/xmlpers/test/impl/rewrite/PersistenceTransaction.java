@@ -29,7 +29,7 @@ import ch.eitchnet.xmlpers.api.XmlIoMode;
  */
 public interface PersistenceTransaction {
 
-	public void commit(PersistenceContextFactory persistenceContextFactory);
+	public void commit(PersistenceContextFactory ctxFactory);
 
 	public void rollback();
 

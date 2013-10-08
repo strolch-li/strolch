@@ -51,7 +51,11 @@ public class ModelBuilder {
 	public static final double BOOK_PRICE = 45.55D;
 
 	public static Resource createResource() {
-		Resource resource = new Resource(RES_ID, RES_NAME, RES_TYPE);
+		return createResource(RES_ID, RES_NAME, RES_TYPE);
+	}
+
+	public static Resource createResource(String id, String name, String type) {
+		Resource resource = new Resource(id, name, type);
 		Parameter param = new Parameter(PARAM_ID, PARAM_NAME, PARAM_TYPE, PARAM_VALUE_1);
 		resource.addParameter(param);
 		return resource;
