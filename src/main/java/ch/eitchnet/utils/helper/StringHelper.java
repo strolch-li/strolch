@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 public class StringHelper {
 
 	public static final String NEW_LINE = "\n"; //$NON-NLS-1$
+	public static final String EMPTY = ""; //$NON-NLS-1$
+	public static final String NULL = "null"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(StringHelper.class);
 
