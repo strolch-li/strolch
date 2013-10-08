@@ -52,6 +52,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import ch.eitchnet.utils.exceptions.XmlException;
+import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.helper.XmlHelper;
 import ch.eitchnet.xmlpers.api.DomParser;
 import ch.eitchnet.xmlpers.api.DomUtil;
@@ -61,6 +62,9 @@ import ch.eitchnet.xmlpers.api.XmlPersistenceException;
 import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
 
 public class FileIo {
+
+	public static final String DEFAULT_XML_VERSION = "1.0"; //$NON-NLS-1$
+	public static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(FileIo.class);
 
@@ -79,11 +83,11 @@ public class FileIo {
 			writeSax(context);
 			break;
 		case DEFAULT:
-			logger.info("Using default XML IO Handler SAX");
+			logger.info("Using default XML IO Handler SAX"); //$NON-NLS-1$
 			writeSax(context);
 			break;
 		default:
-			String msg = "The Xml IO Mode {0} is not supported!";
+			String msg = "The Xml IO Mode {0} is not supported!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, context.getIoMode());
 			throw new UnsupportedOperationException(msg);
 		}
@@ -98,11 +102,11 @@ public class FileIo {
 			readSax(context);
 			break;
 		case DEFAULT:
-			logger.info("Using default XML IO Handler SAX");
+			logger.info("Using default XML IO Handler SAX"); //$NON-NLS-1$
 			readSax(context);
 			break;
 		default:
-			String msg = "The Xml IO Mode {0} is not supported!";
+			String msg = "The Xml IO Mode {0} is not supported!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, context.getIoMode());
 			throw new UnsupportedOperationException(msg);
 		}
@@ -112,38 +116,36 @@ public class FileIo {
 
 		XMLStreamWriter writer = null;
 		try {
-			XMLOutputFactory factory = XMLOutputFactory.newInstance();
-			writer = factory.createXMLStreamWriter(new FileWriter(this.path));
-			writer = new IndentingXMLStreamWriter(writer);
+			try (FileWriter fileWriter = new FileWriter(this.path);) {
 
-			// start document
-			writer.writeStartDocument("utf-8", "1.0");
+				XMLOutputFactory factory = XMLOutputFactory.newInstance();
+				writer = factory.createXMLStreamWriter(fileWriter);
+				writer = new IndentingXMLStreamWriter(writer);
 
-			// then delegate object writing to caller
-			XmlPersistenceStreamWriter xmlWriter = new XmlPersistenceStreamWriter(writer);
-			SaxParser<T> saxParser = context.getParserFactor().getSaxParser();
-			saxParser.setObject(context.getObject());
-			saxParser.write(xmlWriter);
+				// start document
+				writer.writeStartDocument(DEFAULT_ENCODING, DEFAULT_XML_VERSION);
 
-			// and now end
-			writer.writeEndDocument();
-			writer.flush();
+				// then delegate object writing to caller
+				XmlPersistenceStreamWriter xmlWriter = new XmlPersistenceStreamWriter(writer);
+				SaxParser<T> saxParser = context.getParserFactor().getSaxParser();
+				saxParser.setObject(context.getObject());
+				saxParser.write(xmlWriter);
+
+				// and now end
+				writer.writeEndDocument();
+				writer.flush();
+			}
 
 		} catch (FactoryConfigurationError | XMLStreamException | IOException e) {
 			if (this.path.exists())
 				this.path.delete();
-			throw new XmlException("Writing to file failed due to internal error: " + e.getMessage(), e);
-		} finally {
-			if (writer != null) {
-				try {
-					writer.close();
-				} catch (Exception e) {
-					logger.error("Failed to close stream: " + e.getMessage());
-				}
-			}
+			String msg = "Writing to file failed due to internal error: {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, e.getMessage());
+			throw new XmlException(msg, e);
 		}
 
-		logger.info("Wrote SAX to " + this.path.getAbsolutePath());
+		String msg = "Wrote SAX to {0}"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, this.path.getAbsolutePath()));
 	}
 
 	private <T> void readSax(PersistenceContext<T> context) {
@@ -160,10 +162,12 @@ public class FileIo {
 
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 
-			throw new XmlPersistenceException("Parsing failed due to internal error: " + e.getMessage(), e);
+			String msg = "Parsing failed due to internal error: {0}"; //$NON-NLS-1$
+			throw new XmlPersistenceException(MessageFormat.format(msg, e.getMessage()), e);
 		}
 
-		logger.info("SAX parsed file " + this.path.getAbsolutePath());
+		String msg = "SAX parsed file {0}"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, this.path.getAbsolutePath()));
 	}
 
 	private <T> void writeDom(PersistenceContext<T> context) {
@@ -178,19 +182,19 @@ public class FileIo {
 				encoding = XmlHelper.DEFAULT_ENCODING;
 			}
 
-			if (!lineSep.equals("\n")) {
-				logger.info("Overriding line separator to \\n");
-				System.setProperty(XmlHelper.PROP_LINE_SEPARATOR, "\n");
+			if (!lineSep.equals(StringHelper.NEW_LINE)) {
+				logger.info("Overriding line separator to \\n"); //$NON-NLS-1$
+				System.setProperty(XmlHelper.PROP_LINE_SEPARATOR, StringHelper.NEW_LINE);
 			}
 
 			// Set up a transformer
 			TransformerFactory transfac = TransformerFactory.newInstance();
 			Transformer transformer = transfac.newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no"); //$NON-NLS-1$
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml"); //$NON-NLS-1$
 			transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
-			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
+			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-1$ //$NON-NLS-2$
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
@@ -198,12 +202,15 @@ public class FileIo {
 			Source xmlSource = new DOMSource(document);
 			transformer.transform(xmlSource, result);
 
-			logger.info("Wrote DOM to " + this.path.getAbsolutePath());
+			String msg = MessageFormat.format("Wrote DOM to {0}", this.path.getAbsolutePath()); //$NON-NLS-1$
+			logger.info(msg);
 
 		} catch (TransformerFactoryConfigurationError | TransformerException e) {
 			if (this.path.exists())
 				this.path.delete();
-			throw new XmlException("Writing to file failed due to internal error: " + e.getMessage(), e);
+			String msg = "Writing to file failed due to internal error: {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, e.getMessage());
+			throw new XmlException(msg, e);
 		} finally {
 			System.setProperty(XmlHelper.PROP_LINE_SEPARATOR, lineSep);
 		}
@@ -217,9 +224,13 @@ public class FileIo {
 			domParser.fromDom(document);
 			context.setObject(domParser.getObject());
 		} catch (SAXException | IOException e) {
-			throw new XmlPersistenceException("Parsing failed due to internal error: " + e.getMessage(), e);
+			String msg = "Parsing failed due to internal error: {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, e.getMessage());
+			throw new XmlPersistenceException(msg, e);
 		}
 
-		logger.info("DOM parsed file " + this.path.getAbsolutePath());
+		String msg = "DOM parsed file {0}"; //$NON-NLS-1$
+		msg = MessageFormat.format(msg, this.path.getAbsolutePath());
+		logger.info(msg);
 	}
 }
