@@ -21,64 +21,30 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import java.io.File;
-
 import javax.xml.stream.XMLStreamException;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import ch.eitchnet.xmlpers.api.XmlPersistenceSaxContextData;
-import ch.eitchnet.xmlpers.api.XmlPersistenceSaxWriter;
-import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
+import ch.eitchnet.xmlpers.api.XmlPersistenceStreamWriter;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class BookSaxDao extends BookDao {
+@SuppressWarnings("nls")
+public class BookSaxDao {
 
-	@Override
-	protected Book read(File filePath) {
+	private Book book;
 
-		XmlPersistenceSaxContextData cd = new XmlPersistenceSaxContextData();
-		cd.setFile(filePath);
-		BookDefaultHandler bookDefaultHandler = new BookDefaultHandler();
-		cd.setDefaultHandler(bookDefaultHandler);
-
-		getFileHandler().read(cd);
-
-		return bookDefaultHandler.getBook();
-	}
-
-	@Override
-	protected void write(Book book, File filePath) {
-
-		XmlPersistenceSaxContextData cd = new XmlPersistenceSaxContextData();
-		cd.setFile(filePath);
-		cd.setXmlWriter(new BookSaxWriter(book));
-
-		getFileHandler().write(cd);
-	}
-
-	private class BookSaxWriter implements XmlPersistenceSaxWriter {
-
-		private final Book book;
-
-		public BookSaxWriter(Book book) {
-			this.book = book;
-		}
-
-		@Override
-		public void write(XmlPersistenceStreamWriter writer) throws XMLStreamException {
-			writer.writeEmptyElement("Book");
-			writer.writeAttribute("id", Long.toString(this.book.getId()));
-			writer.writeAttribute("title", this.book.getTitle());
-			writer.writeAttribute("author", this.book.getAuthor());
-			writer.writeAttribute("press", this.book.getPress());
-			writer.writeAttribute("price", Double.toString(this.book.getPrice()));
-		}
+	public void write(XmlPersistenceStreamWriter writer) throws XMLStreamException {
+		writer.writeEmptyElement("Book");
+		writer.writeAttribute("id", Long.toString(this.book.getId()));
+		writer.writeAttribute("title", this.book.getTitle());
+		writer.writeAttribute("author", this.book.getAuthor());
+		writer.writeAttribute("press", this.book.getPress());
+		writer.writeAttribute("price", Double.toString(this.book.getPrice()));
 	}
 
 	private class BookDefaultHandler extends DefaultHandler {

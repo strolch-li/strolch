@@ -25,8 +25,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.xml.sax.helpers.DefaultHandler;
 
-import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
-
 public interface SaxParser<T> {
 
 	public T getObject();

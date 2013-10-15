@@ -21,35 +21,16 @@
  */
 package ch.eitchnet.xmlpers.api;
 
-import ch.eitchnet.xmlpers.objref.ObjectRef;
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
+ */
+@SuppressWarnings("nls")
+public class PersistenceConstants {
 
-public class PersistenceContext<T> {
-
-	private final ObjectRef objectRef;
-	private T object;
-	private ParserFactory<T> parserFactory;
-
-	public PersistenceContext(ObjectRef objectRef) {
-		this.objectRef = objectRef;
-	}
-
-	public ObjectRef getObjectRef() {
-		return this.objectRef;
-	}
-
-	public T getObject() {
-		return this.object;
-	}
-
-	public void setObject(T object) {
-		this.object = object;
-	}
-
-	public ParserFactory<T> getParserFactor() {
-		return this.parserFactory;
-	}
-
-	public void setParserFactory(ParserFactory<T> parserFactory) {
-		this.parserFactory = parserFactory;
-	}
+	private static final String PROP_PREFIX = "ch.eitchnet.xmlpers.";
+	public static final String PROP_VERBOSE = PROP_PREFIX + "verbose";
+	public static final String PROP_BASEPATH = PROP_PREFIX + "basePath";
+	public static final String PROP_DAO_FACTORY_CLASS = PROP_PREFIX + "daoFactoryClass";
+	public static final String PROP_XML_IO_MOD = PROP_PREFIX + "ioMode";
 }

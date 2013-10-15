@@ -21,44 +21,15 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import java.io.File;
-
-import javax.xml.parsers.DocumentBuilder;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import ch.eitchnet.xmlpers.api.DomUtil;
-import ch.eitchnet.xmlpers.api.XmlPersistenceDomContextData;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class BookDomDao extends BookDao {
-
-	@Override
-	protected Book read(File filePath) {
-
-		XmlPersistenceDomContextData cd = new XmlPersistenceDomContextData();
-		cd.setFile(filePath);
-		getFileHandler().read(cd);
-		Document document = cd.getDocument();
-		Book book = parseFromDom(document.getDocumentElement());
-		return book;
-	}
-
-	@Override
-	protected void write(Book book, File filePath) {
-
-		XmlPersistenceDomContextData cd = new XmlPersistenceDomContextData();
-		cd.setFile(filePath);
-		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
-		Document document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
-		serializeToDom(book, document);
-		cd.setDocument(document);
-		getFileHandler().write(cd);
-	}
+@SuppressWarnings("nls")
+public class BookDomDao {
 
 	public Element serializeToDom(Book book, Document document) {
 

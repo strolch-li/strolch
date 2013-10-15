@@ -21,35 +21,20 @@
  */
 package ch.eitchnet.xmlpers.api;
 
-import ch.eitchnet.xmlpers.objref.ObjectRef;
+import java.util.Properties;
 
-public class PersistenceContext<T> {
+import ch.eitchnet.xmlpers.impl.DefaultXmlPersistenceManager;
 
-	private final ObjectRef objectRef;
-	private T object;
-	private ParserFactory<T> parserFactory;
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
+ */
+public class PersistenceManagerLoader {
 
-	public PersistenceContext(ObjectRef objectRef) {
-		this.objectRef = objectRef;
-	}
+	public static PersistenceManager load(Properties properties) {
 
-	public ObjectRef getObjectRef() {
-		return this.objectRef;
-	}
-
-	public T getObject() {
-		return this.object;
-	}
-
-	public void setObject(T object) {
-		this.object = object;
-	}
-
-	public ParserFactory<T> getParserFactor() {
-		return this.parserFactory;
-	}
-
-	public void setParserFactory(ParserFactory<T> parserFactory) {
-		this.parserFactory = parserFactory;
+		DefaultXmlPersistenceManager persistenceManager = new DefaultXmlPersistenceManager();
+		persistenceManager.initialize(properties);
+		return persistenceManager;
 	}
 }

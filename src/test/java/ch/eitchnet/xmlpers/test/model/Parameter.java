@@ -49,6 +49,7 @@ public class Parameter {
 		this.value = value;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

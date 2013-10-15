@@ -19,17 +19,13 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import java.io.File;
-
 import javax.xml.stream.XMLStreamException;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import ch.eitchnet.xmlpers.api.XmlPersistenceSaxContextData;
-import ch.eitchnet.xmlpers.api.XmlPersistenceSaxWriter;
-import ch.eitchnet.xmlpers.impl.XmlPersistenceStreamWriter;
+import ch.eitchnet.xmlpers.api.XmlPersistenceStreamWriter;
 import ch.eitchnet.xmlpers.test.model.Parameter;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
@@ -37,60 +33,23 @@ import ch.eitchnet.xmlpers.test.model.Resource;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class ResourceSaxDao extends ResourceDao {
+@SuppressWarnings("nls")
+public class ResourceSaxDao {
 
-	/**
-	 * @param subType
-	 */
-	public ResourceSaxDao(String subType) {
-		super(subType);
-	}
+	private Resource resource;
 
-	@Override
-	protected Resource read(File filePath) {
-
-		XmlPersistenceSaxContextData cd = new XmlPersistenceSaxContextData();
-		cd.setFile(filePath);
-		ResourceDefaultHandler bookDefaultHandler = new ResourceDefaultHandler();
-		cd.setDefaultHandler(bookDefaultHandler);
-
-		getFileHandler().read(cd);
-
-		return bookDefaultHandler.getResource();
-	}
-
-	@Override
-	protected void write(Resource resource, File filePath) {
-
-		XmlPersistenceSaxContextData cd = new XmlPersistenceSaxContextData();
-		cd.setFile(filePath);
-		cd.setXmlWriter(new ResourceSaxWriter(resource));
-
-		getFileHandler().write(cd);
-	}
-
-	private class ResourceSaxWriter implements XmlPersistenceSaxWriter {
-
-		private final Resource resource;
-
-		public ResourceSaxWriter(Resource resource) {
-			this.resource = resource;
-		}
-
-		@Override
-		public void write(XmlPersistenceStreamWriter writer) throws XMLStreamException {
-			writer.writeElement("Resource");
-			writer.writeAttribute("id", this.resource.getId());
-			writer.writeAttribute("name", this.resource.getName());
-			writer.writeAttribute("type", this.resource.getType());
-			for (String paramId : this.resource.getParameterKeySet()) {
-				Parameter param = this.resource.getParameterBy(paramId);
-				writer.writeElement("Parameter");
-				writer.writeAttribute("id", param.getId());
-				writer.writeAttribute("name", param.getName());
-				writer.writeAttribute("type", param.getType());
-				writer.writeAttribute("value", param.getValue());
-			}
+	public void write(XmlPersistenceStreamWriter writer) throws XMLStreamException {
+		writer.writeElement("Resource");
+		writer.writeAttribute("id", this.resource.getId());
+		writer.writeAttribute("name", this.resource.getName());
+		writer.writeAttribute("type", this.resource.getType());
+		for (String paramId : this.resource.getParameterKeySet()) {
+			Parameter param = this.resource.getParameterBy(paramId);
+			writer.writeElement("Parameter");
+			writer.writeAttribute("id", param.getId());
+			writer.writeAttribute("name", param.getName());
+			writer.writeAttribute("type", param.getType());
+			writer.writeAttribute("value", param.getValue());
 		}
 	}
 

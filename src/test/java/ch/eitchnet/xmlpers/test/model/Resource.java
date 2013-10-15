@@ -52,6 +52,7 @@ public class Resource {
 		this.type = type;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

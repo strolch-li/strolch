@@ -21,35 +21,34 @@
  */
 package ch.eitchnet.xmlpers.api;
 
-import ch.eitchnet.xmlpers.objref.ObjectRef;
+import ch.eitchnet.xmlpers.objref.ObjectReferenceCache;
 
-public class PersistenceContext<T> {
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
+ */
+public interface PersistenceTransaction extends AutoCloseable {
 
-	private final ObjectRef objectRef;
-	private T object;
-	private ParserFactory<T> parserFactory;
+	public void setCloseStrategy(TransactionCloseStrategy closeStrategy);
 
-	public PersistenceContext(ObjectRef objectRef) {
-		this.objectRef = objectRef;
-	}
+	public void autoCloseableCommit();
 
-	public ObjectRef getObjectRef() {
-		return this.objectRef;
-	}
+	public void autoCloseableRollback();
 
-	public T getObject() {
-		return this.object;
-	}
+	@Override
+	public void close() throws XmlPersistenceException;
 
-	public void setObject(T object) {
-		this.object = object;
-	}
+	public boolean isOpen();
 
-	public ParserFactory<T> getParserFactor() {
-		return this.parserFactory;
-	}
+	public ObjectDao getObjectDao();
 
-	public void setParserFactory(ParserFactory<T> parserFactory) {
-		this.parserFactory = parserFactory;
-	}
+	public MetadataDao getMetadataDao();
+
+	public ObjectReferenceCache getObjectRefCache();
+
+	public PersistenceRealm getRealm();
+
+	public IoMode getIoMode();
+
+	public void setIoMode(IoMode ioMode);
 }

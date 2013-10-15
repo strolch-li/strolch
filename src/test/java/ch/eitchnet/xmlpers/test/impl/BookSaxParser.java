@@ -19,37 +19,43 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test.impl;
 
-import ch.eitchnet.xmlpers.objref.ObjectRef;
+import javax.xml.stream.XMLStreamException;
 
-public class PersistenceContext<T> {
+import org.xml.sax.helpers.DefaultHandler;
 
-	private final ObjectRef objectRef;
-	private T object;
-	private ParserFactory<T> parserFactory;
+import ch.eitchnet.xmlpers.api.SaxParser;
+import ch.eitchnet.xmlpers.api.XmlPersistenceStreamWriter;
 
-	public PersistenceContext(ObjectRef objectRef) {
-		this.objectRef = objectRef;
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ *
+ */
+public class BookSaxParser implements SaxParser<Book> {
+
+	@Override
+	public Book getObject() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	public ObjectRef getObjectRef() {
-		return this.objectRef;
+	@Override
+	public void setObject(Book object) {
+		// TODO Auto-generated method stub
+
 	}
 
-	public T getObject() {
-		return this.object;
+	@Override
+	public DefaultHandler getDefaultHandler() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	public void setObject(T object) {
-		this.object = object;
+	@Override
+	public void write(XmlPersistenceStreamWriter xmlWriter) throws XMLStreamException {
+		// TODO Auto-generated method stub
+
 	}
 
-	public ParserFactory<T> getParserFactor() {
-		return this.parserFactory;
-	}
-
-	public void setParserFactory(ParserFactory<T> parserFactory) {
-		this.parserFactory = parserFactory;
-	}
 }

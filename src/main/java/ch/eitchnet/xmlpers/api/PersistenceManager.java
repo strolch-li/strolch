@@ -21,35 +21,18 @@
  */
 package ch.eitchnet.xmlpers.api;
 
-import ch.eitchnet.xmlpers.objref.ObjectRef;
 
-public class PersistenceContext<T> {
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ *
+ */
+public interface PersistenceManager {
 
-	private final ObjectRef objectRef;
-	private T object;
-	private ParserFactory<T> parserFactory;
-
-	public PersistenceContext(ObjectRef objectRef) {
-		this.objectRef = objectRef;
-	}
-
-	public ObjectRef getObjectRef() {
-		return this.objectRef;
-	}
-
-	public T getObject() {
-		return this.object;
-	}
-
-	public void setObject(T object) {
-		this.object = object;
-	}
-
-	public ParserFactory<T> getParserFactor() {
-		return this.parserFactory;
-	}
-
-	public void setParserFactory(ParserFactory<T> parserFactory) {
-		this.parserFactory = parserFactory;
-	}
+	public static final String DEFAULT_REALM = "defaultRealm"; //$NON-NLS-1$
+	
+	public PersistenceContextFactoryDelegator getCtxFactory();
+	
+	public PersistenceTransaction openTx();
+	
+	public PersistenceTransaction openTx(String realm);
 }

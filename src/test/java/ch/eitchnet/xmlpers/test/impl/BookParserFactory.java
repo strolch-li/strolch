@@ -19,37 +19,26 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.api;
+package ch.eitchnet.xmlpers.test.impl;
 
-import ch.eitchnet.xmlpers.objref.ObjectRef;
+import ch.eitchnet.xmlpers.api.DomParser;
+import ch.eitchnet.xmlpers.api.ParserFactory;
+import ch.eitchnet.xmlpers.api.SaxParser;
 
-public class PersistenceContext<T> {
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ *
+ */
+public class BookParserFactory implements ParserFactory<Book> {
 
-	private final ObjectRef objectRef;
-	private T object;
-	private ParserFactory<T> parserFactory;
-
-	public PersistenceContext(ObjectRef objectRef) {
-		this.objectRef = objectRef;
+	@Override
+	public DomParser<Book> getDomParser() {
+		return new BookDomParser();
 	}
 
-	public ObjectRef getObjectRef() {
-		return this.objectRef;
+	@Override
+	public SaxParser<Book> getSaxParser() {
+		return new BookSaxParser();
 	}
 
-	public T getObject() {
-		return this.object;
-	}
-
-	public void setObject(T object) {
-		this.object = object;
-	}
-
-	public ParserFactory<T> getParserFactor() {
-		return this.parserFactory;
-	}
-
-	public void setParserFactory(ParserFactory<T> parserFactory) {
-		this.parserFactory = parserFactory;
-	}
 }

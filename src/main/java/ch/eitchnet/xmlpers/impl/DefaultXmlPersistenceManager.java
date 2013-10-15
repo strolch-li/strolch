@@ -1,0 +1,114 @@
+/*
+ * Copyright (c) 2012, Robert von Burg
+ *
+ * All rights reserved.
+ *
+ * This file is part of the XXX.
+ *
+ *  XXX is free software: you can redistribute 
+ *  it and/or modify it under the terms of the GNU General Public License as 
+ *  published by the Free Software Foundation, either version 3 of the License, 
+ *  or (at your option) any later version.
+ *
+ *  XXX is distributed in the hope that it will 
+ *  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with XXX.  If not, see 
+ *  <http://www.gnu.org/licenses/>.
+ */
+package ch.eitchnet.xmlpers.impl;
+
+import java.io.File;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.utils.helper.PropertiesHelper;
+import ch.eitchnet.xmlpers.api.PersistenceConstants;
+import ch.eitchnet.xmlpers.api.PersistenceContextFactoryDelegator;
+import ch.eitchnet.xmlpers.api.PersistenceManager;
+import ch.eitchnet.xmlpers.api.PersistenceTransaction;
+import ch.eitchnet.xmlpers.api.XmlPersistenceException;
+import ch.eitchnet.xmlpers.objref.ObjectReferenceCache;
+
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
+ */
+public class DefaultXmlPersistenceManager implements PersistenceManager {
+
+	protected static final Logger logger = LoggerFactory.getLogger(DefaultXmlPersistenceManager.class);
+
+	protected boolean initialized;
+	protected boolean verbose;
+	protected Properties properties;
+	protected Map<String, DefaultPersistenceRealm> realmMap;
+	private PersistenceContextFactoryDelegator ctxFactory;
+
+	public void initialize(Properties properties) {
+		if (this.initialized)
+			throw new IllegalStateException("Already initialized!"); //$NON-NLS-1$
+
+		String context = DefaultXmlPersistenceManager.class.getSimpleName();
+
+		// get verbose flag
+		boolean verbose = PropertiesHelper.getPropertyBool(properties, context, PersistenceConstants.PROP_VERBOSE,
+				Boolean.FALSE).booleanValue();
+
+		// validate base path
+		validateBasePath(properties);
+
+		this.properties = properties;
+		this.verbose = verbose;
+		this.realmMap = new HashMap<>();
+		this.ctxFactory = new PersistenceContextFactoryDelegator();
+	}
+
+	private void validateBasePath(Properties properties) {
+		String context = DefaultXmlPersistenceManager.class.getSimpleName();
+		String basePath = PropertiesHelper.getProperty(properties, context, PersistenceConstants.PROP_BASEPATH, null);
+
+		// validate base path exists and is writable
+		File basePathF = new File(basePath);
+		if (!basePathF.exists())
+			throw new XmlPersistenceException(MessageFormat.format("The database store path does not exist at {0}", //$NON-NLS-1$
+					basePathF.getAbsolutePath()));
+		if (!basePathF.canWrite())
+			throw new XmlPersistenceException(MessageFormat.format("The database store path is not writeable at {0}", //$NON-NLS-1$
+					basePathF.getAbsolutePath()));
+	}
+
+	@Override
+	public PersistenceContextFactoryDelegator getCtxFactory() {
+		return this.ctxFactory;
+	}
+
+	@Override
+	public PersistenceTransaction openTx() {
+		return openTx(DEFAULT_REALM);
+	}
+
+	@Override
+	public synchronized PersistenceTransaction openTx(String realmName) {
+
+		DefaultPersistenceRealm persistenceRealm = this.realmMap.get(realmName);
+		if (persistenceRealm == null) {
+
+			PathBuilder pathBuilder = new PathBuilder(realmName, this.properties);
+			ObjectReferenceCache objectRefCache = new ObjectReferenceCache(realmName);
+			persistenceRealm = new DefaultPersistenceRealm(realmName, this, this.ctxFactory, pathBuilder, objectRefCache);
+
+			this.realmMap.put(realmName, persistenceRealm);
+		}
+
+		PersistenceTransaction tx = new DefaultPersistenceTransaction(persistenceRealm, this.verbose);
+		return tx;
+	}
+}

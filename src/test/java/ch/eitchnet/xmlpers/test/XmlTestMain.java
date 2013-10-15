@@ -60,6 +60,7 @@ import ch.eitchnet.xmlpers.test.model.Resource;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
+@SuppressWarnings("nls")
 public class XmlTestMain {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlTestMain.class);
@@ -119,10 +120,6 @@ public class XmlTestMain {
 		return resources;
 	}
 
-	/**
-	 * @param res2
-	 * @param paramElements
-	 */
 	private static void parseParameters(Resource res, NodeList paramElements) {
 		for (int i = 0; i < paramElements.getLength(); i++) {
 			Element paramElement = (Element) paramElements.item(i);
@@ -263,43 +260,45 @@ public class XmlTestMain {
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 
 		File file = new File("target/res_sax.xml");
-		XMLStreamWriter writer = factory.createXMLStreamWriter(new FileWriter(file));
+		try (FileWriter fileWriter = new FileWriter(file)) {
+			XMLStreamWriter writer = factory.createXMLStreamWriter(fileWriter);
 
-		writer = new IndentingXMLStreamWriter(writer);
+			writer = new IndentingXMLStreamWriter(writer);
 
-		writer.writeStartDocument("utf-8", "1.0");
-		writer.writeStartElement("model");
+			writer.writeStartDocument("utf-8", "1.0");
+			writer.writeStartElement("model");
 
-		writer.writeStartElement("Resource");
-		writer.writeAttribute("id", res.getId());
-		writer.writeAttribute("name", res.getName());
-		writer.writeAttribute("type", res.getType());
+			writer.writeStartElement("Resource");
+			writer.writeAttribute("id", res.getId());
+			writer.writeAttribute("name", res.getName());
+			writer.writeAttribute("type", res.getType());
 
-		for (String paramId : res.getParameterKeySet()) {
-			Parameter param = res.getParameterBy(paramId);
-			writer.writeEmptyElement("Parameter");
-			writer.writeAttribute("id", param.getId());
-			writer.writeAttribute("name", param.getName());
-			writer.writeAttribute("type", param.getType());
-			writer.writeAttribute("value", param.getValue());
+			for (String paramId : res.getParameterKeySet()) {
+				Parameter param = res.getParameterBy(paramId);
+				writer.writeEmptyElement("Parameter");
+				writer.writeAttribute("id", param.getId());
+				writer.writeAttribute("name", param.getName());
+				writer.writeAttribute("type", param.getType());
+				writer.writeAttribute("value", param.getValue());
+			}
+
+			//writer.writeEmptyElement("data");
+			//writer.writeAttribute("name", "value");
+			////writer.writeEndElement();
+			//writer.writeEmptyElement("stuff");
+			//writer.writeAttribute("attr", "attrVal");
+
+			writer.writeEndElement();
+			writer.writeEndDocument();
+
+			writer.flush();
+			writer.close();
+			logger.info("Wrote SAX to " + file.getAbsolutePath());
+
+			//Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			//Result outputTarget = new StaxR;
+			//Source xmlSource;
+			//transformer.transform(xmlSource, outputTarget);
 		}
-
-		//writer.writeEmptyElement("data");
-		//writer.writeAttribute("name", "value");
-		////writer.writeEndElement();
-		//writer.writeEmptyElement("stuff");
-		//writer.writeAttribute("attr", "attrVal");
-
-		writer.writeEndElement();
-		writer.writeEndDocument();
-
-		writer.flush();
-		writer.close();
-		logger.info("Wrote SAX to " + file.getAbsolutePath());
-
-		//Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		//Result outputTarget = new StaxR;
-		//Source xmlSource;
-		//transformer.transform(xmlSource, outputTarget);
 	}
 }

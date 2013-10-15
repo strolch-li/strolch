@@ -19,17 +19,11 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import java.io.File;
-
-import javax.xml.parsers.DocumentBuilder;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import ch.eitchnet.xmlpers.api.DomUtil;
-import ch.eitchnet.xmlpers.api.XmlPersistenceDomContextData;
 import ch.eitchnet.xmlpers.test.model.Parameter;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
@@ -37,37 +31,8 @@ import ch.eitchnet.xmlpers.test.model.Resource;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class ResourceDomDao extends ResourceDao {
-
-	/**
-	 * @param subType
-	 */
-	public ResourceDomDao(String subType) {
-		super(subType);
-	}
-
-	@Override
-	protected Resource read(File filePath) {
-
-		XmlPersistenceDomContextData cd = new XmlPersistenceDomContextData();
-		cd.setFile(filePath);
-		getFileHandler().read(cd);
-		Document document = cd.getDocument();
-		Resource resource = parseFromDom(document.getDocumentElement());
-		return resource;
-	}
-
-	@Override
-	protected void write(Resource resource, File filePath) {
-
-		XmlPersistenceDomContextData cd = new XmlPersistenceDomContextData();
-		cd.setFile(filePath);
-		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
-		Document document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
-		serializeToDom(resource, document);
-		cd.setDocument(document);
-		getFileHandler().write(cd);
-	}
+@SuppressWarnings("nls")
+public class ResourceDomDao {
 
 	public Element serializeToDom(Resource resource, Document document) {
 

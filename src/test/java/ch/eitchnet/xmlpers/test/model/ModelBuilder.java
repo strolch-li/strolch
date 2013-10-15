@@ -29,6 +29,7 @@ import ch.eitchnet.xmlpers.test.impl.Book;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
+@SuppressWarnings("nls")
 public class ModelBuilder {
 
 	public static final String RES_TYPE = "@subType";
