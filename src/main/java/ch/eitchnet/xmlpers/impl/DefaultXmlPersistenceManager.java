@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.PropertiesHelper;
+import ch.eitchnet.xmlpers.api.IoMode;
 import ch.eitchnet.xmlpers.api.PersistenceConstants;
 import ch.eitchnet.xmlpers.api.PersistenceContextFactoryDelegator;
 import ch.eitchnet.xmlpers.api.PersistenceManager;
@@ -48,6 +49,7 @@ public class DefaultXmlPersistenceManager implements PersistenceManager {
 
 	protected boolean initialized;
 	protected boolean verbose;
+	protected IoMode defaultIoMode;
 	protected Properties properties;
 	protected Map<String, DefaultPersistenceRealm> realmMap;
 	private PersistenceContextFactoryDelegator ctxFactory;
@@ -61,12 +63,16 @@ public class DefaultXmlPersistenceManager implements PersistenceManager {
 		// get verbose flag
 		boolean verbose = PropertiesHelper.getPropertyBool(properties, context, PersistenceConstants.PROP_VERBOSE,
 				Boolean.FALSE).booleanValue();
+		String ioModeS = PropertiesHelper.getProperty(properties, context, PersistenceConstants.PROP_XML_IO_MOD,
+				IoMode.DOM.name());
+		IoMode ioMode = IoMode.valueOf(ioModeS);
 
 		// validate base path
 		validateBasePath(properties);
 
 		this.properties = properties;
 		this.verbose = verbose;
+		this.defaultIoMode = ioMode;
 		this.realmMap = new HashMap<>();
 		this.ctxFactory = new PersistenceContextFactoryDelegator();
 	}
@@ -103,12 +109,14 @@ public class DefaultXmlPersistenceManager implements PersistenceManager {
 
 			PathBuilder pathBuilder = new PathBuilder(realmName, this.properties);
 			ObjectReferenceCache objectRefCache = new ObjectReferenceCache(realmName);
-			persistenceRealm = new DefaultPersistenceRealm(realmName, this, this.ctxFactory, pathBuilder, objectRefCache);
+			persistenceRealm = new DefaultPersistenceRealm(realmName, this, this.ctxFactory, pathBuilder,
+					objectRefCache);
 
 			this.realmMap.put(realmName, persistenceRealm);
 		}
 
 		PersistenceTransaction tx = new DefaultPersistenceTransaction(persistenceRealm, this.verbose);
+		tx.setIoMode(this.defaultIoMode);
 		return tx;
 	}
 }
