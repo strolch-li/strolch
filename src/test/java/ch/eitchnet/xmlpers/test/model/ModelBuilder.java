@@ -23,8 +23,6 @@ package ch.eitchnet.xmlpers.test.model;
 
 import org.junit.Assert;
 
-import ch.eitchnet.xmlpers.test.impl.Book;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 

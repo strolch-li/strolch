@@ -19,7 +19,7 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package ch.eitchnet.xmlpers.test.impl;
+package ch.eitchnet.xmlpers.test.model;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

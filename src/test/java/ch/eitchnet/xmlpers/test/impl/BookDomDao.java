@@ -24,6 +24,8 @@ package ch.eitchnet.xmlpers.test.impl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import ch.eitchnet.xmlpers.test.model.Book;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 

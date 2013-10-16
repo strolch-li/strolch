@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import ch.eitchnet.xmlpers.api.XmlPersistenceStreamWriter;
+import ch.eitchnet.xmlpers.test.model.Book;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

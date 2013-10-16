@@ -21,6 +21,7 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
+import ch.eitchnet.xmlpers.test.model.Book;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**

@@ -24,6 +24,7 @@ package ch.eitchnet.xmlpers.test.impl;
 import ch.eitchnet.xmlpers.api.DomParser;
 import ch.eitchnet.xmlpers.api.ParserFactory;
 import ch.eitchnet.xmlpers.api.SaxParser;
+import ch.eitchnet.xmlpers.test.model.Book;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -40,5 +41,4 @@ public class BookParserFactory implements ParserFactory<Book> {
 	public SaxParser<Book> getSaxParser() {
 		return new BookSaxParser();
 	}
-
 }
