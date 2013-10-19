@@ -20,6 +20,7 @@ public class IdOfTypeRef extends ObjectRef {
 		this.id = id;
 	}
 
+	@Override
 	public String getType() {
 		return this.type;
 	}

@@ -80,7 +80,7 @@ public class FileDaoTest extends AbstractPersistenceTest {
 		try (PersistenceTransaction tx = new DefaultPersistenceTransaction(this.realm, VERBOSE)) {
 			FileDao fileDao = new FileDao(tx, this.pathBuilder, VERBOSE);
 			tx.setIoMode(IoMode.SAX);
-			testCrud(tx, this.realm.getCtxFactoryDelegator(), fileDao);
+			testCrud(this.realm.getCtxFactoryDelegator(), fileDao);
 		}
 	}
 
@@ -90,12 +90,11 @@ public class FileDaoTest extends AbstractPersistenceTest {
 		try (PersistenceTransaction tx = new DefaultPersistenceTransaction(this.realm, VERBOSE)) {
 			FileDao fileDao = new FileDao(tx, this.pathBuilder, VERBOSE);
 			tx.setIoMode(IoMode.DOM);
-			testCrud(tx, this.realm.getCtxFactoryDelegator(), fileDao);
+			testCrud(this.realm.getCtxFactoryDelegator(), fileDao);
 		}
 	}
 
-	private void testCrud(PersistenceTransaction tx, PersistenceContextFactoryDelegator ctxFactoryDelegator,
-			FileDao fileDao) {
+	private void testCrud(PersistenceContextFactoryDelegator ctxFactoryDelegator, FileDao fileDao) {
 
 		Resource resource = createResource();
 		assertResource(resource);

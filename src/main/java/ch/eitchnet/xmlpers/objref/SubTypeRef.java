@@ -18,6 +18,7 @@ public class SubTypeRef extends ObjectRef {
 		this.subType = subType;
 	}
 
+	@Override
 	public String getType() {
 		return this.type;
 	}

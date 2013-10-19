@@ -50,10 +50,18 @@ public enum IoMode {
 		}
 	};
 
+	/**
+	 * @param ctx
+	 * @param fileIo
+	 */
 	public <T> void write(PersistenceContext<T> ctx, FileIo fileIo) {
 		throw new UnsupportedOperationException("Override me!"); //$NON-NLS-1$
 	}
 
+	/**
+	 * @param ctx
+	 * @param fileIo
+	 */
 	public <T> void read(PersistenceContext<T> ctx, FileIo fileIo) {
 		throw new UnsupportedOperationException("Override me!"); //$NON-NLS-1$
 	}

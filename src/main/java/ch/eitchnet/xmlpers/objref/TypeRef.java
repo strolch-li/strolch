@@ -16,6 +16,7 @@ public class TypeRef extends ObjectRef {
 		this.type = type;
 	}
 
+	@Override
 	public String getType() {
 		return this.type;
 	}
