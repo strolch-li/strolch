@@ -28,6 +28,7 @@ import static ch.eitchnet.xmlpers.test.model.ModelBuilder.assertResourceUpdated;
 import static ch.eitchnet.xmlpers.test.model.ModelBuilder.createResource;
 import static ch.eitchnet.xmlpers.test.model.ModelBuilder.updateResource;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
@@ -42,15 +43,17 @@ import ch.eitchnet.xmlpers.api.ObjectDao;
 import ch.eitchnet.xmlpers.api.PersistenceConstants;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.objref.IdOfSubTypeRef;
+import ch.eitchnet.xmlpers.objref.ObjectRef;
 import ch.eitchnet.xmlpers.objref.SubTypeRef;
 import ch.eitchnet.xmlpers.test.impl.TestConstants;
+import ch.eitchnet.xmlpers.test.model.ModelBuilder;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class ObjectDaoTest extends AbstractPersistenceTest {
+public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 
 	private static final String BASEPATH = "target/db/ObjectDaoTest/"; //$NON-NLS-1$
 
@@ -137,15 +140,13 @@ public class ObjectDaoTest extends AbstractPersistenceTest {
 	@Test
 	public void testBulkSax() {
 		setup(IoMode.SAX);
-		IoMode ioMode = IoMode.SAX;
-		testBulk(ioMode);
+		testBulk(IoMode.SAX);
 	}
 
 	@Test
 	public void testBulkDom() {
 		setup(IoMode.DOM);
-		IoMode ioMode = IoMode.DOM;
-		testBulk(ioMode);
+		testBulk(IoMode.DOM);
 	}
 
 	private void testBulk(IoMode ioMode) {
@@ -163,11 +164,9 @@ public class ObjectDaoTest extends AbstractPersistenceTest {
 			resources.add(resource);
 		}
 
-		ObjectDao objectDao;
-
 		// save all
 		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			objectDao = tx.getObjectDao();
+			ObjectDao objectDao = tx.getObjectDao();
 			objectDao.addAll(resources);
 			resources.clear();
 		}
@@ -175,7 +174,7 @@ public class ObjectDaoTest extends AbstractPersistenceTest {
 		// query all
 		try (PersistenceTransaction tx = freshTx(ioMode);) {
 			SubTypeRef subTypeRef = tx.getObjectRefCache().getSubTypeRef(TestConstants.TYPE_RES, type);
-			objectDao = tx.getObjectDao();
+			ObjectDao objectDao = tx.getObjectDao();
 			resources = objectDao.queryAll(subTypeRef);
 			assertEquals("Expected to find 10 entries!", 10, resources.size()); //$NON-NLS-1$
 
@@ -186,9 +185,45 @@ public class ObjectDaoTest extends AbstractPersistenceTest {
 		// now query them again
 		try (PersistenceTransaction tx = freshTx(ioMode);) {
 			SubTypeRef subTypeRef = tx.getObjectRefCache().getSubTypeRef(TestConstants.TYPE_RES, type);
-			objectDao = tx.getObjectDao();
+			ObjectDao objectDao = tx.getObjectDao();
 			resources = objectDao.queryAll(subTypeRef);
 			assertEquals("Expected to find 0 entries!", 0, resources.size()); //$NON-NLS-1$
+		}
+	}
+
+	@Test
+	public void shouldPersistById() {
+		setup(IoMode.SAX);
+
+		String classType = TestConstants.TYPE_RES;
+		String subType = ModelBuilder.RES_TYPE;
+		String id = "shouldPersistById"; //$NON-NLS-1$
+		String name = "shouldPersistById "; //$NON-NLS-1$
+
+		// create a resource
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			Resource resource = createResource(id, name, subType);
+			tx.getObjectDao().add(resource);
+		}
+
+		// read by id
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			ObjectRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
+			Resource resource = tx.getObjectDao().queryById(objectRef);
+			assertNotNull("Expected to read resource by ID", resource); //$NON-NLS-1$
+		}
+
+		// delete by id
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			ObjectRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
+			tx.getObjectDao().removeById(objectRef);
+		}
+
+		// fail to read by id
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			ObjectRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
+			Resource resource = tx.getObjectDao().queryById(objectRef);
+			assertNull("Expected that resource was deleted by ID, thus can not be read anymore", resource); //$NON-NLS-1$
 		}
 	}
 }
