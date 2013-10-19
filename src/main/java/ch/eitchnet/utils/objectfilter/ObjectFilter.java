@@ -125,7 +125,7 @@ public class ObjectFilter {
 	public void add(String key, Object objectToAdd) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
-			ObjectFilter.logger.debug("add object " + objectToAdd + " with key " + key);
+			ObjectFilter.logger.debug(MessageFormat.format("add object {0} with key {1}", objectToAdd, key)); //$NON-NLS-1$
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.get(objectToAdd);
@@ -140,7 +140,7 @@ public class ObjectFilter {
 
 			String existingKey = cached.getKey();
 			if (!existingKey.equals(key)) {
-				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}";
+				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
 				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
 						Operation.ADD.toString(), existingKey, key, objectToAdd.toString()));
 			}
@@ -150,9 +150,9 @@ public class ObjectFilter {
 			Operation op = cached.getOperation();
 			switch (op) {
 			case ADD:
-				throw new IllegalStateException("Stale State exception: Invalid + after +");
+				throw new IllegalStateException("Stale State exception: Invalid + after +"); //$NON-NLS-1$
 			case MODIFY:
-				throw new IllegalStateException("Stale State exception: Invalid + after +=");
+				throw new IllegalStateException("Stale State exception: Invalid + after +="); //$NON-NLS-1$
 			case REMOVE:
 				// replace key if necessary
 				replaceKey(cached.getObject(), objectToAdd);
@@ -161,6 +161,8 @@ public class ObjectFilter {
 				cached.setObject(objectToAdd);
 				cached.setOperation(Operation.MODIFY);
 				break;
+			default:
+				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
 		}// else of object not in cache
 
@@ -171,7 +173,7 @@ public class ObjectFilter {
 	private void replaceKey(Object oldObject, Object newObject) {
 		if (oldObject != newObject) {
 			if (ObjectFilter.logger.isDebugEnabled()) {
-				String msg = "Replacing key for object as they are not the same reference: old: {0} / new: {1}";
+				String msg = "Replacing key for object as they are not the same reference: old: {0} / new: {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, oldObject, newObject);
 				ObjectFilter.logger.warn(msg);
 			}
@@ -207,7 +209,7 @@ public class ObjectFilter {
 	public void update(String key, Object objectToUpdate) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
-			ObjectFilter.logger.debug("update object " + objectToUpdate + " with key " + key);
+			ObjectFilter.logger.debug(MessageFormat.format("update object {0} with key {1}", objectToUpdate, key)); //$NON-NLS-1$
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.get(objectToUpdate);
@@ -222,7 +224,7 @@ public class ObjectFilter {
 
 			String existingKey = cached.getKey();
 			if (!existingKey.equals(key)) {
-				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}";
+				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
 				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
 						Operation.MODIFY.toString(), existingKey, key, objectToUpdate.toString()));
 			}
@@ -239,7 +241,9 @@ public class ObjectFilter {
 				cached.setObject(objectToUpdate);
 				break;
 			case REMOVE:
-				throw new IllegalStateException("Stale State exception: Invalid += after -");
+				throw new IllegalStateException("Stale State exception: Invalid += after -"); //$NON-NLS-1$
+			default:
+				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
 		}// else of object not in cache
 
@@ -274,7 +278,7 @@ public class ObjectFilter {
 	public void remove(String key, Object objectToRemove) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
-			ObjectFilter.logger.debug("remove object " + objectToRemove + " with key " + key);
+			ObjectFilter.logger.debug(MessageFormat.format("remove object {0} with key {1}", objectToRemove, key)); //$NON-NLS-1$
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.get(objectToRemove);
@@ -287,7 +291,7 @@ public class ObjectFilter {
 
 			String existingKey = cached.getKey();
 			if (!existingKey.equals(key)) {
-				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}";
+				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
 				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
 						Operation.REMOVE.toString(), existingKey, key, objectToRemove.toString()));
 			}
@@ -309,7 +313,9 @@ public class ObjectFilter {
 				cached.setOperation(Operation.REMOVE);
 				break;
 			case REMOVE:
-				throw new IllegalStateException("Stale State exception: Invalid - after -");
+				throw new IllegalStateException("Stale State exception: Invalid - after -"); //$NON-NLS-1$
+			default:
+				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
 		}
 
@@ -433,6 +439,7 @@ public class ObjectFilter {
 	 * 
 	 * @param key
 	 *            The registration key of the objects to match
+	 * 
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
 	public List<Object> getAdded(String key) {
@@ -453,6 +460,7 @@ public class ObjectFilter {
 	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
 	 *            The registration key of the objects to match
+	 * 
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
 	public <V extends Object> List<V> getAdded(Class<V> clazz, String key) {
@@ -475,6 +483,7 @@ public class ObjectFilter {
 	 * 
 	 * @param key
 	 *            registration key of the objects to match
+	 * 
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
 	public List<Object> getUpdated(String key) {
@@ -491,8 +500,11 @@ public class ObjectFilter {
 	/**
 	 * Get all objects that were registered under the given key and that have as a resulting final action an update.
 	 * 
+	 * @param clazz
+	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
 	 *            registration key of the objects to match
+	 * 
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
 	public <V extends Object> List<V> getUpdated(Class<V> clazz, String key) {
@@ -515,6 +527,7 @@ public class ObjectFilter {
 	 * 
 	 * @param key
 	 *            The registration key of the objects to match
+	 * 
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public List<Object> getRemoved(String key) {
@@ -531,8 +544,11 @@ public class ObjectFilter {
 	/**
 	 * Get all objects that were registered under the given key that have as a resulting final action their removal.
 	 * 
+	 * @param clazz
+	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
 	 *            The registration key of the objects to match
+	 * 
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public <V extends Object> List<V> getRemoved(Class<V> clazz, String key) {
@@ -551,11 +567,58 @@ public class ObjectFilter {
 	}
 
 	/**
+	 * Get all objects that were registered under the given key
+	 * 
+	 * @param clazz
+	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * @param key
+	 *            The registration key of the objects to match
+	 * 
+	 * @return The list of object registered under the given key that have, as a final action, removal.
+	 */
+	public <V extends Object> List<V> getAll(Class<V> clazz, String key) {
+		List<V> objects = new LinkedList<V>();
+		Collection<ObjectCache> allObjs = this.cache.values();
+		for (ObjectCache objectCache : allObjs) {
+			if (objectCache.getKey().equals(key)) {
+				if (objectCache.getObject().getClass() == clazz) {
+					@SuppressWarnings("unchecked")
+					V object = (V) objectCache.getObject();
+					objects.add(object);
+				}
+			}
+		}
+		return objects;
+	}
+
+	/**
+	 * Get all objects that of the given class
+	 * 
+	 * @param clazz
+	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * 
+	 * @return The list of all objects that of the given class
+	 */
+	public <V extends Object> List<V> getAll(Class<V> clazz) {
+		List<V> objects = new LinkedList<V>();
+		Collection<ObjectCache> allObjs = this.cache.values();
+		for (ObjectCache objectCache : allObjs) {
+			if (objectCache.getObject().getClass() == clazz) {
+				@SuppressWarnings("unchecked")
+				V object = (V) objectCache.getObject();
+				objects.add(object);
+			}
+		}
+		return objects;
+	}
+
+	/**
 	 * Get all the objects that were processed in this transaction, that were registered under the given key. No action
 	 * is associated to the object.
 	 * 
 	 * @param key
 	 *            The registration key for which the objects shall be retrieved
+	 * 
 	 * @return The list of objects matching the given key.
 	 */
 	public List<Object> getAll(String key) {
@@ -575,6 +638,7 @@ public class ObjectFilter {
 	 * 
 	 * @param key
 	 *            The registration key for which the objects shall be retrieved
+	 * 
 	 * @return The list of objects matching the given key.
 	 */
 	public List<ObjectCache> getCache(String key) {
@@ -598,17 +662,23 @@ public class ObjectFilter {
 	}
 
 	/**
-	 * Clear the cache.
+	 * Clears the cache
 	 */
 	public void clearCache() {
 		this.cache.clear();
 		this.keySet.clear();
 	}
 
+	/**
+	 * @return the set of keys used to register objects
+	 */
 	public int sizeKeySet() {
 		return this.keySet.size();
 	}
 
+	/**
+	 * @return the number of objects registered in this filter
+	 */
 	public int sizeCache() {
 		return this.cache.size();
 	}
@@ -619,7 +689,7 @@ public class ObjectFilter {
 	public synchronized long dispenseID() {
 		ObjectFilter.id++;
 		if (ObjectFilter.id == Long.MAX_VALUE) {
-			ObjectFilter.logger.error("Rolling IDs of objectFilter back to 1. Hope this is fine.");
+			ObjectFilter.logger.error("Rolling IDs of objectFilter back to 1. Hope this is fine."); //$NON-NLS-1$
 			ObjectFilter.id = 1;
 		}
 		return ObjectFilter.id;
