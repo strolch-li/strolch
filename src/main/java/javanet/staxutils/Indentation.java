@@ -4,10 +4,11 @@ package javanet.staxutils;
  * Characters that represent line breaks and indentation. These are represented
  * as String-valued JavaBean properties.
  */
+@SuppressWarnings("nls")
 public interface Indentation {
 
     /** Two spaces; the default indentation. */
-    public static final String DEFAULT_INDENT = "  ";
+	public static final String DEFAULT_INDENT = "  ";
 
     /**
      * Set the characters used for one level of indentation. The default is

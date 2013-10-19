@@ -56,4 +56,29 @@ public class RootRef extends ObjectRef {
 		String msg = MessageFormat.format("{0} is not a leaf and can thus not have a Persistence Context", getName()); //$NON-NLS-1$
 		throw new UnsupportedOperationException(msg);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.realmName == null) ? 0 : this.realmName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RootRef other = (RootRef) obj;
+		if (this.realmName == null) {
+			if (other.realmName != null)
+				return false;
+		} else if (!this.realmName.equals(other.realmName))
+			return false;
+		return true;
+	}
 }

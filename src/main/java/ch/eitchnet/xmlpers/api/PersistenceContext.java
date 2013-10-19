@@ -52,4 +52,43 @@ public class PersistenceContext<T> {
 	public void setParserFactory(ParserFactory<T> parserFactory) {
 		this.parserFactory = parserFactory;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.objectRef == null) ? 0 : this.objectRef.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PersistenceContext<?> other = (PersistenceContext<?>) obj;
+		if (this.objectRef == null) {
+			if (other.objectRef != null)
+				return false;
+		} else if (!this.objectRef.equals(other.objectRef))
+			return false;
+		return true;
+	}
+
+	@SuppressWarnings("nls")
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("PersistenceContext [objectRef=");
+		builder.append(this.objectRef);
+		builder.append(", object=");
+		builder.append(this.object);
+		builder.append(", parserFactory=");
+		builder.append(this.parserFactory);
+		builder.append("]");
+		return builder.toString();
+	}
 }

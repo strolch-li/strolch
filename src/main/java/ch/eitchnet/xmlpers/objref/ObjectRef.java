@@ -8,8 +8,8 @@ import ch.eitchnet.xmlpers.impl.PathBuilder;
 
 public abstract class ObjectRef extends LockableObject {
 
-	private String realmName;
-	private String name;
+	protected final String realmName;
+	protected final String name;
 
 	protected ObjectRef(String realmName, String name) {
 		this.realmName = realmName;
@@ -44,4 +44,10 @@ public abstract class ObjectRef extends LockableObject {
 	public String toString() {
 		return getName();
 	}
+
+	@Override
+	public abstract boolean equals(Object obj);
+
+	@Override
+	public abstract int hashCode();
 }

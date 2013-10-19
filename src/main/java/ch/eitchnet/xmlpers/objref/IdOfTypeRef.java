@@ -67,8 +67,44 @@ public class IdOfTypeRef extends ObjectRef {
 	@Override
 	public <T> PersistenceContext<T> createPersistenceContext(PersistenceTransaction tx) {
 		PersistenceContextFactoryDelegator ctxFactoryDelegator = tx.getRealm().getCtxFactoryDelegator();
-		PersistenceContextFactory<T> persistenceContextFactory = ctxFactoryDelegator
-				.<T> getCtxFactory(this.type);
+		PersistenceContextFactory<T> persistenceContextFactory = ctxFactoryDelegator.<T> getCtxFactory(this.type);
 		return persistenceContextFactory.createCtx(this);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+		result = prime * result + ((this.realmName == null) ? 0 : this.realmName.hashCode());
+		result = prime * result + ((this.type == null) ? 0 : this.type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IdOfTypeRef other = (IdOfTypeRef) obj;
+		if (this.realmName == null) {
+			if (other.realmName != null)
+				return false;
+		} else if (!this.realmName.equals(other.realmName))
+			return false;
+		if (this.id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!this.id.equals(other.id))
+			return false;
+		if (this.type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!this.type.equals(other.type))
+			return false;
+		return true;
 	}
 }

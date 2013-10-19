@@ -32,6 +32,7 @@
 package javanet.staxutils;
 
 import javanet.staxutils.helpers.StreamWriterDelegate;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -68,6 +69,7 @@ import javax.xml.stream.XMLStreamWriter;
  * 
  * @author <a href="mailto:jk2006@engineer.com">John Kristian</a>
  */
+@SuppressWarnings("nls")
 public class IndentingXMLStreamWriter extends StreamWriterDelegate implements Indentation {
 
     public IndentingXMLStreamWriter(XMLStreamWriter out) {
