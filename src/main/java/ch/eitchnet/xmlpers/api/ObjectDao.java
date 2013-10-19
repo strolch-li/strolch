@@ -43,59 +43,80 @@ public class ObjectDao {
 	private final ObjectFilter objectFilter;
 	private final FileDao fileDao;
 	private final PersistenceTransaction tx;
+	private PersistenceContextFactoryDelegator ctxFactoryDelegator;
 
 	public ObjectDao(PersistenceTransaction tx, FileDao fileDao, ObjectFilter objectFilter) {
 		this.tx = tx;
 		this.fileDao = fileDao;
 		this.objectFilter = objectFilter;
+		this.ctxFactoryDelegator = this.tx.getRealm().getCtxFactoryDelegator();
 	}
 
 	public <T> void add(T object) {
 		assertNotClosed();
 		assertNotNull(object);
-		this.objectFilter.add(object);
+		PersistenceContext<T> ctx = createCtx(object);
+		ctx.setObject(object);
+		this.objectFilter.add(object.getClass().getName(), ctx);
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> void addAll(List<T> objects) {
 		assertNotClosed();
 		assertNotNull(objects);
-		if (!objects.isEmpty())
-			this.objectFilter.addAll((List<Object>) objects);
+		if (!objects.isEmpty()) {
+			for (T object : objects) {
+				PersistenceContext<T> ctx = createCtx(object);
+				ctx.setObject(object);
+				this.objectFilter.add(object.getClass().getName(), ctx);
+			}
+		}
 	}
 
 	public <T> void update(T object) {
 		assertNotClosed();
 		assertNotNull(object);
-		this.objectFilter.update(object);
+		PersistenceContext<T> ctx = createCtx(object);
+		ctx.setObject(object);
+		this.objectFilter.update(object.getClass().getName(), ctx);
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> void updateAll(List<T> objects) {
 		assertNotClosed();
 		assertNotNull(objects);
-		if (!objects.isEmpty())
-			this.objectFilter.updateAll((List<Object>) objects);
+		if (!objects.isEmpty()) {
+			for (T object : objects) {
+				PersistenceContext<T> ctx = createCtx(object);
+				ctx.setObject(object);
+				this.objectFilter.update(object.getClass().getName(), ctx);
+			}
+		}
 	}
 
 	public <T> void remove(T object) {
 		assertNotClosed();
 		assertNotNull(object);
-		this.objectFilter.remove(object);
+		PersistenceContext<T> ctx = createCtx(object);
+		ctx.setObject(object);
+		this.objectFilter.remove(object.getClass().getName(), ctx);
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> void removeAll(List<T> objects) {
 		assertNotClosed();
 		assertNotNull(objects);
-		if (!objects.isEmpty())
-			this.objectFilter.removeAll((List<Object>) objects);
+		if (!objects.isEmpty()) {
+			for (T object : objects) {
+				PersistenceContext<T> ctx = createCtx(object);
+				ctx.setObject(object);
+				this.objectFilter.remove(object.getClass().getName(), ctx);
+			}
+		}
 	}
 
 	public <T> void removeById(ObjectRef objectRef) {
 		assertNotClosed();
 		assertIsIdRef(objectRef);
-		this.objectFilter.remove(objectRef);
+		PersistenceContext<T> ctx = createCtx(objectRef);
+		this.objectFilter.remove(objectRef.getType(), ctx);
 	}
 
 	public <T> void removeAll(ObjectRef parentRef) {
@@ -107,9 +128,8 @@ public class ObjectDao {
 		for (String id : keySet) {
 
 			ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
-			PersistenceContext<T> childCtx = childRef.<T> createPersistenceContext(this.tx);
-
-			this.objectFilter.remove(childCtx);
+			PersistenceContext<T> ctx = createCtx(childRef);
+			this.objectFilter.remove(childRef.getType(), ctx);
 		}
 	}
 
@@ -158,6 +178,17 @@ public class ObjectDao {
 		MetadataDao metadataDao = this.tx.getMetadataDao();
 		long size = metadataDao.querySize(parentRef);
 		return size;
+	}
+
+	private <T> PersistenceContext<T> createCtx(T object) {
+		return this.ctxFactoryDelegator.<T> getCtxFactory(object.getClass()).createCtx(this.tx.getObjectRefCache(),
+				object);
+	}
+
+	private <T> PersistenceContext<T> createCtx(ObjectRef objectRef) {
+		String type = objectRef.getType();
+		PersistenceContextFactory<T> ctxFactory = this.ctxFactoryDelegator.<T> getCtxFactory(type);
+		return ctxFactory.createCtx(objectRef);
 	}
 
 	private void assertNotClosed() {

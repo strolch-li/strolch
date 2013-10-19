@@ -28,6 +28,8 @@ public abstract class ObjectRef extends LockableObject {
 
 	public abstract boolean isLeaf();
 
+	public abstract String getType();
+
 	public abstract ObjectRef getParent(PersistenceTransaction tx);
 
 	public abstract ObjectRef getChildIdRef(PersistenceTransaction tx, String id);
@@ -37,4 +39,9 @@ public abstract class ObjectRef extends LockableObject {
 	public abstract File getPath(PathBuilder pathBuilder);
 
 	public abstract <T> PersistenceContext<T> createPersistenceContext(PersistenceTransaction tx);
+
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

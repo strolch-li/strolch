@@ -35,7 +35,6 @@ import ch.eitchnet.xmlpers.api.IoMode;
 import ch.eitchnet.xmlpers.api.MetadataDao;
 import ch.eitchnet.xmlpers.api.ObjectDao;
 import ch.eitchnet.xmlpers.api.PersistenceContext;
-import ch.eitchnet.xmlpers.api.PersistenceContextFactoryDelegator;
 import ch.eitchnet.xmlpers.api.PersistenceRealm;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.api.TransactionCloseStrategy;
@@ -143,10 +142,8 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 						logger.info(removed.size() + " objects removed in this tx."); //$NON-NLS-1$
 
 					for (Object object : removed) {
-						PersistenceContextFactoryDelegator ctxFactoryDelegator = this.realm.getCtxFactoryDelegator();
-						PersistenceContext<Object> ctx = ctxFactoryDelegator.getCtxFactory(object.getClass())
-								.createCtx(this.realm.getObjectRefCache(), object);
-						ctx.setObject(object);
+						@SuppressWarnings("unchecked")
+						PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
 						this.fileDao.performDelete(ctx);
 					}
 				}
@@ -160,11 +157,8 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 						logger.info(updated.size() + " objects updated in this tx."); //$NON-NLS-1$
 
 					for (Object object : updated) {
-
-						PersistenceContextFactoryDelegator ctxFactoryDelegator = this.realm.getCtxFactoryDelegator();
-						PersistenceContext<Object> ctx = ctxFactoryDelegator.getCtxFactory(object.getClass())
-								.createCtx(this.realm.getObjectRefCache(), object);
-						ctx.setObject(object);
+						@SuppressWarnings("unchecked")
+						PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
 						this.fileDao.performUpdate(ctx);
 					}
 				}
@@ -178,11 +172,8 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 						logger.info(added.size() + " objects added in this tx."); //$NON-NLS-1$
 
 					for (Object object : added) {
-
-						PersistenceContextFactoryDelegator ctxFactoryDelegator = this.realm.getCtxFactoryDelegator();
-						PersistenceContext<Object> ctx = ctxFactoryDelegator.getCtxFactory(object.getClass())
-								.createCtx(this.realm.getObjectRefCache(), object);
-						ctx.setObject(object);
+						@SuppressWarnings("unchecked")
+						PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
 						this.fileDao.performCreate(ctx);
 					}
 				}

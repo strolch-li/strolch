@@ -23,7 +23,7 @@ package ch.eitchnet.xmlpers.api;
 
 import java.util.Properties;
 
-import ch.eitchnet.xmlpers.impl.DefaultXmlPersistenceManager;
+import ch.eitchnet.xmlpers.impl.DefaultPersistenceManager;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -33,7 +33,7 @@ public class PersistenceManagerLoader {
 
 	public static PersistenceManager load(Properties properties) {
 
-		DefaultXmlPersistenceManager persistenceManager = new DefaultXmlPersistenceManager();
+		DefaultPersistenceManager persistenceManager = new DefaultPersistenceManager();
 		persistenceManager.initialize(properties);
 		return persistenceManager;
 	}

@@ -24,6 +24,12 @@ public class RootRef extends ObjectRef {
 	}
 
 	@Override
+	public String getType() {
+		String msg = MessageFormat.format("RootRef has no type: {0}", getName()); //$NON-NLS-1$
+		throw new UnsupportedOperationException(msg);
+	}
+
+	@Override
 	public ObjectRef getParent(PersistenceTransaction tx) {
 		String msg = MessageFormat.format("RootRef has no parent: {0}", getName()); //$NON-NLS-1$
 		throw new UnsupportedOperationException(msg);

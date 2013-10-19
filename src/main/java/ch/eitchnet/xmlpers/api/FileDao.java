@@ -145,6 +145,7 @@ public class FileDao {
 		if (this.verbose) {
 			String msg = "Path for operation {0} for {1} is at {2}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, operation, objectRef.getName(), path.getAbsolutePath());
+			logger.info(msg);
 		}
 	}
 

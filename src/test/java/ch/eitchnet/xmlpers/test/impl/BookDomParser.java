@@ -21,39 +21,67 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
+import javax.xml.parsers.DocumentBuilder;
+
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import ch.eitchnet.xmlpers.api.DomParser;
 import ch.eitchnet.xmlpers.test.model.Book;
+import ch.eitchnet.xmlpers.util.DomUtil;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
+ * 
  */
 public class BookDomParser implements DomParser<Book> {
 
+	private Book book;
+
 	@Override
 	public Book getObject() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.book;
 	}
 
 	@Override
 	public void setObject(Book object) {
-		// TODO Auto-generated method stub
-
+		this.book = object;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public Document toDom() {
-		// TODO Auto-generated method stub
-		return null;
+
+		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
+		Document document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
+
+		Element rootElement = document.createElement("Book");
+		document.appendChild(rootElement);
+		rootElement.setAttribute("id", Long.toString(this.book.getId()));
+		rootElement.setAttribute("title", this.book.getTitle());
+		rootElement.setAttribute("author", this.book.getAuthor());
+		rootElement.setAttribute("press", this.book.getPress());
+		rootElement.setAttribute("price", Double.toString(this.book.getPrice()));
+
+		return document;
+
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public void fromDom(Document document) {
-		// TODO Auto-generated method stub
 
+		Element rootElement = document.getDocumentElement();
+
+		String idS = rootElement.getAttribute("id");
+		long id = Long.parseLong(idS);
+		String title = rootElement.getAttribute("title");
+		String author = rootElement.getAttribute("author");
+		String press = rootElement.getAttribute("press");
+		String priceS = rootElement.getAttribute("price");
+		double price = Double.parseDouble(priceS);
+
+		Book book = new Book(id, title, author, press, price);
+		this.book = book;
 	}
-
 }

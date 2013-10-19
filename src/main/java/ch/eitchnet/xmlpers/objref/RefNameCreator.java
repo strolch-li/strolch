@@ -6,6 +6,8 @@ public class RefNameCreator {
 
 	protected static final String SLASH = "/"; //$NON-NLS-1$
 
+	// FIXME validate each name part that it is a valid literal for file names...
+
 	public static String createRootName(String realmName) {
 		assertRealmName(realmName);
 		return SLASH + realmName + SLASH;
@@ -21,7 +23,7 @@ public class RefNameCreator {
 		assertRealmName(realmName);
 		assertType(type);
 		assertId(id);
-		return SLASH + realmName + SLASH + type + SLASH + id + SLASH;
+		return SLASH + realmName + SLASH + type + SLASH + id;
 	}
 
 	public static String createSubTypeName(String realmName, String type, String subType) {
@@ -36,7 +38,7 @@ public class RefNameCreator {
 		assertType(type);
 		assertSubType(subType);
 		assertId(id);
-		return SLASH + realmName + SLASH + type + SLASH + subType + SLASH + id + SLASH;
+		return SLASH + realmName + SLASH + type + SLASH + subType + SLASH + id;
 	}
 
 	private static void assertRealmName(String realmName) {

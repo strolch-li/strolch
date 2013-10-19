@@ -70,6 +70,11 @@ public class ModelBuilder {
 		return book;
 	}
 
+	public static Book createBook(long id, String title, String author, String press, double price) {
+		Book book = new Book(id, title, author, press, price);
+		return book;
+	}
+
 	public static void updateBook(Book book) {
 		book.setPress(BOOK_PRESS_2);
 	}

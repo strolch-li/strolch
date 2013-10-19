@@ -43,9 +43,9 @@ import ch.eitchnet.xmlpers.objref.ObjectReferenceCache;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class DefaultXmlPersistenceManager implements PersistenceManager {
+public class DefaultPersistenceManager implements PersistenceManager {
 
-	protected static final Logger logger = LoggerFactory.getLogger(DefaultXmlPersistenceManager.class);
+	protected static final Logger logger = LoggerFactory.getLogger(DefaultPersistenceManager.class);
 
 	protected boolean initialized;
 	protected boolean verbose;
@@ -58,7 +58,7 @@ public class DefaultXmlPersistenceManager implements PersistenceManager {
 		if (this.initialized)
 			throw new IllegalStateException("Already initialized!"); //$NON-NLS-1$
 
-		String context = DefaultXmlPersistenceManager.class.getSimpleName();
+		String context = DefaultPersistenceManager.class.getSimpleName();
 
 		// get verbose flag
 		boolean verbose = PropertiesHelper.getPropertyBool(properties, context, PersistenceConstants.PROP_VERBOSE,
@@ -78,7 +78,7 @@ public class DefaultXmlPersistenceManager implements PersistenceManager {
 	}
 
 	private void validateBasePath(Properties properties) {
-		String context = DefaultXmlPersistenceManager.class.getSimpleName();
+		String context = DefaultPersistenceManager.class.getSimpleName();
 		String basePath = PropertiesHelper.getProperty(properties, context, PersistenceConstants.PROP_BASEPATH, null);
 
 		// validate base path exists and is writable
