@@ -1,7 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>ch.eitchnet</groupId>
+
+	<parent>
+		<groupId>ch.eitchnet</groupId>
+		<artifactId>ch.eitchnet.parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../ch.eitchnet.parent/pom.xml</relativePath>
+	</parent>
+
 	<artifactId>ch.eitchnet.xmlpers</artifactId>
 	<packaging>jar</packaging>
 	<version>0.3.0-SNAPSHOT</version>
@@ -15,47 +22,11 @@
 	<!-- POM Reference: http://maven.apache.org/pom.html#Licenses -->
 
 	<inceptionYear>2011</inceptionYear>
-	<licenses>
-		<license>
-			<name>GNU Lesser General Public License</name>
-			<url>http://www.gnu.org/licenses/lgpl.html</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	<organization>
-		<name>eitchnet.ch</name>
-		<url>http://blog.eitchnet.ch</url>
-	</organization>
-	<developers>
-		<developer>
-			<id>eitch</id>
-			<name>Robert von Vurg</name>
-			<email>eitch@eitchnet.ch</email>
-			<url>http://blog.eitchnet.ch</url>
-			<organization>eitchnet.ch</organization>
-			<organizationUrl>http://blog.eitchnet.ch</organizationUrl>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-			<timezone>+1</timezone>
-			<properties>
-				<picUrl>http://localhost</picUrl>
-			</properties>
-		</developer>
-	</developers>
 
 	<issueManagement>
 		<system>Github Issues</system>
 		<url>https://github.com/eitch/ch.eitchnet.xmlpers/issues</url>
 	</issueManagement>
-
-	<!-- <ciManagement> <system>continuum</system> <url>http://127.0.0.1:8080/continuum</url> <notifiers> <notifier> <type>mail</type> 
-		<sendOnError>true</sendOnError> <sendOnFailure>true</sendOnFailure> <sendOnSuccess>false</sendOnSuccess> <sendOnWarning>false</sendOnWarning> 
-		<configuration><address>continuum@127.0.0.1</address></configuration> </notifier> </notifiers> </ciManagement> <mailingLists> 
-		<mailingList> <name>User List</name> <subscribe>user-subscribe@127.0.0.1</subscribe> <unsubscribe>user-unsubscribe@127.0.0.1</unsubscribe> 
-		<post>user@127.0.0.1</post> <archive>http://127.0.0.1/user/</archive> <otherArchives> <otherArchive>http://base.google.com/base/1/127.0.0.1</otherArchive> 
-		</otherArchives> </mailingList> </mailingLists> -->
 
 	<scm>
 		<connection>scm:git:https://github.com/eitch/ch.eitchnet.xmlpers.git</connection>
@@ -63,46 +34,11 @@
 		<url>https://github.com/eitch/ch.eitchnet.xmlpers</url>
 	</scm>
 
-	<!-- <repositories> <repository> <releases> <enabled>false</enabled> <updatePolicy>always</updatePolicy> <checksumPolicy>warn</checksumPolicy> 
-		</releases> <snapshots> <enabled>true</enabled> <updatePolicy>never</updatePolicy> <checksumPolicy>fail</checksumPolicy> 
-		</snapshots> <id>codehausSnapshots</id> <name>Codehaus Snapshots</name> <url>http://snapshots.maven.codehaus.org/maven2</url> 
-		<layout>default</layout> </repository> </repositories> <pluginRepositories> ... </pluginRepositories> -->
-
-	<distributionManagement>
-		<repository>
-			<id>deployment</id>
-			<name>Internal Releases</name>
-			<url>http://nexus.eitchnet.ch/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>deployment</id>
-			<name>Internal Releases</name>
-			<url>http://nexus.eitchnet.ch/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.10</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>ch.eitchnet</groupId>
 			<artifactId>ch.eitchnet.utils</artifactId>
 			<version>0.2.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.2</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -112,60 +48,22 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<downloadJavadocs>true</downloadJavadocs>
-					<downloadSources>true</downloadSources>
-				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-							<!--mainClass>ch.eitchnet.App</mainClass -->
-						</manifest>
-					</archive>
-				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>2.3</version>
-				<configuration>
-					<outputEncoding>UTF-8</outputEncoding>
-				</configuration>
 			</plugin>
 
 		</plugins>
