@@ -57,6 +57,7 @@ public class ObjectDao {
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
 		ctx.setObject(object);
+		ctx.getObjectRef().lock();
 		this.objectFilter.add(object.getClass().getName(), ctx);
 	}
 
@@ -67,6 +68,7 @@ public class ObjectDao {
 			for (T object : objects) {
 				PersistenceContext<T> ctx = createCtx(object);
 				ctx.setObject(object);
+				ctx.getObjectRef().lock();
 				this.objectFilter.add(object.getClass().getName(), ctx);
 			}
 		}
@@ -77,6 +79,7 @@ public class ObjectDao {
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
 		ctx.setObject(object);
+		ctx.getObjectRef().lock();
 		this.objectFilter.update(object.getClass().getName(), ctx);
 	}
 
@@ -87,6 +90,7 @@ public class ObjectDao {
 			for (T object : objects) {
 				PersistenceContext<T> ctx = createCtx(object);
 				ctx.setObject(object);
+				ctx.getObjectRef().lock();
 				this.objectFilter.update(object.getClass().getName(), ctx);
 			}
 		}
@@ -97,6 +101,7 @@ public class ObjectDao {
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
 		ctx.setObject(object);
+		ctx.getObjectRef().lock();
 		this.objectFilter.remove(object.getClass().getName(), ctx);
 	}
 
@@ -107,6 +112,7 @@ public class ObjectDao {
 			for (T object : objects) {
 				PersistenceContext<T> ctx = createCtx(object);
 				ctx.setObject(object);
+				ctx.getObjectRef().lock();
 				this.objectFilter.remove(object.getClass().getName(), ctx);
 			}
 		}
@@ -116,6 +122,7 @@ public class ObjectDao {
 		assertNotClosed();
 		assertIsIdRef(objectRef);
 		PersistenceContext<T> ctx = createCtx(objectRef);
+		ctx.getObjectRef().lock();
 		this.objectFilter.remove(objectRef.getType(), ctx);
 	}
 
@@ -124,60 +131,99 @@ public class ObjectDao {
 		assertIsNotIdRef(parentRef);
 		assertIsNotRootRef(parentRef);
 
-		Set<String> keySet = queryKeySet(parentRef);
-		for (String id : keySet) {
+		parentRef.lock();
+		try {
 
-			ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
-			PersistenceContext<T> ctx = createCtx(childRef);
-			this.objectFilter.remove(childRef.getType(), ctx);
+			Set<String> keySet = queryKeySet(parentRef);
+			for (String id : keySet) {
+
+				ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
+				PersistenceContext<T> ctx = createCtx(childRef);
+				ctx.getObjectRef().lock();
+				this.objectFilter.remove(childRef.getType(), ctx);
+			}
+		} finally {
+			parentRef.unlock();
 		}
 	}
 
 	public <T> T queryById(ObjectRef objectRef) {
 		assertNotClosed();
 		assertIsIdRef(objectRef);
-		PersistenceContext<T> ctx = objectRef.<T> createPersistenceContext(this.tx);
-		this.fileDao.performRead(ctx);
-		return ctx.getObject();
+
+		objectRef.lock();
+		try {
+			PersistenceContext<T> ctx = objectRef.<T> createPersistenceContext(this.tx);
+			ctx.getObjectRef().lock();
+			try {
+				this.fileDao.performRead(ctx);
+				return ctx.getObject();
+			} finally {
+				ctx.getObjectRef().unlock();
+			}
+		} finally {
+			objectRef.unlock();
+		}
 	}
 
 	public <T> List<T> queryAll(ObjectRef parentRef) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
-		MetadataDao metadataDao = this.tx.getMetadataDao();
-		Set<String> keySet = metadataDao.queryKeySet(parentRef);
+		parentRef.lock();
+		try {
 
-		List<T> result = new ArrayList<>();
-		for (String id : keySet) {
+			MetadataDao metadataDao = this.tx.getMetadataDao();
+			Set<String> keySet = metadataDao.queryKeySet(parentRef);
 
-			ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
-			PersistenceContext<T> childCtx = childRef.createPersistenceContext(this.tx);
+			List<T> result = new ArrayList<>();
+			for (String id : keySet) {
 
-			this.fileDao.performRead(childCtx);
-			assertObjectRead(childCtx);
-			result.add(childCtx.getObject());
+				ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
+				PersistenceContext<T> childCtx = childRef.createPersistenceContext(this.tx);
+				childCtx.getObjectRef().lock();
+				try {
+					this.fileDao.performRead(childCtx);
+					assertObjectRead(childCtx);
+					result.add(childCtx.getObject());
+				} finally {
+					childCtx.getObjectRef().unlock();
+				}
+			}
+
+			return result;
+
+		} finally {
+			parentRef.unlock();
 		}
-
-		return result;
 	}
 
 	public <T> Set<String> queryKeySet(ObjectRef parentRef) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
-		MetadataDao metadataDao = this.tx.getMetadataDao();
-		Set<String> keySet = metadataDao.queryKeySet(parentRef);
-		return keySet;
+		parentRef.lock();
+		try {
+			MetadataDao metadataDao = this.tx.getMetadataDao();
+			Set<String> keySet = metadataDao.queryKeySet(parentRef);
+			return keySet;
+		} finally {
+			parentRef.unlock();
+		}
 	}
 
 	public <T> long querySize(ObjectRef parentRef) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
-		MetadataDao metadataDao = this.tx.getMetadataDao();
-		long size = metadataDao.querySize(parentRef);
-		return size;
+		parentRef.lock();
+		try {
+			MetadataDao metadataDao = this.tx.getMetadataDao();
+			long size = metadataDao.querySize(parentRef);
+			return size;
+		} finally {
+			parentRef.unlock();
+		}
 	}
 
 	private <T> PersistenceContext<T> createCtx(T object) {

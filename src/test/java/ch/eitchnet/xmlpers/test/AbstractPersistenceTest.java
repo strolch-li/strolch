@@ -3,6 +3,9 @@ package ch.eitchnet.xmlpers.test;
 import java.io.File;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.eitchnet.utils.helper.FileHelper;
 import ch.eitchnet.xmlpers.api.IoMode;
 import ch.eitchnet.xmlpers.api.PersistenceConstants;
@@ -15,6 +18,8 @@ import ch.eitchnet.xmlpers.test.model.Book;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
 public abstract class AbstractPersistenceTest {
+
+	protected static final Logger logger = LoggerFactory.getLogger(AbstractPersistenceTest.class);
 
 	protected PersistenceManager persistenceManager;
 

@@ -33,4 +33,5 @@ public class PersistenceConstants {
 	public static final String PROP_BASEPATH = PROP_PREFIX + "basePath";
 	public static final String PROP_DAO_FACTORY_CLASS = PROP_PREFIX + "daoFactoryClass";
 	public static final String PROP_XML_IO_MOD = PROP_PREFIX + "ioMode";
+	public static final String PROP_XML_LOCK_TIME_MILLIS = PROP_PREFIX + "lockTimeSeconds";
 }

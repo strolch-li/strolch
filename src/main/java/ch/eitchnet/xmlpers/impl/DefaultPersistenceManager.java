@@ -22,6 +22,7 @@
 package ch.eitchnet.xmlpers.impl;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +38,7 @@ import ch.eitchnet.xmlpers.api.PersistenceContextFactoryDelegator;
 import ch.eitchnet.xmlpers.api.PersistenceManager;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.api.XmlPersistenceException;
+import ch.eitchnet.xmlpers.objref.LockableObject;
 import ch.eitchnet.xmlpers.objref.ObjectReferenceCache;
 
 /**
@@ -60,12 +62,23 @@ public class DefaultPersistenceManager implements PersistenceManager {
 
 		String context = DefaultPersistenceManager.class.getSimpleName();
 
-		// get verbose flag
+		// get properties
 		boolean verbose = PropertiesHelper.getPropertyBool(properties, context, PersistenceConstants.PROP_VERBOSE,
 				Boolean.FALSE).booleanValue();
 		String ioModeS = PropertiesHelper.getProperty(properties, context, PersistenceConstants.PROP_XML_IO_MOD,
 				IoMode.DOM.name());
 		IoMode ioMode = IoMode.valueOf(ioModeS);
+		long lockTime = PropertiesHelper.getPropertyLong(properties, context,
+				PersistenceConstants.PROP_XML_LOCK_TIME_MILLIS, 10000L);
+
+		// set lock time on LockableObject
+		try {
+			Field lockTimeField = LockableObject.class.getDeclaredField("tryLockTime");//$NON-NLS-1$
+			lockTimeField.setAccessible(true);
+			lockTimeField.setLong(null, lockTime);
+		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
+			throw new RuntimeException("Failed to configure tryLockTime on LockableObject!", e); //$NON-NLS-1$
+		}
 
 		// validate base path
 		validateBasePath(properties);

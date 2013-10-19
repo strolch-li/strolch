@@ -112,6 +112,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			throw new IllegalStateException("Transaction has already been committed!"); //$NON-NLS-1$
 
 		if (!this.closed) {
+			unlockObjectRefs();
 			this.closed = true;
 			this.objectFilter.clearCache();
 		}
@@ -124,13 +125,12 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 		try {
 
-			Set<String> keySet = this.objectFilter.keySet();
-
 			if (this.verbose) {
 				String msg = "Committing {0} operations in TX...";//$NON-NLS-1$
-				logger.info(MessageFormat.format(msg, keySet.size()));
+				logger.info(MessageFormat.format(msg, this.objectFilter.sizeCache()));
 			}
 
+			Set<String> keySet = this.objectFilter.keySet();
 			for (String key : keySet) {
 
 				List<Object> removed = this.objectFilter.getRemoved(key);
@@ -191,8 +191,17 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 		} finally {
 			// clean up
+			unlockObjectRefs();
 			this.objectFilter.clearCache();
 			this.committed = true;
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void unlockObjectRefs() {
+		List<PersistenceContext> lockedObjects = this.objectFilter.getAll(PersistenceContext.class);
+		for (PersistenceContext lockedObject : lockedObjects) {
+			lockedObject.getObjectRef().unlock();
 		}
 	}
 

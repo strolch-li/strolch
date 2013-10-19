@@ -52,6 +52,10 @@ public class ModelBuilder {
 	public static Resource createResource() {
 		return createResource(RES_ID, RES_NAME, RES_TYPE);
 	}
+	
+	public static Resource createResource(String id) {
+		return createResource(id, RES_NAME, RES_TYPE);
+	}
 
 	public static Resource createResource(String id, String name, String type) {
 		Resource resource = new Resource(id, name, type);

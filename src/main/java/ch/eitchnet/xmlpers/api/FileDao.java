@@ -112,33 +112,41 @@ public class FileDao {
 			throw new IllegalArgumentException("IdRefs don't reference directories!"); //$NON-NLS-1$
 		}
 
-		File directoryPath = objectRef.getPath(this.pathBuilder);
-		if (!directoryPath.isDirectory()) {
-			String msg = "The path for {0} is not a directory: {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, objectRef.getName(), directoryPath.getAbsolutePath());
-			throw new IllegalArgumentException(msg);
+		objectRef.lock();
+
+		try {
+
+			File directoryPath = objectRef.getPath(this.pathBuilder);
+			if (!directoryPath.isDirectory()) {
+				String msg = "The path for {0} is not a directory: {1}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, objectRef.getName(), directoryPath.getAbsolutePath());
+				throw new IllegalArgumentException(msg);
+			}
+
+			// stop if empty
+			if (directoryPath.list().length != 0)
+				return;
+
+			// delete
+			if (!directoryPath.delete()) {
+				String msg = "Deletion of empty directory for {0} at {1} failed! Check file permissions!"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, objectRef.getName(), directoryPath.getAbsolutePath());
+				throw new XmlPersistenceException(msg);
+			}
+
+			// log
+			if (this.verbose) {
+				String msg = "Deleted empty directory for {0} at {1}"; //$NON-NLS-1$
+				logger.info(MessageFormat.format(msg, objectRef.getName(), directoryPath));
+			}
+
+			// recursively delete
+			ObjectRef parent = objectRef.getParent(this.tx);
+			deleteEmptyDirectories(parent);
+
+		} finally {
+			objectRef.unlock();
 		}
-
-		// stop if empty
-		if (directoryPath.list().length != 0)
-			return;
-
-		// delete
-		if (!directoryPath.delete()) {
-			String msg = "Deletion of empty directory for {0} at {1} failed! Check file permissions!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, objectRef.getName(), directoryPath.getAbsolutePath());
-			throw new XmlPersistenceException(msg);
-		}
-
-		// log
-		if (this.verbose) {
-			String msg = "Deleted empty directory for {0} at {1}"; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, objectRef.getName(), directoryPath));
-		}
-
-		// recursively delete
-		ObjectRef parent = objectRef.getParent(this.tx);
-		deleteEmptyDirectories(parent);
 	}
 
 	private void logPath(IoOperation operation, File path, ObjectRef objectRef) {
@@ -150,11 +158,17 @@ public class FileDao {
 	}
 
 	private void createMissingParents(File path, ObjectRef objectRef) {
-		File parentFile = path.getParentFile();
-		if (!parentFile.exists() && !parentFile.mkdirs()) {
-			String msg = "Could not create parent path for {0} at {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
-			throw new XmlPersistenceException(msg);
+		ObjectRef parentRef = objectRef.getParent(this.tx);
+		parentRef.lock();
+		try {
+			File parentFile = parentRef.getPath(this.pathBuilder);
+			if (!parentFile.exists() && !parentFile.mkdirs()) {
+				String msg = "Could not create parent path for {0} at {1}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
+				throw new XmlPersistenceException(msg);
+			}
+		} finally {
+			parentRef.unlock();
 		}
 	}
 
