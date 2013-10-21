@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.PropertiesHelper;
+import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.xmlpers.api.IoMode;
 import ch.eitchnet.xmlpers.api.PersistenceConstants;
 import ch.eitchnet.xmlpers.api.PersistenceContextFactoryDelegator;
@@ -69,13 +70,14 @@ public class DefaultPersistenceManager implements PersistenceManager {
 				IoMode.DOM.name());
 		IoMode ioMode = IoMode.valueOf(ioModeS);
 		long lockTime = PropertiesHelper.getPropertyLong(properties, context,
-				PersistenceConstants.PROP_XML_LOCK_TIME_MILLIS, 10000L);
+				PersistenceConstants.PROP_LOCK_TIME_MILLIS, 10000L);
 
 		// set lock time on LockableObject
 		try {
 			Field lockTimeField = LockableObject.class.getDeclaredField("tryLockTime");//$NON-NLS-1$
 			lockTimeField.setAccessible(true);
 			lockTimeField.setLong(null, lockTime);
+			logger.info("Using a max lock acquire time of " + StringHelper.formatMillisecondsDuration(lockTime)); //$NON-NLS-1$
 		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
 			throw new RuntimeException("Failed to configure tryLockTime on LockableObject!", e); //$NON-NLS-1$
 		}

@@ -21,8 +21,12 @@
  */
 package ch.eitchnet.xmlpers.test;
 
+import static ch.eitchnet.xmlpers.test.impl.TestConstants.TYPE_RES;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.RES_TYPE;
 import static ch.eitchnet.xmlpers.test.model.ModelBuilder.createResource;
+import static ch.eitchnet.xmlpers.test.model.ModelBuilder.updateResource;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +39,7 @@ import org.junit.Test;
 import ch.eitchnet.xmlpers.api.IoMode;
 import ch.eitchnet.xmlpers.api.PersistenceConstants;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
+import ch.eitchnet.xmlpers.objref.IdOfSubTypeRef;
 import ch.eitchnet.xmlpers.objref.LockableObject;
 import ch.eitchnet.xmlpers.test.model.Resource;
 
@@ -46,7 +51,8 @@ public class LockingTest extends AbstractPersistenceTest {
 
 	private static final String BASE_PATH = "target/db/LockingTest/"; //$NON-NLS-1$
 
-	long waitForWorkersTime = LockableObject.getLockTime() + 2000L;
+	private long waitForWorkersTime;
+	private boolean run;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -57,18 +63,21 @@ public class LockingTest extends AbstractPersistenceTest {
 	public void before() {
 		Properties properties = new Properties();
 		properties.setProperty(PersistenceConstants.PROP_BASEPATH, BASE_PATH + IoMode.DOM.name());
+		properties.setProperty(PersistenceConstants.PROP_LOCK_TIME_MILLIS, Long.toString(500L));
 		setup(properties);
+
+		this.waitForWorkersTime = LockableObject.getLockTime() + (long) ((double) this.getWaitForWorkersTime() * .2);
 	}
 
 	@Test
 	public void shouldLockObjects() throws InterruptedException {
 
-		List<Worker> workers = new ArrayList<>(5);
+		List<CreateResourceWorker> workers = new ArrayList<>(5);
 
+		String resoureId = "worker"; //$NON-NLS-1$
 		for (int i = 0; i < 5; i++) {
-
-			String workerName = "worker_" + i; //$NON-NLS-1$
-			Worker worker = new Worker(workerName, workerName);
+			String workerName = resoureId + "_" + i; //$NON-NLS-1$
+			CreateResourceWorker worker = new CreateResourceWorker(workerName, workerName);
 			worker.start();
 			workers.add(worker);
 			logger.info("Setup thread " + worker.getName()); //$NON-NLS-1$
@@ -80,14 +89,13 @@ public class LockingTest extends AbstractPersistenceTest {
 	}
 
 	@Test
-	public void shouldFailIfLockNotAcquirable() throws InterruptedException {
+	public void shouldFailIfResourceAlreadyExists() throws InterruptedException {
 
-		List<Worker> workers = new ArrayList<>(5);
+		List<CreateResourceWorker> workers = new ArrayList<>(5);
 
+		String resourceId = "createWorkerRes"; //$NON-NLS-1$
 		for (int i = 0; i < 5; i++) {
-
-			String workerName = "workerRes"; //$NON-NLS-1$
-			Worker worker = new Worker(workerName, workerName);
+			CreateResourceWorker worker = new CreateResourceWorker(resourceId, resourceId);
 			worker.start();
 			workers.add(worker);
 			logger.info("Setup thread " + worker.getName()); //$NON-NLS-1$
@@ -98,18 +106,41 @@ public class LockingTest extends AbstractPersistenceTest {
 		assertEquals("Only one thread should be able to perform the TX!", 1, nrOfSuccess); //$NON-NLS-1$
 	}
 
-	private int runWorkers(List<Worker> workers) throws InterruptedException {
+	@Test
+	public void shouldFailUpdateIfLockNotAcquirable() throws InterruptedException {
 
-		synchronized (this) {
-			this.notifyAll();
+		// prepare workers
+		List<UpdateResourceWorker> workers = new ArrayList<>(5);
+		String resourceId = "updatWorkerRes"; //$NON-NLS-1$
+		for (int i = 0; i < 5; i++) {
+			String workerName = resourceId + "_" + i; //$NON-NLS-1$
+			UpdateResourceWorker worker = new UpdateResourceWorker(workerName, resourceId);
+			worker.start();
+			workers.add(worker);
+			logger.info("Setup thread " + worker.getName()); //$NON-NLS-1$
 		}
 
-		for (Worker worker : workers) {
-			worker.join(this.waitForWorkersTime + 2000L);
+		// create resource which is to be updated
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			Resource resource = createResource(resourceId);
+			tx.getObjectDao().add(resource);
+		}
+
+		int nrOfSuccess = runWorkers(workers);
+
+		assertEquals("Only one thread should be able to perform the TX!", 1, nrOfSuccess); //$NON-NLS-1$
+	}
+
+	private int runWorkers(List<? extends AbstractWorker> workers) throws InterruptedException {
+
+		this.setRun(true);
+
+		for (AbstractWorker worker : workers) {
+			worker.join(this.getWaitForWorkersTime() + 2000L);
 		}
 
 		int nrOfSuccess = 0;
-		for (Worker worker : workers) {
+		for (AbstractWorker worker : workers) {
 			if (worker.isSuccess())
 				nrOfSuccess++;
 		}
@@ -117,22 +148,34 @@ public class LockingTest extends AbstractPersistenceTest {
 		return nrOfSuccess;
 	}
 
-	public class Worker extends Thread {
+	public long getWaitForWorkersTime() {
+		return this.waitForWorkersTime;
+	}
 
-		private boolean success;
-		private String resourceId;
+	public boolean isRun() {
+		return this.run;
+	}
 
-		public Worker(String name, String resourceId) {
+	public void setRun(boolean run) {
+		this.run = run;
+	}
+
+	public abstract class AbstractWorker extends Thread {
+
+		protected boolean success;
+		protected String resourceId;
+
+		public AbstractWorker(String name, String resourceId) {
 			super(name);
 			this.resourceId = resourceId;
 		}
 
 		public void run() {
 
-			synchronized (LockingTest.this) {
+			logger.info("Waiting for ok to work..."); //$NON-NLS-1$
+			while (!LockingTest.this.isRun()) {
 				try {
-					logger.info("Waiting for ok to work..."); //$NON-NLS-1$
-					LockingTest.this.wait();
+					Thread.sleep(10L);
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e);
 				}
@@ -140,23 +183,55 @@ public class LockingTest extends AbstractPersistenceTest {
 
 			logger.info("Starting work..."); //$NON-NLS-1$
 			try (PersistenceTransaction tx = LockingTest.this.persistenceManager.openTx()) {
+				doWork(tx);
 
-				Resource resource = createResource(this.resourceId);
-				tx.getObjectDao().add(resource);
-			}
-			this.success = true;
+				try {
+					Thread.sleep(getWaitForWorkersTime());
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
 
-			try {
-				Thread.sleep(LockingTest.this.waitForWorkersTime);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
+				this.success = true;
 			}
 
 			logger.info("Work completed."); //$NON-NLS-1$
 		}
 
+		protected abstract void doWork(PersistenceTransaction tx);
+
 		public boolean isSuccess() {
 			return this.success;
+		}
+	}
+
+	public class CreateResourceWorker extends AbstractWorker {
+
+		public CreateResourceWorker(String name, String resourceId) {
+			super(name, resourceId);
+		}
+
+		@Override
+		protected void doWork(PersistenceTransaction tx) {
+			Resource resource = createResource(this.resourceId);
+			tx.getObjectDao().add(resource);
+		}
+	}
+
+	public class UpdateResourceWorker extends AbstractWorker {
+
+		public UpdateResourceWorker(String name, String resourceId) {
+			super(name, resourceId);
+		}
+
+		@Override
+		protected void doWork(PersistenceTransaction tx) {
+
+			IdOfSubTypeRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, RES_TYPE, this.resourceId);
+			Resource resource = tx.getObjectDao().queryById(objectRef);
+			assertNotNull(resource);
+			updateResource(resource);
+
+			tx.getObjectDao().update(resource);
 		}
 	}
 }
