@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>li.strolch</groupId>
+		<artifactId>li.strolch.parent</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+		<relativePath>../li.strolch.parent</relativePath>
+	</parent>
+
+	<artifactId>li.strolch.module</artifactId>
+	<packaging>pom</packaging>
+	<name>Module build for li.strolch projects</name>
+	<description>Module build to quickly build all li.strolch projects</description>
+
+	<modules>
+        <module>../li.strolch.parent</module>
+        <module>../li.strolch.model</module>
+        <module>../li.strolch.persistence.api</module>
+        <module>../li.strolch.persistence.impl</module>
+        <module>../li.strolch.runtime</module>
+        <module>../li.strolch.service.api</module>
+        <module>../li.strolch.service.impl</module>
+    </modules>
+</project>
