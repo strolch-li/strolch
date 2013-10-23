@@ -20,7 +20,6 @@
         <module>../li.strolch.persistence.api</module>
         <module>../li.strolch.persistence.xml</module>
         <module>../li.strolch.runtime</module>
-        <module>../li.strolch.service.api</module>
-        <module>../li.strolch.service.impl</module>
+        <module>../li.strolch.service</module>
     </modules>
 </project>
