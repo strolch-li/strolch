@@ -17,7 +17,7 @@
  * along with ????????????????.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.command;
+package li.strolch.command;
 
 import ch.eitchnet.privilege.model.Restrictable;
 

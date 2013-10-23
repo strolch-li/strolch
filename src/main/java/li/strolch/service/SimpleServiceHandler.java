@@ -17,14 +17,15 @@
  * along with ????????????????.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.service;
+package li.strolch.service;
+
+import java.text.MessageFormat;
 
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class SimpleServiceHandler {
 
@@ -39,8 +40,8 @@ public class SimpleServiceHandler {
 			return service.doService(argument);
 
 		} catch (Exception e) {
-			String error = "Failed to perform service " + service.getClass().getName() + " due to exception "
-					+ e.getLocalizedMessage();
+			String msg = "Failed to perform service {0} due to exception {1}"; //$NON-NLS-1$
+			String error = MessageFormat.format(msg, service.getClass().getName(), e.getMessage());
 			return ServiceResult.failed(error, e);
 		}
 	}

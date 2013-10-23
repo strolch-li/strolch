@@ -17,7 +17,7 @@
  * along with ????????????????.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.service;
+package li.strolch.service;
 
 import java.io.Serializable;
 
