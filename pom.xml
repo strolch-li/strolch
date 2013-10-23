@@ -18,7 +18,7 @@
         <module>../li.strolch.parent</module>
         <module>../li.strolch.model</module>
         <module>../li.strolch.persistence.api</module>
-        <module>../li.strolch.persistence.impl</module>
+        <module>../li.strolch.persistence.xml</module>
         <module>../li.strolch.runtime</module>
         <module>../li.strolch.service.api</module>
         <module>../li.strolch.service.impl</module>
