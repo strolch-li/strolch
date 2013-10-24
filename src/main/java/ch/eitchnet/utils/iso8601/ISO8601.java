@@ -6,7 +6,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
 @SuppressWarnings("nls")
 public class ISO8601 implements DateFormat {
 
-	private static final Logger logger = Logger.getLogger(ISO8601.class);
+	private static final Logger logger = LoggerFactory.getLogger(ISO8601.class);
 
 	/**
 	 * misc. numeric formats used in formatting
@@ -234,7 +235,7 @@ public class ISO8601 implements DateFormat {
 			cal.setTime(date);
 			return format(cal);
 		} catch (Exception e) {
-			logger.error(e, e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 	}
