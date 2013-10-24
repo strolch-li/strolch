@@ -44,9 +44,9 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	private static final long serialVersionUID = 0L;
 
-	protected boolean hidden;
-	protected String interpretation;
-	protected String uom;
+	protected boolean hidden = false;
+	protected String interpretation = INTERPRETATION_NONE;
+	protected String uom = UOM_NONE;
 
 	protected ParameterizedElement parent;
 
@@ -149,18 +149,18 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		}
 
 		String interpretation = element.getAttribute(Tags.INTERPRETATION);
-		String isHidden = element.getAttribute(Tags.HIDDEN);
+		String hidden = element.getAttribute(Tags.HIDDEN);
 		String uom = element.getAttribute(Tags.UOM);
 
 		setInterpretation(interpretation);
 		setUom(uom);
 
-		if (isHidden == null) {
+		if (StringHelper.isEmpty(hidden)) {
 			setHidden(false);
 		} else {
-			if (isHidden.equalsIgnoreCase(Boolean.TRUE.toString())) {
+			if (hidden.equalsIgnoreCase(Boolean.TRUE.toString())) {
 				setHidden(true);
-			} else if (isHidden.equalsIgnoreCase(Boolean.FALSE.toString())) {
+			} else if (hidden.equalsIgnoreCase(Boolean.FALSE.toString())) {
 				setHidden(false);
 			} else {
 				String msg = "Boolean string must be either {0} or {1}"; //$NON-NLS-1$

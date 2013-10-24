@@ -71,9 +71,9 @@ public interface Parameter<T> extends StrolchElement {
 	/**
 	 * the value of the parameter
 	 * 
-	 * @param obj
+	 * @param value
 	 */
-	public void setValue(T obj);
+	public void setValue(T value);
 
 	/**
 	 * get the hidden attribute

@@ -26,6 +26,8 @@ import li.strolch.model.Locator.LocatorBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+
 /**
  * The Order is an object used in the EDF to transfer data from one range to another. Orders are not to be thought of as
  * Resources. Resources are supposed to be thought of as things i.e. a table, a machine and so forth, where a order is
@@ -92,11 +94,10 @@ public class Order extends GroupedParameterizedElement {
 		String date = element.getAttribute(Tags.DATE);
 		String state = element.getAttribute(Tags.STATE);
 
-		// TODO the format should be globally configured
 		if (date == null || date.isEmpty()) {
 			setDate(0);
 		} else {
-			setDate(Long.parseLong(date));
+			setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse(date));
 		}
 
 		if (state == null || state.isEmpty()) {
@@ -142,8 +143,7 @@ public class Order extends GroupedParameterizedElement {
 		Element orderElement = doc.createElement(Tags.ORDER);
 		fillElement(orderElement);
 
-		// TODO the format should be globally configured
-		orderElement.setAttribute(Tags.DATE, Long.toString(this.date));
+		orderElement.setAttribute(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(this.date));
 		orderElement.setAttribute(Tags.STATE, this.state.toString());
 
 		return orderElement;
@@ -187,9 +187,8 @@ public class Order extends GroupedParameterizedElement {
 		builder.append(this.type);
 		builder.append(", state=");
 		builder.append(this.state);
-		// TODO the format should be globally configured
 		builder.append(", date=");
-		builder.append(this.date);
+		builder.append(ISO8601FormatFactory.getInstance().formatDate(this.date));
 		builder.append("]");
 
 		return builder.toString();

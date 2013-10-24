@@ -21,14 +21,15 @@
  */
 package li.strolch.model.parameter;
 
-import java.text.DateFormat;
 import java.text.MessageFormat;
-
-import org.w3c.dom.Element;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
+
+import org.w3c.dom.Element;
+
 import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -73,14 +74,12 @@ public class DateParameter extends AbstractParameter<Long> {
 			throw new StrolchException(msg);
 		}
 
-		setValue(Long.valueOf(valueS));
+		setValue(ISO8601FormatFactory.getInstance().getDateFormat().parse(valueS));
 	}
 
 	@Override
 	public String getValueAsString() {
-		// TODO the format should be globally configured
-		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-		return dateFormat.format(this.value);
+		return ISO8601FormatFactory.getInstance().formatDate(this.value);
 	}
 
 	@Override

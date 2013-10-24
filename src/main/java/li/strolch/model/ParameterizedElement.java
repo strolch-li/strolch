@@ -38,6 +38,7 @@ import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 
 import org.w3c.dom.Element;
@@ -238,6 +239,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 				addParameter(param);
 			} else if (paramtype.equals(BooleanParameter.TYPE)) {
 				BooleanParameter param = new BooleanParameter(paramElement);
+				addParameter(param);
+			} else if (paramtype.equals(StringListParameter.TYPE)) {
+				StringListParameter param = new StringListParameter(paramElement);
 				addParameter(param);
 			} else {
 				String msg = "What kind of parameter is this: {0}"; //$NON-NLS-1$
