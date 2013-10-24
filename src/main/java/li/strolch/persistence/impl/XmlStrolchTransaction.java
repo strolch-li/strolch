@@ -12,6 +12,7 @@ public class XmlStrolchTransaction implements StrolchTransaction {
 
 	public XmlStrolchTransaction(PersistenceTransaction tx) {
 		this.tx = tx;
+		this.closeStrategy = TransactionCloseStrategy.COMMIT;
 	}
 
 	PersistenceTransaction getTx() {

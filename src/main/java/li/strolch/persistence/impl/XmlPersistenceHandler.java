@@ -23,10 +23,18 @@ package li.strolch.persistence.impl;
 
 import java.util.Properties;
 
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
+import li.strolch.model.Tags;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.impl.model.OrderContextFactory;
+import li.strolch.persistence.impl.model.ResourceContextFactory;
+import li.strolch.runtime.ComponentConfiguration;
+import ch.eitchnet.xmlpers.api.IoMode;
+import ch.eitchnet.xmlpers.api.PersistenceConstants;
 import ch.eitchnet.xmlpers.api.PersistenceManager;
 import ch.eitchnet.xmlpers.api.PersistenceManagerLoader;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
@@ -35,20 +43,35 @@ import ch.eitchnet.xmlpers.api.PersistenceTransaction;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class StrolchPersistenceHandlerImpl implements StrolchPersistenceHandler {
+public class XmlPersistenceHandler implements StrolchPersistenceHandler {
 
+	public static final String DB_STORE_PATH = "dbStore/"; //$NON-NLS-1$
 	private PersistenceManager persistenceManager;
 
-	public void initialize() {
+	public void initialize(ComponentConfiguration componentConfiguration) {
+
+		String basePath = componentConfiguration.getRuntimeConfiguration().getRootPath();
+		basePath = basePath + DB_STORE_PATH;
+
 		Properties properties = new Properties();
+		properties.setProperty(PersistenceConstants.PROP_VERBOSE, "true"); //$NON-NLS-1$
+		properties.setProperty(PersistenceConstants.PROP_XML_IO_MOD, IoMode.DOM.name());
+		properties.setProperty(PersistenceConstants.PROP_BASEPATH, basePath);
+
 		this.persistenceManager = PersistenceManagerLoader.load(properties);
+
+		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(Resource.class, Tags.RESOURCE,
+				new ResourceContextFactory());
+		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(Order.class, Tags.ORDER,
+				new OrderContextFactory());
 	}
 
 	public StrolchTransaction openTx() {
 		return openTx(PersistenceManager.DEFAULT_REALM);
 	}
 
-	@SuppressWarnings("resource") // caller must close
+	@SuppressWarnings("resource")
+	// caller must close
 	public StrolchTransaction openTx(String realm) {
 		PersistenceTransaction tx = this.persistenceManager.openTx(realm);
 		XmlStrolchTransaction strolchTx = new XmlStrolchTransaction(tx);
@@ -64,5 +87,4 @@ public class StrolchPersistenceHandlerImpl implements StrolchPersistenceHandler 
 	public ResourceDao getResourceDao(StrolchTransaction tx) {
 		return new XmlResourceDao(tx);
 	}
-
 }

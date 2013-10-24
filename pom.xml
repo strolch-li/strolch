@@ -50,6 +50,12 @@
 			<artifactId>ch.eitchnet.xmlpers</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.testbase</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
