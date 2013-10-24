@@ -88,6 +88,11 @@
 			</dependency>
 			<dependency>
 				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.testbase</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
 				<artifactId>li.strolch.persistence.api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
