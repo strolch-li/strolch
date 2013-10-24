@@ -12,7 +12,8 @@ import java.util.SortedSet;
  * @param <T>
  *            the backing value of the timed value object
  */
-public interface ITimeVariable<T extends IValue<?>> {
+@SuppressWarnings("rawtypes")
+public interface ITimeVariable<T extends IValue> {
 
 	/**
 	 * set the value at a point in time to a given time value object
