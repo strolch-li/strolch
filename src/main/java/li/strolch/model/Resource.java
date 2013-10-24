@@ -32,7 +32,6 @@ import li.strolch.model.Locator.LocatorBuilder;
 public class Resource extends GroupedParameterizedElement {
 
 	private static final long serialVersionUID = 0L;
-	public static final String PREFIX_RESOURCE = "ResourcePrefix";
 
 	/**
 	 * Empty constructor
@@ -64,7 +63,7 @@ public class Resource extends GroupedParameterizedElement {
 	@Override
 	public Element toDom(Document doc) {
 
-		Element element = doc.createElement("Resource");
+		Element element = doc.createElement(Tags.RESOURCE);
 		fillElement(element);
 
 		return element;
@@ -81,7 +80,7 @@ public class Resource extends GroupedParameterizedElement {
 
 	@Override
 	protected void fillLocator(LocatorBuilder lb) {
-		lb.append("Resource").append(getId());
+		lb.append(Tags.RESOURCE).append(getId());
 	}
 
 	@Override
@@ -91,6 +90,7 @@ public class Resource extends GroupedParameterizedElement {
 		return lb.build();
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 

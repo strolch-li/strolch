@@ -21,9 +21,12 @@
  */
 package li.strolch.model.parameter;
 
+import java.text.MessageFormat;
+
 import org.w3c.dom.Element;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Tags;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -32,7 +35,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class LongParameter extends AbstractParameter<Long> {
 
-	public static final String TYPE = "Long";
+	public static final String TYPE = "Long"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
 	protected Long value;
@@ -64,9 +67,10 @@ public class LongParameter extends AbstractParameter<Long> {
 	public LongParameter(Element element) {
 		super.fromDom(element);
 
-		String valueS = element.getAttribute("Value");
+		String valueS = element.getAttribute(Tags.VALUE);
 		if (StringHelper.isEmpty(valueS)) {
-			throw new StrolchException("No value defined for " + this.id);
+			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
+			throw new StrolchException(msg);
 		}
 
 		setValue(Long.valueOf(valueS));

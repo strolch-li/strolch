@@ -28,7 +28,6 @@ import org.w3c.dom.Element;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * @param <T>
  */
 public interface StrolchElement extends Serializable, Comparable<StrolchElement> {
 

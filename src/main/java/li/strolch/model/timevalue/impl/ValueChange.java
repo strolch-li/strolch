@@ -12,7 +12,7 @@ import li.strolch.model.timevalue.IValueChange;
 public class ValueChange<T extends IValue> implements IValueChange<T>, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	protected final Long time;
 	protected final T value;
 
@@ -27,19 +27,19 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 
 	@Override
 	public Long getTime() {
-		return time;
+		return this.time;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public T getValue() {
-		return (T) value.getCopy();
+		return (T) this.value.getCopy();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public IValueChange<T> getInverse() {
-		return new ValueChange(time, value.getInverse());
+		return new ValueChange(this.time, this.value.getInverse());
 	}
 
 	@Override
@@ -51,15 +51,15 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 		if (getClass() != obj.getClass())
 			return false;
 		ValueChange<?> other = (ValueChange<?>) obj;
-		if (time == null) {
+		if (this.time == null) {
 			if (other.time != null)
 				return false;
-		} else if (!time.equals(other.time))
+		} else if (!this.time.equals(other.time))
 			return false;
-		if (value == null) {
+		if (this.value == null) {
 			if (other.value != null)
 				return false;
-		} else if (!value.equals(other.value))
+		} else if (!this.value.equals(other.value))
 			return false;
 		return true;
 	}
@@ -68,14 +68,21 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((time == null) ? 0 : time.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		result = prime * result + ((this.time == null) ? 0 : this.time.hashCode());
+		result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
 		return result;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		return "ValueChange [time=" + time + ", value=" + value + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("ValueChange [time=");
+		sb.append(this.time);
+		sb.append(", value=");
+		sb.append(this.value);
+		sb.append("]");
+		return sb.toString();
 	}
 
 }

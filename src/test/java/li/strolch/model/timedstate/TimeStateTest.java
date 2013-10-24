@@ -1,6 +1,8 @@
 package li.strolch.model.timedstate;
 
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.DoubleValue;
@@ -25,69 +27,69 @@ public class TimeStateTest {
 	@Before
 	public void before() {
 
-		final IValueChange<DoubleValue> change1 = new ValueChange<DoubleValue>(t10, expectedValue1);
-		state.applyChange(change1);
+		final IValueChange<DoubleValue> change1 = new ValueChange<DoubleValue>(this.t10, this.expectedValue1);
+		this.state.applyChange(change1);
 
-		final ITimeValue<DoubleValue> stateAt9 = state.getStateAt(9L);
-		Assert.assertNull(stateAt9);
+		final ITimeValue<DoubleValue> stateAt9 = this.state.getStateAt(9L);
+		assertNull(stateAt9);
 
-		final ITimeValue<DoubleValue> stateAt11 = state.getStateAt(11L);
-		Assert.assertNotNull(stateAt11);
-		Assert.assertEquals(true, stateAt11.getValue().matches(expectedValue1));
+		final ITimeValue<DoubleValue> stateAt11 = this.state.getStateAt(11L);
+		assertNotNull(stateAt11);
+		assertEquals(true, stateAt11.getValue().matches(this.expectedValue1));
 
-		final IValueChange<DoubleValue> change2 = new ValueChange<DoubleValue>(t30, expectedValue1);
-		state.applyChange(change2);
+		final IValueChange<DoubleValue> change2 = new ValueChange<DoubleValue>(this.t30, this.expectedValue1);
+		this.state.applyChange(change2);
 
-		final ITimeValue<DoubleValue> stateAt31 = state.getStateAt(31L);
-		Assert.assertNotNull(stateAt31);
-		Assert.assertEquals(true, stateAt31.getValue().matches(expectedValue2));
+		final ITimeValue<DoubleValue> stateAt31 = this.state.getStateAt(31L);
+		assertNotNull(stateAt31);
+		assertEquals(true, stateAt31.getValue().matches(this.expectedValue2));
 	}
 
 	@Test
 	public void testGetNextMatch() {
 
-		ITimeValue<DoubleValue> nextMatch = state.getNextMatch(t0, expectedValue1);
-		Assert.assertNotNull(nextMatch);
-		Assert.assertEquals(t10, nextMatch.getTime());
+		ITimeValue<DoubleValue> nextMatch = this.state.getNextMatch(this.t0, this.expectedValue1);
+		assertNotNull(nextMatch);
+		assertEquals(this.t10, nextMatch.getTime());
 
-		nextMatch = state.getNextMatch(t20, expectedValue1);
-		Assert.assertNull(nextMatch);
+		nextMatch = this.state.getNextMatch(this.t20, this.expectedValue1);
+		assertNull(nextMatch);
 
-		nextMatch = state.getNextMatch(t20, expectedValue2);
-		Assert.assertNotNull(nextMatch);
-		Assert.assertEquals(t30, nextMatch.getTime());
+		nextMatch = this.state.getNextMatch(this.t20, this.expectedValue2);
+		assertNotNull(nextMatch);
+		assertEquals(this.t30, nextMatch.getTime());
 
-		nextMatch = state.getNextMatch(t30, expectedValue2);
-		Assert.assertNotNull(nextMatch);
-		Assert.assertEquals(t30, nextMatch.getTime());
+		nextMatch = this.state.getNextMatch(this.t30, this.expectedValue2);
+		assertNotNull(nextMatch);
+		assertEquals(this.t30, nextMatch.getTime());
 
-		nextMatch = state.getNextMatch(t100, expectedValue1);
-		Assert.assertNull(nextMatch);
+		nextMatch = this.state.getNextMatch(this.t100, this.expectedValue1);
+		assertNull(nextMatch);
 
-		nextMatch = state.getNextMatch(t100, expectedValue2);
-		Assert.assertNull(nextMatch);
+		nextMatch = this.state.getNextMatch(this.t100, this.expectedValue2);
+		assertNull(nextMatch);
 
 	}
 
 	@Test
 	public void testGetPreviousMatch() {
 
-		ITimeValue<DoubleValue> previousMatch = state.getPreviousMatch(t100, expectedValue2);
-		Assert.assertNotNull(previousMatch);
-		Assert.assertEquals(t30, previousMatch.getTime());
+		ITimeValue<DoubleValue> previousMatch = this.state.getPreviousMatch(this.t100, this.expectedValue2);
+		assertNotNull(previousMatch);
+		assertEquals(this.t30, previousMatch.getTime());
 
-		previousMatch = state.getPreviousMatch(t30, expectedValue2);
-		Assert.assertNull(previousMatch);
-		
-		previousMatch = state.getPreviousMatch(t20, expectedValue2);
-		Assert.assertNull(previousMatch);
-		
-		previousMatch = state.getPreviousMatch(t20, expectedValue1);
-		Assert.assertNotNull(previousMatch);
-		Assert.assertEquals(t10, previousMatch.getTime());
-		
-		previousMatch = state.getPreviousMatch(t10, expectedValue1);
-		Assert.assertNull(previousMatch);
+		previousMatch = this.state.getPreviousMatch(this.t30, this.expectedValue2);
+		assertNull(previousMatch);
+
+		previousMatch = this.state.getPreviousMatch(this.t20, this.expectedValue2);
+		assertNull(previousMatch);
+
+		previousMatch = this.state.getPreviousMatch(this.t20, this.expectedValue1);
+		assertNotNull(previousMatch);
+		assertEquals(this.t10, previousMatch.getTime());
+
+		previousMatch = this.state.getPreviousMatch(this.t10, this.expectedValue1);
+		assertNull(previousMatch);
 
 	}
 

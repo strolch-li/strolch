@@ -25,7 +25,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	@Override
 	public ITimeValue<T> getValueAt(final Long time) {
 		ITimeValue<T> tmp = null;
-		for (ITimeValue<T> value : container) {
+		for (ITimeValue<T> value : this.container) {
 			if (value.getTime() <= time) {
 				tmp = value;
 			} else {
@@ -41,25 +41,25 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 		if (current != null && current.getTime().equals(time)) {
 			current.setValue(targetValue);
 		} else {
-			container.add(new TimeValue<T>(time, targetValue));
+			this.container.add(new TimeValue<T>(time, targetValue));
 		}
 	}
 
 	@Override
 	public SortedSet<ITimeValue<T>> getFutureValues(final Long time) {
 		TimeValue<T> picker = new TimeValue<T>(time, null);
-		return new TreeSet<ITimeValue<T>>(container.tailSet(picker));
+		return new TreeSet<ITimeValue<T>>(this.container.tailSet(picker));
 	}
 
 	@Override
 	public Collection<ITimeValue<T>> getPastValues(final Long time) {
 		TimeValue<T> picker = new TimeValue<T>(time, null);
-		return new TreeSet<ITimeValue<T>>(container.headSet(picker));
+		return new TreeSet<ITimeValue<T>>(this.container.headSet(picker));
 	}
 	
 	@Override
 	public SortedSet<ITimeValue<T>> getValues() {
-		return new TreeSet<ITimeValue<T>>(container);
+		return new TreeSet<ITimeValue<T>>(this.container);
 	}
 
 	@Override
@@ -73,11 +73,11 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 		ITimeValue<T> initialValue = getValueAt(change.getTime());
 		if (initialValue == null) {
 			ITimeValue<T> newValue = new TimeValue<T>(change.getTime(), change.getValue());
-			container.add(newValue);
+			this.container.add(newValue);
 		} else if (initialValue.getTime().longValue() < change.getTime().longValue()) {
 			ITimeValue<T> newValue = new TimeValue<T>(change.getTime(), initialValue.getValue());
 			newValue.add(change.getValue()); 
-			container.add(newValue);
+			this.container.add(newValue);
 		}
 		compact();
 	}
@@ -86,10 +86,10 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	@Override
 	public void compact() {
 
-		if (container.size() < 2)
+		if (this.container.size() < 2)
 			return;
 
-		Iterator<ITimeValue<T>> iterator = container.iterator();
+		Iterator<ITimeValue<T>> iterator = this.container.iterator();
 		ITimeValue<T> predecessor = iterator.next();
 
 		while (iterator.hasNext()) {

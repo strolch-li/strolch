@@ -21,9 +21,13 @@
  */
 package li.strolch.model.parameter;
 
-import org.w3c.dom.Element;
+import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Tags;
+
+import org.w3c.dom.Element;
+
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -32,10 +36,11 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class StringParameter extends AbstractParameter<String> {
 
+	public static final String UNDEFINED_VALUE = "-"; //$NON-NLS-1$
+	public static final String TYPE = "String"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
-	public static final String TYPE = "String";
 
-	private String value = "-";
+	private String value = UNDEFINED_VALUE;
 
 	/**
 	 * Empty constructor
@@ -65,9 +70,10 @@ public class StringParameter extends AbstractParameter<String> {
 	public StringParameter(Element element) {
 		super.fromDom(element);
 
-		String valueS = element.getAttribute("Value");
+		String valueS = element.getAttribute(Tags.VALUE);
 		if (StringHelper.isEmpty(valueS)) {
-			throw new StrolchException("No value defined for " + this.id);
+			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
+			throw new StrolchException(msg);
 		}
 
 		setValue(valueS);

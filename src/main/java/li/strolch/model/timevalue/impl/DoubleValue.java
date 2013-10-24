@@ -40,18 +40,23 @@ public class DoubleValue implements IValue<Double>, Serializable {
 
 	@Override
 	public DoubleValue add(Double o) {
-		value += o;
+		this.value += o;
 		return this;
 	}
 
 	@Override
 	public Double getValue() {
-		return value;
+		return this.value;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		return "DoubleValue [value=" + value + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("DoubleValue [value=");
+		sb.append(this.value);
+		sb.append("]");
+		return sb.toString();
 	}
 
 	@Override
@@ -66,14 +71,14 @@ public class DoubleValue implements IValue<Double>, Serializable {
 
 	@Override
 	public DoubleValue getCopy(){
-		return new DoubleValue(value); 
+		return new DoubleValue(this.value); 
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
 		return result;
 	}
 
@@ -86,10 +91,10 @@ public class DoubleValue implements IValue<Double>, Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		DoubleValue other = (DoubleValue) obj;
-		if (value == null) {
+		if (this.value == null) {
 			if (other.value != null)
 				return false;
-		} else if (!value.equals(other.value))
+		} else if (!this.value.equals(other.value))
 			return false;
 		return true;
 	}

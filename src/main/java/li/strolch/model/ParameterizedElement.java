@@ -21,6 +21,7 @@
  */
 package li.strolch.model;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -87,8 +88,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 *            the type to set
 	 */
 	public void setType(String type) {
-		if (StringHelper.isEmpty(type))
-			throw new StrolchException("Type must be set on element " + getLocator());
+		if (StringHelper.isEmpty(type)) {
+			String msg = "Type may not be empty on element {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, getLocator());
+			throw new StrolchException(msg);
+		}
 
 		this.type = type;
 	}
@@ -193,7 +197,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	@Override
 	public void fillLocator(LocatorBuilder lb) {
-		lb.append("ParameterizedElement").append(this.id);
+		lb.append(Tags.PARAMETERIZED_ELEMENT).append(this.id);
 	}
 
 	@Override
@@ -208,14 +212,14 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	protected void fromDom(Element element) {
 		super.fromDom(element);
 
-		String type = element.getAttribute("Type");
+		String type = element.getAttribute(Tags.TYPE);
 		setType(type);
 
 		// add all the parameters
-		NodeList parameterElements = element.getElementsByTagName("Parameter");
+		NodeList parameterElements = element.getElementsByTagName(Tags.PARAMETER);
 		for (int i = 0; i < parameterElements.getLength(); i++) {
 			Element paramElement = (Element) parameterElements.item(i);
-			String paramtype = paramElement.getAttribute("Type");
+			String paramtype = paramElement.getAttribute(Tags.TYPE);
 
 			if (paramtype.equals(StringParameter.TYPE)) {
 				StringParameter param = new StringParameter(paramElement);
@@ -236,7 +240,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 				BooleanParameter param = new BooleanParameter(paramElement);
 				addParameter(param);
 			} else {
-				throw new StrolchException("What kind of parameter is this: " + paramtype);
+				String msg = "What kind of parameter is this: {0}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, paramtype);
+				throw new StrolchException(msg);
 			}
 		}
 	}
@@ -258,6 +264,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		((ParameterizedElement) clone).setType(this.type);
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 

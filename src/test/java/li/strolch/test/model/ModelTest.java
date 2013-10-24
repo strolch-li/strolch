@@ -1,8 +1,10 @@
 package li.strolch.test.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 
-import junit.framework.Assert;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
@@ -17,6 +19,7 @@ import li.strolch.model.parameter.StringParameter;
 
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class ModelTest {
 
 	@Test
@@ -38,11 +41,11 @@ public class ModelTest {
 
 	public static void validateBag(ParameterBag bag) {
 
-		Assert.assertNotNull(bag);
+		assertNotNull(bag);
 
-		Assert.assertEquals(ModelTestHelper.BAG_ID, bag.getId());
-		Assert.assertEquals(ModelTestHelper.BAG_NAME, bag.getName());
-		Assert.assertEquals(ModelTestHelper.BAG_TYPE, bag.getType());
+		assertEquals(ModelTestHelper.BAG_ID, bag.getId());
+		assertEquals(ModelTestHelper.BAG_NAME, bag.getName());
+		assertEquals(ModelTestHelper.BAG_TYPE, bag.getType());
 
 		validateParams(bag);
 	}
@@ -50,35 +53,35 @@ public class ModelTest {
 	public static void validateParams(ParameterBag bag) {
 
 		BooleanParameter boolParam = bag.getParameter(ModelTestHelper.PARAM_BOOLEAN_ID);
-		Assert.assertNotNull("Boolean Param missing with id " + ModelTestHelper.PARAM_BOOLEAN_ID, boolParam);
-		Assert.assertEquals(true, boolParam.getValue().booleanValue());
+		assertNotNull("Boolean Param missing with id " + ModelTestHelper.PARAM_BOOLEAN_ID, boolParam);
+		assertEquals(true, boolParam.getValue().booleanValue());
 
 		FloatParameter floatParam = bag.getParameter(ModelTestHelper.PARAM_FLOAT_ID);
-		Assert.assertNotNull("Float Param missing with id " + ModelTestHelper.PARAM_FLOAT_ID, floatParam);
-		Assert.assertEquals(44.3, floatParam.getValue().doubleValue());
+		assertNotNull("Float Param missing with id " + ModelTestHelper.PARAM_FLOAT_ID, floatParam);
+		assertEquals(44.3, floatParam.getValue().doubleValue(), 0.0001);
 
 		IntegerParameter integerParam = bag.getParameter(ModelTestHelper.PARAM_INTEGER_ID);
-		Assert.assertNotNull("Integer Param missing with id " + ModelTestHelper.PARAM_INTEGER_ID, integerParam);
-		Assert.assertEquals(77, integerParam.getValue().intValue());
+		assertNotNull("Integer Param missing with id " + ModelTestHelper.PARAM_INTEGER_ID, integerParam);
+		assertEquals(77, integerParam.getValue().intValue());
 
 		LongParameter longParam = bag.getParameter(ModelTestHelper.PARAM_LONG_ID);
-		Assert.assertNotNull("Long Param missing with id " + ModelTestHelper.PARAM_LONG_ID, longParam);
-		Assert.assertEquals(4453234566L, longParam.getValue().longValue());
+		assertNotNull("Long Param missing with id " + ModelTestHelper.PARAM_LONG_ID, longParam);
+		assertEquals(4453234566L, longParam.getValue().longValue());
 
 		StringParameter stringParam = bag.getParameter(ModelTestHelper.PARAM_STRING_ID);
-		Assert.assertNotNull("String Param missing with id " + ModelTestHelper.PARAM_STRING_ID, stringParam);
-		Assert.assertEquals("Strolch", stringParam.getValue());
+		assertNotNull("String Param missing with id " + ModelTestHelper.PARAM_STRING_ID, stringParam);
+		assertEquals("Strolch", stringParam.getValue());
 
 		DateParameter dateParam = bag.getParameter(ModelTestHelper.PARAM_DATE_ID);
-		Assert.assertNotNull("Date Param missing with id " + ModelTestHelper.PARAM_DATE_ID, dateParam);
-		Assert.assertEquals(1354295525628L, dateParam.getValue().longValue());
+		assertNotNull("Date Param missing with id " + ModelTestHelper.PARAM_DATE_ID, dateParam);
+		assertEquals(1354295525628L, dateParam.getValue().longValue());
 
 		StringListParameter stringListP = bag.getParameter(ModelTestHelper.PARAM_LIST_STRING_ID);
-		Assert.assertNotNull("StringList Param missing with id " + ModelTestHelper.PARAM_LIST_STRING_ID, stringListP);
+		assertNotNull("StringList Param missing with id " + ModelTestHelper.PARAM_LIST_STRING_ID, stringListP);
 
 		ArrayList<String> stringList = new ArrayList<String>();
 		stringList.add("Hello");
 		stringList.add("World");
-		Assert.assertEquals(stringList, stringListP.getValue());
+		assertEquals(stringList, stringListP.getValue());
 	}
 }

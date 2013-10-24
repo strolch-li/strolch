@@ -24,7 +24,6 @@ package li.strolch.model;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -68,7 +67,7 @@ public class ParameterBag extends ParameterizedElement {
 	@Override
 	public Element toDom(Document doc) {
 
-		Element element = doc.createElement("ParameterBag");
+		Element element = doc.createElement(Tags.PARAMETER_BAG);
 
 		fillElement(element);
 

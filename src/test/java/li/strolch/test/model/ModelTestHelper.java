@@ -40,6 +40,7 @@ import li.strolch.model.parameter.StringParameter;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
+@SuppressWarnings("nls")
 public class ModelTestHelper {
 
 	public static final String PARAM_BOOLEAN_ID = "@param1";

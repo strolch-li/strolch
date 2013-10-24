@@ -21,14 +21,18 @@
  */
 package li.strolch.model.parameter;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.ParameterizedElement;
+import li.strolch.model.Tags;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -113,17 +117,17 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	@Override
 	public Element toDom(Document doc) {
-		Element element = doc.createElement("Parameter");
+		Element element = doc.createElement(Tags.PARAMETER);
 		fillElement(element);
 
-		element.setAttribute("Value", getValueAsString());
+		element.setAttribute(Tags.VALUE, getValueAsString());
 
 		if (!this.interpretation.equals(Parameter.INTERPRETATION_NONE))
-			element.setAttribute("Interpretation", this.interpretation);
+			element.setAttribute(Tags.INTERPRETATION, this.interpretation);
 		if (!this.uom.equals(Parameter.UOM_NONE))
-			element.setAttribute("Uom", this.uom);
+			element.setAttribute(Tags.UOM, this.uom);
 		if (this.hidden)
-			element.setAttribute("Hidden", Boolean.toString(this.hidden));
+			element.setAttribute(Tags.HIDDEN, Boolean.toString(this.hidden));
 
 		return element;
 	}
@@ -133,16 +137,20 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 		super.fromDom(element);
 
-		String typeS = element.getAttribute("Type");
+		String typeS = element.getAttribute(Tags.TYPE);
 		if (StringHelper.isEmpty(typeS)) {
-			throw new StrolchException("Type must be set on element with id " + this.id);
+			String msg = "Type must be set on element with id {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.id);
+			throw new StrolchException(msg);
 		} else if (!typeS.equals(getType())) {
-			throw new StrolchException(getClass().getSimpleName() + " must have type " + getType() + ", not: " + typeS);
+			String msg = "{0} must have type {1}, not: {2}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, getClass().getSimpleName(), getType(), typeS);
+			throw new StrolchException(msg);
 		}
 
-		String interpretation = element.getAttribute("Interpretation");
-		String isHidden = element.getAttribute("Hidden");
-		String uom = element.getAttribute("Uom");
+		String interpretation = element.getAttribute(Tags.INTERPRETATION);
+		String isHidden = element.getAttribute(Tags.HIDDEN);
+		String uom = element.getAttribute(Tags.UOM);
 
 		setInterpretation(interpretation);
 		setUom(uom);
@@ -155,15 +163,16 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 			} else if (isHidden.equalsIgnoreCase(Boolean.FALSE.toString())) {
 				setHidden(false);
 			} else {
-				throw new StrolchException("Boolean string must be either " + Boolean.TRUE.toString() + " or "
-						+ Boolean.FALSE.toString());
+				String msg = "Boolean string must be either {0} or {1}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, Boolean.TRUE.toString(), Boolean.FALSE.toString());
+				throw new StrolchException(msg);
 			}
 		}
 	}
 
 	@Override
 	protected void fillLocator(LocatorBuilder locatorBuilder) {
-		locatorBuilder.append("Parameter").append(this.id);
+		locatorBuilder.append(Tags.PARAMETER).append(this.id);
 	}
 
 	@Override
@@ -184,8 +193,11 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 *             if the value is null
 	 */
 	protected void validateValue(T value) throws StrolchException {
-		if (value == null)
-			throw new StrolchException(getType() + " Parameter " + getId() + " may not have a null value!");
+		if (value == null) {
+			String msg = "{0} Parameter {1} may not have a null value!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, getType(), getId());
+			throw new StrolchException(msg);
+		}
 	}
 
 	/**
@@ -201,6 +213,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		clone.setUom(this.uom);
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 

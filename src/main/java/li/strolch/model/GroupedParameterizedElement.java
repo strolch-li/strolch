@@ -21,6 +21,7 @@
  */
 package li.strolch.model;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,8 +78,11 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *            the type to set
 	 */
 	public void setType(String type) {
-		if (StringHelper.isEmpty(type))
-			throw new StrolchException("Type must be set on element " + getLocator());
+		if (StringHelper.isEmpty(type)) {
+			String msg = "Type may not be empty on element {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, getLocator());
+			throw new StrolchException(msg);
+		}
 
 		this.type = type;
 	}
@@ -120,7 +124,9 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 			this.parameterBagMap = new HashMap<String, ParameterBag>();
 		ParameterBag bag = this.parameterBagMap.get(bagKey);
 		if (bag == null) {
-			throw new StrolchException("No parameter bag exists with key " + bagKey);
+			String msg = "No parameter bag exists with key {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, bagKey);
+			throw new StrolchException(msg);
 		}
 
 		bag.addParameter(parameter);
@@ -225,10 +231,10 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	public void fromDom(Element element) {
 		super.fromDom(element);
 
-		String type = element.getAttribute("Type");
+		String type = element.getAttribute(Tags.TYPE);
 		setType(type);
 
-		NodeList bags = element.getElementsByTagName("ParameterBag");
+		NodeList bags = element.getElementsByTagName(Tags.PARAMETER_BAG);
 		for (int i = 0; i < bags.getLength(); i++) {
 			Element bagElement = (Element) bags.item(i);
 			ParameterBag bag = new ParameterBag(bagElement);

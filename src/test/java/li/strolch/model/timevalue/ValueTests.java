@@ -22,10 +22,9 @@ public class ValueTests {
 		DoubleValue value = new DoubleValue(10.0d);
 		DoubleValue inverse = value.getInverse();
 		assertEquals(Double.valueOf(-10.0d), inverse.getValue());
-		assertEquals(Double.valueOf(0), value.add(inverse.getValue())
-				.getValue());
+		assertEquals(Double.valueOf(0), value.add(inverse.getValue()).getValue());
 	}
-	
+
 	/**
 	 * check, that adding the inverse results in the neutral element (=0)
 	 */
@@ -34,8 +33,7 @@ public class ValueTests {
 		IntegerValue value = new IntegerValue(10);
 		IntegerValue inverse = value.getInverse();
 		assertEquals(Integer.valueOf(-10), inverse.getValue());
-		assertEquals(Integer.valueOf(0), value.add(inverse.getValue())
-				.getValue());
+		assertEquals(Integer.valueOf(0), value.add(inverse.getValue()).getValue());
 	}
 
 	/**
@@ -45,7 +43,7 @@ public class ValueTests {
 	public void testStringSetInverse() {
 		Set<AString> aStrings = new HashSet<AString>();
 		for (int i = 0; i < 10; i++) {
-			aStrings.add(new AString("string " + i));
+			aStrings.add(new AString("string " + i)); //$NON-NLS-1$
 		}
 		IValue<Set<AString>> value = new StringSetValue(aStrings);
 		IValue<Set<AString>> inverse = value.getInverse();
@@ -61,20 +59,19 @@ public class ValueTests {
 
 		Set<AString> aStrings1 = new HashSet<AString>();
 		for (int i = 0; i < 10; i++) {
-			aStrings1.add(new AString("string " + i));
+			aStrings1.add(new AString("string " + i)); //$NON-NLS-1$
 		}
 		IValue<Set<AString>> value1 = new StringSetValue(aStrings1);
 
 		Set<AString> aStrings2 = new HashSet<AString>();
 		for (int i = 0; i < 9; i++) {
-			aStrings2.add(new AString("string " + i, true));
+			aStrings2.add(new AString("string " + i, true)); //$NON-NLS-1$
 		}
 		IValue<Set<AString>> value2 = new StringSetValue(aStrings2);
 
 		assertEquals(false, value1.matches(value2));
 		assertEquals(1, value1.add(value2.getValue()).getValue().size());
-		assertEquals(10, value1.add(value2.getInverse().getValue()).getValue()
-				.size());
+		assertEquals(10, value1.add(value2.getInverse().getValue()).getValue().size());
 	}
 
 }

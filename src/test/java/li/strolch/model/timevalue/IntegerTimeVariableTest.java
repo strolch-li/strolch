@@ -1,11 +1,13 @@
 package li.strolch.model.timevalue;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 
-import junit.framework.Assert;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.TimeVariable;
 import li.strolch.model.timevalue.impl.ValueChange;
@@ -32,19 +34,19 @@ public class IntegerTimeVariableTest {
 	 */
 	@Before
 	public void init() {
-		timeVariable = new TimeVariable<IntegerValue>();
+		this.timeVariable = new TimeVariable<IntegerValue>();
 		for (int i = 0; i < MAX; i += STEP) {
 			IntegerValue expectedValue = new IntegerValue(i);
 			Long time = Long.valueOf(i);
-			expectedValues.put(time, expectedValue);
-			timeVariable.setValueAt(time, expectedValue);
+			this.expectedValues.put(time, expectedValue);
+			this.timeVariable.setValueAt(time, expectedValue);
 		}
 	}
 
 	@Test
 	public void testGetValueAt() {
-		ITimeValue<IntegerValue> valueAt = timeVariable.getValueAt(PICK);
-		Assert.assertEquals(expectedValues.get(PICK), valueAt.getValue());
+		ITimeValue<IntegerValue> valueAt = this.timeVariable.getValueAt(PICK);
+		assertEquals(this.expectedValues.get(PICK), valueAt.getValue());
 	}
 
 	/**
@@ -52,29 +54,28 @@ public class IntegerTimeVariableTest {
 	 */
 	@Test
 	public void testGetFutureValues() {
-		Collection<ITimeValue<IntegerValue>> futureValues = timeVariable.getFutureValues(PICK);
+		Collection<ITimeValue<IntegerValue>> futureValues = this.timeVariable.getFutureValues(PICK);
 		Long expectedTime = PICK;
 		Integer expectedValue = PICK.intValue();
 		for (ITimeValue<IntegerValue> value : futureValues) {
-			Assert.assertEquals(expectedTime, value.getTime());
-			Assert.assertTrue(value.getValue().matches(new IntegerValue(expectedValue)));
+			assertEquals(expectedTime, value.getTime());
+			assertTrue(value.getValue().matches(new IntegerValue(expectedValue)));
 			expectedTime += STEP;
 			expectedValue += STEP.intValue();
 		}
 	}
 
 	/**
-	 * test, that the past values time fields start with 0 and are strictly
-	 * smaller than PICK
+	 * test, that the past values time fields start with 0 and are strictly smaller than PICK
 	 */
 	@Test
 	public void testGetPastValues() {
-		Collection<ITimeValue<IntegerValue>> pastValues = timeVariable.getPastValues(MAX);
+		Collection<ITimeValue<IntegerValue>> pastValues = this.timeVariable.getPastValues(MAX);
 		Long expectedTime = 0L;
 		Integer expectedValue = expectedTime.intValue();
 		for (ITimeValue<IntegerValue> value : pastValues) {
-			Assert.assertEquals(expectedTime, value.getTime());
-			Assert.assertTrue(value.getValue().matches(new IntegerValue(expectedValue)));
+			assertEquals(expectedTime, value.getTime());
+			assertTrue(value.getValue().matches(new IntegerValue(expectedValue)));
 			expectedTime += STEP;
 			expectedValue += STEP.intValue();
 		}
@@ -89,40 +90,39 @@ public class IntegerTimeVariableTest {
 		IntegerValue integerValue = new IntegerValue(STEP.intValue());
 
 		IValueChange<IntegerValue> change = new ValueChange<IntegerValue>(PICK, integerValue);
-		timeVariable.applyChange(change);
+		this.timeVariable.applyChange(change);
 
-		Collection<ITimeValue<IntegerValue>> futureValues = timeVariable.getFutureValues(PICK);
+		Collection<ITimeValue<IntegerValue>> futureValues = this.timeVariable.getFutureValues(PICK);
 		Long expectedTime = PICK;
 
 		IValue<Integer> expectedValue = new IntegerValue(PICK.intValue() + change.getValue().getValue());
 		for (ITimeValue<IntegerValue> value : futureValues) {
-			Assert.assertEquals(expectedTime, value.getTime());
-			Assert.assertTrue(expectedValue.matches(value.getValue()));
+			assertEquals(expectedTime, value.getTime());
+			assertTrue(expectedValue.matches(value.getValue()));
 			expectedTime += STEP;
 			expectedValue = expectedValue.add(STEP.intValue());
 		}
 	}
 
 	/**
-	 * test that successors matching the values of their predecessors are
-	 * removed
+	 * test that successors matching the values of their predecessors are removed
 	 */
 	@Test
 	public void testCompact() {
-		timeVariable = new TimeVariable<IntegerValue>();
+		this.timeVariable = new TimeVariable<IntegerValue>();
 		for (Long i = 0L; i < MAX; i += STEP) {
-			timeVariable.setValueAt(i, new IntegerValue(STEP.intValue()));
+			this.timeVariable.setValueAt(i, new IntegerValue(STEP.intValue()));
 		}
 
 		// call
-		timeVariable.compact();
+		this.timeVariable.compact();
 
 		// check
-		SortedSet<ITimeValue<IntegerValue>> futureValues = timeVariable.getFutureValues(0L);
-		Assert.assertEquals(1, futureValues.size());
+		SortedSet<ITimeValue<IntegerValue>> futureValues = this.timeVariable.getFutureValues(0L);
+		assertEquals(1, futureValues.size());
 
 		ITimeValue<IntegerValue> next = futureValues.iterator().next();
-		Assert.assertEquals(Long.valueOf(0), next.getTime());
+		assertEquals(Long.valueOf(0), next.getTime());
 	}
 
 }

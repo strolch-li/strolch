@@ -25,7 +25,7 @@ public class TimedState<T extends IValue> implements ITimedState<T>, Serializabl
 	@Override
 	@SuppressWarnings("unchecked")
 	public ITimeValue<T> getNextMatch(final Long time, final T value) {
-		Collection<ITimeValue<T>> futureValues = timeVariable.getFutureValues(time);
+		Collection<ITimeValue<T>> futureValues = this.timeVariable.getFutureValues(time);
 		for (ITimeValue<T> iTimeValue : futureValues) {
 			if (iTimeValue.getValue().matches(value)) {
 				return iTimeValue;
@@ -37,7 +37,7 @@ public class TimedState<T extends IValue> implements ITimedState<T>, Serializabl
 	@Override
 	@SuppressWarnings("unchecked")
 	public ITimeValue<T> getPreviousMatch(final Long time, final T value) {
-		Collection<ITimeValue<T>> pastValues = timeVariable.getPastValues(time);
+		Collection<ITimeValue<T>> pastValues = this.timeVariable.getPastValues(time);
 		List<ITimeValue<T>> asList = new ArrayList<ITimeValue<T>>(pastValues);
 		Collections.reverse(asList);
 		for (ITimeValue<T> iTimeValue : asList) {
@@ -50,17 +50,17 @@ public class TimedState<T extends IValue> implements ITimedState<T>, Serializabl
 
 	@Override
 	public void applyChange(final IValueChange<T> change) {
-		timeVariable.applyChange(change);
+		this.timeVariable.applyChange(change);
 	}
 
 	@Override
 	public ITimeValue<T> getStateAt(final Long time) {
-		return timeVariable.getValueAt(time);
+		return this.timeVariable.getValueAt(time);
 	}
 
 	@Override
 	public ITimeVariable<T> getTimeEvolution() {
-		return timeVariable;
+		return this.timeVariable;
 	}
 
 }

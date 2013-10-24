@@ -21,6 +21,8 @@
  */
 package li.strolch.model;
 
+import java.text.MessageFormat;
+
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator.LocatorBuilder;
 
@@ -75,10 +77,10 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	@Override
 	public void setId(String id) {
 		if (id == null)
-			throw new StrolchException("The id may never be null");
+			throw new StrolchException("The id may never be null"); //$NON-NLS-1$
 
 		if (id.isEmpty())
-			throw new StrolchException("The id may never be empty");
+			throw new StrolchException("The id may never be empty"); //$NON-NLS-1$
 
 		this.id = id;
 	}
@@ -113,9 +115,9 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	}
 
 	protected void fillElement(Element element) {
-		element.setAttribute("Id", getId());
-		element.setAttribute("Name", getName());
-		element.setAttribute("Type", getType());
+		element.setAttribute(Tags.ID, getId());
+		element.setAttribute(Tags.NAME, getName());
+		element.setAttribute(Tags.TYPE, getType());
 	}
 
 	/**
@@ -124,15 +126,16 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	 * @param element
 	 */
 	protected void fromDom(Element element) {
-		String id = element.getAttribute("Id");
-		String name = element.getAttribute("Name");
+		String id = element.getAttribute(Tags.ID);
+		String name = element.getAttribute(Tags.NAME);
 
 		if (id != null && name != null) {
 			setId(id);
 			setName(name);
 		} else {
-			throw new StrolchException("Check the values of the element: " + element.getNodeName()
-					+ " either id or name attribute is null!");
+			String msg = "Check the values of the element: {0} either id or name attribute is null!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, element.getNodeName());
+			throw new StrolchException(msg);
 		}
 	}
 

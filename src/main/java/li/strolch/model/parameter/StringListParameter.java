@@ -21,6 +21,7 @@
  */
 package li.strolch.model.parameter;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import org.w3c.dom.Element;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.Tags;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -38,7 +40,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class StringListParameter extends AbstractParameter<List<String>> implements ListParameter<String> {
 
-	public static final String TYPE = "StringList";
+	public static final String TYPE = "StringList"; //$NON-NLS-1$
 	private static final long serialVersionUID = 1L;
 
 	protected List<String> value;
@@ -71,9 +73,10 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	public StringListParameter(Element element) {
 		super.fromDom(element);
 
-		String valueS = element.getAttribute("Value");
+		String valueS = element.getAttribute(Tags.VALUE);
 		if (StringHelper.isEmpty(valueS)) {
-			throw new StrolchException("No value defined for " + this.id);
+			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
+			throw new StrolchException(msg);
 		}
 
 		setValue(parse(valueS));
@@ -83,14 +86,14 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 		if (value.isEmpty())
 			return Collections.emptyList();
 
-		String[] valueArr = value.split(";");
+		String[] valueArr = value.split(VALUE_SEPARATOR);
 		return Arrays.asList(valueArr);
 	}
 
 	@Override
 	public String getValueAsString() {
 		if (this.value.isEmpty())
-			return "";
+			return StringHelper.EMPTY;
 
 		StringBuilder sb = new StringBuilder();
 		Iterator<String> iter = this.value.iterator();
@@ -99,7 +102,7 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 			sb.append(iter.next());
 
 			if (iter.hasNext())
-				sb.append(";");
+				sb.append(VALUE_SEPARATOR);
 		}
 
 		return sb.toString();

@@ -26,23 +26,23 @@ public class AString implements Serializable {
 	}
 
 	public String getString() {
-		return string;
+		return this.string;
 	}
 
 	public boolean isInverse() {
-		return inverse;
+		return this.inverse;
 	}
 
 	public AString getInverse() {
-		return new AString(string, !inverse);
+		return new AString(this.string, !this.inverse);
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (inverse ? 1231 : 1237);
-		result = prime * result + ((string == null) ? 0 : string.hashCode());
+		result = prime * result + (this.inverse ? 1231 : 1237);
+		result = prime * result + ((this.string == null) ? 0 : this.string.hashCode());
 		return result;
 	}
 
@@ -55,19 +55,26 @@ public class AString implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		AString other = (AString) obj;
-		if (inverse != other.inverse)
+		if (this.inverse != other.inverse)
 			return false;
-		if (string == null) {
+		if (this.string == null) {
 			if (other.string != null)
 				return false;
-		} else if (!string.equals(other.string))
+		} else if (!this.string.equals(other.string))
 			return false;
 		return true;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		return "AString [string=" + string + ", inverse=" + inverse + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("AString [string=");
+		sb.append(this.string);
+		sb.append(", inverse=");
+		sb.append(this.inverse);
+		sb.append("]");
+		return sb.toString();
 	}
 
 }

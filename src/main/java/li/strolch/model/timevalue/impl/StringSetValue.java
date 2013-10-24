@@ -10,9 +10,8 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 
 /**
- * {@link IValue} implementation to work with String valued {@link ITimeValue}
- * objects. Since a java.util.String object does not define a inverse, a
- * algebraic {@link AString} wrapper is used.
+ * {@link IValue} implementation to work with String valued {@link ITimeValue} objects. Since a java.util.String object
+ * does not define a inverse, a algebraic {@link AString} wrapper is used.
  * 
  * @author Martin Smock <smock.martin@gmail.com>
  */
@@ -34,7 +33,7 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 
 	@Override
 	public Set<AString> getValue() {
-		return aStrings;
+		return this.aStrings;
 	}
 
 	@Override
@@ -44,7 +43,7 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 
 		for (Iterator<AString> iter1 = toBeAdded.iterator(); iter1.hasNext();) {
 			AString toAdd = iter1.next();
-			for (Iterator<AString> iter = aStrings.iterator(); iter.hasNext();) {
+			for (Iterator<AString> iter = this.aStrings.iterator(); iter.hasNext();) {
 				AString aString = iter.next();
 				boolean valueMatch = aString.getString().equals(toAdd.getString());
 				boolean compensate = (toAdd.isInverse() && !aString.isInverse())
@@ -55,19 +54,19 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 				}
 			}
 		}
-		aStrings.addAll(toBeAdded);
+		this.aStrings.addAll(toBeAdded);
 		return this;
 	}
 
 	@Override
 	public boolean matches(IValue<Set<AString>> other) {
-		return this.getValue().equals(other.getValue());
+		return getValue().equals(other.getValue());
 	}
 
 	@Override
 	public IValue<Set<AString>> getInverse() {
 		Set<AString> inverseSet = new HashSet<AString>();
-		for (AString as : aStrings) {
+		for (AString as : this.aStrings) {
 			inverseSet.add(as.getInverse());
 		}
 		StringSetValue inverse = new StringSetValue();
@@ -77,12 +76,17 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 
 	@Override
 	public StringSetValue getCopy() {
-		return new StringSetValue(aStrings);
+		return new StringSetValue(this.aStrings);
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		return "StringSetValue [aStrings=" + aStrings + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("StringSetValue [aStrings=");
+		sb.append(this.aStrings);
+		sb.append("]");
+		return sb.toString();
 	}
 
 }

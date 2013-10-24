@@ -21,9 +21,12 @@
  */
 package li.strolch.model.parameter;
 
+import java.text.MessageFormat;
+
 import org.w3c.dom.Element;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Tags;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -31,7 +34,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class BooleanParameter extends AbstractParameter<Boolean> {
 
-	public static final String TYPE = "Boolean";
+	public static final String TYPE = "Boolean"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
 	private Boolean value = Boolean.FALSE;
@@ -63,9 +66,10 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	public BooleanParameter(Element element) {
 		super.fromDom(element);
 
-		String valueS = element.getAttribute("Value");
+		String valueS = element.getAttribute(Tags.VALUE);
 		if (StringHelper.isEmpty(valueS)) {
-			throw new StrolchException("No value defined for " + this.id);
+			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
+			throw new StrolchException(msg);
 		}
 
 		setValue(Boolean.valueOf(valueS));

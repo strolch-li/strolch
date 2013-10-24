@@ -6,8 +6,7 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 
 /**
- * {@link IValue} implementation to work with Integer valued {@link ITimeValue}
- * objects
+ * {@link IValue} implementation to work with Integer valued {@link ITimeValue} objects
  * 
  * @author Martin Smock <smock.martin@gmail.com>
  */
@@ -33,7 +32,7 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 
 	@Override
 	public IntegerValue add(Integer o) {
-		value += o;
+		this.value += o;
 		return this;
 	}
 
@@ -44,7 +43,7 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 
 	@Override
 	public Integer getValue() {
-		return value;
+		return this.value;
 	}
 
 	@Override
@@ -52,21 +51,26 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 		return new IntegerValue(-getValue());
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		return "IntegerValue [value=" + value + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("IntegerValue [value=");
+		sb.append(this.value);
+		sb.append("]");
+		return sb.toString();
 	}
 
 	@Override
 	public IntegerValue getCopy() {
-		return new IntegerValue(value);
+		return new IntegerValue(this.value);
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
 		return result;
 	}
 
@@ -79,10 +83,10 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		IntegerValue other = (IntegerValue) obj;
-		if (value == null) {
+		if (this.value == null) {
 			if (other.value != null)
 				return false;
-		} else if (!value.equals(other.value))
+		} else if (!this.value.equals(other.value))
 			return false;
 		return true;
 	}

@@ -35,24 +35,24 @@ public interface Parameter<T> extends StrolchElement {
 	/**
 	 * This interpretation value indicates that the {@link Parameter} has no defined interpretation
 	 */
-	public static final String INTERPRETATION_NONE = "None";
+	public static final String INTERPRETATION_NONE = "None"; //$NON-NLS-1$
 
 	/**
 	 * This uom value indicates that the {@link Parameter} has no defined uom
 	 */
-	public static final String UOM_NONE = "None";
+	public static final String UOM_NONE = "None"; //$NON-NLS-1$
 
 	/**
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
 	 * to a {@link Resource}
 	 */
-	public static final String INTERPRETATION_RESOURCE_REF = "Resource-Reference";
+	public static final String INTERPRETATION_RESOURCE_REF = "Resource-Reference"; //$NON-NLS-1$
 
 	/**
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
 	 * to a {@link Order}
 	 */
-	public static final String INTERPRETATION_ORDER_REF = "Order-Reference";
+	public static final String INTERPRETATION_ORDER_REF = "Order-Reference"; //$NON-NLS-1$
 
 	/**
 	 * the value of the parameter as string
@@ -99,7 +99,7 @@ public interface Parameter<T> extends StrolchElement {
 	/**
 	 * Set the UOM of this {@link Parameter}
 	 * 
-	 * @param hidden
+	 * @param uom
 	 */
 	public void setUom(String uom);
 

@@ -22,10 +22,12 @@
 package li.strolch.model.parameter;
 
 import java.text.DateFormat;
+import java.text.MessageFormat;
 
 import org.w3c.dom.Element;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Tags;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -33,7 +35,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class DateParameter extends AbstractParameter<Long> {
 
-	public static final String TYPE = "Date";
+	public static final String TYPE = "Date"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
 	private Long value;
@@ -65,9 +67,10 @@ public class DateParameter extends AbstractParameter<Long> {
 	public DateParameter(Element element) {
 		super.fromDom(element);
 
-		String valueS = element.getAttribute("Value");
+		String valueS = element.getAttribute(Tags.VALUE);
 		if (StringHelper.isEmpty(valueS)) {
-			throw new StrolchException("No value defined for " + this.id);
+			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
+			throw new StrolchException(msg);
 		}
 
 		setValue(Long.valueOf(valueS));

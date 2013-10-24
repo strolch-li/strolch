@@ -26,7 +26,10 @@ package li.strolch.model;
  */
 public enum State {
 
-	CREATED("Created"), OPEN("Open"), EXECUTION("Execution"), CLOSED("Closed");
+	CREATED("Created"), //$NON-NLS-1$
+	OPEN("Open"), //$NON-NLS-1$
+	EXECUTION("Execution"), //$NON-NLS-1$
+	CLOSED("Closed"); //$NON-NLS-1$
 
 	private String state;
 

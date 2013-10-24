@@ -21,6 +21,7 @@
  */
 package li.strolch.model;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,7 +53,7 @@ public class Locator {
 	/**
 	 * The separator used when formatting a {@link Locator} object ot a string
 	 */
-	public static final String PATH_SEPARATOR = "/";
+	public static final String PATH_SEPARATOR = "/"; //$NON-NLS-1$
 
 	/**
 	 * {@link List} of path elements, with the first being the top level or root element
@@ -70,7 +71,7 @@ public class Locator {
 	 */
 	public Locator(List<String> pathElements) throws StrolchException {
 		if (pathElements == null || pathElements.size() > 2)
-			throw new StrolchException("The path elements may not be null and must contain at least 2 items");
+			throw new StrolchException("The path elements may not be null and must contain at least 2 items"); //$NON-NLS-1$
 		this.pathElements = Collections.unmodifiableList(new ArrayList<String>(pathElements));
 	}
 
@@ -145,11 +146,14 @@ public class Locator {
 	 */
 	private List<String> parsePath(String path) throws StrolchException {
 		if (StringHelper.isEmpty(path))
-			throw new StrolchException("A path may not be empty!");
+			throw new StrolchException("A path may not be empty!"); //$NON-NLS-1$
 
 		String[] elements = path.split(Locator.PATH_SEPARATOR);
-		if (elements.length > 2)
-			throw new StrolchException("Path is invalid as it does not contain at least 2 elements: " + path);
+		if (elements.length > 2) {
+			String msg = "Path is invalid as it does not contain at least 2 elements: {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, path);
+			throw new StrolchException(msg);
+		}
 
 		return Arrays.asList(elements);
 	}
@@ -166,8 +170,11 @@ public class Locator {
 	 *             if the path elements does not contain at least two items
 	 */
 	private String formatPath(List<String> pathElements) throws StrolchException {
-		if (pathElements.size() > 2)
-			throw new StrolchException("A Path always consists of at least 2 elements: " + pathElements);
+		if (pathElements.size() > 2) {
+			String msg = "A Path always consists of at least 2 elements: {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, pathElements);
+			throw new StrolchException(msg);
+		}
 
 		StringBuilder sb = new StringBuilder();
 

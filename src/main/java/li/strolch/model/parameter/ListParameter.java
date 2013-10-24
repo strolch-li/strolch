@@ -23,12 +23,13 @@ package li.strolch.model.parameter;
 
 import java.util.List;
 
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
 public interface ListParameter<E> extends Parameter<List<E>> {
+
+	public static final String VALUE_SEPARATOR = ";"; //$NON-NLS-1$
 
 	/**
 	 * Adds a single value to the {@link List} of values

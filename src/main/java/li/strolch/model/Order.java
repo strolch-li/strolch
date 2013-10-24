@@ -21,10 +21,10 @@
  */
 package li.strolch.model;
 
+import li.strolch.model.Locator.LocatorBuilder;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import li.strolch.model.Locator.LocatorBuilder;
 
 /**
  * The Order is an object used in the EDF to transfer data from one range to another. Orders are not to be thought of as
@@ -40,8 +40,6 @@ import li.strolch.model.Locator.LocatorBuilder;
 public class Order extends GroupedParameterizedElement {
 
 	private static final long serialVersionUID = 0L;
-
-	public static final String PREFIX_ORDER = "OrderPrefix";
 
 	private long date;
 	private State state;
@@ -91,8 +89,8 @@ public class Order extends GroupedParameterizedElement {
 	public Order(Element element) {
 		super.fromDom(element);
 
-		String date = element.getAttribute("Date");
-		String state = element.getAttribute("State");
+		String date = element.getAttribute(Tags.DATE);
+		String state = element.getAttribute(Tags.STATE);
 
 		// TODO the format should be globally configured
 		if (date == null || date.isEmpty()) {
@@ -138,18 +136,15 @@ public class Order extends GroupedParameterizedElement {
 		this.state = state;
 	}
 
-	/**
-	 * @see li.strolch.StrolchElement.datalandscape.element.IEdpElement#toDom(Document)
-	 */
 	@Override
 	public Element toDom(Document doc) {
 
-		Element orderElement = doc.createElement("Order");
+		Element orderElement = doc.createElement(Tags.ORDER);
 		fillElement(orderElement);
 
 		// TODO the format should be globally configured
-		orderElement.setAttribute("Date", Long.toString(this.date));
-		orderElement.setAttribute("State", this.state.toString());
+		orderElement.setAttribute(Tags.DATE, Long.toString(this.date));
+		orderElement.setAttribute(Tags.STATE, this.state.toString());
 
 		return orderElement;
 	}
@@ -168,7 +163,7 @@ public class Order extends GroupedParameterizedElement {
 
 	@Override
 	protected void fillLocator(LocatorBuilder lb) {
-		lb.append("Order").append(getId());
+		lb.append(Tags.ORDER).append(getId());
 	}
 
 	@Override
@@ -178,6 +173,7 @@ public class Order extends GroupedParameterizedElement {
 		return lb.build();
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 

@@ -21,9 +21,13 @@
  */
 package li.strolch.model.parameter;
 
-import org.w3c.dom.Element;
+import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Tags;
+
+import org.w3c.dom.Element;
+
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -32,7 +36,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class IntegerParameter extends AbstractParameter<Integer> {
 
-	public static final String TYPE = "Integer";
+	public static final String TYPE = "Integer"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
 	private Integer value = Integer.MAX_VALUE;
@@ -64,9 +68,10 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	public IntegerParameter(Element element) {
 		super.fromDom(element);
 
-		String valueS = element.getAttribute("Value");
+		String valueS = element.getAttribute(Tags.VALUE);
 		if (StringHelper.isEmpty(valueS)) {
-			throw new StrolchException("No value defined for " + this.id);
+			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
+			throw new StrolchException(msg);
 		}
 
 		setValue(Integer.valueOf(valueS));
