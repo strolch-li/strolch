@@ -44,8 +44,6 @@ public class PersistenceContextFactoryDelegator {
 
 		this.contextFactoryCacheByClass.put(classType, ctxFactory);
 		this.contextFactoryCacheByType.put(type, ctxFactory);
-		if (!classType.getName().equals(type))
-			this.contextFactoryCacheByType.put(classType.getName(), ctxFactory);
 	}
 
 	public <T> PersistenceContextFactory<T> getCtxFactory(Class<?> classType) {

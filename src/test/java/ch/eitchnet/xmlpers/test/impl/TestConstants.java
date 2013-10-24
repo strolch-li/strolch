@@ -21,15 +21,12 @@
  */
 package ch.eitchnet.xmlpers.test.impl;
 
-import ch.eitchnet.xmlpers.test.model.Book;
-import ch.eitchnet.xmlpers.test.model.Resource;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
 public class TestConstants {
 
-	public static final String TYPE_RES = Resource.class.getSimpleName();
-	public static final String TYPE_BOOK = Book.class.getSimpleName();
+	public static final String TYPE_RES = "Resource"; //$NON-NLS-1$
+	public static final String TYPE_BOOK = "Book"; //$NON-NLS-1$
 }

@@ -58,7 +58,7 @@ public class ObjectDao {
 		PersistenceContext<T> ctx = createCtx(object);
 		ctx.setObject(object);
 		ctx.getObjectRef().lock();
-		this.objectFilter.add(object.getClass().getName(), ctx);
+		this.objectFilter.add(ctx.getObjectRef().getType(), ctx);
 	}
 
 	public <T> void addAll(List<T> objects) {
@@ -69,7 +69,7 @@ public class ObjectDao {
 				PersistenceContext<T> ctx = createCtx(object);
 				ctx.setObject(object);
 				ctx.getObjectRef().lock();
-				this.objectFilter.add(object.getClass().getName(), ctx);
+				this.objectFilter.add(ctx.getObjectRef().getType(), ctx);
 			}
 		}
 	}
@@ -80,7 +80,7 @@ public class ObjectDao {
 		PersistenceContext<T> ctx = createCtx(object);
 		ctx.setObject(object);
 		ctx.getObjectRef().lock();
-		this.objectFilter.update(object.getClass().getName(), ctx);
+		this.objectFilter.update(ctx.getObjectRef().getType(), ctx);
 	}
 
 	public <T> void updateAll(List<T> objects) {
@@ -91,7 +91,7 @@ public class ObjectDao {
 				PersistenceContext<T> ctx = createCtx(object);
 				ctx.setObject(object);
 				ctx.getObjectRef().lock();
-				this.objectFilter.update(object.getClass().getName(), ctx);
+				this.objectFilter.update(ctx.getObjectRef().getType(), ctx);
 			}
 		}
 	}
@@ -102,7 +102,7 @@ public class ObjectDao {
 		PersistenceContext<T> ctx = createCtx(object);
 		ctx.setObject(object);
 		ctx.getObjectRef().lock();
-		this.objectFilter.remove(object.getClass().getName(), ctx);
+		this.objectFilter.remove(ctx.getObjectRef().getType(), ctx);
 	}
 
 	public <T> void removeAll(List<T> objects) {
@@ -113,7 +113,7 @@ public class ObjectDao {
 				PersistenceContext<T> ctx = createCtx(object);
 				ctx.setObject(object);
 				ctx.getObjectRef().lock();
-				this.objectFilter.remove(object.getClass().getName(), ctx);
+				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx);
 			}
 		}
 	}
