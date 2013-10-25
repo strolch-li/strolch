@@ -98,12 +98,17 @@
 			</dependency>
 			<dependency>
 				<groupId>li.strolch</groupId>
-				<artifactId>li.strolch.persistence.impl</artifactId>
+				<artifactId>li.strolch.persistence.xml</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>li.strolch</groupId>
 				<artifactId>li.strolch.runtime</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.service</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
