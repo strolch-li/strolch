@@ -6,21 +6,21 @@
 		<groupId>li.strolch</groupId>
 		<artifactId>li.strolch.parent</artifactId>
 		<version>0.1.0-SNAPSHOT</version>
-		<relativePath>../li.strolch.parent</relativePath>
+		<relativePath>li.strolch.parent</relativePath>
 	</parent>
 
-	<artifactId>li.strolch.module</artifactId>
+	<artifactId>li.strolch.dev</artifactId>
 	<packaging>pom</packaging>
-	<name>Module build for li.strolch projects</name>
-	<description>Module build to quickly build all li.strolch projects</description>
+	<name>Dev module build for li.strolch projects</name>
+	<description>Project used to develop strolch modules. Contains scripts for bootstrapping development, etc.</description>
 
 	<modules>
-        <module>../li.strolch.parent</module>
-        <module>../li.strolch.model</module>
-        <module>../li.strolch.testbase</module>
-        <module>../li.strolch.persistence.api</module>
-        <module>../li.strolch.persistence.xml</module>
-        <module>../li.strolch.runtime</module>
-        <module>../li.strolch.service</module>
+        <module>li.strolch.parent</module>
+        <module>li.strolch.model</module>
+        <module>li.strolch.testbase</module>
+        <module>li.strolch.persistence.api</module>
+        <module>li.strolch.persistence.xml</module>
+        <module>li.strolch.runtime</module>
+        <module>li.strolch.service</module>
     </modules>
 </project>

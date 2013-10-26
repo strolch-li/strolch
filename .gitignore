@@ -1,3 +1,11 @@
 target/
 .settings
 .project
+li.strolch.model
+li.strolch.module
+li.strolch.testbase
+li.strolch.runtime
+li.strolch.service
+li.strolch.bom
+li.strolch.persistence.api
+li.strolch.persistence.xml
