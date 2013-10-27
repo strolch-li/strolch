@@ -9,3 +9,4 @@ li.strolch.service
 li.strolch.bom
 li.strolch.persistence.api
 li.strolch.persistence.xml
+li.strolch.parent

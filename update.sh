@@ -1,11 +1,11 @@
 #!/bin/bash
 #######################################################################
 ##
-## Bootstrap developing of strolch projects by cloning all the 
-## projects.
+## Update all projects by pulling from upstream
 ##
 #######################################################################
 
+echo "Updating li.strolch.dev..." ; git pull
 echo "Updating li.strolch.parent..." ; cd li.strolch.parent ; git pull ; cd ..
 echo "Updating li.strolch.bom..." ; cd li.strolch.bom ; git pull ; cd ..
 echo "Updating li.strolch.model..." ; cd li.strolch.model ; git pull ; cd ..
