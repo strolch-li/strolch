@@ -28,8 +28,8 @@ import java.util.Map;
 
 import li.strolch.persistence.api.StrolchPersistenceHandler;
 import li.strolch.persistence.impl.XmlPersistenceHandler;
-import li.strolch.runtime.ComponentConfiguration;
-import li.strolch.runtime.RuntimeConfiguration;
+import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
 
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
