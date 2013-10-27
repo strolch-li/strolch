@@ -1,4 +1,4 @@
-li.strolch.module
+li.strolch.dev
 =================
 
-Module build to quickly build all li.strolch projects
+Dev module build for li.strolch projects
