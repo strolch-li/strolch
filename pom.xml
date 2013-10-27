@@ -34,6 +34,10 @@
 			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.model</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>ch.eitchnet</groupId>
+			<artifactId>ch.eitchnet.privilege</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

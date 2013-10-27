@@ -1,4 +1,4 @@
-package li.strolch.runtime;
+package li.strolch.runtime.configuration;
 
 import java.text.MessageFormat;
 import java.util.Map;

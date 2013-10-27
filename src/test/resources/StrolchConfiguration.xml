@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchConfiguration>
+	<Runtime>
+		<applicationName>StrolchRuntimeTest</applicationName>
+		<properties>
+			<rootPath>target/</rootPath>
+		</properties>
+	</Runtime>
+	<component>
+		<name>li.strolch.service.ServiceHandler</name>
+		<clazz>li.strolch.service.SimpleServiceHandler</clazz>
+		<properties>
+		</properties>
+	</component>
+	<component>
+		<name>li.strolch.persistence.api.StrolchPersistenceHandler</name>
+		<clazz>li.strolch.persistence.impl.XmlPersistenceHandler</clazz>
+		<properties>
+			<verbose>true</verbose>
+		</properties>
+	</component>
+</StrolchConfiguration>

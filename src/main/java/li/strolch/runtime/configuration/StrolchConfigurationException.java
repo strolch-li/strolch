@@ -1,4 +1,4 @@
-package li.strolch.runtime;
+package li.strolch.runtime.configuration;
 
 public class StrolchConfigurationException extends RuntimeException {
 
