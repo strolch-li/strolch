@@ -15,13 +15,13 @@
 	<description>Project used to develop strolch modules. Contains scripts for bootstrapping development, etc.</description>
 
 	<modules>
-        <module>li.strolch.parent</module>
-        <module>li.strolch.bom</module>
-        <module>li.strolch.model</module>
-        <module>li.strolch.testbase</module>
-        <module>li.strolch.persistence.api</module>
-        <module>li.strolch.persistence.xml</module>
-        <module>li.strolch.runtime</module>
-        <module>li.strolch.service</module>
-    </modules>
+            <module>li.strolch.parent</module>
+            <module>li.strolch.bom</module>
+            <module>li.strolch.model</module>
+            <module>li.strolch.testbase</module>
+            <module>li.strolch.persistence.api</module>
+            <module>li.strolch.persistence.xml</module>
+            <module>li.strolch.runtime</module>
+            <module>li.strolch.service</module>
+        </modules>
 </project>
