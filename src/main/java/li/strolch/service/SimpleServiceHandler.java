@@ -38,9 +38,7 @@ public class SimpleServiceHandler extends StrolchComponent implements ServiceHan
 		try {
 
 			this.privilegeHandler.getPrivilegeContext(certificate).validateAction(service);
-
 			ServiceResult serviceResult = service.doService(argument);
-
 			return serviceResult;
 
 		} catch (Exception e) {
