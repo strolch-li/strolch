@@ -27,9 +27,7 @@ import ch.eitchnet.privilege.model.Restrictable;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public interface Service extends Serializable, Restrictable {
+public interface Service<T extends ServiceArgument> extends Serializable, Restrictable {
 
-	public ServiceResult doService(ServiceArgument argument);
-
-	public ServiceArgument getServiceArgument();
+	public ServiceResult doService(T argument);
 }

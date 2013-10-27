@@ -21,23 +21,27 @@ package li.strolch.service;
 
 import java.text.MessageFormat;
 
+import li.strolch.runtime.component.StrolchComponent;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class SimpleServiceHandler {
+public class SimpleServiceHandler extends StrolchComponent implements ServiceHandler {
 
 	private PrivilegeHandler privilegeHandler;
 
-	public ServiceResult doService(Certificate certificate, Service service, ServiceArgument argument) {
+	@Override
+	public <T extends ServiceArgument> ServiceResult doService(Certificate certificate, Service<T> service, T argument) {
 
 		try {
 
 			this.privilegeHandler.getPrivilegeContext(certificate).validateAction(service);
 
-			return service.doService(argument);
+			ServiceResult serviceResult = service.doService(argument);
+
+			return serviceResult;
 
 		} catch (Exception e) {
 			String msg = "Failed to perform service {0} due to exception {1}"; //$NON-NLS-1$

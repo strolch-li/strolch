@@ -19,21 +19,36 @@
  */
 package li.strolch.command;
 
+import li.strolch.persistence.api.StrolchTransaction;
 import ch.eitchnet.privilege.model.Restrictable;
-
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public abstract class AbstractCommand implements Restrictable {
+public abstract class Command implements Restrictable {
+
+	private final StrolchTransaction tx;
+
+	public Command(StrolchTransaction tx) {
+		this.tx = tx;
+	}
+
+	/**
+	 * Returns the {@link StrolchTransaction} bound to this {@link Command}'s runtime
+	 * 
+	 * @return the {@link StrolchTransaction} bound to this {@link Command}'s runtime
+	 */
+	protected StrolchTransaction tx() {
+		return this.tx;
+	}
 
 	/**
 	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeName()
 	 */
 	@Override
 	public String getPrivilegeName() {
-		return AbstractCommand.class.getName();
+		return Command.class.getName();
 	}
 
 	/**
@@ -43,6 +58,6 @@ public abstract class AbstractCommand implements Restrictable {
 	public Object getPrivilegeValue() {
 		return this.getClass().getName();
 	}
-	
+
 	public abstract void doCommand();
 }

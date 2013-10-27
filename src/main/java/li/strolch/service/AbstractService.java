@@ -23,7 +23,7 @@ package li.strolch.service;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public abstract class AbstractService implements Service {
+public abstract class AbstractService<T extends ServiceArgument> implements Service<T> {
 	private static final long serialVersionUID = 1L;
 
 	/**
