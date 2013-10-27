@@ -36,7 +36,6 @@ public class SimpleServiceHandler extends StrolchComponent implements ServiceHan
 	public <T extends ServiceArgument> ServiceResult doService(Certificate certificate, Service<T> service, T argument) {
 
 		try {
-
 			this.privilegeHandler.getPrivilegeContext(certificate).validateAction(service);
 			ServiceResult serviceResult = service.doService(argument);
 			return serviceResult;
