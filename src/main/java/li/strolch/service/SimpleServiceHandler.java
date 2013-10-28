@@ -32,6 +32,10 @@ public class SimpleServiceHandler extends StrolchComponent implements ServiceHan
 
 	private PrivilegeHandler privilegeHandler;
 
+	public SimpleServiceHandler() {
+		super(ServiceHandler.class.getName());
+	}
+
 	@Override
 	public <T extends ServiceArgument> ServiceResult doService(Certificate certificate, Service<T> service, T argument) {
 
