@@ -95,7 +95,8 @@ public class LockingTest extends AbstractPersistenceTest {
 
 		String resourceId = "createWorkerRes"; //$NON-NLS-1$
 		for (int i = 0; i < 5; i++) {
-			CreateResourceWorker worker = new CreateResourceWorker(resourceId, resourceId);
+			String workerName = resourceId + "_" + i;
+			CreateResourceWorker worker = new CreateResourceWorker(workerName, resourceId);
 			worker.start();
 			workers.add(worker);
 			logger.info("Setup thread " + worker.getName()); //$NON-NLS-1$
