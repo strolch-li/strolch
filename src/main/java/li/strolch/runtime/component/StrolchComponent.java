@@ -6,10 +6,19 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 
 public class StrolchComponent {
 
+	private final String componentName;
 	private ComponentState state;
 
-	public StrolchComponent() {
+	public StrolchComponent(String componentName) {
+		this.componentName = componentName;
 		this.state = ComponentState.UNDEFINED;
+	}
+
+	/**
+	 * @return the componentName
+	 */
+	public String getComponentName() {
+		return this.componentName;
 	}
 
 	public ComponentState getState() {
@@ -49,6 +58,16 @@ public class StrolchComponent {
 		this.state = newState;
 	}
 
+	protected void assertStarted() {
+		if (getState() != ComponentState.STARTED) {
+			String msg = "Component {0} is not yet started!"; //$NON-NLS-1$
+			throw new IllegalStateException(MessageFormat.format(msg, this.componentName));
+		}
+	}
+
+	/**
+	 * @param configuration
+	 */
 	public void initialize(ComponentConfiguration configuration) {
 		changeState(ComponentState.INITALIZED);
 	}

@@ -9,12 +9,21 @@
 	<component>
 		<name>li.strolch.service.ServiceHandler</name>
 		<clazz>li.strolch.service.SimpleServiceHandler</clazz>
+		<depends>li.strolch.persistence.api.StrolchPersistenceHandler</depends>
 		<properties>
+		</properties>
+	</component>
+	<component>
+		<name>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</name>
+		<clazz>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</clazz>
+		<properties>
+			<privilegeConfigFile>PrivilegeConfig.xml</privilegeConfigFile>
 		</properties>
 	</component>
 	<component>
 		<name>li.strolch.persistence.api.StrolchPersistenceHandler</name>
 		<clazz>li.strolch.persistence.impl.XmlPersistenceHandler</clazz>
+		<depends>i.strolch.runtime.privilege.StrolchPrivilegeHandler</depends>
 		<properties>
 			<verbose>true</verbose>
 		</properties>

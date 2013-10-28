@@ -1,5 +1,6 @@
 package li.strolch.runtime.configuration;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -87,6 +88,24 @@ public class AbstractionConfiguration {
 		assertDefValueExist(key, defValue);
 		logDefValueUse(key, defValue);
 		return defValue;
+	}
+
+	public File getConfigFile(String key, String defValue, ComponentConfiguration configuration) {
+		String value = this.configurationValues.get(key);
+		if (StringHelper.isEmpty(value)) {
+			assertDefValueExist(key, defValue);
+			logDefValueUse(key, defValue);
+			value = defValue;
+		}
+
+		File configFile = new File(configuration.getRuntimeConfiguration().getConfigPath(), value);
+		if (!configFile.isFile() || !configFile.canRead()) {
+
+			String msg = "Component {0} is missing required configuration file {1}!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.componentName, key, value);
+			throw new StrolchConfigurationException(msg);
+		}
+		return configFile;
 	}
 
 	private void logDefValueUse(String key, Object defValue) {
