@@ -389,7 +389,7 @@ public interface PrivilegeHandler {
 	 * @throws AccessDeniedException
 	 *             if the user does not not have admin privileges
 	 */
-	public void validateIsPrivilegeAdmin(Certificate certificate) throws AccessDeniedException;
+	public void assertIsPrivilegeAdmin(Certificate certificate) throws AccessDeniedException;
 
 	/**
 	 * Validate that the given password meets certain requirements. What these requirements are is a decision made by

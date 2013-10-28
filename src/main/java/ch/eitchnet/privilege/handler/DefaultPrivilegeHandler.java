@@ -55,7 +55,7 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
  * The following list describes implementation details:
  * <ul>
  * <li>any methods which change the model are first validated by checking if the certificate is for an admin user by
- * calling {@link #validateIsPrivilegeAdmin(Certificate)}</li>
+ * calling {@link #assertIsPrivilegeAdmin(Certificate)}</li>
  * <li>all model requests are delegated to the configured {@link PrivilegeHandler}, except for the session id to
  * {@link Certificate} map, no model data is kept in this implementation. This also means that to return the
  * representation objects, for every new model query, a new representation object is created</li>
@@ -273,7 +273,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void addOrReplaceRole(Certificate certificate, RoleRep roleRep) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		// create new role from RoleRep
 		Role role = new Role(roleRep);
@@ -294,7 +294,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		try {
 
 			// validate who is doing this
-			validateIsPrivilegeAdmin(certificate);
+			assertIsPrivilegeAdmin(certificate);
 
 			String passwordHash = null;
 			if (password != null) {
@@ -323,7 +323,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		// validate PrivilegeRep
 		privilegeRep.validate();
@@ -363,7 +363,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void addRoleToUser(Certificate certificate, String username, String roleName) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		// get user
 		User user = this.persistenceHandler.getUser(username);
@@ -398,7 +398,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void removePrivilegeFromRole(Certificate certificate, String roleName, String privilegeName) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		// get role
 		Role role = this.persistenceHandler.getRole(roleName);
@@ -430,7 +430,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public RoleRep removeRole(Certificate certificate, String roleName) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		// delegate role removal to persistence handler
 		Role removedRole = this.persistenceHandler.removeRole(roleName);
@@ -446,7 +446,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void removeRoleFromUser(Certificate certificate, String username, String roleName) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		// get User
 		User user = this.persistenceHandler.getUser(username);
@@ -475,7 +475,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public UserRep removeUser(Certificate certificate, String username) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		// delegate user removal to persistence handler
 		User removedUser = this.persistenceHandler.removeUser(username);
@@ -493,7 +493,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void setUserLocale(Certificate certificate, String username, Locale locale) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		// get User
 		User user = this.persistenceHandler.getUser(username);
@@ -513,7 +513,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void setUserName(Certificate certificate, String username, String firstname, String surname) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		// get User
 		User user = this.persistenceHandler.getUser(username);
@@ -546,7 +546,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			} else {
 
 				// otherwise validate the the certificate is for a privilege admin
-				validateIsPrivilegeAdmin(certificate);
+				assertIsPrivilegeAdmin(certificate);
 			}
 
 			// get User
@@ -586,7 +586,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void setUserState(Certificate certificate, String username, UserState state) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		// get User
 		User user = this.persistenceHandler.getUser(username);
@@ -785,7 +785,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public void validateIsPrivilegeAdmin(Certificate certificate) throws PrivilegeException {
+	public void assertIsPrivilegeAdmin(Certificate certificate) throws PrivilegeException {
 
 		// validate certificate
 		isCertificateValid(certificate);
@@ -826,7 +826,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public boolean persist(Certificate certificate) {
 
 		// validate who is doing this
-		validateIsPrivilegeAdmin(certificate);
+		assertIsPrivilegeAdmin(certificate);
 
 		return this.persistenceHandler.persist();
 	}
