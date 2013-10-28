@@ -21,6 +21,7 @@
  */
 package li.strolch.persistence.impl;
 
+import java.io.File;
 import java.util.Properties;
 
 import li.strolch.model.Order;
@@ -49,16 +50,20 @@ public class XmlPersistenceHandler extends StrolchComponent implements StrolchPe
 	public static final String DB_STORE_PATH = "dbStore/"; //$NON-NLS-1$
 	private PersistenceManager persistenceManager;
 
+	public XmlPersistenceHandler() {
+		super(StrolchPersistenceHandler.class.getName());
+	}
+
 	@Override
 	public void initialize(ComponentConfiguration componentConfiguration) {
 
-		String basePath = componentConfiguration.getRuntimeConfiguration().getRootPath();
-		basePath = basePath + DB_STORE_PATH;
+		File basePathF = componentConfiguration.getRuntimeConfiguration().getRootPath();
+		File dbStorePathF = new File(basePathF, DB_STORE_PATH);
 
 		Properties properties = new Properties();
 		properties.setProperty(PersistenceConstants.PROP_VERBOSE, "true"); //$NON-NLS-1$
 		properties.setProperty(PersistenceConstants.PROP_XML_IO_MOD, IoMode.DOM.name());
-		properties.setProperty(PersistenceConstants.PROP_BASEPATH, basePath);
+		properties.setProperty(PersistenceConstants.PROP_BASEPATH, dbStorePathF.getAbsolutePath());
 
 		this.persistenceManager = PersistenceManagerLoader.load(properties);
 
