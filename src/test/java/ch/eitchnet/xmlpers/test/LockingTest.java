@@ -66,7 +66,7 @@ public class LockingTest extends AbstractPersistenceTest {
 		properties.setProperty(PersistenceConstants.PROP_LOCK_TIME_MILLIS, Long.toString(500L));
 		setup(properties);
 
-		this.waitForWorkersTime = LockableObject.getLockTime() + (long) ((double) this.getWaitForWorkersTime() * .2);
+		this.waitForWorkersTime = LockableObject.getLockTime() + this.getWaitForWorkersTime() + 300L;
 	}
 
 	@Test
