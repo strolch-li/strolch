@@ -23,5 +23,6 @@
             <module>../li.strolch.persistence.xml</module>
             <module>../li.strolch.runtime</module>
             <module>../li.strolch.service</module>
+            <module>../li.strolch.tutorialapp</module>
         </modules>
 </project>

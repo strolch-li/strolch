@@ -80,5 +80,14 @@ else
   echo
 fi
 
+if [ -d ../li.strolch.tutorialapp ] ; then
+  echo "Project li.strolch.tutorialapp already cloned."
+else
+  if ! git clone git@github.com:eitch/li.strolch.tutorialapp.git ../li.strolch.tutorialapp ;then
+    exit 1
+  fi
+  echo
+fi
+
 echo "Done."
 exit 0
