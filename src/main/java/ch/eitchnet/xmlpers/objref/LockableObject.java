@@ -35,12 +35,12 @@ public class LockableObject {
 	public void lock() {
 		try {
 
-			logger.info("locking " + this.toString()); //$NON-NLS-1$
 			if (!this.lock.tryLock(tryLockTime, TimeUnit.MILLISECONDS)) {
 				String msg = "Failed to acquire lock after {0} for {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, StringHelper.formatMillisecondsDuration(tryLockTime), this.toString());
 				throw new XmlPersistenceException(msg);
 			}
+			logger.info("locked " + this.toString()); //$NON-NLS-1$
 		} catch (InterruptedException e) {
 			throw new XmlPersistenceException("Thread interrupted: " + e.getMessage(), e); //$NON-NLS-1$
 		}
