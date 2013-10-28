@@ -1,16 +1,4 @@
-*.class
-
-# Maven target
 target/
-
-# Project files
-tmp/
-logs/
-
-# Eclipse settings
 .classpath
 .project
 .settings/
-
-# External libraries
-lib/
