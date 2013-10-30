@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchConfiguration>
+	<Runtime>
+		<applicationName>StrolchPersistenceTest</applicationName>
+		<Properties>
+			<verbose>true</verbose>
+		</Properties>
+	</Runtime>
+	<Component>
+		<name>PersistenceHandler</name>
+		<api>li.strolch.persistence.api.StrolchPersistenceHandler</api>
+		<impl>li.strolch.persistence.impl.XmlPersistenceHandler</impl>
+		<Properties>
+			<verbose>true</verbose>
+		</Properties>
+	</Component>
+</StrolchConfiguration>

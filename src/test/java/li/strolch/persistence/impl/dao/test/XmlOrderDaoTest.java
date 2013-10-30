@@ -21,6 +21,16 @@ public class XmlOrderDaoTest extends AbstractDaoImplTest {
 	private static final String TYPE = "ToStock"; //$NON-NLS-1$
 
 	@Test
+	public void shouldCreateOrder() {
+
+		// create
+		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", System.currentTimeMillis(), State.CREATED);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		try (StrolchTransaction tx = persistenceHandler.openTx();) {
+			persistenceHandler.getOrderDao(tx).save(newOrder);
+		}
+	}
+
+	@Test
 	public void shouldCrud() {
 
 		// create

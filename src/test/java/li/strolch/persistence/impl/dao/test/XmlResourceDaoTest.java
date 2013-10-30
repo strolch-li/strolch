@@ -20,6 +20,16 @@ public class XmlResourceDaoTest extends AbstractDaoImplTest {
 	private static final String TYPE = "Box"; //$NON-NLS-1$
 
 	@Test
+	public void shouldCreateOrder() {
+
+		// create
+		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		try (StrolchTransaction tx = persistenceHandler.openTx();) {
+			persistenceHandler.getResourceDao(tx).save(newResource);
+		}
+	}
+
+	@Test
 	public void shouldCrud() {
 
 		// create

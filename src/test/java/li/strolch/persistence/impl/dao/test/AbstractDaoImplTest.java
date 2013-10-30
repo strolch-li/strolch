@@ -23,19 +23,16 @@ package li.strolch.persistence.impl.dao.test;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
-import li.strolch.persistence.api.StrolchPersistenceHandler;
 import li.strolch.persistence.impl.XmlPersistenceHandler;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.configuration.RuntimeConfiguration;
+import li.strolch.runtime.configuration.ConfigurationParser;
+import li.strolch.runtime.configuration.StrolchConfiguration;
+import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.utils.helper.FileHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -44,6 +41,7 @@ import ch.eitchnet.utils.helper.FileHelper;
 public abstract class AbstractDaoImplTest {
 
 	private static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
+	private static final String CONFIG_SRC = "src/test/resources/runtime/config"; //$NON-NLS-1$
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractDaoImplTest.class);
 
 	protected static XmlPersistenceHandler persistenceHandler;
@@ -51,36 +49,23 @@ public abstract class AbstractDaoImplTest {
 	@BeforeClass
 	public static void beforeClass() {
 
-		File file = new File(RUNTIME_PATH);
-		if (file.exists()) {
-			if (!FileHelper.deleteFile(file, true)) {
-				String msg = "Failed to delete {0}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, file.getAbsolutePath());
-				throw new RuntimeException(msg);
-			}
-		}
+		File rootPath = new File(RUNTIME_PATH);
+		File configSrc = new File(CONFIG_SRC);
+		RuntimeMock.mockRuntime(rootPath, configSrc);
 
-		file = new File(file, XmlPersistenceHandler.DB_STORE_PATH);
-		if (!file.mkdirs()) {
+		File dbStorePath = new File(rootPath, XmlPersistenceHandler.DB_STORE_PATH);
+		if (!dbStorePath.mkdirs()) {
 			String msg = "Failed to create path {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, file.getAbsolutePath());
+			msg = MessageFormat.format(msg, dbStorePath.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
 
-		// initialize a runtime configuration
-		Map<String, String> runtimeConfigurationValues = new HashMap<>();
-		String rootPath = RUNTIME_PATH;
-		RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration(runtimeConfigurationValues, rootPath);
-
 		// initialize the component configuration
-		String componentName = StrolchPersistenceHandler.class.getName();
-		Map<String, String> configurationValues = new HashMap<>();
-		ComponentConfiguration componentConfiguration = new ComponentConfiguration(runtimeConfiguration, componentName,
-				configurationValues);
-
+		StrolchConfiguration strolchConfiguration = ConfigurationParser.parseConfiguration(rootPath);
+		ComponentConfiguration componentConfiguration = strolchConfiguration
+				.getComponentConfiguration("PersistenceHandler"); //$NON-NLS-1$
 		persistenceHandler = new XmlPersistenceHandler();
 		persistenceHandler.initialize(componentConfiguration);
 
 	}
-
 }
