@@ -21,9 +21,9 @@ package ch.eitchnet.utils.helper;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -57,17 +57,17 @@ public class XmlHelper {
 	/**
 	 * PROP_LINE_SEPARATOR = "line.separator" : the system property to fetch defined line separator
 	 */
-	public static final String PROP_LINE_SEPARATOR = "line.separator";
+	public static final String PROP_LINE_SEPARATOR = "line.separator"; //$NON-NLS-1$
 
 	/**
 	 * UNIX_LINE_SEP = "\n" : mostly we want this line separator, instead of the windows version
 	 */
-	public static final String UNIX_LINE_SEP = "\n";
+	public static final String UNIX_LINE_SEP = "\n"; //$NON-NLS-1$
 
 	/**
 	 * DEFAULT_ENCODING = "utf-8" : defines the default UTF-8 encoding expected of XML files
 	 */
-	public static final String DEFAULT_ENCODING = "utf-8";
+	public static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlHelper.class);
 
@@ -79,11 +79,16 @@ public class XmlHelper {
 	 */
 	public static void parseDocument(File xmlFile, DefaultHandler xmlHandler) {
 
-		try {
-			XmlHelper.logger.info("Parsing XML document " + xmlFile.getAbsolutePath());
-			parseDocument(new FileInputStream(xmlFile), xmlHandler);
-		} catch (FileNotFoundException e) {
-			throw new XmlException("The XML file could not be read: " + xmlFile.getAbsolutePath(), e);
+		try (FileInputStream xmlFileInputStream = new FileInputStream(xmlFile);) {
+
+			parseDocument(xmlFileInputStream, xmlHandler);
+			String msg = "SAX parsed file {0}"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, xmlFile.getAbsolutePath()));
+
+		} catch (IOException e) {
+			String msg = "Failed to parse XML file: {0} due to: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, xmlFile.getAbsolutePath(), e.getMessage());
+			throw new XmlException(msg, e);
 		}
 	}
 
@@ -103,11 +108,11 @@ public class XmlHelper {
 			sp.parse(xmlFileInputStream, xmlHandler);
 
 		} catch (ParserConfigurationException e) {
-			throw new XmlException("Failed to initialize a SAX Parser: " + e.getMessage(), e);
+			throw new XmlException("Failed to initialize a SAX Parser: " + e.getMessage(), e); //$NON-NLS-1$
 		} catch (SAXException e) {
-			throw new XmlException("The XML stream is not parseable: " + e.getMessage(), e);
+			throw new XmlException("The XML stream is not parseable: " + e.getMessage(), e); //$NON-NLS-1$
 		} catch (IOException e) {
-			throw new XmlException("The XML stream not be read: " + e.getMessage(), e);
+			throw new XmlException("The XML stream not be read: " + e.getMessage(), e); //$NON-NLS-1$
 		}
 	}
 
@@ -124,30 +129,33 @@ public class XmlHelper {
 	 */
 	public static void writeDocument(Document document, File file) throws RuntimeException {
 
-		XmlHelper.logger.info("Exporting document element " + document.getNodeName() + " to " + file.getAbsolutePath());
+		String msg = "Exporting document element {0} to {1}"; //$NON-NLS-1$
+		msg = MessageFormat.format(msg, document.getNodeName(), file.getAbsolutePath());
+		XmlHelper.logger.info(msg);
 
 		String lineSep = System.getProperty(PROP_LINE_SEPARATOR);
 		try {
 
 			String encoding = document.getInputEncoding();
 			if (encoding == null || encoding.isEmpty()) {
-				XmlHelper.logger.info("No encoding passed. Using default encoding " + XmlHelper.DEFAULT_ENCODING);
+				XmlHelper.logger.info(MessageFormat.format(
+						"No encoding passed. Using default encoding {0}", XmlHelper.DEFAULT_ENCODING)); //$NON-NLS-1$
 				encoding = XmlHelper.DEFAULT_ENCODING;
 			}
 
-			if (!lineSep.equals("\n")) {
-				XmlHelper.logger.info("Overriding line separator to \\n");
+			if (!lineSep.equals("\n")) { //$NON-NLS-1$
+				XmlHelper.logger.info("Overriding line separator to \\n"); //$NON-NLS-1$
 				System.setProperty(PROP_LINE_SEPARATOR, UNIX_LINE_SEP);
 			}
 
 			// Set up a transformer
 			TransformerFactory transfac = TransformerFactory.newInstance();
 			Transformer transformer = transfac.newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no"); //$NON-NLS-1$
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml"); //$NON-NLS-1$
 			transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
-			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
+			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-1$ //$NON-NLS-2$
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
@@ -157,7 +165,7 @@ public class XmlHelper {
 
 		} catch (Exception e) {
 
-			throw new XmlException("Exception while exporting to file: " + e, e);
+			throw new XmlException("Exception while exporting to file: " + e, e); //$NON-NLS-1$
 
 		} finally {
 
@@ -203,9 +211,9 @@ public class XmlHelper {
 			return document;
 
 		} catch (DOMException e) {
-			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e);
+			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 		} catch (ParserConfigurationException e) {
-			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e);
+			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 		}
 	}
 }
