@@ -220,6 +220,31 @@ public class Locator {
 		return sb.toString();
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.pathElements == null) ? 0 : this.pathElements.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Locator other = (Locator) obj;
+		if (this.pathElements == null) {
+			if (other.pathElements != null)
+				return false;
+		} else if (!this.pathElements.equals(other.pathElements))
+			return false;
+		return true;
+	}
+
 	/**
 	 * {@link LocatorBuilder} is used to build {@link Locator}s where a deep hierarchy is to be created. The
 	 * {@link #append(String)} method returns itself for chain building
