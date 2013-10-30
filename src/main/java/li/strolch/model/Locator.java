@@ -70,8 +70,8 @@ public class Locator {
 	 *             if the path is invalid, meaning has less than two elements in it
 	 */
 	public Locator(List<String> pathElements) throws StrolchException {
-		if (pathElements == null || pathElements.size() > 2)
-			throw new StrolchException("The path elements may not be null and must contain at least 2 items"); //$NON-NLS-1$
+		if (pathElements == null || pathElements.isEmpty())
+			throw new StrolchException("The path elements may not be null and must contain at least 1 item"); //$NON-NLS-1$
 		this.pathElements = Collections.unmodifiableList(new ArrayList<String>(pathElements));
 	}
 
@@ -104,6 +104,21 @@ public class Locator {
 	}
 
 	/**
+	 * Internal constructor to append a element to a constructor
+	 * 
+	 * @param path
+	 *            the base path of the locator
+	 * @param element
+	 *            the additional element
+	 */
+	private Locator(List<String> path, String element) {
+		List<String> fullPath = new ArrayList<String>();
+		fullPath.addAll(path);
+		fullPath.add(element);
+		this.pathElements = Collections.unmodifiableList(fullPath);
+	}
+
+	/**
 	 * Returns the number of elements which this {@link Locator} contains
 	 * 
 	 * @return the number of elements which this {@link Locator} contains
@@ -125,7 +140,19 @@ public class Locator {
 	}
 
 	/**
-	 * Returns the string represenation of this {@link Locator} by using the {@link #PATH_SEPARATOR} to separate the
+	 * Returns a new {@link Locator} where the given element is appended to the locator
+	 * 
+	 * @param element
+	 *            the element to append
+	 * 
+	 * @return the new locator
+	 */
+	public Locator append(String element) {
+		return new Locator(this.pathElements, element);
+	}
+
+	/**
+	 * Returns the string representation of this {@link Locator} by using the {@link #PATH_SEPARATOR} to separate the
 	 * values
 	 */
 	@Override
@@ -149,12 +176,6 @@ public class Locator {
 			throw new StrolchException("A path may not be empty!"); //$NON-NLS-1$
 
 		String[] elements = path.split(Locator.PATH_SEPARATOR);
-		if (elements.length > 2) {
-			String msg = "Path is invalid as it does not contain at least 2 elements: {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, path);
-			throw new StrolchException(msg);
-		}
-
 		return Arrays.asList(elements);
 	}
 
@@ -170,8 +191,8 @@ public class Locator {
 	 *             if the path elements does not contain at least two items
 	 */
 	private String formatPath(List<String> pathElements) throws StrolchException {
-		if (pathElements.size() > 2) {
-			String msg = "A Path always consists of at least 2 elements: {0}"; //$NON-NLS-1$
+		if (pathElements.isEmpty()) {
+			String msg = "A Path always consists of at least 1 element: {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, pathElements);
 			throw new StrolchException(msg);
 		}
@@ -241,6 +262,16 @@ public class Locator {
 		 */
 		public LocatorBuilder append(String element) {
 			this.pathElements.add(element);
+			return this;
+		}
+
+		/**
+		 * Remove the last element from the path
+		 * 
+		 * @return this instance for chaining
+		 */
+		public LocatorBuilder removeLast() {
+			this.pathElements.remove(this.pathElements.size() - 1);
 			return this;
 		}
 
