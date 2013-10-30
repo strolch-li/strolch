@@ -2,27 +2,33 @@ package li.strolch.runtime.configuration;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.StringHelper;
 
-public class AbstractionConfiguration {
+public abstract class AbstractionConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractionConfiguration.class);
 
-	private final String componentName;
+	private final String name;
 	private final Map<String, String> configurationValues;
 
-	public AbstractionConfiguration(String componentName, Map<String, String> configurationValues) {
-		this.componentName = componentName;
+	public AbstractionConfiguration(String name, Map<String, String> configurationValues) {
+		this.name = name;
 		this.configurationValues = configurationValues;
 	}
 
-	public String getComponentName() {
-		return this.componentName;
+	public String getName() {
+		return this.name;
+	}
+
+	public Set<String> getPropertyKeys() {
+		return new HashSet<>(this.configurationValues.keySet());
 	}
 
 	public String getString(String key, String defValue) {
@@ -45,7 +51,7 @@ public class AbstractionConfiguration {
 				return false;
 
 			String msg = "Component {0} has non-boolean configuration value for {1} = {2}!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.componentName, key, value);
+			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
 
@@ -62,7 +68,7 @@ public class AbstractionConfiguration {
 				return Integer.parseInt(value);
 			} catch (NumberFormatException e) {
 				String msg = "Component {0} has non-integer configuration value for {1} = {2}!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, this.componentName, key, value);
+				msg = MessageFormat.format(msg, this.name, key, value);
 				throw new StrolchConfigurationException(msg);
 			}
 		}
@@ -80,7 +86,7 @@ public class AbstractionConfiguration {
 				return Long.parseLong(value);
 			} catch (NumberFormatException e) {
 				String msg = "Component {0} has non-long configuration value for {1} = {2}!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, this.componentName, key, value);
+				msg = MessageFormat.format(msg, this.name, key, value);
 				throw new StrolchConfigurationException(msg);
 			}
 		}
@@ -102,7 +108,7 @@ public class AbstractionConfiguration {
 		if (!configFile.isFile() || !configFile.canRead()) {
 
 			String msg = "Component {0} is missing required configuration file {1}!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.componentName, key, value);
+			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
 		return configFile;
@@ -117,7 +123,7 @@ public class AbstractionConfiguration {
 	private void assertDefValueExist(String key, Object defValue) {
 		if (defValue == null) {
 			String msg = "Component {0} is missing the configuration value for key {1} does not exist!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.componentName, key);
+			msg = MessageFormat.format(msg, this.name, key);
 			throw new StrolchConfigurationException(msg);
 		}
 	}
