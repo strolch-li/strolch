@@ -17,16 +17,15 @@
  * along with ch.eitchnet.java.utils.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.rmi;
+package ch.eitchnet.fileserver;
 
 import java.io.Serializable;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RmiFilePart implements Serializable {
+public class FilePart implements Serializable {
 
-	//
 	private static final long serialVersionUID = 1L;
 
 	private String fileName;
@@ -45,18 +44,18 @@ public class RmiFilePart implements Serializable {
 	 * @param fileType
 	 *            defines the type of file being uploaded or retrieved. This defines in which path the file resides
 	 */
-	public RmiFilePart(String fileName, String fileType) {
+	public FilePart(String fileName, String fileType) {
 
 		if (fileName == null || fileName.isEmpty())
-			throw new RuntimeException("fileName may not be empty!");
+			throw new RuntimeException("fileName may not be empty!"); //$NON-NLS-1$
 		if (fileType == null || fileType.isEmpty())
-			throw new RuntimeException("fileType may not be empty!");
+			throw new RuntimeException("fileType may not be empty!"); //$NON-NLS-1$
 
 		this.fileName = fileName;
 		this.fileType = fileType;
 
 		this.partOffset = 0;
-		this.partLength = RmiFileHandler.MAX_PART_SIZE;
+		this.partLength = FileHandler.MAX_PART_SIZE;
 		this.partBytes = null;
 	}
 

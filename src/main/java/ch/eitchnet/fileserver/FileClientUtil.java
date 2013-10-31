@@ -17,13 +17,14 @@
  * along with ch.eitchnet.java.utils.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.rmi;
+package ch.eitchnet.fileserver;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.text.MessageFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,25 +36,27 @@ import ch.eitchnet.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class RmiHelper {
+public class FileClientUtil {
 
-	private static final Logger logger = LoggerFactory.getLogger(RmiHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(FileClientUtil.class);
 
 	/**
 	 * @param rmiFileClient
 	 * @param origFilePart
 	 * @param dstFile
 	 */
-	public static void downloadFile(RMIFileClient rmiFileClient, RmiFilePart origFilePart, File dstFile) {
+	public static void downloadFile(FileClient rmiFileClient, FilePart origFilePart, File dstFile) {
 
 		// here we don't overwrite, the caller must make sure the destination file does not exist
-		if (dstFile.exists())
-			throw new RuntimeException("The destination file " + dstFile.getAbsolutePath()
-					+ " already exists. Delete it first, if you want to overwrite it!");
+		if (dstFile.exists()) {
+			String msg = "The destination file {0} already exists. Delete it first, if you want to overwrite it!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, dstFile.getAbsolutePath());
+			throw new RuntimeException(msg);
+		}
 
 		try {
 
-			RmiFilePart tmpPart = origFilePart;
+			FilePart tmpPart = origFilePart;
 
 			int loops = 0;
 			int startLength = tmpPart.getPartLength();
@@ -64,14 +67,17 @@ public class RmiHelper {
 				tmpPart = rmiFileClient.requestFile(tmpPart);
 
 				// validate length of data
-				if (tmpPart.getPartLength() != tmpPart.getPartBytes().length)
-					throw new RuntimeException("Invalid tmpPart. Part length is not as long as the bytes passed "
-							+ tmpPart.getPartLength() + " / " + tmpPart.getPartBytes().length);
+				if (tmpPart.getPartLength() != tmpPart.getPartBytes().length) {
+					String msg = "Invalid tmpPart. Part length is not as long as the bytes passed {0} / {1}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, tmpPart.getPartLength(), tmpPart.getPartBytes().length);
+					throw new RuntimeException(msg);
+				}
 
 				// validate offset is size of file
 				if (tmpPart.getPartOffset() != dstFile.length()) {
-					throw new RuntimeException("The part offset $offset is not at the end of the file "
-							+ tmpPart.getPartOffset() + " / " + dstFile.length());
+					String msg = "The part offset $offset is not at the end of the file {0} / {1}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, tmpPart.getPartOffset(), dstFile.length());
+					throw new RuntimeException(msg);
 				}
 
 				// append the part
@@ -84,28 +90,33 @@ public class RmiHelper {
 				if (tmpPart.getPartOffset() >= tmpPart.getFileLength())
 					break;
 			}
-			RmiHelper.logger.info(tmpPart.getFileType() + ": " + tmpPart.getFileName() + ": Requested " + loops
-					+ " parts. StartSize: " + startLength + " EndSize: " + tmpPart.getPartLength());
+
+			String msg = "{0}: {1}: Requested {2} parts. StartSize: {3} EndSize: {4}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, tmpPart.getFileType(), tmpPart.getFileName(), loops, startLength,
+					tmpPart.getPartLength());
+			logger.info(msg);
 
 			// validate that the offset is at the end of the file
 			if (tmpPart.getPartOffset() != origFilePart.getFileLength()) {
-				throw new RuntimeException("Offset " + tmpPart.getPartOffset() + " is not at file length "
-						+ origFilePart.getFileLength() + " after reading all the file parts!");
+				msg = "Offset {0} is not at file length {1} after reading all the file parts!"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, tmpPart.getPartOffset(), origFilePart.getFileLength());
+				throw new RuntimeException(msg);
 			}
 
 			// now validate hashes
 			String dstFileHash = StringHelper.getHexString(FileHelper.hashFileSha256(dstFile));
 			if (!dstFileHash.equals(origFilePart.getFileHash())) {
-				throw new RuntimeException("Downloading the file " + origFilePart.getFileName()
-						+ " failed because the hashes don't match. Expected: " + origFilePart.getFileHash()
-						+ " / Actual: " + dstFileHash);
+				msg = "Downloading the file {0} failed because the hashes don''t match. Expected: {1} / Actual: {2}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, origFilePart.getFileName(), origFilePart.getFileHash(), dstFileHash);
+				throw new RuntimeException(msg);
 			}
 
 		} catch (Exception e) {
 			if (e instanceof RuntimeException)
 				throw (RuntimeException) e;
-			throw new RuntimeException("Downloading the file " + origFilePart.getFileName()
-					+ " failed because of an underlying exception " + e.getLocalizedMessage());
+			String msg = "Downloading the file {0} failed because of an underlying exception {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, origFilePart.getFileName(), e.getLocalizedMessage());
+			throw new RuntimeException(msg);
 		}
 	}
 
@@ -114,28 +125,29 @@ public class RmiHelper {
 	 * @param srcFile
 	 * @param fileType
 	 */
-	public static void uploadFile(RMIFileClient rmiFileClient, File srcFile, String fileType) {
+	public static void uploadFile(FileClient rmiFileClient, File srcFile, String fileType) {
 
 		// make sure the source file exists
-		if (!srcFile.canRead())
-			throw new RuntimeException("The source file does not exist at " + srcFile.getAbsolutePath());
+		if (!srcFile.canRead()) {
+			String msg = MessageFormat.format("The source file does not exist at {0}", srcFile.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException(msg);
+		}
 
-		BufferedInputStream inputStream = null;
-		try {
+		try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(srcFile));) {
 
 			// get the size of the file
 			long fileLength = srcFile.length();
 			String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(srcFile));
 
 			// create the file part to send
-			RmiFilePart filePart = new RmiFilePart(srcFile.getName(), fileType);
+			FilePart filePart = new FilePart(srcFile.getName(), fileType);
 			filePart.setFileLength(fileLength);
 			filePart.setFileHash(fileHash);
 
 			// define the normal size of the parts we're sending. The last part will naturally have a different size
 			int partLength;
-			if (fileLength > RmiFileHandler.MAX_PART_SIZE)
-				partLength = RmiFileHandler.MAX_PART_SIZE;
+			if (fileLength > FileHandler.MAX_PART_SIZE)
+				partLength = FileHandler.MAX_PART_SIZE;
 			else
 				partLength = (int) fileLength;
 
@@ -143,8 +155,6 @@ public class RmiHelper {
 			byte[] bytes = new byte[partLength];
 
 			// open the stream to the file
-			inputStream = new BufferedInputStream(new FileInputStream(srcFile));
-
 			int read = 0;
 			int offset = 0;
 
@@ -159,11 +169,11 @@ public class RmiHelper {
 
 				// validate we read the expected number of bytes
 				if (read == -1)
-					throw new IOException("Something went wrong while reading the bytes as -1 was returned!");
+					throw new IOException("Something went wrong while reading the bytes as -1 was returned!"); //$NON-NLS-1$
 				if (read != bytes.length) {
-					throw new IOException(
-							"Something went wrong while reading the bytes as the wrong number of bytes were read. Expected "
-									+ bytes.length + " Actual: " + read);
+					String msg = "Something went wrong while reading the bytes as the wrong number of bytes were read. Expected {0} Actual: {1}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, bytes.length, read);
+					throw new IOException(msg);
 				}
 
 				// set the fields on the FilePart
@@ -187,9 +197,11 @@ public class RmiHelper {
 				// the last part of the file
 				if (nextOffset + bytes.length > fileLength) {
 					long remaining = fileLength - nextOffset;
-					if (remaining > RmiFileHandler.MAX_PART_SIZE)
-						throw new RuntimeException("Something went wrong as the remaining part " + remaining
-								+ " is larger than MAX_PART_SIZE " + RmiFileHandler.MAX_PART_SIZE + "!");
+					if (remaining > FileHandler.MAX_PART_SIZE) {
+						String msg = "Something went wrong as the remaining part {0} is larger than MAX_PART_SIZE {1}!"; //$NON-NLS-1$
+						msg = MessageFormat.format(msg, remaining, FileHandler.MAX_PART_SIZE);
+						throw new RuntimeException(msg);
+					}
 					partLength = (int) remaining;
 					bytes = new byte[partLength];
 				}
@@ -198,22 +210,17 @@ public class RmiHelper {
 				offset = nextOffset;
 			}
 
-			RmiHelper.logger.info(filePart.getFileType() + ": " + filePart.getFileName() + ": Sent " + loops
-					+ " parts. StartSize: " + startLength + " EndSize: " + filePart.getPartLength());
+			String msg = "{0}: {1}: Sent {2} parts. StartSize: {3} EndSize: {4}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, filePart.getFileType(), filePart.getFileName(), loops, startLength,
+					filePart.getPartLength());
+			logger.info(msg);
 
 		} catch (Exception e) {
 			if (e instanceof RuntimeException)
 				throw (RuntimeException) e;
-			throw new RuntimeException("Uploading the file " + srcFile.getAbsolutePath()
-					+ " failed because of an underlying exception " + e.getLocalizedMessage());
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					RmiHelper.logger.error("Exception while closing FileInputStream " + e.getLocalizedMessage());
-				}
-			}
+			String msg = "Uploading the file {0} failed because of an underlying exception {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, srcFile.getAbsolutePath(), e.getLocalizedMessage());
+			throw new RuntimeException(msg);
 		}
 	}
 
@@ -222,13 +229,14 @@ public class RmiHelper {
 	 * @param fileDeletion
 	 * @param dstFile
 	 */
-	public static void deleteFile(RMIFileClient rmiFileClient, RmiFileDeletion fileDeletion, File dstFile) {
+	public static void deleteFile(FileClient rmiFileClient, FileDeletion fileDeletion, File dstFile) {
 
 		try {
 			rmiFileClient.deleteFile(fileDeletion);
 		} catch (RemoteException e) {
-			throw new RuntimeException("Deleting the file " + fileDeletion.getFileName()
-					+ " failed because of an underlying exception " + e.getLocalizedMessage());
+			String msg = "Deleting the file {0} failed because of an underlying exception {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, fileDeletion.getFileName(), e.getLocalizedMessage());
+			throw new RuntimeException(msg);
 		}
 	}
 }

@@ -17,16 +17,15 @@
  * along with ch.eitchnet.java.utils.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package ch.eitchnet.rmi;
+package ch.eitchnet.fileserver;
 
 import java.io.Serializable;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RmiFileDeletion implements Serializable {
+public class FileDeletion implements Serializable {
 
-	//
 	private static final long serialVersionUID = 1L;
 
 	private String fileName;
@@ -38,7 +37,7 @@ public class RmiFileDeletion implements Serializable {
 	 * @param fileType
 	 *            the type of file to delete. This defines in which path the file resides
 	 */
-	public RmiFileDeletion(String fileName, String fileType) {
+	public FileDeletion(String fileName, String fileType) {
 		this.fileName = fileName;
 		this.fileType = fileType;
 	}
