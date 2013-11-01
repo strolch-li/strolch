@@ -21,6 +21,8 @@
  */
 package ch.eitchnet.utils.helper;
 
+import java.text.MessageFormat;
+
 /**
  * <p>
  * This class implements the encoding and decoding of RFC 4648 <a>https://tools.ietf.org/html/rfc4648</a>.
@@ -368,8 +370,10 @@ public class BaseEncoding {
 	public static byte[] toBase64(byte[] alphabet, byte[] bytes) {
 		if (bytes.length == 0)
 			return new byte[0];
-		if (alphabet.length != 64)
-			throw new RuntimeException("Alphabet does not have expected size 64 but is " + alphabet.length);
+		if (alphabet.length != 64) {
+			String msg = MessageFormat.format("Alphabet does not have expected size 64 but is {0}", alphabet.length); //$NON-NLS-1$
+			throw new RuntimeException(msg);
+		}
 
 		// 6 bits input for every 8 bits (1 byte) output
 		// least common multiple of 6 bits input and 8 bits output = 24
@@ -476,8 +480,10 @@ public class BaseEncoding {
 	public static byte[] toBase32(byte[] alphabet, byte[] bytes) {
 		if (bytes.length == 0)
 			return new byte[0];
-		if (alphabet.length != 32)
-			throw new RuntimeException("Alphabet does not have expected size 32 but is " + alphabet.length);
+		if (alphabet.length != 32) {
+			String msg = MessageFormat.format("Alphabet does not have expected size 32 but is {0}", alphabet.length); //$NON-NLS-1$
+			throw new RuntimeException(msg);
+		}
 
 		// 5 bits input for every 8 bits (1 byte) output
 		// least common multiple of 5 bits input and 8 bits output = 40
@@ -598,8 +604,10 @@ public class BaseEncoding {
 	public static byte[] toBase16(byte[] alphabet, byte[] bytes) {
 		if (bytes.length == 0)
 			return new byte[0];
-		if (alphabet.length != 16)
-			throw new RuntimeException("Alphabet does not have expected size 16 but is " + alphabet.length);
+		if (alphabet.length != 16) {
+			String msg = MessageFormat.format("Alphabet does not have expected size 16 but is {0}", alphabet.length); //$NON-NLS-1$
+			throw new RuntimeException(msg);
+		}
 
 		// calculate output text length
 		int nrOfInputBytes = bytes.length;
@@ -651,15 +659,19 @@ public class BaseEncoding {
 		if (inputLength == 0)
 			return new byte[0];
 		if ((inputLength % 4) != 0) {
-			throw new RuntimeException("The input bytes to be decoded must be multiples of 4, but is multiple of "
-					+ (inputLength % 4));
+			String msg = MessageFormat.format(
+					"The input bytes to be decoded must be multiples of 4, but is multiple of {0}", //$NON-NLS-1$
+					(inputLength % 4));
+			throw new RuntimeException(msg);
 		}
 
-		if (alphabet.length != 128)
-			throw new RuntimeException("Alphabet does not have expected size 128 but is " + alphabet.length);
+		if (alphabet.length != 128) {
+			String msg = MessageFormat.format("Alphabet does not have expected size 128 but is {0}", alphabet.length); //$NON-NLS-1$
+			throw new RuntimeException(msg);
+		}
 
 		if (!isEncodedByAlphabet(alphabet, bytes, PADDING_64))
-			throw new RuntimeException("The data contains illegal values which are not mapped by the given alphabet!");
+			throw new RuntimeException("The data contains illegal values which are not mapped by the given alphabet!"); //$NON-NLS-1$
 
 		// find how much padding we have
 		int nrOfBytesPadding = 0;
@@ -786,15 +798,18 @@ public class BaseEncoding {
 		if (inputLength == 0)
 			return new byte[0];
 		if ((inputLength % 8) != 0) {
-			throw new RuntimeException("The input bytes to be decoded must be multiples of 8, but is multiple of "
-					+ (inputLength % 8));
+			String msg = "The input bytes to be decoded must be multiples of 8, but is multiple of {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, (inputLength % 8));
+			throw new RuntimeException(msg);
 		}
 
-		if (alphabet.length != 128)
-			throw new RuntimeException("Alphabet does not have expected size 128 but is " + alphabet.length);
+		if (alphabet.length != 128) {
+			String msg = MessageFormat.format("Alphabet does not have expected size 128 but is {0}", alphabet.length); //$NON-NLS-1$
+			throw new RuntimeException(msg);
+		}
 
 		if (!isEncodedByAlphabet(alphabet, bytes, PADDING_32))
-			throw new RuntimeException("The data contains illegal values which are not mapped by the given alphabet!");
+			throw new RuntimeException("The data contains illegal values which are not mapped by the given alphabet!"); //$NON-NLS-1$
 
 		// find how much padding we have
 		int nrOfBytesPadding = 0;
@@ -945,15 +960,18 @@ public class BaseEncoding {
 		if (bytes.length == 0)
 			return new byte[0];
 		if ((bytes.length % 2) != 0) {
-			throw new RuntimeException("The input bytes to be decoded must be multiples of 4, but is multiple of "
-					+ (bytes.length % 4));
+			String msg = "The input bytes to be decoded must be multiples of 4, but is multiple of {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, (bytes.length % 4));
+			throw new RuntimeException(msg);
 		}
 
-		if (alphabet.length != 128)
-			throw new RuntimeException("Alphabet does not have expected size 128 but is " + alphabet.length);
+		if (alphabet.length != 128) {
+			String msg = MessageFormat.format("Alphabet does not have expected size 128 but is {0}", alphabet.length); //$NON-NLS-1$
+			throw new RuntimeException(msg);
+		}
 
 		if (!isEncodedByAlphabet(alphabet, bytes, 0))
-			throw new RuntimeException("The data contains illegal values which are not mapped by the given alphabet!");
+			throw new RuntimeException("The data contains illegal values which are not mapped by the given alphabet!"); //$NON-NLS-1$
 
 		int dataLength = bytes.length / 2;
 
@@ -963,25 +981,27 @@ public class BaseEncoding {
 			byte b1 = bytes[i++];
 			byte b2 = bytes[i++];
 
+			String msgOutOfRange = "Value at index {0} is not in range of alphabet (0-127){1}"; //$NON-NLS-1$
 			if (b1 < 0) {
-				throw new IllegalArgumentException("Value at index " + (i - 2) + " is not in range of alphabet (0-127)"
-						+ b1);
+				msgOutOfRange = MessageFormat.format(msgOutOfRange, (i - 2), b1);
+				throw new IllegalArgumentException(msgOutOfRange);
 			}
 			if (b2 < 0) {
-				throw new IllegalArgumentException("Value at index " + (i - 1) + " is not in range of alphabet (0-127)"
-						+ b2);
+				msgOutOfRange = MessageFormat.format(msgOutOfRange, (i - 1), b2);
+				throw new IllegalArgumentException(msgOutOfRange);
 			}
 
 			byte c1 = alphabet[b1];
 			byte c2 = alphabet[b2];
 
+			String msgIllegalValue = "Value at index {0} is referencing illegal value in alphabet: {1}"; //$NON-NLS-1$
 			if (c1 == -1) {
-				throw new IllegalArgumentException("Value at index " + (i - 2)
-						+ " is referencing illegal value in alphabet: " + b1);
+				msgIllegalValue = MessageFormat.format(msgIllegalValue, (i - 2), b1);
+				throw new IllegalArgumentException(msgIllegalValue);
 			}
 			if (c2 == -1) {
-				throw new IllegalArgumentException("Value at index " + (i - 2)
-						+ " is referencing illegal value in alphabet: " + b2);
+				msgIllegalValue = MessageFormat.format(msgIllegalValue, (i - 2), b2);
+				throw new IllegalArgumentException(msgIllegalValue);
 			}
 
 			int dataIndex = (i / 2) - 1;
