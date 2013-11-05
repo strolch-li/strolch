@@ -1,10 +1,11 @@
 package li.strolch.runtime.test;
 
+import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.StrolchComponent;
 
-public class PostInitializerTestImpl extends StrolchComponent implements PostInitializerTest{
+public class PostInitializerTestImpl extends StrolchComponent implements PostInitializerTest {
 
-	public PostInitializerTestImpl(String componentName) {
-		super(componentName);
+	public PostInitializerTestImpl(ComponentContainer container, String componentName) {
+		super(container, componentName);
 	}
 }

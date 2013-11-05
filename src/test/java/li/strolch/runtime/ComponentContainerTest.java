@@ -28,6 +28,7 @@ public class ComponentContainerTest {
 			File rootPathF = new File("src/test/resources/runtimetest");
 			ComponentContainer container = new ComponentContainer();
 			container.setup(rootPathF);
+			container.initialize();
 			container.start();
 
 			ServiceHandlerTest serviceHandler = container.getComponent(ServiceHandlerTest.class);

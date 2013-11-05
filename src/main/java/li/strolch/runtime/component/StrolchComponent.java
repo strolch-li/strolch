@@ -6,10 +6,12 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 
 public class StrolchComponent {
 
+	private final ComponentContainer container;
 	private final String componentName;
 	private ComponentState state;
 
-	public StrolchComponent(String componentName) {
+	public StrolchComponent(ComponentContainer container, String componentName) {
+		this.container = container;
 		this.componentName = componentName;
 		this.state = ComponentState.UNDEFINED;
 	}
@@ -17,7 +19,7 @@ public class StrolchComponent {
 	/**
 	 * @return the componentName
 	 */
-	public String getComponentName() {
+	public String getName() {
 		return this.componentName;
 	}
 
@@ -32,12 +34,16 @@ public class StrolchComponent {
 	}
 
 	protected void changeState(ComponentState newState) {
+
+		if (this.state == newState)
+			return;
+
 		switch (this.state) {
 		case UNDEFINED:
-			if (newState != ComponentState.INITALIZED)
+			if (newState != ComponentState.INITIALIZED)
 				throw getIllegalStateEx(this.state, newState);
 			break;
-		case INITALIZED:
+		case INITIALIZED:
 			if (newState != ComponentState.STARTED)
 				throw getIllegalStateEx(this.state, newState);
 			break;
@@ -65,11 +71,8 @@ public class StrolchComponent {
 		}
 	}
 
-	/**
-	 * @param configuration
-	 */
 	public void initialize(ComponentConfiguration configuration) {
-		changeState(ComponentState.INITALIZED);
+		changeState(ComponentState.INITIALIZED);
 	}
 
 	public void start() {

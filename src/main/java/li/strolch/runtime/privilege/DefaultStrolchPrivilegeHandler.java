@@ -2,6 +2,7 @@ package li.strolch.runtime.privilege;
 
 import java.io.File;
 
+import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import ch.eitchnet.privilege.base.PrivilegeException;
@@ -18,8 +19,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 	private PrivilegeHandler privilegeHandler;
 
-	public DefaultStrolchPrivilegeHandler() {
-		super(StrolchPrivilegeHandler.class.getName());
+	public DefaultStrolchPrivilegeHandler(ComponentContainer container) {
+		super(container, StrolchPrivilegeHandler.class.getName());
 	}
 
 	@Override

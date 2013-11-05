@@ -1,12 +1,13 @@
 package li.strolch.runtime.test;
 
 import li.strolch.model.Resource;
+import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.StrolchComponent;
 
 public class PersistenceHandlerTestImpl extends StrolchComponent implements PersistenceHandlerTest {
 
-	public PersistenceHandlerTestImpl(String componentName) {
-		super(componentName);
+	public PersistenceHandlerTestImpl(ComponentContainer container, String componentName) {
+		super(container, componentName);
 	}
 
 	@Override
