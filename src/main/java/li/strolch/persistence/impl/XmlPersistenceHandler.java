@@ -33,6 +33,7 @@ import li.strolch.persistence.api.StrolchPersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.impl.model.OrderContextFactory;
 import li.strolch.persistence.impl.model.ResourceContextFactory;
+import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import ch.eitchnet.xmlpers.api.IoMode;
@@ -50,8 +51,8 @@ public class XmlPersistenceHandler extends StrolchComponent implements StrolchPe
 	public static final String DB_STORE_PATH = "dbStore/"; //$NON-NLS-1$
 	private PersistenceManager persistenceManager;
 
-	public XmlPersistenceHandler() {
-		super(StrolchPersistenceHandler.class.getName());
+	public XmlPersistenceHandler(ComponentContainer container) {
+		super(container, StrolchPersistenceHandler.class.getName());
 	}
 
 	@Override

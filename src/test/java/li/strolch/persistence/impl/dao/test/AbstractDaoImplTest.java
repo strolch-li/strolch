@@ -25,6 +25,7 @@ import java.io.File;
 import java.text.MessageFormat;
 
 import li.strolch.persistence.impl.XmlPersistenceHandler;
+import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.StrolchConfiguration;
@@ -64,7 +65,8 @@ public abstract class AbstractDaoImplTest {
 		StrolchConfiguration strolchConfiguration = ConfigurationParser.parseConfiguration(rootPath);
 		ComponentConfiguration componentConfiguration = strolchConfiguration
 				.getComponentConfiguration("PersistenceHandler"); //$NON-NLS-1$
-		persistenceHandler = new XmlPersistenceHandler();
+		ComponentContainer container = new ComponentContainer();
+		persistenceHandler = new XmlPersistenceHandler(container);
 		persistenceHandler.initialize(componentConfiguration);
 
 	}
