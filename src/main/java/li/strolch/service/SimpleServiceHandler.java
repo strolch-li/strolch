@@ -21,6 +21,7 @@ package li.strolch.service;
 
 import java.text.MessageFormat;
 
+import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.StrolchComponent;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
@@ -32,8 +33,8 @@ public class SimpleServiceHandler extends StrolchComponent implements ServiceHan
 
 	private PrivilegeHandler privilegeHandler;
 
-	public SimpleServiceHandler() {
-		super(ServiceHandler.class.getName());
+	public SimpleServiceHandler(ComponentContainer container) {
+		super(container, ServiceHandler.class.getName());
 	}
 
 	@Override
