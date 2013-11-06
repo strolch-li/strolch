@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +22,7 @@ public class ComponentContainer {
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainer.class);
 
 	private Map<Class<?>, StrolchComponent> componentMap;
+	private Map<String, ComponentController> controllerMap;
 
 	private ComponentDependencyAnalyzer dependencyAnalyzer;
 
@@ -46,26 +46,26 @@ public class ComponentContainer {
 
 		StrolchConfiguration strolchConfiguration = ConfigurationParser.parseConfiguration(path);
 
-		Map<Class<?>, StrolchComponent> componentByApiMap = new HashMap<>();
-		Map<String, StrolchComponent> componentByNameMap = new HashMap<>();
+		Map<Class<?>, StrolchComponent> componentMap = new HashMap<>();
+		Map<String, ComponentController> controllerMap = new HashMap<>();
 		Set<String> componentNames = strolchConfiguration.getComponentNames();
 		for (String componentName : componentNames) {
 			ComponentConfiguration componentConfiguration = strolchConfiguration
 					.getComponentConfiguration(componentName);
-			initializeComponent(componentByApiMap, componentByNameMap, componentConfiguration);
+			initializeComponent(componentMap, controllerMap, componentConfiguration);
 		}
 
-		this.dependencyAnalyzer = new ComponentDependencyAnalyzer(strolchConfiguration, componentByNameMap);
-		this.dependencyAnalyzer.assertHasNoCyclicDependency();
+		this.dependencyAnalyzer = new ComponentDependencyAnalyzer(strolchConfiguration, controllerMap);
+		this.dependencyAnalyzer.setupDependencies();
 
-		this.componentMap = componentByApiMap;
+		this.componentMap = componentMap;
 		this.strolchConfiguration = strolchConfiguration;
 		msg = "Strolch Container setup with {0} components."; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.componentMap.size()));
 	}
 
-	private void initializeComponent(Map<Class<?>, StrolchComponent> componentByApiMap,
-			Map<String, StrolchComponent> componentByNameMap, ComponentConfiguration componentConfiguration) {
+	private void initializeComponent(Map<Class<?>, StrolchComponent> componentMap,
+			Map<String, ComponentController> controllerMap, ComponentConfiguration componentConfiguration) {
 
 		String componentName = componentConfiguration.getName();
 		try {
@@ -92,8 +92,8 @@ public class ComponentContainer {
 					String.class);
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
 
-			componentByApiMap.put(apiClass, strolchComponent);
-			componentByNameMap.put(componentName, strolchComponent);
+			componentMap.put(apiClass, strolchComponent);
+			controllerMap.put(componentName, new ComponentController(strolchComponent));
 			String msg = "Initialized component {0} with API {1} and impl {2}."; //$NON-NLS-1$
 			logger.info(MessageFormat.format(msg, componentName, api, impl));
 
@@ -108,7 +108,7 @@ public class ComponentContainer {
 
 	public void start(Set<StrolchComponent> components) {
 
-		Set<StrolchComponent> allDownstreamDependencies = findDirectDownstreamDependencies(components);
+		// TODO Set<StrolchComponent> allDownstreamDependencies = findDirectDownstreamDependencies(components);
 
 		// initialize each component
 		for (StrolchComponent component : components) {
@@ -116,12 +116,12 @@ public class ComponentContainer {
 		}
 
 		// initialize downstream dependencies
-		start(allDownstreamDependencies);
+		// TODO start(allDownstreamDependencies);
 	}
 
 	public void stop(Set<StrolchComponent> components) {
 
-		Set<StrolchComponent> allDownstreamDependencies = findDirectUpstreamDependencies(components);
+		// TODO Set<StrolchComponent> allDownstreamDependencies = findDirectUpstreamDependencies(components);
 
 		// initialize each component
 		for (StrolchComponent component : components) {
@@ -129,12 +129,12 @@ public class ComponentContainer {
 		}
 
 		// initialize downstream dependencies
-		stop(allDownstreamDependencies);
+		// TODO stop(allDownstreamDependencies);
 	}
 
 	public void destroy(Set<StrolchComponent> components) {
 
-		Set<StrolchComponent> allUpstreamDependencies = findDirectUpstreamDependencies(components);
+		Set<ComponentController> allUpstreamDependencies = this.dependencyAnalyzer.findRootUpstreamComponents();
 
 		// initialize each component
 		for (StrolchComponent component : components) {
@@ -142,40 +142,7 @@ public class ComponentContainer {
 		}
 
 		// initialize downstream dependencies
-		destroy(allUpstreamDependencies);
-	}
-
-	private Set<StrolchComponent> findDirectDownstreamDependencies(Set<StrolchComponent> components) {
-		Set<StrolchComponent> allDownstreamDependencies = new HashSet<>();
-
-		// find the direct downstream dependencies
-		for (StrolchComponent component : components) {
-
-			// find this component's downstream dependencies
-			Set<StrolchComponent> downstreamDependencies = this.dependencyAnalyzer
-					.findDownstreamDependencies(component);
-
-			// add all of these downstream dependencies
-			allDownstreamDependencies.addAll(downstreamDependencies);
-		}
-
-		// make sure that in these downstream dependencies
-		// none of these dependencies depend on each other
-		Set<StrolchComponent> tmpDependencies = new HashSet<>(allDownstreamDependencies);
-		for (StrolchComponent component : tmpDependencies) {
-
-			Set<StrolchComponent> upstreamDependencies = this.dependencyAnalyzer.findUpstreamDependencies(component);
-			allDownstreamDependencies.removeAll(upstreamDependencies);
-		}
-		return allDownstreamDependencies;
-	}
-
-	private Set<StrolchComponent> findDirectUpstreamDependencies(Set<StrolchComponent> components) {
-		Set<StrolchComponent> allUpstreamDependencies = new HashSet<>();
-
-		// TODO
-
-		return allUpstreamDependencies;
+		// TODO destroy(allUpstreamDependencies);
 	}
 
 	public void initialize() {

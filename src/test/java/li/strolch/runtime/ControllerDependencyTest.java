@@ -3,12 +3,23 @@ package li.strolch.runtime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.ComponentController;
+import li.strolch.runtime.component.ComponentDependencyAnalyzer;
 import li.strolch.runtime.component.StrolchComponent;
+import li.strolch.runtime.configuration.ConfigurationParser;
+import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -52,6 +63,9 @@ public class ControllerDependencyTest {
 	private StrolchComponent com3;
 	private ComponentController con3;
 
+	private StrolchConfiguration strolchConfiguration;
+	private Map<String, ComponentController> controllerMap;
+
 	@Before
 	public void setupModel() {
 
@@ -87,6 +101,10 @@ public class ControllerDependencyTest {
 
 		this.con3.addUpstreamDependency(this.con8);
 		this.con3.addUpstreamDependency(this.con10);
+
+		File rootPathF = new File("src/test/resources/configtest");
+		this.strolchConfiguration = ConfigurationParser.parseConfiguration(rootPathF);
+		this.controllerMap = new HashMap<>();
 	}
 
 	private void assertModel() {
@@ -210,6 +228,39 @@ public class ControllerDependencyTest {
 	public void shouldNotBreakModel3() {
 		assertModel();
 		this.con11.addUpstreamDependency(this.con8);
+	}
+
+	@Test
+	public void shouldNotBreakModel4() {
+		assertModel();
+		this.con8.addUpstreamDependency(this.con11);
+	}
+
+	//         11
+	//    ^   ^  ^
+	//    7   9 < 8
+	//    
+	//   (7, 8) => (11)
+
+	@Test
+	@Ignore
+	public void shouldCollectUpstreamDependencies() {
+		assertModel();
+
+		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
+				this.controllerMap);
+
+		this.con8.addUpstreamDependency(this.con11);
+
+		Set<ComponentController> controllers = new HashSet<>();
+		controllers.add(this.con7);
+		controllers.add(this.con8);
+		
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
+				.findDirectUpstreamDependencies(controllers);
+
+		assertEquals(1, directUpstreamDependencies.size());
+		assertTrue(directUpstreamDependencies.contains(this.con11));
 	}
 
 	@Test

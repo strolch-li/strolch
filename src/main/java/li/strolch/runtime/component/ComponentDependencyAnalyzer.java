@@ -1,146 +1,93 @@
 package li.strolch.runtime.component;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
-import li.strolch.runtime.configuration.StrolchConfigurationException;
 
 public class ComponentDependencyAnalyzer {
 
 	private StrolchConfiguration strolchConfiguration;
-	private Map<String, StrolchComponent> componentMap;
+	private Map<String, ComponentController> controllerMap;
 
 	public ComponentDependencyAnalyzer(StrolchConfiguration strolchConfiguration,
-			Map<String, StrolchComponent> componentMap) {
+			Map<String, ComponentController> controllerMap) {
 		this.strolchConfiguration = strolchConfiguration;
-		this.componentMap = componentMap;
+		this.controllerMap = controllerMap;
 	}
 
-	public Set<StrolchComponent> findAllRootComponents() {
-
-		Set<StrolchComponent> rootComponents = new HashSet<>();
-
-		Set<String> componentNames = this.strolchConfiguration.getComponentNames();
-		for (String componentName : componentNames) {
-			ComponentConfiguration componentConfiguration = this.strolchConfiguration
-					.getComponentConfiguration(componentName);
-			if (componentConfiguration.getDependencies().isEmpty()) {
-				StrolchComponent strolchComponent = this.componentMap.get(componentName);
-				rootComponents.add(strolchComponent);
-			}
+	public Set<ComponentController> findRootUpstreamComponents() {
+		Set<ComponentController> controllers = new HashSet<>();
+		for (ComponentController controller : this.controllerMap.values()) {
+			if (!controller.hasUpstreamDependencies())
+				controllers.add(controller);
 		}
 
-		return rootComponents;
+		return controllers;
 	}
 
-	public Set<StrolchComponent> findAllLeafComponents() {
-
-		Set<StrolchComponent> leafComponents = new HashSet<>();
-
-		Set<String> componentNames = this.strolchConfiguration.getComponentNames();
-		for (String componentName : componentNames) {
-
-			boolean noDownStreamDependency = true;
-			for (String possibleDependency : componentNames) {
-				if (componentName.equals(possibleDependency))
-					continue;
-
-				ComponentConfiguration dependency = this.strolchConfiguration
-						.getComponentConfiguration(possibleDependency);
-				if (dependency.getDependencies().contains(componentName))
-					noDownStreamDependency = false;
-			}
-
-			if (noDownStreamDependency) {
-				StrolchComponent strolchComponent = this.componentMap.get(componentName);
-				leafComponents.add(strolchComponent);
-			}
+	public Set<ComponentController> findRootDownstreamComponents() {
+		Set<ComponentController> controllers = new HashSet<>();
+		for (ComponentController controller : this.controllerMap.values()) {
+			if (!controller.hasDownstreamDependencies())
+				controllers.add(controller);
 		}
 
-		return leafComponents;
+		return controllers;
 	}
 
-	public Set<StrolchComponent> findUpstreamDependencies(StrolchComponent component) {
+	public Set<ComponentController> findDirectUpstreamDependencies(Set<ComponentController> controllers) {
 
-		String componentName = component.getName();
-		ComponentConfiguration componentConfiguration = this.strolchConfiguration
-				.getComponentConfiguration(componentName);
+		Set<ComponentController> directUpstreamDependencies = new HashSet<>();
 
-		Set<String> dependencyNames = componentConfiguration.getDependencies();
-		if (dependencyNames.isEmpty())
-			return Collections.emptySet();
-
-		Set<StrolchComponent> dependencies = new HashSet<>(dependencyNames.size());
-		for (String dependencyName : dependencyNames) {
-			StrolchComponent dependency = this.componentMap.get(dependencyName);
-			if (dependency == null) {
-				String msg = "The dependency {0} for component {0} does not exist!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, dependencyName, componentName);
-				throw new StrolchConfigurationException(msg);
-			}
-
-			dependencies.add(dependency);
+		// collect all direct upstream dependencies
+		for (ComponentController controller : controllers) {
+			Set<ComponentController> upstreamDependencies = controller.getUpstreamDependencies();
+			directUpstreamDependencies.addAll(upstreamDependencies);
 		}
+		
+		// assert no dependency in list which was from source
+		//directUpstreamDependencies.
 
-		return dependencies;
-	}
+		// prune dependencies which are a dependency of any of these dependencies
+		for (ComponentController controller : controllers) {
+			Set<ComponentController> upstreamDependencies = controller.getUpstreamDependencies();
 
-	public Set<StrolchComponent> findDownstreamDependencies(StrolchComponent component) {
+			for (ComponentController upstream : upstreamDependencies) {
 
-		String componentName = component.getName();
-		Set<StrolchComponent> dependencies = new HashSet<>();
+				Iterator<ComponentController> iter = directUpstreamDependencies.iterator();
+				while (iter.hasNext()) {
+					ComponentController possibleTransitiveDependency = iter.next();
+					if (upstream.hasUpstreamDependency(possibleTransitiveDependency))
+						continue;
 
-		Set<String> componentNames = this.strolchConfiguration.getComponentNames();
-		for (String name : componentNames) {
-			ComponentConfiguration configuration = this.strolchConfiguration.getComponentConfiguration(name);
-			if (configuration.getDependencies().contains(componentName))
-				dependencies.add(this.componentMap.get(name));
-		}
-
-		return dependencies;
-	}
-
-	public void assertHasNoCyclicDependency() {
-
-		Set<String> componentNames = this.strolchConfiguration.getComponentNames();
-		for (String componentName : componentNames) {
-			ComponentConfiguration componentConfiguration = this.strolchConfiguration
-					.getComponentConfiguration(componentName);
-			List<String> cyclicDependencies = new ArrayList<>();
-			findCyclicDependency(cyclicDependencies, componentName, componentConfiguration.getDependencies());
-			if (!cyclicDependencies.isEmpty()) {
-				String msg = "Found a cyclic dependency for component {0}: {1}"; //$NON-NLS-1$
-				StringBuilder sb = new StringBuilder(componentName);
-				for (String dep : cyclicDependencies) {
-					sb.append(" -> "); //$NON-NLS-1$
-					sb.append(dep);
+					if (upstream.hasTransitiveUpstreamDependency(possibleTransitiveDependency))
+						iter.remove();
 				}
-				msg = MessageFormat.format(msg, componentName, sb.toString());
-				throw new StrolchConfigurationException(msg);
+			}
+		}
+
+		return directUpstreamDependencies;
+	}
+
+	public Set<ComponentController> findDirectDownstreamDependencies(ComponentController component) {
+
+		Set<ComponentController> controllers = new HashSet<>();
+
+		return controllers;
+	}
+
+	public void setupDependencies() {
+		for (ComponentController controller : this.controllerMap.values()) {
+			String name = controller.getComponent().getName();
+			ComponentConfiguration configuration = this.strolchConfiguration.getComponentConfiguration(name);
+			Set<String> dependencies = configuration.getDependencies();
+			for (String dependency : dependencies) {
+
 			}
 		}
 	}
-
-	private void findCyclicDependency(List<String> cyclicDependencies, String componentName, Set<String> dependencies) {
-
-		for (String dependency : dependencies) {
-			if (componentName.equals(dependency)) {
-				cyclicDependencies.add(dependency);
-				return;
-			}
-
-			ComponentConfiguration dependencyConfiguration = this.strolchConfiguration
-					.getComponentConfiguration(dependency);
-			Set<String> nextDependencies = dependencyConfiguration.getDependencies();
-			findCyclicDependency(cyclicDependencies, componentName, nextDependencies);
-		}
-	}
-
 }
