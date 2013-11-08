@@ -39,7 +39,7 @@ public class ComponentDependencyAnalyzer {
 		return controllers;
 	}
 
-	public Set<ComponentController> findDirectUpstreamDependencies(Set<ComponentController> controllers) {
+	public Set<ComponentController> collectDirectUpstreamDependencies(Set<ComponentController> controllers) {
 
 		Set<ComponentController> directUpstreamDependencies = new HashSet<>();
 
@@ -64,7 +64,7 @@ public class ComponentDependencyAnalyzer {
 					if (upstream.hasUpstreamDependency(possibleTransitiveDependency))
 						continue;
 
-					if (upstream.hasTransitiveUpstreamDependency(possibleTransitiveDependency))
+					if (possibleTransitiveDependency.hasTransitiveUpstreamDependency(upstream))
 						iter.remove();
 				}
 			}
@@ -73,7 +73,7 @@ public class ComponentDependencyAnalyzer {
 		return directUpstreamDependencies;
 	}
 
-	public Set<ComponentController> findDirectDownstreamDependencies(ComponentController component) {
+	public Set<ComponentController> collectDirectDownstreamDependencies(ComponentController component) {
 
 		Set<ComponentController> controllers = new HashSet<>();
 

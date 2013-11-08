@@ -19,7 +19,6 @@ import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -41,27 +40,54 @@ public class ControllerDependencyTest {
 	//        |    | v
 	//       7 --> 8
 	//
+	//
+	//        A
+	//       ^ ^
+	//      B   C
+	//     ^
+	//     D 
+	//
+	//
+	//        A1
+	//      ^   ^
+	//     B1 > C1
+	//     ^
+	//    D1
+	//
+	//
+	//    +-> A2
+	//    |   ^   
+	//    |  B2 > C2
+	//    |  ^
+	//     D2
+	//
+	//    
+	//
 	//  a -> b : Upstream dependency for a is b 
 	//         : Downstream dependency for b is a
 	//
 
 	private ComponentContainer container;
-	private StrolchComponent com2;
 	private ComponentController con2;
-	private StrolchComponent com5;
 	private ComponentController con5;
-	private StrolchComponent com11;
 	private ComponentController con11;
-	private StrolchComponent com10;
 	private ComponentController con10;
-	private StrolchComponent com9;
 	private ComponentController con9;
-	private StrolchComponent com7;
 	private ComponentController con7;
-	private StrolchComponent com8;
 	private ComponentController con8;
-	private StrolchComponent com3;
 	private ComponentController con3;
+	private ComponentController conA;
+	private ComponentController conB;
+	private ComponentController conC;
+	private ComponentController conD;
+	private ComponentController conA1;
+	private ComponentController conB1;
+	private ComponentController conC1;
+	private ComponentController conD1;
+	private ComponentController conA2;
+	private ComponentController conB2;
+	private ComponentController conC2;
+	private ComponentController conD2;
 
 	private StrolchConfiguration strolchConfiguration;
 	private Map<String, ComponentController> controllerMap;
@@ -71,22 +97,14 @@ public class ControllerDependencyTest {
 
 		this.container = new ComponentContainer();
 
-		this.com2 = new StrolchComponent(this.container, "2");
-		this.con2 = new ComponentController(this.com2);
-		this.com5 = new StrolchComponent(this.container, "5");
-		this.con5 = new ComponentController(this.com5);
-		this.com11 = new StrolchComponent(this.container, "11");
-		this.con11 = new ComponentController(this.com11);
-		this.com10 = new StrolchComponent(this.container, "10");
-		this.con10 = new ComponentController(this.com10);
-		this.com9 = new StrolchComponent(this.container, "9");
-		this.con9 = new ComponentController(this.com9);
-		this.com7 = new StrolchComponent(this.container, "7");
-		this.con7 = new ComponentController(this.com7);
-		this.com8 = new StrolchComponent(this.container, "8");
-		this.con8 = new ComponentController(this.com8);
-		this.com3 = new StrolchComponent(this.container, "3");
-		this.con3 = new ComponentController(this.com3);
+		this.con2 = new ComponentController(new StrolchComponent(this.container, "2"));
+		this.con5 = new ComponentController(new StrolchComponent(this.container, "5"));
+		this.con11 = new ComponentController(new StrolchComponent(this.container, "11"));
+		this.con10 = new ComponentController(new StrolchComponent(this.container, "10"));
+		this.con9 = new ComponentController(new StrolchComponent(this.container, "9"));
+		this.con7 = new ComponentController(new StrolchComponent(this.container, "7"));
+		this.con8 = new ComponentController(new StrolchComponent(this.container, "8"));
+		this.con3 = new ComponentController(new StrolchComponent(this.container, "3"));
 
 		this.con5.addUpstreamDependency(this.con11);
 
@@ -102,9 +120,69 @@ public class ControllerDependencyTest {
 		this.con3.addUpstreamDependency(this.con8);
 		this.con3.addUpstreamDependency(this.con10);
 
+		//
+
+		this.conA = new ComponentController(new StrolchComponent(this.container, "A"));
+		this.conB = new ComponentController(new StrolchComponent(this.container, "B"));
+		this.conC = new ComponentController(new StrolchComponent(this.container, "C"));
+		this.conD = new ComponentController(new StrolchComponent(this.container, "D"));
+
+		this.conB.addUpstreamDependency(this.conA);
+		this.conC.addUpstreamDependency(this.conA);
+		this.conD.addUpstreamDependency(this.conB);
+
+		//
+
+		this.conA1 = new ComponentController(new StrolchComponent(this.container, "A1"));
+		this.conB1 = new ComponentController(new StrolchComponent(this.container, "B1"));
+		this.conC1 = new ComponentController(new StrolchComponent(this.container, "C1"));
+		this.conD1 = new ComponentController(new StrolchComponent(this.container, "D1"));
+
+		this.conB1.addUpstreamDependency(this.conA1);
+		this.conB1.addUpstreamDependency(this.conC1);
+		this.conC1.addUpstreamDependency(this.conA1);
+		this.conD1.addUpstreamDependency(this.conB1);
+
+		//
+
+		this.conA2 = new ComponentController(new StrolchComponent(this.container, "A2"));
+		this.conB2 = new ComponentController(new StrolchComponent(this.container, "B2"));
+		this.conC2 = new ComponentController(new StrolchComponent(this.container, "C2"));
+		this.conD2 = new ComponentController(new StrolchComponent(this.container, "D2"));
+
+		this.conB2.addUpstreamDependency(this.conA2);
+		this.conB2.addUpstreamDependency(this.conC2);
+		this.conD2.addUpstreamDependency(this.conB2);
+		this.conD2.addUpstreamDependency(this.conA2);
+
+		//
+
 		File rootPathF = new File("src/test/resources/configtest");
 		this.strolchConfiguration = ConfigurationParser.parseConfiguration(rootPathF);
+
 		this.controllerMap = new HashMap<>();
+
+		this.controllerMap.put("2", this.con2);
+		this.controllerMap.put("3", this.con3);
+		this.controllerMap.put("5", this.con5);
+		this.controllerMap.put("7", this.con7);
+		this.controllerMap.put("8", this.con8);
+		this.controllerMap.put("9", this.con9);
+		this.controllerMap.put("10", this.con10);
+		this.controllerMap.put("11", this.con11);
+		this.controllerMap.put("A", this.conA);
+		this.controllerMap.put("B", this.conB);
+		this.controllerMap.put("C", this.conC);
+		this.controllerMap.put("D", this.conD);
+		this.controllerMap.put("A1", this.conA1);
+		this.controllerMap.put("B1", this.conB1);
+		this.controllerMap.put("C1", this.conC1);
+		this.controllerMap.put("D1", this.conD1);
+		this.controllerMap.put("A2", this.conA2);
+		this.controllerMap.put("B2", this.conB2);
+		this.controllerMap.put("C2", this.conC2);
+		this.controllerMap.put("D2", this.conD2);
+
 	}
 
 	private void assertModel() {
@@ -177,6 +255,49 @@ public class ControllerDependencyTest {
 		assertTrue(this.con9.hasTransitiveDownstreamDependency(this.con3));
 		assertTrue(this.con9.hasTransitiveDownstreamDependency(this.con7));
 
+		//
+
+		assertFalse(this.conA.hasUpstreamDependencies());
+		assertTrue(this.conA.hasDownstreamDependencies());
+		assertEquals(0, this.conA.getUpstreamDependencies().size());
+		assertEquals(2, this.conA.getDownstreamDependencies().size());
+
+		assertTrue(this.conB.hasUpstreamDependencies());
+		assertTrue(this.conB.hasDownstreamDependencies());
+		assertEquals(1, this.conB.getUpstreamDependencies().size());
+		assertEquals(1, this.conB.getDownstreamDependencies().size());
+
+		assertTrue(this.conC.hasUpstreamDependencies());
+		assertFalse(this.conC.hasDownstreamDependencies());
+		assertEquals(1, this.conC.getUpstreamDependencies().size());
+		assertEquals(0, this.conC.getDownstreamDependencies().size());
+
+		assertTrue(this.conD.hasUpstreamDependencies());
+		assertFalse(this.conD.hasDownstreamDependencies());
+		assertEquals(1, this.conD.getUpstreamDependencies().size());
+		assertEquals(0, this.conD.getDownstreamDependencies().size());
+
+		//
+
+		assertFalse(this.conA1.hasUpstreamDependencies());
+		assertTrue(this.conA1.hasDownstreamDependencies());
+		assertEquals(0, this.conA1.getUpstreamDependencies().size());
+		assertEquals(2, this.conA1.getDownstreamDependencies().size());
+
+		assertTrue(this.conB1.hasUpstreamDependencies());
+		assertTrue(this.conB1.hasDownstreamDependencies());
+		assertEquals(2, this.conB1.getUpstreamDependencies().size());
+		assertEquals(1, this.conB1.getDownstreamDependencies().size());
+
+		assertTrue(this.conC1.hasUpstreamDependencies());
+		assertTrue(this.conC1.hasDownstreamDependencies());
+		assertEquals(1, this.conC1.getUpstreamDependencies().size());
+		assertEquals(1, this.conC1.getDownstreamDependencies().size());
+
+		assertTrue(this.conD1.hasUpstreamDependencies());
+		assertFalse(this.conD1.hasDownstreamDependencies());
+		assertEquals(1, this.conD1.getUpstreamDependencies().size());
+		assertEquals(0, this.conD1.getDownstreamDependencies().size());
 	}
 
 	@Test
@@ -205,12 +326,6 @@ public class ControllerDependencyTest {
 		this.con9.addUpstreamDependency(this.con3);
 	}
 
-	@Test
-	public void shouldBreakModel4() {
-		this.thrown.expect(StrolchConfigurationException.class);
-		assertModel();
-		this.con7.addUpstreamDependency(this.con10);
-	}
 
 	@Test
 	public void shouldNotBreakModel1() {
@@ -236,32 +351,175 @@ public class ControllerDependencyTest {
 		this.con8.addUpstreamDependency(this.con11);
 	}
 
-	//         11
-	//    ^   ^  ^
-	//    7   9 < 8
-	//    
-	//   (7, 8) => (11)
+	@Test
+	public void shouldNotBreakModel() {
+		assertModel();
+		this.con11.addUpstreamDependency(this.con3);
+	}
 
 	@Test
-	@Ignore
-	public void shouldCollectUpstreamDependencies() {
+	public void shouldCollectUpstreamDependencies1() {
 		assertModel();
 
 		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
 				this.controllerMap);
 
-		this.con8.addUpstreamDependency(this.con11);
-
 		Set<ComponentController> controllers = new HashSet<>();
-		controllers.add(this.con7);
-		controllers.add(this.con8);
-		
+		controllers.add(this.conB);
+		controllers.add(this.conC);
+
 		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
-				.findDirectUpstreamDependencies(controllers);
+				.collectDirectUpstreamDependencies(controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
-		assertTrue(directUpstreamDependencies.contains(this.con11));
+		assertTrue(directUpstreamDependencies.contains(this.conA));
 	}
+
+	@Test
+	public void shouldCollectUpstreamDependencies2() {
+		assertModel();
+
+		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
+				this.controllerMap);
+
+		Set<ComponentController> controllers = new HashSet<>();
+		controllers.add(this.conD);
+		controllers.add(this.conC);
+
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
+				.collectDirectUpstreamDependencies(controllers);
+
+		assertEquals(1, directUpstreamDependencies.size());
+		assertTrue(directUpstreamDependencies.contains(this.conA));
+	}
+
+	@Test
+	public void shouldCollectUpstreamDependencies3_() {
+		assertModel();
+
+		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
+				this.controllerMap);
+
+		Set<ComponentController> controllers = new HashSet<>();
+		controllers.add(this.conB);
+
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
+				.collectDirectUpstreamDependencies(controllers);
+
+		assertEquals(1, directUpstreamDependencies.size());
+		assertTrue(directUpstreamDependencies.contains(this.conA));
+	}
+
+	//
+	//        A
+	//       ^ ^
+	//      B   C
+	//     ^
+	//     D 
+	//
+
+	@Test
+	public void shouldCollectUpstreamDependencies3() {
+		assertModel();
+
+		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
+				this.controllerMap);
+
+		Set<ComponentController> controllers = new HashSet<>();
+		controllers.add(this.conB1);
+		controllers.add(this.conC1);
+
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
+				.collectDirectUpstreamDependencies(controllers);
+
+		assertEquals(1, directUpstreamDependencies.size());
+		assertTrue(directUpstreamDependencies.contains(this.conA1));
+	}
+
+	@Test
+	public void shouldCollectUpstreamDependencies4() {
+		assertModel();
+
+		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
+				this.controllerMap);
+
+		Set<ComponentController> controllers = new HashSet<>();
+		controllers.add(this.conD1);
+		controllers.add(this.conC1);
+
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
+				.collectDirectUpstreamDependencies(controllers);
+
+		assertEquals(1, directUpstreamDependencies.size());
+		assertTrue(directUpstreamDependencies.contains(this.conA1));
+	}
+
+	@Test
+	public void shouldCollectUpstreamDependencies5() {
+		assertModel();
+
+		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
+				this.controllerMap);
+
+		Set<ComponentController> controllers = new HashSet<>();
+		controllers.add(this.conB1);
+
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
+				.collectDirectUpstreamDependencies(controllers);
+
+		assertEquals(1, directUpstreamDependencies.size());
+		assertTrue(directUpstreamDependencies.contains(this.conA1));
+	}
+
+	//
+	//        A1
+	//      ^   ^
+	//     B1 > C1
+	//     ^
+	//    D1
+	//
+
+	@Test
+	public void shouldCollectUpstreamDependencies6() {
+		assertModel();
+
+		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
+				this.controllerMap);
+
+		Set<ComponentController> controllers = new HashSet<>();
+		controllers.add(this.conB2);
+
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
+				.collectDirectUpstreamDependencies(controllers);
+
+		assertEquals(2, directUpstreamDependencies.size());
+		assertTrue(directUpstreamDependencies.contains(this.conA2));
+		assertTrue(directUpstreamDependencies.contains(this.conC2));
+	}
+
+	@Test
+	public void shouldCollectUpstreamDependencies7() {
+		assertModel();
+
+		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
+				this.controllerMap);
+
+		Set<ComponentController> controllers = new HashSet<>();
+		controllers.add(this.conD2);
+
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
+				.collectDirectUpstreamDependencies(controllers);
+
+		assertEquals(1, directUpstreamDependencies.size());
+		assertTrue(directUpstreamDependencies.contains(this.conA2));
+	}
+
+	//    +-> A2
+	//    |   ^   
+	//    |  B2 > C2
+	//    |  ^
+	//     D2
+	//
 
 	@Test
 	public void shouldAddDepedencies() {

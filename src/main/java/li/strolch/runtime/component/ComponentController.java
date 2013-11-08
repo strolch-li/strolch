@@ -47,15 +47,32 @@ public class ComponentController {
 		if (this.upstreamDependencies.contains(controller))
 			return;
 
-		if (hasTransitiveUpstreamDependency(controller))
+		validateNoCyclicDependency(controller);
+
+		this.upstreamDependencies.add(controller);
+		controller.downstreamDependencies.add(this);
+	}
+
+	//  
+	//         5
+	//         v
+	//   2 <-- 11 ---> 10
+	//        ^  v     ^
+	//        |  9     3
+	//        |   ^   /
+	//        |    | v
+	//       7 --> 8
+	//
+	// New: 3 > 7
+
+	private void validateNoCyclicDependency(ComponentController controller) {
+
+		if (controller.hasTransitiveUpstreamDependency(this))
 			throw new StrolchConfigurationException(this + " has transitive upstream dependeny to " + controller + "!");
 
 		if (hasTransitiveDownstreamDependency(controller))
 			throw new StrolchConfigurationException(this + " has transitive downstream dependeny to " + controller
 					+ "!");
-
-		this.upstreamDependencies.add(controller);
-		controller.downstreamDependencies.add(this);
 	}
 
 	public boolean hasUpstreamDependency(ComponentController controller) {
