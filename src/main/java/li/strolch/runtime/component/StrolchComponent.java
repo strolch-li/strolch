@@ -27,6 +27,10 @@ public class StrolchComponent {
 		return this.state;
 	}
 
+	protected ComponentContainer getContainer() {
+		return this.container;
+	}
+
 	private IllegalStateException getIllegalStateEx(ComponentState currentState, ComponentState newState) {
 		String msg = "Moving from state {0} to state {1} is not allowed!"; //$NON-NLS-1$
 		msg = MessageFormat.format(msg, currentState, newState);

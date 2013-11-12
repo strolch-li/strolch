@@ -48,9 +48,6 @@ public class ComponentDependencyAnalyzer {
 			Set<ComponentController> upstreamDependencies = controller.getUpstreamDependencies();
 			directUpstreamDependencies.addAll(upstreamDependencies);
 		}
-		
-		// assert no dependency in list which was from source
-		//directUpstreamDependencies.
 
 		// prune dependencies which are a dependency of any of these dependencies
 		for (ComponentController controller : controllers) {
@@ -73,20 +70,46 @@ public class ComponentDependencyAnalyzer {
 		return directUpstreamDependencies;
 	}
 
-	public Set<ComponentController> collectDirectDownstreamDependencies(ComponentController component) {
+	public Set<ComponentController> collectDirectDownstreamDependencies(Set<ComponentController> controllers) {
 
-		Set<ComponentController> controllers = new HashSet<>();
+		Set<ComponentController> directDownstreamDependencies = new HashSet<>();
 
-		return controllers;
+		// collect all direct downstream dependencies
+		for (ComponentController controller : controllers) {
+			Set<ComponentController> downstreamDependencies = controller.getDownstreamDependencies();
+			directDownstreamDependencies.addAll(downstreamDependencies);
+		}
+
+		// prune dependencies which are a dependency of any of these dependencies
+		for (ComponentController controller : controllers) {
+			Set<ComponentController> downstreamDependencies = controller.getDownstreamDependencies();
+
+			for (ComponentController downstream : downstreamDependencies) {
+
+				Iterator<ComponentController> iter = directDownstreamDependencies.iterator();
+				while (iter.hasNext()) {
+					ComponentController possibleTransitiveDependency = iter.next();
+					if (downstream.hasUpstreamDependency(possibleTransitiveDependency))
+						continue;
+
+					if (possibleTransitiveDependency.hasTransitiveDownstreamDependency(downstream))
+						iter.remove();
+				}
+			}
+		}
+
+		return directDownstreamDependencies;
 	}
 
 	public void setupDependencies() {
 		for (ComponentController controller : this.controllerMap.values()) {
 			String name = controller.getComponent().getName();
 			ComponentConfiguration configuration = this.strolchConfiguration.getComponentConfiguration(name);
-			Set<String> dependencies = configuration.getDependencies();
-			for (String dependency : dependencies) {
 
+			Set<String> dependencies = configuration.getDependencies();
+			for (String dependencyName : dependencies) {
+				ComponentController dependency = this.controllerMap.get(dependencyName);
+				controller.addUpstreamDependency(dependency);
 			}
 		}
 	}

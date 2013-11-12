@@ -1,5 +1,6 @@
 package li.strolch.runtime.component;
 
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,8 +42,11 @@ public class ComponentController {
 
 	public void addUpstreamDependency(ComponentController controller) {
 
-		if (this.equals(controller))
-			throw new StrolchConfigurationException(controller + " can not depend on itself!");
+		if (this.equals(controller)) {
+			String msg = "{0} can not depend on itself!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, controller);
+			throw new StrolchConfigurationException(msg);
+		}
 
 		if (this.upstreamDependencies.contains(controller))
 			return;
@@ -67,12 +71,11 @@ public class ComponentController {
 
 	private void validateNoCyclicDependency(ComponentController controller) {
 
-		if (controller.hasTransitiveUpstreamDependency(this))
-			throw new StrolchConfigurationException(this + " has transitive upstream dependeny to " + controller + "!");
-
-		if (hasTransitiveDownstreamDependency(controller))
-			throw new StrolchConfigurationException(this + " has transitive downstream dependeny to " + controller
-					+ "!");
+		if (controller.hasTransitiveUpstreamDependency(this)) {
+			String msg = "{0} has transitive upstream dependeny to {1}!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this, controller);
+			throw new StrolchConfigurationException(msg);
+		}
 	}
 
 	public boolean hasUpstreamDependency(ComponentController controller) {
