@@ -43,7 +43,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	 */
 	@Override
 	public Certificate authenticate(String username, byte[] password) {
-		assertStarted();
+		assertContainerStarted();
 		return this.privilegeHandler.authenticate(username, password);
 	}
 
@@ -54,7 +54,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	 */
 	@Override
 	public void isCertificateValid(Certificate certificate) throws PrivilegeException {
-		assertStarted();
+		assertContainerStarted();
 		this.privilegeHandler.isCertificateValid(certificate);
 	}
 
@@ -65,7 +65,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	 */
 	@Override
 	public boolean invalidateSession(Certificate certificate) {
-		assertStarted();
+		assertContainerStarted();
 		return this.privilegeHandler.invalidateSession(certificate);
 	}
 
@@ -77,7 +77,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	 */
 	@Override
 	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException {
-		assertStarted();
+		assertContainerStarted();
 		return this.privilegeHandler.getPrivilegeContext(certificate);
 	}
 
@@ -90,13 +90,13 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	 */
 	@Override
 	public void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException {
-		assertStarted();
+		assertContainerStarted();
 		this.privilegeHandler.runAsSystem(systemUsername, action);
 	}
 
 	@Override
 	public PrivilegeHandler getPrivilegeHandler(Certificate certificate) throws PrivilegeException {
-		assertStarted();
+		assertContainerStarted();
 		this.privilegeHandler.assertIsPrivilegeAdmin(certificate);
 		return this.privilegeHandler;
 	}

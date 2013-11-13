@@ -22,10 +22,17 @@ public class ComponentContainer {
 
 	private Map<Class<?>, StrolchComponent> componentMap;
 	private Map<String, ComponentController> controllerMap;
-
 	private ComponentDependencyAnalyzer dependencyAnalyzer;
-
 	private StrolchConfiguration strolchConfiguration;
+	private ComponentState state;
+
+	public ComponentContainer() {
+		this.state = ComponentState.UNDEFINED;
+	}
+
+	public ComponentState getState() {
+		return this.state;
+	}
 
 	@SuppressWarnings("unchecked")
 	public <T> T getComponent(Class<T> clazz) {
@@ -186,6 +193,7 @@ public class ComponentContainer {
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootUpstreamComponents();
 		initialize(rootUpstreamComponents);
+		this.state = this.state.validateStateChange(ComponentState.INITIALIZED);
 
 		String msg = "All {0} Strolch Components have been initialized."; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.controllerMap.size()));
@@ -197,6 +205,7 @@ public class ComponentContainer {
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootUpstreamComponents();
 		start(rootUpstreamComponents);
+		this.state = this.state.validateStateChange(ComponentState.STARTED);
 
 		String msg = "All {0} Strolch Components started and container now ready to be used. Have fun =))"; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.controllerMap.size()));
@@ -208,6 +217,7 @@ public class ComponentContainer {
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
 		stop(rootUpstreamComponents);
+		this.state = this.state.validateStateChange(ComponentState.STOPPED);
 
 		String msg = "All {0} Strolch Components have been stopped."; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.controllerMap.size()));
@@ -219,6 +229,7 @@ public class ComponentContainer {
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
 		destroy(rootUpstreamComponents);
+		this.state = this.state.validateStateChange(ComponentState.DESTROYED);
 
 		String msg = "All {0} Strolch Components have been destroyed!"; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.controllerMap.size()));

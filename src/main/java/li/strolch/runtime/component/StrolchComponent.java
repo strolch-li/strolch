@@ -31,43 +31,6 @@ public class StrolchComponent {
 		return this.container;
 	}
 
-	private IllegalStateException getIllegalStateEx(ComponentState currentState, ComponentState newState) {
-		String msg = "Moving from state {0} to state {1} is not allowed!"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, currentState, newState);
-		throw new IllegalStateException(msg);
-	}
-
-	protected void changeState(ComponentState newState) {
-
-		if (this.state == newState)
-			return;
-
-		switch (this.state) {
-		case UNDEFINED:
-			if (newState != ComponentState.INITIALIZED)
-				throw getIllegalStateEx(this.state, newState);
-			break;
-		case INITIALIZED:
-			if (newState != ComponentState.STARTED)
-				throw getIllegalStateEx(this.state, newState);
-			break;
-		case STARTED:
-			if (newState != ComponentState.STOPPED)
-				throw getIllegalStateEx(this.state, newState);
-			break;
-		case STOPPED:
-			if (newState != ComponentState.STARTED && newState != ComponentState.DESTROYED)
-				throw getIllegalStateEx(this.state, newState);
-			break;
-		case DESTROYED:
-			throw getIllegalStateEx(this.state, newState);
-		default:
-			throw getIllegalStateEx(this.state, newState);
-		}
-
-		this.state = newState;
-	}
-
 	protected void assertStarted() {
 		if (getState() != ComponentState.STARTED) {
 			String msg = "Component {0} is not yet started!"; //$NON-NLS-1$
@@ -75,19 +38,26 @@ public class StrolchComponent {
 		}
 	}
 
+	protected void assertContainerStarted() {
+		if (getContainer().getState() != ComponentState.STARTED) {
+			String msg = "Container is not yet started!"; //$NON-NLS-1$
+			throw new IllegalStateException(msg);
+		}
+	}
+
 	public void initialize(ComponentConfiguration configuration) {
-		changeState(ComponentState.INITIALIZED);
+		this.state = this.state.validateStateChange(ComponentState.INITIALIZED);
 	}
 
 	public void start() {
-		changeState(ComponentState.STARTED);
+		this.state = this.state.validateStateChange(ComponentState.STARTED);
 	}
 
 	public void stop() {
-		changeState(ComponentState.STOPPED);
+		this.state = this.state.validateStateChange(ComponentState.STOPPED);
 	}
 
 	public void destroy() {
-		changeState(ComponentState.DESTROYED);
+		this.state = this.state.validateStateChange(ComponentState.DESTROYED);
 	}
 }
