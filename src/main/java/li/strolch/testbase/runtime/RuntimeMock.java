@@ -3,12 +3,27 @@ package li.strolch.testbase.runtime;
 import java.io.File;
 import java.text.MessageFormat;
 
+import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.eitchnet.utils.helper.FileHelper;
 
 public class RuntimeMock {
 
+	private static final Logger logger = LoggerFactory.getLogger(RuntimeMock.class);
 	private static final String TARGET = "target"; //$NON-NLS-1$
+
+	private static ComponentContainer container;
+
+	/**
+	 * @return the container
+	 */
+	public static ComponentContainer getContainer() {
+		return container;
+	}
 
 	public static void mockRuntime(File rootPathF, File configSrc) {
 
@@ -46,19 +61,41 @@ public class RuntimeMock {
 			msg = MessageFormat.format(msg, configSrc.getAbsolutePath(), configPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
-//
-//		// initialize a runtime configuration
-//		Map<String, String> runtimeConfigurationValues = new HashMap<>();
-//		RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration("RuntimeMock", runtimeConfigurationValues, //$NON-NLS-1$
-//				rootPathF);
-//
-//		Map<String, ComponentConfiguration> configurationByComponent = new HashMap<>();
-//		StrolchConfiguration configuration = new StrolchConfiguration(runtimeConfiguration, configurationByComponent);
-//
-//		// initialize the component configuration
-//		for (ComponentMock componentMock : runtimeMocks) {
-//			//configurationByComponent.put(key, value)
-//			componentMock.mock(configuration);
-//		}
+	}
+
+	public static void startContainer(File rootPathF) {
+
+		ComponentContainer container = new ComponentContainer();
+		try {
+
+			container.setup(rootPathF);
+			container.initialize();
+			container.start();
+
+			RuntimeMock.container = container;
+
+		} catch (Exception e) {
+			logger.error("Failed to start mocked container due to: " + e.getMessage(), e); //$NON-NLS-1$
+			destroyRuntime();
+			throw e;
+		}
+	}
+
+	public static void destroyRuntime() {
+
+		if (container == null)
+			return;
+
+		try {
+			container.stop();
+		} catch (Exception e) {
+			logger.info("Failed to stop container: " + e.getMessage()); //$NON-NLS-1$
+		}
+
+		try {
+			container.destroy();
+		} catch (Exception e) {
+			logger.info("Failed to destroy container: " + e.getMessage()); //$NON-NLS-1$
+		}
 	}
 }
