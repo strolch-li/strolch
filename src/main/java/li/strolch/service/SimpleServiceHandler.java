@@ -33,8 +33,8 @@ public class SimpleServiceHandler extends StrolchComponent implements ServiceHan
 
 	private PrivilegeHandler privilegeHandler;
 
-	public SimpleServiceHandler(ComponentContainer container) {
-		super(container, ServiceHandler.class.getName());
+	public SimpleServiceHandler(ComponentContainer container, String componentName) {
+		super(container, componentName);
 	}
 
 	@Override
