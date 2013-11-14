@@ -22,15 +22,11 @@
 package li.strolch.persistence.impl.dao.test;
 
 import java.io.File;
-import java.text.MessageFormat;
 
-import li.strolch.persistence.impl.XmlPersistenceHandler;
-import li.strolch.runtime.component.ComponentContainer;
-import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.configuration.ConfigurationParser;
-import li.strolch.runtime.configuration.StrolchConfiguration;
+import li.strolch.persistence.api.StrolchPersistenceHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +35,14 @@ import org.slf4j.LoggerFactory;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public abstract class AbstractDaoImplTest {
+public abstract class AbstractDaoImplTest extends RuntimeMock {
 
 	private static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
+	private static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	private static final String CONFIG_SRC = "src/test/resources/runtime/config"; //$NON-NLS-1$
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractDaoImplTest.class);
 
-	protected static XmlPersistenceHandler persistenceHandler;
+	protected static StrolchPersistenceHandler persistenceHandler;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -53,21 +50,15 @@ public abstract class AbstractDaoImplTest {
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
 		RuntimeMock.mockRuntime(rootPath, configSrc);
-
-		File dbStorePath = new File(rootPath, XmlPersistenceHandler.DB_STORE_PATH);
-		if (!dbStorePath.mkdirs()) {
-			String msg = "Failed to create path {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, dbStorePath.getAbsolutePath());
-			throw new RuntimeException(msg);
-		}
+		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
+		RuntimeMock.startContainer(rootPath);
 
 		// initialize the component configuration
-		StrolchConfiguration strolchConfiguration = ConfigurationParser.parseConfiguration(rootPath);
-		ComponentConfiguration componentConfiguration = strolchConfiguration
-				.getComponentConfiguration("PersistenceHandler"); //$NON-NLS-1$
-		ComponentContainer container = new ComponentContainer();
-		persistenceHandler = new XmlPersistenceHandler(container);
-		persistenceHandler.initialize(componentConfiguration);
+		persistenceHandler = getContainer().getComponent(StrolchPersistenceHandler.class);
+	}
 
+	@AfterClass
+	public static void afterClass() {
+		RuntimeMock.destroyRuntime();
 	}
 }

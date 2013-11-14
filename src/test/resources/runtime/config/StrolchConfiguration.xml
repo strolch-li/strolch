@@ -14,4 +14,9 @@
 			<verbose>true</verbose>
 		</Properties>
 	</Component>
+	<Component>
+		<name>ObserverHandler</name>
+		<api>li.strolch.runtime.observer.ObserverHandler</api>
+		<impl>li.strolch.runtime.observer.DefaultObserverHandler</impl>
+	</Component>
 </StrolchConfiguration>

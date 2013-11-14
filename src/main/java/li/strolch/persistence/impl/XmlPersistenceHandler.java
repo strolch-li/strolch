@@ -36,6 +36,7 @@ import li.strolch.persistence.impl.model.ResourceContextFactory;
 import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.observer.ObserverHandler;
 import ch.eitchnet.xmlpers.api.IoMode;
 import ch.eitchnet.xmlpers.api.PersistenceConstants;
 import ch.eitchnet.xmlpers.api.PersistenceManager;
@@ -51,8 +52,8 @@ public class XmlPersistenceHandler extends StrolchComponent implements StrolchPe
 	public static final String DB_STORE_PATH = "dbStore/"; //$NON-NLS-1$
 	private PersistenceManager persistenceManager;
 
-	public XmlPersistenceHandler(ComponentContainer container) {
-		super(container, StrolchPersistenceHandler.class.getName());
+	public XmlPersistenceHandler(ComponentContainer container, String componentName) {
+		super(container, componentName);
 	}
 
 	@Override
@@ -72,6 +73,8 @@ public class XmlPersistenceHandler extends StrolchComponent implements StrolchPe
 				new ResourceContextFactory());
 		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(Order.class, Tags.ORDER,
 				new OrderContextFactory());
+		
+		super.initialize(componentConfiguration);
 	}
 
 	public StrolchTransaction openTx() {
@@ -79,10 +82,13 @@ public class XmlPersistenceHandler extends StrolchComponent implements StrolchPe
 	}
 
 	@SuppressWarnings("resource")
-	// caller must close
+	// caller will/must close
 	public StrolchTransaction openTx(String realm) {
 		PersistenceTransaction tx = this.persistenceManager.openTx(realm);
 		XmlStrolchTransaction strolchTx = new XmlStrolchTransaction(tx);
+		if (getContainer().hasComponent(ObserverHandler.class)) {
+			strolchTx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
+		}
 		return strolchTx;
 	}
 
