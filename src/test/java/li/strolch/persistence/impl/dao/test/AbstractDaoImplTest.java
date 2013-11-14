@@ -28,8 +28,6 @@ import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -40,8 +38,6 @@ public abstract class AbstractDaoImplTest extends RuntimeMock {
 	private static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
 	private static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	private static final String CONFIG_SRC = "src/test/resources/runtime/config"; //$NON-NLS-1$
-	protected static final Logger logger = LoggerFactory.getLogger(AbstractDaoImplTest.class);
-
 	protected static StrolchPersistenceHandler persistenceHandler;
 
 	@BeforeClass
