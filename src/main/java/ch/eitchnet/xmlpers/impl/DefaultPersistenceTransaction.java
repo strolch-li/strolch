@@ -22,7 +22,11 @@
 package ch.eitchnet.xmlpers.impl;
 
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -33,11 +37,14 @@ import ch.eitchnet.utils.objectfilter.ObjectFilter;
 import ch.eitchnet.xmlpers.api.FileDao;
 import ch.eitchnet.xmlpers.api.IoMode;
 import ch.eitchnet.xmlpers.api.MetadataDao;
+import ch.eitchnet.xmlpers.api.ModificationResult;
 import ch.eitchnet.xmlpers.api.ObjectDao;
 import ch.eitchnet.xmlpers.api.PersistenceContext;
 import ch.eitchnet.xmlpers.api.PersistenceRealm;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.api.TransactionCloseStrategy;
+import ch.eitchnet.xmlpers.api.TransactionResult;
+import ch.eitchnet.xmlpers.api.TransactionState;
 import ch.eitchnet.xmlpers.api.XmlPersistenceException;
 import ch.eitchnet.xmlpers.objref.ObjectReferenceCache;
 
@@ -57,15 +64,18 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 	private final MetadataDao metadataDao;
 
 	private FileDao fileDao;
-
-	private boolean committed;
-	private boolean closed;
-
 	private IoMode ioMode;
 
 	private TransactionCloseStrategy closeStrategy;
 
+	private TransactionState state;
+	private long startTime;
+	private Date startTimeDate;
+	private TransactionResult txResult;
+
 	public DefaultPersistenceTransaction(DefaultPersistenceRealm realm, boolean verbose) {
+		this.startTime = System.nanoTime();
+		this.startTimeDate = new Date();
 		this.realm = realm;
 		this.verbose = verbose;
 		this.objectFilter = new ObjectFilter();
@@ -74,6 +84,25 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 		this.metadataDao = new MetadataDao(realm.getPathBuilder(), this, verbose);
 
 		this.closeStrategy = TransactionCloseStrategy.COMMIT;
+		this.state = TransactionState.OPEN;
+	}
+
+	@Override
+	public void setTransactionResult(TransactionResult txResult) throws IllegalStateException {
+		if (this.txResult != null) {
+			String msg = "The transaction already has a result set!"; //$NON-NLS-1$
+			throw new IllegalStateException(msg);
+		}
+		this.txResult = txResult;
+	}
+
+	@Override
+	public TransactionResult getTransactionResult() throws IllegalStateException {
+		if (isOpen()) {
+			String msg = "The transaction is still open thus has no result yet! Either commit or rollback before calling this method"; //$NON-NLS-1$
+			throw new IllegalStateException(msg);
+		}
+		return this.txResult;
 	}
 
 	@Override
@@ -108,13 +137,26 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 	@Override
 	public void autoCloseableRollback() {
-		if (this.committed)
+		long start = System.nanoTime();
+		if (this.state == TransactionState.COMMITTED)
 			throw new IllegalStateException("Transaction has already been committed!"); //$NON-NLS-1$
 
-		if (!this.closed) {
+		if (this.state != TransactionState.ROLLED_BACK) {
 			unlockObjectRefs();
-			this.closed = true;
+			this.state = TransactionState.ROLLED_BACK;
 			this.objectFilter.clearCache();
+
+			long end = System.nanoTime();
+			long txDuration = end - this.startTime;
+			long closeDuration = end - start;
+
+			this.txResult.clear();
+			this.txResult.setState(this.state);
+			this.txResult.setStartTime(this.startTimeDate);
+			this.txResult.setTxDuration(txDuration);
+			this.txResult.setCloseDuration(closeDuration);
+			this.txResult.setRealm(this.realm.getRealmName());
+			this.txResult.setModificationByKey(Collections.<String, ModificationResult> emptyMap());
 		}
 	}
 
@@ -131,6 +173,12 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			}
 
 			Set<String> keySet = this.objectFilter.keySet();
+			Map<String, ModificationResult> modifications;
+			if (this.txResult == null)
+				modifications = null;
+			else
+				modifications = new HashMap<>(keySet.size());
+
 			for (String key : keySet) {
 
 				List<Object> removed = this.objectFilter.getRemoved(key);
@@ -177,23 +225,73 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 						this.fileDao.performCreate(ctx);
 					}
 				}
+
+				if (modifications != null) {
+					ModificationResult result = new ModificationResult(key, added, updated, removed);
+					modifications.put(key, result);
+				}
 			}
 
-			long end = System.nanoTime();
-			logger.info("TX completed in " + StringHelper.formatNanoDuration(end - start)); //$NON-NLS-1$
+			if (this.txResult != null) {
+				this.txResult.clear();
+				this.txResult.setState(TransactionState.COMMITTED);
+				this.txResult.setModificationByKey(modifications);
+			}
 
 		} catch (Exception e) {
 
-			long end = System.nanoTime();
-			logger.info("TX failed after " + StringHelper.formatNanoDuration(end - start)); //$NON-NLS-1$
+			if (this.txResult == null) {
 
-			throw e;
+				long end = System.nanoTime();
+				long txDuration = end - this.startTime;
+				long closeDuration = end - start;
+
+				StringBuilder sb = new StringBuilder();
+				sb.append("TX has failed after "); //$NON-NLS-1$
+				sb.append(StringHelper.formatNanoDuration(txDuration));
+				sb.append(" with close operation taking "); //$NON-NLS-1$
+				sb.append(StringHelper.formatNanoDuration(closeDuration));
+				logger.info(sb.toString());
+
+				throw e;
+			}
+
+			this.txResult.clear();
+			this.txResult.setState(TransactionState.FAILED);
+			this.txResult.setModificationByKey(Collections.<String, ModificationResult> emptyMap());
 
 		} finally {
+
 			// clean up
 			unlockObjectRefs();
 			this.objectFilter.clearCache();
-			this.committed = true;
+		}
+
+		long end = System.nanoTime();
+		long txDuration = end - this.startTime;
+		long closeDuration = end - start;
+
+		if (this.txResult == null) {
+
+			StringBuilder sb = new StringBuilder();
+			sb.append("TX was completed after "); //$NON-NLS-1$
+			sb.append(StringHelper.formatNanoDuration(txDuration));
+			sb.append(" with close operation taking "); //$NON-NLS-1$
+			sb.append(StringHelper.formatNanoDuration(closeDuration));
+			logger.info(sb.toString());
+
+		} else {
+
+			this.txResult.setStartTime(this.startTimeDate);
+			this.txResult.setTxDuration(txDuration);
+			this.txResult.setCloseDuration(closeDuration);
+			this.txResult.setRealm(this.realm.getRealmName());
+
+			if (this.txResult.getState() == TransactionState.FAILED) {
+				String msg = "Failed to commit TX due to underlying exception: {0}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, this.txResult.getFailCause().getMessage());
+				throw new XmlPersistenceException(msg, this.txResult.getFailCause());
+			}
 		}
 	}
 
@@ -207,7 +305,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 	@Override
 	public boolean isOpen() {
-		return !this.closed && !this.committed;
+		return this.state == TransactionState.OPEN;
 	}
 
 	@Override

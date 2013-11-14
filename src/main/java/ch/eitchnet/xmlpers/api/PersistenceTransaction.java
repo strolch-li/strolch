@@ -29,6 +29,22 @@ import ch.eitchnet.xmlpers.objref.ObjectReferenceCache;
  */
 public interface PersistenceTransaction extends AutoCloseable {
 
+	/**
+	 * Returns the {@link TransactionResult} for this transaction
+	 * 
+	 * @return the {@link TransactionResult}
+	 * 
+	 * @throws IllegalStateException
+	 *             if the transaction has not yet been closed
+	 */
+	public TransactionResult getTransactionResult() throws IllegalStateException;
+
+	/**
+	 * @throws IllegalStateException
+	 *             if a result is already set
+	 */
+	public void setTransactionResult(TransactionResult txResult) throws IllegalStateException;
+
 	public void setCloseStrategy(TransactionCloseStrategy closeStrategy);
 
 	public void autoCloseableCommit();
