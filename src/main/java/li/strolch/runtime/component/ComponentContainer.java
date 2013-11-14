@@ -34,6 +34,10 @@ public class ComponentContainer {
 		return this.state;
 	}
 
+	public boolean hasComponent(Class<?> clazz) {
+		return this.componentMap.containsKey(clazz);
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> T getComponent(Class<T> clazz) {
 		T component = (T) this.componentMap.get(clazz);
@@ -105,8 +109,14 @@ public class ComponentContainer {
 			String msg = "Initialized component {0} with API {1} and impl {2}."; //$NON-NLS-1$
 			logger.info(MessageFormat.format(msg, componentName, api, impl));
 
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException
-				| SecurityException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (NoSuchMethodException e) {
+
+			String msg = "Could not load class for component {0} due to missing constructor with signature (ComponentContainer.class, String.class)"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, componentName, e.getMessage());
+			throw new StrolchConfigurationException(msg, e);
+
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException
+				| IllegalArgumentException | InvocationTargetException e) {
 
 			String msg = "Could not load class for component {0} due to: {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, componentName, e.getMessage());

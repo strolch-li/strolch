@@ -4,8 +4,12 @@ import java.text.MessageFormat;
 
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class StrolchComponent {
 
+	protected static final Logger logger = LoggerFactory.getLogger(StrolchComponent.class);
 	private final ComponentContainer container;
 	private final String componentName;
 	private ComponentState state;

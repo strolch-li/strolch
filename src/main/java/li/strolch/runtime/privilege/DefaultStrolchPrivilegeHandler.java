@@ -19,8 +19,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 	private PrivilegeHandler privilegeHandler;
 
-	public DefaultStrolchPrivilegeHandler(ComponentContainer container) {
-		super(container, StrolchPrivilegeHandler.class.getName());
+	public DefaultStrolchPrivilegeHandler(ComponentContainer container, String componentName) {
+		super(container, componentName);
 	}
 
 	@Override
