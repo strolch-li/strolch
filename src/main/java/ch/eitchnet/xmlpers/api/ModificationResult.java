@@ -1,5 +1,6 @@
 package ch.eitchnet.xmlpers.api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ModificationResult {
@@ -8,6 +9,13 @@ public class ModificationResult {
 	private final List<?> created;
 	private final List<?> updated;
 	private final List<?> deleted;
+
+	public ModificationResult(String key) {
+		this.key = key;
+		this.created = new ArrayList<>();
+		this.updated = new ArrayList<>();
+		this.deleted = new ArrayList<>();
+	}
 
 	public ModificationResult(String key, List<?> created, List<?> updated, List<?> deleted) {
 		this.key = key;

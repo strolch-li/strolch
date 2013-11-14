@@ -109,13 +109,6 @@ public class TransactionResult {
 	}
 
 	/**
-	 * @return the modificationByKey
-	 */
-	public Map<String, ModificationResult> getModificationByKey() {
-		return this.modificationByKey;
-	}
-
-	/**
 	 * @param modificationByKey
 	 *            the modificationByKey to set
 	 */
