@@ -22,10 +22,8 @@ package ch.eitchnet.privilege.helper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.DefaultPrivilegeHandler;
@@ -45,8 +43,6 @@ import ch.eitchnet.utils.helper.XmlHelper;
  */
 public class PrivilegeInitializationHelper {
 
-	private static final Logger logger = LoggerFactory.getLogger(PrivilegeInitializationHelper.class);
-
 	/**
 	 * Initializes the {@link DefaultPrivilegeHandler} from the configuration file
 	 * 
@@ -60,15 +56,18 @@ public class PrivilegeInitializationHelper {
 
 		// make sure file exists
 		if (!privilegeXmlFile.exists()) {
-			throw new PrivilegeException("Privilege file does not exist at path " + privilegeXmlFile.getAbsolutePath());
+			String msg = "Privilege file does not exist at path {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
+			throw new PrivilegeException(msg);
 		}
 
 		// delegate using input stream
 		try {
 			return initializeFromXml(new FileInputStream(privilegeXmlFile));
 		} catch (Exception e) {
-			PrivilegeInitializationHelper.logger.error(e.getMessage(), e);
-			throw new PrivilegeException("Failed to load configuration from " + privilegeXmlFile.getAbsolutePath());
+			String msg = "Failed to load configuration from {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
+			throw new PrivilegeException(msg, e);
 		}
 	}
 
@@ -96,9 +95,9 @@ public class PrivilegeInitializationHelper {
 		try {
 			encryptionHandler.initialize(parameterMap);
 		} catch (Exception e) {
-			PrivilegeInitializationHelper.logger.error(e.getMessage(), e);
-			throw new PrivilegeException("EncryptionHandler " + encryptionHandlerClassName
-					+ " could not be initialized");
+			String msg = "EncryptionHandler {0} could not be initialized"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, encryptionHandlerClassName);
+			throw new PrivilegeException(msg, e);
 		}
 
 		// initialize persistence handler
@@ -108,9 +107,9 @@ public class PrivilegeInitializationHelper {
 		try {
 			persistenceHandler.initialize(parameterMap);
 		} catch (Exception e) {
-			PrivilegeInitializationHelper.logger.error(e.getMessage(), e);
-			throw new PrivilegeException("PersistenceHandler " + persistenceHandlerClassName
-					+ " could not be initialized");
+			String msg = "PersistenceHandler {0} could not be initialized"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, persistenceHandlerClassName);
+			throw new PrivilegeException(msg, e);
 		}
 
 		// initialize privilege handler
@@ -120,9 +119,9 @@ public class PrivilegeInitializationHelper {
 		try {
 			privilegeHandler.initialize(parameterMap, encryptionHandler, persistenceHandler, policyMap);
 		} catch (Exception e) {
-			PrivilegeInitializationHelper.logger.error(e.getMessage(), e);
-			throw new PrivilegeException("PrivilegeHandler " + privilegeHandler.getClass().getName()
-					+ " could not be initialized");
+			String msg = "PrivilegeHandler {0} could not be initialized"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, privilegeHandler.getClass().getName());
+			throw new PrivilegeException(msg, e);
 		}
 
 		return privilegeHandler;

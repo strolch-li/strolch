@@ -96,7 +96,7 @@ public class PrivilegeContext {
 	 */
 	public void validateAction(Restrictable restrictable) throws AccessDeniedException, PrivilegeException {
 
-		// the the privilege for the restrictable
+		// the privilege for the restrictable
 		String privilegeName = restrictable.getPrivilegeName();
 		IPrivilege privilege = this.privileges.get(privilegeName);
 		if (privilege == null) {

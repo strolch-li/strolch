@@ -20,6 +20,7 @@
 package ch.eitchnet.privilege.handler;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -56,7 +57,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	private Map<String, String> parameterMap;
 
-	private String modelPath;
+	private File modelPath;
 
 	@Override
 	public List<User> getAllUsers() {
@@ -125,22 +126,35 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		String basePath = this.parameterMap.get(XmlConstants.XML_PARAM_BASE_PATH);
 		File basePathF = new File(basePath);
 		if (!basePathF.exists() && !basePathF.isDirectory()) {
-			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
-					+ XmlConstants.XML_PARAM_BASE_PATH + " is invalid");
+			String msg = "[{0}] Defined parameter {1} does not point to a valid path at {2}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_BASE_PATH,
+					basePathF.getAbsolutePath());
+			throw new PrivilegeException(msg);
 		}
 
 		// get model file name
 		String modelFileName = this.parameterMap.get(XmlConstants.XML_PARAM_MODEL_FILE);
 		if (modelFileName == null || modelFileName.isEmpty()) {
-			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
-					+ XmlConstants.XML_PARAM_MODEL_FILE + " is invalid");
+			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_MODEL_FILE);
+			throw new PrivilegeException(msg);
+		}
+
+		// validate file exists
+		String modelPathS = basePath + "/" + modelFileName; //$NON-NLS-1$
+		File modelPath = new File(modelPathS);
+		if (!modelPath.exists()) {
+			String msg = "[{0}] Defined parameter {1} is invalid as model file does not exist at path {2}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_MODEL_FILE,
+					modelPath.getAbsolutePath());
+			throw new PrivilegeException(msg);
 		}
 
 		// save path to model
-		this.modelPath = basePath + "/" + modelFileName;
+		this.modelPath = modelPath;
 
 		if (reload())
-			XmlPersistenceHandler.logger.info("Privilege Data loaded.");
+			logger.info("Privilege Data loaded."); //$NON-NLS-1$
 	}
 
 	/**
@@ -152,22 +166,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public boolean reload() {
 
-		// validate file exists
-		File modelsFile = new File(this.modelPath);
-		if (!modelsFile.exists()) {
-			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
-					+ XmlConstants.XML_PARAM_MODEL_FILE + " is invalid as models file does not exist at path "
-					+ modelsFile.getAbsolutePath());
-		}
-
 		this.roleMap = Collections.synchronizedMap(new HashMap<String, Role>());
 		this.userMap = Collections.synchronizedMap(new HashMap<String, User>());
 
 		// parse models xml file to XML document
 		PrivilegeModelSaxReader xmlHandler = new PrivilegeModelSaxReader();
-		XmlHelper.parseDocument(modelsFile, xmlHandler);
+		XmlHelper.parseDocument(this.modelPath, xmlHandler);
 
-		this.modelsFileDate = modelsFile.lastModified();
+		this.modelsFileDate = this.modelPath.lastModified();
 
 		// ROLES
 		List<Role> roles = xmlHandler.getRoles();
@@ -184,8 +190,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.userMapDirty = false;
 		this.roleMapDirty = false;
 
-		XmlPersistenceHandler.logger.info("Read " + this.userMap.size() + " Users");
-		XmlPersistenceHandler.logger.info("Read " + this.roleMap.size() + " Roles");
+		logger.info(MessageFormat.format("Read {0} Users", this.userMap.size())); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Read {0} Roles", this.roleMap.size())); //$NON-NLS-1$
 
 		// validate we have a user with PrivilegeAdmin access
 		boolean privilegeAdminExists = false;
@@ -198,8 +204,9 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		if (!privilegeAdminExists) {
-			XmlPersistenceHandler.logger.warn("No User with role '" + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE
-					+ "' exists. Privilege modifications will not be possible!");
+			String msg = "No User with role ''{0}'' exists. Privilege modifications will not be possible!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
+			logger.warn(msg);
 		}
 
 		return true;
@@ -214,21 +221,20 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// get models file name
 		String modelFileName = this.parameterMap.get(XmlConstants.XML_PARAM_MODEL_FILE);
 		if (modelFileName == null || modelFileName.isEmpty()) {
-			throw new PrivilegeException("[" + PersistenceHandler.class.getName() + "] Defined parameter "
-					+ XmlConstants.XML_PARAM_MODEL_FILE + " is invalid");
+			String msg = "[{0}] Defined parameter {1} is invalid"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_MODEL_FILE);
+			throw new PrivilegeException(msg);
 		}
 
 		// get model file
-		File modelFile = new File(this.modelPath);
-		boolean modelFileUnchanged = modelFile.exists() && modelFile.lastModified() == this.modelsFileDate;
+		boolean modelFileUnchanged = this.modelPath.exists() && this.modelPath.lastModified() == this.modelsFileDate;
 		if (modelFileUnchanged && !this.roleMapDirty && !this.userMapDirty) {
-			XmlPersistenceHandler.logger
-					.warn("Not persisting as current file is unchanged and model data is not dirty");
+			logger.warn("Not persisting as current file is unchanged and model data is not dirty"); //$NON-NLS-1$
 			return false;
 		}
 
 		// delegate writing
-		PrivilegeModelDomWriter modelWriter = new PrivilegeModelDomWriter(getAllUsers(), getAllRoles(), modelFile);
+		PrivilegeModelDomWriter modelWriter = new PrivilegeModelDomWriter(getAllUsers(), getAllRoles(), this.modelPath);
 		modelWriter.write();
 
 		// reset dirty states
