@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 
 import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
+import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,10 @@ public class RuntimeMock {
 	 */
 	public static ComponentContainer getContainer() {
 		return container;
+	}
+
+	public static StrolchPrivilegeHandler getPrivilegeHandler() {
+		return container.getComponent(StrolchPrivilegeHandler.class);
 	}
 
 	public static void mockRuntime(File rootPathF, File configSrc) {
