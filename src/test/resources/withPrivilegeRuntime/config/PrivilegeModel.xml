@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2010, 2011 Robert von Burg <eitch@eitchnet.ch> This file is part of Privilege. Privilege is free software: 
+	you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free 
+	Software Foundation, either version 3 of the License, or (at your option) any later version. Privilege is distributed in 
+	the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+	FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. You should have received a copy of 
+	the GNU Lesser General Public License along with Privilege. If not, see <http://www.gnu.org/licenses/>. -->
+<UsersAndRoles>
+
+	<Users>
+
+		<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
+			<Firstname>Application</Firstname>
+			<Surname>Administrator</Surname>
+			<State>ENABLED</State>
+			<Locale>en_GB</Locale>
+			<Roles>
+				<Role>PrivilegeAdmin</Role>
+				<Role>AppUser</Role>
+			</Roles>
+			<Properties>
+				<Property name="organization" value="eitchnet.ch" />
+				<Property name="organizationalUnit" value="Development" />
+			</Properties>
+		</User>
+
+		<User userId="2" username="bob" password="81b637d8fcd2c6da6359e6963113a1170de795e4b725b84d1e0b4cfd9ec58ce9">
+			<Firstname>Bob</Firstname>
+			<Surname>Bernstein</Surname>
+			<State>ENABLED</State>
+			<Locale>en_GB</Locale>
+			<Roles>
+				<Role>AppUser</Role>
+			</Roles>
+
+		</User>
+		<User userId="3" username="jill" password="8cf37351b60f00084392043ce2e6256b96cea92949f90c7abce464cf164fbfa6">
+			<Firstname>Jill</Firstname>
+			<Surname>Johnson</Surname>
+			<State>ENABLED</State>
+			<Locale>en_GB</Locale>
+			<Roles>
+				<Role>OnlyGreetingServiceRole</Role>
+			</Roles>
+
+		</User>
+		<User userId="4" username="sysAdmin" password="8cffb494ef5ff3f74a571206e141d4fb84f833e431b98c8b3be43727c4cbddc1">
+			<Firstname>System User</Firstname>
+			<Surname>Administrator</Surname>
+			<State>SYSTEM</State>
+			<Locale>en_GB</Locale>
+			<Roles>
+				<Role>sysAdmin</Role>
+				<Role>AppUser</Role>
+			</Roles>
+
+		</User>
+	</Users>
+
+	<Roles>
+
+		<Role name="PrivilegeAdmin" />
+
+		<Role name="AppUser">
+			<Privilege name="li.strolch.service.Service" policy="DefaultPrivilege">
+				<AllAllowed>true</AllAllowed>
+			</Privilege>
+		</Role>
+
+		<Role name="sysAdmin">
+		</Role>
+
+		<Role name="OnlyGreetingServiceRole">
+			<Privilege name="li.strolch.service.Service" policy="DefaultPrivilege">
+				<Allow>li.strolch.service.test.GreetingService</Allow>
+			</Privilege>
+		</Role>
+
+	</Roles>
+</UsersAndRoles>

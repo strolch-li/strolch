@@ -19,15 +19,28 @@
  */
 package li.strolch.service;
 
+import java.io.Serializable;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class ServiceResult {
-
+public class ServiceResult implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private ServiceResultState state;
 	private String message;
 	private Throwable throwable;
+
+	public ServiceResult() {
+		//
+	}
+
+	/**
+	 * @param state
+	 */
+	public ServiceResult(ServiceResultState state) {
+		this.state = state;
+	}
 
 	/**
 	 * @param state

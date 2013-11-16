@@ -52,6 +52,11 @@
 			<groupId>ch.eitchnet</groupId>
 			<artifactId>ch.eitchnet.privilege</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.testbase</artifactId>
+		</dependency>
 
 	</dependencies>
 

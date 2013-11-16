@@ -23,9 +23,9 @@ import java.io.Serializable;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public interface ServiceArgument extends Serializable {
+public class ServiceArgument implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	// marker interface
 }
