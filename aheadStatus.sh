@@ -16,6 +16,7 @@ function logAheadCount() {
 
 echo "Checking how far ahead each project is against origin..."
 cd ..
+cd "li.strolch.dev" ; logAheadCount ; cd ..
 cd "li.strolch.parent" ; logAheadCount ; cd ..
 cd "li.strolch.bom" ; logAheadCount ; cd ..
 cd "li.strolch.model" ; logAheadCount ; cd ..
