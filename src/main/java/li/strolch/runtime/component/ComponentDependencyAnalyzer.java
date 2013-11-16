@@ -1,5 +1,6 @@
 package li.strolch.runtime.component;
 
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Set;
 
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
+import li.strolch.runtime.configuration.StrolchConfigurationException;
 
 public class ComponentDependencyAnalyzer {
 
@@ -109,6 +111,11 @@ public class ComponentDependencyAnalyzer {
 			Set<String> dependencies = configuration.getDependencies();
 			for (String dependencyName : dependencies) {
 				ComponentController dependency = this.controllerMap.get(dependencyName);
+				if (dependency == null) {
+					String msg = "Component {0} is missing required dependency {1}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, name, dependencyName);
+					throw new StrolchConfigurationException(msg);
+				}
 				controller.addUpstreamDependency(dependency);
 			}
 		}
