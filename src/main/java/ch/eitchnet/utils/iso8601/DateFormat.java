@@ -8,6 +8,8 @@
 
 package ch.eitchnet.utils.iso8601;
 
+import java.util.Date;
+
 /**
  * interface for all date formats internally used by rsp applications
  * 
@@ -18,10 +20,18 @@ public interface DateFormat {
 	/**
 	 * format a long to string
 	 * 
-	 * @param l
+	 * @param timepoint
 	 * @return the formatted string of the long value
 	 */
-	public String format(long l);
+	public String format(long timepoint);
+
+	/**
+	 * format a Date to string
+	 * 
+	 * @param date
+	 * @return the formatted string of the long value
+	 */
+	public String format(Date date);
 
 	/**
 	 * parse a string to long
@@ -29,6 +39,13 @@ public interface DateFormat {
 	 * @param s
 	 * @return the value parsed
 	 */
-	public long parse(String s);
+	public long parseLong(String s);
 
+	/**
+	 * parse a string to Date
+	 * 
+	 * @param s
+	 * @return the value parsed
+	 */
+	public Date parse(String s);
 }

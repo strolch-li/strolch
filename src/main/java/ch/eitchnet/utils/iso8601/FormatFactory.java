@@ -1,5 +1,7 @@
 package ch.eitchnet.utils.iso8601;
 
+import java.util.Date;
+
 /**
  * This interface defines methods for formatting values for UI representation and also defines factory methods for
  * formatters for parsing and formatting duration and date values
@@ -51,7 +53,7 @@ public interface FormatFactory {
 	 * 
 	 * @return String representation of the date
 	 */
-	public String formatDate(long date);
+	public String formatDate(Date date);
 
 	/**
 	 * Formats a duration using {@link #getDateFormat()}

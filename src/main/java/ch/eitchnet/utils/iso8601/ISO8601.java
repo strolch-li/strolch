@@ -9,6 +9,8 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.utils.helper.StringHelper;
+
 /**
  * 
  */
@@ -17,9 +19,7 @@ public class ISO8601 implements DateFormat {
 
 	private static final Logger logger = LoggerFactory.getLogger(ISO8601.class);
 
-	/**
-	 * misc. numeric formats used in formatting
-	 */
+	//misc. numeric formats used in formatting
 	private DecimalFormat xxFormat = new DecimalFormat("00");
 	private DecimalFormat xxxFormat = new DecimalFormat("000");
 	private DecimalFormat xxxxFormat = new DecimalFormat("0000");
@@ -28,10 +28,6 @@ public class ISO8601 implements DateFormat {
      * 
      */
 	private Calendar parseToCalendar(String text) {
-
-		if (text == null) {
-			throw new IllegalArgumentException("argument can not be null");
-		}
 
 		// check optional leading sign
 		char sign;
@@ -214,6 +210,13 @@ public class ISO8601 implements DateFormat {
 		return sWriter.toString();
 	}
 
+	@Override
+	public String format(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return format(cal);
+	}
+
 	/**
 	 * added by msmock convert a long to ISO8601
 	 * 
@@ -240,6 +243,11 @@ public class ISO8601 implements DateFormat {
 		}
 	}
 
+	@Override
+	public long parseLong(String s) {
+		return parse(s).getTime();
+	}
+
 	/**
 	 * parse ISO8601 date to long
 	 * 
@@ -249,17 +257,26 @@ public class ISO8601 implements DateFormat {
 	 * @throws NumberFormatException
 	 */
 	@Override
-	public long parse(String s) {
+	public Date parse(String s) {
 
-		if (s.equals("-"))
-			return Long.MAX_VALUE;
+		if (StringHelper.isEmpty(s)) {
+			String msg = "An empty value can not pe parsed to a date!";
+			throw new IllegalArgumentException(msg);
+		}
+
+		if (s.equals("-")) {
+			Calendar cal = Calendar.getInstance();
+			cal.clear();
+			cal.setTimeZone(TimeZone.getTimeZone("GMT0"));
+			return cal.getTime();
+		}
 
 		Calendar cal = parseToCalendar(s);
 		if (cal != null) {
-			return cal.getTime().getTime();
+			return cal.getTime();
 		}
 
 		String msg = "Input string " + s + " cannot be parsed to date.";
-		throw new NumberFormatException(msg);
+		throw new IllegalArgumentException(msg);
 	}
 }

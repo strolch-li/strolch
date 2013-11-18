@@ -1,5 +1,7 @@
 package ch.eitchnet.utils.iso8601;
 
+import java.util.Date;
+
 import ch.eitchnet.utils.helper.MathHelper;
 
 /**
@@ -51,7 +53,7 @@ public class ISO8601FormatFactory implements FormatFactory {
 	}
 
 	@Override
-	public String formatDate(long date) {
+	public String formatDate(Date date) {
 		return getDateFormat().format(date);
 	}
 
