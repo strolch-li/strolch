@@ -22,6 +22,7 @@
 package li.strolch.model.parameter;
 
 import java.text.MessageFormat;
+import java.util.Date;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
@@ -34,12 +35,12 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class DateParameter extends AbstractParameter<Long> {
+public class DateParameter extends AbstractParameter<Date> {
 
 	public static final String TYPE = "Date"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
-	private Long value;
+	private Date value;
 
 	/**
 	 * Empty constructor
@@ -55,7 +56,7 @@ public class DateParameter extends AbstractParameter<Long> {
 	 * @param name
 	 * @param value
 	 */
-	public DateParameter(String id, String name, Long value) {
+	public DateParameter(String id, String name, Date value) {
 		super(id, name);
 		setValue(value);
 	}
@@ -83,12 +84,12 @@ public class DateParameter extends AbstractParameter<Long> {
 	}
 
 	@Override
-	public Long getValue() {
+	public Date getValue() {
 		return this.value;
 	}
 
 	@Override
-	public void setValue(Long value) {
+	public void setValue(Date value) {
 		validateValue(value);
 		this.value = value;
 	}
@@ -99,7 +100,7 @@ public class DateParameter extends AbstractParameter<Long> {
 	}
 
 	@Override
-	public Parameter<Long> getClone() {
+	public Parameter<Date> getClone() {
 		DateParameter clone = new DateParameter();
 
 		super.fillClone(clone);

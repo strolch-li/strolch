@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
@@ -33,8 +34,7 @@ public class ModelTest {
 	@Test
 	public void shouldCreateOrder() {
 
-		Order order = ModelTestHelper.createOrder("@ord01", "Test Order", "MyType", System.currentTimeMillis(),
-				State.OPEN);
+		Order order = ModelTestHelper.createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
 		ParameterBag bag = order.getParameterBag(ModelTestHelper.BAG_ID);
 		validateBag(bag);
 	}
@@ -74,7 +74,7 @@ public class ModelTest {
 
 		DateParameter dateParam = bag.getParameter(ModelTestHelper.PARAM_DATE_ID);
 		assertNotNull("Date Param missing with id " + ModelTestHelper.PARAM_DATE_ID, dateParam);
-		assertEquals(1354295525628L, dateParam.getValue().longValue());
+		assertEquals(1354295525628L, dateParam.getValue().getTime());
 
 		StringListParameter stringListP = bag.getParameter(ModelTestHelper.PARAM_LIST_STRING_ID);
 		assertNotNull("StringList Param missing with id " + ModelTestHelper.PARAM_LIST_STRING_ID, stringListP);

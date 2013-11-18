@@ -21,11 +21,14 @@
  */
 package li.strolch.model;
 
+import java.util.Date;
+
 import li.strolch.model.Locator.LocatorBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -43,7 +46,7 @@ public class Order extends GroupedParameterizedElement {
 
 	private static final long serialVersionUID = 0L;
 
-	private long date;
+	private Date date;
 	private State state;
 
 	/**
@@ -64,7 +67,7 @@ public class Order extends GroupedParameterizedElement {
 		super(id, name, type);
 
 		setState(State.CREATED);
-		setDate(System.currentTimeMillis());
+		setDate(new Date());
 	}
 
 	/**
@@ -76,7 +79,7 @@ public class Order extends GroupedParameterizedElement {
 	 * @param date
 	 * @param state
 	 */
-	public Order(String id, String name, String type, long date, State state) {
+	public Order(String id, String name, String type, Date date, State state) {
 		super(id, name, type);
 
 		setState(state);
@@ -94,8 +97,8 @@ public class Order extends GroupedParameterizedElement {
 		String date = element.getAttribute(Tags.DATE);
 		String state = element.getAttribute(Tags.STATE);
 
-		if (date == null || date.isEmpty()) {
-			setDate(0);
+		if (StringHelper.isEmpty(date)) {
+			setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse("-")); //$NON-NLS-1$
 		} else {
 			setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse(date));
 		}
@@ -110,7 +113,7 @@ public class Order extends GroupedParameterizedElement {
 	/**
 	 * @return the date
 	 */
-	public long getDate() {
+	public Date getDate() {
 		return this.date;
 	}
 
@@ -118,7 +121,7 @@ public class Order extends GroupedParameterizedElement {
 	 * @param date
 	 *            the date to set
 	 */
-	public void setDate(long date) {
+	public void setDate(Date date) {
 		this.date = date;
 	}
 
