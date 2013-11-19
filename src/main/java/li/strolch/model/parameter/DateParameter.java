@@ -75,7 +75,7 @@ public class DateParameter extends AbstractParameter<Date> {
 			throw new StrolchException(msg);
 		}
 
-		setValue(ISO8601FormatFactory.getInstance().getDateFormat().parse(valueS));
+		setValue(parseFromString(valueS));
 	}
 
 	@Override
@@ -108,5 +108,9 @@ public class DateParameter extends AbstractParameter<Date> {
 		clone.setValue(this.value);
 
 		return clone;
+	}
+
+	public static Date parseFromString(String valueS) {
+		return ISO8601FormatFactory.getInstance().getDateFormat().parse(valueS);
 	}
 }

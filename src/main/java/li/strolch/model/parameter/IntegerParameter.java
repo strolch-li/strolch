@@ -74,7 +74,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 			throw new StrolchException(msg);
 		}
 
-		setValue(Integer.valueOf(valueS));
+		setValue(parseFromString(valueS));
 	}
 
 	@Override
@@ -107,5 +107,9 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		clone.setValue(this.value);
 
 		return clone;
+	}
+
+	public static Integer parseFromString(String valueS) {
+		return Integer.valueOf(valueS);
 	}
 }

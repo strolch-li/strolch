@@ -23,10 +23,11 @@ package li.strolch.model.parameter;
 
 import java.text.MessageFormat;
 
-import org.w3c.dom.Element;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
+
+import org.w3c.dom.Element;
+
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -56,7 +57,7 @@ public class LongParameter extends AbstractParameter<Long> {
 	 */
 	public LongParameter(String id, String name, Long value) {
 		super(id, name);
-		setValue(Long.valueOf(value));
+		setValue(value);
 	}
 
 	/**
@@ -73,7 +74,7 @@ public class LongParameter extends AbstractParameter<Long> {
 			throw new StrolchException(msg);
 		}
 
-		setValue(Long.valueOf(valueS));
+		setValue(parseFromString(valueS));
 	}
 
 	@Override
@@ -106,5 +107,9 @@ public class LongParameter extends AbstractParameter<Long> {
 		clone.setValue(this.value);
 
 		return clone;
+	}
+
+	public static Long parseFromString(String valueS) {
+		return Long.valueOf(valueS);
 	}
 }

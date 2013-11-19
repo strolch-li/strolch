@@ -72,7 +72,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 			throw new StrolchException(msg);
 		}
 
-		setValue(Boolean.valueOf(valueS));
+		setValue(parseFromString(valueS));
 	}
 
 	@Override
@@ -105,5 +105,9 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 		clone.setValue(this.value);
 
 		return clone;
+	}
+
+	public static Boolean parseFromString(String valueS) {
+		return Boolean.valueOf(valueS);
 	}
 }

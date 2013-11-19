@@ -75,7 +75,7 @@ public class FloatParameter extends AbstractParameter<Double> {
 			throw new StrolchException(msg);
 		}
 
-		setValue(Double.valueOf(valueS));
+		setValue(parseFromString(valueS));
 	}
 
 	@Override
@@ -108,5 +108,9 @@ public class FloatParameter extends AbstractParameter<Double> {
 		clone.setValue(this.value);
 
 		return clone;
+	}
+	
+	public static Double parseFromString(String valueS) {
+		return Double.valueOf(valueS);
 	}
 }

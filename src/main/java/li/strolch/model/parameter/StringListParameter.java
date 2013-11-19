@@ -28,11 +28,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.w3c.dom.Element;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.Tags;
+
+import org.w3c.dom.Element;
+
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -79,15 +80,7 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 			throw new StrolchException(msg);
 		}
 
-		setValue(parse(valueS));
-	}
-
-	private List<String> parse(String value) {
-		if (value.isEmpty())
-			return Collections.emptyList();
-
-		String[] valueArr = value.split(VALUE_SEPARATOR);
-		return Arrays.asList(valueArr);
+		setValue(parseFromString(valueS));
 	}
 
 	@Override
@@ -146,5 +139,13 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 		clone.setValue(this.value);
 
 		return clone;
+	}
+
+	public static List<String> parseFromString(String value) {
+		if (value.isEmpty())
+			return Collections.emptyList();
+
+		String[] valueArr = value.split(VALUE_SEPARATOR);
+		return Arrays.asList(valueArr);
 	}
 }
