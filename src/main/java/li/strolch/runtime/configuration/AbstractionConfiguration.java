@@ -32,14 +32,7 @@ public abstract class AbstractionConfiguration {
 	}
 
 	public String getString(String key, String defValue) {
-		String value = this.configurationValues.get(key);
-		if (!StringHelper.isEmpty(value)) {
-			return value;
-		}
-
-		assertDefValueExist(key, defValue);
-		logDefValueUse(key, defValue);
-		return defValue;
+		return getValue(key, defValue);
 	}
 
 	public boolean getBoolean(String key, Boolean defValue) {
@@ -96,22 +89,38 @@ public abstract class AbstractionConfiguration {
 		return defValue;
 	}
 
-	public File getConfigFile(String key, String defValue, ComponentConfiguration configuration) {
+	public File getConfigFile(String key, String defValue, RuntimeConfiguration configuration) {
+		String value = getValue(key, defValue);
+
+		File configFile = new File(configuration.getConfigPath(), value);
+		if (!configFile.isFile() || !configFile.canRead()) {
+			String msg = "Component {0} requires configuration file ''{1}'' which does not exist with value: {2}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.name, key, value);
+			throw new StrolchConfigurationException(msg);
+		}
+		return configFile;
+	}
+
+	public File getDataFile(String key, String defValue, RuntimeConfiguration configuration, boolean checkExists) {
+		String value = getValue(key, defValue);
+
+		File dataFile = new File(configuration.getDataPath(), value);
+		if (checkExists && !dataFile.isFile() || !dataFile.canRead()) {
+			String msg = "Component {0} requires data file ''{1}'' which does not exist with value: {2}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.name, key, value);
+			throw new StrolchConfigurationException(msg);
+		}
+		return dataFile;
+	}
+
+	private String getValue(String key, String defValue) {
 		String value = this.configurationValues.get(key);
 		if (StringHelper.isEmpty(value)) {
 			assertDefValueExist(key, defValue);
 			logDefValueUse(key, defValue);
 			value = defValue;
 		}
-
-		File configFile = new File(configuration.getRuntimeConfiguration().getConfigPath(), value);
-		if (!configFile.isFile() || !configFile.canRead()) {
-
-			String msg = "Component {0} is missing required configuration file {1}!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.name, key, value);
-			throw new StrolchConfigurationException(msg);
-		}
-		return configFile;
+		return value;
 	}
 
 	private void logDefValueUse(String key, Object defValue) {

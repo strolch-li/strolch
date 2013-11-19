@@ -7,9 +7,19 @@
 		</Properties>
 	</Runtime>
 	<Component>
+		<name>Agent</name>
+		<api>li.strolch.runtime.agent.StrolchAgent</api>
+		<impl>li.strolch.runtime.agent.StrolchAgent</impl>
+		<Properties>
+			<dataStoreMode>EMPTY</dataStoreMode>
+			<dataStoreModelFile>StrolcheModel.xml</dataStoreModelFile>
+		</Properties>
+	</Component>
+	<Component>
 		<name>ServiceHandler</name>
 		<api>li.strolch.service.ServiceHandler</api>
 		<impl>li.strolch.service.SimpleServiceHandler</impl>
+		<depends>Agent</depends>
 		<Properties>
 		</Properties>
 	</Component>

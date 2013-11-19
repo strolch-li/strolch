@@ -5,6 +5,7 @@ import java.io.File;
 import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.handler.SystemUserAction;
@@ -28,8 +29,9 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		super.initialize(configuration);
 
 		// initialize privilege
+		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
 		File privilegeConfigFile = configuration.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML,
-				configuration);
+				runtimeConfiguration);
 		PrivilegeHandler privilegeHandler = PrivilegeInitializationHelper.initializeFromXml(privilegeConfigFile);
 		this.privilegeHandler = privilegeHandler;
 	}
