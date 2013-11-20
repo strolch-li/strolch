@@ -25,6 +25,7 @@ import static li.strolch.testbase.model.ModelBuilder.createOrder;
 import static li.strolch.testbase.model.ModelBuilder.createResource;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class ObserverUpdateTest extends AbstractDaoImplTest {
 		getContainer().getComponent(ObserverHandler.class).registerObserver("Resource", observer); //$NON-NLS-1$
 
 		// create order
-		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", System.currentTimeMillis(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
 			persistenceHandler.getOrderDao(tx).save(newOrder);
 		}

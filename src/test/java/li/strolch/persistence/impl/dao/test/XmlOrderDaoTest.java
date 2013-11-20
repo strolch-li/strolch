@@ -7,6 +7,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import java.util.Date;
+
 import li.strolch.model.Order;
 import li.strolch.model.State;
 import li.strolch.model.parameter.Parameter;
@@ -24,7 +27,7 @@ public class XmlOrderDaoTest extends AbstractDaoImplTest {
 	public void shouldCreateOrder() {
 
 		// create
-		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", System.currentTimeMillis(), State.CREATED);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
 			persistenceHandler.getOrderDao(tx).save(newOrder);
 		}
@@ -34,7 +37,7 @@ public class XmlOrderDaoTest extends AbstractDaoImplTest {
 	public void shouldCrud() {
 
 		// create
-		Order newOrder = createOrder(ID, NAME, TYPE, System.currentTimeMillis(), State.CREATED);
+		Order newOrder = createOrder(ID, NAME, TYPE, new Date(), State.CREATED);
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
 			persistenceHandler.getOrderDao(tx).save(newOrder);
 		}
