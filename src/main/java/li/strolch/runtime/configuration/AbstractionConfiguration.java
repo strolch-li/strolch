@@ -94,7 +94,7 @@ public abstract class AbstractionConfiguration {
 
 		File configFile = new File(configuration.getConfigPath(), value);
 		if (!configFile.isFile() || !configFile.canRead()) {
-			String msg = "Component {0} requires configuration file ''{1}'' which does not exist with value: {2}"; //$NON-NLS-1$
+			String msg = "Component {0} requires configuration file for configuration property ''{1}'' which does not exist with value: {2}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -106,7 +106,7 @@ public abstract class AbstractionConfiguration {
 
 		File dataFile = new File(configuration.getDataPath(), value);
 		if (checkExists && !dataFile.isFile() || !dataFile.canRead()) {
-			String msg = "Component {0} requires data file ''{1}'' which does not exist with value: {2}"; //$NON-NLS-1$
+			String msg = "Component {0} requires data file for configuraion property ''{1}'' which does not exist with value: {2}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
