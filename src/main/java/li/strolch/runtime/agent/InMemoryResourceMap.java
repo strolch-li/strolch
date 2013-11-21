@@ -22,6 +22,7 @@
 package li.strolch.runtime.agent;
 
 import li.strolch.model.Resource;
+import li.strolch.runtime.component.ComponentContainer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -29,5 +30,10 @@ import li.strolch.model.Resource;
  */
 public class InMemoryResourceMap extends InMemoryElementMap<Resource> implements ResourceMap {
 
-	//
+	/**
+	 * @param container
+	 */
+	public InMemoryResourceMap(ComponentContainer container) {
+		super(container, ResourceMap.class.getSimpleName());
+	}
 }

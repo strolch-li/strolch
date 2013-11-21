@@ -22,9 +22,13 @@
 package li.strolch.runtime.agent;
 
 import java.io.File;
+import java.text.MessageFormat;
 
+import li.strolch.model.xml.XmlModelDefaultHandler;
+import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -46,8 +50,14 @@ public class TransientDataStoreModeAgentInitializer extends EmptyDataStoreModeAg
 		RuntimeConfiguration runtimeConfiguration = this.configuration.getRuntimeConfiguration();
 		File modelFile = this.configuration.getDataFile(PROP_DATA_STORE_MODEL_FILE, null, runtimeConfiguration, true);
 
-		ModelFileDefaultHandler handler = new ModelFileDefaultHandler(modelFile);
+		InMemoryElementListener elementListener = new InMemoryElementListener(this.resourceMap, this.orderMap);
+		XmlModelDefaultHandler handler = new XmlModelDefaultHandler(elementListener, modelFile);
 		handler.parseFile();
+		XmlModelStatistics statistics = handler.getStatistics();
+		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
+		logger.info(MessageFormat.format("Loading XML Model file {0} took {1}.", modelFile.getName(), durationS)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 
 		super.start();
 	}

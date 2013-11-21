@@ -23,6 +23,7 @@ package li.strolch.runtime.agent;
 
 import java.text.MessageFormat;
 
+import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
 import org.slf4j.Logger;
@@ -40,8 +41,8 @@ public class EmptyDataStoreModeAgentInitializer implements AgentLifecycleControl
 
 	protected StrolchAgent strolchAgent;
 	protected ComponentConfiguration configuration;
-	protected OrderMap orderMap;
-	protected ResourceMap resourceMap;
+	protected InMemoryOrderMap orderMap;
+	protected InMemoryResourceMap resourceMap;
 
 	/**
 	 * @param strolchAgent
@@ -65,8 +66,12 @@ public class EmptyDataStoreModeAgentInitializer implements AgentLifecycleControl
 
 	@Override
 	public void initialize() {
-		this.resourceMap = new InMemoryResourceMap();
-		this.orderMap = new InMemoryOrderMap();
+		ComponentContainer container = this.strolchAgent.getContainer();
+		this.resourceMap = new InMemoryResourceMap(container);
+		this.orderMap = new InMemoryOrderMap(container);
+		
+		this.resourceMap.initialize(this.configuration);
+		this.orderMap.initialize(this.configuration);
 	}
 
 	@Override

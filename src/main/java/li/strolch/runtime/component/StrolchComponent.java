@@ -31,7 +31,7 @@ public class StrolchComponent {
 		return this.state;
 	}
 
-	protected ComponentContainer getContainer() {
+	public ComponentContainer getContainer() {
 		return this.container;
 	}
 

@@ -22,18 +22,31 @@
 package li.strolch.runtime.agent;
 
 import li.strolch.model.Order;
-import li.strolch.runtime.component.ComponentContainer;
+import li.strolch.model.Resource;
+import li.strolch.model.xml.StrolchElementListener;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class InMemoryOrderMap extends InMemoryElementMap<Order> implements OrderMap {
+public class InMemoryElementListener implements StrolchElementListener {
 
-	/**
-	 * @param container
-	 */
-	public InMemoryOrderMap(ComponentContainer container) {
-		super(container, OrderMap.class.getSimpleName());
+	private ResourceMap resourceMap;
+	private OrderMap orderMap;
+
+	public InMemoryElementListener(ResourceMap resourceMap, OrderMap orderMap) {
+		this.resourceMap = resourceMap;
+		this.orderMap = orderMap;
 	}
+
+	@Override
+	public void notifyResource(Resource resource) {
+		this.resourceMap.add(resource);
+	}
+
+	@Override
+	public void notifyOrder(Order order) {
+		this.orderMap.add(order);
+	}
+
 }

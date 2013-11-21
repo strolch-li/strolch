@@ -12,7 +12,6 @@
 		<impl>li.strolch.runtime.agent.StrolchAgent</impl>
 		<Properties>
 			<dataStoreMode>EMPTY</dataStoreMode>
-			<dataStoreModelFile>StrolcheModel.xml</dataStoreModelFile>
 		</Properties>
 	</Component>
 	<Component>

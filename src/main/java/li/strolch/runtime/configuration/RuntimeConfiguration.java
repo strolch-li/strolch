@@ -31,7 +31,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 			throw new StrolchConfigurationException(msg);
 		}
 
-		File dataPathF = new File(rootPathF, PATH_CONFIG);
+		File dataPathF = new File(rootPathF, PATH_DATA);
 		if (!dataPathF.exists() && !dataPathF.mkdir()) {
 			String msg = "Could not create missing data path at {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, configPathF);
