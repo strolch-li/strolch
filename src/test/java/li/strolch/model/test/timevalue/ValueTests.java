@@ -1,10 +1,11 @@
-package li.strolch.model.timevalue;
+package li.strolch.model.test.timevalue;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.impl.AString;
 import li.strolch.model.timevalue.impl.DoubleValue;
 import li.strolch.model.timevalue.impl.IntegerValue;

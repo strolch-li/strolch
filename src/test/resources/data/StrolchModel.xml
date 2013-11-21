@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchModel>
+
+	<Order Id="@test1" Name="Test Order" Type="Order">
+		<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
+		</ParameterBag>
+	</Order>
+	<Resource Id="@test1" Name="Test Resource" Type="Resource">
+		<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
+		</ParameterBag>
+	</Resource>
+
+	<IncludeFile file="resources/Resources.xml" />
+	<IncludeFile file="orders/Orders.xml" />
+
+</StrolchModel>

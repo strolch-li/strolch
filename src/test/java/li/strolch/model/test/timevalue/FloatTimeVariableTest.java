@@ -1,4 +1,4 @@
-package li.strolch.model.timevalue;
+package li.strolch.model.test.timevalue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -7,6 +7,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 import java.util.SortedSet;
 
+import li.strolch.model.timevalue.ITimeValue;
+import li.strolch.model.timevalue.IValue;
+import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.DoubleValue;
 import li.strolch.model.timevalue.impl.TimeVariable;
 import li.strolch.model.timevalue.impl.ValueChange;

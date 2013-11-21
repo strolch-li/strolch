@@ -1,8 +1,10 @@
-package li.strolch.model.timedstate;
+package li.strolch.model.test.timedstate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import li.strolch.model.timedstate.ITimedState;
+import li.strolch.model.timedstate.TimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.DoubleValue;
