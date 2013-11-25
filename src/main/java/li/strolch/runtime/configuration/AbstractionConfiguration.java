@@ -131,7 +131,7 @@ public abstract class AbstractionConfiguration {
 
 	private void assertDefValueExist(String key, Object defValue) {
 		if (defValue == null) {
-			String msg = "Component {0} is missing the configuration value for key {1} does not exist!"; //$NON-NLS-1$
+			String msg = "Component {0} is missing the configuration value with key ''{1}''!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, this.name, key);
 			throw new StrolchConfigurationException(msg);
 		}

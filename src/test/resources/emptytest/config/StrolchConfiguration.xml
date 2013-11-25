@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchConfiguration>
+	<Runtime>
+		<applicationName>StrolchRuntimeTest</applicationName>
+		<Properties>
+			<dataStoreMode>EMPTY</dataStoreMode>
+			<verbose>true</verbose>
+		</Properties>
+	</Runtime>
+	<Component>
+		<name>ServiceHandler</name>
+		<api>li.strolch.runtime.test.ServiceHandlerTest</api>
+		<impl>li.strolch.runtime.test.ServiceHandlerTestImpl</impl>
+		<Properties>
+		</Properties>
+	</Component>
+	<Component>
+		<name>PersistenceHandler</name>
+		<api>li.strolch.runtime.test.PersistenceHandlerTest</api>
+		<impl>li.strolch.runtime.test.PersistenceHandlerTestImpl</impl>
+		<Properties>
+			<verbose>true</verbose>
+		</Properties>
+	</Component>
+</StrolchConfiguration>

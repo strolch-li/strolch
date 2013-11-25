@@ -19,19 +19,21 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime.agent;
+package li.strolch.runtime.main;
+
+import java.io.File;
+
+import li.strolch.runtime.agent.StrolchAgent;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public interface AgentLifecycleController {
+public class Main {
 
-	public void initialize();
+	public static void main(String[] args) {
 
-	public void start();
-
-	public void stop();
-
-	public void destroy();
+		StrolchAgent agent = new StrolchAgent();
+		agent.setup(new File("."));
+	}
 }

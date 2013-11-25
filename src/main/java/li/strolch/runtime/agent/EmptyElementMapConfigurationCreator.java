@@ -21,20 +21,20 @@
  */
 package li.strolch.runtime.agent;
 
-import li.strolch.model.Order;
-import li.strolch.runtime.component.ComponentContainer;
+import java.util.List;
+
+import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class InMemoryOrderMap extends InMemoryElementMap<Order> implements OrderMap {
+public class EmptyElementMapConfigurationCreator extends InMemoryElementMapConfigurationCreator {
 
-	/**
-	 * @param container
-	 * @param componentName
-	 */
-	public InMemoryOrderMap(ComponentContainer container, String componentName) {
-		super(container, componentName);
+	@Override
+	protected void addConfiguration(List<ComponentConfiguration> configurations,
+			RuntimeConfiguration runtimeConfiguration) {
+		// nothing to do
 	}
 }

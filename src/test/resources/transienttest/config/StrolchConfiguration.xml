@@ -3,23 +3,16 @@
 	<Runtime>
 		<applicationName>StrolchRuntimeTest</applicationName>
 		<Properties>
+			<dataStoreMode>TRANSIENT</dataStoreMode>
+			<dataStoreFile>StrolchModel.xml</dataStoreFile>
 			<verbose>true</verbose>
 		</Properties>
 	</Runtime>
 	<Component>
-		<name>Agent</name>
-		<api>li.strolch.runtime.agent.StrolchAgent</api>
-		<impl>li.strolch.runtime.agent.StrolchAgent</impl>
-		<Properties>
-			<dataStoreMode>TRANSIENT</dataStoreMode>
-			<dataStoreModelFile>StrolchModel.xml</dataStoreModelFile>
-		</Properties>
-	</Component>
-	<Component>
 		<name>ServiceHandler</name>
 		<api>li.strolch.runtime.test.ServiceHandlerTest</api>
 		<impl>li.strolch.runtime.test.ServiceHandlerTestImpl</impl>
-		<depends>Agent</depends>
+		<depends>PersistenceHandler</depends>
 		<Properties>
 		</Properties>
 	</Component>

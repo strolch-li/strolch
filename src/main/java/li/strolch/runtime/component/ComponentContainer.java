@@ -1,6 +1,5 @@
 package li.strolch.runtime.component;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
@@ -9,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 
@@ -47,33 +45,6 @@ public class ComponentContainer {
 			throw new IllegalArgumentException(msg);
 		}
 		return component;
-	}
-
-	public void setup(File path) {
-
-		String msg = "Setting up Strolch Container from root {0}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, path.getAbsolutePath()));
-
-		StrolchConfiguration strolchConfiguration = ConfigurationParser.parseConfiguration(path);
-
-		Map<Class<?>, StrolchComponent> componentMap = new HashMap<>();
-		Map<String, ComponentController> controllerMap = new HashMap<>();
-		Set<String> componentNames = strolchConfiguration.getComponentNames();
-		for (String componentName : componentNames) {
-			ComponentConfiguration componentConfiguration = strolchConfiguration
-					.getComponentConfiguration(componentName);
-			initializeComponent(componentMap, controllerMap, componentConfiguration);
-		}
-
-		this.dependencyAnalyzer = new ComponentDependencyAnalyzer(strolchConfiguration, controllerMap);
-		this.dependencyAnalyzer.setupDependencies();
-
-		this.componentMap = componentMap;
-		this.controllerMap = controllerMap;
-		this.strolchConfiguration = strolchConfiguration;
-
-		msg = "Strolch Container setup with {0} components."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, this.componentMap.size()));
 	}
 
 	private void initializeComponent(Map<Class<?>, StrolchComponent> componentMap,
@@ -197,15 +168,39 @@ public class ComponentContainer {
 			destroy(dependencies);
 	}
 
-	public void initialize() {
+	public void initialize(StrolchConfiguration strolchConfiguration) {
 
+		// first set up the container itself
+		this.strolchConfiguration = strolchConfiguration;
+		Map<Class<?>, StrolchComponent> componentMap = new HashMap<>();
+		Map<String, ComponentController> controllerMap = new HashMap<>();
+		Set<String> componentNames = this.strolchConfiguration.getComponentNames();
+		for (String componentName : componentNames) {
+			ComponentConfiguration componentConfiguration = strolchConfiguration
+					.getComponentConfiguration(componentName);
+			initializeComponent(componentMap, controllerMap, componentConfiguration);
+		}
+
+		// then analyze dependencies
+		this.dependencyAnalyzer = new ComponentDependencyAnalyzer(strolchConfiguration, controllerMap);
+		this.dependencyAnalyzer.setupDependencies();
+
+		// now save references
+		this.componentMap = componentMap;
+		this.controllerMap = controllerMap;
+		this.strolchConfiguration = strolchConfiguration;
+
+		String msg = "Strolch Container setup with {0} components."; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, this.componentMap.size()));
+
+		// now we can initialize the components
 		logger.info("Initializing strolch components..."); //$NON-NLS-1$
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootUpstreamComponents();
 		initialize(rootUpstreamComponents);
 		this.state = this.state.validateStateChange(ComponentState.INITIALIZED);
 
-		String msg = "All {0} Strolch Components have been initialized."; //$NON-NLS-1$
+		msg = "All {0} Strolch Components have been initialized."; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.controllerMap.size()));
 	}
 

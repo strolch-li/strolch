@@ -54,6 +54,11 @@ public abstract class InMemoryElementMap<T extends StrolchElement> extends Strol
 	}
 
 	@Override
+	public void start() {
+		super.start();
+	}
+	
+	@Override
 	public void stop() {
 		this.elementMap.clear();
 		super.stop();

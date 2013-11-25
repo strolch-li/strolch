@@ -22,7 +22,7 @@ public class StrolchConfiguration {
 	public Set<String> getComponentNames() {
 		return this.configurationByComponent.keySet();
 	}
-	
+
 	public ComponentConfiguration getComponentConfiguration(String componentName) {
 		ComponentConfiguration componentConfiguration = this.configurationByComponent.get(componentName);
 		if (componentConfiguration == null) {
@@ -31,5 +31,13 @@ public class StrolchConfiguration {
 			throw new StrolchConfigurationException(msg);
 		}
 		return componentConfiguration;
+	}
+
+	/**
+	 * @param name
+	 * @param configuration
+	 */
+	public void addConfiguration(String name, ComponentConfiguration configuration) {
+		this.configurationByComponent.put(name, configuration);
 	}
 }

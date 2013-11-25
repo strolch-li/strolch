@@ -23,8 +23,6 @@ package li.strolch.runtime.agent;
 
 import java.text.MessageFormat;
 
-import li.strolch.runtime.configuration.ComponentConfiguration;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
@@ -32,35 +30,30 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 public enum DataStoreMode {
 	EMPTY {
 		@Override
-		public AgentLifecycleController getAgentLifecycleController(StrolchAgent strolchAgent,
-				ComponentConfiguration configuration) {
-			return new EmptyDataStoreModeAgentInitializer(strolchAgent, configuration);
+		public ElementMapConfigurationCreator getElementMapConfigurationConfigurator() {
+			return new EmptyElementMapConfigurationCreator();
 		}
 	}, //
 	TRANSIENT {
 		@Override
-		public AgentLifecycleController getAgentLifecycleController(StrolchAgent strolchAgent,
-				ComponentConfiguration configuration) {
-			return new TransientDataStoreModeAgentInitializer(strolchAgent, configuration);
+		public ElementMapConfigurationCreator getElementMapConfigurationConfigurator() {
+			return new TransientElementMapConfigurationCreator();
 		}
 	}, //
 	CACHED {
 		@Override
-		public AgentLifecycleController getAgentLifecycleController(StrolchAgent strolchAgent,
-				ComponentConfiguration configuration) {
+		public ElementMapConfigurationCreator getElementMapConfigurationConfigurator() {
 			throw new UnsupportedOperationException(MessageFormat.format("The mode {0} is not yet supported!", this)); //$NON-NLS-1$
 		}
 	}, //
 	TRANSACTIONAL {
 		@Override
-		public AgentLifecycleController getAgentLifecycleController(StrolchAgent strolchAgent,
-				ComponentConfiguration configuration) {
+		public ElementMapConfigurationCreator getElementMapConfigurationConfigurator() {
 			throw new UnsupportedOperationException(MessageFormat.format("The mode {0} is not yet supported!", this)); //$NON-NLS-1$
 		}
 	}; //
 
-	public AgentLifecycleController getAgentLifecycleController(StrolchAgent strolchAgent,
-			ComponentConfiguration configuration) {
+	public ElementMapConfigurationCreator getElementMapConfigurationConfigurator() {
 		throw new UnsupportedOperationException("Please implement in enum!"); //$NON-NLS-1$
 	}
 

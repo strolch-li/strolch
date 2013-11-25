@@ -32,8 +32,9 @@ public class InMemoryResourceMap extends InMemoryElementMap<Resource> implements
 
 	/**
 	 * @param container
+	 * @param componentName
 	 */
-	public InMemoryResourceMap(ComponentContainer container) {
-		super(container, ResourceMap.class.getSimpleName());
+	public InMemoryResourceMap(ComponentContainer container, String componentName) {
+		super(container, componentName);
 	}
 }

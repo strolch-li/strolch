@@ -21,86 +21,82 @@
  */
 package li.strolch.runtime.agent;
 
+import java.io.File;
+import java.text.MessageFormat;
+import java.util.List;
+
 import li.strolch.runtime.component.ComponentContainer;
-import li.strolch.runtime.component.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.ConfigurationParser;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
+import li.strolch.runtime.configuration.StrolchConfiguration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class StrolchAgent extends StrolchComponent {
+public class StrolchAgent {
 
 	public static final String PROP_DATA_STORE_MODE = "dataStoreMode"; //$NON-NLS-1$
+	public static final String PROP_DATA_STORE_FILE = "dataStoreFile"; //$NON-NLS-1$
+	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
 
-	private ResourceMap resourceMap;
-	private OrderMap orderMap;
-	private AgentLifecycleController agentInitializer;
-
-	/**
-	 * @param container
-	 * @param componentName
-	 */
-	public StrolchAgent(ComponentContainer container, String componentName) {
-		super(container, componentName);
-	}
+	private ComponentContainer container;
+	private StrolchConfiguration strolchConfiguration;
 
 	/**
-	 * @param resourceMap
-	 *            the resourceMap to set
+	 * @return the strolchConfiguration
 	 */
-	void setResourceMap(ResourceMap resourceMap) {
-		this.resourceMap = resourceMap;
+	public StrolchConfiguration getStrolchConfiguration() {
+		return this.strolchConfiguration;
 	}
-
+	
 	/**
-	 * @param orderMap
-	 *            the orderMap to set
+	 * @return the container
 	 */
-	void setOrderMap(OrderMap orderMap) {
-		this.orderMap = orderMap;
+	public ComponentContainer getContainer() {
+		return this.container;
 	}
 
-	/**
-	 * @return the resourceMap
-	 */
-	public ResourceMap getResourceMap() {
-		return this.resourceMap;
+	public void initialize() {
+		this.container.initialize(this.strolchConfiguration);
 	}
 
-	/**
-	 * @return the orderMap
-	 */
-	public OrderMap getOrderMap() {
-		return this.orderMap;
-	}
-
-	@Override
-	public void initialize(ComponentConfiguration configuration) {
-
-		DataStoreMode dataStoreMode = DataStoreMode.parseDataStoreMode(configuration.getString(PROP_DATA_STORE_MODE,
-				null));
-		this.agentInitializer = dataStoreMode.getAgentLifecycleController(this, configuration);
-		this.agentInitializer.initialize();
-
-		super.initialize(configuration);
-	}
-
-	@Override
 	public void start() {
-		this.agentInitializer.start();
-		super.start();
+		this.container.start();
 	}
 
-	@Override
 	public void stop() {
-		this.agentInitializer.stop();
-		super.stop();
+		this.container.stop();
 	}
 
-	@Override
 	public void destroy() {
-		this.agentInitializer.destroy();
-		super.destroy();
+		this.container.destroy();
+	}
+
+	public void setup(File path) {
+
+		String msg = "Setting up Strolch Container from root {0}"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, path.getAbsolutePath()));
+
+		this.strolchConfiguration = ConfigurationParser.parseConfiguration(path);
+		RuntimeConfiguration runtimeConfiguration = this.strolchConfiguration.getRuntimeConfiguration();
+		DataStoreMode dataStoreMode = DataStoreMode.parseDataStoreMode(runtimeConfiguration.getString(
+				PROP_DATA_STORE_MODE, null));
+		ElementMapConfigurationCreator elementMapConfigurationCreator = dataStoreMode
+				.getElementMapConfigurationConfigurator();
+		List<ComponentConfiguration> componentConfigurations = elementMapConfigurationCreator
+				.getComponentConfigurations(runtimeConfiguration);
+		for (ComponentConfiguration configuration : componentConfigurations) {
+			this.strolchConfiguration.addConfiguration(configuration.getName(), configuration);
+		}
+		
+		ComponentContainer container = new ComponentContainer();
+		this.container = container;
+
+		logger.info(MessageFormat.format("Setup Agent {0}", runtimeConfiguration.getApplicationName())); //$NON-NLS-1$
 	}
 }
