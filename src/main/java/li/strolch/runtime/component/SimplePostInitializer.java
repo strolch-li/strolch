@@ -19,27 +19,20 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime;
-
-import org.junit.Ignore;
-import org.junit.Test;
+package li.strolch.runtime.component;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-//@SuppressWarnings("nls")
-public class QueryTest {
+public class SimplePostInitializer extends StrolchComponent implements PostInitializer {
 
-	@Test
-	@Ignore
-	public void shouldQueryResourceWithParamValue() {
-
-//		ResourceQuery resQuery = new ResourceQuery();
-//		resQuery.with(new TypeMatcher("MyType"));
-//		resQuery.with(new ParameterBagMatcher("Bla").with(ParameterMatcher.stringValue("color", "red")));
-//
-//		List<Resource> result = resQuery.doQuery();
-
+	/**
+	 * @param container
+	 * @param componentName
+	 */
+	public SimplePostInitializer(ComponentContainer container, String componentName) {
+		super(container, componentName);
 	}
+
 }

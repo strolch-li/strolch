@@ -53,12 +53,16 @@ public class StrolchAgent {
 	public StrolchConfiguration getStrolchConfiguration() {
 		return this.strolchConfiguration;
 	}
-	
+
 	/**
 	 * @return the container
 	 */
 	public ComponentContainer getContainer() {
 		return this.container;
+	}
+
+	public String getApplicationName() {
+		return this.strolchConfiguration.getRuntimeConfiguration().getApplicationName();
 	}
 
 	public void initialize() {
@@ -93,7 +97,7 @@ public class StrolchAgent {
 		for (ComponentConfiguration configuration : componentConfigurations) {
 			this.strolchConfiguration.addConfiguration(configuration.getName(), configuration);
 		}
-		
+
 		ComponentContainer container = new ComponentContainer();
 		this.container = container;
 

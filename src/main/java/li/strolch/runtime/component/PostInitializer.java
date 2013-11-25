@@ -19,21 +19,13 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime.main;
-
-import java.io.File;
-
-import li.strolch.runtime.agent.StrolchAgent;
+package li.strolch.runtime.component;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
-public class Main {
+public interface PostInitializer {
 
-	public static void main(String[] args) {
-
-		StrolchAgent agent = new StrolchAgent();
-		agent.setup(new File("."));
-	}
+	// marker interface
 }
