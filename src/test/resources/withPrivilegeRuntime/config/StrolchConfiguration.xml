@@ -3,6 +3,7 @@
 	<Runtime>
 		<applicationName>StrolchPersistenceTest</applicationName>
 		<Properties>
+			<dataStoreMode>EMPTY</dataStoreMode>
 			<verbose>true</verbose>
 		</Properties>
 	</Runtime>
