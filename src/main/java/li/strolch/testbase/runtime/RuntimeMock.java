@@ -3,6 +3,7 @@ package li.strolch.testbase.runtime;
 import java.io.File;
 import java.text.MessageFormat;
 
+import li.strolch.runtime.agent.StrolchAgent;
 import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
@@ -18,6 +19,7 @@ public class RuntimeMock {
 	private static final String TARGET = "target"; //$NON-NLS-1$
 
 	private static ComponentContainer container;
+	private static StrolchAgent agent;
 
 	/**
 	 * @return the container
@@ -70,14 +72,14 @@ public class RuntimeMock {
 
 	public static void startContainer(File rootPathF) {
 
-		ComponentContainer container = new ComponentContainer();
 		try {
+			StrolchAgent agent = new StrolchAgent();
+			agent.setup(rootPathF);
+			agent.initialize();
+			agent.start();
 
-			container.setup(rootPathF);
-			container.initialize();
-			container.start();
-
-			RuntimeMock.container = container;
+			RuntimeMock.agent = agent;
+			RuntimeMock.container = agent.getContainer();
 
 		} catch (Exception e) {
 			logger.error("Failed to start mocked container due to: " + e.getMessage(), e); //$NON-NLS-1$
@@ -88,17 +90,17 @@ public class RuntimeMock {
 
 	public static void destroyRuntime() {
 
-		if (container == null)
+		if (agent == null)
 			return;
 
 		try {
-			container.stop();
+			agent.stop();
 		} catch (Exception e) {
 			logger.info("Failed to stop container: " + e.getMessage()); //$NON-NLS-1$
 		}
 
 		try {
-			container.destroy();
+			agent.destroy();
 		} catch (Exception e) {
 			logger.info("Failed to destroy container: " + e.getMessage()); //$NON-NLS-1$
 		}

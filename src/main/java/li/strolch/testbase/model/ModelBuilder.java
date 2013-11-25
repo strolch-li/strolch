@@ -22,6 +22,7 @@
 package li.strolch.testbase.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
@@ -106,7 +107,7 @@ public class ModelBuilder {
 	 * 
 	 * @return the newly created {@link Order}
 	 */
-	public static Order createOrder(String id, String name, String type, long date, State state) {
+	public static Order createOrder(String id, String name, String type, Date date, State state) {
 
 		Order order = new Order(id, name, type, date, state);
 		ParameterBag bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
@@ -166,7 +167,7 @@ public class ModelBuilder {
 		StringParameter stringParam = new StringParameter(PARAM_STRING_ID, PARAM_STRING_NAME, "Strolch");
 		bag.addParameter(stringParam);
 
-		DateParameter dateParam = new DateParameter(PARAM_DATE_ID, PARAM_DATE_NAME, 1354295525628L);
+		DateParameter dateParam = new DateParameter(PARAM_DATE_ID, PARAM_DATE_NAME, new Date(1354295525628L));
 		bag.addParameter(dateParam);
 
 		ArrayList<String> stringList = new ArrayList<String>();
