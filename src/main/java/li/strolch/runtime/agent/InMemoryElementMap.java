@@ -22,8 +22,12 @@
 package li.strolch.runtime.agent;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import li.strolch.model.StrolchElement;
 import li.strolch.runtime.component.ComponentContainer;
@@ -37,6 +41,8 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public abstract class InMemoryElementMap<T extends StrolchElement> extends StrolchComponent implements ElementMap<T> {
 
+	private Map<String, Map<String, T>> elementMap;
+
 	/**
 	 * @param container
 	 * @param componentName
@@ -44,8 +50,6 @@ public abstract class InMemoryElementMap<T extends StrolchElement> extends Strol
 	public InMemoryElementMap(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
-
-	private Map<String, Map<String, T>> elementMap;
 
 	@Override
 	public void initialize(ComponentConfiguration configuration) {
@@ -57,7 +61,7 @@ public abstract class InMemoryElementMap<T extends StrolchElement> extends Strol
 	public void start() {
 		super.start();
 	}
-	
+
 	@Override
 	public void stop() {
 		this.elementMap.clear();
@@ -71,15 +75,83 @@ public abstract class InMemoryElementMap<T extends StrolchElement> extends Strol
 	}
 
 	@Override
+	public boolean hasElement(String type, String id) {
+		return this.elementMap.containsKey(type) && this.elementMap.get(type).containsKey(id);
+	}
+
+	@Override
+	public boolean hasType(String type) {
+		return this.elementMap.containsKey(type);
+	}
+
+	@Override
 	public T getBy(String type, String id) {
 		if (StringHelper.isEmpty(type) || StringHelper.isEmpty(id))
 			throw new IllegalArgumentException("type and id may not be null!"); //$NON-NLS-1$
 
 		Map<String, T> byTypeMap = this.elementMap.get(type);
-		if (byTypeMap == null)
-			return null;
+		if (byTypeMap == null || byTypeMap.isEmpty()) {
+			String msg = MessageFormat.format("There is no element with the type {0} and id {1}", type, id); //$NON-NLS-1$
+			throw new IllegalArgumentException(msg);
+		}
 
-		return byTypeMap.get(id);
+		T element = byTypeMap.get(id);
+		if (element == null) {
+			String msg = MessageFormat.format("There is no element with the type {0} and id {1}", type, id); //$NON-NLS-1$
+			throw new IllegalArgumentException(msg);
+		}
+
+		return element;
+	}
+
+	public List<T> getAllElements() {
+
+		List<T> allElements = new ArrayList<>();
+		for (Map<String, T> elementsByType : this.elementMap.values()) {
+			allElements.addAll(elementsByType.values());
+		}
+
+		return allElements;
+	}
+
+	public List<T> getElementsBy(String type) {
+		if (StringHelper.isEmpty(type))
+			throw new IllegalArgumentException("type may not be null!"); //$NON-NLS-1$
+
+		Map<String, T> elementsByType = this.elementMap.get(type);
+		if (elementsByType == null || elementsByType.isEmpty()) {
+			String msg = MessageFormat.format("There are no elements with the type {0}", type); //$NON-NLS-1$
+			throw new IllegalArgumentException(msg);
+		}
+
+		return new ArrayList<>(elementsByType.values());
+	}
+
+	public Set<String> getTypes() {
+		return new HashSet<>(this.elementMap.keySet());
+	}
+
+	public Set<String> getAllKeys() {
+
+		Set<String> allKeys = new HashSet<>();
+		for (Map<String, T> elementsByType : this.elementMap.values()) {
+			allKeys.addAll(elementsByType.keySet());
+		}
+
+		return allKeys;
+	}
+
+	public Set<String> getKeysBy(String type) {
+		if (StringHelper.isEmpty(type))
+			throw new IllegalArgumentException("type may not be null!"); //$NON-NLS-1$
+
+		Map<String, T> elementsByType = this.elementMap.get(type);
+		if (elementsByType == null || elementsByType.isEmpty()) {
+			String msg = MessageFormat.format("There are no elements with the type {0}", type); //$NON-NLS-1$
+			throw new IllegalArgumentException(msg);
+		}
+
+		return new HashSet<>(elementsByType.keySet());
 	}
 
 	@Override

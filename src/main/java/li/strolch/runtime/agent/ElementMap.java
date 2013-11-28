@@ -21,6 +21,9 @@
  */
 package li.strolch.runtime.agent;
 
+import java.util.List;
+import java.util.Set;
+
 import li.strolch.model.StrolchElement;
 
 /**
@@ -29,7 +32,21 @@ import li.strolch.model.StrolchElement;
  */
 public interface ElementMap<T extends StrolchElement> {
 
+	public boolean hasType(String type);
+
+	public boolean hasElement(String type, String id);
+
 	public T getBy(String type, String id);
+
+	public List<T> getAllElements();
+
+	public List<T> getElementsBy(String type);
+
+	public Set<String> getTypes();
+
+	public Set<String> getAllKeys();
+
+	public Set<String> getKeysBy(String type);
 
 	public void add(T element);
 
