@@ -28,8 +28,13 @@ import java.util.Date;
 import java.util.List;
 
 import li.strolch.model.Order;
+import li.strolch.model.ParameterBag;
+import li.strolch.model.ParameterizedElement;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
+import li.strolch.model.parameter.BooleanParameter;
+import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.runtime.ModelBuilder;
 
 import org.junit.Test;
@@ -119,6 +124,34 @@ public class InMemoryQueryTest {
 
 		List<Resource> result = resourceQuery.doQuery();
 		assertEquals(0, result.size());
+	}
+
+	@Test
+	public void shouldQueryByParameter() {
+
+		List<Resource> resources = getResources();
+		resources.add(getBallResource());
+
+		InMemoryQuery<Resource> ballQuery = new InMemoryQuery<>();
+		ballQuery.setNavigator(new ListNavigator<>(resources));
+		List<Selector<ParameterizedElement>> ballDetailSelectors = new ArrayList<>();
+		ballDetailSelectors.add(ParameterSelector.stringSelector("color", "red"));
+		ballDetailSelectors.add(ParameterSelector.booleanSelector("forChildren", true));
+		ballDetailSelectors.add(ParameterSelector.floatSelector("diameter", 22.0));
+		ballQuery.addSelector(new ParameterizedElementSelector<Resource>("parameters", ballDetailSelectors));
+		
+		List<Resource> result = ballQuery.doQuery();
+		assertEquals(1, result.size());
+	}
+
+	private Resource getBallResource() {
+		Resource res1 = new Resource("childrensBall", "Ball 1", "Ball");
+		ParameterBag bag = new ParameterBag("parameters", "Ball Details", "Parameters");
+		bag.addParameter(new StringParameter("color", "Color", "red"));
+		bag.addParameter(new BooleanParameter("forChildren", "Color", true));
+		bag.addParameter(new FloatParameter("diameter", "Color", 22.0));
+		res1.addParameterBag(bag);
+		return res1;
 	}
 
 	private List<Resource> getResources() {
