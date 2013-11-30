@@ -19,7 +19,7 @@
  *  along with li.strolch.model.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime;
+package li.strolch.runtime.test.query;
 
 import java.util.ArrayList;
 import java.util.Date;

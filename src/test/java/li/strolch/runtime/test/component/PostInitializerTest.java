@@ -1,4 +1,4 @@
-package li.strolch.runtime.test;
+package li.strolch.runtime.test.component;
 
 public interface PostInitializerTest {
 

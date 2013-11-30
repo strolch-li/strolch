@@ -1,4 +1,4 @@
-package li.strolch.runtime;
+package li.strolch.runtime.test.component;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

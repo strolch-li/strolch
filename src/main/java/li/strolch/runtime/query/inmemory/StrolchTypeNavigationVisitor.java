@@ -21,28 +21,10 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import li.strolch.model.Order;
-import li.strolch.runtime.agent.ElementMap;
-import li.strolch.runtime.agent.OrderMap;
-import li.strolch.runtime.component.ComponentContainer;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
+ *
  */
-public class OrderTypeNavigator extends StrolchTypeNavigator<Order> {
+public class StrolchTypeNavigationVisitor {
 
-	private ComponentContainer container;
-
-	/**
-	 * @param type
-	 */
-	public OrderTypeNavigator(String type, ComponentContainer container) {
-		super(type);
-		this.container = container;
-	}
-
-	@Override
-	protected ElementMap<Order> getElementMap() {
-		return this.container.getComponent(OrderMap.class);
-	}
 }

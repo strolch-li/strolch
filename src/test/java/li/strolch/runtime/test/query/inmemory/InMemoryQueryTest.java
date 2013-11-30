@@ -19,7 +19,7 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime.query.inmemory;
+package li.strolch.runtime.test.query.inmemory;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,7 +35,17 @@ import li.strolch.model.State;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.StringParameter;
-import li.strolch.runtime.ModelBuilder;
+import li.strolch.runtime.query.inmemory.AndSelector;
+import li.strolch.runtime.query.inmemory.BooleanSelector;
+import li.strolch.runtime.query.inmemory.IdSelector;
+import li.strolch.runtime.query.inmemory.InMemoryQuery;
+import li.strolch.runtime.query.inmemory.ListNavigator;
+import li.strolch.runtime.query.inmemory.NameSelector;
+import li.strolch.runtime.query.inmemory.OrSelector;
+import li.strolch.runtime.query.inmemory.ParameterSelector;
+import li.strolch.runtime.query.inmemory.ParameterizedElementSelector;
+import li.strolch.runtime.query.inmemory.Selector;
+import li.strolch.runtime.test.query.ModelBuilder;
 
 import org.junit.Test;
 

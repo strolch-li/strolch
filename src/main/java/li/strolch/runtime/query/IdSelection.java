@@ -21,11 +21,32 @@
  */
 package li.strolch.runtime.query;
 
+import li.strolch.runtime.query.visitor.StrolchElementVisitor;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
+ * 
  */
-public interface ResourceQueryVisitor {
+public class IdSelection implements Selection<StrolchElementVisitor> {
 
-	public void visit(ResourceQuery query);
+	private String id;
+
+	/**
+	 * @param id
+	 */
+	public IdSelection(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return this.id;
+	}
+
+	@Override
+	public void accept(StrolchElementVisitor visitor) {
+		visitor.visit(this);
+	}
 }

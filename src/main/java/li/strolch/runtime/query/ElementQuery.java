@@ -21,25 +21,31 @@
  */
 package li.strolch.runtime.query;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import li.strolch.runtime.query.visitor.StrolchElementVisitor;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class TypeSelection {
+public class ElementQuery implements Query<StrolchElementVisitor> {
 
-	private String type;
+	private Navigation<QueryVisitor> navigation;
+	private List<Selection<QueryVisitor>> selections;
 
-	/**
-	 * @param type
-	 */
-	public TypeSelection(String type) {
-		this.type = type;
+	public ElementQuery(Navigation<QueryVisitor> navigation) {
+		this.selections = new ArrayList<>();
 	}
 
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		return this.type;
+	@Override
+	public void visit(StrolchElementVisitor queryVisitor) {
+
+		this.navigation.accept(queryVisitor);
+
+		for (Selection<QueryVisitor> selection : this.selections) {
+			selection.accept(queryVisitor);
+		}
 	}
 }

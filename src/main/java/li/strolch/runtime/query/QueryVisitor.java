@@ -19,30 +19,16 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime.query.inmemory;
+package li.strolch.runtime.query;
 
-import li.strolch.model.Order;
-import li.strolch.runtime.agent.ElementMap;
-import li.strolch.runtime.agent.OrderMap;
-import li.strolch.runtime.component.ComponentContainer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
  */
-public class OrderTypeNavigator extends StrolchTypeNavigator<Order> {
+public interface QueryVisitor {
 
-	private ComponentContainer container;
-
-	/**
-	 * @param type
-	 */
-	public OrderTypeNavigator(String type, ComponentContainer container) {
-		super(type);
-		this.container = container;
-	}
-
-	@Override
-	protected ElementMap<Order> getElementMap() {
-		return this.container.getComponent(OrderMap.class);
-	}
+	public void visitAnd(AndSelection andSelection);
+	
+	public void visitOr(OrSelection orSelection);
 }

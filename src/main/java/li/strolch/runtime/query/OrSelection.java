@@ -19,37 +19,26 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime.query.inmemory;
+package li.strolch.runtime.query;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import li.strolch.model.Resource;
-import li.strolch.runtime.component.ComponentContainer;
-import li.strolch.runtime.query.ResourceQuery;
-import li.strolch.runtime.query.ResourceQueryVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class InMemoryResourceQueryVisitor implements ResourceQueryVisitor {
+public class OrSelection extends BooleanSelection {
 
-	private ArrayList<Resource> result;
-	
-	public List<Resource> performQuery(ComponentContainer container, ResourceQuery query) {
-		this.result = new ArrayList<>();
+	public OrSelection(List<Selection<QueryVisitor>> selections) {
+		super(selections);
+	}
 
-		query.accept(this);
-
-		return this.result;
+	public OrSelection(Selection<QueryVisitor> leftHandSide, Selection<QueryVisitor> rightHandSide) {
+		super(leftHandSide, rightHandSide);
 	}
 
 	@Override
-	public void visit(ResourceQuery resourceQuery) {
-		// TODO Auto-generated method stub
-
+	public void accept(QueryVisitor visitor) {
+		visitor.visitOr(this);
 	}
-
-	
 }

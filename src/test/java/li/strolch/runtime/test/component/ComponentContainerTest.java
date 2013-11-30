@@ -1,4 +1,4 @@
-package li.strolch.runtime;
+package li.strolch.runtime.test.component;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -8,9 +8,6 @@ import java.io.File;
 import li.strolch.model.Resource;
 import li.strolch.runtime.agent.StrolchAgent;
 import li.strolch.runtime.component.ComponentContainer;
-import li.strolch.runtime.test.PersistenceHandlerTest;
-import li.strolch.runtime.test.ServiceHandlerTest;
-import li.strolch.runtime.test.ServiceResultTest;
 
 import org.junit.Test;
 import org.slf4j.Logger;

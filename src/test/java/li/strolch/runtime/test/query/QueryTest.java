@@ -19,24 +19,23 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime.query;
+package li.strolch.runtime.test.query;
 
-import java.util.List;
-
-import li.strolch.model.Resource;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
+ * 
  */
-public class ResourceQuery {
-	
-	
-	private String byType;
-	
-	
+//@SuppressWarnings("nls")
+public class QueryTest {
 
-	public void accept(ResourceQueryVisitor visitor) {
-		visitor.visit(this);
+	@Test
+	@Ignore
+	public void shouldQueryResourceWithParamValue() {
+
+		//
+
 	}
 }

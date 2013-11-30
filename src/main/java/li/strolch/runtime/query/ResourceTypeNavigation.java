@@ -21,13 +21,23 @@
  */
 package li.strolch.runtime.query;
 
+import li.strolch.runtime.query.visitor.StrolchElementVisitor;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  *
  */
-public class ByElementSelection {
+public class ResourceTypeNavigation extends StrolchTypeNavigation<StrolchElementVisitor>{
 
-	private String id;
-	private String name;
-	private String type;
+	/**
+	 * @param type
+	 */
+	ResourceTypeNavigation(String type) {
+		super(type);
+	}
+
+	@Override
+	public void accept(StrolchElementVisitor visitor) {
+		visitor.visit(this);
+	}
 }

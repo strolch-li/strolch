@@ -1,4 +1,4 @@
-package li.strolch.runtime.test;
+package li.strolch.runtime.test.component;
 
 import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.StrolchComponent;

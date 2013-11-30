@@ -21,28 +21,45 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import li.strolch.model.Order;
-import li.strolch.runtime.agent.ElementMap;
-import li.strolch.runtime.agent.OrderMap;
-import li.strolch.runtime.component.ComponentContainer;
+import java.util.List;
+
+import li.strolch.model.StrolchElement;
+import li.strolch.runtime.query.AndSelection;
+import li.strolch.runtime.query.BooleanSelection;
+import li.strolch.runtime.query.OrSelection;
+import li.strolch.runtime.query.QueryVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
  */
-public class OrderTypeNavigator extends StrolchTypeNavigator<Order> {
+public class BooleanVisitor<T extends StrolchElement> implements QueryVisitor {
 
-	private ComponentContainer container;
+	private List<Selector<T>> selectors;
 
 	/**
-	 * @param type
+	 * @param selectors
 	 */
-	public OrderTypeNavigator(String type, ComponentContainer container) {
-		super(type);
-		this.container = container;
+	public BooleanVisitor(List<Selector<T>> selectors) {
+		this.selectors = selectors;
+	}
+
+	/**
+	 * @param selection
+	 */
+	public void visit(BooleanSelection selection) {
+		selection.accept(this);
 	}
 
 	@Override
-	protected ElementMap<Order> getElementMap() {
-		return this.container.getComponent(OrderMap.class);
+	public void visitAnd(AndSelection selection) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visitOr(OrSelection selection) {
+		// TODO Auto-generated method stub
+		
 	}
 }
