@@ -1,4 +1,4 @@
-package li.strolch.model.test.timevalue;
+package li.strolch.model.timevalue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

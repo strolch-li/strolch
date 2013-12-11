@@ -19,15 +19,11 @@
  *  along with li.strolch.model.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.model.test;
+package li.strolch.model;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.State;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.FloatParameter;
@@ -38,11 +34,13 @@ import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * Class which can be used to generate objects which implement {@link StrolchElement}. These generated classes can then
+ * be used in test classes etc.
  * 
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
-public class ModelTestHelper {
+public class ModelGenerator {
 
 	public static final String PARAM_BOOLEAN_ID = "@param1";
 	public static final String PARAM_BOOLEAN_NAME = "Boolean Param";
@@ -88,6 +86,23 @@ public class ModelTestHelper {
 		resource.addParameterBag(bag);
 
 		return resource;
+	}
+
+	/**
+	 * Creates an {@link Order} with the given values and adds a {@link ParameterBag} by calling
+	 * {@link #createParameterBag(String, String, String)}
+	 * 
+	 * @param id
+	 *            the id of the {@link Order}
+	 * @param name
+	 *            the name of the {@link Order}
+	 * @param type
+	 *            the type of the {@link Order}
+	 * 
+	 * @return the newly created {@link Order}
+	 */
+	public static Order createOrder(String id, String name, String type) {
+		return createOrder(id, name, type, new Date(), State.CREATED);
 	}
 
 	/**

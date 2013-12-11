@@ -19,7 +19,7 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.model.test;
+package li.strolch.model;
 
 import static org.junit.Assert.assertEquals;
 
