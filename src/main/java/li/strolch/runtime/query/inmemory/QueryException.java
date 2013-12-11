@@ -19,26 +19,23 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime.query;
+package li.strolch.runtime.query.inmemory;
 
-import java.util.List;
+import li.strolch.exception.StrolchException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class OrSelection extends BooleanSelection {
+public class QueryException extends StrolchException {
 
-	public OrSelection(List<Selection<QueryVisitor>> selections) {
-		super(selections);
+	private static final long serialVersionUID = 1L;
+
+	public QueryException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	public OrSelection(Selection<QueryVisitor> leftHandSide, Selection<QueryVisitor> rightHandSide) {
-		super(leftHandSide, rightHandSide);
-	}
-
-	@Override
-	public void accept(QueryVisitor visitor) {
-		visitor.visitOr(this);
+	public QueryException(String message) {
+		super(message);
 	}
 }

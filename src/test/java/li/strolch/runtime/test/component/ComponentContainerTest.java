@@ -13,9 +13,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//@Ignore
 @SuppressWarnings("nls")
 public class ComponentContainerTest {
+
+	public static final String PATH_TRANSIENT_CONTAINER = "src/test/resources/transienttest";
+	public static final String PATH_EMPTY_CONTAINER = "src/test/resources/emptytest";
 
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerTest.class);
 
@@ -23,31 +25,34 @@ public class ComponentContainerTest {
 	public void shouldStartEmptyContainer() {
 
 		try {
-			File rootPathF = new File("src/test/resources/emptytest");
-			startContainer(rootPathF);
+			StrolchAgent agent = startContainer(PATH_EMPTY_CONTAINER);
+			testContainer(agent);
+			destroyContainer(agent);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		}
 	}
+
 	@Test
 	public void shouldStartTransientContainer() {
 
 		try {
-			File rootPathF = new File("src/test/resources/transienttest");
-			startContainer(rootPathF);
+			StrolchAgent agent = startContainer(PATH_TRANSIENT_CONTAINER);
+			testContainer(agent);
+			destroyContainer(agent);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		}
 	}
 
+	public static StrolchAgent startContainer(String rootPath) {
+		File rootPathF = new File(rootPath);
+		return startContainer(rootPathF);
+	}
 
-	private void startContainer(File rootPathF) {
-		StrolchAgent agent = new StrolchAgent();
-		agent.setup(rootPathF);
-		agent.initialize();
-		agent.start();
+	private static void testContainer(StrolchAgent agent) {
 
 		ComponentContainer container = agent.getContainer();
 
@@ -59,8 +64,19 @@ public class ComponentContainerTest {
 		Resource resource = persistenceHandler.getTestResource("@testRes", "Test Res", "Test");
 		assertNotNull(resource);
 		assertEquals("@testRes", resource.getId());
+	}
 
-		container.stop();
-		container.destroy();
+	public static StrolchAgent startContainer(File rootPathF) {
+		StrolchAgent agent = new StrolchAgent();
+		agent.setup(rootPathF);
+		agent.initialize();
+		agent.start();
+
+		return agent;
+	}
+
+	public static void destroyContainer(StrolchAgent agent) {
+		agent.getContainer().stop();
+		agent.getContainer().destroy();
 	}
 }

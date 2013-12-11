@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
-import li.strolch.model.ParameterizedElement;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.parameter.BooleanParameter;
@@ -43,9 +43,7 @@ import li.strolch.runtime.query.inmemory.ListNavigator;
 import li.strolch.runtime.query.inmemory.NameSelector;
 import li.strolch.runtime.query.inmemory.OrSelector;
 import li.strolch.runtime.query.inmemory.ParameterSelector;
-import li.strolch.runtime.query.inmemory.ParameterizedElementSelector;
 import li.strolch.runtime.query.inmemory.Selector;
-import li.strolch.runtime.test.query.ModelBuilder;
 
 import org.junit.Test;
 
@@ -144,11 +142,9 @@ public class InMemoryQueryTest {
 
 		InMemoryQuery<Resource> ballQuery = new InMemoryQuery<>();
 		ballQuery.setNavigator(new ListNavigator<>(resources));
-		List<Selector<ParameterizedElement>> ballDetailSelectors = new ArrayList<>();
-		ballDetailSelectors.add(ParameterSelector.stringSelector("color", "red"));
-		ballDetailSelectors.add(ParameterSelector.booleanSelector("forChildren", true));
-		ballDetailSelectors.add(ParameterSelector.floatSelector("diameter", 22.0));
-		ballQuery.addSelector(new ParameterizedElementSelector<Resource>("parameters", ballDetailSelectors));
+		ballQuery.addSelector(ParameterSelector.<Resource>stringSelector("parameters", "color", "red"));
+		ballQuery.addSelector(ParameterSelector.<Resource>booleanSelector("parameters", "forChildren", true));
+		ballQuery.addSelector(ParameterSelector.<Resource>floatSelector("parameters", "diameter", 22.0));
 		
 		List<Resource> result = ballQuery.doQuery();
 		assertEquals(1, result.size());
@@ -165,12 +161,12 @@ public class InMemoryQueryTest {
 	}
 
 	private List<Resource> getResources() {
-		Resource res1 = ModelBuilder.createResource("@1", "Res 1", "MyType1");
-		Resource res2 = ModelBuilder.createResource("@2", "Res 2", "MyType1");
-		Resource res3 = ModelBuilder.createResource("@3", "Res 3", "MyType2");
-		Resource res4 = ModelBuilder.createResource("@4", "Res 4", "MyType2");
-		Resource res5 = ModelBuilder.createResource("@5", "Res 5", "MyType3");
-		Resource res6 = ModelBuilder.createResource("@6", "Res 6", "MyType3");
+		Resource res1 = ModelGenerator.createResource("@1", "Res 1", "MyType1");
+		Resource res2 = ModelGenerator.createResource("@2", "Res 2", "MyType1");
+		Resource res3 = ModelGenerator.createResource("@3", "Res 3", "MyType2");
+		Resource res4 = ModelGenerator.createResource("@4", "Res 4", "MyType2");
+		Resource res5 = ModelGenerator.createResource("@5", "Res 5", "MyType3");
+		Resource res6 = ModelGenerator.createResource("@6", "Res 6", "MyType3");
 		List<Resource> resources = new ArrayList<>();
 		resources.add(res1);
 		resources.add(res2);
@@ -182,12 +178,12 @@ public class InMemoryQueryTest {
 	}
 
 	private List<Order> getOrders() {
-		Order res1 = ModelBuilder.createOrder("@1", "Res 1", "MyType1", new Date(), State.CREATED);
-		Order res2 = ModelBuilder.createOrder("@2", "Res 2", "MyType1", new Date(), State.CREATED);
-		Order res3 = ModelBuilder.createOrder("@3", "Res 3", "MyType2", new Date(), State.CREATED);
-		Order res4 = ModelBuilder.createOrder("@4", "Res 4", "MyType2", new Date(), State.CREATED);
-		Order res5 = ModelBuilder.createOrder("@5", "Res 5", "MyType3", new Date(), State.CREATED);
-		Order res6 = ModelBuilder.createOrder("@6", "Res 6", "MyType3", new Date(), State.CREATED);
+		Order res1 = ModelGenerator.createOrder("@1", "Res 1", "MyType1", new Date(), State.CREATED);
+		Order res2 = ModelGenerator.createOrder("@2", "Res 2", "MyType1", new Date(), State.CREATED);
+		Order res3 = ModelGenerator.createOrder("@3", "Res 3", "MyType2", new Date(), State.CREATED);
+		Order res4 = ModelGenerator.createOrder("@4", "Res 4", "MyType2", new Date(), State.CREATED);
+		Order res5 = ModelGenerator.createOrder("@5", "Res 5", "MyType3", new Date(), State.CREATED);
+		Order res6 = ModelGenerator.createOrder("@6", "Res 6", "MyType3", new Date(), State.CREATED);
 		List<Order> orders = new ArrayList<>();
 		orders.add(res1);
 		orders.add(res2);

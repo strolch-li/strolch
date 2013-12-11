@@ -19,33 +19,29 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime.query;
+package li.strolch.runtime.query.inmemory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
-import li.strolch.runtime.query.visitor.StrolchElementVisitor;
+import li.strolch.model.Order;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class ElementQuery implements Query<StrolchElementVisitor> {
+public class DateSelector implements Selector<Order> {
 
-	private Navigation<QueryVisitor> navigation;
-	private List<Selection<QueryVisitor>> selections;
+	private Date date;
 
-	public ElementQuery(Navigation<QueryVisitor> navigation) {
-		this.selections = new ArrayList<>();
+	/**
+	 * @param date
+	 */
+	public DateSelector(Date date) {
+		this.date = date;
 	}
 
 	@Override
-	public void visit(StrolchElementVisitor queryVisitor) {
-
-		this.navigation.accept(queryVisitor);
-
-		for (Selection<QueryVisitor> selection : this.selections) {
-			selection.accept(queryVisitor);
-		}
+	public boolean select(Order element) {
+		return this.date.equals(element.getDate());
 	}
 }

@@ -19,25 +19,28 @@
  *  along with XXX.  If not, see 
  *  <http://www.gnu.org/licenses/>.
  */
-package li.strolch.runtime.query;
+package li.strolch.runtime.query.inmemory;
 
-import li.strolch.runtime.query.visitor.StrolchElementVisitor;
+import li.strolch.model.Order;
+import li.strolch.model.State;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
+ * 
  */
-public class ResourceTypeNavigation extends StrolchTypeNavigation<StrolchElementVisitor>{
+public class StateSelector implements Selector<Order> {
+
+	private State state;
 
 	/**
-	 * @param type
+	 * @param state
 	 */
-	ResourceTypeNavigation(String type) {
-		super(type);
+	public StateSelector(State state) {
+		this.state = state;
 	}
 
 	@Override
-	public void accept(StrolchElementVisitor visitor) {
-		visitor.visit(this);
+	public boolean select(Order element) {
+		return this.state.equals(element.getState());
 	}
 }

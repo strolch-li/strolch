@@ -24,73 +24,74 @@ package li.strolch.runtime.query.inmemory;
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.model.StrolchElement;
+import li.strolch.model.GroupedParameterizedElement;
+import li.strolch.model.query.AndSelection;
+import li.strolch.model.query.BooleanSelection;
+import li.strolch.model.query.IdSelection;
+import li.strolch.model.query.NameSelection;
+import li.strolch.model.query.OrSelection;
+import li.strolch.model.query.ParameterSelectionVisitor;
+import li.strolch.model.query.Selection;
+import li.strolch.model.query.StrolchElementSelectionVisitor;
+import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
+import li.strolch.model.query.ParameterSelection.DateParameterSelection;
+import li.strolch.model.query.ParameterSelection.FloatParameterSelection;
+import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
+import li.strolch.model.query.ParameterSelection.LongParameterSelection;
+import li.strolch.model.query.ParameterSelection.StringListParameterSelection;
+import li.strolch.model.query.ParameterSelection.StringParameterSelection;
 import li.strolch.runtime.component.ComponentContainer;
-import li.strolch.runtime.query.AndSelection;
-import li.strolch.runtime.query.ElementQuery;
-import li.strolch.runtime.query.IdSelection;
-import li.strolch.runtime.query.NameSelection;
-import li.strolch.runtime.query.OrSelection;
-import li.strolch.runtime.query.OrderTypeNavigation;
-import li.strolch.runtime.query.QueryVisitor;
-import li.strolch.runtime.query.ResourceTypeNavigation;
-import li.strolch.runtime.query.Selection;
-import li.strolch.runtime.query.visitor.StrolchElementVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InMemoryQueryVisitor<T extends StrolchElement> implements StrolchElementVisitor {
+public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement> implements
+		StrolchElementSelectionVisitor, ParameterSelectionVisitor {
 
-	private Navigator<T> navigator;
-	private List<Selector<T>> selectors;
-	private ComponentContainer container;
+	protected ComponentContainer container;
+	protected Navigator<T> navigator;
+	protected List<Selector<T>> selectors;
 
 	public InMemoryQueryVisitor(ComponentContainer container) {
 		this.container = container;
 		this.selectors = new ArrayList<>();
 	}
 
-	/**
-	 * @return the navigator
-	 */
+	public List<Selector<T>> getSelectors() {
+		return this.selectors;
+	}
+
 	public Navigator<T> getNavigator() {
 		return this.navigator;
 	}
 
 	/**
-	 * @return the selectors
+	 * Returns a new instance of this concrete type for performing recursive {@link BooleanSelection BooleanSelections}
+	 * 
+	 * @return a new instance of this concrete type
 	 */
-	public List<Selector<T>> getSelectors() {
-		return this.selectors;
-	}
-
-	public void visit(ElementQuery query) {
-		query.visit(this);
-	}
+	protected abstract InMemoryQueryVisitor<T> newInstance();
 
 	@Override
-	public void visitAnd(AndSelection andSelection) {
-		InMemoryQueryVisitor<T> visitor = new InMemoryQueryVisitor<>(this.container);
-		List<Selection<QueryVisitor>> selections = andSelection.getSelections();
-		for (Selection<QueryVisitor> selection : selections) {
-			selection.accept(visitor);
+	public <U extends Selection> void visitAnd(AndSelection<U> andSelection) {
+		InMemoryQueryVisitor<T> query = newInstance();
+		List<U> selections = andSelection.getSelections();
+		for (U selection : selections) {
+			selection.accept(query);
 		}
-
-		AndSelector<T> andSelector = new AndSelector<>(visitor.getSelectors());
+		AndSelector<T> andSelector = new AndSelector<>(query.getSelectors());
 		this.selectors.add(andSelector);
 	}
 
 	@Override
-	public void visitOr(OrSelection orSelection) {
-		InMemoryQueryVisitor<T> visitor = new InMemoryQueryVisitor<>(this.container);
-		List<Selection<QueryVisitor>> selections = orSelection.getSelections();
-		for (Selection<QueryVisitor> selection : selections) {
-			selection.accept(visitor);
+	public <U extends Selection> void visitOr(OrSelection<U> orSelection) {
+		InMemoryQueryVisitor<T> query = newInstance();
+		List<U> selections = orSelection.getSelections();
+		for (U selection : selections) {
+			selection.accept(query);
 		}
-
-		OrSelector<T> andSelector = new OrSelector<>(visitor.getSelectors());
-		this.selectors.add(andSelector);
+		OrSelector<T> orSelector = new OrSelector<>(query.getSelectors());
+		this.selectors.add(orSelector);
 	}
 
 	@Override
@@ -103,16 +104,45 @@ public class InMemoryQueryVisitor<T extends StrolchElement> implements StrolchEl
 		this.selectors.add(new NameSelector<T>(selection.getName()));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(OrderTypeNavigation navigation) {
-		this.navigator = (Navigator<T>) new OrderTypeNavigator(navigation.getType(), this.container);
+	public void visit(StringParameterSelection selection) {
+		this.selectors.add(ParameterSelector.<T> stringSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(ResourceTypeNavigation navigation) {
-		// XXX not good... class should be parameterized, but then there is no sense in ResourceType... but then one would need the ElementMap passed in...
-		this.navigator = (Navigator<T>) new ResourceTypeNavigator(navigation.getType(), this.container);
+	public void visit(IntegerParameterSelection selection) {
+		this.selectors.add(ParameterSelector.<T> integerSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
+	}
+
+	@Override
+	public void visit(BooleanParameterSelection selection) {
+		this.selectors.add(ParameterSelector.<T> booleanSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
+	}
+
+	@Override
+	public void visit(LongParameterSelection selection) {
+		this.selectors.add(ParameterSelector.<T> longSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
+	}
+
+	@Override
+	public void visit(FloatParameterSelection selection) {
+		this.selectors.add(ParameterSelector.<T> floatSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
+	}
+
+	@Override
+	public void visit(DateParameterSelection selection) {
+		this.selectors.add(ParameterSelector.<T> dateSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
+	}
+
+	@Override
+	public void visit(StringListParameterSelection selection) {
+		this.selectors.add(ParameterSelector.<T> stringListSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
 	}
 }

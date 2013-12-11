@@ -40,6 +40,11 @@ public class InMemoryQuery<T extends StrolchElement> {
 		this.selectors = new ArrayList<>();
 	}
 
+	public InMemoryQuery(Navigator<T> navigator, List<Selector<T>> selectors) {
+		this.navigator = navigator;
+		this.selectors = selectors;
+	}
+
 	/**
 	 * @param navigator
 	 *            the navigator to set
