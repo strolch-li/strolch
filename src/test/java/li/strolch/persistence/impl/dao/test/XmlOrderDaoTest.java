@@ -1,17 +1,13 @@
 package li.strolch.persistence.impl.dao.test;
 
-import static li.strolch.testbase.model.ModelBuilder.BAG_ID;
-import static li.strolch.testbase.model.ModelBuilder.PARAM_STRING_ID;
-import static li.strolch.testbase.model.ModelBuilder.createOrder;
+import static li.strolch.model.ModelGenerator.BAG_ID;
+import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
+import static li.strolch.model.ModelGenerator.createOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
-import java.util.Date;
-
 import li.strolch.model.Order;
-import li.strolch.model.State;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 
@@ -27,7 +23,7 @@ public class XmlOrderDaoTest extends AbstractDaoImplTest {
 	public void shouldCreateOrder() {
 
 		// create
-		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
 			persistenceHandler.getOrderDao(tx).save(newOrder);
 		}
@@ -37,7 +33,7 @@ public class XmlOrderDaoTest extends AbstractDaoImplTest {
 	public void shouldCrud() {
 
 		// create
-		Order newOrder = createOrder(ID, NAME, TYPE, new Date(), State.CREATED);
+		Order newOrder = createOrder(ID, NAME, TYPE);
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
 			persistenceHandler.getOrderDao(tx).save(newOrder);
 		}

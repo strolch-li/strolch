@@ -21,8 +21,8 @@
  */
 package li.strolch.persistence.impl.dao.test;
 
-import static li.strolch.testbase.model.ModelBuilder.createOrder;
-import static li.strolch.testbase.model.ModelBuilder.createResource;
+import static li.strolch.model.ModelGenerator.createOrder;
+import static li.strolch.model.ModelGenerator.createResource;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;

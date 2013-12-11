@@ -1,8 +1,8 @@
 package li.strolch.persistence.impl.dao.test;
 
-import static li.strolch.testbase.model.ModelBuilder.BAG_ID;
-import static li.strolch.testbase.model.ModelBuilder.PARAM_STRING_ID;
-import static li.strolch.testbase.model.ModelBuilder.createResource;
+import static li.strolch.model.ModelGenerator.BAG_ID;
+import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
+import static li.strolch.model.ModelGenerator.createResource;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -20,7 +20,7 @@ public class XmlResourceDaoTest extends AbstractDaoImplTest {
 	private static final String TYPE = "Box"; //$NON-NLS-1$
 
 	@Test
-	public void shouldCreateOrder() {
+	public void shouldCreateResource() {
 
 		// create
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
