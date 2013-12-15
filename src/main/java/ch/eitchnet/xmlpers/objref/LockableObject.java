@@ -24,10 +24,6 @@ public class LockableObject {
 	public static long getLockTime() {
 		return tryLockTime;
 	}
-	
-	public boolean isLockedByCurrentThread() {
-		return this.lock.isHeldByCurrentThread();
-	}
 
 	/**
 	 * @see java.util.concurrent.locks.ReentrantLock#tryLock(long, TimeUnit)
