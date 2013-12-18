@@ -80,6 +80,15 @@ else
   echo
 fi
 
+if [ -d ../li.strolch.persistence.postgresql ] ; then
+  echo "Project li.strolch.persistence.postgresql already cloned."
+else
+  if ! git clone https://github.com/eitch/li.strolch.persistence.postgresql.git ../li.strolch.persistence.postgresql ;then
+    exit 1
+  fi
+  echo
+fi
+
 if [ -d ../li.strolch.tutorialapp ] ; then
   echo "Project li.strolch.tutorialapp already cloned."
 else

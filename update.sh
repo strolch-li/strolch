@@ -14,6 +14,7 @@ echo "Updating li.strolch.runtime..." ; cd li.strolch.runtime ; git pull ; cd ..
 echo "Updating li.strolch.service..." ; cd li.strolch.service ; git pull ; cd .. ; echo
 echo "Updating li.strolch.persistence.api..." ; cd li.strolch.persistence.api ; git pull ; cd .. ; echo
 echo "Updating li.strolch.persistence.xml..." ; cd li.strolch.persistence.xml ; git pull ; cd .. ; echo
+echo "Updating li.strolch.persistence.postgresql..." ; cd li.strolch.persistence.postgresql ; git pull ; cd .. ; echo
 echo "Updating li.strolch.tutorialapp..." ; cd li.strolch.tutorialapp ; git pull ; cd .. ; echo
 
 echo "Done."

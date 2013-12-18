@@ -14,6 +14,7 @@ echo "Showing status of li.strolch.runtime..." ; cd li.strolch.runtime ; git sta
 echo "Showing status of li.strolch.service..." ; cd li.strolch.service ; git status -s ; cd .. ; echo
 echo "Showing status of li.strolch.persistence.api..." ; cd li.strolch.persistence.api ; git status -s ; cd .. ; echo
 echo "Showing status of li.strolch.persistence.xml..." ; cd li.strolch.persistence.xml ; git status -s ; cd .. ; echo
+echo "Showing status of li.strolch.persistence.postgresql..." ; cd li.strolch.persistence.postgresql ; git status -s ; cd .. ; echo
 echo "Showing status of li.strolch.tutorialapp..." ; cd li.strolch.tutorialapp ; git status -s ; cd .. ; echo
 
 echo "Done."
