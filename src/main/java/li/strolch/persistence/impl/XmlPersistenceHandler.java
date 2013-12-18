@@ -72,7 +72,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements StrolchPe
 	}
 
 	public StrolchTransaction openTx() {
-		return openTx(PersistenceManager.DEFAULT_REALM);
+		return openTx(StrolchTransaction.DEFAULT_REALM);
 	}
 
 	@SuppressWarnings("resource")
