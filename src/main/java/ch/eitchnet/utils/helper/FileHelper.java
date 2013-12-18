@@ -27,6 +27,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -101,9 +102,37 @@ public class FileHelper {
 			return sb.toString();
 
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Filed does not exist " + file.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("File does not exist " + file.getAbsolutePath()); //$NON-NLS-1$
 		} catch (IOException e) {
 			throw new RuntimeException("Could not read file " + file.getAbsolutePath()); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Reads the contents of a {@link InputStream} into a string. Note, no encoding is checked. It is expected to be
+	 * UTF-8
+	 * 
+	 * @param stream
+	 *            the stream to read
+	 * 
+	 * @return the contents of a file as a string
+	 */
+	public static final String readStreamToString(InputStream stream) {
+
+		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));) {
+
+			StringBuilder sb = new StringBuilder();
+
+			String line;
+
+			while ((line = bufferedReader.readLine()) != null) {
+				sb.append(line + "\n"); //$NON-NLS-1$
+			}
+
+			return sb.toString();
+
+		} catch (IOException e) {
+			throw new RuntimeException("Could not read strean " + stream); //$NON-NLS-1$
 		}
 	}
 
