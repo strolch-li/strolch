@@ -283,7 +283,9 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 			if (this.txResult.getState() == TransactionState.FAILED) {
 				String msg = "Failed to commit TX due to underlying exception: {0}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, this.txResult.getFailCause().getMessage());
+				String causeMsg = this.txResult.getFailCause() == null ? null : this.txResult.getFailCause()
+						.getMessage();
+				msg = MessageFormat.format(msg, causeMsg);
 				throw new XmlPersistenceException(msg, this.txResult.getFailCause());
 			}
 		}
