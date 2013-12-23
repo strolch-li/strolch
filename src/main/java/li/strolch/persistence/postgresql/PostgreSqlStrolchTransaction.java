@@ -182,15 +182,17 @@ public class PostgreSqlStrolchTransaction implements StrolchTransaction {
 		return this.open;
 	}
 
-	OrderDao getOrderDao(PostgreSqlStrolchTransaction tx) {
+	@Override
+	public OrderDao getOrderDao() {
 		if (this.orderDao == null)
-			this.orderDao = new PostgreSqlOrderDao(tx);
+			this.orderDao = new PostgreSqlOrderDao(this);
 		return (OrderDao) this.orderDao;
 	}
 
-	ResourceDao getResourceDao(PostgreSqlStrolchTransaction tx) {
+	@Override
+	public ResourceDao getResourceDao() {
 		if (this.resourceDao == null)
-			this.resourceDao = new PostgreSqlResourceDao(tx);
+			this.resourceDao = new PostgreSqlResourceDao(this);
 		return (ResourceDao) this.resourceDao;
 	}
 

@@ -35,12 +35,19 @@ public class PostgreSqlOrderDaoTest extends AbstractDaoImplTest {
 	private static final String TYPE = "ToStock"; //$NON-NLS-1$
 
 	@Test
+	public void shouldStartContainer() {
+		try (StrolchTransaction tx = getPersistenceHandler().openTx()) {
+			tx.getOrderDao().queryKeySet();
+		}
+	}
+
+	@Test
 	public void shouldCreateOrder() {
 
 		// create
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			persistenceHandler.getOrderDao(tx).save(newOrder);
+			tx.getOrderDao().save(newOrder);
 		}
 	}
 
@@ -50,13 +57,13 @@ public class PostgreSqlOrderDaoTest extends AbstractDaoImplTest {
 		// create
 		Order newOrder = createOrder(ID, NAME, TYPE);
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			persistenceHandler.getOrderDao(tx).save(newOrder);
+			tx.getOrderDao().save(newOrder);
 		}
 
 		// read
 		Order readOrder = null;
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			readOrder = persistenceHandler.getOrderDao(tx).queryBy(TYPE, ID);
+			readOrder = tx.getOrderDao().queryBy(TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, readOrder); //$NON-NLS-1$
 
@@ -65,13 +72,13 @@ public class PostgreSqlOrderDaoTest extends AbstractDaoImplTest {
 		String newStringValue = "Giddiya!"; //$NON-NLS-1$
 		sParam.setValue(newStringValue);
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			persistenceHandler.getOrderDao(tx).update(readOrder);
+			tx.getOrderDao().update(readOrder);
 		}
 
 		// read updated
 		Order updatedOrder = null;
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			updatedOrder = persistenceHandler.getOrderDao(tx).queryBy(TYPE, ID);
+			updatedOrder = tx.getOrderDao().queryBy(TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, updatedOrder); //$NON-NLS-1$
 		assertFalse("Objects can't be the same reference after re-reading!", readOrder == updatedOrder); //$NON-NLS-1$
@@ -80,12 +87,12 @@ public class PostgreSqlOrderDaoTest extends AbstractDaoImplTest {
 
 		// delete
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			persistenceHandler.getOrderDao(tx).remove(readOrder);
+			tx.getOrderDao().remove(readOrder);
 		}
 
 		// fail to re-read
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			Order order = persistenceHandler.getOrderDao(tx).queryBy(TYPE, ID);
+			Order order = tx.getOrderDao().queryBy(TYPE, ID);
 			assertNull("Should no read Order with id " + ID, order); //$NON-NLS-1$
 		}
 	}

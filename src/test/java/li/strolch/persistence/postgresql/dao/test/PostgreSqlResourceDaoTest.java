@@ -40,7 +40,7 @@ public class PostgreSqlResourceDaoTest extends AbstractDaoImplTest {
 		// create
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			persistenceHandler.getResourceDao(tx).save(newResource);
+			tx.getResourceDao().save(newResource);
 		}
 	}
 
@@ -50,13 +50,13 @@ public class PostgreSqlResourceDaoTest extends AbstractDaoImplTest {
 		// create
 		Resource newResource = createResource(ID, NAME, TYPE);
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			persistenceHandler.getResourceDao(tx).save(newResource);
+			tx.getResourceDao().save(newResource);
 		}
 
 		// read
 		Resource readResource = null;
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			readResource = persistenceHandler.getResourceDao(tx).queryBy(TYPE, ID);
+			readResource = tx.getResourceDao().queryBy(TYPE, ID);
 		}
 		assertNotNull("Should read Resource with id " + ID, readResource); //$NON-NLS-1$
 
@@ -65,13 +65,13 @@ public class PostgreSqlResourceDaoTest extends AbstractDaoImplTest {
 		String newStringValue = "Giddiya!"; //$NON-NLS-1$
 		sParam.setValue(newStringValue);
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			persistenceHandler.getResourceDao(tx).update(readResource);
+			tx.getResourceDao().update(readResource);
 		}
 
 		// read updated
 		Resource updatedResource = null;
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			updatedResource = persistenceHandler.getResourceDao(tx).queryBy(TYPE, ID);
+			updatedResource = tx.getResourceDao().queryBy(TYPE, ID);
 		}
 		assertNotNull("Should read Resource with id " + ID, updatedResource); //$NON-NLS-1$
 		assertFalse("Objects can't be the same reference after re-reading!", readResource == updatedResource); //$NON-NLS-1$
@@ -80,12 +80,12 @@ public class PostgreSqlResourceDaoTest extends AbstractDaoImplTest {
 
 		// delete
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			persistenceHandler.getResourceDao(tx).remove(readResource);
+			tx.getResourceDao().remove(readResource);
 		}
 
 		// fail to re-read
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			Resource resource = persistenceHandler.getResourceDao(tx).queryBy(TYPE, ID);
+			Resource resource = tx.getResourceDao().queryBy(TYPE, ID);
 			assertNull("Should no read Resource with id " + ID, resource); //$NON-NLS-1$
 		}
 	}

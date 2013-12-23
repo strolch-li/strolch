@@ -24,10 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import li.strolch.persistence.api.DbConnectionInfo;
-import li.strolch.persistence.api.OrderDao;
-import li.strolch.persistence.api.ResourceDao;
-import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.agent.ComponentContainerImpl;
@@ -108,18 +106,6 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 			tx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
 		}
 		return tx;
-	}
-
-	@Override
-	public OrderDao getOrderDao(StrolchTransaction tx) {
-		PostgreSqlStrolchTransaction sqlTx = (PostgreSqlStrolchTransaction) tx;
-		return sqlTx.getOrderDao(sqlTx);
-	}
-
-	@Override
-	public ResourceDao getResourceDao(StrolchTransaction tx) {
-		PostgreSqlStrolchTransaction sqlTx = (PostgreSqlStrolchTransaction) tx;
-		return sqlTx.getResourceDao(sqlTx);
 	}
 
 	Connection getConnection(String realm) {
