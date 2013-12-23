@@ -16,7 +16,6 @@
 package li.strolch.runtime.agent;
 
 import li.strolch.model.Order;
-import li.strolch.runtime.component.ComponentContainer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -24,11 +23,5 @@ import li.strolch.runtime.component.ComponentContainer;
  */
 public class InMemoryOrderMap extends InMemoryElementMap<Order> implements OrderMap {
 
-	/**
-	 * @param container
-	 * @param componentName
-	 */
-	public InMemoryOrderMap(ComponentContainer container, String componentName) {
-		super(container, componentName);
-	}
+	// marker class
 }

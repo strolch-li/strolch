@@ -25,10 +25,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import li.strolch.runtime.component.ComponentContainer;
-import li.strolch.runtime.component.ComponentController;
-import li.strolch.runtime.component.ComponentDependencyAnalyzer;
-import li.strolch.runtime.component.StrolchComponent;
+import li.strolch.runtime.agent.ComponentContainerImpl;
+import li.strolch.runtime.agent.ComponentController;
+import li.strolch.runtime.agent.ComponentDependencyAnalyzer;
+import li.strolch.runtime.agent.StrolchComponent;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
@@ -82,7 +82,7 @@ public class ControllerDependencyTest {
 	//         : Downstream dependency for b is a
 	//
 
-	private ComponentContainer container;
+	private ComponentContainerImpl container;
 	private ComponentController con2;
 	private ComponentController con5;
 	private ComponentController con11;
@@ -110,7 +110,7 @@ public class ControllerDependencyTest {
 	@Before
 	public void setupModel() {
 
-		this.container = new ComponentContainer();
+		this.container = new ComponentContainerImpl();
 
 		this.con2 = new ComponentController(new StrolchComponent(this.container, "2"));
 		this.con5 = new ComponentController(new StrolchComponent(this.container, "5"));
@@ -539,7 +539,7 @@ public class ControllerDependencyTest {
 	@Test
 	public void shouldAddDepedencies() {
 
-		ComponentContainer container = new ComponentContainer();
+		ComponentContainerImpl container = new ComponentContainerImpl();
 		StrolchComponent component = new StrolchComponent(container, "1"); //$NON-NLS-1$
 		ComponentController controller = new ComponentController(component);
 

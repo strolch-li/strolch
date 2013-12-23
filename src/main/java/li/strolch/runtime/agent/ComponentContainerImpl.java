@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.component;
+package li.strolch.runtime.agent;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -29,9 +29,9 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ComponentContainer {
+public class ComponentContainerImpl implements ComponentContainer {
 
-	private static final Logger logger = LoggerFactory.getLogger(ComponentContainer.class);
+	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerImpl.class);
 
 	private Map<Class<?>, StrolchComponent> componentMap;
 	private Map<String, ComponentController> controllerMap;
@@ -39,7 +39,7 @@ public class ComponentContainer {
 	private StrolchConfiguration strolchConfiguration;
 	private ComponentState state;
 
-	public ComponentContainer() {
+	public ComponentContainerImpl() {
 		this.state = ComponentState.UNDEFINED;
 	}
 
@@ -47,10 +47,12 @@ public class ComponentContainer {
 		return this.state;
 	}
 
+	@Override
 	public boolean hasComponent(Class<?> clazz) {
 		return this.componentMap.containsKey(clazz);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getComponent(Class<T> clazz) {
 		T component = (T) this.componentMap.get(clazz);
@@ -60,6 +62,16 @@ public class ComponentContainer {
 			throw new IllegalArgumentException(msg);
 		}
 		return component;
+	}
+
+	@Override
+	public OrderMap getOrderMap() {
+		return getComponent(ElementMapHandler.class).getOrderMap();
+	}
+
+	@Override
+	public ResourceMap getResourceMap() {
+		return getComponent(ElementMapHandler.class).getResourceMap();
 	}
 
 	private void initializeComponent(Map<Class<?>, StrolchComponent> componentMap,
@@ -86,7 +98,7 @@ public class ComponentContainer {
 
 			@SuppressWarnings("unchecked")
 			Class<StrolchComponent> strolchComponentClass = (Class<StrolchComponent>) implClass;
-			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(ComponentContainer.class,
+			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(ComponentContainerImpl.class,
 					String.class);
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
 

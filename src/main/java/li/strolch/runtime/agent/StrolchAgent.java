@@ -17,9 +17,7 @@ package li.strolch.runtime.agent;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.List;
 
-import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -30,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class StrolchAgent {
 
@@ -38,7 +35,7 @@ public class StrolchAgent {
 	public static final String PROP_DATA_STORE_FILE = "dataStoreFile"; //$NON-NLS-1$
 	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
 
-	private ComponentContainer container;
+	private ComponentContainerImpl container;
 	private StrolchConfiguration strolchConfiguration;
 
 	/**
@@ -84,17 +81,31 @@ public class StrolchAgent {
 		RuntimeConfiguration runtimeConfiguration = this.strolchConfiguration.getRuntimeConfiguration();
 		DataStoreMode dataStoreMode = DataStoreMode.parseDataStoreMode(runtimeConfiguration.getString(
 				PROP_DATA_STORE_MODE, null));
-		ElementMapConfigurationCreator elementMapConfigurationCreator = dataStoreMode
-				.getElementMapConfigurationConfigurator();
-		List<ComponentConfiguration> componentConfigurations = elementMapConfigurationCreator
-				.getComponentConfigurations(runtimeConfiguration);
-		for (ComponentConfiguration configuration : componentConfigurations) {
-			this.strolchConfiguration.addConfiguration(configuration.getName(), configuration);
-		}
 
-		ComponentContainer container = new ComponentContainer();
+		ElementMapHandlerConfigurator mapHandlerConfigurator = dataStoreMode.getElementMapConfigurationConfigurator();
+		ComponentConfiguration configuration = mapHandlerConfigurator.buildConfiguration(this);
+		this.strolchConfiguration.addConfiguration(configuration.getName(), configuration);
+
+		ComponentContainerImpl container = new ComponentContainerImpl();
 		this.container = container;
 
 		logger.info(MessageFormat.format("Setup Agent {0}", runtimeConfiguration.getApplicationName())); //$NON-NLS-1$
+	}
+
+	public ResourceMap getResourceMap() {
+		assertContainerStarted();
+		return getContainer().getComponent(ElementMapHandler.class).getResourceMap();
+	}
+
+	public OrderMap getOrderMap() {
+		assertContainerStarted();
+		return getContainer().getComponent(ElementMapHandler.class).getOrderMap();
+	}
+
+	protected void assertContainerStarted() {
+		if (this.container == null || this.container.getState() != ComponentState.STARTED) {
+			String msg = "Container is not yet started!"; //$NON-NLS-1$
+			throw new IllegalStateException(msg);
+		}
 	}
 }

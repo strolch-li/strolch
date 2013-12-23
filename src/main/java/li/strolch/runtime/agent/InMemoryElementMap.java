@@ -24,48 +24,18 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.model.StrolchElement;
-import li.strolch.runtime.component.ComponentContainer;
-import li.strolch.runtime.component.StrolchComponent;
-import li.strolch.runtime.configuration.ComponentConfiguration;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public abstract class InMemoryElementMap<T extends StrolchElement> extends StrolchComponent implements ElementMap<T> {
+public abstract class InMemoryElementMap<T extends StrolchElement> implements ElementMap<T> {
 
 	private Map<String, Map<String, T>> elementMap;
 
-	/**
-	 * @param container
-	 * @param componentName
-	 */
-	public InMemoryElementMap(ComponentContainer container, String componentName) {
-		super(container, componentName);
-	}
-
-	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public InMemoryElementMap() {
 		this.elementMap = new HashMap<>();
-		super.initialize(configuration);
-	}
-
-	@Override
-	public void start() {
-		super.start();
-	}
-
-	@Override
-	public void stop() {
-		this.elementMap.clear();
-		super.stop();
-	}
-
-	@Override
-	public void destroy() {
-		this.elementMap = null;
-		super.destroy();
 	}
 
 	@Override

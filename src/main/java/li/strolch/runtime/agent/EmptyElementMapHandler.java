@@ -13,14 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component;
+package li.strolch.runtime.agent;
 
-import li.strolch.runtime.agent.ComponentContainerImpl;
-import li.strolch.runtime.agent.StrolchComponent;
+import li.strolch.runtime.configuration.ComponentConfiguration;
 
-public class PostInitializerTestImpl extends StrolchComponent implements PostInitializerTest {
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
+public class EmptyElementMapHandler extends InMemoryElementMapHandler {
 
-	public PostInitializerTestImpl(ComponentContainerImpl container, String componentName) {
+	/**
+	 * @param container
+	 * @param componentName
+	 */
+	public EmptyElementMapHandler(ComponentContainerImpl container, String componentName) {
 		super(container, componentName);
+	}
+
+	@Override
+	public void initialize(ComponentConfiguration configuration) {
+		this.resourceMap = new InMemoryResourceMap();
+		this.orderMap = new InMemoryOrderMap();
+		super.initialize(configuration);
 	}
 }

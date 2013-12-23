@@ -16,9 +16,8 @@
 package li.strolch.runtime.query.inmemory;
 
 import li.strolch.model.Order;
+import li.strolch.runtime.agent.ComponentContainer;
 import li.strolch.runtime.agent.ElementMap;
-import li.strolch.runtime.agent.OrderMap;
-import li.strolch.runtime.component.ComponentContainer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -37,6 +36,6 @@ public class OrderTypeNavigator extends StrolchTypeNavigator<Order> {
 
 	@Override
 	protected ElementMap<Order> getElementMap() {
-		return this.container.getComponent(OrderMap.class);
+		return this.container.getOrderMap();
 	}
 }

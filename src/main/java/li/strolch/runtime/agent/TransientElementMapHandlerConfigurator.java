@@ -15,16 +15,33 @@
  */
 package li.strolch.runtime.agent;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public interface ElementMapConfigurationCreator {
+public class TransientElementMapHandlerConfigurator implements ElementMapHandlerConfigurator {
 
-	public List<ComponentConfiguration> getComponentConfigurations(RuntimeConfiguration runtimeConfiguration);
+	@Override
+	public ComponentConfiguration buildConfiguration(StrolchAgent agent) {
+
+		String name = ElementMapHandler.class.getSimpleName();
+		String api = ElementMapHandler.class.getName();
+		String impl = TransientElementMapHandler.class.getName();
+
+		Map<String, String> configurationValues = new HashMap<>();
+		Set<String> dependencies = Collections.emptySet();
+
+		RuntimeConfiguration runtimeConfiguration = agent.getStrolchConfiguration().getRuntimeConfiguration();
+		ComponentConfiguration configuration = new ComponentConfiguration(runtimeConfiguration, name,
+				configurationValues, api, impl, dependencies);
+
+		return configuration;
+	}
 }

@@ -15,20 +15,39 @@
  */
 package li.strolch.runtime.agent;
 
-import java.util.List;
-
-import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.configuration.RuntimeConfiguration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class EmptyElementMapConfigurationCreator extends InMemoryElementMapConfigurationCreator {
+public abstract class InMemoryElementMapHandler extends StrolchComponent implements ElementMapHandler {
 
+	protected ResourceMap resourceMap;
+	protected OrderMap orderMap;
+
+	/**
+	 * @param container
+	 * @param componentName
+	 */
+	public InMemoryElementMapHandler(ComponentContainerImpl container, String componentName) {
+		super(container, componentName);
+	}
+
+	/**
+	 * @return the resourceMap
+	 */
 	@Override
-	protected void addConfiguration(List<ComponentConfiguration> configurations,
-			RuntimeConfiguration runtimeConfiguration) {
-		// nothing to do
+	public ResourceMap getResourceMap() {
+		assertContainerStarted();
+		return this.resourceMap;
+	}
+
+	/**
+	 * @return the orderMap
+	 */
+	@Override
+	public OrderMap getOrderMap() {
+		assertContainerStarted();
+		return this.orderMap;
 	}
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.component;
+package li.strolch.runtime.agent;
 
 import java.text.MessageFormat;
 
@@ -25,11 +25,11 @@ import org.slf4j.LoggerFactory;
 public class StrolchComponent {
 
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchComponent.class);
-	private final ComponentContainer container;
+	private final ComponentContainerImpl container;
 	private final String componentName;
 	private ComponentState state;
 
-	public StrolchComponent(ComponentContainer container, String componentName) {
+	public StrolchComponent(ComponentContainerImpl container, String componentName) {
 		this.container = container;
 		this.componentName = componentName;
 		this.state = ComponentState.UNDEFINED;
@@ -46,7 +46,7 @@ public class StrolchComponent {
 		return this.state;
 	}
 
-	protected ComponentContainer getContainer() {
+	protected ComponentContainerImpl getContainer() {
 		return this.container;
 	}
 

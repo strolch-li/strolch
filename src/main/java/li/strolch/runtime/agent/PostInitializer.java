@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.component;
+package li.strolch.runtime.agent;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

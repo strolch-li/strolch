@@ -16,13 +16,11 @@
 package li.strolch.runtime.query.inmemory;
 
 import li.strolch.model.Resource;
+import li.strolch.runtime.agent.ComponentContainer;
 import li.strolch.runtime.agent.ElementMap;
-import li.strolch.runtime.agent.ResourceMap;
-import li.strolch.runtime.component.ComponentContainer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class ResourceTypeNavigator extends StrolchTypeNavigator<Resource> {
 
@@ -38,6 +36,6 @@ public class ResourceTypeNavigator extends StrolchTypeNavigator<Resource> {
 
 	@Override
 	protected ElementMap<Resource> getElementMap() {
-		return this.container.getComponent(ResourceMap.class);
+		return this.container.getResourceMap();
 	}
 }

@@ -20,17 +20,14 @@ import java.text.MessageFormat;
 
 import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
 import li.strolch.model.xml.XmlModelFileHandler;
-import li.strolch.runtime.component.ComponentContainer;
-import li.strolch.runtime.component.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public class TransientElementMapController extends StrolchComponent {
+public class TransientElementMapHandler extends InMemoryElementMapHandler {
 
 	private File modelFile;
 
@@ -38,7 +35,7 @@ public class TransientElementMapController extends StrolchComponent {
 	 * @param container
 	 * @param componentName
 	 */
-	public TransientElementMapController(ComponentContainer container, String componentName) {
+	public TransientElementMapHandler(ComponentContainerImpl container, String componentName) {
 		super(container, componentName);
 	}
 
@@ -50,16 +47,16 @@ public class TransientElementMapController extends StrolchComponent {
 				runtimeConfiguration, true);
 		this.modelFile = modelFile;
 
+		this.resourceMap = new InMemoryResourceMap();
+		this.orderMap = new InMemoryOrderMap();
+
 		super.initialize(configuration);
 	}
 
 	@Override
 	public void start() {
 
-		ResourceMap resourceMap = getContainer().getComponent(ResourceMap.class);
-		OrderMap orderMap = getContainer().getComponent(OrderMap.class);
-
-		InMemoryElementListener elementListener = new InMemoryElementListener(resourceMap, orderMap);
+		InMemoryElementListener elementListener = new InMemoryElementListener(this.resourceMap, this.orderMap);
 		XmlModelFileHandler handler = new XmlModelFileHandler(elementListener, this.modelFile);
 		handler.parseFile();
 		XmlModelStatistics statistics = handler.getStatistics();

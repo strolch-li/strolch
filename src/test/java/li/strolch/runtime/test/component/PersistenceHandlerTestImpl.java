@@ -16,12 +16,12 @@
 package li.strolch.runtime.test.component;
 
 import li.strolch.model.Resource;
-import li.strolch.runtime.component.ComponentContainer;
-import li.strolch.runtime.component.StrolchComponent;
+import li.strolch.runtime.agent.ComponentContainerImpl;
+import li.strolch.runtime.agent.StrolchComponent;
 
 public class PersistenceHandlerTestImpl extends StrolchComponent implements PersistenceHandlerTest {
 
-	public PersistenceHandlerTestImpl(ComponentContainer container, String componentName) {
+	public PersistenceHandlerTestImpl(ComponentContainerImpl container, String componentName) {
 		super(container, componentName);
 	}
 

@@ -34,7 +34,7 @@ import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
 import li.strolch.model.query.ParameterSelection.LongParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringListParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringParameterSelection;
-import li.strolch.runtime.component.ComponentContainer;
+import li.strolch.runtime.agent.ComponentContainer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -33,8 +33,6 @@ import li.strolch.model.query.ParameterSelection;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.runtime.agent.OrderMap;
-import li.strolch.runtime.agent.ResourceMap;
 import li.strolch.runtime.agent.StrolchAgent;
 import li.strolch.runtime.query.inmemory.InMemoryOrderQueryVisitor;
 import li.strolch.runtime.query.inmemory.InMemoryQuery;
@@ -57,7 +55,7 @@ public class QueryTest {
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		res1.addParameter(BAG_ID, iP);
-		agent.getContainer().getComponent(ResourceMap.class).add(res1);
+		agent.getResourceMap().add(res1);
 
 		List<Selection> elementAndSelections = new ArrayList<>();
 		elementAndSelections.add(new IdSelection("@1"));
@@ -80,7 +78,7 @@ public class QueryTest {
 		Order o1 = createOrder("@1", "Test Order", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		o1.addParameter(BAG_ID, iP);
-		agent.getContainer().getComponent(OrderMap.class).add(o1);
+		agent.getOrderMap().add(o1);
 
 		List<Selection> elementAndSelections = new ArrayList<>();
 		elementAndSelections.add(new IdSelection("@1"));

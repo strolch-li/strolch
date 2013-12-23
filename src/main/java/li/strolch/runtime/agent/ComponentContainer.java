@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component;
+package li.strolch.runtime.agent;
 
-import li.strolch.runtime.agent.ComponentContainerImpl;
-import li.strolch.runtime.agent.StrolchComponent;
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ *
+ */
+public interface ComponentContainer {
 
-public class PostInitializerTestImpl extends StrolchComponent implements PostInitializerTest {
+	public abstract boolean hasComponent(Class<?> clazz);
 
-	public PostInitializerTestImpl(ComponentContainerImpl container, String componentName) {
-		super(container, componentName);
-	}
+	public abstract <T> T getComponent(Class<T> clazz);
+
+	public abstract OrderMap getOrderMap();
+
+	public abstract ResourceMap getResourceMap();
+
 }

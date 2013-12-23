@@ -21,8 +21,8 @@ import static org.junit.Assert.assertNotNull;
 import java.io.File;
 
 import li.strolch.model.Resource;
+import li.strolch.runtime.agent.ComponentContainer;
 import li.strolch.runtime.agent.StrolchAgent;
-import li.strolch.runtime.component.ComponentContainer;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -91,7 +91,7 @@ public class ComponentContainerTest {
 	}
 
 	public static void destroyContainer(StrolchAgent agent) {
-		agent.getContainer().stop();
-		agent.getContainer().destroy();
+		agent.stop();
+		agent.destroy();
 	}
 }

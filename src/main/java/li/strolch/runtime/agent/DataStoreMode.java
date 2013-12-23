@@ -24,32 +24,30 @@ import java.text.MessageFormat;
 public enum DataStoreMode {
 	EMPTY {
 		@Override
-		public ElementMapConfigurationCreator getElementMapConfigurationConfigurator() {
-			return new EmptyElementMapConfigurationCreator();
+		public ElementMapHandlerConfigurator getElementMapConfigurationConfigurator() {
+			return new EmptyElementMapHandlerConfigurator();
 		}
 	}, //
 	TRANSIENT {
 		@Override
-		public ElementMapConfigurationCreator getElementMapConfigurationConfigurator() {
-			return new TransientElementMapConfigurationCreator();
+		public ElementMapHandlerConfigurator getElementMapConfigurationConfigurator() {
+			return new TransientElementMapHandlerConfigurator();
 		}
 	}, //
 	CACHED {
 		@Override
-		public ElementMapConfigurationCreator getElementMapConfigurationConfigurator() {
+		public ElementMapHandlerConfigurator getElementMapConfigurationConfigurator() {
 			throw new UnsupportedOperationException(MessageFormat.format("The mode {0} is not yet supported!", this)); //$NON-NLS-1$
 		}
 	}, //
 	TRANSACTIONAL {
 		@Override
-		public ElementMapConfigurationCreator getElementMapConfigurationConfigurator() {
+		public ElementMapHandlerConfigurator getElementMapConfigurationConfigurator() {
 			throw new UnsupportedOperationException(MessageFormat.format("The mode {0} is not yet supported!", this)); //$NON-NLS-1$
 		}
 	}; //
 
-	public ElementMapConfigurationCreator getElementMapConfigurationConfigurator() {
-		throw new UnsupportedOperationException("Please implement in enum!"); //$NON-NLS-1$
-	}
+	public abstract ElementMapHandlerConfigurator getElementMapConfigurationConfigurator();
 
 	public static DataStoreMode parseDataStoreMode(String modeS) {
 		for (DataStoreMode dataStoreMode : values()) {

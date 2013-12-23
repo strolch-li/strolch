@@ -21,7 +21,7 @@ import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.OrderQueryVisitor;
 import li.strolch.model.query.StateSelection;
 import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.runtime.component.ComponentContainer;
+import li.strolch.runtime.agent.ComponentContainer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
