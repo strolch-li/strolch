@@ -83,7 +83,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptor>src/assembly/bin.xml</descriptor>
-					<finalName>tutorial-app-${pom.version}</finalName>
+					<finalName>tutorial-app-${project.version}</finalName>
 				</configuration>
 				<executions>
 					<execution>
