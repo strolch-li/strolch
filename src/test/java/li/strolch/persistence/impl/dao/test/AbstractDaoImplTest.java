@@ -17,7 +17,7 @@ package li.strolch.persistence.impl.dao.test;
 
 import java.io.File;
 
-import li.strolch.persistence.api.StrolchPersistenceHandler;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
@@ -32,7 +32,7 @@ public abstract class AbstractDaoImplTest extends RuntimeMock {
 	private static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
 	private static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	private static final String CONFIG_SRC = "src/test/resources/runtime/config"; //$NON-NLS-1$
-	protected static StrolchPersistenceHandler persistenceHandler;
+	protected static PersistenceHandler persistenceHandler;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -44,7 +44,7 @@ public abstract class AbstractDaoImplTest extends RuntimeMock {
 		RuntimeMock.startContainer(rootPath);
 
 		// initialize the component configuration
-		persistenceHandler = getContainer().getComponent(StrolchPersistenceHandler.class);
+		persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
 	}
 
 	@AfterClass

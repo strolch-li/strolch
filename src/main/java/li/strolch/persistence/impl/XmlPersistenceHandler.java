@@ -23,10 +23,11 @@ import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
-import li.strolch.persistence.api.StrolchPersistenceHandler;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.impl.model.OrderContextFactory;
 import li.strolch.persistence.impl.model.ResourceContextFactory;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.agent.ComponentContainerImpl;
 import li.strolch.runtime.agent.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -41,7 +42,7 @@ import ch.eitchnet.xmlpers.api.PersistenceTransaction;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class XmlPersistenceHandler extends StrolchComponent implements StrolchPersistenceHandler {
+public class XmlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
 	public static final String DB_STORE_PATH = "dbStore/"; //$NON-NLS-1$
 	private PersistenceManager persistenceManager;
@@ -72,7 +73,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements StrolchPe
 	}
 
 	public StrolchTransaction openTx() {
-		return openTx(StrolchTransaction.DEFAULT_REALM);
+		return openTx(StrolchConstants.DEFAULT_REALM);
 	}
 
 	@SuppressWarnings("resource")
