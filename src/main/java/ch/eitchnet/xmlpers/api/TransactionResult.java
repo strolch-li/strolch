@@ -16,6 +16,7 @@
 package ch.eitchnet.xmlpers.api;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +33,11 @@ public class TransactionResult {
 	private long closeDuration;
 
 	private Map<String, ModificationResult> modificationByKey;
+	
+	public TransactionResult() {
+		this.state = TransactionState.OPEN;
+		this.modificationByKey = new HashMap<>();
+	}
 
 	/**
 	 * @return the realm
