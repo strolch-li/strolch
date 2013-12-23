@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("nls")
 public class ComponentContainerTest {
 
+	public static final String PATH_REALM_CONTAINER = "src/test/resources/realmtest";
 	public static final String PATH_TRANSIENT_CONTAINER = "src/test/resources/transienttest";
 	public static final String PATH_EMPTY_CONTAINER = "src/test/resources/emptytest";
 
@@ -54,6 +55,19 @@ public class ComponentContainerTest {
 
 		try {
 			StrolchAgent agent = startContainer(PATH_TRANSIENT_CONTAINER);
+			testContainer(agent);
+			destroyContainer(agent);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@Test
+	public void shouldStartRealmTestContainer() {
+
+		try {
+			StrolchAgent agent = startContainer(PATH_REALM_CONTAINER);
 			testContainer(agent);
 			destroyContainer(agent);
 		} catch (Exception e) {

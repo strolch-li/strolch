@@ -21,6 +21,10 @@ package li.strolch.runtime.agent;
 public interface ElementMapHandler {
 
 	public ResourceMap getResourceMap();
+	
+	public ResourceMap getResourceMap(String realm);
 
 	public OrderMap getOrderMap();
+	
+	public OrderMap getOrderMap(String realm);
 }

@@ -33,6 +33,7 @@ public class StrolchAgent {
 
 	public static final String PROP_DATA_STORE_MODE = "dataStoreMode"; //$NON-NLS-1$
 	public static final String PROP_DATA_STORE_FILE = "dataStoreFile"; //$NON-NLS-1$
+	public static final String PROP_REALMS = "realms"; //$NON-NLS-1$
 	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
 
 	private ComponentContainerImpl container;

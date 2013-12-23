@@ -17,11 +17,14 @@ package li.strolch.runtime.agent;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
 import li.strolch.model.xml.XmlModelFileHandler;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
+import li.strolch.runtime.configuration.StrolchConfigurationException;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -29,7 +32,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class TransientElementMapHandler extends InMemoryElementMapHandler {
 
-	private File modelFile;
+	private Map<String, File> realmModelFiles;
 
 	/**
 	 * @param container
@@ -41,29 +44,52 @@ public class TransientElementMapHandler extends InMemoryElementMapHandler {
 
 	@Override
 	public void initialize(ComponentConfiguration configuration) {
+		super.initialize(configuration);
 
+		this.realmModelFiles = new HashMap<>();
 		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
-		File modelFile = runtimeConfiguration.getDataFile(StrolchAgent.PROP_DATA_STORE_FILE, null,
-				runtimeConfiguration, true);
-		this.modelFile = modelFile;
+		for (String realm : this.realms.keySet()) {
+			String key = getDataStoreFilePropKey(realm);
 
-		this.resourceMap = new InMemoryResourceMap();
-		this.orderMap = new InMemoryOrderMap();
+			if (!runtimeConfiguration.hasProperty(key)) {
+				String msg = "There is no data store file for realm {0}. Set a property with key {1}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, realm, key);
+				throw new StrolchConfigurationException(msg);
+			}
+
+			File modelFile = runtimeConfiguration.getDataFile(key, null, runtimeConfiguration, true);
+			this.realmModelFiles.put(realm, modelFile);
+		}
 
 		super.initialize(configuration);
+	}
+
+	private String getDataStoreFilePropKey(String realm) {
+		if (realm.equals(StrolchRealm.DEFAULT_REALM))
+			return StrolchAgent.PROP_DATA_STORE_FILE;
+		return StrolchAgent.PROP_DATA_STORE_FILE + "." + realm; //$NON-NLS-1$
 	}
 
 	@Override
 	public void start() {
 
-		InMemoryElementListener elementListener = new InMemoryElementListener(this.resourceMap, this.orderMap);
-		XmlModelFileHandler handler = new XmlModelFileHandler(elementListener, this.modelFile);
-		handler.parseFile();
-		XmlModelStatistics statistics = handler.getStatistics();
-		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info(MessageFormat.format("Loading XML Model file {0} took {1}.", this.modelFile.getName(), durationS)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
+		for (String realm : this.realms.keySet()) {
+
+			StrolchRealm strolchRealm = this.realms.get(realm);
+			ResourceMap resourceMap = strolchRealm.getResourceMap();
+			OrderMap orderMap = strolchRealm.getOrderMap();
+
+			File modelFile = this.realmModelFiles.get(realm);
+			InMemoryElementListener elementListener = new InMemoryElementListener(resourceMap, orderMap);
+			XmlModelFileHandler handler = new XmlModelFileHandler(elementListener, modelFile);
+			handler.parseFile();
+			XmlModelStatistics statistics = handler.getStatistics();
+			String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
+			logger.info(MessageFormat.format(
+					"Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(), realm, durationS)); //$NON-NLS-1$
+			logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
+			logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
+		}
 
 		super.start();
 	}

@@ -15,16 +15,43 @@
  */
 package li.strolch.runtime.agent;
 
+import li.strolch.model.query.StrolchQuery;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class EmptyElementMapHandler extends InMemoryElementMapHandler {
+public class StrolchRealm {
+
+	public static final String DEFAULT_REALM = StrolchQuery.DEFAULT_REALM;
+
+	private String realm;
+	private ResourceMap resourceMap;
+	private OrderMap orderMap;
+
+	public StrolchRealm(String realm, ResourceMap resourceMap, OrderMap orderMap) {
+		this.realm = realm;
+		this.resourceMap = resourceMap;
+		this.orderMap = orderMap;
+	}
 
 	/**
-	 * @param container
-	 * @param componentName
+	 * @return the realm
 	 */
-	public EmptyElementMapHandler(ComponentContainerImpl container, String componentName) {
-		super(container, componentName);
+	public String getRealm() {
+		return this.realm;
+	}
+
+	/**
+	 * @return the resourceMap
+	 */
+	public ResourceMap getResourceMap() {
+		return this.resourceMap;
+	}
+
+	/**
+	 * @return the orderMap
+	 */
+	public OrderMap getOrderMap() {
+		return this.orderMap;
 	}
 }

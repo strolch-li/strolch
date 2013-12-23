@@ -42,8 +42,22 @@ public abstract class AbstractionConfiguration {
 		return this.name;
 	}
 
+	public boolean hasProperty(String key) {
+		return this.configurationValues.containsKey(key);
+	}
+
 	public Set<String> getPropertyKeys() {
 		return new HashSet<>(this.configurationValues.keySet());
+	}
+
+	public String[] getStringArray(String key, String defValue) {
+		String value = getValue(key, defValue);
+		String[] values = value.split(","); //$NON-NLS-1$
+		for (int i = 0; i < values.length; i++) {
+			values[i] = values[i].trim();
+		}
+
+		return values;
 	}
 
 	public String getString(String key, String defValue) {

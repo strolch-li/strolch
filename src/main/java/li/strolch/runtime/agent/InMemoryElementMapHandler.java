@@ -15,15 +15,16 @@
  */
 package li.strolch.runtime.agent;
 
+import java.util.HashMap;
+
+import li.strolch.model.query.StrolchQuery;
+import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public abstract class InMemoryElementMapHandler extends StrolchComponent implements ElementMapHandler {
-
-	protected ResourceMap resourceMap;
-	protected OrderMap orderMap;
+public class InMemoryElementMapHandler extends AbstractElementMapHandler {
 
 	/**
 	 * @param container
@@ -33,21 +34,20 @@ public abstract class InMemoryElementMapHandler extends StrolchComponent impleme
 		super(container, componentName);
 	}
 
-	/**
-	 * @return the resourceMap
-	 */
 	@Override
-	public ResourceMap getResourceMap() {
-		assertContainerStarted();
-		return this.resourceMap;
-	}
+	public void initialize(ComponentConfiguration configuration) {
 
-	/**
-	 * @return the orderMap
-	 */
-	@Override
-	public OrderMap getOrderMap() {
-		assertContainerStarted();
-		return this.orderMap;
+		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
+		String[] realms = runtimeConfiguration.getStringArray(StrolchAgent.PROP_REALMS, StrolchQuery.DEFAULT_REALM);
+
+		this.realms = new HashMap<>();
+		for (String realm : realms) {
+			InMemoryResourceMap resourceMap = new InMemoryResourceMap();
+			InMemoryOrderMap orderMap = new InMemoryOrderMap();
+			StrolchRealm strolchRealm = new StrolchRealm(realm, resourceMap, orderMap);
+			this.realms.put(realm, strolchRealm);
+		}
+
+		super.initialize(configuration);
 	}
 }
