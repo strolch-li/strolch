@@ -126,10 +126,4 @@ public abstract class AbstractDao<T extends StrolchElement> implements StrolchDa
 	public void removeAll(List<T> objects) {
 		this.tx.getObjectDao().removeAll(objects);
 	}
-
-	@Override
-	public void remove(String type, String id) {
-		IdOfSubTypeRef objectRef = this.tx.getObjectRefCache().getIdOfSubTypeRef(getClassType(), type, id);
-		this.tx.getObjectDao().removeById(objectRef);
-	}
 }

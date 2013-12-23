@@ -15,15 +15,13 @@
  */
 package li.strolch.persistence.impl.model;
 
-import javax.xml.parsers.DocumentBuilder;
-
 import li.strolch.model.Order;
+import li.strolch.model.xml.OrderToDomVisitor;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ch.eitchnet.xmlpers.api.DomParser;
-import ch.eitchnet.xmlpers.util.DomUtil;
 
 public class OrderDomParser implements DomParser<Order> {
 
@@ -42,19 +40,13 @@ public class OrderDomParser implements DomParser<Order> {
 
 	@Override
 	public Document toDom() {
-
-		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
-		Document document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
-
-		Element orderDom = this.order.toDom(document);
-		document.appendChild(orderDom);
-
-		return document;
+		OrderToDomVisitor orderDomVisitor = new OrderToDomVisitor();
+		orderDomVisitor.visit(this.order);
+		return orderDomVisitor.getDocument();
 	}
 
 	@Override
 	public void fromDom(Document document) {
-
 		Element rootElement = document.getDocumentElement();
 		Order order = new Order(rootElement);
 		this.order = order;

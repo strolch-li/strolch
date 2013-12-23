@@ -32,7 +32,6 @@ public class XmlStrolchTransaction implements StrolchTransaction {
 	private boolean suppressUpdates;
 	private PersistenceTransaction tx;
 	private TransactionCloseStrategy closeStrategy;
-	private TransactionResult txResult;
 
 	public XmlStrolchTransaction(PersistenceTransaction tx) {
 		this.suppressUpdates = false;
@@ -75,18 +74,18 @@ public class XmlStrolchTransaction implements StrolchTransaction {
 	@Override
 	public void autoCloseableCommit() {
 
+		TransactionResult txResult = new TransactionResult();
 		if (!this.suppressUpdates && this.observerHandler != null) {
-			this.txResult = new TransactionResult();
-			this.tx.setTransactionResult(this.txResult);
+			this.tx.setTransactionResult(txResult);
 		}
 
 		this.tx.autoCloseableCommit();
 
 		if (!this.suppressUpdates && this.observerHandler != null) {
 
-			Set<String> keys = this.txResult.getKeys();
+			Set<String> keys = txResult.getKeys();
 			for (String key : keys) {
-				ModificationResult modificationResult = this.txResult.getModificationResult(key);
+				ModificationResult modificationResult = txResult.getModificationResult(key);
 
 				this.observerHandler.add(key, modificationResult.<StrolchElement> getCreated());
 				this.observerHandler.update(key, modificationResult.<StrolchElement> getUpdated());

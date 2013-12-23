@@ -15,15 +15,13 @@
  */
 package li.strolch.persistence.impl.model;
 
-import javax.xml.parsers.DocumentBuilder;
-
 import li.strolch.model.Resource;
+import li.strolch.model.xml.ResourceToDomVisitor;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ch.eitchnet.xmlpers.api.DomParser;
-import ch.eitchnet.xmlpers.util.DomUtil;
 
 public class ResourceDomParser implements DomParser<Resource> {
 
@@ -41,19 +39,13 @@ public class ResourceDomParser implements DomParser<Resource> {
 
 	@Override
 	public Document toDom() {
-
-		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
-		Document document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
-
-		Element resourceDom = this.resource.toDom(document);
-		document.appendChild(resourceDom);
-
-		return document;
+		ResourceToDomVisitor domVisitor = new ResourceToDomVisitor();
+		domVisitor.visit(this.resource);
+		return domVisitor.getDocument();
 	}
 
 	@Override
 	public void fromDom(Document document) {
-
 		Element rootElement = document.getDocumentElement();
 		Resource resource = new Resource(rootElement);
 		this.resource = resource;
