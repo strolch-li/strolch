@@ -28,8 +28,9 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.Tags;
+import li.strolch.persistence.api.ModificationResult;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.persistence.postgresql.ModificationResult;
 import li.strolch.runtime.observer.Observer;
 import li.strolch.runtime.observer.ObserverHandler;
 
@@ -75,8 +76,8 @@ public class ObserverUpdateTest extends AbstractDaoImplTest {
 
 		// register an observer for orders and resources
 		ElementAddedObserver observer = new ElementAddedObserver();
-		getContainer().getComponent(ObserverHandler.class).registerObserver("Order", observer); //$NON-NLS-1$
-		getContainer().getComponent(ObserverHandler.class).registerObserver("Resource", observer); //$NON-NLS-1$
+		getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.ORDER, observer);
+		getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.RESOURCE, observer);
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
@@ -91,8 +92,7 @@ public class ObserverUpdateTest extends AbstractDaoImplTest {
 		}
 
 		assertEquals(2, observer.results.size());
-		assertEquals(1, observer.results.get("Order").getCreated().size()); //$NON-NLS-1$
-		assertEquals(1, observer.results.get("Resource").getCreated().size()); //$NON-NLS-1$
-
+		assertEquals(1, observer.results.get(Tags.ORDER).getCreated().size());
+		assertEquals(1, observer.results.get(Tags.RESOURCE).getCreated().size());
 	}
 }

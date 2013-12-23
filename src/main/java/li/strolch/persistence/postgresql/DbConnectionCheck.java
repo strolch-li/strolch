@@ -32,7 +32,6 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
 public class DbConnectionCheck {
 
@@ -56,9 +55,9 @@ public class DbConnectionCheck {
 			try (Connection con = DriverManager.getConnection(url, username, password);
 					Statement st = con.createStatement();) {
 
-				try (ResultSet rs = st.executeQuery("SELECT VERSION()")) {
+				try (ResultSet rs = st.executeQuery("select version()")) { //$NON-NLS-1$
 					if (rs.next()) {
-						logger.info("Connected to: " + rs.getString(1));
+						logger.info(MessageFormat.format("Connected to: {0}", rs.getString(1))); //$NON-NLS-1$
 					}
 				}
 
@@ -69,5 +68,4 @@ public class DbConnectionCheck {
 			}
 		}
 	}
-
 }

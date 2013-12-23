@@ -120,9 +120,9 @@ public class DbSchemaVersionCheck {
 		}
 	}
 
-	private String getExpectedDbVersion() {
+	public static String getExpectedDbVersion() {
 		Properties dbVersionProps = new Properties();
-		try (InputStream stream = getClass().getResourceAsStream(RESOURCE_DB_VERSION);) {
+		try (InputStream stream = DbSchemaVersionCheck.class.getResourceAsStream(RESOURCE_DB_VERSION);) {
 			DBC.PRE.assertNotNull(
 					MessageFormat.format("Resource file with name {0} does not exist!", RESOURCE_DB_VERSION), stream);
 			dbVersionProps.load(stream);
@@ -136,9 +136,9 @@ public class DbSchemaVersionCheck {
 		return dbVersion;
 	}
 
-	private String getSql(String dbVersion, String type) {
+	public static String getSql(String dbVersion, String type) {
 		String schemaResourceS = "/db_schema_" + dbVersion + "_" + type + ".sql";
-		try (InputStream stream = getClass().getResourceAsStream(schemaResourceS);) {
+		try (InputStream stream = DbSchemaVersionCheck.class.getResourceAsStream(schemaResourceS);) {
 			DBC.PRE.assertNotNull(
 					MessageFormat.format("Schema Resource file with name {0} does not exist!", schemaResourceS), stream);
 			return FileHelper.readStreamToString(stream);

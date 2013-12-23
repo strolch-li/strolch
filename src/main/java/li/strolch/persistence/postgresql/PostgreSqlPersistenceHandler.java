@@ -15,6 +15,7 @@
  */
 package li.strolch.persistence.postgresql;
 
+import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -25,21 +26,23 @@ import java.util.Map;
 import li.strolch.persistence.api.DbConnectionInfo;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
+import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchPersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+import li.strolch.runtime.observer.ObserverHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PostgreSqlPersistenceHandler extends StrolchComponent implements StrolchPersistenceHandler {
 
-	private static final String PROP_DB_URL = "db.url";
-	private static final String PROP_DB_USERNAME = "db.username";
-	private static final String PROP_DB_PASSWORD = "db.password";
+	private static final String PROP_DB_URL = "db.url"; //$NON-NLS-1$
+	private static final String PROP_DB_USERNAME = "db.username"; //$NON-NLS-1$
+	private static final String PROP_DB_PASSWORD = "db.password"; //$NON-NLS-1$
 
 	private ComponentConfiguration componentConfiguration;
 	private Map<String, DbConnectionInfo> connetionInfoMap;
@@ -88,7 +91,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements St
 		connectionCheck.checkConnections();
 
 		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(this.connetionInfoMap,
-				componentConfiguration);
+				this.componentConfiguration);
 		schemaVersionCheck.checkSchemaVersion();
 
 		super.start();
@@ -98,25 +101,38 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements St
 		return openTx(StrolchTransaction.DEFAULT_REALM);
 	}
 
-	@SuppressWarnings("resource")
-	// caller will/must close
 	public StrolchTransaction openTx(String realm) {
-//		PersistenceTransaction tx = this.persistenceManager.openTx(realm);
-//		XmlStrolchTransaction strolchTx = new XmlStrolchTransaction(tx);
-//		if (getContainer().hasComponent(ObserverHandler.class)) {
-//			strolchTx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
-//		}
-//		return strolchTx;
-		return null;
+		PostgreSqlStrolchTransaction tx = new PostgreSqlStrolchTransaction(realm, this);
+		if (getContainer().hasComponent(ObserverHandler.class)) {
+			tx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
+		}
+		return tx;
 	}
 
 	@Override
 	public OrderDao getOrderDao(StrolchTransaction tx) {
-		return new PostgreSqlOrderDao(tx);
+		PostgreSqlStrolchTransaction sqlTx = (PostgreSqlStrolchTransaction) tx;
+		return sqlTx.getOrderDao(sqlTx);
 	}
 
 	@Override
 	public ResourceDao getResourceDao(StrolchTransaction tx) {
-		return new PostgreSqlResourceDao(tx);
+		PostgreSqlStrolchTransaction sqlTx = (PostgreSqlStrolchTransaction) tx;
+		return sqlTx.getResourceDao(sqlTx);
+	}
+
+	Connection getConnection(String realm) {
+		DbConnectionInfo dbInfo = this.connetionInfoMap.get(realm);
+		if (dbInfo == null) {
+			String msg = MessageFormat.format("There is no connection registered for the realm {0}", realm); //$NON-NLS-1$
+			throw new StrolchPersistenceException(msg);
+		}
+
+		try {
+			return DriverManager.getConnection(dbInfo.getUrl(), dbInfo.getUsername(), dbInfo.getPassword());
+		} catch (SQLException e) {
+			String msg = MessageFormat.format("Failed to get a connection for {0} due to {1}", dbInfo, e.getMessage()); //$NON-NLS-1$
+			throw new StrolchPersistenceException(msg, e);
+		}
 	}
 }
