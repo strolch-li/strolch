@@ -29,8 +29,8 @@ import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchPersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.component.ComponentContainer;
-import li.strolch.runtime.component.StrolchComponent;
+import li.strolch.runtime.agent.ComponentContainerImpl;
+import li.strolch.runtime.agent.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.observer.ObserverHandler;
@@ -47,7 +47,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements St
 	private ComponentConfiguration componentConfiguration;
 	private Map<String, DbConnectionInfo> connetionInfoMap;
 
-	public PostgreSqlPersistenceHandler(ComponentContainer container, String componentName) {
+	public PostgreSqlPersistenceHandler(ComponentContainerImpl container, String componentName) {
 		super(container, componentName);
 	}
 
