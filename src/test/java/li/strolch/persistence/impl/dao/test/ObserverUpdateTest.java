@@ -82,13 +82,13 @@ public class ObserverUpdateTest extends AbstractDaoImplTest {
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			persistenceHandler.getOrderDao(tx).save(newOrder);
+			tx.getOrderDao().save(newOrder);
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
-			persistenceHandler.getResourceDao(tx).save(newResource);
+			tx.getResourceDao().save(newResource);
 		}
 
 		assertEquals(2, observer.results.size());

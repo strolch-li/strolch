@@ -18,6 +18,8 @@ package li.strolch.persistence.impl;
 import java.util.Set;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.persistence.api.OrderDao;
+import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.api.TransactionCloseStrategy;
@@ -107,5 +109,15 @@ public class XmlStrolchTransaction implements StrolchTransaction {
 	@Override
 	public boolean isOpen() {
 		return this.tx.isOpen();
+	}
+
+	@Override
+	public OrderDao getOrderDao() {
+		return new XmlOrderDao(this);
+	}
+
+	@Override
+	public ResourceDao getResourceDao() {
+		return new XmlResourceDao(this);
 	}
 }

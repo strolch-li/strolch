@@ -21,8 +21,6 @@ import java.util.Properties;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
-import li.strolch.persistence.api.OrderDao;
-import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.impl.model.OrderContextFactory;
@@ -68,7 +66,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 				new ResourceContextFactory());
 		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(Order.class, Tags.ORDER,
 				new OrderContextFactory());
-		
+
 		super.initialize(componentConfiguration);
 	}
 
@@ -85,15 +83,5 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 			strolchTx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
 		}
 		return strolchTx;
-	}
-
-	@Override
-	public OrderDao getOrderDao(StrolchTransaction tx) {
-		return new XmlOrderDao(tx);
-	}
-
-	@Override
-	public ResourceDao getResourceDao(StrolchTransaction tx) {
-		return new XmlResourceDao(tx);
 	}
 }
