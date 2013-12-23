@@ -55,7 +55,7 @@ public class CachedElementMapHandler extends InMemoryElementMapHandler {
 			PersistenceHandler persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
 			try (StrolchTransaction tx = persistenceHandler.openTx(realm)) {
 
-				ResourceDao resourceDao = persistenceHandler.getResourceDao(tx);
+				ResourceDao resourceDao = tx.getResourceDao();
 				Set<String> resourceTypes = resourceDao.queryTypes();
 				for (String type : resourceTypes) {
 					List<Resource> resources = resourceDao.queryAll(type);
@@ -65,7 +65,7 @@ public class CachedElementMapHandler extends InMemoryElementMapHandler {
 					}
 				}
 
-				OrderDao orderDao = persistenceHandler.getOrderDao(tx);
+				OrderDao orderDao = tx.getOrderDao();
 				Set<String> orderTypes = orderDao.queryTypes();
 				for (String type : orderTypes) {
 					List<Order> orders = orderDao.queryAll(type);
