@@ -20,7 +20,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import li.strolch.persistence.api.StrolchPersistenceHandler;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.postgresql.DbSchemaVersionCheck;
 import li.strolch.testbase.runtime.RuntimeMock;
 
@@ -39,7 +39,7 @@ public abstract class AbstractDaoImplTest extends RuntimeMock {
 	private static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
 	private static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	private static final String CONFIG_SRC = "src/test/resources/runtime/config"; //$NON-NLS-1$
-	protected static StrolchPersistenceHandler persistenceHandler;
+	protected static PersistenceHandler persistenceHandler;
 
 	@BeforeClass
 	public static void beforeClass() throws SQLException {
@@ -53,7 +53,7 @@ public abstract class AbstractDaoImplTest extends RuntimeMock {
 		RuntimeMock.startContainer(rootPath);
 
 		// initialize the component configuration
-		persistenceHandler = getContainer().getComponent(StrolchPersistenceHandler.class);
+		persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
 	}
 
 	private static void dropSchema() throws SQLException {

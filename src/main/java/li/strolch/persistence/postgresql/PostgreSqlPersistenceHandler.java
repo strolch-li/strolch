@@ -27,8 +27,9 @@ import li.strolch.persistence.api.DbConnectionInfo;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
-import li.strolch.persistence.api.StrolchPersistenceHandler;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.agent.ComponentContainerImpl;
 import li.strolch.runtime.agent.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -38,7 +39,7 @@ import li.strolch.runtime.observer.ObserverHandler;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PostgreSqlPersistenceHandler extends StrolchComponent implements StrolchPersistenceHandler {
+public class PostgreSqlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
 	private static final String PROP_DB_URL = "db.url"; //$NON-NLS-1$
 	private static final String PROP_DB_USERNAME = "db.username"; //$NON-NLS-1$
@@ -70,10 +71,10 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements St
 			throw new StrolchConfigurationException(msg, e);
 		}
 
-		DbConnectionInfo connectionInfo = new DbConnectionInfo(StrolchTransaction.DEFAULT_REALM, dbUrl);
+		DbConnectionInfo connectionInfo = new DbConnectionInfo(StrolchConstants.DEFAULT_REALM, dbUrl);
 		connectionInfo.setUsername(username);
 		connectionInfo.setPassword(password);
-		this.connetionInfoMap.put(StrolchTransaction.DEFAULT_REALM, connectionInfo);
+		this.connetionInfoMap.put(StrolchConstants.DEFAULT_REALM, connectionInfo);
 
 		String compliant = driver.jdbcCompliant() ? "" : "non"; //$NON-NLS-1$ //$NON-NLS-2$
 		String msg = "Using {0} JDBC compliant Driver {1}.{2}"; //$NON-NLS-1$
@@ -98,7 +99,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements St
 	}
 
 	public StrolchTransaction openTx() {
-		return openTx(StrolchTransaction.DEFAULT_REALM);
+		return openTx(StrolchConstants.DEFAULT_REALM);
 	}
 
 	public StrolchTransaction openTx(String realm) {
