@@ -18,6 +18,7 @@ package li.strolch.testbase.runtime;
 import java.io.File;
 import java.text.MessageFormat;
 
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.runtime.agent.ComponentContainer;
 import li.strolch.runtime.agent.StrolchAgent;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -45,6 +46,10 @@ public class RuntimeMock {
 
 	public static StrolchPrivilegeHandler getPrivilegeHandler() {
 		return container.getComponent(StrolchPrivilegeHandler.class);
+	}
+
+	public static PersistenceHandler getPersistenceHandler() {
+		return container.getComponent(PersistenceHandler.class);
 	}
 
 	public static void mockRuntime(File rootPathF, File configSrc) {
