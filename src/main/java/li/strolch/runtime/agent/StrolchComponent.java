@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 public class StrolchComponent {
 
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchComponent.class);
-	private final ComponentContainerImpl container;
+	private final ComponentContainer container;
 	private final String componentName;
 	private ComponentState state;
 
@@ -46,7 +46,7 @@ public class StrolchComponent {
 		return this.state;
 	}
 
-	protected ComponentContainerImpl getContainer() {
+	protected ComponentContainer getContainer() {
 		return this.container;
 	}
 
@@ -58,7 +58,7 @@ public class StrolchComponent {
 	}
 
 	protected void assertContainerStarted() {
-		if (getContainer().getState() != ComponentState.STARTED) {
+		if (this.container.getState() != ComponentState.STARTED) {
 			String msg = "Container is not yet started!"; //$NON-NLS-1$
 			throw new IllegalStateException(msg);
 		}

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
 import li.strolch.model.xml.XmlModelFileHandler;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
@@ -60,12 +61,10 @@ public class TransientElementMapHandler extends InMemoryElementMapHandler {
 			File modelFile = runtimeConfiguration.getDataFile(key, null, runtimeConfiguration, true);
 			this.realmModelFiles.put(realm, modelFile);
 		}
-
-		super.initialize(configuration);
 	}
 
 	private String getDataStoreFilePropKey(String realm) {
-		if (realm.equals(StrolchRealm.DEFAULT_REALM))
+		if (realm.equals(StrolchConstants.DEFAULT_REALM))
 			return StrolchAgent.PROP_DATA_STORE_FILE;
 		return StrolchAgent.PROP_DATA_STORE_FILE + "." + realm; //$NON-NLS-1$
 	}

@@ -19,7 +19,7 @@ import java.text.MessageFormat;
 import java.util.Map;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.model.query.StrolchQuery;
+import li.strolch.runtime.StrolchConstants;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -38,7 +38,7 @@ public abstract class AbstractElementMapHandler extends StrolchComponent impleme
 
 	@Override
 	public ResourceMap getResourceMap() {
-		return getResourceMap(StrolchQuery.DEFAULT_REALM);
+		return getResourceMap(StrolchConstants.DEFAULT_REALM);
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public abstract class AbstractElementMapHandler extends StrolchComponent impleme
 
 	@Override
 	public OrderMap getOrderMap() {
-		return getOrderMap(StrolchQuery.DEFAULT_REALM);
+		return getOrderMap(StrolchConstants.DEFAULT_REALM);
 	}
 
 	@Override
@@ -59,7 +59,6 @@ public abstract class AbstractElementMapHandler extends StrolchComponent impleme
 	}
 
 	private StrolchRealm getRealm(String realm) {
-		assertContainerStarted();
 		StrolchRealm strolchRealm = this.realms.get(realm);
 		if (strolchRealm == null) {
 			String msg = "No realm is configured with the name {0}"; //$NON-NLS-1$

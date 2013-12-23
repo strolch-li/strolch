@@ -23,7 +23,6 @@ import ch.eitchnet.privilege.model.PrivilegeContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface StrolchPrivilegeHandler {
 

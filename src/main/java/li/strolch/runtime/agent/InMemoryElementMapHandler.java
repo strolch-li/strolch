@@ -17,7 +17,7 @@ package li.strolch.runtime.agent;
 
 import java.util.HashMap;
 
-import li.strolch.model.query.StrolchQuery;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 
@@ -38,7 +38,7 @@ public class InMemoryElementMapHandler extends AbstractElementMapHandler {
 	public void initialize(ComponentConfiguration configuration) {
 
 		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
-		String[] realms = runtimeConfiguration.getStringArray(StrolchAgent.PROP_REALMS, StrolchQuery.DEFAULT_REALM);
+		String[] realms = runtimeConfiguration.getStringArray(StrolchAgent.PROP_REALMS, StrolchConstants.DEFAULT_REALM);
 
 		this.realms = new HashMap<>();
 		for (String realm : realms) {

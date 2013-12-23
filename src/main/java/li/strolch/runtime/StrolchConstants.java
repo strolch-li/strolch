@@ -13,41 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.agent;
+package li.strolch.runtime;
+
+import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.runtime.observer.ObserverHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class StrolchRealm {
+@SuppressWarnings("nls")
+public class StrolchConstants {
 
-	private String realm;
-	private ResourceMap resourceMap;
-	private OrderMap orderMap;
+	public static final String PERSISTENCE_HANDLER = PersistenceHandler.class.getSimpleName();
+	public static final String OBSERVER_HANDLER = ObserverHandler.class.getSimpleName();
+	public static final String PRIVILEGE_HANDLER = "PrivilegeHandler";
 
-	public StrolchRealm(String realm, ResourceMap resourceMap, OrderMap orderMap) {
-		this.realm = realm;
-		this.resourceMap = resourceMap;
-		this.orderMap = orderMap;
-	}
-
-	/**
-	 * @return the realm
-	 */
-	public String getRealm() {
-		return this.realm;
-	}
-
-	/**
-	 * @return the resourceMap
-	 */
-	public ResourceMap getResourceMap() {
-		return this.resourceMap;
-	}
-
-	/**
-	 * @return the orderMap
-	 */
-	public OrderMap getOrderMap() {
-		return this.orderMap;
-	}
+	public static final String DEFAULT_REALM = "defaultRealm";
 }

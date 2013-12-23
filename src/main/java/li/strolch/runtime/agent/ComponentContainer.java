@@ -17,9 +17,11 @@ package li.strolch.runtime.agent;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
+ * 
  */
 public interface ComponentContainer {
+
+	public abstract ComponentState getState();
 
 	public abstract boolean hasComponent(Class<?> clazz);
 
@@ -27,6 +29,9 @@ public interface ComponentContainer {
 
 	public abstract OrderMap getOrderMap();
 
+	public abstract OrderMap getOrderMap(String realm);
+
 	public abstract ResourceMap getResourceMap();
 
+	public abstract ResourceMap getResourceMap(String realm);
 }

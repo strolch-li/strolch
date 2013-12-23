@@ -85,7 +85,7 @@ public class ConfigurationParserTest {
 
 		//	<Component>
 		//		<name>PersistenceHandler</name>
-		//		<api>li.strolch.persistence.api.StrolchPersistenceHandler</api>
+		//		<api>li.strolch.persistence.api.PersistenceHandler</api>
 		//		<impl>li.strolch.persistence.impl.XmlPersistenceHandler</impl>
 		//		<Properties>
 		//			<verbose>true</verbose>
@@ -95,7 +95,7 @@ public class ConfigurationParserTest {
 				.getComponentConfiguration("PersistenceHandler");
 		assertNotNull("Should have created a PersistenceHandler Configuration", persistenceHandlerConfiguration);
 		assertEquals("PersistenceHandler", persistenceHandlerConfiguration.getName());
-		assertEquals("li.strolch.persistence.api.StrolchPersistenceHandler", persistenceHandlerConfiguration.getApi());
+		assertEquals("li.strolch.persistence.api.PersistenceHandler", persistenceHandlerConfiguration.getApi());
 		assertEquals("li.strolch.persistence.impl.XmlPersistenceHandler", persistenceHandlerConfiguration.getImpl());
 		assertEquals(1, persistenceHandlerConfiguration.getPropertyKeys().size());
 		assertEquals(true, persistenceHandlerConfiguration.getBoolean("verbose", null));

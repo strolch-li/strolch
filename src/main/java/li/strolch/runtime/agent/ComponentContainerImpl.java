@@ -70,8 +70,18 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	@Override
+	public OrderMap getOrderMap(String realm) {
+		return getComponent(ElementMapHandler.class).getOrderMap(realm);
+	}
+
+	@Override
 	public ResourceMap getResourceMap() {
 		return getComponent(ElementMapHandler.class).getResourceMap();
+	}
+
+	@Override
+	public ResourceMap getResourceMap(String realm) {
+		return getComponent(ElementMapHandler.class).getResourceMap(realm);
 	}
 
 	private void initializeComponent(Map<Class<?>, StrolchComponent> componentMap,
@@ -98,8 +108,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			@SuppressWarnings("unchecked")
 			Class<StrolchComponent> strolchComponentClass = (Class<StrolchComponent>) implClass;
-			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(ComponentContainerImpl.class,
-					String.class);
+			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(
+					ComponentContainerImpl.class, String.class);
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
 
 			componentMap.put(apiClass, strolchComponent);
