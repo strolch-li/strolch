@@ -18,8 +18,8 @@ package li.strolch.runtime.agent;
 import java.io.File;
 import java.text.MessageFormat;
 
-import li.strolch.model.xml.XmlModelDefaultHandler;
 import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
+import li.strolch.model.xml.XmlModelFileHandler;
 import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.component.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -46,8 +46,8 @@ public class TransientElementMapController extends StrolchComponent {
 	public void initialize(ComponentConfiguration configuration) {
 
 		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
-		File modelFile = runtimeConfiguration.getDataFile(StrolchAgent.PROP_DATA_STORE_FILE, null, runtimeConfiguration,
-				true);
+		File modelFile = runtimeConfiguration.getDataFile(StrolchAgent.PROP_DATA_STORE_FILE, null,
+				runtimeConfiguration, true);
 		this.modelFile = modelFile;
 
 		super.initialize(configuration);
@@ -60,7 +60,7 @@ public class TransientElementMapController extends StrolchComponent {
 		OrderMap orderMap = getContainer().getComponent(OrderMap.class);
 
 		InMemoryElementListener elementListener = new InMemoryElementListener(resourceMap, orderMap);
-		XmlModelDefaultHandler handler = new XmlModelDefaultHandler(elementListener, this.modelFile);
+		XmlModelFileHandler handler = new XmlModelFileHandler(elementListener, this.modelFile);
 		handler.parseFile();
 		XmlModelStatistics statistics = handler.getStatistics();
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
