@@ -20,10 +20,11 @@ import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
 public abstract class StrolchQuery<T extends QueryVisitor> {
 
+	public static final String DEFAULT_REALM = "defaultRealm"; //$NON-NLS-1$
+	
 	private Navigation navigation;
 	protected List<Selection> selections;
 
