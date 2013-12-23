@@ -23,8 +23,6 @@ import java.util.List;
  */
 public abstract class StrolchQuery<T extends QueryVisitor> {
 
-	public static final String DEFAULT_REALM = "defaultRealm"; //$NON-NLS-1$
-	
 	private Navigation navigation;
 	protected List<Selection> selections;
 
