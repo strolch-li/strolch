@@ -18,8 +18,8 @@ package li.strolch.testbase.runtime;
 import java.io.File;
 import java.text.MessageFormat;
 
+import li.strolch.runtime.agent.ComponentContainer;
 import li.strolch.runtime.agent.StrolchAgent;
-import li.strolch.runtime.component.ComponentContainer;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
 
