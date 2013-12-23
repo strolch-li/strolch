@@ -15,16 +15,10 @@
  */
 package li.strolch.model.xml;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import li.strolch.exception.StrolchException;
+import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
@@ -54,20 +48,16 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
  */
 public class XmlModelDefaultHandler extends DefaultHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(XmlModelDefaultHandler.class);
+	protected static final Logger logger = LoggerFactory.getLogger(XmlModelDefaultHandler.class);
 
-	private StrolchElementListener listener;
-	private File modelFile;
+	protected StrolchElementListener listener;
+	protected XmlModelStatistics statistics;
 
-	private Resource resource;
-	private Order order;
+	private GroupedParameterizedElement parameterizedElement;
 	private ParameterBag pBag;
 
-	private XmlModelStatistics statistics;
-
-	public XmlModelDefaultHandler(StrolchElementListener listener, File modelFile) {
+	public XmlModelDefaultHandler(StrolchElementListener listener) {
 		this.listener = listener;
-		this.modelFile = modelFile;
 		this.statistics = new XmlModelStatistics();
 	}
 
@@ -94,7 +84,7 @@ public class XmlModelDefaultHandler extends DefaultHandler {
 			String resName = attributes.getValue(Tags.NAME);
 			String resType = attributes.getValue(Tags.TYPE);
 			Resource resource = new Resource(resId, resName, resType);
-			this.resource = resource;
+			this.parameterizedElement = resource;
 			break;
 
 		case Tags.ORDER:
@@ -112,7 +102,7 @@ public class XmlModelDefaultHandler extends DefaultHandler {
 				State orderState = State.valueOf(orderStateS);
 				order.setState(orderState);
 			}
-			this.order = order;
+			this.parameterizedElement = order;
 			break;
 
 		case Tags.PARAMETER_BAG:
@@ -121,6 +111,7 @@ public class XmlModelDefaultHandler extends DefaultHandler {
 			String pBagType = attributes.getValue(Tags.TYPE);
 			ParameterBag pBag = new ParameterBag(pBagId, pBagName, pBagType);
 			this.pBag = pBag;
+			this.parameterizedElement.addParameterBag(pBag);
 			break;
 
 		case Tags.PARAMETER:
@@ -165,25 +156,6 @@ public class XmlModelDefaultHandler extends DefaultHandler {
 			this.pBag.addParameter(param);
 			break;
 
-		case Tags.INCLUDE_FILE:
-
-			String includeFileS = attributes.getValue(Tags.FILE);
-			if (StringHelper.isEmpty(includeFileS))
-				throw new IllegalArgumentException(MessageFormat.format(
-						"The attribute {0} is missing for IncludeFile!", Tags.FILE)); //$NON-NLS-1$
-			File includeFile = new File(this.modelFile.getParentFile(), includeFileS);
-			if (!includeFile.exists() || !includeFile.canRead()) {
-				String msg = "The IncludeFile does not exist, or is not readable. Source model: {0} with IncludeFile: {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, this.modelFile.getName(), includeFileS);
-				throw new IllegalArgumentException(msg);
-			}
-
-			XmlModelDefaultHandler handler = new XmlModelDefaultHandler(this.listener, includeFile);
-			handler.parseFile();
-			this.statistics.nrOfOrders += handler.statistics.nrOfOrders;
-			this.statistics.nrOfResources += handler.statistics.nrOfResources;
-
-			break;
 		default:
 			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
 		}
@@ -196,14 +168,14 @@ public class XmlModelDefaultHandler extends DefaultHandler {
 		case Tags.STROLCH_MODEL:
 			break;
 		case Tags.RESOURCE:
-			this.listener.notifyResource(this.resource);
+			this.listener.notifyResource((Resource) this.parameterizedElement);
 			this.statistics.nrOfResources++;
-			this.resource = null;
+			this.parameterizedElement = null;
 			break;
 		case Tags.ORDER:
-			this.listener.notifyOrder(this.order);
+			this.listener.notifyOrder((Order) this.parameterizedElement);
 			this.statistics.nrOfOrders++;
-			this.order = null;
+			this.parameterizedElement = null;
 			break;
 		case Tags.PARAMETER_BAG:
 			this.pBag = null;
@@ -214,30 +186,6 @@ public class XmlModelDefaultHandler extends DefaultHandler {
 			break;
 		default:
 			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
-		}
-	}
-
-	public void parseFile() {
-
-		try {
-			long startNanos = System.nanoTime();
-			this.statistics.startTime = new Date();
-
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser sp = spf.newSAXParser();
-
-			sp.parse(this.modelFile, this);
-
-			long endNanos = System.nanoTime();
-			this.statistics.durationNanos = endNanos - startNanos;
-			String msg = "SAX parsed model file {0} took {1}"; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, this.modelFile.getAbsolutePath(),
-					StringHelper.formatNanoDuration(this.statistics.durationNanos)));
-
-		} catch (ParserConfigurationException | SAXException | IOException e) {
-
-			String msg = "Parsing failed due to internal error: {0}"; //$NON-NLS-1$
-			throw new StrolchException(MessageFormat.format(msg, e.getMessage()), e);
 		}
 	}
 

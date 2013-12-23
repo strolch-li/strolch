@@ -32,7 +32,6 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public abstract class GroupedParameterizedElement extends AbstractStrolchElement {
 

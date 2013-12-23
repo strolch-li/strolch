@@ -28,7 +28,10 @@
 	</scm>
 
 	<dependencies>
-
+		<dependency>
+			<groupId>ch.eitchnet</groupId>
+			<artifactId>ch.eitchnet.utils</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

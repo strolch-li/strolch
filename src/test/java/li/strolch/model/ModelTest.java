@@ -16,16 +16,13 @@
 package li.strolch.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-import li.strolch.model.ModelGenerator;
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.State;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.FloatParameter;
@@ -33,6 +30,8 @@ import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.visitor.OrderDeepEqualsVisitor;
+import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
 
 import org.junit.Test;
 
@@ -53,6 +52,39 @@ public class ModelTest {
 		Order order = ModelGenerator.createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
 		ParameterBag bag = order.getParameterBag(ModelGenerator.BAG_ID);
 		validateBag(bag);
+	}
+
+	@Test
+	public void shouldPerformDeepResourceEquals() {
+		Resource srcRes = ModelGenerator.createResource("@res01", "Test resource", "MyType");
+		Resource dstRes = ModelGenerator.createResource("@res01", "Test resource", "MyType");
+		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
+		visitor.visit(dstRes);
+		assertTrue("Same Resource should be deep equal!", visitor.isEqual());
+	}
+
+	@Test
+	public void shouldFailDeepResourceEquals1() {
+		Resource srcRes = ModelGenerator.createResource("@res01", "Test resource", "MyType");
+		Resource dstRes = ModelGenerator.createResource("@res01", "Test resource", "MyType");
+		ParameterBag bag = dstRes.getParameterBag(ModelGenerator.BAG_ID);
+		bag.setName("Bla bla");
+		FloatParameter fParam = bag.getParameter(ModelGenerator.PARAM_FLOAT_ID);
+		fParam.setValue(23434234.234);
+		fParam.setName("Ohla");
+		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
+		visitor.visit(dstRes);
+		assertFalse("Resource should not be same if param is changed!", visitor.isEqual());
+		assertEquals("Three changes should be registered", 3, visitor.getMismatchedLocators().size());
+	}
+
+	@Test
+	public void shouldPerformDeepOrderEquals() {
+		Order srcOrder = ModelGenerator.createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
+		Order dstOrder = ModelGenerator.createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
+		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
+		visitor.visit(dstOrder);
+		assertTrue("Same Order should be deep equal!", visitor.isEqual());
 	}
 
 	public static void validateBag(ParameterBag bag) {
