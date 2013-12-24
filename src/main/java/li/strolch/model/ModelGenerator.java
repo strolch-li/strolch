@@ -17,6 +17,7 @@ package li.strolch.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
@@ -83,6 +84,31 @@ public class ModelGenerator {
 	}
 
 	/**
+	 * Creates a list of {@link Resource Resources} with the given values and adds a {@link ParameterBag} by calling
+	 * {@link #createParameterBag(String, String, String)}
+	 * 
+	 * @param idStart
+	 *            id range start
+	 * @param count
+	 *            the number of elements to create
+	 * @param idPrefix
+	 *            the prefix to generate IDs for the {@link Resource Resources}
+	 * @param name
+	 *            the name of the {@link Resource}
+	 * @param type
+	 *            the type of the {@link Resource}
+	 * 
+	 * @return the list of newly created {@link Resource Resources}
+	 */
+	public static List<Resource> createResources(int idStart, int count, String idPrefix, String name, String type) {
+		List<Resource> resources = new ArrayList<>();
+		for (int i = 0; i < count; i++) {
+			resources.add(createResource(idPrefix + "_" + (i + idStart), name + " " + i, type));
+		}
+		return resources;
+	}
+
+	/**
 	 * Creates an {@link Order} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 * 
@@ -123,6 +149,31 @@ public class ModelGenerator {
 		order.addParameterBag(bag);
 
 		return order;
+	}
+
+	/**
+	 * Creates a list of {@link Order Orders} with the given values and adds a {@link ParameterBag} by calling
+	 * {@link #createParameterBag(String, String, String)}
+	 * 
+	 * @param idStart
+	 *            id range start
+	 * @param count
+	 *            the number of elements to create
+	 * @param idPrefix
+	 *            the prefix to generate IDs for the {@link Order Orders}
+	 * @param name
+	 *            the name of the {@link Order}
+	 * @param type
+	 *            the type of the {@link Order}
+	 * 
+	 * @return the list of newly created {@link Order Orders}
+	 */
+	public static List<Order> createOrders(int idStart, int count, String idPrefix, String name, String type) {
+		List<Order> orders = new ArrayList<>();
+		for (int i = 0; i < count; i++) {
+			orders.add(createOrder(idPrefix + "_" + (i + idStart), name + " " + i, type));
+		}
+		return orders;
 	}
 
 	/**
