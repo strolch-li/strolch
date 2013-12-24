@@ -15,12 +15,14 @@
  */
 package ch.eitchnet.privilege.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
-import junit.framework.Assert;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -53,6 +55,7 @@ import ch.eitchnet.utils.helper.FileHelper;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public class PrivilegeTest {
 
 	private static final String ADMIN = "admin";
@@ -80,7 +83,7 @@ public class PrivilegeTest {
 	public static void init() throws Exception {
 		try {
 			destroy();
-			
+
 			// copy configuration to tmp
 			String pwd = System.getProperty("user.dir");
 
@@ -146,7 +149,7 @@ public class PrivilegeTest {
 
 	private void login(String username, byte[] password) {
 		Certificate certificate = privilegeHandler.authenticate(username, password);
-		Assert.assertTrue("Certificate is null!", certificate != null);
+		assertTrue("Certificate is null!", certificate != null);
 		PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
 		PrivilegeContext.set(privilegeContext);
 	}
@@ -350,10 +353,10 @@ public class PrivilegeTest {
 			// see if bob can perform restrictable
 			Restrictable restrictable = new TestRestrictable();
 			PrivilegeContext.get().validateAction(restrictable);
-			Assert.fail("Should fail as bob does not have role app");
+			fail("Should fail as bob does not have role app");
 		} catch (AccessDeniedException e) {
 			String msg = "User bob does not have Privilege ch.eitchnet.privilege.test.model.TestRestrictable needed for Restrictable ch.eitchnet.privilege.test.model.TestRestrictable";
-			Assert.assertEquals(msg, e.getLocalizedMessage());
+			assertEquals(msg, e.getLocalizedMessage());
 		} finally {
 			logout();
 		}
@@ -397,10 +400,10 @@ public class PrivilegeTest {
 			// testFailAuthAsTedNoPass
 			// Will fail because user ted has no password
 			login(TED, ArraysHelper.copyOf(PASS_TED));
-			org.junit.Assert.fail("User Ted may not authenticate because the user has no password!");
+			fail("User Ted may not authenticate because the user has no password!");
 		} catch (PrivilegeException e) {
 			String msg = "User ted has no password and may not login!";
-			Assert.assertEquals(msg, e.getMessage());
+			assertEquals(msg, e.getMessage());
 		} finally {
 			logout();
 		}
@@ -451,10 +454,10 @@ public class PrivilegeTest {
 					new HashMap<String, String>());
 			certificate = PrivilegeContext.get().getCertificate();
 			privilegeHandler.addOrReplaceUser(certificate, userRep, null);
-			Assert.fail("User bob may not add a user as bob does not have admin rights!");
+			fail("User bob may not add a user as bob does not have admin rights!");
 		} catch (PrivilegeException e) {
 			String msg = "User does not have PrivilegeAdmin role! Certificate: " + certificate;
-			Assert.assertEquals(msg, e.getMessage());
+			assertEquals(msg, e.getMessage());
 		} finally {
 			logout();
 		}
@@ -501,10 +504,10 @@ public class PrivilegeTest {
 			// testFailAuthUserBob
 			// Will fail as user bob has no role
 			privilegeHandler.authenticate(BOB, ArraysHelper.copyOf(PASS_BOB));
-			org.junit.Assert.fail("User Bob may not authenticate because the user has no role");
+			fail("User Bob may not authenticate because the user has no role");
 		} catch (PrivilegeException e) {
 			String msg = "User bob does not have any roles defined!";
-			Assert.assertEquals(msg, e.getMessage());
+			assertEquals(msg, e.getMessage());
 		} finally {
 			logout();
 		}
@@ -527,10 +530,10 @@ public class PrivilegeTest {
 			// testFailAuthAsBob
 			// Will fail because user bob is not yet enabled
 			privilegeHandler.authenticate(BOB, ArraysHelper.copyOf(PASS_BOB));
-			org.junit.Assert.fail("User Bob may not authenticate because the user is not yet enabled!");
+			fail("User Bob may not authenticate because the user is not yet enabled!");
 		} catch (PrivilegeException e) {
 			String msg = "User bob does not have state ENABLED and can not login!";
-			Assert.assertEquals(msg, e.getMessage());
+			assertEquals(msg, e.getMessage());
 		} finally {
 			logout();
 		}

@@ -15,6 +15,9 @@
  */
 package ch.eitchnet.privilege.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,8 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import junit.framework.Assert;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -51,13 +52,10 @@ import ch.eitchnet.utils.helper.XmlHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
+@SuppressWarnings("nls")
 public class XmlTest {
 
-	/**
-	 * 
-	 */
 	private static final String TARGET_TEST = "./target/test";
 	private static final Logger logger = LoggerFactory.getLogger(XmlTest.class);
 
@@ -109,17 +107,17 @@ public class XmlTest {
 		logger.info(containerModel.toString());
 
 		// assert all objects read
-		Assert.assertNotNull(containerModel.getParameterMap());
-		Assert.assertNotNull(containerModel.getPolicies());
-		Assert.assertNotNull(containerModel.getEncryptionHandlerClassName());
-		Assert.assertNotNull(containerModel.getEncryptionHandlerParameterMap());
-		Assert.assertNotNull(containerModel.getPersistenceHandlerClassName());
-		Assert.assertNotNull(containerModel.getPersistenceHandlerParameterMap());
+		assertNotNull(containerModel.getParameterMap());
+		assertNotNull(containerModel.getPolicies());
+		assertNotNull(containerModel.getEncryptionHandlerClassName());
+		assertNotNull(containerModel.getEncryptionHandlerParameterMap());
+		assertNotNull(containerModel.getPersistenceHandlerClassName());
+		assertNotNull(containerModel.getPersistenceHandlerParameterMap());
 
-		Assert.assertEquals(1, containerModel.getParameterMap().size());
-		Assert.assertEquals(1, containerModel.getPolicies().size());
-		Assert.assertEquals(1, containerModel.getEncryptionHandlerParameterMap().size());
-		Assert.assertEquals(2, containerModel.getPersistenceHandlerParameterMap().size());
+		assertEquals(1, containerModel.getParameterMap().size());
+		assertEquals(1, containerModel.getPolicies().size());
+		assertEquals(1, containerModel.getEncryptionHandlerParameterMap().size());
+		assertEquals(2, containerModel.getPersistenceHandlerParameterMap().size());
 
 		// TODO extend assertions to actual model
 	}
@@ -150,7 +148,7 @@ public class XmlTest {
 		configSaxWriter.write();
 
 		String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(configFile));
-		Assert.assertEquals("2ABD3442EEC8BCEC5BEE365AAB6DB2FD4E1789325425CB1E017E900582525685", fileHash);
+		assertEquals("2ABD3442EEC8BCEC5BEE365AAB6DB2FD4E1789325425CB1E017E900582525685", fileHash);
 	}
 
 	@Test
@@ -161,12 +159,12 @@ public class XmlTest {
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
 		List<User> users = xmlHandler.getUsers();
-		Assert.assertNotNull(users);
+		assertNotNull(users);
 		List<Role> roles = xmlHandler.getRoles();
-		Assert.assertNotNull(roles);
+		assertNotNull(roles);
 
-		Assert.assertEquals(2, users.size());
-		Assert.assertEquals(4, roles.size());
+		assertEquals(2, users.size());
+		assertEquals(4, roles.size());
 
 		// TODO extend assertions to actual model
 	}
@@ -212,6 +210,6 @@ public class XmlTest {
 		configSaxWriter.write();
 
 		String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(modelFile));
-		Assert.assertEquals("A2127D20A61E00BCDBB61569CD2B200C4F0F111C972BAC3B1E54DF3B2FCDC8BE", fileHash);
+		assertEquals("A2127D20A61E00BCDBB61569CD2B200C4F0F111C972BAC3B1E54DF3B2FCDC8BE", fileHash);
 	}
 }
