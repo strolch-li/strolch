@@ -28,11 +28,11 @@ public enum ComponentState {
 
 		switch (this) {
 		case UNDEFINED:
-			if (newState != ComponentState.INITIALIZED)
+			if (newState != ComponentState.INITIALIZED && newState != STOPPED)
 				throw getIllegalStateEx(newState);
 			break;
 		case INITIALIZED:
-			if (newState != ComponentState.STARTED)
+			if (newState != ComponentState.STARTED && newState != STOPPED)
 				throw getIllegalStateEx(newState);
 			break;
 		case STARTED:

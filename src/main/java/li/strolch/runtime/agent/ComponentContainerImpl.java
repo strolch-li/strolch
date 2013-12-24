@@ -257,25 +257,36 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		logger.info("Stopping strolch components..."); //$NON-NLS-1$
 
-		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
-		stop(rootUpstreamComponents);
-		this.state = this.state.validateStateChange(ComponentState.STOPPED);
+		if (this.dependencyAnalyzer == null) {
+			logger.info("Strolch Components have been stopped."); //$NON-NLS-1$
+		} else {
+			Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
+			stop(rootUpstreamComponents);
+			this.state = this.state.validateStateChange(ComponentState.STOPPED);
 
-		String msg = "All {0} Strolch Components have been stopped."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, this.controllerMap.size()));
+			String msg = "All {0} Strolch Components have been stopped."; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, this.controllerMap.size()));
+		}
 	}
 
 	public void destroy() {
 
 		logger.info("Destroying strolch components..."); //$NON-NLS-1$
 
-		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
-		destroy(rootUpstreamComponents);
-		this.state = this.state.validateStateChange(ComponentState.DESTROYED);
+		if (this.dependencyAnalyzer == null) {
+			logger.info("Strolch Components have been destroyed."); //$NON-NLS-1$
+		} else {
+			Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
+			destroy(rootUpstreamComponents);
+			this.state = this.state.validateStateChange(ComponentState.DESTROYED);
 
-		String msg = "All {0} Strolch Components have been destroyed!"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, this.controllerMap.size()));
-		this.controllerMap.clear();
-		this.componentMap.clear();
+			String msg = "All {0} Strolch Components have been destroyed!"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, this.controllerMap.size()));
+			this.controllerMap.clear();
+			this.componentMap.clear();
+		}
+
+		this.controllerMap = null;
+		this.componentMap = null;
 	}
 }

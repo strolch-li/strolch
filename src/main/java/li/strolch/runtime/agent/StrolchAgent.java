@@ -66,11 +66,13 @@ public class StrolchAgent {
 	}
 
 	public void stop() {
-		this.container.stop();
+		if (this.container != null)
+			this.container.stop();
 	}
 
 	public void destroy() {
-		this.container.destroy();
+		if (this.container != null)
+			this.container.destroy();
 	}
 
 	public void setup(File path) {
