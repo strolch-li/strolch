@@ -155,11 +155,11 @@ public class PostgreSqlResourceDaoTest extends AbstractDaoImplTest {
 		}
 
 		try (StrolchTransaction tx = persistenceHandler.openTx()) {
-			Resource resource = tx.getResourceDao().queryBy("MyType1", "@_1");
+			Resource resource = tx.getResourceDao().queryBy("MyType1", "@_00000001");
 			assertNotNull(resource);
-			resource = tx.getResourceDao().queryBy("MyType2", "@_6");
+			resource = tx.getResourceDao().queryBy("MyType2", "@_00000006");
 			assertNotNull(resource);
-			resource = tx.getResourceDao().queryBy("MyType3", "@_11");
+			resource = tx.getResourceDao().queryBy("MyType3", "@_00000011");
 			assertNotNull(resource);
 		}
 	}
