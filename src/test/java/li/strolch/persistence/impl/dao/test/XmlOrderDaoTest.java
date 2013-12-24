@@ -18,12 +18,22 @@ package li.strolch.persistence.impl.dao.test;
 import static li.strolch.model.ModelGenerator.BAG_ID;
 import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
 import static li.strolch.model.ModelGenerator.createOrder;
+import static li.strolch.model.ModelGenerator.createOrders;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import li.strolch.model.Order;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
 import org.junit.Test;
@@ -87,6 +97,70 @@ public class XmlOrderDaoTest extends AbstractDaoImplTest {
 		try (StrolchTransaction tx = persistenceHandler.openTx();) {
 			Order order = tx.getOrderDao().queryBy(TYPE, ID);
 			assertNull("Should no read Order with id " + ID, order); //$NON-NLS-1$
+		}
+	}
+
+	@SuppressWarnings("nls")
+	@Test
+	public void shouldPerformBulkOperations() {
+
+		List<Order> orders = new ArrayList<>();
+		orders.addAll(createOrders(orders.size(), 5, "@", "My Order ", "MyType1"));
+		orders.addAll(createOrders(orders.size(), 5, "@", "Other Order ", "MyType2"));
+		orders.addAll(createOrders(orders.size(), 5, "@", "Further Order ", "MyType3"));
+
+		Comparator<Order> comparator = new Comparator<Order>() {
+			@Override
+			public int compare(Order o1, Order o2) {
+				return o1.getId().compareTo(o2.getId());
+			}
+		};
+		Collections.sort(orders, comparator);
+
+		try (StrolchTransaction tx = persistenceHandler.openTx()) {
+			tx.getOrderDao().removeAll(tx.getOrderDao().queryAll());
+		}
+
+		try (StrolchTransaction tx = persistenceHandler.openTx()) {
+			tx.getOrderDao().saveAll(orders);
+		}
+
+		Set<String> expectedTypes = new HashSet<>();
+		expectedTypes.add("MyType1");
+		expectedTypes.add("MyType2");
+		expectedTypes.add("MyType3");
+
+		try (StrolchTransaction tx = persistenceHandler.openTx()) {
+			List<Order> allOrders = tx.getOrderDao().queryAll();
+			Collections.sort(allOrders, comparator);
+			assertEquals(orders, allOrders);
+		}
+
+		try (StrolchTransaction tx = persistenceHandler.openTx()) {
+			OrderDao orderDao = tx.getOrderDao();
+
+			Set<String> types = orderDao.queryTypes();
+			assertEquals(expectedTypes, types);
+
+			Set<String> keySet = orderDao.queryKeySet();
+			assertEquals(15, keySet.size());
+
+			for (String type : types) {
+				Set<String> idsByType = orderDao.queryKeySet(type);
+				assertEquals(5, idsByType.size());
+
+				List<Order> ordersByType = orderDao.queryAll(type);
+				assertEquals(5, ordersByType.size());
+			}
+		}
+
+		try (StrolchTransaction tx = persistenceHandler.openTx()) {
+			Order order = tx.getOrderDao().queryBy("MyType1", "@_1");
+			assertNotNull(order);
+			order = tx.getOrderDao().queryBy("MyType2", "@_6");
+			assertNotNull(order);
+			order = tx.getOrderDao().queryBy("MyType3", "@_11");
+			assertNotNull(order);
 		}
 	}
 }
