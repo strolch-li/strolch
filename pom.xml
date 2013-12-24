@@ -11,7 +11,7 @@
 
 	<artifactId>li.strolch.testbase</artifactId>
 
-	<name>runtime for Strolch</name>
+	<name>li.strolch.testbase</name>
 	<description>runtime for Strolch</description>
 
 	<url>https://github.com/eitch/li.strolch.testbase</url>
