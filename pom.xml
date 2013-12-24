@@ -11,7 +11,7 @@
 
 	<artifactId>li.strolch.tutorialapp</artifactId>
 
-	<name>Tutorial Application for Strolch</name>
+	<name>li.strolch.tutorialapp</name>
 	<description>Tutorial Application for Strolch</description>
 
 	<url>https://github.com/eitch/li.strolch.tutorialapp</url>
