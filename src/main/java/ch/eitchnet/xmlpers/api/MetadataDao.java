@@ -152,10 +152,9 @@ public class MetadataDao {
 		Set<String> keySet = new HashSet<String>();
 		File[] subTypeFiles = queryPath.listFiles();
 		for (File subTypeFile : subTypeFiles) {
-			if (subTypeFile.isFile()) {
-				String filename = subTypeFile.getName();
-				String id = FilenameUtility.getId(filename);
-				keySet.add(id);
+			if (subTypeFile.isDirectory()) {
+				String type = subTypeFile.getName();
+				keySet.add(type);
 			}
 		}
 
