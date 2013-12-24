@@ -16,6 +16,7 @@ echo "Pushing li.strolch.persistence.api..." ; cd li.strolch.persistence.api ; g
 echo "Pushing li.strolch.persistence.xml..." ; cd li.strolch.persistence.xml ; git push ; cd .. ; echo
 echo "Pushing li.strolch.persistence.postgresql..." ; cd li.strolch.persistence.postgresql ; git push ; cd .. ; echo
 echo "Pushing li.strolch.tutorialapp..." ; cd li.strolch.tutorialapp ; git push ; cd .. ; echo
+echo "Pushing li.strolch.tutorialwebapp..." ; cd li.strolch.tutorialwebapp ; git push ; cd .. ; echo
 
 echo "Done."
 exit 0
