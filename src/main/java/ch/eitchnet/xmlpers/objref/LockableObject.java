@@ -51,7 +51,8 @@ public class LockableObject {
 				msg = MessageFormat.format(msg, StringHelper.formatMillisecondsDuration(tryLockTime), this.toString());
 				throw new XmlPersistenceException(msg);
 			}
-			logger.info("locked " + this.toString()); //$NON-NLS-1$
+			if (logger.isDebugEnabled())
+				logger.debug("locked " + this.toString()); //$NON-NLS-1$
 		} catch (InterruptedException e) {
 			throw new XmlPersistenceException("Thread interrupted: " + e.getMessage(), e); //$NON-NLS-1$
 		}
@@ -62,6 +63,7 @@ public class LockableObject {
 	 */
 	public void unlock() {
 		this.lock.unlock();
-		logger.info("unlocking " + this.toString()); //$NON-NLS-1$
+		if (logger.isDebugEnabled())
+			logger.debug("unlocking " + this.toString()); //$NON-NLS-1$
 	}
 }

@@ -95,8 +95,10 @@ public class FileIo {
 			throw new XmlException(msg, e);
 		}
 
-		String msg = "Wrote SAX to {0}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, this.path.getAbsolutePath()));
+		if (logger.isDebugEnabled()) {
+			String msg = "Wrote SAX to {0}"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, this.path.getAbsolutePath()));
+		}
 	}
 
 	public <T> void readSax(PersistenceContext<T> ctx) {
@@ -110,8 +112,10 @@ public class FileIo {
 			DefaultHandler defaultHandler = saxParser.getDefaultHandler();
 			sp.parse(this.path, defaultHandler);
 
-			String msg = "SAX parsed file {0}"; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, this.path.getAbsolutePath()));
+			if (logger.isDebugEnabled()) {
+				String msg = "SAX parsed file {0}"; //$NON-NLS-1$
+				logger.info(MessageFormat.format(msg, this.path.getAbsolutePath()));
+			}
 
 			ctx.setObject(saxParser.getObject());
 
@@ -157,8 +161,10 @@ public class FileIo {
 			Source xmlSource = new DOMSource(document);
 			transformer.transform(xmlSource, result);
 
-			String msg = MessageFormat.format("Wrote DOM to {0}", this.path.getAbsolutePath()); //$NON-NLS-1$
-			logger.info(msg);
+			if (logger.isDebugEnabled()) {
+				String msg = MessageFormat.format("Wrote DOM to {0}", this.path.getAbsolutePath()); //$NON-NLS-1$
+				logger.info(msg);
+			}
 
 		} catch (TransformerFactoryConfigurationError | TransformerException e) {
 
@@ -183,9 +189,11 @@ public class FileIo {
 			DomParser<T> domParser = ctx.getParserFactor().getDomParser();
 			domParser.fromDom(document);
 
-			String msg = "DOM parsed file {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.path.getAbsolutePath());
-			logger.info(msg);
+			if (logger.isDebugEnabled()) {
+				String msg = "DOM parsed file {0}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, this.path.getAbsolutePath());
+				logger.info(msg);
+			}
 
 			ctx.setObject(domParser.getObject());
 
