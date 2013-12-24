@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.FloatParameter;
@@ -103,7 +104,8 @@ public class ModelGenerator {
 	public static List<Resource> createResources(int idStart, int count, String idPrefix, String name, String type) {
 		List<Resource> resources = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
-			resources.add(createResource(idPrefix + "_" + (i + idStart), name + " " + i, type));
+			String id = StringHelper.normalizeLength(String.valueOf((i + idStart)), 8, true, '0');
+			resources.add(createResource(idPrefix + "_" + id, name + " " + i, type));
 		}
 		return resources;
 	}
@@ -171,7 +173,8 @@ public class ModelGenerator {
 	public static List<Order> createOrders(int idStart, int count, String idPrefix, String name, String type) {
 		List<Order> orders = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
-			orders.add(createOrder(idPrefix + "_" + (i + idStart), name + " " + i, type));
+			String id = StringHelper.normalizeLength(String.valueOf((i + idStart)), 8, true, '0');
+			orders.add(createOrder(idPrefix + "_" + id, name + " " + i, type));
 		}
 		return orders;
 	}
