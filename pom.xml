@@ -12,8 +12,8 @@
 
 	<artifactId>li.strolch.persistence.postgresql</artifactId>
 
-	<name>Reference Persistence Implementation for Strolch</name>
-	<description>Reference Persistence Implementation for Strolch</description>
+	<name>li.strolch.persistence.postgresql</name>
+	<description>PostgreSQL Persistence Implementation for Strolch</description>
 
 	<url>https://github.com/eitch/li.strolch.persistence.postgresql</url>
 
