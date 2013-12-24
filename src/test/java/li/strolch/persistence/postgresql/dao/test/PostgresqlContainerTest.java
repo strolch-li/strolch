@@ -16,50 +16,40 @@
 package li.strolch.persistence.postgresql.dao.test;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import li.strolch.persistence.api.PersistenceHandler;
-import li.strolch.persistence.postgresql.DbSchemaVersionCheck;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class AbstractDaoImplTest extends RuntimeMock {
+public class PostgresqlContainerTest extends RuntimeMock {
 
-	private static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
-	private static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
-	private static final String DB_PASSWORD = "test"; //$NON-NLS-1$
-	public static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
-	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/runtime/config"; //$NON-NLS-1$
 	protected static PersistenceHandler persistenceHandler;
 
 	@BeforeClass
 	public static void beforeClass() throws SQLException {
 
-		dropSchema();
-
-		File rootPath = new File(RUNTIME_PATH);
-		File configSrc = new File(CONFIG_SRC);
+		File rootPath = new File(AbstractDaoImplTest.RUNTIME_PATH);
+		File configSrc = new File(AbstractDaoImplTest.CONFIG_SRC);
 		RuntimeMock.mockRuntime(rootPath, configSrc);
-		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
+		new File(rootPath, AbstractDaoImplTest.DB_STORE_PATH_DIR).mkdir();
 		RuntimeMock.startContainer(rootPath);
 
 		// initialize the component configuration
 		persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
 	}
 
-	private static void dropSchema() throws SQLException {
-		String dbVersion = DbSchemaVersionCheck.getExpectedDbVersion();
-		String sql = DbSchemaVersionCheck.getSql(dbVersion, "drop"); //$NON-NLS-1$
-		try (Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-			connection.prepareStatement(sql).execute();
+	@Test
+	public void shouldStartContainer() {
+		try (StrolchTransaction tx = getPersistenceHandler().openTx()) {
+			tx.getOrderDao().queryKeySet();
 		}
 	}
 

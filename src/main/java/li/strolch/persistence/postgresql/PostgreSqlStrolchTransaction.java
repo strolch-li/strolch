@@ -16,6 +16,7 @@
 package li.strolch.persistence.postgresql;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Set;
 
@@ -109,11 +110,21 @@ public class PostgreSqlStrolchTransaction implements StrolchTransaction {
 				this.resourceDao.commit(this.txResult);
 			}
 
+			this.connection.commit();
+
 			this.txResult.setState(TransactionState.COMMITTED);
 
 		} catch (Exception e) {
-			this.txResult.setState(TransactionState.FAILED);
 
+			if (this.connection != null) {
+				try {
+					this.connection.rollback();
+				} catch (SQLException e1) {
+					logger.error("Failed to rollback transation due to " + e.getMessage(), e); //$NON-NLS-1$
+				}
+			}
+
+			this.txResult.setState(TransactionState.FAILED);
 			long end = System.nanoTime();
 			long txDuration = end - this.startTime;
 			long closeDuration = end - start;
@@ -124,7 +135,14 @@ public class PostgreSqlStrolchTransaction implements StrolchTransaction {
 			sb.append(StringHelper.formatNanoDuration(closeDuration));
 			logger.info(sb.toString());
 
-			throw e;
+			throw new StrolchPersistenceException("Strolch Transaction failed due to " + e.getMessage(), e); //$NON-NLS-1$
+
+		} finally {
+			try {
+				this.connection.close();
+			} catch (Exception e) {
+				logger.error("Failed to close connection due to " + e.getMessage(), e); //$NON-NLS-1$
+			}
 		}
 
 		long end = System.nanoTime();
@@ -159,6 +177,20 @@ public class PostgreSqlStrolchTransaction implements StrolchTransaction {
 	@Override
 	public void autoCloseableRollback() {
 		long start = System.nanoTime();
+
+		if (this.connection != null) {
+			try {
+				this.connection.rollback();
+			} catch (SQLException e) {
+				throw new StrolchPersistenceException("Strolch Transaction failed due to " + e.getMessage(), e); //$NON-NLS-1$
+			} finally {
+				try {
+					this.connection.close();
+				} catch (Exception e) {
+					logger.error("Failed to close connection due to " + e.getMessage(), e); //$NON-NLS-1$
+				}
+			}
+		}
 
 		long end = System.nanoTime();
 		long txDuration = end - this.startTime;

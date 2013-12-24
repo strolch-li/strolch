@@ -137,7 +137,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 		String sql = "select id, name, type, asxml from " + getTableName();
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 			try (ResultSet result = statement.executeQuery()) {
-				while (!result.next()) {
+				while (result.next()) {
 					String id = result.getString("id");
 					String type = result.getString("type");
 					SQLXML sqlxml = result.getSQLXML("asxml");
@@ -160,7 +160,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
 			try (ResultSet result = statement.executeQuery()) {
-				while (!result.next()) {
+				while (result.next()) {
 					String id = result.getString("id");
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					T t = parseFromXml(id, type, sqlxml);

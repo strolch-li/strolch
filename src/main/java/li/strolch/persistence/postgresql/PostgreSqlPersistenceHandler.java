@@ -116,7 +116,12 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		}
 
 		try {
-			return DriverManager.getConnection(dbInfo.getUrl(), dbInfo.getUsername(), dbInfo.getPassword());
+			String url = dbInfo.getUrl();
+			String username = dbInfo.getUsername();
+			String password = dbInfo.getPassword();
+			Connection connection = DriverManager.getConnection(url, username, password);
+			connection.setAutoCommit(false);
+			return connection;
 		} catch (SQLException e) {
 			String msg = MessageFormat.format("Failed to get a connection for {0} due to {1}", dbInfo, e.getMessage()); //$NON-NLS-1$
 			throw new StrolchPersistenceException(msg, e);
