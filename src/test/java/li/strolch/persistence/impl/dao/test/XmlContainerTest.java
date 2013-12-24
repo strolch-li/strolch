@@ -15,14 +15,40 @@
  */
 package li.strolch.persistence.impl.dao.test;
 
-import li.strolch.persistence.api.StrolchTransaction;
+import java.io.File;
 
+import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.testbase.runtime.RuntimeMock;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class XmlContainerTest extends AbstractDaoImplTest {
+public class XmlContainerTest extends RuntimeMock {
+
+	protected static PersistenceHandler persistenceHandler;
+
+	@BeforeClass
+	public static void beforeClass() {
+
+		File rootPath = new File(AbstractDaoImplTest.RUNTIME_PATH);
+		File configSrc = new File(AbstractDaoImplTest.CONFIG_SRC);
+		RuntimeMock.mockRuntime(rootPath, configSrc);
+		new File(rootPath, AbstractDaoImplTest.DB_STORE_PATH_DIR).mkdir();
+		RuntimeMock.startContainer(rootPath);
+
+		// initialize the component configuration
+		persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		RuntimeMock.destroyRuntime();
+	}
 
 	@Test
 	public void shouldStartContainer() {
