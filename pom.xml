@@ -12,7 +12,7 @@
 
 	<artifactId>li.strolch.persistence.xml</artifactId>
 
-	<name>Reference Persistence Implementation for Strolch</name>
+	<name>li.strolch.persistence.xml</name>
 	<description>Reference Persistence Implementation for Strolch</description>
 
 	<url>https://github.com/eitch/li.strolch.persistence.xml</url>
