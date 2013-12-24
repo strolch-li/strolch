@@ -11,7 +11,7 @@
 
 	<artifactId>li.strolch.service</artifactId>
 
-	<name>Service API for Strolch</name>
+	<name>li.strolch.service</name>
 	<description>Service API for Strolch</description>
 
 	<url>https://github.com/eitch/li.strolch.service</url>
