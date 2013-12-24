@@ -11,7 +11,7 @@
 
 	<artifactId>li.strolch.bom</artifactId>
 	<packaging>pom</packaging>
-	<name>The default set of dependencies to start working with strolch projects</name>
+	<name>li.strolch.bom</name>
 	<description>The default set of dependencies to start working with strolch projects</description>
 
 	<dependencies>
