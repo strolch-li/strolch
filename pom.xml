@@ -6,7 +6,7 @@
 	<artifactId>li.strolch.parent</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Parent for li.strolch projects</name>
+	<name>li.strolch.parent</name>
 	<description>Parent for all li.strolch projects for easier project maintenance</description>
 	<inceptionYear>2013</inceptionYear>
 
