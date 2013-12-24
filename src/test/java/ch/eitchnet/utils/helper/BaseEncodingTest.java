@@ -22,7 +22,7 @@ import static ch.eitchnet.utils.helper.BaseEncoding.toBase32;
 import static ch.eitchnet.utils.helper.BaseEncoding.toBase32Dmedia;
 import static ch.eitchnet.utils.helper.BaseEncoding.toBase32Hex;
 import static ch.eitchnet.utils.helper.BaseEncoding.toBase64;
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -30,66 +30,66 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
+@SuppressWarnings("nls")
 public class BaseEncodingTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(BaseEncodingTest.class);
 
 	@Test
 	public void testBase64() {
-		Assert.assertEquals("", toBase64(""));
-		Assert.assertEquals("Zg==", toBase64("f"));
-		Assert.assertEquals("Zm8=", toBase64("fo"));
-		Assert.assertEquals("Zm9v", toBase64("foo"));
-		Assert.assertEquals("Zm9vYg==", toBase64("foob"));
-		Assert.assertEquals("Zm9vYmE=", toBase64("fooba"));
-		Assert.assertEquals("Zm9vYmFy", toBase64("foobar"));
+		assertEquals("", toBase64(""));
+		assertEquals("Zg==", toBase64("f"));
+		assertEquals("Zm8=", toBase64("fo"));
+		assertEquals("Zm9v", toBase64("foo"));
+		assertEquals("Zm9vYg==", toBase64("foob"));
+		assertEquals("Zm9vYmE=", toBase64("fooba"));
+		assertEquals("Zm9vYmFy", toBase64("foobar"));
 	}
 
 	@Test
 	public void testBase32() {
-		Assert.assertEquals("", toBase32(""));
-		Assert.assertEquals("MY======", toBase32("f"));
-		Assert.assertEquals("MZXQ====", toBase32("fo"));
-		Assert.assertEquals("MZXW6===", toBase32("foo"));
-		Assert.assertEquals("MZXW6YQ=", toBase32("foob"));
-		Assert.assertEquals("MZXW6YTB", toBase32("fooba"));
-		Assert.assertEquals("MZXW6YTBOI======", toBase32("foobar"));
+		assertEquals("", toBase32(""));
+		assertEquals("MY======", toBase32("f"));
+		assertEquals("MZXQ====", toBase32("fo"));
+		assertEquals("MZXW6===", toBase32("foo"));
+		assertEquals("MZXW6YQ=", toBase32("foob"));
+		assertEquals("MZXW6YTB", toBase32("fooba"));
+		assertEquals("MZXW6YTBOI======", toBase32("foobar"));
 	}
 
 	@Test
 	public void testBase32Hex() {
-		Assert.assertEquals("", toBase32Hex(""));
-		Assert.assertEquals("CO======", toBase32Hex("f"));
-		Assert.assertEquals("CPNG====", toBase32Hex("fo"));
-		Assert.assertEquals("CPNMU===", toBase32Hex("foo"));
-		Assert.assertEquals("CPNMUOG=", toBase32Hex("foob"));
-		Assert.assertEquals("CPNMUOJ1", toBase32Hex("fooba"));
-		Assert.assertEquals("CPNMUOJ1E8======", toBase32Hex("foobar"));
+		assertEquals("", toBase32Hex(""));
+		assertEquals("CO======", toBase32Hex("f"));
+		assertEquals("CPNG====", toBase32Hex("fo"));
+		assertEquals("CPNMU===", toBase32Hex("foo"));
+		assertEquals("CPNMUOG=", toBase32Hex("foob"));
+		assertEquals("CPNMUOJ1", toBase32Hex("fooba"));
+		assertEquals("CPNMUOJ1E8======", toBase32Hex("foobar"));
 	}
 
 	@Test
 	public void testBase32Dmedia() {
-		Assert.assertEquals("", toBase32Dmedia(""));
-		Assert.assertEquals("FCNPVRELI7J9FUUI", toBase32Dmedia("binary foo"));
-		Assert.assertEquals("FR======", toBase32Dmedia("f"));
-		Assert.assertEquals("FSQJ====", toBase32Dmedia("fo"));
-		Assert.assertEquals("FSQPX===", toBase32Dmedia("foo"));
-		Assert.assertEquals("FSQPXRJ=", toBase32Dmedia("foob"));
-		Assert.assertEquals("FSQPXRM4", toBase32Dmedia("fooba"));
-		Assert.assertEquals("FSQPXRM4HB======", toBase32Dmedia("foobar"));
+		assertEquals("", toBase32Dmedia(""));
+		assertEquals("FCNPVRELI7J9FUUI", toBase32Dmedia("binary foo"));
+		assertEquals("FR======", toBase32Dmedia("f"));
+		assertEquals("FSQJ====", toBase32Dmedia("fo"));
+		assertEquals("FSQPX===", toBase32Dmedia("foo"));
+		assertEquals("FSQPXRJ=", toBase32Dmedia("foob"));
+		assertEquals("FSQPXRM4", toBase32Dmedia("fooba"));
+		assertEquals("FSQPXRM4HB======", toBase32Dmedia("foobar"));
 	}
 
 	@Test
 	public void testBase16() {
-		Assert.assertEquals("", toBase16(""));
-		Assert.assertEquals("66", toBase16("f"));
-		Assert.assertEquals("666F", toBase16("fo"));
-		Assert.assertEquals("666F6F", toBase16("foo"));
-		Assert.assertEquals("666F6F62", toBase16("foob"));
-		Assert.assertEquals("666F6F6261", toBase16("fooba"));
-		Assert.assertEquals("666F6F626172", toBase16("foobar"));
+		assertEquals("", toBase16(""));
+		assertEquals("66", toBase16("f"));
+		assertEquals("666F", toBase16("fo"));
+		assertEquals("666F6F", toBase16("foo"));
+		assertEquals("666F6F62", toBase16("foob"));
+		assertEquals("666F6F6261", toBase16("fooba"));
+		assertEquals("666F6F626172", toBase16("foobar"));
 	}
 
 	@Test
