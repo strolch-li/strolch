@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>li.strolch</groupId>
+		<artifactId>li.strolch.parent</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+		<relativePath>../li.strolch.parent/pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<warFinalName>tutorialwebapp</warFinalName>
+		<m2eclipse.wtp.contextRoot>${warFinalName}</m2eclipse.wtp.contextRoot>
+	</properties>
+
+	<artifactId>li.strolch.tutorialwebapp</artifactId>
+	<name>li.strolch.tutorialwebapp Maven Webapp</name>
+	<description>Tutorial webapp to show case using Strolch in a servlet container</description>
+	<packaging>war</packaging>
+
+	<url>https://github.com/eitch/li.strolch.tutorialwebapp</url>
+
+	<inceptionYear>2011</inceptionYear>
+
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/eitch/li.strolch.tutorialwebapp/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:https://github.com/eitch/li.strolch.tutorialwebapp.git</connection>
+		<developerConnection>scm:git:git@github.com:eitch/li.strolch.tutorialwebapp.git</developerConnection>
+		<url>https://github.com/eitch/li.strolch.tutorialwebapp</url>
+	</scm>
+
+	<dependencies>
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.bom</artifactId>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${warFinalName}</finalName>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<warName>${warFinalName}</warName>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

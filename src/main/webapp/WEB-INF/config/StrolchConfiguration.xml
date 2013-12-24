@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchConfiguration>
+	<Runtime>
+		<applicationName>StrolchTutorialApp</applicationName>
+		<Properties>
+			<dataStoreMode>TRANSIENT</dataStoreMode>
+			<dataStoreFile>StrolchModel.xml</dataStoreFile>
+			<verbose>true</verbose>
+		</Properties>
+	</Runtime>
+	<Component>
+		<name>ServiceHandler</name>
+		<api>li.strolch.service.ServiceHandler</api>
+		<impl>li.strolch.service.DefaultServiceHandler</impl>
+		<Properties>
+			<verbose>true</verbose>
+		</Properties>
+	</Component>
+	<Component>
+		<name>PrivilegeHandler</name>
+		<api>li.strolch.runtime.privilege.StrolchPrivilegeHandler</api>
+		<impl>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</impl>
+		<Properties>
+			<privilegeConfigFile>PrivilegeConfig.xml</privilegeConfigFile>
+		</Properties>
+	</Component>
+	<Component>
+		<name>PostInitializer</name>
+		<api>li.strolch.runtime.agent.PostInitializer</api>
+		<impl>li.strolch.tutorialwebapp.postinitializer.PostInitializer</impl>
+		<depends>ServiceHandler</depends>
+		<Properties>
+		</Properties>
+	</Component>
+	<Component>
+		<name>PersistenceHandler</name>
+		<api>li.strolch.persistence.api.PersistenceHandler</api>
+		<impl>li.strolch.persistence.impl.XmlPersistenceHandler</impl>
+		<Properties>
+			<verbose>true</verbose>
+		</Properties>
+	</Component>
+</StrolchConfiguration>
