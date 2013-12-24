@@ -155,11 +155,11 @@ public class XmlOrderDaoTest extends AbstractDaoImplTest {
 		}
 
 		try (StrolchTransaction tx = persistenceHandler.openTx()) {
-			Order order = tx.getOrderDao().queryBy("MyType1", "@_1");
+			Order order = tx.getOrderDao().queryBy("MyType1", "@_00000001");
 			assertNotNull(order);
-			order = tx.getOrderDao().queryBy("MyType2", "@_6");
+			order = tx.getOrderDao().queryBy("MyType2", "@_00000006");
 			assertNotNull(order);
-			order = tx.getOrderDao().queryBy("MyType3", "@_11");
+			order = tx.getOrderDao().queryBy("MyType3", "@_00000011");
 			assertNotNull(order);
 		}
 	}
