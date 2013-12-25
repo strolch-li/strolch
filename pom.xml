@@ -275,6 +275,17 @@
 						<warName>${warFinalName}</warName>
 					</configuration>
 				</plugin>
+				<plugin>
+					<!-- Publish to Tomcat7: mvn tomcat7:redeploy -->
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<version>2.2</version>
+					<configuration>
+						<url>${tomcat7Url}</url>
+						<server>${tomcat7ServerId}</server>
+						<path>/${warFinalName}</path>
+					</configuration>
+				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
