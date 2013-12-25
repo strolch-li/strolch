@@ -18,8 +18,9 @@ package li.strolch.testbase.runtime;
 import java.io.File;
 import java.text.MessageFormat;
 
-import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.runtime.agent.api.ComponentContainer;
+import li.strolch.runtime.agent.api.OrderMap;
+import li.strolch.runtime.agent.api.ResourceMap;
 import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
@@ -49,8 +50,12 @@ public final class RuntimeMock {
 		return this.container.getComponent(StrolchPrivilegeHandler.class);
 	}
 
-	public PersistenceHandler getPersistenceHandler() {
-		return this.container.getComponent(PersistenceHandler.class);
+	public OrderMap getOrderMap() {
+		return this.container.getOrderMap();
+	}
+	
+	public ResourceMap getResourceMap() {
+		return this.container.getResourceMap();
 	}
 
 	public void mockRuntime(File rootPathF, File rootSrc) {
