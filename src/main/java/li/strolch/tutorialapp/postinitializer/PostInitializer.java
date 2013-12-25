@@ -15,8 +15,8 @@
  */
 package li.strolch.tutorialapp.postinitializer;
 
-import li.strolch.runtime.agent.ComponentContainerImpl;
-import li.strolch.runtime.agent.SimplePostInitializer;
+import li.strolch.runtime.agent.impl.ComponentContainerImpl;
+import li.strolch.runtime.agent.impl.SimplePostInitializer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
