@@ -23,11 +23,11 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public class XmlCachedDaoTest extends AbstractModelTest {
+public class XmlTransactionalDaoTest extends AbstractModelTest {
 
-	public static final String RUNTIME_PATH = "target/cachedStrolchRuntime/"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/transactionalStrolchRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/cachedruntime"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/test/resources/transactionalruntime"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
 
