@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.query.inmemory;
+package li.strolch.runtime.agent.impl;
 
-import li.strolch.model.Order;
-import li.strolch.runtime.agent.api.ComponentContainer;
-import li.strolch.runtime.agent.api.ElementMap;
+import li.strolch.runtime.agent.api.PostInitializer;
+import li.strolch.runtime.agent.api.StrolchComponent;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
  */
-public class OrderTypeNavigator extends StrolchTypeNavigator<Order> {
-
-	private ComponentContainer container;
+public class SimplePostInitializer extends StrolchComponent implements PostInitializer {
 
 	/**
-	 * @param type
+	 * @param container
+	 * @param componentName
 	 */
-	public OrderTypeNavigator(String type, ComponentContainer container) {
-		super(type);
-		this.container = container;
+	public SimplePostInitializer(ComponentContainerImpl container, String componentName) {
+		super(container, componentName);
 	}
 
-	@Override
-	protected ElementMap<Order> getElementMap() {
-		return this.container.getOrderMap();
-	}
 }

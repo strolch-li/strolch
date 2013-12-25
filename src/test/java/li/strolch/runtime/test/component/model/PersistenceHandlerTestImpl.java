@@ -16,8 +16,8 @@
 package li.strolch.runtime.test.component.model;
 
 import li.strolch.model.Resource;
-import li.strolch.runtime.agent.ComponentContainerImpl;
-import li.strolch.runtime.agent.StrolchComponent;
+import li.strolch.runtime.agent.api.StrolchComponent;
+import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 
 public class PersistenceHandlerTestImpl extends StrolchComponent implements PersistenceHandlerTest {
 

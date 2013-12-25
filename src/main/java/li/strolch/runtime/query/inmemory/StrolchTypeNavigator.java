@@ -18,7 +18,7 @@ package li.strolch.runtime.query.inmemory;
 import java.util.List;
 
 import li.strolch.model.StrolchElement;
-import li.strolch.runtime.agent.ElementMap;
+import li.strolch.runtime.agent.api.ElementMap;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

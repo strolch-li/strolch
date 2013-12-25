@@ -13,29 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.query.inmemory;
+package li.strolch.runtime.agent.api;
 
-import li.strolch.model.Order;
-import li.strolch.runtime.agent.api.ComponentContainer;
-import li.strolch.runtime.agent.api.ElementMap;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
  */
-public class OrderTypeNavigator extends StrolchTypeNavigator<Order> {
+public interface ComponentContainer {
 
-	private ComponentContainer container;
+	public abstract ComponentState getState();
 
-	/**
-	 * @param type
-	 */
-	public OrderTypeNavigator(String type, ComponentContainer container) {
-		super(type);
-		this.container = container;
-	}
+	public abstract boolean hasComponent(Class<?> clazz);
 
-	@Override
-	protected ElementMap<Order> getElementMap() {
-		return this.container.getOrderMap();
-	}
+	public abstract <T> T getComponent(Class<T> clazz);
+
+	public abstract OrderMap getOrderMap();
+
+	public abstract OrderMap getOrderMap(String realm);
+
+	public abstract ResourceMap getResourceMap();
+
+	public abstract ResourceMap getResourceMap(String realm);
 }

@@ -3,8 +3,8 @@ package li.strolch.persistence.mock;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.agent.ComponentContainerImpl;
-import li.strolch.runtime.agent.StrolchComponent;
+import li.strolch.runtime.agent.api.StrolchComponent;
+import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 
 public class PersistenceHandlerMock extends StrolchComponent implements PersistenceHandler {
 

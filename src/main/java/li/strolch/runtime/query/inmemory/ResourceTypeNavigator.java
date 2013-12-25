@@ -16,8 +16,8 @@
 package li.strolch.runtime.query.inmemory;
 
 import li.strolch.model.Resource;
-import li.strolch.runtime.agent.ComponentContainer;
-import li.strolch.runtime.agent.ElementMap;
+import li.strolch.runtime.agent.api.ComponentContainer;
+import li.strolch.runtime.agent.api.ElementMap;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

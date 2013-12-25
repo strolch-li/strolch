@@ -33,7 +33,7 @@ import li.strolch.model.query.ParameterSelection;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.runtime.agent.StrolchAgent;
+import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.query.inmemory.InMemoryOrderQueryVisitor;
 import li.strolch.runtime.query.inmemory.InMemoryQuery;
 import li.strolch.runtime.query.inmemory.InMemoryResourceQueryVisitor;

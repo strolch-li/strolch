@@ -13,29 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.query.inmemory;
+package li.strolch.runtime.agent.api;
 
-import li.strolch.model.Order;
-import li.strolch.runtime.agent.api.ComponentContainer;
-import li.strolch.runtime.agent.api.ElementMap;
+import java.util.List;
+import java.util.Set;
+
+import li.strolch.model.StrolchElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
  */
-public class OrderTypeNavigator extends StrolchTypeNavigator<Order> {
+public interface ElementMap<T extends StrolchElement> {
 
-	private ComponentContainer container;
+	public boolean hasType(String type);
 
-	/**
-	 * @param type
-	 */
-	public OrderTypeNavigator(String type, ComponentContainer container) {
-		super(type);
-		this.container = container;
-	}
+	public boolean hasElement(String type, String id);
 
-	@Override
-	protected ElementMap<Order> getElementMap() {
-		return this.container.getOrderMap();
-	}
+	public T getBy(String type, String id);
+
+	public List<T> getAllElements();
+
+	public List<T> getElementsBy(String type);
+
+	public Set<String> getTypes();
+
+	public Set<String> getAllKeys();
+
+	public Set<String> getKeysBy(String type);
+
+	public void add(T element);
+
+	public void update(T element);
+
+	public void remove(T element);
+
 }

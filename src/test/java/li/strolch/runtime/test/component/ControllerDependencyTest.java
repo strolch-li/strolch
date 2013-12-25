@@ -25,10 +25,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import li.strolch.runtime.agent.ComponentContainerImpl;
-import li.strolch.runtime.agent.ComponentController;
-import li.strolch.runtime.agent.ComponentDependencyAnalyzer;
-import li.strolch.runtime.agent.StrolchComponent;
+import li.strolch.runtime.agent.api.StrolchComponent;
+import li.strolch.runtime.agent.impl.ComponentContainerImpl;
+import li.strolch.runtime.agent.impl.ComponentController;
+import li.strolch.runtime.agent.impl.ComponentDependencyAnalyzer;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;

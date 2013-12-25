@@ -20,8 +20,8 @@ import java.io.FileInputStream;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import li.strolch.runtime.agent.ComponentContainerImpl;
-import li.strolch.runtime.agent.StrolchComponent;
+import li.strolch.runtime.agent.api.StrolchComponent;
+import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import ch.eitchnet.privilege.base.PrivilegeException;

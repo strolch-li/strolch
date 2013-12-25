@@ -22,7 +22,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.ResourceQueryVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.runtime.agent.ComponentContainer;
+import li.strolch.runtime.agent.api.ComponentContainer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
