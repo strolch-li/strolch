@@ -15,6 +15,7 @@
  */
 package ch.eitchnet.privilege.xml;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.model.internal.PrivilegeImpl;
@@ -42,7 +44,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class PrivilegeModelSaxReader extends DefaultHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(PrivilegeModelSaxReader.class);
+	protected static final Logger logger = LoggerFactory.getLogger(PrivilegeModelSaxReader.class);
 
 	private Stack<ElementParser> buildersStack = new Stack<ElementParser>();
 
@@ -73,12 +75,12 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		if (qName.equals("Users")) {
+		if (qName.equals(XmlConstants.XML_USERS)) {
 			this.buildersStack.add(new UserParser());
 			this.insideUser = true;
-		} else if (qName.equals("Properties")) {
+		} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
 			this.buildersStack.add(new PropertyParser());
-		} else if (qName.equals("Roles") && !this.insideUser) {
+		} else if (qName.equals(XmlConstants.XML_ROLES) && !this.insideUser) {
 			this.buildersStack.add(new RoleParser());
 		}
 
@@ -99,16 +101,16 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (qName.equals("Users")) {
+		if (qName.equals(XmlConstants.XML_USERS)) {
 			elementParser = this.buildersStack.pop();
 			this.insideUser = false;
-			PrivilegeModelSaxReader.logger.info("Popping for Users");
-		} else if (qName.equals("Properties")) {
+			logger.info("Popping for Users"); //$NON-NLS-1$
+		} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
 			elementParser = this.buildersStack.pop();
-			PrivilegeModelSaxReader.logger.info("Popping for Properties");
-		} else if (qName.equals("Roles") && !this.insideUser) {
+			logger.info("Popping for Properties"); //$NON-NLS-1$
+		} else if (qName.equals(XmlConstants.XML_ROLES) && !this.insideUser) {
 			elementParser = this.buildersStack.pop();
-			PrivilegeModelSaxReader.logger.info("Popping for Roles");
+			logger.info("Popping for Roles"); //$NON-NLS-1$
 		}
 
 		if (!this.buildersStack.isEmpty() && elementParser != null)
@@ -142,16 +144,10 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 
 		private Map<String, IPrivilege> privileges;
 
-		/**
-		 * 
-		 */
 		public RoleParser() {
 			init();
 		}
 
-		/**
-		 * 
-		 */
 		private void init() {
 			this.privileges = new HashMap<String, IPrivilege>();
 
@@ -170,11 +166,11 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 
 			this.text = new StringBuilder();
 
-			if (qName.equals("Role")) {
-				this.roleName = attributes.getValue("name");
-			} else if (qName.equals("Privilege")) {
-				this.privilegeName = attributes.getValue("name");
-				this.privilegePolicy = attributes.getValue("policy");
+			if (qName.equals(XmlConstants.XML_ROLE)) {
+				this.roleName = attributes.getValue(XmlConstants.XML_ATTR_NAME);
+			} else if (qName.equals(XmlConstants.XML_PRIVILEGE)) {
+				this.privilegeName = attributes.getValue(XmlConstants.XML_ATTR_NAME);
+				this.privilegePolicy = attributes.getValue(XmlConstants.XML_ATTR_POLICY);
 			}
 		}
 
@@ -187,24 +183,24 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 
-			if (qName.equals("AllAllowed")) {
+			if (qName.equals(XmlConstants.XML_ALL_ALLOWED)) {
 				this.allAllowed = StringHelper.parseBoolean(this.text.toString().trim());
-			} else if (qName.equals("Allow")) {
+			} else if (qName.equals(XmlConstants.XML_ALLOW)) {
 				this.allowList.add(this.text.toString().trim());
-			} else if (qName.equals("Deny")) {
+			} else if (qName.equals(XmlConstants.XML_DENY)) {
 				this.denyList.add(this.text.toString().trim());
-			} else if (qName.equals("Privilege")) {
+			} else if (qName.equals(XmlConstants.XML_PRIVILEGE)) {
 
 				IPrivilege privilege = new PrivilegeImpl(this.privilegeName, this.privilegePolicy, this.allAllowed,
 						this.denyList, this.allowList);
 				this.privileges.put(this.privilegeName, privilege);
 
-			} else if (qName.equals("Role")) {
+			} else if (qName.equals(XmlConstants.XML_ROLE)) {
 
 				Role role = new Role(this.roleName, this.privileges);
 
-				PrivilegeModelSaxReader.this.roles.add(role);
-				PrivilegeModelSaxReader.logger.info("New Role: " + role);
+				getRoles().add(role);
+				logger.info(MessageFormat.format("New Role: {0}", role)); //$NON-NLS-1$
 				init();
 			}
 		}
@@ -248,10 +244,10 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 
 			this.text = new StringBuilder();
 
-			if (qName.equals("User")) {
-				this.userId = attributes.getValue("userId");
-				this.username = attributes.getValue("username");
-				this.password = attributes.getValue("password");
+			if (qName.equals(XmlConstants.XML_USER)) {
+				this.userId = attributes.getValue(XmlConstants.XML_ATTR_USER_ID);
+				this.username = attributes.getValue(XmlConstants.XML_ATTR_USERNAME);
+				this.password = attributes.getValue(XmlConstants.XML_ATTR_PASSWORD);
 			}
 		}
 
@@ -263,22 +259,22 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 
-			if (qName.equals("Firstname")) {
+			if (qName.equals(XmlConstants.XML_FIRSTNAME)) {
 				this.firstName = this.text.toString().trim();
-			} else if (qName.equals("Surname")) {
+			} else if (qName.equals(XmlConstants.XML_SURNAME)) {
 				this.surname = this.text.toString().trim();
-			} else if (qName.equals("State")) {
+			} else if (qName.equals(XmlConstants.XML_STATE)) {
 				this.userState = UserState.valueOf(this.text.toString().trim());
-			} else if (qName.equals("Locale")) {
+			} else if (qName.equals(XmlConstants.XML_LOCALE)) {
 				this.locale = Locale.forLanguageTag(this.text.toString().trim());
-			} else if (qName.equals("Role")) {
+			} else if (qName.equals(XmlConstants.XML_ROLE)) {
 				this.userRoles.add(this.text.toString().trim());
-			} else if (qName.equals("User")) {
+			} else if (qName.equals(XmlConstants.XML_USER)) {
 
 				User user = new User(this.userId, this.username, this.password, this.firstName, this.surname,
 						this.userState, this.userRoles, this.locale, this.parameters);
 
-				PrivilegeModelSaxReader.this.users.add(user);
+				getUsers().add(user);
 			}
 		}
 
@@ -294,20 +290,17 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 
 //	      <Property name="organizationalUnit" value="Development" />
 
-		private Map<String, String> parameterMap = new HashMap<String, String>();
+		public Map<String, String> parameterMap = new HashMap<String, String>();
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-			if (qName.equals("Property")) {
-				String key = attributes.getValue("name");
-				String value = attributes.getValue("value");
+			if (qName.equals(XmlConstants.XML_PROPERTY)) {
+				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME);
+				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE);
 				this.parameterMap.put(key, value);
 			}
 		}
 
-		/**
-		 * @return the parameterMap
-		 */
 		public Map<String, String> getParameterMap() {
 			return this.parameterMap;
 		}

@@ -20,6 +20,7 @@ package ch.eitchnet.privilege.helper;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public class XmlConstants {
 
 	/**

@@ -31,11 +31,14 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import ch.eitchnet.utils.helper.StringHelper;
+
 /**
  * Simple Swing UI to create passwords
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public class PasswordCreaterUI {
 
 	/**
@@ -91,7 +94,7 @@ public class PasswordCreaterUI {
 					String digest = (String) digestCombo.getSelectedItem();
 					char[] passwordChar = passwordField.getPassword();
 					String password = new String(passwordChar);
-					String hash = HashHelper.stringToHash(digest, password);
+					String hash = StringHelper.hashAsHex(digest, password);
 					hashField.setText(hash);
 				} catch (Exception e1) {
 					e1.printStackTrace();

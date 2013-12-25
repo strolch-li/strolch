@@ -23,11 +23,11 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class PrivilegeConfigSaxReader extends DefaultHandler {
 
@@ -41,14 +41,18 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		this.containerModel = containerModel;
 	}
 
+	public PrivilegeContainerModel getContainerModel() {
+		return this.containerModel;
+	}
+
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		if (qName.equals("Container")) {
+		if (qName.equals(XmlConstants.XML_CONTAINER)) {
 			this.buildersStack.add(new ContainerParser());
-		} else if (qName.equals("Parameters")) {
+		} else if (qName.equals(XmlConstants.XML_PARAMETERS)) {
 			this.buildersStack.add(new ParametersParser());
-		} else if (qName.equals("Policies")) {
+		} else if (qName.equals(XmlConstants.XML_POLICIES)) {
 			this.buildersStack.add(new PoliciesParser());
 		}
 
@@ -69,11 +73,11 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (qName.equals("Container")) {
+		if (qName.equals(XmlConstants.XML_CONTAINER)) {
 			elementParser = this.buildersStack.pop();
-		} else if (qName.equals("Parameters")) {
+		} else if (qName.equals(XmlConstants.XML_PARAMETERS)) {
 			elementParser = this.buildersStack.pop();
-		} else if (qName.equals("Policies")) {
+		} else if (qName.equals(XmlConstants.XML_POLICIES)) {
 			elementParser = this.buildersStack.pop();
 		}
 
@@ -105,16 +109,16 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-			if (qName.equals("Container")) {
+			if (qName.equals(XmlConstants.XML_CONTAINER)) {
 				this.currentElement = qName;
-			} else if (qName.equals("EncryptionHandler")) {
+			} else if (qName.equals(XmlConstants.XML_HANDLER_ENCRYPTION)) {
 				this.currentElement = qName;
-				PrivilegeConfigSaxReader.this.containerModel
-						.setEncryptionHandlerClassName(attributes.getValue("class"));
-			} else if (qName.equals("PersistenceHandler")) {
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				getContainerModel().setEncryptionHandlerClassName(className);
+			} else if (qName.equals(XmlConstants.XML_HANDLER_PERSISTENCE)) {
 				this.currentElement = qName;
-				PrivilegeConfigSaxReader.this.containerModel.setPersistenceHandlerClassName(attributes
-						.getValue("class"));
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				getContainerModel().setPersistenceHandlerClassName(className);
 			}
 		}
 
@@ -125,14 +129,12 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 			ParametersParser parametersChild = (ParametersParser) child;
 
-			if (this.currentElement.equals("Container")) {
-				PrivilegeConfigSaxReader.this.containerModel.setParameterMap(parametersChild.getParameterMap());
-			} else if (this.currentElement.equals("EncryptionHandler")) {
-				PrivilegeConfigSaxReader.this.containerModel.setEncryptionHandlerParameterMap(parametersChild
-						.getParameterMap());
-			} else if (this.currentElement.equals("PersistenceHandler")) {
-				PrivilegeConfigSaxReader.this.containerModel.setPersistenceHandlerParameterMap(parametersChild
-						.getParameterMap());
+			if (this.currentElement.equals(XmlConstants.XML_CONTAINER)) {
+				getContainerModel().setParameterMap(parametersChild.getParameterMap());
+			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_ENCRYPTION)) {
+				getContainerModel().setEncryptionHandlerParameterMap(parametersChild.getParameterMap());
+			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_PERSISTENCE)) {
+				getContainerModel().setPersistenceHandlerParameterMap(parametersChild.getParameterMap());
 			}
 		}
 	}
@@ -145,9 +147,9 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-			if (qName.equals("Parameter")) {
-				String key = attributes.getValue("name");
-				String value = attributes.getValue("value");
+			if (qName.equals(XmlConstants.XML_PARAMETER)) {
+				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME);
+				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE);
 				this.parameterMap.put(key, value);
 			}
 		}
@@ -166,11 +168,11 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-			if (qName.equals("Policy")) {
-				String policyName = attributes.getValue("name");
-				String policyClassName = attributes.getValue("class");
+			if (qName.equals(XmlConstants.XML_POLICY)) {
+				String policyName = attributes.getValue(XmlConstants.XML_ATTR_NAME);
+				String policyClassName = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
 
-				PrivilegeConfigSaxReader.this.containerModel.addPolicy(policyName, policyClassName);
+				getContainerModel().addPolicy(policyName, policyClassName);
 			}
 		}
 	}

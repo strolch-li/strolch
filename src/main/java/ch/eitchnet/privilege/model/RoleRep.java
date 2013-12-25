@@ -57,7 +57,7 @@ public class RoleRep implements Serializable {
 	 */
 	public void validate() {
 		if (StringHelper.isEmpty(this.name))
-			throw new PrivilegeException("name is null");
+			throw new PrivilegeException("name is null"); //$NON-NLS-1$
 	}
 
 	/**
@@ -87,6 +87,7 @@ public class RoleRep implements Serializable {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

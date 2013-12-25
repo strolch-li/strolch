@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.helper.ClassHelper;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.PrivilegeContext;
@@ -42,6 +41,7 @@ import ch.eitchnet.privilege.model.internal.PrivilegeImpl;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
+import ch.eitchnet.utils.helper.ClassHelper;
 
 /**
  * <p>
@@ -66,7 +66,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * configuration parameter to define automatic persisting on password change
 	 */
-	private static final String PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE = "autoPersistOnPasswordChange";
+	private static final String PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE = "autoPersistOnPasswordChange"; //$NON-NLS-1$
 
 	/**
 	 * slf4j logger
@@ -327,14 +327,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get role
 		Role role = this.persistenceHandler.getRole(roleName);
 		if (role == null) {
-			throw new PrivilegeException("Role " + roleName + " does not exist!");
+			String msg = MessageFormat.format("Role {0} does not exist!", roleName); //$NON-NLS-1$
+			throw new PrivilegeException(msg);
 		}
 
 		// validate that policy exists if needed
 		String policy = privilegeRep.getPolicy();
 		if (policy != null && !this.policyMap.containsKey(policy)) {
-			throw new PrivilegeException("Policy " + policy + " for Privilege " + privilegeRep.getName()
-					+ " does not exist");
+			String msg = "Policy {0} for Privilege {1} does not exist"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, policy, privilegeRep.getName());
+			throw new PrivilegeException(msg);
 		}
 
 		// create new role with the additional privilege
@@ -364,19 +366,21 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get user
 		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
-			throw new PrivilegeException("User " + username + " does not exist!");
+			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
 		}
 
 		// ignore if user already has role
 		Set<String> currentRoles = user.getRoles();
 		if (currentRoles.contains(roleName)) {
-			DefaultPrivilegeHandler.logger.error("User " + username + " already has role " + roleName);
+			String msg = MessageFormat.format("User {0} already has role {1}", username, roleName); //$NON-NLS-1$
+			DefaultPrivilegeHandler.logger.error(msg);
 			return;
 		}
 
 		// validate that role exists
 		if (getRole(roleName) == null) {
-			throw new PrivilegeException("Role " + roleName + " does not exist!");
+			String msg = MessageFormat.format("Role {0} does not exist!", roleName); //$NON-NLS-1$
+			throw new PrivilegeException(msg);
 		}
 
 		// create new user
@@ -399,12 +403,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get role
 		Role role = this.persistenceHandler.getRole(roleName);
 		if (role == null) {
-			throw new PrivilegeException("Role " + roleName + " does not exist!");
+			throw new PrivilegeException(MessageFormat.format("Role {0} does not exist!", roleName)); //$NON-NLS-1$
 		}
 
 		// ignore if role does not have privilege
-		if (!role.hasPrivilege(privilegeName))
-			throw new PrivilegeException("Role " + roleName + " does not have Privilege " + privilegeName);
+		if (!role.hasPrivilege(privilegeName)) {
+			String msg = MessageFormat.format("Role {0} does not have Privilege {1}", roleName, privilegeName); //$NON-NLS-1$
+			throw new PrivilegeException(msg);
+		}
 
 		// create new set of privileges with out the to removed privilege
 		Set<String> privilegeNames = role.getPrivilegeNames();
@@ -447,13 +453,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get User
 		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
-			throw new PrivilegeException("User " + username + " does not exist!");
+			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
 		}
 
 		// ignore if user does not have role
 		Set<String> currentRoles = user.getRoles();
 		if (!currentRoles.contains(roleName)) {
-			DefaultPrivilegeHandler.logger.error("User " + user + " does not have role " + roleName);
+			String msg = MessageFormat.format("User {0} does not have role {1}", user, roleName); //$NON-NLS-1$
+			logger.error(msg);
 			return;
 		}
 
@@ -494,7 +501,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get User
 		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
-			throw new PrivilegeException("User " + username + " does not exist!");
+			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
 		}
 
 		// create new user
@@ -514,7 +521,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get User
 		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
-			throw new PrivilegeException("User " + username + " does not exist!");
+			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
 		}
 
 		// create new user
@@ -548,7 +555,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// get User
 			User user = this.persistenceHandler.getUser(username);
 			if (user == null) {
-				throw new PrivilegeException("User " + username + " does not exist!");
+				throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
 			}
 
 			String passwordHash = null;
@@ -587,7 +594,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get User
 		User user = this.persistenceHandler.getUser(username);
 		if (user == null) {
-			throw new PrivilegeException("User " + username + " does not exist!");
+			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
 		}
 
 		// create new user
@@ -611,8 +618,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Certificate certificate;
 		try {
 			// username must be at least 2 characters in length
-			if (username == null || username.length() < 2)
-				throw new PrivilegeException("The given username '" + username + "' is shorter than 2 characters");
+			if (username == null || username.length() < 2) {
+				String msg = MessageFormat.format("The given username ''{0}'' is shorter than 2 characters", username); //$NON-NLS-1$
+				throw new PrivilegeException(msg);
+			}
 
 			// and validate the password
 			validatePassword(password);
@@ -623,26 +632,32 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// get user object
 			User user = this.persistenceHandler.getUser(username);
 			// no user means no authentication
-			if (user == null)
-				throw new AccessDeniedException("There is no user defined with the username " + username);
+			if (user == null) {
+				String msg = MessageFormat.format("There is no user defined with the username {0}", username); //$NON-NLS-1$
+				throw new AccessDeniedException(msg);
+			}
 
 			// validate password
 			String pwHash = user.getPassword();
 			if (pwHash == null)
-				throw new AccessDeniedException("User " + username + " has no password and may not login!");
+				throw new AccessDeniedException(MessageFormat.format(
+						"User {0} has no password and may not login!", username)); //$NON-NLS-1$
 			if (!pwHash.equals(passwordHash))
-				throw new AccessDeniedException("Password is incorrect for " + username);
+				throw new AccessDeniedException(MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
 
 			// validate if user is allowed to login
 			// this also capture the trying to login of SYSTEM user
-			if (user.getUserState() != UserState.ENABLED)
-				throw new AccessDeniedException("User " + username + " does not have state " + UserState.ENABLED
-						+ " and can not login!");
+			if (user.getUserState() != UserState.ENABLED) {
+				String msg = "User {0} does not have state {1} and can not login!"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, username, UserState.ENABLED);
+				throw new AccessDeniedException(msg);
+			}
 
 			// validate user has at least one role
 			Set<String> userRoles = user.getRoles();
 			if (userRoles.isEmpty()) {
-				throw new PrivilegeException("User " + username + " does not have any roles defined!");
+				throw new PrivilegeException(
+						MessageFormat.format("User {0} does not have any roles defined!", username)); //$NON-NLS-1$
 			}
 
 			// get 2 auth tokens
@@ -660,11 +675,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			this.privilegeContextMap.put(sessionId, privilegeContext);
 
 			// log
-			DefaultPrivilegeHandler.logger.info("User " + username + " authenticated: " + certificate);
+			DefaultPrivilegeHandler.logger.info(MessageFormat.format(
+					"User {0} authenticated: {1}", username, certificate)); //$NON-NLS-1$
 
 		} catch (RuntimeException e) {
-			DefaultPrivilegeHandler.logger.error("User " + username + " Failed to authenticate: "
-					+ e.getLocalizedMessage());
+			String msg = "User {0} Failed to authenticate: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, username, e.getMessage());
+			DefaultPrivilegeHandler.logger.error(msg);
 			throw e;
 		} finally {
 			clearPassword(password);
@@ -700,8 +717,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 				IPrivilege privilege = role.getPrivilege(privilegeName);
 				if (privilege == null) {
-					throw new PrivilegeException(MessageFormat.format("The Privilege {0} does not exist for role {1}",
-							privilegeName, roleName));
+					String msg = "The Privilege {0} does not exist for role {1}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, privilegeName, roleName);
+					throw new PrivilegeException(msg);
 				}
 				privileges.put(privilegeName, privilege);
 
@@ -712,8 +730,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 				PrivilegePolicy policy = getPolicy(policyName);
 				if (policy == null) {
-					throw new PrivilegeException(MessageFormat.format(
-							"The Policy {0} does not exist for Privilege {1}", policyName, privilegeName));
+					String msg = "The Policy {0} does not exist for Privilege {1}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, policyName, privilegeName);
+					throw new PrivilegeException(msg);
 				}
 				policies.put(policyName, policy);
 			}
@@ -736,9 +755,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// return true if object was really removed
 		boolean loggedOut = privilegeContext != null;
 		if (loggedOut)
-			DefaultPrivilegeHandler.logger.info("User " + certificate.getUsername() + " logged out.");
+			DefaultPrivilegeHandler.logger
+					.info(MessageFormat.format("User {0} logged out.", certificate.getUsername())); //$NON-NLS-1$
 		else
-			DefaultPrivilegeHandler.logger.warn("User already logged out!");
+			DefaultPrivilegeHandler.logger.warn("User already logged out!"); //$NON-NLS-1$
 		return loggedOut;
 	}
 
@@ -747,25 +767,30 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// certificate  must not be null
 		if (certificate == null)
-			throw new PrivilegeException("Certificate may not be null!");
+			throw new PrivilegeException("Certificate may not be null!"); //$NON-NLS-1$
 
 		// first see if a session exists for this certificate
 		PrivilegeContext privilegeContext = this.privilegeContextMap.get(certificate.getSessionId());
-		if (privilegeContext == null)
-			throw new AccessDeniedException("There is no session information for " + certificate.toString());
+		if (privilegeContext == null) {
+			String msg = MessageFormat.format("There is no session information for {0}", certificate); //$NON-NLS-1$
+			throw new AccessDeniedException(msg);
+		}
 
 		// validate certificate has not been tampered with
 		Certificate sessionCertificate = privilegeContext.getCertificate();
-		if (!sessionCertificate.equals(certificate))
-			throw new PrivilegeException("Received illegal certificate for session id " + certificate.getSessionId());
+		if (!sessionCertificate.equals(certificate)) {
+			String msg = "Received illegal certificate for session id {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, certificate.getSessionId());
+			throw new PrivilegeException(msg);
+		}
 
 		// get user object
 		User user = this.persistenceHandler.getUser(privilegeContext.getUsername());
 
 		// if user exists, then certificate is valid
 		if (user == null) {
-			throw new PrivilegeException(
-					"Oh boy, how did this happen: No User in user map although the certificate is valid!");
+			String msg = "Oh boy, how did this happen: No User in user map although the certificate is valid!"; //$NON-NLS-1$
+			throw new PrivilegeException(msg);
 		}
 
 		// everything is ok
@@ -789,15 +814,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get user object
 		User user = this.persistenceHandler.getUser(certificate.getUsername());
 		if (user == null) {
-			throw new PrivilegeException(
-					"Oh boy, how did this happen: No User in user map although the certificate is valid! Certificate: "
-							+ certificate);
+			String msg = "Oh boy, how did this happen: No User in user map although the certificate is valid! Certificate: {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, certificate);
+			throw new PrivilegeException(msg);
 		}
 
 		// validate user has PrivilegeAdmin role
 		if (!user.hasRole(PrivilegeHandler.PRIVILEGE_ADMIN_ROLE)) {
-			throw new AccessDeniedException("User does not have " + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE
-					+ " role! Certificate: " + certificate);
+			String msg = "User does not have {0} role! Certificate: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, PrivilegeHandler.PRIVILEGE_ADMIN_ROLE, certificate);
+			throw new AccessDeniedException(msg);
 		}
 	}
 
@@ -810,11 +836,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void validatePassword(byte[] password) throws PrivilegeException {
 
 		if (password == null || password.length == 0) {
-			throw new PrivilegeException("A password may not be empty!");
+			throw new PrivilegeException("A password may not be empty!"); //$NON-NLS-1$
 		}
 
 		if (password.length < 3) {
-			throw new PrivilegeException("The given password is shorter than 3 characters");
+			throw new PrivilegeException("The given password is shorter than 3 characters"); //$NON-NLS-1$
 		}
 	}
 
@@ -848,7 +874,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			PersistenceHandler persistenceHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
 
 		if (this.initialized)
-			throw new PrivilegeException("Already initialized!");
+			throw new PrivilegeException("Already initialized!"); //$NON-NLS-1$
 
 		this.policyMap = policyMap;
 		this.encryptionHandler = encryptionHandler;
@@ -859,10 +885,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			this.autoPersistOnPasswordChange = false;
 		} else if (autoPersistS.equals(Boolean.TRUE.toString())) {
 			this.autoPersistOnPasswordChange = true;
-			logger.info("Enabling automatic persistence on password change.");
+			logger.info("Enabling automatic persistence on password change."); //$NON-NLS-1$
 		} else {
-			logger.error("Parameter " + PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE + " has illegal value " + autoPersistS
-					+ ". Overriding with " + Boolean.FALSE.toString());
+			String msg = "Parameter {0} has illegal value {1}. Overriding with {2}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE, autoPersistS, Boolean.FALSE);
+			logger.error(msg);
 		}
 
 		// validate policies on privileges of Roles
@@ -886,8 +913,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			IPrivilege privilege = role.getPrivilege(privilegeName);
 			String policy = privilege.getPolicy();
 			if (policy != null && !this.policyMap.containsKey(policy)) {
-				throw new PrivilegeException("Policy " + policy + " for Privilege " + privilege.getName()
-						+ " does not exist on role " + role);
+				String msg = "Policy {0} for Privilege {1} does not exist on role {2}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, policy, privilege.getName(), role);
+				throw new PrivilegeException(msg);
 			}
 		}
 	}
@@ -918,18 +946,18 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException {
 
 		if (systemUsername == null)
-			throw new PrivilegeException("systemUsername may not be null!");
+			throw new PrivilegeException("systemUsername may not be null!"); //$NON-NLS-1$
 		if (action == null)
-			throw new PrivilegeException("action may not be null!");
+			throw new PrivilegeException("action may not be null!"); //$NON-NLS-1$
 
 		// get the system user
 		User systemUser = this.persistenceHandler.getUser(systemUsername);
 		if (systemUser == null)
-			throw new PrivilegeException("System user " + systemUsername + " does not exist!");
+			throw new PrivilegeException(MessageFormat.format("System user {0} does not exist!", systemUsername)); //$NON-NLS-1$
 
 		// validate this is a system user
 		if (systemUser.getUserState() != UserState.SYSTEM)
-			throw new PrivilegeException("User " + systemUsername + " is not a System user!");
+			throw new PrivilegeException(MessageFormat.format("User {0} is not a System user!", systemUsername)); //$NON-NLS-1$
 
 		// validate this system user may perform the given action
 		String actionClassname = action.getClass().getName();
@@ -966,7 +994,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// default throw exception, as the user does not have the privilege
-		throw new PrivilegeException("User " + user.getUsername() + " does not have Privilege " + privilegeName);
+		String msg = MessageFormat.format("User {0} does not have Privilege {1}", user.getUsername(), privilegeName); //$NON-NLS-1$
+		throw new PrivilegeException(msg);
 	}
 
 	/**
@@ -986,24 +1015,33 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get user object
 		User user = this.persistenceHandler.getUser(systemUsername);
 		// no user means no authentication
-		if (user == null)
-			throw new AccessDeniedException("The system user with username " + systemUsername + " does not exist!");
+		if (user == null) {
+			String msg = MessageFormat.format("The system user with username {0} does not exist!", systemUsername); //$NON-NLS-1$
+			throw new AccessDeniedException(msg);
+		}
 
 		// validate password
 		String pwHash = user.getPassword();
-		if (pwHash == null)
-			throw new AccessDeniedException("System user " + systemUsername + " has no password and may not login!");
-		if (!pwHash.equals(passwordHash))
-			throw new AccessDeniedException("System user " + systemUsername + " has an incorrect password defined!");
+		if (pwHash == null) {
+			String msg = MessageFormat.format("System user {0} has no password and may not login!", systemUsername); //$NON-NLS-1$
+			throw new AccessDeniedException(msg);
+		}
+		if (!pwHash.equals(passwordHash)) {
+			String msg = MessageFormat.format("System user {0} has an incorrect password defined!", systemUsername); //$NON-NLS-1$
+			throw new AccessDeniedException(msg);
+		}
 
 		// validate user state is system
-		if (user.getUserState() != UserState.SYSTEM)
-			throw new PrivilegeException("The system " + systemUsername + " user does not have expected user state "
-					+ UserState.SYSTEM);
+		if (user.getUserState() != UserState.SYSTEM) {
+			String msg = "The system {0} user does not have expected user state {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, systemUsername, UserState.SYSTEM);
+			throw new PrivilegeException(msg);
+		}
 
 		// validate user has at least one role
 		if (user.getRoles().isEmpty()) {
-			throw new PrivilegeException("The system user " + systemUsername + " does not have any roles defined!");
+			String msg = MessageFormat.format("The system user {0} does not have any roles defined!", systemUsername); //$NON-NLS-1$
+			throw new PrivilegeException(msg);
 		}
 
 		// get 2 auth tokens
@@ -1021,8 +1059,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);
 
 		// log
-		DefaultPrivilegeHandler.logger.info("The system user " + systemUsername + " is logged in with session "
-				+ systemUserCertificate);
+		String msg = "The system user {0} is logged in with session {1}"; //$NON-NLS-1$
+		msg = MessageFormat.format(msg, systemUsername, systemUserCertificate);
+		DefaultPrivilegeHandler.logger.info(msg);
 
 		return privilegeContext;
 	}
@@ -1055,8 +1094,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		try {
 			policy = ClassHelper.instantiateClass(policyClazz);
 		} catch (Exception e) {
-			throw new PrivilegeException("The class for the policy with the name " + policyName + " does not exist!"
-					+ policyName, e);
+			String msg = "The class for the policy with the name {0} does not exist!{1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, policyName, policyName);
+			throw new PrivilegeException(msg, e);
 		}
 
 		return policy;

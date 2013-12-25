@@ -72,18 +72,18 @@ public class PrivilegeRep implements Serializable {
 	public void validate() {
 
 		if (StringHelper.isEmpty(this.name)) {
-			throw new PrivilegeException("No name defined!");
+			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
 		}
 
 		if (StringHelper.isEmpty(this.policy)) {
-			throw new PrivilegeException("policy is null!");
+			throw new PrivilegeException("policy is null!"); //$NON-NLS-1$
 		}
 
 		if (this.denyList == null) {
-			throw new PrivilegeException("denyList is null");
+			throw new PrivilegeException("denyList is null"); //$NON-NLS-1$
 		}
 		if (this.allowList == null) {
-			throw new PrivilegeException("allowList is null");
+			throw new PrivilegeException("allowList is null"); //$NON-NLS-1$
 		}
 	}
 
@@ -167,6 +167,7 @@ public class PrivilegeRep implements Serializable {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

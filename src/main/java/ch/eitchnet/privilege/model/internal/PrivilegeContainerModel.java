@@ -15,6 +15,7 @@
  */
 package ch.eitchnet.privilege.model.internal;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -139,14 +140,17 @@ public class PrivilegeContainerModel {
 			this.policies.put(privilegeName, clazz);
 
 		} catch (InstantiationException e) {
-			throw new PrivilegeException("Configured Privilege Policy " + privilegeName + " with class "
-					+ policyClassName + " could not be instantiated.", e);
+			String msg = "Configured Privilege Policy {0} with class {1} could not be instantiated."; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, privilegeName, policyClassName);
+			throw new PrivilegeException(msg, e);
 		} catch (IllegalAccessException e) {
-			throw new PrivilegeException("Configured Privilege Policy " + privilegeName + " with class "
-					+ policyClassName + " can not be accessed.", e);
+			String msg = "Configured Privilege Policy {0} with class {1} can not be accessed."; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, privilegeName, policyClassName);
+			throw new PrivilegeException(msg, e);
 		} catch (ClassNotFoundException e) {
-			throw new PrivilegeException("Configured Privilege Policy " + privilegeName + " with class "
-					+ policyClassName + " does not exist.", e);
+			String msg = "Configured Privilege Policy {0} with class {1} does not exist."; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, privilegeName, policyClassName);
+			throw new PrivilegeException(msg, e);
 		}
 	}
 
@@ -162,6 +166,7 @@ public class PrivilegeContainerModel {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

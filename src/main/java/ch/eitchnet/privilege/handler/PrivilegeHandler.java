@@ -43,7 +43,7 @@ public interface PrivilegeHandler {
 	/**
 	 * PRIVILEGE_ADMIN_ROLE = PrivilegeAdmin: This is the role users must have, if they are allowed to modify objects
 	 */
-	public static final String PRIVILEGE_ADMIN_ROLE = "PrivilegeAdmin";
+	public static final String PRIVILEGE_ADMIN_ROLE = "PrivilegeAdmin"; //$NON-NLS-1$
 
 	/**
 	 * Returns a {@link UserRep} for the given username

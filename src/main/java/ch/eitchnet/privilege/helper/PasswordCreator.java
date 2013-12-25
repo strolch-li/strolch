@@ -19,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.security.MessageDigest;
 
+import ch.eitchnet.utils.helper.StringHelper;
+
 /**
  * <p>
  * Simple main class which can be used to create a hash from a password which the user must type in at the command line
@@ -38,6 +40,7 @@ public class PasswordCreator {
 	 * @throws Exception
 	 *             thrown if anything goes wrong
 	 */
+	@SuppressWarnings("nls")
 	public static void main(String[] args) throws Exception {
 
 		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
@@ -63,7 +66,7 @@ public class PasswordCreator {
 
 		System.out.print("Password: ");
 		String password = r.readLine().trim();
-		System.out.print("Hash is: " + HashHelper.stringToHash(hashAlgorithm, password));
+		System.out.print("Hash is: " + StringHelper.hashAsHex(hashAlgorithm, password));
 	}
 
 }

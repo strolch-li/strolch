@@ -73,16 +73,16 @@ public final class PrivilegeImpl implements IPrivilege {
 	public PrivilegeImpl(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
 
 		if (StringHelper.isEmpty(name)) {
-			throw new PrivilegeException("No name defined!");
+			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
 		}
 		if (StringHelper.isEmpty(policy)) {
-			throw new PrivilegeException("Policy may not be empty!");
+			throw new PrivilegeException("Policy may not be empty!"); //$NON-NLS-1$
 		}
 		if (denyList == null) {
-			throw new PrivilegeException("denyList is null!");
+			throw new PrivilegeException("denyList is null!"); //$NON-NLS-1$
 		}
 		if (allowList == null) {
-			throw new PrivilegeException("allowList is null!");
+			throw new PrivilegeException("allowList is null!"); //$NON-NLS-1$
 		}
 
 		this.name = name;
@@ -189,6 +189,7 @@ public final class PrivilegeImpl implements IPrivilege {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

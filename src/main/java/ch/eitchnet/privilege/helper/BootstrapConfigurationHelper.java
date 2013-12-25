@@ -40,6 +40,7 @@ import ch.eitchnet.privilege.xml.PrivilegeConfigDomWriter;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public class BootstrapConfigurationHelper {
 
 	// private static final Logger logger = Loggerdoc.getLogger(BootstrapConfigurationHelper.class);

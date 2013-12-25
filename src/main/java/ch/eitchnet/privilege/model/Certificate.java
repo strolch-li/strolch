@@ -72,16 +72,16 @@ public final class Certificate implements Serializable {
 
 		// validate arguments are not null
 		if (StringHelper.isEmpty(sessionId)) {
-			throw new PrivilegeException("sessionId is null!");
+			throw new PrivilegeException("sessionId is null!"); //$NON-NLS-1$
 		}
 		if (StringHelper.isEmpty(username)) {
-			throw new PrivilegeException("username is null!");
+			throw new PrivilegeException("username is null!"); //$NON-NLS-1$
 		}
 		if (StringHelper.isEmpty(authToken)) {
-			throw new PrivilegeException("authToken is null!");
+			throw new PrivilegeException("authToken is null!"); //$NON-NLS-1$
 		}
 		if (StringHelper.isEmpty(authPassword)) {
-			throw new PrivilegeException("authPassword is null!");
+			throw new PrivilegeException("authPassword is null!"); //$NON-NLS-1$
 		}
 
 		this.sessionId = sessionId;
@@ -162,6 +162,7 @@ public final class Certificate implements Serializable {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

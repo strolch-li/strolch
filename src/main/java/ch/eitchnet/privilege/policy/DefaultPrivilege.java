@@ -81,7 +81,7 @@ public class DefaultPrivilege implements PrivilegePolicy {
 		// first check values not allowed
 		if (privilege.isDenied(privilegeValue)) {
 			// then throw access denied
-			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"),
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
 					PrivilegeContext.get().getUsername(), privilegeName, restrictable.getClass().getName());
 			throw new AccessDeniedException(msg);
 		}
@@ -91,7 +91,7 @@ public class DefaultPrivilege implements PrivilegePolicy {
 			return;
 
 		// default is not allowed
-		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"),
+		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
 				PrivilegeContext.get().getUsername(), privilegeName, restrictable.getClass().getName());
 		throw new AccessDeniedException(msg);
 	}

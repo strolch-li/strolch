@@ -19,14 +19,15 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.text.MessageFormat;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.helper.HashHelper;
 import ch.eitchnet.privilege.helper.XmlConstants;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * <p>
@@ -60,27 +61,25 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 
 	@Override
 	public String convertToHash(String string) {
-		try {
-
-			return HashHelper.stringToHash(this.hashAlgorithm, string);
-
-		} catch (NoSuchAlgorithmException e) {
-			throw new PrivilegeException("Algorithm " + this.hashAlgorithm + " was not found!", e);
-		} catch (UnsupportedEncodingException e) {
-			throw new PrivilegeException("Charset ASCII is not supported!", e);
-		}
+		return convertToHash(string.getBytes());
 	}
 
 	@Override
 	public String convertToHash(byte[] bytes) {
 		try {
 
-			return HashHelper.stringToHash(this.hashAlgorithm, bytes);
+			return StringHelper.hashAsHex(this.hashAlgorithm, bytes);
 
-		} catch (NoSuchAlgorithmException e) {
-			throw new PrivilegeException("Algorithm " + this.hashAlgorithm + " was not found!", e);
-		} catch (UnsupportedEncodingException e) {
-			throw new PrivilegeException("Charset ASCII is not supported!", e);
+		} catch (RuntimeException e) {
+			if (e.getCause() == null)
+				throw e;
+			if (e.getCause().getClass().equals(NoSuchAlgorithmException.class))
+				throw new PrivilegeException(
+						MessageFormat.format("Algorithm {0} was not found!", this.hashAlgorithm), e.getCause()); //$NON-NLS-1$
+			if (e.getCause().getClass().equals(UnsupportedEncodingException.class))
+				throw new PrivilegeException("Charset ASCII is not supported!", e.getCause()); //$NON-NLS-1$
+
+			throw e;
 		}
 	}
 
@@ -100,18 +99,21 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		// get hash algorithm parameters
 		this.hashAlgorithm = parameterMap.get(XmlConstants.XML_PARAM_HASH_ALGORITHM);
 		if (this.hashAlgorithm == null || this.hashAlgorithm.isEmpty()) {
-			throw new PrivilegeException("[" + EncryptionHandler.class.getName() + "] Defined parameter "
-					+ XmlConstants.XML_PARAM_HASH_ALGORITHM + " is invalid");
+			String msg = "[{0}] Defined parameter {1} is invalid"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), XmlConstants.XML_PARAM_HASH_ALGORITHM);
+			throw new PrivilegeException(msg);
 		}
 
 		// test hash algorithm
 		try {
-			convertToHash("test");
-			DefaultEncryptionHandler.logger.info("Using hashing algorithm " + this.hashAlgorithm);
+			convertToHash("test"); //$NON-NLS-1$
+			DefaultEncryptionHandler.logger.info(MessageFormat
+					.format("Using hashing algorithm {0}", this.hashAlgorithm)); //$NON-NLS-1$
 		} catch (Exception e) {
-			throw new PrivilegeException("[" + EncryptionHandler.class.getName() + "] Defined parameter "
-					+ XmlConstants.XML_PARAM_HASH_ALGORITHM + " is invalid because of underlying exception: "
-					+ e.getLocalizedMessage(), e);
+			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), XmlConstants.XML_PARAM_HASH_ALGORITHM,
+					e.getLocalizedMessage());
+			throw new PrivilegeException(msg, e);
 		}
 	}
 }

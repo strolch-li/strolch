@@ -29,6 +29,7 @@ import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
 import ch.eitchnet.privilege.xml.PrivilegeConfigSaxReader;
+import ch.eitchnet.utils.helper.ClassHelper;
 import ch.eitchnet.utils.helper.XmlHelper;
 
 /**

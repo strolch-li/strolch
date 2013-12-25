@@ -55,10 +55,10 @@ public final class Role {
 	public Role(String name, Map<String, IPrivilege> privilegeMap) {
 
 		if (StringHelper.isEmpty(name)) {
-			throw new PrivilegeException("No name defined!");
+			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
 		}
 		if (privilegeMap == null) {
-			throw new PrivilegeException("No privileges defined!");
+			throw new PrivilegeException("No privileges defined!"); //$NON-NLS-1$
 		}
 
 		this.name = name;
@@ -75,11 +75,11 @@ public final class Role {
 
 		String name = roleRep.getName();
 		if (StringHelper.isEmpty(name)) {
-			throw new PrivilegeException("No name defined!");
+			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
 		}
 
 		if (roleRep.getPrivilegeMap() == null) {
-			throw new PrivilegeException("No privileges defined!");
+			throw new PrivilegeException("No privileges defined!"); //$NON-NLS-1$
 		}
 
 		// build privileges from reps
@@ -145,6 +145,7 @@ public final class Role {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

@@ -85,22 +85,22 @@ public class UserRep implements Serializable {
 	public void validate() {
 
 		if (StringHelper.isEmpty(this.userId))
-			throw new PrivilegeException("userId is null or empty");
+			throw new PrivilegeException("userId is null or empty"); //$NON-NLS-1$
 
 		if (StringHelper.isEmpty(this.username))
-			throw new PrivilegeException("username is null or empty");
+			throw new PrivilegeException("username is null or empty"); //$NON-NLS-1$
 
 		if (StringHelper.isEmpty(this.firstname))
-			throw new PrivilegeException("firstname is null or empty");
+			throw new PrivilegeException("firstname is null or empty"); //$NON-NLS-1$
 
 		if (StringHelper.isEmpty(this.surname))
-			throw new PrivilegeException("surname is null or empty");
+			throw new PrivilegeException("surname is null or empty"); //$NON-NLS-1$
 
 		if (this.userState == null)
-			throw new PrivilegeException("userState is null");
+			throw new PrivilegeException("userState is null"); //$NON-NLS-1$
 
 		if (this.roles == null)
-			throw new PrivilegeException("roles is null");
+			throw new PrivilegeException("roles is null"); //$NON-NLS-1$
 	}
 
 	/**
@@ -247,6 +247,7 @@ public class UserRep implements Serializable {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

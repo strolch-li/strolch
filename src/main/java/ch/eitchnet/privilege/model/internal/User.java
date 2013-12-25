@@ -82,19 +82,19 @@ public final class User {
 			Set<String> roles, Locale locale, Map<String, String> propertyMap) {
 
 		if (StringHelper.isEmpty(userId)) {
-			throw new PrivilegeException("No UserId defined!");
+			throw new PrivilegeException("No UserId defined!"); //$NON-NLS-1$
 		}
 		if (StringHelper.isEmpty(username)) {
-			throw new PrivilegeException("No username defined!");
+			throw new PrivilegeException("No username defined!"); //$NON-NLS-1$
 		}
 		if (StringHelper.isEmpty(firstname)) {
-			throw new PrivilegeException("No firstname defined!");
+			throw new PrivilegeException("No firstname defined!"); //$NON-NLS-1$
 		}
 		if (StringHelper.isEmpty(surname)) {
-			throw new PrivilegeException("No surname defined!");
+			throw new PrivilegeException("No surname defined!"); //$NON-NLS-1$
 		}
 		if (userState == null) {
-			throw new PrivilegeException("No userState defined!");
+			throw new PrivilegeException("No userState defined!"); //$NON-NLS-1$
 		}
 
 		// password may be null, meaning not able to login
@@ -240,6 +240,7 @@ public final class User {
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

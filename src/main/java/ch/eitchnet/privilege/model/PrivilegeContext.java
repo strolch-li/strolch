@@ -94,7 +94,7 @@ public class PrivilegeContext {
 		String privilegeName = restrictable.getPrivilegeName();
 		IPrivilege privilege = this.privileges.get(privilegeName);
 		if (privilege == null) {
-			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"),
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
 					getUsername(), privilegeName, restrictable.getClass().getName());
 			throw new AccessDeniedException(msg);
 		}
@@ -103,7 +103,7 @@ public class PrivilegeContext {
 		String policyName = privilege.getPolicy();
 		PrivilegePolicy policy = this.policies.get(policyName);
 		if (policy == null) {
-			String msg = "The PrivilegePolicy {0} does not exist on the PrivilegeContext!";
+			String msg = "The PrivilegePolicy {0} does not exist on the PrivilegeContext!"; //$NON-NLS-1$
 			throw new PrivilegeException(MessageFormat.format(msg, policyName));
 		}
 
@@ -130,7 +130,7 @@ public class PrivilegeContext {
 	public static PrivilegeContext get() throws PrivilegeException {
 		PrivilegeContext privilegeContext = PrivilegeContext.threadLocal.get();
 		if (privilegeContext == null) {
-			throw new PrivilegeException("There is no PrivilegeContext currently bound to the ThreadLocal!");
+			throw new PrivilegeException("There is no PrivilegeContext currently bound to the ThreadLocal!"); //$NON-NLS-1$
 		}
 		return privilegeContext;
 	}
@@ -148,7 +148,7 @@ public class PrivilegeContext {
 	public static void set(PrivilegeContext privilegeContext) throws PrivilegeException {
 		PrivilegeContext currentContext = PrivilegeContext.threadLocal.get();
 		if (privilegeContext != null && currentContext != null) {
-			throw new PrivilegeException("There already is a PrivilegeContext bound to the ThreadLocal!");
+			throw new PrivilegeException("There already is a PrivilegeContext bound to the ThreadLocal!"); //$NON-NLS-1$
 		}
 		PrivilegeContext.threadLocal.set(privilegeContext);
 	}
