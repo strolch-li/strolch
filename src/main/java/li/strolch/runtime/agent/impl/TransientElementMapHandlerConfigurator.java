@@ -15,11 +15,16 @@
  */
 package li.strolch.runtime.agent.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.persistence.inmemory.InMemoryPersistenceHandler;
 import li.strolch.runtime.agent.api.ElementMapHandler;
 import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -31,11 +36,19 @@ import li.strolch.runtime.configuration.RuntimeConfiguration;
 public class TransientElementMapHandlerConfigurator implements ElementMapHandlerConfigurator {
 
 	@Override
-	public ComponentConfiguration buildConfiguration(StrolchAgent agent) {
+	public List<ComponentConfiguration> buildConfigurations(StrolchAgent agent) {
 
-		String name = ElementMapHandler.class.getSimpleName();
-		String api = ElementMapHandler.class.getName();
-		String impl = TransientElementMapHandler.class.getName();
+		List<ComponentConfiguration> configurations = new ArrayList<>();
+		configurations.add(getElementMapHandlerConfiguration(agent));
+		configurations.add(getPersistenceHandlerConfiguration(agent));
+
+		return configurations;
+	}
+
+	protected ComponentConfiguration getPersistenceHandlerConfiguration(StrolchAgent agent) {
+		String name = PersistenceHandler.class.getSimpleName();
+		String api = PersistenceHandler.class.getName();
+		String impl = InMemoryPersistenceHandler.class.getName();
 
 		Map<String, String> configurationValues = new HashMap<>();
 		Set<String> dependencies = Collections.emptySet();
@@ -43,7 +56,21 @@ public class TransientElementMapHandlerConfigurator implements ElementMapHandler
 		RuntimeConfiguration runtimeConfiguration = agent.getStrolchConfiguration().getRuntimeConfiguration();
 		ComponentConfiguration configuration = new ComponentConfiguration(runtimeConfiguration, name,
 				configurationValues, api, impl, dependencies);
+		return configuration;
+	}
 
+	protected ComponentConfiguration getElementMapHandlerConfiguration(StrolchAgent agent) {
+		String name = ElementMapHandler.class.getSimpleName();
+		String api = ElementMapHandler.class.getName();
+		String impl = TransientElementMapHandler.class.getName();
+
+		Map<String, String> configurationValues = new HashMap<>();
+		Set<String> dependencies = new HashSet<>();
+		dependencies.add(PersistenceHandler.class.getSimpleName());
+
+		RuntimeConfiguration runtimeConfiguration = agent.getStrolchConfiguration().getRuntimeConfiguration();
+		ComponentConfiguration configuration = new ComponentConfiguration(runtimeConfiguration, name,
+				configurationValues, api, impl, dependencies);
 		return configuration;
 	}
 }

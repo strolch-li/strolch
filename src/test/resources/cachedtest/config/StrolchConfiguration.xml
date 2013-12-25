@@ -27,6 +27,6 @@
 	<Component>
 		<name>PersistenceHandler</name>
 		<api>li.strolch.persistence.api.PersistenceHandler</api>
-		<impl>li.strolch.persistence.mock.PersistenceHandlerMock</impl>
+		<impl>li.strolch.persistence.inmemory.InMemoryPersistenceHandler</impl>
 	</Component>
 </StrolchConfiguration>

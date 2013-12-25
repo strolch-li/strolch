@@ -84,19 +84,21 @@ public class ConfigurationParserTest {
 		assertEquals("PrivilegeConfig.xml", privilegeHandlerConfiguration.getString("privilegeConfigFile", null));
 
 		//	<Component>
-		//		<name>PersistenceHandler</name>
-		//		<api>li.strolch.persistence.api.PersistenceHandler</api>
-		//		<impl>li.strolch.persistence.impl.XmlPersistenceHandler</impl>
+		//		<name>ResourceGeneratorHandler</name>
+		//		<api>li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTest</api>
+		//		<impl>li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTestImpl</impl>
 		//		<Properties>
 		//			<verbose>true</verbose>
 		//		</Properties>
 		//	</Component>
 		ComponentConfiguration persistenceHandlerConfiguration = strolchConfiguration
-				.getComponentConfiguration("PersistenceHandler");
-		assertNotNull("Should have created a PersistenceHandler Configuration", persistenceHandlerConfiguration);
-		assertEquals("PersistenceHandler", persistenceHandlerConfiguration.getName());
-		assertEquals("li.strolch.persistence.api.PersistenceHandler", persistenceHandlerConfiguration.getApi());
-		assertEquals("li.strolch.persistence.impl.XmlPersistenceHandler", persistenceHandlerConfiguration.getImpl());
+				.getComponentConfiguration("ResourceGeneratorHandler");
+		assertNotNull("Should have created a ResourceGeneratorHandler Configuration", persistenceHandlerConfiguration);
+		assertEquals("ResourceGeneratorHandler", persistenceHandlerConfiguration.getName());
+		assertEquals("li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTest",
+				persistenceHandlerConfiguration.getApi());
+		assertEquals("li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTestImpl",
+				persistenceHandlerConfiguration.getImpl());
 		assertEquals(1, persistenceHandlerConfiguration.getPropertyKeys().size());
 		assertEquals(true, persistenceHandlerConfiguration.getBoolean("verbose", null));
 	}

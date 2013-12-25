@@ -23,7 +23,6 @@ import li.strolch.runtime.agent.api.ResourceMap;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class InMemoryElementListener implements StrolchElementListener {
 
@@ -44,5 +43,4 @@ public class InMemoryElementListener implements StrolchElementListener {
 	public void notifyOrder(Order order) {
 		this.orderMap.add(order);
 	}
-
 }

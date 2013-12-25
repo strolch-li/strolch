@@ -19,9 +19,9 @@ import li.strolch.model.Resource;
 import li.strolch.runtime.agent.api.StrolchComponent;
 import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 
-public class PersistenceHandlerTestImpl extends StrolchComponent implements PersistenceHandlerTest {
+public class ResourceGeneratorHandlerTestImpl extends StrolchComponent implements ResourceGeneratorHandlerTest {
 
-	public PersistenceHandlerTestImpl(ComponentContainerImpl container, String componentName) {
+	public ResourceGeneratorHandlerTestImpl(ComponentContainerImpl container, String componentName) {
 		super(container, componentName);
 	}
 

@@ -28,11 +28,10 @@ import li.strolch.runtime.configuration.RuntimeConfiguration;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class EmptyElementMapHandlerConfigurator implements ElementMapHandlerConfigurator {
+public class EmptyElementMapHandlerConfigurator extends TransientElementMapHandlerConfigurator {
 
 	@Override
-	public ComponentConfiguration buildConfiguration(StrolchAgent agent) {
-
+	protected ComponentConfiguration getElementMapHandlerConfiguration(StrolchAgent agent) {
 		String name = ElementMapHandler.class.getSimpleName();
 		String api = ElementMapHandler.class.getName();
 		String impl = EmptyElementMapHandler.class.getName();

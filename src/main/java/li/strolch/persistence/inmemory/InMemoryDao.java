@@ -1,4 +1,4 @@
-package li.strolch.persistence.mock;
+package li.strolch.persistence.inmemory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,11 +11,11 @@ import java.util.Set;
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.StrolchDao;
 
-public class AbstractDaoMock<T extends StrolchElement> implements StrolchDao<T> {
+public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 
 	private Map<String, Map<String, T>> elementMap;
 
-	public AbstractDaoMock() {
+	public InMemoryDao() {
 		this.elementMap = new HashMap<>();
 	}
 

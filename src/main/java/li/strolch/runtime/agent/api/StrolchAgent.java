@@ -17,6 +17,7 @@ package li.strolch.runtime.agent.api;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.List;
 
 import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.agent.impl.DataStoreMode;
@@ -89,8 +90,10 @@ public class StrolchAgent {
 				PROP_DATA_STORE_MODE, null));
 
 		ElementMapHandlerConfigurator mapHandlerConfigurator = dataStoreMode.getElementMapConfigurationConfigurator();
-		ComponentConfiguration configuration = mapHandlerConfigurator.buildConfiguration(this);
-		this.strolchConfiguration.addConfiguration(configuration.getName(), configuration);
+		List<ComponentConfiguration> configurations = mapHandlerConfigurator.buildConfigurations(this);
+		for (ComponentConfiguration configuration : configurations) {
+			this.strolchConfiguration.addConfiguration(configuration.getName(), configuration);
+		}
 
 		ComponentContainerImpl container = new ComponentContainerImpl();
 		this.container = container;

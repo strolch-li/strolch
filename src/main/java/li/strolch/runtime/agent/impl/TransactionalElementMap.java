@@ -9,12 +9,12 @@ import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.api.ElementMap;
 
-public abstract class AbstractTransactionalElementMap<T extends StrolchElement> implements ElementMap<T> {
+public abstract class TransactionalElementMap<T extends StrolchElement> implements ElementMap<T> {
 
 	private PersistenceHandler persistenceHandler;
 	private String realm;
 
-	public AbstractTransactionalElementMap(String realm, PersistenceHandler persistenceHandler) {
+	public TransactionalElementMap(String realm, PersistenceHandler persistenceHandler) {
 		this.realm = realm;
 		this.persistenceHandler = persistenceHandler;
 	}

@@ -25,9 +25,9 @@
 		</Properties>
 	</Component>
 	<Component>
-		<name>PersistenceHandler</name>
-		<api>li.strolch.persistence.api.PersistenceHandler</api>
-		<impl>li.strolch.persistence.impl.XmlPersistenceHandler</impl>
+		<name>ResourceGeneratorHandler</name>
+		<api>li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTest</api>
+		<impl>li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTestImpl</impl>
 		<Properties>
 			<verbose>true</verbose>
 		</Properties>

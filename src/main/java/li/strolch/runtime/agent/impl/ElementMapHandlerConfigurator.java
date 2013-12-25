@@ -15,6 +15,8 @@
  */
 package li.strolch.runtime.agent.impl;
 
+import java.util.List;
+
 import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
@@ -23,5 +25,5 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
  */
 public interface ElementMapHandlerConfigurator {
 
-	public ComponentConfiguration buildConfiguration(StrolchAgent agent);
+	public List<ComponentConfiguration> buildConfigurations(StrolchAgent agent);
 }

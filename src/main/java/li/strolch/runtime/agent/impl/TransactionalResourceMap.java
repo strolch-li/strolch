@@ -6,7 +6,7 @@ import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.api.ResourceMap;
 
-public class TransactionalResourceMap extends AbstractTransactionalElementMap<Resource> implements ResourceMap {
+public class TransactionalResourceMap extends TransactionalElementMap<Resource> implements ResourceMap {
 
 	public TransactionalResourceMap(String realm, PersistenceHandler persistenceHandler) {
 		super(realm, persistenceHandler);

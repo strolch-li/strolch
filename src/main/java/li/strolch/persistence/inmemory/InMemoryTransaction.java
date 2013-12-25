@@ -1,4 +1,4 @@
-package li.strolch.persistence.mock;
+package li.strolch.persistence.inmemory;
 
 import java.util.Date;
 import java.util.Set;
@@ -19,10 +19,11 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.StringHelper;
 
-public class TransactionMock implements StrolchTransaction {
+public class InMemoryTransaction implements StrolchTransaction {
 
-	private static final Logger logger = LoggerFactory.getLogger(TransactionMock.class);
+	private static final Logger logger = LoggerFactory.getLogger(InMemoryTransaction.class);
 	private String realm;
+	private InMemoryPersistenceHandler persistenceHandler;
 
 	private TransactionCloseStrategy closeStrategy;
 	private ObserverHandler observerHandler;
@@ -32,10 +33,9 @@ public class TransactionMock implements StrolchTransaction {
 	private Date startTimeDate;
 	private TransactionResult txResult;
 	private boolean open;
-	private OrderDaoMock orderDao;
-	private ResourceDaoMock resourceDao;
 
-	public TransactionMock(String realm) {
+	public InMemoryTransaction(String realm, InMemoryPersistenceHandler persistenceHandler) {
+		this.persistenceHandler = persistenceHandler;
 		this.startTime = System.nanoTime();
 		this.startTimeDate = new Date();
 		this.realm = realm;
@@ -159,15 +159,11 @@ public class TransactionMock implements StrolchTransaction {
 
 	@Override
 	public OrderDao getOrderDao() {
-		if (this.orderDao == null)
-			this.orderDao = new OrderDaoMock();
-		return (OrderDao) this.orderDao;
+		return this.persistenceHandler.getOrderDao();
 	}
 
 	@Override
 	public ResourceDao getResourceDao() {
-		if (this.resourceDao == null)
-			this.resourceDao = new ResourceDaoMock();
-		return (ResourceDao) this.resourceDao;
+		return this.persistenceHandler.getResourceDao();
 	}
 }

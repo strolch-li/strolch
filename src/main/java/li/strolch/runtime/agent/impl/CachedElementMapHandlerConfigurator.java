@@ -15,8 +15,10 @@
  */
 package li.strolch.runtime.agent.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +34,7 @@ import li.strolch.runtime.configuration.RuntimeConfiguration;
 public class CachedElementMapHandlerConfigurator implements ElementMapHandlerConfigurator {
 
 	@Override
-	public ComponentConfiguration buildConfiguration(StrolchAgent agent) {
+	public List<ComponentConfiguration> buildConfigurations(StrolchAgent agent) {
 
 		String name = ElementMapHandler.class.getSimpleName();
 		String api = ElementMapHandler.class.getName();
@@ -46,6 +48,6 @@ public class CachedElementMapHandlerConfigurator implements ElementMapHandlerCon
 		ComponentConfiguration configuration = new ComponentConfiguration(runtimeConfiguration, name,
 				configurationValues, api, impl, dependencies);
 
-		return configuration;
+		return Arrays.asList(configuration);
 	}
 }

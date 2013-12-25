@@ -29,7 +29,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.api.ComponentContainer;
 import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
-import li.strolch.runtime.test.component.model.PersistenceHandlerTest;
+import li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTest;
 import li.strolch.runtime.test.component.model.ServiceHandlerTest;
 import li.strolch.runtime.test.component.model.ServiceResultTest;
 
@@ -130,8 +130,8 @@ public class ComponentContainerTest {
 		ServiceResultTest result = serviceHandler.doService();
 		assertEquals(1, result.getResult());
 
-		PersistenceHandlerTest persistenceHandler = container.getComponent(PersistenceHandlerTest.class);
-		Resource resource = persistenceHandler.getTestResource("@testRes", "Test Res", "Test");
+		ResourceGeneratorHandlerTest resourceGeneratorHandler = container.getComponent(ResourceGeneratorHandlerTest.class);
+		Resource resource = resourceGeneratorHandler.getTestResource("@testRes", "Test Res", "Test");
 		assertNotNull(resource);
 		assertEquals("@testRes", resource.getId());
 	}

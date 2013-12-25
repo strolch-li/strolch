@@ -13,16 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.agent.impl;
+package li.strolch.runtime.test.component.model;
 
-import li.strolch.model.Order;
-import li.strolch.runtime.agent.api.OrderMap;
+import li.strolch.model.Resource;
 
-/**
- * @author Robert von Burg <eitch@eitchnet.ch>
- * 
- */
-public class InMemoryOrderMap extends InMemoryElementMap<Order> implements OrderMap {
+public interface ResourceGeneratorHandlerTest {
 
-	// marker class
+	public Resource getTestResource(String id, String name, String type);
 }
