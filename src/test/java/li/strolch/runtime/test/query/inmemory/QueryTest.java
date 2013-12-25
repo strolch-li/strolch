@@ -48,10 +48,13 @@ import org.junit.Test;
 @SuppressWarnings("nls")
 public class QueryTest {
 
+	public static final String PATH_EMPTY_RUNTIME = "target/QueryTest/"; //$NON-NLS-1$
+
 	@Test
 	public void shouldQueryResourceWithParamValue() {
 
-		StrolchAgent agent = ComponentContainerTest.startContainer(ComponentContainerTest.PATH_EMPTY_CONTAINER);
+		StrolchAgent agent = ComponentContainerTest.startContainer(PATH_EMPTY_RUNTIME,
+				ComponentContainerTest.PATH_EMPTY_CONTAINER);
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		res1.addParameter(BAG_ID, iP);
@@ -74,7 +77,8 @@ public class QueryTest {
 	@Test
 	public void shouldQueryOrderWithParamValue() {
 
-		StrolchAgent agent = ComponentContainerTest.startContainer(ComponentContainerTest.PATH_EMPTY_CONTAINER);
+		StrolchAgent agent = ComponentContainerTest.startContainer(PATH_EMPTY_RUNTIME,
+				ComponentContainerTest.PATH_EMPTY_CONTAINER);
 		Order o1 = createOrder("@1", "Test Order", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		o1.addParameter(BAG_ID, iP);
