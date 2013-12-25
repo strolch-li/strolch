@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component;
+package li.strolch.runtime.test.component.model;
 
 public class ServiceResultTest {
 

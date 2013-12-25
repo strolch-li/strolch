@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component;
+package li.strolch.runtime.test.component.model;
 
-import li.strolch.runtime.agent.ComponentContainerImpl;
-import li.strolch.runtime.agent.StrolchComponent;
+public interface PostInitializerTest {
 
-public class PostInitializerTestImpl extends StrolchComponent implements PostInitializerTest {
-
-	public PostInitializerTestImpl(ComponentContainerImpl container, String componentName) {
-		super(container, componentName);
-	}
+	// marker interface
 }

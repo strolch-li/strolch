@@ -9,15 +9,15 @@
 	</Runtime>
 	<Component>
 		<name>ServiceHandler</name>
-		<api>li.strolch.runtime.test.component.ServiceHandlerTest</api>
-		<impl>li.strolch.runtime.test.component.ServiceHandlerTestImpl</impl>
+		<api>li.strolch.runtime.test.component.model.ServiceHandlerTest</api>
+		<impl>li.strolch.runtime.test.component.model.ServiceHandlerTestImpl</impl>
 		<Properties>
 		</Properties>
 	</Component>
 	<Component>
 		<name>PersistenceHandler</name>
-		<api>li.strolch.runtime.test.component.PersistenceHandlerTest</api>
-		<impl>li.strolch.runtime.test.component.PersistenceHandlerTestImpl</impl>
+		<api>li.strolch.runtime.test.component.model.PersistenceHandlerTest</api>
+		<impl>li.strolch.runtime.test.component.model.PersistenceHandlerTestImpl</impl>
 		<Properties>
 			<verbose>true</verbose>
 		</Properties>

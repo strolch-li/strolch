@@ -23,6 +23,9 @@ import java.io.File;
 import li.strolch.model.Resource;
 import li.strolch.runtime.agent.ComponentContainer;
 import li.strolch.runtime.agent.StrolchAgent;
+import li.strolch.runtime.test.component.model.PersistenceHandlerTest;
+import li.strolch.runtime.test.component.model.ServiceHandlerTest;
+import li.strolch.runtime.test.component.model.ServiceResultTest;
 
 import org.junit.Test;
 import org.slf4j.Logger;

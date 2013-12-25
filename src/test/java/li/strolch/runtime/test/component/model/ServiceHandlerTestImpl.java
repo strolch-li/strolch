@@ -13,11 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component;
+package li.strolch.runtime.test.component.model;
 
-import li.strolch.model.Resource;
+import li.strolch.runtime.agent.ComponentContainerImpl;
+import li.strolch.runtime.agent.StrolchComponent;
 
-public interface PersistenceHandlerTest {
+public class ServiceHandlerTestImpl extends StrolchComponent implements ServiceHandlerTest {
 
-	public Resource getTestResource(String id, String name, String type);
+	public ServiceHandlerTestImpl(ComponentContainerImpl container, String componentName) {
+		super(container, componentName);
+	}
+
+	@Override
+	public ServiceResultTest doService() {
+		return new ServiceResultTest(1);
+	}
 }
