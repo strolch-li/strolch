@@ -16,17 +16,28 @@
 package li.strolch.runtime.privilege;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.text.MessageFormat;
+import java.util.Map;
 
 import li.strolch.runtime.agent.ComponentContainerImpl;
 import li.strolch.runtime.agent.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import ch.eitchnet.privilege.base.PrivilegeException;
+import ch.eitchnet.privilege.handler.DefaultPrivilegeHandler;
+import ch.eitchnet.privilege.handler.EncryptionHandler;
+import ch.eitchnet.privilege.handler.PersistenceHandler;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.handler.SystemUserAction;
+import ch.eitchnet.privilege.handler.XmlPersistenceHandler;
 import ch.eitchnet.privilege.helper.PrivilegeInitializationHelper;
+import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeContext;
+import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
+import ch.eitchnet.privilege.xml.PrivilegeConfigSaxReader;
+import ch.eitchnet.utils.helper.XmlHelper;
 
 public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements StrolchPrivilegeHandler {
 
@@ -47,8 +58,49 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
 		File privilegeConfigFile = configuration.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML,
 				runtimeConfiguration);
-		PrivilegeHandler privilegeHandler = PrivilegeInitializationHelper.initializeFromXml(privilegeConfigFile);
+		PrivilegeHandler privilegeHandler = initializeFromXml(configuration, privilegeConfigFile);
 		this.privilegeHandler = privilegeHandler;
+	}
+
+	/**
+	 * Initializes the {@link DefaultPrivilegeHandler} from the configuration file
+	 * 
+	 * @param privilegeXmlFile
+	 *            a {@link File} reference to the XML file containing the configuration for Privilege
+	 * 
+	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
+	 *         {@link PersistenceHandler} are set and initialized as well
+	 */
+	private PrivilegeHandler initializeFromXml(ComponentConfiguration configuration, File privilegeXmlFile) {
+
+		// make sure file exists
+		if (!privilegeXmlFile.exists()) {
+			String msg = "Privilege file does not exist at path {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
+			throw new PrivilegeException(msg);
+		}
+
+		try {
+			// parse configuration file
+			PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
+			PrivilegeConfigSaxReader xmlHandler = new PrivilegeConfigSaxReader(containerModel);
+			try (FileInputStream inputStream = new FileInputStream(privilegeXmlFile)) {
+				XmlHelper.parseDocument(inputStream, xmlHandler);
+
+				// set base path
+				if (containerModel.getPersistenceHandlerClassName().equals(XmlPersistenceHandler.class.getName())) {
+					Map<String, String> xmlParams = containerModel.getPersistenceHandlerParameterMap();
+					File configPath = configuration.getRuntimeConfiguration().getConfigPath();
+					xmlParams.put(XmlConstants.XML_PARAM_BASE_PATH, configPath.getPath());
+				}
+
+				return PrivilegeInitializationHelper.initializeFromXml(containerModel);
+			}
+		} catch (Exception e) {
+			String msg = "Failed to load Privilege configuration from {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
+			throw new PrivilegeException(msg, e);
+		}
 	}
 
 	/**
