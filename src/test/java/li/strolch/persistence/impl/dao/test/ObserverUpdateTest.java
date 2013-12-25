@@ -19,6 +19,7 @@ import static li.strolch.model.ModelGenerator.createOrder;
 import static li.strolch.model.ModelGenerator.createResource;
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,16 +32,44 @@ import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.observer.Observer;
 import li.strolch.runtime.observer.ObserverHandler;
+import li.strolch.testbase.runtime.RuntimeMock;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.eitchnet.xmlpers.api.ModificationResult;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public class ObserverUpdateTest extends AbstractDaoImplTest {
+public class ObserverUpdateTest {
+
+	public static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
+	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/test/resources/cachedruntime/config"; //$NON-NLS-1$
+
+	protected static RuntimeMock runtimeMock;
+
+	protected RuntimeMock getRuntimeMock() {
+		return runtimeMock;
+	}
+
+	@BeforeClass
+	public static void beforeClass() {
+
+		File rootPath = new File(RUNTIME_PATH);
+		File configSrc = new File(CONFIG_SRC);
+		runtimeMock = new RuntimeMock();
+		runtimeMock.mockRuntime(rootPath, configSrc);
+		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
+		runtimeMock.startContainer(rootPath);
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		runtimeMock.destroyRuntime();
+	}
 
 	public final class ElementAddedObserver implements Observer {
 

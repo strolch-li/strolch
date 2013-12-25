@@ -17,40 +17,38 @@ package li.strolch.persistence.impl.dao.test;
 
 import java.io.File;
 
-import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.testbase.runtime.AbstractModelTest;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
-/**
- * @author Robert von Burg <eitch@eitchnet.ch>
- */
-public class XmlContainerTest {
+public class XmlCachedDaoTest extends AbstractModelTest {
+
+	public static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
+	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/test/resources/cachedruntime/config"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
+
+	@Override
+	protected RuntimeMock getRuntimeMock() {
+		return runtimeMock;
+	}
 
 	@BeforeClass
 	public static void beforeClass() {
 
-		File rootPath = new File(AbstractDaoImplTest.RUNTIME_PATH);
-		File configSrc = new File(AbstractDaoImplTest.CONFIG_SRC);
+		File rootPath = new File(RUNTIME_PATH);
+		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
-		new File(rootPath, AbstractDaoImplTest.DB_STORE_PATH_DIR).mkdir();
+		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
 		runtimeMock.startContainer(rootPath);
 	}
 
 	@AfterClass
 	public static void afterClass() {
 		runtimeMock.destroyRuntime();
-	}
-
-	@Test
-	public void shouldStartContainer() {
-		try (StrolchTransaction tx = runtimeMock.getPersistenceHandler().openTx()) {
-			tx.getOrderDao().queryKeySet();
-		}
 	}
 }
