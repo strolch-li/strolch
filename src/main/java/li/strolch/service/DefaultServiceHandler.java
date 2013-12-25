@@ -18,8 +18,8 @@ package li.strolch.service;
 import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.runtime.agent.ComponentContainerImpl;
-import li.strolch.runtime.agent.StrolchComponent;
+import li.strolch.runtime.agent.api.StrolchComponent;
+import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
