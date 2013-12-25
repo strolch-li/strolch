@@ -43,7 +43,7 @@ public enum DataStoreMode {
 	TRANSACTIONAL {
 		@Override
 		public ElementMapHandlerConfigurator getElementMapConfigurationConfigurator() {
-			throw new UnsupportedOperationException(MessageFormat.format("The mode {0} is not yet supported!", this)); //$NON-NLS-1$
+			return new TransactionalElementMapHandlerConfigurator();
 		}
 	}; //
 
