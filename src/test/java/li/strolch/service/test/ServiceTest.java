@@ -39,14 +39,14 @@ public class ServiceTest extends AbstractServiceTest {
 	public void shouldFailNoCertificate() {
 		this.thrown.expect(PrivilegeException.class);
 		TestService testService = new TestService();
-		serviceHandler.doService(null, testService);
+		getServiceHandler().doService(null, testService);
 	}
 
 	@Test
 	public void shouldFailInvalidCertificate1() {
 		this.thrown.expect(PrivilegeException.class);
 		TestService testService = new TestService();
-		serviceHandler.doService(new Certificate(null, 0, null, null, null, null, null), testService);
+		getServiceHandler().doService(new Certificate(null, 0, null, null, null, null, null), testService);
 	}
 
 	@Test
@@ -54,7 +54,7 @@ public class ServiceTest extends AbstractServiceTest {
 		this.thrown.expect(AccessDeniedException.class);
 		TestService testService = new TestService();
 		Certificate badCert = new Certificate("1", System.currentTimeMillis(), "bob", "dsdf", "dferg", null, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		serviceHandler.doService(badCert, testService);
+		getServiceHandler().doService(badCert, testService);
 	}
 
 	@Test
@@ -62,52 +62,52 @@ public class ServiceTest extends AbstractServiceTest {
 		this.thrown.expect(AccessDeniedException.class);
 		this.thrown.expectMessage("User jill does not have Privilege li.strolch.service.Service"); //$NON-NLS-1$
 
-		Certificate certificate = getPrivilegeHandler().authenticate("jill", "jill".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
 		try {
 			TestService testService = new TestService();
-			serviceHandler.doService(certificate, testService);
+			getServiceHandler().doService(certificate, testService);
 		} finally {
-			getPrivilegeHandler().invalidateSession(certificate);
+			runtimeMock.getPrivilegeHandler().invalidateSession(certificate);
 		}
 	}
 
 	@Test
 	public void shouldNotFailWithAccess() {
-		Certificate certificate = getPrivilegeHandler().authenticate("jill", "jill".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
 		try {
 			GreetingService service = new GreetingService();
 			GreetingArgument argument = new GreetingArgument();
 			argument.name = "Jill"; //$NON-NLS-1$
-			GreetingResult greetingResult = serviceHandler.doService(certificate, service, argument);
+			GreetingResult greetingResult = getServiceHandler().doService(certificate, service, argument);
 			assertThat(greetingResult.getGreeting(), equalTo("Hello Jill. Nice to meet you!")); //$NON-NLS-1$
 		} finally {
-			getPrivilegeHandler().invalidateSession(certificate);
+			runtimeMock.getPrivilegeHandler().invalidateSession(certificate);
 		}
 	}
 
 	@Test
 	public void shouldNotFailWithLogin1() {
 
-		Certificate certificate = getPrivilegeHandler().authenticate("bob", "bob".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("bob", "bob".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
 		try {
 			TestService testService = new TestService();
-			serviceHandler.doService(certificate, testService);
+			getServiceHandler().doService(certificate, testService);
 		} finally {
-			getPrivilegeHandler().invalidateSession(certificate);
+			runtimeMock.getPrivilegeHandler().invalidateSession(certificate);
 		}
 	}
 
 	@Test
 	public void shouldNotFailWithLogin2() {
-		Certificate certificate = getPrivilegeHandler().authenticate("bob", "bob".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("bob", "bob".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
 		try {
 			GreetingService service = new GreetingService();
 			GreetingArgument argument = new GreetingArgument();
 			argument.name = "Bob"; //$NON-NLS-1$
-			GreetingResult greetingResult = serviceHandler.doService(certificate, service, argument);
+			GreetingResult greetingResult = getServiceHandler().doService(certificate, service, argument);
 			assertThat(greetingResult.getGreeting(), equalTo("Hello Bob. Nice to meet you!")); //$NON-NLS-1$
 		} finally {
-			getPrivilegeHandler().invalidateSession(certificate);
+			runtimeMock.getPrivilegeHandler().invalidateSession(certificate);
 		}
 	}
 }

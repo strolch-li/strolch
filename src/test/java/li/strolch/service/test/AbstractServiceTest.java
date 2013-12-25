@@ -26,26 +26,28 @@ import org.junit.BeforeClass;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class AbstractServiceTest extends RuntimeMock {
+public abstract class AbstractServiceTest {
 
 	private static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
 	private static final String CONFIG_SRC = "src/test/resources/withPrivilegeRuntime/config"; //$NON-NLS-1$
-	protected static ServiceHandler serviceHandler;
+	protected static RuntimeMock runtimeMock;
 
 	@BeforeClass
 	public static void beforeClass() {
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
-		RuntimeMock.mockRuntime(rootPath, configSrc);
-		RuntimeMock.startContainer(rootPath);
-
-		// initialize the component configuration
-		serviceHandler = getContainer().getComponent(ServiceHandler.class);
+		runtimeMock = new RuntimeMock();
+		runtimeMock.mockRuntime(rootPath, configSrc);
+		runtimeMock.startContainer(rootPath);
 	}
 
 	@AfterClass
 	public static void afterClass() {
-		RuntimeMock.destroyRuntime();
+		runtimeMock.destroyRuntime();
+	}
+
+	public static ServiceHandler getServiceHandler() {
+		return runtimeMock.getContainer().getComponent(ServiceHandler.class);
 	}
 }
