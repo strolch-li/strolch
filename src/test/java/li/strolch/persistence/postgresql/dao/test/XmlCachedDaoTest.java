@@ -21,15 +21,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import li.strolch.persistence.postgresql.DbSchemaVersionCheck;
+import li.strolch.testbase.runtime.AbstractModelTest;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-/**
- * @author Robert von Burg <eitch@eitchnet.ch>
- */
-public abstract class AbstractDaoImplTest {
+public class XmlCachedDaoTest extends AbstractModelTest {
 
 	public static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
@@ -40,6 +38,11 @@ public abstract class AbstractDaoImplTest {
 	private static final String DB_PASSWORD = "test"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
+	
+	@Override
+	protected RuntimeMock getRuntimeMock() {
+		return runtimeMock;
+	}
 
 	@BeforeClass
 	public static void beforeClass() throws SQLException {
