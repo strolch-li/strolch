@@ -29,7 +29,7 @@ import org.junit.BeforeClass;
 public abstract class AbstractServiceTest {
 
 	private static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
-	private static final String CONFIG_SRC = "src/test/resources/withPrivilegeRuntime/config"; //$NON-NLS-1$
+	private static final String CONFIG_SRC = "src/test/resources/withPrivilegeRuntime"; //$NON-NLS-1$
 	protected static RuntimeMock runtimeMock;
 
 	@BeforeClass

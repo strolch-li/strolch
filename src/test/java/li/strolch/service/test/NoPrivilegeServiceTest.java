@@ -35,7 +35,7 @@ import org.junit.Test;
 public class NoPrivilegeServiceTest {
 
 	private static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
-	private static final String CONFIG_SRC = "src/test/resources/withoutPrivilegeRuntime/config"; //$NON-NLS-1$
+	private static final String CONFIG_SRC = "src/test/resources/withoutPrivilegeRuntime"; //$NON-NLS-1$
 	protected static RuntimeMock runtimeMock;
 
 	@BeforeClass
