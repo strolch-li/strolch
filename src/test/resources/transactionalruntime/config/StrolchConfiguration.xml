@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchConfiguration>
+	<Runtime>
+		<applicationName>StrolchPersistenceTest</applicationName>
+		<Properties>
+			<dataStoreMode>TRANSACTIONAL</dataStoreMode>
+			<verbose>true</verbose>
+		</Properties>
+	</Runtime>
+	<Component>
+		<name>PersistenceHandler</name>
+		<api>li.strolch.persistence.api.PersistenceHandler</api>
+		<impl>li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler</impl>
+		<Properties>
+			<allowSchemaCreation>true</allowSchemaCreation>
+			<allowSchemaDrop>true</allowSchemaDrop>
+			<db.url>jdbc:postgresql://localhost/testdb</db.url>
+			<db.username>testuser</db.username>
+			<db.password>test</db.password>
+		</Properties>
+	</Component>
+	<Component>
+		<name>ObserverHandler</name>
+		<api>li.strolch.runtime.observer.ObserverHandler</api>
+		<impl>li.strolch.runtime.observer.DefaultObserverHandler</impl>
+	</Component>
+</StrolchConfiguration>

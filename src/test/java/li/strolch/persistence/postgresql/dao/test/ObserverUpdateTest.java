@@ -46,9 +46,9 @@ import org.junit.Test;
  */
 public class ObserverUpdateTest {
 
-	public static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/observerUpdateStrolchRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/runtime/config"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/test/resources/cachedruntime"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
 
