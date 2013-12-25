@@ -68,6 +68,7 @@ public final class RuntimeMock {
 		}
 
 		if (rootPathF.exists()) {
+			logger.info("Deleting all files in " + rootPathF.getAbsolutePath()); //$NON-NLS-1$
 			if (!FileHelper.deleteFile(rootPathF, true)) {
 				String msg = "Failed to delete {0}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, rootPathF.getAbsolutePath());
