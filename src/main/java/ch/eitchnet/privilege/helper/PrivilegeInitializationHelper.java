@@ -84,6 +84,20 @@ public class PrivilegeInitializationHelper {
 		PrivilegeConfigSaxReader xmlHandler = new PrivilegeConfigSaxReader(containerModel);
 		XmlHelper.parseDocument(privilegeConfigInputStream, xmlHandler);
 
+		return initializeFromXml(containerModel);
+	}
+
+	/**
+	 * Initializes the {@link PrivilegeHandler} by initializing from the given {@link PrivilegeContainerModel}
+	 * 
+	 * @param containerModel
+	 *            the configuration for the {@link PrivilegeHandler}
+	 * 
+	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
+	 *         {@link PersistenceHandler} are set and initialized as well
+	 */
+	public static PrivilegeHandler initializeFromXml(PrivilegeContainerModel containerModel) {
+
 		// initialize encryption handler
 		String encryptionHandlerClassName = containerModel.getEncryptionHandlerClassName();
 		EncryptionHandler encryptionHandler = ClassHelper.instantiateClass(encryptionHandlerClassName);
