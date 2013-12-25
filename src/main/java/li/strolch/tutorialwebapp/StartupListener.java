@@ -6,7 +6,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import li.strolch.runtime.agent.StrolchAgent;
+import li.strolch.runtime.agent.api.StrolchAgent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
