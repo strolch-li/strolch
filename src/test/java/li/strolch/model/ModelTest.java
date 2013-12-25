@@ -80,11 +80,12 @@ public class ModelTest {
 
 	@Test
 	public void shouldPerformDeepOrderEquals() {
-		Order srcOrder = ModelGenerator.createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
-		Order dstOrder = ModelGenerator.createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
+		Date date = new Date();
+		Order srcOrder = ModelGenerator.createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		Order dstOrder = ModelGenerator.createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
 		visitor.visit(dstOrder);
-		assertTrue("Same Order should be deep equal!", visitor.isEqual());
+		assertTrue("Same Order should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
 	}
 
 	public static void validateBag(ParameterBag bag) {
