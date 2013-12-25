@@ -25,8 +25,8 @@ import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
+@SuppressWarnings("nls")
 public class ObjectFilterTest {
 
 	@Test
@@ -100,9 +100,9 @@ public class ObjectFilterTest {
 
 		try {
 			filter.add(myObj);
-			fail("Should have failed adding twice!");
+			fail("Should have failed adding twice!"); 
 		} catch (RuntimeException e) {
-			assertEquals("Stale State exception: Invalid + after +", e.getMessage());
+			assertEquals("Stale State exception: Invalid + after +", e.getMessage()); 
 		}
 
 		testAssertions(filter, 1, 1, 1, 0, 0);
@@ -118,9 +118,9 @@ public class ObjectFilterTest {
 
 		try {
 			filter.remove(myObj);
-			fail("Should have failed removing twice!");
+			fail("Should have failed removing twice!"); 
 		} catch (RuntimeException e) {
-			assertEquals("Stale State exception: Invalid - after -", e.getMessage());
+			assertEquals("Stale State exception: Invalid - after -", e.getMessage()); 
 		}
 
 		testAssertions(filter, 1, 1, 0, 0, 1);
@@ -158,9 +158,9 @@ public class ObjectFilterTest {
 
 		try {
 			filter.add(myObj);
-			fail("Should have failed add after modify");
+			fail("Should have failed add after modify"); 
 		} catch (RuntimeException e) {
-			assertEquals("Stale State exception: Invalid + after +=", e.getMessage());
+			assertEquals("Stale State exception: Invalid + after +=", e.getMessage()); 
 		}
 
 		testAssertions(filter, 1, 1, 0, 1, 0);
@@ -186,9 +186,9 @@ public class ObjectFilterTest {
 
 		try {
 			filter.update(myObj);
-			fail("Should have failed modify after remove");
+			fail("Should have failed modify after remove"); 
 		} catch (RuntimeException e) {
-			assertEquals("Stale State exception: Invalid += after -", e.getMessage());
+			assertEquals("Stale State exception: Invalid += after -", e.getMessage()); 
 		}
 
 		testAssertions(filter, 1, 1, 0, 0, 1);

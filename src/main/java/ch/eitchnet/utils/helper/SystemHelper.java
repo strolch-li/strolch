@@ -32,11 +32,11 @@ public class SystemHelper {
 		return SystemHelper.instance;
 	}
 
-	public static final String osName = System.getProperty("os.name");
-	public static final String osArch = System.getProperty("os.arch");
-	public static final String osVersion = System.getProperty("os.version");
-	public static final String javaVendor = System.getProperty("java.vendor");
-	public static final String javaVersion = System.getProperty("java.version");
+	public static final String osName = System.getProperty("os.name"); //$NON-NLS-1$
+	public static final String osArch = System.getProperty("os.arch"); //$NON-NLS-1$
+	public static final String osVersion = System.getProperty("os.version"); //$NON-NLS-1$
+	public static final String javaVendor = System.getProperty("java.vendor"); //$NON-NLS-1$
+	public static final String javaVersion = System.getProperty("java.version"); //$NON-NLS-1$
 
 	/**
 	 * private constructor
@@ -59,40 +59,41 @@ public class SystemHelper {
 	public static String asString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(SystemHelper.osName);
-		sb.append(" ");
+		sb.append(StringHelper.EMPTY);
 		sb.append(SystemHelper.osArch);
-		sb.append(" ");
+		sb.append(StringHelper.EMPTY);
 		sb.append(SystemHelper.osVersion);
-		sb.append(" ");
-		sb.append("on Java " + SystemHelper.javaVendor);
-		sb.append(" version ");
+		sb.append(StringHelper.EMPTY);
+		sb.append("on Java "); //$NON-NLS-1$
+		sb.append(SystemHelper.javaVendor);
+		sb.append(" version "); //$NON-NLS-1$
 		sb.append(SystemHelper.javaVersion);
 		return sb.toString();
 	}
 
 	public static String getUserDir() {
-		return System.getProperty("user.dir");
+		return System.getProperty("user.dir"); //$NON-NLS-1$
 	}
 
 	public static boolean isMacOS() {
-		return SystemHelper.osName.startsWith("Mac");
+		return SystemHelper.osName.startsWith("Mac"); //$NON-NLS-1$
 	}
 
 	public static boolean isWindows() {
-		return SystemHelper.osName.startsWith("Win");
+		return SystemHelper.osName.startsWith("Win"); //$NON-NLS-1$
 	}
 
 	public static boolean isLinux() {
-		return SystemHelper.osName.startsWith("Lin");
+		return SystemHelper.osName.startsWith("Lin"); //$NON-NLS-1$
 	}
 
 	public static boolean is32bit() {
-		return SystemHelper.osArch.equals("x86") || SystemHelper.osArch.equals("i386")
-				|| SystemHelper.osArch.equals("i686");
+		return SystemHelper.osArch.equals("x86") || SystemHelper.osArch.equals("i386") //$NON-NLS-1$ //$NON-NLS-2$
+				|| SystemHelper.osArch.equals("i686"); //$NON-NLS-1$
 	}
 
 	public static boolean is64bit() {
-		return SystemHelper.osArch.equals("x86_64") || SystemHelper.osArch.equals("amd64");
+		return SystemHelper.osArch.equals("x86_64") || SystemHelper.osArch.equals("amd64"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static String getMaxMemory() {
@@ -108,7 +109,13 @@ public class SystemHelper {
 	}
 
 	public static String getMemorySummary() {
-		return "Memory available " + SystemHelper.getMaxMemory() + " / Used: " + SystemHelper.getUsedMemory()
-				+ " / Free:" + SystemHelper.getFreeMemory();
+		StringBuilder sb = new StringBuilder();
+		sb.append("Memory available "); //$NON-NLS-1$
+		sb.append(SystemHelper.getMaxMemory());
+		sb.append(" / Used: "); //$NON-NLS-1$
+		sb.append(SystemHelper.getUsedMemory());
+		sb.append(" / Free:"); //$NON-NLS-1$
+		sb.append(SystemHelper.getFreeMemory());
+		return sb.toString();
 	}
 }

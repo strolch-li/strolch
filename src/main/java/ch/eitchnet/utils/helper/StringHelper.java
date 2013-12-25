@@ -18,6 +18,7 @@ package ch.eitchnet.utils.helper;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.MessageFormat;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -32,15 +33,17 @@ public class StringHelper {
 
 	public static final String NEW_LINE = "\n"; //$NON-NLS-1$
 	public static final String EMPTY = ""; //$NON-NLS-1$
+	public static final String SPACE = " "; //$NON-NLS-1$
 	public static final String NULL = "null"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(StringHelper.class);
 
 	/**
-	 * Hex char table for fast calculating of hex value
+	 * Hex char table for fast calculating of hex values
 	 */
-	private static final byte[] HEX_CHAR_TABLE = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C',
-			'D', 'E', 'F' };
+	private static final byte[] HEX_CHAR_TABLE = { (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4',
+			(byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd',
+			(byte) 'e', (byte) 'f' };
 
 	/**
 	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
@@ -59,14 +62,15 @@ public class StringHelper {
 
 			for (byte b : raw) {
 				int v = b & 0xFF;
-				hex[index++] = StringHelper.HEX_CHAR_TABLE[v >>> 4];
-				hex[index++] = StringHelper.HEX_CHAR_TABLE[v & 0xF];
+				hex[index++] = HEX_CHAR_TABLE[v >>> 4];
+				hex[index++] = HEX_CHAR_TABLE[v & 0xF];
 			}
 
-			return new String(hex, "ASCII");
+			return new String(hex, "ASCII"); //$NON-NLS-1$
 
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException("Something went wrong while converting to HEX: " + e.getLocalizedMessage(), e);
+			String msg = MessageFormat.format("Something went wrong while converting to HEX: {0}", e.getMessage()); //$NON-NLS-1$
+			throw new RuntimeException(msg, e);
 		}
 	}
 
@@ -80,7 +84,7 @@ public class StringHelper {
 	 */
 	public static byte[] fromHexString(String encoded) {
 		if ((encoded.length() % 2) != 0)
-			throw new IllegalArgumentException("Input string must contain an even number of characters.");
+			throw new IllegalArgumentException("Input string must contain an even number of characters."); //$NON-NLS-1$
 
 		final byte result[] = new byte[encoded.length() / 2];
 		final char enc[] = encoded.toCharArray();
@@ -102,7 +106,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashMd5AsHex(String string) {
-		return getHexString(StringHelper.hashMd5(string.getBytes()));
+		return getHexString(hashMd5(string.getBytes()));
 	}
 
 	/**
@@ -115,7 +119,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashMd5(String string) {
-		return StringHelper.hashMd5(string.getBytes());
+		return hashMd5(string.getBytes());
 	}
 
 	/**
@@ -128,7 +132,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashMd5(byte[] bytes) {
-		return StringHelper.hash("MD5", bytes);
+		return hash("MD5", bytes); //$NON-NLS-1$
 	}
 
 	/**
@@ -140,7 +144,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashSha1AsHex(String string) {
-		return getHexString(StringHelper.hashSha1(string.getBytes()));
+		return getHexString(hashSha1(string.getBytes()));
 	}
 
 	/**
@@ -153,7 +157,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha1(String string) {
-		return StringHelper.hashSha1(string.getBytes());
+		return hashSha1(string.getBytes());
 	}
 
 	/**
@@ -166,7 +170,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha1(byte[] bytes) {
-		return StringHelper.hash("SHA-1", bytes);
+		return hash("SHA-1", bytes); //$NON-NLS-1$
 	}
 
 	/**
@@ -178,7 +182,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashSha256AsHex(String string) {
-		return getHexString(StringHelper.hashSha256(string.getBytes()));
+		return getHexString(hashSha256(string.getBytes()));
 	}
 
 	/**
@@ -191,7 +195,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha256(String string) {
-		return StringHelper.hashSha256(string.getBytes());
+		return hashSha256(string.getBytes());
 	}
 
 	/**
@@ -204,7 +208,59 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha256(byte[] bytes) {
-		return StringHelper.hash("SHA-256", bytes);
+		return hash("SHA-256", bytes); //$NON-NLS-1$
+	}
+
+	/**
+	 * Returns the hash of an algorithm
+	 * 
+	 * @param algorithm
+	 *            the algorithm to use
+	 * @param string
+	 *            the string to hash
+	 * 
+	 * @return the hash or null, if an exception was thrown
+	 */
+	public static String hashAsHex(String algorithm, String string) {
+		return getHexString(hash(algorithm, string));
+	}
+
+	/**
+	 * Returns the hash of an algorithm
+	 * 
+	 * @param algorithm
+	 *            the algorithm to use
+	 * @param string
+	 *            the string to hash
+	 * 
+	 * @return the hash or null, if an exception was thrown
+	 */
+	public static byte[] hash(String algorithm, String string) {
+		try {
+
+			MessageDigest digest = MessageDigest.getInstance(algorithm);
+			byte[] hashArray = digest.digest(string.getBytes());
+
+			return hashArray;
+
+		} catch (NoSuchAlgorithmException e) {
+			String msg = MessageFormat.format("Algorithm {0} does not exist!", algorithm); //$NON-NLS-1$
+			throw new RuntimeException(msg, e);
+		}
+	}
+
+	/**
+	 * Returns the hash of an algorithm
+	 * 
+	 * @param algorithm
+	 *            the algorithm to use
+	 * @param bytes
+	 *            the bytes to hash
+	 * 
+	 * @return the hash or null, if an exception was thrown
+	 */
+	public static String hashAsHex(String algorithm, byte[] bytes) {
+		return getHexString(hash(algorithm, bytes));
 	}
 
 	/**
@@ -226,7 +282,8 @@ public class StringHelper {
 			return hashArray;
 
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("Algorithm " + algorithm + " does not exist!", e);
+			String msg = MessageFormat.format("Algorithm {0} does not exist!", algorithm); //$NON-NLS-1$
+			throw new RuntimeException(msg, e);
 		}
 	}
 
@@ -245,7 +302,7 @@ public class StringHelper {
 	 * @return the new string
 	 */
 	public static String normalizeLength(String value, int length, boolean beginning, char c) {
-		return StringHelper.normalizeLength(value, length, beginning, false, c);
+		return normalizeLength(value, length, beginning, false, c);
 	}
 
 	/**
@@ -284,8 +341,8 @@ public class StringHelper {
 
 		} else if (shorten) {
 
-			StringHelper.logger.warn("Shortening length of value: " + value);
-			StringHelper.logger.warn("Length is: " + value.length() + " max: " + length);
+			logger.warn(MessageFormat.format("Shortening length of value: {0}", value)); //$NON-NLS-1$
+			logger.warn(MessageFormat.format("Length is: {0} max: {1}", value.length(), length)); //$NON-NLS-1$
 
 			return value.substring(0, length);
 		}
@@ -300,7 +357,7 @@ public class StringHelper {
 	 *         returned
 	 */
 	public static String replaceSystemPropertiesIn(String value) {
-		return StringHelper.replacePropertiesIn(System.getProperties(), value);
+		return replacePropertiesIn(System.getProperties(), value);
 	}
 
 	/**
@@ -315,10 +372,10 @@ public class StringHelper {
 	 * 
 	 * @return a new string with all defined properties replaced or if an error occurred the original value is returned
 	 */
-	public static String replacePropertiesIn(Properties properties, String alue) {
+	public static String replacePropertiesIn(Properties properties, String value) {
 
 		// get a copy of the value
-		String tmpValue = alue;
+		String tmpValue = value;
 
 		// get first occurrence of $ character
 		int pos = -1;
@@ -337,8 +394,8 @@ public class StringHelper {
 
 			// if no stop found, then break as another sequence should be able to start
 			if (stop == -1) {
-				StringHelper.logger.error("Sequence starts at offset " + pos + " but does not end!");
-				tmpValue = alue;
+				logger.error(MessageFormat.format("Sequence starts at offset {0} but does not end!", pos)); //$NON-NLS-1$
+				tmpValue = value;
 				break;
 			}
 
@@ -346,15 +403,16 @@ public class StringHelper {
 			String sequence = tmpValue.substring(pos + 2, stop);
 
 			// make sure sequence doesn't contain $ { } characters
-			if (sequence.contains("$") || sequence.contains("{") || sequence.contains("}")) {
-				StringHelper.logger.error("Enclosed sequence in offsets " + pos + " - " + stop
-						+ " contains one of the illegal chars: $ { }: " + sequence);
-				tmpValue = alue;
+			if (sequence.contains("$") || sequence.contains("{") || sequence.contains("}")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				String msg = "Enclosed sequence in offsets {0} - {1} contains one of the illegal chars: $ { }: {2}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, pos, stop, sequence);
+				logger.error(msg);
+				tmpValue = value;
 				break;
 			}
 
 			// sequence is good, so see if we have a property for it
-			String property = properties.getProperty(sequence, "");
+			String property = properties.getProperty(sequence, StringHelper.EMPTY);
 
 			// if no property exists, then log and continue
 			if (property.isEmpty()) {
@@ -363,7 +421,7 @@ public class StringHelper {
 			}
 
 			// property exists, so replace in value
-			tmpValue = tmpValue.replace("${" + sequence + "}", property);
+			tmpValue = tmpValue.replace("${" + sequence + "}", property); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return tmpValue;
@@ -377,7 +435,7 @@ public class StringHelper {
 	 *            the properties in which the values must have any ${...} replaced by values of the respective key
 	 */
 	public static void replaceProperties(Properties properties) {
-		StringHelper.replaceProperties(properties, null);
+		replaceProperties(properties, null);
 	}
 
 	/**
@@ -394,7 +452,7 @@ public class StringHelper {
 		for (Object keyObj : properties.keySet()) {
 			String key = (String) keyObj;
 			String property = properties.getProperty(key);
-			String newProperty = StringHelper.replacePropertiesIn(properties, property);
+			String newProperty = replacePropertiesIn(properties, property);
 
 			// try first properties
 			if (!property.equals(newProperty)) {
@@ -403,7 +461,7 @@ public class StringHelper {
 			} else if (altProperties != null) {
 
 				// try alternative properties
-				newProperty = StringHelper.replacePropertiesIn(altProperties, property);
+				newProperty = replacePropertiesIn(altProperties, property);
 				if (!property.equals(newProperty)) {
 					// logger.info("Key " + key + " has replaced property " + property + " from alternative properties with new value " + newProperty);
 					properties.put(key, newProperty);
@@ -443,10 +501,15 @@ public class StringHelper {
 		int end = Math.min(i + maxContext, (Math.min(bytes1.length, bytes2.length)));
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("Strings are not equal! Start of inequality is at " + i + ". Showing " + maxContext
-				+ " extra characters and start and end:\n");
-		sb.append("context s1: " + s1.substring(start, end) + "\n");
-		sb.append("context s2: " + s2.substring(start, end) + "\n");
+		sb.append("Strings are not equal! Start of inequality is at " + i); //$NON-NLS-1$
+		sb.append(". Showing " + maxContext); //$NON-NLS-1$
+		sb.append(" extra characters and start and end:\n"); //$NON-NLS-1$
+		sb.append("context s1: "); //$NON-NLS-1$
+		sb.append(s1.substring(start, end));
+		sb.append("\n"); //$NON-NLS-1$
+		sb.append("context s2: "); //$NON-NLS-1$
+		sb.append(s2.substring(start, end));
+		sb.append("\n"); //$NON-NLS-1$
 
 		return sb.toString();
 	}
@@ -519,15 +582,16 @@ public class StringHelper {
 	 */
 	public static boolean parseBoolean(String value) throws RuntimeException {
 		if (isEmpty(value))
-			throw new RuntimeException("Value to parse to boolean is empty! Expected case insensitive true or false");
+			throw new RuntimeException("Value to parse to boolean is empty! Expected case insensitive true or false"); //$NON-NLS-1$
 		String tmp = value.toLowerCase();
 		if (tmp.equals(Boolean.TRUE.toString())) {
 			return true;
 		} else if (tmp.equals(Boolean.FALSE.toString())) {
 			return false;
 		} else {
-			throw new RuntimeException("Value " + value
-					+ " can not be parsed to boolean! Expected case insensitive true or false");
+			String msg = "Value {0} can not be parsed to boolean! Expected case insensitive true or false"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, value);
+			throw new RuntimeException(msg);
 		}
 	}
 }

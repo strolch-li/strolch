@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.MessageFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,55 +33,62 @@ public class ProcessHelper {
 
 	public static ProcessResult runCommand(String command) {
 		final StringBuffer sb = new StringBuffer();
-		sb.append("=====================================\n");
+		sb.append("=====================================\n"); //$NON-NLS-1$
 		try {
 
 			final Process process = Runtime.getRuntime().exec(command);
+			final int[] returnValue = new int[1];
 
-			final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-			Thread errorIn = new Thread("errorIn") {
-				@Override
-				public void run() {
-					ProcessHelper.readStream(sb, "[ERROR] ", errorStream);
-				}
-			};
-			errorIn.start();
+			try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					final BufferedReader inputStream = new BufferedReader(new InputStreamReader(
+							process.getInputStream()));) {
 
-			final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			Thread infoIn = new Thread("infoIn") {
-				@Override
-				public void run() {
-					ProcessHelper.readStream(sb, "[INFO] ", inputStream);
-				}
-			};
-			infoIn.start();
+				Thread errorIn = new Thread("errorIn") { //$NON-NLS-1$
+					@Override
+					public void run() {
+						readStream(sb, "[ERROR] ", errorStream); //$NON-NLS-1$
+					}
+				};
+				errorIn.start();
 
-			int returnValue = process.waitFor();
+				Thread infoIn = new Thread("infoIn") { //$NON-NLS-1$
+					@Override
+					public void run() {
+						readStream(sb, "[INFO] ", inputStream); //$NON-NLS-1$
+					}
+				};
+				infoIn.start();
 
-			errorIn.join(100l);
-			infoIn.join(100l);
-			sb.append("=====================================\n");
+				returnValue[0] = process.waitFor();
 
-			return new ProcessResult(returnValue, sb.toString(), null);
+				errorIn.join(100l);
+				infoIn.join(100l);
+				sb.append("=====================================\n"); //$NON-NLS-1$
+			}
+			return new ProcessResult(returnValue[0], sb.toString(), null);
 
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to perform command: " + e.getLocalizedMessage(), e);
+			String msg = MessageFormat.format("Failed to perform command: {0}", e.getMessage()); //$NON-NLS-1$
+			throw new RuntimeException(msg, e);
 		} catch (InterruptedException e) {
-			ProcessHelper.logger.error("Interrupted!");
-			sb.append("[FATAL] Interrupted");
+			logger.error("Interrupted!"); //$NON-NLS-1$
+			sb.append("[FATAL] Interrupted"); //$NON-NLS-1$
 			return new ProcessResult(-1, sb.toString(), e);
 		}
 	}
 
 	public static ProcessResult runCommand(File workingDirectory, String... commandAndArgs) {
 
-		if (!workingDirectory.exists())
-			throw new RuntimeException("Working directory does not exist at " + workingDirectory.getAbsolutePath());
+		if (!workingDirectory.exists()) {
+			String msg = "Working directory does not exist at {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, workingDirectory.getAbsolutePath());
+			throw new RuntimeException(msg);
+		}
 		if (commandAndArgs == null || commandAndArgs.length == 0)
-			throw new RuntimeException("No command passed!");
+			throw new RuntimeException("No command passed!"); //$NON-NLS-1$
 
 		final StringBuffer sb = new StringBuffer();
-		sb.append("=====================================\n");
+		sb.append("=====================================\n"); //$NON-NLS-1$
 		try {
 
 			ProcessBuilder processBuilder = new ProcessBuilder(commandAndArgs);
@@ -88,38 +96,42 @@ public class ProcessHelper {
 			processBuilder.directory(workingDirectory);
 
 			final Process process = processBuilder.start();
+			int[] returnValue = new int[1];
 
-			final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-			Thread errorIn = new Thread("errorIn") {
-				@Override
-				public void run() {
-					ProcessHelper.readStream(sb, "[ERROR] ", errorStream);
-				}
-			};
-			errorIn.start();
+			try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					final BufferedReader inputStream = new BufferedReader(new InputStreamReader(
+							process.getInputStream()));) {
 
-			final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			Thread infoIn = new Thread("infoIn") {
-				@Override
-				public void run() {
-					ProcessHelper.readStream(sb, "[INFO] ", inputStream);
-				}
-			};
-			infoIn.start();
+				Thread errorIn = new Thread("errorIn") { //$NON-NLS-1$
+					@Override
+					public void run() {
+						readStream(sb, "[ERROR] ", errorStream); //$NON-NLS-1$
+					}
+				};
+				errorIn.start();
 
-			int returnValue = process.waitFor();
+				Thread infoIn = new Thread("infoIn") { //$NON-NLS-1$
+					@Override
+					public void run() {
+						readStream(sb, "[INFO] ", inputStream); //$NON-NLS-1$
+					}
+				};
+				infoIn.start();
 
-			errorIn.join(100l);
-			infoIn.join(100l);
-			sb.append("=====================================\n");
+				returnValue[0] = process.waitFor();
 
-			return new ProcessResult(returnValue, sb.toString(), null);
+				errorIn.join(100l);
+				infoIn.join(100l);
+				sb.append("=====================================\n"); //$NON-NLS-1$
+			}
+
+			return new ProcessResult(returnValue[0], sb.toString(), null);
 
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to perform command: " + e.getLocalizedMessage(), e);
+			throw new RuntimeException("Failed to perform command: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 		} catch (InterruptedException e) {
-			ProcessHelper.logger.error("Interrupted!");
-			sb.append("[FATAL] Interrupted");
+			logger.error("Interrupted!"); //$NON-NLS-1$
+			sb.append("[FATAL] Interrupted"); //$NON-NLS-1$
 			return new ProcessResult(-1, sb.toString(), e);
 		}
 	}
@@ -127,24 +139,27 @@ public class ProcessHelper {
 	public static class ProcessResult {
 		public final int returnValue;
 		public final String processOutput;
-		public final Throwable t;
+		public final Throwable throwable;
 
 		public ProcessResult(int returnValue, String processOutput, Throwable t) {
 			this.returnValue = returnValue;
 			this.processOutput = processOutput;
-			this.t = t;
+			this.throwable = t;
 		}
 	}
 
-	private static void readStream(StringBuffer sb, String prefix, BufferedReader bufferedReader) {
+	static void readStream(StringBuffer sb, String prefix, BufferedReader bufferedReader) {
 		String line;
 		try {
 			while ((line = bufferedReader.readLine()) != null) {
-				sb.append(prefix + line + "\n");
+				sb.append(prefix + line + StringHelper.NEW_LINE);
 			}
 		} catch (IOException e) {
-			String msg = "Faild to read from " + prefix + " stream: " + e.getLocalizedMessage();
-			sb.append("[FATAL] " + msg + "\n");
+			String msg = "Faild to read from {0} stream: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, prefix, e.getMessage());
+			sb.append("[FATAL] "); //$NON-NLS-1$
+			sb.append(msg);
+			sb.append(StringHelper.NEW_LINE);
 		}
 	}
 
@@ -152,31 +167,32 @@ public class ProcessHelper {
 
 		ProcessResult processResult;
 		if (SystemHelper.isLinux()) {
-			processResult = ProcessHelper.runCommand("xdg-open " + pdfPath.getAbsolutePath());
+			processResult = runCommand("xdg-open " + pdfPath.getAbsolutePath()); //$NON-NLS-1$
 		} else if (SystemHelper.isMacOS()) {
-			processResult = ProcessHelper.runCommand("open " + pdfPath.getAbsolutePath());
+			processResult = runCommand("open " + pdfPath.getAbsolutePath()); //$NON-NLS-1$
 		} else if (SystemHelper.isWindows()) {
 			// remove the first char (/) from the report path (/D:/temp.....)
 			String pdfFile = pdfPath.getAbsolutePath();
 			if (pdfFile.charAt(0) == '/')
 				pdfFile = pdfFile.substring(1);
-			processResult = ProcessHelper.runCommand("rundll32 url.dll,FileProtocolHandler " + pdfFile);
+			processResult = runCommand("rundll32 url.dll,FileProtocolHandler " + pdfFile); //$NON-NLS-1$
 		} else {
-			throw new UnsupportedOperationException("Unexpected OS: " + SystemHelper.osName);
+			String msg = MessageFormat.format("Unexpected OS: {0}", SystemHelper.osName); //$NON-NLS-1$
+			throw new UnsupportedOperationException(msg);
 		}
 
-		ProcessHelper.logProcessResult(processResult);
+		logProcessResult(processResult);
 	}
 
 	public static void logProcessResult(ProcessResult processResult) {
 		if (processResult.returnValue == 0) {
-			ProcessHelper.logger.info("Process executed successfully");
+			logger.info("Process executed successfully"); //$NON-NLS-1$
 		} else if (processResult.returnValue == -1) {
-			ProcessHelper.logger.error("Process execution failed:\n" + processResult.processOutput);
-			ProcessHelper.logger.error(processResult.t.getMessage(), processResult.t);
+			logger.error("Process execution failed:\n" + processResult.processOutput); //$NON-NLS-1$
+			logger.error(processResult.throwable.getMessage(), processResult.throwable);
 		} else {
-			ProcessHelper.logger.info("Process execution was not successful with return value:"
-					+ processResult.returnValue + "\n" + processResult.processOutput);
+			String msg = "Process execution was not successful with return value:{0}\n{1}"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, processResult.returnValue, processResult.processOutput));
 		}
 	}
 }

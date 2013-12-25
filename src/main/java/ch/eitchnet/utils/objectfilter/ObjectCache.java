@@ -15,6 +15,8 @@
  */
 package ch.eitchnet.utils.objectfilter;
 
+import java.text.MessageFormat;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +71,7 @@ public class ObjectCache {
 	 * @param object
 	 * @param operation
 	 */
+	@SuppressWarnings("nls")
 	public ObjectCache(long id, String key, Object object, Operation operation) {
 
 		this.id = id;
@@ -77,8 +80,16 @@ public class ObjectCache {
 		this.operation = operation;
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("Instanciated Cache: ID" + this.id + " / " + key + " OP: " + this.operation
-					+ " / " + object.toString());
+			StringBuilder sb = new StringBuilder();
+			sb.append("Instanciated Cache: ID");
+			sb.append(this.id);
+			sb.append(" / ");
+			sb.append(key);
+			sb.append(" OP: ");
+			sb.append(this.operation);
+			sb.append(" / ");
+			sb.append(object.toString());
+			logger.debug(sb.toString());
 		}
 	}
 
@@ -89,7 +100,7 @@ public class ObjectCache {
 	 */
 	public void setObject(Object object) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("Updating ID " + this.id + " to value " + object.toString());
+			logger.debug(MessageFormat.format("Updating ID {0} to value {1}", this.id, object.toString())); //$NON-NLS-1$
 		}
 		this.object = object;
 	}
@@ -100,9 +111,10 @@ public class ObjectCache {
 	 * @param newOperation
 	 */
 	public void setOperation(Operation newOperation) {
-		if (ObjectCache.logger.isDebugEnabled()) {
-			ObjectCache.logger.debug("Updating Operation of ID " + this.id + " from " + this.operation + " to "
-					+ newOperation);
+		if (logger.isDebugEnabled()) {
+			String msg = "Updating Operation of ID {0} from {1} to {2}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.id, this.operation, newOperation);
+			logger.debug(msg);
 		}
 		this.operation = newOperation;
 	}
@@ -120,7 +132,7 @@ public class ObjectCache {
 	public String getKey() {
 		return this.key;
 	}
-	
+
 	/**
 	 * @return the operation
 	 */

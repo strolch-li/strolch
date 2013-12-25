@@ -15,11 +15,11 @@
  */
 package ch.eitchnet.utils.helper;
 
+import java.text.MessageFormat;
 import java.util.Properties;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class PropertiesHelper {
 
@@ -45,8 +45,11 @@ public class PropertiesHelper {
 	public static String getProperty(Properties properties, String context, String key, String def)
 			throws RuntimeException {
 		String property = properties.getProperty(key, def);
-		if (property == null)
-			throw new RuntimeException("[" + context + "] Property " + key + " is not set, and no default was given!");
+		if (property == null) {
+			String msg = "[{0}] Property {1} is not set, and no default was given!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, context, key);
+			throw new RuntimeException(msg);
+		}
 
 		return property;
 	}

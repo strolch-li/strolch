@@ -19,10 +19,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Simple helper class to generate the reverse alphabets for {@link BaseDecoding}
+ * Simple helper class to generate the reverse alphabets for {@link BaseEncoding}
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public class GenerateReverseBaseEncodingAlphabets {
 
 	public static void main(String[] args) {

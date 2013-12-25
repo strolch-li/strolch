@@ -33,7 +33,7 @@ public class ByteHelper {
 	public static long toLong(byte[] bytes) {
 
 		if (bytes.length != 8)
-			throw new IllegalArgumentException("The input byte array for a long must have 8 values");
+			throw new IllegalArgumentException("The input byte array for a long must have 8 values"); //$NON-NLS-1$
 
 		return ((long) (bytes[0] & 0xff) << 56) //
 				| ((long) (bytes[1] & 0xff) << 48) //
@@ -57,7 +57,7 @@ public class ByteHelper {
 	public static int toInt(byte[] bytes) {
 
 		if (bytes.length != 4)
-			throw new IllegalArgumentException("The input byte array for a long must have 4 values");
+			throw new IllegalArgumentException("The input byte array for a long must have 4 values"); //$NON-NLS-1$
 
 		return ((bytes[0] & 0xff) << 24) //
 				| ((bytes[1] & 0xff) << 16) //
@@ -92,7 +92,7 @@ public class ByteHelper {
 	/**
 	 * Formats the given byte array to a binary string, separating each byte by a space
 	 * 
-	 * @param b
+	 * @param bytes
 	 *            the byte to format to a binary string
 	 * 
 	 * @return the binary string
@@ -102,7 +102,7 @@ public class ByteHelper {
 
 		for (byte b : bytes) {
 			sb.append(asBinary(b));
-			sb.append(" ");
+			sb.append(StringHelper.SPACE);
 		}
 
 		return sb.toString();
@@ -129,7 +129,7 @@ public class ByteHelper {
 		sb.append(((i >>> 25) & 1));
 		sb.append(((i >>> 24) & 1));
 
-		sb.append(" ");
+		sb.append(StringHelper.SPACE);
 
 		sb.append(((i >>> 23) & 1));
 		sb.append(((i >>> 22) & 1));
@@ -140,7 +140,7 @@ public class ByteHelper {
 		sb.append(((i >>> 17) & 1));
 		sb.append(((i >>> 16) & 1));
 
-		sb.append(" ");
+		sb.append(StringHelper.SPACE);
 
 		sb.append(((i >>> 15) & 1));
 		sb.append(((i >>> 14) & 1));
@@ -151,7 +151,7 @@ public class ByteHelper {
 		sb.append(((i >>> 9) & 1));
 		sb.append(((i >>> 8) & 1));
 
-		sb.append(" ");
+		sb.append(StringHelper.SPACE);
 
 		sb.append(((i >>> 7) & 1));
 		sb.append(((i >>> 6) & 1));
@@ -186,7 +186,7 @@ public class ByteHelper {
 		sb.append(((i >>> 57) & 1));
 		sb.append(((i >>> 56) & 1));
 
-		sb.append(" ");
+		sb.append(StringHelper.SPACE);
 
 		sb.append(((i >>> 55) & 1));
 		sb.append(((i >>> 54) & 1));
@@ -197,7 +197,7 @@ public class ByteHelper {
 		sb.append(((i >>> 49) & 1));
 		sb.append(((i >>> 48) & 1));
 
-		sb.append(" ");
+		sb.append(StringHelper.SPACE);
 
 		sb.append(((i >>> 47) & 1));
 		sb.append(((i >>> 46) & 1));
@@ -208,7 +208,7 @@ public class ByteHelper {
 		sb.append(((i >>> 41) & 1));
 		sb.append(((i >>> 40) & 1));
 
-		sb.append(" ");
+		sb.append(StringHelper.SPACE);
 
 		sb.append(((i >>> 39) & 1));
 		sb.append(((i >>> 38) & 1));
@@ -219,7 +219,7 @@ public class ByteHelper {
 		sb.append(((i >>> 33) & 1));
 		sb.append(((i >>> 32) & 1));
 
-		sb.append(" ");
+		sb.append(StringHelper.SPACE);
 
 		sb.append(((i >>> 31) & 1));
 		sb.append(((i >>> 30) & 1));
@@ -230,7 +230,7 @@ public class ByteHelper {
 		sb.append(((i >>> 25) & 1));
 		sb.append(((i >>> 24) & 1));
 
-		sb.append(" ");
+		sb.append(StringHelper.SPACE);
 
 		sb.append(((i >>> 23) & 1));
 		sb.append(((i >>> 22) & 1));
@@ -241,7 +241,7 @@ public class ByteHelper {
 		sb.append(((i >>> 17) & 1));
 		sb.append(((i >>> 16) & 1));
 
-		sb.append(" ");
+		sb.append(StringHelper.SPACE);
 
 		sb.append(((i >>> 15) & 1));
 		sb.append(((i >>> 14) & 1));
@@ -252,7 +252,7 @@ public class ByteHelper {
 		sb.append(((i >>> 9) & 1));
 		sb.append(((i >>> 8) & 1));
 
-		sb.append(" ");
+		sb.append(StringHelper.SPACE);
 
 		sb.append(((i >>> 7) & 1));
 		sb.append(((i >>> 6) & 1));
