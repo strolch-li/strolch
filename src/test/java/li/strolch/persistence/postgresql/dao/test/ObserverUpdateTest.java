@@ -76,18 +76,18 @@ public class ObserverUpdateTest extends AbstractDaoImplTest {
 
 		// register an observer for orders and resources
 		ElementAddedObserver observer = new ElementAddedObserver();
-		getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.ORDER, observer);
-		getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.RESOURCE, observer);
+		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.ORDER, observer);
+		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.RESOURCE, observer);
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = persistenceHandler.openTx();) {
+		try (StrolchTransaction tx = runtimeMock.getPersistenceHandler().openTx();) {
 			tx.getOrderDao().save(newOrder);
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = persistenceHandler.openTx();) {
+		try (StrolchTransaction tx = runtimeMock.getPersistenceHandler().openTx();) {
 			tx.getResourceDao().save(newResource);
 		}
 

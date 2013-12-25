@@ -20,7 +20,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.postgresql.DbSchemaVersionCheck;
 import li.strolch.testbase.runtime.RuntimeMock;
 
@@ -30,15 +29,17 @@ import org.junit.BeforeClass;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class AbstractDaoImplTest extends RuntimeMock {
+public abstract class AbstractDaoImplTest {
+
+	public static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
+	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/test/resources/runtime/config"; //$NON-NLS-1$
 
 	private static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
 	private static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
 	private static final String DB_PASSWORD = "test"; //$NON-NLS-1$
-	public static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
-	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/runtime/config"; //$NON-NLS-1$
-	protected static PersistenceHandler persistenceHandler;
+
+	protected static RuntimeMock runtimeMock;
 
 	@BeforeClass
 	public static void beforeClass() throws SQLException {
@@ -47,12 +48,10 @@ public abstract class AbstractDaoImplTest extends RuntimeMock {
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
-		RuntimeMock.mockRuntime(rootPath, configSrc);
+		runtimeMock = new RuntimeMock();
+		runtimeMock.mockRuntime(rootPath, configSrc);
 		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
-		RuntimeMock.startContainer(rootPath);
-
-		// initialize the component configuration
-		persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
+		runtimeMock.startContainer(rootPath);
 	}
 
 	private static void dropSchema() throws SQLException {
@@ -65,6 +64,6 @@ public abstract class AbstractDaoImplTest extends RuntimeMock {
 
 	@AfterClass
 	public static void afterClass() {
-		RuntimeMock.destroyRuntime();
+		runtimeMock.destroyRuntime();
 	}
 }
