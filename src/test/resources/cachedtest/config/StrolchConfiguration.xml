@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchConfiguration>
+	<Runtime>
+		<applicationName>StrolchRuntimeTest</applicationName>
+		<Properties>
+			<dataStoreMode>CACHED</dataStoreMode>
+			<dataStoreFile>StrolchModel.xml</dataStoreFile>
+			<verbose>true</verbose>
+		</Properties>
+	</Runtime>
+	<Component>
+		<name>ServiceHandler</name>
+		<api>li.strolch.runtime.test.component.model.ServiceHandlerTest</api>
+		<impl>li.strolch.runtime.test.component.model.ServiceHandlerTestImpl</impl>
+		<depends>PersistenceHandler</depends>
+		<Properties>
+		</Properties>
+	</Component>
+	<Component>
+		<name>PostInitializer</name>
+		<api>li.strolch.runtime.test.component.model.PostInitializerTest</api>
+		<impl>li.strolch.runtime.test.component.model.PostInitializerTestImpl</impl>
+		<depends>ServiceHandler</depends>
+		<Properties>
+		</Properties>
+	</Component>
+	<Component>
+		<name>PersistenceHandler</name>
+		<api>li.strolch.persistence.api.PersistenceHandler</api>
+		<impl>li.strolch.persistence.mock.PersistenceHandlerMock</impl>
+	</Component>
+</StrolchConfiguration>

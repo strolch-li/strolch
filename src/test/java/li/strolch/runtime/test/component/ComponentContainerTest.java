@@ -21,7 +21,11 @@ import static org.junit.Assert.assertNotNull;
 import java.io.File;
 import java.text.MessageFormat;
 
+import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
+import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.persistence.api.ResourceDao;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.ComponentContainer;
 import li.strolch.runtime.agent.StrolchAgent;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -40,11 +44,15 @@ public class ComponentContainerTest {
 
 	public static final String PATH_REALM_CONTAINER = "src/test/resources/realmtest";
 	public static final String PATH_TRANSIENT_CONTAINER = "src/test/resources/transienttest";
+	public static final String PATH_TRANSACTIONAL_CONTAINER = "src/test/resources/transactionaltest";
+	public static final String PATH_CACHED_CONTAINER = "src/test/resources/cachedtest";
 	public static final String PATH_EMPTY_CONTAINER = "src/test/resources/emptytest";
 
-	public static final String PATH_REALM_RUNTIME = "target/realmtest/"; //$NON-NLS-1$
-	public static final String PATH_TRANSIENT_RUNTIME = "target/transienttest/"; //$NON-NLS-1$
-	public static final String PATH_EMPTY_RUNTIME = "target/emptytest/"; //$NON-NLS-1$
+	public static final String PATH_REALM_RUNTIME = "target/realmtest/";
+	public static final String PATH_TRANSIENT_RUNTIME = "target/transienttest/";
+	public static final String PATH_TRANSACTIONAL_RUNTIME = "target/transactionaltest/";
+	public static final String PATH_CACHED_RUNTIME = "target/cachedtest/";
+	public static final String PATH_EMPTY_RUNTIME = "target/emptytest/";
 
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerTest.class);
 	private static final String TARGET = "target"; //$NON-NLS-1$
@@ -68,6 +76,32 @@ public class ComponentContainerTest {
 		try {
 			StrolchAgent agent = startContainer(PATH_TRANSIENT_RUNTIME, PATH_TRANSIENT_CONTAINER);
 			testContainer(agent);
+			destroyContainer(agent);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@Test
+	public void shouldStartTransactionalContainer() {
+
+		try {
+			StrolchAgent agent = startContainer(PATH_TRANSACTIONAL_RUNTIME, PATH_TRANSACTIONAL_CONTAINER);
+			testPersistenceContainer(agent);
+			destroyContainer(agent);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@Test
+	public void shouldStartCachedContainer() {
+
+		try {
+			StrolchAgent agent = startContainer(PATH_CACHED_RUNTIME, PATH_CACHED_CONTAINER);
+			testPersistenceContainer(agent);
 			destroyContainer(agent);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -100,6 +134,24 @@ public class ComponentContainerTest {
 		Resource resource = persistenceHandler.getTestResource("@testRes", "Test Res", "Test");
 		assertNotNull(resource);
 		assertEquals("@testRes", resource.getId());
+	}
+
+	private static void testPersistenceContainer(StrolchAgent agent) {
+
+		ComponentContainer container = agent.getContainer();
+
+		ServiceHandlerTest serviceHandler = container.getComponent(ServiceHandlerTest.class);
+		ServiceResultTest result = serviceHandler.doService();
+		assertEquals(1, result.getResult());
+
+		PersistenceHandler persistenceHandler = container.getComponent(PersistenceHandler.class);
+		try (StrolchTransaction tx = persistenceHandler.openTx()) {
+			ResourceDao resourceDao = tx.getResourceDao();
+			resourceDao.save(ModelGenerator.createResource("@testRes", "Test Res", "Test"));
+			Resource queriesRes = resourceDao.queryBy("Test", "@testRes");
+			assertNotNull(queriesRes);
+			assertEquals("@testRes", queriesRes.getId());
+		}
 	}
 
 	public static StrolchAgent startContainer(String rootPath, String configSrc) {
