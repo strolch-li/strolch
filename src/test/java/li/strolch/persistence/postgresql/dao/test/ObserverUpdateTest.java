@@ -20,6 +20,7 @@ import static li.strolch.model.ModelGenerator.createResource;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,9 @@ public class ObserverUpdateTest {
 	}
 
 	@BeforeClass
-	public static void beforeClass() {
+	public static void beforeClass() throws SQLException {
+
+		XmlCachedDaoTest.dropSchema();
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);

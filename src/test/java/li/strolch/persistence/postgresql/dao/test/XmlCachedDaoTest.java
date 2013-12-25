@@ -57,7 +57,7 @@ public class XmlCachedDaoTest extends AbstractModelTest {
 		runtimeMock.startContainer(rootPath);
 	}
 
-	private static void dropSchema() throws SQLException {
+	public static void dropSchema() throws SQLException {
 		String dbVersion = DbSchemaVersionCheck.getExpectedDbVersion();
 		String sql = DbSchemaVersionCheck.getSql(dbVersion, "drop"); //$NON-NLS-1$
 		try (Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
