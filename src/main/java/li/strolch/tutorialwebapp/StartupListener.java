@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @WebListener
+@SuppressWarnings("nls")
 public class StartupListener implements ServletContextListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(StartupListener.class);
