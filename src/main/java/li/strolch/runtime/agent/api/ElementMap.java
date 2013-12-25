@@ -19,33 +19,36 @@ import java.util.List;
 import java.util.Set;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface ElementMap<T extends StrolchElement> {
 
-	public boolean hasType(String type);
+	public boolean hasType(StrolchTransaction tx, String type);
 
-	public boolean hasElement(String type, String id);
+	public boolean hasElement(StrolchTransaction tx, String type, String id);
 
-	public T getBy(String type, String id);
+	public T getBy(StrolchTransaction tx, String type, String id);
 
-	public List<T> getAllElements();
+	public List<T> getAllElements(StrolchTransaction tx);
 
-	public List<T> getElementsBy(String type);
+	public List<T> getElementsBy(StrolchTransaction tx, String type);
 
-	public Set<String> getTypes();
+	public Set<String> getTypes(StrolchTransaction tx);
 
-	public Set<String> getAllKeys();
+	public Set<String> getAllKeys(StrolchTransaction tx);
 
-	public Set<String> getKeysBy(String type);
+	public Set<String> getKeysBy(StrolchTransaction tx, String type);
 
-	public void add(T element);
+	public void add(StrolchTransaction tx, T element);
 
-	public void update(T element);
+	public void update(StrolchTransaction tx, T element);
 
-	public void remove(T element);
+	public void remove(StrolchTransaction tx, T element);
 
+	public StrolchTransaction openTx();
+
+	public StrolchTransaction openTx(String realm);
 }

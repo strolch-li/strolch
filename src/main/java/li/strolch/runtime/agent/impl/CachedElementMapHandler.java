@@ -22,7 +22,6 @@ import java.util.Set;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.OrderDao;
-import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.api.OrderMap;
@@ -54,25 +53,25 @@ public class CachedElementMapHandler extends InMemoryElementMapHandler {
 			OrderMap orderMap = getContainer().getOrderMap(realm);
 			ResourceMap resourceMap = getContainer().getResourceMap(realm);
 
-			PersistenceHandler persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
-			try (StrolchTransaction tx = persistenceHandler.openTx(realm)) {
-
+			try (StrolchTransaction tx = resourceMap.openTx(realm)) {
 				ResourceDao resourceDao = tx.getResourceDao();
 				Set<String> resourceTypes = resourceDao.queryTypes();
 				for (String type : resourceTypes) {
 					List<Resource> resources = resourceDao.queryAll(type);
 					for (Resource resource : resources) {
-						resourceMap.add(resource);
+						resourceMap.add(tx, resource);
 						nrOfResources++;
 					}
 				}
+			}
 
+			try (StrolchTransaction tx = orderMap.openTx(realm)) {
 				OrderDao orderDao = tx.getOrderDao();
 				Set<String> orderTypes = orderDao.queryTypes();
 				for (String type : orderTypes) {
 					List<Order> orders = orderDao.queryAll(type);
 					for (Order order : orders) {
-						orderMap.add(order);
+						orderMap.add(tx, order);
 						nrOfOrders++;
 					}
 				}

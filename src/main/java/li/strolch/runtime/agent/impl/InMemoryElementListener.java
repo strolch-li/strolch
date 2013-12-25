@@ -18,6 +18,7 @@ package li.strolch.runtime.agent.impl;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.xml.StrolchElementListener;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.api.OrderMap;
 import li.strolch.runtime.agent.api.ResourceMap;
 
@@ -26,21 +27,23 @@ import li.strolch.runtime.agent.api.ResourceMap;
  */
 public class InMemoryElementListener implements StrolchElementListener {
 
+	private StrolchTransaction tx;
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;
 
-	public InMemoryElementListener(ResourceMap resourceMap, OrderMap orderMap) {
+	public InMemoryElementListener(StrolchTransaction tx, ResourceMap resourceMap, OrderMap orderMap) {
+		this.tx = tx;
 		this.resourceMap = resourceMap;
 		this.orderMap = orderMap;
 	}
 
 	@Override
 	public void notifyResource(Resource resource) {
-		this.resourceMap.add(resource);
+		this.resourceMap.add(this.tx, resource);
 	}
 
 	@Override
 	public void notifyOrder(Order order) {
-		this.orderMap.add(order);
+		this.orderMap.add(this.tx, order);
 	}
 }

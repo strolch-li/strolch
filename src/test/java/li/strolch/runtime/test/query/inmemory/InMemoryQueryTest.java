@@ -57,7 +57,7 @@ public class InMemoryQueryTest {
 		orderQuery.setNavigator(new ListNavigator<>(orders));
 		orderQuery.addSelector(new IdSelector<Order>("@1"));
 
-		List<Order> result = orderQuery.doQuery();
+		List<Order> result = orderQuery.doQuery(null);
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
 	}
@@ -71,7 +71,7 @@ public class InMemoryQueryTest {
 		resourceQuery.setNavigator(new ListNavigator<>(resources));
 		resourceQuery.addSelector(new IdSelector<Resource>("@1"));
 
-		List<Resource> result = resourceQuery.doQuery();
+		List<Resource> result = resourceQuery.doQuery(null);
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
 	}
@@ -87,7 +87,7 @@ public class InMemoryQueryTest {
 				new IdSelector<Resource>("@4"));
 		resourceQuery.addSelector(andSelector);
 
-		List<Resource> result = resourceQuery.doQuery();
+		List<Resource> result = resourceQuery.doQuery(null);
 		assertEquals(2, result.size());
 		assertEquals("@3", result.get(0).getId());
 		assertEquals("@4", result.get(1).getId());
@@ -106,7 +106,7 @@ public class InMemoryQueryTest {
 		BooleanSelector<Resource> andSelector = new AndSelector<Resource>(andSelectors);
 		resourceQuery.addSelector(andSelector);
 
-		List<Resource> result = resourceQuery.doQuery();
+		List<Resource> result = resourceQuery.doQuery(null);
 		assertEquals(1, result.size());
 		assertEquals("@3", result.get(0).getId());
 	}
@@ -124,7 +124,7 @@ public class InMemoryQueryTest {
 		BooleanSelector<Resource> andSelector = new AndSelector<Resource>(andSelectors);
 		resourceQuery.addSelector(andSelector);
 
-		List<Resource> result = resourceQuery.doQuery();
+		List<Resource> result = resourceQuery.doQuery(null);
 		assertEquals(0, result.size());
 	}
 
@@ -140,7 +140,7 @@ public class InMemoryQueryTest {
 		ballQuery.addSelector(ParameterSelector.<Resource>booleanSelector("parameters", "forChildren", true));
 		ballQuery.addSelector(ParameterSelector.<Resource>floatSelector("parameters", "diameter", 22.0));
 		
-		List<Resource> result = ballQuery.doQuery();
+		List<Resource> result = ballQuery.doQuery(null);
 		assertEquals(1, result.size());
 	}
 

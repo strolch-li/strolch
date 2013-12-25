@@ -16,21 +16,16 @@
 package li.strolch.runtime.agent.impl;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
 
-import li.strolch.persistence.api.PersistenceHandler;
-import li.strolch.runtime.StrolchConstants;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.api.OrderMap;
 import li.strolch.runtime.agent.api.ResourceMap;
-import li.strolch.runtime.agent.api.StrolchAgent;
-import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.configuration.RuntimeConfiguration;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class TransactionalElementMapHandler extends AbstractElementMapHandler {
+public class TransactionalElementMapHandler extends InMemoryElementMapHandler {
 
 	/**
 	 * @param container
@@ -38,24 +33,6 @@ public class TransactionalElementMapHandler extends AbstractElementMapHandler {
 	 */
 	public TransactionalElementMapHandler(ComponentContainerImpl container, String componentName) {
 		super(container, componentName);
-	}
-
-	@Override
-	public void initialize(ComponentConfiguration configuration) {
-
-		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
-		String[] realms = runtimeConfiguration.getStringArray(StrolchAgent.PROP_REALMS, StrolchConstants.DEFAULT_REALM);
-
-		this.realms = new HashMap<>();
-		for (String realm : realms) {
-			PersistenceHandler persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
-			TransactionalResourceMap resourceMap = new TransactionalResourceMap(realm, persistenceHandler);
-			TransactionalOrderMap orderMap = new TransactionalOrderMap(realm, persistenceHandler);
-			StrolchRealm strolchRealm = new StrolchRealm(realm, resourceMap, orderMap);
-			this.realms.put(realm, strolchRealm);
-		}
-
-		super.initialize(configuration);
 	}
 
 	@Override
@@ -68,10 +45,14 @@ public class TransactionalElementMapHandler extends AbstractElementMapHandler {
 			int nrOfResources = 0;
 
 			OrderMap orderMap = getContainer().getOrderMap(realm);
-			ResourceMap resourceMap = getContainer().getResourceMap(realm);
+			try (StrolchTransaction tx = orderMap.openTx(realm)) {
+				nrOfOrders = orderMap.getAllKeys(tx).size();
+			}
 
-			nrOfOrders = orderMap.getAllKeys().size();
-			nrOfResources = resourceMap.getAllKeys().size();
+			ResourceMap resourceMap = getContainer().getResourceMap(realm);
+			try (StrolchTransaction tx = resourceMap.openTx(realm)) {
+				nrOfResources = resourceMap.getAllKeys(tx).size();
+			}
 
 			long duration = System.nanoTime() - start;
 			String durationS = StringHelper.formatNanoDuration(duration);

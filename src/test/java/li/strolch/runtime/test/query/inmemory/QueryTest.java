@@ -33,6 +33,9 @@ import li.strolch.model.query.ParameterSelection;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchTypeNavigation;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.agent.api.OrderMap;
+import li.strolch.runtime.agent.api.ResourceMap;
 import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.query.inmemory.InMemoryOrderQueryVisitor;
 import li.strolch.runtime.query.inmemory.InMemoryQuery;
@@ -58,7 +61,10 @@ public class QueryTest {
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		res1.addParameter(BAG_ID, iP);
-		agent.getResourceMap().add(res1);
+		ResourceMap resourceMap = agent.getResourceMap();
+		try (StrolchTransaction tx = resourceMap.openTx()) {
+			resourceMap.add(tx, res1);
+		}
 
 		List<Selection> elementAndSelections = new ArrayList<>();
 		elementAndSelections.add(new IdSelection("@1"));
@@ -69,7 +75,10 @@ public class QueryTest {
 
 		InMemoryResourceQueryVisitor resourceQuery = new InMemoryResourceQueryVisitor(agent.getContainer());
 		InMemoryQuery<Resource> inMemoryQuery = resourceQuery.visit(query);
-		List<Resource> result = inMemoryQuery.doQuery();
+		List<Resource> result;
+		try (StrolchTransaction tx = resourceMap.openTx()) {
+			result = inMemoryQuery.doQuery(tx);
+		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
 	}
@@ -82,7 +91,10 @@ public class QueryTest {
 		Order o1 = createOrder("@1", "Test Order", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		o1.addParameter(BAG_ID, iP);
-		agent.getOrderMap().add(o1);
+		OrderMap orderMap = agent.getOrderMap();
+		try (StrolchTransaction tx = orderMap.openTx()) {
+			orderMap.add(tx, o1);
+		}
 
 		List<Selection> elementAndSelections = new ArrayList<>();
 		elementAndSelections.add(new IdSelection("@1"));
@@ -93,7 +105,10 @@ public class QueryTest {
 
 		InMemoryOrderQueryVisitor orderQuery = new InMemoryOrderQueryVisitor(agent.getContainer());
 		InMemoryQuery<Order> inMemoryQuery = orderQuery.visit(query);
-		List<Order> result = inMemoryQuery.doQuery();
+		List<Order> result;
+		try (StrolchTransaction tx = orderMap.openTx()) {
+			result = inMemoryQuery.doQuery(tx);
+		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
 	}

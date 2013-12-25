@@ -20,10 +20,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class InMemoryQuery<T extends StrolchElement> {
 
@@ -51,9 +51,9 @@ public class InMemoryQuery<T extends StrolchElement> {
 		this.selectors.add(selector);
 	}
 
-	public List<T> doQuery() {
+	public List<T> doQuery(StrolchTransaction tx) {
 
-		List<T> elements = this.navigator.navigate();
+		List<T> elements = this.navigator.navigate(tx);
 		Iterator<T> iter = elements.iterator();
 		while (iter.hasNext()) {
 			T element = iter.next();

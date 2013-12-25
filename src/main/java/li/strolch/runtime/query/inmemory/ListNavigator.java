@@ -18,10 +18,10 @@ package li.strolch.runtime.query.inmemory;
 import java.util.List;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class ListNavigator<T extends StrolchElement> implements Navigator<T> {
 
@@ -32,7 +32,7 @@ public class ListNavigator<T extends StrolchElement> implements Navigator<T> {
 	}
 
 	@Override
-	public List<T> navigate() {
+	public List<T> navigate(StrolchTransaction tx) {
 		return this.input;
 	}
 }

@@ -18,11 +18,11 @@ package li.strolch.runtime.query.inmemory;
 import java.util.List;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.api.ElementMap;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public abstract class StrolchTypeNavigator<T extends StrolchElement> implements Navigator<T> {
 
@@ -32,8 +32,9 @@ public abstract class StrolchTypeNavigator<T extends StrolchElement> implements 
 		this.type = type;
 	}
 
-	public List<T> navigate() {
-		return getElementMap().getElementsBy(this.type);
+	@Override
+	public List<T> navigate(StrolchTransaction tx) {
+		return getElementMap().getElementsBy(tx, this.type);
 	}
 
 	protected abstract ElementMap<T> getElementMap();

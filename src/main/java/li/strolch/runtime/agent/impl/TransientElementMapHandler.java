@@ -22,6 +22,7 @@ import java.util.Map;
 
 import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
 import li.strolch.model.xml.XmlModelFileHandler;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.agent.api.OrderMap;
 import li.strolch.runtime.agent.api.ResourceMap;
@@ -82,10 +83,14 @@ public class TransientElementMapHandler extends InMemoryElementMapHandler {
 			OrderMap orderMap = strolchRealm.getOrderMap();
 
 			File modelFile = this.realmModelFiles.get(realm);
-			InMemoryElementListener elementListener = new InMemoryElementListener(resourceMap, orderMap);
-			XmlModelFileHandler handler = new XmlModelFileHandler(elementListener, modelFile);
-			handler.parseFile();
-			XmlModelStatistics statistics = handler.getStatistics();
+			XmlModelStatistics statistics;
+			try (StrolchTransaction tx = resourceMap.openTx(realm)) {
+				InMemoryElementListener elementListener = new InMemoryElementListener(tx, resourceMap, orderMap);
+				XmlModelFileHandler handler = new XmlModelFileHandler(elementListener, modelFile);
+				handler.parseFile();
+				statistics = handler.getStatistics();
+			}
+
 			String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
 			logger.info(MessageFormat.format(
 					"Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(), realm, durationS)); //$NON-NLS-1$

@@ -18,12 +18,12 @@ package li.strolch.runtime.query.inmemory;
 import java.util.List;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
 public interface Navigator<T extends StrolchElement>{
 
-	public List<T> navigate();
+	public List<T> navigate(StrolchTransaction tx);
 }
