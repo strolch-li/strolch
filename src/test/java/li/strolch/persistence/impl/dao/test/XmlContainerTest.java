@@ -17,7 +17,6 @@ package li.strolch.persistence.impl.dao.test;
 
 import java.io.File;
 
-import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.testbase.runtime.RuntimeMock;
 
@@ -28,31 +27,29 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class XmlContainerTest extends RuntimeMock {
+public class XmlContainerTest {
 
-	protected static PersistenceHandler persistenceHandler;
+	protected static RuntimeMock runtimeMock;
 
 	@BeforeClass
 	public static void beforeClass() {
 
 		File rootPath = new File(AbstractDaoImplTest.RUNTIME_PATH);
 		File configSrc = new File(AbstractDaoImplTest.CONFIG_SRC);
-		RuntimeMock.mockRuntime(rootPath, configSrc);
+		runtimeMock = new RuntimeMock();
+		runtimeMock.mockRuntime(rootPath, configSrc);
 		new File(rootPath, AbstractDaoImplTest.DB_STORE_PATH_DIR).mkdir();
-		RuntimeMock.startContainer(rootPath);
-
-		// initialize the component configuration
-		persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
+		runtimeMock.startContainer(rootPath);
 	}
 
 	@AfterClass
 	public static void afterClass() {
-		RuntimeMock.destroyRuntime();
+		runtimeMock.destroyRuntime();
 	}
 
 	@Test
 	public void shouldStartContainer() {
-		try (StrolchTransaction tx = getPersistenceHandler().openTx()) {
+		try (StrolchTransaction tx = runtimeMock.getPersistenceHandler().openTx()) {
 			tx.getOrderDao().queryKeySet();
 		}
 	}

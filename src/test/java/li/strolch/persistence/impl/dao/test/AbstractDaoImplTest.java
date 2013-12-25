@@ -17,7 +17,6 @@ package li.strolch.persistence.impl.dao.test;
 
 import java.io.File;
 
-import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
@@ -26,28 +25,27 @@ import org.junit.BeforeClass;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class AbstractDaoImplTest extends RuntimeMock {
+public abstract class AbstractDaoImplTest {
 
 	public static final String RUNTIME_PATH = "target/strolchRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/runtime/config"; //$NON-NLS-1$
-	protected static PersistenceHandler persistenceHandler;
+	public static final String CONFIG_SRC = "src/test/resources/cachedruntime/config"; //$NON-NLS-1$
+
+	protected static RuntimeMock runtimeMock;
 
 	@BeforeClass
 	public static void beforeClass() {
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
-		RuntimeMock.mockRuntime(rootPath, configSrc);
+		runtimeMock = new RuntimeMock();
+		runtimeMock.mockRuntime(rootPath, configSrc);
 		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
-		RuntimeMock.startContainer(rootPath);
-
-		// initialize the component configuration
-		persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
+		runtimeMock.startContainer(rootPath);
 	}
 
 	@AfterClass
 	public static void afterClass() {
-		RuntimeMock.destroyRuntime();
+		runtimeMock.destroyRuntime();
 	}
 }

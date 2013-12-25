@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchConfiguration>
+	<Runtime>
+		<applicationName>StrolchPersistenceTest</applicationName>
+		<Properties>
+			<dataStoreMode>TRANSACTIONAL</dataStoreMode>
+			<verbose>true</verbose>
+		</Properties>
+	</Runtime>
+	<Component>
+		<name>PersistenceHandler</name>
+		<api>li.strolch.persistence.api.PersistenceHandler</api>
+		<impl>li.strolch.persistence.impl.XmlPersistenceHandler</impl>
+		<Properties>
+			<verbose>true</verbose>
+		</Properties>
+	</Component>
+	<Component>
+		<name>ObserverHandler</name>
+		<api>li.strolch.runtime.observer.ObserverHandler</api>
+		<impl>li.strolch.runtime.observer.DefaultObserverHandler</impl>
+	</Component>
+</StrolchConfiguration>
