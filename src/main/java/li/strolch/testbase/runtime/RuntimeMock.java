@@ -29,30 +29,31 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.FileHelper;
 
-public class RuntimeMock {
+public final class RuntimeMock {
 
 	private static final Logger logger = LoggerFactory.getLogger(RuntimeMock.class);
 	private static final String TARGET = "target"; //$NON-NLS-1$
 
-	private static ComponentContainer container;
-	private static StrolchAgent agent;
+	private ComponentContainer container;
+	private StrolchAgent agent;
 
-	/**
-	 * @return the container
-	 */
-	public static ComponentContainer getContainer() {
-		return container;
+	public ComponentContainer getContainer() {
+		return this.container;
 	}
 
-	public static StrolchPrivilegeHandler getPrivilegeHandler() {
-		return container.getComponent(StrolchPrivilegeHandler.class);
+	public StrolchAgent getAgent() {
+		return this.agent;
 	}
 
-	public static PersistenceHandler getPersistenceHandler() {
-		return container.getComponent(PersistenceHandler.class);
+	public StrolchPrivilegeHandler getPrivilegeHandler() {
+		return this.container.getComponent(StrolchPrivilegeHandler.class);
 	}
 
-	public static void mockRuntime(File rootPathF, File configSrc) {
+	public PersistenceHandler getPersistenceHandler() {
+		return this.container.getComponent(PersistenceHandler.class);
+	}
+
+	public void mockRuntime(File rootPathF, File configSrc) {
 
 		if (!rootPathF.getParentFile().getName().equals(TARGET)) {
 			String msg = "Mocking path must be in a maven target: {0}"; //$NON-NLS-1$
@@ -90,7 +91,7 @@ public class RuntimeMock {
 		}
 	}
 
-	public static void startContainer(File rootPathF) {
+	public void startContainer(File rootPathF) {
 
 		try {
 			StrolchAgent agent = new StrolchAgent();
@@ -98,8 +99,8 @@ public class RuntimeMock {
 			agent.initialize();
 			agent.start();
 
-			RuntimeMock.agent = agent;
-			RuntimeMock.container = agent.getContainer();
+			this.agent = agent;
+			this.container = agent.getContainer();
 
 		} catch (Exception e) {
 			logger.error("Failed to start mocked container due to: " + e.getMessage(), e); //$NON-NLS-1$
@@ -108,19 +109,19 @@ public class RuntimeMock {
 		}
 	}
 
-	public static void destroyRuntime() {
+	public void destroyRuntime() {
 
-		if (agent == null)
+		if (this.agent == null)
 			return;
 
 		try {
-			agent.stop();
+			this.agent.stop();
 		} catch (Exception e) {
 			logger.info("Failed to stop container: " + e.getMessage()); //$NON-NLS-1$
 		}
 
 		try {
-			agent.destroy();
+			this.agent.destroy();
 		} catch (Exception e) {
 			logger.info("Failed to destroy container: " + e.getMessage()); //$NON-NLS-1$
 		}

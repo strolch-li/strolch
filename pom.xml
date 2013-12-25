@@ -38,6 +38,11 @@
 			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.runtime</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
