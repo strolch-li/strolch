@@ -15,8 +15,11 @@
  */
 package li.strolch.persistence.impl;
 
+import java.util.List;
+
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
+import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
@@ -29,5 +32,11 @@ public class XmlResourceDao extends AbstractDao<Resource> implements ResourceDao
 	@Override
 	protected String getClassType() {
 		return Tags.RESOURCE;
+	}
+
+	@Override
+	public List<Resource> doQuery(ResourceQuery query) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

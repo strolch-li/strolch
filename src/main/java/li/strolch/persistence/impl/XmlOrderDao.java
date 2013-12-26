@@ -15,8 +15,11 @@
  */
 package li.strolch.persistence.impl;
 
+import java.util.List;
+
 import li.strolch.model.Order;
 import li.strolch.model.Tags;
+import li.strolch.model.query.OrderQuery;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
@@ -29,5 +32,11 @@ public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
 	@Override
 	protected String getClassType() {
 		return Tags.ORDER;
+	}
+
+	@Override
+	public List<Order> doQuery(OrderQuery query) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
