@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLXML;
 import java.text.MessageFormat;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -29,6 +30,7 @@ import javax.xml.transform.sax.SAXResult;
 
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
+import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.xml.ResourceToSaxVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
 import li.strolch.model.xml.XmlModelDefaultHandler;
@@ -129,5 +131,11 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Resource {0} due to {1}",
 					resource.getLocator(), e.getLocalizedMessage()), e);
 		}
+	}
+
+	@Override
+	public List<Resource> doQuery(ResourceQuery query) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

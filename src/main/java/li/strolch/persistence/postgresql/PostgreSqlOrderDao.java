@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.SQLXML;
 import java.text.MessageFormat;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -31,6 +32,7 @@ import javax.xml.transform.sax.SAXResult;
 
 import li.strolch.model.Order;
 import li.strolch.model.Tags;
+import li.strolch.model.query.OrderQuery;
 import li.strolch.model.xml.OrderToSaxVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
 import li.strolch.model.xml.XmlModelDefaultHandler;
@@ -140,5 +142,11 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Order {0} due to {1}",
 					order.getLocator(), e.getLocalizedMessage()), e);
 		}
+	}
+
+	@Override
+	public List<Order> doQuery(OrderQuery query) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
