@@ -35,7 +35,7 @@
 	<Component>
 		<name>PersistenceHandler</name>
 		<api>li.strolch.persistence.api.PersistenceHandler</api>
-		<impl>li.strolch.persistence.impl.XmlPersistenceHandler</impl>
+		<impl>li.strolch.persistence.xml.XmlPersistenceHandler</impl>
 		<Properties>
 			<verbose>true</verbose>
 		</Properties>
