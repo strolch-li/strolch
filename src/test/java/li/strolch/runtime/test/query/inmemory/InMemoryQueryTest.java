@@ -29,11 +29,13 @@ import li.strolch.model.State;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.persistence.inmemory.InMemoryOrderDao;
+import li.strolch.persistence.inmemory.InMemoryResourceDao;
 import li.strolch.runtime.query.inmemory.AndSelector;
+import li.strolch.runtime.query.inmemory.AnyNavigator;
 import li.strolch.runtime.query.inmemory.BooleanSelector;
 import li.strolch.runtime.query.inmemory.IdSelector;
 import li.strolch.runtime.query.inmemory.InMemoryQuery;
-import li.strolch.runtime.query.inmemory.ListNavigator;
 import li.strolch.runtime.query.inmemory.NameSelector;
 import li.strolch.runtime.query.inmemory.OrSelector;
 import li.strolch.runtime.query.inmemory.ParameterSelector;
@@ -52,12 +54,14 @@ public class InMemoryQueryTest {
 	public void shouldQueryOrderById() {
 
 		List<Order> orders = getOrders();
+		InMemoryOrderDao dao = new InMemoryOrderDao();
+		dao.saveAll(orders);
 
 		InMemoryQuery<Order> orderQuery = new InMemoryQuery<>();
-		orderQuery.setNavigator(new ListNavigator<>(orders));
+		orderQuery.setNavigator(new AnyNavigator<Order>());
 		orderQuery.addSelector(new IdSelector<Order>("@1"));
 
-		List<Order> result = orderQuery.doQuery(null);
+		List<Order> result = orderQuery.doQuery(dao);
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
 	}
@@ -66,12 +70,14 @@ public class InMemoryQueryTest {
 	public void shouldQueryResourceById() {
 
 		List<Resource> resources = getResources();
+		InMemoryResourceDao dao = new InMemoryResourceDao();
+		dao.saveAll(resources);
 
 		InMemoryQuery<Resource> resourceQuery = new InMemoryQuery<>();
-		resourceQuery.setNavigator(new ListNavigator<>(resources));
+		resourceQuery.setNavigator(new AnyNavigator<Resource>());
 		resourceQuery.addSelector(new IdSelector<Resource>("@1"));
 
-		List<Resource> result = resourceQuery.doQuery(null);
+		List<Resource> result = resourceQuery.doQuery(dao);
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
 	}
@@ -80,14 +86,16 @@ public class InMemoryQueryTest {
 	public void shouldQueryResourceByIdOr() {
 
 		List<Resource> resources = getResources();
+		InMemoryResourceDao dao = new InMemoryResourceDao();
+		dao.saveAll(resources);
 
 		InMemoryQuery<Resource> resourceQuery = new InMemoryQuery<>();
-		resourceQuery.setNavigator(new ListNavigator<>(resources));
+		resourceQuery.setNavigator(new AnyNavigator<Resource>());
 		BooleanSelector<Resource> andSelector = new OrSelector<>(new IdSelector<Resource>("@3"),
 				new IdSelector<Resource>("@4"));
 		resourceQuery.addSelector(andSelector);
 
-		List<Resource> result = resourceQuery.doQuery(null);
+		List<Resource> result = resourceQuery.doQuery(dao);
 		assertEquals(2, result.size());
 		assertEquals("@3", result.get(0).getId());
 		assertEquals("@4", result.get(1).getId());
@@ -97,16 +105,18 @@ public class InMemoryQueryTest {
 	public void shouldQueryResourceByIdAnd() {
 
 		List<Resource> resources = getResources();
+		InMemoryResourceDao dao = new InMemoryResourceDao();
+		dao.saveAll(resources);
 
 		InMemoryQuery<Resource> resourceQuery = new InMemoryQuery<>();
-		resourceQuery.setNavigator(new ListNavigator<>(resources));
+		resourceQuery.setNavigator(new AnyNavigator<Resource>());
 		List<Selector<Resource>> andSelectors = new ArrayList<>();
 		andSelectors.add(new IdSelector<Resource>("@3"));
 		andSelectors.add(new NameSelector<Resource>("Res 3"));
 		BooleanSelector<Resource> andSelector = new AndSelector<Resource>(andSelectors);
 		resourceQuery.addSelector(andSelector);
 
-		List<Resource> result = resourceQuery.doQuery(null);
+		List<Resource> result = resourceQuery.doQuery(dao);
 		assertEquals(1, result.size());
 		assertEquals("@3", result.get(0).getId());
 	}
@@ -115,16 +125,18 @@ public class InMemoryQueryTest {
 	public void shouldNotQueryResourceByIdAnd() {
 
 		List<Resource> resources = getResources();
+		InMemoryResourceDao dao = new InMemoryResourceDao();
+		dao.saveAll(resources);
 
 		InMemoryQuery<Resource> resourceQuery = new InMemoryQuery<>();
-		resourceQuery.setNavigator(new ListNavigator<>(resources));
+		resourceQuery.setNavigator(new AnyNavigator<Resource>());
 		List<Selector<Resource>> andSelectors = new ArrayList<>();
 		andSelectors.add(new IdSelector<Resource>("@3"));
 		andSelectors.add(new NameSelector<Resource>("Res 4"));
 		BooleanSelector<Resource> andSelector = new AndSelector<Resource>(andSelectors);
 		resourceQuery.addSelector(andSelector);
 
-		List<Resource> result = resourceQuery.doQuery(null);
+		List<Resource> result = resourceQuery.doQuery(dao);
 		assertEquals(0, result.size());
 	}
 
@@ -133,14 +145,16 @@ public class InMemoryQueryTest {
 
 		List<Resource> resources = getResources();
 		resources.add(getBallResource());
+		InMemoryResourceDao dao = new InMemoryResourceDao();
+		dao.saveAll(resources);
 
 		InMemoryQuery<Resource> ballQuery = new InMemoryQuery<>();
-		ballQuery.setNavigator(new ListNavigator<>(resources));
-		ballQuery.addSelector(ParameterSelector.<Resource>stringSelector("parameters", "color", "red"));
-		ballQuery.addSelector(ParameterSelector.<Resource>booleanSelector("parameters", "forChildren", true));
-		ballQuery.addSelector(ParameterSelector.<Resource>floatSelector("parameters", "diameter", 22.0));
-		
-		List<Resource> result = ballQuery.doQuery(null);
+		ballQuery.setNavigator(new AnyNavigator<Resource>());
+		ballQuery.addSelector(ParameterSelector.<Resource> stringSelector("parameters", "color", "red"));
+		ballQuery.addSelector(ParameterSelector.<Resource> booleanSelector("parameters", "forChildren", true));
+		ballQuery.addSelector(ParameterSelector.<Resource> floatSelector("parameters", "diameter", 22.0));
+
+		List<Resource> result = ballQuery.doQuery(dao);
 		assertEquals(1, result.size());
 	}
 

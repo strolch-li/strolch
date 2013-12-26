@@ -18,21 +18,15 @@ package li.strolch.runtime.query.inmemory;
 import java.util.List;
 
 import li.strolch.model.StrolchElement;
-import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.StrolchDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ListNavigator<T extends StrolchElement> implements Navigator<T> {
-
-	private List<T> input;
-
-	public ListNavigator(List<T> input) {
-		this.input = input;
-	}
+public class AnyNavigator<T extends StrolchElement> implements Navigator<T> {
 
 	@Override
-	public List<T> navigate(StrolchTransaction tx) {
-		return this.input;
+	public List<T> navigate(StrolchDao<T> dao) {
+		return dao.queryAll();
 	}
 }

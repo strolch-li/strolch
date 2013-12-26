@@ -15,34 +15,25 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import li.strolch.model.Resource;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.ResourceQueryVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.runtime.agent.api.ComponentContainer;
+import li.strolch.persistence.api.ResourceDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource> implements ResourceQueryVisitor {
+public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource, ResourceDao> implements
+		ResourceQueryVisitor {
 
-	private ComponentContainer container;
-
-	private Navigator<Resource> navigator;
-	private List<Selector<Resource>> selectors;
-
-	public InMemoryResourceQueryVisitor(ComponentContainer container) {
-		super(container);
-		this.container = container;
-		this.selectors = new ArrayList<>();
+	public InMemoryResourceQueryVisitor() {
+		super();
 	}
 
 	@Override
-	protected InMemoryQueryVisitor<Resource> newInstance() {
-		return new InMemoryResourceQueryVisitor(this.container);
+	protected InMemoryQueryVisitor<Resource, ResourceDao> newInstance() {
+		return new InMemoryResourceQueryVisitor();
 	}
 
 	public InMemoryQuery<Resource> visit(ResourceQuery resourceQuery) {
@@ -58,6 +49,6 @@ public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource>
 
 	@Override
 	public void visit(StrolchTypeNavigation navigation) {
-		this.navigator = new ResourceTypeNavigator(navigation.getType(), this.container);
+		this.navigator = new ResourceTypeNavigator(navigation.getType());
 	}
 }

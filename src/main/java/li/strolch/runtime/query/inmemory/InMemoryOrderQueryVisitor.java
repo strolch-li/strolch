@@ -21,20 +21,20 @@ import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.OrderQueryVisitor;
 import li.strolch.model.query.StateSelection;
 import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.runtime.agent.api.ComponentContainer;
+import li.strolch.persistence.api.OrderDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order> implements OrderQueryVisitor {
+public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order, OrderDao> implements OrderQueryVisitor {
 
-	public InMemoryOrderQueryVisitor(ComponentContainer container) {
-		super(container);
+	public InMemoryOrderQueryVisitor() {
+		super();
 	}
 
 	@Override
-	protected InMemoryQueryVisitor<Order> newInstance() {
-		return new InMemoryOrderQueryVisitor(this.container);
+	protected InMemoryQueryVisitor<Order, OrderDao> newInstance() {
+		return new InMemoryOrderQueryVisitor();
 	}
 
 	public InMemoryQuery<Order> visit(OrderQuery orderQuery) {
@@ -50,7 +50,7 @@ public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order> imple
 
 	@Override
 	public void visit(StrolchTypeNavigation navigation) {
-		this.navigator = new OrderTypeNavigator(navigation.getType(), this.container);
+		this.navigator = new OrderTypeNavigator(navigation.getType());
 	}
 
 	@Override

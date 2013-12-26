@@ -16,26 +16,16 @@
 package li.strolch.runtime.query.inmemory;
 
 import li.strolch.model.Order;
-import li.strolch.runtime.agent.api.ComponentContainer;
-import li.strolch.runtime.agent.api.ElementMap;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class OrderTypeNavigator extends StrolchTypeNavigator<Order> {
 
-	private ComponentContainer container;
-
 	/**
 	 * @param type
 	 */
-	public OrderTypeNavigator(String type, ComponentContainer container) {
+	public OrderTypeNavigator(String type) {
 		super(type);
-		this.container = container;
-	}
-
-	@Override
-	protected ElementMap<Order> getElementMap() {
-		return this.container.getOrderMap();
 	}
 }

@@ -15,10 +15,8 @@
  */
 package li.strolch.runtime.agent.api;
 
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface ComponentContainer {
 

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.model.query.StrolchQuery;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -11,10 +12,11 @@ import li.strolch.runtime.agent.api.ElementMap;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
+ * 
  * @param <T>
  */
-public abstract class TransactionalElementMap<T extends StrolchElement> implements ElementMap<T> {
+public abstract class TransactionalElementMap<T extends StrolchElement, U extends StrolchQuery<?>> implements
+		ElementMap<T> {
 
 	private PersistenceHandler persistenceHandler;
 	private String realm;
@@ -26,6 +28,10 @@ public abstract class TransactionalElementMap<T extends StrolchElement> implemen
 
 	protected String getRealm() {
 		return this.realm;
+	}
+
+	protected PersistenceHandler getPersistenceHandler() {
+		return this.persistenceHandler;
 	}
 
 	protected abstract StrolchDao<T> getDao(StrolchTransaction tx);

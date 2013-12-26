@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.model.StrolchElement;
-import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.StrolchDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -51,9 +51,9 @@ public class InMemoryQuery<T extends StrolchElement> {
 		this.selectors.add(selector);
 	}
 
-	public List<T> doQuery(StrolchTransaction tx) {
+	public List<T> doQuery(StrolchDao<T> dao) {
 
-		List<T> elements = this.navigator.navigate(tx);
+		List<T> elements = this.navigator.navigate(dao);
 		Iterator<T> iter = elements.iterator();
 		while (iter.hasNext()) {
 			T element = iter.next();
@@ -66,6 +66,7 @@ public class InMemoryQuery<T extends StrolchElement> {
 	}
 
 	private boolean isAccepted(T element) {
+
 		for (Selector<T> selector : this.selectors) {
 			if (!selector.select(element))
 				return false;

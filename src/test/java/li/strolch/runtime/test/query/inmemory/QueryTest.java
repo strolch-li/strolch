@@ -73,11 +73,11 @@ public class QueryTest {
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
 		query.addSelection(andSelection);
 
-		InMemoryResourceQueryVisitor resourceQuery = new InMemoryResourceQueryVisitor(agent.getContainer());
+		InMemoryResourceQueryVisitor resourceQuery = new InMemoryResourceQueryVisitor();
 		InMemoryQuery<Resource> inMemoryQuery = resourceQuery.visit(query);
 		List<Resource> result;
 		try (StrolchTransaction tx = resourceMap.openTx()) {
-			result = inMemoryQuery.doQuery(tx);
+			result = inMemoryQuery.doQuery(tx.getResourceDao());
 		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
@@ -103,11 +103,11 @@ public class QueryTest {
 		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType"));
 		query.addSelection(andSelection);
 
-		InMemoryOrderQueryVisitor orderQuery = new InMemoryOrderQueryVisitor(agent.getContainer());
+		InMemoryOrderQueryVisitor orderQuery = new InMemoryOrderQueryVisitor();
 		InMemoryQuery<Order> inMemoryQuery = orderQuery.visit(query);
 		List<Order> result;
 		try (StrolchTransaction tx = orderMap.openTx()) {
-			result = inMemoryQuery.doQuery(tx);
+			result = inMemoryQuery.doQuery(tx.getOrderDao());
 		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());

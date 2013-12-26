@@ -24,9 +24,6 @@ import li.strolch.model.query.BooleanSelection;
 import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
 import li.strolch.model.query.OrSelection;
-import li.strolch.model.query.ParameterSelectionVisitor;
-import li.strolch.model.query.Selection;
-import li.strolch.model.query.StrolchElementSelectionVisitor;
 import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
 import li.strolch.model.query.ParameterSelection.FloatParameterSelection;
@@ -34,20 +31,21 @@ import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
 import li.strolch.model.query.ParameterSelection.LongParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringListParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringParameterSelection;
-import li.strolch.runtime.agent.api.ComponentContainer;
+import li.strolch.model.query.ParameterSelectionVisitor;
+import li.strolch.model.query.Selection;
+import li.strolch.model.query.StrolchElementSelectionVisitor;
+import li.strolch.persistence.api.StrolchDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement> implements
+public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement, S extends StrolchDao<?>> implements
 		StrolchElementSelectionVisitor, ParameterSelectionVisitor {
 
-	protected ComponentContainer container;
 	protected Navigator<T> navigator;
 	protected List<Selector<T>> selectors;
 
-	public InMemoryQueryVisitor(ComponentContainer container) {
-		this.container = container;
+	public InMemoryQueryVisitor() {
 		this.selectors = new ArrayList<>();
 	}
 
@@ -64,11 +62,11 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	 * 
 	 * @return a new instance of this concrete type
 	 */
-	protected abstract InMemoryQueryVisitor<T> newInstance();
+	protected abstract InMemoryQueryVisitor<T, S> newInstance();
 
 	@Override
 	public <U extends Selection> void visitAnd(AndSelection<U> andSelection) {
-		InMemoryQueryVisitor<T> query = newInstance();
+		InMemoryQueryVisitor<T, S> query = newInstance();
 		List<U> selections = andSelection.getSelections();
 		for (U selection : selections) {
 			selection.accept(query);
@@ -79,7 +77,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 
 	@Override
 	public <U extends Selection> void visitOr(OrSelection<U> orSelection) {
-		InMemoryQueryVisitor<T> query = newInstance();
+		InMemoryQueryVisitor<T, S> query = newInstance();
 		List<U> selections = orSelection.getSelections();
 		for (U selection : selections) {
 			selection.accept(query);

@@ -19,9 +19,8 @@ import li.strolch.model.Order;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface OrderMap extends ElementMap<Order> {
 
-	//
+	// marker interface
 }
