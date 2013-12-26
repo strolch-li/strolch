@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.impl.model;
+package li.strolch.persistence.xml.model;
 
-import li.strolch.model.Order;
+import li.strolch.model.Resource;
 import ch.eitchnet.xmlpers.api.DomParser;
 import ch.eitchnet.xmlpers.api.ParserFactory;
 import ch.eitchnet.xmlpers.api.SaxParser;
 
-public class OrderParserFactory implements ParserFactory<Order> {
+public class ResourceParserFactory implements ParserFactory<Resource> {
 
 	@Override
-	public DomParser<Order> getDomParser() {
-		return new OrderDomParser();
+	public DomParser<Resource> getDomParser() {
+		return new ResourceDomParser();
 	}
 
 	@Override
-	public SaxParser<Order> getSaxParser() {
+	public SaxParser<Resource> getSaxParser() {
 		throw new UnsupportedOperationException("Not yet implemented!"); //$NON-NLS-1$
 	}
 }

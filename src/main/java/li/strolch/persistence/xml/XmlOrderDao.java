@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.impl;
+package li.strolch.persistence.xml;
 
 import java.util.List;
 
-import li.strolch.model.Resource;
+import li.strolch.model.Order;
 import li.strolch.model.Tags;
-import li.strolch.model.query.ResourceQuery;
-import li.strolch.persistence.api.ResourceDao;
+import li.strolch.model.query.OrderQuery;
+import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
-public class XmlResourceDao extends AbstractDao<Resource> implements ResourceDao {
+public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
 
-	protected XmlResourceDao(StrolchTransaction tx) {
+	protected XmlOrderDao(StrolchTransaction tx) {
 		super(tx);
 	}
 
 	@Override
 	protected String getClassType() {
-		return Tags.RESOURCE;
+		return Tags.ORDER;
 	}
 
 	@Override
-	public List<Resource> doQuery(ResourceQuery query) {
+	public List<Order> doQuery(OrderQuery query) {
 		// TODO Auto-generated method stub
 		return null;
 	}

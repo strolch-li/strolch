@@ -13,41 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.impl.model;
+package li.strolch.persistence.xml.model;
 
-import li.strolch.model.Resource;
-import li.strolch.model.xml.ResourceToDomVisitor;
+import li.strolch.model.Order;
+import li.strolch.model.xml.OrderToDomVisitor;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ch.eitchnet.xmlpers.api.DomParser;
 
-public class ResourceDomParser implements DomParser<Resource> {
+public class OrderDomParser implements DomParser<Order> {
 
-	private Resource resource;
+	private Order order;
 
 	@Override
-	public Resource getObject() {
-		return this.resource;
+	public Order getObject() {
+		return this.order;
 	}
 
 	@Override
-	public void setObject(Resource resource) {
-		this.resource = resource;
+	public void setObject(Order object) {
+		this.order = object;
+
 	}
 
 	@Override
 	public Document toDom() {
-		ResourceToDomVisitor domVisitor = new ResourceToDomVisitor();
-		domVisitor.visit(this.resource);
-		return domVisitor.getDocument();
+		OrderToDomVisitor orderDomVisitor = new OrderToDomVisitor();
+		orderDomVisitor.visit(this.order);
+		return orderDomVisitor.getDocument();
 	}
 
 	@Override
 	public void fromDom(Document document) {
 		Element rootElement = document.getDocumentElement();
-		Resource resource = new Resource(rootElement);
-		this.resource = resource;
+		Order order = new Order(rootElement);
+		this.order = order;
 	}
 }

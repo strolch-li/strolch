@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.impl;
+package li.strolch.persistence.xml;
 
 import java.io.File;
 import java.util.Properties;
@@ -23,8 +23,8 @@ import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.persistence.impl.model.OrderContextFactory;
-import li.strolch.persistence.impl.model.ResourceContextFactory;
+import li.strolch.persistence.xml.model.OrderContextFactory;
+import li.strolch.persistence.xml.model.ResourceContextFactory;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.agent.api.StrolchComponent;
 import li.strolch.runtime.agent.impl.ComponentContainerImpl;

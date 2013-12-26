@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.impl;
+package li.strolch.persistence.xml;
 
 import java.util.Set;
 
