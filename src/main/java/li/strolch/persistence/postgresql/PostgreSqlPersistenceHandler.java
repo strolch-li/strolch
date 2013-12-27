@@ -62,6 +62,9 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 		Driver driver;
 		try {
+			// server loader does not seem to work in all contexts, thus:
+			org.postgresql.Driver.getLogLevel();
+
 			driver = DriverManager.getDriver(dbUrl);
 		} catch (SQLException e) {
 			String msg = "Failed to load DB driver for URL {0} due to: {1}"; //$NON-NLS-1$
