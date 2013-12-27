@@ -61,7 +61,7 @@ public class QueryTest {
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		res1.addParameter(BAG_ID, iP);
-		ResourceMap resourceMap = agent.getResourceMap();
+		ResourceMap resourceMap = agent.getContainer().getResourceMap();
 		try (StrolchTransaction tx = resourceMap.openTx()) {
 			resourceMap.add(tx, res1);
 		}
@@ -91,7 +91,7 @@ public class QueryTest {
 		Order o1 = createOrder("@1", "Test Order", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		o1.addParameter(BAG_ID, iP);
-		OrderMap orderMap = agent.getOrderMap();
+		OrderMap orderMap = agent.getContainer().getOrderMap();
 		try (StrolchTransaction tx = orderMap.openTx()) {
 			orderMap.add(tx, o1);
 		}

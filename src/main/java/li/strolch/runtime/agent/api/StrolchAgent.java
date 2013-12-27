@@ -101,16 +101,6 @@ public class StrolchAgent {
 		logger.info(MessageFormat.format("Setup Agent {0}", runtimeConfiguration.getApplicationName())); //$NON-NLS-1$
 	}
 
-	public ResourceMap getResourceMap() {
-		assertContainerStarted();
-		return getContainer().getComponent(ElementMapHandler.class).getResourceMap();
-	}
-
-	public OrderMap getOrderMap() {
-		assertContainerStarted();
-		return getContainer().getComponent(ElementMapHandler.class).getOrderMap();
-	}
-
 	protected void assertContainerStarted() {
 		if (this.container == null || this.container.getState() != ComponentState.STARTED) {
 			String msg = "Container is not yet started!"; //$NON-NLS-1$
