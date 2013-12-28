@@ -972,9 +972,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// get certificate for this system user
 		PrivilegeContext systemUserPrivilegeContext = getSystemUserPrivilegeContext(systemUsername);
-
-		// perform the action
-		action.execute(systemUserPrivilegeContext);
+		String sessionId = systemUserPrivilegeContext.getCertificate().getSessionId();
+		this.privilegeContextMap.put(sessionId, systemUserPrivilegeContext);
+		try {
+			// perform the action
+			action.execute(systemUserPrivilegeContext);
+		} finally {
+			this.privilegeContextMap.remove(sessionId);
+		}
 	}
 
 	/**

@@ -15,11 +15,16 @@
  */
 package ch.eitchnet.privilege.test;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -166,7 +171,130 @@ public class XmlTest {
 		assertEquals(2, users.size());
 		assertEquals(4, roles.size());
 
-		// TODO extend assertions to actual model
+		// assert model
+
+		//
+		// users
+		//
+
+		// admin
+		User admin = findUser("admin", users);
+		assertEquals("1", admin.getUserId());
+		assertEquals("admin", admin.getUsername());
+		assertEquals("8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", admin.getPassword());
+		assertEquals("Application", admin.getFirstname());
+		assertEquals("Administrator", admin.getSurname());
+		assertEquals(UserState.ENABLED, admin.getUserState());
+		assertEquals("en_gb", admin.getLocale().toString());
+		assertThat(admin.getRoles(), containsInAnyOrder("PrivilegeAdmin", "AppUser"));
+		Map<String, String> properties = admin.getProperties();
+		assertEquals(new HashSet<String>(Arrays.asList("organization", "organizationalUnit")), properties.keySet());
+		assertEquals("eitchnet.ch", properties.get("organization"));
+		assertEquals("Development", properties.get("organizationalUnit"));
+
+		// system_admin
+		User systemAdmin = findUser("system_admin", users);
+		assertEquals("2", systemAdmin.getUserId());
+		assertEquals("system_admin", systemAdmin.getUsername());
+		assertEquals(null, systemAdmin.getPassword());
+		assertEquals("System User", systemAdmin.getFirstname());
+		assertEquals("Administrator", systemAdmin.getSurname());
+		assertEquals(UserState.SYSTEM, systemAdmin.getUserState());
+		assertEquals("en_gb", systemAdmin.getLocale().toString());
+		assertThat(systemAdmin.getRoles(), containsInAnyOrder("system_admin_privileges"));
+		assertTrue(systemAdmin.getProperties().isEmpty());
+
+		//
+		// roles
+		//
+
+		// PrivilegeAdmin
+		Role privilegeAdmin = findRole("PrivilegeAdmin", roles);
+		assertEquals("PrivilegeAdmin", privilegeAdmin.getName());
+		assertTrue(privilegeAdmin.getPrivilegeNames().isEmpty());
+
+		// AppUser
+		Role appUser = findRole("AppUser", roles);
+		assertEquals("AppUser", appUser.getName());
+		assertEquals(new HashSet<String>(Arrays.asList("ch.eitchnet.privilege.test.model.TestRestrictable")),
+				appUser.getPrivilegeNames());
+
+		IPrivilege testRestrictable = appUser.getPrivilege("ch.eitchnet.privilege.test.model.TestRestrictable");
+		assertEquals("ch.eitchnet.privilege.test.model.TestRestrictable", testRestrictable.getName());
+		assertEquals("DefaultPrivilege", testRestrictable.getPolicy());
+		assertTrue(testRestrictable.isAllAllowed());
+		assertEquals(0, testRestrictable.getAllowList().size());
+		assertEquals(0, testRestrictable.getDenyList().size());
+
+		// system_admin_privileges
+		Role systemAdminPrivileges = findRole("system_admin_privileges", roles);
+		assertEquals("system_admin_privileges", systemAdminPrivileges.getName());
+		assertEquals(2, systemAdminPrivileges.getPrivilegeNames().size());
+		assertThat(
+				systemAdminPrivileges.getPrivilegeNames(),
+				containsInAnyOrder("ch.eitchnet.privilege.test.model.TestSystemUserAction",
+						"ch.eitchnet.privilege.test.model.TestSystemRestrictable"));
+
+		IPrivilege testSystemUserAction = systemAdminPrivileges
+				.getPrivilege("ch.eitchnet.privilege.test.model.TestSystemUserAction");
+		assertEquals("ch.eitchnet.privilege.test.model.TestSystemUserAction", testSystemUserAction.getName());
+		assertEquals("DefaultPrivilege", testSystemUserAction.getPolicy());
+		assertTrue(testSystemUserAction.isAllAllowed());
+		assertEquals(0, testSystemUserAction.getAllowList().size());
+		assertEquals(0, testSystemUserAction.getDenyList().size());
+
+		IPrivilege testSystemRestrictable = systemAdminPrivileges
+				.getPrivilege("ch.eitchnet.privilege.test.model.TestSystemRestrictable");
+		assertEquals("ch.eitchnet.privilege.test.model.TestSystemRestrictable", testSystemRestrictable.getName());
+		assertEquals("DefaultPrivilege", testSystemRestrictable.getPolicy());
+		assertTrue(testSystemRestrictable.isAllAllowed());
+		assertEquals(0, testSystemRestrictable.getAllowList().size());
+		assertEquals(0, testSystemRestrictable.getDenyList().size());
+
+		// restrictedRole
+		Role restrictedRole = findRole("restrictedRole", roles);
+		assertEquals("restrictedRole", restrictedRole.getName());
+		assertEquals(1, restrictedRole.getPrivilegeNames().size());
+		assertThat(restrictedRole.getPrivilegeNames(),
+				containsInAnyOrder("ch.eitchnet.privilege.test.model.TestSystemUserAction"));
+
+		IPrivilege testSystemUserAction2 = restrictedRole
+				.getPrivilege("ch.eitchnet.privilege.test.model.TestSystemUserAction");
+		assertEquals("ch.eitchnet.privilege.test.model.TestSystemUserAction", testSystemUserAction2.getName());
+		assertEquals("DefaultPrivilege", testSystemUserAction2.getPolicy());
+		assertFalse(testSystemUserAction2.isAllAllowed());
+		assertEquals(1, testSystemUserAction2.getAllowList().size());
+		assertEquals(1, testSystemUserAction2.getDenyList().size());
+		assertThat(testSystemUserAction2.getAllowList(), containsInAnyOrder("hello"));
+		assertThat(testSystemUserAction2.getDenyList(), containsInAnyOrder("goodbye"));
+	}
+
+	/**
+	 * @param username
+	 * @param users
+	 * @return
+	 */
+	private User findUser(String username, List<User> users) {
+		for (User user : users) {
+			if (user.getUsername().equals(username))
+				return user;
+		}
+
+		throw new RuntimeException("No user exists with username " + username);
+	}
+
+	/**
+	 * @param name
+	 * @param roles
+	 * @return
+	 */
+	private Role findRole(String name, List<Role> roles) {
+		for (Role role : roles) {
+			if (role.getName().equals(name))
+				return role;
+		}
+
+		throw new RuntimeException("No role exists with name " + name);
 	}
 
 	@Test

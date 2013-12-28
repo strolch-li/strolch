@@ -75,12 +75,12 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		if (qName.equals(XmlConstants.XML_USERS)) {
+		if (qName.equals(XmlConstants.XML_USER)) {
 			this.buildersStack.add(new UserParser());
 			this.insideUser = true;
 		} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
 			this.buildersStack.add(new PropertyParser());
-		} else if (qName.equals(XmlConstants.XML_ROLES) && !this.insideUser) {
+		} else if (qName.equals(XmlConstants.XML_ROLE) && !this.insideUser) {
 			this.buildersStack.add(new RoleParser());
 		}
 
@@ -101,16 +101,13 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (qName.equals(XmlConstants.XML_USERS)) {
+		if (qName.equals(XmlConstants.XML_USER)) {
 			elementParser = this.buildersStack.pop();
 			this.insideUser = false;
-			logger.info("Popping for Users"); //$NON-NLS-1$
 		} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
 			elementParser = this.buildersStack.pop();
-			logger.info("Popping for Properties"); //$NON-NLS-1$
-		} else if (qName.equals(XmlConstants.XML_ROLES) && !this.insideUser) {
+		} else if (qName.equals(XmlConstants.XML_ROLE) && !this.insideUser) {
 			elementParser = this.buildersStack.pop();
-			logger.info("Popping for Roles"); //$NON-NLS-1$
 		}
 
 		if (!this.buildersStack.isEmpty() && elementParser != null)
@@ -266,14 +263,14 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 			} else if (qName.equals(XmlConstants.XML_STATE)) {
 				this.userState = UserState.valueOf(this.text.toString().trim());
 			} else if (qName.equals(XmlConstants.XML_LOCALE)) {
-				this.locale = Locale.forLanguageTag(this.text.toString().trim());
+				this.locale = new Locale(this.text.toString().trim());
 			} else if (qName.equals(XmlConstants.XML_ROLE)) {
 				this.userRoles.add(this.text.toString().trim());
 			} else if (qName.equals(XmlConstants.XML_USER)) {
 
 				User user = new User(this.userId, this.username, this.password, this.firstName, this.surname,
 						this.userState, this.userRoles, this.locale, this.parameters);
-
+				logger.info(MessageFormat.format("New User: {0}", user)); //$NON-NLS-1$
 				getUsers().add(user);
 			}
 		}
