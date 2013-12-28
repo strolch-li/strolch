@@ -17,17 +17,32 @@ package li.strolch.service;
 
 import java.text.MessageFormat;
 
+import li.strolch.runtime.agent.api.ComponentContainer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public abstract class AbstractService<T extends ServiceArgument, U extends ServiceResult> implements Service<T, U> {
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractService.class);
 	private static final long serialVersionUID = 1L;
+
+	private ComponentContainer container;
+
+	/**
+	 * @return the container
+	 */
+	protected ComponentContainer getContainer() {
+		return this.container;
+	}
+
+	@Override
+	public void setContainer(ComponentContainer container) {
+		this.container = container;
+	}
 
 	@Override
 	public final U doService(T argument) {

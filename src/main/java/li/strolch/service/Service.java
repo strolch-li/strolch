@@ -17,13 +17,15 @@ package li.strolch.service;
 
 import java.io.Serializable;
 
+import li.strolch.runtime.agent.api.ComponentContainer;
 import ch.eitchnet.privilege.model.Restrictable;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface Service<T extends ServiceArgument, U extends ServiceResult> extends Serializable, Restrictable {
 
 	public U doService(T argument);
+	
+	public void setContainer(ComponentContainer container);
 }

@@ -43,6 +43,13 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	}
 
 	@Override
+	public void initialize(ComponentConfiguration configuration) {
+		if (getContainer().hasComponent(StrolchPrivilegeHandler.class))
+			this.privilegeHandler = getContainer().getComponent(StrolchPrivilegeHandler.class);
+		super.initialize(configuration);
+	}
+
+	@Override
 	public <U extends ServiceResult> U doService(Certificate certificate, Service<ServiceArgument, U> service) {
 		return doService(certificate, service, null);
 	}
@@ -67,6 +74,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		try {
 			// then perform the service
+			service.setContainer(getContainer());
 			U serviceResult = service.doService(argument);
 
 			// log the result
@@ -89,12 +97,5 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			logger.error(msg, e);
 			throw new StrolchException(msg, e);
 		}
-	}
-
-	@Override
-	public void initialize(ComponentConfiguration configuration) {
-		if (getContainer().hasComponent(StrolchPrivilegeHandler.class))
-			this.privilegeHandler = getContainer().getComponent(StrolchPrivilegeHandler.class);
-		super.initialize(configuration);
 	}
 }
