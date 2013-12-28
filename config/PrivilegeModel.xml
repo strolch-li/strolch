@@ -18,7 +18,7 @@
 			</Properties>
 		</User>
 
-		<User userId="2" username="system_admin" password="bb06d5caae150999027a8cb68956564d3ae0f3662aee02eea96253df3dc49bf7">
+		<User userId="2" username="system_admin">
 			<Firstname>System User</Firstname>
 			<Surname>Administrator</Surname>
 			<State>SYSTEM</State>
@@ -26,7 +26,6 @@
 			<Roles>
 				<Role>system_admin_privileges</Role>
 			</Roles>
-
 		</User>
 
 	</Users>

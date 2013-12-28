@@ -637,6 +637,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new AccessDeniedException(msg);
 			}
 
+			// make sure not a system user - they may not login in
+			if (user.getUserState() == UserState.SYSTEM) {
+				String msg = "User {0} is a system user and may no login!"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, username);
+				throw new AccessDeniedException(msg);
+			}
+
 			// validate password
 			String pwHash = user.getPassword();
 			if (pwHash == null)
@@ -1009,9 +1016,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 */
 	private PrivilegeContext getSystemUserPrivilegeContext(String systemUsername) {
 
-		// we only work with hashed passwords
-		String passwordHash = this.encryptionHandler.convertToHash(systemUsername.getBytes());
-
 		// get user object
 		User user = this.persistenceHandler.getUser(systemUsername);
 		// no user means no authentication
@@ -1022,12 +1026,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate password
 		String pwHash = user.getPassword();
-		if (pwHash == null) {
-			String msg = MessageFormat.format("System user {0} has no password and may not login!", systemUsername); //$NON-NLS-1$
-			throw new AccessDeniedException(msg);
-		}
-		if (!pwHash.equals(passwordHash)) {
-			String msg = MessageFormat.format("System user {0} has an incorrect password defined!", systemUsername); //$NON-NLS-1$
+		if (pwHash != null) {
+			String msg = MessageFormat.format("System users must not have a password: {0}", systemUsername); //$NON-NLS-1$
 			throw new AccessDeniedException(msg);
 		}
 

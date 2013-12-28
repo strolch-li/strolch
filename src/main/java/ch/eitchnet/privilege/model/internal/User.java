@@ -105,7 +105,7 @@ public final class User {
 		this.userId = userId;
 
 		this.username = username;
-		this.password = password;
+		this.password = StringHelper.isEmpty(password) ? null : password;
 		this.userState = userState;
 
 		this.firstname = firstname;
