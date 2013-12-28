@@ -93,7 +93,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	}
 
 	@Override
-	public Parameter<Integer> getClone() {
+	public IntegerParameter getClone() {
 		IntegerParameter clone = new IntegerParameter();
 
 		super.fillClone(clone);

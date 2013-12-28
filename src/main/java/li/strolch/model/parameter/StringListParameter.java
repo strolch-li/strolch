@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.model.StrolchElement;
 import li.strolch.model.Tags;
 
 import org.w3c.dom.Element;
@@ -125,7 +124,7 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
-	public StrolchElement getClone() {
+	public StringListParameter getClone() {
 		StringListParameter clone = new StringListParameter();
 
 		super.fillClone(clone);

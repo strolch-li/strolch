@@ -94,7 +94,7 @@ public class DateParameter extends AbstractParameter<Date> {
 	}
 
 	@Override
-	public Parameter<Date> getClone() {
+	public DateParameter getClone() {
 		DateParameter clone = new DateParameter();
 
 		super.fillClone(clone);

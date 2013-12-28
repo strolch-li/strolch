@@ -140,4 +140,7 @@ public interface Parameter<T> extends StrolchElement {
 
 	@Override
 	public boolean equals(Object obj);
+	
+	@Override
+	public Parameter<T> getClone();
 }

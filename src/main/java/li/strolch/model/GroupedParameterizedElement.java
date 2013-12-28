@@ -91,7 +91,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * 
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	public <T> Parameter<T> getParameter(String bagKey, String paramKey) {
+	public <T> T getParameter(String bagKey, String paramKey) {
 		if (this.parameterBagMap == null)
 			return null;
 		ParameterBag bag = this.parameterBagMap.get(bagKey);

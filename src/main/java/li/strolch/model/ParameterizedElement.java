@@ -259,7 +259,13 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	@Override
 	protected void fillClone(StrolchElement clone) {
 		super.fillClone(clone);
-		((ParameterizedElement) clone).setType(this.type);
+		ParameterizedElement peClone = (ParameterizedElement) clone;
+		peClone.setType(this.type);
+		if(this.parameterMap != null) {
+			for(Parameter<?> param : this.parameterMap.values()) {
+				peClone.addParameter(param.getClone());
+			}
+		}
 	}
 
 	@SuppressWarnings("nls")

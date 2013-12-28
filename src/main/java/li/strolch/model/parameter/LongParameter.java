@@ -93,7 +93,7 @@ public class LongParameter extends AbstractParameter<Long> {
 	}
 
 	@Override
-	public Parameter<Long> getClone() {
+	public LongParameter getClone() {
 		LongParameter clone = new LongParameter();
 
 		super.fillClone(clone);
