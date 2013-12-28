@@ -146,7 +146,6 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	 */
 	@Override
 	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException {
-		assertContainerStarted();
 		return this.privilegeHandler.getPrivilegeContext(certificate);
 	}
 
@@ -159,7 +158,6 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	 */
 	@Override
 	public void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException {
-		assertContainerStarted();
 		this.privilegeHandler.runAsSystem(systemUsername, action);
 	}
 
