@@ -76,6 +76,11 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			// then perform the service
 			service.setContainer(getContainer());
 			U serviceResult = service.doService(argument);
+			if (serviceResult == null) {
+				String msg = "Service {0} is not properly implemented as it returned a null result!"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, service);
+				throw new StrolchException(msg);
+			}
 
 			// log the result
 			long end = System.nanoTime();

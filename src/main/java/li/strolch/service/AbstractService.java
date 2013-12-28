@@ -17,6 +17,7 @@ package li.strolch.service;
 
 import java.text.MessageFormat;
 
+import li.strolch.exception.StrolchException;
 import li.strolch.runtime.agent.api.ComponentContainer;
 
 import org.slf4j.Logger;
@@ -61,7 +62,14 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 
 		try {
 
-			return internalDoService(argument);
+			U serviceResult = internalDoService(argument);
+			if (serviceResult == null) {
+				String msg = "Service {0} is not properly implemented as it returned a null result!"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, this.getClass().getName());
+				throw new StrolchException(msg);
+			}
+
+			return serviceResult;
 
 		} catch (Exception e) {
 
@@ -97,10 +105,10 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Internal method to perform the {@link Service}. The implementor does not need to handle exceptions as this is
 	 * done in the {@link #doService(ServiceArgument)} which calls this method
 	 * 
-	 * @param argument
+	 * @param arg
 	 * @return
 	 */
-	protected abstract U internalDoService(T argument);
+	protected abstract U internalDoService(T arg);
 
 	/**
 	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeName()
