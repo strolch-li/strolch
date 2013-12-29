@@ -38,7 +38,6 @@ public final class Certificate implements Serializable {
 	private final long loginTime;
 	private final String username;
 	private final String authToken;
-	private final String authPassword;
 
 	private Locale locale;
 
@@ -58,17 +57,14 @@ public final class Certificate implements Serializable {
 	 *            the users login name
 	 * @param authToken
 	 *            the authentication token defining the users unique session and is a private field of this certificate.
-	 * @param authPassword
-	 *            the password to access the authentication token, this is not known to the client but set by the
-	 *            {@link PrivilegeHandler} on authentication.
 	 * @param locale
 	 *            the users {@link Locale}
 	 * @param propertyMap
 	 *            a {@link Map} containing string value pairs of properties for the logged in user. These properties can
 	 *            be edited and can be used for the user to change settings of this session
 	 */
-	public Certificate(String sessionId, long loginTime, String username, String authToken, String authPassword,
-			Locale locale, Map<String, String> propertyMap) {
+	public Certificate(String sessionId, long loginTime, String username, String authToken, Locale locale,
+			Map<String, String> propertyMap) {
 
 		// validate arguments are not null
 		if (StringHelper.isEmpty(sessionId)) {
@@ -80,15 +76,11 @@ public final class Certificate implements Serializable {
 		if (StringHelper.isEmpty(authToken)) {
 			throw new PrivilegeException("authToken is null!"); //$NON-NLS-1$
 		}
-		if (StringHelper.isEmpty(authPassword)) {
-			throw new PrivilegeException("authPassword is null!"); //$NON-NLS-1$
-		}
 
 		this.sessionId = sessionId;
 		this.loginTime = loginTime;
 		this.username = username;
 		this.authToken = authToken;
-		this.authPassword = authPassword;
 
 		// if no locale is given, set default
 		if (locale == null)
@@ -145,16 +137,10 @@ public final class Certificate implements Serializable {
 	/**
 	 * Returns the authToken if the given authPassword is correct, null otherwise
 	 * 
-	 * @param authPassword
-	 *            the authentication password with which this certificate was created
-	 * 
 	 * @return the authToken if the given authPassword is correct, null otherwise
 	 */
-	public String getAuthToken(String authPassword) {
-		if (this.authPassword.equals(authPassword))
-			return this.authToken;
-
-		return null;
+	public String getAuthToken() {
+		return this.authToken;
 	}
 
 	/**
@@ -180,7 +166,6 @@ public final class Certificate implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.authPassword == null) ? 0 : this.authPassword.hashCode());
 		result = prime * result + ((this.authToken == null) ? 0 : this.authToken.hashCode());
 		result = prime * result + ((this.locale == null) ? 0 : this.locale.hashCode());
 		result = prime * result + ((this.sessionId == null) ? 0 : this.sessionId.hashCode());
@@ -197,11 +182,6 @@ public final class Certificate implements Serializable {
 		if (!(obj instanceof Certificate))
 			return false;
 		Certificate other = (Certificate) obj;
-		if (this.authPassword == null) {
-			if (other.authPassword != null)
-				return false;
-		} else if (!this.authPassword.equals(other.authPassword))
-			return false;
 		if (this.authToken == null) {
 			if (other.authToken != null)
 				return false;

@@ -668,15 +668,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			// get 2 auth tokens
-			String authToken = this.encryptionHandler.nextToken();
-			String authPassword = this.encryptionHandler.nextToken();
+			String authToken = this.encryptionHandler.convertToHash(this.encryptionHandler.nextToken());
 
 			// get next session id
 			String sessionId = nextSessionId();
 
 			// create a new certificate, with details of the user
-			certificate = new Certificate(sessionId, System.currentTimeMillis(), username, authToken, authPassword,
-					user.getLocale(), new HashMap<String, String>(user.getProperties()));
+			certificate = new Certificate(sessionId, System.currentTimeMillis(), username, authToken, user.getLocale(),
+					new HashMap<String, String>(user.getProperties()));
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1051,14 +1050,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// get 2 auth tokens
 		String authToken = this.encryptionHandler.nextToken();
-		String authPassword = this.encryptionHandler.nextToken();
 
 		// get next session id
 		String sessionId = nextSessionId();
 
 		// create a new certificate, with details of the user
 		Certificate systemUserCertificate = new Certificate(sessionId, System.currentTimeMillis(), systemUsername,
-				authToken, authPassword, user.getLocale(), new HashMap<String, String>(user.getProperties()));
+				authToken, user.getLocale(), new HashMap<String, String>(user.getProperties()));
 
 		// create and save a new privilege context
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);
