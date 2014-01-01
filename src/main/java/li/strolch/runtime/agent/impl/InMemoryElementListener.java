@@ -27,6 +27,11 @@ import li.strolch.runtime.agent.api.ResourceMap;
  */
 public class InMemoryElementListener implements StrolchElementListener {
 
+	private boolean addOrders;
+	private boolean addResources;
+	private boolean updateOrders;
+	private boolean updateResources;
+
 	private StrolchTransaction tx;
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;
@@ -35,15 +40,64 @@ public class InMemoryElementListener implements StrolchElementListener {
 		this.tx = tx;
 		this.resourceMap = resourceMap;
 		this.orderMap = orderMap;
+
+		this.addResources = true;
+		this.addOrders = true;
+		this.updateResources = true;
+		this.updateOrders = true;
+	}
+
+	/**
+	 * @param addResources
+	 *            the addResources to set
+	 */
+	public void setAddResources(boolean addResources) {
+		this.addResources = addResources;
+	}
+
+	/**
+	 * @param addOrders
+	 *            the addOrders to set
+	 */
+	public void setAddOrders(boolean addOrders) {
+		this.addOrders = addOrders;
+	}
+
+	/**
+	 * @param updateResources
+	 *            the updateResources to set
+	 */
+	public void setUpdateResources(boolean updateResources) {
+		this.updateResources = updateResources;
+	}
+
+	/**
+	 * @param updateOrders
+	 *            the updateOrders to set
+	 */
+	public void setUpdateOrders(boolean updateOrders) {
+		this.updateOrders = updateOrders;
 	}
 
 	@Override
 	public void notifyResource(Resource resource) {
-		this.resourceMap.add(this.tx, resource);
+		if (this.resourceMap.hasElement(this.tx, resource.getType(), resource.getId())) {
+			if (this.updateResources) {
+				this.resourceMap.update(this.tx, resource);
+			}
+		} else if (this.addResources) {
+			this.resourceMap.add(this.tx, resource);
+		}
 	}
 
 	@Override
 	public void notifyOrder(Order order) {
-		this.orderMap.add(this.tx, order);
+		if (this.orderMap.hasElement(this.tx, order.getType(), order.getId())) {
+			if (this.updateOrders) {
+				this.orderMap.update(this.tx, order);
+			}
+		} else if (this.addOrders) {
+			this.orderMap.add(this.tx, order);
+		}
 	}
 }
