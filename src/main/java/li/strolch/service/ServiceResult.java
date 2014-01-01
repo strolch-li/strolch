@@ -19,7 +19,6 @@ import java.io.Serializable;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class ServiceResult implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -47,6 +46,13 @@ public class ServiceResult implements Serializable {
 		this.state = state;
 		this.message = message;
 		this.throwable = throwable;
+	}
+
+	/**
+	 * @return true if the state is {@link ServiceResultState#SUCCESS}
+	 */
+	public boolean isOk() {
+		return this.state == ServiceResultState.SUCCESS;
 	}
 
 	/**

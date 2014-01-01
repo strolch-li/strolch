@@ -18,9 +18,12 @@ package li.strolch.service;
 import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.runtime.agent.api.OrderMap;
+import li.strolch.runtime.agent.api.ResourceMap;
 import li.strolch.runtime.agent.api.StrolchComponent;
 import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeContext;
@@ -28,10 +31,10 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class DefaultServiceHandler extends StrolchComponent implements ServiceHandler {
 
+	private RuntimeConfiguration runtimeConfiguration;
 	private StrolchPrivilegeHandler privilegeHandler;
 
 	/**
@@ -46,7 +49,24 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	public void initialize(ComponentConfiguration configuration) {
 		if (getContainer().hasComponent(StrolchPrivilegeHandler.class))
 			this.privilegeHandler = getContainer().getComponent(StrolchPrivilegeHandler.class);
+		this.runtimeConfiguration = configuration.getRuntimeConfiguration();
 		super.initialize(configuration);
+	}
+
+	public <T> T getComponent(Class<T> clazz) {
+		return getContainer().getComponent(clazz);
+	}
+
+	public RuntimeConfiguration getRuntimeConfiguration() {
+		return this.runtimeConfiguration;
+	}
+
+	public ResourceMap getResourceMap(String realm) {
+		return this.getContainer().getResourceMap(realm);
+	}
+
+	public OrderMap getOrderMap(String realm) {
+		return this.getContainer().getOrderMap(realm);
 	}
 
 	@Override
@@ -74,7 +94,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		try {
 			// then perform the service
-			service.setContainer(getContainer());
+			if (service instanceof AbstractService)
+				((AbstractService<?, ?>) service).setServiceHandler(this);
 			U serviceResult = service.doService(argument);
 			if (serviceResult == null) {
 				String msg = "Service {0} is not properly implemented as it returned a null result!"; //$NON-NLS-1$

@@ -18,7 +18,9 @@ package li.strolch.service;
 import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.runtime.agent.api.ComponentContainer;
+import li.strolch.runtime.agent.api.OrderMap;
+import li.strolch.runtime.agent.api.ResourceMap;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,18 +33,30 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractService.class);
 	private static final long serialVersionUID = 1L;
 
-	private ComponentContainer container;
+	private DefaultServiceHandler serviceHandler;
 
 	/**
-	 * @return the container
+	 * @param serviceHandler
+	 *            the serviceHandler to set
 	 */
-	protected ComponentContainer getContainer() {
-		return this.container;
+	public void setServiceHandler(DefaultServiceHandler serviceHandler) {
+		this.serviceHandler = serviceHandler;
 	}
 
-	@Override
-	public void setContainer(ComponentContainer container) {
-		this.container = container;
+	public <V> V getComponent(Class<V> clazz) {
+		return this.serviceHandler.getComponent(clazz);
+	}
+
+	public RuntimeConfiguration getRuntimeConfiguration() {
+		return this.serviceHandler.getRuntimeConfiguration();
+	}
+
+	public ResourceMap getResourceMap(String realm) {
+		return this.serviceHandler.getResourceMap(realm);
+	}
+
+	public OrderMap getOrderMap(String realm) {
+		return this.serviceHandler.getOrderMap(realm);
 	}
 
 	@Override

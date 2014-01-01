@@ -17,11 +17,26 @@ package li.strolch.service;
 
 import java.io.Serializable;
 
+import li.strolch.runtime.StrolchConstants;
+
 /**
+ * Base argument to be used when performing {@link Service Services}. The realm parameter is set to
+ * {@link StrolchConstants#DEFAULT_REALM} and can be overridden when the caller of the service wants to perform the
+ * service in a different realm
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ServiceArgument implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	// marker interface
+	/**
+	 * <p>
+	 * Set this to the realm in which the service should operate
+	 * </p>
+	 * 
+	 * <p>
+	 * realm = StrolchConstants.DEFAULT_REALM
+	 * </p>
+	 */
+	public String realm = StrolchConstants.DEFAULT_REALM;
 }
