@@ -15,9 +15,9 @@
  */
 package li.strolch.service.test;
 
-import li.strolch.service.AbstractService;
-import li.strolch.service.ServiceArgument;
-import li.strolch.service.ServiceResult;
+import li.strolch.service.api.AbstractService;
+import li.strolch.service.api.ServiceArgument;
+import li.strolch.service.api.ServiceResult;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

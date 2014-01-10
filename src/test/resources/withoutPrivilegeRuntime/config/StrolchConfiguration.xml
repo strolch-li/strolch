@@ -9,8 +9,8 @@
 	</Runtime>
 	<Component>
 		<name>ServiceHandler</name>
-		<api>li.strolch.service.ServiceHandler</api>
-		<impl>li.strolch.service.DefaultServiceHandler</impl>
+		<api>li.strolch.service.api.ServiceHandler</api>
+		<impl>li.strolch.service.api.DefaultServiceHandler</impl>
 		<Properties>
 			<verbose>true</verbose>
 		</Properties>

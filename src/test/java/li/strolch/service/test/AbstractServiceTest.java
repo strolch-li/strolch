@@ -17,7 +17,7 @@ package li.strolch.service.test;
 
 import java.io.File;
 
-import li.strolch.service.ServiceHandler;
+import li.strolch.service.api.ServiceHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;

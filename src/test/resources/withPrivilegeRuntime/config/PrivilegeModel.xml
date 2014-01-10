@@ -56,7 +56,7 @@
 		<Role name="PrivilegeAdmin" />
 
 		<Role name="AppUser">
-			<Privilege name="li.strolch.service.Service" policy="DefaultPrivilege">
+			<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>
@@ -65,7 +65,7 @@
 		</Role>
 
 		<Role name="OnlyGreetingServiceRole">
-			<Privilege name="li.strolch.service.Service" policy="DefaultPrivilege">
+			<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
 				<Allow>li.strolch.service.test.GreetingService</Allow>
 			</Privilege>
 		</Role>

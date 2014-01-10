@@ -15,8 +15,8 @@
  */
 package li.strolch.service.test;
 
-import li.strolch.service.ServiceResult;
-import li.strolch.service.ServiceResultState;
+import li.strolch.service.api.ServiceResult;
+import li.strolch.service.api.ServiceResultState;
 
 public class GreetingResult extends ServiceResult {
 	private static final long serialVersionUID = 1L;

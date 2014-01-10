@@ -17,8 +17,8 @@ package li.strolch.service.test;
 
 import java.text.MessageFormat;
 
-import li.strolch.service.AbstractService;
-import li.strolch.service.ServiceArgument;
+import li.strolch.service.api.AbstractService;
+import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.test.GreetingService.GreetingArgument;
 import ch.eitchnet.utils.helper.StringHelper;
 

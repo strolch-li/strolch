@@ -60,7 +60,7 @@ public class ServiceTest extends AbstractServiceTest {
 	@Test
 	public void shouldFailWithNoAccess() {
 		this.thrown.expect(AccessDeniedException.class);
-		this.thrown.expectMessage("User jill does not have Privilege li.strolch.service.Service"); //$NON-NLS-1$
+		this.thrown.expectMessage("User jill does not have Privilege li.strolch.service.api.Service"); //$NON-NLS-1$
 
 		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
 		try {

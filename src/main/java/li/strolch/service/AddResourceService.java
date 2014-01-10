@@ -13,22 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.model;
-
-import java.util.List;
+package li.strolch.service;
 
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.api.ResourceMap;
-import li.strolch.service.AbstractService;
-import li.strolch.service.ServiceArgument;
-import li.strolch.service.ServiceResult;
+import li.strolch.service.api.AbstractService;
+import li.strolch.service.api.ServiceArgument;
+import li.strolch.service.api.ServiceResult;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddResourceCollectionService extends
-		AbstractService<AddResourceCollectionService.AddResourceCollectionArg, ServiceResult> {
+public class AddResourceService extends AbstractService<AddResourceService.AddResourceArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,20 +35,18 @@ public class AddResourceCollectionService extends
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddResourceCollectionArg arg) {
+	protected ServiceResult internalDoService(AddResourceArg arg) {
 
 		ResourceMap resourceMap = getResourceMap(arg.realm);
 		try (StrolchTransaction tx = resourceMap.openTx(arg.realm)) {
-			for (Resource resource : arg.resources) {
-				resourceMap.add(tx, resource);
-			}
+			resourceMap.add(tx, arg.resource);
 		}
 
 		return ServiceResult.success();
 	}
 
-	public static class AddResourceCollectionArg extends ServiceArgument {
+	public static class AddResourceArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
-		public List<Resource> resources;
+		public Resource resource;
 	}
 }

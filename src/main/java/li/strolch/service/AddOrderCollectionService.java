@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.model;
+package li.strolch.service;
 
 import java.util.List;
 
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.service.AbstractService;
-import li.strolch.service.ServiceArgument;
-import li.strolch.service.ServiceResult;
+import li.strolch.service.api.AbstractService;
+import li.strolch.service.api.ServiceArgument;
+import li.strolch.service.api.ServiceResult;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

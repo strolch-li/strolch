@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.model;
+package li.strolch.service;
 
-import li.strolch.model.Order;
+import java.util.List;
+
+import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.service.AbstractService;
-import li.strolch.service.ServiceArgument;
-import li.strolch.service.ServiceResult;
+import li.strolch.runtime.agent.api.ResourceMap;
+import li.strolch.service.api.AbstractService;
+import li.strolch.service.api.ServiceArgument;
+import li.strolch.service.api.ServiceResult;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrderService extends AbstractService<AddOrderService.AddOrderArg, ServiceResult> {
+public class AddResourceCollectionService extends
+		AbstractService<AddResourceCollectionService.AddResourceCollectionArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -35,18 +38,20 @@ public class AddOrderService extends AbstractService<AddOrderService.AddOrderArg
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddOrderArg arg) {
+	protected ServiceResult internalDoService(AddResourceCollectionArg arg) {
 
-		OrderMap orderMap = getOrderMap(arg.realm);
-		try (StrolchTransaction tx = orderMap.openTx(arg.realm)) {
-			orderMap.add(tx, arg.order);
+		ResourceMap resourceMap = getResourceMap(arg.realm);
+		try (StrolchTransaction tx = resourceMap.openTx(arg.realm)) {
+			for (Resource resource : arg.resources) {
+				resourceMap.add(tx, resource);
+			}
 		}
 
 		return ServiceResult.success();
 	}
 
-	public static class AddOrderArg extends ServiceArgument {
+	public static class AddResourceCollectionArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
-		public Order order;
+		public List<Resource> resources;
 	}
 }
