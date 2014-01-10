@@ -19,9 +19,8 @@ import java.io.File;
 import java.text.MessageFormat;
 
 import li.strolch.runtime.agent.api.ComponentContainer;
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.runtime.agent.api.ResourceMap;
 import li.strolch.runtime.agent.api.StrolchAgent;
+import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
 
@@ -50,12 +49,12 @@ public final class RuntimeMock {
 		return this.container.getComponent(StrolchPrivilegeHandler.class);
 	}
 
-	public OrderMap getOrderMap() {
-		return this.container.getOrderMap();
+	public StrolchRealm getDefaultRealm() {
+		return this.container.getDefaultRealm();
 	}
-	
-	public ResourceMap getResourceMap() {
-		return this.container.getResourceMap();
+
+	public StrolchRealm getRealm(String realm) {
+		return this.container.getRealm(realm);
 	}
 
 	public void mockRuntime(File rootPathF, File rootSrc) {

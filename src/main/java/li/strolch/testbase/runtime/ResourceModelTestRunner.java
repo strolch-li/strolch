@@ -38,7 +38,7 @@ public class ResourceModelTestRunner {
 
 		// create
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
 			tx.getResourceDao().save(newResource);
 		}
 	}
@@ -47,13 +47,13 @@ public class ResourceModelTestRunner {
 
 		// create
 		Resource newResource = createResource(ID, NAME, TYPE);
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
 			tx.getResourceDao().save(newResource);
 		}
 
 		// read
 		Resource readResource = null;
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
 			readResource = tx.getResourceDao().queryBy(TYPE, ID);
 		}
 		assertNotNull("Should read Resource with id " + ID, readResource); //$NON-NLS-1$
@@ -62,13 +62,13 @@ public class ResourceModelTestRunner {
 		Parameter<String> sParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
 		String newStringValue = "Giddiya!"; //$NON-NLS-1$
 		sParam.setValue(newStringValue);
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
 			tx.getResourceDao().update(readResource);
 		}
 
 		// read updated
 		Resource updatedResource = null;
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
 			updatedResource = tx.getResourceDao().queryBy(TYPE, ID);
 		}
 		assertNotNull("Should read Resource with id " + ID, updatedResource); //$NON-NLS-1$
@@ -77,12 +77,12 @@ public class ResourceModelTestRunner {
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
 			tx.getResourceDao().remove(readResource);
 		}
 
 		// fail to re-read
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
 			Resource resource = tx.getResourceDao().queryBy(TYPE, ID);
 			assertNull("Should no read Resource with id " + ID, resource); //$NON-NLS-1$
 		}
@@ -103,11 +103,11 @@ public class ResourceModelTestRunner {
 		};
 		Collections.sort(resources, comparator);
 
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
 			tx.getResourceDao().removeAll(tx.getResourceDao().queryAll());
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
 			tx.getResourceDao().saveAll(resources);
 		}
 
@@ -116,13 +116,13 @@ public class ResourceModelTestRunner {
 		expectedTypes.add("MyType2");
 		expectedTypes.add("MyType3");
 
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
 			List<Resource> allResources = tx.getResourceDao().queryAll();
 			Collections.sort(allResources, comparator);
 			assertEquals(resources, allResources);
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
 			ResourceDao resourceDao = tx.getResourceDao();
 
 			Set<String> types = resourceDao.queryTypes();
@@ -140,7 +140,7 @@ public class ResourceModelTestRunner {
 			}
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getResourceMap().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
 			Resource resource = tx.getResourceDao().queryBy("MyType1", "@_00000001");
 			assertNotNull(resource);
 			resource = tx.getResourceDao().queryBy("MyType2", "@_00000006");
