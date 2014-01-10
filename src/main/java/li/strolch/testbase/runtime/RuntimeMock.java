@@ -66,7 +66,6 @@ public final class RuntimeMock {
 		}
 
 		File configSrc = new File(rootSrc, RuntimeConfiguration.PATH_CONFIG);
-		File dataSrc = new File(rootSrc, RuntimeConfiguration.PATH_DATA);
 
 		if (!configSrc.isDirectory() || !configSrc.canRead()) {
 			String msg = "Could not find config source in: {0}"; //$NON-NLS-1$
@@ -89,24 +88,13 @@ public final class RuntimeMock {
 			throw new RuntimeException(msg);
 		}
 
-		File configPathF = new File(rootPathF, RuntimeConfiguration.PATH_CONFIG);
-		configPathF.mkdir();
+		logger.info(MessageFormat.format("Mocking runtime from {0} to {1}", rootSrc.getAbsolutePath(),
+				rootPathF.getAbsolutePath()));
 
-		if (!FileHelper.copy(configSrc.listFiles(), configPathF, false)) {
-			String msg = "Failed to copy source configs from {0} to {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, configSrc.getAbsolutePath(), configPathF.getAbsolutePath());
+		if (!FileHelper.copy(rootSrc.listFiles(), rootPathF, false)) {
+			String msg = "Failed to copy source files from {0} to {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, rootSrc.getAbsolutePath(), rootPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
-		}
-
-		if (dataSrc.exists()) {
-			File dataPathF = new File(rootPathF, RuntimeConfiguration.PATH_DATA);
-			dataPathF.mkdir();
-
-			if (!FileHelper.copy(dataSrc.listFiles(), dataPathF, false)) {
-				String msg = "Failed to copy source data from {0} to {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, configSrc.getAbsolutePath(), configPathF.getAbsolutePath());
-				throw new RuntimeException(msg);
-			}
 		}
 	}
 
