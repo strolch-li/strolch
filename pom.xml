@@ -18,7 +18,7 @@
 	</properties>
 
 	<artifactId>li.strolch.tutorialwebapp</artifactId>
-	<name>li.strolch.tutorialwebapp Maven Webapp</name>
+	<name>li.strolch.tutorialwebapp</name>
 	<description>Tutorial webapp to show case using Strolch in a servlet container</description>
 	<packaging>war</packaging>
 
