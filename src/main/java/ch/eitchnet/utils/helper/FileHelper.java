@@ -234,8 +234,9 @@ public class FileHelper {
 	}
 
 	/**
-	 * Copy a given list of {@link File Files}. The renameTo method does not allow action across NFS mounted filesystems
-	 * this method is the workaround
+	 * <p>
+	 * Copy a given list of {@link File Files}. Recursively copies the files and directories to the destination.
+	 * </p>
 	 * 
 	 * @param srcFiles
 	 *            The source files to copy
@@ -255,8 +256,14 @@ public class FileHelper {
 		for (File srcFile : srcFiles) {
 
 			File dstFile = new File(dstDirectory, srcFile.getName());
-			if (!copy(srcFile, dstFile, checksum))
-				return false;
+			if (srcFile.isDirectory()) {
+				dstFile.mkdir();
+				if (!copy(srcFile.listFiles(), dstFile, checksum))
+					return false;
+			} else {
+				if (!copy(srcFile, dstFile, checksum))
+					return false;
+			}
 		}
 
 		return true;
