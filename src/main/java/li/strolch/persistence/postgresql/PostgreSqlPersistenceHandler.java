@@ -23,14 +23,14 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.impl.ComponentContainerImpl;
+import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.persistence.api.DbConnectionInfo;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.agent.api.StrolchComponent;
-import li.strolch.runtime.agent.impl.ComponentContainerImpl;
-import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.observer.ObserverHandler;
