@@ -30,6 +30,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.agent.api.StrolchComponent;
 import li.strolch.runtime.agent.impl.ComponentContainerImpl;
+import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.observer.ObserverHandler;
@@ -99,11 +100,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		super.start();
 	}
 
-	public StrolchTransaction openTx() {
-		return openTx(StrolchConstants.DEFAULT_REALM);
-	}
-
-	public StrolchTransaction openTx(String realm) {
+	public StrolchTransaction openTx(StrolchRealm realm) {
 		PostgreSqlStrolchTransaction tx = new PostgreSqlStrolchTransaction(realm, this);
 		if (getContainer().hasComponent(ObserverHandler.class)) {
 			tx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));

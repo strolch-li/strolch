@@ -21,14 +21,15 @@ import java.util.Date;
 import java.util.Set;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.ModificationResult;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
-import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.api.TransactionCloseStrategy;
 import li.strolch.persistence.api.TransactionResult;
 import li.strolch.persistence.api.TransactionState;
+import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.observer.ObserverHandler;
 
 import org.slf4j.Logger;
@@ -36,11 +37,10 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.StringHelper;
 
-public class PostgreSqlStrolchTransaction implements StrolchTransaction {
+public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 
 	private static final Logger logger = LoggerFactory.getLogger(PostgreSqlStrolchTransaction.class);
 	private PostgreSqlPersistenceHandler persistenceHandler;
-	private String realm;
 
 	private TransactionCloseStrategy closeStrategy;
 	private ObserverHandler observerHandler;
@@ -54,10 +54,10 @@ public class PostgreSqlStrolchTransaction implements StrolchTransaction {
 	private TransactionResult txResult;
 	private boolean open;
 
-	public PostgreSqlStrolchTransaction(String realm, PostgreSqlPersistenceHandler persistenceHandler) {
+	public PostgreSqlStrolchTransaction(StrolchRealm realm, PostgreSqlPersistenceHandler persistenceHandler) {
+		super(realm);
 		this.startTime = System.nanoTime();
 		this.startTimeDate = new Date();
-		this.realm = realm;
 		this.persistenceHandler = persistenceHandler;
 		this.suppressUpdates = false;
 		this.closeStrategy = TransactionCloseStrategy.COMMIT;
@@ -152,7 +152,7 @@ public class PostgreSqlStrolchTransaction implements StrolchTransaction {
 		this.txResult.setStartTime(this.startTimeDate);
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
-		this.txResult.setRealm(this.realm);
+		this.txResult.setRealm(getRealm().getRealm());
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("TX was completed after "); //$NON-NLS-1$
@@ -201,7 +201,7 @@ public class PostgreSqlStrolchTransaction implements StrolchTransaction {
 		this.txResult.setStartTime(this.startTimeDate);
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
-		this.txResult.setRealm(this.realm);
+		this.txResult.setRealm(getRealm().getRealm());
 	}
 
 	@Override
@@ -233,7 +233,7 @@ public class PostgreSqlStrolchTransaction implements StrolchTransaction {
 	 */
 	Connection getConnection() {
 		if (this.connection == null) {
-			this.connection = this.persistenceHandler.getConnection(this.realm);
+			this.connection = this.persistenceHandler.getConnection(getRealm().getRealm());
 		}
 		return this.connection;
 	}
