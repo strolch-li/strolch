@@ -17,13 +17,13 @@ package li.strolch.persistence.xml;
 
 import java.util.Set;
 
+import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionCloseStrategy;
-import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.observer.ObserverHandler;
 import ch.eitchnet.xmlpers.api.ModificationResult;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
