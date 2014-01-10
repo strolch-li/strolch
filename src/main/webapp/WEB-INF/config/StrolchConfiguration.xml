@@ -26,7 +26,7 @@
 	</Component>
 	<Component>
 		<name>PostInitializer</name>
-		<api>li.strolch.runtime.agent.api.PostInitializer</api>
+		<api>li.strolch.agent.api.PostInitializer</api>
 		<impl>li.strolch.tutorialwebapp.postinitializer.PostInitializer</impl>
 		<depends>ServiceHandler</depends>
 		<Properties>
