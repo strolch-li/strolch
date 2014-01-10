@@ -4,9 +4,9 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.agent.api.StrolchComponent;
 import li.strolch.runtime.agent.impl.ComponentContainerImpl;
+import li.strolch.runtime.agent.impl.StrolchRealm;
 
 public class InMemoryPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
@@ -18,12 +18,7 @@ public class InMemoryPersistenceHandler extends StrolchComponent implements Pers
 	}
 
 	@Override
-	public StrolchTransaction openTx() {
-		return openTx(StrolchConstants.DEFAULT_REALM);
-	}
-
-	@Override
-	public StrolchTransaction openTx(String realm) {
+	public StrolchTransaction openTx(StrolchRealm realm) {
 		return new InMemoryTransaction(realm, this);
 	}
 

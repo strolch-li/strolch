@@ -36,10 +36,10 @@ public class InMemoryElementListener implements StrolchElementListener {
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;
 
-	public InMemoryElementListener(StrolchTransaction tx, ResourceMap resourceMap, OrderMap orderMap) {
+	public InMemoryElementListener(StrolchTransaction tx) {
 		this.tx = tx;
-		this.resourceMap = resourceMap;
-		this.orderMap = orderMap;
+		this.resourceMap = tx.getResourceMap();
+		this.orderMap = tx.getOrderMap();
 
 		this.addResources = true;
 		this.addOrders = true;

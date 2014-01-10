@@ -22,11 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.agent.api.ComponentContainer;
 import li.strolch.runtime.agent.api.ComponentState;
 import li.strolch.runtime.agent.api.ElementMapHandler;
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.runtime.agent.api.ResourceMap;
+import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.agent.api.StrolchComponent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
@@ -45,8 +45,16 @@ public class ComponentContainerImpl implements ComponentContainer {
 	private StrolchConfiguration strolchConfiguration;
 	private ComponentState state;
 
-	public ComponentContainerImpl() {
+	private StrolchAgent agent;
+
+	public ComponentContainerImpl(StrolchAgent agent) {
+		this.agent = agent;
 		this.state = ComponentState.UNDEFINED;
+	}
+
+	@Override
+	public StrolchAgent getAgent() {
+		return this.agent;
 	}
 
 	public ComponentState getState() {
@@ -71,23 +79,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	@Override
-	public OrderMap getOrderMap() {
-		return getComponent(ElementMapHandler.class).getOrderMap();
+	public StrolchRealm getDefaultRealm() {
+		return getRealm(StrolchConstants.DEFAULT_REALM);
 	}
 
 	@Override
-	public OrderMap getOrderMap(String realm) {
-		return getComponent(ElementMapHandler.class).getOrderMap(realm);
-	}
-
-	@Override
-	public ResourceMap getResourceMap() {
-		return getComponent(ElementMapHandler.class).getResourceMap();
-	}
-
-	@Override
-	public ResourceMap getResourceMap(String realm) {
-		return getComponent(ElementMapHandler.class).getResourceMap(realm);
+	public StrolchRealm getRealm(String realm) {
+		return getComponent(ElementMapHandler.class).getRealm(realm);
 	}
 
 	private void initializeComponent(Map<Class<?>, StrolchComponent> componentMap,

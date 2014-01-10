@@ -50,10 +50,11 @@ public class CachedElementMapHandler extends InMemoryElementMapHandler {
 			int nrOfOrders = 0;
 			int nrOfResources = 0;
 
-			OrderMap orderMap = getContainer().getOrderMap(realm);
-			ResourceMap resourceMap = getContainer().getResourceMap(realm);
+			StrolchRealm strolchRealm = this.realms.get(realm);
+			OrderMap orderMap = strolchRealm.getOrderMap();
+			ResourceMap resourceMap = strolchRealm.getResourceMap();
 
-			try (StrolchTransaction tx = resourceMap.openTx(realm)) {
+			try (StrolchTransaction tx = strolchRealm.openTx()) {
 				ResourceDao resourceDao = tx.getResourceDao();
 				Set<String> resourceTypes = resourceDao.queryTypes();
 				for (String type : resourceTypes) {
@@ -65,7 +66,7 @@ public class CachedElementMapHandler extends InMemoryElementMapHandler {
 				}
 			}
 
-			try (StrolchTransaction tx = orderMap.openTx(realm)) {
+			try (StrolchTransaction tx = strolchRealm.openTx()) {
 				OrderDao orderDao = tx.getOrderDao();
 				Set<String> orderTypes = orderDao.queryTypes();
 				for (String type : orderTypes) {

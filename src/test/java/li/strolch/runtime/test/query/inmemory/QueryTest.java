@@ -34,8 +34,7 @@ import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.runtime.agent.api.ResourceMap;
+import li.strolch.runtime.agent.api.ComponentContainer;
 import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.query.inmemory.InMemoryOrderQueryVisitor;
 import li.strolch.runtime.query.inmemory.InMemoryQuery;
@@ -58,12 +57,13 @@ public class QueryTest {
 
 		StrolchAgent agent = ComponentContainerTest.startContainer(PATH_EMPTY_RUNTIME,
 				ComponentContainerTest.PATH_EMPTY_CONTAINER);
+		ComponentContainer container = agent.getContainer();
+
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		res1.addParameter(BAG_ID, iP);
-		ResourceMap resourceMap = agent.getContainer().getResourceMap();
-		try (StrolchTransaction tx = resourceMap.openTx()) {
-			resourceMap.add(tx, res1);
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			tx.getResourceMap().add(tx, res1);
 		}
 
 		List<Selection> elementAndSelections = new ArrayList<>();
@@ -76,7 +76,7 @@ public class QueryTest {
 		InMemoryResourceQueryVisitor resourceQuery = new InMemoryResourceQueryVisitor();
 		InMemoryQuery<Resource> inMemoryQuery = resourceQuery.visit(query);
 		List<Resource> result;
-		try (StrolchTransaction tx = resourceMap.openTx()) {
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
 			result = inMemoryQuery.doQuery(tx.getResourceDao());
 		}
 		assertEquals(1, result.size());
@@ -88,12 +88,13 @@ public class QueryTest {
 
 		StrolchAgent agent = ComponentContainerTest.startContainer(PATH_EMPTY_RUNTIME,
 				ComponentContainerTest.PATH_EMPTY_CONTAINER);
+		ComponentContainer container = agent.getContainer();
+
 		Order o1 = createOrder("@1", "Test Order", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		o1.addParameter(BAG_ID, iP);
-		OrderMap orderMap = agent.getContainer().getOrderMap();
-		try (StrolchTransaction tx = orderMap.openTx()) {
-			orderMap.add(tx, o1);
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			tx.getOrderMap().add(tx, o1);
 		}
 
 		List<Selection> elementAndSelections = new ArrayList<>();
@@ -106,7 +107,7 @@ public class QueryTest {
 		InMemoryOrderQueryVisitor orderQuery = new InMemoryOrderQueryVisitor();
 		InMemoryQuery<Order> inMemoryQuery = orderQuery.visit(query);
 		List<Order> result;
-		try (StrolchTransaction tx = orderMap.openTx()) {
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
 			result = inMemoryQuery.doQuery(tx.getOrderDao());
 		}
 		assertEquals(1, result.size());

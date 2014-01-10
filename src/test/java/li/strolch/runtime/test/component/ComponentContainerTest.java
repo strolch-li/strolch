@@ -23,7 +23,6 @@ import java.text.MessageFormat;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
-import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.agent.api.ComponentContainer;
@@ -144,8 +143,7 @@ public class ComponentContainerTest {
 		ServiceResultTest result = serviceHandler.doService();
 		assertEquals(1, result.getResult());
 
-		PersistenceHandler persistenceHandler = container.getComponent(PersistenceHandler.class);
-		try (StrolchTransaction tx = persistenceHandler.openTx()) {
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
 			ResourceDao resourceDao = tx.getResourceDao();
 			resourceDao.save(ModelGenerator.createResource("@testRes", "Test Res", "Test"));
 			Resource queriesRes = resourceDao.queryBy("Test", "@testRes");

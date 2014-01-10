@@ -110,7 +110,7 @@ public class ControllerDependencyTest {
 	@Before
 	public void setupModel() {
 
-		this.container = new ComponentContainerImpl();
+		this.container = new ComponentContainerImpl(null);
 
 		this.con2 = new ComponentController(new StrolchComponent(this.container, "2"));
 		this.con5 = new ComponentController(new StrolchComponent(this.container, "5"));
@@ -539,7 +539,7 @@ public class ControllerDependencyTest {
 	@Test
 	public void shouldAddDepedencies() {
 
-		ComponentContainerImpl container = new ComponentContainerImpl();
+		ComponentContainerImpl container = new ComponentContainerImpl(null);
 		StrolchComponent component = new StrolchComponent(container, "1"); //$NON-NLS-1$
 		ComponentController controller = new ComponentController(component);
 

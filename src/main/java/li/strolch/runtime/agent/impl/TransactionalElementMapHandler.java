@@ -44,13 +44,15 @@ public class TransactionalElementMapHandler extends InMemoryElementMapHandler {
 			int nrOfOrders = 0;
 			int nrOfResources = 0;
 
-			OrderMap orderMap = getContainer().getOrderMap(realm);
-			try (StrolchTransaction tx = orderMap.openTx(realm)) {
+			StrolchRealm strolchRealm = this.realms.get(realm);
+			OrderMap orderMap = strolchRealm.getOrderMap();
+			ResourceMap resourceMap = strolchRealm.getResourceMap();
+
+			try (StrolchTransaction tx = strolchRealm.openTx()) {
 				nrOfOrders = orderMap.getAllKeys(tx).size();
 			}
 
-			ResourceMap resourceMap = getContainer().getResourceMap(realm);
-			try (StrolchTransaction tx = resourceMap.openTx(realm)) {
+			try (StrolchTransaction tx = strolchRealm.openTx()) {
 				nrOfResources = resourceMap.getAllKeys(tx).size();
 			}
 

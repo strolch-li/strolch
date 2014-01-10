@@ -18,8 +18,6 @@ package li.strolch.service.api;
 import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.runtime.agent.api.ResourceMap;
 import li.strolch.runtime.agent.api.StrolchComponent;
 import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -61,14 +59,6 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		return this.runtimeConfiguration;
 	}
 
-	public ResourceMap getResourceMap(String realm) {
-		return this.getContainer().getResourceMap(realm);
-	}
-
-	public OrderMap getOrderMap(String realm) {
-		return this.getContainer().getOrderMap(realm);
-	}
-
 	@Override
 	public <U extends ServiceResult> U doService(Certificate certificate, Service<ServiceArgument, U> service) {
 		return doService(certificate, service, null);
@@ -94,8 +84,12 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		try {
 			// then perform the service
-			if (service instanceof AbstractService)
-				((AbstractService<?, ?>) service).setServiceHandler(this);
+			if (service instanceof AbstractService) {
+				AbstractService<?, ?> abstractService = (AbstractService<?, ?>) service;
+				abstractService.setContainer(getContainer());
+				abstractService.setCertificate(certificate);
+			}
+
 			U serviceResult = service.doService(argument);
 			if (serviceResult == null) {
 				String msg = "Service {0} is not properly implemented as it returned a null result!"; //$NON-NLS-1$

@@ -15,12 +15,12 @@
  */
 package li.strolch.persistence.api;
 
+import li.strolch.runtime.agent.impl.StrolchRealm;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface PersistenceHandler {
 
-	public StrolchTransaction openTx();
-
-	public StrolchTransaction openTx(String realm);
+	public StrolchTransaction openTx(StrolchRealm realm);
 }

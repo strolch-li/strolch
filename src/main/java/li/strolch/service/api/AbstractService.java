@@ -18,12 +18,16 @@ package li.strolch.service.api;
 import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.runtime.agent.api.ResourceMap;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.agent.api.ComponentContainer;
+import li.strolch.runtime.agent.api.ElementMapHandler;
+import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -33,30 +37,53 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractService.class);
 	private static final long serialVersionUID = 1L;
 
-	private DefaultServiceHandler serviceHandler;
+	private ComponentContainer container;
+	private Certificate certificate;
 
 	/**
-	 * @param serviceHandler
-	 *            the serviceHandler to set
+	 * @param container
+	 *            the container to set
 	 */
-	public void setServiceHandler(DefaultServiceHandler serviceHandler) {
-		this.serviceHandler = serviceHandler;
+	public void setContainer(ComponentContainer container) {
+		this.container = container;
 	}
 
-	public <V> V getComponent(Class<V> clazz) {
-		return this.serviceHandler.getComponent(clazz);
+	/**
+	 * @param certificate
+	 *            the certificate to set
+	 */
+	public void setCertificate(Certificate certificate) {
+		this.certificate = certificate;
 	}
 
-	public RuntimeConfiguration getRuntimeConfiguration() {
-		return this.serviceHandler.getRuntimeConfiguration();
+	/**
+	 * @return the certificate
+	 */
+	protected Certificate getCertificate() {
+		return this.certificate;
 	}
 
-	public ResourceMap getResourceMap(String realm) {
-		return this.serviceHandler.getResourceMap(realm);
+	/**
+	 * @return the container
+	 */
+	protected ComponentContainer getContainer() {
+		return this.container;
 	}
 
-	public OrderMap getOrderMap(String realm) {
-		return this.serviceHandler.getOrderMap(realm);
+	protected <V> V getComponent(Class<V> clazz) {
+		return this.container.getComponent(clazz);
+	}
+
+	protected RuntimeConfiguration getRuntimeConfiguration() {
+		return this.container.getAgent().getStrolchConfiguration().getRuntimeConfiguration();
+	}
+
+	protected StrolchRealm getRealm(String realm) {
+		return getComponent(ElementMapHandler.class).getRealm(realm);
+	}
+
+	protected StrolchTransaction openTx(String realm) {
+		return getComponent(ElementMapHandler.class).getRealm(realm).openTx();
 	}
 
 	@Override

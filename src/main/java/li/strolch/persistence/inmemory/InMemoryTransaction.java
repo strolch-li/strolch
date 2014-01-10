@@ -4,25 +4,20 @@ import java.util.Date;
 import java.util.Set;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.ModificationResult;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
-import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.api.TransactionCloseStrategy;
 import li.strolch.persistence.api.TransactionResult;
 import li.strolch.persistence.api.TransactionState;
+import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.observer.ObserverHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
-public class InMemoryTransaction implements StrolchTransaction {
+public class InMemoryTransaction extends AbstractTransaction {
 
-	private static final Logger logger = LoggerFactory.getLogger(InMemoryTransaction.class);
-	private String realm;
 	private InMemoryPersistenceHandler persistenceHandler;
 
 	private TransactionCloseStrategy closeStrategy;
@@ -34,11 +29,11 @@ public class InMemoryTransaction implements StrolchTransaction {
 	private TransactionResult txResult;
 	private boolean open;
 
-	public InMemoryTransaction(String realm, InMemoryPersistenceHandler persistenceHandler) {
+	public InMemoryTransaction(StrolchRealm realm, InMemoryPersistenceHandler persistenceHandler) {
+		super(realm);
 		this.persistenceHandler = persistenceHandler;
 		this.startTime = System.nanoTime();
 		this.startTimeDate = new Date();
-		this.realm = realm;
 		this.suppressUpdates = false;
 		this.closeStrategy = TransactionCloseStrategy.COMMIT;
 	}
@@ -109,7 +104,7 @@ public class InMemoryTransaction implements StrolchTransaction {
 		this.txResult.setStartTime(this.startTimeDate);
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
-		this.txResult.setRealm(this.realm);
+		this.txResult.setRealm(getRealm().getRealm());
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("TX was completed after "); //$NON-NLS-1$
@@ -144,7 +139,7 @@ public class InMemoryTransaction implements StrolchTransaction {
 		this.txResult.setStartTime(this.startTimeDate);
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
-		this.txResult.setRealm(this.realm);
+		this.txResult.setRealm(getRealm().getRealm());
 	}
 
 	@Override

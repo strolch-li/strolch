@@ -15,6 +15,9 @@
  */
 package li.strolch.persistence.api;
 
+import li.strolch.runtime.agent.api.OrderMap;
+import li.strolch.runtime.agent.api.ResourceMap;
+
 public interface StrolchTransaction extends AutoCloseable {
 
 	public void setCloseStrategy(TransactionCloseStrategy closeStrategy);
@@ -27,6 +30,10 @@ public interface StrolchTransaction extends AutoCloseable {
 	public void close() throws StrolchPersistenceException;
 
 	public boolean isOpen();
+
+	public ResourceMap getResourceMap();
+
+	public OrderMap getOrderMap();
 
 	public OrderDao getOrderDao();
 

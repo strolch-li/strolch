@@ -15,17 +15,15 @@
  */
 package li.strolch.runtime.agent.api;
 
+import li.strolch.runtime.agent.impl.StrolchRealm;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface ElementMapHandler {
 
-	public ResourceMap getResourceMap();
-	
-	public ResourceMap getResourceMap(String realm);
+	public StrolchRealm getDefaultRealm();
 
-	public OrderMap getOrderMap();
-	
-	public OrderMap getOrderMap(String realm);
+	public StrolchRealm getRealm(String realm);
+
 }

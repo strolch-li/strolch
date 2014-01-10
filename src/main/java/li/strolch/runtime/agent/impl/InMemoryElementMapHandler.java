@@ -47,7 +47,7 @@ public class InMemoryElementMapHandler extends AbstractElementMapHandler {
 			PersistenceHandler persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
 			TransactionalResourceMap resourceMap = new TransactionalResourceMap(realm, persistenceHandler);
 			TransactionalOrderMap orderMap = new TransactionalOrderMap(realm, persistenceHandler);
-			StrolchRealm strolchRealm = new StrolchRealm(realm, resourceMap, orderMap);
+			StrolchRealm strolchRealm = new StrolchRealm(realm, persistenceHandler, resourceMap, orderMap);
 			this.realms.put(realm, strolchRealm);
 		}
 

@@ -21,8 +21,6 @@ import java.util.Map;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.agent.api.ElementMapHandler;
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.runtime.agent.api.ResourceMap;
 import li.strolch.runtime.agent.api.StrolchComponent;
 
 /**
@@ -41,28 +39,12 @@ public abstract class AbstractElementMapHandler extends StrolchComponent impleme
 	}
 
 	@Override
-	public ResourceMap getResourceMap() {
-		return getResourceMap(StrolchConstants.DEFAULT_REALM);
+	public StrolchRealm getDefaultRealm() {
+		return getRealm(StrolchConstants.DEFAULT_REALM);
 	}
 
 	@Override
-	public ResourceMap getResourceMap(String realm) {
-		StrolchRealm strolchRealm = getRealm(realm);
-		return strolchRealm.getResourceMap();
-	}
-
-	@Override
-	public OrderMap getOrderMap() {
-		return getOrderMap(StrolchConstants.DEFAULT_REALM);
-	}
-
-	@Override
-	public OrderMap getOrderMap(String realm) {
-		StrolchRealm strolchRealm = getRealm(realm);
-		return strolchRealm.getOrderMap();
-	}
-
-	private StrolchRealm getRealm(String realm) {
+	public StrolchRealm getRealm(String realm) {
 		StrolchRealm strolchRealm = this.realms.get(realm);
 		if (strolchRealm == null) {
 			String msg = "No realm is configured with the name {0}"; //$NON-NLS-1$

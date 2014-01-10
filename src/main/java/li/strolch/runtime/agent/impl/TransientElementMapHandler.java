@@ -24,8 +24,6 @@ import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
 import li.strolch.model.xml.XmlModelFileHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.runtime.agent.api.ResourceMap;
 import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -79,13 +77,11 @@ public class TransientElementMapHandler extends InMemoryElementMapHandler {
 		for (String realm : this.realms.keySet()) {
 
 			StrolchRealm strolchRealm = this.realms.get(realm);
-			ResourceMap resourceMap = strolchRealm.getResourceMap();
-			OrderMap orderMap = strolchRealm.getOrderMap();
 
 			File modelFile = this.realmModelFiles.get(realm);
 			XmlModelStatistics statistics;
-			try (StrolchTransaction tx = resourceMap.openTx(realm)) {
-				InMemoryElementListener elementListener = new InMemoryElementListener(tx, resourceMap, orderMap);
+			try (StrolchTransaction tx = strolchRealm.openTx()) {
+				InMemoryElementListener elementListener = new InMemoryElementListener(tx);
 				XmlModelFileHandler handler = new XmlModelFileHandler(elementListener, modelFile);
 				handler.parseFile();
 				statistics = handler.getStatistics();

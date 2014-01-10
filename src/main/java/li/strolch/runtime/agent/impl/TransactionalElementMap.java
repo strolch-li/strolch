@@ -90,14 +90,4 @@ public abstract class TransactionalElementMap<T extends StrolchElement, U extend
 	public void remove(StrolchTransaction tx, T element) {
 		getDao(tx).remove(element);
 	}
-
-	@Override
-	public StrolchTransaction openTx() {
-		return this.persistenceHandler.openTx();
-	}
-
-	@Override
-	public StrolchTransaction openTx(String realm) {
-		return this.persistenceHandler.openTx(realm);
-	}
 }

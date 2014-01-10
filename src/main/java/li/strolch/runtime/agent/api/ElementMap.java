@@ -47,8 +47,4 @@ public interface ElementMap<T extends StrolchElement> {
 	public void update(StrolchTransaction tx, T element);
 
 	public void remove(StrolchTransaction tx, T element);
-
-	public StrolchTransaction openTx();
-
-	public StrolchTransaction openTx(String realm);
 }

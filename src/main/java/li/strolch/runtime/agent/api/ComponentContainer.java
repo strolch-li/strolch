@@ -15,11 +15,14 @@
  */
 package li.strolch.runtime.agent.api;
 
+import li.strolch.runtime.agent.impl.StrolchRealm;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface ComponentContainer {
+
+	public abstract StrolchAgent getAgent();
 
 	public abstract ComponentState getState();
 
@@ -27,11 +30,7 @@ public interface ComponentContainer {
 
 	public abstract <T> T getComponent(Class<T> clazz);
 
-	public abstract OrderMap getOrderMap();
+	public abstract StrolchRealm getDefaultRealm();
 
-	public abstract OrderMap getOrderMap(String realm);
-
-	public abstract ResourceMap getResourceMap();
-
-	public abstract ResourceMap getResourceMap(String realm);
+	public abstract StrolchRealm getRealm(String realm);
 }

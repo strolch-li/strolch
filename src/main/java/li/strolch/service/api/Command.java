@@ -16,9 +16,7 @@
 package li.strolch.service.api;
 
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.runtime.agent.api.ResourceMap;
-import li.strolch.runtime.configuration.RuntimeConfiguration;
+import li.strolch.runtime.agent.api.ComponentContainer;
 import ch.eitchnet.privilege.model.Restrictable;
 
 /**
@@ -26,28 +24,23 @@ import ch.eitchnet.privilege.model.Restrictable;
  */
 public abstract class Command implements Restrictable {
 
-	private final DefaultServiceHandler serviceHandler;
+	private final ComponentContainer container;
 	private final StrolchTransaction tx;
 
-	public Command(DefaultServiceHandler serviceHandler, StrolchTransaction tx) {
-		this.serviceHandler = serviceHandler;
+	public Command(ComponentContainer container, StrolchTransaction tx) {
+		this.container = container;
 		this.tx = tx;
 	}
 
 	public <V> V getComponent(Class<V> clazz) {
-		return this.serviceHandler.getComponent(clazz);
+		return this.container.getComponent(clazz);
 	}
 
-	public RuntimeConfiguration getRuntimeConfiguration() {
-		return this.serviceHandler.getRuntimeConfiguration();
-	}
-
-	public ResourceMap getResourceMap(String realm) {
-		return this.serviceHandler.getResourceMap(realm);
-	}
-
-	public OrderMap getOrderMap(String realm) {
-		return this.serviceHandler.getOrderMap(realm);
+	/**
+	 * @return the container
+	 */
+	protected ComponentContainer getContainer() {
+		return this.container;
 	}
 
 	/**
