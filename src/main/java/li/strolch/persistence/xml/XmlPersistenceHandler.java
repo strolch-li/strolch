@@ -25,9 +25,9 @@ import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.xml.model.OrderContextFactory;
 import li.strolch.persistence.xml.model.ResourceContextFactory;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.agent.api.StrolchComponent;
 import li.strolch.runtime.agent.impl.ComponentContainerImpl;
+import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.observer.ObserverHandler;
 import ch.eitchnet.xmlpers.api.IoMode;
@@ -69,15 +69,10 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 		super.initialize(componentConfiguration);
 	}
 
-	public StrolchTransaction openTx() {
-		return openTx(StrolchConstants.DEFAULT_REALM);
-	}
-
-	@SuppressWarnings("resource")
-	// caller will/must close
-	public StrolchTransaction openTx(String realm) {
-		PersistenceTransaction tx = this.persistenceManager.openTx(realm);
-		XmlStrolchTransaction strolchTx = new XmlStrolchTransaction(tx);
+	@Override
+	public StrolchTransaction openTx(StrolchRealm realm) {
+		PersistenceTransaction tx = this.persistenceManager.openTx(realm.getRealm());
+		XmlStrolchTransaction strolchTx = new XmlStrolchTransaction(realm, tx);
 		if (getContainer().hasComponent(ObserverHandler.class)) {
 			strolchTx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
 		}

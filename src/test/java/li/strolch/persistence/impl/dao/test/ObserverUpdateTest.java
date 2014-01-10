@@ -110,13 +110,13 @@ public class ObserverUpdateTest {
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getOrderMap().openTx()) {
+		try (StrolchTransaction tx = runtimeMock.getDefaultRealm().openTx()) {
 			tx.getOrderDao().save(newOrder);
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getResourceMap().openTx()) {
+		try (StrolchTransaction tx = runtimeMock.getDefaultRealm().openTx()) {
 			tx.getResourceDao().save(newResource);
 		}
 

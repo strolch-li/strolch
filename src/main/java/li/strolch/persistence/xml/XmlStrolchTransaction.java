@@ -18,24 +18,26 @@ package li.strolch.persistence.xml;
 import java.util.Set;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
-import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.api.TransactionCloseStrategy;
+import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.observer.ObserverHandler;
 import ch.eitchnet.xmlpers.api.ModificationResult;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.api.TransactionResult;
 
-public class XmlStrolchTransaction implements StrolchTransaction {
+public class XmlStrolchTransaction extends AbstractTransaction {
 
 	private ObserverHandler observerHandler;
 	private boolean suppressUpdates;
 	private PersistenceTransaction tx;
 	private TransactionCloseStrategy closeStrategy;
 
-	public XmlStrolchTransaction(PersistenceTransaction tx) {
+	public XmlStrolchTransaction(StrolchRealm realm, PersistenceTransaction tx) {
+		super(realm);
 		this.suppressUpdates = false;
 		this.tx = tx;
 		this.closeStrategy = TransactionCloseStrategy.COMMIT;
