@@ -74,7 +74,7 @@ public class Resource extends GroupedParameterizedElement {
 
 	@Override
 	protected void fillLocator(LocatorBuilder lb) {
-		lb.append(Tags.RESOURCE).append(getId());
+		lb.append(Tags.RESOURCE).append(getType()).append(getId());
 	}
 
 	@Override

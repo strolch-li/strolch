@@ -160,7 +160,7 @@ public class Order extends GroupedParameterizedElement {
 
 	@Override
 	protected void fillLocator(LocatorBuilder lb) {
-		lb.append(Tags.ORDER).append(getId());
+		lb.append(Tags.ORDER).append(getType()).append(getId());
 	}
 
 	@Override
