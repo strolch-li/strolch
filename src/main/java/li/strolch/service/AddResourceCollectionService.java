@@ -17,9 +17,9 @@ package li.strolch.service;
 
 import java.util.List;
 
+import li.strolch.command.AddResourceCollectionCommand;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.ResourceMap;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -40,11 +40,10 @@ public class AddResourceCollectionService extends
 	@Override
 	protected ServiceResult internalDoService(AddResourceCollectionArg arg) {
 
-		ResourceMap resourceMap = getResourceMap(arg.realm);
-		try (StrolchTransaction tx = resourceMap.openTx(arg.realm)) {
-			for (Resource resource : arg.resources) {
-				resourceMap.add(tx, resource);
-			}
+		try (StrolchTransaction tx = openTx(arg.realm)) {
+			AddResourceCollectionCommand command = new AddResourceCollectionCommand(getContainer(), tx);
+			command.setResources(arg.resources);
+			command.doCommand();
 		}
 
 		return ServiceResult.success();

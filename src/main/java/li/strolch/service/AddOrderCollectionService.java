@@ -17,9 +17,9 @@ package li.strolch.service;
 
 import java.util.List;
 
+import li.strolch.command.AddOrderCollectionCommand;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.OrderMap;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -40,11 +40,10 @@ public class AddOrderCollectionService extends
 	@Override
 	protected ServiceResult internalDoService(AddOrderCollectionArg arg) {
 
-		OrderMap orderMap = getOrderMap(arg.realm);
-		try (StrolchTransaction tx = orderMap.openTx(arg.realm)) {
-			for (Order order : arg.orders) {
-				orderMap.add(tx, order);
-			}
+		try (StrolchTransaction tx = openTx(arg.realm)) {
+			AddOrderCollectionCommand command = new AddOrderCollectionCommand(getContainer(), tx);
+			command.setOrders(arg.orders);
+			command.doCommand();
 		}
 
 		return ServiceResult.success();

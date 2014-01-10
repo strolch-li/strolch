@@ -22,8 +22,6 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
 import li.strolch.model.xml.XmlModelFileHandler;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.runtime.agent.api.ResourceMap;
 import li.strolch.runtime.agent.impl.InMemoryElementListener;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
@@ -46,9 +44,6 @@ public class ImportModelFromXmlService extends
 	@Override
 	protected ServiceResult internalDoService(ImportModelFromXmlArg arg) {
 
-		ResourceMap resourceMap = getResourceMap(arg.realm);
-		OrderMap orderMap = getOrderMap(arg.realm);
-
 		File dataPath = getRuntimeConfiguration().getDataPath();
 		File modelFile = new File(dataPath, arg.fileName);
 		if (!modelFile.exists()) {
@@ -58,8 +53,8 @@ public class ImportModelFromXmlService extends
 		}
 
 		XmlModelStatistics statistics;
-		try (StrolchTransaction tx = resourceMap.openTx(arg.realm)) {
-			InMemoryElementListener elementListener = new InMemoryElementListener(tx, resourceMap, orderMap);
+		try (StrolchTransaction tx = openTx(arg.realm)) {
+			InMemoryElementListener elementListener = new InMemoryElementListener(tx);
 			XmlModelFileHandler handler = new XmlModelFileHandler(elementListener, modelFile);
 			handler.parseFile();
 			statistics = handler.getStatistics();

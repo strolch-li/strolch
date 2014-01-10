@@ -15,9 +15,9 @@
  */
 package li.strolch.service;
 
+import li.strolch.command.AddOrderCommand;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.OrderMap;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -37,9 +37,10 @@ public class AddOrderService extends AbstractService<AddOrderService.AddOrderArg
 	@Override
 	protected ServiceResult internalDoService(AddOrderArg arg) {
 
-		OrderMap orderMap = getOrderMap(arg.realm);
-		try (StrolchTransaction tx = orderMap.openTx(arg.realm)) {
-			orderMap.add(tx, arg.order);
+		try (StrolchTransaction tx = openTx(arg.realm)) {
+			AddOrderCommand command = new AddOrderCommand(getContainer(), tx);
+			command.setOrder(arg.order);
+			command.doCommand();
 		}
 
 		return ServiceResult.success();
