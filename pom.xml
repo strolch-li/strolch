@@ -36,7 +36,7 @@
 		</dependency>
 		<dependency>
 			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.runtime</artifactId>
+			<artifactId>li.strolch.agent</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
