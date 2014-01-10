@@ -59,7 +59,7 @@ public class ConfigurationParserTest {
 				.getComponentConfiguration("ServiceHandler");
 		assertNotNull("Should have created a ServiceHandler Configuration", serviceHandlerConfiguration);
 		assertEquals("ServiceHandler", serviceHandlerConfiguration.getName());
-		assertEquals("li.strolch.service.ServiceHandler", serviceHandlerConfiguration.getApi());
+		assertEquals("li.strolch.service.api.ServiceHandler", serviceHandlerConfiguration.getApi());
 		assertEquals("li.strolch.service.SimpleServiceHandler", serviceHandlerConfiguration.getImpl());
 		assertEquals(0, serviceHandlerConfiguration.getPropertyKeys().size());
 
