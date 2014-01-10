@@ -1,4 +1,4 @@
-li.strolch.runtime
+li.strolch.agent
 ==================
 
-runtime for Strolch
+The Strolch Agent which is the runtime for Strolch

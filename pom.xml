@@ -9,24 +9,24 @@
 		<relativePath>../li.strolch.parent/pom.xml</relativePath>
 	</parent>
 
-	<artifactId>li.strolch.runtime</artifactId>
+	<artifactId>li.strolch.agent</artifactId>
 
-	<name>li.strolch.runtime</name>
-	<description>runtime for Strolch</description>
+	<name>li.strolch.agent</name>
+	<description>Strolch Agent which is the runtime for Strolch</description>
 
-	<url>https://github.com/eitch/li.strolch.runtime</url>
+	<url>https://github.com/eitch/li.strolch.agent</url>
 
 	<inceptionYear>2011</inceptionYear>
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitch/li.strolch.runtime/issues</url>
+		<url>https://github.com/eitch/li.strolch.agent/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitch/li.strolch.runtime.git</connection>
-		<developerConnection>scm:git:git@github.com:eitch/li.strolch.runtime.git</developerConnection>
-		<url>https://github.com/eitch/li.strolch.runtime</url>
+		<connection>scm:git:https://github.com/eitch/li.strolch.agent.git</connection>
+		<developerConnection>scm:git:git@github.com:eitch/li.strolch.agent.git</developerConnection>
+		<url>https://github.com/eitch/li.strolch.agent</url>
 	</scm>
 
 	<dependencies>
