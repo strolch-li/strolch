@@ -40,10 +40,6 @@
 			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.runtime</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.persistence.api</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>org.postgresql</groupId>
