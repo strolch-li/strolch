@@ -21,7 +21,7 @@ cd "li.strolch.parent" ; logAheadCount ; cd ..
 cd "li.strolch.bom" ; logAheadCount ; cd ..
 cd "li.strolch.model" ; logAheadCount ; cd ..
 cd "li.strolch.testbase" ; logAheadCount ; cd ..
-cd "li.strolch.runtime" ; logAheadCount ; cd ..
+cd "li.strolch.agent" ; logAheadCount ; cd ..
 cd "li.strolch.service" ; logAheadCount ; cd ..
 cd "li.strolch.persistence.xml" ; logAheadCount ; cd ..
 cd "li.strolch.persistence.postgresql" ; logAheadCount ; cd ..

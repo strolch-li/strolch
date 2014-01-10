@@ -44,10 +44,10 @@ else
   echo
 fi
 
-if [ -d ../li.strolch.runtime ] ; then
-  echo "Project li.strolch.runtime already cloned."
+if [ -d ../li.strolch.agent ] ; then
+  echo "Project li.strolch.agent already cloned."
 else
-  if ! git clone https://github.com/eitch/li.strolch.runtime.git ../li.strolch.runtime ;then
+  if ! git clone https://github.com/eitch/li.strolch.agent.git ../li.strolch.agent ;then
     exit 1
   fi
   echo
