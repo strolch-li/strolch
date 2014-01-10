@@ -93,7 +93,7 @@
 			</dependency>
 			<dependency>
 				<groupId>li.strolch</groupId>
-				<artifactId>li.strolch.runtime</artifactId>
+				<artifactId>li.strolch.agent</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
