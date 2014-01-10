@@ -38,7 +38,6 @@ import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class XmlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
