@@ -18,11 +18,11 @@ package li.strolch.service;
 import java.io.File;
 import java.text.MessageFormat;
 
+import li.strolch.agent.impl.InMemoryElementListener;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
 import li.strolch.model.xml.XmlModelFileHandler;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.impl.InMemoryElementListener;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;

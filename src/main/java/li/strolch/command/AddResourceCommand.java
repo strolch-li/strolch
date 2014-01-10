@@ -15,11 +15,11 @@
  */
 package li.strolch.command;
 
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.ComponentContainer;
-import li.strolch.runtime.agent.api.ResourceMap;
 import li.strolch.service.api.Command;
 import ch.eitchnet.utils.dbc.DBC;
 

@@ -17,11 +17,11 @@ package li.strolch.command;
 
 import java.util.List;
 
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.OrderMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.ComponentContainer;
-import li.strolch.runtime.agent.api.OrderMap;
 import li.strolch.service.api.Command;
 import ch.eitchnet.utils.dbc.DBC;
 
