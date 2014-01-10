@@ -13,14 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
+package li.strolch.agent.api;
 
 import li.strolch.agent.impl.StrolchRealm;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface PersistenceHandler {
+public interface ComponentContainer {
 
-	public StrolchTransaction openTx(StrolchRealm realm);
+	public abstract StrolchAgent getAgent();
+
+	public abstract ComponentState getState();
+
+	public abstract boolean hasComponent(Class<?> clazz);
+
+	public abstract <T> T getComponent(Class<T> clazz);
+
+	public abstract StrolchRealm getDefaultRealm();
+
+	public abstract StrolchRealm getRealm(String realm);
 }

@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.model.StrolchElement;
-import li.strolch.runtime.agent.api.StrolchComponent;
-import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
 /**

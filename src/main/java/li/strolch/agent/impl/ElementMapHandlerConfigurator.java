@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
+package li.strolch.agent.impl;
 
-import li.strolch.agent.impl.StrolchRealm;
+import java.util.List;
+
+import li.strolch.agent.api.StrolchAgent;
+import li.strolch.runtime.configuration.ComponentConfiguration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface PersistenceHandler {
+public interface ElementMapHandlerConfigurator {
 
-	public StrolchTransaction openTx(StrolchRealm realm);
+	public List<ComponentConfiguration> buildConfigurations(StrolchAgent agent);
 }

@@ -21,12 +21,12 @@ import static org.junit.Assert.assertNotNull;
 import java.io.File;
 import java.text.MessageFormat;
 
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.ComponentContainer;
-import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTest;
 import li.strolch.runtime.test.component.model.ServiceHandlerTest;

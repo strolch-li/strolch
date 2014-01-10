@@ -23,6 +23,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.IntegerParameter;
@@ -34,8 +36,6 @@ import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.ComponentContainer;
-import li.strolch.runtime.agent.api.StrolchAgent;
 import li.strolch.runtime.query.inmemory.InMemoryOrderQueryVisitor;
 import li.strolch.runtime.query.inmemory.InMemoryQuery;
 import li.strolch.runtime.query.inmemory.InMemoryResourceQueryVisitor;

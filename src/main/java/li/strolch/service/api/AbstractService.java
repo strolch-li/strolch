@@ -17,11 +17,11 @@ package li.strolch.service.api;
 
 import java.text.MessageFormat;
 
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.ElementMapHandler;
+import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.ComponentContainer;
-import li.strolch.runtime.agent.api.ElementMapHandler;
-import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 
 import org.slf4j.Logger;

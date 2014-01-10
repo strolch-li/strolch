@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
+package li.strolch.agent.api;
 
-import li.strolch.agent.impl.StrolchRealm;
+import li.strolch.model.Resource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface PersistenceHandler {
+public interface ResourceMap extends ElementMap<Resource> {
 
-	public StrolchTransaction openTx(StrolchRealm realm);
+	// marker interface
 }

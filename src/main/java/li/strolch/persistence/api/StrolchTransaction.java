@@ -15,8 +15,8 @@
  */
 package li.strolch.persistence.api;
 
-import li.strolch.runtime.agent.api.OrderMap;
-import li.strolch.runtime.agent.api.ResourceMap;
+import li.strolch.agent.api.OrderMap;
+import li.strolch.agent.api.ResourceMap;
 
 public interface StrolchTransaction extends AutoCloseable {
 

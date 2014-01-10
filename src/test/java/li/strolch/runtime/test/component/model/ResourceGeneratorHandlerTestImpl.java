@@ -15,9 +15,9 @@
  */
 package li.strolch.runtime.test.component.model;
 
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.model.Resource;
-import li.strolch.runtime.agent.api.StrolchComponent;
-import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 
 public class ResourceGeneratorHandlerTestImpl extends StrolchComponent implements ResourceGeneratorHandlerTest {
 

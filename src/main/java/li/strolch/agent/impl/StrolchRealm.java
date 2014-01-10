@@ -13,45 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
+package li.strolch.agent.impl;
 
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.impl.StrolchRealm;
-import li.strolch.persistence.inmemory.InMemoryTransaction;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class AbstractTransaction implements StrolchTransaction {
+public class StrolchRealm {
 
-	protected static final Logger logger = LoggerFactory.getLogger(InMemoryTransaction.class);
-	private StrolchRealm realm;
+	private String realm;
+	private ResourceMap resourceMap;
+	private OrderMap orderMap;
+	private PersistenceHandler persistenceHandler;
 
-	/**
-	 * @param realm
-	 */
-	public AbstractTransaction(StrolchRealm realm) {
+	public StrolchRealm(String realm, PersistenceHandler persistenceHandler, ResourceMap resourceMap, OrderMap orderMap) {
 		this.realm = realm;
+		this.persistenceHandler = persistenceHandler;
+		this.resourceMap = resourceMap;
+		this.orderMap = orderMap;
 	}
 
 	/**
 	 * @return the realm
 	 */
-	protected StrolchRealm getRealm() {
+	public String getRealm() {
 		return this.realm;
 	}
 
-	@Override
-	public ResourceMap getResourceMap() {
-		return this.realm.getResourceMap();
+	public StrolchTransaction openTx() {
+		return this.persistenceHandler.openTx(this);
 	}
 
-	@Override
+	/**
+	 * @return the resourceMap
+	 */
+	public ResourceMap getResourceMap() {
+		return this.resourceMap;
+	}
+
+	/**
+	 * @return the orderMap
+	 */
 	public OrderMap getOrderMap() {
-		return this.realm.getOrderMap();
+		return this.orderMap;
 	}
 }

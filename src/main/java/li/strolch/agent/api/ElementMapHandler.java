@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
+package li.strolch.agent.api;
 
 import li.strolch.agent.impl.StrolchRealm;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface PersistenceHandler {
+public interface ElementMapHandler {
 
-	public StrolchTransaction openTx(StrolchRealm realm);
+	public StrolchRealm getDefaultRealm();
+
+	public StrolchRealm getRealm(String realm);
+
 }

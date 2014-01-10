@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
+package li.strolch.agent.impl;
 
-import li.strolch.agent.impl.StrolchRealm;
+import li.strolch.agent.api.PostInitializer;
+import li.strolch.agent.api.StrolchComponent;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
  */
-public interface PersistenceHandler {
+public class SimplePostInitializer extends StrolchComponent implements PostInitializer {
 
-	public StrolchTransaction openTx(StrolchRealm realm);
+	/**
+	 * @param container
+	 * @param componentName
+	 */
+	public SimplePostInitializer(ComponentContainerImpl container, String componentName) {
+		super(container, componentName);
+	}
+
 }

@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
-
-import li.strolch.agent.impl.StrolchRealm;
+package li.strolch.agent.impl;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface PersistenceHandler {
+public class EmptyElementMapHandler extends InMemoryElementMapHandler {
 
-	public StrolchTransaction openTx(StrolchRealm realm);
+	/**
+	 * @param container
+	 * @param componentName
+	 */
+	public EmptyElementMapHandler(ComponentContainerImpl container, String componentName) {
+		super(container, componentName);
+	}
 }

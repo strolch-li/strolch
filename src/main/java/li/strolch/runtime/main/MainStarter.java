@@ -19,7 +19,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import li.strolch.runtime.agent.api.StrolchAgent;
+import li.strolch.agent.api.StrolchAgent;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;

@@ -17,9 +17,9 @@ package li.strolch.service.api;
 
 import java.text.MessageFormat;
 
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.exception.StrolchException;
-import li.strolch.runtime.agent.api.StrolchComponent;
-import li.strolch.runtime.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;

@@ -1,12 +1,12 @@
 package li.strolch.persistence.inmemory;
 
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.impl.ComponentContainerImpl;
+import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.StrolchComponent;
-import li.strolch.runtime.agent.impl.ComponentContainerImpl;
-import li.strolch.runtime.agent.impl.StrolchRealm;
 
 public class InMemoryPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 

@@ -15,8 +15,8 @@
  */
 package li.strolch.service.api;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.agent.api.ComponentContainer;
 import ch.eitchnet.privilege.model.Restrictable;
 
 /**

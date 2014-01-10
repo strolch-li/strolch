@@ -15,8 +15,8 @@
  */
 package li.strolch.runtime.test.component.model;
 
-import li.strolch.runtime.agent.api.StrolchComponent;
-import li.strolch.runtime.agent.impl.ComponentContainerImpl;
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.impl.ComponentContainerImpl;
 
 public class ServiceHandlerTestImpl extends StrolchComponent implements ServiceHandlerTest {
 

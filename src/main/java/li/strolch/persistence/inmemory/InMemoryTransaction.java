@@ -3,6 +3,7 @@ package li.strolch.persistence.inmemory;
 import java.util.Date;
 import java.util.Set;
 
+import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.ModificationResult;
@@ -12,7 +13,6 @@ import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionCloseStrategy;
 import li.strolch.persistence.api.TransactionResult;
 import li.strolch.persistence.api.TransactionState;
-import li.strolch.runtime.agent.impl.StrolchRealm;
 import li.strolch.runtime.observer.ObserverHandler;
 import ch.eitchnet.utils.helper.StringHelper;
 
