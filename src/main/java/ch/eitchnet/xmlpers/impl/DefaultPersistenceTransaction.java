@@ -253,6 +253,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			this.txResult.clear();
 			this.txResult.setState(TransactionState.FAILED);
 			this.txResult.setModificationByKey(Collections.<String, ModificationResult> emptyMap());
+			this.txResult.setFailCause(e);
 
 		} finally {
 
