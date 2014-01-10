@@ -62,15 +62,6 @@ else
   echo
 fi
 
-if [ -d ../li.strolch.persistence.api ] ; then
-  echo "Project li.strolch.persistence.api already cloned."
-else
-  if ! git clone https://github.com/eitch/li.strolch.persistence.api.git ../li.strolch.persistence.api ;then
-    exit 1
-  fi
-  echo
-fi
-
 if [ -d ../li.strolch.persistence.xml ] ; then
   echo "Project li.strolch.persistence.xml already cloned."
 else

@@ -19,7 +19,6 @@
 		<module>../li.strolch.bom</module>
 		<module>../li.strolch.model</module>
 		<module>../li.strolch.testbase</module>
-		<module>../li.strolch.persistence.api</module>
 		<module>../li.strolch.persistence.xml</module>
 		<module>../li.strolch.persistence.postgresql</module>
 		<module>../li.strolch.runtime</module>
