@@ -5,7 +5,7 @@ import li.strolch.model.Order;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
-public class TransactionalOrderMap extends TransactionalElementMap<Order> implements OrderMap {
+public class CachedOrderMap extends CachedElementMap<Order> implements OrderMap {
 
 	@Override
 	protected OrderDao getDao(StrolchTransaction tx) {

@@ -100,7 +100,7 @@ public class StrolchAgent {
 			this.strolchConfiguration.addConfiguration(configuration.getName(), configuration);
 		}
 
-		ComponentContainerImpl container = new ComponentContainerImpl(this);
+		ComponentContainerImpl container = new ComponentContainerImpl(this, dataStoreMode);
 		this.container = container;
 
 		logger.info(MessageFormat.format("Setup Agent {0}", runtimeConfiguration.getApplicationName())); //$NON-NLS-1$

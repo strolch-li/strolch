@@ -5,8 +5,6 @@ import java.util.Set;
 
 import li.strolch.agent.api.ElementMap;
 import li.strolch.model.StrolchElement;
-import li.strolch.model.query.StrolchQuery;
-import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
@@ -15,24 +13,7 @@ import li.strolch.persistence.api.StrolchTransaction;
  * 
  * @param <T>
  */
-public abstract class TransactionalElementMap<T extends StrolchElement, U extends StrolchQuery<?>> implements
-		ElementMap<T> {
-
-	private PersistenceHandler persistenceHandler;
-	private String realm;
-
-	public TransactionalElementMap(String realm, PersistenceHandler persistenceHandler) {
-		this.realm = realm;
-		this.persistenceHandler = persistenceHandler;
-	}
-
-	protected String getRealm() {
-		return this.realm;
-	}
-
-	protected PersistenceHandler getPersistenceHandler() {
-		return this.persistenceHandler;
-	}
+public abstract class TransactionalElementMap<T extends StrolchElement> implements ElementMap<T> {
 
 	protected abstract StrolchDao<T> getDao(StrolchTransaction tx);
 
@@ -89,5 +70,20 @@ public abstract class TransactionalElementMap<T extends StrolchElement, U extend
 	@Override
 	public void remove(StrolchTransaction tx, T element) {
 		getDao(tx).remove(element);
+	}
+
+	@Override
+	public void addAll(StrolchTransaction tx, List<T> elements) {
+		getDao(tx).saveAll(elements);
+	}
+
+	@Override
+	public void removeAll(StrolchTransaction tx, List<T> elements) {
+		getDao(tx).removeAll(elements);
+	}
+
+	@Override
+	public void updateAll(StrolchTransaction tx, List<T> elements) {
+		getDao(tx).updateAll(elements);
 	}
 }

@@ -29,6 +29,7 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.agent.impl.ComponentController;
 import li.strolch.agent.impl.ComponentDependencyAnalyzer;
+import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
@@ -110,7 +111,7 @@ public class ControllerDependencyTest {
 	@Before
 	public void setupModel() {
 
-		this.container = new ComponentContainerImpl(null);
+		this.container = new ComponentContainerImpl(null, DataStoreMode.EMPTY);
 
 		this.con2 = new ComponentController(new StrolchComponent(this.container, "2"));
 		this.con5 = new ComponentController(new StrolchComponent(this.container, "5"));
@@ -539,7 +540,7 @@ public class ControllerDependencyTest {
 	@Test
 	public void shouldAddDepedencies() {
 
-		ComponentContainerImpl container = new ComponentContainerImpl(null);
+		ComponentContainerImpl container = new ComponentContainerImpl(null, DataStoreMode.EMPTY);
 		StrolchComponent component = new StrolchComponent(container, "1"); //$NON-NLS-1$
 		ComponentController controller = new ComponentController(component);
 

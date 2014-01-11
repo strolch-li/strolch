@@ -34,8 +34,6 @@ public interface StrolchTransaction extends AutoCloseable {
 	public ResourceMap getResourceMap();
 
 	public OrderMap getOrderMap();
-
-	public OrderDao getOrderDao();
-
-	public ResourceDao getResourceDao();
+	
+	public PersistenceHandler getPersistenceHandler();
 }

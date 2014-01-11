@@ -22,13 +22,15 @@ public class InMemoryPersistenceHandler extends StrolchComponent implements Pers
 		return new InMemoryTransaction(realm, this);
 	}
 
-	public OrderDao getOrderDao() {
+	@Override
+	public OrderDao getOrderDao(StrolchTransaction tx) {
 		if (this.orderDao == null)
 			this.orderDao = new InMemoryOrderDao();
 		return this.orderDao;
 	}
 
-	public ResourceDao getResourceDao() {
+	@Override
+	public ResourceDao getResourceDao(StrolchTransaction tx) {
 		if (this.resourceDao == null)
 			this.resourceDao = new InMemoryResourceDao();
 		return this.resourceDao;

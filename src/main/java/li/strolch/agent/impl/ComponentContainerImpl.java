@@ -39,16 +39,18 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerImpl.class);
 
+	private StrolchAgent agent;
+	private DataStoreMode dataStoreMode;
+
 	private Map<Class<?>, StrolchComponent> componentMap;
 	private Map<String, ComponentController> controllerMap;
 	private ComponentDependencyAnalyzer dependencyAnalyzer;
 	private StrolchConfiguration strolchConfiguration;
 	private ComponentState state;
 
-	private StrolchAgent agent;
-
-	public ComponentContainerImpl(StrolchAgent agent) {
+	public ComponentContainerImpl(StrolchAgent agent, DataStoreMode dataStoreMode) {
 		this.agent = agent;
+		this.dataStoreMode = dataStoreMode;
 		this.state = ComponentState.UNDEFINED;
 	}
 
@@ -59,6 +61,11 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	public ComponentState getState() {
 		return this.state;
+	}
+
+	@Override
+	public DataStoreMode getDataStoreMode() {
+		return this.dataStoreMode;
 	}
 
 	@Override

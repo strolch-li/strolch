@@ -15,6 +15,7 @@
  */
 package li.strolch.agent.api;
 
+import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.agent.impl.StrolchRealm;
 
 /**
@@ -25,6 +26,8 @@ public interface ComponentContainer {
 	public abstract StrolchAgent getAgent();
 
 	public abstract ComponentState getState();
+	
+	public abstract DataStoreMode getDataStoreMode();
 
 	public abstract boolean hasComponent(Class<?> clazz);
 

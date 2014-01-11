@@ -22,9 +22,13 @@ import java.io.File;
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.OrderMap;
+import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ModelGenerator;
+import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -88,6 +92,7 @@ public class ComponentContainerTest {
 		try {
 			StrolchAgent agent = startContainer(PATH_TRANSACTIONAL_RUNTIME, PATH_TRANSACTIONAL_CONTAINER);
 			testPersistenceContainer(agent);
+			testElementMaps(agent);
 			destroyContainer(agent);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -101,6 +106,7 @@ public class ComponentContainerTest {
 		try {
 			StrolchAgent agent = startContainer(PATH_CACHED_RUNTIME, PATH_CACHED_CONTAINER);
 			testPersistenceContainer(agent);
+			testElementMaps(agent);
 			destroyContainer(agent);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -129,7 +135,8 @@ public class ComponentContainerTest {
 		ServiceResultTest result = serviceHandler.doService();
 		assertEquals(1, result.getResult());
 
-		ResourceGeneratorHandlerTest resourceGeneratorHandler = container.getComponent(ResourceGeneratorHandlerTest.class);
+		ResourceGeneratorHandlerTest resourceGeneratorHandler = container
+				.getComponent(ResourceGeneratorHandlerTest.class);
 		Resource resource = resourceGeneratorHandler.getTestResource("@testRes", "Test Res", "Test");
 		assertNotNull(resource);
 		assertEquals("@testRes", resource.getId());
@@ -144,11 +151,40 @@ public class ComponentContainerTest {
 		assertEquals(1, result.getResult());
 
 		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
-			ResourceDao resourceDao = tx.getResourceDao();
-			resourceDao.save(ModelGenerator.createResource("@testRes", "Test Res", "Test"));
-			Resource queriesRes = resourceDao.queryBy("Test", "@testRes");
-			assertNotNull(queriesRes);
-			assertEquals("@testRes", queriesRes.getId());
+			ResourceDao resourceDao = tx.getPersistenceHandler().getResourceDao(tx);
+			resourceDao.save(ModelGenerator.createResource("@testRes0", "Test Res", "Test"));
+			Resource queriedRes = resourceDao.queryBy("Test", "@testRes0");
+			assertNotNull(queriedRes);
+			assertEquals("@testRes0", queriedRes.getId());
+		}
+
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			OrderDao orderDao = tx.getPersistenceHandler().getOrderDao(tx);
+			orderDao.save(ModelGenerator.createOrder("@testOrder0", "Test Order", "Test"));
+			Order queriedOrder = orderDao.queryBy("Test", "@testOrder0");
+			assertNotNull(queriedOrder);
+			assertEquals("@testOrder0", queriedOrder.getId());
+		}
+	}
+
+	private static void testElementMaps(StrolchAgent agent) {
+
+		ComponentContainer container = agent.getContainer();
+
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			ResourceMap resourceMap = tx.getResourceMap();
+			resourceMap.add(tx, ModelGenerator.createResource("@testRes1", "Test Res", "Test"));
+			Resource queriedRes = resourceMap.getBy(tx, "Test", "@testRes1");
+			assertNotNull(queriedRes);
+			assertEquals("@testRes1", queriedRes.getId());
+		}
+
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			OrderMap orderMap = tx.getOrderMap();
+			orderMap.add(tx, ModelGenerator.createOrder("@testOrder1", "Test Order", "Test"));
+			Order queriedOrder = orderMap.getBy(tx, "Test", "@testOrder1");
+			assertNotNull(queriedOrder);
+			assertEquals("@testOrder1", queriedOrder.getId());
 		}
 	}
 

@@ -23,4 +23,8 @@ import li.strolch.agent.impl.StrolchRealm;
 public interface PersistenceHandler {
 
 	public StrolchTransaction openTx(StrolchRealm realm);
+
+	public OrderDao getOrderDao(StrolchTransaction tx);
+
+	public ResourceDao getResourceDao(StrolchTransaction tx);
 }

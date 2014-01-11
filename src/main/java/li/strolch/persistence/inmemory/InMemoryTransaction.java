@@ -7,8 +7,7 @@ import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.ModificationResult;
-import li.strolch.persistence.api.OrderDao;
-import li.strolch.persistence.api.ResourceDao;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionCloseStrategy;
 import li.strolch.persistence.api.TransactionResult;
@@ -153,12 +152,7 @@ public class InMemoryTransaction extends AbstractTransaction {
 	}
 
 	@Override
-	public OrderDao getOrderDao() {
-		return this.persistenceHandler.getOrderDao();
-	}
-
-	@Override
-	public ResourceDao getResourceDao() {
-		return this.persistenceHandler.getResourceDao();
+	public PersistenceHandler getPersistenceHandler() {
+		return this.persistenceHandler;
 	}
 }

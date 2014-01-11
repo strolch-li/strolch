@@ -5,7 +5,7 @@ import li.strolch.model.Resource;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
-public class TransactionalResourceMap extends TransactionalElementMap<Resource> implements ResourceMap {
+public class CachedResourceMap extends CachedElementMap<Resource> implements ResourceMap {
 
 	@Override
 	protected ResourceDao getDao(StrolchTransaction tx) {

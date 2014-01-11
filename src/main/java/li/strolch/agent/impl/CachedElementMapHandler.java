@@ -16,22 +16,26 @@
 package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import li.strolch.agent.api.OrderMap;
-import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.OrderDao;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
+import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class CachedElementMapHandler extends InMemoryElementMapHandler {
+public class CachedElementMapHandler extends AbstractElementMapHandler {
 
 	/**
 	 * @param container
@@ -39,6 +43,24 @@ public class CachedElementMapHandler extends InMemoryElementMapHandler {
 	 */
 	public CachedElementMapHandler(ComponentContainerImpl container, String componentName) {
 		super(container, componentName);
+	}
+
+	@Override
+	public void initialize(ComponentConfiguration configuration) {
+
+		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
+		String[] realms = runtimeConfiguration.getStringArray(StrolchAgent.PROP_REALMS, StrolchConstants.DEFAULT_REALM);
+
+		this.realms = new HashMap<>();
+		for (String realm : realms) {
+			PersistenceHandler persistenceHandler = getContainer().getComponent(PersistenceHandler.class);
+			CachedResourceMap resourceMap = new CachedResourceMap();
+			CachedOrderMap orderMap = new CachedOrderMap();
+			StrolchRealm strolchRealm = new StrolchRealm(realm, persistenceHandler, resourceMap, orderMap);
+			this.realms.put(realm, strolchRealm);
+		}
+
+		super.initialize(configuration);
 	}
 
 	@Override
@@ -51,28 +73,28 @@ public class CachedElementMapHandler extends InMemoryElementMapHandler {
 			int nrOfResources = 0;
 
 			StrolchRealm strolchRealm = this.realms.get(realm);
-			OrderMap orderMap = strolchRealm.getOrderMap();
-			ResourceMap resourceMap = strolchRealm.getResourceMap();
+			CachedOrderMap orderMap = (CachedOrderMap) strolchRealm.getOrderMap();
+			CachedResourceMap resourceMap = (CachedResourceMap) strolchRealm.getResourceMap();
 
 			try (StrolchTransaction tx = strolchRealm.openTx()) {
-				ResourceDao resourceDao = tx.getResourceDao();
+				ResourceDao resourceDao = tx.getPersistenceHandler().getResourceDao(tx);
 				Set<String> resourceTypes = resourceDao.queryTypes();
 				for (String type : resourceTypes) {
 					List<Resource> resources = resourceDao.queryAll(type);
 					for (Resource resource : resources) {
-						resourceMap.add(tx, resource);
+						resourceMap.insert(resource, null);
 						nrOfResources++;
 					}
 				}
 			}
 
 			try (StrolchTransaction tx = strolchRealm.openTx()) {
-				OrderDao orderDao = tx.getOrderDao();
+				OrderDao orderDao = tx.getPersistenceHandler().getOrderDao(tx);
 				Set<String> orderTypes = orderDao.queryTypes();
 				for (String type : orderTypes) {
 					List<Order> orders = orderDao.queryAll(type);
 					for (Order order : orders) {
-						orderMap.add(tx, order);
+						orderMap.insert(order, null);
 						nrOfOrders++;
 					}
 				}

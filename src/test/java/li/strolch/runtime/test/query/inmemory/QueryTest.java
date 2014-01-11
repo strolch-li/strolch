@@ -77,7 +77,7 @@ public class QueryTest {
 		InMemoryQuery<Resource> inMemoryQuery = resourceQuery.visit(query);
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
-			result = inMemoryQuery.doQuery(tx.getResourceDao());
+			result = inMemoryQuery.doQuery(tx.getPersistenceHandler().getResourceDao(tx));
 		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
@@ -108,7 +108,7 @@ public class QueryTest {
 		InMemoryQuery<Order> inMemoryQuery = orderQuery.visit(query);
 		List<Order> result;
 		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
-			result = inMemoryQuery.doQuery(tx.getOrderDao());
+			result = inMemoryQuery.doQuery(tx.getPersistenceHandler().getOrderDao(tx));
 		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
