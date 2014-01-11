@@ -11,7 +11,7 @@ public abstract class AbstractModelTest {
 	@Test
 	public void shouldStartContainer() {
 		try (StrolchTransaction tx = getRuntimeMock().getDefaultRealm().openTx()) {
-			tx.getOrderDao().queryKeySet();
+			tx.getOrderMap().getAllKeys(tx);
 		}
 	}
 

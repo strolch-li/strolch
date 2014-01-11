@@ -16,9 +16,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
 @SuppressWarnings("nls")
@@ -39,7 +40,7 @@ public class ResourceModelTestRunner {
 		// create
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			tx.getResourceDao().save(newResource);
+			tx.getResourceMap().add(tx, newResource);
 		}
 	}
 
@@ -48,13 +49,13 @@ public class ResourceModelTestRunner {
 		// create
 		Resource newResource = createResource(ID, NAME, TYPE);
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			tx.getResourceDao().save(newResource);
+			tx.getResourceMap().add(tx, newResource);
 		}
 
 		// read
 		Resource readResource = null;
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			readResource = tx.getResourceDao().queryBy(TYPE, ID);
+			readResource = tx.getResourceMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Resource with id " + ID, readResource); //$NON-NLS-1$
 
@@ -63,27 +64,28 @@ public class ResourceModelTestRunner {
 		String newStringValue = "Giddiya!"; //$NON-NLS-1$
 		sParam.setValue(newStringValue);
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			tx.getResourceDao().update(readResource);
+			tx.getResourceMap().update(tx, readResource);
 		}
 
 		// read updated
 		Resource updatedResource = null;
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			updatedResource = tx.getResourceDao().queryBy(TYPE, ID);
+			updatedResource = tx.getResourceMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Resource with id " + ID, updatedResource); //$NON-NLS-1$
-		assertFalse("Objects can't be the same reference after re-reading!", readResource == updatedResource); //$NON-NLS-1$
+		if (runtimeMock.getContainer().getDataStoreMode() != DataStoreMode.CACHED)
+			assertFalse("Objects can't be the same reference after re-reading!", readResource == updatedResource); //$NON-NLS-1$
 		Parameter<String> updatedParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			tx.getResourceDao().remove(readResource);
+			tx.getResourceMap().remove(tx, readResource);
 		}
 
 		// fail to re-read
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			Resource resource = tx.getResourceDao().queryBy(TYPE, ID);
+			Resource resource = tx.getResourceMap().getBy(tx, TYPE, ID);
 			assertNull("Should no read Resource with id " + ID, resource); //$NON-NLS-1$
 		}
 	}
@@ -104,11 +106,12 @@ public class ResourceModelTestRunner {
 		Collections.sort(resources, comparator);
 
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
-			tx.getResourceDao().removeAll(tx.getResourceDao().queryAll());
+			ResourceMap resourceMap = tx.getResourceMap();
+			resourceMap.removeAll(tx, resourceMap.getAllElements(tx));
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
-			tx.getResourceDao().saveAll(resources);
+			tx.getResourceMap().addAll(tx, resources);
 		}
 
 		Set<String> expectedTypes = new HashSet<>();
@@ -117,35 +120,35 @@ public class ResourceModelTestRunner {
 		expectedTypes.add("MyType3");
 
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
-			List<Resource> allResources = tx.getResourceDao().queryAll();
+			List<Resource> allResources = tx.getResourceMap().getAllElements(tx);
 			Collections.sort(allResources, comparator);
 			assertEquals(resources, allResources);
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
-			ResourceDao resourceDao = tx.getResourceDao();
+			ResourceMap resourceMap = tx.getResourceMap();
 
-			Set<String> types = resourceDao.queryTypes();
+			Set<String> types = resourceMap.getTypes(tx);
 			assertEquals(expectedTypes, types);
 
-			Set<String> keySet = resourceDao.queryKeySet();
+			Set<String> keySet = resourceMap.getAllKeys(tx);
 			assertEquals(15, keySet.size());
 
 			for (String type : types) {
-				Set<String> idsByType = resourceDao.queryKeySet(type);
+				Set<String> idsByType = resourceMap.getKeysBy(tx, type);
 				assertEquals(5, idsByType.size());
 
-				List<Resource> resourcesByType = resourceDao.queryAll(type);
+				List<Resource> resourcesByType = resourceMap.getElementsBy(tx, type);
 				assertEquals(5, resourcesByType.size());
 			}
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
-			Resource resource = tx.getResourceDao().queryBy("MyType1", "@_00000001");
+			Resource resource = tx.getResourceMap().getBy(tx, "MyType1", "@_00000001");
 			assertNotNull(resource);
-			resource = tx.getResourceDao().queryBy("MyType2", "@_00000006");
+			resource = tx.getResourceMap().getBy(tx, "MyType2", "@_00000006");
 			assertNotNull(resource);
-			resource = tx.getResourceDao().queryBy("MyType3", "@_00000011");
+			resource = tx.getResourceMap().getBy(tx, "MyType3", "@_00000011");
 			assertNotNull(resource);
 		}
 	}

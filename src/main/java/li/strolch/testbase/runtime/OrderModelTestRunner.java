@@ -16,9 +16,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import li.strolch.agent.api.OrderMap;
+import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.Order;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
 @SuppressWarnings("nls")
@@ -39,7 +40,7 @@ public class OrderModelTestRunner {
 		// create
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			tx.getOrderDao().save(newOrder);
+			tx.getOrderMap().add(tx, newOrder);
 		}
 	}
 
@@ -48,13 +49,13 @@ public class OrderModelTestRunner {
 		// create
 		Order newOrder = createOrder(ID, NAME, TYPE);
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			tx.getOrderDao().save(newOrder);
+			tx.getOrderMap().add(tx, newOrder);
 		}
 
 		// read
 		Order readOrder = null;
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			readOrder = tx.getOrderDao().queryBy(TYPE, ID);
+			readOrder = tx.getOrderMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, readOrder);
 
@@ -63,27 +64,28 @@ public class OrderModelTestRunner {
 		String newStringValue = "Giddiya!";
 		sParam.setValue(newStringValue);
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			tx.getOrderDao().update(readOrder);
+			tx.getOrderMap().update(tx, readOrder);
 		}
 
 		// read updated
 		Order updatedOrder = null;
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			updatedOrder = tx.getOrderDao().queryBy(TYPE, ID);
+			updatedOrder = tx.getOrderMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, updatedOrder);
-		assertFalse("Objects can't be the same reference after re-reading!", readOrder == updatedOrder);
+		if (runtimeMock.getContainer().getDataStoreMode() != DataStoreMode.CACHED)
+			assertFalse("Objects can't be the same reference after re-reading!", readOrder == updatedOrder);
 		Parameter<String> updatedParam = readOrder.getParameter(BAG_ID, PARAM_STRING_ID);
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			tx.getOrderDao().remove(readOrder);
+			tx.getOrderMap().remove(tx, readOrder);
 		}
 
 		// fail to re-read
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
-			Order order = tx.getOrderDao().queryBy(TYPE, ID);
+			Order order = tx.getOrderMap().getBy(tx, TYPE, ID);
 			assertNull("Should no read Order with id " + ID, order);
 		}
 	}
@@ -104,11 +106,12 @@ public class OrderModelTestRunner {
 		Collections.sort(orders, comparator);
 
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
-			tx.getOrderDao().removeAll(tx.getOrderDao().queryAll());
+			OrderMap orderMap = tx.getOrderMap();
+			orderMap.removeAll(tx, orderMap.getAllElements(tx));
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
-			tx.getOrderDao().saveAll(orders);
+			tx.getOrderMap().addAll(tx, orders);
 		}
 
 		Set<String> expectedTypes = new HashSet<>();
@@ -117,35 +120,35 @@ public class OrderModelTestRunner {
 		expectedTypes.add("MyType3");
 
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
-			List<Order> allOrders = tx.getOrderDao().queryAll();
+			List<Order> allOrders = tx.getOrderMap().getAllElements(tx);
 			Collections.sort(allOrders, comparator);
 			assertEquals(orders, allOrders);
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
-			OrderDao orderDao = tx.getOrderDao();
+			OrderMap orderMap = tx.getOrderMap();
 
-			Set<String> types = orderDao.queryTypes();
+			Set<String> types = orderMap.getTypes(tx);
 			assertEquals(expectedTypes, types);
 
-			Set<String> keySet = orderDao.queryKeySet();
+			Set<String> keySet = orderMap.getAllKeys(tx);
 			assertEquals(15, keySet.size());
 
 			for (String type : types) {
-				Set<String> idsByType = orderDao.queryKeySet(type);
+				Set<String> idsByType = orderMap.getKeysBy(tx, type);
 				assertEquals(5, idsByType.size());
 
-				List<Order> ordersByType = orderDao.queryAll(type);
+				List<Order> ordersByType = orderMap.getElementsBy(tx, type);
 				assertEquals(5, ordersByType.size());
 			}
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
-			Order order = tx.getOrderDao().queryBy("MyType1", "@_00000001");
+			Order order = tx.getOrderMap().getBy(tx, "MyType1", "@_00000001");
 			assertNotNull(order);
-			order = tx.getOrderDao().queryBy("MyType2", "@_00000006");
+			order = tx.getOrderMap().getBy(tx, "MyType2", "@_00000006");
 			assertNotNull(order);
-			order = tx.getOrderDao().queryBy("MyType3", "@_00000011");
+			order = tx.getOrderMap().getBy(tx, "MyType3", "@_00000011");
 			assertNotNull(order);
 		}
 	}
