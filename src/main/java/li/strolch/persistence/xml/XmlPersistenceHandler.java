@@ -24,7 +24,9 @@ import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
+import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.xml.model.OrderContextFactory;
 import li.strolch.persistence.xml.model.ResourceContextFactory;
@@ -72,10 +74,20 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm) {
 		PersistenceTransaction tx = this.persistenceManager.openTx(realm.getRealm());
-		XmlStrolchTransaction strolchTx = new XmlStrolchTransaction(realm, tx);
+		XmlStrolchTransaction strolchTx = new XmlStrolchTransaction(realm, tx, this);
 		if (getContainer().hasComponent(ObserverHandler.class)) {
 			strolchTx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
 		}
 		return strolchTx;
+	}
+
+	@Override
+	public OrderDao getOrderDao(StrolchTransaction tx) {
+		return new XmlOrderDao(tx);
+	}
+
+	@Override
+	public ResourceDao getResourceDao(StrolchTransaction tx) {
+		return new XmlResourceDao(tx);
 	}
 }

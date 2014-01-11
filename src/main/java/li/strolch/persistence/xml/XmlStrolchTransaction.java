@@ -20,8 +20,7 @@ import java.util.Set;
 import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.AbstractTransaction;
-import li.strolch.persistence.api.OrderDao;
-import li.strolch.persistence.api.ResourceDao;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionCloseStrategy;
 import li.strolch.runtime.observer.ObserverHandler;
@@ -31,13 +30,15 @@ import ch.eitchnet.xmlpers.api.TransactionResult;
 
 public class XmlStrolchTransaction extends AbstractTransaction {
 
+	private XmlPersistenceHandler persistenceHandler;
 	private ObserverHandler observerHandler;
 	private boolean suppressUpdates;
 	private PersistenceTransaction tx;
 	private TransactionCloseStrategy closeStrategy;
 
-	public XmlStrolchTransaction(StrolchRealm realm, PersistenceTransaction tx) {
+	public XmlStrolchTransaction(StrolchRealm realm, PersistenceTransaction tx, XmlPersistenceHandler persistenceHandler) {
 		super(realm);
+		this.persistenceHandler = persistenceHandler;
 		this.suppressUpdates = false;
 		this.tx = tx;
 		this.closeStrategy = TransactionCloseStrategy.COMMIT;
@@ -84,6 +85,7 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 		}
 
 		this.tx.autoCloseableCommit();
+		logger.info(txResult.getLogMessage());
 
 		if (!this.suppressUpdates && this.observerHandler != null) {
 
@@ -114,12 +116,7 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 	}
 
 	@Override
-	public OrderDao getOrderDao() {
-		return new XmlOrderDao(this);
-	}
-
-	@Override
-	public ResourceDao getResourceDao() {
-		return new XmlResourceDao(this);
+	public PersistenceHandler getPersistenceHandler() {
+		return this.persistenceHandler;
 	}
 }
