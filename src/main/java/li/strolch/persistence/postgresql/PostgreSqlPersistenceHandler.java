@@ -27,7 +27,9 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.persistence.api.DbConnectionInfo;
+import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
@@ -126,5 +128,15 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 			String msg = MessageFormat.format("Failed to get a connection for {0} due to {1}", dbInfo, e.getMessage()); //$NON-NLS-1$
 			throw new StrolchPersistenceException(msg, e);
 		}
+	}
+
+	@Override
+	public OrderDao getOrderDao(StrolchTransaction tx) {
+		return ((PostgreSqlStrolchTransaction) tx).getOrderDao();
+	}
+
+	@Override
+	public ResourceDao getResourceDao(StrolchTransaction tx) {
+		return ((PostgreSqlStrolchTransaction) tx).getResourceDao();
 	}
 }

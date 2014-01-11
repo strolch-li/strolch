@@ -25,6 +25,7 @@ import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.ModificationResult;
 import li.strolch.persistence.api.OrderDao;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionCloseStrategy;
@@ -102,15 +103,12 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 		this.txResult = new TransactionResult();
 
 		try {
-			if (this.orderDao != null) {
+			if (this.orderDao != null)
 				this.orderDao.commit(this.txResult);
-			}
-
-			if (this.resourceDao != null) {
+			if (this.resourceDao != null)
 				this.resourceDao.commit(this.txResult);
-			}
-
-			this.connection.commit();
+			if (this.connection != null)
+				this.connection.commit();
 
 			this.txResult.setState(TransactionState.COMMITTED);
 
@@ -214,15 +212,13 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 		return this.open;
 	}
 
-	@Override
-	public OrderDao getOrderDao() {
+	OrderDao getOrderDao() {
 		if (this.orderDao == null)
 			this.orderDao = new PostgreSqlOrderDao(this);
 		return (OrderDao) this.orderDao;
 	}
 
-	@Override
-	public ResourceDao getResourceDao() {
+	ResourceDao getResourceDao() {
 		if (this.resourceDao == null)
 			this.resourceDao = new PostgreSqlResourceDao(this);
 		return (ResourceDao) this.resourceDao;
@@ -236,5 +232,10 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 			this.connection = this.persistenceHandler.getConnection(getRealm().getRealm());
 		}
 		return this.connection;
+	}
+
+	@Override
+	public PersistenceHandler getPersistenceHandler() {
+		return this.persistenceHandler;
 	}
 }
