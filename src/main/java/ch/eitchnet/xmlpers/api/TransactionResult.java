@@ -33,7 +33,7 @@ public class TransactionResult {
 	private long closeDuration;
 
 	private Map<String, ModificationResult> modificationByKey;
-	
+
 	public TransactionResult() {
 		this.state = TransactionState.OPEN;
 		this.modificationByKey = new HashMap<>();
@@ -70,6 +70,8 @@ public class TransactionResult {
 	}
 
 	/**
+	 * The internal exception why the transaction failed
+	 * 
 	 * @return the failCause
 	 */
 	public Exception getFailCause() {
@@ -85,6 +87,8 @@ public class TransactionResult {
 	}
 
 	/**
+	 * Start time of the transaction
+	 * 
 	 * @return the startTime
 	 */
 	public Date getStartTime() {
@@ -100,6 +104,8 @@ public class TransactionResult {
 	}
 
 	/**
+	 * The duration the transaction was open in nanoseconds
+	 * 
 	 * @return the txDuration
 	 */
 	public long getTxDuration() {
@@ -115,6 +121,8 @@ public class TransactionResult {
 	}
 
 	/**
+	 * The duration the transaction took to close in nanoseconds
+	 * 
 	 * @return the closeDuration
 	 */
 	public long getCloseDuration() {
