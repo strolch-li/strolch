@@ -16,6 +16,7 @@
 package li.strolch.command;
 
 import java.text.MessageFormat;
+import java.util.List;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
@@ -28,36 +29,39 @@ import ch.eitchnet.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrderCommand extends Command {
+public class UpdateOrderCollectionCommand extends Command {
 
-	private Order order;
+	private List<Order> orders;
 
 	/**
 	 * @param tx
 	 */
-	public AddOrderCommand(ComponentContainer container, StrolchTransaction tx) {
+	public UpdateOrderCollectionCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
 	/**
-	 * @param order
-	 *            the order to set
+	 * @param orders
+	 *            the orders to set
 	 */
-	public void setOrder(Order order) {
-		this.order = order;
+	public void setOrders(List<Order> orders) {
+		this.orders = orders;
 	}
 
 	@Override
 	public void doCommand() {
 
-		DBC.PRE.assertNotNull("Order may not be null!", this.order);
+		DBC.PRE.assertNotNull("Order list may not be null!", this.orders);
 
 		OrderMap orderMap = tx().getOrderMap();
-		if (orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
-			String msg = MessageFormat.format("The Order {0} already exists!", this.order.getLocator());
-			throw new StrolchException(msg);
+		for (Order order : orders) {
+			if (!orderMap.hasElement(tx(), order.getType(), order.getId())) {
+				String msg = "The Order {0} can not be updated as it does not exist!";
+				msg = MessageFormat.format(msg, order.getLocator());
+				throw new StrolchException(msg);
+			}
 		}
 
-		orderMap.add(tx(), this.order);
+		orderMap.updateAll(tx(), orders);
 	}
 }

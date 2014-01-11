@@ -15,6 +15,8 @@
  */
 package li.strolch.command;
 
+import java.text.MessageFormat;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
@@ -52,7 +54,7 @@ public class AddResourceCommand extends Command {
 
 		ResourceMap resourceMap = tx().getResourceMap();
 		if (resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {
-			String msg = "The Resource " + this.resource.getLocator() + " already exists!";
+			String msg = MessageFormat.format("The Resource {0} already exists!", this.resource.getLocator());
 			throw new StrolchException(msg);
 		}
 

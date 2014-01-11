@@ -16,11 +16,12 @@
 package li.strolch.command;
 
 import java.text.MessageFormat;
+import java.util.List;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.OrderMap;
+import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.Order;
+import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import ch.eitchnet.utils.dbc.DBC;
@@ -28,36 +29,39 @@ import ch.eitchnet.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrderCommand extends Command {
+public class UpdateResourceCollectionCommand extends Command {
 
-	private Order order;
+	private List<Resource> resources;
 
 	/**
 	 * @param tx
 	 */
-	public AddOrderCommand(ComponentContainer container, StrolchTransaction tx) {
+	public UpdateResourceCollectionCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
 	/**
-	 * @param order
-	 *            the order to set
+	 * @param resources
+	 *            the resources to set
 	 */
-	public void setOrder(Order order) {
-		this.order = order;
+	public void setResources(List<Resource> resources) {
+		this.resources = resources;
 	}
 
 	@Override
 	public void doCommand() {
 
-		DBC.PRE.assertNotNull("Order may not be null!", this.order);
+		DBC.PRE.assertNotNull("Resource list may not be null!", this.resources);
 
-		OrderMap orderMap = tx().getOrderMap();
-		if (orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
-			String msg = MessageFormat.format("The Order {0} already exists!", this.order.getLocator());
-			throw new StrolchException(msg);
+		ResourceMap resourceMap = tx().getResourceMap();
+		for (Resource resource : resources) {
+			if (!resourceMap.hasElement(tx(), resource.getType(), resource.getId())) {
+				String msg = "The Resource {0} can not be updated as it does not exist!";
+				msg = MessageFormat.format(msg, resource.getLocator());
+				throw new StrolchException(msg);
+			}
 		}
 
-		orderMap.add(tx(), this.order);
+		resourceMap.updateAll(tx(), resources);
 	}
 }

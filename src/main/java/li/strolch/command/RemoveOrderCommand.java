@@ -28,14 +28,14 @@ import ch.eitchnet.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrderCommand extends Command {
+public class RemoveOrderCommand extends Command {
 
 	private Order order;
 
 	/**
 	 * @param tx
 	 */
-	public AddOrderCommand(ComponentContainer container, StrolchTransaction tx) {
+	public RemoveOrderCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
@@ -53,11 +53,12 @@ public class AddOrderCommand extends Command {
 		DBC.PRE.assertNotNull("Order may not be null!", this.order);
 
 		OrderMap orderMap = tx().getOrderMap();
-		if (orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
-			String msg = MessageFormat.format("The Order {0} already exists!", this.order.getLocator());
+		if (!orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
+			String msg = "The Order {0} can not be removed as it does not exist!";
+			msg = MessageFormat.format(msg, this.order.getLocator());
 			throw new StrolchException(msg);
 		}
 
-		orderMap.add(tx(), this.order);
+		orderMap.remove(tx(), this.order);
 	}
 }

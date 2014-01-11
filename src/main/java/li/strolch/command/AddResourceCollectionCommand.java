@@ -15,6 +15,7 @@
  */
 package li.strolch.command;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -55,14 +56,11 @@ public class AddResourceCollectionCommand extends Command {
 		ResourceMap resourceMap = tx().getResourceMap();
 		for (Resource resource : resources) {
 			if (resourceMap.hasElement(tx(), resource.getType(), resource.getId())) {
-				String msg = "The Resource " + resource.getLocator() + " already exists!";
+				String msg = MessageFormat.format("The Resource {0} already exists!", resource.getLocator());
 				throw new StrolchException(msg);
 			}
-
 		}
 
-		for (Resource resource : resources) {
-			resourceMap.add(tx(), resource);
-		}
+		resourceMap.addAll(tx(), resources);
 	}
 }

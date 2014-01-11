@@ -15,6 +15,7 @@
  */
 package li.strolch.command;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -55,14 +56,11 @@ public class AddOrderCollectionCommand extends Command {
 		OrderMap orderMap = tx().getOrderMap();
 		for (Order order : orders) {
 			if (orderMap.hasElement(tx(), order.getType(), order.getId())) {
-				String msg = "The Order " + order.getLocator() + " already exists!";
+				String msg = MessageFormat.format("The Order {0} already exists!", order.getLocator());
 				throw new StrolchException(msg);
 			}
-
 		}
 
-		for (Order order : orders) {
-			orderMap.add(tx(), order);
-		}
+		orderMap.addAll(tx(), orders);
 	}
 }

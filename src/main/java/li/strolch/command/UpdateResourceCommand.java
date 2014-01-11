@@ -18,9 +18,9 @@ package li.strolch.command;
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.OrderMap;
+import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.Order;
+import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import ch.eitchnet.utils.dbc.DBC;
@@ -28,36 +28,37 @@ import ch.eitchnet.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrderCommand extends Command {
+public class UpdateResourceCommand extends Command {
 
-	private Order order;
+	private Resource resource;
 
 	/**
 	 * @param tx
 	 */
-	public AddOrderCommand(ComponentContainer container, StrolchTransaction tx) {
+	public UpdateResourceCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
 	/**
-	 * @param order
-	 *            the order to set
+	 * @param resource
+	 *            the resource to set
 	 */
-	public void setOrder(Order order) {
-		this.order = order;
+	public void setResource(Resource resource) {
+		this.resource = resource;
 	}
 
 	@Override
 	public void doCommand() {
 
-		DBC.PRE.assertNotNull("Order may not be null!", this.order);
+		DBC.PRE.assertNotNull("Resource may not be null!", this.resource);
 
-		OrderMap orderMap = tx().getOrderMap();
-		if (orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
-			String msg = MessageFormat.format("The Order {0} already exists!", this.order.getLocator());
+		ResourceMap resourceMap = tx().getResourceMap();
+		if (!resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {
+			String msg = "The Resource {0} can not be updated as it does not exist!!";
+			msg = MessageFormat.format(msg, this.resource.getLocator());
 			throw new StrolchException(msg);
 		}
 
-		orderMap.add(tx(), this.order);
+		resourceMap.update(tx(), this.resource);
 	}
 }
