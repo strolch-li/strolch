@@ -244,7 +244,7 @@ public class FileHelper {
 	 *            The destination where to copy the files
 	 * @param checksum
 	 *            if true, then a MD5 checksum is made to validate copying
-	 * @return <b>true</b> if and only if the renaming succeeded; <b>false</b> otherwise
+	 * @return <b>true</b> if and only if the copying succeeded; <b>false</b> otherwise
 	 */
 	public final static boolean copy(File[] srcFiles, File dstDirectory, boolean checksum) {
 
@@ -258,11 +258,16 @@ public class FileHelper {
 			File dstFile = new File(dstDirectory, srcFile.getName());
 			if (srcFile.isDirectory()) {
 				dstFile.mkdir();
-				if (!copy(srcFile.listFiles(), dstFile, checksum))
+				if (!copy(srcFile.listFiles(), dstFile, checksum)) {
+					String msg = "Failed to copy contents of {0} to {1}";
+					msg = MessageFormat.format(msg, srcFile.getAbsolutePath(), dstFile.getAbsolutePath());
+					logger.error(msg);
 					return false;
+				}
 			} else {
-				if (!copy(srcFile, dstFile, checksum))
+				if (!copy(srcFile, dstFile, checksum)) {
 					return false;
+				}
 			}
 		}
 
@@ -310,8 +315,8 @@ public class FileHelper {
 
 			// cleanup if files are not the same length
 			if (fromFile.length() != toFile.length()) {
-				String msg = MessageFormat.format("Copying failed, as new files are not the same length: {0} / {1}", //$NON-NLS-1$
-						fromFile.length(), toFile.length());
+				String msg = "Copying failed, as new files are not the same length: {0} / {1}";
+				msg = MessageFormat.format(msg, fromFile.length(), toFile.length());
 				FileHelper.logger.error(msg);
 				toFile.delete();
 
@@ -319,8 +324,8 @@ public class FileHelper {
 			}
 
 		} catch (Exception e) {
-
-			FileHelper.logger.error(e.getMessage(), e);
+			String msg = MessageFormat.format("Failed to copy path from {0} to + {1} due to:", fromFile, toFile);
+			FileHelper.logger.error(msg, e);
 			return false;
 		}
 
