@@ -166,7 +166,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	@Override
 	protected void fillLocator(LocatorBuilder locatorBuilder) {
-		locatorBuilder.append(Tags.PARAMETER).append(this.id);
+		locatorBuilder.append(this.id);
 	}
 
 	@Override

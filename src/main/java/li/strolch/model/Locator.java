@@ -15,7 +15,6 @@
  */
 package li.strolch.model;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,8 +26,9 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * <p>
- * The {@link Locator} is used to fully qualify the location of an object in the model. It consists of a {@link List} of
- * Strings which starting from the first value, defining the root, with the last item defining the objects id.
+ * The {@link Locator} is an immutable object and is used to fully qualify the location of an object in the model. It
+ * consists of a {@link List} of Strings which starting from the first value, defining the root, with the last item
+ * defining the objects id.
  * </p>
  * 
  * <p>
@@ -113,6 +113,15 @@ public class Locator {
 	}
 
 	/**
+	 * Returns the immutable list of path elements making up this locator
+	 * 
+	 * @return the pathElements
+	 */
+	public List<String> getPathElements() {
+		return this.pathElements;
+	}
+
+	/**
 	 * Returns the number of elements which this {@link Locator} contains
 	 * 
 	 * @return the number of elements which this {@link Locator} contains
@@ -185,12 +194,6 @@ public class Locator {
 	 *             if the path elements does not contain at least two items
 	 */
 	private String formatPath(List<String> pathElements) throws StrolchException {
-		if (pathElements.isEmpty()) {
-			String msg = "A Path always consists of at least 1 element: {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, pathElements);
-			throw new StrolchException(msg);
-		}
-
 		StringBuilder sb = new StringBuilder();
 
 		Iterator<String> iter = pathElements.iterator();
@@ -227,6 +230,17 @@ public class Locator {
 		} else if (!this.pathElements.equals(other.pathElements))
 			return false;
 		return true;
+	}
+
+	/**
+	 * Instantiates a new immutable {@link Locator} instance from the given string
+	 * 
+	 * @param locatorPath
+	 *            the path from which to instantiate the locator
+	 * @return the immutable {@link Locator} instance
+	 */
+	public static Locator valueOf(String locatorPath) {
+		return new Locator(locatorPath);
 	}
 
 	/**
@@ -270,11 +284,13 @@ public class Locator {
 		}
 
 		/**
-		 * Creates a {@link Locator} instance with the current elements
+		 * Creates an immutable {@link Locator} instance with the current elements
 		 * 
 		 * @return a new {@link Locator} instance
 		 */
 		public Locator build() {
+			if (this.pathElements.isEmpty())
+				throw new StrolchException("The path elements must contain at least 1 item"); //$NON-NLS-1$
 			return new Locator(this.pathElements);
 		}
 	}

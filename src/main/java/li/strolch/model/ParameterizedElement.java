@@ -192,7 +192,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	@Override
 	public void fillLocator(LocatorBuilder lb) {
-		lb.append(Tags.PARAMETERIZED_ELEMENT).append(this.id);
+		lb.append(this.id);
 	}
 
 	@Override
