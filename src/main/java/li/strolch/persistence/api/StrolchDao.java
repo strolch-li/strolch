@@ -28,6 +28,8 @@ public interface StrolchDao<T extends StrolchElement> {
 
 	public Set<String> queryKeySet();
 
+	// TODO add method hasElement(String type, String id)
+
 	public Set<String> queryKeySet(String type);
 
 	public Set<String> queryTypes();
@@ -47,6 +49,6 @@ public interface StrolchDao<T extends StrolchElement> {
 	public void updateAll(List<T> elements);
 
 	public void remove(T element);
-	
+
 	public void removeAll(List<T> elements);
 }
