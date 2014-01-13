@@ -116,6 +116,10 @@ public class ServiceResult implements Serializable {
 		return new ServiceResult(ServiceResultState.WARNING, warning, t);
 	}
 
+	public static ServiceResult error(String error) {
+		return new ServiceResult(ServiceResultState.FAILED, error, null);
+	}
+
 	public static ServiceResult failed(String error, Throwable t) {
 		return new ServiceResult(ServiceResultState.FAILED, error, t);
 	}
