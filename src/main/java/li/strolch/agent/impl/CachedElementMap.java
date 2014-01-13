@@ -155,15 +155,16 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 				throw new StrolchPersistenceException(msg);
 			}
 
-			// TODO remove empty byType map after element removal, but be wary of synchronisation...
-
 			synchronized (byType) {
 				if (byType.remove(element.getId()) == null) {
 					msg = MessageFormat.format(msg, element.getLocator());
 					throw new StrolchPersistenceException(msg);
 				}
 				if (byType.isEmpty()) {
-					this.elementMap.remove(element.getType());
+					synchronized (this.elementMap) {
+						if (byType.isEmpty())
+							this.elementMap.remove(element.getType());
+					}
 				}
 				this.allKeys.remove(element.getId());
 				getDao(tx).remove(element);
@@ -334,7 +335,10 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 						}
 
 						if (byType.isEmpty()) {
-							this.elementMap.remove(type);
+							synchronized (this.elementMap) {
+								if (byType.isEmpty())
+									this.elementMap.remove(type);
+							}
 						}
 					}
 				}
