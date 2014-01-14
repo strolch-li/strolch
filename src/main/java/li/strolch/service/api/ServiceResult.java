@@ -40,6 +40,16 @@ public class ServiceResult implements Serializable {
 	/**
 	 * @param state
 	 * @param message
+	 */
+	public ServiceResult(ServiceResultState state, String message) {
+		super();
+		this.state = state;
+		this.message = message;
+	}
+
+	/**
+	 * @param state
+	 * @param message
 	 * @param throwable
 	 */
 	public ServiceResult(ServiceResultState state, String message, Throwable throwable) {
