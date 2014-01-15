@@ -23,6 +23,7 @@ cd "li.strolch.model" ; logAheadCount ; cd ..
 cd "li.strolch.testbase" ; logAheadCount ; cd ..
 cd "li.strolch.agent" ; logAheadCount ; cd ..
 cd "li.strolch.service" ; logAheadCount ; cd ..
+cd "li.strolch.rest" ; logAheadCount ; cd ..
 cd "li.strolch.persistence.xml" ; logAheadCount ; cd ..
 cd "li.strolch.persistence.postgresql" ; logAheadCount ; cd ..
 cd "li.strolch.tutorialapp" ; logAheadCount ; cd ..

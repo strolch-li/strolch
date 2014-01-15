@@ -62,6 +62,15 @@ else
   echo
 fi
 
+if [ -d ../li.strolch.rest ] ; then
+  echo "Project li.strolch.rest already cloned."
+else
+  if ! git clone git@github.com:eitch/li.strolch.rest.git ../li.strolch.rest ;then
+    exit 1
+  fi
+  echo
+fi
+
 if [ -d ../li.strolch.persistence.xml ] ; then
   echo "Project li.strolch.persistence.xml already cloned."
 else

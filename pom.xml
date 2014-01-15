@@ -23,6 +23,7 @@
 		<module>../li.strolch.persistence.postgresql</module>
 		<module>../li.strolch.agent</module>
 		<module>../li.strolch.service</module>
+		<module>../li.strolch.rest</module>
 		<module>../li.strolch.tutorialapp</module>
 		<module>../li.strolch.tutorialwebapp</module>
 	</modules>

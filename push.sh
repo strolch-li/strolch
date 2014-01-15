@@ -12,6 +12,7 @@ echo "Pushing li.strolch.model..." ; cd li.strolch.model ; git push ; cd .. ; ec
 echo "Pushing li.strolch.testbase..." ; cd li.strolch.testbase ; git push ; cd .. ; echo
 echo "Pushing li.strolch.agent..." ; cd li.strolch.agent ; git push ; cd .. ; echo
 echo "Pushing li.strolch.service..." ; cd li.strolch.service ; git push ; cd .. ; echo
+echo "Pushing li.strolch.rest..." ; cd li.strolch.rest ; git push ; cd .. ; echo
 echo "Pushing li.strolch.persistence.xml..." ; cd li.strolch.persistence.xml ; git push ; cd .. ; echo
 echo "Pushing li.strolch.persistence.postgresql..." ; cd li.strolch.persistence.postgresql ; git push ; cd .. ; echo
 echo "Pushing li.strolch.tutorialapp..." ; cd li.strolch.tutorialapp ; git push ; cd .. ; echo

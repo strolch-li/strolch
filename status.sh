@@ -12,6 +12,7 @@ echo "Showing status of li.strolch.model..." ; cd li.strolch.model ; git status 
 echo "Showing status of li.strolch.testbase..." ; cd li.strolch.testbase ; git status -s ; cd .. ; echo
 echo "Showing status of li.strolch.agent..." ; cd li.strolch.agent ; git status -s ; cd .. ; echo
 echo "Showing status of li.strolch.service..." ; cd li.strolch.service ; git status -s ; cd .. ; echo
+echo "Showing status of li.strolch.rest..." ; cd li.strolch.rest ; git status -s ; cd .. ; echo
 echo "Showing status of li.strolch.persistence.xml..." ; cd li.strolch.persistence.xml ; git status -s ; cd .. ; echo
 echo "Showing status of li.strolch.persistence.postgresql..." ; cd li.strolch.persistence.postgresql ; git status -s ; cd .. ; echo
 echo "Showing status of li.strolch.tutorialapp..." ; cd li.strolch.tutorialapp ; git status -s ; cd .. ; echo
