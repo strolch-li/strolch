@@ -13,34 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.tutorialwebapp.postinitializer;
+package li.strolch.tutorialwebapp.web.rest;
 
-import li.strolch.agent.impl.ComponentContainerImpl;
-import li.strolch.agent.impl.SimplePostInitializer;
-import li.strolch.rest.inspector.AgentRef;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+
+import li.strolch.rest.inspector.StrolchRestfulClasses;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public class PostInitializer extends SimplePostInitializer {
-
-	/**
-	 * @param container
-	 * @param componentName
-	 */
-	public PostInitializer(ComponentContainerImpl container, String componentName) {
-		super(container, componentName);
-	}
+@ApplicationPath("rest")
+public class RestfulApplication extends Application {
 
 	@Override
-	public void start() {
-
-		logger.info("Initializing RestfulServices...");
-		AgentRef.getInstance().init(getContainer().getAgent());
-
-		logger.info("Started PostInitializer."); //$NON-NLS-1$
-
-		super.start();
+	public Set<Class<?>> getClasses() {
+		Set<Class<?>> classes = new HashSet<>();
+		classes.addAll(StrolchRestfulClasses.getClasses());
+		return classes;
 	}
 }

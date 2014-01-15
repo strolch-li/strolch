@@ -38,6 +38,7 @@
 	</scm>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.bom</artifactId>
@@ -45,8 +46,13 @@
 		</dependency>
 		<dependency>
 			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.rest</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.persistence.xml</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
