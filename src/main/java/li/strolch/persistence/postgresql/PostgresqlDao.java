@@ -52,6 +52,34 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	protected abstract T parseFromXml(String id, String type, SQLXML xml);
 
 	@Override
+	public long querySize() {
+		String sql = "select count(*) from " + getTableName();
+		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				return result.getLong(1);
+			}
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public long querySize(String type) {
+
+		String sql = "select count(*) from " + getTableName() + " where type = ?";
+		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+			statement.setString(1, type);
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				return result.getLong(1);
+			}
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
 	public Set<String> queryKeySet() {
 
 		Set<String> keySet = new HashSet<>();
