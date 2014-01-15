@@ -29,6 +29,16 @@ public abstract class TransactionalElementMap<T extends StrolchElement> implemen
 	}
 
 	@Override
+	public long querySize(StrolchTransaction tx) {
+		return getDao(tx).querySize();
+	}
+
+	@Override
+	public long querySize(StrolchTransaction tx, String type) {
+		return getDao(tx).querySize(type);
+	}
+
+	@Override
 	public T getBy(StrolchTransaction tx, String type, String id) {
 		return getDao(tx).queryBy(type, id);
 	}

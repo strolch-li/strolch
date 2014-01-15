@@ -30,6 +30,10 @@ public interface ElementMap<T extends StrolchElement> {
 
 	public boolean hasElement(StrolchTransaction tx, String type, String id);
 
+	public long querySize(StrolchTransaction tx);
+
+	public long querySize(StrolchTransaction tx, String type);
+
 	public T getBy(StrolchTransaction tx, String type, String id);
 
 	public List<T> getAllElements(StrolchTransaction tx);

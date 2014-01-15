@@ -20,6 +20,24 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
+	public long querySize() {
+		long size = 0;
+		for (String type : this.elementMap.keySet()) {
+			Map<String, T> byType = this.elementMap.get(type);
+			size += byType.size();
+		}
+		return size;
+	}
+
+	@Override
+	public long querySize(String type) {
+		Map<String, T> byType = this.elementMap.get(type);
+		if (byType == null)
+			return 0;
+		return byType.size();
+	}
+
+	@Override
 	public Set<String> queryKeySet() {
 
 		Set<String> keySet = new HashSet<>();
@@ -35,11 +53,10 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 
 	@Override
 	public Set<String> queryKeySet(String type) {
-
-		if (!this.elementMap.containsKey(type))
+		Map<String, T> byType = this.elementMap.get(type);
+		if (byType == null)
 			return Collections.emptySet();
-
-		return this.elementMap.get(type).keySet();
+		return byType.keySet();
 	}
 
 	@Override
@@ -49,10 +66,10 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 
 	@Override
 	public T queryBy(String type, String id) {
-		if (!this.elementMap.containsKey(type))
+		Map<String, T> byType = this.elementMap.get(type);
+		if (byType == null)
 			return null;
-
-		return this.elementMap.get(type).get(id);
+		return byType.get(id);
 	}
 
 	@Override
@@ -70,10 +87,10 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 
 	@Override
 	public List<T> queryAll(String type) {
-		if (!this.elementMap.containsKey(type))
+		Map<String, T> byType = this.elementMap.get(type);
+		if (byType == null)
 			return Collections.emptyList();
-
-		return new ArrayList<>(this.elementMap.get(type).values());
+		return new ArrayList<>(byType.values());
 	}
 
 	@Override

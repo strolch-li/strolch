@@ -22,13 +22,16 @@ import li.strolch.model.StrolchElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface StrolchDao<T extends StrolchElement> {
 
 	public Set<String> queryKeySet();
 
 	// TODO add method hasElement(String type, String id)
+
+	public long querySize();
+
+	public long querySize(String type);
 
 	public Set<String> queryKeySet(String type);
 

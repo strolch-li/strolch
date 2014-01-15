@@ -61,6 +61,16 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 	}
 
 	@Override
+	public long querySize(StrolchTransaction tx) {
+		return getAllKeys(tx).size();
+	}
+
+	@Override
+	public long querySize(StrolchTransaction tx, String type) {
+		return getKeysBy(tx, type).size();
+	}
+
+	@Override
 	public T getBy(StrolchTransaction tx, String type, String id) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
