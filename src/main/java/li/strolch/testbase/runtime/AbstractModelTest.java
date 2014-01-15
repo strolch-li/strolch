@@ -23,6 +23,13 @@ public abstract class AbstractModelTest {
 	}
 
 	@Test
+	public void shouldQueryOrderSizes() {
+
+		OrderModelTestRunner testRunner = new OrderModelTestRunner(getRuntimeMock());
+		testRunner.runQuerySizeTest();
+	}
+
+	@Test
 	public void shouldOrderCrud() {
 
 		OrderModelTestRunner testRunner = new OrderModelTestRunner(getRuntimeMock());
@@ -41,6 +48,13 @@ public abstract class AbstractModelTest {
 
 		ResourceModelTestRunner testRunner = new ResourceModelTestRunner(getRuntimeMock());
 		testRunner.runCreateResourceTest();
+	}
+
+	@Test
+	public void shouldQueryResourceSizes() {
+
+		ResourceModelTestRunner testRunner = new ResourceModelTestRunner(getRuntimeMock());
+		testRunner.runQuerySizeTest();
 	}
 
 	@Test

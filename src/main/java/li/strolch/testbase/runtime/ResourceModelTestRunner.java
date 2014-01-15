@@ -44,6 +44,42 @@ public class ResourceModelTestRunner {
 		}
 	}
 
+	public void runQuerySizeTest() {
+
+		// remove all
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+			tx.getResourceMap().removeAll(tx, tx.getResourceMap().getAllElements(tx));
+		}
+
+		// create three resources
+		Resource resource1 = createResource("myTestResource1", "Test Name", "QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Resource resource2 = createResource("myTestResource2", "Test Name", "QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Resource resource3 = createResource("myTestResource3", "Test Name", "QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+			tx.getResourceMap().add(tx, resource1);
+			tx.getResourceMap().add(tx, resource2);
+			tx.getResourceMap().add(tx, resource3);
+		}
+
+		// query size
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+			long size = tx.getResourceMap().querySize(tx);
+			assertEquals("Should have three objects", 3, size);
+
+			size = tx.getResourceMap().querySize(tx, "QTestType1");
+			assertEquals("Should have only one object of type 'QTestType1'", 1, size);
+
+			size = tx.getResourceMap().querySize(tx, "QTestType2");
+			assertEquals("Should have only one object of type 'QTestType1'", 1, size);
+
+			size = tx.getResourceMap().querySize(tx, "QTestType3");
+			assertEquals("Should have only one object of type 'QTestType1'", 1, size);
+
+			size = tx.getResourceMap().querySize(tx, "NonExistingType");
+			assertEquals("Should have zero objects of type 'NonExistingType'", 0, size);
+		}
+	}
+
 	public void runCrudTests() {
 
 		// create

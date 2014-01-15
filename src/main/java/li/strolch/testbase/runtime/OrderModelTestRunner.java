@@ -44,6 +44,42 @@ public class OrderModelTestRunner {
 		}
 	}
 
+	public void runQuerySizeTest() {
+		
+		// remove all
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+			tx.getOrderMap().removeAll(tx, tx.getOrderMap().getAllElements(tx));
+		}
+
+		// create three orders
+		Order order1 = createOrder("myTestOrder1", "Test Name", "QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Order order2 = createOrder("myTestOrder2", "Test Name", "QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Order order3 = createOrder("myTestOrder3", "Test Name", "QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+			tx.getOrderMap().add(tx, order1);
+			tx.getOrderMap().add(tx, order2);
+			tx.getOrderMap().add(tx, order3);
+		}
+
+		// query size
+		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+			long size = tx.getOrderMap().querySize(tx);
+			assertEquals("Should have three objects", 3, size);
+
+			size = tx.getOrderMap().querySize(tx, "QTestType1");
+			assertEquals("Should have only one object of type 'QTestType1'", 1, size);
+
+			size = tx.getOrderMap().querySize(tx, "QTestType2");
+			assertEquals("Should have only one object of type 'QTestType1'", 1, size);
+
+			size = tx.getOrderMap().querySize(tx, "QTestType3");
+			assertEquals("Should have only one object of type 'QTestType1'", 1, size);
+
+			size = tx.getOrderMap().querySize(tx, "NonExistingType");
+			assertEquals("Should have zero objects of type 'NonExistingType'", 0, size);
+		}
+	}
+
 	public void runCrudTests() {
 
 		// create
