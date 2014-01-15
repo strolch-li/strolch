@@ -103,6 +103,11 @@
 			</dependency>
 			<dependency>
 				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.rest</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
 				<artifactId>li.strolch.bom</artifactId>
 				<type>pom</type>
 				<version>${project.version}</version>
