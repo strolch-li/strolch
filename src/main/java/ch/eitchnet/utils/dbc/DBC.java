@@ -41,10 +41,23 @@ public enum DBC {
 				throw new DbcException(ex);
 			}
 		}
+
+		@Override
+		public void assertNull(String msg, Object value) {
+			if (value != null) {
+				String ex = "Illegal situation as value is not null: {0}"; //$NON-NLS-1$
+				ex = MessageFormat.format(ex, msg);
+				throw new DbcException(ex);
+			}
+		}
+
 	};
 
 	public abstract void assertNotEmpty(String msg, String value);
+
 	public abstract void assertNotNull(String msg, Object value);
+
+	public abstract void assertNull(String msg, Object value);
 
 	public class DbcException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
