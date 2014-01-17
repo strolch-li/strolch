@@ -15,55 +15,46 @@
  */
 package li.strolch.rest.inspector.model;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "ElementMap")
-public class ElementMapOverview {
+@XmlRootElement(name = "RealmOverview")
+public class RealmOverview {
 
-	@XmlAttribute(name = "elementMapName")
-	private String elementMapName;
+	@XmlAttribute(name = "realmName")
+	private String realmName;
 	@XmlAttribute(name = "size")
 	private long size;
-	@XmlElement(name = "types", type = TypeOverview.class)
-	private List<TypeOverview> typeOverviews;
 
-	public ElementMapOverview() {
+	public RealmOverview() {
 		// no-arg constructor for JAXB
 	}
 
-	/**
-	 * @param elementMapName
-	 * @param typeOverviews
-	 */
-	public ElementMapOverview(String elementMapName, List<TypeOverview> typeOverviews) {
-		this.elementMapName = elementMapName;
-		this.typeOverviews = typeOverviews;
-		this.size = this.typeOverviews.size();
+	public RealmOverview(String realmName, long size) {
+		this.realmName = realmName;
+		this.size = size;
+
 	}
 
 	/**
-	 * @return the elementMapName
+	 * @return the realmName
 	 */
-	public String getElementMapName() {
-		return this.elementMapName;
+	public String getRealmName() {
+		return this.realmName;
 	}
 
 	/**
-	 * @param elementMapName
-	 *            the elementMapName to set
+	 * @param realmName
+	 *            the realmName to set
 	 */
-	public void setElementMapName(String elementMapName) {
-		this.elementMapName = elementMapName;
+	public void setRealmName(String realmName) {
+		this.realmName = realmName;
 	}
 
 	/**
@@ -81,18 +72,4 @@ public class ElementMapOverview {
 		this.size = size;
 	}
 
-	/**
-	 * @return the typeOverviews
-	 */
-	public List<TypeOverview> getTypeOverviews() {
-		return this.typeOverviews;
-	}
-
-	/**
-	 * @param typeOverviews
-	 *            the typeOverviews to set
-	 */
-	public void setTypeOverviews(List<TypeOverview> typeOverviews) {
-		this.typeOverviews = typeOverviews;
-	}
 }

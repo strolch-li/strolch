@@ -15,40 +15,64 @@
  */
 package li.strolch.rest.inspector.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement
-public class ModelOverview {
+@XmlRootElement(name = "Types")
+public class TypeOverview {
 
-	@XmlElement
-	private List<ElementMapOverview> elementMapOverviews;
+	@XmlAttribute(name = "type")
+	private String type;
 
-	public ModelOverview() {
-		this.elementMapOverviews = new ArrayList<>();
+	@XmlAttribute(name = "size")
+	private long size;
+
+	public TypeOverview() {
+		// no-arg constructor for JAXB
 	}
 
 	/**
-	 * @return the elementMapOverviews
+	 * @param type
+	 * @param size
 	 */
-	public List<ElementMapOverview> getElementMapOverviews() {
-		return this.elementMapOverviews;
+	public TypeOverview(String type, long size) {
+		this.type = type;
+		this.size = size;
 	}
 
 	/**
-	 * @param elementMapOverviews
-	 *            the elementMapOverviews to set
+	 * @return the type
 	 */
-	public void setElementMapOverviews(List<ElementMapOverview> elementMapOverviews) {
-		this.elementMapOverviews = elementMapOverviews;
+	public String getType() {
+		return this.type;
+	}
+
+	/**
+	 * @param type
+	 *            the type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the size
+	 */
+	public long getSize() {
+		return this.size;
+	}
+
+	/**
+	 * @param size
+	 *            the size to set
+	 */
+	public void setSize(long size) {
+		this.size = size;
 	}
 }
