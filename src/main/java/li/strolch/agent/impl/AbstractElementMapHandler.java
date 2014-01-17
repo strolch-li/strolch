@@ -16,7 +16,9 @@
 package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import li.strolch.agent.api.ElementMapHandler;
 import li.strolch.agent.api.StrolchComponent;
@@ -36,6 +38,11 @@ public abstract class AbstractElementMapHandler extends StrolchComponent impleme
 	 */
 	public AbstractElementMapHandler(ComponentContainerImpl container, String componentName) {
 		super(container, componentName);
+	}
+
+	@Override
+	public Set<String> getRealmNames() {
+		return new HashSet<>(realms.keySet());
 	}
 
 	@Override

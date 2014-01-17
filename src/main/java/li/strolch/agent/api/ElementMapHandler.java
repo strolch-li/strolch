@@ -15,6 +15,8 @@
  */
 package li.strolch.agent.api;
 
+import java.util.Set;
+
 import li.strolch.agent.impl.StrolchRealm;
 
 /**
@@ -22,8 +24,9 @@ import li.strolch.agent.impl.StrolchRealm;
  */
 public interface ElementMapHandler {
 
+	public Set<String> getRealmNames();
+
 	public StrolchRealm getDefaultRealm();
 
 	public StrolchRealm getRealm(String realm);
-
 }

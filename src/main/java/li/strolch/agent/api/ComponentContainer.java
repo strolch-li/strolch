@@ -15,6 +15,8 @@
  */
 package li.strolch.agent.api;
 
+import java.util.Set;
+
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.agent.impl.StrolchRealm;
 
@@ -26,14 +28,17 @@ public interface ComponentContainer {
 	public abstract StrolchAgent getAgent();
 
 	public abstract ComponentState getState();
-	
+
 	public abstract DataStoreMode getDataStoreMode();
 
 	public abstract boolean hasComponent(Class<?> clazz);
 
 	public abstract <T> T getComponent(Class<T> clazz);
 
+	public abstract Set<String> getRealmNames();
+
 	public abstract StrolchRealm getDefaultRealm();
 
 	public abstract StrolchRealm getRealm(String realm);
+
 }

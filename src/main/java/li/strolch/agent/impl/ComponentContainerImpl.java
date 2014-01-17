@@ -86,6 +86,11 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	@Override
+	public Set<String> getRealmNames() {
+		return getComponent(ElementMapHandler.class).getRealmNames();
+	}
+
+	@Override
 	public StrolchRealm getDefaultRealm() {
 		return getRealm(StrolchConstants.DEFAULT_REALM);
 	}
