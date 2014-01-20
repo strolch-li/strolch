@@ -1,0 +1,12 @@
+li.strolch.dev
+li.strolch.parent
+li.strolch.bom
+li.strolch.model
+li.strolch.testbase
+li.strolch.agent
+li.strolch.service
+li.strolch.rest
+li.strolch.persistence.xml
+li.strolch.persistence.postgresql
+li.strolch.tutorialapp
+li.strolch.tutorialwebapp
