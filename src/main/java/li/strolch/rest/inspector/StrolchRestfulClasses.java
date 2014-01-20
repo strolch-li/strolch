@@ -15,6 +15,7 @@
  */
 package li.strolch.rest.inspector;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,17 +24,28 @@ import java.util.Set;
  */
 public class StrolchRestfulClasses {
 
-	public static Set<Class<?>> classes;
+	public static Set<Class<?>> restfulClasses;
+	public static Set<Class<?>> providerClasses;
 
 	static {
-		classes = new HashSet<>();
-		classes.add(Inspector.class);
+		Set<Class<?>> restfulClasses = new HashSet<>();
+		restfulClasses.add(Inspector.class);
+
+		Set<Class<?>> providerClasses = new HashSet<>();
+		providerClasses.add(StrolchRestfulExceptionMapper.class);
+
+		StrolchRestfulClasses.restfulClasses = Collections.unmodifiableSet(restfulClasses);
+		StrolchRestfulClasses.providerClasses = Collections.unmodifiableSet(providerClasses);
 	}
 
 	/**
 	 * @return the classes
 	 */
-	public static Set<Class<?>> getClasses() {
-		return classes;
+	public static Set<Class<?>> getRestfulClasses() {
+		return restfulClasses;
+	}
+
+	public static Set<Class<?>> getProviderClasses() {
+		return providerClasses;
 	}
 }

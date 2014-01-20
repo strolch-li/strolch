@@ -71,25 +71,30 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAgent() {
 
-		ComponentContainer container = AgentRef.getInstance().getContainer();
-		Set<String> realmNames = container.getRealmNames();
-		List<RealmOverview> realmOverviews = new ArrayList<>(realmNames.size());
-		for (String realmName : realmNames) {
+		try {
+			ComponentContainer container = AgentRef.getInstance().getContainer();
+			Set<String> realmNames = container.getRealmNames();
+			List<RealmOverview> realmOverviews = new ArrayList<>(realmNames.size());
+			for (String realmName : realmNames) {
 
-			StrolchRealm realm = container.getRealm(realmName);
-			try (StrolchTransaction tx = realm.openTx()) {
-				long size = 0;
-				size += realm.getResourceMap().querySize(tx);
-				size += realm.getOrderMap().querySize(tx);
-				RealmOverview realmOverview = new RealmOverview(realmName, size);
-				realmOverviews.add(realmOverview);
+				StrolchRealm realm = container.getRealm(realmName);
+				try (StrolchTransaction tx = realm.openTx()) {
+					long size = 0;
+					size += realm.getResourceMap().querySize(tx);
+					size += realm.getOrderMap().querySize(tx);
+					RealmOverview realmOverview = new RealmOverview(realmName, size);
+					realmOverviews.add(realmOverview);
+				}
 			}
-		}
 
-		AgentOverview agentOverview = new AgentOverview(realmOverviews);
-		GenericEntity<AgentOverview> entity = new GenericEntity<AgentOverview>(agentOverview, AgentOverview.class) {
-		};
-		return Response.ok().entity(entity).build();
+			AgentOverview agentOverview = new AgentOverview(realmOverviews);
+			GenericEntity<AgentOverview> entity = new GenericEntity<AgentOverview>(agentOverview, AgentOverview.class) {
+			};
+			return Response.ok().entity(entity).build();
+		} catch (Exception e) {
+			//e.printStackTrace();
+			throw e;
+		}
 	}
 
 	/**

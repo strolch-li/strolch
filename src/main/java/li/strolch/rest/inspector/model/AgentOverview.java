@@ -54,4 +54,34 @@ public class AgentOverview {
 	public void setRealms(List<RealmOverview> realms) {
 		this.realms = realms;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.realms == null) ? 0 : this.realms.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AgentOverview other = (AgentOverview) obj;
+		if (this.realms == null) {
+			if (other.realms != null)
+				return false;
+		} else if (!this.realms.equals(other.realms))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "AgentOverview [realms=" + this.realms + "]";
+	}
 }

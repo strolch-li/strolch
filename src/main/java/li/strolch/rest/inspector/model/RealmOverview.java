@@ -72,4 +72,36 @@ public class RealmOverview {
 		this.size = size;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.realmName == null) ? 0 : this.realmName.hashCode());
+		result = prime * result + (int) (this.size ^ (this.size >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RealmOverview other = (RealmOverview) obj;
+		if (this.realmName == null) {
+			if (other.realmName != null)
+				return false;
+		} else if (!this.realmName.equals(other.realmName))
+			return false;
+		if (this.size != other.size)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "RealmOverview [realmName=" + this.realmName + ", size=" + this.size + "]";
+	}
 }
