@@ -32,7 +32,7 @@ public class RestfulApplication extends Application {
 	@Override
 	public Set<Class<?>> getClasses() {
 		Set<Class<?>> classes = new HashSet<>();
-		classes.addAll(StrolchRestfulClasses.getClasses());
+		classes.addAll(StrolchRestfulClasses.getRestfulClasses());
 		return classes;
 	}
 }
