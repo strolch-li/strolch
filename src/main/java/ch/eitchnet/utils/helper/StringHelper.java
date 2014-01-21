@@ -15,6 +15,8 @@
  */
 package ch.eitchnet.utils.helper;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -549,6 +551,21 @@ public class StringHelper {
 		} else {
 			return nanos + "ns"; //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * Formats the given {@link Throwable}'s stack trace to a string
+	 * 
+	 * @param t
+	 *            the throwable for which the stack trace is to be formatted to string
+	 * 
+	 * @return a string representation of the given {@link Throwable}'s stack trace
+	 */
+	public static String formatException(Throwable t) {
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter writer = new PrintWriter(stringWriter);
+		t.printStackTrace(writer);
+		return stringWriter.toString();
 	}
 
 	/**
