@@ -4,9 +4,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.glassfish.grizzly.utils.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.utils.helper.StringHelper;
 
 @Provider
 public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception> {
@@ -16,6 +17,6 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 	@Override
 	public Response toResponse(Exception ex) {
 		logger.error("Handling exception " + ex.getClass(), ex);
-		return Response.status(500).entity(Exceptions.getStackTraceAsString(ex)).type("text/plain").build();
+		return Response.status(500).entity(StringHelper.formatException(ex)).type("text/plain").build();
 	}
 }

@@ -95,4 +95,38 @@ public class ElementMapOverview {
 	public void setTypeOverviews(List<TypeOverview> typeOverviews) {
 		this.typeOverviews = typeOverviews;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.elementMapName == null) ? 0 : this.elementMapName.hashCode());
+		result = prime * result + (int) (this.size ^ (this.size >>> 32));
+		result = prime * result + ((this.typeOverviews == null) ? 0 : this.typeOverviews.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ElementMapOverview other = (ElementMapOverview) obj;
+		if (this.elementMapName == null) {
+			if (other.elementMapName != null)
+				return false;
+		} else if (!this.elementMapName.equals(other.elementMapName))
+			return false;
+		if (this.size != other.size)
+			return false;
+		if (this.typeOverviews == null) {
+			if (other.typeOverviews != null)
+				return false;
+		} else if (!this.typeOverviews.equals(other.typeOverviews))
+			return false;
+		return true;
+	}
 }

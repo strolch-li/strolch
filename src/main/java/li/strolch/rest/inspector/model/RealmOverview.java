@@ -36,10 +36,13 @@ public class RealmOverview {
 		// no-arg constructor for JAXB
 	}
 
+	/**
+	 * @param realmName
+	 * @param size
+	 */
 	public RealmOverview(String realmName, long size) {
 		this.realmName = realmName;
 		this.size = size;
-
 	}
 
 	/**

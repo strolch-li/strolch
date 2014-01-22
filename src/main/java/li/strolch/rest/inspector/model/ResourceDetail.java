@@ -15,9 +15,12 @@
  */
 package li.strolch.rest.inspector.model;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 import li.strolch.model.Resource;
 
@@ -26,9 +29,10 @@ import li.strolch.model.Resource;
  */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "Resource")
-public class ResourceOverview extends StrolchElementOverview {
+@XmlType(name = "")
+public class ResourceDetail extends GroupedParameterizedElementDetail {
 
-	public ResourceOverview() {
+	public ResourceDetail() {
 		// no-arg constructor for JAXB
 	}
 
@@ -36,15 +40,16 @@ public class ResourceOverview extends StrolchElementOverview {
 	 * @param id
 	 * @param name
 	 * @param type
+	 * @param parameterizedElements
 	 */
-	public ResourceOverview(String id, String name, String type) {
-		super(id, name, type);
+	public ResourceDetail(String id, String name, String type, List<ParameterizedElementDetail> parameterizedElements) {
+		super(id, name, type, parameterizedElements);
 	}
 
 	/**
 	 * @param resource
 	 */
-	public ResourceOverview(Resource resource) {
+	public ResourceDetail(Resource resource) {
 		super(resource);
 	}
 }

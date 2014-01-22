@@ -34,8 +34,8 @@ public class TypeDetail {
 	@XmlAttribute(name = "type")
 	private String type;
 
-	@XmlElements(value = { @XmlElement(name = "Orders", type = OrderOverview.class),
-			@XmlElement(name = "Resources", type = ResourceOverview.class) })
+	@XmlElements({ @XmlElement(name = "orders", type = OrderOverview.class),
+			@XmlElement(name = "resources", type = ResourceOverview.class) })
 	private List<StrolchElementOverview> elementOverviews;
 
 	public TypeDetail() {
@@ -47,7 +47,6 @@ public class TypeDetail {
 	 * @param elementOverviews
 	 */
 	public TypeDetail(String type, List<StrolchElementOverview> elementOverviews) {
-		super();
 		this.type = type;
 		this.elementOverviews = elementOverviews;
 	}
@@ -80,5 +79,36 @@ public class TypeDetail {
 	 */
 	public void setElementOverviews(List<StrolchElementOverview> elementOverviews) {
 		this.elementOverviews = elementOverviews;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.elementOverviews == null) ? 0 : this.elementOverviews.hashCode());
+		result = prime * result + ((this.type == null) ? 0 : this.type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TypeDetail other = (TypeDetail) obj;
+		if (this.elementOverviews == null) {
+			if (other.elementOverviews != null)
+				return false;
+		} else if (!this.elementOverviews.equals(other.elementOverviews))
+			return false;
+		if (this.type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!this.type.equals(other.type))
+			return false;
+		return true;
 	}
 }

@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Realm")
 public class RealmDetail {
 
-	@XmlElement(name = "ElementMaps")
+	@XmlElement(name = "elementMaps")
 	private List<ElementMapsOverview> elementMapOverviews;
 
 	public RealmDetail() {
@@ -53,5 +53,30 @@ public class RealmDetail {
 	 */
 	public void setElementMapOverviews(List<ElementMapsOverview> elementMapOverviews) {
 		this.elementMapOverviews = elementMapOverviews;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.elementMapOverviews == null) ? 0 : this.elementMapOverviews.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RealmDetail other = (RealmDetail) obj;
+		if (this.elementMapOverviews == null) {
+			if (other.elementMapOverviews != null)
+				return false;
+		} else if (!this.elementMapOverviews.equals(other.elementMapOverviews))
+			return false;
+		return true;
 	}
 }

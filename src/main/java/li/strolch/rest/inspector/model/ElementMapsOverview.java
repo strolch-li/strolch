@@ -50,9 +50,20 @@ public class ElementMapsOverview {
 	 * @param elementMapType
 	 */
 	public ElementMapsOverview(ElementMapType elementMapType) {
-		super();
 		this.elementMapType = elementMapType;
 		this.name = elementMapType.getName();
+	}
+
+	/**
+	 * 
+	 * @param elementMapType
+	 * @param nrOfElements
+	 * @param types
+	 */
+	public ElementMapsOverview(ElementMapType elementMapType, long nrOfElements, Set<String> types) {
+		this(elementMapType);
+		this.nrOfElements = nrOfElements;
+		this.types = types;
 	}
 
 	/**
@@ -113,5 +124,42 @@ public class ElementMapsOverview {
 	 */
 	public void setNrOfElements(long nrOfElements) {
 		this.nrOfElements = nrOfElements;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.elementMapType == null) ? 0 : this.elementMapType.hashCode());
+		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
+		result = prime * result + (int) (this.nrOfElements ^ (this.nrOfElements >>> 32));
+		result = prime * result + ((this.types == null) ? 0 : this.types.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ElementMapsOverview other = (ElementMapsOverview) obj;
+		if (this.elementMapType != other.elementMapType)
+			return false;
+		if (this.name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!this.name.equals(other.name))
+			return false;
+		if (this.nrOfElements != other.nrOfElements)
+			return false;
+		if (this.types == null) {
+			if (other.types != null)
+				return false;
+		} else if (!this.types.equals(other.types))
+			return false;
+		return true;
 	}
 }

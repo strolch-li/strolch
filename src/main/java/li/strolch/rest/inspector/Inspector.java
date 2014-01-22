@@ -39,9 +39,11 @@ import li.strolch.rest.inspector.model.AgentOverview;
 import li.strolch.rest.inspector.model.ElementMapOverview;
 import li.strolch.rest.inspector.model.ElementMapType;
 import li.strolch.rest.inspector.model.ElementMapsOverview;
+import li.strolch.rest.inspector.model.OrderDetail;
 import li.strolch.rest.inspector.model.OrderOverview;
 import li.strolch.rest.inspector.model.RealmDetail;
 import li.strolch.rest.inspector.model.RealmOverview;
+import li.strolch.rest.inspector.model.ResourceDetail;
 import li.strolch.rest.inspector.model.ResourceOverview;
 import li.strolch.rest.inspector.model.StrolchElementOverview;
 import li.strolch.rest.inspector.model.TypeDetail;
@@ -189,7 +191,7 @@ public class Inspector {
 	 * Order inspector
 	 * </p>
 	 * <p>
-	 * Returns an overview of the {@link Order Orderss}. This is a list of all the types and the size each type has
+	 * Returns an overview of the {@link Order Orders}. This is a list of all the types and the size each type has
 	 * </p>
 	 * 
 	 * @param realm
@@ -228,6 +230,25 @@ public class Inspector {
 
 	// TODO for the get element type details, we should not simply query all objects, but rather find a solution to query only the id, name, type and date, state for the order
 
+	/**
+	 * <p>
+	 * Resource type inspector
+	 * </p>
+	 * <p>
+	 * Returns an overview of the {@link Resource Resources} with the given type. This is a list of overviews of the
+	 * resources
+	 * </p>
+	 * 
+	 * @param realm
+	 *            the realm for which the resource type overview is to be returned
+	 * @param type
+	 * 
+	 * @return an overview of the {@link Resource Resources} with the given type. This is a list of overviews of the
+	 *         resources
+	 * 
+	 * @see TypeDetail
+	 * @see StrolchElementOverview
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resource/{type}")
@@ -240,8 +261,7 @@ public class Inspector {
 			List<Resource> byType = tx.getResourceMap().getElementsBy(tx, type);
 			List<StrolchElementOverview> elementOverviews = new ArrayList<>(byType.size());
 			for (Resource resource : byType) {
-				ResourceOverview resourceOverview = new ResourceOverview(resource.getId(), resource.getName(),
-						resource.getType());
+				ResourceOverview resourceOverview = new ResourceOverview(resource);
 				elementOverviews.add(resourceOverview);
 			}
 			typeDetail = new TypeDetail(type, elementOverviews);
@@ -252,6 +272,23 @@ public class Inspector {
 		return Response.ok().entity(entity).build();
 	}
 
+	/**
+	 * <p>
+	 * Order type inspector
+	 * </p>
+	 * <p>
+	 * Returns an overview of the {@link Order Orders} with the given type. This is a list of overviews of the orders
+	 * </p>
+	 * 
+	 * @param realm
+	 *            the realm for which the order type overview is to be returned
+	 * @param type
+	 * 
+	 * @return an overview of the {@link Order Orders} with the given type. This is a list of overviews of the orders
+	 * 
+	 * @see TypeDetail
+	 * @see StrolchElementOverview
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/order/{type}")
@@ -264,8 +301,7 @@ public class Inspector {
 			List<Order> byType = tx.getOrderMap().getElementsBy(tx, type);
 			List<StrolchElementOverview> elementOverviews = new ArrayList<>(byType.size());
 			for (Order order : byType) {
-				OrderOverview orderOverview = new OrderOverview(order.getId(), order.getName(), order.getType(),
-						order.getDate(), order.getState());
+				OrderOverview orderOverview = new OrderOverview(order);
 				elementOverviews.add(orderOverview);
 			}
 			typeDetail = new TypeDetail(type, elementOverviews);
@@ -276,6 +312,26 @@ public class Inspector {
 		return Response.ok().entity(entity).build();
 	}
 
+	/**
+	 * <p>
+	 * Resource inspector
+	 * </p>
+	 * 
+	 * <p>
+	 * Returns the resource with the given id
+	 * </p>
+	 * 
+	 * @param realm
+	 *            the realm for which the resource is to be returned
+	 * @param type
+	 *            the type of the resource
+	 * @param id
+	 *            the id of the resource
+	 * 
+	 * @return the resource with the given id
+	 * 
+	 * @see Res
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resource/{type}/{id}")
@@ -292,10 +348,8 @@ public class Inspector {
 			throw new StrolchException("No Resource exists for " + type + "/" + id);
 		}
 
-		ResourceOverview resourceOverview = new ResourceOverview(resource.getId(), resource.getName(),
-				resource.getType());
-		GenericEntity<ResourceOverview> entity = new GenericEntity<ResourceOverview>(resourceOverview,
-				ResourceOverview.class) {
+		ResourceDetail resourceDetail = new ResourceDetail(resource);
+		GenericEntity<ResourceDetail> entity = new GenericEntity<ResourceDetail>(resourceDetail, ResourceDetail.class) {
 		};
 		return Response.ok().entity(entity).build();
 	}
@@ -316,9 +370,8 @@ public class Inspector {
 			throw new StrolchException("No Order exists for " + type + "/" + id);
 		}
 
-		OrderOverview orderOverview = new OrderOverview(order.getId(), order.getName(), order.getType(),
-				order.getDate(), order.getState());
-		GenericEntity<OrderOverview> entity = new GenericEntity<OrderOverview>(orderOverview, OrderOverview.class) {
+		OrderDetail orderDetail = new OrderDetail(order);
+		GenericEntity<OrderDetail> entity = new GenericEntity<OrderDetail>(orderDetail, OrderDetail.class) {
 		};
 		return Response.ok().entity(entity).build();
 	}

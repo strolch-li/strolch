@@ -18,12 +18,14 @@ package li.strolch.rest.inspector.test;
 import java.io.File;
 import java.net.URI;
 
+import javax.ws.rs.core.MediaType;
+
 import li.strolch.rest.inspector.AgentRef;
 import li.strolch.rest.inspector.StrolchRestfulClasses;
 import li.strolch.rest.inspector.StrolchRestfulExceptionMapper;
-import li.strolch.service.api.ServiceHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
+import org.eclipse.persistence.jaxb.rs.MOXyJsonProvider;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -31,6 +33,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -73,7 +81,20 @@ public abstract class AbstractRestfulTest {
 		runtimeMock.destroyRuntime();
 	}
 
-	public static ServiceHandler getServiceHandler() {
-		return runtimeMock.getContainer().getComponent(ServiceHandler.class);
+	protected WebResource getResource() {
+		ClientConfig cc = new DefaultClientConfig();
+		cc.getClasses().add(MOXyJsonProvider.class);
+		Client client = Client.create(cc);
+		WebResource resource = client.resource(BASE_URI);
+		return resource;
 	}
+
+	protected ClientResponse getClientResponse(String path) {
+		WebResource resource = getResource();
+		ClientResponse response = resource.path(path).accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
+		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode())
+			throw new RuntimeException("Failed to get path " + path + " due to " + response.getEntity(String.class));
+		return response;
+	}
+
 }

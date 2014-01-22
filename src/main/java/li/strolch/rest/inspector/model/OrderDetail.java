@@ -16,11 +16,13 @@
 package li.strolch.rest.inspector.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 import li.strolch.model.Order;
 import li.strolch.model.State;
@@ -31,14 +33,15 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
  */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "Order")
-public class OrderOverview extends StrolchElementOverview {
+@XmlType(name = "")
+public class OrderDetail extends GroupedParameterizedElementDetail {
 
 	@XmlAttribute(name = "date")
 	private String date;
 	@XmlAttribute(name = "state")
 	private State state;
 
-	public OrderOverview() {
+	public OrderDetail() {
 		// no-arg constructor for JAXB
 	}
 
@@ -46,9 +49,13 @@ public class OrderOverview extends StrolchElementOverview {
 	 * @param id
 	 * @param name
 	 * @param type
+	 * @param date
+	 * @param state
+	 * @param parameterizedElementDetails
 	 */
-	public OrderOverview(String id, String name, String type, Date date, State state) {
-		super(id, name, type);
+	public OrderDetail(String id, String name, String type, Date date, State state,
+			List<ParameterizedElementDetail> parameterizedElementDetails) {
+		super(id, name, type, parameterizedElementDetails);
 		this.state = state;
 		this.date = ISO8601FormatFactory.getInstance().formatDate(date);
 	}
@@ -56,7 +63,7 @@ public class OrderOverview extends StrolchElementOverview {
 	/**
 	 * @param order
 	 */
-	public OrderOverview(Order order) {
+	public OrderDetail(Order order) {
 		super(order);
 		this.state = order.getState();
 		this.date = ISO8601FormatFactory.getInstance().formatDate(order.getDate());
@@ -109,7 +116,7 @@ public class OrderOverview extends StrolchElementOverview {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		OrderOverview other = (OrderOverview) obj;
+		OrderDetail other = (OrderDetail) obj;
 		if (this.date == null) {
 			if (other.date != null)
 				return false;

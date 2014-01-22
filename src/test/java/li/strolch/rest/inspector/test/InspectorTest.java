@@ -16,43 +16,32 @@
 package li.strolch.rest.inspector.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
-import javax.ws.rs.core.MediaType;
+import java.util.Set;
 
 import li.strolch.rest.inspector.model.AgentOverview;
+import li.strolch.rest.inspector.model.ElementMapOverview;
+import li.strolch.rest.inspector.model.ElementMapType;
+import li.strolch.rest.inspector.model.ElementMapsOverview;
+import li.strolch.rest.inspector.model.OrderDetail;
+import li.strolch.rest.inspector.model.RealmDetail;
 import li.strolch.rest.inspector.model.RealmOverview;
+import li.strolch.rest.inspector.model.ResourceDetail;
+import li.strolch.rest.inspector.model.TypeOverview;
 
-import org.eclipse.persistence.jaxb.rs.MOXyJsonProvider;
 import org.junit.Test;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class InspectorTest extends AbstractRestfulTest {
-
-	protected WebResource getResource() {
-		ClientConfig cc = new DefaultClientConfig();
-		cc.getClasses().add(MOXyJsonProvider.class);
-		Client client = Client.create(cc);
-		WebResource resource = client.resource(BASE_URI);
-		return resource;
-	}
-
-	protected ClientResponse getClientResponse(String path) {
-		WebResource resource = getResource();
-		ClientResponse response = resource.path(path).accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
-		return response;
-	}
 
 	@Test
 	public void shouldGetAgent() {
@@ -69,5 +58,108 @@ public class InspectorTest extends AbstractRestfulTest {
 
 		// assertions
 		assertEquals(expectedAgentOverview, agentOverview);
+	}
+
+	@Test
+	public void shouldGetRealm() {
+
+		// expected result
+		List<ElementMapsOverview> elementMapOverviews = new ArrayList<>(2);
+		Set<String> resourceTypes = new HashSet<>();
+		resourceTypes.add("Template");
+		resourceTypes.add("TestType");
+		elementMapOverviews.add(new ElementMapsOverview(ElementMapType.RESOURCE, 2, resourceTypes));
+		Set<String> orderTypes = new HashSet<>();
+		orderTypes.add("Template");
+		orderTypes.add("TestType");
+		elementMapOverviews.add(new ElementMapsOverview(ElementMapType.ORDER, 2, orderTypes));
+		RealmDetail expectedRealmDetail = new RealmDetail(elementMapOverviews);
+
+		// query
+		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm");
+		RealmDetail realmDetail = response.getEntity(new GenericType<RealmDetail>() {
+		});
+
+		// assertions
+		assertEquals(expectedRealmDetail, realmDetail);
+	}
+
+	@Test
+	public void shouldGetResourcesOverview() {
+
+		// expected result
+		String elementMapName = "Resource";
+		List<TypeOverview> typeOverviews = new ArrayList<>(2);
+		typeOverviews.add(new TypeOverview("Template", 1));
+		typeOverviews.add(new TypeOverview("TestType", 1));
+		ElementMapOverview expectedElementMapOverview = new ElementMapOverview(elementMapName, typeOverviews);
+
+		// query
+		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/resource");
+		ElementMapOverview elementMapOverview = response.getEntity(new GenericType<ElementMapOverview>() {
+		});
+
+		// assertions
+		assertEquals(expectedElementMapOverview, elementMapOverview);
+	}
+
+	@Test
+	public void shouldGetOrdersOverview() {
+
+		// expected result
+		String elementMapName = "Order";
+		List<TypeOverview> typeOverviews = new ArrayList<>(2);
+		typeOverviews.add(new TypeOverview("Template", 1));
+		typeOverviews.add(new TypeOverview("TestType", 1));
+		ElementMapOverview expectedElementMapOverview = new ElementMapOverview(elementMapName, typeOverviews);
+
+		// query
+		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/order");
+		ElementMapOverview elementMapOverview = response.getEntity(new GenericType<ElementMapOverview>() {
+		});
+
+		// assertions
+		assertEquals(expectedElementMapOverview, elementMapOverview);
+	}
+
+	// TODO modify object model to include discriminator values, so that we can parse the objects
+
+	@Test
+	public void shouldGetResourceTypeDetails() {
+
+		// query
+		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/resource/Template");
+		String entity = response.getEntity(String.class);
+		String expected = "{\"type\":\"Template\",\"resources\":[{\"id\":\"TestType\",\"name\":\"TestType Template\",\"type\":\"Template\"}]}";
+		assertEquals(expected, entity);
+	}
+
+	@Test
+	public void shouldGetOrderTypeDetails() {
+
+		// query
+		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/order/Template");
+		String entity = response.getEntity(String.class);
+		String expected = "{\"type\":\"Template\",\"orders\":[{\"id\":\"TestType\",\"name\":\"MyTestOrder Template\",\"type\":\"Template\",\"date\":\"2012-11-30T18:12:05.628+01:00\",\"state\":\"CREATED\"}]}";
+		assertEquals(expected, entity);
+	}
+
+	@Test
+	public void shouldGetResource() {
+
+		// query
+		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/resource/Template/TestType");
+		String entity = response.getEntity(String.class);
+		assertTrue(entity.contains("name\":\"TestType Template\",\"type\":\"Template\",\"parameterBags\":"));
+	}
+
+	@Test
+	public void shouldGetOrder() {
+
+		// query
+		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/order/Template/TestType");
+		String entity = response.getEntity(String.class);
+		assertTrue(entity
+				.contains("\"date\":\"2012-11-30T18:12:05.628+01:00\",\"state\":\"CREATED\",\"parameterBags\""));
 	}
 }
