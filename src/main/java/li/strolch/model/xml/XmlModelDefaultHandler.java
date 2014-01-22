@@ -98,7 +98,7 @@ public class XmlModelDefaultHandler extends DefaultHandler {
 				Date orderDate = ISO8601FormatFactory.getInstance().getDateFormat().parse(orderDateS);
 				order.setDate(orderDate);
 			}
-			if (orderDateS != null) {
+			if (orderStateS != null) {
 				State orderState = State.valueOf(orderStateS);
 				order.setState(orderState);
 			}
