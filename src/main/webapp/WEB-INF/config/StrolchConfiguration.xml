@@ -12,6 +12,8 @@
 		<name>ServiceHandler</name>
 		<api>li.strolch.service.api.ServiceHandler</api>
 		<impl>li.strolch.service.api.DefaultServiceHandler</impl>
+		<depends>ElementMapHandler</depends>
+		<depends>PrivilegeHandler</depends>
 		<Properties>
 			<verbose>true</verbose>
 		</Properties>
