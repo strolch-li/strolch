@@ -45,7 +45,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
  */
 public abstract class AbstractRestfulTest {
 
-	protected static final String BASE_URI = "http://localhost:8080/tutorialwebapp";
+	protected static final String BASE_URI = "http://localhost:56789/tutorialwebapp";
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractRestfulTest.class);
 
 	private static final String RUNTIME_PATH = "target/withPrivilegeRuntime/"; //$NON-NLS-1$
