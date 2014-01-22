@@ -25,8 +25,14 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.utils.helper.StringHelper;
+
 public class ComponentDependencyAnalyzer {
 
+	private static final Logger logger = LoggerFactory.getLogger(ComponentDependencyAnalyzer.class);
 	private StrolchConfiguration strolchConfiguration;
 	private Map<String, ComponentController> controllerMap;
 
@@ -133,6 +139,22 @@ public class ComponentDependencyAnalyzer {
 				}
 				controller.addUpstreamDependency(dependency);
 			}
+		}
+
+		logDependencies(0, findRootUpstreamComponents());
+	}
+
+	/**
+	 * @param components
+	 */
+	private void logDependencies(int depth, Set<ComponentController> components) {
+		if (depth == 0) {
+			logger.info("Dependency tree:");
+		}
+		String inset = StringHelper.normalizeLength("  ", depth * 2, false, ' ');
+		for (ComponentController controller : components) {
+			logger.info(inset + controller.getComponent().getName());
+			logDependencies(depth + 1, controller.getDownstreamDependencies());
 		}
 	}
 }

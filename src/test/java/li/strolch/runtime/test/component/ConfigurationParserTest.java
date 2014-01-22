@@ -17,6 +17,7 @@ package li.strolch.runtime.test.component;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
@@ -81,6 +82,7 @@ public class ConfigurationParserTest {
 		assertEquals("li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler",
 				privilegeHandlerConfiguration.getImpl());
 		assertEquals(1, privilegeHandlerConfiguration.getPropertyKeys().size());
+		assertTrue(privilegeHandlerConfiguration.getDependencies().contains("PersistenceHandler"));
 		assertEquals("PrivilegeConfig.xml", privilegeHandlerConfiguration.getString("privilegeConfigFile", null));
 
 		//	<Component>

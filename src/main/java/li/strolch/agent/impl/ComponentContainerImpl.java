@@ -152,6 +152,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		// initialize each component
 		for (ComponentController controller : controllers) {
+			if (controller.getState() == ComponentState.INITIALIZED)
+				continue;
+
 			StrolchComponent component = controller.getComponent();
 			String componentName = component.getName();
 			ComponentConfiguration componentConfiguration = this.strolchConfiguration
@@ -173,6 +176,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		// Start each component
 		for (ComponentController controller : controllers) {
+			if (controller.getState() == ComponentState.STARTED)
+				continue;
+
 			StrolchComponent component = controller.getComponent();
 			String msg = "Starting component {0}..."; //$NON-NLS-1$
 			String componentName = component.getName();
@@ -191,6 +197,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		// Stop each component
 		for (ComponentController controller : controllers) {
+			if (controller.getState() == ComponentState.STOPPED)
+				continue;
+
 			StrolchComponent component = controller.getComponent();
 			String msg = "Stopping component {0}..."; //$NON-NLS-1$
 			String componentName = component.getName();
@@ -208,6 +217,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		// Destroy each component
 		for (ComponentController controller : controllers) {
+			if (controller.getState() == ComponentState.DESTROYED)
+				continue;
+
 			StrolchComponent component = controller.getComponent();
 			String msg = "Destroying component {0}..."; //$NON-NLS-1$
 			String componentName = component.getName();

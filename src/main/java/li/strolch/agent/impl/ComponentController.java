@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
+import li.strolch.agent.api.ComponentState;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 
@@ -34,6 +35,10 @@ public class ComponentController {
 		this.component = component;
 		this.upstreamDependencies = new HashSet<>();
 		this.downstreamDependencies = new HashSet<>();
+	}
+
+	public ComponentState getState() {
+		return this.component.getState();
 	}
 
 	public StrolchComponent getComponent() {
