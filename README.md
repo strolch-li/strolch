@@ -1,8 +1,9 @@
 li.strolch.persistence.postgresql
 =======================================================================
 
-PostgreSQL Persistence Implementation for Strolch
+[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=li.strolch.persistence.postgresql)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.persistence.postgresql/)
 
+PostgreSQL Persistence Implementation for Strolch
 
 Setup
 =======================================================================
