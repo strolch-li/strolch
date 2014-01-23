@@ -1,5 +1,8 @@
 ch.eitchnet.java.xmlpers
 ========================
+
+[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=ch.eitchnet.xmlpers)](http://jenkins.eitchnet.ch/view/ch.eitchnet/job/ch.eitchnet.xmlpers/)
+
 Generic Java XML persistence layer. Implemented to be light-weight and simple to use
 
 Dependencies
