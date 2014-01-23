@@ -15,7 +15,10 @@
  */
 package li.strolch.agent.api;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.Properties;
 
 import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -29,6 +32,7 @@ public class StrolchComponent {
 	private final ComponentContainer container;
 	private final String componentName;
 	private ComponentState state;
+	private ComponentVersion version;
 
 	public StrolchComponent(ComponentContainerImpl container, String componentName) {
 		this.container = container;
@@ -79,5 +83,21 @@ public class StrolchComponent {
 
 	public void destroy() {
 		this.state = this.state.validateStateChange(ComponentState.DESTROYED);
+	}
+
+	public ComponentVersion getVersion() throws IOException {
+		if (this.version == null) {
+			InputStream stream = getClass().getResourceAsStream("/componentVersion.properties");
+			if (stream == null) {
+				throw new RuntimeException("/componentVersion.properties does not exist");
+			}
+			Properties properties = new Properties();
+			properties.load(stream);
+
+			ComponentVersion componentVersion = new ComponentVersion(getName(), properties);
+			this.version = componentVersion;
+		}
+
+		return this.version;
 	}
 }

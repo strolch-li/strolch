@@ -59,6 +59,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		return this.agent;
 	}
 
+	@Override
 	public ComponentState getState() {
 		return this.state;
 	}
@@ -66,6 +67,11 @@ public class ComponentContainerImpl implements ComponentContainer {
 	@Override
 	public DataStoreMode getDataStoreMode() {
 		return this.dataStoreMode;
+	}
+
+	@Override
+	public Set<Class<?>> getComponentTypes() {
+		return this.componentMap.keySet();
 	}
 
 	@Override

@@ -16,8 +16,12 @@
 package li.strolch.agent.api;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.agent.impl.DataStoreMode;
@@ -126,4 +130,43 @@ public class StrolchAgent {
 		return Long.toString(uniqueId);
 	}
 
+	private VersionQueryResult versionQueryResult;
+
+	public VersionQueryResult getVersion() {
+		if (this.versionQueryResult == null) {
+
+			VersionQueryResult queryResult = new VersionQueryResult();
+
+			InputStream stream = getClass().getResourceAsStream("/agentVersion.properties");
+			Properties properties = new Properties();
+			try {
+				properties.load(stream);
+				AgentVersion agentVersion = new AgentVersion(getStrolchConfiguration().getRuntimeConfiguration()
+						.getApplicationName(), properties);
+				queryResult.setAgentVersion(agentVersion);
+			} catch (IOException e) {
+				String msg = MessageFormat.format("Failed to read version properties for agent: {0}", e.getMessage());
+				queryResult.getErrors().add(msg);
+				logger.error(msg, e);
+			}
+
+			Set<Class<?>> componentTypes = container.getComponentTypes();
+			for (Class<?> componentType : componentTypes) {
+				StrolchComponent component = (StrolchComponent) container.getComponent(componentType);
+				try {
+					ComponentVersion componentVersion = component.getVersion();
+					queryResult.add(componentVersion);
+				} catch (Exception e) {
+					String msg = "Failed to read version properties for component {0} due to: {1}";
+					msg = MessageFormat.format(msg, component.getName(), e.getMessage());
+					queryResult.getErrors().add(msg);
+					logger.error(msg, e);
+				}
+			}
+
+			this.versionQueryResult = queryResult;
+		}
+
+		return this.versionQueryResult;
+	}
 }

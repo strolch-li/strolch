@@ -34,6 +34,8 @@ public interface ComponentContainer {
 	public abstract boolean hasComponent(Class<?> clazz);
 
 	public abstract <T> T getComponent(Class<T> clazz);
+	
+	public abstract Set<Class<?>> getComponentTypes();
 
 	public abstract Set<String> getRealmNames();
 
