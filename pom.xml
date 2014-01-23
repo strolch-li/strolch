@@ -48,7 +48,7 @@
 			<groupId>ch.eitchnet</groupId>
 			<artifactId>ch.eitchnet.privilege</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.testbase</artifactId>
@@ -58,6 +58,10 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
