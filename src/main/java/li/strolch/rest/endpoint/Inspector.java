@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.rest.inspector;
+package li.strolch.rest.endpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +35,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.rest.AgentRef;
 import li.strolch.rest.model.AgentOverview;
 import li.strolch.rest.model.ElementMapOverview;
 import li.strolch.rest.model.ElementMapType;

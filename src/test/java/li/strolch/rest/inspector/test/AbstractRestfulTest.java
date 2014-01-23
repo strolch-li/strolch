@@ -20,9 +20,9 @@ import java.net.URI;
 
 import javax.ws.rs.core.MediaType;
 
-import li.strolch.rest.inspector.AgentRef;
-import li.strolch.rest.inspector.StrolchRestfulClasses;
-import li.strolch.rest.inspector.StrolchRestfulExceptionMapper;
+import li.strolch.rest.AgentRef;
+import li.strolch.rest.StrolchRestfulClasses;
+import li.strolch.rest.StrolchRestfulExceptionMapper;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.eclipse.persistence.jaxb.rs.MOXyJsonProvider;

@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.rest.inspector;
+package li.strolch.rest;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import li.strolch.rest.endpoint.Inspector;
+import li.strolch.rest.endpoint.VersionQuery;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -30,6 +33,7 @@ public class StrolchRestfulClasses {
 	static {
 		Set<Class<?>> restfulClasses = new HashSet<>();
 		restfulClasses.add(Inspector.class);
+		restfulClasses.add(VersionQuery.class);
 
 		Set<Class<?>> providerClasses = new HashSet<>();
 		providerClasses.add(StrolchRestfulExceptionMapper.class);

@@ -1,4 +1,4 @@
-package li.strolch.rest.inspector;
+package li.strolch.rest;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
