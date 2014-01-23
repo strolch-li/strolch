@@ -17,7 +17,7 @@ package li.strolch.tutorialwebapp.postinitializer;
 
 import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.agent.impl.SimplePostInitializer;
-import li.strolch.rest.inspector.AgentRef;
+import li.strolch.rest.AgentRef;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

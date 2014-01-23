@@ -21,7 +21,7 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import li.strolch.rest.inspector.StrolchRestfulClasses;
+import li.strolch.rest.StrolchRestfulClasses;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
