@@ -1,5 +1,8 @@
-ch.eitchnet.java.utils
+ch.eitchnet.utils
 ======================
+
+[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=ch.eitchnet.utils)](http://jenkins.eitchnet.ch/view/ch.eitchnet/job/ch.eitchnet.utils/)
+
 Java Utilites which ease daily work when programming in the Java language
 
 Dependencies
