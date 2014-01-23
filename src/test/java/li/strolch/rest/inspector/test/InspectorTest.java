@@ -23,15 +23,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import li.strolch.rest.inspector.model.AgentOverview;
-import li.strolch.rest.inspector.model.ElementMapOverview;
-import li.strolch.rest.inspector.model.ElementMapType;
-import li.strolch.rest.inspector.model.ElementMapsOverview;
-import li.strolch.rest.inspector.model.OrderDetail;
-import li.strolch.rest.inspector.model.RealmDetail;
-import li.strolch.rest.inspector.model.RealmOverview;
-import li.strolch.rest.inspector.model.ResourceDetail;
-import li.strolch.rest.inspector.model.TypeOverview;
+import li.strolch.rest.model.AgentOverview;
+import li.strolch.rest.model.ElementMapOverview;
+import li.strolch.rest.model.ElementMapType;
+import li.strolch.rest.model.ElementMapsOverview;
+import li.strolch.rest.model.OrderDetail;
+import li.strolch.rest.model.RealmDetail;
+import li.strolch.rest.model.RealmOverview;
+import li.strolch.rest.model.ResourceDetail;
+import li.strolch.rest.model.TypeOverview;
 
 import org.junit.Test;
 

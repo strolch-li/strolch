@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.rest.inspector.model;
+package li.strolch.rest.model;
 
 import java.util.List;
 
@@ -26,40 +26,40 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "Agent")
-public class AgentOverview {
+@XmlRootElement(name = "Realm")
+public class RealmDetail {
 
-	@XmlElement(name = "realms")
-	private List<RealmOverview> realms;
+	@XmlElement(name = "elementMaps")
+	private List<ElementMapsOverview> elementMapOverviews;
 
-	public AgentOverview() {
+	public RealmDetail() {
 		// no-arg constructor for JAXB
 	}
 
-	public AgentOverview(List<RealmOverview> realms) {
-		this.realms = realms;
+	public RealmDetail(List<ElementMapsOverview> elementMapOverviews) {
+		this.elementMapOverviews = elementMapOverviews;
 	}
 
 	/**
-	 * @return the realms
+	 * @return the elementMapOverviews
 	 */
-	public List<RealmOverview> getRealms() {
-		return this.realms;
+	public List<ElementMapsOverview> getElementMapOverviews() {
+		return this.elementMapOverviews;
 	}
 
 	/**
-	 * @param realms
-	 *            the realms to set
+	 * @param elementMapOverviews
+	 *            the elementMapOverviews to set
 	 */
-	public void setRealms(List<RealmOverview> realms) {
-		this.realms = realms;
+	public void setElementMapOverviews(List<ElementMapsOverview> elementMapOverviews) {
+		this.elementMapOverviews = elementMapOverviews;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.realms == null) ? 0 : this.realms.hashCode());
+		result = prime * result + ((this.elementMapOverviews == null) ? 0 : this.elementMapOverviews.hashCode());
 		return result;
 	}
 
@@ -71,17 +71,12 @@ public class AgentOverview {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AgentOverview other = (AgentOverview) obj;
-		if (this.realms == null) {
-			if (other.realms != null)
+		RealmDetail other = (RealmDetail) obj;
+		if (this.elementMapOverviews == null) {
+			if (other.elementMapOverviews != null)
 				return false;
-		} else if (!this.realms.equals(other.realms))
+		} else if (!this.elementMapOverviews.equals(other.elementMapOverviews))
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "AgentOverview [realms=" + this.realms + "]";
 	}
 }

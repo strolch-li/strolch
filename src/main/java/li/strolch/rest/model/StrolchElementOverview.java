@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.rest.inspector.model;
+package li.strolch.rest.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -26,8 +26,8 @@ import li.strolch.model.StrolchElement;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlSeeAlso({ GroupedParameterizedElementDetail.class, ParameterizedElementDetail.class, ParameterDetail.class })
-public abstract class StrolchElementDetail {
+@XmlSeeAlso({ ResourceOverview.class, OrderOverview.class })
+public abstract class StrolchElementOverview {
 
 	@XmlAttribute(name = "id", required = true)
 	private String id;
@@ -36,7 +36,7 @@ public abstract class StrolchElementDetail {
 	@XmlAttribute(name = "type", required = true)
 	private String type;
 
-	public StrolchElementDetail() {
+	public StrolchElementOverview() {
 		// no-arg constructor for JAXB
 	}
 
@@ -45,7 +45,7 @@ public abstract class StrolchElementDetail {
 	 * @param name
 	 * @param type
 	 */
-	public StrolchElementDetail(String id, String name, String type) {
+	public StrolchElementOverview(String id, String name, String type) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
@@ -54,7 +54,7 @@ public abstract class StrolchElementDetail {
 	/**
 	 * @param strolchElement
 	 */
-	public StrolchElementDetail(StrolchElement strolchElement) {
+	public StrolchElementOverview(StrolchElement strolchElement) {
 		this.id = strolchElement.getId();
 		this.name = strolchElement.getName();
 		this.type = strolchElement.getType();
@@ -123,7 +123,7 @@ public abstract class StrolchElementDetail {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		StrolchElementDetail other = (StrolchElementDetail) obj;
+		StrolchElementOverview other = (StrolchElementOverview) obj;
 		if (this.id == null) {
 			if (other.id != null)
 				return false;

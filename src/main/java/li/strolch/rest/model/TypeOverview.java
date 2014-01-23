@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.rest.inspector.model;
+package li.strolch.rest.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,40 +24,41 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "RealmOverview")
-public class RealmOverview {
+@XmlRootElement(name = "Types")
+public class TypeOverview {
 
-	@XmlAttribute(name = "realmName")
-	private String realmName;
+	@XmlAttribute(name = "type")
+	private String type;
+
 	@XmlAttribute(name = "size")
 	private long size;
 
-	public RealmOverview() {
+	public TypeOverview() {
 		// no-arg constructor for JAXB
 	}
 
 	/**
-	 * @param realmName
+	 * @param type
 	 * @param size
 	 */
-	public RealmOverview(String realmName, long size) {
-		this.realmName = realmName;
+	public TypeOverview(String type, long size) {
+		this.type = type;
 		this.size = size;
 	}
 
 	/**
-	 * @return the realmName
+	 * @return the type
 	 */
-	public String getRealmName() {
-		return this.realmName;
+	public String getType() {
+		return this.type;
 	}
 
 	/**
-	 * @param realmName
-	 *            the realmName to set
+	 * @param type
+	 *            the type to set
 	 */
-	public void setRealmName(String realmName) {
-		this.realmName = realmName;
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	/**
@@ -79,8 +80,8 @@ public class RealmOverview {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.realmName == null) ? 0 : this.realmName.hashCode());
 		result = prime * result + (int) (this.size ^ (this.size >>> 32));
+		result = prime * result + ((this.type == null) ? 0 : this.type.hashCode());
 		return result;
 	}
 
@@ -92,19 +93,14 @@ public class RealmOverview {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		RealmOverview other = (RealmOverview) obj;
-		if (this.realmName == null) {
-			if (other.realmName != null)
-				return false;
-		} else if (!this.realmName.equals(other.realmName))
-			return false;
+		TypeOverview other = (TypeOverview) obj;
 		if (this.size != other.size)
 			return false;
+		if (this.type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!this.type.equals(other.type))
+			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "RealmOverview [realmName=" + this.realmName + ", size=" + this.size + "]";
 	}
 }
