@@ -1,8 +1,10 @@
+ch.eitchnet.privilege
+==================
 
-Privilege README file
+[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=ch.eitchnet.privilege)](http://jenkins.eitchnet.ch/view/ch.eitchnet/job/ch.eitchnet.privilege/)
 
 Overview
-################################
+=======================================================================
 
 Privilege is a light weight library to secure access or grant privileges to 
 users in an application. Privilege allows a developer to secure the application 
@@ -23,7 +25,7 @@ The main developer is Robert von Burg <eitch@eitchnet.ch> who also maintains the
 Github repository. He is available for all questions regarding Privilege
 
 Motivation
-################################
+=======================================================================
 In some cases a developer might want to restrict access to an application 
 depending on the role which an authenticated user has. In other cases the 
 developer would need a more finely grained control by restricting access to a 
@@ -39,7 +41,7 @@ provide an API which suited our needs or which were not easily implemented, thus
 leading to the design of Privilege.
 
 Design Goals
-################################
+=======================================================================
 When a developer needs to implement access restriction an application there are
 different questions which the developer will ask:
 - Does the user have a specific role?
@@ -64,13 +66,13 @@ depending on the application. For example it should be able to store the data in
 XML files, in a LDAP directory and so forth.
 
 Documentation
-################################
+=======================================================================
 
 The current documentation, though a bit outdated, can be found in the docs/
 directory of the Repository
 
 Compiling
-################################
+=======================================================================
 
 Privilege is a Maven3 project and can be built by simply performing the
 following command:
@@ -78,7 +80,7 @@ following command:
 $ mvn compile
 
 Using
-################################
+=======================================================================
 
 To use Privilege see the ch.eitchnet.privilege.test.PrivilegeTest.java class
 which contains a few test cases including showing how to load Privilege.
