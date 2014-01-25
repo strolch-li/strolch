@@ -23,8 +23,8 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.persistence.api.DbConnectionInfo;
 import li.strolch.persistence.api.OrderDao;
@@ -49,7 +49,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	private ComponentConfiguration componentConfiguration;
 	private Map<String, DbConnectionInfo> connetionInfoMap;
 
-	public PostgreSqlPersistenceHandler(ComponentContainerImpl container, String componentName) {
+	public PostgreSqlPersistenceHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

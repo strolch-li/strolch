@@ -24,11 +24,11 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.persistence.api.DbConnectionInfo;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
