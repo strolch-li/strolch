@@ -18,8 +18,8 @@ package li.strolch.persistence.xml;
 import java.io.File;
 import java.util.Properties;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
@@ -46,7 +46,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	public static final String DB_STORE_PATH = "dbStore/"; //$NON-NLS-1$
 	private PersistenceManager persistenceManager;
 
-	public XmlPersistenceHandler(ComponentContainerImpl container, String componentName) {
+	public XmlPersistenceHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 
