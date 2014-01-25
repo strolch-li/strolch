@@ -20,7 +20,6 @@ import java.net.URI;
 
 import javax.ws.rs.core.MediaType;
 
-import li.strolch.rest.AgentRef;
 import li.strolch.rest.StrolchRestfulClasses;
 import li.strolch.rest.StrolchRestfulExceptionMapper;
 import li.strolch.testbase.runtime.RuntimeMock;
@@ -61,8 +60,6 @@ public abstract class AbstractRestfulTest {
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer(rootPath);
-
-		AgentRef.getInstance().init(runtimeMock.getAgent());
 
 		// create a resource config that scans for JAX-RS resources and providers
 		// in com.example package

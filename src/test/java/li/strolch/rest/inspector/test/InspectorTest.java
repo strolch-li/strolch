@@ -23,9 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import li.strolch.agent.api.AgentVersion;
-import li.strolch.agent.api.ComponentVersion;
-import li.strolch.agent.api.VersionQueryResult;
 import li.strolch.rest.model.AgentOverview;
 import li.strolch.rest.model.ElementMapOverview;
 import li.strolch.rest.model.ElementMapType;
@@ -42,7 +39,7 @@ import com.sun.jersey.api.client.GenericType;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RestfulServicesTest extends AbstractRestfulTest {
+public class InspectorTest extends AbstractRestfulTest {
 
 	@Test
 	public void shouldGetAgent() {
@@ -162,33 +159,5 @@ public class RestfulServicesTest extends AbstractRestfulTest {
 		String entity = response.getEntity(String.class);
 		assertTrue(entity
 				.contains("\"date\":\"2012-11-30T18:12:05.628+01:00\",\"state\":\"CREATED\",\"parameterBags\""));
-	}
-
-	@Test
-	public void shouldQueryVersion() {
-
-		// query
-		ClientResponse response = getClientResponse("/strolch/version");
-		VersionQueryResult versionQueryResult = response.getEntity(new GenericType<VersionQueryResult>() {
-		});
-
-		if (versionQueryResult.hasErrors()) {
-			for (String error : versionQueryResult.getErrors()) {
-				logger.error(error);
-			}
-		}
-
-		AgentVersion agentVersion = versionQueryResult.getAgentVersion();
-		logger.info(agentVersion.toString());
-		List<ComponentVersion> componentVersions = versionQueryResult.getComponentVersions();
-		assertEquals(4, componentVersions.size());
-		for (ComponentVersion version : componentVersions) {
-			logger.info(version.toString());
-			assertEquals("li.strolch", agentVersion.getGroupId());
-		}
-
-		assertEquals("StrolchPersistenceTest", agentVersion.getAgentName());
-		assertEquals("li.strolch", agentVersion.getGroupId());
-		assertEquals("li.strolch.agent", agentVersion.getArtifactId());
 	}
 }

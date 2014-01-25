@@ -35,7 +35,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.rest.AgentRef;
+import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.model.AgentOverview;
 import li.strolch.rest.model.ElementMapOverview;
 import li.strolch.rest.model.ElementMapType;
@@ -75,7 +75,7 @@ public class Inspector {
 	public Response getAgent() {
 
 		try {
-			ComponentContainer container = AgentRef.getInstance().getContainer();
+			ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
 			Set<String> realmNames = container.getRealmNames();
 			List<RealmOverview> realmOverviews = new ArrayList<>(realmNames.size());
 			for (String realmName : realmNames) {
@@ -122,7 +122,7 @@ public class Inspector {
 	public Response getRealm(@PathParam("realm") String realm) {
 		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
 
-		StrolchRealm strolchRealm = AgentRef.getInstance().getContainer().getRealm(realm);
+		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 		List<ElementMapsOverview> elementMapOverviews = new ArrayList<>(2);
 		try (StrolchTransaction tx = strolchRealm.openTx()) {
 
@@ -165,7 +165,7 @@ public class Inspector {
 	@Path("{realm}/resource")
 	public Response getResourcesOverview(@PathParam("realm") String realm) {
 		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
-		StrolchRealm strolchRealm = AgentRef.getInstance().getContainer().getRealm(realm);
+		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		ElementMapOverview resourcesOverview;
 		try (StrolchTransaction tx = strolchRealm.openTx()) {
@@ -207,7 +207,7 @@ public class Inspector {
 	@Path("{realm}/order")
 	public Response getOrdersOverview(@PathParam("realm") String realm) {
 		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
-		StrolchRealm strolchRealm = AgentRef.getInstance().getContainer().getRealm(realm);
+		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		ElementMapOverview ordersOverview;
 		try (StrolchTransaction tx = strolchRealm.openTx()) {
@@ -255,7 +255,7 @@ public class Inspector {
 	@Path("{realm}/resource/{type}")
 	public Response getResourceTypeDetails(@PathParam("realm") String realm, @PathParam("type") String type) {
 		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
-		StrolchRealm strolchRealm = AgentRef.getInstance().getContainer().getRealm(realm);
+		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		TypeDetail typeDetail;
 		try (StrolchTransaction tx = strolchRealm.openTx()) {
@@ -295,7 +295,7 @@ public class Inspector {
 	@Path("{realm}/order/{type}")
 	public Response getOrderTypeDetails(@PathParam("realm") String realm, @PathParam("type") String type) {
 		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
-		StrolchRealm strolchRealm = AgentRef.getInstance().getContainer().getRealm(realm);
+		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		TypeDetail typeDetail;
 		try (StrolchTransaction tx = strolchRealm.openTx()) {
@@ -339,7 +339,7 @@ public class Inspector {
 	public Response getResource(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id) {
 		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
-		StrolchRealm strolchRealm = AgentRef.getInstance().getContainer().getRealm(realm);
+		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		Resource resource;
 		try (StrolchTransaction tx = strolchRealm.openTx()) {
@@ -361,7 +361,7 @@ public class Inspector {
 	public Response getOrder(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id) {
 		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
-		StrolchRealm strolchRealm = AgentRef.getInstance().getContainer().getRealm(realm);
+		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		Order order;
 		try (StrolchTransaction tx = strolchRealm.openTx()) {

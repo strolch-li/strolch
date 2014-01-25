@@ -24,4 +24,11 @@
 			<privilegeConfigFile>PrivilegeConfig.xml</privilegeConfigFile>
 		</Properties>
 	</Component>
+	<Component>
+		<name>RestfulHandler</name>
+		<api>li.strolch.rest.RestfulStrolchComponent</api>
+		<impl>li.strolch.rest.RestfulStrolchComponent</impl>
+		<Properties>
+		</Properties>
+	</Component>
 </StrolchConfiguration>

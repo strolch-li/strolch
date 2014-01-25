@@ -23,7 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import li.strolch.agent.api.VersionQueryResult;
-import li.strolch.rest.AgentRef;
+import li.strolch.rest.RestfulStrolchComponent;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -34,7 +34,8 @@ public class VersionQuery {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getVersions() {
-		VersionQueryResult versionQueryResult = AgentRef.getInstance().getAgent().getVersion();
+		VersionQueryResult versionQueryResult = RestfulStrolchComponent.getInstance().getContainer().getAgent()
+				.getVersion();
 		GenericEntity<VersionQueryResult> entity = new GenericEntity<VersionQueryResult>(versionQueryResult,
 				VersionQueryResult.class) {
 		};

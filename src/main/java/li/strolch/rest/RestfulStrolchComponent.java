@@ -16,49 +16,52 @@
 package li.strolch.rest;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AgentRef {
+public class RestfulStrolchComponent extends StrolchComponent {
 
-	private static final AgentRef instance;
+	private static RestfulStrolchComponent instance;
 
-	static {
-		instance = new AgentRef();
+	/**
+	 * @param container
+	 * @param componentName
+	 */
+	public RestfulStrolchComponent(ComponentContainer container, String componentName) {
+		super(container, componentName);
 	}
 
-	public static AgentRef getInstance() {
-		return instance;
+	@Override
+	public void start() {
+		DBC.PRE.assertNull("Instance is already set! This component is a singleton resource!", instance);
+		instance = this;
+
+		super.start();
 	}
 
-	private StrolchAgent agent;
-
-	private AgentRef() {
-		// singleton
-	}
-
-	public void init(StrolchAgent agent) {
-		DBC.PRE.assertNull("AgentRef has already been configured!", this.agent);
-		this.agent = agent;
+	@Override
+	public void stop() {
+		instance = null;
+		super.stop();
 	}
 
 	/**
-	 * @return the agent
+	 * @return the RestfulStrolchComponent
 	 */
-	public StrolchAgent getAgent() {
-		DBC.PRE.assertNotNull("Not yet initialized!", agent);
-		return this.agent;
+	public static RestfulStrolchComponent getInstance() {
+		DBC.PRE.assertNotNull("Not yet initialized!", instance);
+		return instance;
 	}
 
+	@Override
 	public ComponentContainer getContainer() {
-		return getAgent().getContainer();
+		return super.getContainer();
 	}
 
 	public <T extends StrolchComponent> T getComponent(Class<T> clazz) {
-		return getAgent().getContainer().getComponent(clazz);
+		return getContainer().getComponent(clazz);
 	}
 }
