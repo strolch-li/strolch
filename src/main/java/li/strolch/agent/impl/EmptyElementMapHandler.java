@@ -15,6 +15,8 @@
  */
 package li.strolch.agent.impl;
 
+import li.strolch.agent.api.ComponentContainer;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -24,7 +26,7 @@ public class EmptyElementMapHandler extends InMemoryElementMapHandler {
 	 * @param container
 	 * @param componentName
 	 */
-	public EmptyElementMapHandler(ComponentContainerImpl container, String componentName) {
+	public EmptyElementMapHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 }

@@ -15,12 +15,12 @@
  */
 package li.strolch.runtime.test.component.model;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.ComponentContainerImpl;
 
 public class ServiceHandlerTestImpl extends StrolchComponent implements ServiceHandlerTest {
 
-	public ServiceHandlerTestImpl(ComponentContainerImpl container, String componentName) {
+	public ServiceHandlerTestImpl(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

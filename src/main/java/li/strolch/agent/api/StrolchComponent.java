@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ public class StrolchComponent {
 	private ComponentState state;
 	private ComponentVersion version;
 
-	public StrolchComponent(ComponentContainerImpl container, String componentName) {
+	public StrolchComponent(ComponentContainer container, String componentName) {
 		this.container = container;
 		this.componentName = componentName;
 		this.state = ComponentState.UNDEFINED;

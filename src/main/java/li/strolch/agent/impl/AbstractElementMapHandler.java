@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ElementMapHandler;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
@@ -36,7 +37,7 @@ public abstract class AbstractElementMapHandler extends StrolchComponent impleme
 	 * @param container
 	 * @param componentName
 	 */
-	public AbstractElementMapHandler(ComponentContainerImpl container, String componentName) {
+	public AbstractElementMapHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

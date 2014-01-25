@@ -131,7 +131,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			@SuppressWarnings("unchecked")
 			Class<StrolchComponent> strolchComponentClass = (Class<StrolchComponent>) implClass;
 			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(
-					ComponentContainerImpl.class, String.class);
+					ComponentContainer.class, String.class);
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
 
 			componentMap.put(apiClass, strolchComponent);

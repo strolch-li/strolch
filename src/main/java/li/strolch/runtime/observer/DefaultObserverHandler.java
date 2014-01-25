@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.model.StrolchElement;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
@@ -44,7 +44,7 @@ public class DefaultObserverHandler extends StrolchComponent implements Observer
 	 * @param container
 	 * @param componentName
 	 */
-	public DefaultObserverHandler(ComponentContainerImpl container, String componentName) {
+	public DefaultObserverHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

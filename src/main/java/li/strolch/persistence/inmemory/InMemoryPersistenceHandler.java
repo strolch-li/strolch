@@ -1,7 +1,7 @@
 package li.strolch.persistence.inmemory;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
@@ -13,7 +13,7 @@ public class InMemoryPersistenceHandler extends StrolchComponent implements Pers
 	private OrderDao orderDao;
 	private ResourceDao resourceDao;
 
-	public InMemoryPersistenceHandler(ComponentContainerImpl container, String componentName) {
+	public InMemoryPersistenceHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

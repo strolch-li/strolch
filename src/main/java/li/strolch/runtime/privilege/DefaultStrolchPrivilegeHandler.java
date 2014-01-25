@@ -20,8 +20,8 @@ import java.io.FileInputStream;
 import java.text.MessageFormat;
 import java.util.Map;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import ch.eitchnet.privilege.base.PrivilegeException;
@@ -46,7 +46,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 	private PrivilegeHandler privilegeHandler;
 
-	public DefaultStrolchPrivilegeHandler(ComponentContainerImpl container, String componentName) {
+	public DefaultStrolchPrivilegeHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

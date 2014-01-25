@@ -15,12 +15,12 @@
  */
 package li.strolch.runtime.test.component.model;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.ComponentContainerImpl;
 
 public class PostInitializerTestImpl extends StrolchComponent implements PostInitializerTest {
 
-	public PostInitializerTestImpl(ComponentContainerImpl container, String componentName) {
+	public PostInitializerTestImpl(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 }

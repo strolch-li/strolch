@@ -17,6 +17,7 @@ package li.strolch.agent.impl;
 
 import java.util.HashMap;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.runtime.StrolchConstants;
@@ -32,7 +33,7 @@ public class InMemoryElementMapHandler extends AbstractElementMapHandler {
 	 * @param container
 	 * @param componentName
 	 */
-	public InMemoryElementMapHandler(ComponentContainerImpl container, String componentName) {
+	public InMemoryElementMapHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

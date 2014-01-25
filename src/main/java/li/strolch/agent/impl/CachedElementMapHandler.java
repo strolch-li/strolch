@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
@@ -41,7 +42,7 @@ public class CachedElementMapHandler extends AbstractElementMapHandler {
 	 * @param container
 	 * @param componentName
 	 */
-	public CachedElementMapHandler(ComponentContainerImpl container, String componentName) {
+	public CachedElementMapHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

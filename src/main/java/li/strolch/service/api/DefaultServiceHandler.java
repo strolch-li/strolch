@@ -17,8 +17,8 @@ package li.strolch.service.api;
 
 import java.text.MessageFormat;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -39,7 +39,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	 * @param container
 	 * @param componentName
 	 */
-	public DefaultServiceHandler(ComponentContainerImpl container, String componentName) {
+	public DefaultServiceHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

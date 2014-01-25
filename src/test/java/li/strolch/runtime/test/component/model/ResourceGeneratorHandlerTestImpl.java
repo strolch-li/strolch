@@ -15,13 +15,13 @@
  */
 package li.strolch.runtime.test.component.model;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.model.Resource;
 
 public class ResourceGeneratorHandlerTestImpl extends StrolchComponent implements ResourceGeneratorHandlerTest {
 
-	public ResourceGeneratorHandlerTestImpl(ComponentContainerImpl container, String componentName) {
+	public ResourceGeneratorHandlerTestImpl(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

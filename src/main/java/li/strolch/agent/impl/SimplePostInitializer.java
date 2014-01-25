@@ -15,6 +15,7 @@
  */
 package li.strolch.agent.impl;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.PostInitializer;
 import li.strolch.agent.api.StrolchComponent;
 
@@ -28,7 +29,7 @@ public class SimplePostInitializer extends StrolchComponent implements PostIniti
 	 * @param container
 	 * @param componentName
 	 */
-	public SimplePostInitializer(ComponentContainerImpl container, String componentName) {
+	public SimplePostInitializer(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

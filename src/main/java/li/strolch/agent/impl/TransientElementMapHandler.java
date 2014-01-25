@@ -20,6 +20,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
 import li.strolch.model.xml.XmlModelFileHandler;
@@ -41,7 +42,7 @@ public class TransientElementMapHandler extends InMemoryElementMapHandler {
 	 * @param container
 	 * @param componentName
 	 */
-	public TransientElementMapHandler(ComponentContainerImpl container, String componentName) {
+	public TransientElementMapHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 

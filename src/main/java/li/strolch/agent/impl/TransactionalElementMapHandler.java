@@ -17,6 +17,7 @@ package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -31,7 +32,7 @@ public class TransactionalElementMapHandler extends InMemoryElementMapHandler {
 	 * @param container
 	 * @param componentName
 	 */
-	public TransactionalElementMapHandler(ComponentContainerImpl container, String componentName) {
+	public TransactionalElementMapHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 
