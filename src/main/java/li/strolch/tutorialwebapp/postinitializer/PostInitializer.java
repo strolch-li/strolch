@@ -15,9 +15,8 @@
  */
 package li.strolch.tutorialwebapp.postinitializer;
 
-import li.strolch.agent.impl.ComponentContainerImpl;
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.impl.SimplePostInitializer;
-import li.strolch.rest.AgentRef;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -29,15 +28,12 @@ public class PostInitializer extends SimplePostInitializer {
 	 * @param container
 	 * @param componentName
 	 */
-	public PostInitializer(ComponentContainerImpl container, String componentName) {
+	public PostInitializer(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 
 	@Override
 	public void start() {
-
-		logger.info("Initializing RestfulServices...");
-		AgentRef.getInstance().init(getContainer().getAgent());
 
 		logger.info("Started PostInitializer."); //$NON-NLS-1$
 
