@@ -22,9 +22,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 import java.util.SortedSet;
 
-import li.strolch.model.timevalue.ITimeValue;
-import li.strolch.model.timevalue.IValue;
-import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.DoubleValue;
 import li.strolch.model.timevalue.impl.TimeVariable;
 import li.strolch.model.timevalue.impl.ValueChange;

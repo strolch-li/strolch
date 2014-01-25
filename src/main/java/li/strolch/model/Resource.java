@@ -15,10 +15,10 @@
  */
 package li.strolch.model;
 
+import li.strolch.model.Locator.LocatorBuilder;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import li.strolch.model.Locator.LocatorBuilder;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

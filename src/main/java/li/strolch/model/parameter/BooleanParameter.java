@@ -17,10 +17,11 @@ package li.strolch.model.parameter;
 
 import java.text.MessageFormat;
 
-import org.w3c.dom.Element;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
+
+import org.w3c.dom.Element;
+
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**

@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.FloatParameter;
@@ -28,6 +27,7 @@ import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * Class which can be used to generate objects which implement {@link StrolchElement}. These generated classes can then
