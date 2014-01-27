@@ -50,7 +50,7 @@ public class InspectorTest extends AbstractRestfulTest {
 		AgentOverview expectedAgentOverview = new AgentOverview(realms);
 
 		// query
-		ClientResponse response = getClientResponse("/strolch/inspector");
+		ClientResponse response = doGet("/strolch/inspector");
 		AgentOverview agentOverview = response.getEntity(new GenericType<AgentOverview>() {
 		});
 
@@ -74,7 +74,7 @@ public class InspectorTest extends AbstractRestfulTest {
 		RealmDetail expectedRealmDetail = new RealmDetail(elementMapOverviews);
 
 		// query
-		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm");
+		ClientResponse response = doGet("/strolch/inspector/defaultRealm");
 		RealmDetail realmDetail = response.getEntity(new GenericType<RealmDetail>() {
 		});
 
@@ -93,7 +93,7 @@ public class InspectorTest extends AbstractRestfulTest {
 		ElementMapOverview expectedElementMapOverview = new ElementMapOverview(elementMapName, typeOverviews);
 
 		// query
-		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/resource");
+		ClientResponse response = doGet("/strolch/inspector/defaultRealm/resource");
 		ElementMapOverview elementMapOverview = response.getEntity(new GenericType<ElementMapOverview>() {
 		});
 
@@ -112,7 +112,7 @@ public class InspectorTest extends AbstractRestfulTest {
 		ElementMapOverview expectedElementMapOverview = new ElementMapOverview(elementMapName, typeOverviews);
 
 		// query
-		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/order");
+		ClientResponse response = doGet("/strolch/inspector/defaultRealm/order");
 		ElementMapOverview elementMapOverview = response.getEntity(new GenericType<ElementMapOverview>() {
 		});
 
@@ -126,7 +126,7 @@ public class InspectorTest extends AbstractRestfulTest {
 	public void shouldGetResourceTypeDetails() {
 
 		// query
-		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/resource/Template");
+		ClientResponse response = doGet("/strolch/inspector/defaultRealm/resource/Template");
 		String entity = response.getEntity(String.class);
 		String expected = "{\"type\":\"Template\",\"resources\":[{\"id\":\"TestType\",\"name\":\"TestType Template\",\"type\":\"Template\"}]}";
 		assertEquals(expected, entity);
@@ -136,7 +136,7 @@ public class InspectorTest extends AbstractRestfulTest {
 	public void shouldGetOrderTypeDetails() {
 
 		// query
-		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/order/Template");
+		ClientResponse response = doGet("/strolch/inspector/defaultRealm/order/Template");
 		String entity = response.getEntity(String.class);
 		String expected = "{\"type\":\"Template\",\"orders\":[{\"id\":\"TestType\",\"name\":\"MyTestOrder Template\",\"type\":\"Template\",\"date\":\"2012-11-30T18:12:05.628+01:00\",\"state\":\"CREATED\"}]}";
 		assertEquals(expected, entity);
@@ -146,7 +146,7 @@ public class InspectorTest extends AbstractRestfulTest {
 	public void shouldGetResource() {
 
 		// query
-		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/resource/Template/TestType");
+		ClientResponse response = doGet("/strolch/inspector/defaultRealm/resource/Template/TestType");
 		String entity = response.getEntity(String.class);
 		assertTrue(entity.contains("name\":\"TestType Template\",\"type\":\"Template\",\"parameterBags\":"));
 	}
@@ -155,7 +155,7 @@ public class InspectorTest extends AbstractRestfulTest {
 	public void shouldGetOrder() {
 
 		// query
-		ClientResponse response = getClientResponse("/strolch/inspector/defaultRealm/order/Template/TestType");
+		ClientResponse response = doGet("/strolch/inspector/defaultRealm/order/Template/TestType");
 		String entity = response.getEntity(String.class);
 		assertTrue(entity
 				.contains("\"date\":\"2012-11-30T18:12:05.628+01:00\",\"state\":\"CREATED\",\"parameterBags\""));

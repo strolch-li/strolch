@@ -38,6 +38,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.representation.Form;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -86,12 +87,21 @@ public abstract class AbstractRestfulTest {
 		return resource;
 	}
 
-	protected ClientResponse getClientResponse(String path) {
+	protected ClientResponse doGet(String path) {
 		WebResource resource = getResource();
 		ClientResponse response = resource.path(path).accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode())
-			throw new RuntimeException("Failed to get path " + path + " due to " + response.getEntity(String.class));
+			throw new RuntimeException("Failed to get from path " + path + " due to "
+					+ response.getEntity(String.class));
 		return response;
 	}
 
+	protected <T> ClientResponse doPostForm(String path, Form form) {
+		WebResource resource = getResource();
+		ClientResponse response = resource.path(path).type(MediaType.APPLICATION_FORM_URLENCODED)
+				.accept(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, form);
+		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode())
+			throw new RuntimeException("Failed to post to path " + path + " due to " + response.getEntity(String.class));
+		return response;
+	}
 }

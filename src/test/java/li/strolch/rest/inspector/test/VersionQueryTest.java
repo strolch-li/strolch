@@ -37,7 +37,7 @@ public class VersionQueryTest extends AbstractRestfulTest {
 	public void shouldQueryVersion() {
 
 		// query
-		ClientResponse response = getClientResponse("/strolch/version");
+		ClientResponse response = doGet("/strolch/version");
 		VersionQueryResult versionQueryResult = response.getEntity(new GenericType<VersionQueryResult>() {
 		});
 

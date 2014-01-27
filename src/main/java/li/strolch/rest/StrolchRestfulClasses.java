@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import li.strolch.rest.endpoint.AuthenticationService;
 import li.strolch.rest.endpoint.Inspector;
 import li.strolch.rest.endpoint.VersionQuery;
 
@@ -32,6 +33,7 @@ public class StrolchRestfulClasses {
 
 	static {
 		Set<Class<?>> restfulClasses = new HashSet<>();
+		restfulClasses.add(AuthenticationService.class);
 		restfulClasses.add(Inspector.class);
 		restfulClasses.add(VersionQuery.class);
 

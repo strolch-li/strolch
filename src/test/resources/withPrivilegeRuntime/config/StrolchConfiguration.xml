@@ -31,4 +31,12 @@
 		<Properties>
 		</Properties>
 	</Component>
+	<Component>
+		<name>SessionHandler</name>
+		<api>li.strolch.rest.StrolchSessionHandler</api>
+		<impl>li.strolch.rest.DefaultStrolchSessionHandler</impl>
+		<Properties>
+			<rememberUser>true</rememberUser>
+		</Properties>
+	</Component>
 </StrolchConfiguration>
