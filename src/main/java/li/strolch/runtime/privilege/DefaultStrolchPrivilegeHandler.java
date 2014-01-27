@@ -22,8 +22,10 @@ import java.util.Map;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
+import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.DefaultPrivilegeHandler;
 import ch.eitchnet.privilege.handler.EncryptionHandler;
@@ -113,7 +115,11 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	@Override
 	public Certificate authenticate(String username, byte[] password) {
 		assertContainerStarted();
-		return this.privilegeHandler.authenticate(username, password);
+		try {
+			return this.privilegeHandler.authenticate(username, password);
+		} catch (AccessDeniedException e) {
+			throw new StrolchException("Authentication credentials are invalid", e);
+		}
 	}
 
 	/**
