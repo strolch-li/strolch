@@ -38,7 +38,6 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	public void start() {
 		DBC.PRE.assertNull("Instance is already set! This component is a singleton resource!", instance);
 		instance = this;
-
 		super.start();
 	}
 

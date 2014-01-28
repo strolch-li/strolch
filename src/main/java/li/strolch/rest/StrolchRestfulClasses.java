@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import li.strolch.rest.endpoint.AuthenticationService;
+import li.strolch.rest.endpoint.EnumQuery;
 import li.strolch.rest.endpoint.Inspector;
 import li.strolch.rest.endpoint.VersionQuery;
 
@@ -36,6 +37,7 @@ public class StrolchRestfulClasses {
 		restfulClasses.add(AuthenticationService.class);
 		restfulClasses.add(Inspector.class);
 		restfulClasses.add(VersionQuery.class);
+		restfulClasses.add(EnumQuery.class);
 
 		Set<Class<?>> providerClasses = new HashSet<>();
 		providerClasses.add(StrolchRestfulExceptionMapper.class);
