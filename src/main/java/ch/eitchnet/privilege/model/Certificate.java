@@ -89,7 +89,10 @@ public final class Certificate implements Serializable {
 		else
 			this.locale = locale;
 
-		this.propertyMap = Collections.unmodifiableMap(propertyMap);
+		if (propertyMap == null)
+			this.propertyMap = Collections.emptyMap();
+		else
+			this.propertyMap = Collections.unmodifiableMap(propertyMap);
 	}
 
 	/**
