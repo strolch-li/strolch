@@ -639,7 +639,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// make sure not a system user - they may not login in
 			if (user.getUserState() == UserState.SYSTEM) {
-				String msg = "User {0} is a system user and may no login!"; //$NON-NLS-1$
+				String msg = "User {0} is a system user and may not login!"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, username);
 				throw new AccessDeniedException(msg);
 			}

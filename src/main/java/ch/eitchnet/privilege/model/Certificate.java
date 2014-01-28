@@ -16,6 +16,7 @@
 package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 
@@ -88,7 +89,7 @@ public final class Certificate implements Serializable {
 		else
 			this.locale = locale;
 
-		this.propertyMap = propertyMap;
+		this.propertyMap = Collections.unmodifiableMap(propertyMap);
 	}
 
 	/**
