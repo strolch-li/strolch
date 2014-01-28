@@ -32,4 +32,16 @@
 			<verbose>true</verbose>
 		</Properties>
 	</Component>
+	<Component>
+		<name>EnumHandler</name>
+		<api>li.strolch.runtime.query.enums.EnumHandler</api>
+		<impl>li.strolch.runtime.query.enums.DefaultEnumHandler</impl>
+		<depends>ElementMapHandler</depends>
+		<Properties>
+			<realm>defaultRealm</realm>
+			<salutations>Resource/Enumeration/salutations</salutations>
+			<sex>Resource/Enumeration/sex</sex>
+			<religions>Resource/Enumeration/religions</religions>
+		</Properties>
+	</Component>
 </StrolchConfiguration>

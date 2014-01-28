@@ -23,6 +23,7 @@
 		</ParameterBag>
 	</Order>
 
+	<IncludeFile file="Enums.xml" />
 	<IncludeFile file="Resources.xml" />
 	<IncludeFile file="Orders.xml" />
 
