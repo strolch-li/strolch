@@ -40,8 +40,6 @@ import org.slf4j.LoggerFactory;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.helper.StringHelper;
 
-import com.sun.jersey.api.client.ClientResponse.Status;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -74,7 +72,7 @@ public class AuthenticationService {
 
 			if (sb.length() != 0) {
 				loginResult.setMsg("Could not log in due to: " + sb.toString());
-				return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
+				return Response.status(401).entity(loginResult).build();
 			}
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getComponent(
@@ -91,7 +89,7 @@ public class AuthenticationService {
 			return Response.ok().entity(entity).build();
 		} catch (StrolchException e) {
 			loginResult.setMsg("Could not log in due to: " + e.getMessage());
-			return Response.status(Status.UNAUTHORIZED).entity(entity).build();
+			return Response.status(401).entity(entity).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
@@ -127,7 +125,7 @@ public class AuthenticationService {
 			}
 			if (sb.length() != 0) {
 				logoutResult.setMsg("Could not logout due to: " + sb.toString());
-				return Response.status(Status.UNAUTHORIZED).entity(logoutResult).build();
+				return Response.status(401).entity(logoutResult).build();
 			}
 
 			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance().getComponent(
