@@ -42,4 +42,33 @@
 			<verbose>true</verbose>
 		</Properties>
 	</Component>
+	<Component>
+		<name>EnumHandler</name>
+		<api>li.strolch.runtime.query.enums.EnumHandler</api>
+		<impl>li.strolch.runtime.query.enums.DefaultEnumHandler</impl>
+		<depends>ElementMapHandler</depends>
+		<Properties>
+			<realm>defaultRealm</realm>
+			<salutations>Resource/Enumeration/salutations</salutations>
+			<sex>Resource/Enumeration/sex</sex>
+			<religions>Resource/Enumeration/religions</religions>
+		</Properties>
+	</Component>
+	<Component>
+		<name>RestfulHandler</name>
+		<api>li.strolch.rest.RestfulStrolchComponent</api>
+		<impl>li.strolch.rest.RestfulStrolchComponent</impl>
+		<depends>SessionHandler</depends>
+		<Properties>
+		</Properties>
+	</Component>
+	<Component>
+		<name>SessionHandler</name>
+		<api>li.strolch.rest.StrolchSessionHandler</api>
+		<impl>li.strolch.rest.DefaultStrolchSessionHandler</impl>
+		<depends>PrivilegeHandler</depends>
+		<Properties>
+			<rememberUser>true</rememberUser>
+		</Properties>
+	</Component>
 </StrolchConfiguration>

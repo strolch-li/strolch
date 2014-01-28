@@ -33,6 +33,7 @@ public class RestfulApplication extends Application {
 	public Set<Class<?>> getClasses() {
 		Set<Class<?>> classes = new HashSet<>();
 		classes.addAll(StrolchRestfulClasses.getRestfulClasses());
+		classes.addAll(StrolchRestfulClasses.getProviderClasses());
 		return classes;
 	}
 }
