@@ -35,7 +35,7 @@ import li.strolch.model.Tags;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.xml.OrderToSaxVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
-import li.strolch.model.xml.XmlModelDefaultHandler;
+import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 
@@ -67,7 +67,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
 		try (InputStream binaryStream = sqlxml.getBinaryStream()) {
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(binaryStream, new XmlModelDefaultHandler(listener));
+			parser.parse(binaryStream, new XmlModelSaxReader(listener));
 		} catch (SQLException | IOException | SAXException | ParserConfigurationException e) {
 			throw new StrolchPersistenceException(MessageFormat.format(
 					"Failed to extract Order from sqlxml value for {0} / {1}", id, type));

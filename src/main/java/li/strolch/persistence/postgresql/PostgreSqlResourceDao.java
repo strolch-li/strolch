@@ -33,7 +33,7 @@ import li.strolch.model.Tags;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.xml.ResourceToSaxVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
-import li.strolch.model.xml.XmlModelDefaultHandler;
+import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 
@@ -62,7 +62,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
 		try (InputStream binaryStream = sqlxml.getBinaryStream()) {
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(binaryStream, new XmlModelDefaultHandler(listener));
+			parser.parse(binaryStream, new XmlModelSaxReader(listener));
 		} catch (SQLException | IOException | SAXException | ParserConfigurationException e) {
 			throw new StrolchPersistenceException(MessageFormat.format(
 					"Failed to extract Resource from sqlxml value for {0} / {1}", id, type));
