@@ -18,21 +18,18 @@ package li.strolch.service;
 import java.io.File;
 import java.text.MessageFormat;
 
-import li.strolch.agent.impl.InMemoryElementListener;
+import li.strolch.command.XmlImportModelCommand;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
-import li.strolch.model.xml.XmlModelFileHandler;
+import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ImportModelFromXmlService extends
-		AbstractService<ImportModelFromXmlService.ImportModelFromXmlArg, ServiceResult> {
+public class XmlImportModelService extends AbstractService<XmlImportModelArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,22 +39,29 @@ public class ImportModelFromXmlService extends
 	}
 
 	@Override
-	protected ServiceResult internalDoService(ImportModelFromXmlArg arg) {
+	protected ServiceResult internalDoService(XmlImportModelArgument arg) {
 
 		File dataPath = getRuntimeConfiguration().getDataPath();
-		File modelFile = new File(dataPath, arg.fileName);
+		File modelFile = new File(dataPath, arg.modelFileName);
 		if (!modelFile.exists()) {
 			String msg = "Model File does not exist with name {0} in data path {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, arg.fileName, dataPath);
+			msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
 			throw new StrolchException(msg);
 		}
 
 		XmlModelStatistics statistics;
 		try (StrolchTransaction tx = openTx(arg.realm)) {
-			InMemoryElementListener elementListener = new InMemoryElementListener(tx);
-			XmlModelFileHandler handler = new XmlModelFileHandler(elementListener, modelFile);
-			handler.parseFile();
-			statistics = handler.getStatistics();
+
+			XmlImportModelCommand command = new XmlImportModelCommand(getContainer(), tx);
+			command.setModelFile(modelFile);
+			command.setAddOrders(arg.addOrders);
+			command.setAddResources(arg.addResources);
+			command.setUpdateOrders(arg.updateOrders);
+			command.setUpdateResources(arg.updateResources);
+			command.setOrderTypes(arg.orderTypes);
+			command.setResourceTypes(arg.resourceTypes);
+			command.doCommand();
+			statistics = command.getStatistics();
 		}
 
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
@@ -67,10 +71,5 @@ public class ImportModelFromXmlService extends
 		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 
 		return ServiceResult.success();
-	}
-
-	public static class ImportModelFromXmlArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public String fileName;
 	}
 }
