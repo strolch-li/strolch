@@ -15,6 +15,7 @@
  */
 package ch.eitchnet.utils.dbc;
 
+import java.io.File;
 import java.text.MessageFormat;
 
 import ch.eitchnet.utils.helper.StringHelper;
@@ -51,6 +52,23 @@ public enum DBC {
 			}
 		}
 
+		@Override
+		public void assertNotExists(String msg, File file) {
+			if (file.exists()) {
+				String ex = "Illegal situation as file (" + file + ") exists: {0}"; //$NON-NLS-1$
+				ex = MessageFormat.format(ex, msg);
+				throw new DbcException(ex);
+			}
+		}
+
+		@Override
+		public void assertExists(String msg, File file) {
+			if (!file.exists()) {
+				String ex = "Illegal situation as file (" + file + ") does not exist: {0}"; //$NON-NLS-1$
+				ex = MessageFormat.format(ex, msg);
+				throw new DbcException(ex);
+			}
+		}
 	};
 
 	public abstract void assertNotEmpty(String msg, String value);
@@ -58,6 +76,10 @@ public enum DBC {
 	public abstract void assertNotNull(String msg, Object value);
 
 	public abstract void assertNull(String msg, Object value);
+
+	public abstract void assertNotExists(String msg, File file);
+
+	public abstract void assertExists(String msg, File file);
 
 	public class DbcException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
