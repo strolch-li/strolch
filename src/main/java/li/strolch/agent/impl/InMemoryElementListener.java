@@ -15,6 +15,9 @@
  */
 package li.strolch.agent.impl;
 
+import java.util.Collections;
+import java.util.Set;
+
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Order;
@@ -31,6 +34,8 @@ public class InMemoryElementListener implements StrolchElementListener {
 	private boolean addResources;
 	private boolean updateOrders;
 	private boolean updateResources;
+	private Set<String> orderTypes;
+	private Set<String> resourceTypes;
 
 	private StrolchTransaction tx;
 	private ResourceMap resourceMap;
@@ -45,6 +50,8 @@ public class InMemoryElementListener implements StrolchElementListener {
 		this.addOrders = true;
 		this.updateResources = true;
 		this.updateOrders = true;
+		this.orderTypes = Collections.emptySet();
+		this.resourceTypes = Collections.emptySet();
 	}
 
 	/**
@@ -79,8 +86,27 @@ public class InMemoryElementListener implements StrolchElementListener {
 		this.updateOrders = updateOrders;
 	}
 
+	/**
+	 * @param orderTypes
+	 *            the orderTypes to set
+	 */
+	public void setOrderTypes(Set<String> orderTypes) {
+		this.orderTypes = orderTypes;
+	}
+
+	/**
+	 * @param resourceTypes
+	 *            the resourceTypes to set
+	 */
+	public void setResourceTypes(Set<String> resourceTypes) {
+		this.resourceTypes = resourceTypes;
+	}
+
 	@Override
 	public void notifyResource(Resource resource) {
+		if (!resourceTypes.isEmpty() && !resourceTypes.contains(resource.getType()))
+			return;
+
 		if (this.resourceMap.hasElement(this.tx, resource.getType(), resource.getId())) {
 			if (this.updateResources) {
 				this.resourceMap.update(this.tx, resource);
@@ -92,6 +118,9 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	@Override
 	public void notifyOrder(Order order) {
+		if (!orderTypes.isEmpty() && !orderTypes.contains(order.getType()))
+			return;
+
 		if (this.orderMap.hasElement(this.tx, order.getType(), order.getId())) {
 			if (this.updateOrders) {
 				this.orderMap.update(this.tx, order);

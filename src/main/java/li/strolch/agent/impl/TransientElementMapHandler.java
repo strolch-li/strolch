@@ -22,8 +22,8 @@ import java.util.Map;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
-import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
-import li.strolch.model.xml.XmlModelFileHandler;
+import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
+import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -83,7 +83,7 @@ public class TransientElementMapHandler extends InMemoryElementMapHandler {
 			XmlModelStatistics statistics;
 			try (StrolchTransaction tx = strolchRealm.openTx()) {
 				InMemoryElementListener elementListener = new InMemoryElementListener(tx);
-				XmlModelFileHandler handler = new XmlModelFileHandler(elementListener, modelFile);
+				XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, modelFile);
 				handler.parseFile();
 				statistics = handler.getStatistics();
 			}
