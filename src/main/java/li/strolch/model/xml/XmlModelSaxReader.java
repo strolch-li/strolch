@@ -44,11 +44,10 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public class XmlModelDefaultHandler extends DefaultHandler {
+public class XmlModelSaxReader extends DefaultHandler {
 
-	protected static final Logger logger = LoggerFactory.getLogger(XmlModelDefaultHandler.class);
+	protected static final Logger logger = LoggerFactory.getLogger(XmlModelSaxReader.class);
 
 	protected StrolchElementListener listener;
 	protected XmlModelStatistics statistics;
@@ -56,7 +55,7 @@ public class XmlModelDefaultHandler extends DefaultHandler {
 	private GroupedParameterizedElement parameterizedElement;
 	private ParameterBag pBag;
 
-	public XmlModelDefaultHandler(StrolchElementListener listener) {
+	public XmlModelSaxReader(StrolchElementListener listener) {
 		this.listener = listener;
 		this.statistics = new XmlModelStatistics();
 	}

@@ -36,7 +36,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class XmlModelFileHandler extends XmlModelDefaultHandler {
+public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
 	private File modelFile;
 
@@ -44,7 +44,7 @@ public class XmlModelFileHandler extends XmlModelDefaultHandler {
 	 * @param listener
 	 * @param modelFile
 	 */
-	public XmlModelFileHandler(StrolchElementListener listener, File modelFile) {
+	public XmlModelSaxFileReader(StrolchElementListener listener, File modelFile) {
 		super(listener);
 		this.modelFile = modelFile;
 	}
@@ -67,7 +67,7 @@ public class XmlModelFileHandler extends XmlModelDefaultHandler {
 				throw new IllegalArgumentException(msg);
 			}
 
-			XmlModelFileHandler handler = new XmlModelFileHandler(this.listener, includeFile);
+			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(this.listener, includeFile);
 			handler.parseFile();
 			this.statistics.nrOfOrders += handler.statistics.nrOfOrders;
 			this.statistics.nrOfResources += handler.statistics.nrOfResources;

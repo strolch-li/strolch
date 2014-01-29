@@ -187,6 +187,15 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	/**
+	 * Returns true if this {@link GroupedParameterizedElement} has any {@link ParameterBag ParameterBag}
+	 * 
+	 * @return true if this {@link GroupedParameterizedElement} has any {@link ParameterBag ParameterBag}
+	 */
+	public boolean hasParameterBags() {
+		return this.parameterBagMap != null && !this.parameterBagMap.isEmpty();
+	}
+
+	/**
 	 * Returns true if the {@link ParameterBag} with the given key exists on this {@link GroupedParameterizedElement}.
 	 * 
 	 * @param bagKey
@@ -194,7 +203,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * @return true if the {@link ParameterBag} with the given key exists on this {@link GroupedParameterizedElement}.
 	 */
 	public boolean hasParameterBag(String bagKey) {
-		return this.parameterBagMap != null &&  this.parameterBagMap.containsKey(bagKey);
+		return this.parameterBagMap != null && this.parameterBagMap.containsKey(bagKey);
 	}
 
 	/**

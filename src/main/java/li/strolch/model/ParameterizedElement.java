@@ -166,6 +166,15 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	}
 
 	/**
+	 * Returns true, if the this {@link ParameterizedElement} has any {@link Parameter Parameters}, false otherwise
+	 * 
+	 * @return true, if the this {@link ParameterizedElement} has any {@link Parameter Parameters}, false otherwise
+	 */
+	public boolean hasParameters() {
+		return this.parameterMap != null && !this.parameterMap.isEmpty();
+	}
+
+	/**
 	 * Returns true, if the {@link Parameter} exists with the given key, false otherwise
 	 * 
 	 * @param key
@@ -261,8 +270,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		super.fillClone(clone);
 		ParameterizedElement peClone = (ParameterizedElement) clone;
 		peClone.setType(this.type);
-		if(this.parameterMap != null) {
-			for(Parameter<?> param : this.parameterMap.values()) {
+		if (this.parameterMap != null) {
+			for (Parameter<?> param : this.parameterMap.values()) {
 				peClone.addParameter(param.getClone());
 			}
 		}

@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import li.strolch.model.xml.StrolchElementListener;
-import li.strolch.model.xml.XmlModelDefaultHandler.XmlModelStatistics;
-import li.strolch.model.xml.XmlModelFileHandler;
+import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
+import li.strolch.model.xml.XmlModelSaxFileReader;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class XmlModelDefaultHandlerTest {
 				orderMap.put(order.getId(), order);
 			}
 		};
-		XmlModelFileHandler handler = new XmlModelFileHandler(listener, file);
+		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, file);
 		handler.parseFile();
 
 		assertEquals(3, resourceMap.size());
