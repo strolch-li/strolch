@@ -55,7 +55,7 @@ public enum DBC {
 		@Override
 		public void assertNotExists(String msg, File file) {
 			if (file.exists()) {
-				String ex = "Illegal situation as file (" + file + ") exists: {0}"; //$NON-NLS-1$
+				String ex = MessageFormat.format("Illegal situation as file ({0}) exists: {0}", file); //$NON-NLS-1$
 				ex = MessageFormat.format(ex, msg);
 				throw new DbcException(ex);
 			}
@@ -64,7 +64,7 @@ public enum DBC {
 		@Override
 		public void assertExists(String msg, File file) {
 			if (!file.exists()) {
-				String ex = "Illegal situation as file (" + file + ") does not exist: {0}"; //$NON-NLS-1$
+				String ex = MessageFormat.format("Illegal situation as file ({0}) does not exist: {0}", file); //$NON-NLS-1$
 				ex = MessageFormat.format(ex, msg);
 				throw new DbcException(ex);
 			}
