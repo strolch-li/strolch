@@ -30,6 +30,7 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public class EnumHandlerTest {
 
 	private static final String ENUM_HANDLER_TEST_RUNTIME = "target/EnumHandlerTest/";

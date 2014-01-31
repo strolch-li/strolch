@@ -15,6 +15,8 @@
  */
 package li.strolch.persistence.api;
 
+import java.util.List;
+
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
@@ -24,6 +26,8 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.query.OrderQuery;
+import li.strolch.model.query.ResourceQuery;
 
 public interface StrolchTransaction extends AutoCloseable {
 
@@ -43,6 +47,10 @@ public interface StrolchTransaction extends AutoCloseable {
 	public OrderMap getOrderMap();
 
 	public PersistenceHandler getPersistenceHandler();
+
+	public List<Order> doQuery(OrderQuery query);
+
+	public List<Resource> doQuery(ResourceQuery query);
 
 	/**
 	 * <p>

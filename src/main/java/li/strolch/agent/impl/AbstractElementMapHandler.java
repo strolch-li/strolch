@@ -43,7 +43,7 @@ public abstract class AbstractElementMapHandler extends StrolchComponent impleme
 
 	@Override
 	public Set<String> getRealmNames() {
-		return new HashSet<>(realms.keySet());
+		return new HashSet<>(this.realms.keySet());
 	}
 
 	@Override

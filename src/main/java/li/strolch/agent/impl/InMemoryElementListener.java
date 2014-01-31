@@ -104,7 +104,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	@Override
 	public void notifyResource(Resource resource) {
-		if (!resourceTypes.isEmpty() && !resourceTypes.contains(resource.getType()))
+		if (!this.resourceTypes.isEmpty() && !this.resourceTypes.contains(resource.getType()))
 			return;
 
 		if (this.resourceMap.hasElement(this.tx, resource.getType(), resource.getId())) {
@@ -118,7 +118,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	@Override
 	public void notifyOrder(Order order) {
-		if (!orderTypes.isEmpty() && !orderTypes.contains(order.getType()))
+		if (!this.orderTypes.isEmpty() && !this.orderTypes.contains(order.getType()))
 			return;
 
 		if (this.orderMap.hasElement(this.tx, order.getType(), order.getId())) {

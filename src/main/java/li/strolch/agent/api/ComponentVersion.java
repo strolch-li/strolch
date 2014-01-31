@@ -60,6 +60,7 @@ public class ComponentVersion extends AbstractVersion {
 		this.componentName = componentName;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		return "ComponentVersion [componentName=" + this.componentName + ", groupId=" + this.getGroupId()

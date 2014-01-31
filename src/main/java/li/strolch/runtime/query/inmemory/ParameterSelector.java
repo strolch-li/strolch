@@ -30,7 +30,6 @@ import li.strolch.model.parameter.StringParameter;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public abstract class ParameterSelector<T extends GroupedParameterizedElement> implements Selector<T> {
 
@@ -45,48 +44,68 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 	@Override
 	public abstract boolean select(GroupedParameterizedElement element);
 
-	public static <T extends GroupedParameterizedElement> Selector<T> stringSelector(String bagKey, String paramKey,
-			String value) {
+	public static <T extends GroupedParameterizedElement> StringParameterSelector<T> stringSelector(String bagKey,
+			String paramKey, String value) {
 		return new StringParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> Selector<T> integerSelector(String bagKey, String paramKey,
-			int value) {
+	public static <T extends GroupedParameterizedElement> IntegerParameterSelector<T> integerSelector(String bagKey,
+			String paramKey, int value) {
 		return new IntegerParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> Selector<T> booleanSelector(String bagKey, String paramKey,
-			boolean value) {
+	public static <T extends GroupedParameterizedElement> BooleanParameterSelector<T> booleanSelector(String bagKey,
+			String paramKey, boolean value) {
 		return new BooleanParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> Selector<T> floatSelector(String bagKey, String paramKey,
-			double value) {
+	public static <T extends GroupedParameterizedElement> FloatParameterSelector<T> floatSelector(String bagKey,
+			String paramKey, double value) {
 		return new FloatParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> Selector<T> longSelector(String bagKey, String paramKey,
-			long value) {
+	public static <T extends GroupedParameterizedElement> LongParameterSelector<T> longSelector(String bagKey,
+			String paramKey, long value) {
 		return new LongParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> Selector<T> dateSelector(String bagKey, String paramKey,
-			Date value) {
+	public static <T extends GroupedParameterizedElement> DateParameterSelector<T> dateSelector(String bagKey,
+			String paramKey, Date value) {
 		return new DateParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> Selector<T> stringListSelector(String bagKey,
-			String paramKey, List<String> value) {
+	public static <T extends GroupedParameterizedElement> StringListParameterSelector<T> stringListSelector(
+			String bagKey, String paramKey, List<String> value) {
 		return new StringListParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	private static class StringParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class StringParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
 
 		private String value;
+		private boolean contains;
+		private boolean caseInsensitive;
 
 		public StringParameterSelector(String bagKey, String paramKey, String value) {
 			super(bagKey, paramKey);
 			this.value = value;
+		}
+
+		public boolean isContains() {
+			return this.contains;
+		}
+
+		public boolean isCaseInsensitive() {
+			return this.caseInsensitive;
+		}
+
+		public StringParameterSelector<T> contains(boolean contains) {
+			this.contains = contains;
+			return this;
+		}
+
+		public StringParameterSelector<T> caseInsensitive(boolean caseInsensitive) {
+			this.caseInsensitive = caseInsensitive;
+			return this;
 		}
 
 		@Override
@@ -100,11 +119,22 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 				return false;
 
 			StringParameter param = bag.getParameter(this.paramKey);
-			return param.getValue().equals(this.value);
+			String paramValue = param.getValue();
+
+			if (this.contains && this.caseInsensitive)
+				return paramValue.toLowerCase().contains(this.value.toLowerCase());
+
+			if (this.caseInsensitive)
+				return paramValue.toLowerCase().equals(this.value.toLowerCase());
+
+			if (this.contains)
+				return paramValue.contains(this.value);
+
+			return paramValue.equals(this.value);
 		}
 	}
 
-	private static class IntegerParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class IntegerParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
 
 		private Integer value;
 
@@ -127,7 +157,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	private static class BooleanParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class BooleanParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
 
 		private Boolean value;
 
@@ -150,7 +180,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	private static class FloatParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class FloatParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
 
 		private Double value;
 
@@ -173,7 +203,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	private static class LongParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class LongParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
 
 		private Long value;
 
@@ -196,7 +226,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	private static class DateParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class DateParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
 
 		private Date value;
 
@@ -219,8 +249,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	private static class StringListParameterSelector<T extends GroupedParameterizedElement> extends
-			ParameterSelector<T> {
+	public static class StringListParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
 
 		private List<String> value;
 

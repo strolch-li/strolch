@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class StrolchComponent {
 
+	private static final String COMPONENT_VERSION_PROPERTIES = "/componentVersion.properties"; //$NON-NLS-1$
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchComponent.class);
 	private final ComponentContainer container;
 	private final String componentName;
@@ -86,15 +87,16 @@ public class StrolchComponent {
 
 	public ComponentVersion getVersion() throws IOException {
 		if (this.version == null) {
-			InputStream stream = getClass().getResourceAsStream("/componentVersion.properties");
-			if (stream == null) {
-				throw new RuntimeException("/componentVersion.properties does not exist");
-			}
-			Properties properties = new Properties();
-			properties.load(stream);
+			try (InputStream stream = getClass().getResourceAsStream(COMPONENT_VERSION_PROPERTIES)) {
+				if (stream == null) {
+					throw new RuntimeException("/componentVersion.properties does not exist"); //$NON-NLS-1$
+				}
+				Properties properties = new Properties();
+				properties.load(stream);
 
-			ComponentVersion componentVersion = new ComponentVersion(getName(), properties);
-			this.version = componentVersion;
+				ComponentVersion componentVersion = new ComponentVersion(getName(), properties);
+				this.version = componentVersion;
+			}
 		}
 
 		return this.version;

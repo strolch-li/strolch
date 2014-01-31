@@ -123,18 +123,18 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 	@Override
 	public void add(StrolchTransaction tx, T element) {
-		DBC.PRE.assertNotNull("Transaction may not be null!", tx);
-		DBC.PRE.assertNotNull("Element may not be null!", element);
+		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Element may not be null!", element); //$NON-NLS-1$
 
 		insert(element, tx);
 	}
 
 	@Override
 	public void update(StrolchTransaction tx, T element) {
-		DBC.PRE.assertNotNull("Transaction may not be null!", tx);
-		DBC.PRE.assertNotNull("Element may not be null!", element);
+		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Element may not be null!", element); //$NON-NLS-1$
 
-		String msg = "The element {0} can not be updated as it does not exist!";
+		String msg = "The element {0} can not be updated as it does not exist!"; //$NON-NLS-1$
 		Map<String, T> byType = this.elementMap.get(element.getType());
 		if (byType == null) {
 			msg = MessageFormat.format(msg, element.getLocator());
@@ -153,10 +153,10 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 	@Override
 	public void remove(StrolchTransaction tx, T element) {
-		DBC.PRE.assertNotNull("Transaction may not be null!", tx);
-		DBC.PRE.assertNotNull("Element may not be null!", element);
+		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Element may not be null!", element); //$NON-NLS-1$
 
-		String msg = "The element {0} can not be removed as it does not exist!";
+		String msg = "The element {0} can not be removed as it does not exist!"; //$NON-NLS-1$
 
 		synchronized (this.elementMap) {
 			Map<String, T> byType = this.elementMap.get(element.getType());
@@ -192,8 +192,8 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 	 */
 	void insert(T element, StrolchTransaction tx) {
 		if (this.allKeys.contains(element.getId())) {
-			String msg = "An element already exists with the id " + element.getId()
-					+ ". Elements of the same class must always have a unique id, regardless of their type!";
+			String msg = "An element already exists with the id " + element.getId() //$NON-NLS-1$
+					+ ". Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
 			throw new StrolchPersistenceException(msg);
 		}
 
@@ -208,7 +208,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 		synchronized (byType) {
 			if (byType.containsKey(element.getId())) {
-				String msg = MessageFormat.format("The element {0} already exists!", element.getLocator());
+				String msg = MessageFormat.format("The element {0} already exists!", element.getLocator()); //$NON-NLS-1$
 				throw new StrolchPersistenceException(msg);
 			}
 
@@ -234,8 +234,8 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 	@Override
 	public void addAll(StrolchTransaction tx, List<T> elements) {
-		DBC.PRE.assertNotNull("Transaction may not be null!", tx);
-		DBC.PRE.assertNotNull("Elements may not be null!", elements);
+		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Elements may not be null!", elements); //$NON-NLS-1$
 
 		if (elements.isEmpty())
 			return;
@@ -258,7 +258,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 				for (T element : newByType) {
 					synchronized (byType) {
 						if (byType.containsKey(element.getId())) {
-							String msg = "An element already exists with the id {0}. Elements of the same class must always have a unique id, regardless of their type!";
+							String msg = "An element already exists with the id {0}. Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
 							msg = MessageFormat.format(msg, element.getId());
 							throw new StrolchPersistenceException(msg);
 						}
@@ -276,8 +276,8 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 	@Override
 	public void updateAll(StrolchTransaction tx, List<T> elements) {
-		DBC.PRE.assertNotNull("Transaction may not be null!", tx);
-		DBC.PRE.assertNotNull("Elements may not be null!", elements);
+		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Elements may not be null!", elements); //$NON-NLS-1$
 
 		if (elements.isEmpty())
 			return;
@@ -285,7 +285,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 		// sort elements by type
 		Map<String, List<T>> map = sortElementsToType(elements);
 
-		String msg = "The element {0} can not be updated as it does not exist!";
+		String msg = "The element {0} can not be updated as it does not exist!"; //$NON-NLS-1$
 
 		// update elements
 		for (String type : map.keySet()) {
@@ -316,8 +316,8 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 	@Override
 	public void removeAll(StrolchTransaction tx, List<T> elements) {
-		DBC.PRE.assertNotNull("Transaction may not be null!", tx);
-		DBC.PRE.assertNotNull("Elements may not be null!", elements);
+		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Elements may not be null!", elements); //$NON-NLS-1$
 
 		if (elements.isEmpty())
 			return;
@@ -325,7 +325,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 		// sort elements by type
 		Map<String, List<T>> map = sortElementsToType(elements);
 
-		String msg = "The element {0} can not be removed as it does not exist!";
+		String msg = "The element {0} can not be removed as it does not exist!"; //$NON-NLS-1$
 
 		// update elements
 		for (String type : map.keySet()) {

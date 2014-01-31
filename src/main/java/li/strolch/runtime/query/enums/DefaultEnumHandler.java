@@ -15,6 +15,8 @@
  */
 package li.strolch.runtime.query.enums;
 
+import static ch.eitchnet.utils.helper.StringHelper.UNDERLINE;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +42,7 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public class DefaultEnumHandler extends StrolchComponent implements EnumHandler {
 
-	private static final String PROP_REALM = "realm";
+	private static final String PROP_REALM = "realm"; //$NON-NLS-1$
 
 	private String realm;
 	private Map<String, Locator> enumLocators;
@@ -67,8 +69,8 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 
 			String enumLocatorS = configuration.getString(enumName, null);
 			Locator enumLocator = Locator.valueOf(enumLocatorS);
-			logger.info(MessageFormat.format("Registered enum {0} at {1}", enumName, enumLocator));
-			enumLocators.put(enumName, enumLocator);
+			logger.info(MessageFormat.format("Registered enum {0} at {1}", enumName, enumLocator)); //$NON-NLS-1$
+			this.enumLocators.put(enumName, enumLocator);
 		}
 
 		super.initialize(configuration);
@@ -77,14 +79,14 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 	@Override
 	public StrolchEnum getEnum(String name, Locale locale) {
 
-		DBC.PRE.assertNotEmpty("Enum name must be given!", name);
-		DBC.PRE.assertNotNull("Locale must be given!", locale);
+		DBC.PRE.assertNotEmpty("Enum name must be given!", name); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Locale must be given!", locale); //$NON-NLS-1$
 
 		Locator enumLocator = this.enumLocators.get(name);
 		if (enumLocator == null)
-			throw new StrolchException(MessageFormat.format("No enumeration is configured for the name {0}", name));
+			throw new StrolchException(MessageFormat.format("No enumeration is configured for the name {0}", name)); //$NON-NLS-1$
 
-		try (StrolchTransaction tx = getContainer().getRealm(realm).openTx()) {
+		try (StrolchTransaction tx = getContainer().getRealm(this.realm).openTx()) {
 			Resource enumeration = tx.findElement(enumLocator);
 			ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, locale);
 
@@ -107,11 +109,11 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 	 */
 	private ParameterBag findParameterBagByLanguage(Resource enumeration, Locale locale) {
 
-		String localeS = locale.getLanguage() + "_" + locale.getCountry() + "_" + locale.getVariant();
+		String localeS = locale.getLanguage() + UNDERLINE + locale.getCountry() + UNDERLINE + locale.getVariant();
 		if (enumeration.hasParameterBag(localeS))
 			return enumeration.getParameterBag(localeS);
 
-		localeS = locale.getLanguage() + "_" + locale.getCountry();
+		localeS = locale.getLanguage() + UNDERLINE + locale.getCountry();
 		if (enumeration.hasParameterBag(localeS))
 			return enumeration.getParameterBag(localeS);
 
@@ -119,7 +121,7 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 		if (enumeration.hasParameterBag(localeS))
 			return enumeration.getParameterBag(localeS);
 
-		String msg = "No enumeration exists for language {0} on enumeration {1}";
+		String msg = "No enumeration exists for language {0} on enumeration {1}"; //$NON-NLS-1$
 		msg = MessageFormat.format(msg, locale, enumeration.getLocator());
 		throw new StrolchException(msg);
 	}

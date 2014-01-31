@@ -16,17 +16,26 @@
 package li.strolch.runtime.query.inmemory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import li.strolch.model.StrolchElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public abstract class BooleanSelector<T extends StrolchElement> implements Selector<T> {
 
 	protected List<Selector<T>> selectors;
+
+	public BooleanSelector() {
+		this.selectors = new ArrayList<>();
+	}
+
+	@SafeVarargs
+	public BooleanSelector(Selector<T>... selector) {
+		this.selectors = Arrays.asList(selector);
+	}
 
 	public BooleanSelector(Selector<T> leftHandSide, Selector<T> rightHandSide) {
 		this.selectors = new ArrayList<>();
@@ -36,6 +45,11 @@ public abstract class BooleanSelector<T extends StrolchElement> implements Selec
 
 	public BooleanSelector(List<Selector<T>> selectors) {
 		this.selectors = selectors;
+	}
+
+	public BooleanSelector<T> with(Selector<T> selector) {
+		this.selectors.add(selector);
+		return this;
 	}
 
 	public abstract boolean select(T element);

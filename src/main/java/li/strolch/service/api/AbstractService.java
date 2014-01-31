@@ -147,9 +147,13 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * done in the {@link #doService(ServiceArgument)} which calls this method
 	 * 
 	 * @param arg
-	 * @return
+	 * 
+	 * @return a {@link ServiceResult} which denotes the execution state of this {@link Service}
+	 * 
+	 * @throws Exception
+	 *             if something went wrong. The caller will catch and handle the {@link ServiceResult}
 	 */
-	protected abstract U internalDoService(T arg);
+	protected abstract U internalDoService(T arg) throws Exception;
 
 	/**
 	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeName()

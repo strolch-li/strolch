@@ -65,10 +65,10 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	protected abstract InMemoryQueryVisitor<T, S> newInstance();
 
 	@Override
-	public <U extends Selection> void visitAnd(AndSelection<U> andSelection) {
+	public void visitAnd(AndSelection andSelection) {
 		InMemoryQueryVisitor<T, S> query = newInstance();
-		List<U> selections = andSelection.getSelections();
-		for (U selection : selections) {
+		List<Selection> selections = andSelection.getSelections();
+		for (Selection selection : selections) {
 			selection.accept(query);
 		}
 		AndSelector<T> andSelector = new AndSelector<>(query.getSelectors());
@@ -76,10 +76,10 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	}
 
 	@Override
-	public <U extends Selection> void visitOr(OrSelection<U> orSelection) {
+	public void visitOr(OrSelection orSelection) {
 		InMemoryQueryVisitor<T, S> query = newInstance();
-		List<U> selections = orSelection.getSelections();
-		for (U selection : selections) {
+		List<Selection> selections = orSelection.getSelections();
+		for (Selection selection : selections) {
 			selection.accept(query);
 		}
 		OrSelector<T> orSelector = new OrSelector<>(query.getSelectors());
@@ -98,8 +98,9 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 
 	@Override
 	public void visit(StringParameterSelection selection) {
-		this.selectors.add(ParameterSelector.<T> stringSelector(selection.getBagKey(), selection.getParamKey(),
-				selection.getValue()));
+		this.selectors.add(ParameterSelector
+				.<T> stringSelector(selection.getBagKey(), selection.getParamKey(), selection.getValue())
+				.contains(selection.isContains()).caseInsensitive(selection.isCaseInsensitive()));
 	}
 
 	@Override

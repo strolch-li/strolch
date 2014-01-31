@@ -149,9 +149,9 @@ public class ComponentDependencyAnalyzer {
 	 */
 	private void logDependencies(int depth, Set<ComponentController> components) {
 		if (depth == 0) {
-			logger.info("Dependency tree:");
+			logger.info("Dependency tree:"); //$NON-NLS-1$
 		}
-		String inset = StringHelper.normalizeLength("  ", depth * 2, false, ' ');
+		String inset = StringHelper.normalizeLength("  ", depth * 2, false, ' '); //$NON-NLS-1$
 		for (ComponentController controller : components) {
 			logger.info(inset + controller.getComponent().getName());
 			logDependencies(depth + 1, controller.getDownstreamDependencies());

@@ -48,12 +48,12 @@ public abstract class AbstractVersion {
 	 * @param properties
 	 */
 	public AbstractVersion(Properties properties) {
-		this.groupId = properties.getProperty("groupId");
-		this.artifactId = properties.getProperty("artifactId");
-		this.artifactVersion = properties.getProperty("artifactVersion");
-		this.scmRevision = properties.getProperty("scmRevision");
-		this.scmBranch = properties.getProperty("scmBranch");
-		this.buildTimestamp = properties.getProperty("buildTimestamp");
+		this.groupId = properties.getProperty("groupId"); //$NON-NLS-1$
+		this.artifactId = properties.getProperty("artifactId"); //$NON-NLS-1$
+		this.artifactVersion = properties.getProperty("artifactVersion"); //$NON-NLS-1$
+		this.scmRevision = properties.getProperty("scmRevision"); //$NON-NLS-1$
+		this.scmBranch = properties.getProperty("scmBranch"); //$NON-NLS-1$
+		this.buildTimestamp = properties.getProperty("buildTimestamp"); //$NON-NLS-1$
 	}
 
 	/**

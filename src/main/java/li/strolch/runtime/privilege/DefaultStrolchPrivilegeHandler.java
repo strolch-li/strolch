@@ -118,7 +118,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		try {
 			return this.privilegeHandler.authenticate(username, password);
 		} catch (AccessDeniedException e) {
-			throw new StrolchException("Authentication credentials are invalid", e);
+			throw new StrolchException("Authentication credentials are invalid", e); //$NON-NLS-1$
 		}
 	}
 

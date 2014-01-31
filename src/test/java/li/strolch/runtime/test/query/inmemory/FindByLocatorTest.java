@@ -31,6 +31,7 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public class FindByLocatorTest {
 
 	private static final String PATH_FIND_BY_LOCATOR_RUNTIME = "target/FindByLocatorTest/";

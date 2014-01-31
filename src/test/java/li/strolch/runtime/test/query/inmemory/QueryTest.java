@@ -69,7 +69,7 @@ public class QueryTest {
 		List<Selection> elementAndSelections = new ArrayList<>();
 		elementAndSelections.add(new IdSelection("@1"));
 		elementAndSelections.add(ParameterSelection.integerSelection(BAG_ID, "nbOfBooks", 33));
-		AndSelection<Selection> andSelection = new AndSelection<>(elementAndSelections);
+		AndSelection andSelection = new AndSelection(elementAndSelections);
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
 		query.addSelection(andSelection);
 
@@ -100,7 +100,7 @@ public class QueryTest {
 		List<Selection> elementAndSelections = new ArrayList<>();
 		elementAndSelections.add(new IdSelection("@1"));
 		elementAndSelections.add(ParameterSelection.integerSelection(BAG_ID, "nbOfBooks", 33));
-		AndSelection<Selection> andSelection = new AndSelection<>(elementAndSelections);
+		AndSelection andSelection = new AndSelection(elementAndSelections);
 		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType"));
 		query.addSelection(andSelection);
 

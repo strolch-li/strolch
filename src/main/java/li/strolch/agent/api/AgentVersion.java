@@ -60,6 +60,7 @@ public class AgentVersion extends AbstractVersion {
 		this.agentName = agentName;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		return "AgentVersion [agentName=" + this.agentName + ", groupId=" + this.getGroupId() + ", artifactId="

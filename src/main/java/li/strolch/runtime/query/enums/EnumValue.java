@@ -27,8 +27,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "EnumValue")
 public class EnumValue {
 
-	@XmlAttribute(name = "name")
-	private String name;
+	@XmlAttribute(name = "id")
+	private String id;
 	@XmlAttribute(name = "value")
 	private String value;
 
@@ -37,28 +37,28 @@ public class EnumValue {
 	}
 
 	/**
-	 * @param name
+	 * @param id
 	 * @param value
 	 */
-	public EnumValue(String name, String value) {
+	public EnumValue(String id, String value) {
 		super();
-		this.name = name;
+		this.id = id;
 		this.value = value;
 	}
 
 	/**
-	 * @return the name
+	 * @return the key
 	 */
-	public String getName() {
-		return this.name;
+	public String getId() {
+		return this.id;
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param id
+	 *            the id to set
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	/**

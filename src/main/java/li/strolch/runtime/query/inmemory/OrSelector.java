@@ -21,12 +21,20 @@ import li.strolch.model.StrolchElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class OrSelector<T extends StrolchElement> extends BooleanSelector<T> {
 
+	public OrSelector() {
+		super();
+	}
+
 	public OrSelector(List<Selector<T>> selectors) {
 		super(selectors);
+	}
+
+	@SafeVarargs
+	public OrSelector(Selector<T>... selector) {
+		super(selector);
 	}
 
 	public OrSelector(Selector<T> leftHandSide, Selector<T> rightHandSide) {
@@ -34,7 +42,16 @@ public class OrSelector<T extends StrolchElement> extends BooleanSelector<T> {
 	}
 
 	@Override
+	public OrSelector<T> with(Selector<T> selector) {
+		super.with(selector);
+		return this;
+	}
+
+	@Override
 	public boolean select(T element) {
+		if (this.selectors == null || this.selectors.isEmpty())
+			return true;
+
 		for (Selector<T> selector : this.selectors) {
 			if (selector.select(element))
 				return true;

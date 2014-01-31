@@ -21,12 +21,19 @@ import li.strolch.model.StrolchElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class AndSelector<T extends StrolchElement> extends BooleanSelector<T> {
 
+	public AndSelector() {
+		super();
+	}
+
 	public AndSelector(List<Selector<T>> selectors) {
 		super(selectors);
+	}
+
+	public AndSelector(@SuppressWarnings("unchecked") Selector<T>... selector) {
+		super(selector);
 	}
 
 	public AndSelector(Selector<T> leftHandSide, Selector<T> rightHandSide) {
@@ -34,7 +41,16 @@ public class AndSelector<T extends StrolchElement> extends BooleanSelector<T> {
 	}
 
 	@Override
+	public AndSelector<T> with(Selector<T> selector) {
+		super.with(selector);
+		return this;
+	}
+
+	@Override
 	public boolean select(T element) {
+		if (this.selectors == null || this.selectors.isEmpty())
+			return true;
+
 		for (Selector<T> selector : this.selectors) {
 			if (!selector.select(element))
 				return false;

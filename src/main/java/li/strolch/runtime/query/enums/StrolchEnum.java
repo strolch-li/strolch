@@ -15,6 +15,7 @@
  */
 package li.strolch.runtime.query.enums;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -82,5 +83,29 @@ public class StrolchEnum {
 	 */
 	public List<EnumValue> getValues() {
 		return this.values;
+	}
+
+	/**
+	 * @return the list of {@link EnumValue#getId()}
+	 */
+	public List<String> getEnumValueIds() {
+		List<String> values = new ArrayList<>(this.values.size());
+		for (EnumValue enumValue : this.values) {
+			values.add(enumValue.getId());
+		}
+
+		return values;
+	}
+
+	/**
+	 * @return the list of {@link EnumValue#getValue()}
+	 */
+	public List<String> getEnumValues() {
+		List<String> values = new ArrayList<>(this.values.size());
+		for (EnumValue enumValue : this.values) {
+			values.add(enumValue.getValue());
+		}
+
+		return values;
 	}
 }

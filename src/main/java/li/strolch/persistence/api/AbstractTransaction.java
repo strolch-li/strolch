@@ -24,10 +24,14 @@ import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
+import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
+import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.query.OrderQuery;
+import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.inmemory.InMemoryTransaction;
 
 import org.slf4j.Logger;
@@ -65,17 +69,27 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return this.realm.getOrderMap();
 	}
 
+	@Override
+	public List<Order> doQuery(OrderQuery query) {
+		return getPersistenceHandler().getOrderDao(this).doQuery(query);
+	}
+
+	@Override
+	public List<Resource> doQuery(ResourceQuery query) {
+		return getPersistenceHandler().getResourceDao(this).doQuery(query);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends StrolchElement> T findElement(Locator locator) {
 
 		if (locator.getSize() < 3) {
-			String msg = "The locator is invalid as it does not have at least three path elements (e.g. Resource/MyType/@id): {0}";
+			String msg = "The locator is invalid as it does not have at least three path elements (e.g. Resource/MyType/@id): {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, locator.toString());
 			throw new StrolchException(msg);
 		} else if (locator.getSize() > 5) {
 			// TODO handle state variables, which will probably be separated by an additional part so we can differentiate between parameters and state variables on a parameter bag
-			String msg = "The locator is invalid as it has more than 5 parts. The fifth part references a Parameter, which is the deepest fetchable entry: {0}";
+			String msg = "The locator is invalid as it has more than 5 parts. The fifth part references a Parameter, which is the deepest fetchable entry: {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, locator.toString());
 			throw new StrolchException(msg);
 		}
@@ -93,11 +107,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			groupedParameterizedElement = getOrderMap().getBy(this, type, id);
 			break;
 		default:
-			throw new StrolchException("Unknown object class " + objectClassType);
+			throw new StrolchException(MessageFormat.format("Unknown object class {0}", objectClassType)); //$NON-NLS-1$
 		}
 
 		if (groupedParameterizedElement == null) {
-			String msg = "No top level object could be found with locator {0}";
+			String msg = "No top level object could be found with locator {0}"; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, locator));
 		}
 
@@ -107,7 +121,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		String parameterBagId = elements.get(3);
 		ParameterBag bag = groupedParameterizedElement.getParameterBag(parameterBagId);
 		if (bag == null) {
-			String msg = "Could not find ParameterBag for locator {0} on element {1}";
+			String msg = "Could not find ParameterBag for locator {0} on element {1}"; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, locator, groupedParameterizedElement.getLocator()));
 		}
 

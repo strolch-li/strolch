@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StrolchAgent {
 
+	private static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties"; //$NON-NLS-1$
 	public static final String PROP_DATA_STORE_MODE = "dataStoreMode"; //$NON-NLS-1$
 	public static final String PROP_DATA_STORE_FILE = "dataStoreFile"; //$NON-NLS-1$
 	public static final String PROP_REALMS = "realms"; //$NON-NLS-1$
@@ -137,27 +138,27 @@ public class StrolchAgent {
 
 			VersionQueryResult queryResult = new VersionQueryResult();
 
-			InputStream stream = getClass().getResourceAsStream("/agentVersion.properties");
 			Properties properties = new Properties();
-			try {
+
+			try (InputStream stream = getClass().getResourceAsStream(AGENT_VERSION_PROPERTIES);) {
 				properties.load(stream);
 				AgentVersion agentVersion = new AgentVersion(getStrolchConfiguration().getRuntimeConfiguration()
 						.getApplicationName(), properties);
 				queryResult.setAgentVersion(agentVersion);
 			} catch (IOException e) {
-				String msg = MessageFormat.format("Failed to read version properties for agent: {0}", e.getMessage());
+				String msg = MessageFormat.format("Failed to read version properties for agent: {0}", e.getMessage()); //$NON-NLS-1$
 				queryResult.getErrors().add(msg);
 				logger.error(msg, e);
 			}
 
-			Set<Class<?>> componentTypes = container.getComponentTypes();
+			Set<Class<?>> componentTypes = this.container.getComponentTypes();
 			for (Class<?> componentType : componentTypes) {
-				StrolchComponent component = (StrolchComponent) container.getComponent(componentType);
+				StrolchComponent component = (StrolchComponent) this.container.getComponent(componentType);
 				try {
 					ComponentVersion componentVersion = component.getVersion();
 					queryResult.add(componentVersion);
 				} catch (Exception e) {
-					String msg = "Failed to read version properties for component {0} due to: {1}";
+					String msg = "Failed to read version properties for component {0} due to: {1}"; //$NON-NLS-1$
 					msg = MessageFormat.format(msg, component.getName(), e.getMessage());
 					queryResult.getErrors().add(msg);
 					logger.error(msg, e);
