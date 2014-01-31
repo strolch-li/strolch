@@ -67,6 +67,8 @@ public abstract class StrolchElementToDomVisitor {
 			attributes.addAttribute(null, null, Tags.INTERPRETATION, Tags.CDATA, parameter.getInterpretation());
 		if (parameter.isHidden())
 			attributes.addAttribute(null, null, Tags.HIDDEN, Tags.CDATA, Boolean.toString(parameter.isHidden()));
+		if (parameter.getIndex() != 0)
+			attributes.addAttribute(null, null, Tags.INDEX, Tags.CDATA, Integer.toString(parameter.getIndex()));
 
 		return attributes;
 	}

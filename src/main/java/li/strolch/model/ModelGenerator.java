@@ -216,21 +216,27 @@ public class ModelGenerator {
 	public static void addAllParameters(ParameterBag bag) {
 
 		BooleanParameter boolParam = new BooleanParameter(PARAM_BOOLEAN_ID, PARAM_BOOLEAN_NAME, true);
+		boolParam.setIndex(1);
 		bag.addParameter(boolParam);
 
 		FloatParameter floatParam = new FloatParameter(PARAM_FLOAT_ID, PARAM_FLOAT_NAME, 44.3);
+		floatParam.setIndex(2);
 		bag.addParameter(floatParam);
 
 		IntegerParameter integerParam = new IntegerParameter(PARAM_INTEGER_ID, PARAM_INTEGER_NAME, 77);
+		integerParam.setIndex(3);
 		bag.addParameter(integerParam);
 
 		LongParameter longParam = new LongParameter(PARAM_LONG_ID, PARAM_LONG_NAME, 4453234566L);
+		longParam.setIndex(4);
 		bag.addParameter(longParam);
 
 		StringParameter stringParam = new StringParameter(PARAM_STRING_ID, PARAM_STRING_NAME, "Strolch");
+		stringParam.setIndex(5);
 		bag.addParameter(stringParam);
 
 		DateParameter dateParam = new DateParameter(PARAM_DATE_ID, PARAM_DATE_NAME, new Date(1354295525628L));
+		dateParam.setIndex(6);
 		bag.addParameter(dateParam);
 
 		ArrayList<String> stringList = new ArrayList<String>();
@@ -238,6 +244,7 @@ public class ModelGenerator {
 		stringList.add("World");
 		StringListParameter stringListP = new StringListParameter(PARAM_LIST_STRING_ID, PARAM_LIST_STRING_NAME,
 				stringList);
+		stringListP.setIndex(7);
 		bag.addParameter(stringListP);
 	}
 }

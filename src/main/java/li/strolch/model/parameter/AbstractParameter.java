@@ -39,6 +39,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	private static final long serialVersionUID = 0L;
 
 	protected boolean hidden = false;
+	protected int index;
 	protected String interpretation = INTERPRETATION_NONE;
 	protected String uom = UOM_NONE;
 
@@ -100,6 +101,16 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	}
 
 	@Override
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	@Override
+	public int getIndex() {
+		return this.index;
+	}
+
+	@Override
 	public ParameterizedElement getParent() {
 		return this.parent;
 	}
@@ -122,6 +133,8 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 			element.setAttribute(Tags.UOM, this.uom);
 		if (this.hidden)
 			element.setAttribute(Tags.HIDDEN, Boolean.toString(this.hidden));
+		if (this.index != 0)
+			element.setAttribute(Tags.INDEX, Integer.toString(this.index));
 
 		return element;
 	}
@@ -145,10 +158,17 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		String interpretation = element.getAttribute(Tags.INTERPRETATION);
 		String hidden = element.getAttribute(Tags.HIDDEN);
 		String uom = element.getAttribute(Tags.UOM);
+		String index = element.getAttribute(Tags.INDEX);
 
 		setInterpretation(interpretation);
 		setUom(uom);
 
+		if(StringHelper.isEmpty(index)) {
+			this.index = 0;
+		} else {
+			this.index = Integer.valueOf(index);
+		}
+		
 		if (StringHelper.isEmpty(hidden)) {
 			setHidden(false);
 		} else {
@@ -205,6 +225,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		clone.setHidden(this.hidden);
 		clone.setInterpretation(this.interpretation);
 		clone.setUom(this.uom);
+		clone.setIndex(this.index);
 	}
 
 	@SuppressWarnings("nls")

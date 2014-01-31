@@ -75,6 +75,8 @@ public abstract class AbstractToSaxWriterVisitor {
 				this.writer.writeAttribute(Tags.UOM, parameter.getUom());
 			if (parameter.isHidden())
 				this.writer.writeAttribute(Tags.HIDDEN, Boolean.toString(parameter.isHidden()));
+			if (parameter.getIndex() != 0)
+				this.writer.writeAttribute(Tags.INDEX, Integer.toString(parameter.getIndex()));
 
 			this.writer.writeAttribute(Tags.VALUE, parameter.getValueAsString());
 		}

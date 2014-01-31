@@ -119,7 +119,9 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String paramType = attributes.getValue(Tags.TYPE);
 			String paramValue = attributes.getValue(Tags.VALUE);
 			String paramHiddenS = attributes.getValue(Tags.HIDDEN);
-			boolean paramHidden = paramHiddenS == null ? false : StringHelper.parseBoolean(paramHiddenS);
+			String paramIndexS = attributes.getValue(Tags.INDEX);
+			int index = StringHelper.isEmpty(paramIndexS) ? 0 : Integer.valueOf(paramIndexS);
+			boolean paramHidden = StringHelper.isEmpty(paramHiddenS) ? false : StringHelper.parseBoolean(paramHiddenS);
 			String paramUom = attributes.getValue(Tags.UOM);
 			String paramInterpretation = attributes.getValue(Tags.INTERPRETATION);
 			Parameter<?> param;
@@ -152,6 +154,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 			param.setHidden(paramHidden);
 			param.setUom(paramUom);
 			param.setInterpretation(paramInterpretation);
+			param.setIndex(index);
 			this.pBag.addParameter(param);
 			break;
 

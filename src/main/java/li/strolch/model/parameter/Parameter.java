@@ -98,6 +98,21 @@ public interface Parameter<T> extends StrolchElement {
 	public void setUom(String uom);
 
 	/**
+	 * Returns the index of this {@link Parameter}. This can be used to sort the parameters in a UI
+	 * 
+	 * @return the index of this {@link Parameter}. This can be used to sort the parameters in a UI
+	 */
+	public int getIndex();
+
+	/**
+	 * Set the index of this {@link Parameter}. This can be used to sort the parameters in a UI
+	 * 
+	 * @param index
+	 *            the index to set
+	 */
+	public void setIndex(int index);
+
+	/**
 	 * The {@link ParameterizedElement} parent to which this {@link Parameter} belongs
 	 * 
 	 * @return
@@ -140,7 +155,7 @@ public interface Parameter<T> extends StrolchElement {
 
 	@Override
 	public boolean equals(Object obj);
-	
+
 	@Override
 	public Parameter<T> getClone();
 }

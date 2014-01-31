@@ -127,6 +127,8 @@ public class StrolchElementDeepEqualsVisitor {
 			this.mismatchedLocators.add(dstParam.getLocator());
 		if (srcParam.isHidden() != dstParam.isHidden())
 			this.mismatchedLocators.add(dstParam.getLocator());
+		if (srcParam.getIndex() != dstParam.getIndex())
+			this.mismatchedLocators.add(dstParam.getLocator());
 
 		if (!srcParam.getValue().equals(dstParam.getValue()))
 			this.mismatchedLocators.add(dstParam.getLocator());
