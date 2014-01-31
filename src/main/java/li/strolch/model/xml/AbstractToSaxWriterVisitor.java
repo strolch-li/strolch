@@ -44,21 +44,21 @@ public abstract class AbstractToSaxWriterVisitor {
 		writeStartStrolchElement(tag, isEmpty, element);
 		if (!isEmpty) {
 			writeParameterBags(element);
-			writer.writeEndElement();
+			this.writer.writeEndElement();
 		}
 	}
 
 	protected void writeStartStrolchElement(String tag, boolean empty, StrolchElement element)
 			throws XMLStreamException {
 		if (empty)
-			writer.writeEmptyElement(tag);
+			this.writer.writeEmptyElement(tag);
 		else
-			writer.writeStartElement(tag);
+			this.writer.writeStartElement(tag);
 
-		writer.writeAttribute(Tags.ID, element.getId());
+		this.writer.writeAttribute(Tags.ID, element.getId());
 		if (!StringHelper.isEmpty(element.getName()))
-			writer.writeAttribute(Tags.NAME, element.getName());
-		writer.writeAttribute(Tags.TYPE, element.getType());
+			this.writer.writeAttribute(Tags.NAME, element.getName());
+		this.writer.writeAttribute(Tags.TYPE, element.getType());
 	}
 
 	protected void writeParameters(ParameterizedElement element) throws XMLStreamException {
@@ -70,13 +70,13 @@ public abstract class AbstractToSaxWriterVisitor {
 			writeStartStrolchElement(Tags.PARAMETER, true, parameter);
 
 			if (!Parameter.INTERPRETATION_NONE.equals(parameter.getInterpretation()))
-				writer.writeAttribute(Tags.INTERPRETATION, parameter.getInterpretation());
+				this.writer.writeAttribute(Tags.INTERPRETATION, parameter.getInterpretation());
 			if (!Parameter.UOM_NONE.equals(parameter.getUom()))
-				writer.writeAttribute(Tags.UOM, parameter.getUom());
+				this.writer.writeAttribute(Tags.UOM, parameter.getUom());
 			if (parameter.isHidden())
-				writer.writeAttribute(Tags.HIDDEN, Boolean.toString(parameter.isHidden()));
+				this.writer.writeAttribute(Tags.HIDDEN, Boolean.toString(parameter.isHidden()));
 
-			writer.writeAttribute(Tags.VALUE, parameter.getValueAsString());
+			this.writer.writeAttribute(Tags.VALUE, parameter.getValueAsString());
 		}
 	}
 
@@ -89,7 +89,7 @@ public abstract class AbstractToSaxWriterVisitor {
 			writeStartStrolchElement(Tags.PARAMETER_BAG, isEmpty, parameterBag);
 			if (!isEmpty) {
 				writeParameters(parameterBag);
-				writer.writeEndElement();
+				this.writer.writeEndElement();
 			}
 		}
 	}

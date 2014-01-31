@@ -15,22 +15,36 @@
  */
 package li.strolch.model.query;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public abstract class BooleanSelection<T extends Selection> implements Selection {
+public abstract class BooleanSelection implements Selection {
 
-	protected List<T> selections;
+	protected List<Selection> selections;
 
-	public BooleanSelection(List<T> selections) {
+	public BooleanSelection() {
+		this.selections = new ArrayList<>();
+	}
+
+	public BooleanSelection(List<Selection> selections) {
 		this.selections = selections;
 	}
 
-	public List<T> getSelections() {
+	public BooleanSelection(Selection... selections) {
+		this.selections = Arrays.asList(selections);
+	}
+
+	public List<Selection> getSelections() {
 		return this.selections;
+	}
+
+	public BooleanSelection with(Selection selection) {
+		this.selections.add(selection);
+		return this;
 	}
 
 	public abstract void accept(QueryVisitor visitor);

@@ -18,7 +18,7 @@ package li.strolch.model.query;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchElementSelectionVisitor extends QueryVisitor{
+public interface StrolchElementSelectionVisitor extends QueryVisitor {
 
 	public void visit(StrolchTypeNavigation navigation);
 

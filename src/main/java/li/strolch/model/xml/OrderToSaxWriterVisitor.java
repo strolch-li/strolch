@@ -39,7 +39,7 @@ public class OrderToSaxWriterVisitor extends AbstractToSaxWriterVisitor implemen
 		try {
 			writeElement(Tags.ORDER, order);
 		} catch (XMLStreamException e) {
-			String msg = "Failed to write Order {0} due to {1}";
+			String msg = "Failed to write Order {0} due to {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, order.getLocator(), e.getMessage());
 			throw new StrolchException(msg, e);
 		}

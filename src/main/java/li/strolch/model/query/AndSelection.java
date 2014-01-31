@@ -20,13 +20,28 @@ import java.util.List;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AndSelection<T extends Selection> extends BooleanSelection<T> {
+public class AndSelection extends BooleanSelection {
+
+	public AndSelection() {
+		super();
+	}
+
+	@SafeVarargs
+	public AndSelection(Selection... selections) {
+		super(selections);
+	}
 
 	/**
 	 * @param selections
 	 */
-	public AndSelection(List<T> selections) {
+	public AndSelection(List<Selection> selections) {
 		super(selections);
+	}
+
+	@Override
+	public AndSelection with(Selection selection) {
+		super.with(selection);
+		return this;
 	}
 
 	public void accept(QueryVisitor visitor) {

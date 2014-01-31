@@ -17,11 +17,10 @@ package li.strolch.model.query;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface QueryVisitor {
 
-	public <T extends Selection> void visitAnd(AndSelection<T> andSelection);
+	public void visitAnd(AndSelection andSelection);
 
-	public <T extends Selection> void visitOr(OrSelection<T> orSelection);
+	public void visitOr(OrSelection orSelection);
 }

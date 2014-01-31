@@ -31,7 +31,7 @@ public abstract class StrolchQuery<T extends QueryVisitor> {
 		this.selections = new ArrayList<>();
 	}
 
-	public void addSelection(BooleanSelection<Selection> selection) {
+	public void addSelection(BooleanSelection selection) {
 		this.selections.add(selection);
 	}
 

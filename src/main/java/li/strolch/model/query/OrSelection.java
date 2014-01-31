@@ -19,12 +19,26 @@ import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public class OrSelection<T extends Selection> extends BooleanSelection<T> {
+public class OrSelection extends BooleanSelection {
 
-	public OrSelection(List<T> selections) {
+	public OrSelection() {
+		super();
+	}
+
+	public OrSelection(List<Selection> selections) {
 		super(selections);
+	}
+
+	@SafeVarargs
+	public OrSelection(Selection... selections) {
+		super(selections);
+	}
+
+	@Override
+	public OrSelection with(Selection selection) {
+		super.with(selection);
+		return this;
 	}
 
 	@Override

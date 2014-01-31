@@ -39,7 +39,7 @@ public class ResourceToSaxWriterVisitor extends AbstractToSaxWriterVisitor imple
 		try {
 			writeElement(Tags.RESOURCE, resource);
 		} catch (XMLStreamException e) {
-			String msg = "Failed to write Resource {0} due to {1}";
+			String msg = "Failed to write Resource {0} due to {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, resource.getLocator(), e.getMessage());
 			throw new StrolchException(msg, e);
 		}

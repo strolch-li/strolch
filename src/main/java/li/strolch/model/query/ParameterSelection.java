@@ -52,37 +52,39 @@ public abstract class ParameterSelection implements Selection {
 
 	public abstract void accept(ParameterSelectionVisitor visitor);
 
-	public static ParameterSelection stringSelection(String bagKey, String paramKey, String value) {
+	public static StringParameterSelection stringSelection(String bagKey, String paramKey, String value) {
 		return new StringParameterSelection(bagKey, paramKey, value);
 	}
 
-	public static ParameterSelection integerSelection(String bagKey, String paramKey, int value) {
+	public static IntegerParameterSelection integerSelection(String bagKey, String paramKey, int value) {
 		return new IntegerParameterSelection(bagKey, paramKey, value);
 	}
 
-	public static ParameterSelection booleanSelection(String bagKey, String paramKey, boolean value) {
+	public static BooleanParameterSelection booleanSelection(String bagKey, String paramKey, boolean value) {
 		return new BooleanParameterSelection(bagKey, paramKey, value);
 	}
 
-	public static ParameterSelection floatSelection(String bagKey, String paramKey, double value) {
+	public static FloatParameterSelection floatSelection(String bagKey, String paramKey, double value) {
 		return new FloatParameterSelection(bagKey, paramKey, value);
 	}
 
-	public static ParameterSelection longSelection(String bagKey, String paramKey, long value) {
+	public static LongParameterSelection longSelection(String bagKey, String paramKey, long value) {
 		return new LongParameterSelection(bagKey, paramKey, value);
 	}
 
-	public static ParameterSelection dateSelection(String bagKey, String paramKey, Date value) {
+	public static DateParameterSelection dateSelection(String bagKey, String paramKey, Date value) {
 		return new DateParameterSelection(bagKey, paramKey, value);
 	}
 
-	public static ParameterSelection stringListSelection(String bagKey, String paramKey, List<String> value) {
+	public static StringListParameterSelection stringListSelection(String bagKey, String paramKey, List<String> value) {
 		return new StringListParameterSelection(bagKey, paramKey, value);
 	}
 
 	public static class StringParameterSelection extends ParameterSelection {
 
 		private String value;
+		private boolean contains;
+		private boolean caseInsensitive;
 
 		public StringParameterSelection(String bagKey, String paramKey, String value) {
 			super(bagKey, paramKey);
@@ -91,6 +93,24 @@ public abstract class ParameterSelection implements Selection {
 
 		public String getValue() {
 			return this.value;
+		}
+
+		public boolean isContains() {
+			return this.contains;
+		}
+
+		public boolean isCaseInsensitive() {
+			return this.caseInsensitive;
+		}
+
+		public StringParameterSelection contains(boolean contains) {
+			this.contains = contains;
+			return this;
+		}
+
+		public StringParameterSelection caseInsensitive(boolean caseInsensitive) {
+			this.caseInsensitive = true;
+			return this;
 		}
 
 		@Override
