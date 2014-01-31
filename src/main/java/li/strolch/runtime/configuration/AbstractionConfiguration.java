@@ -66,7 +66,7 @@ public abstract class AbstractionConfiguration {
 
 	public boolean getBoolean(String key, Boolean defValue) {
 		String value = this.configurationValues.get(key);
-		if (!StringHelper.isEmpty(value)) {
+		if (StringHelper.isNotEmpty(value)) {
 			if (value.equalsIgnoreCase("true")) //$NON-NLS-1$
 				return true;
 			else if (value.equalsIgnoreCase("false")) //$NON-NLS-1$
@@ -84,7 +84,7 @@ public abstract class AbstractionConfiguration {
 
 	public int getInt(String key, int defValue) {
 		String value = this.configurationValues.get(key);
-		if (!StringHelper.isEmpty(value)) {
+		if (StringHelper.isNotEmpty(value)) {
 
 			try {
 				return Integer.parseInt(value);
@@ -102,7 +102,7 @@ public abstract class AbstractionConfiguration {
 
 	public long getLong(String key, long defValue) {
 		String value = this.configurationValues.get(key);
-		if (!StringHelper.isEmpty(value)) {
+		if (StringHelper.isNotEmpty(value)) {
 
 			try {
 				return Long.parseLong(value);
