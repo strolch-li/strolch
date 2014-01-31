@@ -88,7 +88,7 @@ public final class RuntimeMock {
 			throw new RuntimeException(msg);
 		}
 
-		logger.info(MessageFormat.format("Mocking runtime from {0} to {1}", rootSrc.getAbsolutePath(),
+		logger.info(MessageFormat.format("Mocking runtime from {0} to {1}", rootSrc.getAbsolutePath(), //$NON-NLS-1$
 				rootPathF.getAbsolutePath()));
 
 		if (!FileHelper.copy(rootSrc.listFiles(), rootPathF, false)) {
