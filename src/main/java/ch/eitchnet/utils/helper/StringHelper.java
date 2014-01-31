@@ -40,6 +40,8 @@ public class StringHelper {
 	public static final String DASH = "-"; //$NON-NLS-1$
 	public static final String UNDERLINE = "_"; //$NON-NLS-1$
 	public static final String COMMA = ","; //$NON-NLS-1$
+	public static final String SEMICOLON = ";"; //$NON-NLS-1$
+	public static final String COLON = ":"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(StringHelper.class);
 
@@ -580,6 +582,18 @@ public class StringHelper {
 	 */
 	public static boolean isEmpty(String value) {
 		return value == null || value.isEmpty();
+	}
+
+	/**
+	 * Simply returns true if the value is neither null nor empty
+	 * 
+	 * @param value
+	 *            the value to check
+	 * 
+	 * @return true if the value is neither null nor empty
+	 */
+	public static boolean isNotEmpty(String value) {
+		return value != null && !value.isEmpty();
 	}
 
 	/**
