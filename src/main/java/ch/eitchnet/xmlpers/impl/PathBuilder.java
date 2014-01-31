@@ -80,15 +80,15 @@ public class PathBuilder {
 
 	String getPathAsString(String type, String subType, String id) {
 		StringBuilder sb = new StringBuilder(this.basePath);
-		if (!StringHelper.isEmpty(type)) {
+		if (StringHelper.isNotEmpty(type)) {
 			sb.append(File.separatorChar);
 			sb.append(type);
 		}
-		if (!StringHelper.isEmpty(subType)) {
+		if (StringHelper.isNotEmpty(subType)) {
 			sb.append(File.separatorChar);
 			sb.append(subType);
 		}
-		if (!StringHelper.isEmpty(id)) {
+		if (StringHelper.isNotEmpty(id)) {
 			sb.append(File.separatorChar);
 			sb.append(getFilename(id));
 		}
