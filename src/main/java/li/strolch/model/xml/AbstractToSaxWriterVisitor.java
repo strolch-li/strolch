@@ -56,7 +56,7 @@ public abstract class AbstractToSaxWriterVisitor {
 			this.writer.writeStartElement(tag);
 
 		this.writer.writeAttribute(Tags.ID, element.getId());
-		if (!StringHelper.isEmpty(element.getName()))
+		if (StringHelper.isNotEmpty(element.getName()))
 			this.writer.writeAttribute(Tags.NAME, element.getName());
 		this.writer.writeAttribute(Tags.TYPE, element.getType());
 	}
