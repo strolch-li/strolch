@@ -259,7 +259,7 @@ public class FileHelper {
 			if (srcFile.isDirectory()) {
 				dstFile.mkdir();
 				if (!copy(srcFile.listFiles(), dstFile, checksum)) {
-					String msg = "Failed to copy contents of {0} to {1}";
+					String msg = "Failed to copy contents of {0} to {1}"; //$NON-NLS-1$
 					msg = MessageFormat.format(msg, srcFile.getAbsolutePath(), dstFile.getAbsolutePath());
 					logger.error(msg);
 					return false;
@@ -315,7 +315,7 @@ public class FileHelper {
 
 			// cleanup if files are not the same length
 			if (fromFile.length() != toFile.length()) {
-				String msg = "Copying failed, as new files are not the same length: {0} / {1}";
+				String msg = "Copying failed, as new files are not the same length: {0} / {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, fromFile.length(), toFile.length());
 				FileHelper.logger.error(msg);
 				toFile.delete();
@@ -324,7 +324,7 @@ public class FileHelper {
 			}
 
 		} catch (Exception e) {
-			String msg = MessageFormat.format("Failed to copy path from {0} to + {1} due to:", fromFile, toFile);
+			String msg = MessageFormat.format("Failed to copy path from {0} to + {1} due to:", fromFile, toFile); //$NON-NLS-1$
 			FileHelper.logger.error(msg, e);
 			return false;
 		}
