@@ -43,6 +43,29 @@ public abstract class StrolchQuery<T extends QueryVisitor> {
 		this.selections.add(selection);
 	}
 
+	public StrolchQuery<T> select(Selection selection) {
+		this.selections.add(selection);
+		return this;
+	}
+
+	public StrolchQuery<T> and(Selection... selections) {
+		AndSelection and = new AndSelection(selections);
+		this.selections.add(and);
+		return this;
+	}
+
+	public StrolchQuery<T> or(Selection... selections) {
+		OrSelection or = new OrSelection(selections);
+		this.selections.add(or);
+		return this;
+	}
+
+	public StrolchQuery<T> not(Selection selection) {
+		NotSelection not = new NotSelection(selection);
+		this.selections.add(not);
+		return this;
+	}
+
 	public void accept(T visitor) {
 		this.navigation.accept(visitor);
 		for (Selection selection : this.selections) {

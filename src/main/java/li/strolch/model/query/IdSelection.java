@@ -15,25 +15,57 @@
  */
 package li.strolch.model.query;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class IdSelection extends StrolchElementSelection {
 
-	private String id;
+	private List<String> ids;
+
+	public IdSelection() {
+		this.ids = new ArrayList<>(1);
+	}
 
 	/**
 	 * @param id
 	 */
 	public IdSelection(String id) {
-		this.id = id;
+		this.ids = new ArrayList<>(1);
+		this.ids.add(id);
 	}
 
 	/**
-	 * @return the id
+	 * @param ids
 	 */
-	public String getId() {
-		return this.id;
+	public IdSelection(String... ids) {
+		this.ids = Arrays.asList(ids);
+	}
+
+	/**
+	 * @param ids
+	 */
+	public IdSelection(List<String> ids) {
+		this.ids = ids;
+	}
+
+	/**
+	 * @return the ids
+	 */
+	public List<String> getIds() {
+		return this.ids;
+	}
+
+	/**
+	 * @param id
+	 * @return
+	 */
+	public IdSelection with(String id) {
+		this.ids.add(id);
+		return this;
 	}
 
 	@Override

@@ -17,6 +17,7 @@ package li.strolch.model.query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,11 +28,17 @@ public abstract class BooleanSelection implements Selection {
 	protected List<Selection> selections;
 
 	public BooleanSelection() {
-		this.selections = new ArrayList<>();
+		this.selections = new ArrayList<>(1);
 	}
 
 	public BooleanSelection(List<Selection> selections) {
 		this.selections = selections;
+	}
+
+	public BooleanSelection(Selection leftHandSide, Selection rightHandSide) {
+		this.selections = new ArrayList<>(2);
+		this.selections.add(leftHandSide);
+		this.selections.add(rightHandSide);
 	}
 
 	public BooleanSelection(Selection... selections) {
@@ -39,7 +46,7 @@ public abstract class BooleanSelection implements Selection {
 	}
 
 	public List<Selection> getSelections() {
-		return this.selections;
+		return Collections.unmodifiableList(this.selections);
 	}
 
 	public BooleanSelection with(Selection selection) {
@@ -47,5 +54,6 @@ public abstract class BooleanSelection implements Selection {
 		return this;
 	}
 
+	@Override
 	public abstract void accept(QueryVisitor visitor);
 }

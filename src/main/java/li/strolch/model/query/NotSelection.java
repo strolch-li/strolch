@@ -15,37 +15,33 @@
  */
 package li.strolch.model.query;
 
-import java.util.List;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AndSelection extends BooleanSelection {
+public class NotSelection extends BooleanSelection {
 
-	public AndSelection() {
-		super();
-	}
-
-	@SafeVarargs
-	public AndSelection(Selection... selections) {
-		super(selections);
+	/**
+	 * @param selection
+	 */
+	public NotSelection(Selection selection) {
+		super(selection);
 	}
 
 	/**
-	 * @param selections
+	 * @throws UnsupportedOperationException
+	 *             because a {@link NotSelection} can only work on a single {@link Selection}
 	 */
-	public AndSelection(List<Selection> selections) {
-		super(selections);
+	@Override
+	public NotSelection with(Selection selection) {
+		throw new UnsupportedOperationException("NotSelection can only have a single selection"); //$NON-NLS-1$
 	}
 
-	@Override
-	public AndSelection with(Selection selection) {
-		super.with(selection);
-		return this;
+	public Selection getSelection() {
+		return this.selections.get(0);
 	}
 
 	@Override
 	public void accept(QueryVisitor visitor) {
-		visitor.visitAnd(this);
+		visitor.visitNot(this);
 	}
 }
