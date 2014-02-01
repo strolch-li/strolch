@@ -23,6 +23,7 @@ import li.strolch.model.query.AndSelection;
 import li.strolch.model.query.BooleanSelection;
 import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
+import li.strolch.model.query.NotSelection;
 import li.strolch.model.query.OrSelection;
 import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
@@ -87,8 +88,22 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	}
 
 	@Override
+	public void visitNot(NotSelection notSelection) {
+		InMemoryQueryVisitor<T, S> query = newInstance();
+		List<Selection> selections = notSelection.getSelections();
+		for (Selection selection : selections) {
+			selection.accept(query);
+		}
+		List<Selector<T>> notSelectors = query.getSelectors();
+		if (!notSelectors.isEmpty()) {
+			NotSelector<T> notSelector = new NotSelector<>(notSelectors.get(0));
+			this.selectors.add(notSelector);
+		}
+	}
+
+	@Override
 	public void visit(IdSelection selection) {
-		this.selectors.add(new IdSelector<T>(selection.getId()));
+		this.selectors.add(new IdSelector<T>(selection.getIds()));
 	}
 
 	@Override

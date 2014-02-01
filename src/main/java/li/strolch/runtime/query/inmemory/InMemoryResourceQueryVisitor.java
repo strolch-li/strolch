@@ -15,6 +15,7 @@
  */
 package li.strolch.runtime.query.inmemory;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.model.Resource;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.ResourceQueryVisitor;
@@ -44,7 +45,11 @@ public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource,
 			throw new QueryException(msg);
 		}
 
-		return new InMemoryQuery<>(this.navigator, this.selectors);
+		if (this.selectors.isEmpty())
+			return new InMemoryQuery<>(this.navigator, null);
+
+		DBC.PRE.assertTrue("Invalid query as it may only contain one selector!", this.selectors.size() == 1); //$NON-NLS-1$
+		return new InMemoryQuery<>(this.navigator, this.selectors.get(0));
 	}
 
 	@Override

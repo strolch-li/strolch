@@ -22,6 +22,7 @@ import li.strolch.model.query.OrderQueryVisitor;
 import li.strolch.model.query.StateSelection;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.persistence.api.OrderDao;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -45,7 +46,11 @@ public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order, Order
 			throw new QueryException(msg);
 		}
 
-		return new InMemoryQuery<>(this.navigator, this.selectors);
+		if (this.selectors.isEmpty())
+			return new InMemoryQuery<>(this.navigator, null);
+
+		DBC.PRE.assertTrue("Invalid query as it may only contain one selector!", this.selectors.size() == 1); //$NON-NLS-1$
+		return new InMemoryQuery<>(this.navigator, this.selectors.get(0));
 	}
 
 	@Override

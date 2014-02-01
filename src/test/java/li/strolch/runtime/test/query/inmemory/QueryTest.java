@@ -16,6 +16,7 @@
 package li.strolch.runtime.test.query.inmemory;
 
 import static li.strolch.model.ModelGenerator.BAG_ID;
+import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
 import static li.strolch.model.ModelGenerator.createOrder;
 import static li.strolch.model.ModelGenerator.createResource;
 import static org.junit.Assert.assertEquals;
@@ -112,5 +113,138 @@ public class QueryTest {
 		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
+	}
+
+	@Test
+	public void shouldQueryContainsString() {
+
+		StrolchAgent agent = ComponentContainerTest.startContainer(PATH_EMPTY_RUNTIME,
+				ComponentContainerTest.PATH_EMPTY_CONTAINER);
+		ComponentContainer container = agent.getContainer();
+
+		Resource res1 = createResource("@1", "Test Resource", "MyType");
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			tx.getResourceMap().add(tx, res1);
+		}
+
+		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+		query.and(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "olch").contains(true));
+		List<Resource> result;
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			result = tx.doQuery(query);
+		}
+		assertEquals(1, result.size());
+		assertEquals("@1", result.get(0).getId());
+	}
+
+	@Test
+	public void shouldNotQueryContainsString() {
+
+		StrolchAgent agent = ComponentContainerTest.startContainer(PATH_EMPTY_RUNTIME,
+				ComponentContainerTest.PATH_EMPTY_CONTAINER);
+		ComponentContainer container = agent.getContainer();
+
+		Resource res1 = createResource("@1", "Test Resource", "MyType");
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			tx.getResourceMap().add(tx, res1);
+		}
+
+		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+		query.and(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "str").contains(true));
+		List<Resource> result;
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			result = tx.doQuery(query);
+		}
+		assertEquals(0, result.size());
+	}
+
+	@Test
+	public void shouldQueryCaseInsensitiveString() {
+
+		StrolchAgent agent = ComponentContainerTest.startContainer(PATH_EMPTY_RUNTIME,
+				ComponentContainerTest.PATH_EMPTY_CONTAINER);
+		ComponentContainer container = agent.getContainer();
+
+		Resource res1 = createResource("@1", "Test Resource", "MyType");
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			tx.getResourceMap().add(tx, res1);
+		}
+
+		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+		query.and(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch").caseInsensitive(true));
+		List<Resource> result;
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			result = tx.doQuery(query);
+		}
+		assertEquals(1, result.size());
+		assertEquals("@1", result.get(0).getId());
+	}
+
+	@Test
+	public void shouldNotQueryCaseInsensitiveString() {
+
+		StrolchAgent agent = ComponentContainerTest.startContainer(PATH_EMPTY_RUNTIME,
+				ComponentContainerTest.PATH_EMPTY_CONTAINER);
+		ComponentContainer container = agent.getContainer();
+
+		Resource res1 = createResource("@1", "Test Resource", "MyType");
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			tx.getResourceMap().add(tx, res1);
+		}
+
+		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+		query.and(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch"));
+		List<Resource> result;
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			result = tx.doQuery(query);
+		}
+		assertEquals(0, result.size());
+	}
+
+	@Test
+	public void shouldQueryNot() {
+
+		StrolchAgent agent = ComponentContainerTest.startContainer(PATH_EMPTY_RUNTIME,
+				ComponentContainerTest.PATH_EMPTY_CONTAINER);
+		ComponentContainer container = agent.getContainer();
+
+		Resource res1 = createResource("@1", "Test Resource", "MyType");
+		Resource res2 = createResource("@2", "Test Resource", "MyType");
+		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			tx.getResourceMap().add(tx, res1);
+			tx.getResourceMap().add(tx, res2);
+		}
+
+		{
+			ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+			query.not(new IdSelection("@1"));
+			List<Resource> result;
+			try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+				result = tx.doQuery(query);
+			}
+			assertEquals(1, result.size());
+			assertEquals("@2", result.get(0).getId());
+		}
+
+		{
+			ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+			query.not(new IdSelection("@2"));
+			List<Resource> result;
+			try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+				result = tx.doQuery(query);
+			}
+			assertEquals(1, result.size());
+			assertEquals("@1", result.get(0).getId());
+		}
+
+		{
+			ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+			query.not(new IdSelection("@1", "@2"));
+			List<Resource> result;
+			try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+				result = tx.doQuery(query);
+			}
+			assertEquals(0, result.size());
+		}
 	}
 }

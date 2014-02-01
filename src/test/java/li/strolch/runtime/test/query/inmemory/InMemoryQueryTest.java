@@ -45,7 +45,6 @@ import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 @SuppressWarnings("nls")
 public class InMemoryQueryTest {
@@ -59,7 +58,7 @@ public class InMemoryQueryTest {
 
 		InMemoryQuery<Order> orderQuery = new InMemoryQuery<>();
 		orderQuery.setNavigator(new AnyNavigator<Order>());
-		orderQuery.addSelector(new IdSelector<Order>("@1"));
+		orderQuery.setSelector(new IdSelector<Order>("@1"));
 
 		List<Order> result = orderQuery.doQuery(dao);
 		assertEquals(1, result.size());
@@ -75,7 +74,7 @@ public class InMemoryQueryTest {
 
 		InMemoryQuery<Resource> resourceQuery = new InMemoryQuery<>();
 		resourceQuery.setNavigator(new AnyNavigator<Resource>());
-		resourceQuery.addSelector(new IdSelector<Resource>("@1"));
+		resourceQuery.setSelector(new IdSelector<Resource>("@1"));
 
 		List<Resource> result = resourceQuery.doQuery(dao);
 		assertEquals(1, result.size());
@@ -93,7 +92,7 @@ public class InMemoryQueryTest {
 		resourceQuery.setNavigator(new AnyNavigator<Resource>());
 		BooleanSelector<Resource> andSelector = new OrSelector<>(new IdSelector<Resource>("@3"),
 				new IdSelector<Resource>("@4"));
-		resourceQuery.addSelector(andSelector);
+		resourceQuery.setSelector(andSelector);
 
 		List<Resource> result = resourceQuery.doQuery(dao);
 		assertEquals(2, result.size());
@@ -114,7 +113,7 @@ public class InMemoryQueryTest {
 		andSelectors.add(new IdSelector<Resource>("@3"));
 		andSelectors.add(new NameSelector<Resource>("Res 3"));
 		BooleanSelector<Resource> andSelector = new AndSelector<Resource>(andSelectors);
-		resourceQuery.addSelector(andSelector);
+		resourceQuery.setSelector(andSelector);
 
 		List<Resource> result = resourceQuery.doQuery(dao);
 		assertEquals(1, result.size());
@@ -134,7 +133,7 @@ public class InMemoryQueryTest {
 		andSelectors.add(new IdSelector<Resource>("@3"));
 		andSelectors.add(new NameSelector<Resource>("Res 4"));
 		BooleanSelector<Resource> andSelector = new AndSelector<Resource>(andSelectors);
-		resourceQuery.addSelector(andSelector);
+		resourceQuery.setSelector(andSelector);
 
 		List<Resource> result = resourceQuery.doQuery(dao);
 		assertEquals(0, result.size());
@@ -150,9 +149,11 @@ public class InMemoryQueryTest {
 
 		InMemoryQuery<Resource> ballQuery = new InMemoryQuery<>();
 		ballQuery.setNavigator(new AnyNavigator<Resource>());
-		ballQuery.addSelector(ParameterSelector.<Resource> stringSelector("parameters", "color", "red"));
-		ballQuery.addSelector(ParameterSelector.<Resource> booleanSelector("parameters", "forChildren", true));
-		ballQuery.addSelector(ParameterSelector.<Resource> floatSelector("parameters", "diameter", 22.0));
+		AndSelector<Resource> andSelector = new AndSelector<>();
+		andSelector.with(ParameterSelector.<Resource> stringSelector("parameters", "color", "red"));
+		andSelector.with(ParameterSelector.<Resource> booleanSelector("parameters", "forChildren", true));
+		andSelector.with(ParameterSelector.<Resource> floatSelector("parameters", "diameter", 22.0));
+		ballQuery.setSelector(andSelector);
 
 		List<Resource> result = ballQuery.doQuery(dao);
 		assertEquals(1, result.size());

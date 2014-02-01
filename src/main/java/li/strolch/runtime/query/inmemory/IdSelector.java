@@ -15,6 +15,10 @@
  */
 package li.strolch.runtime.query.inmemory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import li.strolch.model.StrolchElement;
 
 /**
@@ -23,14 +27,64 @@ import li.strolch.model.StrolchElement;
  */
 public class IdSelector<T extends StrolchElement> implements Selector<T> {
 
-	private String id;
+	private List<String> ids;
 
+	public IdSelector() {
+		this.ids = new ArrayList<>(1);
+	}
+
+	/**
+	 * @param id
+	 */
 	public IdSelector(String id) {
-		this.id = id;
+		this.ids = new ArrayList<>(1);
+		this.ids.add(id);
+	}
+
+	/**
+	 * @param ids
+	 */
+	public IdSelector(String... ids) {
+		this.ids = Arrays.asList(ids);
+	}
+
+	/**
+	 * @param ids
+	 */
+	public IdSelector(List<String> ids) {
+		this.ids = ids;
+	}
+
+	/**
+	 * @return the ids
+	 */
+	public List<String> getIds() {
+		return this.ids;
+	}
+
+	/**
+	 * @param id
+	 * @return
+	 */
+	public IdSelector<T> with(String id) {
+		this.ids.add(id);
+		return this;
 	}
 
 	@Override
 	public boolean select(StrolchElement element) {
-		return element.getId().equals(this.id);
+		if (this.ids.isEmpty())
+			return true;
+
+		String elemId = element.getId();
+		if (this.ids.size() == 1)
+			return this.ids.get(0).equals(elemId);
+
+		for (String id : this.ids) {
+			if (elemId.equals(id))
+				return true;
+		}
+
+		return false;
 	}
 }

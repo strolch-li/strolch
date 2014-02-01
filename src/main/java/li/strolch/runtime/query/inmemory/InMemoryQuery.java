@@ -15,7 +15,7 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,15 +28,15 @@ import li.strolch.persistence.api.StrolchDao;
 public class InMemoryQuery<T extends StrolchElement> {
 
 	private Navigator<T> navigator;
-	private List<Selector<T>> selectors;
+	private Selector<T> selector;
 
 	public InMemoryQuery() {
-		this.selectors = new ArrayList<>();
+		// empty constructor
 	}
 
-	public InMemoryQuery(Navigator<T> navigator, List<Selector<T>> selectors) {
+	public InMemoryQuery(Navigator<T> navigator, Selector<T> selector) {
 		this.navigator = navigator;
-		this.selectors = selectors;
+		this.selector = selector;
 	}
 
 	/**
@@ -47,31 +47,24 @@ public class InMemoryQuery<T extends StrolchElement> {
 		this.navigator = navigator;
 	}
 
-	public void addSelector(Selector<T> selector) {
-		this.selectors.add(selector);
+	public void setSelector(Selector<T> selector) {
+		this.selector = selector;
 	}
 
 	public List<T> doQuery(StrolchDao<T> dao) {
+
+		if (this.selector == null)
+			return Collections.emptyList();
 
 		List<T> elements = this.navigator.navigate(dao);
 		Iterator<T> iter = elements.iterator();
 		while (iter.hasNext()) {
 			T element = iter.next();
-			if (!isAccepted(element)) {
+			if (!this.selector.select(element)) {
 				iter.remove();
 			}
 		}
 
 		return elements;
-	}
-
-	private boolean isAccepted(T element) {
-
-		for (Selector<T> selector : this.selectors) {
-			if (!selector.select(element))
-				return false;
-		}
-
-		return true;
 	}
 }

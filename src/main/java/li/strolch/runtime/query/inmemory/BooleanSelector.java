@@ -29,7 +29,7 @@ public abstract class BooleanSelector<T extends StrolchElement> implements Selec
 	protected List<Selector<T>> selectors;
 
 	public BooleanSelector() {
-		this.selectors = new ArrayList<>();
+		this.selectors = new ArrayList<>(1);
 	}
 
 	@SafeVarargs
@@ -38,7 +38,7 @@ public abstract class BooleanSelector<T extends StrolchElement> implements Selec
 	}
 
 	public BooleanSelector(Selector<T> leftHandSide, Selector<T> rightHandSide) {
-		this.selectors = new ArrayList<>();
+		this.selectors = new ArrayList<>(2);
 		this.selectors.add(leftHandSide);
 		this.selectors.add(rightHandSide);
 	}
@@ -52,5 +52,6 @@ public abstract class BooleanSelector<T extends StrolchElement> implements Selec
 		return this;
 	}
 
+	@Override
 	public abstract boolean select(T element);
 }
