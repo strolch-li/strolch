@@ -17,13 +17,14 @@ package li.strolch.runtime.configuration;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
@@ -40,11 +41,11 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 	private ConfigurationBuilder configurationBuilder;
 	private LocatorBuilder locatorBuilder;
-	private Stack<ElementHandler> delegateHandlers;
+	private Deque<ElementHandler> delegateHandlers;
 
 	public ConfigurationSaxParser() {
 		this.locatorBuilder = new LocatorBuilder();
-		this.delegateHandlers = new Stack<>();
+		this.delegateHandlers = new ArrayDeque<>();
 		this.configurationBuilder = new ConfigurationBuilder();
 	}
 
@@ -63,24 +64,24 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		case "StrolchConfiguration/Runtime": //$NON-NLS-1$
 			RuntimeHandler runtimeHandler = new RuntimeHandler(this.configurationBuilder, locator);
-			this.delegateHandlers.addElement(runtimeHandler);
+			this.delegateHandlers.push(runtimeHandler);
 			break;
 
 		case "StrolchConfiguration/Runtime/Properties": //$NON-NLS-1$
 			PropertiesHandler runtimePropertiesHandler = new PropertiesHandler(this.configurationBuilder, locator);
-			this.delegateHandlers.addElement(runtimePropertiesHandler);
+			this.delegateHandlers.push(runtimePropertiesHandler);
 			this.configurationBuilder.setPropertyBuilder(this.configurationBuilder.runtimeBuilder());
 			break;
 
 		case "StrolchConfiguration/Component": //$NON-NLS-1$
 			this.configurationBuilder.nextComponentBuilder();
 			ComponentHandler componentHandler = new ComponentHandler(this.configurationBuilder, locator);
-			this.delegateHandlers.addElement(componentHandler);
+			this.delegateHandlers.push(componentHandler);
 			break;
 
 		case "StrolchConfiguration/Component/Properties": //$NON-NLS-1$
 			PropertiesHandler componentPropertiesHandler = new PropertiesHandler(this.configurationBuilder, locator);
-			this.delegateHandlers.addElement(componentPropertiesHandler);
+			this.delegateHandlers.push(componentPropertiesHandler);
 			this.configurationBuilder.setPropertyBuilder(this.configurationBuilder.componentBuilder());
 			break;
 
