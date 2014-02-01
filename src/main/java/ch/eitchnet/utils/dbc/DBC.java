@@ -26,6 +26,26 @@ import ch.eitchnet.utils.helper.StringHelper;
 public enum DBC {
 
 	PRE {
+
+		@Override
+		public void assertTrue(String msg, boolean value) {
+			if (!value) {
+				String ex = "Expected true, but was false: {0}"; //$NON-NLS-1$
+				ex = MessageFormat.format(ex, msg);
+				throw new DbcException(ex);
+			}
+		}
+
+		@Override
+		public void assertFalse(String msg, boolean value) {
+			if (value) {
+				String ex = "Expected false, but was true: {0}"; //$NON-NLS-1$
+				ex = MessageFormat.format(ex, msg);
+				throw new DbcException(ex);
+			}
+		}
+
+		@Override
 		public void assertNotEmpty(String msg, String value) {
 			if (StringHelper.isEmpty(value)) {
 				String ex = "Illegal empty value: {0}"; //$NON-NLS-1$
@@ -70,6 +90,10 @@ public enum DBC {
 			}
 		}
 	};
+
+	public abstract void assertTrue(String msg, boolean value);
+
+	public abstract void assertFalse(String msg, boolean value);
 
 	public abstract void assertNotEmpty(String msg, String value);
 
