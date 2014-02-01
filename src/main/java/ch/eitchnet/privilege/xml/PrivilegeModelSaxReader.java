@@ -16,14 +16,15 @@
 package ch.eitchnet.privilege.xml;
 
 import java.text.MessageFormat;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(PrivilegeModelSaxReader.class);
 
-	private Stack<ElementParser> buildersStack = new Stack<ElementParser>();
+	private Deque<ElementParser> buildersStack = new ArrayDeque<ElementParser>();
 
 	private List<User> users;
 	private List<Role> roles;
@@ -76,12 +77,12 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
 		if (qName.equals(XmlConstants.XML_USER)) {
-			this.buildersStack.add(new UserParser());
+			this.buildersStack.push(new UserParser());
 			this.insideUser = true;
 		} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
-			this.buildersStack.add(new PropertyParser());
+			this.buildersStack.push(new PropertyParser());
 		} else if (qName.equals(XmlConstants.XML_ROLE) && !this.insideUser) {
-			this.buildersStack.add(new RoleParser());
+			this.buildersStack.push(new RoleParser());
 		}
 
 		if (!this.buildersStack.isEmpty())

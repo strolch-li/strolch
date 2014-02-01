@@ -15,9 +15,10 @@
  */
 package ch.eitchnet.privilege.xml;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -33,7 +34,7 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 	// private static final Logger logger = LoggerFactory.getLogger(PrivilegeConfigSaxReader.class);
 
-	private Stack<ElementParser> buildersStack = new Stack<ElementParser>();
+	private Deque<ElementParser> buildersStack = new ArrayDeque<ElementParser>();
 
 	private PrivilegeContainerModel containerModel;
 
@@ -49,11 +50,11 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
 		if (qName.equals(XmlConstants.XML_CONTAINER)) {
-			this.buildersStack.add(new ContainerParser());
+			this.buildersStack.push(new ContainerParser());
 		} else if (qName.equals(XmlConstants.XML_PARAMETERS)) {
-			this.buildersStack.add(new ParametersParser());
+			this.buildersStack.push(new ParametersParser());
 		} else if (qName.equals(XmlConstants.XML_POLICIES)) {
-			this.buildersStack.add(new PoliciesParser());
+			this.buildersStack.push(new PoliciesParser());
 		}
 
 		if (!this.buildersStack.isEmpty())
