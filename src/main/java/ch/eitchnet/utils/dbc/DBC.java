@@ -28,6 +28,22 @@ public enum DBC {
 	PRE {
 
 		@Override
+		public void assertEquals(String msg, Object value1, Object value2) {
+			if (value1 == null && value2 == null)
+				return;
+
+			if (value1 != null && value1.equals(value2))
+				return;
+
+			if (value2 != null && value2.equals(value1))
+				return;
+
+			String ex = "Values are not equal: {0}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
+		}
+
+		@Override
 		public void assertTrue(String msg, boolean value) {
 			if (!value) {
 				String ex = "Expected true, but was false: {0}"; //$NON-NLS-1$
@@ -75,7 +91,7 @@ public enum DBC {
 		@Override
 		public void assertNotExists(String msg, File file) {
 			if (file.exists()) {
-				String ex = MessageFormat.format("Illegal situation as file ({0}) exists: {0}", file); //$NON-NLS-1$
+				String ex = MessageFormat.format("Illegal situation as file ({0}) exists: {1}", file, msg); //$NON-NLS-1$
 				ex = MessageFormat.format(ex, msg);
 				throw new DbcException(ex);
 			}
@@ -84,12 +100,14 @@ public enum DBC {
 		@Override
 		public void assertExists(String msg, File file) {
 			if (!file.exists()) {
-				String ex = MessageFormat.format("Illegal situation as file ({0}) does not exist: {0}", file); //$NON-NLS-1$
+				String ex = MessageFormat.format("Illegal situation as file ({0}) does not exist: {1}", file, msg); //$NON-NLS-1$
 				ex = MessageFormat.format(ex, msg);
 				throw new DbcException(ex);
 			}
 		}
 	};
+
+	public abstract void assertEquals(String msg, Object value1, Object value2);
 
 	public abstract void assertTrue(String msg, boolean value);
 
