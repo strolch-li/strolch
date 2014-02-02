@@ -23,6 +23,7 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
+import li.strolch.service.api.ServiceHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,10 @@ public final class RuntimeMock {
 
 	public StrolchPrivilegeHandler getPrivilegeHandler() {
 		return this.container.getComponent(StrolchPrivilegeHandler.class);
+	}
+
+	public ServiceHandler getServiceHandler() {
+		return this.container.getComponent(ServiceHandler.class);
 	}
 
 	public StrolchRealm getDefaultRealm() {
