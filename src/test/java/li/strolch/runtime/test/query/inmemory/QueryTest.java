@@ -29,7 +29,6 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.IntegerParameter;
-import li.strolch.model.query.AndSelection;
 import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ParameterSelection;
@@ -67,12 +66,11 @@ public class QueryTest {
 			tx.getResourceMap().add(tx, res1);
 		}
 
+		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
 		List<Selection> elementAndSelections = new ArrayList<>();
 		elementAndSelections.add(new IdSelection("@1"));
 		elementAndSelections.add(ParameterSelection.integerSelection(BAG_ID, "nbOfBooks", 33));
-		AndSelection andSelection = new AndSelection(elementAndSelections);
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
-		query.addSelection(andSelection);
+		query.and().with(elementAndSelections);
 
 		InMemoryResourceQueryVisitor resourceQuery = new InMemoryResourceQueryVisitor();
 		InMemoryQuery<Resource> inMemoryQuery = resourceQuery.visit(query);
@@ -98,12 +96,11 @@ public class QueryTest {
 			tx.getOrderMap().add(tx, o1);
 		}
 
+		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType"));
 		List<Selection> elementAndSelections = new ArrayList<>();
 		elementAndSelections.add(new IdSelection("@1"));
 		elementAndSelections.add(ParameterSelection.integerSelection(BAG_ID, "nbOfBooks", 33));
-		AndSelection andSelection = new AndSelection(elementAndSelections);
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType"));
-		query.addSelection(andSelection);
+		query.and().with(elementAndSelections);
 
 		InMemoryOrderQueryVisitor orderQuery = new InMemoryOrderQueryVisitor();
 		InMemoryQuery<Order> inMemoryQuery = orderQuery.visit(query);
@@ -128,7 +125,7 @@ public class QueryTest {
 		}
 
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
-		query.and(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "olch").contains(true));
+		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "olch").contains(true));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
 			result = tx.doQuery(query);
@@ -150,7 +147,7 @@ public class QueryTest {
 		}
 
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
-		query.and(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "str").contains(true));
+		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "str").contains(true));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
 			result = tx.doQuery(query);
@@ -171,7 +168,7 @@ public class QueryTest {
 		}
 
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
-		query.and(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch").caseInsensitive(true));
+		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch").caseInsensitive(true));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
 			result = tx.doQuery(query);
@@ -193,7 +190,7 @@ public class QueryTest {
 		}
 
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
-		query.and(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch"));
+		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch"));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
 			result = tx.doQuery(query);
