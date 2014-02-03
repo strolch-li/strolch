@@ -8,17 +8,17 @@ import java.io.IOException;
 /**
  * <p>
  * This sub class of {@link FileInputStream} allows to follow the currently read bytes of a {@link File}. In conjunction
- * with a {@link Thread} and a {@link FileProgressListener} it is possible to track the progress of a long running job on
- * bigger files
+ * with a {@link Thread} and a {@link FileProgressListener} it is possible to track the progress of a long running job
+ * on bigger files
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ProgressableFileInputStream extends FileInputStream {
 
-	private long fileSize;
-	private long bytesRead;
-	private boolean closed;
+	private volatile long fileSize;
+	private volatile long bytesRead;
+	private volatile boolean closed;
 
 	/**
 	 * Constructs a normal {@link FileInputStream} with the given {@link File}
@@ -132,7 +132,7 @@ public class ProgressableFileInputStream extends FileInputStream {
 		}
 
 		double read = (100.0d / this.fileSize * currentRead);
-		return (int) read;
+		return (int) Math.ceil(read);
 	}
 
 	/**

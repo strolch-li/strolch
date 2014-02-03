@@ -13,10 +13,14 @@ public interface FileProgressListener {
 	/**
 	 * Notify the listener that the progress has begun
 	 * 
+	 * @param percent
+	 *            percent completed
+	 * @param position
+	 *            the position relative to the job size
 	 * @param size
 	 *            the size of the job which is to be accomplished
 	 */
-	public void begin(long size);
+	public void begin(int percent, long position, long size);
 
 	/**
 	 * Notifies the listener of incremental progress
