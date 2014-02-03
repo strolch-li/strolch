@@ -54,6 +54,18 @@ public abstract class BooleanSelection implements Selection {
 		return this;
 	}
 
+	public BooleanSelection with(Selection... selections) {
+		for (Selection selection : selections) {
+			this.selections.add(selection);
+		}
+		return this;
+	}
+
+	public BooleanSelection with(List<Selection> selections) {
+		this.selections.addAll(selections);
+		return this;
+	}
+
 	@Override
 	public abstract void accept(QueryVisitor visitor);
 }

@@ -15,8 +15,7 @@
  */
 package li.strolch.model.query;
 
-import java.util.ArrayList;
-import java.util.List;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -24,52 +23,41 @@ import java.util.List;
 public abstract class StrolchQuery<T extends QueryVisitor> {
 
 	private Navigation navigation;
-	protected List<Selection> selections;
+	private Selection selection;
 
 	public StrolchQuery(Navigation navigation) {
 		this.navigation = navigation;
-		this.selections = new ArrayList<>();
 	}
 
-	public void addSelection(BooleanSelection selection) {
-		this.selections.add(selection);
+	public void select(Selection selection) {
+		DBC.PRE.assertNull("A selection is already set! Use a boolean operator to perform multiple selections",
+				this.selection);
+		this.selection = selection;
 	}
 
-	public void addSelection(StrolchElementSelection selection) {
-		this.selections.add(selection);
+	public AndSelection and() {
+		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection);
+		AndSelection and = new AndSelection();
+		this.selection = and;
+		return and;
 	}
 
-	public void addSelection(ParameterSelection selection) {
-		this.selections.add(selection);
+	public OrSelection or() {
+		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection);
+		OrSelection or = new OrSelection();
+		this.selection = or;
+		return or;
 	}
 
-	public StrolchQuery<T> select(Selection selection) {
-		this.selections.add(selection);
-		return this;
-	}
-
-	public StrolchQuery<T> and(Selection... selections) {
-		AndSelection and = new AndSelection(selections);
-		this.selections.add(and);
-		return this;
-	}
-
-	public StrolchQuery<T> or(Selection... selections) {
-		OrSelection or = new OrSelection(selections);
-		this.selections.add(or);
-		return this;
-	}
-
-	public StrolchQuery<T> not(Selection selection) {
-		NotSelection not = new NotSelection(selection);
-		this.selections.add(not);
-		return this;
+	public void not(Selection selection) {
+		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection);
+		this.selection = new NotSelection(selection);
 	}
 
 	public void accept(T visitor) {
+		DBC.PRE.assertNotNull("No navigation set!", this.navigation);
+		DBC.PRE.assertNotNull("No selection defined!", this.selection);
 		this.navigation.accept(visitor);
-		for (Selection selection : this.selections) {
-			selection.accept(visitor);
-		}
+		this.selection.accept(visitor);
 	}
 }

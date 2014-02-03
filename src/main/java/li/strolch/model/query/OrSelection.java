@@ -42,6 +42,18 @@ public class OrSelection extends BooleanSelection {
 	}
 
 	@Override
+	public OrSelection with(List<Selection> selections) {
+		super.with(selections);
+		return this;
+	}
+
+	@Override
+	public OrSelection with(Selection... selections) {
+		super.with(selections);
+		return this;
+	}
+
+	@Override
 	public void accept(QueryVisitor visitor) {
 		visitor.visitOr(this);
 	}

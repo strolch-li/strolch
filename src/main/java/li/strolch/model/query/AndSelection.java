@@ -45,6 +45,18 @@ public class AndSelection extends BooleanSelection {
 	}
 
 	@Override
+	public AndSelection with(List<Selection> selections) {
+		super.with(selections);
+		return this;
+	}
+
+	@Override
+	public AndSelection with(Selection... selections) {
+		super.with(selections);
+		return this;
+	}
+
+	@Override
 	public void accept(QueryVisitor visitor) {
 		visitor.visitAnd(this);
 	}

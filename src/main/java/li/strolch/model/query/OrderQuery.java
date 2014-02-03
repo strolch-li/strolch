@@ -23,8 +23,4 @@ public class OrderQuery extends StrolchQuery<OrderQueryVisitor> {
 	public OrderQuery(Navigation navigation) {
 		super(navigation);
 	}
-
-	public void add(OrderSelection selection) {
-		this.selections.add(selection);
-	}
 }
