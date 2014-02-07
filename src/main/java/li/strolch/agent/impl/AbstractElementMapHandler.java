@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ElementMapHandler;
 import li.strolch.agent.api.StrolchComponent;
@@ -53,6 +54,7 @@ public abstract class AbstractElementMapHandler extends StrolchComponent impleme
 
 	@Override
 	public StrolchRealm getRealm(String realm) {
+		DBC.PRE.assertNotEmpty("Realm name must be set!", realm);
 		StrolchRealm strolchRealm = this.realms.get(realm);
 		if (strolchRealm == null) {
 			String msg = "No realm is configured with the name {0}"; //$NON-NLS-1$
