@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
+import li.strolch.model.visitor.ParameterVisitor;
 
 import org.w3c.dom.Element;
 
@@ -100,6 +101,11 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 		clone.setValue(this.value);
 
 		return clone;
+	}
+
+	@Override
+	public <U> U accept(ParameterVisitor visitor) {
+		return visitor.visitBooleanParam(this);
 	}
 
 	public static Boolean parseFromString(String valueS) {

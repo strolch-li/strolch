@@ -21,6 +21,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.visitor.ParameterVisitor;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.Tags;
 
@@ -163,12 +164,12 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		setInterpretation(interpretation);
 		setUom(uom);
 
-		if(StringHelper.isEmpty(index)) {
+		if (StringHelper.isEmpty(index)) {
 			this.index = 0;
 		} else {
 			this.index = Integer.valueOf(index);
 		}
-		
+
 		if (StringHelper.isEmpty(hidden)) {
 			setHidden(false);
 		} else {
@@ -226,6 +227,11 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		clone.setInterpretation(this.interpretation);
 		clone.setUom(this.uom);
 		clone.setIndex(this.index);
+	}
+
+	@Override
+	public <U> U accept(ParameterVisitor visitor) {
+		return visitor.visitParam(this);
 	}
 
 	@SuppressWarnings("nls")

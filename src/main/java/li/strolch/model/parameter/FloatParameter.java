@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
+import li.strolch.model.visitor.ParameterVisitor;
 
 import org.w3c.dom.Element;
 
@@ -103,7 +104,12 @@ public class FloatParameter extends AbstractParameter<Double> {
 
 		return clone;
 	}
-	
+
+	@Override
+	public <U> U accept(ParameterVisitor visitor) {
+		return visitor.visitFloatParam(this);
+	}
+
 	public static Double parseFromString(String valueS) {
 		return Double.valueOf(valueS);
 	}

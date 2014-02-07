@@ -19,6 +19,7 @@ import li.strolch.model.Order;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.visitor.ParameterVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -158,4 +159,6 @@ public interface Parameter<T> extends StrolchElement {
 
 	@Override
 	public Parameter<T> getClone();
+
+	public <U> U accept(ParameterVisitor visitor);
 }

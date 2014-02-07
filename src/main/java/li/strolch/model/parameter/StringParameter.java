@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
+import li.strolch.model.visitor.ParameterVisitor;
 
 import org.w3c.dom.Element;
 
@@ -103,5 +104,10 @@ public class StringParameter extends AbstractParameter<String> {
 		clone.setValue(this.value);
 
 		return clone;
+	}
+
+	@Override
+	public <U> U accept(ParameterVisitor visitor) {
+		return visitor.visitStringParam(this);
 	}
 }
