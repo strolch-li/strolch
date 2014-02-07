@@ -8,10 +8,10 @@ Java Utilites which ease daily work when programming in the Java language
 Dependencies
 ----------------------
 This utility package is built by Maven3 and has very few external dependencies. The current dependencies are:
-* the Java Runtime Environment 6
-* JUnit 4.10 (only during tests)
+* the Java Runtime Environment 7
+* JUnit 4.11 (test scope)
 * slf4j 1.7.2
-* slf4j-log4j bindings (only during tests)
+* slf4j-log4j bindings (test scope)
 
 Features
 ----------------------
