@@ -54,7 +54,7 @@ public class XmlCachedDaoTest extends AbstractModelTest {
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
-		runtimeMock.startContainer(rootPath);
+		runtimeMock.startContainer();
 	}
 
 	public static void dropSchema() throws SQLException {
