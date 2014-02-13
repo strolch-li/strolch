@@ -60,7 +60,7 @@ public abstract class AbstractRestfulTest {
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
-		runtimeMock.startContainer(rootPath);
+		runtimeMock.startContainer();
 
 		// create a resource config that scans for JAX-RS resources and providers
 		// in com.example package
