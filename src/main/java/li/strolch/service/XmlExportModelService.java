@@ -24,7 +24,6 @@ import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -49,6 +48,9 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 			throw new StrolchException(msg);
 		}
 
+		logger.info("Exporting: " + arg);
+		logger.info("Exporting model to real path: " + modelFile.getAbsolutePath());
+
 		XmlModelStatistics statistics;
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 
@@ -62,12 +64,8 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 			statistics = command.getStatistics();
 		}
 
-		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info(MessageFormat
-				.format("Writing XML Model file {0} for realm {1} took {2} at path: {3}", modelFile.getName(), arg.realm, durationS, modelFile.getAbsolutePath())); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Wrote {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Wrote {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
-
+		String msg = "Wrote XML Model file {0} for realm {1}: {2} at path: {3}";
+		logger.info(MessageFormat.format(msg, modelFile.getName(), arg.realm, statistics, modelFile.getAbsolutePath()));
 		return ServiceResult.success();
 	}
 }

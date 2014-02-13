@@ -28,4 +28,29 @@ public class XmlExportModelArgument extends ServiceArgument {
 	public boolean doResources = true;
 	public Set<String> orderTypes = new HashSet<>();
 	public Set<String> resourceTypes = new HashSet<>();
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("XmlExportModelArgument [");
+
+		if (this.doResources)
+			builder.append("resources");
+		if (this.doOrders)
+			builder.append(", orders");
+
+		if (this.resourceTypes != null) {
+			builder.append(", resourceTypes=");
+			builder.append(this.resourceTypes);
+		}
+		if (this.orderTypes != null) {
+			builder.append(", orderTypes=");
+			builder.append(this.orderTypes);
+		}
+
+		builder.append(", modelFileName=");
+		builder.append(this.modelFileName);
+		builder.append("]");
+		return builder.toString();
+	}
 }

@@ -45,7 +45,7 @@ public class NoPrivilegeServiceTest {
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
-		runtimeMock.startContainer(rootPath);
+		runtimeMock.startContainer();
 	}
 
 	@AfterClass
