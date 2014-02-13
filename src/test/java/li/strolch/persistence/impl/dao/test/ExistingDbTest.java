@@ -22,6 +22,7 @@ import java.io.File;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
@@ -43,7 +44,7 @@ public class ExistingDbTest {
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
-		runtimeMock.startContainer(rootPath);
+		runtimeMock.startContainer();
 	}
 
 	@AfterClass
@@ -54,7 +55,7 @@ public class ExistingDbTest {
 	@Test
 	public void shouldQueryExistingData() {
 
-		try (StrolchTransaction tx = runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			Resource resource = tx.getResourceMap().getBy(tx, "MyType", "@1");
 			assertNotNull("Should be able to read existing element from db", resource);
 

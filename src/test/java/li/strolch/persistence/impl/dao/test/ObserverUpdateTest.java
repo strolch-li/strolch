@@ -30,6 +30,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.observer.Observer;
 import li.strolch.runtime.observer.ObserverHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
@@ -63,7 +64,7 @@ public class ObserverUpdateTest {
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
-		runtimeMock.startContainer(rootPath);
+		runtimeMock.startContainer();
 	}
 
 	@AfterClass
@@ -110,13 +111,13 @@ public class ObserverUpdateTest {
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getOrderMap().add(tx, newOrder);
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getResourceMap().add(tx, newResource);
 		}
 
