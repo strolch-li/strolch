@@ -21,6 +21,7 @@ import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 
 @SuppressWarnings("nls")
 public class ResourceModelTestRunner {
@@ -39,7 +40,7 @@ public class ResourceModelTestRunner {
 
 		// create
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getResourceMap().add(tx, newResource);
 		}
 	}
@@ -47,7 +48,7 @@ public class ResourceModelTestRunner {
 	public void runQuerySizeTest() {
 
 		// remove all
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getResourceMap().removeAll(tx, tx.getResourceMap().getAllElements(tx));
 		}
 
@@ -55,14 +56,14 @@ public class ResourceModelTestRunner {
 		Resource resource1 = createResource("myTestResource1", "Test Name", "QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		Resource resource2 = createResource("myTestResource2", "Test Name", "QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		Resource resource3 = createResource("myTestResource3", "Test Name", "QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getResourceMap().add(tx, resource1);
 			tx.getResourceMap().add(tx, resource2);
 			tx.getResourceMap().add(tx, resource3);
 		}
 
 		// query size
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			long size = tx.getResourceMap().querySize(tx);
 			assertEquals("Should have three objects", 3, size);
 
@@ -84,13 +85,13 @@ public class ResourceModelTestRunner {
 
 		// create
 		Resource newResource = createResource(ID, NAME, TYPE);
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getResourceMap().add(tx, newResource);
 		}
 
 		// read
 		Resource readResource = null;
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			readResource = tx.getResourceMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Resource with id " + ID, readResource); //$NON-NLS-1$
@@ -99,13 +100,13 @@ public class ResourceModelTestRunner {
 		Parameter<String> sParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
 		String newStringValue = "Giddiya!"; //$NON-NLS-1$
 		sParam.setValue(newStringValue);
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getResourceMap().update(tx, readResource);
 		}
 
 		// read updated
 		Resource updatedResource = null;
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			updatedResource = tx.getResourceMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Resource with id " + ID, updatedResource); //$NON-NLS-1$
@@ -115,12 +116,12 @@ public class ResourceModelTestRunner {
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getResourceMap().remove(tx, readResource);
 		}
 
 		// fail to re-read
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			Resource resource = tx.getResourceMap().getBy(tx, TYPE, ID);
 			assertNull("Should no read Resource with id " + ID, resource); //$NON-NLS-1$
 		}
@@ -141,12 +142,12 @@ public class ResourceModelTestRunner {
 		};
 		Collections.sort(resources, comparator);
 
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			resourceMap.removeAll(tx, resourceMap.getAllElements(tx));
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getResourceMap().addAll(tx, resources);
 		}
 
@@ -155,13 +156,13 @@ public class ResourceModelTestRunner {
 		expectedTypes.add("MyType2");
 		expectedTypes.add("MyType3");
 
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			List<Resource> allResources = tx.getResourceMap().getAllElements(tx);
 			Collections.sort(allResources, comparator);
 			assertEquals(resources, allResources);
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			ResourceMap resourceMap = tx.getResourceMap();
 
 			Set<String> types = resourceMap.getTypes(tx);
@@ -179,7 +180,7 @@ public class ResourceModelTestRunner {
 			}
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			Resource resource = tx.getResourceMap().getBy(tx, "MyType1", "@_00000001");
 			assertNotNull(resource);
 			resource = tx.getResourceMap().getBy(tx, "MyType2", "@_00000006");

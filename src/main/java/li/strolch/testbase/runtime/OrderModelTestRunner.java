@@ -21,6 +21,7 @@ import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.Order;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 
 @SuppressWarnings("nls")
 public class OrderModelTestRunner {
@@ -39,7 +40,7 @@ public class OrderModelTestRunner {
 
 		// create
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getOrderMap().add(tx, newOrder);
 		}
 	}
@@ -47,7 +48,7 @@ public class OrderModelTestRunner {
 	public void runQuerySizeTest() {
 		
 		// remove all
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getOrderMap().removeAll(tx, tx.getOrderMap().getAllElements(tx));
 		}
 
@@ -55,14 +56,14 @@ public class OrderModelTestRunner {
 		Order order1 = createOrder("myTestOrder1", "Test Name", "QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		Order order2 = createOrder("myTestOrder2", "Test Name", "QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		Order order3 = createOrder("myTestOrder3", "Test Name", "QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getOrderMap().add(tx, order1);
 			tx.getOrderMap().add(tx, order2);
 			tx.getOrderMap().add(tx, order3);
 		}
 
 		// query size
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			long size = tx.getOrderMap().querySize(tx);
 			assertEquals("Should have three objects", 3, size);
 
@@ -84,13 +85,13 @@ public class OrderModelTestRunner {
 
 		// create
 		Order newOrder = createOrder(ID, NAME, TYPE);
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getOrderMap().add(tx, newOrder);
 		}
 
 		// read
 		Order readOrder = null;
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			readOrder = tx.getOrderMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, readOrder);
@@ -99,13 +100,13 @@ public class OrderModelTestRunner {
 		Parameter<String> sParam = readOrder.getParameter(BAG_ID, PARAM_STRING_ID);
 		String newStringValue = "Giddiya!";
 		sParam.setValue(newStringValue);
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getOrderMap().update(tx, readOrder);
 		}
 
 		// read updated
 		Order updatedOrder = null;
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			updatedOrder = tx.getOrderMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, updatedOrder);
@@ -115,12 +116,12 @@ public class OrderModelTestRunner {
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			tx.getOrderMap().remove(tx, readOrder);
 		}
 
 		// fail to re-read
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx();) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
 			Order order = tx.getOrderMap().getBy(tx, TYPE, ID);
 			assertNull("Should no read Order with id " + ID, order);
 		}
@@ -141,12 +142,12 @@ public class OrderModelTestRunner {
 		};
 		Collections.sort(orders, comparator);
 
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			OrderMap orderMap = tx.getOrderMap();
 			orderMap.removeAll(tx, orderMap.getAllElements(tx));
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getOrderMap().addAll(tx, orders);
 		}
 
@@ -155,13 +156,13 @@ public class OrderModelTestRunner {
 		expectedTypes.add("MyType2");
 		expectedTypes.add("MyType3");
 
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			List<Order> allOrders = tx.getOrderMap().getAllElements(tx);
 			Collections.sort(allOrders, comparator);
 			assertEquals(orders, allOrders);
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			OrderMap orderMap = tx.getOrderMap();
 
 			Set<String> types = orderMap.getTypes(tx);
@@ -179,7 +180,7 @@ public class OrderModelTestRunner {
 			}
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			Order order = tx.getOrderMap().getBy(tx, "MyType1", "@_00000001");
 			assertNotNull(order);
 			order = tx.getOrderMap().getBy(tx, "MyType2", "@_00000006");

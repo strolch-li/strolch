@@ -1,6 +1,7 @@
 package li.strolch.testbase.runtime;
 
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 
 import org.junit.Test;
 
@@ -10,7 +11,7 @@ public abstract class AbstractModelTest {
 
 	@Test
 	public void shouldStartContainer() {
-		try (StrolchTransaction tx = getRuntimeMock().getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = getRuntimeMock().getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getOrderMap().getAllKeys(tx);
 		}
 	}

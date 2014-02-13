@@ -28,7 +28,6 @@ import li.strolch.service.api.ServiceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.FileHelper;
 
 public final class RuntimeMock {
@@ -55,10 +54,6 @@ public final class RuntimeMock {
 
 	public ServiceHandler getServiceHandler() {
 		return this.container.getComponent(ServiceHandler.class);
-	}
-
-	public StrolchRealm getDefaultRealm() {
-		return this.container.getDefaultRealm();
 	}
 
 	public StrolchRealm getRealm(String realm) {
@@ -107,15 +102,6 @@ public final class RuntimeMock {
 			msg = MessageFormat.format(msg, this.rootSrc.getAbsolutePath(), this.rootPath.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
-	}
-
-	/**
-	 * @deprecated use parameterless {@link #startContainer()}
-	 */
-	@Deprecated
-	public void startContainer(File rootPathF) {
-		DBC.PRE.assertEquals("Starting a different runtime than was mocked!", this.rootPath, rootPathF); //$NON-NLS-1$
-		startContainer();
 	}
 
 	public void startContainer() {
