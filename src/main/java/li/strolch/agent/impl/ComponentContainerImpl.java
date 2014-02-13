@@ -27,7 +27,7 @@ import li.strolch.agent.api.ComponentState;
 import li.strolch.agent.api.ElementMapHandler;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.runtime.StrolchConstants;
+import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
@@ -97,12 +97,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	@Override
-	public StrolchRealm getDefaultRealm() {
-		return getRealm(StrolchConstants.DEFAULT_REALM);
-	}
-
-	@Override
-	public StrolchRealm getRealm(String realm) {
+	public StrolchRealm getRealm(String realm) throws StrolchException {
 		return getComponent(ElementMapHandler.class).getRealm(realm);
 	}
 
@@ -130,8 +125,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			@SuppressWarnings("unchecked")
 			Class<StrolchComponent> strolchComponentClass = (Class<StrolchComponent>) implClass;
-			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(
-					ComponentContainer.class, String.class);
+			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(ComponentContainer.class,
+					String.class);
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
 
 			componentMap.put(apiClass, strolchComponent);

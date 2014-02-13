@@ -45,6 +45,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	protected static final Logger logger = LoggerFactory.getLogger(InMemoryTransaction.class);
 	private StrolchRealm realm;
 
+	@Override
+	public String getRealmName() {
+		return this.realm.getRealm();
+	}
+
 	/**
 	 * @param realm
 	 */

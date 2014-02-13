@@ -31,6 +31,8 @@ import li.strolch.model.query.ResourceQuery;
 
 public interface StrolchTransaction extends AutoCloseable {
 
+	public String getRealmName();
+
 	public void setCloseStrategy(TransactionCloseStrategy closeStrategy);
 
 	public void autoCloseableCommit();

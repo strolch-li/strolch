@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component;
+package li.strolch.agent;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -31,10 +32,11 @@ import li.strolch.model.Resource;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
-import li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTest;
-import li.strolch.runtime.test.component.model.ServiceHandlerTest;
-import li.strolch.runtime.test.component.model.ServiceResultTest;
+import li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTest;
+import li.strolch.runtime.configuration.model.ServiceHandlerTest;
+import li.strolch.runtime.configuration.model.ServiceResultTest;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -57,7 +59,8 @@ public class ComponentContainerTest {
 	public static final String PATH_CACHED_RUNTIME = "target/cachedtest/";
 	public static final String PATH_EMPTY_RUNTIME = "target/emptytest/";
 
-	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerTest.class);
+	public static final Logger logger = LoggerFactory.getLogger(ComponentContainerTest.class);
+
 	private static final String TARGET = "target"; //$NON-NLS-1$
 
 	@Test
@@ -127,7 +130,21 @@ public class ComponentContainerTest {
 		}
 	}
 
-	private static void testContainer(StrolchAgent agent) {
+	@Test
+	public void shouldTestRealms() {
+
+		try {
+			StrolchAgent agent = startContainer(PATH_REALM_RUNTIME, PATH_REALM_CONTAINER);
+			testContainer(agent);
+			testRealms(agent);
+			destroyContainer(agent);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	public static void testContainer(StrolchAgent agent) {
 
 		ComponentContainer container = agent.getContainer();
 
@@ -142,7 +159,7 @@ public class ComponentContainerTest {
 		assertEquals("@testRes", resource.getId());
 	}
 
-	private static void testPersistenceContainer(StrolchAgent agent) {
+	public static void testPersistenceContainer(StrolchAgent agent) {
 
 		ComponentContainer container = agent.getContainer();
 
@@ -150,7 +167,7 @@ public class ComponentContainerTest {
 		ServiceResultTest result = serviceHandler.doService();
 		assertEquals(1, result.getResult());
 
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			ResourceDao resourceDao = tx.getPersistenceHandler().getResourceDao(tx);
 			resourceDao.save(ModelGenerator.createResource("@testRes0", "Test Res", "Test"));
 			Resource queriedRes = resourceDao.queryBy("Test", "@testRes0");
@@ -158,7 +175,7 @@ public class ComponentContainerTest {
 			assertEquals("@testRes0", queriedRes.getId());
 		}
 
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			OrderDao orderDao = tx.getPersistenceHandler().getOrderDao(tx);
 			orderDao.save(ModelGenerator.createOrder("@testOrder0", "Test Order", "Test"));
 			Order queriedOrder = orderDao.queryBy("Test", "@testOrder0");
@@ -167,11 +184,11 @@ public class ComponentContainerTest {
 		}
 	}
 
-	private static void testElementMaps(StrolchAgent agent) {
+	public static void testElementMaps(StrolchAgent agent) {
 
 		ComponentContainer container = agent.getContainer();
 
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			resourceMap.add(tx, ModelGenerator.createResource("@testRes1", "Test Res", "Test"));
 			Resource queriedRes = resourceMap.getBy(tx, "Test", "@testRes1");
@@ -179,12 +196,62 @@ public class ComponentContainerTest {
 			assertEquals("@testRes1", queriedRes.getId());
 		}
 
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			OrderMap orderMap = tx.getOrderMap();
 			orderMap.add(tx, ModelGenerator.createOrder("@testOrder1", "Test Order", "Test"));
 			Order queriedOrder = orderMap.getBy(tx, "Test", "@testOrder1");
 			assertNotNull(queriedOrder);
 			assertEquals("@testOrder1", queriedOrder.getId());
+		}
+	}
+
+	public static void testRealms(StrolchAgent agent) {
+
+		ComponentContainer container = agent.getContainer();
+
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
+			ResourceMap resourceMap = tx.getResourceMap();
+			resourceMap.add(tx, ModelGenerator.createResource("@testRes1", "Test Res", "Test"));
+			Resource queriedRes = resourceMap.getBy(tx, "Test", "@testRes1");
+			assertNotNull(queriedRes);
+			assertEquals("@testRes1", queriedRes.getId());
+
+			OrderMap orderMap = tx.getOrderMap();
+			orderMap.add(tx, ModelGenerator.createOrder("@testOrder1", "Test Order", "Test"));
+			Order queriedOrder = orderMap.getBy(tx, "Test", "@testOrder1");
+			assertNotNull(queriedOrder);
+			assertEquals("@testOrder1", queriedOrder.getId());
+		}
+
+		try (StrolchTransaction tx = container.getRealm("myRealm").openTx()) {
+			ResourceMap resourceMap = tx.getResourceMap();
+			Resource myRealmRes = resourceMap.getBy(tx, "TestType", "MyRealmRes");
+			assertNotNull(myRealmRes);
+			assertEquals("MyRealmRes", myRealmRes.getId());
+			Resource otherRealmRes = resourceMap.getBy(tx, "TestType", "OtherRealmRes");
+			assertNull(otherRealmRes);
+
+			OrderMap orderMap = tx.getOrderMap();
+			Order myRealmOrder = orderMap.getBy(tx, "TestType", "MyRealmOrder");
+			assertNotNull(myRealmOrder);
+			assertEquals("MyRealmOrder", myRealmOrder.getId());
+			Order otherRealmOrder = orderMap.getBy(tx, "TestType", "OtherRealmOrder");
+			assertNull(otherRealmOrder);
+		}
+		try (StrolchTransaction tx = container.getRealm("otherRealm").openTx()) {
+			ResourceMap resourceMap = tx.getResourceMap();
+			Resource otherRealmRes = resourceMap.getBy(tx, "TestType", "OtherRealmRes");
+			assertNotNull(otherRealmRes);
+			assertEquals("OtherRealmRes", otherRealmRes.getId());
+			Resource myRealmRes = resourceMap.getBy(tx, "TestType", "MyRealmRes");
+			assertNull(myRealmRes);
+
+			OrderMap orderMap = tx.getOrderMap();
+			Order otherRealmOrder = orderMap.getBy(tx, "TestType", "OtherRealmOrder");
+			assertNotNull(otherRealmOrder);
+			assertEquals("OtherRealmOrder", otherRealmOrder.getId());
+			Order myRealmOrder = orderMap.getBy(tx, "TestType", "MyRealmOrder");
+			assertNull(myRealmOrder);
 		}
 	}
 

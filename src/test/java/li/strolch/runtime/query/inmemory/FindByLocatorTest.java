@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.query.inmemory;
+package li.strolch.runtime.query.inmemory;
 
 import static org.junit.Assert.assertNotNull;
+import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.Locator;
@@ -24,7 +25,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.test.component.ComponentContainerTest;
+import li.strolch.runtime.StrolchConstants;
 
 import org.junit.Test;
 
@@ -43,7 +44,7 @@ public class FindByLocatorTest {
 				ComponentContainerTest.PATH_TRANSIENT_CONTAINER);
 		ComponentContainer container = agent.getContainer();
 
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			Locator locResStringParam = Locator.valueOf("Resource/TestType/MyTestResource/@bag01/@param5");
 			StringParameter resStringParam = tx.findElement(locResStringParam);
 			assertNotNull("Should have found a StringParameter with the locator " + locResStringParam, resStringParam);

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component.model;
+package li.strolch.runtime.configuration.model;
 
-public interface PostInitializerTest {
 
-	// marker interface
+public interface ServiceHandlerTest {
+
+	public ServiceResultTest doService();
 }

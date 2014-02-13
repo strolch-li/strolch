@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.query.enums;
+package li.strolch.runtime.query.enums;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.Locale;
 
+import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.runtime.query.enums.EnumHandler;
 import li.strolch.runtime.query.enums.StrolchEnum;
-import li.strolch.runtime.test.component.ComponentContainerTest;
 
 import org.junit.Test;
 

@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component.model;
+package li.strolch.runtime.configuration.model;
 
-public class ServiceResultTest {
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchComponent;
 
-	private int result;
+public class ServiceHandlerTestImpl extends StrolchComponent implements ServiceHandlerTest {
 
-	public ServiceResultTest(int result) {
-		this.result = result;
+	public ServiceHandlerTestImpl(ComponentContainer container, String componentName) {
+		super(container, componentName);
 	}
 
-	public int getResult() {
-		return this.result;
+	@Override
+	public ServiceResultTest doService() {
+		return new ServiceResultTest(1);
 	}
 }

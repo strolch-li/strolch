@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.query.inmemory;
+package li.strolch.runtime.query.inmemory;
 
 import static li.strolch.model.ModelGenerator.BAG_ID;
 import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.Order;
@@ -36,10 +37,7 @@ import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.query.inmemory.InMemoryOrderQueryVisitor;
-import li.strolch.runtime.query.inmemory.InMemoryQuery;
-import li.strolch.runtime.query.inmemory.InMemoryResourceQueryVisitor;
-import li.strolch.runtime.test.component.ComponentContainerTest;
+import li.strolch.runtime.StrolchConstants;
 
 import org.junit.Test;
 
@@ -62,7 +60,7 @@ public class QueryTest {
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		res1.addParameter(BAG_ID, iP);
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getResourceMap().add(tx, res1);
 		}
 
@@ -75,7 +73,7 @@ public class QueryTest {
 		InMemoryResourceQueryVisitor resourceQuery = new InMemoryResourceQueryVisitor();
 		InMemoryQuery<Resource> inMemoryQuery = resourceQuery.visit(query);
 		List<Resource> result;
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			result = inMemoryQuery.doQuery(tx.getPersistenceHandler().getResourceDao(tx));
 		}
 		assertEquals(1, result.size());
@@ -92,7 +90,7 @@ public class QueryTest {
 		Order o1 = createOrder("@1", "Test Order", "MyType");
 		IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 		o1.addParameter(BAG_ID, iP);
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getOrderMap().add(tx, o1);
 		}
 
@@ -105,7 +103,7 @@ public class QueryTest {
 		InMemoryOrderQueryVisitor orderQuery = new InMemoryOrderQueryVisitor();
 		InMemoryQuery<Order> inMemoryQuery = orderQuery.visit(query);
 		List<Order> result;
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			result = inMemoryQuery.doQuery(tx.getPersistenceHandler().getOrderDao(tx));
 		}
 		assertEquals(1, result.size());
@@ -120,14 +118,14 @@ public class QueryTest {
 		ComponentContainer container = agent.getContainer();
 
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getResourceMap().add(tx, res1);
 		}
 
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
 		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "olch").contains(true));
 		List<Resource> result;
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			result = tx.doQuery(query);
 		}
 		assertEquals(1, result.size());
@@ -142,14 +140,14 @@ public class QueryTest {
 		ComponentContainer container = agent.getContainer();
 
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getResourceMap().add(tx, res1);
 		}
 
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
 		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "str").contains(true));
 		List<Resource> result;
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			result = tx.doQuery(query);
 		}
 		assertEquals(0, result.size());
@@ -163,14 +161,14 @@ public class QueryTest {
 		ComponentContainer container = agent.getContainer();
 
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getResourceMap().add(tx, res1);
 		}
 
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
 		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch").caseInsensitive(true));
 		List<Resource> result;
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			result = tx.doQuery(query);
 		}
 		assertEquals(1, result.size());
@@ -185,14 +183,14 @@ public class QueryTest {
 		ComponentContainer container = agent.getContainer();
 
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getResourceMap().add(tx, res1);
 		}
 
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
 		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch"));
 		List<Resource> result;
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			result = tx.doQuery(query);
 		}
 		assertEquals(0, result.size());
@@ -207,7 +205,7 @@ public class QueryTest {
 
 		Resource res1 = createResource("@1", "Test Resource", "MyType");
 		Resource res2 = createResource("@2", "Test Resource", "MyType");
-		try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			tx.getResourceMap().add(tx, res1);
 			tx.getResourceMap().add(tx, res2);
 		}
@@ -216,7 +214,7 @@ public class QueryTest {
 			ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
 			query.not(new IdSelection("@1"));
 			List<Resource> result;
-			try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 				result = tx.doQuery(query);
 			}
 			assertEquals(1, result.size());
@@ -227,7 +225,7 @@ public class QueryTest {
 			ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
 			query.not(new IdSelection("@2"));
 			List<Resource> result;
-			try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 				result = tx.doQuery(query);
 			}
 			assertEquals(1, result.size());
@@ -238,7 +236,7 @@ public class QueryTest {
 			ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
 			query.not(new IdSelection("@1", "@2"));
 			List<Resource> result;
-			try (StrolchTransaction tx = container.getDefaultRealm().openTx()) {
+			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 				result = tx.doQuery(query);
 			}
 			assertEquals(0, result.size());

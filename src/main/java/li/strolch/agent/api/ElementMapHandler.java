@@ -18,15 +18,31 @@ package li.strolch.agent.api;
 import java.util.Set;
 
 import li.strolch.agent.impl.StrolchRealm;
+import li.strolch.exception.StrolchException;
+import li.strolch.runtime.StrolchConstants;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface ElementMapHandler {
 
+	/**
+	 * Returns the names of the configured {@link StrolchRealm StrolchRealms}
+	 * 
+	 * @return the set of names of the configured {@link StrolchRealm StrolchRealms}
+	 */
 	public Set<String> getRealmNames();
 
-	public StrolchRealm getDefaultRealm();
-
+	/**
+	 * Returns the {@link StrolchRealm} with the given name. To get the default realm, use the constante
+	 * {@link StrolchConstants#DEFAULT_REALM}.
+	 * 
+	 * @param realm
+	 *            the name of the {@link StrolchRealm} to return
+	 * @return the {@link StrolchRealm} with the given name
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StrolchRealm} does not exist with the given name
+	 */
 	public StrolchRealm getRealm(String realm);
 }

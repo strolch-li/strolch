@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.query.inmemory;
+package li.strolch.runtime.query.inmemory;
 
 import static org.junit.Assert.assertEquals;
 

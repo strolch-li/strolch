@@ -26,8 +26,8 @@
 	</Component>
 	<Component>
 		<name>ResourceGeneratorHandler</name>
-		<api>li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTest</api>
-		<impl>li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTestImpl</impl>
+		<api>li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTest</api>
+		<impl>li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTestImpl</impl>
 		<depends>PersistenceHandler</depends>
 		<depends>ServiceHandler</depends>
 		<Properties>

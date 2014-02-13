@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component;
+package li.strolch.runtime.configuration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -87,8 +87,8 @@ public class ConfigurationParserTest {
 
 		//	<Component>
 		//		<name>ResourceGeneratorHandler</name>
-		//		<api>li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTest</api>
-		//		<impl>li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTestImpl</impl>
+		//		<api>li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTest</api>
+		//		<impl>li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTestImpl</impl>
 		//		<Properties>
 		//			<verbose>true</verbose>
 		//		</Properties>
@@ -97,9 +97,9 @@ public class ConfigurationParserTest {
 				.getComponentConfiguration("ResourceGeneratorHandler");
 		assertNotNull("Should have created a ResourceGeneratorHandler Configuration", persistenceHandlerConfiguration);
 		assertEquals("ResourceGeneratorHandler", persistenceHandlerConfiguration.getName());
-		assertEquals("li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTest",
+		assertEquals("li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTest",
 				persistenceHandlerConfiguration.getApi());
-		assertEquals("li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTestImpl",
+		assertEquals("li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTestImpl",
 				persistenceHandlerConfiguration.getImpl());
 		assertEquals(1, persistenceHandlerConfiguration.getPropertyKeys().size());
 		assertEquals(true, persistenceHandlerConfiguration.getBoolean("verbose", null));

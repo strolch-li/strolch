@@ -10,24 +10,24 @@
 	</Runtime>
 	<Component>
 		<name>ServiceHandler</name>
-		<api>li.strolch.runtime.test.component.model.ServiceHandlerTest</api>
-		<impl>li.strolch.runtime.test.component.model.ServiceHandlerTestImpl</impl>
+		<api>li.strolch.runtime.configuration.model.ServiceHandlerTest</api>
+		<impl>li.strolch.runtime.configuration.model.ServiceHandlerTestImpl</impl>
 		<depends>PersistenceHandler</depends>
 		<Properties>
 		</Properties>
 	</Component>
 	<Component>
 		<name>PostInitializer</name>
-		<api>li.strolch.runtime.test.component.model.PostInitializerTest</api>
-		<impl>li.strolch.runtime.test.component.model.PostInitializerTestImpl</impl>
+		<api>li.strolch.runtime.configuration.model.PostInitializerTest</api>
+		<impl>li.strolch.runtime.configuration.model.PostInitializerTestImpl</impl>
 		<depends>ServiceHandler</depends>
 		<Properties>
 		</Properties>
 	</Component>
 	<Component>
 		<name>ResourceGeneratorHandler</name>
-		<api>li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTest</api>
-		<impl>li.strolch.runtime.test.component.model.ResourceGeneratorHandlerTestImpl</impl>
+		<api>li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTest</api>
+		<impl>li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTestImpl</impl>
 		<Properties>
 			<verbose>true</verbose>
 		</Properties>

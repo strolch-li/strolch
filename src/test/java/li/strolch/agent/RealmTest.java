@@ -13,10 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component.model;
+package li.strolch.agent;
 
+import li.strolch.agent.api.StrolchAgent;
+import static li.strolch.agent.ComponentContainerTest.*;
 
-public interface ServiceHandlerTest {
+import org.junit.Test;
 
-	public ServiceResultTest doService();
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
+public class RealmTest {
+
+	@Test
+	public void shouldStartRealmTestContainer() {
+
+		try {
+			StrolchAgent agent = startContainer(PATH_REALM_RUNTIME, PATH_REALM_CONTAINER);
+			testContainer(agent);
+			
+			
+			
+			destroyContainer(agent);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw e;
+		}
+	}
 }

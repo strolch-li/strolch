@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component.model;
+package li.strolch.runtime.configuration.model;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchComponent;
-import li.strolch.model.Resource;
+public class ServiceResultTest {
 
-public class ResourceGeneratorHandlerTestImpl extends StrolchComponent implements ResourceGeneratorHandlerTest {
+	private int result;
 
-	public ResourceGeneratorHandlerTestImpl(ComponentContainer container, String componentName) {
-		super(container, componentName);
+	public ServiceResultTest(int result) {
+		this.result = result;
 	}
 
-	@Override
-	public Resource getTestResource(String id, String name, String type) {
-
-		Resource resource = new Resource(id, name, type);
-
-		return resource;
+	public int getResult() {
+		return this.result;
 	}
 }

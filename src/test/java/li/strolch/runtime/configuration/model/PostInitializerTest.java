@@ -13,19 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.test.component.model;
+package li.strolch.runtime.configuration.model;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchComponent;
+public interface PostInitializerTest {
 
-public class ServiceHandlerTestImpl extends StrolchComponent implements ServiceHandlerTest {
-
-	public ServiceHandlerTestImpl(ComponentContainer container, String componentName) {
-		super(container, componentName);
-	}
-
-	@Override
-	public ServiceResultTest doService() {
-		return new ServiceResultTest(1);
-	}
+	// marker interface
 }
