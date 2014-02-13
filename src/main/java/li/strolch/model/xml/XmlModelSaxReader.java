@@ -15,6 +15,8 @@
  */
 package li.strolch.model.xml;
 
+import static ch.eitchnet.utils.helper.StringHelper.NULL;
+
 import java.text.MessageFormat;
 import java.util.Date;
 
@@ -196,5 +198,21 @@ public class XmlModelSaxReader extends DefaultHandler {
 		public long durationNanos;
 		public int nrOfResources;
 		public int nrOfOrders;
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder();
+			builder.append("XmlModelStatistics [startTime=");
+			builder.append(this.startTime == null ? NULL : ISO8601FormatFactory.getInstance()
+					.formatDate(this.startTime));
+			builder.append(", durationNanos=");
+			builder.append(StringHelper.formatNanoDuration(this.durationNanos));
+			builder.append(", nrOfResources=");
+			builder.append(this.nrOfResources);
+			builder.append(", nrOfOrders=");
+			builder.append(this.nrOfOrders);
+			builder.append("]");
+			return builder.toString();
+		}
 	}
 }

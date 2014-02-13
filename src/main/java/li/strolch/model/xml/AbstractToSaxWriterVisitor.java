@@ -15,7 +15,12 @@
  */
 package li.strolch.model.xml;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -63,10 +68,14 @@ public abstract class AbstractToSaxWriterVisitor {
 
 	protected void writeParameters(ParameterizedElement element) throws XMLStreamException {
 
-		Set<String> parameterKeySet = element.getParameterKeySet();
-		for (String paramKey : parameterKeySet) {
-			Parameter<?> parameter = element.getParameter(paramKey);
-
+		List<Parameter<?>> parameters = new ArrayList<>(element.getParameters());
+		Collections.sort(parameters, new Comparator<Parameter<?>>() {
+			@Override
+			public int compare(Parameter<?> o1, Parameter<?> o2) {
+				return Integer.valueOf(o1.getIndex()).compareTo(o2.getIndex());
+			}
+		});
+		for (Parameter<?> parameter : parameters) {
 			writeStartStrolchElement(Tags.PARAMETER, true, parameter);
 
 			if (!Parameter.INTERPRETATION_NONE.equals(parameter.getInterpretation()))
@@ -83,8 +92,7 @@ public abstract class AbstractToSaxWriterVisitor {
 	}
 
 	protected void writeParameterBags(GroupedParameterizedElement element) throws XMLStreamException {
-
-		Set<String> bagKeySet = element.getParameterBagKeySet();
+		Set<String> bagKeySet = new TreeSet<>(element.getParameterBagKeySet());
 		for (String bagKey : bagKeySet) {
 			ParameterBag parameterBag = element.getParameterBag(bagKey);
 			boolean isEmpty = !parameterBag.hasParameters();
