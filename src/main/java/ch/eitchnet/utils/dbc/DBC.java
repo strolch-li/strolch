@@ -25,103 +25,78 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public enum DBC {
 
-	PRE {
+	PRE, INTERIM, POST;
 
-		@Override
-		public void assertEquals(String msg, Object value1, Object value2) {
-			if (value1 == null && value2 == null)
-				return;
+	public void assertEquals(String msg, Object value1, Object value2) {
+		if (value1 == null && value2 == null)
+			return;
 
-			if (value1 != null && value1.equals(value2))
-				return;
+		if (value1 != null && value1.equals(value2))
+			return;
 
-			if (value2 != null && value2.equals(value1))
-				return;
+		if (value2 != null && value2.equals(value1))
+			return;
 
-			String ex = "Values are not equal: {0}"; //$NON-NLS-1$
+		String ex = "Values are not equal: {0}"; //$NON-NLS-1$
+		ex = MessageFormat.format(ex, msg);
+		throw new DbcException(ex);
+	}
+
+	public void assertTrue(String msg, boolean value) {
+		if (!value) {
+			String ex = "Expected true, but was false: {0}"; //$NON-NLS-1$
 			ex = MessageFormat.format(ex, msg);
 			throw new DbcException(ex);
 		}
+	}
 
-		@Override
-		public void assertTrue(String msg, boolean value) {
-			if (!value) {
-				String ex = "Expected true, but was false: {0}"; //$NON-NLS-1$
-				ex = MessageFormat.format(ex, msg);
-				throw new DbcException(ex);
-			}
+	public void assertFalse(String msg, boolean value) {
+		if (value) {
+			String ex = "Expected false, but was true: {0}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
 		}
+	}
 
-		@Override
-		public void assertFalse(String msg, boolean value) {
-			if (value) {
-				String ex = "Expected false, but was true: {0}"; //$NON-NLS-1$
-				ex = MessageFormat.format(ex, msg);
-				throw new DbcException(ex);
-			}
+	public void assertNotEmpty(String msg, String value) {
+		if (StringHelper.isEmpty(value)) {
+			String ex = "Illegal empty value: {0}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
 		}
+	}
 
-		@Override
-		public void assertNotEmpty(String msg, String value) {
-			if (StringHelper.isEmpty(value)) {
-				String ex = "Illegal empty value: {0}"; //$NON-NLS-1$
-				ex = MessageFormat.format(ex, msg);
-				throw new DbcException(ex);
-			}
+	public void assertNotNull(String msg, Object value) {
+		if (value == null) {
+			String ex = "Illegal null value: {0}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
 		}
+	}
 
-		@Override
-		public void assertNotNull(String msg, Object value) {
-			if (value == null) {
-				String ex = "Illegal null value: {0}"; //$NON-NLS-1$
-				ex = MessageFormat.format(ex, msg);
-				throw new DbcException(ex);
-			}
+	public void assertNull(String msg, Object value) {
+		if (value != null) {
+			String ex = "Illegal situation as value is not null: {0}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
 		}
+	}
 
-		@Override
-		public void assertNull(String msg, Object value) {
-			if (value != null) {
-				String ex = "Illegal situation as value is not null: {0}"; //$NON-NLS-1$
-				ex = MessageFormat.format(ex, msg);
-				throw new DbcException(ex);
-			}
+	public void assertNotExists(String msg, File file) {
+		if (file.exists()) {
+			String ex = MessageFormat.format("Illegal situation as file ({0}) exists: {1}", file, msg); //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
 		}
+	}
 
-		@Override
-		public void assertNotExists(String msg, File file) {
-			if (file.exists()) {
-				String ex = MessageFormat.format("Illegal situation as file ({0}) exists: {1}", file, msg); //$NON-NLS-1$
-				ex = MessageFormat.format(ex, msg);
-				throw new DbcException(ex);
-			}
+	public void assertExists(String msg, File file) {
+		if (!file.exists()) {
+			String ex = MessageFormat.format("Illegal situation as file ({0}) does not exist: {1}", file, msg); //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
 		}
-
-		@Override
-		public void assertExists(String msg, File file) {
-			if (!file.exists()) {
-				String ex = MessageFormat.format("Illegal situation as file ({0}) does not exist: {1}", file, msg); //$NON-NLS-1$
-				ex = MessageFormat.format(ex, msg);
-				throw new DbcException(ex);
-			}
-		}
-	};
-
-	public abstract void assertEquals(String msg, Object value1, Object value2);
-
-	public abstract void assertTrue(String msg, boolean value);
-
-	public abstract void assertFalse(String msg, boolean value);
-
-	public abstract void assertNotEmpty(String msg, String value);
-
-	public abstract void assertNotNull(String msg, Object value);
-
-	public abstract void assertNull(String msg, Object value);
-
-	public abstract void assertNotExists(String msg, File file);
-
-	public abstract void assertExists(String msg, File file);
+	}
 
 	public class DbcException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
