@@ -15,6 +15,9 @@
  */
 package li.strolch.testbase.runtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.text.MessageFormat;
 
@@ -24,11 +27,14 @@ import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
 import li.strolch.service.api.ServiceHandler;
+import li.strolch.service.api.ServiceResult;
+import li.strolch.service.api.ServiceResultState;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.FileHelper;
+import ch.eitchnet.utils.helper.StringHelper;
 
 public final class RuntimeMock {
 
@@ -137,6 +143,16 @@ public final class RuntimeMock {
 			this.agent.destroy();
 		} catch (Exception e) {
 			logger.info("Failed to destroy container: " + e.getMessage()); //$NON-NLS-1$
+		}
+	}
+
+	public void assertServiceResult(ServiceResultState expectedState, Class<?> expectedResultType, ServiceResult result) {
+		assertEquals("Expected service result of type " + expectedResultType + " but was " + result.getClass(),
+				expectedResultType, result.getClass());
+
+		if (!expectedState.equals(result.getState())) {
+			fail("Expected service result state " + expectedState + " but was " + result.getState() + ": Reason: "
+					+ StringHelper.formatException(result.getThrowable()));
 		}
 	}
 }
