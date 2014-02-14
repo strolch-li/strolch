@@ -17,6 +17,10 @@ package li.strolch.service.api;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.eitchnet.privilege.model.Restrictable;
 
 /**
@@ -24,6 +28,7 @@ import ch.eitchnet.privilege.model.Restrictable;
  */
 public abstract class Command implements Restrictable {
 
+	protected static final Logger logger = LoggerFactory.getLogger(Command.class);
 	private final ComponentContainer container;
 	private final StrolchTransaction tx;
 
