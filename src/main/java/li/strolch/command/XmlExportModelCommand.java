@@ -67,6 +67,9 @@ public class XmlExportModelCommand extends Command {
 	private XmlModelStatistics statistics;
 	private boolean multiFile;
 
+	private int nrOfResourcesToExport;
+	private int nrOfOrdersToExport;
+
 	public XmlExportModelCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
@@ -83,6 +86,31 @@ public class XmlExportModelCommand extends Command {
 
 		String exportName = fileName.substring(0, fileName.indexOf(XML_FILE_SUFFIX));
 		Set<File> createdFiles = new HashSet<>();
+
+		if (this.doResources) {
+			ResourceMap resourceMap = tx().getResourceMap();
+			Set<String> resourceTypesToExport = resourceMap.getTypes(tx());
+			if (!this.resourceTypes.isEmpty())
+				resourceTypesToExport.retainAll(this.resourceTypes);
+			for (String type : resourceTypesToExport) {
+				nrOfResourcesToExport += resourceMap.querySize(tx(), type);
+			}
+			logger.info("Exporting " + nrOfResourcesToExport + " Resources...");
+		}
+
+		if (this.doOrders) {
+			OrderMap orderMap = tx().getOrderMap();
+			Set<String> orderTypesToExport = orderMap.getTypes(tx());
+			if (!this.orderTypes.isEmpty())
+				orderTypesToExport.retainAll(this.orderTypes);
+
+			for (String type : orderTypesToExport) {
+				nrOfOrdersToExport += orderMap.querySize(tx(), type);
+			}
+			logger.info("Exporting " + nrOfOrdersToExport + " Orders...");
+		}
+
+		logger.info("Exporting " + (nrOfResourcesToExport + nrOfOrdersToExport) + " Elements...");
 
 		try (FileOutputStream out = new FileOutputStream(this.modelFile)) {
 			createdFiles.add(this.modelFile);
@@ -107,6 +135,8 @@ public class XmlExportModelCommand extends Command {
 						writer.writeAttribute(Tags.FILE, typeXmlFile);
 
 						File typeXmlFileF = new File(modelFile.getParentFile(), typeXmlFile);
+						logger.info("Writing " + resourceMap.querySize(tx(), type) + " " + type
+								+ " Resources to path: " + typeXmlFileF.getAbsolutePath() + "...");
 						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = openXmlStreamWriter(typeOut);
@@ -134,6 +164,8 @@ public class XmlExportModelCommand extends Command {
 						writer.writeAttribute(Tags.FILE, typeXmlFile);
 
 						File typeXmlFileF = new File(modelFile.getParentFile(), typeXmlFile);
+						logger.info("Writing " + orderMap.querySize(tx(), type) + " " + type + " Orders to path: "
+								+ typeXmlFileF.getAbsolutePath() + "...");
 						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = openXmlStreamWriter(typeOut);
