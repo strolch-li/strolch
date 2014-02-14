@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.test;
+package li.strolch.service.test.model;
 
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;

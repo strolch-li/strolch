@@ -15,16 +15,21 @@
  */
 package li.strolch.command;
 
+import static ch.eitchnet.utils.helper.StringHelper.UNDERLINE;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -49,6 +54,8 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public class XmlExportModelCommand extends Command {
 
+	public static final String XML_FILE_SUFFIX = ".xml";
+
 	// input
 	private File modelFile;
 	private boolean doOrders;
@@ -58,11 +65,8 @@ public class XmlExportModelCommand extends Command {
 
 	// output
 	private XmlModelStatistics statistics;
+	private boolean multiFile;
 
-	/**
-	 * @param container
-	 * @param tx
-	 */
 	public XmlExportModelCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
@@ -70,53 +74,72 @@ public class XmlExportModelCommand extends Command {
 	@Override
 	public void doCommand() {
 		DBC.PRE.assertNotExists("Model may not already exist!", this.modelFile);
+		String fileName = this.modelFile.getName();
+		DBC.PRE.assertTrue("Model file must end with .xml", fileName.endsWith(XML_FILE_SUFFIX));
 
+		long start = System.nanoTime();
 		this.statistics = new XmlModelStatistics();
 		this.statistics.startTime = new Date();
-		long start = System.nanoTime();
+
+		String exportName = fileName.substring(0, fileName.indexOf(XML_FILE_SUFFIX));
+		Set<File> createdFiles = new HashSet<>();
 
 		try (FileOutputStream out = new FileOutputStream(this.modelFile)) {
+			createdFiles.add(this.modelFile);
 
-			XMLOutputFactory factory = XMLOutputFactory.newInstance();
-			XMLStreamWriter writer = factory.createXMLStreamWriter(out, StrolchConstants.DEFAULT_ENCODING);
-			writer = new IndentingXMLStreamWriter(writer);
+			XMLStreamWriter writer = openXmlStreamWriter(out);
 
-			// start document
-			writer.writeStartDocument(StrolchConstants.DEFAULT_ENCODING, StrolchConstants.DEFAULT_XML_VERSION);
-			writer.writeStartElement(Tags.STROLCH_MODEL);
-
-			if (doResources) {
+			if (this.doResources) {
 				ResourceMap resourceMap = tx().getResourceMap();
 				Set<String> resourceTypesToExport = resourceMap.getTypes(tx());
 				if (!this.resourceTypes.isEmpty())
-					resourceTypesToExport.retainAll(resourceTypes);
+					resourceTypesToExport.retainAll(this.resourceTypes);
 
 				resourceTypesToExport = new TreeSet<>(resourceTypesToExport);
-				ResourceVisitor visitor = new ResourceToSaxWriterVisitor(writer);
 				for (String type : resourceTypesToExport) {
-					Set<String> keysByType = new TreeSet<>(resourceMap.getKeysBy(tx(), type));
-					for (String id : keysByType) {
-						Resource resource = resourceMap.getBy(tx(), type, id);
-						visitor.visit(resource);
-						statistics.nrOfResources++;
+
+					if (!multiFile) {
+						writeResourcesByType(writer, resourceMap, type);
+					} else {
+						String typeXmlFile = exportName + UNDERLINE + Tags.RESOURCE + UNDERLINE + type
+								+ XML_FILE_SUFFIX;
+						writer.writeEmptyElement(Tags.INCLUDE_FILE);
+						writer.writeAttribute(Tags.FILE, typeXmlFile);
+
+						File typeXmlFileF = new File(modelFile.getParentFile(), typeXmlFile);
+						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
+							createdFiles.add(typeXmlFileF);
+							XMLStreamWriter typeWriter = openXmlStreamWriter(typeOut);
+							writeResourcesByType(typeWriter, resourceMap, type);
+							typeWriter.writeEndDocument();
+						}
 					}
 				}
 			}
 
-			if (doOrders) {
+			if (this.doOrders) {
 				OrderMap orderMap = tx().getOrderMap();
 				Set<String> orderTypesToExport = orderMap.getTypes(tx());
 				if (!this.orderTypes.isEmpty())
-					orderTypesToExport.retainAll(orderTypes);
+					orderTypesToExport.retainAll(this.orderTypes);
 
 				orderTypesToExport = new TreeSet<>(orderTypesToExport);
-				OrderVisitor visitor = new OrderToSaxWriterVisitor(writer);
 				for (String type : orderTypesToExport) {
-					Set<String> keysByType = new TreeSet<>(orderMap.getKeysBy(tx(), type));
-					for (String id : keysByType) {
-						Order order = orderMap.getBy(tx(), type, id);
-						visitor.visit(order);
-						statistics.nrOfOrders++;
+
+					if (!multiFile) {
+						writeOrdersByType(writer, orderMap, type);
+					} else {
+						String typeXmlFile = exportName + UNDERLINE + Tags.ORDER + UNDERLINE + type + XML_FILE_SUFFIX;
+						writer.writeEmptyElement(Tags.INCLUDE_FILE);
+						writer.writeAttribute(Tags.FILE, typeXmlFile);
+
+						File typeXmlFileF = new File(modelFile.getParentFile(), typeXmlFile);
+						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
+							createdFiles.add(typeXmlFileF);
+							XMLStreamWriter typeWriter = openXmlStreamWriter(typeOut);
+							writeOrdersByType(typeWriter, orderMap, type);
+							typeWriter.writeEndDocument();
+						}
 					}
 				}
 			}
@@ -131,12 +154,46 @@ public class XmlExportModelCommand extends Command {
 			this.statistics.durationNanos = System.nanoTime() - start;
 
 		} catch (Exception e) {
-			if (modelFile.exists())
-				modelFile.delete();
+			for (File createdFile : createdFiles) {
+				if (createdFile.exists())
+					createdFile.delete();
+			}
 			String msg = "Failed to write model to file {0} due to {1}";
-			msg = MessageFormat.format(msg, modelFile, e.getMessage());
+			msg = MessageFormat.format(msg, this.modelFile, e.getMessage());
 			throw new StrolchException(msg, e);
 		}
+	}
+
+	private void writeOrdersByType(XMLStreamWriter writer, OrderMap orderMap, String type) {
+		OrderVisitor visitor = new OrderToSaxWriterVisitor(writer);
+		Set<String> keysByType = new TreeSet<>(orderMap.getKeysBy(tx(), type));
+		for (String id : keysByType) {
+			Order order = orderMap.getBy(tx(), type, id);
+			visitor.visit(order);
+			this.statistics.nrOfOrders++;
+		}
+	}
+
+	private void writeResourcesByType(XMLStreamWriter writer, ResourceMap resourceMap, String type) {
+		ResourceVisitor visitor = new ResourceToSaxWriterVisitor(writer);
+		Set<String> keysByType = new TreeSet<>(resourceMap.getKeysBy(tx(), type));
+		for (String id : keysByType) {
+			Resource resource = resourceMap.getBy(tx(), type, id);
+			visitor.visit(resource);
+			this.statistics.nrOfResources++;
+		}
+	}
+
+	private XMLStreamWriter openXmlStreamWriter(FileOutputStream out) throws FactoryConfigurationError,
+			XMLStreamException {
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		XMLStreamWriter writer = factory.createXMLStreamWriter(out, StrolchConstants.DEFAULT_ENCODING);
+		writer = new IndentingXMLStreamWriter(writer);
+
+		// start document
+		writer.writeStartDocument(StrolchConstants.DEFAULT_ENCODING, StrolchConstants.DEFAULT_XML_VERSION);
+		writer.writeStartElement(Tags.STROLCH_MODEL);
+		return writer;
 	}
 
 	/**
@@ -145,6 +202,13 @@ public class XmlExportModelCommand extends Command {
 	 */
 	public void setModelFile(File modelFile) {
 		this.modelFile = modelFile;
+	}
+
+	/**
+	 * @param multiFile
+	 */
+	public void setMultiFile(boolean multiFile) {
+		this.multiFile = multiFile;
 	}
 
 	/**

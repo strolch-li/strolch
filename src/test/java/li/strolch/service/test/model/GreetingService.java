@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.test;
+package li.strolch.service.test.model;
 
 import java.text.MessageFormat;
 
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.test.GreetingService.GreetingArgument;
+import li.strolch.service.test.model.GreetingService.GreetingArgument;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**

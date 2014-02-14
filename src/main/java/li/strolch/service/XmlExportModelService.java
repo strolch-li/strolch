@@ -24,6 +24,7 @@ import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -39,6 +40,8 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 
 	@Override
 	protected ServiceResult internalDoService(XmlExportModelArgument arg) {
+
+		DBC.PRE.assertNotEmpty("Modelfile must be set!", arg.modelFileName);
 
 		File dataPath = getRuntimeConfiguration().getDataPath();
 		File modelFile = new File(dataPath, arg.modelFileName);
@@ -56,6 +59,7 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 
 			XmlExportModelCommand command = new XmlExportModelCommand(getContainer(), tx);
 			command.setModelFile(modelFile);
+			command.setMultiFile(arg.multiFile);
 			command.setDoOrders(arg.doOrders);
 			command.setDoResources(arg.doResources);
 			command.setOrderTypes(arg.orderTypes);

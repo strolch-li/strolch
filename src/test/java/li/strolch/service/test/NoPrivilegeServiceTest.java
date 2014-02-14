@@ -21,7 +21,9 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 
 import li.strolch.service.api.ServiceHandler;
-import li.strolch.service.test.GreetingService.GreetingArgument;
+import li.strolch.service.test.model.GreetingResult;
+import li.strolch.service.test.model.GreetingService;
+import li.strolch.service.test.model.GreetingService.GreetingArgument;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;

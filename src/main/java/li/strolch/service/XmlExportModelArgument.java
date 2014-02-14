@@ -24,6 +24,7 @@ public class XmlExportModelArgument extends ServiceArgument {
 	private static final long serialVersionUID = 1L;
 
 	public String modelFileName;
+	public boolean multiFile;
 	public boolean doOrders = true;
 	public boolean doResources = true;
 	public Set<String> orderTypes = new HashSet<>();
@@ -34,18 +35,25 @@ public class XmlExportModelArgument extends ServiceArgument {
 		StringBuilder builder = new StringBuilder();
 		builder.append("XmlExportModelArgument [");
 
+		builder.append("multiFile=");
+		builder.append(this.multiFile);
+
 		if (this.doResources)
-			builder.append("resources");
+			builder.append(", resources");
 		if (this.doOrders)
 			builder.append(", orders");
 
-		if (this.resourceTypes != null) {
+		if (this.resourceTypes != null && !this.resourceTypes.isEmpty()) {
 			builder.append(", resourceTypes=");
 			builder.append(this.resourceTypes);
+		} else {
+			builder.append(", resourceTypes=*");
 		}
-		if (this.orderTypes != null) {
+		if (this.orderTypes != null && !this.orderTypes.isEmpty()) {
 			builder.append(", orderTypes=");
 			builder.append(this.orderTypes);
+		} else {
+			builder.append(", orderTypes=*");
 		}
 
 		builder.append(", modelFileName=");
