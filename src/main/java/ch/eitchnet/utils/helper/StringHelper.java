@@ -40,6 +40,7 @@ public class StringHelper {
 	public static final String DASH = "-"; //$NON-NLS-1$
 	public static final String UNDERLINE = "_"; //$NON-NLS-1$
 	public static final String COMMA = ","; //$NON-NLS-1$
+	public static final String DOT = "."; //$NON-NLS-1$
 	public static final String SEMICOLON = ";"; //$NON-NLS-1$
 	public static final String COLON = ":"; //$NON-NLS-1$
 
