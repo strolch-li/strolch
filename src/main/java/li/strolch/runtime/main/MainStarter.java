@@ -39,13 +39,17 @@ import org.slf4j.LoggerFactory;
 public class MainStarter {
 
 	private static final Logger logger = LoggerFactory.getLogger(MainStarter.class);
+
+	private static final String OPT_ROOT_PATH = "root-path";
+
 	private Options options;
 	private StrolchAgent agent;
 
 	public MainStarter() {
 		Options op = new Options();
-		Option rootPathOption = new Option("p", "root-path", true, "root path to strolch runtime");
+		Option rootPathOption = new Option("p", OPT_ROOT_PATH, true, "root path to strolch runtime");
 		rootPathOption.setOptionalArg(false);
+		rootPathOption.setRequired(true);
 		op.addOption(rootPathOption);
 		this.options = op;
 	}
@@ -65,7 +69,7 @@ public class MainStarter {
 			return 1;
 		}
 
-		String pathS = line.getOptionValue("root-path");
+		String pathS = line.getOptionValue(OPT_ROOT_PATH);
 		File pathF = new File(pathS);
 		if (!pathF.exists()) {
 			logger.info(MessageFormat.format("Path parameter does not exist at: {0}", pathS));
