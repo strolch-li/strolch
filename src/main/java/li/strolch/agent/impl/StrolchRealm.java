@@ -15,50 +15,44 @@
  */
 package li.strolch.agent.impl;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
-import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.configuration.ComponentConfiguration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class StrolchRealm {
+public abstract class StrolchRealm {
 
+	protected static final Logger logger = LoggerFactory.getLogger(StrolchRealm.class);
 	private String realm;
-	private ResourceMap resourceMap;
-	private OrderMap orderMap;
-	private PersistenceHandler persistenceHandler;
 
-	public StrolchRealm(String realm, PersistenceHandler persistenceHandler, ResourceMap resourceMap, OrderMap orderMap) {
+	public StrolchRealm(String realm) {
 		this.realm = realm;
-		this.persistenceHandler = persistenceHandler;
-		this.resourceMap = resourceMap;
-		this.orderMap = orderMap;
 	}
 
-	/**
-	 * @return the realm
-	 */
 	public String getRealm() {
 		return this.realm;
 	}
 
-	public StrolchTransaction openTx() {
-		return this.persistenceHandler.openTx(this);
-	}
+	public abstract DataStoreMode getMode();
 
-	/**
-	 * @return the resourceMap
-	 */
-	public ResourceMap getResourceMap() {
-		return this.resourceMap;
-	}
+	public abstract void initialize(ComponentContainer container, ComponentConfiguration configuration);
 
-	/**
-	 * @return the orderMap
-	 */
-	public OrderMap getOrderMap() {
-		return this.orderMap;
-	}
+	public abstract void start();
+
+	public abstract void stop();
+
+	public abstract void destroy();
+
+	public abstract StrolchTransaction openTx();
+
+	public abstract ResourceMap getResourceMap();
+
+	public abstract OrderMap getOrderMap();
 }

@@ -184,7 +184,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 	/**
 	 * Special method used when starting the container to cache the values. Not to be used anywhere else but from the
-	 * {@link CachedElementMapHandler} and of course through the {@link #add(StrolchTransaction, StrolchElement)}-call
+	 * {@link CachedRealm} and of course through the {@link #add(StrolchTransaction, StrolchElement)}-call
 	 * to not duplicate code
 	 * 
 	 * @param element

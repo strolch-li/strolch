@@ -19,14 +19,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
 import li.strolch.agent.impl.ComponentContainerImpl;
-import li.strolch.agent.impl.DataStoreMode;
-import li.strolch.agent.impl.ElementMapHandlerConfigurator;
-import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
@@ -40,9 +36,6 @@ import org.slf4j.LoggerFactory;
 public class StrolchAgent {
 
 	private static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties"; //$NON-NLS-1$
-	public static final String PROP_DATA_STORE_MODE = "dataStoreMode"; //$NON-NLS-1$
-	public static final String PROP_DATA_STORE_FILE = "dataStoreFile"; //$NON-NLS-1$
-	public static final String PROP_REALMS = "realms"; //$NON-NLS-1$
 	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
 
 	/**
@@ -95,19 +88,11 @@ public class StrolchAgent {
 		logger.info(MessageFormat.format(msg, path.getAbsolutePath()));
 
 		this.strolchConfiguration = ConfigurationParser.parseConfiguration(path);
-		RuntimeConfiguration runtimeConfiguration = this.strolchConfiguration.getRuntimeConfiguration();
-		DataStoreMode dataStoreMode = DataStoreMode.parseDataStoreMode(runtimeConfiguration.getString(
-				PROP_DATA_STORE_MODE, null));
 
-		ElementMapHandlerConfigurator mapHandlerConfigurator = dataStoreMode.getElementMapConfigurationConfigurator();
-		List<ComponentConfiguration> configurations = mapHandlerConfigurator.buildConfigurations(this);
-		for (ComponentConfiguration configuration : configurations) {
-			this.strolchConfiguration.addConfiguration(configuration.getName(), configuration);
-		}
-
-		ComponentContainerImpl container = new ComponentContainerImpl(this, dataStoreMode);
+		ComponentContainerImpl container = new ComponentContainerImpl(this);
 		this.container = container;
 
+		RuntimeConfiguration runtimeConfiguration = this.strolchConfiguration.getRuntimeConfiguration();
 		logger.info(MessageFormat.format("Setup Agent {0}", runtimeConfiguration.getApplicationName())); //$NON-NLS-1$
 	}
 

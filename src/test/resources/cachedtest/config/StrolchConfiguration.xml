@@ -3,16 +3,24 @@
 	<Runtime>
 		<applicationName>StrolchRuntimeTest</applicationName>
 		<Properties>
-			<dataStoreMode>CACHED</dataStoreMode>
-			<dataStoreFile>StrolchModel.xml</dataStoreFile>
 			<verbose>true</verbose>
 		</Properties>
 	</Runtime>
 	<Component>
+		<name>RealmHandler</name>
+		<api>li.strolch.agent.api.RealmHandler</api>
+		<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+		<depends>PersistenceHandler</depends>
+		<Properties>
+			<dataStoreMode>CACHED</dataStoreMode>
+			<dataStoreFile>StrolchModel.xml</dataStoreFile>
+		</Properties>
+	</Component>
+	<Component>
 		<name>ServiceHandler</name>
 		<api>li.strolch.runtime.configuration.model.ServiceHandlerTest</api>
 		<impl>li.strolch.runtime.configuration.model.ServiceHandlerTestImpl</impl>
-		<depends>PersistenceHandler</depends>
+		<depends>RealmHandler</depends>
 		<Properties>
 		</Properties>
 	</Component>

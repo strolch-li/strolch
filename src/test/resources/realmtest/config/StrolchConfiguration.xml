@@ -4,18 +4,31 @@
 		<applicationName>StrolchRuntimeTest</applicationName>
 		<Properties>
 			<dataStoreMode>TRANSIENT</dataStoreMode>
-			<realms>defaultRealm, myRealm, otherRealm</realms>
-			<dataStoreFile>DefaultRealm.xml</dataStoreFile>
-			<dataStoreFile.myRealm>MyRealm.xml</dataStoreFile.myRealm>
-			<dataStoreFile.otherRealm>OtherRealm.xml</dataStoreFile.otherRealm>
 			<verbose>true</verbose>
 		</Properties>
 	</Runtime>
 	<Component>
+		<name>RealmHandler</name>
+		<api>li.strolch.agent.api.RealmHandler</api>
+		<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+		<Properties>
+			<realms>defaultRealm, myRealm, otherRealm, cachedRealm, transactionalRealm, emptyRealm</realms>
+			<dataStoreMode>TRANSIENT</dataStoreMode>
+			<dataStoreFile>DefaultRealm.xml</dataStoreFile>
+			<dataStoreMode.myRealm>TRANSIENT</dataStoreMode.myRealm>
+			<dataStoreFile.myRealm>MyRealm.xml</dataStoreFile.myRealm>
+			<dataStoreMode.otherRealm>TRANSIENT</dataStoreMode.otherRealm>
+			<dataStoreFile.otherRealm>OtherRealm.xml</dataStoreFile.otherRealm>
+			<dataStoreMode.transactionalRealm>TRANSACTIONAL</dataStoreMode.transactionalRealm>
+			<dataStoreMode.cachedRealm>CACHED</dataStoreMode.cachedRealm>
+			<dataStoreMode.emptyRealm>EMPTY</dataStoreMode.emptyRealm>
+		</Properties>
+	</Component>
+	<Component>
 		<name>ServiceHandler</name>
 		<api>li.strolch.runtime.configuration.model.ServiceHandlerTest</api>
 		<impl>li.strolch.runtime.configuration.model.ServiceHandlerTestImpl</impl>
-		<depends>PersistenceHandler</depends>
+		<depends>RealmHandler</depends>
 		<Properties>
 		</Properties>
 	</Component>
@@ -34,5 +47,10 @@
 		<Properties>
 			<verbose>true</verbose>
 		</Properties>
+	</Component>
+	<Component>
+		<name>PersistenceHandler</name>
+		<api>li.strolch.persistence.api.PersistenceHandler</api>
+		<impl>li.strolch.persistence.inmemory.InMemoryPersistenceHandler</impl>
 	</Component>
 </StrolchConfiguration>

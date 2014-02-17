@@ -15,8 +15,21 @@
  */
 package li.strolch.agent;
 
+import static li.strolch.agent.ComponentContainerTest.PATH_REALM_CONTAINER;
+import static li.strolch.agent.ComponentContainerTest.PATH_REALM_RUNTIME;
+import static li.strolch.agent.ComponentContainerTest.destroyContainer;
+import static li.strolch.agent.ComponentContainerTest.logger;
+import static li.strolch.agent.ComponentContainerTest.startContainer;
+import static li.strolch.agent.ComponentContainerTest.testContainer;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
-import static li.strolch.agent.ComponentContainerTest.*;
+import li.strolch.agent.impl.DataStoreMode;
 
 import org.junit.Test;
 
@@ -31,9 +44,22 @@ public class RealmTest {
 		try {
 			StrolchAgent agent = startContainer(PATH_REALM_RUNTIME, PATH_REALM_CONTAINER);
 			testContainer(agent);
-			
-			
-			
+
+			ComponentContainer container = agent.getContainer();
+			Set<String> realmNames = container.getRealmNames();
+			assertEquals(6, realmNames.size());
+
+			Set<String> expectedRealmNames = new HashSet<>(Arrays.asList("defaultRealm", "myRealm", "otherRealm",
+					"cachedRealm", "transactionalRealm", "emptyRealm"));
+			assertEquals(expectedRealmNames, realmNames);
+
+			assertEquals(DataStoreMode.TRANSIENT, container.getRealm("defaultRealm").getMode());
+			assertEquals(DataStoreMode.TRANSIENT, container.getRealm("myRealm").getMode());
+			assertEquals(DataStoreMode.TRANSIENT, container.getRealm("otherRealm").getMode());
+			assertEquals(DataStoreMode.CACHED, container.getRealm("cachedRealm").getMode());
+			assertEquals(DataStoreMode.TRANSACTIONAL, container.getRealm("transactionalRealm").getMode());
+			assertEquals(DataStoreMode.EMPTY, container.getRealm("emptyRealm").getMode());
+
 			destroyContainer(agent);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

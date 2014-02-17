@@ -24,7 +24,7 @@ import li.strolch.runtime.StrolchConstants;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface ElementMapHandler {
+public interface RealmHandler {
 
 	/**
 	 * Returns the names of the configured {@link StrolchRealm StrolchRealms}

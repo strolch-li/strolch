@@ -24,7 +24,7 @@ import java.util.Set;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ComponentState;
-import li.strolch.agent.api.ElementMapHandler;
+import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
@@ -40,17 +40,14 @@ public class ComponentContainerImpl implements ComponentContainer {
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerImpl.class);
 
 	private StrolchAgent agent;
-	private DataStoreMode dataStoreMode;
-
 	private Map<Class<?>, StrolchComponent> componentMap;
 	private Map<String, ComponentController> controllerMap;
 	private ComponentDependencyAnalyzer dependencyAnalyzer;
 	private StrolchConfiguration strolchConfiguration;
 	private ComponentState state;
 
-	public ComponentContainerImpl(StrolchAgent agent, DataStoreMode dataStoreMode) {
+	public ComponentContainerImpl(StrolchAgent agent) {
 		this.agent = agent;
-		this.dataStoreMode = dataStoreMode;
 		this.state = ComponentState.UNDEFINED;
 	}
 
@@ -62,11 +59,6 @@ public class ComponentContainerImpl implements ComponentContainer {
 	@Override
 	public ComponentState getState() {
 		return this.state;
-	}
-
-	@Override
-	public DataStoreMode getDataStoreMode() {
-		return this.dataStoreMode;
 	}
 
 	@Override
@@ -93,12 +85,12 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	@Override
 	public Set<String> getRealmNames() {
-		return getComponent(ElementMapHandler.class).getRealmNames();
+		return getComponent(RealmHandler.class).getRealmNames();
 	}
 
 	@Override
 	public StrolchRealm getRealm(String realm) throws StrolchException {
-		return getComponent(ElementMapHandler.class).getRealm(realm);
+		return getComponent(RealmHandler.class).getRealm(realm);
 	}
 
 	private void initializeComponent(Map<Class<?>, StrolchComponent> componentMap,

@@ -17,7 +17,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 public class InMemoryTransaction extends AbstractTransaction {
 
-	private InMemoryPersistenceHandler persistenceHandler;
+	private InMemoryPersistence persistenceHandler;
 
 	private TransactionCloseStrategy closeStrategy;
 	private ObserverHandler observerHandler;
@@ -28,7 +28,7 @@ public class InMemoryTransaction extends AbstractTransaction {
 	private TransactionResult txResult;
 	private boolean open;
 
-	public InMemoryTransaction(StrolchRealm realm, InMemoryPersistenceHandler persistenceHandler) {
+	public InMemoryTransaction(StrolchRealm realm, InMemoryPersistence persistenceHandler) {
 		super(realm);
 		this.persistenceHandler = persistenceHandler;
 		this.startTime = System.nanoTime();

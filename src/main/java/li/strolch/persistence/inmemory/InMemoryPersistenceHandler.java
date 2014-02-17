@@ -1,7 +1,19 @@
+/*
+ * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package li.strolch.persistence.inmemory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -12,61 +24,40 @@ import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ * 
+ */
 public class InMemoryPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
-	private Map<String, DaoCache> daoCache;
+	private InMemoryPersistence persistenceHandler;
 
+	/**
+	 * @param container
+	 * @param componentName
+	 */
 	public InMemoryPersistenceHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 
 	@Override
-	public StrolchTransaction openTx(StrolchRealm realm) {
-		return new InMemoryTransaction(realm, this);
+	public void initialize(ComponentConfiguration configuration) {
+		this.persistenceHandler = new InMemoryPersistence();
+		super.initialize(configuration);
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
-		super.initialize(configuration);
-		this.daoCache = new HashMap<>();
+	public StrolchTransaction openTx(StrolchRealm realm) {
+		return this.persistenceHandler.openTx(realm);
 	}
 
 	@Override
 	public OrderDao getOrderDao(StrolchTransaction tx) {
-		DaoCache daoCache = getDaoCache(tx);
-		return daoCache.getOrderDao();
+		return this.persistenceHandler.getOrderDao(tx);
 	}
 
 	@Override
 	public ResourceDao getResourceDao(StrolchTransaction tx) {
-		DaoCache daoCache = getDaoCache(tx);
-		return daoCache.getResourceDao();
-	}
-
-	private synchronized DaoCache getDaoCache(StrolchTransaction tx) {
-		DaoCache daoCache = this.daoCache.get(tx.getRealmName());
-		if (daoCache == null) {
-			daoCache = new DaoCache(new InMemoryOrderDao(), new InMemoryResourceDao());
-			this.daoCache.put(tx.getRealmName(), daoCache);
-		}
-		return daoCache;
-	}
-
-	private class DaoCache {
-		private OrderDao orderDao;
-		private ResourceDao resourceDao;
-
-		public DaoCache(OrderDao orderDao, ResourceDao resourceDao) {
-			this.orderDao = orderDao;
-			this.resourceDao = resourceDao;
-		}
-
-		public OrderDao getOrderDao() {
-			return this.orderDao;
-		}
-
-		public ResourceDao getResourceDao() {
-			return this.resourceDao;
-		}
+		return this.persistenceHandler.getResourceDao(tx);
 	}
 }

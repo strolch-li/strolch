@@ -24,30 +24,30 @@ import java.text.MessageFormat;
 public enum DataStoreMode {
 	EMPTY {
 		@Override
-		public ElementMapHandlerConfigurator getElementMapConfigurationConfigurator() {
-			return new EmptyElementMapHandlerConfigurator();
+		public StrolchRealm createRealm(String realm) {
+			return new EmptyRealm(realm);
 		}
 	}, //
 	TRANSIENT {
 		@Override
-		public ElementMapHandlerConfigurator getElementMapConfigurationConfigurator() {
-			return new TransientElementMapHandlerConfigurator();
+		public StrolchRealm createRealm(String realm) {
+			return new TransientRealm(realm);
 		}
 	}, //
 	CACHED {
 		@Override
-		public ElementMapHandlerConfigurator getElementMapConfigurationConfigurator() {
-			return new CachedElementMapHandlerConfigurator();
+		public StrolchRealm createRealm(String realm) {
+			return new CachedRealm(realm);
 		}
 	}, //
 	TRANSACTIONAL {
 		@Override
-		public ElementMapHandlerConfigurator getElementMapConfigurationConfigurator() {
-			return new TransactionalElementMapHandlerConfigurator();
+		public StrolchRealm createRealm(String realm) {
+			return new TransactionalRealm(realm);
 		}
 	}; //
 
-	public abstract ElementMapHandlerConfigurator getElementMapConfigurationConfigurator();
+	public abstract StrolchRealm createRealm(String realm);
 
 	public static DataStoreMode parseDataStoreMode(String modeS) {
 		for (DataStoreMode dataStoreMode : values()) {

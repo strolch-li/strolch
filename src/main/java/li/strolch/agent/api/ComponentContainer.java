@@ -17,7 +17,6 @@ package li.strolch.agent.api;
 
 import java.util.Set;
 
-import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.StrolchConstants;
@@ -30,8 +29,6 @@ public interface ComponentContainer {
 	public abstract StrolchAgent getAgent();
 
 	public abstract ComponentState getState();
-
-	public abstract DataStoreMode getDataStoreMode();
 
 	public abstract boolean hasComponent(Class<?> clazz);
 
