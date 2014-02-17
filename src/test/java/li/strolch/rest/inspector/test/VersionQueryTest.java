@@ -50,7 +50,7 @@ public class VersionQueryTest extends AbstractRestfulTest {
 		AgentVersion agentVersion = versionQueryResult.getAgentVersion();
 		logger.info(agentVersion.toString());
 		List<ComponentVersion> componentVersions = versionQueryResult.getComponentVersions();
-		assertEquals(6, componentVersions.size());
+		assertEquals(5, componentVersions.size());
 		for (ComponentVersion version : componentVersions) {
 			logger.info(version.toString());
 			assertEquals("li.strolch", agentVersion.getGroupId());
