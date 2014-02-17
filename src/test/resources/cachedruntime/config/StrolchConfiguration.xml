@@ -3,10 +3,18 @@
 	<Runtime>
 		<applicationName>StrolchPersistenceTest</applicationName>
 		<Properties>
-			<dataStoreMode>CACHED</dataStoreMode>
 			<verbose>true</verbose>
 		</Properties>
 	</Runtime>
+	<Component>
+		<name>RealmHandler</name>
+		<api>li.strolch.agent.api.RealmHandler</api>
+		<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+		<depends>PersistenceHandler</depends>
+		<Properties>
+			<dataStoreMode>CACHED</dataStoreMode>
+		</Properties>
+	</Component>
 	<Component>
 		<name>PersistenceHandler</name>
 		<api>li.strolch.persistence.api.PersistenceHandler</api>
