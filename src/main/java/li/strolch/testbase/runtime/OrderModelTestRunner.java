@@ -110,7 +110,7 @@ public class OrderModelTestRunner {
 			updatedOrder = tx.getOrderMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, updatedOrder);
-		if (this.runtimeMock.getContainer().getDataStoreMode() != DataStoreMode.CACHED)
+		if (this.runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).getMode() != DataStoreMode.CACHED)
 			assertFalse("Objects can't be the same reference after re-reading!", readOrder == updatedOrder);
 		Parameter<String> updatedParam = readOrder.getParameter(BAG_ID, PARAM_STRING_ID);
 		assertEquals(newStringValue, updatedParam.getValue());
