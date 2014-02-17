@@ -3,16 +3,24 @@
 	<Runtime>
 		<applicationName>StrolchTutorialApp</applicationName>
 		<Properties>
-			<dataStoreMode>TRANSIENT</dataStoreMode>
-			<dataStoreFile>StrolchModel.xml</dataStoreFile>
 			<verbose>true</verbose>
 		</Properties>
 	</Runtime>
 	<Component>
+		<name>RealmHandler</name>
+		<api>li.strolch.agent.api.RealmHandler</api>
+		<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+		<depends>PersistenceHandler</depends>
+		<Properties>
+			<dataStoreMode>TRANSIENT</dataStoreMode>
+			<dataStoreFile>StrolchModel.xml</dataStoreFile>
+		</Properties>
+	</Component>
+	<Component>
 		<name>ServiceHandler</name>
 		<api>li.strolch.service.api.ServiceHandler</api>
 		<impl>li.strolch.service.api.DefaultServiceHandler</impl>
-		<depends>ElementMapHandler</depends>
+		<depends>RealmHandler</depends>
 		<depends>PrivilegeHandler</depends>
 		<Properties>
 			<verbose>true</verbose>
@@ -46,7 +54,7 @@
 		<name>EnumHandler</name>
 		<api>li.strolch.runtime.query.enums.EnumHandler</api>
 		<impl>li.strolch.runtime.query.enums.DefaultEnumHandler</impl>
-		<depends>ElementMapHandler</depends>
+		<depends>RealmHandler</depends>
 		<Properties>
 			<realm>defaultRealm</realm>
 			<salutations>Resource/Enumeration/salutations</salutations>
