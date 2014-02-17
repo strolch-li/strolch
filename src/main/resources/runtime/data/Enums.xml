@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchModel>
+
+	<Resource Id="salutations" Name="Salutations" Type="Enumeration">
+		<ParameterBag Id="en" Name="Salutations" Type="Enumeration">
+			<Parameter Id="mr" name="Mr" Type="String" Value="Mr" />
+			<Parameter Id="mrs" name="Mrs" Type="String" Value="Mrs" />
+			<Parameter Id="ms" name="Ms" Type="String" Value="Ms" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="sex" Name="Sex" Type="Enumeration">
+		<ParameterBag Id="en" Name="Sex" Type="Enumeration">
+			<Parameter Id="male" name="Male" Type="String" Value="male" />
+			<Parameter Id="female" name="Female" Type="String" Value="female" />
+			<Parameter Id="both" name="Both" Type="String" Value="both" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="religions" Name="Religions" Type="Enumeration">
+		<ParameterBag Id="en" Name="Religions" Type="Enumeration">
+			<Parameter Id="Roman Catholic" name="Roman Catholic" Type="String" Value="Roman Catholic" />
+			<Parameter Id="Protestant" name="Protestant" Type="String" Value="Protestant" />
+			<Parameter Id="Orthodox" name="Orthodox" Type="String" Value="Orthodox" />
+			<Parameter Id="Christian" name="Anglican" Type="String" Value="Anglican" />
+			<Parameter Id="Muslim" name="Muslim" Type="String" Value="Muslim" />
+			<Parameter Id="Hindu" name="Hindu" Type="String" Value="Hindu" />
+			<Parameter Id="Buddhist" name="Buddhist" Type="String" Value="Buddhist" />
+			<Parameter Id="Jewish" name="Jewish" Type="String" Value="Jewish" />
+			<Parameter Id="Atheist" name="Atheist" Type="String" Value="Atheist" />
+		</ParameterBag>
+	</Resource>
+
+</StrolchModel>
