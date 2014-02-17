@@ -3,10 +3,17 @@
 	<Runtime>
 		<applicationName>StrolchPersistenceTest</applicationName>
 		<Properties>
-			<dataStoreMode>EMPTY</dataStoreMode>
 			<verbose>true</verbose>
 		</Properties>
 	</Runtime>
+	<Component>
+		<name>RealmHandler</name>
+		<api>li.strolch.agent.api.RealmHandler</api>
+		<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+		<Properties>
+			<dataStoreMode>EMPTY</dataStoreMode>
+		</Properties>
+	</Component>
 	<Component>
 		<name>ServiceHandler</name>
 		<api>li.strolch.service.api.ServiceHandler</api>
