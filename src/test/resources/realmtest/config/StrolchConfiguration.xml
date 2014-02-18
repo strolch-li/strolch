@@ -25,12 +25,12 @@
 			<allowSchemaCreation>true</allowSchemaCreation>
 			<allowSchemaDrop>true</allowSchemaDrop>
 
-			<db.url.first>jdbc:postgresql://localhost/testdb</db.url.first>
-			<db.username.first>testuser</db.username.first>
+			<db.url.first>jdbc:postgresql://localhost/testdb1</db.url.first>
+			<db.username.first>testuser1</db.username.first>
 			<db.password.first>test</db.password.first>
 
-			<db.url.second>jdbc:postgresql://localhost/testdb</db.url.second>
-			<db.username.second>testuser</db.username.second>
+			<db.url.second>jdbc:postgresql://localhost/testdb2</db.url.second>
+			<db.username.second>testuser2</db.username.second>
 			<db.password.second>test</db.password.second>
 		</Properties>
 	</Component>

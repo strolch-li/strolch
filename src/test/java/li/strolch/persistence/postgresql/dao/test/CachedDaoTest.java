@@ -33,12 +33,12 @@ public class CachedDaoTest extends AbstractModelTest {
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/test/resources/cachedruntime"; //$NON-NLS-1$
 
-	private static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
-	private static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
-	private static final String DB_PASSWORD = "test"; //$NON-NLS-1$
+	public static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
+	public static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
+	public static final String DB_PASSWORD = "test"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
-	
+
 	@Override
 	protected RuntimeMock getRuntimeMock() {
 		return runtimeMock;
@@ -47,7 +47,7 @@ public class CachedDaoTest extends AbstractModelTest {
 	@BeforeClass
 	public static void beforeClass() throws SQLException {
 
-		dropSchema();
+		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
@@ -57,10 +57,10 @@ public class CachedDaoTest extends AbstractModelTest {
 		runtimeMock.startContainer();
 	}
 
-	public static void dropSchema() throws SQLException {
+	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws SQLException {
 		String dbVersion = DbSchemaVersionCheck.getExpectedDbVersion();
 		String sql = DbSchemaVersionCheck.getSql(dbVersion, "drop"); //$NON-NLS-1$
-		try (Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();
 		}
 	}

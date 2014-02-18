@@ -41,6 +41,7 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -60,7 +61,7 @@ public class ObserverUpdateTest {
 	@BeforeClass
 	public static void beforeClass() throws SQLException {
 
-		CachedDaoTest.dropSchema();
+		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);

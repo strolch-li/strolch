@@ -15,6 +15,11 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_PASSWORD;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_URL;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_USERNAME;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
+
 import java.io.File;
 import java.sql.SQLException;
 
@@ -40,7 +45,7 @@ public class TransactionalDaoTest extends AbstractModelTest {
 	@BeforeClass
 	public static void beforeClass() throws SQLException {
 
-		CachedDaoTest.dropSchema();
+		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);

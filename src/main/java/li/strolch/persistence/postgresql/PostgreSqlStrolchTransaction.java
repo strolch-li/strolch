@@ -139,10 +139,12 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 					"Strolch Transaction for realm " + getRealmName() + " failed due to " + e.getMessage(), e); //$NON-NLS-1$
 
 		} finally {
-			try {
-				this.connection.close();
-			} catch (Exception e) {
-				logger.error("Failed to close connection due to " + e.getMessage(), e); //$NON-NLS-1$
+			if (this.connection != null) {
+				try {
+					this.connection.close();
+				} catch (Exception e) {
+					logger.error("Failed to close connection due to " + e.getMessage(), e); //$NON-NLS-1$
+				}
 			}
 		}
 
