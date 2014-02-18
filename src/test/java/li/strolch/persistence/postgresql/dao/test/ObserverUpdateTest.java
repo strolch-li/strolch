@@ -60,7 +60,7 @@ public class ObserverUpdateTest {
 	@BeforeClass
 	public static void beforeClass() throws SQLException {
 
-		XmlCachedDaoTest.dropSchema();
+		CachedDaoTest.dropSchema();
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);

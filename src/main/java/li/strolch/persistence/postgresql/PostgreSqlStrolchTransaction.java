@@ -96,7 +96,7 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	public void autoCloseableCommit() {
 
 		if (logger.isDebugEnabled()) {
-			logger.info("Committing TX..."); //$NON-NLS-1$
+			logger.info("Committing TX for realm " + getRealmName() + "..."); //$NON-NLS-1$
 		}
 
 		long start = System.nanoTime();
@@ -127,13 +127,16 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 			long txDuration = end - this.startTime;
 			long closeDuration = end - start;
 			StringBuilder sb = new StringBuilder();
-			sb.append("TX has failed after "); //$NON-NLS-1$
+			sb.append("TX for realm ");
+			sb.append(getRealmName());
+			sb.append(" has failed after "); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(txDuration));
 			sb.append(" with close operation taking "); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(closeDuration));
 			logger.info(sb.toString());
 
-			throw new StrolchPersistenceException("Strolch Transaction failed due to " + e.getMessage(), e); //$NON-NLS-1$
+			throw new StrolchPersistenceException(
+					"Strolch Transaction for realm " + getRealmName() + " failed due to " + e.getMessage(), e); //$NON-NLS-1$
 
 		} finally {
 			try {
@@ -153,7 +156,9 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 		this.txResult.setRealm(getRealm().getRealm());
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("TX was completed after "); //$NON-NLS-1$
+		sb.append("TX for realm ");
+		sb.append(getRealmName());
+		sb.append(" was completed after "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(txDuration));
 		sb.append(" with close operation taking "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(closeDuration));

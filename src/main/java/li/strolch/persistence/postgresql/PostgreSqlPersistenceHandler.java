@@ -15,6 +15,8 @@
  */
 package li.strolch.persistence.postgresql;
 
+import static ch.eitchnet.utils.helper.StringHelper.DOT;
+
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -22,6 +24,7 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -59,33 +62,51 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		this.componentConfiguration = componentConfiguration;
 		this.connetionInfoMap = new HashMap<>();
 
-		String dbUrl = componentConfiguration.getString(PROP_DB_URL, null);
-		String username = componentConfiguration.getString(PROP_DB_USERNAME, null);
-		String password = componentConfiguration.getString(PROP_DB_PASSWORD, null);
+		Set<String> realmNames = getContainer().getRealmNames();
+		for (String realmName : realmNames) {
 
+			String dbUrlKey = PROP_DB_URL;
+			String dbUsernameKey = PROP_DB_USERNAME;
+			String dbPasswordKey = PROP_DB_PASSWORD;
+			if (!realmName.equals(StrolchConstants.DEFAULT_REALM)) {
+				dbUrlKey += DOT + realmName;
+				dbUsernameKey += DOT + realmName;
+				dbPasswordKey += DOT + realmName;
+			}
+
+			String dbUrl = componentConfiguration.getString(dbUrlKey, null);
+			String username = componentConfiguration.getString(dbUsernameKey, null);
+			String password = componentConfiguration.getString(dbPasswordKey, null);
+
+			DbConnectionInfo connectionInfo = new DbConnectionInfo(realmName, dbUrl);
+			connectionInfo.setUsername(username);
+			connectionInfo.setPassword(password);
+
+			loadDriverForConnection(connectionInfo);
+			this.connetionInfoMap.put(realmName, connectionInfo);
+		}
+
+		super.initialize(componentConfiguration);
+	}
+
+	private void loadDriverForConnection(DbConnectionInfo connectionInfo) {
 		Driver driver;
 		try {
 			// server loader does not seem to work in all contexts, thus:
 			org.postgresql.Driver.getLogLevel();
 
-			driver = DriverManager.getDriver(dbUrl);
+			driver = DriverManager.getDriver(connectionInfo.getUrl());
 		} catch (SQLException e) {
 			String msg = "Failed to load DB driver for URL {0} due to: {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, dbUrl, e.getMessage());
+			msg = MessageFormat.format(msg, connectionInfo.getUrl(), e.getMessage());
 			throw new StrolchConfigurationException(msg, e);
 		}
-
-		DbConnectionInfo connectionInfo = new DbConnectionInfo(StrolchConstants.DEFAULT_REALM, dbUrl);
-		connectionInfo.setUsername(username);
-		connectionInfo.setPassword(password);
-		this.connetionInfoMap.put(StrolchConstants.DEFAULT_REALM, connectionInfo);
 
 		String compliant = driver.jdbcCompliant() ? "" : "non"; //$NON-NLS-1$ //$NON-NLS-2$
 		String msg = "Using {0} JDBC compliant Driver {1}.{2}"; //$NON-NLS-1$
 		msg = MessageFormat.format(msg, compliant, driver.getMajorVersion(), driver.getMinorVersion());
 		logger.info(msg);
 
-		super.initialize(componentConfiguration);
 	}
 
 	@Override

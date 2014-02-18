@@ -27,7 +27,7 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public class XmlCachedDaoTest extends AbstractModelTest {
+public class CachedDaoTest extends AbstractModelTest {
 
 	public static final String RUNTIME_PATH = "target/cachedStrolchRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$

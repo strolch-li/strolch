@@ -48,6 +48,7 @@ public class DbConnectionCheck {
 	public void checkConnections() {
 		Collection<DbConnectionInfo> values = this.connetionInfoMap.values();
 		for (DbConnectionInfo connectionInfo : values) {
+
 			String url = connectionInfo.getUrl();
 			String username = connectionInfo.getUsername();
 			String password = connectionInfo.getPassword();

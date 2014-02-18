@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchConfiguration>
+	<Runtime>
+		<applicationName>StrolchPersistenceTest</applicationName>
+		<Properties>
+			<verbose>true</verbose>
+		</Properties>
+	</Runtime>
+	<Component>
+		<name>RealmHandler</name>
+		<api>li.strolch.agent.api.RealmHandler</api>
+		<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+		<depends>PersistenceHandler</depends>
+		<Properties>
+			<realms>first, second</realms>
+			<dataStoreMode.first>TRANSACTIONAL</dataStoreMode.first>
+			<dataStoreMode.second>TRANSACTIONAL</dataStoreMode.second>
+		</Properties>
+	</Component>
+	<Component>
+		<name>PersistenceHandler</name>
+		<api>li.strolch.persistence.api.PersistenceHandler</api>
+		<impl>li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler</impl>
+		<Properties>
+			<allowSchemaCreation>true</allowSchemaCreation>
+			<allowSchemaDrop>true</allowSchemaDrop>
+
+			<db.url.first>jdbc:postgresql://localhost/testdb</db.url.first>
+			<db.username.first>testuser</db.username.first>
+			<db.password.first>test</db.password.first>
+
+			<db.url.second>jdbc:postgresql://localhost/testdb</db.url.second>
+			<db.username.second>testuser</db.username.second>
+			<db.password.second>test</db.password.second>
+		</Properties>
+	</Component>
+	<Component>
+		<name>ObserverHandler</name>
+		<api>li.strolch.runtime.observer.ObserverHandler</api>
+		<impl>li.strolch.runtime.observer.DefaultObserverHandler</impl>
+	</Component>
+</StrolchConfiguration>

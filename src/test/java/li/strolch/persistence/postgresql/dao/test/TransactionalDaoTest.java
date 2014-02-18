@@ -24,7 +24,7 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public class XmlTransactionalDaoTest extends AbstractModelTest {
+public class TransactionalDaoTest extends AbstractModelTest {
 
 	public static final String RUNTIME_PATH = "target/transactionalStrolchRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
@@ -40,7 +40,7 @@ public class XmlTransactionalDaoTest extends AbstractModelTest {
 	@BeforeClass
 	public static void beforeClass() throws SQLException {
 
-		XmlCachedDaoTest.dropSchema();
+		CachedDaoTest.dropSchema();
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
