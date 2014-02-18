@@ -67,7 +67,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public void setup(ComponentConfiguration configuration) {
 
 		this.realms = new HashMap<>();
 		String[] realms = configuration.getStringArray(PROP_REALMS, StrolchConstants.DEFAULT_REALM);
@@ -81,6 +81,11 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 			StrolchRealm realm = dataStoreMode.createRealm(realmName);
 			this.realms.put(realmName, realm);
 		}
+		super.setup(configuration);
+	}
+
+	@Override
+	public void initialize(ComponentConfiguration configuration) {
 
 		for (String realmName : this.realms.keySet()) {
 			StrolchRealm realm = this.realms.get(realmName);

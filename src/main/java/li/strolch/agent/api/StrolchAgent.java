@@ -90,6 +90,8 @@ public class StrolchAgent {
 		this.strolchConfiguration = ConfigurationParser.parseConfiguration(path);
 
 		ComponentContainerImpl container = new ComponentContainerImpl(this);
+		container.setup(strolchConfiguration);
+
 		this.container = container;
 
 		RuntimeConfiguration runtimeConfiguration = this.strolchConfiguration.getRuntimeConfiguration();

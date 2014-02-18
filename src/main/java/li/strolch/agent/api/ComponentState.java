@@ -19,7 +19,7 @@ import java.text.MessageFormat;
 
 public enum ComponentState {
 
-	UNDEFINED, INITIALIZED, STARTED, STOPPED, DESTROYED;
+	UNDEFINED, SETUP, INITIALIZED, STARTED, STOPPED, DESTROYED;
 
 	public ComponentState validateStateChange(ComponentState newState) {
 
@@ -28,6 +28,10 @@ public enum ComponentState {
 
 		switch (this) {
 		case UNDEFINED:
+			if (newState != ComponentState.SETUP && newState != STOPPED)
+				throw getIllegalStateEx(newState);
+			break;
+		case SETUP:
 			if (newState != ComponentState.INITIALIZED && newState != STOPPED)
 				throw getIllegalStateEx(newState);
 			break;

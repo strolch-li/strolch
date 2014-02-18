@@ -69,6 +69,10 @@ public class StrolchComponent {
 		}
 	}
 
+	public void setup(ComponentConfiguration configuration) {
+		this.state = this.state.validateStateChange(ComponentState.SETUP);
+	}
+
 	public void initialize(ComponentConfiguration configuration) {
 		this.state = this.state.validateStateChange(ComponentState.INITIALIZED);
 	}

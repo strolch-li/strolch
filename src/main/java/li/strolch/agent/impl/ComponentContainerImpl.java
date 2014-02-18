@@ -93,7 +93,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		return getComponent(RealmHandler.class).getRealm(realm);
 	}
 
-	private void initializeComponent(Map<Class<?>, StrolchComponent> componentMap,
+	private void setupComponent(Map<Class<?>, StrolchComponent> componentMap,
 			Map<String, ComponentController> controllerMap, ComponentConfiguration componentConfiguration) {
 
 		String componentName = componentConfiguration.getName();
@@ -120,6 +120,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(ComponentContainer.class,
 					String.class);
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
+			strolchComponent.setup(componentConfiguration);
 
 			componentMap.put(apiClass, strolchComponent);
 			controllerMap.put(componentName, new ComponentController(strolchComponent));
@@ -226,7 +227,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			destroy(dependencies);
 	}
 
-	public void initialize(StrolchConfiguration strolchConfiguration) {
+	public void setup(StrolchConfiguration strolchConfiguration) {
 
 		// first set up the container itself
 		this.strolchConfiguration = strolchConfiguration;
@@ -236,7 +237,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		for (String componentName : componentNames) {
 			ComponentConfiguration componentConfiguration = strolchConfiguration
 					.getComponentConfiguration(componentName);
-			initializeComponent(componentMap, controllerMap, componentConfiguration);
+			setupComponent(componentMap, controllerMap, componentConfiguration);
 		}
 
 		// then analyze dependencies
@@ -248,8 +249,12 @@ public class ComponentContainerImpl implements ComponentContainer {
 		this.controllerMap = controllerMap;
 		this.strolchConfiguration = strolchConfiguration;
 
+		this.state = this.state.validateStateChange(ComponentState.SETUP);
 		String msg = "Strolch Container setup with {0} components."; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.componentMap.size()));
+	}
+
+	public void initialize(StrolchConfiguration strolchConfiguration) {
 
 		// now we can initialize the components
 		logger.info("Initializing strolch components..."); //$NON-NLS-1$
@@ -258,7 +263,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		initialize(rootUpstreamComponents);
 		this.state = this.state.validateStateChange(ComponentState.INITIALIZED);
 
-		msg = "All {0} Strolch Components have been initialized."; //$NON-NLS-1$
+		String msg = "All {0} Strolch Components have been initialized."; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.controllerMap.size()));
 	}
 
