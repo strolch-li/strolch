@@ -72,7 +72,7 @@ public class TransactionResultTest extends AbstractPersistenceTest {
 		performChanges(txResult);
 		String logMessage = txResult.getLogMessage();
 		logger.info(logMessage);
-		assertThat(logMessage, containsString("TX was completed after")); //$NON-NLS-1$
+		assertThat(logMessage, containsString("TX for realm defaultRealm was completed after")); //$NON-NLS-1$
 		assertThat(logMessage, containsString("30 objects in 2 types were modified")); //$NON-NLS-1$
 		assertThat(txResult.getKeys(), containsInAnyOrder("Resource", "Book")); //$NON-NLS-1$ //$NON-NLS-2$
 

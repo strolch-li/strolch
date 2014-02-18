@@ -171,21 +171,23 @@ public class TransactionResult {
 		}
 
 		StringBuilder sb = new StringBuilder();
+		sb.append("TX for realm ");
+		sb.append(getRealm());
 		switch (this.state) {
 		case OPEN:
-			sb.append("TX is still open after ");
+			sb.append(" is still open after ");
 			break;
 		case COMMITTED:
-			sb.append("TX was completed after ");
+			sb.append(" was completed after ");
 			break;
 		case ROLLED_BACK:
-			sb.append("TX was rolled back after ");
+			sb.append(" was rolled back after ");
 			break;
 		case FAILED:
-			sb.append("TX has failed after ");
+			sb.append(" has failed after ");
 			break;
 		default:
-			sb.append("TX is in unhandled state ");
+			sb.append(" is in unhandled state ");
 			sb.append(this.state);
 			sb.append(" after ");
 		}
