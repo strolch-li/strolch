@@ -37,9 +37,9 @@ import org.junit.Test;
 
 public class RealmTest extends AbstractModelTest {
 
-	public static final String RUNTIME_PATH = "target/realmTest/"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/realmtest/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/realmTest"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/test/resources/realmtest"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
 
