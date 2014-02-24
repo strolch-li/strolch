@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.impl.StrolchRealm;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
