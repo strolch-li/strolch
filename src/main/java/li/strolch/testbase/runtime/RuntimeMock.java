@@ -23,7 +23,7 @@ import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
-import li.strolch.agent.impl.StrolchRealm;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
 import li.strolch.service.api.ServiceHandler;
