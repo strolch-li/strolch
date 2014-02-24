@@ -33,10 +33,9 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
  * In this sense, orders do not need to be verified, so all verifier chracteristics are disabled and the
  * getVerifier()-method will return the null reference
  * 
- * @author eitch
- * 
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class Order extends GroupedParameterizedElement {
+public class Order extends GroupedParameterizedElement implements StrolchRootElement {
 
 	private static final long serialVersionUID = 0L;
 

@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class Resource extends GroupedParameterizedElement {
+public class Resource extends GroupedParameterizedElement implements StrolchRootElement {
 
 	private static final long serialVersionUID = 0L;
 
