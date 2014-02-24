@@ -22,8 +22,8 @@ import static org.junit.Assert.assertNull;
 import java.io.File;
 import java.sql.SQLException;
 
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.DataStoreMode;
-import li.strolch.agent.impl.StrolchRealm;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
