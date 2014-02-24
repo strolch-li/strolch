@@ -42,6 +42,18 @@ public enum DBC {
 		throw new DbcException(ex);
 	}
 
+	public void assertNotEquals(String msg, Object value1, Object value2) {
+		if (value1 != null && !value1.equals(value2))
+			return;
+
+		if (value2 != null && !value2.equals(value1))
+			return;
+
+		String ex = "Values are equal: {0}"; //$NON-NLS-1$
+		ex = MessageFormat.format(ex, msg);
+		throw new DbcException(ex);
+	}
+
 	public void assertTrue(String msg, boolean value) {
 		if (!value) {
 			String ex = "Expected true, but was false: {0}"; //$NON-NLS-1$

@@ -126,6 +126,92 @@ public class DBCTest {
 	}
 
 	/**
+	 * Run the void assertEquals(String,Object,Object) method test.
+	 * 
+	 * @throws Exception
+	 * 
+	 * @generatedBy CodePro at 2/2/14 8:13 PM
+	 */
+	@Test
+	public void testAssertNotEquals_1() throws Exception {
+		this.exception.expect(DbcException.class);
+		this.exception.expectMessage("Values are equal:");
+
+		String msg = "";
+		Object value1 = null;
+		Object value2 = null;
+
+		DBC.PRE.assertNotEquals(msg, value1, value2);
+	}
+
+	/**
+	 * Run the void assertEquals(String,Object,Object) method test.
+	 * 
+	 * @throws Exception
+	 * 
+	 * @generatedBy CodePro at 2/2/14 8:13 PM
+	 */
+	@Test
+	public void testAssertNotEquals_2() throws Exception {
+		String msg = "";
+		Object value1 = new Object();
+		Object value2 = new Object();
+
+		DBC.PRE.assertNotEquals(msg, value1, value2);
+	}
+
+	/**
+	 * Run the void assertEquals(String,Object,Object) method test.
+	 * 
+	 * @throws Exception
+	 * 
+	 * @generatedBy CodePro at 2/2/14 8:13 PM
+	 */
+	@Test
+	public void testAssertNotEquals_3() throws Exception {
+		String msg = "";
+		Object value1 = null;
+		Object value2 = new Object();
+
+		DBC.PRE.assertNotEquals(msg, value1, value2);
+	}
+
+	/**
+	 * Run the void assertEquals(String,Object,Object) method test.
+	 * 
+	 * @throws Exception
+	 * 
+	 * @generatedBy CodePro at 2/2/14 8:13 PM
+	 */
+	@Test
+	public void testAssertNotEquals_4() throws Exception {
+		String msg = "";
+		Object value1 = new Object();
+		Object value2 = null;
+
+		DBC.PRE.assertNotEquals(msg, value1, value2);
+	}
+
+	/**
+	 * Run the void assertEquals(String,Object,Object) method test.
+	 * 
+	 * @throws Exception
+	 * 
+	 * @generatedBy CodePro at 2/2/14 8:13 PM
+	 */
+	@Test
+	public void testAssertNotEquals_5() throws Exception {
+		this.exception.expect(DbcException.class);
+		this.exception.expectMessage("Values are equal:");
+
+		String msg = "";
+		Object value1 = "bla";
+		Object value2 = "bla";
+
+		DBC.PRE.assertNotEquals(msg, value1, value2);
+	}
+
+	/**
 	 * Run the void assertExists(String,File) method test.
 	 * 
 	 * @throws Exception
