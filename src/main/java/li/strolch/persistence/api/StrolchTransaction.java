@@ -25,6 +25,7 @@ import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
@@ -49,6 +50,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	public OrderMap getOrderMap();
 
 	public PersistenceHandler getPersistenceHandler();
+
+	public <T extends StrolchRootElement> void lock(T element);
 
 	public List<Order> doQuery(OrderQuery query);
 

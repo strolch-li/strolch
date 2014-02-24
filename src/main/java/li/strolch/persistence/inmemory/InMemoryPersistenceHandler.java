@@ -17,7 +17,7 @@ package li.strolch.persistence.inmemory;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.StrolchRealm;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;

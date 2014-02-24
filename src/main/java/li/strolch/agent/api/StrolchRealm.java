@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.agent.impl;
+package li.strolch.agent.api;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.OrderMap;
-import li.strolch.agent.api.ResourceMap;
+import java.util.concurrent.TimeUnit;
+
+import li.strolch.agent.impl.DataStoreMode;
+import li.strolch.agent.impl.DefaultLockHandler;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
@@ -29,8 +31,11 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class StrolchRealm {
 
+	private static final String PROP_TRY_LOCK_TIME_UNIT = "tryLockTimeUnit";
+	private static final String PROP_TRY_LOCK_TIME = "tryLockTime";
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchRealm.class);
 	private String realm;
+	private LockHandler lockHandler;
 
 	public StrolchRealm(String realm) {
 		this.realm = realm;
@@ -40,9 +45,22 @@ public abstract class StrolchRealm {
 		return this.realm;
 	}
 
-	public abstract DataStoreMode getMode();
+	public void lock(StrolchRootElement element) {
+		this.lockHandler.lock(element);
+	}
 
-	public abstract void initialize(ComponentContainer container, ComponentConfiguration configuration);
+	public void unlock(StrolchRootElement lockedElement) {
+		this.lockHandler.unlock(lockedElement);
+	}
+
+	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
+		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(PROP_TRY_LOCK_TIME_UNIT, TimeUnit.SECONDS.name()));
+		long time = configuration.getLong(PROP_TRY_LOCK_TIME, 10);
+		logger.info("Using a locking try timeout of " + timeUnit.toSeconds(time) + "s");
+		this.lockHandler = new DefaultLockHandler(realm, timeUnit, time);
+	}
+
+	public abstract DataStoreMode getMode();
 
 	public abstract void start();
 
@@ -55,4 +73,5 @@ public abstract class StrolchRealm {
 	public abstract ResourceMap getResourceMap();
 
 	public abstract OrderMap getOrderMap();
+
 }

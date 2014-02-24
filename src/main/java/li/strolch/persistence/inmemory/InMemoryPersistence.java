@@ -3,7 +3,7 @@ package li.strolch.persistence.inmemory;
 import java.util.HashMap;
 import java.util.Map;
 
-import li.strolch.agent.impl.StrolchRealm;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;

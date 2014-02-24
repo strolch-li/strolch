@@ -19,7 +19,7 @@ import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.RealmHandler;
-import li.strolch.agent.impl.StrolchRealm;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.RuntimeConfiguration;

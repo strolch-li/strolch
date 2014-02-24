@@ -17,6 +17,8 @@ package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
 
+import li.strolch.agent.api.StrolchRealm;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 

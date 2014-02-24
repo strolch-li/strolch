@@ -23,6 +23,7 @@ import java.text.MessageFormat;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
 import li.strolch.persistence.api.PersistenceHandler;
@@ -72,6 +73,7 @@ public class TransientRealm extends StrolchRealm {
 
 	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
+		super.initialize(container, configuration);
 
 		String key = PREFIX_DATA_STORE_FILE;
 		if (!getRealm().equals(StrolchConstants.DEFAULT_REALM))

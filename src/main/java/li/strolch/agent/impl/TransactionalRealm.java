@@ -20,6 +20,7 @@ import java.text.MessageFormat;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -60,6 +61,7 @@ public class TransactionalRealm extends StrolchRealm {
 
 	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
+		super.initialize(container, configuration);
 		this.resourceMap = new TransactionalResourceMap();
 		this.orderMap = new TransactionalOrderMap();
 		this.persistenceHandler = container.getComponent(PersistenceHandler.class);

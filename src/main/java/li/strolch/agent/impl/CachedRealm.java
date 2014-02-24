@@ -22,6 +22,7 @@ import java.util.Set;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.OrderDao;
@@ -66,7 +67,7 @@ public class CachedRealm extends StrolchRealm {
 
 	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
-
+		super.initialize(container, configuration);
 		this.persistenceHandler = container.getComponent(PersistenceHandler.class);
 		this.resourceMap = new CachedResourceMap();
 		this.orderMap = new CachedOrderMap();

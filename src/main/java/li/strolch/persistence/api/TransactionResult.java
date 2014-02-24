@@ -28,13 +28,17 @@ public class TransactionResult {
 	private TransactionState state;
 	private Exception failCause;
 
+	private long startNanos;
 	private Date startTime;
 	private long txDuration;
 	private long closeDuration;
 
 	private Map<String, ModificationResult> modificationByKey;
-	
-	public TransactionResult() {
+
+	public TransactionResult(String realm, long startNanos, Date startDate) {
+		this.realm = realm;
+		this.startNanos = startNanos;
+		this.startTime = startDate;
 		this.state = TransactionState.OPEN;
 		this.modificationByKey = new HashMap<>();
 	}
@@ -44,14 +48,6 @@ public class TransactionResult {
 	 */
 	public String getRealm() {
 		return this.realm;
-	}
-
-	/**
-	 * @param realm
-	 *            the realm to set
-	 */
-	public void setRealm(String realm) {
-		this.realm = realm;
 	}
 
 	/**
@@ -82,6 +78,13 @@ public class TransactionResult {
 	 */
 	public void setFailCause(Exception failCause) {
 		this.failCause = failCause;
+	}
+
+	/**
+	 * @return the startNanos
+	 */
+	public long getStartNanos() {
+		return this.startNanos;
 	}
 
 	/**
@@ -136,7 +139,7 @@ public class TransactionResult {
 	public void setModificationByKey(Map<String, ModificationResult> modificationByKey) {
 		this.modificationByKey = modificationByKey;
 	}
-	
+
 	public void addModificationResult(ModificationResult modificationResult) {
 		this.modificationByKey.put(modificationResult.getKey(), modificationResult);
 	}

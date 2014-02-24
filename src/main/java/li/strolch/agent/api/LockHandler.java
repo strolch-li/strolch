@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
+package li.strolch.agent.api;
 
-import li.strolch.agent.api.StrolchRealm;
+import li.strolch.model.StrolchRootElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface PersistenceHandler {
+public interface LockHandler {
 
-	public StrolchTransaction openTx(StrolchRealm realm);
+	public void lock(StrolchRootElement element);
 
-	public OrderDao getOrderDao(StrolchTransaction tx);
-
-	public ResourceDao getResourceDao(StrolchTransaction tx);
+	public void unlock(StrolchRootElement element);
 }

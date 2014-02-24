@@ -153,8 +153,8 @@ public abstract class AbstractionConfiguration {
 	}
 
 	private void logDefValueUse(String key, Object defValue) {
-		String msg = "Using default for key {0}={1}"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, key, defValue);
+		String msg = "{0}: Using default for key {1}={2}"; //$NON-NLS-1$
+		msg = MessageFormat.format(msg, name, key, defValue);
 		logger.info(msg);
 	}
 

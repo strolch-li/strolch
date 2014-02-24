@@ -20,6 +20,7 @@ import java.text.MessageFormat;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.inmemory.InMemoryPersistence;
@@ -60,6 +61,7 @@ public class EmptyRealm extends StrolchRealm {
 
 	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
+		super.initialize(container, configuration);
 		this.persistenceHandler = new InMemoryPersistence();
 		this.resourceMap = new TransactionalResourceMap();
 		this.orderMap = new TransactionalOrderMap();

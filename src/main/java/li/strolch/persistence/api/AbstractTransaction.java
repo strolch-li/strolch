@@ -16,11 +16,14 @@
 package li.strolch.persistence.api;
 
 import java.text.MessageFormat;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.impl.StrolchRealm;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
@@ -28,14 +31,18 @@ import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.inmemory.InMemoryTransaction;
+import li.strolch.runtime.observer.ObserverHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -45,23 +52,79 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	protected static final Logger logger = LoggerFactory.getLogger(InMemoryTransaction.class);
 	private StrolchRealm realm;
 
+	private TransactionCloseStrategy closeStrategy;
+	private ObserverHandler observerHandler;
+	private boolean suppressUpdates;
+	private TransactionResult txResult;
+	private boolean open;
+
+	private Set<StrolchRootElement> lockedElements;
+
+	public AbstractTransaction(StrolchRealm realm) {
+		this.realm = realm;
+		this.lockedElements = new HashSet<>();
+		this.closeStrategy = TransactionCloseStrategy.COMMIT;
+		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), new Date());
+		this.open = true;
+	}
+
+	@Override
+	public boolean isOpen() {
+		return this.open;
+	}
+
 	@Override
 	public String getRealmName() {
 		return this.realm.getRealm();
 	}
 
-	/**
-	 * @param realm
-	 */
-	public AbstractTransaction(StrolchRealm realm) {
-		this.realm = realm;
+	protected StrolchRealm getRealm() {
+		return this.realm;
+	}
+
+	@Override
+	public void setCloseStrategy(TransactionCloseStrategy closeStrategy) {
+		this.closeStrategy = closeStrategy;
+	}
+
+	@Override
+	public void close() throws StrolchPersistenceException {
+		this.closeStrategy.close(this);
 	}
 
 	/**
-	 * @return the realm
+	 * @param suppressUpdates
+	 *            the suppressUpdates to set
 	 */
-	protected StrolchRealm getRealm() {
-		return this.realm;
+	public void setSuppressUpdates(boolean suppressUpdates) {
+		this.suppressUpdates = suppressUpdates;
+	}
+
+	/**
+	 * @return the suppressUpdates
+	 */
+	public boolean isSuppressUpdates() {
+		return this.suppressUpdates;
+	}
+
+	/**
+	 * @param observerHandler
+	 *            the observerHandler to set
+	 */
+	public void setObserverHandler(ObserverHandler observerHandler) {
+		this.observerHandler = observerHandler;
+	}
+
+	@Override
+	public <T extends StrolchRootElement> void lock(T element) {
+		this.realm.lock(element);
+		this.lockedElements.add(element);
+	}
+
+	private void unlockElements() {
+		for (StrolchRootElement lockedElement : this.lockedElements) {
+			this.realm.unlock(lockedElement);
+		}
 	}
 
 	@Override
@@ -136,5 +199,111 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		String parameterId = elements.get(4);
 		Parameter<?> parameter = bag.getParameter(parameterId);
 		return (T) parameter;
+	}
+
+	@Override
+	public void autoCloseableCommit() {
+		long start = System.nanoTime();
+		if (logger.isDebugEnabled()) {
+			logger.info("Committing TX for realm " + getRealmName() + "..."); //$NON-NLS-1$
+		}
+
+		try {
+			commit(this.txResult);
+			handleCommit(start);
+		} catch (Exception e) {
+			handleFailure(start, e);
+		} finally {
+			unlockElements();
+		}
+	}
+
+	@Override
+	public void autoCloseableRollback() {
+		long start = System.nanoTime();
+		if (logger.isDebugEnabled()) {
+			logger.info("Rolling back TX for realm " + getRealmName() + "..."); //$NON-NLS-1$
+		}
+		try {
+			rollback(this.txResult);
+			handleRollback(start);
+		} catch (Exception e) {
+			handleFailure(start, e);
+		} finally {
+			unlockElements();
+		}
+	}
+
+	protected abstract void commit(TransactionResult txResult) throws Exception;
+
+	protected abstract void rollback(TransactionResult txResult) throws Exception;
+
+	private void handleCommit(long start) {
+		this.open = false;
+
+		long end = System.nanoTime();
+		long txDuration = end - txResult.getStartNanos();
+		long closeDuration = end - start;
+
+		this.txResult.setState(TransactionState.COMMITTED);
+		this.txResult.setTxDuration(txDuration);
+		this.txResult.setCloseDuration(closeDuration);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("TX for realm ");
+		sb.append(getRealmName());
+		sb.append(" was completed after "); //$NON-NLS-1$
+		sb.append(StringHelper.formatNanoDuration(txDuration));
+		sb.append(" with close operation taking "); //$NON-NLS-1$
+		sb.append(StringHelper.formatNanoDuration(closeDuration));
+		logger.info(sb.toString());
+
+		if (!this.suppressUpdates && this.observerHandler != null) {
+
+			Set<String> keys = this.txResult.getKeys();
+			for (String key : keys) {
+				ModificationResult modificationResult = this.txResult.getModificationResult(key);
+
+				this.observerHandler.add(key, modificationResult.<StrolchElement> getCreated());
+				this.observerHandler.update(key, modificationResult.<StrolchElement> getUpdated());
+				this.observerHandler.remove(key, modificationResult.<StrolchElement> getDeleted());
+			}
+		}
+	}
+
+	private void handleRollback(long start) {
+		this.open = false;
+
+		long end = System.nanoTime();
+		long txDuration = end - this.txResult.getStartNanos();
+		long closeDuration = end - start;
+
+		this.txResult.setState(TransactionState.ROLLED_BACK);
+		this.txResult.setTxDuration(txDuration);
+		this.txResult.setCloseDuration(closeDuration);
+	}
+
+	protected void handleFailure(long closeStartNanos, Exception e) {
+		this.open = false;
+
+		long end = System.nanoTime();
+		long txDuration = end - this.txResult.getStartNanos();
+		long closeDuration = end - closeStartNanos;
+
+		this.txResult.setState(TransactionState.FAILED);
+		this.txResult.setTxDuration(txDuration);
+		this.txResult.setCloseDuration(closeDuration);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("TX");
+		sb.append(getRealmName());
+		sb.append(" has failed after "); //$NON-NLS-1$
+		sb.append(StringHelper.formatNanoDuration(txDuration));
+		sb.append(" with close operation taking "); //$NON-NLS-1$
+		sb.append(StringHelper.formatNanoDuration(closeDuration));
+		logger.info(sb.toString());
+
+		throw new StrolchPersistenceException(
+				"Strolch Transaction for realm " + getRealmName() + " failed due to " + e.getMessage(), e); //$NON-NLS-1$
 	}
 }
