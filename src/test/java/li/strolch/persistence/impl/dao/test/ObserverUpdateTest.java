@@ -29,6 +29,7 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.observer.Observer;
@@ -106,8 +107,8 @@ public class ObserverUpdateTest {
 
 		// register an observer for orders and resources
 		ElementAddedObserver observer = new ElementAddedObserver();
-		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver("Order", observer); //$NON-NLS-1$
-		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver("Resource", observer); //$NON-NLS-1$
+		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.ORDER, observer); //$NON-NLS-1$
+		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.RESOURCE, observer); //$NON-NLS-1$
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
@@ -122,8 +123,7 @@ public class ObserverUpdateTest {
 		}
 
 		assertEquals(2, observer.results.size());
-		assertEquals(1, observer.results.get("Order").getCreated().size()); //$NON-NLS-1$
-		assertEquals(1, observer.results.get("Resource").getCreated().size()); //$NON-NLS-1$
-
+		assertEquals(1, observer.results.get(Tags.ORDER).getCreated().size()); //$NON-NLS-1$
+		assertEquals(1, observer.results.get(Tags.RESOURCE).getCreated().size()); //$NON-NLS-1$
 	}
 }

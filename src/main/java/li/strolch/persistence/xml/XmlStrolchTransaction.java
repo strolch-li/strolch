@@ -17,13 +17,9 @@ package li.strolch.persistence.xml;
 
 import java.util.Set;
 
-import li.strolch.agent.impl.StrolchRealm;
-import li.strolch.model.StrolchElement;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.PersistenceHandler;
-import li.strolch.persistence.api.StrolchPersistenceException;
-import li.strolch.persistence.api.TransactionCloseStrategy;
-import li.strolch.runtime.observer.ObserverHandler;
 import ch.eitchnet.xmlpers.api.ModificationResult;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.api.TransactionResult;
@@ -31,40 +27,12 @@ import ch.eitchnet.xmlpers.api.TransactionResult;
 public class XmlStrolchTransaction extends AbstractTransaction {
 
 	private XmlPersistenceHandler persistenceHandler;
-	private ObserverHandler observerHandler;
-	private boolean suppressUpdates;
 	private PersistenceTransaction tx;
-	private TransactionCloseStrategy closeStrategy;
 
 	public XmlStrolchTransaction(StrolchRealm realm, PersistenceTransaction tx, XmlPersistenceHandler persistenceHandler) {
 		super(realm);
 		this.persistenceHandler = persistenceHandler;
-		this.suppressUpdates = false;
 		this.tx = tx;
-		this.closeStrategy = TransactionCloseStrategy.COMMIT;
-	}
-
-	/**
-	 * @param observerHandler
-	 *            the observerHandler to set
-	 */
-	public void setObserverHandler(ObserverHandler observerHandler) {
-		this.observerHandler = observerHandler;
-	}
-
-	/**
-	 * @param suppressUpdates
-	 *            the suppressUpdates to set
-	 */
-	public void setSuppressUpdates(boolean suppressUpdates) {
-		this.suppressUpdates = suppressUpdates;
-	}
-
-	/**
-	 * @return the suppressUpdates
-	 */
-	public boolean isSuppressUpdates() {
-		return this.suppressUpdates;
 	}
 
 	PersistenceTransaction getTx() {
@@ -72,47 +40,22 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 	}
 
 	@Override
-	public void setCloseStrategy(TransactionCloseStrategy closeStrategy) {
-		this.closeStrategy = closeStrategy;
-	}
-
-	@Override
-	public void autoCloseableCommit() {
-
-		TransactionResult txResult = new TransactionResult();
-		if (!this.suppressUpdates && this.observerHandler != null) {
-			this.tx.setTransactionResult(txResult);
-		}
-
+	protected void commit(li.strolch.persistence.api.TransactionResult txResult) throws Exception {
+		TransactionResult result = new TransactionResult();
+		this.tx.setTransactionResult(result);
 		this.tx.autoCloseableCommit();
-		logger.info(txResult.getLogMessage());
-
-		if (!this.suppressUpdates && this.observerHandler != null) {
-
-			Set<String> keys = txResult.getKeys();
-			for (String key : keys) {
-				ModificationResult modificationResult = txResult.getModificationResult(key);
-
-				this.observerHandler.add(key, modificationResult.<StrolchElement> getCreated());
-				this.observerHandler.update(key, modificationResult.<StrolchElement> getUpdated());
-				this.observerHandler.remove(key, modificationResult.<StrolchElement> getDeleted());
-			}
+		Set<String> keys = result.getKeys();
+		for (String key : keys) {
+			ModificationResult modificationResult = result.getModificationResult(key);
+			li.strolch.persistence.api.ModificationResult mr = new li.strolch.persistence.api.ModificationResult(key,
+					modificationResult.getCreated(), modificationResult.getUpdated(), modificationResult.getDeleted());
+			txResult.addModificationResult(mr);
 		}
 	}
 
 	@Override
-	public void autoCloseableRollback() {
+	protected void rollback(li.strolch.persistence.api.TransactionResult txResult) throws Exception {
 		this.tx.autoCloseableRollback();
-	}
-
-	@Override
-	public void close() throws StrolchPersistenceException {
-		this.closeStrategy.close(this);
-	}
-
-	@Override
-	public boolean isOpen() {
-		return this.tx.isOpen();
 	}
 
 	@Override

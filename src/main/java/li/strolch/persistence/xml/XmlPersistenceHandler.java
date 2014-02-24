@@ -20,7 +20,7 @@ import java.util.Properties;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.StrolchRealm;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
