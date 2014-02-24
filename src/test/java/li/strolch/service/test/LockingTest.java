@@ -48,7 +48,7 @@ public class LockingTest {
 	private static final String RESOURCE_LOCATOR = "Resource/TestType/MyTestResource";
 
 	protected static RuntimeMock runtimeMock;
-	private boolean run;
+	private volatile boolean run;
 
 	@BeforeClass
 	public static void beforeClass() {
