@@ -11,6 +11,8 @@
 		<api>li.strolch.agent.api.RealmHandler</api>
 		<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
 		<Properties>
+			<tryLockTimeUnit>SECONDS</tryLockTimeUnit>
+			<tryLockTime>1</tryLockTime>
 			<dataStoreMode>TRANSIENT</dataStoreMode>
 			<dataStoreFile>StrolchModel.xml</dataStoreFile>
 		</Properties>
