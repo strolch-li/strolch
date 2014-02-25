@@ -289,7 +289,12 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setString(1, element.getId());
-			preparedStatement.execute();
+			int modCount = preparedStatement.executeUpdate();
+			if (modCount != 1) {
+				String msg = "Expected to delete 1 element with id {0} but SQL statement modified {1} elements!";
+				msg = MessageFormat.format(msg, element.getId(), modCount);
+				throw new StrolchPersistenceException(msg);
+			}
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Order {0} due to {2}",

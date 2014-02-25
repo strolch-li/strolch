@@ -107,7 +107,12 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			SQLXML sqlxml = createSqlXml(order, preparedStatement);
 			preparedStatement.setSQLXML(6, sqlxml);
 			try {
-				preparedStatement.execute();
+				int modCount = preparedStatement.executeUpdate();
+				if (modCount != 1) {
+					String msg = "Expected to save 1 element with id {0} but SQL statement modified {1} elements!";
+					msg = MessageFormat.format(msg, order.getId(), modCount);
+					throw new StrolchPersistenceException(msg);
+				}
 			} finally {
 				sqlxml.free();
 			}
@@ -133,7 +138,12 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			SQLXML sqlxml = createSqlXml(order, preparedStatement);
 			preparedStatement.setSQLXML(5, sqlxml);
 			try {
-				preparedStatement.execute();
+				int modCount = preparedStatement.executeUpdate();
+				if (modCount != 1) {
+					String msg = "Expected to update 1 element with id {0} but SQL statement modified {1} elements!";
+					msg = MessageFormat.format(msg, order.getId(), modCount);
+					throw new StrolchPersistenceException(msg);
+				}
 			} finally {
 				sqlxml.free();
 			}

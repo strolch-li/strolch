@@ -43,22 +43,19 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 
 	@Override
 	protected void commit(TransactionResult txResult) throws Exception {
-		try {
-			if (this.orderDao != null)
-				this.orderDao.commit(txResult);
-			if (this.resourceDao != null)
-				this.resourceDao.commit(txResult);
-			if (this.connection != null)
-				this.connection.commit();
-		} finally {
-			if (this.connection != null) {
-				try {
-					this.connection.close();
-				} catch (Exception e) {
-					logger.error("Failed to close connection due to " + e.getMessage(), e); //$NON-NLS-1$
-				}
-			}
-		}
+
+		// first perform DAOs
+		if (this.orderDao != null)
+			this.orderDao.commit(txResult);
+		if (this.resourceDao != null)
+			this.resourceDao.commit(txResult);
+
+		// then commit the SQL connection
+		if (this.connection != null)
+			this.connection.commit();
+
+		// and close the connection, but not catching, as otherwise we can't rollback in exception case
+		this.connection.close();
 	}
 
 	@Override
