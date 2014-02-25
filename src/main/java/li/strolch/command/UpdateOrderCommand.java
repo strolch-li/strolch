@@ -31,6 +31,7 @@ import ch.eitchnet.utils.dbc.DBC;
 public class UpdateOrderCommand extends Command {
 
 	private Order order;
+	private Order replacedElement;
 
 	/**
 	 * @param tx
@@ -59,6 +60,13 @@ public class UpdateOrderCommand extends Command {
 			throw new StrolchException(msg);
 		}
 
-		orderMap.update(tx(), this.order);
+		this.replacedElement = orderMap.update(tx(), this.order);
+	}
+
+	@Override
+	public void undo() {
+		if (this.replacedElement != null && tx().isRollingBack()) {
+			tx().getOrderMap().update(tx(), replacedElement);
+		}
 	}
 }

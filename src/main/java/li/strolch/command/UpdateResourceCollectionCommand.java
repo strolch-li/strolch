@@ -32,6 +32,7 @@ import ch.eitchnet.utils.dbc.DBC;
 public class UpdateResourceCollectionCommand extends Command {
 
 	private List<Resource> resources;
+	private List<Resource> replacedElements;
 
 	/**
 	 * @param tx
@@ -62,6 +63,14 @@ public class UpdateResourceCollectionCommand extends Command {
 			}
 		}
 
-		resourceMap.updateAll(tx(), resources);
+		this.replacedElements = resourceMap.updateAll(tx(), resources);
+	}
+
+	@Override
+	public void undo() {
+		if (this.replacedElements != null && tx().isRollingBack()) {
+			ResourceMap resourceMap = tx().getResourceMap();
+			resourceMap.updateAll(tx(), replacedElements);
+		}
 	}
 }

@@ -52,6 +52,11 @@ public class XmlImportModelCommand extends Command {
 	}
 
 	@Override
+	public void undo() {
+		logger.warn("Not undoing import of file " + this.modelFile);
+	}
+
+	@Override
 	public void doCommand() {
 		DBC.PRE.assertExists("Model must exist!", this.modelFile);
 

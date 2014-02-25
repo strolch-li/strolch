@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ParameterizedElement;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
@@ -31,6 +32,8 @@ public class RemoveParameterCommand extends Command {
 
 	private ParameterizedElement element;
 	private String parameterId;
+
+	private Parameter<?> removedParameter;
 
 	/**
 	 * @param container
@@ -58,15 +61,22 @@ public class RemoveParameterCommand extends Command {
 
 	@Override
 	public void doCommand() {
-		DBC.PRE.assertNotNull("Element may not be null!", element);
-		DBC.PRE.assertNotEmpty("ParameterId must be set!", parameterId);
+		DBC.PRE.assertNotNull("Element may not be null!", this.element);
+		DBC.PRE.assertNotEmpty("ParameterId must be set!", this.parameterId);
 
-		if (!element.hasParameter(this.parameterId)) {
+		if (!this.element.hasParameter(this.parameterId)) {
 			String msg = "The Parameter {0} can not be removed as it does not exist on element {1}";
-			msg = MessageFormat.format(msg, parameterId, element.getLocator());
+			msg = MessageFormat.format(msg, this.parameterId, this.element.getLocator());
 			throw new StrolchPersistenceException(msg);
 		}
 
-		this.element.removeParameter(parameterId);
+		this.removedParameter = this.element.removeParameter(this.parameterId);
+	}
+
+	@Override
+	public void undo() {
+		if (this.removedParameter != null) {
+			this.element.addParameter(this.removedParameter);
+		}
 	}
 }

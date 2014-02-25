@@ -31,6 +31,7 @@ import ch.eitchnet.utils.dbc.DBC;
 public class UpdateResourceCommand extends Command {
 
 	private Resource resource;
+	private Resource replacedElement;
 
 	/**
 	 * @param tx
@@ -59,6 +60,13 @@ public class UpdateResourceCommand extends Command {
 			throw new StrolchException(msg);
 		}
 
-		resourceMap.update(tx(), this.resource);
+		this.replacedElement = resourceMap.update(tx(), this.resource);
+	}
+
+	@Override
+	public void undo() {
+		if (this.replacedElement != null && tx().isRollingBack()) {
+			tx().getResourceMap().update(tx(), replacedElement);
+		}
 	}
 }

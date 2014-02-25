@@ -63,4 +63,16 @@ public class AddResourceCollectionCommand extends Command {
 
 		resourceMap.addAll(tx(), resources);
 	}
+
+	@Override
+	public void undo() {
+		if (this.resources != null && !this.resources.isEmpty() && tx().isRollingBack()) {
+			ResourceMap resourceMap = tx().getResourceMap();
+			for (Resource resource : this.resources) {
+				if (resourceMap.hasElement(tx(), resource.getType(), resource.getId())) {
+					resourceMap.remove(tx(), resource);
+				}
+			}
+		}
+	}
 }

@@ -59,16 +59,24 @@ public class AddParameterCommand extends Command {
 
 	@Override
 	public void doCommand() {
-		DBC.PRE.assertNotNull("Element may not be null!", element);
-		DBC.PRE.assertNotNull("Parameter may not be null!", parameter);
+		DBC.PRE.assertNotNull("Element may not be null!", this.element);
+		DBC.PRE.assertNotNull("Parameter may not be null!", this.parameter);
 
-		if (element.hasParameter(this.parameter.getId())) {
+		if (this.element.hasParameter(this.parameter.getId())) {
 			String msg = "The Parameter {0} already exists on element {1}";
-			msg = MessageFormat.format(msg, parameter.getId(), element.getLocator());
+			msg = MessageFormat.format(msg, this.parameter.getId(), this.element.getLocator());
 			throw new StrolchPersistenceException(msg);
 		}
 
-		this.element.addParameter(parameter);
+		this.element.addParameter(this.parameter);
 	}
 
+	@Override
+	public void undo() {
+		if (this.parameter != null) {
+			if (this.element.hasParameter(this.parameter.getId())) {
+				this.element.removeParameter(this.parameter.getId());
+			}
+		}
+	}
 }

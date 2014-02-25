@@ -37,6 +37,13 @@ public class SetParameterCommand extends Command {
 
 	private String valueAsString;
 
+	private String oldName;
+	private String oldInterpretation;
+	private String oldUom;
+	private Boolean oldHidden;
+	private Integer oldIndex;
+	private String oldValueAsString;
+
 	/**
 	 * @param container
 	 * @param tx
@@ -103,27 +110,59 @@ public class SetParameterCommand extends Command {
 
 	@Override
 	public void doCommand() {
-		DBC.PRE.assertNotNull("Parameter may not be null!", parameter);
+		DBC.PRE.assertNotNull("Parameter may not be null!", this.parameter);
 
 		if (this.name != null) {
-			this.parameter.setName(name);
+			this.oldName = this.parameter.getName();
+			this.parameter.setName(this.name);
 		}
 		if (this.interpretation != null) {
-			this.parameter.setInterpretation(interpretation);
+			this.oldInterpretation = this.parameter.getInterpretation();
+			this.parameter.setInterpretation(this.interpretation);
 		}
 		if (this.uom != null) {
-			this.parameter.setUom(uom);
+			this.oldUom = this.parameter.getUom();
+			this.parameter.setUom(this.uom);
 		}
 		if (this.hidden != null) {
+			this.oldHidden = this.parameter.isHidden();
 			this.parameter.setHidden(this.hidden);
 		}
 		if (this.index != null) {
+			this.oldIndex = this.parameter.getIndex();
 			this.parameter.setIndex(this.index.intValue());
 		}
 
 		if (this.valueAsString != null) {
+			this.oldValueAsString = this.parameter.getValueAsString();
 			SetParameterValueVisitor visitor = new SetParameterValueVisitor();
-			visitor.setValue(parameter, valueAsString);
+			visitor.setValue(this.parameter, this.valueAsString);
+		}
+	}
+
+	@Override
+	public void undo() {
+		if (this.parameter != null) {
+			if (this.oldName != null) {
+				this.parameter.setName(this.oldName);
+			}
+			if (this.oldInterpretation != null) {
+				this.parameter.setInterpretation(this.oldInterpretation);
+			}
+			if (this.oldUom != null) {
+				this.parameter.setUom(this.oldUom);
+			}
+			if (this.oldHidden != null) {
+				this.parameter.setHidden(this.oldHidden);
+			}
+			if (this.oldIndex != null) {
+				this.parameter.setIndex(this.oldIndex.intValue());
+			}
+
+			if (this.oldValueAsString != null) {
+				SetParameterValueVisitor visitor = new SetParameterValueVisitor();
+				visitor.setValue(this.parameter, this.oldValueAsString);
+			}
 		}
 	}
 }

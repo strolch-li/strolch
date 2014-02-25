@@ -60,4 +60,13 @@ public class AddOrderCommand extends Command {
 
 		orderMap.add(tx(), this.order);
 	}
+
+	@Override
+	public void undo() {
+		if (this.order != null && tx().isRollingBack()) {
+			OrderMap orderMap = tx().getOrderMap();
+			if (orderMap.hasElement(tx(), this.order.getType(), this.order.getId()))
+				orderMap.remove(tx(), this.order);
+		}
+	}
 }

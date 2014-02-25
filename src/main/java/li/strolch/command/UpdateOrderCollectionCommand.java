@@ -32,6 +32,7 @@ import ch.eitchnet.utils.dbc.DBC;
 public class UpdateOrderCollectionCommand extends Command {
 
 	private List<Order> orders;
+	private List<Order> replacedElements;
 
 	/**
 	 * @param tx
@@ -62,6 +63,14 @@ public class UpdateOrderCollectionCommand extends Command {
 			}
 		}
 
-		orderMap.updateAll(tx(), orders);
+		replacedElements = orderMap.updateAll(tx(), orders);
+	}
+
+	@Override
+	public void undo() {
+		if (this.replacedElements != null && tx().isRollingBack()) {
+			OrderMap orderMap = tx().getOrderMap();
+			orderMap.updateAll(tx(), replacedElements);
+		}
 	}
 }

@@ -64,4 +64,16 @@ public class RemoveOrderCollectionCommand extends Command {
 
 		orderMap.removeAll(tx(), orders);
 	}
+
+	@Override
+	public void undo() {
+		if (this.orders != null && !this.orders.isEmpty() && tx().isRollingBack()) {
+			OrderMap orderMap = tx().getOrderMap();
+			for (Order order : this.orders) {
+				if (!orderMap.hasElement(tx(), order.getType(), order.getId())) {
+					orderMap.add(tx(), order);
+				}
+			}
+		}
+	}
 }

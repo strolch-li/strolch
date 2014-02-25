@@ -61,4 +61,13 @@ public class RemoveResourceCommand extends Command {
 
 		resourceMap.remove(tx(), this.resource);
 	}
+
+	@Override
+	public void undo() {
+		if (this.resource != null && tx().isRollingBack()) {
+			ResourceMap resourceMap = tx().getResourceMap();
+			if (!resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId()))
+				resourceMap.add(tx(), this.resource);
+		}
+	}
 }

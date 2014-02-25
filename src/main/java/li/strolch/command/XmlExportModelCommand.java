@@ -75,6 +75,11 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	@Override
+	public void undo() {
+		logger.warn("Not undoing export to file " + this.modelFile);
+	}
+
+	@Override
 	public void doCommand() {
 		DBC.PRE.assertNotExists("Model may not already exist!", this.modelFile);
 		String fileName = this.modelFile.getName();

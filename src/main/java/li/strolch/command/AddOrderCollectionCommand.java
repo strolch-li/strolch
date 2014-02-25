@@ -54,13 +54,25 @@ public class AddOrderCollectionCommand extends Command {
 		DBC.PRE.assertNotNull("Order list may not be null!", this.orders);
 
 		OrderMap orderMap = tx().getOrderMap();
-		for (Order order : orders) {
+		for (Order order : this.orders) {
 			if (orderMap.hasElement(tx(), order.getType(), order.getId())) {
 				String msg = MessageFormat.format("The Order {0} already exists!", order.getLocator());
 				throw new StrolchException(msg);
 			}
 		}
 
-		orderMap.addAll(tx(), orders);
+		orderMap.addAll(tx(), this.orders);
+	}
+
+	@Override
+	public void undo() {
+		if (this.orders != null && !this.orders.isEmpty() && tx().isRollingBack()) {
+			OrderMap orderMap = tx().getOrderMap();
+			for (Order order : this.orders) {
+				if (orderMap.hasElement(tx(), order.getType(), order.getId())) {
+					orderMap.remove(tx(), order);
+				}
+			}
+		}
 	}
 }
