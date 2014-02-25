@@ -17,7 +17,9 @@ package li.strolch.persistence.api;
 
 public enum TransactionState {
 	OPEN, // 
+	COMMITTING, //
+	ROLLING_BACK, //
 	COMMITTED, // 
-	ROLLED_BACK, //
+	ROLLED_BACK,
 	FAILED;
 }

@@ -56,7 +56,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private ObserverHandler observerHandler;
 	private boolean suppressUpdates;
 	private TransactionResult txResult;
-	private boolean open;
 
 	private Set<StrolchRootElement> lockedElements;
 
@@ -65,12 +64,32 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.lockedElements = new HashSet<>();
 		this.closeStrategy = TransactionCloseStrategy.COMMIT;
 		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), new Date());
-		this.open = true;
+		this.txResult.setState(TransactionState.OPEN);
 	}
 
 	@Override
 	public boolean isOpen() {
-		return this.open;
+		return this.txResult.getState() == TransactionState.OPEN;
+	}
+
+	@Override
+	public boolean isRollingBack() {
+		return this.txResult.getState() == TransactionState.ROLLING_BACK;
+	}
+
+	@Override
+	public boolean isCommitting() {
+		return this.txResult.getState() == TransactionState.COMMITTING;
+	}
+
+	@Override
+	public boolean isCommitted() {
+		return this.txResult.getState() == TransactionState.COMMITTED;
+	}
+
+	@Override
+	public boolean isRolledBack() {
+		return this.txResult.getState() == TransactionState.ROLLED_BACK;
 	}
 
 	@Override
@@ -209,9 +228,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		}
 
 		try {
+			this.txResult.setState(TransactionState.COMMITTING);
 			commit(this.txResult);
 			handleCommit(start);
 		} catch (Exception e) {
+			this.txResult.setState(TransactionState.ROLLING_BACK);
 			handleFailure(start, e);
 		} finally {
 			unlockElements();
@@ -239,7 +260,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	protected abstract void rollback(TransactionResult txResult) throws Exception;
 
 	private void handleCommit(long start) {
-		this.open = false;
 
 		long end = System.nanoTime();
 		long txDuration = end - txResult.getStartNanos();
@@ -272,7 +292,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	private void handleRollback(long start) {
-		this.open = false;
 
 		long end = System.nanoTime();
 		long txDuration = end - this.txResult.getStartNanos();
@@ -284,7 +303,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	protected void handleFailure(long closeStartNanos, Exception e) {
-		this.open = false;
 
 		long end = System.nanoTime();
 		long txDuration = end - this.txResult.getStartNanos();

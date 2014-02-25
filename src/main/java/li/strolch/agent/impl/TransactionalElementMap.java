@@ -74,8 +74,9 @@ public abstract class TransactionalElementMap<T extends StrolchElement> implemen
 	}
 
 	@Override
-	public void update(StrolchTransaction tx, T element) {
+	public T update(StrolchTransaction tx, T element) {
 		getDao(tx).update(element);
+		return element;
 	}
 
 	@Override
@@ -94,7 +95,8 @@ public abstract class TransactionalElementMap<T extends StrolchElement> implemen
 	}
 
 	@Override
-	public void updateAll(StrolchTransaction tx, List<T> elements) {
+	public List<T> updateAll(StrolchTransaction tx, List<T> elements) {
 		getDao(tx).updateAll(elements);
+		return elements;
 	}
 }

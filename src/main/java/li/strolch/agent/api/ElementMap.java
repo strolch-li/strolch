@@ -50,9 +50,9 @@ public interface ElementMap<T extends StrolchElement> {
 
 	public void addAll(StrolchTransaction tx, List<T> elements);
 
-	public void update(StrolchTransaction tx, T element);
+	public T update(StrolchTransaction tx, T element);
 
-	public void updateAll(StrolchTransaction tx, List<T> elements);
+	public List<T> updateAll(StrolchTransaction tx, List<T> elements);
 
 	public void remove(StrolchTransaction tx, T element);
 

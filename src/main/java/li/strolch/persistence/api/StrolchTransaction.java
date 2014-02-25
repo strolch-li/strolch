@@ -45,6 +45,14 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	public boolean isOpen();
 
+	public boolean isRollingBack();
+
+	public boolean isCommitting();
+
+	public boolean isCommitted();
+
+	public boolean isRolledBack();
+
 	public ResourceMap getResourceMap();
 
 	public OrderMap getOrderMap();

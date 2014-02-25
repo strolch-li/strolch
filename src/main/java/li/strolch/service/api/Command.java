@@ -74,4 +74,6 @@ public abstract class Command implements Restrictable {
 	}
 
 	public abstract void doCommand();
+
+	public abstract void undo();
 }

@@ -130,7 +130,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 	}
 
 	@Override
-	public void update(StrolchTransaction tx, T element) {
+	public T update(StrolchTransaction tx, T element) {
 		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Element may not be null!", element); //$NON-NLS-1$
 
@@ -141,14 +141,17 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 			throw new StrolchPersistenceException(msg);
 		}
 
+		T replacedElement;
 		synchronized (byType) {
 			if (byType.remove(element.getId()) == null) {
 				msg = MessageFormat.format(msg, element.getLocator());
 				throw new StrolchPersistenceException(msg);
 			}
-			byType.put(element.getId(), element);
+			replacedElement = byType.put(element.getId(), element);
 			getDao(tx).update(element);
 		}
+
+		return replacedElement;
 	}
 
 	@Override
@@ -184,8 +187,8 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 	/**
 	 * Special method used when starting the container to cache the values. Not to be used anywhere else but from the
-	 * {@link CachedRealm} and of course through the {@link #add(StrolchTransaction, StrolchElement)}-call
-	 * to not duplicate code
+	 * {@link CachedRealm} and of course through the {@link #add(StrolchTransaction, StrolchElement)}-call to not
+	 * duplicate code
 	 * 
 	 * @param element
 	 * @param tx
@@ -275,17 +278,19 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 	}
 
 	@Override
-	public void updateAll(StrolchTransaction tx, List<T> elements) {
+	public List<T> updateAll(StrolchTransaction tx, List<T> elements) {
 		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Elements may not be null!", elements); //$NON-NLS-1$
 
 		if (elements.isEmpty())
-			return;
+			return Collections.emptyList();
 
 		// sort elements by type
 		Map<String, List<T>> map = sortElementsToType(elements);
 
 		String msg = "The element {0} can not be updated as it does not exist!"; //$NON-NLS-1$
+
+		List<T> replacedElements = new ArrayList<>(elements.size());
 
 		// update elements
 		for (String type : map.keySet()) {
@@ -304,7 +309,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 							msg = MessageFormat.format(msg, element.getLocator());
 							throw new StrolchPersistenceException(msg);
 						}
-						byType.put(element.getId(), element);
+						replacedElements.add(byType.put(element.getId(), element));
 					}
 				}
 			}
@@ -312,6 +317,8 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 		// last is to perform DB changes
 		getDao(tx).updateAll(elements);
+
+		return replacedElements;
 	}
 
 	@Override
