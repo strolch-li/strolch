@@ -27,7 +27,7 @@ public enum DBC {
 
 	PRE, INTERIM, POST;
 
-	public void assertEquals(String msg, Object value1, Object value2) {
+	public <T> void assertEquals(String msg, T value1, T value2) {
 		if (value1 == null && value2 == null)
 			return;
 
@@ -42,7 +42,7 @@ public enum DBC {
 		throw new DbcException(ex);
 	}
 
-	public void assertNotEquals(String msg, Object value1, Object value2) {
+	public <T> void assertNotEquals(String msg, T value1, T value2) {
 		if (value1 != null && !value1.equals(value2))
 			return;
 
