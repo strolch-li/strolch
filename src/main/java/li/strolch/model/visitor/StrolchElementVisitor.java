@@ -20,7 +20,7 @@ import li.strolch.model.StrolchElement;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchElementVisitor<T extends StrolchElement> {
+public interface StrolchElementVisitor<T extends StrolchElement> extends StrolchVisitor {
 
 	public void visit(T element);
 }

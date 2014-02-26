@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model;
-
-import li.strolch.model.visitor.StrolchRootElementVisitor;
+package li.strolch.model.visitor;
 
 /**
- * Root element for all top level {@link StrolchElement}. These are elements which have no parent, e.g. {@link Resource
- * Resources} and {@link Order Orders}
+ * Marker interface to allow to quickly see the visitor implementations in Strolch
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchRootElement extends StrolchElement {
+public interface StrolchVisitor {
 
-	public <T> T accept(StrolchRootElementVisitor visitor);
+	// marker interface
 }

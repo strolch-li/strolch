@@ -16,6 +16,7 @@
 package li.strolch.model;
 
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.visitor.StrolchRootElementVisitor;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -82,6 +83,21 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 		LocatorBuilder lb = new LocatorBuilder();
 		fillLocator(lb);
 		return lb.build();
+	}
+
+	@Override
+	public StrolchElement getParent() {
+		return null;
+	}
+
+	@Override
+	public Resource getRootElement() {
+		return this;
+	}
+
+	@Override
+	public <T> T accept(StrolchRootElementVisitor visitor) {
+		return visitor.visitResource(this);
 	}
 
 	@SuppressWarnings("nls")

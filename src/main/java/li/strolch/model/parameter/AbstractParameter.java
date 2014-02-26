@@ -21,9 +21,10 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.visitor.ParameterVisitor;
 import li.strolch.model.ParameterizedElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.visitor.ParameterVisitor;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -119,6 +120,11 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	@Override
 	public void setParent(ParameterizedElement parent) {
 		this.parent = parent;
+	}
+
+	@Override
+	public StrolchRootElement getRootElement() {
+		return this.parent.getRootElement();
 	}
 
 	@Override

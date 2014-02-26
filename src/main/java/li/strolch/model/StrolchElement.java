@@ -94,6 +94,10 @@ public interface StrolchElement extends Serializable, Comparable<StrolchElement>
 	 */
 	public String getType();
 
+	public StrolchElement getParent();
+
+	public StrolchRootElement getRootElement();
+
 	/**
 	 * Return a clone of this {@link StrolchElement}
 	 * 

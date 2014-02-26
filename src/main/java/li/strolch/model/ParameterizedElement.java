@@ -93,25 +93,6 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	}
 
 	/**
-	 * Returns this {@link ParameterizedElement}'s parent
-	 * 
-	 * @return the parent
-	 */
-	public GroupedParameterizedElement getParent() {
-		return this.parent;
-	}
-
-	/**
-	 * Set the parent for this {@link ParameterizedElement}
-	 * 
-	 * @param parent
-	 *            the parent to set
-	 */
-	public void setParent(GroupedParameterizedElement parent) {
-		this.parent = parent;
-	}
-
-	/**
 	 * Returns the {@link Parameter} with the given id, or null if it does not exist
 	 * 
 	 * @param key
@@ -276,6 +257,26 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 				peClone.addParameter(param.getClone());
 			}
 		}
+	}
+
+	@Override
+	public GroupedParameterizedElement getParent() {
+		return this.parent;
+	}
+
+	/**
+	 * Set the parent for this {@link ParameterizedElement}
+	 * 
+	 * @param parent
+	 *            the parent to set
+	 */
+	public void setParent(GroupedParameterizedElement parent) {
+		this.parent = parent;
+	}
+
+	@Override
+	public StrolchRootElement getRootElement() {
+		return this.parent.getRootElement();
 	}
 
 	@SuppressWarnings("nls")

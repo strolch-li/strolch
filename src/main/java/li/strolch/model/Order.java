@@ -18,6 +18,7 @@ package li.strolch.model;
 import java.util.Date;
 
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.visitor.StrolchRootElementVisitor;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -167,6 +168,21 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 		LocatorBuilder lb = new LocatorBuilder();
 		fillLocator(lb);
 		return lb.build();
+	}
+
+	@Override
+	public StrolchElement getParent() {
+		return null;
+	}
+
+	@Override
+	public Order getRootElement() {
+		return this;
+	}
+
+	@Override
+	public <T> T accept(StrolchRootElementVisitor visitor) {
+		return visitor.visitOrder(this);
 	}
 
 	@SuppressWarnings("nls")
