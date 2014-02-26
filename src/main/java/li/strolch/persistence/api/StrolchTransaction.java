@@ -29,6 +29,7 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
+import li.strolch.service.api.Command;
 
 public interface StrolchTransaction extends AutoCloseable {
 
@@ -60,6 +61,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	public PersistenceHandler getPersistenceHandler();
 
 	public <T extends StrolchRootElement> void lock(T element);
+
+	public void addCommand(Command command);
 
 	public List<Order> doQuery(OrderQuery query);
 

@@ -16,6 +16,7 @@
 package li.strolch.persistence.api;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.inmemory.InMemoryTransaction;
 import li.strolch.runtime.observer.ObserverHandler;
+import li.strolch.service.api.Command;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,10 +59,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private boolean suppressUpdates;
 	private TransactionResult txResult;
 
+	private List<Command> commands;
 	private Set<StrolchRootElement> lockedElements;
 
 	public AbstractTransaction(StrolchRealm realm) {
 		this.realm = realm;
+		this.commands = new ArrayList<>();
 		this.lockedElements = new HashSet<>();
 		this.closeStrategy = TransactionCloseStrategy.COMMIT;
 		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), new Date());
@@ -147,6 +151,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public void addCommand(Command command) {
+		this.commands.add(command);
+	}
+
+	@Override
 	public ResourceMap getResourceMap() {
 		return this.realm.getResourceMap();
 	}
@@ -229,11 +238,26 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		try {
 			this.txResult.setState(TransactionState.COMMITTING);
+
+			validateCommands();
+			doCommands();
 			commit(this.txResult);
-			handleCommit(start);
+
+			long observerUpdateStart = System.nanoTime();
+			updateObservers();
+			long observerUpdateDuration = System.nanoTime() - observerUpdateStart;
+
+			handleCommit(start, observerUpdateDuration);
+
 		} catch (Exception e) {
 			this.txResult.setState(TransactionState.ROLLING_BACK);
-			handleFailure(start, e);
+			undoCommands();
+			try {
+				rollback(txResult);
+				handleRollback(start);
+			} catch (Exception e1) {
+				handleFailure(start, e);
+			}
 		} finally {
 			unlockElements();
 		}
@@ -242,10 +266,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void autoCloseableRollback() {
 		long start = System.nanoTime();
-		if (logger.isDebugEnabled()) {
-			logger.info("Rolling back TX for realm " + getRealmName() + "..."); //$NON-NLS-1$
-		}
+		logger.warn("Rolling back TX for realm " + getRealmName() + "..."); //$NON-NLS-1$
 		try {
+			undoCommands();
 			rollback(this.txResult);
 			handleRollback(start);
 		} catch (Exception e) {
@@ -259,7 +282,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	protected abstract void rollback(TransactionResult txResult) throws Exception;
 
-	private void handleCommit(long start) {
+	private void handleCommit(long start, long observerUpdateDuration) {
 
 		long end = System.nanoTime();
 		long txDuration = end - txResult.getStartNanos();
@@ -276,19 +299,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append(StringHelper.formatNanoDuration(txDuration));
 		sb.append(" with close operation taking "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(closeDuration));
+		sb.append(" and observer updates took ");
+		sb.append(StringHelper.formatNanoDuration(observerUpdateDuration));
 		logger.info(sb.toString());
-
-		if (!this.suppressUpdates && this.observerHandler != null) {
-
-			Set<String> keys = this.txResult.getKeys();
-			for (String key : keys) {
-				ModificationResult modificationResult = this.txResult.getModificationResult(key);
-
-				this.observerHandler.add(key, modificationResult.<StrolchElement> getCreated());
-				this.observerHandler.update(key, modificationResult.<StrolchElement> getUpdated());
-				this.observerHandler.remove(key, modificationResult.<StrolchElement> getDeleted());
-			}
-		}
 	}
 
 	private void handleRollback(long start) {
@@ -323,5 +336,49 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		throw new StrolchPersistenceException(
 				"Strolch Transaction for realm " + getRealmName() + " failed due to " + e.getMessage(), e); //$NON-NLS-1$
+	}
+
+	private void updateObservers() {
+		if (!this.suppressUpdates && this.observerHandler != null) {
+
+			Set<String> keys = this.txResult.getKeys();
+			for (String key : keys) {
+				ModificationResult modificationResult = this.txResult.getModificationResult(key);
+
+				this.observerHandler.add(key, modificationResult.<StrolchElement> getCreated());
+				this.observerHandler.update(key, modificationResult.<StrolchElement> getUpdated());
+				this.observerHandler.remove(key, modificationResult.<StrolchElement> getDeleted());
+			}
+		}
+	}
+
+	/**
+	 * Calls {@link Command#validate()} on all registered command. This is done before we perform any commands and thus
+	 * no rollback needs be done due to invalid input for a command
+	 */
+	private void validateCommands() {
+		for (Command command : this.commands) {
+			command.validate();
+		}
+	}
+
+	/**
+	 * Calls {@link Command#doCommand()} on all registered commands. This is done after the commands have been validated
+	 * so chance of a runtime exception should be small
+	 */
+	private void doCommands() {
+		for (Command command : this.commands) {
+			command.doCommand();
+		}
+	}
+
+	/**
+	 * Calls {@link Command#undo()} on all registered commands. This is done when an exception is caught while
+	 * performing the commands
+	 */
+	private void undoCommands() {
+		for (Command command : this.commands) {
+			command.undo();
+		}
 	}
 }

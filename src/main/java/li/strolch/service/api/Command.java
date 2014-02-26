@@ -73,6 +73,8 @@ public abstract class Command implements Restrictable {
 		return this.getClass().getName();
 	}
 
+	public abstract void validate();
+
 	public abstract void doCommand();
 
 	public abstract void undo();
