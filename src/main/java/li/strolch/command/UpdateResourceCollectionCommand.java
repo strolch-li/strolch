@@ -57,6 +57,10 @@ public class UpdateResourceCollectionCommand extends Command {
 	@Override
 	public void doCommand() {
 
+		for (Resource resource : this.resources) {
+			tx().lock(resource);
+		}
+
 		ResourceMap resourceMap = tx().getResourceMap();
 		for (Resource resource : resources) {
 			if (!resourceMap.hasElement(tx(), resource.getType(), resource.getId())) {

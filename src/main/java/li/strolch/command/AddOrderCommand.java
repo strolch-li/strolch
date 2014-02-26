@@ -55,6 +55,8 @@ public class AddOrderCommand extends Command {
 	@Override
 	public void doCommand() {
 
+		tx().lock(order);
+
 		OrderMap orderMap = tx().getOrderMap();
 		if (orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
 			String msg = MessageFormat.format("The Order {0} already exists!", this.order.getLocator());

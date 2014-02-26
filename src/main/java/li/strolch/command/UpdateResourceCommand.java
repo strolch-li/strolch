@@ -56,6 +56,8 @@ public class UpdateResourceCommand extends Command {
 	@Override
 	public void doCommand() {
 
+		tx().lock(resource);
+
 		ResourceMap resourceMap = tx().getResourceMap();
 		if (!resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {
 			String msg = "The Resource {0} can not be updated as it does not exist!!";

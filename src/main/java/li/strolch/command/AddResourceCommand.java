@@ -55,6 +55,8 @@ public class AddResourceCommand extends Command {
 	@Override
 	public void doCommand() {
 
+		tx().lock(resource);
+
 		ResourceMap resourceMap = tx().getResourceMap();
 		if (resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {
 			String msg = MessageFormat.format("The Resource {0} already exists!", this.resource.getLocator());

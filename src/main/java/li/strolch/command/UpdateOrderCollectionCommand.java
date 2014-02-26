@@ -57,6 +57,10 @@ public class UpdateOrderCollectionCommand extends Command {
 	@Override
 	public void doCommand() {
 
+		for (Order order : this.orders) {
+			tx().lock(order);
+		}
+
 		OrderMap orderMap = tx().getOrderMap();
 		for (Order order : orders) {
 			if (!orderMap.hasElement(tx(), order.getType(), order.getId())) {

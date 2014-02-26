@@ -55,6 +55,8 @@ public class RemoveResourceCommand extends Command {
 	@Override
 	public void doCommand() {
 
+		tx().lock(resource);
+
 		ResourceMap resourceMap = tx().getResourceMap();
 		if (!resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {
 			String msg = "The Resource {0} can not be removed as it does not exist!!";

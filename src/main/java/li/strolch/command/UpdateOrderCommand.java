@@ -56,6 +56,8 @@ public class UpdateOrderCommand extends Command {
 	@Override
 	public void doCommand() {
 
+		tx().lock(order);
+
 		OrderMap orderMap = tx().getOrderMap();
 		if (!orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
 			String msg = "The Order {0} can not be updated as it does not exist!";

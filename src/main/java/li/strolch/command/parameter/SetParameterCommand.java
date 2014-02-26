@@ -120,6 +120,9 @@ public class SetParameterCommand extends Command {
 	@Override
 	public void doCommand() {
 
+		StrolchRootElement rootElement = this.parameter.getRootElement();
+		tx().lock(rootElement);
+
 		if (this.name != null) {
 			this.oldName = this.parameter.getName();
 			this.parameter.setName(this.name);
@@ -148,7 +151,6 @@ public class SetParameterCommand extends Command {
 		}
 
 		if (hasChanges()) {
-			StrolchRootElement rootElement = this.parameter.getRootElement();
 			replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
 		}
 	}

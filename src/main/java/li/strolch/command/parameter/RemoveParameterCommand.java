@@ -76,8 +76,11 @@ public class RemoveParameterCommand extends Command {
 
 	@Override
 	public void doCommand() {
-		this.removedParameter = this.element.removeParameter(this.parameterId);
+
 		StrolchRootElement rootElement = this.element.getRootElement();
+		tx().lock(rootElement);
+
+		this.removedParameter = this.element.removeParameter(this.parameterId);
 		replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
 	}
 
