@@ -18,7 +18,9 @@ package li.strolch.command.parameter;
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.command.visitor.UpdateElementVisitor;
 import li.strolch.model.ParameterizedElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -34,6 +36,7 @@ public class RemoveParameterCommand extends Command {
 	private String parameterId;
 
 	private Parameter<?> removedParameter;
+	private StrolchRootElement replacedElement;
 
 	/**
 	 * @param container
@@ -60,7 +63,7 @@ public class RemoveParameterCommand extends Command {
 	}
 
 	@Override
-	public void doCommand() {
+	public void validate() {
 		DBC.PRE.assertNotNull("Element may not be null!", this.element);
 		DBC.PRE.assertNotEmpty("ParameterId must be set!", this.parameterId);
 
@@ -69,14 +72,23 @@ public class RemoveParameterCommand extends Command {
 			msg = MessageFormat.format(msg, this.parameterId, this.element.getLocator());
 			throw new StrolchPersistenceException(msg);
 		}
+	}
 
+	@Override
+	public void doCommand() {
 		this.removedParameter = this.element.removeParameter(this.parameterId);
+		StrolchRootElement rootElement = this.element.getRootElement();
+		replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
 	}
 
 	@Override
 	public void undo() {
 		if (this.removedParameter != null) {
 			this.element.addParameter(this.removedParameter);
+		}
+
+		if (this.replacedElement != null && this.element != this.replacedElement) {
+			new UpdateElementVisitor(tx()).update(this.replacedElement);
 		}
 	}
 }

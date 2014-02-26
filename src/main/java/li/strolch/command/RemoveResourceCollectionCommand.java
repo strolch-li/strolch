@@ -49,9 +49,12 @@ public class RemoveResourceCollectionCommand extends Command {
 	}
 
 	@Override
-	public void doCommand() {
-
+	public void validate() {
 		DBC.PRE.assertNotNull("Resource list may not be null!", this.resources);
+	}
+
+	@Override
+	public void doCommand() {
 
 		ResourceMap resourceMap = tx().getResourceMap();
 		for (Resource resource : resources) {

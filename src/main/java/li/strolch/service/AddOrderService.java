@@ -40,7 +40,7 @@ public class AddOrderService extends AbstractService<AddOrderService.AddOrderArg
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			AddOrderCommand command = new AddOrderCommand(getContainer(), tx);
 			command.setOrder(arg.order);
-			command.doCommand();
+			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();

@@ -25,7 +25,7 @@ import li.strolch.service.api.ServiceResult;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RemoveResourceService extends AbstractService<RemoveResourceService.AddResourceArg, ServiceResult> {
+public class RemoveResourceService extends AbstractService<RemoveResourceService.RemoveResourceArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -35,18 +35,18 @@ public class RemoveResourceService extends AbstractService<RemoveResourceService
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddResourceArg arg) {
+	protected ServiceResult internalDoService(RemoveResourceArg arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			RemoveResourceCommand command = new RemoveResourceCommand(getContainer(), tx);
 			command.setResource(arg.resource);
-			command.doCommand();
+			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();
 	}
 
-	public static class AddResourceArg extends ServiceArgument {
+	public static class RemoveResourceArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
 		public Resource resource;
 	}

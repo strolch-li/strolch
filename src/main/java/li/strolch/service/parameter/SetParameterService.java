@@ -53,7 +53,7 @@ public class SetParameterService extends AbstractService<SetParameterService.Set
 
 			command.setValueAsString(arg.valueAsString);
 
-			command.doCommand();
+			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();

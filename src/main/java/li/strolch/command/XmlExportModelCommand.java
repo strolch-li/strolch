@@ -75,15 +75,14 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	@Override
-	public void undo() {
-		logger.warn("Not undoing export to file " + this.modelFile);
+	public void validate() {
+		DBC.PRE.assertNotExists("Model may not already exist!", this.modelFile);
+		DBC.PRE.assertTrue("Model file must end with .xml", this.modelFile.getName().endsWith(XML_FILE_SUFFIX));
 	}
 
 	@Override
 	public void doCommand() {
-		DBC.PRE.assertNotExists("Model may not already exist!", this.modelFile);
 		String fileName = this.modelFile.getName();
-		DBC.PRE.assertTrue("Model file must end with .xml", fileName.endsWith(XML_FILE_SUFFIX));
 
 		long start = System.nanoTime();
 		this.statistics = new XmlModelStatistics();
@@ -199,6 +198,11 @@ public class XmlExportModelCommand extends Command {
 			msg = MessageFormat.format(msg, this.modelFile, e.getMessage());
 			throw new StrolchException(msg, e);
 		}
+	}
+
+	@Override
+	public void undo() {
+		logger.warn("Not undoing export to file " + this.modelFile);
 	}
 
 	private void writeOrdersByType(XMLStreamWriter writer, OrderMap orderMap, String type) {

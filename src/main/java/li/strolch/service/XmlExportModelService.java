@@ -54,20 +54,20 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 		logger.info("Exporting: " + arg);
 		logger.info("Exporting model to real path: " + modelFile.getAbsolutePath());
 
-		XmlModelStatistics statistics;
+		XmlExportModelCommand command;
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 
-			XmlExportModelCommand command = new XmlExportModelCommand(getContainer(), tx);
+			command = new XmlExportModelCommand(getContainer(), tx);
 			command.setModelFile(modelFile);
 			command.setMultiFile(arg.multiFile);
 			command.setDoOrders(arg.doOrders);
 			command.setDoResources(arg.doResources);
 			command.setOrderTypes(arg.orderTypes);
 			command.setResourceTypes(arg.resourceTypes);
-			command.doCommand();
-			statistics = command.getStatistics();
+			tx.addCommand(command);
 		}
 
+		XmlModelStatistics statistics = command.getStatistics();
 		String msg = "Wrote XML Model file {0} for realm {1}: {2} at path: {3}";
 		logger.info(MessageFormat.format(msg, modelFile.getName(), arg.realm, statistics, modelFile.getAbsolutePath()));
 		return ServiceResult.success();

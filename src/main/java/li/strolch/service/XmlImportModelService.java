@@ -49,10 +49,10 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 			throw new StrolchException(msg);
 		}
 
-		XmlModelStatistics statistics;
+		XmlImportModelCommand command;
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 
-			XmlImportModelCommand command = new XmlImportModelCommand(getContainer(), tx);
+			command = new XmlImportModelCommand(getContainer(), tx);
 			command.setModelFile(modelFile);
 			command.setAddOrders(arg.addOrders);
 			command.setAddResources(arg.addResources);
@@ -60,10 +60,10 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 			command.setUpdateResources(arg.updateResources);
 			command.setOrderTypes(arg.orderTypes);
 			command.setResourceTypes(arg.resourceTypes);
-			command.doCommand();
-			statistics = command.getStatistics();
+			tx.addCommand(command);
 		}
 
+		XmlModelStatistics statistics = command.getStatistics();
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
 		logger.info(MessageFormat.format(
 				"Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(), arg.realm, durationS)); //$NON-NLS-1$

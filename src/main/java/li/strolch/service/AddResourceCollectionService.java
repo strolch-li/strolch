@@ -43,7 +43,7 @@ public class AddResourceCollectionService extends
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			AddResourceCollectionCommand command = new AddResourceCollectionCommand(getContainer(), tx);
 			command.setResources(arg.resources);
-			command.doCommand();
+			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();

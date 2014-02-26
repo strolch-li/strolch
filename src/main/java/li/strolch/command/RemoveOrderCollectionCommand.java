@@ -49,9 +49,12 @@ public class RemoveOrderCollectionCommand extends Command {
 	}
 
 	@Override
-	public void doCommand() {
-
+	public void validate() {
 		DBC.PRE.assertNotNull("Order list may not be null!", this.orders);
+	}
+
+	@Override
+	public void doCommand() {
 
 		OrderMap orderMap = tx().getOrderMap();
 		for (Order order : orders) {

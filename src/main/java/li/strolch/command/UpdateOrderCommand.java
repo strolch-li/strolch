@@ -49,9 +49,12 @@ public class UpdateOrderCommand extends Command {
 	}
 
 	@Override
-	public void doCommand() {
-
+	public void validate() {
 		DBC.PRE.assertNotNull("Order may not be null!", this.order);
+	}
+
+	@Override
+	public void doCommand() {
 
 		OrderMap orderMap = tx().getOrderMap();
 		if (!orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {

@@ -16,6 +16,8 @@
 package li.strolch.command.parameter;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.command.visitor.UpdateElementVisitor;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.visitor.SetParameterValueVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -43,6 +45,8 @@ public class SetParameterCommand extends Command {
 	private Boolean oldHidden;
 	private Integer oldIndex;
 	private String oldValueAsString;
+
+	private StrolchRootElement replacedElement;
 
 	/**
 	 * @param container
@@ -109,8 +113,12 @@ public class SetParameterCommand extends Command {
 	}
 
 	@Override
-	public void doCommand() {
+	public void validate() {
 		DBC.PRE.assertNotNull("Parameter may not be null!", this.parameter);
+	}
+
+	@Override
+	public void doCommand() {
 
 		if (this.name != null) {
 			this.oldName = this.parameter.getName();
@@ -138,10 +146,21 @@ public class SetParameterCommand extends Command {
 			SetParameterValueVisitor visitor = new SetParameterValueVisitor();
 			visitor.setValue(this.parameter, this.valueAsString);
 		}
+
+		if (hasChanges()) {
+			StrolchRootElement rootElement = this.parameter.getRootElement();
+			replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
+		}
+	}
+
+	private boolean hasChanges() {
+		return this.oldValueAsString != null || this.oldName != null || this.oldInterpretation != null
+				|| this.oldUom != null || this.oldHidden != null || this.oldIndex != null;
 	}
 
 	@Override
 	public void undo() {
+
 		if (this.parameter != null) {
 			if (this.oldName != null) {
 				this.parameter.setName(this.oldName);
@@ -162,6 +181,10 @@ public class SetParameterCommand extends Command {
 			if (this.oldValueAsString != null) {
 				SetParameterValueVisitor visitor = new SetParameterValueVisitor();
 				visitor.setValue(this.parameter, this.oldValueAsString);
+			}
+
+			if (hasChanges() && this.replacedElement != null && this.replacedElement != this.parameter.getRootElement()) {
+				new UpdateElementVisitor(tx()).update(replacedElement);
 			}
 		}
 	}

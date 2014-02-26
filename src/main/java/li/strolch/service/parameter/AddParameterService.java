@@ -46,7 +46,7 @@ public class AddParameterService extends AbstractService<AddParameterService.Add
 			AddParameterCommand command = new AddParameterCommand(getContainer(), tx);
 			command.setElement(element);
 			command.setParameter(arg.parameter);
-			command.doCommand();
+			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();

@@ -40,7 +40,7 @@ public class AddResourceService extends AbstractService<AddResourceService.AddRe
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			AddResourceCommand command = new AddResourceCommand(getContainer(), tx);
 			command.setResource(arg.resource);
-			command.doCommand();
+			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();

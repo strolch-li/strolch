@@ -48,9 +48,12 @@ public class AddResourceCommand extends Command {
 	}
 
 	@Override
-	public void doCommand() {
-
+	public void validate() {
 		DBC.PRE.assertNotNull("Resource may not be null!", this.resource);
+	}
+
+	@Override
+	public void doCommand() {
 
 		ResourceMap resourceMap = tx().getResourceMap();
 		if (resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {

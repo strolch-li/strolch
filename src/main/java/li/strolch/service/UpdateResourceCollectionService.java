@@ -28,7 +28,7 @@ import li.strolch.service.api.ServiceResult;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class UpdateResourceCollectionService extends
-		AbstractService<UpdateResourceCollectionService.AddResourceCollectionArg, ServiceResult> {
+		AbstractService<UpdateResourceCollectionService.UpdateResourceCollectionArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,18 +38,18 @@ public class UpdateResourceCollectionService extends
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddResourceCollectionArg arg) {
+	protected ServiceResult internalDoService(UpdateResourceCollectionArg arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			UpdateResourceCollectionCommand command = new UpdateResourceCollectionCommand(getContainer(), tx);
 			command.setResources(arg.resources);
-			command.doCommand();
+			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();
 	}
 
-	public static class AddResourceCollectionArg extends ServiceArgument {
+	public static class UpdateResourceCollectionArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
 		public List<Resource> resources;
 	}

@@ -45,7 +45,7 @@ public class RemoveParameterService extends AbstractService<RemoveParameterServi
 			RemoveParameterCommand command = new RemoveParameterCommand(getContainer(), tx);
 			command.setElement(element);
 			command.setParameterId(arg.parameterId);
-			command.doCommand();
+			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();

@@ -28,7 +28,7 @@ import li.strolch.service.api.ServiceResult;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class UpdateOrderCollectionService extends
-		AbstractService<UpdateOrderCollectionService.AddOrderCollectionArg, ServiceResult> {
+		AbstractService<UpdateOrderCollectionService.UpdateOrderCollectionArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,18 +38,18 @@ public class UpdateOrderCollectionService extends
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddOrderCollectionArg arg) {
+	protected ServiceResult internalDoService(UpdateOrderCollectionArg arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			UpdateOrderCollectionCommand command = new UpdateOrderCollectionCommand(getContainer(), tx);
 			command.setOrders(arg.orders);
-			command.doCommand();
+			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();
 	}
 
-	public static class AddOrderCollectionArg extends ServiceArgument {
+	public static class UpdateOrderCollectionArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
 		public List<Order> orders;
 	}

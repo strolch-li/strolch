@@ -43,7 +43,7 @@ public class AddOrderCollectionService extends
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			AddOrderCollectionCommand command = new AddOrderCollectionCommand(getContainer(), tx);
 			command.setOrders(arg.orders);
-			command.doCommand();
+			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();

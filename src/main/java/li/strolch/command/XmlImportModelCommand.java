@@ -52,13 +52,12 @@ public class XmlImportModelCommand extends Command {
 	}
 
 	@Override
-	public void undo() {
-		logger.warn("Not undoing import of file " + this.modelFile);
+	public void validate() {
+		DBC.PRE.assertExists("Model must exist!", this.modelFile);
 	}
 
 	@Override
 	public void doCommand() {
-		DBC.PRE.assertExists("Model must exist!", this.modelFile);
 
 		InMemoryElementListener elementListener = new InMemoryElementListener(tx());
 
@@ -73,6 +72,11 @@ public class XmlImportModelCommand extends Command {
 		handler.parseFile();
 
 		statistics = handler.getStatistics();
+	}
+
+	@Override
+	public void undo() {
+		logger.warn("Not undoing import of file " + this.modelFile);
 	}
 
 	/**
