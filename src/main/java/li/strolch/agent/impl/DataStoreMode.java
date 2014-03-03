@@ -26,11 +26,21 @@ import li.strolch.agent.api.StrolchRealm;
 public enum DataStoreMode {
 	EMPTY {
 		@Override
+		public boolean isTransient() {
+			return true;
+		}
+
+		@Override
 		public StrolchRealm createRealm(String realm) {
 			return new EmptyRealm(realm);
 		}
 	}, //
 	TRANSIENT {
+		@Override
+		public boolean isTransient() {
+			return true;
+		}
+
 		@Override
 		public StrolchRealm createRealm(String realm) {
 			return new TransientRealm(realm);
@@ -38,11 +48,21 @@ public enum DataStoreMode {
 	}, //
 	CACHED {
 		@Override
+		public boolean isTransient() {
+			return false;
+		}
+
+		@Override
 		public StrolchRealm createRealm(String realm) {
 			return new CachedRealm(realm);
 		}
 	}, //
 	TRANSACTIONAL {
+		@Override
+		public boolean isTransient() {
+			return false;
+		}
+
 		@Override
 		public StrolchRealm createRealm(String realm) {
 			return new TransactionalRealm(realm);
@@ -50,6 +70,8 @@ public enum DataStoreMode {
 	}; //
 
 	public abstract StrolchRealm createRealm(String realm);
+
+	public abstract boolean isTransient();
 
 	public static DataStoreMode parseDataStoreMode(String modeS) {
 		for (DataStoreMode dataStoreMode : values()) {

@@ -258,6 +258,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			} catch (Exception e1) {
 				handleFailure(start, e);
 			}
+
+			String msg = "Strolch Transaction for realm {0} failed due to {1}";
+			msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
+			throw new StrolchPersistenceException(msg, e);
+
 		} finally {
 			unlockElements();
 		}
@@ -334,8 +339,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append(StringHelper.formatNanoDuration(closeDuration));
 		logger.info(sb.toString());
 
-		throw new StrolchPersistenceException(
-				"Strolch Transaction for realm " + getRealmName() + " failed due to " + e.getMessage(), e); //$NON-NLS-1$
+		String msg = "Strolch Transaction for realm {0} failed due to {1}";
+		msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
+		throw new StrolchPersistenceException(msg, e);
 	}
 
 	private void updateObservers() {

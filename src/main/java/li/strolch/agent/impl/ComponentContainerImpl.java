@@ -74,7 +74,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T getComponent(Class<T> clazz) {
+	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
 		T component = (T) this.componentMap.get(clazz);
 		if (component == null) {
 			String msg = "The component does not exist for class {0}"; //$NON-NLS-1$

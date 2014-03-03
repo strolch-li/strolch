@@ -31,7 +31,7 @@ public interface ComponentContainer {
 
 	public abstract boolean hasComponent(Class<?> clazz);
 
-	public abstract <T> T getComponent(Class<T> clazz);
+	public abstract <T> T getComponent(Class<T> clazz) throws IllegalArgumentException;
 
 	public abstract Set<Class<?>> getComponentTypes();
 

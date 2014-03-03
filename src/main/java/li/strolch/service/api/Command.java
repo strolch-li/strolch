@@ -16,6 +16,7 @@
 package li.strolch.service.api;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchComponent;
 import li.strolch.persistence.api.StrolchTransaction;
 
 import org.slf4j.Logger;
@@ -24,6 +25,16 @@ import org.slf4j.LoggerFactory;
 import ch.eitchnet.privilege.model.Restrictable;
 
 /**
+ * <p>
+ * Implementation of the Command Pattern to create re-usable components which are performed during
+ * {@link StrolchTransaction StrolchTransactions} as part of the execution of {@link Service Services}
+ * </p>
+ * 
+ * <p>
+ * <b>Note:</b> Do not call {@link #doCommand()} from {@link Service Services} or other places. Add {@link Command}
+ * instances to a {@link StrolchTransaction} by calling {@link StrolchTransaction#addCommand(Command)}
+ * </p>
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class Command implements Restrictable {
@@ -32,12 +43,31 @@ public abstract class Command implements Restrictable {
 	private final ComponentContainer container;
 	private final StrolchTransaction tx;
 
+	/**
+	 * Instantiate a new {@link Command}
+	 * 
+	 * @param container
+	 *            the {@link ComponentContainer} to access components at runtime
+	 * @param tx
+	 */
 	public Command(ComponentContainer container, StrolchTransaction tx) {
 		this.container = container;
 		this.tx = tx;
 	}
 
-	public <V> V getComponent(Class<V> clazz) {
+	/**
+	 * Allows the concrete {@link Command} implementation access to {@link StrolchComponent StrolchComponents} at
+	 * runtime
+	 * 
+	 * @param clazz
+	 *            the type of component to be returned
+	 * 
+	 * @return the component with the given {@link Class} which is registered on the {@link ComponentContainer}
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the component with the given class does not exist
+	 */
+	protected <V> V getComponent(Class<V> clazz) throws IllegalArgumentException {
 		return this.container.getComponent(clazz);
 	}
 
@@ -73,9 +103,32 @@ public abstract class Command implements Restrictable {
 		return this.getClass().getName();
 	}
 
+	/**
+	 * To ensure that as few possibilities for exceptions as possible occur when {@link #doCommand()} is called, the
+	 * {@link Command} should verify any input data so that a {@link #doCommand()} can be performed without exceptions
+	 */
 	public abstract void validate();
 
+	/**
+	 * <p>
+	 * Clients implement this method to perform the work which is to be done in this {@link Command}.
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Note:</b> Do not call this method directly, this method is called by the {@link StrolchTransaction} when the
+	 * transaction is committed. Add this {@link Command} to the transaction by calling
+	 * {@link StrolchTransaction#addCommand(Command)}
+	 * </p>
+	 */
 	public abstract void doCommand();
 
+	/**
+	 * <p>
+	 * Should the transaction fail, either due to a {@link Command} throwing an exception when {@link #validate()} is
+	 * called, or while committing the transaction, then this method should properly undo any changes it has done. It is
+	 * imperative that this method does not throw further exceptions and that the state to be rolled back is remembered
+	 * in the Command during committing
+	 * </p>
+	 */
 	public abstract void undo();
 }

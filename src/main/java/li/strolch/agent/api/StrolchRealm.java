@@ -15,16 +15,21 @@
  */
 package li.strolch.agent.api;
 
+import static ch.eitchnet.utils.helper.StringHelper.DOT;
+
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.agent.impl.DefaultLockHandler;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -38,6 +43,7 @@ public abstract class StrolchRealm {
 	private LockHandler lockHandler;
 
 	public StrolchRealm(String realm) {
+		DBC.PRE.assertNotEmpty("RealmName may not be empty!", realm);
 		this.realm = realm;
 	}
 
@@ -46,6 +52,7 @@ public abstract class StrolchRealm {
 	}
 
 	public void lock(StrolchRootElement element) {
+		DBC.PRE.assertNotNull("Can not lock a null pointer =)", element);
 		this.lockHandler.lock(element);
 	}
 
@@ -54,8 +61,16 @@ public abstract class StrolchRealm {
 	}
 
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
-		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(PROP_TRY_LOCK_TIME_UNIT, TimeUnit.SECONDS.name()));
-		long time = configuration.getLong(PROP_TRY_LOCK_TIME, 10);
+
+		String propTryLockTimeUnit = PROP_TRY_LOCK_TIME_UNIT;
+		String propTryLockTime = PROP_TRY_LOCK_TIME;
+		if (!StrolchConstants.DEFAULT_REALM.equals(this.realm)) {
+			propTryLockTimeUnit += DOT + this.realm;
+			propTryLockTime += DOT + this.realm;
+		}
+
+		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(propTryLockTimeUnit, TimeUnit.SECONDS.name()));
+		long time = configuration.getLong(propTryLockTime, 10);
 		logger.info("Using a locking try timeout of " + timeUnit.toSeconds(time) + "s");
 		this.lockHandler = new DefaultLockHandler(realm, timeUnit, time);
 	}
