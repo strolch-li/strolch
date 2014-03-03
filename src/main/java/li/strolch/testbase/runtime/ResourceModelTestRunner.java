@@ -21,7 +21,6 @@ import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.StrolchConstants;
 
 @SuppressWarnings("nls")
 public class ResourceModelTestRunner {

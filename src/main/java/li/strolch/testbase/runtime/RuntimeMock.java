@@ -146,7 +146,8 @@ public final class RuntimeMock {
 		}
 	}
 
-	public void assertServiceResult(ServiceResultState expectedState, Class<?> expectedResultType, ServiceResult result) {
+	public static void assertServiceResult(ServiceResultState expectedState, Class<?> expectedResultType,
+			ServiceResult result) {
 		assertEquals("Expected service result of type " + expectedResultType + " but was " + result.getClass(),
 				expectedResultType, result.getClass());
 
