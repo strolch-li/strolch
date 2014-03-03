@@ -76,7 +76,7 @@ public class DbSchemaVersionCheck {
 			String username = connectionInfo.getUsername();
 			String password = connectionInfo.getPassword();
 
-			logger.info("Checking Schema version for realm " + realm + "...");
+			logger.info(MessageFormat.format("[{0}] Checking Schema version...", realm));
 
 			try (Connection con = DriverManager.getConnection(url, username, password);
 					Statement st = con.createStatement();) {
@@ -84,9 +84,8 @@ public class DbSchemaVersionCheck {
 				String expectedDbVersion = getExpectedDbVersion();
 
 				// first see if we have any schema
-				String checkSchemaExistsSql = MessageFormat
-						.format("select table_schema, table_name, table_type from information_schema.tables where table_name=''{0}'';",
-								PROP_DB_VERSION);
+				String msg = "select table_schema, table_name, table_type from information_schema.tables where table_name=''{0}'';";
+				String checkSchemaExistsSql = MessageFormat.format(msg, PROP_DB_VERSION);
 				try (ResultSet rs = st.executeQuery(checkSchemaExistsSql)) {
 					if (!rs.next()) {
 						createSchema(realm, expectedDbVersion, st);
@@ -110,10 +109,13 @@ public class DbSchemaVersionCheck {
 			} else {
 				String currentVersion = rs.getString(2);
 				if (expectedDbVersion.equals(currentVersion)) {
-					logger.info("Schema version " + currentVersion + " is the current version. No changes needed.");
+					String msg = "[{0}] Schema version {1} is the current version. No changes needed.";
+					msg = MessageFormat.format(msg, realm, currentVersion);
+					logger.info(msg);
 				} else {
-					logger.warn("Schema version is not current. Need to upgrade from " + currentVersion + " to "
-							+ expectedDbVersion);
+					String msg = "[{0}] Schema version is not current. Need to upgrade from {1} to {2}";
+					msg = MessageFormat.format(msg, realm, currentVersion, expectedDbVersion);
+					logger.warn(msg);
 					upgradeSchema(realm, expectedDbVersion, st);
 				}
 			}
@@ -127,8 +129,9 @@ public class DbSchemaVersionCheck {
 					MessageFormat.format("Resource file with name {0} does not exist!", RESOURCE_DB_VERSION), stream);
 			dbVersionProps.load(stream);
 		} catch (IOException e) {
-			throw new StrolchException("Expected resource file " + RESOURCE_DB_VERSION
-					+ " does not exist or is not a valid properties file: " + e.getMessage(), e);
+			String msg = "Expected resource file {0} does not exist or is not a valid properties file: {1}";
+			msg = MessageFormat.format(msg, RESOURCE_DB_VERSION, e.getMessage());
+			throw new StrolchException(msg, e);
 		}
 		String dbVersion = dbVersionProps.getProperty(PROP_DB_VERSION);
 		String msg = "Missing property {0} in resource file {1}";
@@ -137,7 +140,7 @@ public class DbSchemaVersionCheck {
 	}
 
 	public static String getSql(String dbVersion, String type) {
-		String schemaResourceS = "/db_schema_" + dbVersion + "_" + type + ".sql";
+		String schemaResourceS = MessageFormat.format("/db_schema_{0}_{1}.sql", dbVersion, type);
 		try (InputStream stream = DbSchemaVersionCheck.class.getResourceAsStream(schemaResourceS);) {
 			DBC.PRE.assertNotNull(
 					MessageFormat.format("Schema Resource file with name {0} does not exist!", schemaResourceS), stream);
@@ -155,11 +158,12 @@ public class DbSchemaVersionCheck {
 	private void createSchema(String realm, String dbVersion, Statement st) {
 
 		if (!this.allowSchemaCreation) {
-			throw new StrolchConfigurationException("[" + realm
-					+ "] No schema exists, or is not valid. Schema generation is disabled, thus can not continue!");
+			String msg = "[{0}] No schema exists, or is not valid. Schema generation is disabled, thus can not continue!";
+			msg = MessageFormat.format(msg, realm);
+			throw new StrolchConfigurationException(msg);
 		}
 
-		logger.info("[" + realm + "] Creating initial schema...");
+		logger.info(MessageFormat.format("[{0}] Creating initial schema...", realm));
 
 		String sql = getSql(dbVersion, "initial");
 		try {
@@ -169,17 +173,18 @@ public class DbSchemaVersionCheck {
 			throw new StrolchException("Failed to execute schema generation SQL: " + e.getMessage(), e);
 		}
 
-		logger.info("[" + realm + "] Successfully created schema for version " + dbVersion);
+		logger.info(MessageFormat.format("[{0}] Successfully created schema for version {1}", realm, dbVersion));
 	}
 
 	private void dropSchema(String realm, String dbVersion, Statement st) {
 
 		if (!this.allowSchemaDrop) {
-			throw new StrolchConfigurationException("[" + realm
-					+ "] Dropping Schema is disabled, but is required to upgrade current schema...");
+			String msg = "[{0}] Dropping Schema is disabled, but is required to upgrade current schema...";
+			msg = MessageFormat.format(msg, realm);
+			throw new StrolchConfigurationException(msg);
 		}
 
-		logger.info("[" + realm + "] Dropping existing schema...");
+		logger.info(MessageFormat.format("[{0}] Dropping existing schema...", realm));
 
 		String sql = getSql(dbVersion, "drop");
 		try {
