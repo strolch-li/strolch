@@ -51,11 +51,12 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 			this.resourceDao.commit(txResult);
 
 		// then commit the SQL connection
-		if (this.connection != null)
+		if (this.connection != null) {
 			this.connection.commit();
 
-		// and close the connection, but not catching, as otherwise we can't rollback in exception case
-		this.connection.close();
+			// and close the connection, but not catching, as otherwise we can't rollback in exception case
+			this.connection.close();
+		}
 	}
 
 	@Override
