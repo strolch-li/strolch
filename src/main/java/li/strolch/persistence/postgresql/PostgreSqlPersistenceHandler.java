@@ -65,6 +65,10 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		Set<String> realmNames = getContainer().getRealmNames();
 		for (String realmName : realmNames) {
 
+			StrolchRealm realm = getContainer().getRealm(realmName);
+			if (realm.getMode().isTransient())
+				continue;
+
 			String dbUrlKey = PROP_DB_URL;
 			String dbUsernameKey = PROP_DB_USERNAME;
 			String dbPasswordKey = PROP_DB_PASSWORD;
@@ -103,8 +107,9 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		}
 
 		String compliant = driver.jdbcCompliant() ? "" : "non"; //$NON-NLS-1$ //$NON-NLS-2$
-		String msg = "Using {0} JDBC compliant Driver {1}.{2}"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, compliant, driver.getMajorVersion(), driver.getMinorVersion());
+		String msg = "Realm {0}: Using {1} JDBC compliant Driver {2}.{3}"; //$NON-NLS-1$
+		msg = MessageFormat.format(msg, connectionInfo.getRealm(), compliant, driver.getMajorVersion(),
+				driver.getMinorVersion());
 		logger.info(msg);
 
 	}
