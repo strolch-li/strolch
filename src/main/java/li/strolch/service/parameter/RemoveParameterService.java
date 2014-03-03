@@ -17,7 +17,7 @@ package li.strolch.service.parameter;
 
 import li.strolch.command.parameter.RemoveParameterCommand;
 import li.strolch.model.Locator;
-import li.strolch.model.ParameterizedElement;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
@@ -26,7 +26,7 @@ import li.strolch.service.api.ServiceResult;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RemoveParameterService extends AbstractService<RemoveParameterService.AddParameterArg, ServiceResult> {
+public class RemoveParameterService extends AbstractService<RemoveParameterService.RemoveParameterArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,24 +36,23 @@ public class RemoveParameterService extends AbstractService<RemoveParameterServi
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddParameterArg arg) {
+	protected ServiceResult internalDoService(RemoveParameterArg arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 
-			ParameterizedElement element = tx.findElement(arg.locator);
+			Parameter<?> parameter = tx.findElement(arg.locator);
 
 			RemoveParameterCommand command = new RemoveParameterCommand(getContainer(), tx);
-			command.setElement(element);
-			command.setParameterId(arg.parameterId);
+			command.setElement(parameter.getParent());
+			command.setParameterId(parameter.getId());
 			tx.addCommand(command);
 		}
 
 		return ServiceResult.success();
 	}
 
-	public static class AddParameterArg extends ServiceArgument {
+	public static class RemoveParameterArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
 		public Locator locator;
-		public String parameterId;
 	}
 }

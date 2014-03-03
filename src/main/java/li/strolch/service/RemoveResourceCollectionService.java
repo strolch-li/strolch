@@ -15,9 +15,11 @@
  */
 package li.strolch.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import li.strolch.command.RemoveResourceCollectionCommand;
+import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
@@ -41,8 +43,15 @@ public class RemoveResourceCollectionService extends
 	protected ServiceResult internalDoService(RemoveResourceCollectionArg arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
+
+			List<Resource> resources = new ArrayList<>(arg.locators.size());
+			for (Locator locator : arg.locators) {
+				Resource resource = tx.findElement(locator);
+				resources.add(resource);
+			}
+
 			RemoveResourceCollectionCommand command = new RemoveResourceCollectionCommand(getContainer(), tx);
-			command.setResources(arg.resources);
+			command.setResources(resources);
 			tx.addCommand(command);
 		}
 
@@ -51,6 +60,6 @@ public class RemoveResourceCollectionService extends
 
 	public static class RemoveResourceCollectionArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
-		public List<Resource> resources;
+		public List<Locator> locators;
 	}
 }

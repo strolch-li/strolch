@@ -75,7 +75,7 @@ public class AddParameterCommand extends Command {
 	@Override
 	public void doCommand() {
 
-		StrolchRootElement rootElement = this.parameter.getRootElement();
+		StrolchRootElement rootElement = this.element.getRootElement();
 		tx().lock(rootElement);
 
 		this.element.addParameter(this.parameter);

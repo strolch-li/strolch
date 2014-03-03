@@ -65,7 +65,7 @@ public class XmlExportServiceTest {
 		arg.modelFileName = "TestExportSingle.xml";
 		arg.multiFile = false;
 		ServiceResult result = runtimeMock.getServiceHandler().doService(null, service, arg);
-		runtimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
+		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 		assertNumberOfFilesCreated(arg.modelFileName.split("\\.")[0], 1);
 
 		importModel(arg.modelFileName);
@@ -79,7 +79,7 @@ public class XmlExportServiceTest {
 		arg.modelFileName = "TestExportMulti.xml";
 		arg.multiFile = true;
 		ServiceResult result = runtimeMock.getServiceHandler().doService(null, service, arg);
-		runtimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
+		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 		assertNumberOfFilesCreated(arg.modelFileName.split("\\.")[0], 6);
 
 		importModel(arg.modelFileName);
@@ -95,7 +95,7 @@ public class XmlExportServiceTest {
 		arg.resourceTypes.add(Tags.TEMPLATE);
 		arg.multiFile = true;
 		ServiceResult result = runtimeMock.getServiceHandler().doService(null, service, arg);
-		runtimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
+		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 		assertNumberOfFilesCreated(arg.modelFileName.split("\\.")[0], 2);
 
 		importModel(arg.modelFileName);
@@ -106,7 +106,7 @@ public class XmlExportServiceTest {
 		XmlImportModelArgument importArgument = new XmlImportModelArgument();
 		importArgument.modelFileName = modelFileName;
 		ServiceResult result = runtimeMock.getServiceHandler().doService(null, importService, importArgument);
-		runtimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
+		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 	}
 
 	private void assertNumberOfFilesCreated(final String modelFileName, int nrOfExpectedFiles) {

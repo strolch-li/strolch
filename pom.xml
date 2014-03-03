@@ -53,6 +53,11 @@
 			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.testbase</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.persistence.postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 

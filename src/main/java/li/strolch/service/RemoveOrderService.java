@@ -16,6 +16,7 @@
 package li.strolch.service;
 
 import li.strolch.command.RemoveOrderCommand;
+import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
@@ -38,8 +39,11 @@ public class RemoveOrderService extends AbstractService<RemoveOrderService.Remov
 	protected ServiceResult internalDoService(RemoveOrderArg arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
+
+			Order order = tx.findElement(arg.locator);
+
 			RemoveOrderCommand command = new RemoveOrderCommand(getContainer(), tx);
-			command.setOrder(arg.order);
+			command.setOrder(order);
 			tx.addCommand(command);
 		}
 
@@ -48,6 +52,6 @@ public class RemoveOrderService extends AbstractService<RemoveOrderService.Remov
 
 	public static class RemoveOrderArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
-		public Order order;
+		public Locator locator;
 	}
 }

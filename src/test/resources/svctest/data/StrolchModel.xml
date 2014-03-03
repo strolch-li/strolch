@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchModel>
+
+	<IncludeFile file="Enums.xml" />
+	<IncludeFile file="Resources.xml" />
+	<IncludeFile file="Orders.xml" />
+
+</StrolchModel>

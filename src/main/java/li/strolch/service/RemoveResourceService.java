@@ -16,6 +16,7 @@
 package li.strolch.service;
 
 import li.strolch.command.RemoveResourceCommand;
+import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
@@ -38,8 +39,11 @@ public class RemoveResourceService extends AbstractService<RemoveResourceService
 	protected ServiceResult internalDoService(RemoveResourceArg arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
+
+			Resource resource = tx.findElement(arg.locator);
+
 			RemoveResourceCommand command = new RemoveResourceCommand(getContainer(), tx);
-			command.setResource(arg.resource);
+			command.setResource(resource);
 			tx.addCommand(command);
 		}
 
@@ -48,6 +52,6 @@ public class RemoveResourceService extends AbstractService<RemoveResourceService
 
 	public static class RemoveResourceArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
-		public Resource resource;
+		public Locator locator;
 	}
 }
