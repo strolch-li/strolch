@@ -22,6 +22,8 @@ import li.strolch.model.Locator.LocatorBuilder;
 
 import org.w3c.dom.Element;
 
+import ch.eitchnet.utils.helper.StringHelper;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -70,12 +72,11 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 
 	@Override
 	public void setId(String id) {
-		if (id == null)
-			throw new StrolchException("The id may never be null"); //$NON-NLS-1$
-
-		if (id.isEmpty())
-			throw new StrolchException("The id may never be empty"); //$NON-NLS-1$
-
+		if (StringHelper.isEmpty(id)) {
+			String msg = "The id may never be empty for {0}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName());
+			throw new StrolchException(msg);
+		}
 		this.id = id;
 	}
 
@@ -86,6 +87,11 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 
 	@Override
 	public void setName(String name) {
+		if (StringHelper.isEmpty(name)) {
+			String msg = "The name may never be empty for {0} with id {1}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName(), id);
+			throw new StrolchException(msg);
+		}
 		this.name = name;
 	}
 

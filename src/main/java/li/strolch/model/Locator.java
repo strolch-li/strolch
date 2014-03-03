@@ -244,6 +244,18 @@ public class Locator {
 	}
 
 	/**
+	 * Creates a new {@link LocatorBuilder} instance and appends the given root element tag to it
+	 * 
+	 * @param rootElement
+	 *            the first element on the {@link Locator}
+	 * 
+	 * @return a new {@link LocatorBuilder} instance with the given root element tag as the first element
+	 */
+	public static LocatorBuilder newBuilder(String rootElement) {
+		return new LocatorBuilder().append(rootElement);
+	}
+
+	/**
 	 * {@link LocatorBuilder} is used to build {@link Locator}s where a deep hierarchy is to be created. The
 	 * {@link #append(String)} method returns itself for chain building
 	 * 

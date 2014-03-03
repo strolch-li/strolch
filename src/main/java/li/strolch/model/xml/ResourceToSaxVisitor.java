@@ -22,7 +22,6 @@ import li.strolch.model.ResourceVisitor;
 import li.strolch.model.Tags;
 
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -41,7 +40,7 @@ public class ResourceToSaxVisitor extends StrolchElementToDomVisitor implements 
 			toSax(res);
 			this.contentHandler.endElement(null, null, Tags.RESOURCE);
 
-		} catch (SAXException e) {
+		} catch (Exception e) {
 			String msg = "Failed to transform Resource {0} to XML due to {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, res.getLocator(), e.getMessage());
 			throw new RuntimeException(msg, e);

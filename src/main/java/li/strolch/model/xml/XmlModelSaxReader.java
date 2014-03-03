@@ -20,6 +20,7 @@ import static ch.eitchnet.utils.helper.StringHelper.NULL;
 import java.text.MessageFormat;
 import java.util.Date;
 
+import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
@@ -122,42 +123,48 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String paramValue = attributes.getValue(Tags.VALUE);
 			String paramHiddenS = attributes.getValue(Tags.HIDDEN);
 			String paramIndexS = attributes.getValue(Tags.INDEX);
-			int index = StringHelper.isEmpty(paramIndexS) ? 0 : Integer.valueOf(paramIndexS);
-			boolean paramHidden = StringHelper.isEmpty(paramHiddenS) ? false : StringHelper.parseBoolean(paramHiddenS);
-			String paramUom = attributes.getValue(Tags.UOM);
-			String paramInterpretation = attributes.getValue(Tags.INTERPRETATION);
-			Parameter<?> param;
-			switch (paramType) {
-			case StringParameter.TYPE:
-				param = new StringParameter(paramId, paramName, paramValue);
-				break;
-			case IntegerParameter.TYPE:
-				param = new IntegerParameter(paramId, paramName, IntegerParameter.parseFromString(paramValue));
-				break;
-			case BooleanParameter.TYPE:
-				param = new BooleanParameter(paramId, paramName, BooleanParameter.parseFromString(paramValue));
-				break;
-			case LongParameter.TYPE:
-				param = new LongParameter(paramId, paramName, LongParameter.parseFromString(paramValue));
-				break;
-			case DateParameter.TYPE:
-				param = new DateParameter(paramId, paramName, DateParameter.parseFromString(paramValue));
-				break;
-			case StringListParameter.TYPE:
-				param = new StringListParameter(paramId, paramName, StringListParameter.parseFromString(paramValue));
-				break;
-			case FloatParameter.TYPE:
-				param = new FloatParameter(paramId, paramName, FloatParameter.parseFromString(paramValue));
-				break;
-			default:
-				throw new UnsupportedOperationException(MessageFormat.format(
-						"Parameters of type {0} are not supported!", paramType)); //$NON-NLS-1$
+			try {
+				int index = StringHelper.isEmpty(paramIndexS) ? 0 : Integer.valueOf(paramIndexS);
+				boolean paramHidden = StringHelper.isEmpty(paramHiddenS) ? false : StringHelper
+						.parseBoolean(paramHiddenS);
+				String paramUom = attributes.getValue(Tags.UOM);
+				String paramInterpretation = attributes.getValue(Tags.INTERPRETATION);
+				Parameter<?> param;
+				switch (paramType) {
+				case StringParameter.TYPE:
+					param = new StringParameter(paramId, paramName, paramValue);
+					break;
+				case IntegerParameter.TYPE:
+					param = new IntegerParameter(paramId, paramName, IntegerParameter.parseFromString(paramValue));
+					break;
+				case BooleanParameter.TYPE:
+					param = new BooleanParameter(paramId, paramName, BooleanParameter.parseFromString(paramValue));
+					break;
+				case LongParameter.TYPE:
+					param = new LongParameter(paramId, paramName, LongParameter.parseFromString(paramValue));
+					break;
+				case DateParameter.TYPE:
+					param = new DateParameter(paramId, paramName, DateParameter.parseFromString(paramValue));
+					break;
+				case StringListParameter.TYPE:
+					param = new StringListParameter(paramId, paramName, StringListParameter.parseFromString(paramValue));
+					break;
+				case FloatParameter.TYPE:
+					param = new FloatParameter(paramId, paramName, FloatParameter.parseFromString(paramValue));
+					break;
+				default:
+					throw new UnsupportedOperationException(MessageFormat.format(
+							"Parameters of type {0} are not supported!", paramType)); //$NON-NLS-1$
+				}
+				param.setHidden(paramHidden);
+				param.setUom(paramUom);
+				param.setInterpretation(paramInterpretation);
+				param.setIndex(index);
+				this.pBag.addParameter(param);
+			} catch (Exception e) {
+				throw new StrolchException("Failed to instantiate parameter " + paramId + " for bag "
+						+ this.pBag.getLocator() + " due to " + e.getMessage(), e);
 			}
-			param.setHidden(paramHidden);
-			param.setUom(paramUom);
-			param.setInterpretation(paramInterpretation);
-			param.setIndex(index);
-			this.pBag.addParameter(param);
 			break;
 
 		default:
