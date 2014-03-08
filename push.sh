@@ -4,6 +4,9 @@ projectsFile="${PWD}/projects.lst"
 
 cd ..
 while read project; do
+  if [ "${project}" == "" ] ; then
+  	continue;
+  fi
   echo "Pushing ${project}..."
   cd ${project}
   git push

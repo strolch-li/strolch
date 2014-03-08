@@ -4,6 +4,9 @@ projectsFile="${PWD}/projects.lst"
 
 cd ..
 while read project; do
+  if [ "${project}" == "" ] ; then
+  	continue;
+  fi
   echo "Pulling ${project}..."
   cd ${project}
   git pull

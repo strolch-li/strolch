@@ -13,6 +13,9 @@ function logAheadCount() {
 
 cd ..
 while read project; do
+  if [ "${project}" == "" ] ; then
+  	continue;
+  fi
   cd "${project}"
   logAheadCount
   cd ..

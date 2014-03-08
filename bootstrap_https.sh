@@ -6,6 +6,9 @@ echo "Cloning projects using HTTPS..."
 
 cd ..
 while read project; do
+  if [ "${project}" == "" ] ; then
+  	continue;
+  fi
   if [ -d "${project}" ] ; then
     echo "Project ${project} already cloned."
   else
