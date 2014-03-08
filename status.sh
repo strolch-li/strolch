@@ -1,22 +1,15 @@
 #!/bin/bash
-#######################################################################
-##
-## Show status of all projects
-##
-#######################################################################
 
-echo "Showing status of li.strolch.dev..." ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.parent..." ; cd li.strolch.parent ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.bom..." ; cd li.strolch.bom ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.model..." ; cd li.strolch.model ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.testbase..." ; cd li.strolch.testbase ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.agent..." ; cd li.strolch.agent ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.service..." ; cd li.strolch.service ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.rest..." ; cd li.strolch.rest ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.persistence.xml..." ; cd li.strolch.persistence.xml ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.persistence.postgresql..." ; cd li.strolch.persistence.postgresql ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.tutorialapp..." ; cd li.strolch.tutorialapp ; git status -s ; cd .. ; echo
-echo "Showing status of li.strolch.tutorialwebapp..." ; cd li.strolch.tutorialwebapp ; git status -s ; cd .. ; echo
+projectsFile="${PWD}/projects.lst"
+
+cd ..
+while read project; do
+  echo "Status of ${project}..."
+  cd ${project}
+  git status -s
+  cd ..
+  echo
+done < ${projectsFile}
 
 echo "Done."
 exit 0

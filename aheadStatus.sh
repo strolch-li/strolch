@@ -1,33 +1,22 @@
 #!/bin/bash
-#######################################################################
-##
-## Shows how far ahead each project is against origin
-##
-#######################################################################
+
+projectsFile="${PWD}/projects.lst"
 
 function logAheadCount() {
   aheadCount="$(git rev-list origin..master --count)"
-  if [ "${aheadCount}" -ne 0 ] ; then
+#  if [ "${aheadCount}" -ne 0 ] ; then
     project="${PWD}"
   	project="${project##*/}"
-    echo "${project} is ahead of origin by ${aheadCount} commits"
-  fi
+    echo "${aheadCount} commits need pushing for ${project}"
+#  fi
 }
 
-echo "Checking how far ahead each project is against origin..."
 cd ..
-cd "li.strolch.dev" ; logAheadCount ; cd ..
-cd "li.strolch.parent" ; logAheadCount ; cd ..
-cd "li.strolch.bom" ; logAheadCount ; cd ..
-cd "li.strolch.model" ; logAheadCount ; cd ..
-cd "li.strolch.testbase" ; logAheadCount ; cd ..
-cd "li.strolch.agent" ; logAheadCount ; cd ..
-cd "li.strolch.service" ; logAheadCount ; cd ..
-cd "li.strolch.rest" ; logAheadCount ; cd ..
-cd "li.strolch.persistence.xml" ; logAheadCount ; cd ..
-cd "li.strolch.persistence.postgresql" ; logAheadCount ; cd ..
-cd "li.strolch.tutorialapp" ; logAheadCount ; cd ..
-cd "li.strolch.tutorialwebapp" ; logAheadCount ; cd ..
+while read project; do
+  cd "${project}"
+  logAheadCount
+  cd ..
+done < ${projectsFile}
 
 echo "Done."
 exit 0
