@@ -15,6 +15,9 @@
 	<description>Project used to develop strolch modules. Contains scripts for bootstrapping development, etc.</description>
 
 	<modules>
+		<module>../ch.eitchnet.privilege</module>
+		<module>../ch.eitchnet.utils</module>
+		<module>../ch.eitchnet.xmlpers</module>
 		<module>../li.strolch.parent</module>
 		<module>../li.strolch.bom</module>
 		<module>../li.strolch.model</module>
