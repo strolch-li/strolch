@@ -305,11 +305,13 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 				synchronized (byType) {
 					for (T element : list) {
-						if (byType.remove(element.getId()) == null) {
+						T replacedElement = byType.remove(element.getId());
+						if (replacedElement == null) {
 							msg = MessageFormat.format(msg, element.getLocator());
 							throw new StrolchPersistenceException(msg);
 						}
-						replacedElements.add(byType.put(element.getId(), element));
+						byType.put(element.getId(), element);
+						replacedElements.add(replacedElement);
 					}
 				}
 			}
@@ -350,6 +352,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 							msg = MessageFormat.format(msg, element.getLocator());
 							throw new StrolchPersistenceException(msg);
 						}
+						this.allKeys.remove(element.getId());
 
 						if (byType.isEmpty()) {
 							synchronized (this.elementMap) {
