@@ -41,11 +41,11 @@ import org.junit.Test;
  */
 public abstract class AbstractRealmServiceTest {
 
-	protected static final String REALM_CACHED = "svcCached";
-	protected static final String REALM_TRANSACTIONAL = "svcTransactional";
-	protected static final String REALM_TRANSIENT = "svcTransient";
-	protected static final String RUNTIME_PATH = "target/svcTestRuntime/"; //$NON-NLS-1$
-	protected static final String CONFIG_SRC = "src/test/resources/svctest"; //$NON-NLS-1$
+	public static final String REALM_CACHED = "svcCached";
+	public static final String REALM_TRANSACTIONAL = "svcTransactional";
+	public static final String REALM_TRANSIENT = "svcTransient";
+	public static final String RUNTIME_PATH = "target/svcTestRuntime/"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/test/resources/svctest"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
 
@@ -61,11 +61,16 @@ public abstract class AbstractRealmServiceTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		importFromXml(REALM_CACHED);
-		importFromXml(REALM_TRANSACTIONAL);
+		importFromXml(REALM_CACHED, getServiceHandler());
+		importFromXml(REALM_TRANSACTIONAL, getServiceHandler());
 	}
 
-	private static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws SQLException {
+	@AfterClass
+	public static void afterClass() {
+		runtimeMock.destroyRuntime();
+	}
+
+	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws SQLException {
 		String dbVersion = DbSchemaVersionCheck.getExpectedDbVersion();
 		String sql = DbSchemaVersionCheck.getSql(dbVersion, "drop"); //$NON-NLS-1$
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
@@ -73,13 +78,13 @@ public abstract class AbstractRealmServiceTest {
 		}
 	}
 
-	private static void importFromXml(String realm) {
+	public static void importFromXml(String realm, ServiceHandler serviceHandler) {
 
 		XmlImportModelService svc = new XmlImportModelService();
 		XmlImportModelArgument arg = new XmlImportModelArgument();
 		arg.realm = realm;
 		arg.modelFileName = "StrolchModel.xml";
-		ServiceResult result = getServiceHandler().doService(null, svc, arg);
+		ServiceResult result = serviceHandler.doService(null, svc, arg);
 		assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 	}
 
@@ -91,23 +96,18 @@ public abstract class AbstractRealmServiceTest {
 		assertServiceResult(expectedState, expectedServiceResultType, result);
 	}
 
-	@AfterClass
-	public static void afterClass() {
-		runtimeMock.destroyRuntime();
-	}
-
 	public static ServiceHandler getServiceHandler() {
 		return runtimeMock.getContainer().getComponent(ServiceHandler.class);
-	}
-
-	@Test
-	public void shouldPerformServiceTransient() {
-		doService(REALM_TRANSIENT, ServiceResultState.SUCCESS, ServiceResult.class, getSvc(), getArg());
 	}
 
 	public abstract <T extends ServiceArgument> T getArg();
 
 	public abstract <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc();
+
+	@Test
+	public void shouldPerformServiceTransient() {
+		doService(REALM_TRANSIENT, ServiceResultState.SUCCESS, ServiceResult.class, getSvc(), getArg());
+	}
 
 	@Test
 	public void shouldPerformServiceCached() {
