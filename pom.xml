@@ -14,19 +14,19 @@
 	<name>li.strolch.agent</name>
 	<description>Strolch Agent which is the runtime for Strolch</description>
 
-	<url>https://github.com/eitch/li.strolch.agent</url>
+	<url>https://github.com/eitchnet/li.strolch.agent</url>
 
 	<inceptionYear>2011</inceptionYear>
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitch/li.strolch.agent/issues</url>
+		<url>https://github.com/eitchnet/li.strolch.agent/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitch/li.strolch.agent.git</connection>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.agent.git</connection>
 		<developerConnection>scm:git:git@github.com:eitch/li.strolch.agent.git</developerConnection>
-		<url>https://github.com/eitch/li.strolch.agent</url>
+		<url>https://github.com/eitchnet/li.strolch.agent</url>
 	</scm>
 
 	<dependencies>
