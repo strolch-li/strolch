@@ -14,19 +14,19 @@
 	<name>li.strolch.rest</name>
 	<description>Restful Web Service API for Strolch</description>
 
-	<url>https://github.com/eitch/li.strolch.rest</url>
+	<url>https://github.com/eitchnet/li.strolch.rest</url>
 
 	<inceptionYear>2011</inceptionYear>
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitch/li.strolch.rest/issues</url>
+		<url>https://github.com/eitchnet/li.strolch.rest/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitch/li.strolch.rest.git</connection>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.rest.git</connection>
 		<developerConnection>scm:git:git@github.com:eitch/li.strolch.rest.git</developerConnection>
-		<url>https://github.com/eitch/li.strolch.rest</url>
+		<url>https://github.com/eitchnet/li.strolch.rest</url>
 	</scm>
 
 	<properties>
