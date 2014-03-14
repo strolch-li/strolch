@@ -15,19 +15,19 @@
 	<name>li.strolch.persistence.postgresql</name>
 	<description>PostgreSQL Persistence Implementation for Strolch</description>
 
-	<url>https://github.com/eitch/li.strolch.persistence.postgresql</url>
+	<url>https://github.com/eitchnet/li.strolch.persistence.postgresql</url>
 
 	<inceptionYear>2011</inceptionYear>
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitch/li.strolch.persistence.postgresql/issues</url>
+		<url>https://github.com/eitchnet/li.strolch.persistence.postgresql/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitch/li.strolch.persistence.postgresql.git</connection>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.persistence.postgresql.git</connection>
 		<developerConnection>scm:git:git@github.com:eitch/li.strolch.persistence.postgresql.git</developerConnection>
-		<url>https://github.com/eitch/li.strolch.persistence.postgresql</url>
+		<url>https://github.com/eitchnet/li.strolch.persistence.postgresql</url>
 	</scm>
 
 	<dependencies>
