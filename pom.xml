@@ -14,19 +14,19 @@
 	<name>li.strolch.testbase</name>
 	<description>runtime for Strolch</description>
 
-	<url>https://github.com/eitch/li.strolch.testbase</url>
+	<url>https://github.com/eitchnet/li.strolch.testbase</url>
 
 	<inceptionYear>2011</inceptionYear>
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitch/li.strolch.testbase/issues</url>
+		<url>https://github.com/eitchnet/li.strolch.testbase/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitch/li.strolch.testbase.git</connection>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.testbase.git</connection>
 		<developerConnection>scm:git:git@github.com:eitch/li.strolch.testbase.git</developerConnection>
-		<url>https://github.com/eitch/li.strolch.testbase</url>
+		<url>https://github.com/eitchnet/li.strolch.testbase</url>
 	</scm>
 
 	<dependencies>
