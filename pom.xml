@@ -13,7 +13,7 @@
 	<packaging>jar</packaging>
 	<version>0.3.0-SNAPSHOT</version>
 	<name>ch.eitchnet.xmlpers</name>
-	<url>https://github.com/eitch/ch.eitchnet.xmlpers</url>
+	<url>https://github.com/eitchnet/ch.eitchnet.xmlpers</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,13 +25,13 @@
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitch/ch.eitchnet.xmlpers/issues</url>
+		<url>https://github.com/eitchnet/ch.eitchnet.xmlpers/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitch/ch.eitchnet.xmlpers.git</connection>
-		<developerConnection>scm:git:git@github.com:eitch/ch.eitchnet.xmlpers.git</developerConnection>
-		<url>https://github.com/eitch/ch.eitchnet.xmlpers</url>
+		<connection>scm:git:https://github.com/eitchnet/ch.eitchnet.xmlpers.git</connection>
+		<developerConnection>scm:git:git@github.com:eitchnet/ch.eitchnet.xmlpers.git</developerConnection>
+		<url>https://github.com/eitchnet/ch.eitchnet.xmlpers</url>
 	</scm>
 
 	<dependencies>
