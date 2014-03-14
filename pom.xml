@@ -15,19 +15,19 @@
 	<name>li.strolch.persistence.xml</name>
 	<description>Reference Persistence Implementation for Strolch</description>
 
-	<url>https://github.com/eitch/li.strolch.persistence.xml</url>
+	<url>https://github.com/eitchnet/li.strolch.persistence.xml</url>
 
 	<inceptionYear>2011</inceptionYear>
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitch/li.strolch.persistence.xml/issues</url>
+		<url>https://github.com/eitchnet/li.strolch.persistence.xml/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitch/li.strolch.persistence.xml.git</connection>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.persistence.xml.git</connection>
 		<developerConnection>scm:git:git@github.com:eitch/li.strolch.persistence.xml.git</developerConnection>
-		<url>https://github.com/eitch/li.strolch.persistence.xml</url>
+		<url>https://github.com/eitchnet/li.strolch.persistence.xml</url>
 	</scm>
 
 	<dependencies>
