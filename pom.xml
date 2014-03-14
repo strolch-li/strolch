@@ -14,19 +14,19 @@
 	<name>li.strolch.service</name>
 	<description>Service API for Strolch</description>
 
-	<url>https://github.com/eitch/li.strolch.service</url>
+	<url>https://github.com/eitchnet/li.strolch.service</url>
 
 	<inceptionYear>2011</inceptionYear>
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitch/li.strolch.service/issues</url>
+		<url>https://github.com/eitchnet/li.strolch.service/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitch/li.strolch.service.git</connection>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.service.git</connection>
 		<developerConnection>scm:git:git@github.com:eitch/li.strolch.service.git</developerConnection>
-		<url>https://github.com/eitch/li.strolch.service</url>
+		<url>https://github.com/eitchnet/li.strolch.service</url>
 	</scm>
 
 	<dependencies>
