@@ -18,7 +18,7 @@ for /F  %%i in ('type projects.lst') do (
       echo INFO: Project !project! already exists. Not cloning
     ) else (
       echo INFO: Cloning project !project! ...
-      git clone git@github.com:eitch/!project!.git ..\!project!
+      git clone git@github.com:eitchnet/!project!.git ..\!project!
       if !ERRORLEVEL! NEQ 0 goto :FAIL
       echo.
     )
