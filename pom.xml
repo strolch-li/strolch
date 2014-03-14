@@ -12,19 +12,19 @@
 	<artifactId>li.strolch.model</artifactId>
 	<packaging>jar</packaging>
 	<name>li.strolch.model</name>
-	<url>https://github.com/eitch/li.strolch.model</url>
+	<url>https://github.com/eitchnet/li.strolch.model</url>
 
 	<inceptionYear>2012</inceptionYear>
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitch/li.strolch.model/issues</url>
+		<url>https://github.com/eitchnet/li.strolch.model/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitch/li.strolch.model.git</connection>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.model.git</connection>
 		<developerConnection>scm:git:git@github.com:eitch/li.strolch.model.git</developerConnection>
-		<url>https://github.com/eitch/li.strolch.model</url>
+		<url>https://github.com/eitchnet/li.strolch.model</url>
 	</scm>
 
 	<dependencies>
