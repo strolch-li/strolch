@@ -19,7 +19,7 @@ a LDAP repository with only the Privilege JAR.
 Privilege is distributed under the GNU Lesser General Public License on 
 Github.com and can be downloaded at 
 
-   https://github.com/eitch/ch.eitchnet.privilege
+   https://github.com/eitchnet/ch.eitchnet.privilege
 
 The main developer is Robert von Burg <eitch@eitchnet.ch> who also maintains the
 Github repository. He is available for all questions regarding Privilege
