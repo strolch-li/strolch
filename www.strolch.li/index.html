@@ -348,9 +348,9 @@ public class SetParameterCommand extends Command {
 
         <h3>Main Strolch components</h3>
         <ul>
-          <li><a href="https://github.com/eitch/li.strolch.model">li.strolch.model</a>
+          <li><a href="https://github.com/eitchnet/li.strolch.model">li.strolch.model</a>
           <p>This project implements the Strolch model. This is where you will find the different elements that can store data at runtime. Currently there are two root elements: Resource and Order</p></li>
-        <li><a href="https://github.com/eitch/li.strolch.agent">li.strolch.agent</a>
+        <li><a href="https://github.com/eitchnet/li.strolch.agent">li.strolch.agent</a>
           <p>The agent is the Strolch runtime and is the component which implements the core Agent functionality. That is:</p>
           <ul>
             <li>Provide the Agent instance which loads the configuration and is the entry point to the runtime</li>
@@ -360,7 +360,7 @@ public class SetParameterCommand extends Command {
             <li>Implements the realms which each can operate in different modes data store modes: TRANSACTIONAL, CACHED, TRANSIENT</li>
           </ul>
         </li>
-        <li><a href="https://github.com/eitch/li.strolch.service">li.strolch.service</a>
+        <li><a href="https://github.com/eitchnet/li.strolch.service">li.strolch.service</a>
           <p>Implements the basic Services and the re-usable Commands:</p>
           <ul>
             <li>CRUD Services and Commands to modify the model</li>
@@ -372,39 +372,39 @@ public class SetParameterCommand extends Command {
 
         <h3>Additional components</h3>
         <ul>
-          <li><a href="https://github.com/eitch/li.strolch.persistence.postgresql">li.strolch.persistence.postgresql</a>
+          <li><a href="https://github.com/eitchnet/li.strolch.persistence.postgresql">li.strolch.persistence.postgresql</a>
             <p>Implements a PostgreSQL persistence layer so that the Strolch model can be persisted to a PostgreSQL RDBMS when the realm is configured to have a data store mode of either CACHED or TRANSACTIONAL</p>
           </li>
-          <li><a href="https://github.com/eitch/li.strolch.persistence.xml">li.strolch.persistence.xml</a>
+          <li><a href="https://github.com/eitchnet/li.strolch.persistence.xml">li.strolch.persistence.xml</a>
             <p>Implements an XML persistence layer so that the Strolch model can be persisted to XML files when the realm is configured to have a data store mode of either CACHED or TRANSACTIONAL. This implementation uses the <a href="xmlpers">xmlpers project</a>.</p>
           </li>
-          <li><a href="https://github.com/eitch/li.strolch.rest">li.strolch.rest</a>
+          <li><a href="https://github.com/eitchnet/li.strolch.rest">li.strolch.rest</a>
             <p>Implements a Restful API to communicate with the Strolch runtime from clients and external systems.</p>
           </li>
         </ul>
 
         <h3>Meta projects</h3>
         <ul>
-          <li><a href="https://github.com/eitch/li.strolch.dev">li.strolch.dev</a>
+          <li><a href="https://github.com/eitchnet/li.strolch.dev">li.strolch.dev</a>
             <p>To quickly get started developing Strolch, this projects provides scripts to checkout all the relevant projects and implements a Maven module so that building this projects builds all Strolch projects.</p>
           </li>
-          <li><a href="https://github.com/eitch/li.strolch.parent">li.strolch.parent</a>
+          <li><a href="https://github.com/eitchnet/li.strolch.parent">li.strolch.parent</a>
             <p>A Maven parent project for the Strolch projects to synchronize the maven project structure</p>
           </li>
-          <li><a href="https://github.com/eitch/li.strolch.bom">li.strolch.bom</a>
+          <li><a href="https://github.com/eitchnet/li.strolch.bom">li.strolch.bom</a>
             <p>This bill of material is a Maven project which, when imported in one's own Strolch project, pulls in all required dependencies needed to set up a minimal working Strolch environment.</p>
           </li>
-          <li><a href="https://github.com/eitch/li.strolch.testbase">li.strolch.testbase</a>
+          <li><a href="https://github.com/eitchnet/li.strolch.testbase">li.strolch.testbase</a>
             <p>Implements a test base so that writing tests for Strolch is easy. It provides a RuntimeMock, which handles setting up and tearing down Strolch runtimes during tests.</p>
           </li>
         </ul>
 
         <h3>Example projects</h3>
         <ul>
-          <li><a href="https://github.com/eitch/li.strolch.tutorialapp">li.strolch.tutorialapp</a>
+          <li><a href="https://github.com/eitchnet/li.strolch.tutorialapp">li.strolch.tutorialapp</a>
             <p>A tutorial application which showcases how to setup Strolch as a standalone Java SE project and starts the Strolch runtime by means of a main-class.</p>
           </li>
-          <li><a href="https://github.com/eitch/li.strolch.tutorialwebapp">li.strolch.tutorialwebapp</a>
+          <li><a href="https://github.com/eitchnet/li.strolch.tutorialwebapp">li.strolch.tutorialwebapp</a>
             <p>A tutorial application which showcases how to setup Strolch as a standalone Java Webapp which can be deployed to a servlet container e.g. Apache Tomcat 7.</p>
           </li>
         </ul>
@@ -414,7 +414,7 @@ public class SetParameterCommand extends Command {
         <pre class="pre-scrollable">
 mkdir strolch
 cd strolch
-git clone https://github.com/eitch/li.strolch.dev.git
+git clone https://github.com/eitchnet/li.strolch.dev.git
 ./bootstrap_https.sh
 mvn clean package -DskipTests=true</pre>
 
