@@ -199,7 +199,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 			String msg = "Stopping component {0}..."; //$NON-NLS-1$
 			String componentName = component.getName();
 			logger.info(MessageFormat.format(msg, componentName));
-			component.stop();
+			try {
+				component.stop();
+			} catch (Exception e) {
+				msg = "Failed to stop component {0} due to {1}";
+				msg = MessageFormat.format(msg, componentName, e.getMessage());
+				logger.error(msg, e);
+			}
 		}
 
 		// Stop direct upstream components
@@ -219,7 +225,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 			String msg = "Destroying component {0}..."; //$NON-NLS-1$
 			String componentName = component.getName();
 			logger.info(MessageFormat.format(msg, componentName));
-			component.destroy();
+			try {
+				component.destroy();
+			} catch (Exception e) {
+				msg = "Failed to destroy component {0} due to {1}";
+				msg = MessageFormat.format(msg, componentName, e.getMessage());
+				logger.error(msg, e);
+			}
 		}
 
 		// Destroy direct upstream components
