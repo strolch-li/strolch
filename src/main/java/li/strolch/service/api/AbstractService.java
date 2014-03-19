@@ -18,7 +18,6 @@ package li.strolch.service.api;
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -79,11 +78,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	protected StrolchRealm getRealm(String realm) {
-		return getComponent(RealmHandler.class).getRealm(realm);
+		return this.container.getRealm(realm);
 	}
 
 	protected StrolchTransaction openTx(String realm) {
-		return getComponent(RealmHandler.class).getRealm(realm).openTx();
+		return this.container.getRealm(realm).openTx();
 	}
 
 	@Override
