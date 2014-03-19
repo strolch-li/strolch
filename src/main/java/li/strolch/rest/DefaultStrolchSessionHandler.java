@@ -58,10 +58,12 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public void stop() {
-		for (Certificate certificate : this.certificateMap.values()) {
-			this.privilegeHandler.invalidateSession(certificate);
+		if (this.certificateMap != null) {
+			for (Certificate certificate : this.certificateMap.values()) {
+				this.privilegeHandler.invalidateSession(certificate);
+			}
+			this.certificateMap.clear();
 		}
-		this.certificateMap.clear();
 		this.privilegeHandler = null;
 		super.stop();
 	}

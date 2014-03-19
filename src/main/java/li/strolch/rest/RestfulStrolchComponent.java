@@ -17,6 +17,8 @@ package li.strolch.rest;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.rest.filters.AccessControlResponseFilter;
+import li.strolch.runtime.configuration.ComponentConfiguration;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -32,6 +34,18 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 */
 	public RestfulStrolchComponent(ComponentContainer container, String componentName) {
 		super(container, componentName);
+	}
+
+	@Override
+	public void initialize(ComponentConfiguration configuration) {
+
+		if (configuration.getBoolean("corsEnabled", Boolean.FALSE)) {
+			AccessControlResponseFilter.setCorsEnabled(true);
+			String origin = configuration.getString("corsOrigin", null);
+			AccessControlResponseFilter.setOrigin(origin);
+		}
+
+		super.initialize(configuration);
 	}
 
 	@Override
