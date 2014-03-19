@@ -40,8 +40,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	public void initialize(ComponentConfiguration configuration) {
 
 		if (configuration.getBoolean("corsEnabled", Boolean.FALSE)) {
-			AccessControlResponseFilter.setCorsEnabled(true);
 			String origin = configuration.getString("corsOrigin", null);
+			logger.info("Enabling CORS for origin: " + origin);
+			AccessControlResponseFilter.setCorsEnabled(true);
 			AccessControlResponseFilter.setOrigin(origin);
 		}
 
