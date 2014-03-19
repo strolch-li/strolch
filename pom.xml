@@ -14,19 +14,19 @@
 	<name>li.strolch.tutorialapp</name>
 	<description>Tutorial Application for Strolch</description>
 
-	<url>https://github.com/eitch/li.strolch.tutorialapp</url>
+	<url>https://github.com/eitchnet/li.strolch.tutorialapp</url>
 
 	<inceptionYear>2011</inceptionYear>
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitch/li.strolch.tutorialapp/issues</url>
+		<url>https://github.com/eitchnet/li.strolch.tutorialapp/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitch/li.strolch.tutorialapp.git</connection>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.tutorialapp.git</connection>
 		<developerConnection>scm:git:git@github.com:eitch/li.strolch.tutorialapp.git</developerConnection>
-		<url>https://github.com/eitch/li.strolch.tutorialapp</url>
+		<url>https://github.com/eitchnet/li.strolch.tutorialapp</url>
 	</scm>
 
 	<dependencies>
