@@ -12,7 +12,7 @@ while read project; do
   if [ -d "${project}" ] ; then
     echo "Project ${project} already cloned."
   else
-    if ! git clone "git@github.com:eitch/${project}.git" "${project}" ;then
+    if ! git clone "git@github.com:eitchnet/${project}.git" "${project}" ;then
       exit 1
     fi
     echo
