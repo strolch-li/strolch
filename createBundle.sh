@@ -34,20 +34,18 @@ while read project; do
   fi
 
   echo "INFO: Copying ${project} packages..."
-  if ! ls target/*.jar 2>/dev/null ; then
+  if ls target/*.jar 2>/dev/null ; then
+    if ! cp target/*.jar "${workDir}" ; then
+      echo "ERROR: Failed to copy package for project ${project}."
+      exit 1
+    fi
+  else if ls target/*.war 2>/dev/null ; then
+    if ! cp target/*.war "${workDir}" ; then
+      echo "ERROR: Failed to copy wars for project ${project}."
+      exit 1
+    fi
+  else
     echo "INFO: Project ${project} has no target, skipping."
-    cd ..
-    continue
-  fi
-
-  if ! cp target/*.jar "${workDir}" ; then
-    echo "ERROR: Failed to copy package for project ${project}."
-    exit 1
-  fi
-
-  if ! cp target/*.jar "${DIST_STROLCH}" ; then
-    echo "ERROR: Failed to publish package for project ${project}."
-    exit 1
   fi
 
   cd ..
