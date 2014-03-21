@@ -1,5 +1,7 @@
+#!/bin/bash
+
 VERVEINE="/data/programs/verveinej/verveinej.sh"
-DIST_STROLCH_MSE="/var/www/eitch/www.strolch.li/dist/snapshot"
+DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 
 ## Prepare a new environment
 mkdir -p target/strolch_mse
@@ -42,7 +44,7 @@ if ! tar --exclude="*/target" --exclude="*/.git*" -cvzf strolch_mse.tar.gz strol
 fi
 rm -rf strolch_mse/
 
-if ! mv strolch_mse.tar.gz ${DIST_STROLCH_MSE}/strolch_mse.tar.gz ; then
+if ! mv strolch_mse.tar.gz ${DIST_STROLCH}/strolch_mse.tar.gz ; then
   echo "ERROR: Failed to publish MSE file!"
   exit 1
 fi
