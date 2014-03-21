@@ -1,5 +1,7 @@
 #!/bin/bash
 
+projectName=strolch_bundle
+projectVersion=0.1.0-SNAPSHOT
 DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 workDir="${PWD}/target/strolch_bundle"
 projectsFile="${PWD}/projects.lst"
@@ -53,12 +55,12 @@ while read project; do
 done < ${projectsFile}
 
 cd ${workDir}/..
-if ! tar -cvzf strolch_bundle.tar.gz strolch_bundle ; then
+if ! tar -cvzf ${projectName}-${projectVersion}.tar.gz ${projectName} ; then
   echo "ERROR: Failed to make bundle."
   exit 1
 fi
 
-if ! mv strolch_bundle.tar.gz "${DIST_STROLCH}" ; then
+if ! mv ${projectName}-${projectVersion}.tar.gz "${DIST_STROLCH}" ; then
   echo "ERROR: Failed to publish bundle."
   exit 1
 fi
