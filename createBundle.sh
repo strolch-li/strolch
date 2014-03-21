@@ -6,6 +6,18 @@ DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 workDir="${PWD}/target/strolch_bundle"
 projectsFile="${PWD}/projects.lst"
 
+echo "INFO Bootstrapping..."
+if ! ./bootstrap_https.sh ; then
+  echo "ERROR: Failed to boostrap!"
+  exit 1
+fi
+
+echo "INFO Pulling..."
+if ! ./pull.sh ; then
+  echo "ERROR: Failed to pull from upstream!"
+  exit 1
+fi
+
 # first we create all needed packages
 if ! mvn -DskipTests clean package ; then
   echo "ERROR: Failed to build packages!"
