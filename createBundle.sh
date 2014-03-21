@@ -43,6 +43,11 @@ while read project; do
     exit 1
   fi
 
+  if ! cp target/*.jar "${DIST_STROLCH}" ; then
+    echo "ERROR: Failed to publish package for project ${project}."
+    exit 1
+  fi
+
   cd ..
 
 done < ${projectsFile}
