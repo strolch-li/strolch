@@ -22,19 +22,19 @@
     <description>Tutorial webapp to show case using Strolch in a servlet container</description>
     <packaging>war</packaging>
 
-    <url>https://github.com/eitch/li.strolch.tutorialwebapp</url>
+    <url>https://github.com/eitchnet/li.strolch.tutorialwebapp</url>
 
     <inceptionYear>2011</inceptionYear>
 
     <issueManagement>
         <system>Github Issues</system>
-        <url>https://github.com/eitch/li.strolch.tutorialwebapp/issues</url>
+        <url>https://github.com/eitchnet/li.strolch.tutorialwebapp/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:https://github.com/eitch/li.strolch.tutorialwebapp.git</connection>
+        <connection>scm:git:https://github.com/eitchnet/li.strolch.tutorialwebapp.git</connection>
         <developerConnection>scm:git:git@github.com:eitch/li.strolch.tutorialwebapp.git</developerConnection>
-        <url>https://github.com/eitch/li.strolch.tutorialwebapp</url>
+        <url>https://github.com/eitchnet/li.strolch.tutorialwebapp</url>
     </scm>
 
     <dependencies>
