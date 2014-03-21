@@ -1,147 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="shortcut icon" href="ico/favicon.ico">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="shortcut icon" href="ico/favicon.ico">
 
-    <title>Starter Template for Bootstrap</title>
+        <title>Starter Template for Bootstrap</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap core CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this template -->
-    <link href="css/custom.css" rel="stylesheet">
+        <!-- Custom styles for this template -->
+        <link href="css/custom.css" rel="stylesheet">
 
-    <!-- Just for debugging purposes. Don't actually copy this line! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+        <!-- Just for debugging purposes. Don't actually copy this line! -->
+        <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
 
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
     </head>
-  <body>
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">Strolch</a>
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="index.html">Strolch</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="index.html">Overview</a></li>
+                        <li><a href="downloads.html">Downloads</a></li>
+                        <li><a href="development.html">Development</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
         </div>
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Overview</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </div>
 
-    <div class="container">
+        <div class="container">
 
-      <div class="content">
-        <h1>Strolch Overview</h1>
-        <p class="lead">This page describes the Strolch software agent and the motivation behind its development.</p>
+            <div class="content">
+                <h1>Strolch Overview</h1>
+                <p class="lead">This page describes the Strolch software agent and the motivation behind its development.</p>
 
-        <h2>Overview</h2>
-        <p>Strolch is an open source component based software agent written in Java and can be compared, in a light sense, with the Java EE stack: Strolch takes care of persistence, implements Services for use cases, Commands as re-usable algorithms and has a parameterized data model.</p>
+                <h2>Overview</h2>
+                <p>Strolch is an open source component based software agent written in Java and can be compared, in a light sense, with the Java EE stack: Strolch takes care of persistence, implements Services for use cases, Commands as re-usable algorithms and has a parameterized data model.</p>
 
-        <p>Strolch has an intrinsic understanding for mandates, which are called realms so that a single agent can be used to implement applications with multiple users/customers for instance in SaaS environments.</p>
+                <p>Strolch has an intrinsic understanding for mandates, which are called realms so that a single agent can be used to implement applications with multiple users/customers for instance in SaaS environments.</p>
 
-        <p>The parameterized data model consists of two top level objects, Resources and Orders. These two objects can have any number of ParameterBags which in turn can have any number of Parameters on them. This allows for a very dynamic modelling of data structures including modification at run time. Multiple ready to use Parameter types are already implemented which handle the primitive types in Java including ListParameters for collections of these primitive types.</p>
+                <p>The parameterized data model consists of two top level objects, Resources and Orders. These two objects can have any number of ParameterBags which in turn can have any number of Parameters on them. This allows for a very dynamic modelling of data structures including modification at run time. Multiple ready to use Parameter types are already implemented which handle the primitive types in Java including ListParameters for collections of these primitive types.</p>
 
-        <p>One of the main features of the Strolch agent, is that persistence is handled transparently and the user must not be worried about databases and the likes. Currently there are two implementations for persisting the Strolch model, a PostgreSQL and an XML file persistence. Currently both persistence layers persist the data by converting to XML and storing it into the database. The XML file persistence stores each object in its own file.</p>
+                <p>One of the main features of the Strolch agent, is that persistence is handled transparently and the user must not be worried about databases and the likes. Currently there are two implementations for persisting the Strolch model, a PostgreSQL and an XML file persistence. Currently both persistence layers persist the data by converting to XML and storing it into the database. The XML file persistence stores each object in its own file.</p>
 
-        <p>The agent itself has a small memory footprint and requires very few components to start. For the agent to be useful it needs additional functionality which is implemented in StrolchComponents. Each component is registered via its Java interface on the agent and is bound to the life cycle of the agent. When the agent is started, these components can be retrieved and used to perform any number of functionalities. This is the preferred way to extend the Strolch agent. There are a number of components already implemented, e.g. the ServiceHandler which executes Services in a controlled fashion and can validate authorized access to these services.</p>
+                <p>The agent itself has a small memory footprint and requires very few components to start. For the agent to be useful it needs additional functionality which is implemented in StrolchComponents. Each component is registered via its Java interface on the agent and is bound to the life cycle of the agent. When the agent is started, these components can be retrieved and used to perform any number of functionalities. This is the preferred way to extend the Strolch agent. There are a number of components already implemented, e.g. the ServiceHandler which executes Services in a controlled fashion and can validate authorized access to these services.</p>
 
-        <p>No software product is complete without a system for authentication and authorization. Strolch implements this by using the Privilege framework which has been written by Robert von Burg. The standard ServiceHandler detects the existence of the PrivilegeHandler and then validates that the user has authorization to perform the service. This framework is implemented as its own Strolch component, thus can be retrieved at any time during execution to perform fine grained and special authorization validation.</p>
+                <p>No software product is complete without a system for authentication and authorization. Strolch implements this by using the Privilege framework which has been written by Robert von Burg. The standard ServiceHandler detects the existence of the PrivilegeHandler and then validates that the user has authorization to perform the service. This framework is implemented as its own Strolch component, thus can be retrieved at any time during execution to perform fine grained and special authorization validation.</p>
 
-        <h2>Motivation</h2>
-        <p>A question often asked is why create Strolch. What are its benefits in contrast to using Java SE with an OR-Mapper like Hibernate, or using Java EE on JBoss or Glassfish? Especially since many of the features existing in those stacks needed to be re-created in Strolch.</p>
+                <h2>Motivation</h2>
+                <p>A question often asked is why create Strolch. What are its benefits in contrast to using Java SE with an OR-Mapper like Hibernate, or using Java EE on JBoss or Glassfish? Especially since many of the features existing in those stacks needed to be re-created in Strolch.</p>
 
-        <p>The first answer to this question is that those systems are often overly complicated and bloated. Java SE with Hibernate certainly is a viable option when it comes to being light-weightier but Hibernate, even though it is supposed to, often fails to truly help remove the need to really understand an RDBMS. Often enough Hibernate will just get in the way of the most important part of development: writing the business code. Being an OR-Mapper which is supposed to implement all the nitty-gritty details of an RDBMS system, Hibernate, and JPA for that matter, still often has the developer go back to understanding these details.</p>
+                <p>The first answer to this question is that those systems are often overly complicated and bloated. Java SE with Hibernate certainly is a viable option when it comes to being light-weightier but Hibernate, even though it is supposed to, often fails to truly help remove the need to really understand an RDBMS. Often enough Hibernate will just get in the way of the most important part of development: writing the business code. Being an OR-Mapper which is supposed to implement all the nitty-gritty details of an RDBMS system, Hibernate, and JPA for that matter, still often has the developer go back to understanding these details.</p>
 
-        <p>Strolch tries a different approach to persistence. Instead of writing pojos/entities, Strolch's model has the concept that each element's attributes are part of a composition pattern: each attribute is its own object and thus can be dynamically changed at runtime, but also makes persistence of such an element generic. Instead of having fixed attributes for a concrete class, these parameters are stored in a map and are accessed through the parameter's ID.</p>
+                <p>Strolch tries a different approach to persistence. Instead of writing pojos/entities, Strolch's model has the concept that each element's attributes are part of a composition pattern: each attribute is its own object and thus can be dynamically changed at runtime, but also makes persistence of such an element generic. Instead of having fixed attributes for a concrete class, these parameters are stored in a map and are accessed through the parameter's ID.</p>
 
-        <p>Assigning an ID to an attribute for accessing of course brings its own downsides, i.e. the parameter might simply not be there, when being accessed. This is certainly an issue that the developer must handle, when implementing a project using Strolch, but allows the developer to not need to worry about persistence, as this is generically handled.</p>
+                <p>Assigning an ID to an attribute for accessing of course brings its own downsides, i.e. the parameter might simply not be there, when being accessed. This is certainly an issue that the developer must handle, when implementing a project using Strolch, but allows the developer to not need to worry about persistence, as this is generically handled.</p>
 
-        <p>Since the persistence is generically handled, and Strolch stays lightweight on its requirements at runtime, the developer can quickly get down to what is important for business value: Writing the business logic and the presentation layer. Here too Strolch tries to help the developer by bringing in concepts which are easy to follow: Use cases are implemented as Services, and re-usable business logic is put into Commands.</p>
+                <p>Since the persistence is generically handled, and Strolch stays lightweight on its requirements at runtime, the developer can quickly get down to what is important for business value: Writing the business logic and the presentation layer. Here too Strolch tries to help the developer by bringing in concepts which are easy to follow: Use cases are implemented as Services, and re-usable business logic is put into Commands.</p>
 
-        <p>There will be reasons against using Strolch, as there will be against using the Java EE stack, or an OR-Mapper or even the Java ecosystem for that fact. Important is to note, that the concepts behind Strolch are nothing new, but have been implemented in at least two previous proprietary products. Since those products are not accessible to the public, it was decided that a re-implementation might be of use to the programming community at large.</p>
+                <p>There will be reasons against using Strolch, as there will be against using the Java EE stack, or an OR-Mapper or even the Java ecosystem for that fact. Important is to note, that the concepts behind Strolch are nothing new, but have been implemented in at least two previous proprietary products. Since those products are not accessible to the public, it was decided that a re-implementation might be of use to the programming community at large.</p>
 
-        <p>Currently there is at least one company using Strolch in a commercial project which helps drive Strolch's development and further motivates its existence.</p>
+                <p>Currently there is at least one company using Strolch in a commercial project which helps drive Strolch's development and further motivates its existence.</p>
 
-        <p>Strolch is an open source project and licensed under the Apache License 2.0.</p>
+                <p>Strolch is an open source project and licensed under the Apache License 2.0.</p>
 
-        <h2>Technologoy</h2>
-        <p>Strolch is written in Java and is programmed against the JDK 7. Strolch runs on any JRE 7 compliant environment. Strolch is tested on the Oracle JRE 7.</p>
+                <h2>Technologoy</h2>
+                <p>Strolch is written in Java and is programmed against the JDK 7. Strolch runs on any JRE 7 compliant environment. Strolch is tested on the Oracle JRE 7.</p>
 
-        <h3>Dependencies</h3>
-        <p>Strolch strives to use as few external dependencies as possible, so that the Strolch runtime is not bloated unnecessarily. The following list of Strolch dependencies is a summary and was created using mvn dependency:tree on the li.strolch.dev project on the 2014-03-08.</p>
+                <h3>Dependencies</h3>
+                <p>Strolch strives to use as few external dependencies as possible, so that the Strolch runtime is not bloated unnecessarily. The following list of Strolch dependencies is a summary and was created using mvn dependency:tree on the li.strolch.dev project on the 2014-03-08.</p>
 
-        <h4>Basic runtime dependencies</h4>
-        <ul>
-          <li>ch.eitchnet:ch.eitchnet.privilege:jar:0.2.0-SNAPSHOT:compile
-            <p>implements the authorization and authentication in Strolch</p></li>
-          <li>ch.eitchnet:ch.eitchnet.utils:jar:0.2.0-SNAPSHOT:compile
-            <p>Consists of utility classes for recurring problems</p></li>
-          <li>ch.eitchnet:ch.eitchnet.xmlpers:jar:0.3.0-SNAPSHOT:compile
-            <p>Implements the XML Persistence layer used by li.strolch.persistence.xml</p></li>
-          <li>org.postgresql:postgresql:jar:9.3-1100-jdbc41:compile
-            <p>Implements the PostgreSQL Persistence layer used by li.strolch.persistence.postgresql</p></li>
-          <li>commons-cli:commons-cli:jar:1.2:compile
-            <p>Implements the command line parameter parsing when starting from a main class</p></li>
-          <li>junit:junit:jar:4.11:compile
-            <p>Testing facilities</p></li>
-          <li>org.slf4j:slf4j-api:jar:1.7.2:compile
-            <p>Logging facilities</p></li>
-        </ul>
+                <h4>Basic runtime dependencies</h4>
+                <ul>
+                    <li>ch.eitchnet:ch.eitchnet.privilege:jar:0.2.0-SNAPSHOT:compile
+                        <p>implements the authorization and authentication in Strolch</p></li>
+                    <li>ch.eitchnet:ch.eitchnet.utils:jar:0.2.0-SNAPSHOT:compile
+                        <p>Consists of utility classes for recurring problems</p></li>
+                    <li>ch.eitchnet:ch.eitchnet.xmlpers:jar:0.3.0-SNAPSHOT:compile
+                        <p>Implements the XML Persistence layer used by li.strolch.persistence.xml</p></li>
+                    <li>org.postgresql:postgresql:jar:9.3-1100-jdbc41:compile
+                        <p>Implements the PostgreSQL Persistence layer used by li.strolch.persistence.postgresql</p></li>
+                    <li>commons-cli:commons-cli:jar:1.2:compile
+                        <p>Implements the command line parameter parsing when starting from a main class</p></li>
+                    <li>junit:junit:jar:4.11:compile
+                        <p>Testing facilities</p></li>
+                    <li>org.slf4j:slf4j-api:jar:1.7.2:compile
+                        <p>Logging facilities</p></li>
+                </ul>
 
 
-        <h4>Web Restful dependencies</h4>
-        Sadly Restful services development requires quite a few extra dependencies:
-        <ul>
-          <li>com.google.guava:guava:jar:14.0.1:compile</li>
-          <li>javax.annotation:javax.annotation-api:jar:1.2:compile</li>
-          <li>javax.servlet:javax.servlet-api:jar:3.0.1:provided</li>
-          <li>javax.validation:validation-api:jar:1.1.0.Final:compile</li>
-          <li>javax.ws.rs:javax.ws.rs-api:jar:2.0:compile</li>
-          <li>log4j:log4j:jar:1.2.17:runtime</li>
-          <li>org.eclipse.persistence:org.eclipse.persistence.antlr:jar:2.5.0:compile</li>
-          <li>org.eclipse.persistence:org.eclipse.persistence.asm:jar:2.5.0:compile</li>
-          <li>org.eclipse.persistence:org.eclipse.persistence.core:jar:2.5.0:compile</li>
-          <li>org.eclipse.persistence:org.eclipse.persistence.moxy:jar:2.5.0:compile</li>
-          <li>org.glassfish.hk2.external:asm-all-repackaged:jar:2.2.0-b21:compile</li>
-          <li>org.glassfish.hk2.external:cglib:jar:2.2.0-b21:compile</li>
-          <li>org.glassfish.hk2.external:javax.inject:jar:2.2.0-b21:compile</li>
-          <li>org.glassfish.hk2:hk2-api:jar:2.2.0-b21:compile</li>
-          <li>org.glassfish.hk2:hk2-locator:jar:2.2.0-b21:compile</li>
-          <li>org.glassfish.hk2:hk2-utils:jar:2.2.0-b21:compile</li>
-          <li>org.glassfish.hk2:osgi-resource-locator:jar:1.0.1:compile</li>
-          <li>org.glassfish.jersey.containers:jersey-container-servlet-core:jar:2.5.1:compile</li>
-          <li>org.glassfish.jersey.containers:jersey-container-servlet:jar:2.5.1:compile</li>
-          <li>org.glassfish.jersey.core:jersey-client:jar:2.5.1:compile</li>
-          <li>org.glassfish.jersey.core:jersey-common:jar:2.5.1:compile</li>
-          <li>org.glassfish.jersey.core:jersey-server:jar:2.5.1:compile</li>
-          <li>org.glassfish.jersey.ext:jersey-entity-filtering:jar:2.5.1:compile</li>
-          <li>org.glassfish.jersey.media:jersey-media-moxy:jar:2.5.1:compile</li>
-        </ul>
+                <h4>Web Restful dependencies</h4>
+                Sadly Restful services development requires quite a few extra dependencies:
+                <ul>
+                    <li>com.google.guava:guava:jar:14.0.1:compile</li>
+                    <li>javax.annotation:javax.annotation-api:jar:1.2:compile</li>
+                    <li>javax.servlet:javax.servlet-api:jar:3.0.1:provided</li>
+                    <li>javax.validation:validation-api:jar:1.1.0.Final:compile</li>
+                    <li>javax.ws.rs:javax.ws.rs-api:jar:2.0:compile</li>
+                    <li>log4j:log4j:jar:1.2.17:runtime</li>
+                    <li>org.eclipse.persistence:org.eclipse.persistence.antlr:jar:2.5.0:compile</li>
+                    <li>org.eclipse.persistence:org.eclipse.persistence.asm:jar:2.5.0:compile</li>
+                    <li>org.eclipse.persistence:org.eclipse.persistence.core:jar:2.5.0:compile</li>
+                    <li>org.eclipse.persistence:org.eclipse.persistence.moxy:jar:2.5.0:compile</li>
+                    <li>org.glassfish.hk2.external:asm-all-repackaged:jar:2.2.0-b21:compile</li>
+                    <li>org.glassfish.hk2.external:cglib:jar:2.2.0-b21:compile</li>
+                    <li>org.glassfish.hk2.external:javax.inject:jar:2.2.0-b21:compile</li>
+                    <li>org.glassfish.hk2:hk2-api:jar:2.2.0-b21:compile</li>
+                    <li>org.glassfish.hk2:hk2-locator:jar:2.2.0-b21:compile</li>
+                    <li>org.glassfish.hk2:hk2-utils:jar:2.2.0-b21:compile</li>
+                    <li>org.glassfish.hk2:osgi-resource-locator:jar:1.0.1:compile</li>
+                    <li>org.glassfish.jersey.containers:jersey-container-servlet-core:jar:2.5.1:compile</li>
+                    <li>org.glassfish.jersey.containers:jersey-container-servlet:jar:2.5.1:compile</li>
+                    <li>org.glassfish.jersey.core:jersey-client:jar:2.5.1:compile</li>
+                    <li>org.glassfish.jersey.core:jersey-common:jar:2.5.1:compile</li>
+                    <li>org.glassfish.jersey.core:jersey-server:jar:2.5.1:compile</li>
+                    <li>org.glassfish.jersey.ext:jersey-entity-filtering:jar:2.5.1:compile</li>
+                    <li>org.glassfish.jersey.media:jersey-media-moxy:jar:2.5.1:compile</li>
+                </ul>
 
-        <h2>Model</h2>
-        <p>The Strolch model is implemented in the project li.strolch.model.</p>
-        
-        The Strolch model consists of two root level elements: Resource and Order. Each element has at least the following attributes:
-        <ul>
-        <li>Id &rarr; the element's id</li>
-        <li>Name &rarr; the element's name</li>
-        <li>Type &rarr; the element's type</li>
-        </ul>
-        
-        <p>Each root element can have any number of ParameterBag instances on it, which in turn can have any number of Parameters on it. Accessing these objects is always done by their IDs. Strolch root elements are always stored in the respective ElementMaps in their Strolch realm. Thus accessing a certain parameter from a Resource would look like this:</p>
-        <pre class="pre-scrollable">
+                <h2>Model</h2>
+                <p>The Strolch model is implemented in the project li.strolch.model.</p>
+
+                The Strolch model consists of two root level elements: Resource and Order. Each element has at least the following attributes:
+                <ul>
+                    <li>Id &rarr; the element's id</li>
+                    <li>Name &rarr; the element's name</li>
+                    <li>Type &rarr; the element's type</li>
+                </ul>
+
+                <p>Each root element can have any number of ParameterBag instances on it, which in turn can have any number of Parameters on it. Accessing these objects is always done by their IDs. Strolch root elements are always stored in the respective ElementMaps in their Strolch realm. Thus accessing a certain parameter from a Resource would look like this:</p>
+                <pre class="pre-scrollable">
 try (StrolchTransaction tx = realm.openTx()) {
   Resource resource = tx.getResourceMap().getBy(tx, "TestType", "MyTestResource");
   DateParameter dateP = resource.getParameter("@bag01", "@param6");
@@ -149,8 +151,8 @@ try (StrolchTransaction tx = realm.openTx()) {
   logger.info("@param6 date is " + date);
 }</pre>
 
-        XML Presentation of Strolch's top level elements:
-        <pre class="pre-scrollable">
+                XML Presentation of Strolch's top level elements:
+                <pre class="pre-scrollable">
 &lt;!-- Resource instance --&gt;
 &lt;Resource Id="MyTestResource" Name="Test Name" Type="TestType"&gt;
   &lt;ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag"&gt;
@@ -182,38 +184,38 @@ try (StrolchTransaction tx = realm.openTx()) {
 &lt;/Order&gt;</pre>
 
 
-        <h2>Realms</h2>
-        Strolch realms implement the multi-client capability which is thus baked right into the Strolch runtime. When configuring a Strolch runtime, realms are configured and for each realm the data store mode is set. Each realm has its own persistence configuration and can thus run in one of the 4 modes that the Strolch agent implements:
-        <ul>
-        <li>EMPTY
-          <p>This is a transient data store mode, where no model changes are persisted, but they are only kept in memory. When the Strolch agent is started, this realm stays empty as no data is loaded.</p></li>
-        <li>TRANSIENT
-          <p>This is the same as EMPTY, but with the difference that when the Strolch agent is started, an XML file is parsed and the in memory realm is populated with the elements parsed from that XML file.</p></li>
-        <li>CACHED
-          <p>In this mode, all data is stored in memory, and any changes made are written back to the persistence layer. This allows for fast in-memory quries, but makes sure no data is lost when the agent is restarted.</p></li>
-        <li>TRANSACTIONAL
-          <p>In this mode no data is kept in memory and every query, and root element retrieval is passed to the persistence layer to be retrieved from the underlying database. This is what comes closest to a typical Java+Hibernate implementation.</p></li>
-        </ul>
+                <h2>Realms</h2>
+                Strolch realms implement the multi-client capability which is thus baked right into the Strolch runtime. When configuring a Strolch runtime, realms are configured and for each realm the data store mode is set. Each realm has its own persistence configuration and can thus run in one of the 4 modes that the Strolch agent implements:
+                <ul>
+                    <li>EMPTY
+                        <p>This is a transient data store mode, where no model changes are persisted, but they are only kept in memory. When the Strolch agent is started, this realm stays empty as no data is loaded.</p></li>
+                    <li>TRANSIENT
+                        <p>This is the same as EMPTY, but with the difference that when the Strolch agent is started, an XML file is parsed and the in memory realm is populated with the elements parsed from that XML file.</p></li>
+                    <li>CACHED
+                        <p>In this mode, all data is stored in memory, and any changes made are written back to the persistence layer. This allows for fast in-memory quries, but makes sure no data is lost when the agent is restarted.</p></li>
+                    <li>TRANSACTIONAL
+                        <p>In this mode no data is kept in memory and every query, and root element retrieval is passed to the persistence layer to be retrieved from the underlying database. This is what comes closest to a typical Java+Hibernate implementation.</p></li>
+                </ul>
 
-        <p>Strolch Realms are also responsible for opening Transactions, as these are bound to the persistence layer configured for this realm. At runtime, a realm is then accessed from the ComponentContainer:</p>
-        <pre class="pre-scrollable">
+                <p>Strolch Realms are also responsible for opening Transactions, as these are bound to the persistence layer configured for this realm. At runtime, a realm is then accessed from the ComponentContainer:</p>
+                <pre class="pre-scrollable">
 ComponentContainer container = getAgent().getContainer();
 StrolchRealm realm = container.getRealm(StrolchConstants.DEFAULT_REALM);
 try(StrolchTransaction tx = realm.openTx()) {
   Resource resource = tx.getResourceMap().getBy(tx, "TestType", "MyTestResource");
   ...
 }</pre>
-        In a Service implementation there is a convenience method, so that this is as simple as calling <i>openTx(String)</i>.
+                In a Service implementation there is a convenience method, so that this is as simple as calling <i>openTx(String)</i>.
 
-        <h2>Services and Commands</h2>
-        <p>In the motivation section, it was discusses that writing business logic is what developing is about and a reason why Strolch is a different approach to the Java EE ecosystem. So this is where Services and Commands come into play, and tries to make writing business logic a first class citizen.</p>
+                <h2>Services and Commands</h2>
+                <p>In the motivation section, it was discusses that writing business logic is what developing is about and a reason why Strolch is a different approach to the Java EE ecosystem. So this is where Services and Commands come into play, and tries to make writing business logic a first class citizen.</p>
 
-        <p>Services are to be used once for each use case. Services are not re-used or called by other services. Services open transactions are implement the calling of the re-usable commands. Thus when writing projects using Strolch, the first thing to do after configuring the runtime environmet for your situation, Services will be implemented.</p>
+                <p>Services are to be used once for each use case. Services are not re-used or called by other services. Services open transactions are implement the calling of the re-usable commands. Thus when writing projects using Strolch, the first thing to do after configuring the runtime environmet for your situation, Services will be implemented.</p>
 
-        <p>Commands on the other hand are re-usable and should be implemented in such a way, that the encapsulate the use case's different actions. Commands are then passed to a transaction for execution and, when the transaction is comitted, will be executed. Commands also implement undoing its operation in the case of exceptions. Strolch transactions handle the life-cycle of a command. A further function of Commands is to lock the relevant Strolch elements before execution.</p>
+                <p>Commands on the other hand are re-usable and should be implemented in such a way, that the encapsulate the use case's different actions. Commands are then passed to a transaction for execution and, when the transaction is comitted, will be executed. Commands also implement undoing its operation in the case of exceptions. Strolch transactions handle the life-cycle of a command. A further function of Commands is to lock the relevant Strolch elements before execution.</p>
 
-        <p>A typical Service and Command implementation would look as follows:</p>
-        <pre class="pre-scrollable">
+                <p>A typical Service and Command implementation would look as follows:</p>
+                <pre class="pre-scrollable">
 public class SetParameterService extends AbstractService&lt;SetParameterArg, ServiceResult&gt; {
 
   public static final long serialVersionUID = 1L;
@@ -268,9 +270,9 @@ public class SetParameterService extends AbstractService&lt;SetParameterArg, Ser
     return new ServiceResult();
   }
 }
-</pre>
+                </pre>
 
-<pre class="pre-scrollable">
+                <pre class="pre-scrollable">
 public class SetParameterCommand extends Command {
 
   // input fields
@@ -339,107 +341,93 @@ public class SetParameterCommand extends Command {
     }
   }
 }</pre>
-        
-        <h2>Code</h2>
-        <p>The Strolch code can be retrieved from GitHub, where the code is hosted. Each commit triggers a continuous integration build, so that SNAPSHOT builds can be quickly integrated in projects if needed.</p>
 
-        <p>Strolch is divided up into different projects on GitHub so that these projects can be developed, or bugfixed independently and not all parts are required in every context.</p>
+                <h2>Code</h2>
+                <p>The Strolch code can be retrieved from GitHub, where the code is hosted. Each commit triggers a continuous integration build, so that SNAPSHOT builds can be quickly integrated in projects if needed.</p>
 
-        <p><a href="https://github.com/search?q=%40eitch+li.strolch">All Strolch projects on GitHub</a></p>
+                <p>Strolch is divided up into different projects on GitHub so that these projects can be developed, or bugfixed independently and not all parts are required in every context.</p>
 
-        <h3>Main Strolch components</h3>
-        <ul>
-          <li><a href="https://github.com/eitchnet/li.strolch.model">li.strolch.model</a>
-          <p>This project implements the Strolch model. This is where you will find the different elements that can store data at runtime. Currently there are two root elements: Resource and Order</p></li>
-        <li><a href="https://github.com/eitchnet/li.strolch.agent">li.strolch.agent</a>
-          <p>The agent is the Strolch runtime and is the component which implements the core Agent functionality. That is:</p>
-          <ul>
-            <li>Provide the Agent instance which loads the configuration and is the entry point to the runtime</li>
-            <li>Provide the ComponentContainer instance from which the registered components can be accessed</li>
-            <li>Configure and maintain the realms, which implement the multi-client capability</li>
-            <li>Provide a default ServiceHandler to perform Services at runtime</li>
-            <li>Implements the realms which each can operate in different modes data store modes: TRANSACTIONAL, CACHED, TRANSIENT</li>
-          </ul>
-        </li>
-        <li><a href="https://github.com/eitchnet/li.strolch.service">li.strolch.service</a>
-          <p>Implements the basic Services and the re-usable Commands:</p>
-          <ul>
-            <li>CRUD Services and Commands to modify the model</li>
-            <li>Commands to import and export the model to XML</li>
-            <li>Further services and commands...</li>
-          </ul>
-        </li>
-        </ul>
+                <p><a href="https://github.com/search?q=%40eitch+li.strolch">All Strolch projects on GitHub</a></p>
 
-        <h3>Additional components</h3>
-        <ul>
-          <li><a href="https://github.com/eitchnet/li.strolch.persistence.postgresql">li.strolch.persistence.postgresql</a>
-            <p>Implements a PostgreSQL persistence layer so that the Strolch model can be persisted to a PostgreSQL RDBMS when the realm is configured to have a data store mode of either CACHED or TRANSACTIONAL</p>
-          </li>
-          <li><a href="https://github.com/eitchnet/li.strolch.persistence.xml">li.strolch.persistence.xml</a>
-            <p>Implements an XML persistence layer so that the Strolch model can be persisted to XML files when the realm is configured to have a data store mode of either CACHED or TRANSACTIONAL. This implementation uses the <a href="xmlpers">xmlpers project</a>.</p>
-          </li>
-          <li><a href="https://github.com/eitchnet/li.strolch.rest">li.strolch.rest</a>
-            <p>Implements a Restful API to communicate with the Strolch runtime from clients and external systems.</p>
-          </li>
-        </ul>
+                <h3>Main Strolch components</h3>
+                <ul>
+                    <li><a href="https://github.com/eitchnet/li.strolch.model">li.strolch.model</a>
+                        <p>This project implements the Strolch model. This is where you will find the different elements that can store data at runtime. Currently there are two root elements: Resource and Order</p></li>
+                    <li><a href="https://github.com/eitchnet/li.strolch.agent">li.strolch.agent</a>
+                        <p>The agent is the Strolch runtime and is the component which implements the core Agent functionality. That is:</p>
+                        <ul>
+                            <li>Provide the Agent instance which loads the configuration and is the entry point to the runtime</li>
+                            <li>Provide the ComponentContainer instance from which the registered components can be accessed</li>
+                            <li>Configure and maintain the realms, which implement the multi-client capability</li>
+                            <li>Provide a default ServiceHandler to perform Services at runtime</li>
+                            <li>Implements the realms which each can operate in different modes data store modes: TRANSACTIONAL, CACHED, TRANSIENT</li>
+                        </ul>
+                    </li>
+                    <li><a href="https://github.com/eitchnet/li.strolch.service">li.strolch.service</a>
+                        <p>Implements the basic Services and the re-usable Commands:</p>
+                        <ul>
+                            <li>CRUD Services and Commands to modify the model</li>
+                            <li>Commands to import and export the model to XML</li>
+                            <li>Further services and commands...</li>
+                        </ul>
+                    </li>
+                </ul>
 
-        <h3>Meta projects</h3>
-        <ul>
-          <li><a href="https://github.com/eitchnet/li.strolch.dev">li.strolch.dev</a>
-            <p>To quickly get started developing Strolch, this projects provides scripts to checkout all the relevant projects and implements a Maven module so that building this projects builds all Strolch projects.</p>
-          </li>
-          <li><a href="https://github.com/eitchnet/li.strolch.parent">li.strolch.parent</a>
-            <p>A Maven parent project for the Strolch projects to synchronize the maven project structure</p>
-          </li>
-          <li><a href="https://github.com/eitchnet/li.strolch.bom">li.strolch.bom</a>
-            <p>This bill of material is a Maven project which, when imported in one's own Strolch project, pulls in all required dependencies needed to set up a minimal working Strolch environment.</p>
-          </li>
-          <li><a href="https://github.com/eitchnet/li.strolch.testbase">li.strolch.testbase</a>
-            <p>Implements a test base so that writing tests for Strolch is easy. It provides a RuntimeMock, which handles setting up and tearing down Strolch runtimes during tests.</p>
-          </li>
-        </ul>
+                <h3>Additional components</h3>
+                <ul>
+                    <li><a href="https://github.com/eitchnet/li.strolch.persistence.postgresql">li.strolch.persistence.postgresql</a>
+                        <p>Implements a PostgreSQL persistence layer so that the Strolch model can be persisted to a PostgreSQL RDBMS when the realm is configured to have a data store mode of either CACHED or TRANSACTIONAL</p>
+                    </li>
+                    <li><a href="https://github.com/eitchnet/li.strolch.persistence.xml">li.strolch.persistence.xml</a>
+                        <p>Implements an XML persistence layer so that the Strolch model can be persisted to XML files when the realm is configured to have a data store mode of either CACHED or TRANSACTIONAL. This implementation uses the <a href="xmlpers">xmlpers project</a>.</p>
+                    </li>
+                    <li><a href="https://github.com/eitchnet/li.strolch.rest">li.strolch.rest</a>
+                        <p>Implements a Restful API to communicate with the Strolch runtime from clients and external systems.</p>
+                    </li>
+                </ul>
 
-        <h3>Example projects</h3>
-        <ul>
-          <li><a href="https://github.com/eitchnet/li.strolch.tutorialapp">li.strolch.tutorialapp</a>
-            <p>A tutorial application which showcases how to setup Strolch as a standalone Java SE project and starts the Strolch runtime by means of a main-class.</p>
-          </li>
-          <li><a href="https://github.com/eitchnet/li.strolch.tutorialwebapp">li.strolch.tutorialwebapp</a>
-            <p>A tutorial application which showcases how to setup Strolch as a standalone Java Webapp which can be deployed to a servlet container e.g. Apache Tomcat 7.</p>
-          </li>
-        </ul>
+                <h3>Meta projects</h3>
+                <ul>
+                    <li><a href="https://github.com/eitchnet/li.strolch.dev">li.strolch.dev</a>
+                        <p>To quickly get started developing Strolch, this projects provides scripts to checkout all the relevant projects and implements a Maven module so that building this projects builds all Strolch projects.</p>
+                    </li>
+                    <li><a href="https://github.com/eitchnet/li.strolch.parent">li.strolch.parent</a>
+                        <p>A Maven parent project for the Strolch projects to synchronize the maven project structure</p>
+                    </li>
+                    <li><a href="https://github.com/eitchnet/li.strolch.bom">li.strolch.bom</a>
+                        <p>This bill of material is a Maven project which, when imported in one's own Strolch project, pulls in all required dependencies needed to set up a minimal working Strolch environment.</p>
+                    </li>
+                    <li><a href="https://github.com/eitchnet/li.strolch.testbase">li.strolch.testbase</a>
+                        <p>Implements a test base so that writing tests for Strolch is easy. It provides a RuntimeMock, which handles setting up and tearing down Strolch runtimes during tests.</p>
+                    </li>
+                </ul>
 
-        <h2>Development</h2>
-        <p>So, if this overview has gotten you eager to start developing Strolch, then let this little howto get you started:</p>
-        <pre class="pre-scrollable">
-mkdir strolch
-cd strolch
-git clone https://github.com/eitchnet/li.strolch.dev.git
-./bootstrap_https.sh
-mvn clean package -DskipTests=true</pre>
+                <h3>Example projects</h3>
+                <ul>
+                    <li><a href="https://github.com/eitchnet/li.strolch.tutorialapp">li.strolch.tutorialapp</a>
+                        <p>A tutorial application which showcases how to setup Strolch as a standalone Java SE project and starts the Strolch runtime by means of a main-class.</p>
+                    </li>
+                    <li><a href="https://github.com/eitchnet/li.strolch.tutorialwebapp">li.strolch.tutorialwebapp</a>
+                        <p>A tutorial application which showcases how to setup Strolch as a standalone Java Webapp which can be deployed to a servlet container e.g. Apache Tomcat 7.</p>
+                    </li>
+                </ul>
 
-        <p><b>Note:</b> If you want to run the tests, then either install a PostgreSQL DB and configure the users as is required by the project, or remove the project from the li.strolch.dev module build, otherwise the build will fail =))</p>
+                <h2>Development</h2>
+                <p>To start getting involved with Strolch Development, or create your own applications using Strolch, then see the <a href="development.html">development page</a></p>
 
-        <p>After running the Maven build, you will have a full build of all Strolch projects. Now you can start modifying the projects, and add your own features, or, far more interesting, start developing your projects using the Strolch agent.</p>
+            </div><!-- /.content -->
 
-        <p>To use Strolch in your own projects, look at the two tutorial apps on how they are configured. You can also simply copy the projects, modify the Maven POMs and remove what ever you do not need.</p>
+            <div id="footer">
+                <div class="container">
+                    <p class="text-muted">&copy; Strolch / <a href="mailto:eitch@eitchnet.ch">Robert von Burg</a> / Hosting by <a href="http://www.eitchnet.ch">eitchnet.ch</a></p>
+                </div>
+            </div>
 
-        <p>Happy coding =))</p>
-        
-      </div><!-- /.content -->
+        </div><!-- /.container -->
 
-      <div id="footer">
-        <div class="container">
-          <p class="text-muted">&copy; Strolch / <a href="mailto:eitch@eitchnet.ch">Robert von Burg</a> / Hosting by <a href="http://www.eitchnet.ch">eitchnet.ch</a></p>
-        </div>
-      </div>
-
-    </div><!-- /.container -->
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-  </body>
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="js/bootstrap.min.js"></script>
+    </body>
 </html>
