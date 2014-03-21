@@ -39,7 +39,7 @@ while read project; do
       echo "ERROR: Failed to copy package for project ${project}."
       exit 1
     fi
-  else if ls target/*.war 2>/dev/null ; then
+  elif ls target/*.war 2>/dev/null ; then
     if ! cp target/*.war "${workDir}" ; then
       echo "ERROR: Failed to copy wars for project ${project}."
       exit 1
