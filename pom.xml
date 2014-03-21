@@ -27,7 +27,7 @@
 
 	<organization>
 		<name>eitchnet.ch</name>
-		<url>http://blog.eitchnet.ch</url>
+		<url>http://www.strolch.li</url>
 	</organization>
 
 	<developers>
@@ -35,32 +35,16 @@
 			<id>eitch</id>
 			<name>Robert von Vurg</name>
 			<email>eitch@eitchnet.ch</email>
-			<url>http://blog.eitchnet.ch</url>
+			<url>http://www.eitchnet.ch</url>
 			<organization>eitchnet.ch</organization>
-			<organizationUrl>http://blog.eitchnet.ch</organizationUrl>
+			<organizationUrl>http://www.eitchnet.ch</organizationUrl>
 			<roles>
 				<role>architect</role>
 				<role>developer</role>
 			</roles>
 			<timezone>+1</timezone>
-			<properties>
-				<picUrl>http://localhost</picUrl>
-			</properties>
 		</developer>
 	</developers>
-
-
-	<!-- <ciManagement> <system>continuum</system> <url>http://127.0.0.1:8080/continuum</url> <notifiers> <notifier> <type>mail</type> 
-		<sendOnError>true</sendOnError> <sendOnFailure>true</sendOnFailure> <sendOnSuccess>false</sendOnSuccess> <sendOnWarning>false</sendOnWarning> 
-		<configuration><address>continuum@127.0.0.1</address></configuration> </notifier> </notifiers> </ciManagement> <mailingLists> 
-		<mailingList> <name>User List</name> <subscribe>user-subscribe@127.0.0.1</subscribe> <unsubscribe>user-unsubscribe@127.0.0.1</unsubscribe> 
-		<post>user@127.0.0.1</post> <archive>http://127.0.0.1/user/</archive> <otherArchives> <otherArchive>http://base.google.com/base/1/127.0.0.1</otherArchive> 
-		</otherArchives> </mailingList> </mailingLists> -->
-
-	<!-- <repositories> <repository> <releases> <enabled>false</enabled> <updatePolicy>always</updatePolicy> <checksumPolicy>warn</checksumPolicy> 
-		</releases> <snapshots> <enabled>true</enabled> <updatePolicy>never</updatePolicy> <checksumPolicy>fail</checksumPolicy> 
-		</snapshots> <id>codehausSnapshots</id> <name>Codehaus Snapshots</name> <url>http://snapshots.maven.codehaus.org/maven2</url> 
-		<layout>default</layout> </repository> </repositories> <pluginRepositories> ... </pluginRepositories> -->
 
 	<distributionManagement>
 		<repository>
@@ -256,6 +240,9 @@
 					<configuration>
 						<source>1.7</source>
 						<target>1.7</target>
+						<showDeprecation>true</showDeprecation>
+						<showWarnings>true</showWarnings>
+						<compilerArgument>-Xlint:all</compilerArgument>
 					</configuration>
 				</plugin>
 
