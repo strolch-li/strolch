@@ -84,9 +84,13 @@
 			</dependency>
 			<dependency>
 				<groupId>li.strolch</groupId>
-				<artifactId>li.strolch.testbase</artifactId>
+				<artifactId>li.strolch.agent</artifactId>
 				<version>${project.version}</version>
-				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.service</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>li.strolch</groupId>
@@ -100,18 +104,25 @@
 			</dependency>
 			<dependency>
 				<groupId>li.strolch</groupId>
-				<artifactId>li.strolch.agent</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>li.strolch</groupId>
-				<artifactId>li.strolch.service</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>li.strolch</groupId>
 				<artifactId>li.strolch.rest</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.tutorialapp</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.tutorialwebapp</artifactId>
+				<type>war</type>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.testbase</artifactId>
+				<version>${project.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>li.strolch</groupId>
@@ -273,7 +284,7 @@
 					<executions>
 						<execution>
 							<id>attach-sources</id>
-							<phase>verify</phase>
+							<phase>package</phase>
 							<goals>
 								<goal>jar-no-fork</goal>
 							</goals>
