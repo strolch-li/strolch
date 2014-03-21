@@ -51,9 +51,17 @@ while read project; do
       echo "ERROR: Failed to copy package for project ${project}."
       exit 1
     fi
+    if ! cp target/*.jar "${DIST_STROLCH}" ; then
+      echo "ERROR: Failed to publish package for project ${project}."
+      exit 1
+    fi
   elif ls target/*.war 2>/dev/null ; then
     if ! cp target/*.war "${workDir}" ; then
       echo "ERROR: Failed to copy wars for project ${project}."
+      exit 1
+    fi
+    if ! cp target/*.war "${DIST_STROLCH}" ; then
+      echo "ERROR: Failed to publish wars for project ${project}."
       exit 1
     fi
   else
