@@ -4,8 +4,6 @@ DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 workDir="${PWD}/target/strolch_bundle"
 projectsFile="${PWD}/projects.lst"
 
-DIST_STROLCH="/Users/eitch/Downloads/"
-
 # first we create all needed packages
 if ! mvn -DskipTests clean package ; then
   echo "ERROR: Failed to build packages!"
