@@ -15,51 +15,55 @@
  */
 package li.strolch.model;
 
-import static org.junit.Assert.assertTrue;
-import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
+import li.strolch.model.visitor.OrderDeepEqualsVisitor;
+import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
 import li.strolch.model.xml.OrderToDomVisitor;
 import li.strolch.model.xml.ResourceToDomVisitor;
-
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 @SuppressWarnings("nls")
 public class XmlToDomTest extends ModelTest {
 
-	@Test
-	public void shouldFormatAndParseOrder() {
+    @Test
+    public void shouldFormatAndParseOrder() {
 
-		Order order = ModelGenerator.createOrder("@1", "My Order 1", "MyOrder");
+        Order order = ModelGenerator.createOrder("@1", "My Order 1", "MyOrder");
 
-		OrderToDomVisitor domVisitor = new OrderToDomVisitor();
-		domVisitor.visit(order);
-		Document document = domVisitor.getDocument();
+        OrderToDomVisitor domVisitor = new OrderToDomVisitor();
+        domVisitor.visit(order);
+        Document document = domVisitor.getDocument();
 
-		Element rootElement = document.getDocumentElement();
-		Order parsedOrder = new Order(rootElement);
+        Element rootElement = document.getDocumentElement();
+        Order parsedOrder = new Order(rootElement);
 
-		assertTrue("To DOM and back should equal same Order!",
-				StrolchElementDeepEqualsVisitor.isEqual(order, parsedOrder));
-	}
+        OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
+        visitor.visit(parsedOrder);
+        assertTrue("To DOM and back should equal same Order:\n" + visitor.getMismatchedLocators(),
+                visitor.isEqual());
+    }
 
-	@Test
-	public void shouldFormatAndParseResource() {
+    @Test
+    public void shouldFormatAndParseResource() {
 
-		Resource resource = ModelGenerator.createResource("@1", "My Resource 1", "MyResource");
+        Resource resource = ModelGenerator.createResource("@1", "My Resource 1", "MyResource");
 
-		ResourceToDomVisitor domVisitor = new ResourceToDomVisitor();
-		domVisitor.visit(resource);
-		Document document = domVisitor.getDocument();
+        ResourceToDomVisitor domVisitor = new ResourceToDomVisitor();
+        domVisitor.visit(resource);
+        Document document = domVisitor.getDocument();
 
-		Element rootElement = document.getDocumentElement();
-		Resource parsedResource = new Resource(rootElement);
+        Element rootElement = document.getDocumentElement();
+        Resource parsedResource = new Resource(rootElement);
 
-		assertTrue("To DOM and back should equal same Resource!",
-				StrolchElementDeepEqualsVisitor.isEqual(resource, parsedResource));
-	}
+        ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(resource);
+        visitor.visit(parsedResource);
+        assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(),
+                visitor.isEqual());
+    }
 }

@@ -21,77 +21,70 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 
 /**
+ * {@link IValue} implementation to work with Boolean valued {@link ITimeValue} objects
+ * 
  * @author Martin Smock <smock.martin@gmail.com>
  */
-@SuppressWarnings("rawtypes")
-public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable {
+public class BooleanValue implements IValue<Boolean>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	protected final Long time;
-	protected T value;
+	public static final BooleanValue NEUTRAL = new BooleanValue(false);
 
-	/**
-	 * @param time
-	 * @param value
-	 */
-	public TimeValue(final Long time, final T value) {
-		this.time = time;
+	private Boolean value;
+
+	public BooleanValue(Boolean value) {
 		this.value = value;
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public T getValue() {
-		return (T) this.value.getCopy();
+	public BooleanValue(boolean value) {
+		this.value = Boolean.valueOf(value);
+	}
+
+	public BooleanValue(String valueAsString) throws NumberFormatException {
+		this.value = Boolean.parseBoolean(valueAsString);
 	}
 
 	@Override
-	public Long getTime() {
-		return this.time;
-	}
-
-	@Override
-	public ITimeValue<T> setValue(final T value) {
-		this.value = value;
-		return this;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public ITimeValue<T> add(final T change) {
-		this.value.add(change.getValue());
+	public BooleanValue add(Boolean o) {
+		this.value = o;
 		return this;
 	}
 
 	@Override
-	public int compareTo(final ITimeValue<T> arg0) {
-		return this.getTime().compareTo(arg0.getTime());
+	public boolean matches(IValue<Boolean> other) {
+		return this.value.equals(other.getValue());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public ITimeValue<T> getCopy() {
-		return new TimeValue<T>(time, (T) value.getCopy());
+	public Boolean getValue() {
+		return this.value;
+	}
+
+	@Override
+	public BooleanValue getInverse() {
+		return new BooleanValue(!getValue());
 	}
 
 	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("TimeValue [time=");
-		sb.append(this.time);
-		sb.append(", value=");
+		sb.append("BooleanValue [value=");
 		sb.append(this.value);
 		sb.append("]");
 		return sb.toString();
 	}
 
 	@Override
+	public BooleanValue getCopy() {
+		return new BooleanValue(this.value);
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.time == null) ? 0 : this.time.hashCode());
 		result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
 		return result;
 	}
@@ -104,13 +97,7 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		@SuppressWarnings("unchecked")
-		TimeValue<T> other = (TimeValue<T>) obj;
-		if (this.time == null) {
-			if (other.time != null)
-				return false;
-		} else if (!this.time.equals(other.time))
-			return false;
+		BooleanValue other = (BooleanValue) obj;
 		if (this.value == null) {
 			if (other.value != null)
 				return false;

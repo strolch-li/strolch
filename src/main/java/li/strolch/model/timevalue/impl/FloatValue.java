@@ -25,36 +25,36 @@ import li.strolch.model.timevalue.IValue;
  * 
  * @author Martin Smock <smock.martin@gmail.com>
  */
-public class DoubleValue implements IValue<Double>, Serializable {
+public class FloatValue implements IValue<Double>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final DoubleValue NEUTRAL = new DoubleValue(0.0d);
+	public static final FloatValue NEUTRAL = new FloatValue(0.0d);
 
 	private Double value;
 
-	public DoubleValue(Double value) {
+	public FloatValue(Double value) {
 		this.value = value;
 	}
 
-	public DoubleValue(double value) {
+	public FloatValue(double value) {
 		this.value = Double.valueOf(value);
 	}
 
-	public DoubleValue(Integer value) {
+	public FloatValue(Integer value) {
 		this.value = this.value.doubleValue();
 	}
 
-	public DoubleValue(int value) {
+	public FloatValue(int value) {
 		this.value = Integer.valueOf(value).doubleValue();
 	}
 
-	public DoubleValue(String valueAsString) throws NumberFormatException {
+	public FloatValue(String valueAsString) throws NumberFormatException {
 		this.value = Double.parseDouble(valueAsString);
 	}
 
 	@Override
-	public DoubleValue add(Double o) {
+	public FloatValue add(Double o) {
 		this.value += o;
 		return this;
 	}
@@ -80,13 +80,13 @@ public class DoubleValue implements IValue<Double>, Serializable {
 	}
 
 	@Override
-	public DoubleValue getInverse() {
-		return new DoubleValue(-getValue());
+	public FloatValue getInverse() {
+		return new FloatValue(-getValue());
 	}
 
 	@Override
-	public DoubleValue getCopy(){
-		return new DoubleValue(this.value); 
+	public FloatValue getCopy(){
+		return new FloatValue(this.value); 
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public class DoubleValue implements IValue<Double>, Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DoubleValue other = (DoubleValue) obj;
+		FloatValue other = (FloatValue) obj;
 		if (this.value == null) {
 			if (other.value != null)
 				return false;

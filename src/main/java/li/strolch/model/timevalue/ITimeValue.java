@@ -36,4 +36,5 @@ public interface ITimeValue<T extends IValue> extends Comparable<ITimeValue<T>> 
 
 	ITimeValue<T> add(final T change);
 
+	ITimeValue<T> getCopy();
 }

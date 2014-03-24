@@ -34,7 +34,7 @@ import li.strolch.model.timevalue.impl.TimeVariable;
 public class TimedState<T extends IValue> implements ITimedState<T>, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private ITimeVariable<T> timeVariable = new TimeVariable<T>();
 
 	@Override
@@ -64,7 +64,7 @@ public class TimedState<T extends IValue> implements ITimedState<T>, Serializabl
 	}
 
 	@Override
-	public void applyChange(final IValueChange<T> change) {
+	public <U extends IValueChange<T>> void applyChange(U change) {
 		this.timeVariable.applyChange(change);
 	}
 
@@ -78,4 +78,10 @@ public class TimedState<T extends IValue> implements ITimedState<T>, Serializabl
 		return this.timeVariable;
 	}
 
+	@Override
+	public ITimedState<T> getCopy() {
+		TimedState<T> copy = new TimedState<>();
+		copy.timeVariable = this.timeVariable.getCopy();
+		return copy;
+	}
 }

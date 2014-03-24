@@ -26,7 +26,6 @@ import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 
-
 /**
  * @author Martin Smock <smock.martin@gmail.com>
  */
@@ -34,7 +33,7 @@ import li.strolch.model.timevalue.IValueChange;
 public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public SortedSet<ITimeValue<T>> container = new TreeSet<ITimeValue<T>>();
 
 	@Override
@@ -71,7 +70,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 		TimeValue<T> picker = new TimeValue<T>(time, null);
 		return new TreeSet<ITimeValue<T>>(this.container.headSet(picker));
 	}
-	
+
 	@Override
 	public SortedSet<ITimeValue<T>> getValues() {
 		return new TreeSet<ITimeValue<T>>(this.container);
@@ -91,9 +90,10 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 			this.container.add(newValue);
 		} else if (initialValue.getTime().longValue() < change.getTime().longValue()) {
 			ITimeValue<T> newValue = new TimeValue<T>(change.getTime(), initialValue.getValue());
-			newValue.add(change.getValue()); 
+			newValue.add(change.getValue());
 			this.container.add(newValue);
 		}
+
 		compact();
 	}
 
@@ -115,7 +115,15 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 				predecessor = successor;
 			}
 		}
-
 	}
 
+	@Override
+	public ITimeVariable<T> getCopy() {
+		TimeVariable<T> clone = new TimeVariable<>();
+		for (ITimeValue<T> timeValue : this.container) {
+			clone.container.add(timeValue.getCopy());
+		}
+
+		return clone;
+	}
 }

@@ -19,8 +19,7 @@ import java.util.Collection;
 import java.util.SortedSet;
 
 /**
- * A timed variable storing a ordered sequence of {@link ITimeValue} objects
- * modeling a time evolution of a quantity.
+ * A timed variable storing a ordered sequence of {@link ITimeValue} objects modeling a time evolution of a quantity.
  * 
  * @author Martin Smock <smock.martin@gmail.com>
  * 
@@ -41,14 +40,12 @@ public interface ITimeVariable<T extends IValue> {
 	void setValueAt(final Long time, final T value);
 
 	/**
-	 * get the latest {@link ITimeValue} whose time field is less or equal to
-	 * the time given
+	 * get the latest {@link ITimeValue} whose time field is less or equal to the time given
 	 */
 	ITimeValue<T> getValueAt(final Long time);
 
 	/**
-	 * Applies a {@link IValueChange} propagating the change to all future
-	 * values starting from the time of the change.
+	 * Applies a {@link IValueChange} propagating the change to all future values starting from the time of the change.
 	 * 
 	 * @param change
 	 *            the {@link IValueChange} to be applied
@@ -56,8 +53,7 @@ public interface ITimeVariable<T extends IValue> {
 	void applyChange(final IValueChange<T> change);
 
 	/**
-	 * Get all {@link ITimeValue} objects whose time field is greater or equal
-	 * to the given time
+	 * Get all {@link ITimeValue} objects whose time field is greater or equal to the given time
 	 * 
 	 * @param time
 	 *            the time the sequence starts with
@@ -66,8 +62,7 @@ public interface ITimeVariable<T extends IValue> {
 	Collection<ITimeValue<T>> getFutureValues(final Long time);
 
 	/**
-	 * Get all {@link ITimeValue} objects whose time field is strictly smaller
-	 * than the given time
+	 * Get all {@link ITimeValue} objects whose time field is strictly smaller than the given time
 	 * 
 	 * @param time
 	 *            the time the sequence starts with
@@ -81,13 +76,16 @@ public interface ITimeVariable<T extends IValue> {
 	 * @return a defensive copy of the {@link ITimeValue}s
 	 */
 	SortedSet<ITimeValue<T>> getValues();
-	
+
 	/**
-	 * removes {@link ITimeValue} objects from the sequence, where the successor
-	 * matches value. I.e considering a pair of adjacent {@link ITimeValue}
-	 * objects in the sequence which have the same {@link IValue}, the later one
-	 * is removed, since it contains no additional information.
+	 * removes {@link ITimeValue} objects from the sequence, where the successor matches value. I.e considering a pair
+	 * of adjacent {@link ITimeValue} objects in the sequence which have the same {@link IValue}, the later one is
+	 * removed, since it contains no additional information.
 	 */
 	void compact();
 
+	/**
+	 * @return a copy of this time variable
+	 */
+	ITimeVariable<T> getCopy();
 }

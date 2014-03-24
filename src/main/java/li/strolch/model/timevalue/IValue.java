@@ -23,7 +23,6 @@ package li.strolch.model.timevalue;
  * 
  * @param <T>
  *            any object for which a (generalized) add operation can be defined.
- * 
  */
 public interface IValue<T> {
 
@@ -52,5 +51,4 @@ public interface IValue<T> {
 	 * @return a copy of this
 	 */
 	IValue<T> getCopy();
-
 }

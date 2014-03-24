@@ -25,11 +25,13 @@ public class Tags {
 	public static final String DATE = "Date";
 	public static final String STATE = "State";
 	public static final String VALUE = "Value";
+    public static final String TIME = "Time";
 	public static final String INTERPRETATION = "Interpretation";
 	public static final String UOM = "Uom";
 	public static final String HIDDEN = "Hidden";
 	public static final String INDEX = "Index";
 	public static final String PARAMETER = "Parameter";
+	public static final String TIMED_STATE = "TimedState";
 	public static final String PARAMETERIZED_ELEMENT = "ParameterizedElement";
 	public static final String RESOURCE = "Resource";
 	public static final String ORDER = "Order";

@@ -45,7 +45,7 @@ public interface ITimedState<T extends IValue> {
 	 * @param change
 	 *            the state change to be applied
 	 */
-	void applyChange(final IValueChange<T> change);
+	<U extends IValueChange<T>> void applyChange(final U change);
 
 	/**
 	 * @return the state at the given time
@@ -57,4 +57,8 @@ public interface ITimedState<T extends IValue> {
 	 */
 	ITimeVariable<T> getTimeEvolution();
 
+	/**
+	 * @return a copy of this timed state
+	 */
+	ITimedState<T> getCopy();
 }

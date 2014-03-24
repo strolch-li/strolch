@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import li.strolch.model.timevalue.impl.AString;
-import li.strolch.model.timevalue.impl.DoubleValue;
+import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.StringSetValue;
 
@@ -34,8 +34,8 @@ public class ValueTests {
 	 */
 	@Test
 	public void testDoubleInverse() {
-		DoubleValue value = new DoubleValue(10.0d);
-		DoubleValue inverse = value.getInverse();
+		FloatValue value = new FloatValue(10.0d);
+		FloatValue inverse = value.getInverse();
 		assertEquals(Double.valueOf(-10.0d), inverse.getValue());
 		assertEquals(Double.valueOf(0), value.add(inverse.getValue()).getValue());
 	}

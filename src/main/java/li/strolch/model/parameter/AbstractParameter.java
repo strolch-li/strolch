@@ -200,7 +200,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	public Locator getLocator() {
 		LocatorBuilder lb = new LocatorBuilder();
 		this.parent.fillLocator(lb);
-		this.fillLocator(lb);
+		fillLocator(lb);
 		return lb.build();
 	}
 
