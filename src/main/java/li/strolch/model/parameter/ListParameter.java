@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public interface ListParameter<E> extends Parameter<List<E>> {
 
@@ -27,18 +27,16 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 
 	/**
 	 * Adds a single value to the {@link List} of values
-	 * 
-	 * @param value
-	 *            the value to add
+	 *
+	 * @param value the value to add
 	 */
 	public void addValue(E value);
 
 	/**
 	 * Removes a single value from the {@link List} of values
-	 * 
-	 * @param value
-	 *            the value to remove
-	 * 
+	 *
+	 * @param value the value to remove
+	 *
 	 * @return true if the value was removed, false if it did not exist
 	 */
 	public boolean removeValue(E value);

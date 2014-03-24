@@ -29,60 +29,60 @@ import org.w3c.dom.NodeList;
  */
 public class FloatTimedState extends AbstractStrolchTimedState<FloatValue> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public static final String TYPE = "FloatState";
+	public static final String TYPE = "FloatState";
 
-    public FloatTimedState() {
-        super();
-    }
+	public FloatTimedState() {
+		super();
+	}
 
-    public FloatTimedState(String id, String name) {
-        super(id, name);
-    }
+	public FloatTimedState(String id, String name) {
+		super(id, name);
+	}
 
-    public FloatTimedState(Element element) {
-        super.fromDom(element);
+	public FloatTimedState(Element element) {
+		super.fromDom(element);
 
-        this.state = new TimedState<>();
+		this.state = new TimedState<>();
 
-        NodeList timeValueElems = element.getElementsByTagName(Tags.VALUE);
-        for (int i = 0; i < timeValueElems.getLength(); i++) {
-            Element timeValueElem = (Element) timeValueElems.item(i);
-            Long time = Long.valueOf(timeValueElem.getAttribute(Tags.TIME));
-            Double value = Double.valueOf(timeValueElem.getAttribute(Tags.VALUE));
-            FloatValue floatValue = new FloatValue(value);
-            this.state.getTimeEvolution().setValueAt(time, floatValue);
-        }
-    }
+		NodeList timeValueElems = element.getElementsByTagName(Tags.VALUE);
+		for (int i = 0; i < timeValueElems.getLength(); i++) {
+			Element timeValueElem = (Element) timeValueElems.item(i);
+			Long time = Long.valueOf(timeValueElem.getAttribute(Tags.TIME));
+			Double value = Double.valueOf(timeValueElem.getAttribute(Tags.VALUE));
+			FloatValue floatValue = new FloatValue(value);
+			this.state.getTimeEvolution().setValueAt(time, floatValue);
+		}
+	}
 
-    @Override
-    public Element toDom(Document doc) {
+	@Override
+	public Element toDom(Document doc) {
 
-        Element stateElement = doc.createElement(Tags.TIMED_STATE);
-        super.fillElement(stateElement);
-        SortedSet<ITimeValue<FloatValue>> values = this.state.getTimeEvolution().getValues();
-        for (ITimeValue<FloatValue> timeValue : values) {
-            Long time = timeValue.getTime();
-            FloatValue value = timeValue.getValue();
-            Element valueElem = doc.createElement(Tags.VALUE);
-            valueElem.setAttribute(Tags.TIME, time.toString());
-            valueElem.setAttribute(Tags.VALUE, value.getValue().toString());
-            stateElement.appendChild(valueElem);
-        }
+		Element stateElement = doc.createElement(Tags.TIMED_STATE);
+		super.fillElement(stateElement);
+		SortedSet<ITimeValue<FloatValue>> values = this.state.getTimeEvolution().getValues();
+		for (ITimeValue<FloatValue> timeValue : values) {
+			Long time = timeValue.getTime();
+			FloatValue value = timeValue.getValue();
+			Element valueElem = doc.createElement(Tags.VALUE);
+			valueElem.setAttribute(Tags.TIME, time.toString());
+			valueElem.setAttribute(Tags.VALUE, value.getValue().toString());
+			stateElement.appendChild(valueElem);
+		}
 
-        return stateElement;
-    }
+		return stateElement;
+	}
 
-    @Override
-    public String getType() {
-        return TYPE;
-    }
+	@Override
+	public String getType() {
+		return TYPE;
+	}
 
-    @Override
-    public StrolchElement getClone() {
-        FloatTimedState clone = new FloatTimedState();
-        fillClone(clone);
-        return clone;
-    }
+	@Override
+	public StrolchElement getClone() {
+		FloatTimedState clone = new FloatTimedState();
+		fillClone(clone);
+		return clone;
+	}
 }

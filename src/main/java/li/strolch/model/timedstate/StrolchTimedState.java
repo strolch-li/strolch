@@ -38,5 +38,5 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 
 	public ITimeVariable<T> getTimeEvolution();
 
-    public void setParent(Resource aThis);
+	public void setParent(Resource aThis);
 }

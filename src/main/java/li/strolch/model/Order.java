@@ -30,10 +30,10 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
  * The Order is an object used in the EDF to transfer data from one range to another. Orders are not to be thought of as
  * Resources. Resources are supposed to be thought of as things i.e. a table, a machine and so forth, where a order is
  * to be thought of as an object for doing something.
- * 
+ *
  * In this sense, orders do not need to be verified, so all verifier chracteristics are disabled and the
  * getVerifier()-method will return the null reference
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class Order extends GroupedParameterizedElement implements StrolchRootElement {
@@ -52,7 +52,7 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 
 	/**
 	 * Default Constructor
-	 * 
+	 *
 	 * @param id
 	 * @param name
 	 * @param type
@@ -66,7 +66,7 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 
 	/**
 	 * Extended Constructor for date and {@link State}
-	 * 
+	 *
 	 * @param id
 	 * @param name
 	 * @param type
@@ -82,7 +82,7 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 
 	/**
 	 * DOM Constructor
-	 * 
+	 *
 	 * @param element
 	 */
 	public Order(Element element) {
@@ -112,8 +112,7 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 	}
 
 	/**
-	 * @param date
-	 *            the date to set
+	 * @param date the date to set
 	 */
 	public void setDate(Date date) {
 		this.date = date;
@@ -127,8 +126,7 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 	}
 
 	/**
-	 * @param state
-	 *            the state to set
+	 * @param state the state to set
 	 */
 	public void setState(State state) {
 		this.state = state;

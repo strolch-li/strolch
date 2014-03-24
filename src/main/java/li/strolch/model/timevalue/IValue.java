@@ -16,13 +16,12 @@
 package li.strolch.model.timevalue;
 
 /**
- * A value object defining some basic algebraic operations. Mathematically
- * speaking {@link IValue} objects define a group with a addition operation.
- * 
+ * A value object defining some basic algebraic operations. Mathematically speaking {@link IValue} objects define a
+ * group with a addition operation.
+ *
  * @author Martin Smock <smock.martin@gmail.com>
- * 
- * @param <T>
- *            any object for which a (generalized) add operation can be defined.
+ *
+ * @param <T> any object for which a (generalized) add operation can be defined.
  */
 public interface IValue<T> {
 
@@ -42,8 +41,7 @@ public interface IValue<T> {
 	boolean matches(IValue<T> other);
 
 	/**
-	 * @return the inverse value, such that add(value.getInverse()) returns the
-	 *         neutral element of the group
+	 * @return the inverse value, such that add(value.getInverse()) returns the neutral element of the group
 	 */
 	IValue<T> getInverse();
 

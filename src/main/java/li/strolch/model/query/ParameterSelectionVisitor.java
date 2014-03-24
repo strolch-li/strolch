@@ -25,7 +25,7 @@ import li.strolch.model.query.ParameterSelection.StringParameterSelection;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public interface ParameterSelectionVisitor extends QueryVisitor {
 

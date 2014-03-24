@@ -19,7 +19,7 @@ import li.strolch.model.State;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public class StateSelection {
 

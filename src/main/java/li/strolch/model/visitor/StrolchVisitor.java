@@ -17,7 +17,7 @@ package li.strolch.model.visitor;
 
 /**
  * Marker interface to allow to quickly see the visitor implementations in Strolch
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface StrolchVisitor {

@@ -29,60 +29,60 @@ import org.w3c.dom.NodeList;
  */
 public class IntegerTimedState extends AbstractStrolchTimedState<IntegerValue> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public static final String TYPE = "IntegerState";
+	public static final String TYPE = "IntegerState";
 
-    public IntegerTimedState() {
-        super();
-    }
+	public IntegerTimedState() {
+		super();
+	}
 
-    public IntegerTimedState(String id, String name) {
-        super(id, name);
-    }
+	public IntegerTimedState(String id, String name) {
+		super(id, name);
+	}
 
-    public IntegerTimedState(Element element) {
-        super.fromDom(element);
+	public IntegerTimedState(Element element) {
+		super.fromDom(element);
 
-        this.state = new TimedState<>();
+		this.state = new TimedState<>();
 
-        NodeList timeValueElems = element.getElementsByTagName(Tags.VALUE);
-        for (int i = 0; i < timeValueElems.getLength(); i++) {
-            Element timeValueElem = (Element) timeValueElems.item(i);
-            Long time = Long.valueOf(timeValueElem.getAttribute(Tags.TIME));
-            Integer value = Integer.valueOf(timeValueElem.getAttribute(Tags.VALUE));
-            IntegerValue integerValue = new IntegerValue(value);
-            this.state.getTimeEvolution().setValueAt(time, integerValue);
-        }
-    }
+		NodeList timeValueElems = element.getElementsByTagName(Tags.VALUE);
+		for (int i = 0; i < timeValueElems.getLength(); i++) {
+			Element timeValueElem = (Element) timeValueElems.item(i);
+			Long time = Long.valueOf(timeValueElem.getAttribute(Tags.TIME));
+			Integer value = Integer.valueOf(timeValueElem.getAttribute(Tags.VALUE));
+			IntegerValue integerValue = new IntegerValue(value);
+			this.state.getTimeEvolution().setValueAt(time, integerValue);
+		}
+	}
 
-    @Override
-    public Element toDom(Document doc) {
+	@Override
+	public Element toDom(Document doc) {
 
-        Element stateElement = doc.createElement(Tags.TIMED_STATE);
-        super.fillElement(stateElement);
-        SortedSet<ITimeValue<IntegerValue>> values = this.state.getTimeEvolution().getValues();
-        for (ITimeValue<IntegerValue> timeValue : values) {
-            Long time = timeValue.getTime();
-            IntegerValue value = timeValue.getValue();
-            Element valueElem = doc.createElement(Tags.VALUE);
-            valueElem.setAttribute(Tags.TIME, time.toString());
-            valueElem.setAttribute(Tags.VALUE, value.getValue().toString());
-            stateElement.appendChild(valueElem);
-        }
+		Element stateElement = doc.createElement(Tags.TIMED_STATE);
+		super.fillElement(stateElement);
+		SortedSet<ITimeValue<IntegerValue>> values = this.state.getTimeEvolution().getValues();
+		for (ITimeValue<IntegerValue> timeValue : values) {
+			Long time = timeValue.getTime();
+			IntegerValue value = timeValue.getValue();
+			Element valueElem = doc.createElement(Tags.VALUE);
+			valueElem.setAttribute(Tags.TIME, time.toString());
+			valueElem.setAttribute(Tags.VALUE, value.getValue().toString());
+			stateElement.appendChild(valueElem);
+		}
 
-        return stateElement;
-    }
+		return stateElement;
+	}
 
-    @Override
-    public String getType() {
-        return TYPE;
-    }
+	@Override
+	public String getType() {
+		return TYPE;
+	}
 
-    @Override
-    public StrolchElement getClone() {
-        IntegerTimedState clone = new IntegerTimedState();
-        fillClone(clone);
-        return clone;
-    }
+	@Override
+	public StrolchElement getClone() {
+		IntegerTimedState clone = new IntegerTimedState();
+		fillClone(clone);
+		return clone;
+	}
 }

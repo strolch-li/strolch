@@ -27,7 +27,7 @@ public interface StrolchElement extends Serializable, Comparable<StrolchElement>
 
 	/**
 	 * Return the {@link Locator} for this element
-	 * 
+	 *
 	 * @return the {@link Locator} for this element
 	 */
 	public Locator getLocator();
@@ -35,7 +35,7 @@ public interface StrolchElement extends Serializable, Comparable<StrolchElement>
 	/**
 	 * Set the semi unique id of this {@link StrolchElement}. This value should be unique under all concrete
 	 * implementations of this interface
-	 * 
+	 *
 	 * @param id
 	 */
 	public void setId(String id);
@@ -43,53 +43,52 @@ public interface StrolchElement extends Serializable, Comparable<StrolchElement>
 	/**
 	 * Returns the semi unique id of this {@link StrolchElement}. This value should be unique under all concrete
 	 * implementations of this interface
-	 * 
+	 *
 	 * @return
 	 */
 	public String getId();
 
 	/**
 	 * Set the name of this {@link StrolchElement}
-	 * 
+	 *
 	 * @param name
 	 */
 	public void setName(String name);
 
 	/**
 	 * Returns the name of this {@link StrolchElement}
-	 * 
+	 *
 	 * @return
 	 */
 	public String getName();
 
 	/**
 	 * Set the currently set long value which defines the primary key for use in RDBM-Systems
-	 * 
+	 *
 	 * @param dbid
 	 */
 	public void setDbid(long dbid);
 
 	/**
 	 * Returns the currently set long value which defines the primary key for use in RDBM-Systems
-	 * 
+	 *
 	 * @return
 	 */
 	public long getDbid();
 
 	/**
 	 * Returns an {@link Element} object which is an XML representation of this object
-	 * 
-	 * @param doc
-	 *            the document to which this element is being written. The client must not append to the document, the
-	 *            caller will perform this as needed
-	 * 
+	 *
+	 * @param doc the document to which this element is being written. The client must not append to the document, the
+	 * caller will perform this as needed
+	 *
 	 * @return
 	 */
 	public Element toDom(Document doc);
 
 	/**
 	 * Returns the type of this {@link StrolchElement}
-	 * 
+	 *
 	 * @return
 	 */
 	public String getType();
@@ -100,7 +99,7 @@ public interface StrolchElement extends Serializable, Comparable<StrolchElement>
 
 	/**
 	 * Return a clone of this {@link StrolchElement}
-	 * 
+	 *
 	 * @return
 	 */
 	public StrolchElement getClone();

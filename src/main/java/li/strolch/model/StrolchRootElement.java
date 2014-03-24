@@ -20,7 +20,7 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 /**
  * Root element for all top level {@link StrolchElement}. These are elements which have no parent, e.g. {@link Resource
  * Resources} and {@link Order Orders}
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface StrolchRootElement extends StrolchElement {

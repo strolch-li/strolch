@@ -55,14 +55,16 @@ public abstract class AbstractToSaxWriterVisitor {
 
 	protected void writeStartStrolchElement(String tag, boolean empty, StrolchElement element)
 			throws XMLStreamException {
-		if (empty)
+		if (empty) {
 			this.writer.writeEmptyElement(tag);
-		else
+		} else {
 			this.writer.writeStartElement(tag);
+		}
 
 		this.writer.writeAttribute(Tags.ID, element.getId());
-		if (StringHelper.isNotEmpty(element.getName()))
+		if (StringHelper.isNotEmpty(element.getName())) {
 			this.writer.writeAttribute(Tags.NAME, element.getName());
+		}
 		this.writer.writeAttribute(Tags.TYPE, element.getType());
 	}
 
@@ -78,14 +80,18 @@ public abstract class AbstractToSaxWriterVisitor {
 		for (Parameter<?> parameter : parameters) {
 			writeStartStrolchElement(Tags.PARAMETER, true, parameter);
 
-			if (!Parameter.INTERPRETATION_NONE.equals(parameter.getInterpretation()))
+			if (!Parameter.INTERPRETATION_NONE.equals(parameter.getInterpretation())) {
 				this.writer.writeAttribute(Tags.INTERPRETATION, parameter.getInterpretation());
-			if (!Parameter.UOM_NONE.equals(parameter.getUom()))
+			}
+			if (!Parameter.UOM_NONE.equals(parameter.getUom())) {
 				this.writer.writeAttribute(Tags.UOM, parameter.getUom());
-			if (parameter.isHidden())
+			}
+			if (parameter.isHidden()) {
 				this.writer.writeAttribute(Tags.HIDDEN, Boolean.toString(parameter.isHidden()));
-			if (parameter.getIndex() != 0)
+			}
+			if (parameter.getIndex() != 0) {
 				this.writer.writeAttribute(Tags.INDEX, Integer.toString(parameter.getIndex()));
+			}
 
 			this.writer.writeAttribute(Tags.VALUE, parameter.getValueAsString());
 		}

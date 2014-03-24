@@ -27,7 +27,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public class IntegerParameter extends AbstractParameter<Integer> {
 
@@ -45,7 +45,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param id
 	 * @param name
 	 * @param value
@@ -57,7 +57,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 
 	/**
 	 * DOM Constructor
-	 * 
+	 *
 	 * @param element
 	 */
 	public IntegerParameter(Element element) {

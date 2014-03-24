@@ -27,7 +27,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public class FloatParameter extends AbstractParameter<Double> {
 
@@ -45,7 +45,7 @@ public class FloatParameter extends AbstractParameter<Double> {
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param id
 	 * @param name
 	 * @param value
@@ -58,7 +58,7 @@ public class FloatParameter extends AbstractParameter<Double> {
 
 	/**
 	 * DOM Constructor
-	 * 
+	 *
 	 * @param element
 	 */
 	public FloatParameter(Element element) {

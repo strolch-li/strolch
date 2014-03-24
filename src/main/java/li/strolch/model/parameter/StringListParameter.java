@@ -49,7 +49,7 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param id
 	 * @param name
 	 * @param value
@@ -62,7 +62,7 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 
 	/**
 	 * DOM Constructor
-	 * 
+	 *
 	 * @param element
 	 */
 	public StringListParameter(Element element) {
@@ -79,8 +79,9 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 
 	@Override
 	public String getValueAsString() {
-		if (this.value.isEmpty())
+		if (this.value.isEmpty()) {
 			return StringHelper.EMPTY;
+		}
 
 		StringBuilder sb = new StringBuilder();
 		Iterator<String> iter = this.value.iterator();
@@ -88,8 +89,9 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 
 			sb.append(iter.next());
 
-			if (iter.hasNext())
+			if (iter.hasNext()) {
 				sb.append(VALUE_SEPARATOR);
+			}
 		}
 
 		return sb.toString();
@@ -103,8 +105,9 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	@Override
 	public void setValue(List<String> value) {
 		validateValue(value);
-		if (this.value == null)
+		if (this.value == null) {
 			this.value = new ArrayList<String>(value.size());
+		}
 		this.value.clear();
 		this.value.addAll(value);
 	}
@@ -141,8 +144,9 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	public static List<String> parseFromString(String value) {
-		if (value.isEmpty())
+		if (value.isEmpty()) {
 			return Collections.emptyList();
+		}
 
 		String[] valueArr = value.split(VALUE_SEPARATOR);
 		return Arrays.asList(valueArr);

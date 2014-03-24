@@ -17,7 +17,7 @@ package li.strolch.exception;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public class StrolchException extends RuntimeException {
 

@@ -20,7 +20,7 @@ import li.strolch.model.Resource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public interface StrolchElementListener {
 

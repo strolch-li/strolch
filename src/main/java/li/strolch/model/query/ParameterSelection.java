@@ -139,6 +139,7 @@ public abstract class ParameterSelection implements Selection {
 	}
 
 	public static class BooleanParameterSelection extends ParameterSelection {
+
 		private Boolean value;
 
 		public BooleanParameterSelection(String bagKey, String paramKey, Boolean value) {
@@ -157,6 +158,7 @@ public abstract class ParameterSelection implements Selection {
 	}
 
 	public static class LongParameterSelection extends ParameterSelection {
+
 		private Long value;
 
 		public LongParameterSelection(String bagKey, String paramKey, Long value) {
@@ -175,6 +177,7 @@ public abstract class ParameterSelection implements Selection {
 	}
 
 	public static class FloatParameterSelection extends ParameterSelection {
+
 		private Double value;
 
 		public FloatParameterSelection(String bagKey, String paramKey, Double value) {
@@ -193,6 +196,7 @@ public abstract class ParameterSelection implements Selection {
 	}
 
 	public static class DateParameterSelection extends ParameterSelection {
+
 		private Date value;
 
 		public DateParameterSelection(String bagKey, String paramKey, Date value) {
@@ -211,6 +215,7 @@ public abstract class ParameterSelection implements Selection {
 	}
 
 	public static class StringListParameterSelection extends ParameterSelection {
+
 		private List<String> value;
 
 		public StringListParameterSelection(String bagKey, String paramKey, List<String> value) {

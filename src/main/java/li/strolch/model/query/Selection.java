@@ -21,6 +21,5 @@ package li.strolch.model.query;
 public interface Selection {
 
 	// marker interface
-	
 	public void accept(QueryVisitor visitor);
 }

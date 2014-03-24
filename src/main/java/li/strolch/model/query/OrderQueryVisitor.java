@@ -17,7 +17,7 @@ package li.strolch.model.query;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public interface OrderQueryVisitor extends OrderSelectionVisitor, ParameterSelectionVisitor {
 

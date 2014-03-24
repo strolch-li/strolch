@@ -18,15 +18,14 @@ package li.strolch.model.timevalue.impl;
 import java.io.Serializable;
 
 /**
- * Wrapper for java.util.String object defining a inverse to support algebraic
- * operations.
- * 
+ * Wrapper for java.util.String object defining a inverse to support algebraic operations.
+ *
  * @author Martin Smock <smock.martin@gmail.com>
  */
 public class AString implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private final String string;
 	private final boolean inverse;
 
@@ -63,20 +62,26 @@ public class AString implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		AString other = (AString) obj;
-		if (this.inverse != other.inverse)
+		if (this.inverse != other.inverse) {
 			return false;
+		}
 		if (this.string == null) {
-			if (other.string != null)
+			if (other.string != null) {
 				return false;
-		} else if (!this.string.equals(other.string))
+			}
+		} else if (!this.string.equals(other.string)) {
 			return false;
+		}
 		return true;
 	}
 

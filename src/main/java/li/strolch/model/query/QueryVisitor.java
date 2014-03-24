@@ -23,6 +23,6 @@ public interface QueryVisitor {
 	public void visitAnd(AndSelection andSelection);
 
 	public void visitOr(OrSelection orSelection);
-	
+
 	public void visitNot(NotSelection notSelection);
 }

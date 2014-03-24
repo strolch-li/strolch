@@ -22,6 +22,7 @@ import org.w3c.dom.Element;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ParameterBag extends ParameterizedElement {
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -33,7 +34,7 @@ public class ParameterBag extends ParameterizedElement {
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param id
 	 * @param name
 	 * @param type
@@ -44,7 +45,7 @@ public class ParameterBag extends ParameterizedElement {
 
 	/**
 	 * DOM Constructor
-	 * 
+	 *
 	 * @param bagElement
 	 */
 	public ParameterBag(Element bagElement) {

@@ -33,85 +33,85 @@ import org.junit.Test;
  */
 public class StrolchTimedStateTest {
 
-    @Test
-    public void testFloatState() {
+	@Test
+	public void testFloatState() {
 
-        Resource myRes = ModelGenerator.createResource("@1", "Test With States", "Stated");
+		Resource myRes = ModelGenerator.createResource("@1", "Test With States", "Stated");
 
-        FloatTimedState floatState = myRes.getTimedState(ModelGenerator.STATE_FLOAT_ID);
-        ITimeValue<FloatValue> valueAt0 = floatState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_0);
-        assertEquals(ModelGenerator.STATE_FLOAT_TIME_0, valueAt0.getValue().getValue());
+		FloatTimedState floatState = myRes.getTimedState(ModelGenerator.STATE_FLOAT_ID);
+		ITimeValue<FloatValue> valueAt0 = floatState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_0);
+		assertEquals(ModelGenerator.STATE_FLOAT_TIME_0, valueAt0.getValue().getValue());
 
-        ITimeValue<FloatValue> valueAt10 = floatState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_10);
-        assertEquals(ModelGenerator.STATE_FLOAT_TIME_10, valueAt10.getValue().getValue());
+		ITimeValue<FloatValue> valueAt10 = floatState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_10);
+		assertEquals(ModelGenerator.STATE_FLOAT_TIME_10, valueAt10.getValue().getValue());
 
-        ITimeValue<FloatValue> valueAt20 = floatState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_20);
-        assertEquals(ModelGenerator.STATE_FLOAT_TIME_20, valueAt20.getValue().getValue());
+		ITimeValue<FloatValue> valueAt20 = floatState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_20);
+		assertEquals(ModelGenerator.STATE_FLOAT_TIME_20, valueAt20.getValue().getValue());
 
-        ITimeValue<FloatValue> valueAt30 = floatState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_30);
-        assertEquals(ModelGenerator.STATE_FLOAT_TIME_30, valueAt30.getValue().getValue());
-    }
+		ITimeValue<FloatValue> valueAt30 = floatState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_30);
+		assertEquals(ModelGenerator.STATE_FLOAT_TIME_30, valueAt30.getValue().getValue());
+	}
 
-    @Test
-    public void testIntegerState() {
+	@Test
+	public void testIntegerState() {
 
-        Resource myRes = ModelGenerator.createResource("@1", "Test With States", "Stated");
+		Resource myRes = ModelGenerator.createResource("@1", "Test With States", "Stated");
 
-        IntegerTimedState integerState = myRes.getTimedState(ModelGenerator.STATE_INTEGER_ID);
-        ITimeValue<IntegerValue> valueAt0 = integerState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_0);
-        assertEquals(ModelGenerator.STATE_INTEGER_TIME_0, valueAt0.getValue().getValue());
+		IntegerTimedState integerState = myRes.getTimedState(ModelGenerator.STATE_INTEGER_ID);
+		ITimeValue<IntegerValue> valueAt0 = integerState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_0);
+		assertEquals(ModelGenerator.STATE_INTEGER_TIME_0, valueAt0.getValue().getValue());
 
-        ITimeValue<IntegerValue> valueAt10 = integerState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_10);
-        assertEquals(ModelGenerator.STATE_INTEGER_TIME_10, valueAt10.getValue().getValue());
+		ITimeValue<IntegerValue> valueAt10 = integerState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_10);
+		assertEquals(ModelGenerator.STATE_INTEGER_TIME_10, valueAt10.getValue().getValue());
 
-        ITimeValue<IntegerValue> valueAt20 = integerState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_20);
-        assertEquals(ModelGenerator.STATE_INTEGER_TIME_20, valueAt20.getValue().getValue());
+		ITimeValue<IntegerValue> valueAt20 = integerState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_20);
+		assertEquals(ModelGenerator.STATE_INTEGER_TIME_20, valueAt20.getValue().getValue());
 
-        ITimeValue<IntegerValue> valueAt30 = integerState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_30);
-        assertEquals(ModelGenerator.STATE_INTEGER_TIME_30, valueAt30.getValue().getValue());
-    }
+		ITimeValue<IntegerValue> valueAt30 = integerState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_30);
+		assertEquals(ModelGenerator.STATE_INTEGER_TIME_30, valueAt30.getValue().getValue());
+	}
 
-    @Test
-    public void testBooleanState() {
+	@Test
+	public void testBooleanState() {
 
-        Resource myRes = ModelGenerator.createResource("@1", "Test With States", "Stated");
+		Resource myRes = ModelGenerator.createResource("@1", "Test With States", "Stated");
 
-        BooleanTimedState booleanState = myRes.getTimedState(ModelGenerator.STATE_BOOLEAN_ID);
-        ITimeValue<BooleanValue> valueAt0 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_0);
-        assertEquals(ModelGenerator.STATE_BOOLEAN_TIME_0, valueAt0.getValue().getValue());
+		BooleanTimedState booleanState = myRes.getTimedState(ModelGenerator.STATE_BOOLEAN_ID);
+		ITimeValue<BooleanValue> valueAt0 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_0);
+		assertEquals(ModelGenerator.STATE_BOOLEAN_TIME_0, valueAt0.getValue().getValue());
 
-        ITimeValue<BooleanValue> valueAt10 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_10);
-        assertEquals(ModelGenerator.STATE_BOOLEAN_TIME_10, valueAt10.getValue().getValue());
+		ITimeValue<BooleanValue> valueAt10 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_10);
+		assertEquals(ModelGenerator.STATE_BOOLEAN_TIME_10, valueAt10.getValue().getValue());
 
-        ITimeValue<BooleanValue> valueAt20 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_20);
-        assertEquals(ModelGenerator.STATE_BOOLEAN_TIME_20, valueAt20.getValue().getValue());
+		ITimeValue<BooleanValue> valueAt20 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_20);
+		assertEquals(ModelGenerator.STATE_BOOLEAN_TIME_20, valueAt20.getValue().getValue());
 
-        ITimeValue<BooleanValue> valueAt30 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_30);
-        assertEquals(ModelGenerator.STATE_BOOLEAN_TIME_30, valueAt30.getValue().getValue());
-    }
+		ITimeValue<BooleanValue> valueAt30 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_30);
+		assertEquals(ModelGenerator.STATE_BOOLEAN_TIME_30, valueAt30.getValue().getValue());
+	}
 
-    @Test
-    public void testStringSetState() {
+	@Test
+	public void testStringSetState() {
 
-        Resource myRes = ModelGenerator.createResource("@1", "Test With States", "Stated");
+		Resource myRes = ModelGenerator.createResource("@1", "Test With States", "Stated");
 
-        StringSetTimedState booleanState = myRes.getTimedState(ModelGenerator.STATE_STRING_ID);
-        ITimeValue<StringSetValue> valueAt0 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_0);
-        assertEquals(asSet(ModelGenerator.STATE_STRING_TIME_0), valueAt0.getValue().getValue());
+		StringSetTimedState booleanState = myRes.getTimedState(ModelGenerator.STATE_STRING_ID);
+		ITimeValue<StringSetValue> valueAt0 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_0);
+		assertEquals(asSet(ModelGenerator.STATE_STRING_TIME_0), valueAt0.getValue().getValue());
 
-        ITimeValue<StringSetValue> valueAt10 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_10);
-        assertEquals(asSet(ModelGenerator.STATE_STRING_TIME_10), valueAt10.getValue().getValue());
+		ITimeValue<StringSetValue> valueAt10 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_10);
+		assertEquals(asSet(ModelGenerator.STATE_STRING_TIME_10), valueAt10.getValue().getValue());
 
-        ITimeValue<StringSetValue> valueAt20 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_20);
-        assertEquals(asSet(ModelGenerator.STATE_STRING_TIME_20), valueAt20.getValue().getValue());
+		ITimeValue<StringSetValue> valueAt20 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_20);
+		assertEquals(asSet(ModelGenerator.STATE_STRING_TIME_20), valueAt20.getValue().getValue());
 
-        ITimeValue<StringSetValue> valueAt30 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_30);
-        assertEquals(asSet(ModelGenerator.STATE_STRING_TIME_30), valueAt30.getValue().getValue());
-    }
+		ITimeValue<StringSetValue> valueAt30 = booleanState.getTimeEvolution().getValueAt(ModelGenerator.STATE_TIME_30);
+		assertEquals(asSet(ModelGenerator.STATE_STRING_TIME_30), valueAt30.getValue().getValue());
+	}
 
-    private static Set<AString> asSet(String value) {
-        HashSet<AString> hashSet = new HashSet<>();
-        hashSet.add(new AString(value));
-        return hashSet;
-    }
+	private static Set<AString> asSet(String value) {
+		HashSet<AString> hashSet = new HashSet<>();
+		hashSet.add(new AString(value));
+		return hashSet;
+	}
 }

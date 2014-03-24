@@ -15,14 +15,12 @@
  */
 package li.strolch.model.query;
 
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public interface Navigation {
 
 	// marker interface
-	
 	public void accept(QueryVisitor visitor);
 }

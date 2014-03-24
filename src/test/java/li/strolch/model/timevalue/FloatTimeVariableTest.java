@@ -71,8 +71,7 @@ public class FloatTimeVariableTest {
 	}
 
 	/**
-	 * test, that the past values time fields start with 0 and are strictly
-	 * smaller than PICK
+	 * test, that the past values time fields start with 0 and are strictly smaller than PICK
 	 */
 	@Test
 	public void testGetPastValues() {
@@ -124,16 +123,15 @@ public class FloatTimeVariableTest {
 		IValueChange<FloatValue> change = new ValueChange<FloatValue>(PICK, doubleValue);
 		this.timeVariable.applyChange(change);
 
-		ITimeValue<FloatValue> actual = this.timeVariable.getValueAt(PICK); 
-		assertNotNull(actual); 	
-		
+		ITimeValue<FloatValue> actual = this.timeVariable.getValueAt(PICK);
+		assertNotNull(actual);
+
 		IValue<Double> expectedValue = new FloatValue(STEP.doubleValue());
 		assertEquals(true, actual.getValue().matches(expectedValue));
 	}
 
 	/**
-	 * test that successors matching the values of their predecessors are
-	 * removed
+	 * test that successors matching the values of their predecessors are removed
 	 */
 	@Test
 	public void testCompact() {

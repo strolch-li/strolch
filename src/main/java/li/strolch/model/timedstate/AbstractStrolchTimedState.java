@@ -32,96 +32,96 @@ import li.strolch.model.timevalue.IValueChange;
  */
 @SuppressWarnings("rawtypes")
 public abstract class AbstractStrolchTimedState<T extends IValue> extends AbstractStrolchElement implements
-        StrolchTimedState<T> {
+		StrolchTimedState<T> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    protected Resource parent;
-    protected ITimedState<T> state;
+	protected Resource parent;
+	protected ITimedState<T> state;
 
-    public AbstractStrolchTimedState() {
-        this.state = new TimedState<>();
-    }
+	public AbstractStrolchTimedState() {
+		this.state = new TimedState<>();
+	}
 
-    public AbstractStrolchTimedState(String id, String name) {
-        super(id, name);
-        this.state = new TimedState<>();
-    }
+	public AbstractStrolchTimedState(String id, String name) {
+		super(id, name);
+		this.state = new TimedState<>();
+	}
 
-    @Override
-    public ITimeValue<T> getNextMatch(Long time, T value) {
-        return this.state.getNextMatch(time, value);
-    }
+	@Override
+	public ITimeValue<T> getNextMatch(Long time, T value) {
+		return this.state.getNextMatch(time, value);
+	}
 
-    @Override
-    public ITimeValue<T> getPreviousMatch(Long time, T value) {
-        return this.state.getPreviousMatch(time, value);
-    }
+	@Override
+	public ITimeValue<T> getPreviousMatch(Long time, T value) {
+		return this.state.getPreviousMatch(time, value);
+	}
 
-    @Override
-    public <U extends IValueChange<T>> void applyChange(U change) {
-        this.state.applyChange(change);
-    }
+	@Override
+	public <U extends IValueChange<T>> void applyChange(U change) {
+		this.state.applyChange(change);
+	}
 
-    @Override
-    public ITimeValue<T> getStateAt(Long time) {
-        return this.state.getStateAt(time);
-    }
+	@Override
+	public ITimeValue<T> getStateAt(Long time) {
+		return this.state.getStateAt(time);
+	}
 
-    @Override
-    public ITimeVariable<T> getTimeEvolution() {
-        return this.state.getTimeEvolution();
-    }
+	@Override
+	public ITimeVariable<T> getTimeEvolution() {
+		return this.state.getTimeEvolution();
+	}
 
-    @Override
-    public StrolchElement getParent() {
-        return this.parent;
-    }
+	@Override
+	public StrolchElement getParent() {
+		return this.parent;
+	}
 
-    @Override
-    public void setParent(Resource parent) {
-        this.parent = parent;
-    }
+	@Override
+	public void setParent(Resource parent) {
+		this.parent = parent;
+	}
 
-    @Override
-    public StrolchRootElement getRootElement() {
-        return this.parent;
-    }
+	@Override
+	public StrolchRootElement getRootElement() {
+		return this.parent;
+	}
 
-    @Override
-    protected void fillLocator(LocatorBuilder locatorBuilder) {
-        locatorBuilder.append(Tags.TIMED_STATE);
-        locatorBuilder.append(getId());
-    }
+	@Override
+	protected void fillLocator(LocatorBuilder locatorBuilder) {
+		locatorBuilder.append(Tags.TIMED_STATE);
+		locatorBuilder.append(getId());
+	}
 
-    @Override
-    public Locator getLocator() {
-        LocatorBuilder lb = new LocatorBuilder();
-        this.parent.fillLocator(lb);
-        fillLocator(lb);
-        return lb.build();
-    }
+	@Override
+	public Locator getLocator() {
+		LocatorBuilder lb = new LocatorBuilder();
+		this.parent.fillLocator(lb);
+		fillLocator(lb);
+		return lb.build();
+	}
 
-    protected void fillClone(AbstractStrolchTimedState<T> clone) {
-        super.fillClone(clone);
-        clone.state = this.state.getCopy();
-    }
+	protected void fillClone(AbstractStrolchTimedState<T> clone) {
+		super.fillClone(clone);
+		clone.state = this.state.getCopy();
+	}
 
-    @SuppressWarnings("nls")
-    @Override
-    public String toString() {
+	@SuppressWarnings("nls")
+	@Override
+	public String toString() {
 
-        StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 
-        builder.append(getClass().getSimpleName());
-        builder.append(" [id=");
-        builder.append(this.id);
-        builder.append(", name=");
-        builder.append(this.name);
-        builder.append(", valueNow=");
-        builder.append(this.state.getStateAt(System.currentTimeMillis()));
-        builder.append("]");
+		builder.append(getClass().getSimpleName());
+		builder.append(" [id=");
+		builder.append(this.id);
+		builder.append(", name=");
+		builder.append(this.name);
+		builder.append(", valueNow=");
+		builder.append(this.state.getStateAt(System.currentTimeMillis()));
+		builder.append("]");
 
-        return builder.toString();
-    }
+		return builder.toString();
+	}
 }

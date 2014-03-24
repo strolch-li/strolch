@@ -61,14 +61,18 @@ public abstract class StrolchElementToDomVisitor {
 		AttributesImpl attributes = attributesFor((StrolchElement) parameter);
 		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, parameter.getValueAsString());
 
-		if (!Parameter.UOM_NONE.equals(parameter.getUom()))
+		if (!Parameter.UOM_NONE.equals(parameter.getUom())) {
 			attributes.addAttribute(null, null, Tags.UOM, Tags.CDATA, parameter.getUom());
-		if (!Parameter.INTERPRETATION_NONE.equals(parameter.getInterpretation()))
+		}
+		if (!Parameter.INTERPRETATION_NONE.equals(parameter.getInterpretation())) {
 			attributes.addAttribute(null, null, Tags.INTERPRETATION, Tags.CDATA, parameter.getInterpretation());
-		if (parameter.isHidden())
+		}
+		if (parameter.isHidden()) {
 			attributes.addAttribute(null, null, Tags.HIDDEN, Tags.CDATA, Boolean.toString(parameter.isHidden()));
-		if (parameter.getIndex() != 0)
+		}
+		if (parameter.getIndex() != 0) {
 			attributes.addAttribute(null, null, Tags.INDEX, Tags.CDATA, Integer.toString(parameter.getIndex()));
+		}
 
 		return attributes;
 	}

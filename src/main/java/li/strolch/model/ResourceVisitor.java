@@ -20,7 +20,7 @@ import li.strolch.model.visitor.StrolchElementVisitor;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface ResourceVisitor extends StrolchElementVisitor<Resource>{
+public interface ResourceVisitor extends StrolchElementVisitor<Resource> {
 
 	@Override
 	public void visit(Resource element);

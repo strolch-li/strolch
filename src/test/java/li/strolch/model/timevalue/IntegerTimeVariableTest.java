@@ -32,7 +32,7 @@ import org.junit.Test;
 
 /**
  * Basic tests for a {@link TimeVariable} with integer values.
- * 
+ *
  * @author martin_smock
  */
 public class IntegerTimeVariableTest {

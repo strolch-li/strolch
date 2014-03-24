@@ -33,7 +33,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * @param <T>
  */
 public abstract class AbstractParameter<T> extends AbstractStrolchElement implements Parameter<T> {
@@ -56,7 +56,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param id
 	 * @param name
 	 */
@@ -134,14 +134,18 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 		element.setAttribute(Tags.VALUE, getValueAsString());
 
-		if (!this.interpretation.equals(Parameter.INTERPRETATION_NONE))
+		if (!this.interpretation.equals(Parameter.INTERPRETATION_NONE)) {
 			element.setAttribute(Tags.INTERPRETATION, this.interpretation);
-		if (!this.uom.equals(Parameter.UOM_NONE))
+		}
+		if (!this.uom.equals(Parameter.UOM_NONE)) {
 			element.setAttribute(Tags.UOM, this.uom);
-		if (this.hidden)
+		}
+		if (this.hidden) {
 			element.setAttribute(Tags.HIDDEN, Boolean.toString(this.hidden));
-		if (this.index != 0)
+		}
+		if (this.index != 0) {
 			element.setAttribute(Tags.INDEX, Integer.toString(this.index));
+		}
 
 		return element;
 	}
@@ -206,12 +210,10 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	/**
 	 * Validates that the value is legal. This is the case when it is not null in this implementation
-	 * 
-	 * @param value
-	 *            the value to check for this parameter instance
-	 * 
-	 * @throws StrolchException
-	 *             if the value is null
+	 *
+	 * @param value the value to check for this parameter instance
+	 *
+	 * @throws StrolchException if the value is null
 	 */
 	protected void validateValue(T value) throws StrolchException {
 		if (value == null) {
@@ -223,7 +225,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	/**
 	 * Fills the {@link Parameter} clone with the id, name, hidden, interpretation and uom
-	 * 
+	 *
 	 * @param clone
 	 */
 	protected void fillClone(Parameter<?> clone) {

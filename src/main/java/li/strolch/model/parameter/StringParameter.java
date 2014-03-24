@@ -27,7 +27,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public class StringParameter extends AbstractParameter<String> {
 
@@ -39,7 +39,7 @@ public class StringParameter extends AbstractParameter<String> {
 
 	/**
 	 * Empty constructor
-	 * 
+	 *
 	 */
 	public StringParameter() {
 		//
@@ -47,7 +47,7 @@ public class StringParameter extends AbstractParameter<String> {
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param id
 	 * @param name
 	 * @param value
@@ -59,7 +59,7 @@ public class StringParameter extends AbstractParameter<String> {
 
 	/**
 	 * DOM Constructor
-	 * 
+	 *
 	 * @param element
 	 */
 	public StringParameter(Element element) {

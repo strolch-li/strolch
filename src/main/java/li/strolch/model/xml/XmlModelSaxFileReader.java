@@ -34,7 +34,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
@@ -54,27 +54,28 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
 		switch (qName) {
 
-		case Tags.INCLUDE_FILE:
+			case Tags.INCLUDE_FILE:
 
-			String includeFileS = attributes.getValue(Tags.FILE);
-			if (StringHelper.isEmpty(includeFileS))
-				throw new IllegalArgumentException(MessageFormat.format(
-						"The attribute {0} is missing for IncludeFile!", Tags.FILE)); //$NON-NLS-1$
-			File includeFile = new File(this.modelFile.getParentFile(), includeFileS);
-			if (!includeFile.exists() || !includeFile.canRead()) {
-				String msg = "The IncludeFile does not exist, or is not readable. Source model: {0} with IncludeFile: {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, this.modelFile.getName(), includeFileS);
-				throw new IllegalArgumentException(msg);
-			}
+				String includeFileS = attributes.getValue(Tags.FILE);
+				if (StringHelper.isEmpty(includeFileS)) {
+					throw new IllegalArgumentException(MessageFormat.format(
+							"The attribute {0} is missing for IncludeFile!", Tags.FILE)); //$NON-NLS-1$
+				}
+				File includeFile = new File(this.modelFile.getParentFile(), includeFileS);
+				if (!includeFile.exists() || !includeFile.canRead()) {
+					String msg = "The IncludeFile does not exist, or is not readable. Source model: {0} with IncludeFile: {1}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, this.modelFile.getName(), includeFileS);
+					throw new IllegalArgumentException(msg);
+				}
 
-			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(this.listener, includeFile);
-			handler.parseFile();
-			this.statistics.nrOfOrders += handler.statistics.nrOfOrders;
-			this.statistics.nrOfResources += handler.statistics.nrOfResources;
+				XmlModelSaxFileReader handler = new XmlModelSaxFileReader(this.listener, includeFile);
+				handler.parseFile();
+				this.statistics.nrOfOrders += handler.statistics.nrOfOrders;
+				this.statistics.nrOfResources += handler.statistics.nrOfResources;
 
-			break;
-		default:
-			super.startElement(uri, localName, qName, attributes);
+				break;
+			default:
+				super.startElement(uri, localName, qName, attributes);
 		}
 	}
 

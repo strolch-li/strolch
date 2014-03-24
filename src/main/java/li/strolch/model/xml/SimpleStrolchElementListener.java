@@ -31,15 +31,17 @@ public class SimpleStrolchElementListener implements StrolchElementListener {
 
 	@Override
 	public void notifyResource(Resource resource) {
-		if (this.resources == null)
+		if (this.resources == null) {
 			this.resources = new ArrayList<>();
+		}
 		this.resources.add(resource);
 	}
 
 	@Override
 	public void notifyOrder(Order order) {
-		if (this.orders == null)
+		if (this.orders == null) {
 			this.orders = new ArrayList<>();
+		}
 		this.orders.add(order);
 	}
 

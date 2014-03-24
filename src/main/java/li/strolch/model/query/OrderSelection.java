@@ -17,7 +17,7 @@ package li.strolch.model.query;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public abstract class OrderSelection implements Selection {
 
@@ -25,6 +25,6 @@ public abstract class OrderSelection implements Selection {
 	public void accept(QueryVisitor visitor) {
 		accept((OrderSelectionVisitor) visitor);
 	}
-	
+
 	public abstract void accept(OrderSelectionVisitor visitor);
 }

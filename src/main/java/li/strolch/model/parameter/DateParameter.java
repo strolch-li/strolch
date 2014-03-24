@@ -46,7 +46,7 @@ public class DateParameter extends AbstractParameter<Date> {
 
 	/**
 	 * Default Constructor
-	 * 
+	 *
 	 * @param id
 	 * @param name
 	 * @param value
@@ -58,7 +58,7 @@ public class DateParameter extends AbstractParameter<Date> {
 
 	/**
 	 * DOM Constructor
-	 * 
+	 *
 	 * @param element
 	 */
 	public DateParameter(Element element) {

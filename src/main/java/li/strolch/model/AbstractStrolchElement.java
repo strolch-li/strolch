@@ -44,11 +44,9 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 
 	/**
 	 * Default constructor
-	 * 
-	 * @param id
-	 *            id of this {@link StrolchElement}
-	 * @param name
-	 *            name of this {@link StrolchElement}
+	 *
+	 * @param id id of this {@link StrolchElement}
+	 * @param name name of this {@link StrolchElement}
 	 */
 	public AbstractStrolchElement(String id, String name) {
 		setId(id);
@@ -98,15 +96,15 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	/**
 	 * Used to build a {@link Locator} for this {@link StrolchElement}. It must be implemented by the concrete
 	 * implemented as parents must first add their {@link Locator} information
-	 * 
-	 * @param locatorBuilder
-	 *            the {@link LocatorBuilder} to which the {@link StrolchElement} must add its locator information
+	 *
+	 * @param locatorBuilder the {@link LocatorBuilder} to which the {@link StrolchElement} must add its locator
+	 * information
 	 */
 	protected abstract void fillLocator(LocatorBuilder locatorBuilder);
 
 	/**
 	 * fills the {@link StrolchElement} clone with the id, name and type
-	 * 
+	 *
 	 * @param clone
 	 */
 	protected void fillClone(StrolchElement clone) {
@@ -122,7 +120,7 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 
 	/**
 	 * Builds the fields of this {@link StrolchElement} from a {@link Element}
-	 * 
+	 *
 	 * @param element
 	 */
 	protected void fromDom(Element element) {
@@ -149,18 +147,23 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		AbstractStrolchElement other = (AbstractStrolchElement) obj;
 		if (this.id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!this.id.equals(other.id))
+			}
+		} else if (!this.id.equals(other.id)) {
 			return false;
+		}
 		return true;
 	}
 

@@ -16,9 +16,8 @@
 package li.strolch.model.timevalue;
 
 /**
- * Interface for operators to be used to change the values of {@link ITimeValue}
- * in a {@link ITimeVariable}.
- * 
+ * Interface for operators to be used to change the values of {@link ITimeValue} in a {@link ITimeVariable}.
+ *
  * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("rawtypes")
@@ -35,8 +34,7 @@ public interface IValueChange<T extends IValue> {
 	T getValue();
 
 	/**
-	 * @return the inverse neutralizing a change. Very useful to undo changes
-	 *         applied.
+	 * @return the inverse neutralizing a change. Very useful to undo changes applied.
 	 */
 	IValueChange<T> getInverse();
 

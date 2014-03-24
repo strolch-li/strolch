@@ -101,8 +101,9 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	@Override
 	public void compact() {
 
-		if (this.container.size() < 2)
+		if (this.container.size() < 2) {
 			return;
+		}
 
 		Iterator<ITimeValue<T>> iterator = this.container.iterator();
 		ITimeValue<T> predecessor = iterator.next();

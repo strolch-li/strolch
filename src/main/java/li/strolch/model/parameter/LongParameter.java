@@ -27,7 +27,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  */
 public class LongParameter extends AbstractParameter<Long> {
 
@@ -45,7 +45,7 @@ public class LongParameter extends AbstractParameter<Long> {
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param id
 	 * @param name
 	 * @param value
@@ -57,7 +57,7 @@ public class LongParameter extends AbstractParameter<Long> {
 
 	/**
 	 * DOM Constructor
-	 * 
+	 *
 	 * @param element
 	 */
 	public LongParameter(Element element) {

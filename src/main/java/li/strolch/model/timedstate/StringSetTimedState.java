@@ -33,79 +33,79 @@ import org.w3c.dom.NodeList;
  */
 public class StringSetTimedState extends AbstractStrolchTimedState<StringSetValue> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public static final String TYPE = "StringSetState";
+	public static final String TYPE = "StringSetState";
 
-    public StringSetTimedState() {
-        super();
-    }
+	public StringSetTimedState() {
+		super();
+	}
 
-    public StringSetTimedState(String id, String name) {
-        super(id, name);
-    }
+	public StringSetTimedState(String id, String name) {
+		super(id, name);
+	}
 
-    public StringSetTimedState(Element element) {
-        super.fromDom(element);
+	public StringSetTimedState(Element element) {
+		super.fromDom(element);
 
-        this.state = new TimedState<>();
+		this.state = new TimedState<>();
 
-        NodeList timeValueElems = element.getElementsByTagName(Tags.VALUE);
-        for (int i = 0; i < timeValueElems.getLength(); i++) {
-            Element timeValueElem = (Element) timeValueElems.item(i);
-            Long time = Long.valueOf(timeValueElem.getAttribute(Tags.TIME));
+		NodeList timeValueElems = element.getElementsByTagName(Tags.VALUE);
+		for (int i = 0; i < timeValueElems.getLength(); i++) {
+			Element timeValueElem = (Element) timeValueElems.item(i);
+			Long time = Long.valueOf(timeValueElem.getAttribute(Tags.TIME));
 
-            String valueAsString = timeValueElem.getAttribute(Tags.VALUE);
-            Set<AString> value = new HashSet<>();
-            String[] values = valueAsString.split(",");
-            for (String s : values) {
-                value.add(new AString(s.trim()));
-            }
+			String valueAsString = timeValueElem.getAttribute(Tags.VALUE);
+			Set<AString> value = new HashSet<>();
+			String[] values = valueAsString.split(",");
+			for (String s : values) {
+				value.add(new AString(s.trim()));
+			}
 
-            StringSetValue integerValue = new StringSetValue(value);
-            this.state.getTimeEvolution().setValueAt(time, integerValue);
-        }
-    }
+			StringSetValue integerValue = new StringSetValue(value);
+			this.state.getTimeEvolution().setValueAt(time, integerValue);
+		}
+	}
 
-    @Override
-    public Element toDom(Document doc) {
+	@Override
+	public Element toDom(Document doc) {
 
-        Element stateElement = doc.createElement(Tags.TIMED_STATE);
-        super.fillElement(stateElement);
-        SortedSet<ITimeValue<StringSetValue>> values = this.state.getTimeEvolution().getValues();
-        for (ITimeValue<StringSetValue> timeValue : values) {
-            Long time = timeValue.getTime();
-            StringSetValue stringSetValue = timeValue.getValue();
+		Element stateElement = doc.createElement(Tags.TIMED_STATE);
+		super.fillElement(stateElement);
+		SortedSet<ITimeValue<StringSetValue>> values = this.state.getTimeEvolution().getValues();
+		for (ITimeValue<StringSetValue> timeValue : values) {
+			Long time = timeValue.getTime();
+			StringSetValue stringSetValue = timeValue.getValue();
 
-            Set<AString> value = stringSetValue.getValue();
-            StringBuilder sb = new StringBuilder();
-            Iterator<AString> iter = value.iterator();
-            while (iter.hasNext()) {
-                sb.append(iter.next().getString());
-                if (iter.hasNext()) {
-                    sb.append(", ");
-                }
-            }
-            String valueAsString = sb.toString();
+			Set<AString> value = stringSetValue.getValue();
+			StringBuilder sb = new StringBuilder();
+			Iterator<AString> iter = value.iterator();
+			while (iter.hasNext()) {
+				sb.append(iter.next().getString());
+				if (iter.hasNext()) {
+					sb.append(", ");
+				}
+			}
+			String valueAsString = sb.toString();
 
-            Element valueElem = doc.createElement(Tags.VALUE);
-            valueElem.setAttribute(Tags.TIME, time.toString());
-            valueElem.setAttribute(Tags.VALUE, valueAsString);
-            stateElement.appendChild(valueElem);
-        }
+			Element valueElem = doc.createElement(Tags.VALUE);
+			valueElem.setAttribute(Tags.TIME, time.toString());
+			valueElem.setAttribute(Tags.VALUE, valueAsString);
+			stateElement.appendChild(valueElem);
+		}
 
-        return stateElement;
-    }
+		return stateElement;
+	}
 
-    @Override
-    public String getType() {
-        return TYPE;
-    }
+	@Override
+	public String getType() {
+		return TYPE;
+	}
 
-    @Override
-    public StrolchElement getClone() {
-        StringSetTimedState clone = new StringSetTimedState();
-        fillClone(clone);
-        return clone;
-    }
+	@Override
+	public StrolchElement getClone() {
+		StringSetTimedState clone = new StringSetTimedState();
+		fillClone(clone);
+		return clone;
+	}
 }

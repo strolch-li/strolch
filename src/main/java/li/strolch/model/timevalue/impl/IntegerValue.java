@@ -22,7 +22,7 @@ import li.strolch.model.timevalue.IValue;
 
 /**
  * {@link IValue} implementation to work with Integer valued {@link ITimeValue} objects
- * 
+ *
  * @author Martin Smock <smock.martin@gmail.com>
  */
 public class IntegerValue implements IValue<Integer>, Serializable {
@@ -91,18 +91,23 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		IntegerValue other = (IntegerValue) obj;
 		if (this.value == null) {
-			if (other.value != null)
+			if (other.value != null) {
 				return false;
-		} else if (!this.value.equals(other.value))
+			}
+		} else if (!this.value.equals(other.value)) {
 			return false;
+		}
 		return true;
 	}
 

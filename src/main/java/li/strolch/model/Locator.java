@@ -30,16 +30,16 @@ import ch.eitchnet.utils.helper.StringHelper;
  * consists of a {@link List} of Strings which starting from the first value, defining the root, with the last item
  * defining the objects id.
  * </p>
- * 
+ *
  * <p>
  * When the {@link Locator} is formatted to a String, it resembles the same format as is used in Unix based files
  * systems, with slashes (/), separating the different list values
  * </p>
- * 
+ *
  * <p>
  * A {@link Locator} is always immutable, modifications return a new instance
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class Locator {
@@ -56,27 +56,24 @@ public class Locator {
 
 	/**
 	 * Constructs a new {@link Locator} with the given list of path elements
-	 * 
-	 * @param pathElements
-	 *            the elements making up the {@link Locator}
-	 * 
-	 * @throws StrolchException
-	 *             if the path is invalid, meaning has less than two elements in it
+	 *
+	 * @param pathElements the elements making up the {@link Locator}
+	 *
+	 * @throws StrolchException if the path is invalid, meaning has less than two elements in it
 	 */
 	public Locator(List<String> pathElements) throws StrolchException {
-		if (pathElements == null || pathElements.isEmpty())
+		if (pathElements == null || pathElements.isEmpty()) {
 			throw new StrolchException("The path elements may not be null and must contain at least 1 item"); //$NON-NLS-1$
+		}
 		this.pathElements = Collections.unmodifiableList(new ArrayList<String>(pathElements));
 	}
 
 	/**
 	 * Constructs a new {@link Locator} by parsing the given string path.
-	 * 
-	 * @param path
-	 *            the path to parse for instantiate this {@link Locator} with elements
-	 * 
-	 * @throws StrolchException
-	 *             if the path is invalid, meaning has less than two elements in it
+	 *
+	 * @param path the path to parse for instantiate this {@link Locator} with elements
+	 *
+	 * @throws StrolchException if the path is invalid, meaning has less than two elements in it
 	 */
 	public Locator(String path) throws StrolchException {
 		this.pathElements = Collections.unmodifiableList(parsePath(path));
@@ -84,11 +81,9 @@ public class Locator {
 
 	/**
 	 * Internal constructor to append a sub path to a constructor
-	 * 
-	 * @param path
-	 *            the base path of the locator
-	 * @param subPath
-	 *            the additional path
+	 *
+	 * @param path the base path of the locator
+	 * @param subPath the additional path
 	 */
 	private Locator(List<String> path, List<String> subPath) {
 		List<String> fullPath = new ArrayList<String>();
@@ -99,11 +94,9 @@ public class Locator {
 
 	/**
 	 * Internal constructor to append a element to a constructor
-	 * 
-	 * @param path
-	 *            the base path of the locator
-	 * @param element
-	 *            the additional element
+	 *
+	 * @param path the base path of the locator
+	 * @param element the additional element
 	 */
 	private Locator(List<String> path, String element) {
 		List<String> fullPath = new ArrayList<String>();
@@ -114,7 +107,7 @@ public class Locator {
 
 	/**
 	 * Returns the immutable list of path elements making up this locator
-	 * 
+	 *
 	 * @return the pathElements
 	 */
 	public List<String> getPathElements() {
@@ -123,7 +116,7 @@ public class Locator {
 
 	/**
 	 * Returns the number of elements which this {@link Locator} contains
-	 * 
+	 *
 	 * @return the number of elements which this {@link Locator} contains
 	 */
 	public int getSize() {
@@ -132,10 +125,9 @@ public class Locator {
 
 	/**
 	 * Returns a new {@link Locator} where the given sub path is appended to the locator
-	 * 
-	 * @param subPathElements
-	 *            the sub path to append
-	 * 
+	 *
+	 * @param subPathElements the sub path to append
+	 *
 	 * @return the new locator
 	 */
 	public Locator append(List<String> subPathElements) {
@@ -144,10 +136,9 @@ public class Locator {
 
 	/**
 	 * Returns a new {@link Locator} where the given element is appended to the locator
-	 * 
-	 * @param element
-	 *            the element to append
-	 * 
+	 *
+	 * @param element the element to append
+	 *
 	 * @return the new locator
 	 */
 	public Locator append(String element) {
@@ -165,33 +156,30 @@ public class Locator {
 
 	/**
 	 * Parses the given path to a {@link List} of path elements by splitting the string with the {@link #PATH_SEPARATOR}
-	 * 
-	 * @param path
-	 *            the path to parse
-	 * 
+	 *
+	 * @param path the path to parse
+	 *
 	 * @return the list of path elements for the list
-	 * 
-	 * @throws StrolchException
-	 *             if the path is empty, or does not contain at least 2 elements separated by {@link #PATH_SEPARATOR}
+	 *
+	 * @throws StrolchException if the path is empty, or does not contain at least 2 elements separated by
+	 * {@link #PATH_SEPARATOR}
 	 */
 	private List<String> parsePath(String path) throws StrolchException {
-		if (StringHelper.isEmpty(path))
+		if (StringHelper.isEmpty(path)) {
 			throw new StrolchException("A path may not be empty!"); //$NON-NLS-1$
-
+		}
 		String[] elements = path.split(Locator.PATH_SEPARATOR);
 		return Arrays.asList(elements);
 	}
 
 	/**
 	 * Formats the given list of path elements to a String representation of the {@link Locator}
-	 * 
-	 * @param pathElements
-	 *            the locator elements
-	 * 
+	 *
+	 * @param pathElements the locator elements
+	 *
 	 * @return a string representation of the path elements
-	 * 
-	 * @throws StrolchException
-	 *             if the path elements does not contain at least two items
+	 *
+	 * @throws StrolchException if the path elements does not contain at least two items
 	 */
 	private String formatPath(List<String> pathElements) throws StrolchException {
 		StringBuilder sb = new StringBuilder();
@@ -200,8 +188,9 @@ public class Locator {
 		while (iter.hasNext()) {
 			String element = iter.next();
 			sb.append(element);
-			if (iter.hasNext())
+			if (iter.hasNext()) {
 				sb.append(Locator.PATH_SEPARATOR);
+			}
 		}
 
 		return sb.toString();
@@ -217,26 +206,30 @@ public class Locator {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Locator other = (Locator) obj;
 		if (this.pathElements == null) {
-			if (other.pathElements != null)
+			if (other.pathElements != null) {
 				return false;
-		} else if (!this.pathElements.equals(other.pathElements))
+			}
+		} else if (!this.pathElements.equals(other.pathElements)) {
 			return false;
+		}
 		return true;
 	}
 
 	/**
 	 * Instantiates a new immutable {@link Locator} instance from the given string
-	 * 
-	 * @param locatorPath
-	 *            the path from which to instantiate the locator
+	 *
+	 * @param locatorPath the path from which to instantiate the locator
 	 * @return the immutable {@link Locator} instance
 	 */
 	public static Locator valueOf(String locatorPath) {
@@ -245,10 +238,9 @@ public class Locator {
 
 	/**
 	 * Creates a new {@link LocatorBuilder} instance and appends the given root element tag to it
-	 * 
-	 * @param rootElement
-	 *            the first element on the {@link Locator}
-	 * 
+	 *
+	 * @param rootElement the first element on the {@link Locator}
+	 *
 	 * @return a new {@link LocatorBuilder} instance with the given root element tag as the first element
 	 */
 	public static LocatorBuilder newBuilder(String rootElement) {
@@ -258,7 +250,7 @@ public class Locator {
 	/**
 	 * {@link LocatorBuilder} is used to build {@link Locator}s where a deep hierarchy is to be created. The
 	 * {@link #append(String)} method returns itself for chain building
-	 * 
+	 *
 	 * @author Robert von Burg <eitch@eitchnet.ch>
 	 */
 	public static class LocatorBuilder {
@@ -274,10 +266,9 @@ public class Locator {
 
 		/**
 		 * Append an element to the path
-		 * 
-		 * @param element
-		 *            the element to add
-		 * 
+		 *
+		 * @param element the element to add
+		 *
 		 * @return this instance for chaining
 		 */
 		public LocatorBuilder append(String element) {
@@ -287,7 +278,7 @@ public class Locator {
 
 		/**
 		 * Remove the last element from the path
-		 * 
+		 *
 		 * @return this instance for chaining
 		 */
 		public LocatorBuilder removeLast() {
@@ -297,12 +288,13 @@ public class Locator {
 
 		/**
 		 * Creates an immutable {@link Locator} instance with the current elements
-		 * 
+		 *
 		 * @return a new {@link Locator} instance
 		 */
 		public Locator build() {
-			if (this.pathElements.isEmpty())
+			if (this.pathElements.isEmpty()) {
 				throw new StrolchException("The path elements must contain at least 1 item"); //$NON-NLS-1$
+			}
 			return new Locator(this.pathElements);
 		}
 	}
