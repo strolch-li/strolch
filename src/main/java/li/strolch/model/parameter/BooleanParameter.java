@@ -44,7 +44,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 
 	/**
 	 * Default constructors
-	 *
+	 * 
 	 * @param id
 	 * @param name
 	 * @param value
@@ -56,7 +56,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 
 	/**
 	 * DOM Constructor
-	 *
+	 * 
 	 * @param element
 	 */
 	public BooleanParameter(Element element) {
@@ -109,6 +109,6 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	}
 
 	public static Boolean parseFromString(String valueS) {
-		return Boolean.valueOf(valueS);
+		return StringHelper.parseBoolean(valueS);
 	}
 }
