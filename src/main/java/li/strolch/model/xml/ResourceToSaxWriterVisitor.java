@@ -38,6 +38,7 @@ public class ResourceToSaxWriterVisitor extends AbstractToSaxWriterVisitor imple
 	public void visit(Resource resource) {
 		try {
 			writeElement(Tags.RESOURCE, resource);
+			this.writer.flush();
 		} catch (XMLStreamException e) {
 			String msg = "Failed to write Resource {0} due to {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, resource.getLocator(), e.getMessage());
