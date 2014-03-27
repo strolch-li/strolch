@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 
@@ -55,6 +56,7 @@ import ch.eitchnet.utils.dbc.DBC;
 public class XmlExportModelCommand extends Command {
 
 	public static final String XML_FILE_SUFFIX = ".xml";
+	private static final long LOG_INTERVAL = TimeUnit.SECONDS.toMillis(1);
 
 	// input
 	private File modelFile;
@@ -67,8 +69,11 @@ public class XmlExportModelCommand extends Command {
 	private XmlModelStatistics statistics;
 	private boolean multiFile;
 
+	private int elementsToWrite;
 	private int nrOfResourcesToExport;
 	private int nrOfOrdersToExport;
+
+	private long nextLogTime;
 
 	public XmlExportModelCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
@@ -82,6 +87,7 @@ public class XmlExportModelCommand extends Command {
 
 	@Override
 	public void doCommand() {
+		this.nextLogTime = System.currentTimeMillis() + LOG_INTERVAL;
 		String fileName = this.modelFile.getName();
 
 		long start = System.nanoTime();
@@ -99,7 +105,6 @@ public class XmlExportModelCommand extends Command {
 			for (String type : resourceTypesToExport) {
 				nrOfResourcesToExport += resourceMap.querySize(tx(), type);
 			}
-			logger.info("Exporting " + nrOfResourcesToExport + " Resources...");
 		}
 
 		if (this.doOrders) {
@@ -111,10 +116,12 @@ public class XmlExportModelCommand extends Command {
 			for (String type : orderTypesToExport) {
 				nrOfOrdersToExport += orderMap.querySize(tx(), type);
 			}
-			logger.info("Exporting " + nrOfOrdersToExport + " Orders...");
 		}
 
-		logger.info("Exporting " + (nrOfResourcesToExport + nrOfOrdersToExport) + " Elements...");
+		this.elementsToWrite = nrOfResourcesToExport + nrOfOrdersToExport;
+		logger.info("Exporting " + elementsToWrite + " Elements...");
+		logger.info("Exporting " + nrOfResourcesToExport + " Resources...");
+		logger.info("Exporting " + nrOfOrdersToExport + " Orders...");
 
 		try (FileOutputStream out = new FileOutputStream(this.modelFile)) {
 			createdFiles.add(this.modelFile);
@@ -212,6 +219,14 @@ public class XmlExportModelCommand extends Command {
 			Order order = orderMap.getBy(tx(), type, id);
 			visitor.visit(order);
 			this.statistics.nrOfOrders++;
+			logElementsWritten();
+		}
+	}
+
+	private void logElementsWritten() {
+		if (this.nextLogTime < System.currentTimeMillis()) {
+			logger.info("Wrote " + this.statistics.getNrOfElements() + " of " + this.elementsToWrite + " Elements.");
+			this.nextLogTime = System.currentTimeMillis() + LOG_INTERVAL;
 		}
 	}
 
@@ -222,6 +237,7 @@ public class XmlExportModelCommand extends Command {
 			Resource resource = resourceMap.getBy(tx(), type, id);
 			visitor.visit(resource);
 			this.statistics.nrOfResources++;
+			logElementsWritten();
 		}
 	}
 
