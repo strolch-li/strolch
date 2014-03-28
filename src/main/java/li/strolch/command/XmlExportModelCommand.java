@@ -56,7 +56,7 @@ import ch.eitchnet.utils.dbc.DBC;
 public class XmlExportModelCommand extends Command {
 
 	public static final String XML_FILE_SUFFIX = ".xml";
-	private static final long LOG_INTERVAL = TimeUnit.SECONDS.toMillis(1);
+	private static final long LOG_INTERVAL = TimeUnit.SECONDS.toMillis(10);
 
 	// input
 	private File modelFile;
