@@ -523,36 +523,36 @@ public class StringHelper {
 	}
 
 	/**
-	 * Formats the given number of milliseconds to a time like 0.000h/m/s/ms/us/ns
+	 * Formats the given number of milliseconds to a time like #h/m/s/ms/us/ns
 	 * 
 	 * @param millis
 	 *            the number of milliseconds
 	 * 
-	 * @return format the given number of milliseconds to a time like 0.000h/m/s/ms/us/ns
+	 * @return format the given number of milliseconds to a time like #h/m/s/ms/us/ns
 	 */
 	public static String formatMillisecondsDuration(final long millis) {
 		return formatNanoDuration(millis * 1000000L);
 	}
 
 	/**
-	 * Formats the given number of nanoseconds to a time like 0.000h/m/s/ms/us/ns
+	 * Formats the given number of nanoseconds to a time like #h/m/s/ms/us/ns
 	 * 
 	 * @param nanos
 	 *            the number of nanoseconds
 	 * 
-	 * @return format the given number of nanoseconds to a time like 0.000h/m/s/ms/us/ns
+	 * @return format the given number of nanoseconds to a time like #h/m/s/ms/us/ns
 	 */
 	public static String formatNanoDuration(final long nanos) {
-		if (nanos > 3600000000000L) {
-			return String.format("%.3fh", (nanos / 3600000000000.0D)); //$NON-NLS-1$
-		} else if (nanos > 60000000000L) {
-			return String.format("%.3fm", (nanos / 60000000000.0D)); //$NON-NLS-1$
-		} else if (nanos > 1000000000L) {
-			return String.format("%.3fs", (nanos / 1000000000.0D)); //$NON-NLS-1$
-		} else if (nanos > 1000000L) {
-			return String.format("%.3fms", (nanos / 1000000.0D)); //$NON-NLS-1$
-		} else if (nanos > 1000L) {
-			return String.format("%.3fus", (nanos / 1000.0D)); //$NON-NLS-1$
+		if (nanos >= 3600000000000L) {
+			return String.format("%.0fh", (nanos / 3600000000000.0D)); //$NON-NLS-1$
+		} else if (nanos >= 60000000000L) {
+			return String.format("%.0fm", (nanos / 60000000000.0D)); //$NON-NLS-1$
+		} else if (nanos >= 1000000000L) {
+			return String.format("%.0fs", (nanos / 1000000000.0D)); //$NON-NLS-1$
+		} else if (nanos >= 1000000L) {
+			return String.format("%.0fms", (nanos / 1000000.0D)); //$NON-NLS-1$
+		} else if (nanos >= 1000L) {
+			return String.format("%.0fus", (nanos / 1000.0D)); //$NON-NLS-1$
 		} else {
 			return nanos + "ns"; //$NON-NLS-1$
 		}
