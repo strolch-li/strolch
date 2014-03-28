@@ -125,4 +125,18 @@ public class MapOfMaps<T, U, V> {
 			return false;
 		return map.containsKey(u);
 	}
+
+	public int size() {
+		int size = 0;
+		Set<Entry<T, Map<U, V>>> entrySet = this.mapOfMaps.entrySet();
+		Iterator<Entry<T, Map<U, V>>> iter = entrySet.iterator();
+		while (iter.hasNext()) {
+			size += iter.next().getValue().size();
+		}
+		return size;
+	}
+
+	public int size(T t) {
+		return this.mapOfMaps.get(t).size();
+	}
 }
