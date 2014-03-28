@@ -86,8 +86,8 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	@Override
 	public void setName(String name) {
 		if (StringHelper.isEmpty(name)) {
-			String msg = "The name may never be empty for {0} with id {1}";
-			msg = MessageFormat.format(msg, getClass().getSimpleName(), id);
+			String msg = "The name may never be empty for {0} {1}";
+			msg = MessageFormat.format(msg, getClass().getSimpleName(), getLocator());
 			throw new StrolchException(msg);
 		}
 		this.name = name;
