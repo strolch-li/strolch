@@ -23,6 +23,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import li.strolch.rest.model.AgentOverview;
 import li.strolch.rest.model.ElementMapOverview;
 import li.strolch.rest.model.ElementMapType;
@@ -33,13 +37,12 @@ import li.strolch.rest.model.TypeOverview;
 
 import org.junit.Test;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class InspectorTest extends AbstractRestfulTest {
+
+	private static final String ROOT_PATH = "strolch/inspector/";
 
 	@Test
 	public void shouldGetAgent() {
@@ -50,9 +53,9 @@ public class InspectorTest extends AbstractRestfulTest {
 		AgentOverview expectedAgentOverview = new AgentOverview(realms);
 
 		// query
-		ClientResponse response = doGet("/strolch/inspector");
-		AgentOverview agentOverview = response.getEntity(new GenericType<AgentOverview>() {
-		});
+		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).get();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		AgentOverview agentOverview = result.readEntity(AgentOverview.class);
 
 		// assertions
 		assertEquals(expectedAgentOverview, agentOverview);
@@ -74,9 +77,9 @@ public class InspectorTest extends AbstractRestfulTest {
 		RealmDetail expectedRealmDetail = new RealmDetail(elementMapOverviews);
 
 		// query
-		ClientResponse response = doGet("/strolch/inspector/defaultRealm");
-		RealmDetail realmDetail = response.getEntity(new GenericType<RealmDetail>() {
-		});
+		Response result = target().path(ROOT_PATH + "defaultRealm").request(MediaType.APPLICATION_JSON).get();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		RealmDetail realmDetail = result.readEntity(RealmDetail.class);
 
 		// assertions
 		assertEquals(expectedRealmDetail, realmDetail);
@@ -93,9 +96,9 @@ public class InspectorTest extends AbstractRestfulTest {
 		ElementMapOverview expectedElementMapOverview = new ElementMapOverview(elementMapName, typeOverviews);
 
 		// query
-		ClientResponse response = doGet("/strolch/inspector/defaultRealm/resource");
-		ElementMapOverview elementMapOverview = response.getEntity(new GenericType<ElementMapOverview>() {
-		});
+		Response result = target().path(ROOT_PATH + "defaultRealm/resource").request(MediaType.APPLICATION_JSON).get();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		ElementMapOverview elementMapOverview = result.readEntity(ElementMapOverview.class);
 
 		// assertions
 		assertEquals(expectedElementMapOverview, elementMapOverview);
@@ -112,9 +115,9 @@ public class InspectorTest extends AbstractRestfulTest {
 		ElementMapOverview expectedElementMapOverview = new ElementMapOverview(elementMapName, typeOverviews);
 
 		// query
-		ClientResponse response = doGet("/strolch/inspector/defaultRealm/order");
-		ElementMapOverview elementMapOverview = response.getEntity(new GenericType<ElementMapOverview>() {
-		});
+		Response result = target().path(ROOT_PATH + "defaultRealm/order").request(MediaType.APPLICATION_JSON).get();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		ElementMapOverview elementMapOverview = result.readEntity(ElementMapOverview.class);
 
 		// assertions
 		assertEquals(expectedElementMapOverview, elementMapOverview);
@@ -126,8 +129,10 @@ public class InspectorTest extends AbstractRestfulTest {
 	public void shouldGetResourceTypeDetails() {
 
 		// query
-		ClientResponse response = doGet("/strolch/inspector/defaultRealm/resource/Template");
-		String entity = response.getEntity(String.class);
+		Response result = target().path(ROOT_PATH + "defaultRealm/resource/Template")
+				.request(MediaType.APPLICATION_JSON).get();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		String entity = result.readEntity(String.class);
 		String expected = "{\"type\":\"Template\",\"resources\":[{\"id\":\"TestType\",\"name\":\"TestType Template\",\"type\":\"Template\"}]}";
 		assertEquals(expected, entity);
 	}
@@ -136,8 +141,10 @@ public class InspectorTest extends AbstractRestfulTest {
 	public void shouldGetOrderTypeDetails() {
 
 		// query
-		ClientResponse response = doGet("/strolch/inspector/defaultRealm/order/Template");
-		String entity = response.getEntity(String.class);
+		Response result = target().path(ROOT_PATH + "defaultRealm/order/Template").request(MediaType.APPLICATION_JSON)
+				.get();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		String entity = result.readEntity(String.class);
 		String expected = "{\"type\":\"Template\",\"orders\":[{\"id\":\"TestType\",\"name\":\"MyTestOrder Template\",\"type\":\"Template\",\"date\":\"2012-11-30T18:12:05.628+01:00\",\"state\":\"CREATED\"}]}";
 		assertEquals(expected, entity);
 	}
@@ -146,8 +153,10 @@ public class InspectorTest extends AbstractRestfulTest {
 	public void shouldGetResource() {
 
 		// query
-		ClientResponse response = doGet("/strolch/inspector/defaultRealm/resource/Template/TestType");
-		String entity = response.getEntity(String.class);
+		Response result = target().path(ROOT_PATH + "defaultRealm/resource/Template/TestType")
+				.request(MediaType.APPLICATION_JSON).get();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		String entity = result.readEntity(String.class);
 		assertTrue(entity.contains("name\":\"TestType Template\",\"type\":\"Template\",\"parameterBags\":"));
 	}
 
@@ -155,8 +164,10 @@ public class InspectorTest extends AbstractRestfulTest {
 	public void shouldGetOrder() {
 
 		// query
-		ClientResponse response = doGet("/strolch/inspector/defaultRealm/order/Template/TestType");
-		String entity = response.getEntity(String.class);
+		Response result = target().path(ROOT_PATH + "defaultRealm/order/Template/TestType")
+				.request(MediaType.APPLICATION_JSON).get();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		String entity = result.readEntity(String.class);
 		assertTrue(entity
 				.contains("\"date\":\"2012-11-30T18:12:05.628+01:00\",\"state\":\"CREATED\",\"parameterBags\""));
 	}

@@ -19,28 +19,30 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import li.strolch.agent.api.AgentVersion;
 import li.strolch.agent.api.ComponentVersion;
 import li.strolch.agent.api.VersionQueryResult;
 
 import org.junit.Test;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class VersionQueryTest extends AbstractRestfulTest {
 
+	private static final String ROOT_PATH = "strolch/version";
+
 	@Test
 	public void shouldQueryVersion() {
 
 		// query
-		ClientResponse response = doGet("/strolch/version");
-		VersionQueryResult versionQueryResult = response.getEntity(new GenericType<VersionQueryResult>() {
-		});
-
+		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).get();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		VersionQueryResult versionQueryResult = result.readEntity(VersionQueryResult.class);
 		if (versionQueryResult.hasErrors()) {
 			for (String error : versionQueryResult.getErrors()) {
 				logger.error(error);

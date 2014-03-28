@@ -25,6 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.rest.RestfulStrolchComponent;
@@ -37,6 +38,7 @@ import li.strolch.rest.model.LogoutResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.helper.StringHelper;
 
@@ -72,7 +74,7 @@ public class AuthenticationService {
 
 			if (sb.length() != 0) {
 				loginResult.setMsg("Could not log in due to: " + sb.toString());
-				return Response.status(401).entity(loginResult).build();
+				return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
 			}
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getComponent(
@@ -87,9 +89,11 @@ public class AuthenticationService {
 			loginResult.setParameters(certificate.getPropertyMap());
 
 			return Response.ok().entity(entity).build();
+
 		} catch (StrolchException e) {
+			logger.error(e.getMessage(), e);
 			loginResult.setMsg("Could not log in due to: " + e.getMessage());
-			return Response.status(401).entity(entity).build();
+			return Response.status(Status.UNAUTHORIZED).entity(entity).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
@@ -118,14 +122,14 @@ public class AuthenticationService {
 
 			StringBuilder sb = new StringBuilder();
 			if (StringHelper.isEmpty(logoutForm.getUsername())) {
-				sb.append("Username was not given. ");
+				sb.append("Username was not given.");
 			}
 			if (StringHelper.isEmpty(logoutForm.getSessionId())) {
-				sb.append("SessionId was not given. ");
+				sb.append("SessionId was not given.");
 			}
 			if (sb.length() != 0) {
 				logoutResult.setMsg("Could not logout due to: " + sb.toString());
-				return Response.status(401).entity(logoutResult).build();
+				return Response.status(Status.UNAUTHORIZED).entity(logoutResult).build();
 			}
 
 			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance().getComponent(
@@ -136,6 +140,11 @@ public class AuthenticationService {
 			sessionHandlerHandler.invalidateSession(origin, certificate);
 
 			return Response.ok().entity(entity).build();
+
+		} catch (StrolchException | PrivilegeException e) {
+			logger.error(e.getMessage(), e);
+			logoutResult.setMsg("Could not logout due to: " + e.getMessage());
+			return Response.status(Status.UNAUTHORIZED).entity(entity).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();

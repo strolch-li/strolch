@@ -20,6 +20,7 @@ import java.util.Map;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
@@ -112,10 +113,10 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			certificate = this.certificateMap.get(sessionId);
 
 		if (certificate == null)
-			throw new RuntimeException("No certificate exists for sessionId " + sessionId);
+			throw new StrolchException("No certificate exists for sessionId " + sessionId);
 
 		if (!certificate.getUsername().equals(username) || !certificate.getAuthToken().equals(sessionId)) {
-			throw new RuntimeException("Illegal request for username " + username + " and sessionId " + sessionId);
+			throw new StrolchException("Illegal request for username " + username + " and sessionId " + sessionId);
 		}
 
 		this.privilegeHandler.isCertificateValid(certificate);

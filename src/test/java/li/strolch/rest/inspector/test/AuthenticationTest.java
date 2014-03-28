@@ -18,34 +18,39 @@ package li.strolch.rest.inspector.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import li.strolch.rest.model.LoginResult;
 import li.strolch.rest.model.LogoutResult;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.representation.Form;
+//import com.sun.jersey.api.client.ClientResponse;
+//import com.sun.jersey.api.representation.Form;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class AuthenticationTest extends AbstractRestfulTest {
 
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
+	private static final String ROOT_PATH = "strolch/authentication";
 
 	@Test
 	public void shouldAuthenticate() {
 
-		Form loginForm = new Form();
-		loginForm.add("username", "jill");
-		loginForm.add("password", "jill");
-
 		// login
-		ClientResponse loginResponse = doPostForm("/strolch/authentication/login", loginForm);
-		LoginResult loginResult = loginResponse.getEntity(LoginResult.class);
+		Form loginForm = new Form();
+		loginForm.param("username", "jill");
+		loginForm.param("password", "jill");
+		Entity<Form> entity = Entity.entity(loginForm, MediaType.APPLICATION_FORM_URLENCODED);
+		Response result = target().path(ROOT_PATH + "/login").request(MediaType.APPLICATION_JSON).post(entity);
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		LoginResult loginResult = result.readEntity(LoginResult.class);
 		assertNotNull(loginResult);
 		assertEquals("jill", loginResult.getUsername());
 		assertEquals(64, loginResult.getSessionId().length());
@@ -53,10 +58,13 @@ public class AuthenticationTest extends AbstractRestfulTest {
 
 		// logout
 		Form logoutForm = new Form();
-		logoutForm.add("username", "jill");
-		logoutForm.add("sessionId", loginResult.getSessionId());
-		ClientResponse logoutResponse = doPostForm("/strolch/authentication/logout", logoutForm);
-		LogoutResult logoutResult = logoutResponse.getEntity(LogoutResult.class);
+		logoutForm.param("username", "jill");
+		logoutForm.param("sessionId", loginResult.getSessionId());
+		entity = Entity.entity(logoutForm, MediaType.APPLICATION_FORM_URLENCODED);
+		result = target().path(ROOT_PATH + "/logout").request(MediaType.APPLICATION_JSON).post(entity);
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		assertNotNull(loginResult);
+		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
 		assertNotNull(logoutResult);
 		assertNull(logoutResult.getMsg());
 	}
@@ -64,30 +72,29 @@ public class AuthenticationTest extends AbstractRestfulTest {
 	@Test
 	public void shouldNotAuthenticate() {
 
-		exception.expect(RuntimeException.class);
-		exception.expectMessage("Authentication credentials are invalid");
-
-		Form loginForm = new Form();
-		loginForm.add("username", "admin");
-		loginForm.add("password", "blalba");
-
 		// login
-		doPostForm("/strolch/authentication/login", loginForm);
+		Form loginForm = new Form();
+		loginForm.param("username", "admin");
+		loginForm.param("password", "blalba");
+		Entity<Form> entity = Entity.entity(loginForm, MediaType.APPLICATION_FORM_URLENCODED);
+		Response result = target().path(ROOT_PATH + "/login").request(MediaType.APPLICATION_JSON).post(entity);
+		assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
+		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
+		assertNotNull(logoutResult);
+		assertEquals("Could not log in due to: Authentication credentials are invalid", logoutResult.getMsg());
 	}
 
 	@Test
 	public void shouldFailLogoutIllegalSession() {
 
-		exception.expect(RuntimeException.class);
-		exception.expectMessage("Illegal request for username jill and sessionId blabla");
-
-		Form loginForm = new Form();
-		loginForm.add("username", "jill");
-		loginForm.add("password", "jill");
-
 		// login
-		ClientResponse loginResponse = doPostForm("/strolch/authentication/login", loginForm);
-		LoginResult loginResult = loginResponse.getEntity(LoginResult.class);
+		Form loginForm = new Form();
+		loginForm.param("username", "jill");
+		loginForm.param("password", "jill");
+		Entity<Form> entity = Entity.entity(loginForm, MediaType.APPLICATION_FORM_URLENCODED);
+		Response result = target().path(ROOT_PATH + "/login").request(MediaType.APPLICATION_JSON).post(entity);
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		LoginResult loginResult = result.readEntity(LoginResult.class);
 		assertNotNull(loginResult);
 		assertEquals("jill", loginResult.getUsername());
 		assertEquals(64, loginResult.getSessionId().length());
@@ -95,8 +102,14 @@ public class AuthenticationTest extends AbstractRestfulTest {
 
 		// logout
 		Form logoutForm = new Form();
-		logoutForm.add("username", "jill");
-		logoutForm.add("sessionId", "blabla");
-		doPostForm("/strolch/authentication/logout", logoutForm);
+		logoutForm.param("username", "jill");
+		logoutForm.param("sessionId", "blabla");
+		entity = Entity.entity(logoutForm, MediaType.APPLICATION_FORM_URLENCODED);
+		result = target().path(ROOT_PATH + "/logout").request(MediaType.APPLICATION_JSON).post(entity);
+		assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
+		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
+		assertNotNull(logoutResult);
+		assertEquals("Could not logout due to: Illegal request for username jill and sessionId blabla",
+				logoutResult.getMsg());
 	}
 }
