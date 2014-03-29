@@ -1,5 +1,6 @@
 package li.strolch.persistence.inmemory;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.StrolchDao;
+import li.strolch.persistence.api.StrolchPersistenceException;
 
 public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 
@@ -101,6 +103,12 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 			this.elementMap.put(element.getType(), byType);
 		}
 
+		if (byType.containsKey(element.getId())) {
+			String msg = "An element already exists with the id {0}. Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, element.getId());
+			throw new StrolchPersistenceException(msg);
+		}
+
 		byType.put(element.getId(), element);
 	}
 
@@ -113,7 +121,13 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 
 	@Override
 	public void update(T element) {
-		save(element);
+		Map<String, T> byType = this.elementMap.get(element.getType());
+		if (byType == null) {
+			byType = new HashMap<>();
+			this.elementMap.put(element.getType(), byType);
+		}
+
+		byType.put(element.getId(), element);
 	}
 
 	@Override
