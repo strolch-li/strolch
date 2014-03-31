@@ -15,6 +15,9 @@
  */
 package li.strolch.runtime;
 
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.runtime.observer.ObserverHandler;
 
@@ -32,4 +35,16 @@ public class StrolchConstants {
 
 	public static final String DEFAULT_XML_VERSION = "1.0"; //$NON-NLS-1$
 	public static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
+
+	/**
+	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
+	 * to a {@link Resource}
+	 */
+	public static final String INTERPRETATION_RESOURCE_REF = "Resource-Ref"; //$NON-NLS-1$
+
+	/**
+	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
+	 * to an {@link Order}
+	 */
+	public static final String INTERPRETATION_ORDER_REF = "Order-Ref"; //$NON-NLS-1$
 }

@@ -18,8 +18,12 @@ package li.strolch.agent.api;
 import java.util.List;
 import java.util.Set;
 
+import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -35,6 +39,23 @@ public interface ElementMap<T extends StrolchElement> {
 	public long querySize(StrolchTransaction tx, String type);
 
 	public T getBy(StrolchTransaction tx, String type, String id);
+
+	/**
+	 * Returns the Element which is referenced by the given {@link StringParameter}. A reference {@link Parameter} must
+	 * have its interpretation set to the element type being referenced e.g. s
+	 * {@link StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the element's type and the value is
+	 * the id of the element
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param refP
+	 *            the {@link StringParameter} which references an element
+	 * @return the element found, or null if it does not exist
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	public T getBy(StrolchTransaction tx, StringParameter refP) throws StrolchException;
 
 	public List<T> getAllElements(StrolchTransaction tx);
 
