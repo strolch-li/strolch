@@ -49,7 +49,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Default Constructor
-	 *
+	 * 
 	 * @param id
 	 * @param name
 	 * @param type
@@ -66,8 +66,9 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Sets the type of this {@link GroupedParameterizedElement}
-	 *
-	 * @param type the type to set
+	 * 
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(String type) {
 		if (StringHelper.isEmpty(type)) {
@@ -82,10 +83,12 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	/**
 	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the given bagKey, or null if
 	 * the {@link Parameter} or the {@link ParameterBag} does not exist
-	 *
-	 * @param bagKey the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
-	 * @param paramKey the key of the {@link Parameter} which is to be returned
-	 *
+	 * 
+	 * @param bagKey
+	 *            the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * @param paramKey
+	 *            the key of the {@link Parameter} which is to be returned
+	 * 
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
 	public <T> T getParameter(String bagKey, String paramKey) {
@@ -102,11 +105,14 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key
-	 *
-	 * @param bagKey the key of the {@link ParameterBag} to which the {@link Parameter} should be added
-	 * @param parameter the {@link Parameter} to be added to the {@link ParameterBag}
-	 *
-	 * @throws StrolchException if the {@link ParameterBag} does not exist
+	 * 
+	 * @param bagKey
+	 *            the key of the {@link ParameterBag} to which the {@link Parameter} should be added
+	 * @param parameter
+	 *            the {@link Parameter} to be added to the {@link ParameterBag}
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link ParameterBag} does not exist
 	 */
 	public void addParameter(String bagKey, Parameter<?> parameter) throws StrolchException {
 		if (this.parameterBagMap == null) {
@@ -124,10 +130,12 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
-	 *
-	 * @param bagKey the key of the {@link ParameterBag} from which the {@link Parameter} is to be removed
-	 * @param paramKey the key of the {@link Parameter} which is to be removed
-	 *
+	 * 
+	 * @param bagKey
+	 *            the key of the {@link ParameterBag} from which the {@link Parameter} is to be removed
+	 * @param paramKey
+	 *            the key of the {@link Parameter} which is to be removed
+	 * 
 	 * @return the removed {@link Parameter} or null if it did not exist
 	 */
 	public <T> Parameter<T> removeParameter(String bagKey, String paramKey) {
@@ -144,9 +152,10 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Returns the {@link ParameterBag} with the given key, or null if it does not exist
-	 *
-	 * @param key the key of the {@link ParameterBag} to return
-	 *
+	 * 
+	 * @param key
+	 *            the key of the {@link ParameterBag} to return
+	 * 
 	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
 	 */
 	public ParameterBag getParameterBag(String key) {
@@ -158,12 +167,18 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Adds the given {@link ParameterBag} to this {@link GroupedParameterizedElement}
-	 *
-	 * @param bag the {@link ParameterBag} to add
+	 * 
+	 * @param bag
+	 *            the {@link ParameterBag} to add
 	 */
 	public void addParameterBag(ParameterBag bag) {
 		if (this.parameterBagMap == null) {
 			this.parameterBagMap = new HashMap<String, ParameterBag>();
+		}
+
+		if (this.parameterBagMap.containsKey(bag.getId())) {
+			String msg = "A ParameterBag already exists with id {0} on {1}";
+			throw new StrolchException(MessageFormat.format(msg, bag.getId(), getLocator()));
 		}
 		this.parameterBagMap.put(bag.getId(), bag);
 		bag.setParent(this);
@@ -171,9 +186,10 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Removes the {@link ParameterBag} with the given key
-	 *
-	 * @param key the key of the {@link ParameterBag} to remove
-	 *
+	 * 
+	 * @param key
+	 *            the key of the {@link ParameterBag} to remove
+	 * 
 	 * @return the removed {@link ParameterBag}, or null if it does not exist
 	 */
 	public ParameterBag removeParameterBag(String key) {
@@ -185,7 +201,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Returns true if this {@link GroupedParameterizedElement} has any {@link ParameterBag ParameterBag}
-	 *
+	 * 
 	 * @return true if this {@link GroupedParameterizedElement} has any {@link ParameterBag ParameterBag}
 	 */
 	public boolean hasParameterBags() {
@@ -194,8 +210,9 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Returns true if the {@link ParameterBag} with the given key exists on this {@link GroupedParameterizedElement}.
-	 *
-	 * @param bagKey the key of the {@link ParameterBag} which is to be checked for existence
+	 * 
+	 * @param bagKey
+	 *            the key of the {@link ParameterBag} which is to be checked for existence
 	 * @return true if the {@link ParameterBag} with the given key exists on this {@link GroupedParameterizedElement}.
 	 */
 	public boolean hasParameterBag(String bagKey) {
@@ -205,13 +222,15 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	/**
 	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
 	 * bagKey
-	 *
-	 * @param bagKey the key of the {@link ParameterBag} on which to find the {@link Parameter}
-	 * @param paramKey the key of the {@link Parameter} to be found
-	 *
+	 * 
+	 * @param bagKey
+	 *            the key of the {@link ParameterBag} on which to find the {@link Parameter}
+	 * @param paramKey
+	 *            the key of the {@link Parameter} to be found
+	 * 
 	 * @return true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
-	 * bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not exist on
-	 * the {@link ParameterBag}
+	 *         bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not
+	 *         exist on the {@link ParameterBag}
 	 */
 	public boolean hasParameter(String bagKey, String paramKey) {
 		if (this.parameterBagMap == null) {
@@ -227,7 +246,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Returns the {@link Set} of keys for the {@link ParameterBag}s on this {@link GroupedParameterizedElement}
-	 *
+	 * 
 	 * @return the {@link Set} of keys for the {@link ParameterBag}s on this {@link GroupedParameterizedElement}
 	 */
 	public Set<String> getParameterBagKeySet() {
@@ -265,7 +284,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	/**
 	 * Fills {@link GroupedParameterizedElement} properties of this clone
-	 *
+	 * 
 	 * @param clone
 	 */
 	protected void fillClone(GroupedParameterizedElement clone) {

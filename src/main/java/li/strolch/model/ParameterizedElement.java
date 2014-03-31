@@ -16,6 +16,7 @@
 package li.strolch.model;
 
 import ch.eitchnet.utils.dbc.DBC;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +62,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	/**
 	 * Default Constructor
-	 *
+	 * 
 	 * @param id
 	 * @param name
 	 * @param type
@@ -79,8 +80,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	/**
 	 * Sets the type of this {@link ParameterizedElement}
-	 *
-	 * @param type the type to set
+	 * 
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(String type) {
 		if (StringHelper.isEmpty(type)) {
@@ -94,9 +96,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	/**
 	 * Returns the {@link Parameter} with the given id, or null if it does not exist
-	 *
-	 * @param key the id of the parameter to return
-	 *
+	 * 
+	 * @param key
+	 *            the id of the parameter to return
+	 * 
 	 * @return the {@link Parameter} with the given id, or null if it does not exist
 	 */
 	@SuppressWarnings("unchecked")
@@ -109,12 +112,18 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	/**
 	 * Adds the given {@link Parameter} to the {@link ParameterizedElement}
-	 *
-	 * @param parameter the {@link Parameter} to add
+	 * 
+	 * @param parameter
+	 *            the {@link Parameter} to add
 	 */
 	public void addParameter(Parameter<?> parameter) {
 		if (this.parameterMap == null) {
 			this.parameterMap = new HashMap<String, Parameter<?>>();
+		}
+
+		if (this.parameterMap.containsKey(parameter.getId())) {
+			String msg = "A Parameter already exists with id {0} on {1}";
+			throw new StrolchException(MessageFormat.format(msg, parameter.getId(), getLocator()));
 		}
 		this.parameterMap.put(parameter.getId(), parameter);
 		parameter.setParent(this);
@@ -122,9 +131,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	/**
 	 * Removes the {@link Parameter} with the given key
-	 *
-	 * @param key the key of the {@link Parameter} to remove
-	 *
+	 * 
+	 * @param key
+	 *            the key of the {@link Parameter} to remove
+	 * 
 	 * @return the removed {@link Parameter}, or null if it does not exist
 	 */
 	@SuppressWarnings("unchecked")
@@ -137,7 +147,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	/**
 	 * Returns a list of all the {@link Parameter}s in this {@link ParameterizedElement}
-	 *
+	 * 
 	 * @return a list of all the {@link Parameter}s in this {@link ParameterizedElement}
 	 */
 	public List<Parameter<?>> getParameters() {
@@ -149,7 +159,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	/**
 	 * Returns true, if the this {@link ParameterizedElement} has any {@link Parameter Parameters}, false otherwise
-	 *
+	 * 
 	 * @return true, if the this {@link ParameterizedElement} has any {@link Parameter Parameters}, false otherwise
 	 */
 	public boolean hasParameters() {
@@ -158,9 +168,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	/**
 	 * Returns true, if the {@link Parameter} exists with the given key, false otherwise
-	 *
-	 * @param key the key of the {@link Parameter} to check for
-	 *
+	 * 
+	 * @param key
+	 *            the key of the {@link Parameter} to check for
+	 * 
 	 * @return true, if the {@link Parameter} exists with the given key, false otherwise
 	 */
 	public boolean hasParameter(String key) {
@@ -172,7 +183,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	/**
 	 * Returns a {@link Set} of all the {@link Parameter} keys in this {@link ParameterizedElement}
-	 *
+	 * 
 	 * @return a {@link Set} of all the {@link Parameter} keys in this {@link ParameterizedElement}
 	 */
 	public Set<String> getParameterKeySet() {
@@ -269,8 +280,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	/**
 	 * Set the parent for this {@link ParameterizedElement}
-	 *
-	 * @param parent the parent to set
+	 * 
+	 * @param parent
+	 *            the parent to set
 	 */
 	public void setParent(GroupedParameterizedElement parent) {
 		this.parent = parent;

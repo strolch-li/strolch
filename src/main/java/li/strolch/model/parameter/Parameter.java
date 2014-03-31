@@ -15,15 +15,13 @@
  */
 package li.strolch.model.parameter;
 
-import li.strolch.model.Order;
 import li.strolch.model.ParameterizedElement;
-import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.visitor.ParameterVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
+ * 
  */
 public interface Parameter<T> extends StrolchElement {
 
@@ -38,83 +36,72 @@ public interface Parameter<T> extends StrolchElement {
 	public static final String UOM_NONE = "None"; //$NON-NLS-1$
 
 	/**
-	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
-	 * to a {@link Resource}
-	 */
-	public static final String INTERPRETATION_RESOURCE_REF = "Resource-Reference"; //$NON-NLS-1$
-
-	/**
-	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
-	 * to a {@link Order}
-	 */
-	public static final String INTERPRETATION_ORDER_REF = "Order-Reference"; //$NON-NLS-1$
-
-	/**
 	 * the value of the parameter as string
-	 *
+	 * 
 	 * @return String
 	 */
 	public String getValueAsString();
 
 	/**
 	 * the value of the parameter
-	 *
+	 * 
 	 * @return
 	 */
 	public T getValue();
 
 	/**
 	 * the value of the parameter
-	 *
+	 * 
 	 * @param value
 	 */
 	public void setValue(T value);
 
 	/**
 	 * get the hidden attribute
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean isHidden();
 
 	/**
 	 * set the hidden attribute
-	 *
+	 * 
 	 * @param hidden
 	 */
 	public void setHidden(boolean hidden);
 
 	/**
 	 * Get the UOM of this {@link Parameter}
-	 *
+	 * 
 	 * @return
 	 */
 	public String getUom();
 
 	/**
 	 * Set the UOM of this {@link Parameter}
-	 *
+	 * 
 	 * @param uom
 	 */
 	public void setUom(String uom);
 
 	/**
 	 * Returns the index of this {@link Parameter}. This can be used to sort the parameters in a UI
-	 *
+	 * 
 	 * @return the index of this {@link Parameter}. This can be used to sort the parameters in a UI
 	 */
 	public int getIndex();
 
 	/**
 	 * Set the index of this {@link Parameter}. This can be used to sort the parameters in a UI
-	 *
-	 * @param index the index to set
+	 * 
+	 * @param index
+	 *            the index to set
 	 */
 	public void setIndex(int index);
 
 	/**
 	 * The {@link ParameterizedElement} parent to which this {@link Parameter} belongs
-	 *
+	 * 
 	 * @return
 	 */
 	public ParameterizedElement getParent();
@@ -132,7 +119,7 @@ public interface Parameter<T> extends StrolchElement {
 	 * <li>{@link Parameter#INTERPRETATION_ORDER_REF}</li>
 	 * <li>{@link Parameter#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
-	 *
+	 * 
 	 * @return string value
 	 */
 	public String getInterpretation();
@@ -145,7 +132,7 @@ public interface Parameter<T> extends StrolchElement {
 	 * <li>{@link Parameter#INTERPRETATION_ORDER_REF}</li>
 	 * <li>{@link Parameter#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param interpretation
 	 */
 	public void setInterpretation(String interpretation);
