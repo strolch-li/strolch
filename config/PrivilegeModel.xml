@@ -28,6 +28,17 @@
 			</Roles>
 		</User>
 
+		<User userId="3" username="system_admin2">
+			<Firstname>System User</Firstname>
+			<Surname>Administrator</Surname>
+			<State>SYSTEM</State>
+			<Locale>en_GB</Locale>
+			<Roles>
+				<Role>system_admin_privileges</Role>
+				<Role>system_admin_privileges2</Role>
+			</Roles>
+		</User>
+
 	</Users>
 
 	<Roles>
@@ -45,6 +56,12 @@
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemRestrictable" policy="DefaultPrivilege">
+				<AllAllowed>true</AllAllowed>
+			</Privilege>
+		</Role>
+
+		<Role name="system_admin_privileges2">
+			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemUserActionDeny" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>

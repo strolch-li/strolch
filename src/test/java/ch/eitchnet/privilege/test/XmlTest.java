@@ -168,8 +168,8 @@ public class XmlTest {
 		List<Role> roles = xmlHandler.getRoles();
 		assertNotNull(roles);
 
-		assertEquals(2, users.size());
-		assertEquals(4, roles.size());
+		assertEquals(3, users.size());
+		assertEquals(5, roles.size());
 
 		// assert model
 

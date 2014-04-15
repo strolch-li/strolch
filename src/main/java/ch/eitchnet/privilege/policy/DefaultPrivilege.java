@@ -40,7 +40,7 @@ public class DefaultPrivilege implements PrivilegePolicy {
 	 * @see ch.eitchnet.privilege.policy.PrivilegePolicy#validateAction(IPrivilege, Restrictable)
 	 */
 	@Override
-	public void validateAction(IPrivilege privilege, Restrictable restrictable) {
+	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable) {
 
 		if (privilege == null)
 			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.privilegeNull")); //$NON-NLS-1$
@@ -82,7 +82,7 @@ public class DefaultPrivilege implements PrivilegePolicy {
 		if (privilege.isDenied(privilegeValue)) {
 			// then throw access denied
 			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
-					PrivilegeContext.get().getUsername(), privilegeName, restrictable.getClass().getName());
+					ctx.getUsername(), privilegeName, restrictable.getClass().getName());
 			throw new AccessDeniedException(msg);
 		}
 
@@ -92,7 +92,7 @@ public class DefaultPrivilege implements PrivilegePolicy {
 
 		// default is not allowed
 		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
-				PrivilegeContext.get().getUsername(), privilegeName, restrictable.getClass().getName());
+				ctx.getUsername(), privilegeName, restrictable.getClass().getName());
 		throw new AccessDeniedException(msg);
 	}
 }

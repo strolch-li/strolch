@@ -27,8 +27,6 @@ public class TestSystemUserAction implements SystemUserAction {
 	@Override
 	public void execute(PrivilegeContext context) {
 		TestSystemRestrictable restrictable = new TestSystemRestrictable();
-		PrivilegeContext.set(context);
 		context.validateAction(restrictable);
-		PrivilegeContext.set(null);
 	}
 }

@@ -41,7 +41,6 @@ import ch.eitchnet.privilege.model.internal.PrivilegeImpl;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
-import ch.eitchnet.utils.helper.ClassHelper;
 
 /**
  * <p>
@@ -1095,7 +1094,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// instantiate the policy
 		PrivilegePolicy policy;
 		try {
-			policy = ClassHelper.instantiateClass(policyClazz);
+
+			policy = policyClazz.newInstance();
 		} catch (Exception e) {
 			String msg = "The class for the policy with the name {0} does not exist!{1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, policyName, policyName);

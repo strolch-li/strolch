@@ -17,6 +17,7 @@ package ch.eitchnet.privilege.policy;
 
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.model.IPrivilege;
+import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
@@ -38,6 +39,8 @@ public interface PrivilegePolicy {
 	/**
 	 * Checks if the given {@link Role} and the given {@link IPrivilege} has access to the given {@link Restrictable}
 	 * 
+	 * @param context
+	 *            the privilege context
 	 * @param privilege
 	 *            the {@link IPrivilege} containing the permissions
 	 * @param restrictable
@@ -46,5 +49,6 @@ public interface PrivilegePolicy {
 	 * @throws AccessDeniedException
 	 *             if action not allowed
 	 */
-	public void validateAction(IPrivilege privilege, Restrictable restrictable) throws AccessDeniedException;
+	public abstract void validateAction(PrivilegeContext context, IPrivilege privilege, Restrictable restrictable)
+			throws AccessDeniedException;
 }

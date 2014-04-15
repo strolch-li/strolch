@@ -108,48 +108,6 @@ public class PrivilegeContext {
 		}
 
 		// delegate to the policy
-		policy.validateAction(privilege, restrictable);
-	}
-
-	//
-	// ThreadLocal binding
-	//
-
-	private static final ThreadLocal<PrivilegeContext> threadLocal = new ThreadLocal<PrivilegeContext>();
-
-	/**
-	 * Returns the currently {@link ThreadLocal} bound {@link PrivilegeContext} or throws a {@link PrivilegeException}
-	 * if none is set
-	 * 
-	 * @return the currently {@link ThreadLocal} bound {@link PrivilegeContext} or throws a {@link PrivilegeException}
-	 *         if none is set
-	 * 
-	 * @throws PrivilegeException
-	 *             if no {@link PrivilegeContext} is set
-	 */
-	public static PrivilegeContext get() throws PrivilegeException {
-		PrivilegeContext privilegeContext = PrivilegeContext.threadLocal.get();
-		if (privilegeContext == null) {
-			throw new PrivilegeException("There is no PrivilegeContext currently bound to the ThreadLocal!"); //$NON-NLS-1$
-		}
-		return privilegeContext;
-	}
-
-	/**
-	 * Bind a {@link PrivilegeContext} to the {@link ThreadLocal} or throws a {@link PrivilegeException} if one is
-	 * already bound
-	 * 
-	 * @param privilegeContext
-	 *            the {@link PrivilegeContext} to bind
-	 * 
-	 * @throws PrivilegeException
-	 *             if e {@link PrivilegeContext} is already bound
-	 */
-	public static void set(PrivilegeContext privilegeContext) throws PrivilegeException {
-		PrivilegeContext currentContext = PrivilegeContext.threadLocal.get();
-		if (privilegeContext != null && currentContext != null) {
-			throw new PrivilegeException("There already is a PrivilegeContext bound to the ThreadLocal!"); //$NON-NLS-1$
-		}
-		PrivilegeContext.threadLocal.set(privilegeContext);
+		policy.validateAction(this, privilege, restrictable);
 	}
 }

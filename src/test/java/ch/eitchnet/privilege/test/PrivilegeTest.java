@@ -27,7 +27,9 @@ import java.util.Map;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +65,7 @@ public class PrivilegeTest {
 	private static final String BOB = "bob";
 	private static final String TED = "ted";
 	private static final String SYSTEM_USER_ADMIN = "system_admin";
+	private static final String SYSTEM_USER_ADMIN2 = "system_admin2";
 	private static final byte[] PASS_BOB = "admin1".getBytes();
 	private static final String ROLE_APP_USER = "AppUser";
 	private static final String ROLE_TEMP = "temp";
@@ -73,7 +76,11 @@ public class PrivilegeTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(PrivilegeTest.class);
 
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
+
 	private static PrivilegeHandler privilegeHandler;
+	private PrivilegeContext ctx;
 
 	/**
 	 * @throws Exception
@@ -151,19 +158,20 @@ public class PrivilegeTest {
 		Certificate certificate = privilegeHandler.authenticate(username, password);
 		assertTrue("Certificate is null!", certificate != null);
 		PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
-		PrivilegeContext.set(privilegeContext);
+		this.ctx = privilegeContext;
 	}
 
 	private void logout() {
-		try {
-			PrivilegeContext privilegeContext = PrivilegeContext.get();
-			privilegeHandler.invalidateSession(privilegeContext.getCertificate());
-		} catch (PrivilegeException e) {
-			String msg = "There is no PrivilegeContext currently bound to the ThreadLocal!";
-			if (!e.getMessage().equals(msg))
-				throw e;
-		} finally {
-			PrivilegeContext.set(null);
+		if (this.ctx != null) {
+			try {
+				PrivilegeContext privilegeContext = this.ctx;
+				this.ctx = null;
+				privilegeHandler.invalidateSession(privilegeContext.getCertificate());
+			} catch (PrivilegeException e) {
+				String msg = "There is no PrivilegeContext currently bound to the ThreadLocal!";
+				if (!e.getMessage().equals(msg))
+					throw e;
+			}
 		}
 	}
 
@@ -176,8 +184,9 @@ public class PrivilegeTest {
 		}
 	}
 
-	@Test(expected = AccessDeniedException.class)
 	public void testFailAuthenticationNOk() throws Exception {
+		exception.expect(AccessDeniedException.class);
+		exception.expectMessage("blabla");
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_BAD));
 		} finally {
@@ -185,8 +194,9 @@ public class PrivilegeTest {
 		}
 	}
 
-	@Test(expected = PrivilegeException.class)
 	public void testFailAuthenticationPWNull() throws Exception {
+		exception.expect(PrivilegeException.class);
+		exception.expectMessage("blabla");
 		try {
 			login(ADMIN, null);
 		} finally {
@@ -202,7 +212,7 @@ public class PrivilegeTest {
 			Map<String, PrivilegeRep> privilegeMap = new HashMap<String, PrivilegeRep>();
 			RoleRep roleRep = new RoleRep(ROLE_TEMP, privilegeMap);
 
-			Certificate certificate = PrivilegeContext.get().getCertificate();
+			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addOrReplaceRole(certificate, roleRep);
 			privilegeHandler.persist(certificate);
 		} finally {
@@ -217,7 +227,7 @@ public class PrivilegeTest {
 
 			// see if admin can perform restrictable
 			Restrictable restrictable = new TestRestrictable();
-			PrivilegeContext.get().validateAction(restrictable);
+			this.ctx.validateAction(restrictable);
 
 		} finally {
 			logout();
@@ -238,8 +248,11 @@ public class PrivilegeTest {
 	/**
 	 * Checks that the system user can not perform a valid action, but illegal privilege
 	 */
-	@Test(expected = PrivilegeException.class)
+	@Test
 	public void testPerformSystemRestrictableFailPrivilege() throws Exception {
+		exception.expect(PrivilegeException.class);
+		exception
+				.expectMessage("User system_admin does not have Privilege ch.eitchnet.privilege.test.model.TestSystemUserActionDeny");
 		try {
 			// create the action to be performed as a system user
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
@@ -252,10 +265,30 @@ public class PrivilegeTest {
 	}
 
 	/**
+	 * Checks that the system user can not perform a valid action, but illegal privilege
+	 */
+	@Test
+	public void testPerformSystemRestrictableFailNoAdditionalPrivilege() throws Exception {
+		exception.expect(PrivilegeException.class);
+		exception.expectMessage("User system_admin2 does not have Privilege ch.eitchnet.privilege.test.model.TestRestrictable");
+		try {
+			// create the action to be performed as a system user
+			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
+
+			// and then perform the action
+			privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN2, action);
+		} finally {
+			logout();
+		}
+	}
+
+	/**
 	 * System user may not login
 	 */
-	@Test(expected = AccessDeniedException.class)
+	@Test
 	public void testLoginSystemUser() throws Exception {
+		exception.expect(AccessDeniedException.class);
+		exception.expectMessage("User system_admin is a system user and may not login!");
 		try {
 			login(SYSTEM_USER_ADMIN, SYSTEM_USER_ADMIN.getBytes());
 		} finally {
@@ -268,7 +301,7 @@ public class PrivilegeTest {
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Restrictable restrictable = new TestRestrictable();
-			PrivilegeContext.get().validateAction(restrictable);
+			this.ctx.validateAction(restrictable);
 		} finally {
 			logout();
 		}
@@ -325,7 +358,7 @@ public class PrivilegeTest {
 			login(BOB, ArraysHelper.copyOf(PASS_BOB));
 			// see if bob can perform restrictable
 			Restrictable restrictable = new TestRestrictable();
-			PrivilegeContext.get().validateAction(restrictable);
+			this.ctx.validateAction(restrictable);
 		} finally {
 			logout();
 		}
@@ -335,7 +368,7 @@ public class PrivilegeTest {
 		try {
 			// testAddAppRoleToBob
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
-			Certificate certificate = PrivilegeContext.get().getCertificate();
+			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addRoleToUser(certificate, BOB, ROLE_APP_USER);
 			logger.info("Added " + ROLE_APP_USER + " to " + BOB);
 			privilegeHandler.persist(certificate);
@@ -352,7 +385,7 @@ public class PrivilegeTest {
 			login(BOB, ArraysHelper.copyOf(PASS_BOB));
 			// see if bob can perform restrictable
 			Restrictable restrictable = new TestRestrictable();
-			PrivilegeContext.get().validateAction(restrictable);
+			this.ctx.validateAction(restrictable);
 			fail("Should fail as bob does not have role app");
 		} catch (AccessDeniedException e) {
 			String msg = "User bob does not have Privilege ch.eitchnet.privilege.test.model.TestRestrictable needed for Restrictable ch.eitchnet.privilege.test.model.TestRestrictable";
@@ -375,7 +408,7 @@ public class PrivilegeTest {
 		try {
 			// testTedChangesOwnPwd
 			login(TED, ArraysHelper.copyOf(PASS_DEF));
-			Certificate certificate = PrivilegeContext.get().getCertificate();
+			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.setUserPassword(certificate, TED, ArraysHelper.copyOf(PASS_TED));
 		} finally {
 			logout();
@@ -387,7 +420,7 @@ public class PrivilegeTest {
 			// testSetTedPwdAsBob
 			login(BOB, ArraysHelper.copyOf(PASS_BOB));
 			// set ted's password to default
-			Certificate certificate = PrivilegeContext.get().getCertificate();
+			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.setUserPassword(certificate, TED, ArraysHelper.copyOf(PASS_DEF));
 			privilegeHandler.persist(certificate);
 		} finally {
@@ -419,7 +452,7 @@ public class PrivilegeTest {
 			roles.add(ROLE_USER);
 			userRep = new UserRep("2", TED, "Ted", "Newman", UserState.ENABLED, roles, null,
 					new HashMap<String, String>());
-			Certificate certificate = PrivilegeContext.get().getCertificate();
+			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 			logger.info("Added user " + TED);
 			privilegeHandler.persist(certificate);
@@ -432,7 +465,7 @@ public class PrivilegeTest {
 		try {
 			// testAddAdminRoleToBob
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
-			Certificate certificate = PrivilegeContext.get().getCertificate();
+			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addRoleToUser(certificate, BOB, PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
 			logger.info("Added " + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE + " to " + ADMIN);
 			privilegeHandler.persist(certificate);
@@ -452,7 +485,7 @@ public class PrivilegeTest {
 			// let's add a new user Ted
 			userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<String>(), null,
 					new HashMap<String, String>());
-			certificate = PrivilegeContext.get().getCertificate();
+			certificate = this.ctx.getCertificate();
 			privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 			fail("User bob may not add a user as bob does not have admin rights!");
 		} catch (PrivilegeException e) {
@@ -476,7 +509,7 @@ public class PrivilegeTest {
 		try {
 			// testAddRoleUserToBob
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
-			Certificate certificate = PrivilegeContext.get().getCertificate();
+			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addRoleToUser(certificate, BOB, ROLE_USER);
 			privilegeHandler.persist(certificate);
 			logout();
@@ -491,7 +524,7 @@ public class PrivilegeTest {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Map<String, PrivilegeRep> privilegeMap = new HashMap<String, PrivilegeRep>();
 			RoleRep roleRep = new RoleRep(ROLE_USER, privilegeMap);
-			Certificate certificate = PrivilegeContext.get().getCertificate();
+			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addOrReplaceRole(certificate, roleRep);
 			privilegeHandler.persist(certificate);
 		} finally {
@@ -517,7 +550,7 @@ public class PrivilegeTest {
 		try {
 			// testEnableUserBob
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
-			Certificate certificate = PrivilegeContext.get().getCertificate();
+			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.setUserState(certificate, BOB, UserState.ENABLED);
 			privilegeHandler.persist(certificate);
 		} finally {
@@ -546,7 +579,7 @@ public class PrivilegeTest {
 			// let's add a new user bob
 			UserRep userRep = new UserRep("1", BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(), null,
 					new HashMap<String, String>());
-			Certificate certificate = PrivilegeContext.get().getCertificate();
+			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addOrReplaceUser(certificate, userRep, null);
 			logger.info("Added user " + BOB);
 
