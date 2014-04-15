@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -37,51 +39,74 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	private static final long serialVersionUID = 1L;
 
 	private ComponentContainer container;
-	private Certificate certificate;
+	private PrivilegeContext privilegeContext;
 
 	/**
-	 * @param container
-	 *            the container to set
+	 * @param privilegeContext
+	 *            the privilegeContext to set
 	 */
-	public void setContainer(ComponentContainer container) {
-		this.container = container;
+	public final void setPrivilegeContext(PrivilegeContext privilegeContext) {
+		DBC.PRE.assertNull("PrivilegeContext is already set!", this.privilegeContext);
+		this.privilegeContext = privilegeContext;
 	}
 
 	/**
-	 * @param certificate
-	 *            the certificate to set
+	 * @return the privilegeContext
 	 */
-	public void setCertificate(Certificate certificate) {
-		this.certificate = certificate;
+	public final PrivilegeContext getPrivilegeContext() {
+		return this.privilegeContext;
 	}
 
 	/**
 	 * @return the certificate
 	 */
-	protected Certificate getCertificate() {
-		return this.certificate;
+	protected final Certificate getCertificate() {
+		return this.privilegeContext.getCertificate();
+	}
+
+	/**
+	 * @param container
+	 *            the container to set
+	 */
+	public final void setContainer(ComponentContainer container) {
+		this.container = container;
 	}
 
 	/**
 	 * @return the container
 	 */
-	protected ComponentContainer getContainer() {
+	protected final ComponentContainer getContainer() {
 		return this.container;
 	}
 
-	protected <V> V getComponent(Class<V> clazz) {
+	/**
+	 * @param clazz
+	 * @return
+	 */
+	protected final <V> V getComponent(Class<V> clazz) {
 		return this.container.getComponent(clazz);
 	}
 
-	protected RuntimeConfiguration getRuntimeConfiguration() {
+	/**
+	 * @return
+	 */
+	protected final RuntimeConfiguration getRuntimeConfiguration() {
 		return this.container.getAgent().getStrolchConfiguration().getRuntimeConfiguration();
 	}
 
-	protected StrolchRealm getRealm(String realm) {
+	/**
+	 * @param realm
+	 * @return
+	 */
+	protected final StrolchRealm getRealm(String realm) {
 		return this.container.getRealm(realm);
 	}
 
-	protected StrolchTransaction openTx(String realm) {
+	/**
+	 * @param realm
+	 * @return
+	 */
+	protected final StrolchTransaction openTx(String realm) {
 		return this.container.getRealm(realm).openTx();
 	}
 

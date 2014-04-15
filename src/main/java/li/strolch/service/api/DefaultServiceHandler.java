@@ -71,15 +71,10 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		long start = System.nanoTime();
 
 		// first check that the caller may perform this service
+		PrivilegeContext privilegeContext = null;
 		if (this.privilegeHandler != null) {
-			// XXX Bad bad bad: remove the need for thread locals...
-			try {
-				PrivilegeContext privilegeContext = this.privilegeHandler.getPrivilegeContext(certificate);
-				PrivilegeContext.set(privilegeContext);
-				privilegeContext.validateAction(service);
-			} finally {
-				PrivilegeContext.set(null);
-			}
+			privilegeContext = this.privilegeHandler.getPrivilegeContext(certificate);
+			privilegeContext.validateAction(service);
 		}
 
 		try {
@@ -87,7 +82,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			if (service instanceof AbstractService) {
 				AbstractService<?, ?> abstractService = (AbstractService<?, ?>) service;
 				abstractService.setContainer(getContainer());
-				abstractService.setCertificate(certificate);
+				if (privilegeContext != null)
+					abstractService.setPrivilegeContext(privilegeContext);
 			}
 
 			U serviceResult = service.doService(argument);
