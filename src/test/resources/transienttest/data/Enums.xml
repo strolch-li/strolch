@@ -22,7 +22,7 @@
 			<Parameter Id="Roman Catholic" Name="Roman Catholic" Type="String" Value="Roman Catholic" />
 			<Parameter Id="Protestant" Name="Protestant" Type="String" Value="Protestant" />
 			<Parameter Id="Orthodox" Name="Orthodox" Type="String" Value="Orthodox" />
-			<Parameter Id="Christian" Name="Anglican" Type="String" Value="Anglican" />
+			<Parameter Id="Christian" Name="Christian" Type="String" Value="Christian" />
 			<Parameter Id="Muslim" Name="Muslim" Type="String" Value="Muslim" />
 			<Parameter Id="Hindu" Name="Hindu" Type="String" Value="Hindu" />
 			<Parameter Id="Buddhist" Name="Buddhist" Type="String" Value="Buddhist" />
