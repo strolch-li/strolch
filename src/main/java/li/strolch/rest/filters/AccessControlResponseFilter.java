@@ -1,6 +1,7 @@
 package li.strolch.rest.filters;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -16,6 +17,11 @@ import org.slf4j.LoggerFactory;
 @Provider
 @Priority(Priorities.HEADER_DECORATOR)
 public class AccessControlResponseFilter implements ContainerResponseFilter {
+
+	private static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods"; //$NON-NLS-1$
+	private static final String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers"; //$NON-NLS-1$
+	private static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers"; //$NON-NLS-1$
+	private static final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(AccessControlResponseFilter.class);
 
@@ -48,14 +54,17 @@ public class AccessControlResponseFilter implements ContainerResponseFilter {
 
 		if (!logged) {
 			logged = true;
-			logger.info("Enabling CORS for origin: " + origin);
+			logger.info(MessageFormat.format("Enabling CORS for origin: {0}", origin)); //$NON-NLS-1$
 		}
 
 		MultivaluedMap<String, Object> headers = responseContext.getHeaders();
 
-		headers.add("Access-Control-Allow-Origin", origin);
-		headers.add("Access-Control-Allow-Headers", "Authorization, Origin, X-Requested-With, Content-Type");
-		headers.add("Access-Control-Expose-Headers", "Location, Content-Disposition");
-		headers.add("Access-Control-Allow-Methods", "POST, PUT, GET, DELETE, HEAD, OPTIONS");
+		// allow for the configured origin
+		headers.add(ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+
+		// and set the allowed HTTP headers and methods
+		headers.add(ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Origin, X-Requested-With, Content-Type"); //$NON-NLS-1$
+		headers.add(ACCESS_CONTROL_EXPOSE_HEADERS, "Location, Content-Disposition"); //$NON-NLS-1$
+		headers.add(ACCESS_CONTROL_ALLOW_METHODS, "POST, PUT, GET, DELETE, HEAD, OPTIONS"); //$NON-NLS-1$
 	}
 }
