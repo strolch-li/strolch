@@ -15,6 +15,7 @@
  */
 package li.strolch.rest.model;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -128,5 +129,12 @@ public class ElementMapOverview {
 		} else if (!this.typeOverviews.equals(other.typeOverviews))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return MessageFormat.format(
+				"ElementMapOverview [elementMapName={0}, size={1}, typeOverviews={2}]", this.elementMapName, //$NON-NLS-1$
+				this.size, this.typeOverviews);
 	}
 }

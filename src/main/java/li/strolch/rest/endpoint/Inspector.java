@@ -15,7 +15,9 @@
  */
 package li.strolch.rest.endpoint;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -92,6 +94,7 @@ public class Inspector {
 
 			AgentOverview agentOverview = new AgentOverview(realmOverviews);
 			GenericEntity<AgentOverview> entity = new GenericEntity<AgentOverview>(agentOverview, AgentOverview.class) {
+				//
 			};
 			return Response.ok().entity(entity).build();
 		} catch (Exception e) {
@@ -120,7 +123,7 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}")
 	public Response getRealm(@PathParam("realm") String realm) {
-		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
+		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
 
 		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 		List<ElementMapsOverview> elementMapOverviews = new ArrayList<>(2);
@@ -141,6 +144,7 @@ public class Inspector {
 
 		RealmDetail modelOverview = new RealmDetail(elementMapOverviews);
 		GenericEntity<RealmDetail> entity = new GenericEntity<RealmDetail>(modelOverview, RealmDetail.class) {
+			//
 		};
 		return Response.ok().entity(entity).build();
 	}
@@ -164,13 +168,14 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resource")
 	public Response getResourcesOverview(@PathParam("realm") String realm) {
-		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
+		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
 		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		ElementMapOverview resourcesOverview;
 		try (StrolchTransaction tx = strolchRealm.openTx()) {
 			ResourceMap resourceMap = tx.getResourceMap();
-			Set<String> types = resourceMap.getTypes(tx);
+			List<String> types = new ArrayList<>(resourceMap.getTypes(tx));
+			Collections.sort(types);
 			List<TypeOverview> typeOverviews = new ArrayList<>(types.size());
 			for (String type : types) {
 				long size = resourceMap.querySize(tx, type);
@@ -183,6 +188,7 @@ public class Inspector {
 
 		GenericEntity<ElementMapOverview> entity = new GenericEntity<ElementMapOverview>(resourcesOverview,
 				ElementMapOverview.class) {
+			//
 		};
 		return Response.ok().entity(entity).build();
 	}
@@ -206,13 +212,14 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/order")
 	public Response getOrdersOverview(@PathParam("realm") String realm) {
-		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
+		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
 		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		ElementMapOverview ordersOverview;
 		try (StrolchTransaction tx = strolchRealm.openTx()) {
 			OrderMap orderMap = tx.getOrderMap();
-			Set<String> types = orderMap.getTypes(tx);
+			List<String> types = new ArrayList<>(orderMap.getTypes(tx));
+			Collections.sort(types);
 			List<TypeOverview> typeOverviews = new ArrayList<>(types.size());
 			for (String type : types) {
 				long size = orderMap.querySize(tx, type);
@@ -225,6 +232,7 @@ public class Inspector {
 
 		GenericEntity<ElementMapOverview> entity = new GenericEntity<ElementMapOverview>(ordersOverview,
 				ElementMapOverview.class) {
+			//
 		};
 		return Response.ok().entity(entity).build();
 	}
@@ -254,7 +262,7 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resource/{type}")
 	public Response getResourceTypeDetails(@PathParam("realm") String realm, @PathParam("type") String type) {
-		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
+		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
 		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		TypeDetail typeDetail;
@@ -269,6 +277,7 @@ public class Inspector {
 		}
 
 		GenericEntity<TypeDetail> entity = new GenericEntity<TypeDetail>(typeDetail, TypeDetail.class) {
+			//
 		};
 		return Response.ok().entity(entity).build();
 	}
@@ -294,7 +303,7 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/order/{type}")
 	public Response getOrderTypeDetails(@PathParam("realm") String realm, @PathParam("type") String type) {
-		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
+		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
 		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		TypeDetail typeDetail;
@@ -309,6 +318,7 @@ public class Inspector {
 		}
 
 		GenericEntity<TypeDetail> entity = new GenericEntity<TypeDetail>(typeDetail, TypeDetail.class) {
+			//
 		};
 		return Response.ok().entity(entity).build();
 	}
@@ -331,14 +341,14 @@ public class Inspector {
 	 * 
 	 * @return the resource with the given id
 	 * 
-	 * @see Res
+	 * @see ResourceDetail
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resource/{type}/{id}")
 	public Response getResource(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id) {
-		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
+		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
 		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		Resource resource;
@@ -346,11 +356,12 @@ public class Inspector {
 			resource = tx.getResourceMap().getBy(tx, type, id);
 		}
 		if (resource == null) {
-			throw new StrolchException("No Resource exists for " + type + "/" + id);
+			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
 		ResourceDetail resourceDetail = new ResourceDetail(resource);
 		GenericEntity<ResourceDetail> entity = new GenericEntity<ResourceDetail>(resourceDetail, ResourceDetail.class) {
+			//
 		};
 		return Response.ok().entity(entity).build();
 	}
@@ -360,7 +371,7 @@ public class Inspector {
 	@Path("{realm}/order/{type}/{id}")
 	public Response getOrder(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id) {
-		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
+		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
 		StrolchRealm strolchRealm = RestfulStrolchComponent.getInstance().getContainer().getRealm(realm);
 
 		Order order;
@@ -368,11 +379,12 @@ public class Inspector {
 			order = tx.getOrderMap().getBy(tx, type, id);
 		}
 		if (order == null) {
-			throw new StrolchException("No Order exists for " + type + "/" + id);
+			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
 		OrderDetail orderDetail = new OrderDetail(order);
 		GenericEntity<OrderDetail> entity = new GenericEntity<OrderDetail>(orderDetail, OrderDetail.class) {
+			//
 		};
 		return Response.ok().entity(entity).build();
 	}

@@ -40,6 +40,7 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public class InspectorTest extends AbstractRestfulTest {
 
 	private static final String ROOT_PATH = "strolch/inspector/";

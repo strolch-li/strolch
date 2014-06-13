@@ -15,6 +15,8 @@
  */
 package li.strolch.rest.model;
 
+import java.text.MessageFormat;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -102,5 +104,10 @@ public class TypeOverview {
 		} else if (!this.type.equals(other.type))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return MessageFormat.format("TypeOverview [type={0}, size={1}]", this.type, this.size); //$NON-NLS-1$
 	}
 }
