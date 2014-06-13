@@ -36,6 +36,7 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public class RealmTest {
 
 	@Test
