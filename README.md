@@ -18,6 +18,7 @@ create database transactionaluserdb;
 GRANT ALL PRIVILEGES ON DATABASE transactionaluserdb to transactionaluser;
 GRANT CONNECT ON DATABASE transactionaluserdb TO transactionaluser;
 
+# You can revoke the privileges with the following:
 revoke ALL PRIVILEGES ON DATABASE cacheduserdb from cacheduser;
 drop user cacheduser;
 drop database cacheduserdb;
