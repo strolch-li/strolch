@@ -7,6 +7,7 @@ import li.strolch.agent.api.ElementMap;
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -36,6 +37,11 @@ public abstract class TransactionalElementMap<T extends StrolchElement> implemen
 	@Override
 	public long querySize(StrolchTransaction tx, String type) {
 		return getDao(tx).querySize(type);
+	}
+
+	@Override
+	public T getTemplate(StrolchTransaction tx, String type) {
+		return getBy(tx, StrolchConstants.TEMPLATE, type);
 	}
 
 	@Override

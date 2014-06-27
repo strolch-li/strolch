@@ -38,6 +38,25 @@ public interface ElementMap<T extends StrolchElement> {
 
 	public long querySize(StrolchTransaction tx, String type);
 
+	/**
+	 * Returns the element with the type "Template" and the id = type
+	 * 
+	 * @param tx
+	 *            the open {@link StrolchTransaction}
+	 * @param type
+	 *            The template id to return
+	 * @return the template, or null if it does not exist
+	 */
+	public T getTemplate(StrolchTransaction tx, String type);
+
+	/**
+	 * 
+	 * 
+	 * @param tx
+	 * @param type
+	 * @param id
+	 * @return
+	 */
 	public T getBy(StrolchTransaction tx, String type, String id);
 
 	/**

@@ -29,6 +29,7 @@ import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -68,6 +69,11 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 	@Override
 	public long querySize(StrolchTransaction tx, String type) {
 		return getKeysBy(tx, type).size();
+	}
+
+	@Override
+	public T getTemplate(StrolchTransaction tx, String type) {
+		return getBy(tx, StrolchConstants.TEMPLATE, type);
 	}
 
 	@Override

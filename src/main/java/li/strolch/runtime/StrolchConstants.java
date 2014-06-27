@@ -36,6 +36,8 @@ public class StrolchConstants {
 	public static final String DEFAULT_XML_VERSION = "1.0"; //$NON-NLS-1$
 	public static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
 
+	public static final String TEMPLATE = "Template";
+
 	/**
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
 	 * to a {@link Resource}
