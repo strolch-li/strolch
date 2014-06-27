@@ -130,6 +130,18 @@ public abstract class AbstractionConfiguration {
 		return configFile;
 	}
 
+	public File getDataDir(String key, String defValue, RuntimeConfiguration configuration, boolean checkExists) {
+		String value = getValue(key, defValue);
+
+		File dataDir = new File(configuration.getDataPath(), value);
+		if (checkExists && !dataDir.isDirectory() || !dataDir.canRead()) {
+			String msg = "Component {0} requires data directory for configuraion property ''{1}'' which does not exist with value: {2}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.name, key, value);
+			throw new StrolchConfigurationException(msg);
+		}
+		return dataDir;
+	}
+
 	public File getDataFile(String key, String defValue, RuntimeConfiguration configuration, boolean checkExists) {
 		String value = getValue(key, defValue);
 
@@ -154,7 +166,7 @@ public abstract class AbstractionConfiguration {
 
 	private void logDefValueUse(String key, Object defValue) {
 		String msg = "{0}: Using default for key {1}={2}"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, name, key, defValue);
+		msg = MessageFormat.format(msg, this.name, key, defValue);
 		logger.info(msg);
 	}
 
