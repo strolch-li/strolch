@@ -33,7 +33,5 @@ public enum TransactionCloseStrategy {
 	/**
 	 * @param tx
 	 */
-	public void close(StrolchTransaction tx) {
-		throw new UnsupportedOperationException("Override in enum!"); //$NON-NLS-1$
-	}
+	public abstract void close(StrolchTransaction tx);
 }
