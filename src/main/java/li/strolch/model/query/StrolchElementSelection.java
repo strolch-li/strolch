@@ -25,5 +25,10 @@ public abstract class StrolchElementSelection implements Selection {
 		accept((StrolchElementSelectionVisitor) visitor);
 	}
 
+	@Override
+	public boolean hasSelection() {
+		return true;
+	}
+
 	public abstract void accept(StrolchElementSelectionVisitor visitor);
 }

@@ -28,6 +28,14 @@ public abstract class StrolchQuery<T extends QueryVisitor> {
 	public StrolchQuery(Navigation navigation) {
 		this.navigation = navigation;
 	}
+	
+	public boolean hasNavigation() {
+		return navigation != null;
+	}
+	
+	public boolean hasSelection() {
+		return selection != null && selection.hasSelection();
+	}
 
 	public void select(Selection selection) {
 		DBC.PRE.assertNull("A selection is already set! Use a boolean operator to perform multiple selections",

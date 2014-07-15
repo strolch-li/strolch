@@ -46,8 +46,24 @@ public abstract class ParameterSelection implements Selection {
 	}
 
 	@Override
+	public boolean hasSelection() {
+		return true;
+	}
+
+	@Override
 	public void accept(QueryVisitor visitor) {
 		accept((ParameterSelectionVisitor) visitor);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(getClass().getSimpleName() + " [bagKey=");
+		builder.append(this.bagKey);
+		builder.append(", paramKey=");
+		builder.append(this.paramKey);
+		builder.append("]");
+		return builder.toString();
 	}
 
 	public abstract void accept(ParameterSelectionVisitor visitor);

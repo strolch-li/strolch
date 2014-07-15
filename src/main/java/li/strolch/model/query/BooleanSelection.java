@@ -45,6 +45,20 @@ public abstract class BooleanSelection implements Selection {
 		this.selections = Arrays.asList(selections);
 	}
 
+	@Override
+	public boolean hasSelection() {
+		if (this.selections == null || this.selections.isEmpty())
+			return false;
+
+		for (Selection selection : this.selections) {
+			if (selection.hasSelection()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public List<Selection> getSelections() {
 		return Collections.unmodifiableList(this.selections);
 	}

@@ -17,13 +17,18 @@ package li.strolch.model.query;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
+ * 
  */
 public abstract class OrderSelection implements Selection {
 
 	@Override
 	public void accept(QueryVisitor visitor) {
 		accept((OrderSelectionVisitor) visitor);
+	}
+
+	@Override
+	public boolean hasSelection() {
+		return true;
 	}
 
 	public abstract void accept(OrderSelectionVisitor visitor);
