@@ -274,6 +274,36 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 		});
 	}
 
+	@Override
+	public long removeAll() {
+
+		final long toRemove = querySize();
+
+		this.commands.add(new DaoCommand() {
+			@Override
+			public void doComand(ModificationResult modificationResult) {
+				internalRemoveAll(toRemove);
+			}
+		});
+
+		return toRemove;
+	}
+
+	@Override
+	public long removeAllBy(final String type) {
+
+		final long toRemove = querySize(type);
+
+		this.commands.add(new DaoCommand() {
+			@Override
+			public void doComand(ModificationResult modificationResult) {
+				internalRemoveAllBy(toRemove, type);
+			}
+		});
+
+		return toRemove;
+	}
+
 	/**
 	 * @param element
 	 */
@@ -297,8 +327,41 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Order {0} due to {2}",
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {2}",
 					element.getLocator(), e.getLocalizedMessage()), e);
+		}
+	}
+
+	protected void internalRemoveAll(final long toRemove) {
+		String sql = "delete from " + getTableName();
+		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
+			int modCount = preparedStatement.executeUpdate();
+			if (modCount != toRemove) {
+				String msg = "Expected to delete {0} elements but SQL statement removed {1} elements!";
+				msg = MessageFormat.format(msg, toRemove, modCount);
+				throw new StrolchPersistenceException(msg);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove all elements due to {0}",
+					e.getLocalizedMessage()), e);
+		}
+	}
+
+	protected void internalRemoveAllBy(final long toRemove, String type) {
+		String sql = "delete from " + getTableName() + " where type = ?";
+		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
+			preparedStatement.setString(1, type);
+			int modCount = preparedStatement.executeUpdate();
+			if (modCount != toRemove) {
+				String msg = "Expected to delete {0} elements of type {1} but SQL statement removed {2} elements!";
+				msg = MessageFormat.format(msg, toRemove, type, modCount);
+				throw new StrolchPersistenceException(msg);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException(MessageFormat.format(
+					"Failed to remove all elements of type {0} due to {1}", type, e.getLocalizedMessage()), e);
 		}
 	}
 
