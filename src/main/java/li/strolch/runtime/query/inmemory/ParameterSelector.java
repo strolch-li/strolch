@@ -74,6 +74,11 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		return new DateParameterSelector<>(bagKey, paramKey, value);
 	}
 
+	public static <T extends GroupedParameterizedElement> DateRangeParameterSelector<T> dateRangeSelector(
+			String bagKey, String paramKey, Date from, Date to) {
+		return new DateRangeParameterSelector<>(bagKey, paramKey, from, to);
+	}
+
 	public static <T extends GroupedParameterizedElement> StringListParameterSelector<T> stringListSelector(
 			String bagKey, String paramKey, List<String> value) {
 		return new StringListParameterSelector<>(bagKey, paramKey, value);
@@ -246,6 +251,33 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 
 			DateParameter param = bag.getParameter(this.paramKey);
 			return param.getValue().equals(this.value);
+		}
+	}
+
+	public static class DateRangeParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+
+		private Date from;
+		private Date to;
+
+		public DateRangeParameterSelector(String bagKey, String paramKey, Date from, Date to) {
+			super(bagKey, paramKey);
+			this.from = from;
+			this.to = to;
+		}
+
+		@Override
+		public boolean select(GroupedParameterizedElement element) {
+			if (!element.hasParameterBag(this.bagKey))
+				return false;
+
+			ParameterBag bag = element.getParameterBag(this.bagKey);
+			if (!bag.hasParameter(this.paramKey))
+				return false;
+
+			DateParameter param = bag.getParameter(this.paramKey);
+			Date value = param.getValue();
+
+			return (from == null || !value.before(from)) && (to == null || !value.after(to));
 		}
 	}
 

@@ -27,6 +27,7 @@ import li.strolch.model.query.NotSelection;
 import li.strolch.model.query.OrSelection;
 import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
+import li.strolch.model.query.ParameterSelection.DateRangeParameterSelection;
 import li.strolch.model.query.ParameterSelection.FloatParameterSelection;
 import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
 import li.strolch.model.query.ParameterSelection.LongParameterSelection;
@@ -146,6 +147,12 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	public void visit(DateParameterSelection selection) {
 		this.selectors.add(ParameterSelector.<T> dateSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
+	}
+	
+	@Override
+	public void visit(DateRangeParameterSelection selection) {
+		this.selectors.add(ParameterSelector.<T> dateRangeSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getFrom(), selection.getTo()));
 	}
 
 	@Override
