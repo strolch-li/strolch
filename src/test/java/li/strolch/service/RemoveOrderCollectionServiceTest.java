@@ -20,44 +20,28 @@ import java.util.ArrayList;
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
 import li.strolch.service.RemoveOrderCollectionService.RemoveOrderCollectionArg;
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class RemoveOrderCollectionServiceTest extends AbstractRealmServiceTest {
 
-	private RemoveOrderCollectionService svc;
-	private RemoveOrderCollectionArg arg;
-	private ArrayList<Locator> locators;
+	@Test
+	public void runTest() {
 
-	@Before
-	public void before() {
-		svc = new RemoveOrderCollectionService();
-		arg = new RemoveOrderCollectionArg();
+		RemoveOrderCollectionService svc = new RemoveOrderCollectionService();
+		RemoveOrderCollectionArg arg = new RemoveOrderCollectionArg();
 
-		locators = new ArrayList<>();
+		ArrayList<Locator> locators = new ArrayList<>();
 		locators.add(Locator.newBuilder(Tags.ORDER).append("TestType").append("@1").build());
 		locators.add(Locator.newBuilder(Tags.ORDER).append("TestType").append("@2").build());
 		locators.add(Locator.newBuilder(Tags.ORDER).append("TestType").append("@3").build());
 
 		arg.locators = locators;
-	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+		runServiceInAllRealmTypes(svc, arg);
 	}
 }

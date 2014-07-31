@@ -16,50 +16,32 @@
 package li.strolch.service;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.service.UpdateResourceCollectionService.UpdateResourceCollectionArg;
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class UpdateResourceCollectionServiceTest extends AbstractRealmServiceTest {
 
-	private UpdateResourceCollectionService svc;
-	private UpdateResourceCollectionArg arg;
+	@Test
+	public void runTest() {
 
-	private List<Resource> resources;
+		UpdateResourceCollectionService svc = new UpdateResourceCollectionService();
+		UpdateResourceCollectionArg arg = new UpdateResourceCollectionArg();
 
-	@Before
-	public void before() {
-		svc = new UpdateResourceCollectionService();
-		arg = new UpdateResourceCollectionArg();
-
-		resources = new ArrayList<>();
+		ArrayList<Resource> resources = new ArrayList<>();
 		resources.add(ModelGenerator.createResource("salutations", "Modified Enumeration", "Enumeration"));
 		resources.add(ModelGenerator.createResource("sex", "Modified Enumeration", "Enumeration"));
 		resources.add(ModelGenerator.createResource("religions", "Modified Enumeration", "Enumeration"));
 
 		arg.resources = resources;
-	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+		runServiceInAllRealmTypes(svc, arg);
 	}
 }

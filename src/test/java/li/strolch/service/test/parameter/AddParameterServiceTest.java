@@ -17,44 +17,28 @@ package li.strolch.service.test.parameter;
 
 import li.strolch.model.Locator;
 import li.strolch.model.parameter.FloatParameter;
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
 import li.strolch.service.parameter.AddParameterService;
 import li.strolch.service.parameter.AddParameterService.AddParameterArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class AddParameterServiceTest extends AbstractRealmServiceTest {
 
-	private AddParameterService svc;
-	private AddParameterArg arg;
-	private FloatParameter parameter;
+	@Test
+	public void runTest() {
 
-	@Before
-	public void before() {
-		svc = new AddParameterService();
-		arg = new AddParameterArg();
+		AddParameterService svc = new AddParameterService();
+		AddParameterArg arg = new AddParameterArg();
 		arg.locator = Locator.valueOf("Resource/Ball/yellow/parameters");
-		parameter = new FloatParameter("diameter", "Diameter", 22.0);
+		FloatParameter parameter = new FloatParameter("diameter", "Diameter", 22.0);
 		parameter.setInterpretation("Dimension");
 		parameter.setUom("cm");
 		arg.parameter = parameter;
-	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+		runServiceInAllRealmTypes(svc, arg);
 	}
 }

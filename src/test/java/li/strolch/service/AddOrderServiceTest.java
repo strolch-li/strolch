@@ -17,37 +17,22 @@ package li.strolch.service;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.service.AddOrderService.AddOrderArg;
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class AddOrderServiceTest extends AbstractRealmServiceTest {
 
-	private AddOrderService svc;
-	private AddOrderArg arg;
+	@Test
+	public void runTest() {
 
-	@Before
-	public void before() {
-		svc = new AddOrderService();
-		arg = new AddOrderArg();
+		AddOrderService svc = new AddOrderService();
+		AddOrderArg arg = new AddOrderArg();
 		arg.order = ModelGenerator.createOrder("firstOrder", "First Order", "AdditionalOrders");
-	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+		runServiceInAllRealmTypes(svc, arg);
 	}
 }

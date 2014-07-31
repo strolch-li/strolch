@@ -20,44 +20,28 @@ import java.util.ArrayList;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.service.AddOrderCollectionService.AddOrderCollectionArg;
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class AddOrderCollectionServiceTest extends AbstractRealmServiceTest {
 
-	private AddOrderCollectionService svc;
-	private AddOrderCollectionArg arg;
-	private ArrayList<Order> orders;
+	@Test
+	public void runTest() {
 
-	@Before
-	public void before() {
-		svc = new AddOrderCollectionService();
-		arg = new AddOrderCollectionArg();
+		AddOrderCollectionService svc = new AddOrderCollectionService();
+		AddOrderCollectionArg arg = new AddOrderCollectionArg();
 
-		orders = new ArrayList<>();
+		ArrayList<Order> orders = new ArrayList<>();
 		orders.add(ModelGenerator.createOrder("firstOrder", "First Order", "AdditionalOrders"));
 		orders.add(ModelGenerator.createOrder("secondOrder", "Second Order", "AdditionalOrders"));
 		orders.add(ModelGenerator.createOrder("thirdOrder", "Third Order", "AdditionalOrders"));
 
 		arg.orders = orders;
-	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+		runServiceInAllRealmTypes(svc, arg);
 	}
 }

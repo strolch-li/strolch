@@ -16,49 +16,32 @@
 package li.strolch.service;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
 import li.strolch.service.RemoveResourceCollectionService.RemoveResourceCollectionArg;
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class RemoveResourceCollectionServiceTest extends AbstractRealmServiceTest {
 
-	private RemoveResourceCollectionService svc;
-	private RemoveResourceCollectionArg arg;
-	private List<Locator> locators;
+	@Test
+	public void runTest() {
 
-	@Before
-	public void before() {
-		svc = new RemoveResourceCollectionService();
-		arg = new RemoveResourceCollectionArg();
+		RemoveResourceCollectionService svc = new RemoveResourceCollectionService();
+		RemoveResourceCollectionArg arg = new RemoveResourceCollectionArg();
 
-		locators = new ArrayList<>();
+		ArrayList<Locator> locators = new ArrayList<>();
 		locators.add(Locator.newBuilder(Tags.RESOURCE).append("Enumeration").append("salutations").build());
 		locators.add(Locator.newBuilder(Tags.RESOURCE).append("Enumeration").append("sex").build());
 		locators.add(Locator.newBuilder(Tags.RESOURCE).append("Enumeration").append("religions").build());
 
 		arg.locators = locators;
-	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+		runServiceInAllRealmTypes(svc, arg);
 	}
 }

@@ -15,38 +15,81 @@
  */
 package li.strolch.service;
 
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchRealm;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ClearModelServiceTest extends AbstractRealmServiceTest {
 
-	private ClearModelService svc;
-	private ClearModelArgument arg;
+	@Test
+	public void runClearTest() {
 
-	@Before
-	public void before() {
-		svc = new ClearModelService();
-		arg = new ClearModelArgument();
+		Runner validator = new Runner() {
+			@Override
+			public void run(StrolchRealm strolchRealm, ComponentContainer container) {
+				try (StrolchTransaction tx = strolchRealm.openTx()) {
+					assertEquals(0, tx.getResourceMap().querySize(tx));
+					assertEquals(0, tx.getOrderMap().querySize(tx));
+				}
+			}
+		};
+
+		ClearModelService svc = new ClearModelService();
+		ClearModelArgument arg = new ClearModelArgument();
 		arg.clearOrders = true;
 		arg.clearResources = true;
+
+		runServiceInAllRealmTypes(svc, arg, null, validator, null);
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
+	@Test
+	public void runClearOnlyOrdersTest() {
+
+		Runner validator = new Runner() {
+			@Override
+			public void run(StrolchRealm strolchRealm, ComponentContainer container) {
+				try (StrolchTransaction tx = strolchRealm.openTx()) {
+					assertNotEquals(0, tx.getResourceMap().querySize(tx));
+					assertEquals(0, tx.getOrderMap().querySize(tx));
+				}
+			}
+		};
+
+		ClearModelService svc = new ClearModelService();
+		ClearModelArgument arg = new ClearModelArgument();
+		arg.clearOrders = true;
+		arg.clearResources = false;
+
+		runServiceInAllRealmTypes(svc, arg, null, validator, null);
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+	@Test
+	public void runClearOnlyResourcesTest() {
+
+		Runner validator = new Runner() {
+			@Override
+			public void run(StrolchRealm strolchRealm, ComponentContainer container) {
+				try (StrolchTransaction tx = strolchRealm.openTx()) {
+					assertNotEquals(0, tx.getOrderMap().querySize(tx));
+					assertEquals(0, tx.getResourceMap().querySize(tx));
+				}
+			}
+		};
+
+		ClearModelService svc = new ClearModelService();
+		ClearModelArgument arg = new ClearModelArgument();
+		arg.clearOrders = false;
+		arg.clearResources = true;
+
+		runServiceInAllRealmTypes(svc, arg, null, validator, null);
 	}
+
 }

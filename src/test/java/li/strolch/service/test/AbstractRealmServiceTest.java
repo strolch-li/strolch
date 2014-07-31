@@ -22,6 +22,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.postgresql.DbSchemaVersionCheck;
 import li.strolch.service.XmlImportModelArgument;
 import li.strolch.service.XmlImportModelService;
@@ -32,9 +34,8 @@ import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.testbase.runtime.RuntimeMock;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.After;
+import org.junit.Before;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -49,8 +50,8 @@ public abstract class AbstractRealmServiceTest {
 
 	protected static RuntimeMock runtimeMock;
 
-	@BeforeClass
-	public static void beforeClass() throws SQLException {
+	@Before
+	public void beforeClass() throws SQLException {
 
 		dropSchema("jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
 		dropSchema("jdbc:postgresql://localhost/transactionaluserdb", "transactionaluser", "test");
@@ -65,8 +66,8 @@ public abstract class AbstractRealmServiceTest {
 		importFromXml(REALM_TRANSACTIONAL, getServiceHandler());
 	}
 
-	@AfterClass
-	public static void afterClass() {
+	@After
+	public void afterClass() {
 		runtimeMock.destroyRuntime();
 	}
 
@@ -89,33 +90,57 @@ public abstract class AbstractRealmServiceTest {
 	}
 
 	protected <T extends ServiceArgument, U extends ServiceResult> void doService(String realm,
-			ServiceResultState expectedState, Class<?> expectedServiceResultType, Service<T, U> svc, T arg) {
+			ServiceResultState expectedState, Class<?> expectedServiceResultType, Service<T, U> svc, T arg,
+			Runner before, Runner validator, Runner after) {
+
+		if (before != null)
+			before.run(runtimeMock.getContainer().getRealm(realm), runtimeMock.getContainer());
 
 		arg.realm = realm;
 		ServiceResult result = getServiceHandler().doService(null, svc, arg);
 		assertServiceResult(expectedState, expectedServiceResultType, result);
+
+		if (validator != null)
+			validator.run(runtimeMock.getContainer().getRealm(realm), runtimeMock.getContainer());
+
+		if (after != null)
+			after.run(runtimeMock.getContainer().getRealm(realm), runtimeMock.getContainer());
 	}
 
 	public static ServiceHandler getServiceHandler() {
 		return runtimeMock.getContainer().getComponent(ServiceHandler.class);
 	}
 
-	public abstract <T extends ServiceArgument> T getArg();
-
-	public abstract <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc();
-
-	@Test
-	public void shouldPerformServiceTransient() {
-		doService(REALM_TRANSIENT, ServiceResultState.SUCCESS, ServiceResult.class, getSvc(), getArg());
+	public interface Runner {
+		public void run(StrolchRealm strolchRealm, ComponentContainer container);
 	}
 
-	@Test
-	public void shouldPerformServiceCached() {
-		doService(REALM_CACHED, ServiceResultState.SUCCESS, ServiceResult.class, getSvc(), getArg());
+	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(Service<T, U> svc,
+			T arg) {
+		runServiceInAllRealmTypes(svc, arg, null, null, null);
 	}
 
-	@Test
-	public void shouldPerformServiceTransactional() {
-		doService(REALM_TRANSACTIONAL, ServiceResultState.SUCCESS, ServiceResult.class, getSvc(), getArg());
+	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(Service<T, U> svc,
+			T arg, Runner before, Runner validator, Runner after) {
+
+		runTransient(svc, arg, before, validator, after);
+		runCached(svc, arg, before, validator, after);
+		runTransactional(svc, arg, before, validator, after);
+	}
+
+	private <T extends ServiceArgument, U extends ServiceResult> void runTransactional(Service<T, U> svc, T arg,
+			Runner before, Runner validator, Runner after) {
+		doService(REALM_TRANSACTIONAL, ServiceResultState.SUCCESS, ServiceResult.class, svc, arg, before, validator,
+				after);
+	}
+
+	private <T extends ServiceArgument, U extends ServiceResult> void runCached(Service<T, U> svc, T arg,
+			Runner before, Runner validator, Runner after) {
+		doService(REALM_CACHED, ServiceResultState.SUCCESS, ServiceResult.class, svc, arg, before, validator, after);
+	}
+
+	private <T extends ServiceArgument, U extends ServiceResult> void runTransient(Service<T, U> svc, T arg,
+			Runner before, Runner validator, Runner after) {
+		doService(REALM_TRANSIENT, ServiceResultState.SUCCESS, ServiceResult.class, svc, arg, before, validator, after);
 	}
 }

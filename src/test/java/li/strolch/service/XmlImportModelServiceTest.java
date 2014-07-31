@@ -15,37 +15,22 @@
  */
 package li.strolch.service;
 
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class XmlImportModelServiceTest  extends AbstractRealmServiceTest {
+public class XmlImportModelServiceTest extends AbstractRealmServiceTest {
 
-	private XmlImportModelService svc;
-	private XmlImportModelArgument arg;
+	@Test
+	public void runTest() {
 
-	@Before
-	public void before() {
-		svc = new XmlImportModelService();
-		arg = new XmlImportModelArgument();
+		XmlImportModelService svc = new XmlImportModelService();
+		XmlImportModelArgument arg = new XmlImportModelArgument();
 		arg.modelFileName = "Enums.xml";
-	}
-	
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
-	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+		runServiceInAllRealmTypes(svc, arg);
 	}
 }

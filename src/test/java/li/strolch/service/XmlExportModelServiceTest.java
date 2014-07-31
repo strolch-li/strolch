@@ -17,13 +17,11 @@ package li.strolch.service;
 
 import java.io.File;
 
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -31,32 +29,23 @@ import org.junit.Before;
 public class XmlExportModelServiceTest extends AbstractRealmServiceTest {
 
 	private static final String TMP_XML_EXPORT_XML = "tmpXmlExport.xml";
-	private XmlExportModelService svc;
-	private XmlExportModelArgument arg;
 
-	@Before
-	public void before() {
-		svc = new XmlExportModelService();
-		arg = new XmlExportModelArgument();
+	@Test
+	public void runTest() {
+
+		Runner before = new Runner() {
+			@Override
+			public void run(StrolchRealm strolchRealm, ComponentContainer container) {
+				File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
+				if (file.exists())
+					file.delete();
+			}
+		};
+
+		XmlExportModelService svc = new XmlExportModelService();
+		XmlExportModelArgument arg = new XmlExportModelArgument();
 		arg.modelFileName = TMP_XML_EXPORT_XML;
-	}
 
-	@After
-	public void after() {
-		File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
-		if (file.exists())
-			file.delete();
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+		runServiceInAllRealmTypes(svc, arg, before, null, null);
 	}
 }

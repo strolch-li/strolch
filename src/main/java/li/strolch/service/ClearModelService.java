@@ -50,8 +50,7 @@ public class ClearModelService extends AbstractService<ClearModelArgument, Servi
 
 		ModelStatistics statistics = command.getStatistics();
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info(MessageFormat.format(
-				"Clearing Model for realm {1} took {2}.", arg.realm, durationS)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Clearing Model for realm {0} took {1}.", arg.realm, durationS)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Cleared {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Cleared {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 

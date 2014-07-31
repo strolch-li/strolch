@@ -16,39 +16,24 @@
 package li.strolch.service.test.parameter;
 
 import li.strolch.model.Locator;
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
 import li.strolch.service.parameter.RemoveParameterService;
 import li.strolch.service.parameter.RemoveParameterService.RemoveParameterArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class RemoveParameterServiceTest extends AbstractRealmServiceTest {
 
-	private RemoveParameterService svc;
-	private RemoveParameterArg arg;
+	@Test
+	public void runTest() {
 
-	@Before
-	public void before() {
-		svc = new RemoveParameterService();
-		arg = new RemoveParameterArg();
+		RemoveParameterService svc = new RemoveParameterService();
+		RemoveParameterArg arg = new RemoveParameterArg();
 		arg.locator = Locator.valueOf("Resource/Ball/yellow/parameters/owner");
-	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+		runServiceInAllRealmTypes(svc, arg);
 	}
 }

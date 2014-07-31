@@ -16,27 +16,22 @@
 package li.strolch.service.test.parameter;
 
 import li.strolch.model.Locator;
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceResult;
 import li.strolch.service.parameter.SetParameterService;
 import li.strolch.service.parameter.SetParameterService.SetParameterArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
-import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class SetParameterServiceTest extends AbstractRealmServiceTest {
 
-	private SetParameterService svc;
-	private SetParameterArg arg;
+	@Test
+	public void runTest() {
 
-	@Before
-	public void before() {
-		svc = new SetParameterService();
-		arg = new SetParameterArg();
+		SetParameterService svc = new SetParameterService();
+		SetParameterArg arg = new SetParameterArg();
 		arg.locator = Locator.valueOf("Resource/Ball/yellow/parameters/owner");
 		arg.name = "The Owner";
 		arg.interpretation = "Changing The Interpretation";
@@ -44,17 +39,7 @@ public class SetParameterServiceTest extends AbstractRealmServiceTest {
 		arg.hidden = true;
 		arg.index = 99;
 		arg.valueAsString = "someotherdude";
-	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument> T getArg() {
-		return (T) this.arg;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends ServiceArgument, U extends ServiceResult> Service<T, U> getSvc() {
-		return (Service<T, U>) this.svc;
+		runServiceInAllRealmTypes(svc, arg);
 	}
 }
