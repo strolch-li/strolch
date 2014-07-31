@@ -160,7 +160,8 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	public long removeAll() {
 		long removed = 0;
 
-		for (String type : this.elementMap.keySet()) {
+		Set<String> keySet = new HashSet<String>(this.elementMap.keySet());
+		for (String type : keySet) {
 			Map<String, T> byType = this.elementMap.remove(type);
 			removed += byType.size();
 			byType.clear();
