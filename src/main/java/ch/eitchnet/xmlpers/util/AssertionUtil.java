@@ -53,7 +53,7 @@ public class AssertionUtil {
 	}
 
 	public static void assertIsNotRootRef(ObjectRef objectRef) {
-		if (!objectRef.isRoot()) {
+		if (objectRef.isRoot()) {
 			String msg = "RootRef not expected {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, objectRef.getName());
 			throw new IllegalArgumentException(msg);

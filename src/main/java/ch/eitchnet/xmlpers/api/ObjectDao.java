@@ -22,11 +22,14 @@ import static ch.eitchnet.xmlpers.util.AssertionUtil.assertNotNull;
 import static ch.eitchnet.xmlpers.util.AssertionUtil.assertObjectRead;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import ch.eitchnet.utils.objectfilter.ObjectFilter;
 import ch.eitchnet.xmlpers.objref.ObjectRef;
+import ch.eitchnet.xmlpers.objref.SubTypeRef;
+import ch.eitchnet.xmlpers.objref.TypeRef;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -112,6 +115,68 @@ public class ObjectDao {
 		}
 	}
 
+	public <T> long removeAllBy(TypeRef typeRef) {
+		assertNotClosed();
+
+		long removed = 0;
+
+		Set<ObjectRef> refs = new HashSet<ObjectRef>();
+		typeRef.lock();
+		refs.add(typeRef);
+		try {
+
+			Set<String> types = tx.getMetadataDao().queryTypeSet(typeRef);
+			for (String type : types) {
+				ObjectRef childTypeRef = typeRef.getChildTypeRef(tx, type);
+				childTypeRef.lock();
+				refs.add(childTypeRef);
+
+				Set<String> ids = queryKeySet(childTypeRef);
+				for (String id : ids) {
+
+					ObjectRef idRef = childTypeRef.getChildIdRef(tx, id);
+
+					PersistenceContext<T> ctx = createCtx(idRef);
+					ctx.getObjectRef().lock();
+					this.objectFilter.remove(ctx.getObjectRef().getType(), ctx);
+					removed++;
+				}
+			}
+		} finally {
+			for (ObjectRef ref : refs) {
+				ref.unlock();
+			}
+		}
+
+		return removed;
+	}
+
+	public <T> long removeAllBy(SubTypeRef subTypeRef) {
+		assertNotClosed();
+		assertIsNotRootRef(subTypeRef);
+		assertIsNotIdRef(subTypeRef);
+
+		long removed = 0;
+
+		subTypeRef.lock();
+		try {
+			Set<String> ids = queryKeySet(subTypeRef);
+			for (String id : ids) {
+
+				ObjectRef idRef = subTypeRef.getChildIdRef(tx, id);
+
+				PersistenceContext<T> ctx = createCtx(idRef);
+				ctx.getObjectRef().lock();
+				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx);
+				removed++;
+			}
+		} finally {
+			subTypeRef.unlock();
+		}
+
+		return removed;
+	}
+
 	public <T> void removeById(ObjectRef objectRef) {
 		assertNotClosed();
 		assertIsIdRef(objectRef);
@@ -192,7 +257,7 @@ public class ObjectDao {
 		}
 	}
 
-	public <T> Set<String> queryKeySet(ObjectRef parentRef) {
+	public Set<String> queryKeySet(ObjectRef parentRef) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
@@ -206,7 +271,7 @@ public class ObjectDao {
 		}
 	}
 
-	public <T> long querySize(ObjectRef parentRef) {
+	public long querySize(ObjectRef parentRef) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
