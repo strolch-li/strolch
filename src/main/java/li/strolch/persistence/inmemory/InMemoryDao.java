@@ -142,6 +142,10 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 		Map<String, T> byType = this.elementMap.get(element.getType());
 		if (byType != null) {
 			byType.remove(element.getId());
+
+			if (byType.isEmpty()) {
+				this.elementMap.remove(element.getType());
+			}
 		}
 	}
 
@@ -150,5 +154,28 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 		for (T element : elements) {
 			remove(element);
 		}
+	}
+
+	@Override
+	public long removeAll() {
+		long removed = 0;
+
+		for (String type : this.elementMap.keySet()) {
+			Map<String, T> byType = this.elementMap.remove(type);
+			removed += byType.size();
+			byType.clear();
+		}
+
+		return removed;
+	}
+
+	@Override
+	public long removeAllBy(String type) {
+		Map<String, T> byType = this.elementMap.remove(type);
+		if (byType == null)
+			return 0;
+		long removed = byType.size();
+		byType.clear();
+		return removed;
 	}
 }

@@ -24,8 +24,8 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.model.ModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
-import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.inmemory.InMemoryPersistence;
@@ -95,7 +95,7 @@ public class TransientRealm extends StrolchRealm {
 	@Override
 	public void start() {
 
-		XmlModelStatistics statistics;
+		ModelStatistics statistics;
 		try (StrolchTransaction tx = openTx()) {
 			InMemoryElementListener elementListener = new InMemoryElementListener(tx);
 			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, modelFile);

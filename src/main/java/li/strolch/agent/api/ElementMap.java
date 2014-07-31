@@ -97,4 +97,8 @@ public interface ElementMap<T extends StrolchElement> {
 	public void remove(StrolchTransaction tx, T element);
 
 	public void removeAll(StrolchTransaction tx, List<T> elements);
+	
+	public long removeAll(StrolchTransaction tx);
+	
+	public long removeAllBy(StrolchTransaction tx, String type);
 }

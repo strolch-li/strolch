@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.agent.api.ElementMap;
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.StrolchDao;
@@ -37,6 +40,7 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public abstract class CachedElementMap<T extends StrolchElement> implements ElementMap<T> {
 
+	private static final Logger logger = LoggerFactory.getLogger(CachedElementMap.class);
 	private Set<String> allKeys;
 	private Map<String, Map<String, T>> elementMap;
 
@@ -373,5 +377,62 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 		// last is to perform DB changes
 		getDao(tx).removeAll(elements);
+	}
+
+	@Override
+	public long removeAll(StrolchTransaction tx) {
+
+		if (this.elementMap.isEmpty())
+			return 0;
+
+		long removed = 0;
+
+		synchronized (this.elementMap) {
+			Set<String> types = this.elementMap.keySet();
+			for (String type : types) {
+
+				Map<String, T> byType = this.elementMap.get(type);
+				removed += byType.size();
+				byType.clear();
+			}
+		}
+
+		// last is to perform DB changes
+		long daoRemoved = getDao(tx).removeAll();
+
+		if (removed != daoRemoved) {
+			String msg = "Removed {0} elements from cached map, but dao removed {1} elements!";
+			logger.error(MessageFormat.format(msg, removed, daoRemoved));
+		}
+
+		return removed;
+	}
+
+	@Override
+	public long removeAllBy(StrolchTransaction tx, String type) {
+
+		long removed = 0;
+		String msg = "The elements with type {0} can not be removed as they do not exist!"; //$NON-NLS-1$
+
+		synchronized (this.elementMap) {
+			Map<String, T> byType = this.elementMap.get(type);
+			if (byType == null) {
+				msg = MessageFormat.format(msg, type);
+				throw new StrolchPersistenceException(msg);
+			}
+
+			removed = byType.size();
+			byType.clear();
+		}
+
+		// last is to perform DB changes
+		long daoRemoved = getDao(tx).removeAllBy(type);
+
+		if (removed != daoRemoved) {
+			msg = "Removed {0} elements from cached map for type {1}, but dao removed {3} elements!";
+			logger.error(MessageFormat.format(msg, removed, type, daoRemoved));
+		}
+
+		return removed;
 	}
 }

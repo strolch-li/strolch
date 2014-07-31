@@ -96,13 +96,23 @@ public abstract class TransactionalElementMap<T extends StrolchElement> implemen
 	}
 
 	@Override
+	public List<T> updateAll(StrolchTransaction tx, List<T> elements) {
+		getDao(tx).updateAll(elements);
+		return elements;
+	}
+
+	@Override
 	public void removeAll(StrolchTransaction tx, List<T> elements) {
 		getDao(tx).removeAll(elements);
 	}
 
 	@Override
-	public List<T> updateAll(StrolchTransaction tx, List<T> elements) {
-		getDao(tx).updateAll(elements);
-		return elements;
+	public long removeAll(StrolchTransaction tx) {
+		return getDao(tx).removeAll();
+	}
+
+	@Override
+	public long removeAllBy(StrolchTransaction tx, String type) {
+		return getDao(tx).removeAllBy(type);
 	}
 }
