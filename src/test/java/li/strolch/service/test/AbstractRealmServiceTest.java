@@ -51,7 +51,7 @@ public abstract class AbstractRealmServiceTest {
 	protected static RuntimeMock runtimeMock;
 
 	@Before
-	public void beforeClass() throws SQLException {
+	public void before() throws SQLException {
 
 		dropSchema("jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
 		dropSchema("jdbc:postgresql://localhost/transactionaluserdb", "transactionaluser", "test");
@@ -67,7 +67,7 @@ public abstract class AbstractRealmServiceTest {
 	}
 
 	@After
-	public void afterClass() {
+	public void after() {
 		runtimeMock.destroyRuntime();
 	}
 

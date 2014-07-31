@@ -15,10 +15,17 @@
  */
 package li.strolch.service;
 
+import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+
 import java.io.File;
+import java.io.IOException;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.service.api.ServiceResult;
+import li.strolch.service.api.ServiceResultState;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
 import org.junit.Test;
@@ -45,7 +52,53 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest {
 		XmlExportModelService svc = new XmlExportModelService();
 		XmlExportModelArgument arg = new XmlExportModelArgument();
 		arg.modelFileName = TMP_XML_EXPORT_XML;
+		arg.multiFile = true;
 
 		runServiceInAllRealmTypes(svc, arg, before, null, null);
+	}
+
+	@Test
+	public void runTestFailOnExisting() {
+		File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		XmlExportModelService svc = new XmlExportModelService();
+		XmlExportModelArgument arg = new XmlExportModelArgument();
+		arg.realm = REALM_TRANSIENT;
+		arg.overwrite = false;
+		arg.multiFile = true;
+		arg.modelFileName = TMP_XML_EXPORT_XML;
+
+		ServiceResult result = getServiceHandler().doService(null, svc, arg);
+		assertServiceResult(ServiceResultState.FAILED, ServiceResult.class, result);
+		assertThat(result.getMessage(), containsString("Model File already exists with name"));
+	}
+
+	@Test
+	public void runTestOverwrite() {
+		File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		XmlExportModelService svc = new XmlExportModelService();
+		XmlExportModelArgument arg = new XmlExportModelArgument();
+		arg.realm = REALM_TRANSIENT;
+		arg.overwrite = true;
+		arg.multiFile = true;
+		arg.modelFileName = TMP_XML_EXPORT_XML;
+
+		ServiceResult result = getServiceHandler().doService(null, svc, arg);
+		assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 	}
 }

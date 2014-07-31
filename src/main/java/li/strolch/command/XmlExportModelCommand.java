@@ -19,6 +19,7 @@ import static ch.eitchnet.utils.helper.StringHelper.UNDERLINE;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -60,6 +61,8 @@ public class XmlExportModelCommand extends Command {
 
 	// input
 	private File modelFile;
+	private boolean multiFile;
+	private boolean overwrite;
 	private boolean doOrders;
 	private boolean doResources;
 	private Set<String> orderTypes;
@@ -67,7 +70,6 @@ public class XmlExportModelCommand extends Command {
 
 	// output
 	private ModelStatistics statistics;
-	private boolean multiFile;
 
 	private int elementsToWrite;
 	private int nrOfResourcesToExport;
@@ -81,8 +83,23 @@ public class XmlExportModelCommand extends Command {
 
 	@Override
 	public void validate() {
-		DBC.PRE.assertNotExists("Model may not already exist!", this.modelFile);
+		if (!this.overwrite)
+			DBC.PRE.assertNotExists("Model may not already exist!", this.modelFile);
 		DBC.PRE.assertTrue("Model file must end with .xml", this.modelFile.getName().endsWith(XML_FILE_SUFFIX));
+	}
+
+	private void cleanUpExisting(final String exportName) {
+		File parentFile = this.modelFile.getParentFile();
+		File[] existingFiles = parentFile.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.startsWith(exportName);
+			}
+		});
+
+		for (File file : existingFiles) {
+			file.delete();
+		}
 	}
 
 	@Override
@@ -95,6 +112,8 @@ public class XmlExportModelCommand extends Command {
 		this.statistics.startTime = new Date();
 
 		String exportName = fileName.substring(0, fileName.indexOf(XML_FILE_SUFFIX));
+		cleanUpExisting(exportName);
+
 		Set<File> createdFiles = new HashSet<>();
 
 		if (this.doResources) {
@@ -146,6 +165,7 @@ public class XmlExportModelCommand extends Command {
 						writer.writeAttribute(Tags.FILE, typeXmlFile);
 
 						File typeXmlFileF = new File(modelFile.getParentFile(), typeXmlFile);
+						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
 						logger.info("Writing " + resourceMap.querySize(tx(), type) + " " + type
 								+ " Resources to path: " + typeXmlFileF.getAbsolutePath() + "...");
 						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
@@ -175,6 +195,7 @@ public class XmlExportModelCommand extends Command {
 						writer.writeAttribute(Tags.FILE, typeXmlFile);
 
 						File typeXmlFileF = new File(modelFile.getParentFile(), typeXmlFile);
+						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
 						logger.info("Writing " + orderMap.querySize(tx(), type) + " " + type + " Orders to path: "
 								+ typeXmlFileF.getAbsolutePath() + "...");
 						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
@@ -305,5 +326,12 @@ public class XmlExportModelCommand extends Command {
 	 */
 	public ModelStatistics getStatistics() {
 		return this.statistics;
+	}
+
+	/**
+	 * @param overwrite
+	 */
+	public void setOverwrite(boolean overwrite) {
+		this.overwrite = overwrite;
 	}
 }

@@ -46,9 +46,12 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 		File dataPath = getRuntimeConfiguration().getDataPath();
 		File modelFile = new File(dataPath, arg.modelFileName);
 		if (modelFile.exists()) {
-			String msg = "Model File already exists with name {0} in data path {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
-			throw new StrolchException(msg);
+
+			if (!arg.overwrite) {
+				String msg = "Model File already exists with name {0} in data path {1}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
+				throw new StrolchException(msg);
+			}
 		}
 
 		logger.info("Exporting: " + arg);
@@ -59,6 +62,7 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 
 			command = new XmlExportModelCommand(getContainer(), tx);
 			command.setModelFile(modelFile);
+			command.setOverwrite(arg.overwrite);
 			command.setMultiFile(arg.multiFile);
 			command.setDoOrders(arg.doOrders);
 			command.setDoResources(arg.doResources);

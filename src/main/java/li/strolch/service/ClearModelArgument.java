@@ -19,7 +19,6 @@ import li.strolch.service.api.ServiceArgument;
 
 public class ClearModelArgument extends ServiceArgument {
 	private static final long serialVersionUID = 1L;
-
-	public boolean clearOrders = true;
-	public boolean clearResources = true;
+	public boolean clearOrders;
+	public boolean clearResources;
 }

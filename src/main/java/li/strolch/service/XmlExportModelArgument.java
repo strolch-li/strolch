@@ -24,6 +24,7 @@ public class XmlExportModelArgument extends ServiceArgument {
 	private static final long serialVersionUID = 1L;
 
 	public String modelFileName;
+	public boolean overwrite;
 	public boolean multiFile;
 	public boolean doOrders = true;
 	public boolean doResources = true;
@@ -33,9 +34,14 @@ public class XmlExportModelArgument extends ServiceArgument {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("XmlExportModelArgument [");
+		builder.append("XmlExportModelArgument [ ");
 
-		builder.append("multiFile=");
+		builder.append("modelFileName=");
+		builder.append(this.modelFileName);
+
+		builder.append(", overwrite=");
+		builder.append(this.overwrite);
+		builder.append(", multiFile=");
 		builder.append(this.multiFile);
 
 		if (this.doResources)
@@ -56,8 +62,6 @@ public class XmlExportModelArgument extends ServiceArgument {
 			builder.append(", orderTypes=*");
 		}
 
-		builder.append(", modelFileName=");
-		builder.append(this.modelFileName);
 		builder.append("]");
 		return builder.toString();
 	}
