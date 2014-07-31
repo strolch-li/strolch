@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import li.strolch.model.xml.StrolchElementListener;
-import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
 
 import org.junit.Test;
@@ -64,7 +63,7 @@ public class XmlModelDefaultHandlerTest {
 		assertEquals(3, resourceMap.size());
 		assertEquals(3, orderMap.size());
 
-		XmlModelStatistics statistics = handler.getStatistics();
+		ModelStatistics statistics = handler.getStatistics();
 		logger.info("Parsing took " + StringHelper.formatNanoDuration(statistics.durationNanos));
 		assertEquals(3, statistics.nrOfOrders);
 		assertEquals(3, statistics.nrOfResources);

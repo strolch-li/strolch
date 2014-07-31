@@ -15,13 +15,12 @@
  */
 package li.strolch.model.xml;
 
-import static ch.eitchnet.utils.helper.StringHelper.NULL;
-
 import java.text.MessageFormat;
 import java.util.Date;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
+import li.strolch.model.ModelStatistics;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
@@ -53,20 +52,20 @@ public class XmlModelSaxReader extends DefaultHandler {
 	protected static final Logger logger = LoggerFactory.getLogger(XmlModelSaxReader.class);
 
 	protected StrolchElementListener listener;
-	protected XmlModelStatistics statistics;
+	protected ModelStatistics statistics;
 
 	private GroupedParameterizedElement parameterizedElement;
 	private ParameterBag pBag;
 
 	public XmlModelSaxReader(StrolchElementListener listener) {
 		this.listener = listener;
-		this.statistics = new XmlModelStatistics();
+		this.statistics = new ModelStatistics();
 	}
 
 	/**
 	 * @return the statistics
 	 */
-	public XmlModelStatistics getStatistics() {
+	public ModelStatistics getStatistics() {
 		return this.statistics;
 	}
 
@@ -196,48 +195,6 @@ public class XmlModelSaxReader extends DefaultHandler {
 			break;
 		default:
 			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
-		}
-	}
-
-	public static class XmlModelStatistics {
-
-		public Date startTime;
-		public long durationNanos;
-		public int nrOfResources;
-		public int nrOfOrders;
-
-		/**
-		 * @return the nrOfOrders
-		 */
-		public int getNrOfOrders() {
-			return this.nrOfOrders;
-		}
-
-		/**
-		 * @return the nrOfResources
-		 */
-		public int getNrOfResources() {
-			return this.nrOfResources;
-		}
-
-		public long getNrOfElements() {
-			return this.nrOfOrders + this.nrOfResources;
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder();
-			builder.append("XmlModelStatistics [startTime=");
-			builder.append(this.startTime == null ? NULL : ISO8601FormatFactory.getInstance()
-					.formatDate(this.startTime));
-			builder.append(", durationNanos=");
-			builder.append(StringHelper.formatNanoDuration(this.durationNanos));
-			builder.append(", nrOfResources=");
-			builder.append(this.nrOfResources);
-			builder.append(", nrOfOrders=");
-			builder.append(this.nrOfOrders);
-			builder.append("]");
-			return builder.toString();
 		}
 	}
 }
