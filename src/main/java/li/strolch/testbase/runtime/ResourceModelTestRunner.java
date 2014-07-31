@@ -130,11 +130,13 @@ public class ResourceModelTestRunner {
 
 	public void runBulkOperationTests() {
 
+		// create 15 resources
 		List<Resource> resources = new ArrayList<>();
 		resources.addAll(createResources(resources.size(), 5, "@", "My Resource ", "MyType1"));
 		resources.addAll(createResources(resources.size(), 5, "@", "Other Resource ", "MyType2"));
 		resources.addAll(createResources(resources.size(), 5, "@", "Further Resource ", "MyType3"));
 
+		// sort them so we know which order our objects are
 		Comparator<Resource> comparator = new Comparator<Resource>() {
 			@Override
 			public int compare(Resource o1, Resource o2) {
@@ -143,11 +145,57 @@ public class ResourceModelTestRunner {
 		};
 		Collections.sort(resources, comparator);
 
+		// first clear the map, so that we have a clean state
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			resourceMap.removeAll(tx, resourceMap.getAllElements(tx));
 		}
 
+		{
+			// make sure it is empty
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				ResourceMap resourceMap = tx.getResourceMap();
+				assertEquals(0, resourceMap.querySize(tx));
+			}
+
+			// now add some resources
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				tx.getResourceMap().addAll(tx, resources);
+			}
+
+			// make sure we have our expected size
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				ResourceMap resourceMap = tx.getResourceMap();
+				assertEquals(resources.size(), resourceMap.querySize(tx));
+				assertEquals(5, resourceMap.querySize(tx, "MyType3"));
+			}
+
+			// now use the remove all by type
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				tx.getResourceMap().removeAllBy(tx, "MyType3");
+			}
+
+			// again make sure we have our expected size
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				ResourceMap resourceMap = tx.getResourceMap();
+				assertEquals(resources.size() - 5, resourceMap.querySize(tx));
+				assertEquals(0, resourceMap.querySize(tx, "MyType3"));
+			}
+
+			// now use the remove all
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				long removed = tx.getResourceMap().removeAll(tx);
+				assertEquals(resources.size() - 5, removed);
+			}
+
+			// again make sure we have our expected size
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				ResourceMap resourceMap = tx.getResourceMap();
+				assertEquals(0, resourceMap.querySize(tx));
+			}
+		}
+
+		// now add all again
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
 			tx.getResourceMap().addAll(tx, resources);
 		}

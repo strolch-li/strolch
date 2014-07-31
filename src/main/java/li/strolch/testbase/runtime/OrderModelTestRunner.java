@@ -130,11 +130,13 @@ public class OrderModelTestRunner {
 
 	public void runBulkOperationTests() {
 
+		// create 15 orders
 		List<Order> orders = new ArrayList<>();
 		orders.addAll(createOrders(orders.size(), 5, "@", "My Order ", "MyType1"));
 		orders.addAll(createOrders(orders.size(), 5, "@", "Other Order ", "MyType2"));
 		orders.addAll(createOrders(orders.size(), 5, "@", "Further Order ", "MyType3"));
 
+		// sort them so we know which order our objects are
 		Comparator<Order> comparator = new Comparator<Order>() {
 			@Override
 			public int compare(Order o1, Order o2) {
@@ -143,11 +145,57 @@ public class OrderModelTestRunner {
 		};
 		Collections.sort(orders, comparator);
 
+		// first clear the map, so that we have a clean state
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
 			OrderMap orderMap = tx.getOrderMap();
 			orderMap.removeAll(tx, orderMap.getAllElements(tx));
 		}
 
+		{
+			// make sure it is empty
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				OrderMap orderMap = tx.getOrderMap();
+				assertEquals(0, orderMap.querySize(tx));
+			}
+
+			// now add some orders
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				tx.getOrderMap().addAll(tx, orders);
+			}
+
+			// make sure we have our expected size
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				OrderMap orderMap = tx.getOrderMap();
+				assertEquals(orders.size(), orderMap.querySize(tx));
+				assertEquals(5, orderMap.querySize(tx, "MyType3"));
+			}
+
+			// now use the remove all by type
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				tx.getOrderMap().removeAllBy(tx, "MyType3");
+			}
+
+			// again make sure we have our expected size
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				OrderMap orderMap = tx.getOrderMap();
+				assertEquals(orders.size() - 5, orderMap.querySize(tx));
+				assertEquals(0, orderMap.querySize(tx, "MyType3"));
+			}
+
+			// now use the remove all
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				long removed = tx.getOrderMap().removeAll(tx);
+				assertEquals(orders.size() - 5, removed);
+			}
+
+			// again make sure we have our expected size
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
+				OrderMap orderMap = tx.getOrderMap();
+				assertEquals(0, orderMap.querySize(tx));
+			}
+		}
+
+		// now add all again
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx()) {
 			tx.getOrderMap().addAll(tx, orders);
 		}
