@@ -128,7 +128,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return Collections.emptySet();
-		return byType.keySet();
+		return new HashSet<>(byType.keySet());
 	}
 
 	@Override

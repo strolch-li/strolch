@@ -50,12 +50,16 @@ public interface ElementMap<T extends StrolchElement> {
 	public T getTemplate(StrolchTransaction tx, String type);
 
 	/**
-	 * 
+	 * Retrieves the element with the given type and id, or null if it does not exist
 	 * 
 	 * @param tx
+	 *            the open transaction
 	 * @param type
+	 *            the type of the element to retrieve
 	 * @param id
-	 * @return
+	 *            the id of the element to retrieve
+	 * 
+	 * @return the element with the type and id, or null if it does not exist
 	 */
 	public T getBy(StrolchTransaction tx, String type, String id);
 
@@ -97,8 +101,8 @@ public interface ElementMap<T extends StrolchElement> {
 	public void remove(StrolchTransaction tx, T element);
 
 	public void removeAll(StrolchTransaction tx, List<T> elements);
-	
+
 	public long removeAll(StrolchTransaction tx);
-	
+
 	public long removeAllBy(StrolchTransaction tx, String type);
 }

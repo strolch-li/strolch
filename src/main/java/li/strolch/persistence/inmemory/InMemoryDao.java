@@ -58,12 +58,12 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return Collections.emptySet();
-		return byType.keySet();
+		return new HashSet<>(byType.keySet());
 	}
 
 	@Override
 	public Set<String> queryTypes() {
-		return this.elementMap.keySet();
+		return new HashSet<>(this.elementMap.keySet());
 	}
 
 	@Override
