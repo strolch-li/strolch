@@ -18,6 +18,8 @@ package li.strolch.model.query;
 import java.util.Date;
 import java.util.List;
 
+import ch.eitchnet.utils.dbc.DBC;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -90,6 +92,10 @@ public abstract class ParameterSelection implements Selection {
 
 	public static DateParameterSelection dateSelection(String bagKey, String paramKey, Date value) {
 		return new DateParameterSelection(bagKey, paramKey, value);
+	}
+
+	public static DateRangeParameterSelection dateRangeSelection(String bagKey, String paramKey, Date from, Date to) {
+		return new DateRangeParameterSelection(bagKey, paramKey, from, to);
 	}
 
 	public static StringListParameterSelection stringListSelection(String bagKey, String paramKey, List<String> value) {
@@ -222,6 +228,32 @@ public abstract class ParameterSelection implements Selection {
 
 		public Date getValue() {
 			return this.value;
+		}
+
+		@Override
+		public void accept(ParameterSelectionVisitor visitor) {
+			visitor.visit(this);
+		}
+	}
+
+	public static class DateRangeParameterSelection extends ParameterSelection {
+
+		private Date from;
+		private Date to;
+
+		public DateRangeParameterSelection(String bagKey, String paramKey, Date from, Date to) {
+			super(bagKey, paramKey);
+			DBC.PRE.assertFalse("Either 'to' or 'from' must be set! Both can not be null!", from == null && to == null);
+			this.from = from;
+			this.to = to;
+		}
+
+		public Date getFrom() {
+			return this.from;
+		}
+
+		public Date getTo() {
+			return this.to;
 		}
 
 		@Override
