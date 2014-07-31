@@ -20,8 +20,8 @@ import java.util.Set;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.impl.InMemoryElementListener;
+import li.strolch.model.ModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
-import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import ch.eitchnet.utils.dbc.DBC;
@@ -41,7 +41,7 @@ public class XmlImportModelCommand extends Command {
 	private Set<String> resourceTypes;
 
 	// output
-	private XmlModelStatistics statistics;
+	private ModelStatistics statistics;
 
 	/**
 	 * @param container
@@ -137,7 +137,7 @@ public class XmlImportModelCommand extends Command {
 	/**
 	 * @return the statistics
 	 */
-	public XmlModelStatistics getStatistics() {
+	public ModelStatistics getStatistics() {
 		return this.statistics;
 	}
 }

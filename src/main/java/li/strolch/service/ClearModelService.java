@@ -15,11 +15,9 @@
  */
 package li.strolch.service;
 
-import java.io.File;
 import java.text.MessageFormat;
 
-import li.strolch.command.XmlImportModelCommand;
-import li.strolch.exception.StrolchException;
+import li.strolch.command.ClearModelCommand;
 import li.strolch.model.ModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
@@ -29,7 +27,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class XmlImportModelService extends AbstractService<XmlImportModelArgument, ServiceResult> {
+public class ClearModelService extends AbstractService<ClearModelArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,36 +37,23 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 	}
 
 	@Override
-	protected ServiceResult internalDoService(XmlImportModelArgument arg) {
+	protected ServiceResult internalDoService(ClearModelArgument arg) {
 
-		File dataPath = getRuntimeConfiguration().getDataPath();
-		File modelFile = new File(dataPath, arg.modelFileName);
-		if (!modelFile.exists()) {
-			String msg = "Model File does not exist with name {0} in data path {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
-			throw new StrolchException(msg);
-		}
-
-		XmlImportModelCommand command;
+		ClearModelCommand command;
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 
-			command = new XmlImportModelCommand(getContainer(), tx);
-			command.setModelFile(modelFile);
-			command.setAddOrders(arg.addOrders);
-			command.setAddResources(arg.addResources);
-			command.setUpdateOrders(arg.updateOrders);
-			command.setUpdateResources(arg.updateResources);
-			command.setOrderTypes(arg.orderTypes);
-			command.setResourceTypes(arg.resourceTypes);
+			command = new ClearModelCommand(getContainer(), tx);
+			command.setClearOrders(arg.clearOrders);
+			command.setClearResources(arg.clearResources);
 			tx.addCommand(command);
 		}
 
 		ModelStatistics statistics = command.getStatistics();
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
 		logger.info(MessageFormat.format(
-				"Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(), arg.realm, durationS)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
+				"Clearing Model for realm {1} took {2}.", arg.realm, durationS)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Cleared {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Cleared {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 
 		return ServiceResult.success();
 	}

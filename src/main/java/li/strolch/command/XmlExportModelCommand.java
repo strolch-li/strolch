@@ -37,6 +37,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
+import li.strolch.model.ModelStatistics;
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 import li.strolch.model.Resource;
@@ -44,7 +45,6 @@ import li.strolch.model.ResourceVisitor;
 import li.strolch.model.Tags;
 import li.strolch.model.xml.OrderToSaxWriterVisitor;
 import li.strolch.model.xml.ResourceToSaxWriterVisitor;
-import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
@@ -66,7 +66,7 @@ public class XmlExportModelCommand extends Command {
 	private Set<String> resourceTypes;
 
 	// output
-	private XmlModelStatistics statistics;
+	private ModelStatistics statistics;
 	private boolean multiFile;
 
 	private int elementsToWrite;
@@ -91,7 +91,7 @@ public class XmlExportModelCommand extends Command {
 		String fileName = this.modelFile.getName();
 
 		long start = System.nanoTime();
-		this.statistics = new XmlModelStatistics();
+		this.statistics = new ModelStatistics();
 		this.statistics.startTime = new Date();
 
 		String exportName = fileName.substring(0, fileName.indexOf(XML_FILE_SUFFIX));
@@ -303,7 +303,7 @@ public class XmlExportModelCommand extends Command {
 	/**
 	 * @return the statistics
 	 */
-	public XmlModelStatistics getStatistics() {
+	public ModelStatistics getStatistics() {
 		return this.statistics;
 	}
 }

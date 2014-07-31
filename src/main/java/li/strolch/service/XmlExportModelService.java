@@ -20,7 +20,7 @@ import java.text.MessageFormat;
 
 import li.strolch.command.XmlExportModelCommand;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.xml.XmlModelSaxReader.XmlModelStatistics;
+import li.strolch.model.ModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
@@ -67,7 +67,7 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 			tx.addCommand(command);
 		}
 
-		XmlModelStatistics statistics = command.getStatistics();
+		ModelStatistics statistics = command.getStatistics();
 		String msg = "Wrote XML Model file {0} for realm {1}: {2} at path: {3}";
 		logger.info(MessageFormat.format(msg, modelFile.getName(), arg.realm, statistics, modelFile.getAbsolutePath()));
 		return ServiceResult.success();
