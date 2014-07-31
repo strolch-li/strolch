@@ -55,7 +55,7 @@ public abstract class AbstractDao<T extends StrolchElement> implements StrolchDa
 		Set<String> types = queryTypes();
 		for (String type : types) {
 
-			SubTypeRef subTypeRef = this.tx.getObjectRefCache().getSubTypeRef(getClassType(), type);
+			SubTypeRef subTypeRef = getTypeRef(type);
 			size += this.tx.getMetadataDao().querySize(subTypeRef);
 		}
 		return size;
@@ -63,7 +63,7 @@ public abstract class AbstractDao<T extends StrolchElement> implements StrolchDa
 
 	@Override
 	public long querySize(String type) {
-		SubTypeRef subTypeRef = this.tx.getObjectRefCache().getSubTypeRef(getClassType(), type);
+		SubTypeRef subTypeRef = getTypeRef(type);
 		return tx.getMetadataDao().querySize(subTypeRef);
 	}
 
@@ -79,7 +79,7 @@ public abstract class AbstractDao<T extends StrolchElement> implements StrolchDa
 
 	@Override
 	public Set<String> queryKeySet(String type) {
-		SubTypeRef typeRef = this.tx.getObjectRefCache().getSubTypeRef(getClassType(), type);
+		SubTypeRef typeRef = getTypeRef(type);
 		Set<String> keys = this.tx.getMetadataDao().queryKeySet(typeRef);
 		return keys;
 	}
@@ -143,5 +143,17 @@ public abstract class AbstractDao<T extends StrolchElement> implements StrolchDa
 	@Override
 	public void removeAll(List<T> objects) {
 		this.tx.getObjectDao().removeAll(objects);
+	}
+
+	@Override
+	public long removeAll() {
+		TypeRef typeRef = this.tx.getObjectRefCache().getTypeRef(getClassType());
+		return this.tx.getObjectDao().removeAllBy(typeRef);
+	}
+
+	@Override
+	public long removeAllBy(String type) {
+		SubTypeRef typeRef = getTypeRef(type);
+		return this.tx.getObjectDao().removeAllBy(typeRef);
 	}
 }
