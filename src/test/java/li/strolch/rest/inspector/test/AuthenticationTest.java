@@ -15,16 +15,18 @@
  */
 package li.strolch.rest.inspector.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
 import li.strolch.rest.model.LogoutResult;
 
@@ -44,11 +46,11 @@ public class AuthenticationTest extends AbstractRestfulTest {
 	public void shouldAuthenticate() {
 
 		// login
-		Form loginForm = new Form();
-		loginForm.param("username", "jill");
-		loginForm.param("password", "jill");
-		Entity<Form> entity = Entity.entity(loginForm, MediaType.APPLICATION_FORM_URLENCODED);
-		Response result = target().path(ROOT_PATH + "/login").request(MediaType.APPLICATION_JSON).post(entity);
+		Login login = new Login();
+		login.setUsername("jill");
+		login.setPassword("jill");
+		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
+		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(loginEntity);
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		LoginResult loginResult = result.readEntity(LoginResult.class);
 		assertNotNull(loginResult);
@@ -57,11 +59,8 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		assertNull(loginResult.getMsg());
 
 		// logout
-		Form logoutForm = new Form();
-		logoutForm.param("username", "jill");
-		logoutForm.param("sessionId", loginResult.getSessionId());
-		entity = Entity.entity(logoutForm, MediaType.APPLICATION_FORM_URLENCODED);
-		result = target().path(ROOT_PATH + "/logout").request(MediaType.APPLICATION_JSON).post(entity);
+		result = target().path(ROOT_PATH + "/" + loginResult.getSessionId()).request(MediaType.APPLICATION_JSON)
+				.delete();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		assertNotNull(loginResult);
 		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
@@ -73,11 +72,11 @@ public class AuthenticationTest extends AbstractRestfulTest {
 	public void shouldNotAuthenticate() {
 
 		// login
-		Form loginForm = new Form();
-		loginForm.param("username", "admin");
-		loginForm.param("password", "blalba");
-		Entity<Form> entity = Entity.entity(loginForm, MediaType.APPLICATION_FORM_URLENCODED);
-		Response result = target().path(ROOT_PATH + "/login").request(MediaType.APPLICATION_JSON).post(entity);
+		Login login = new Login();
+		login.setUsername("admin");
+		login.setPassword("blalba");
+		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
+		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(loginEntity);
 		assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
 		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
 		assertNotNull(logoutResult);
@@ -88,11 +87,11 @@ public class AuthenticationTest extends AbstractRestfulTest {
 	public void shouldFailLogoutIllegalSession() {
 
 		// login
-		Form loginForm = new Form();
-		loginForm.param("username", "jill");
-		loginForm.param("password", "jill");
-		Entity<Form> entity = Entity.entity(loginForm, MediaType.APPLICATION_FORM_URLENCODED);
-		Response result = target().path(ROOT_PATH + "/login").request(MediaType.APPLICATION_JSON).post(entity);
+		Login login = new Login();
+		login.setUsername("jill");
+		login.setPassword("jill");
+		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
+		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(loginEntity);
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		LoginResult loginResult = result.readEntity(LoginResult.class);
 		assertNotNull(loginResult);
@@ -101,15 +100,10 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		assertNull(loginResult.getMsg());
 
 		// logout
-		Form logoutForm = new Form();
-		logoutForm.param("username", "jill");
-		logoutForm.param("sessionId", "blabla");
-		entity = Entity.entity(logoutForm, MediaType.APPLICATION_FORM_URLENCODED);
-		result = target().path(ROOT_PATH + "/logout").request(MediaType.APPLICATION_JSON).post(entity);
+		result = target().path(ROOT_PATH + "/blabla").request(MediaType.APPLICATION_JSON).delete();
 		assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
 		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
 		assertNotNull(logoutResult);
-		assertEquals("Could not logout due to: Illegal request for username jill and sessionId blabla",
-				logoutResult.getMsg());
+		assertThat(logoutResult.getMsg(), containsString("No certificate exists for sessionId blabla"));
 	}
 }

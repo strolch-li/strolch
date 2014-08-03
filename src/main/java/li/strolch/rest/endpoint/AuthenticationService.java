@@ -20,6 +20,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
@@ -32,7 +33,6 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
-import li.strolch.rest.model.Logout;
 import li.strolch.rest.model.LogoutResult;
 
 import org.slf4j.Logger;
@@ -79,7 +79,7 @@ public class AuthenticationService {
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getComponent(
 					StrolchSessionHandler.class);
-			String origin = request.getRemoteAddr();
+			String origin = request == null ? "test" : request.getRemoteAddr();
 			Certificate certificate = sessionHandler.authenticate(origin, login.getUsername(), login.getPassword()
 					.getBytes());
 
@@ -105,7 +105,8 @@ public class AuthenticationService {
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response logout(Logout logout) {
+	@Path("{authToken}")
+	public Response logout(@PathParam("authToken") String authToken) {
 
 		LogoutResult logoutResult = new LogoutResult();
 
@@ -113,22 +114,10 @@ public class AuthenticationService {
 		};
 		try {
 
-			StringBuilder sb = new StringBuilder();
-			if (StringHelper.isEmpty(logout.getUsername())) {
-				sb.append("Username was not given.");
-			}
-			if (StringHelper.isEmpty(logout.getSessionId())) {
-				sb.append("SessionId was not given.");
-			}
-			if (sb.length() != 0) {
-				logoutResult.setMsg("Could not logout due to: " + sb.toString());
-				return Response.status(Status.UNAUTHORIZED).entity(logoutResult).build();
-			}
-
 			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance().getComponent(
 					StrolchSessionHandler.class);
-			String origin = request.getRemoteAddr();
-			Certificate certificate = sessionHandlerHandler.validate(origin, logout.getSessionId());
+			String origin = request == null ? "test" : request.getRemoteAddr();
+			Certificate certificate = sessionHandlerHandler.validate(origin, authToken);
 			sessionHandlerHandler.invalidateSession(origin, certificate);
 
 			return Response.ok().entity(entity).build();
