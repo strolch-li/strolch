@@ -15,16 +15,10 @@
  */
 package li.strolch.rest;
 
-import ch.eitchnet.privilege.model.Certificate;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchSessionHandler {
+public class StrolchRestfulConstants {
 
-	public Certificate authenticate(String origin, String username, byte[] password);
-
-	public Certificate validate(String origin, String authToken);
-
-	public void invalidateSession(String origin, Certificate certificate);
+	public static final String STROLCH_CERTIFICATE = "strolch.certificate"; //$NON-NLS-1$
 }

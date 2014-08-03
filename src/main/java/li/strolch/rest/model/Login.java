@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.rest.form;
+package li.strolch.rest.model;
 
-import javax.ws.rs.FormParam;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class LoginForm {
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(name = "Login")
+public class Login {
 
-	@FormParam("username")
+	@XmlAttribute
 	private String username;
-	@FormParam("password")
+	@XmlAttribute
 	private String password;
 
-	public LoginForm() {
+	public Login() {
 		// no-arg constructor for JAXB
 	}
 

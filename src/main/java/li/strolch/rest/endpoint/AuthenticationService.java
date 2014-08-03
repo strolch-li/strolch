@@ -16,8 +16,8 @@
 package li.strolch.rest.endpoint;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -30,9 +30,9 @@ import javax.ws.rs.core.Response.Status;
 import li.strolch.exception.StrolchException;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchSessionHandler;
-import li.strolch.rest.form.LoginForm;
-import li.strolch.rest.form.LogoutForm;
+import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
+import li.strolch.rest.model.Logout;
 import li.strolch.rest.model.LogoutResult;
 
 import org.slf4j.Logger;
@@ -51,24 +51,24 @@ public class AuthenticationService {
 	private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
 	@Context
-	HttpServletRequest servletRequest;
+	HttpServletRequest request;
 
 	@POST
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("login")
-	public Response login(@BeanParam LoginForm loginForm) {
+	public Response login(Login login) {
 
 		LoginResult loginResult = new LoginResult();
 		GenericEntity<LoginResult> entity = new GenericEntity<LoginResult>(loginResult, LoginResult.class) {
 		};
+
 		try {
 
 			StringBuilder sb = new StringBuilder();
-			if (StringHelper.isEmpty(loginForm.getUsername())) {
+			if (StringHelper.isEmpty(login.getUsername())) {
 				sb.append("Username was not given. ");
 			}
-			if (StringHelper.isEmpty(loginForm.getPassword())) {
+			if (StringHelper.isEmpty(login.getPassword())) {
 				sb.append("Password was not given.");
 			}
 
@@ -79,9 +79,9 @@ public class AuthenticationService {
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getComponent(
 					StrolchSessionHandler.class);
-			String origin = getOrigin();
-			Certificate certificate = sessionHandler.authenticate(origin, loginForm.getUsername(), loginForm
-					.getPassword().getBytes());
+			String origin = request.getRemoteAddr();
+			Certificate certificate = sessionHandler.authenticate(origin, login.getUsername(), login.getPassword()
+					.getBytes());
 
 			loginResult.setSessionId(certificate.getAuthToken());
 			loginResult.setUsername(certificate.getUsername());
@@ -102,17 +102,10 @@ public class AuthenticationService {
 		}
 	}
 
-	private String getOrigin() {
-		if (servletRequest == null)
-			return "test";
-		return servletRequest.getRequestedSessionId();
-	}
-
-	@POST
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@DELETE
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("logout")
-	public Response logout(@BeanParam LogoutForm logoutForm) {
+	public Response logout(Logout logout) {
 
 		LogoutResult logoutResult = new LogoutResult();
 
@@ -121,10 +114,10 @@ public class AuthenticationService {
 		try {
 
 			StringBuilder sb = new StringBuilder();
-			if (StringHelper.isEmpty(logoutForm.getUsername())) {
+			if (StringHelper.isEmpty(logout.getUsername())) {
 				sb.append("Username was not given.");
 			}
-			if (StringHelper.isEmpty(logoutForm.getSessionId())) {
+			if (StringHelper.isEmpty(logout.getSessionId())) {
 				sb.append("SessionId was not given.");
 			}
 			if (sb.length() != 0) {
@@ -134,9 +127,8 @@ public class AuthenticationService {
 
 			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance().getComponent(
 					StrolchSessionHandler.class);
-			String origin = getOrigin();
-			Certificate certificate = sessionHandlerHandler.validate(origin, logoutForm.getUsername(),
-					logoutForm.getSessionId());
+			String origin = request.getRemoteAddr();
+			Certificate certificate = sessionHandlerHandler.validate(origin, logout.getSessionId());
 			sessionHandlerHandler.invalidateSession(origin, certificate);
 
 			return Response.ok().entity(entity).build();

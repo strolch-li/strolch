@@ -15,6 +15,7 @@
  */
 package li.strolch.rest;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,10 +32,11 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public class DefaultStrolchSessionHandler extends StrolchComponent implements StrolchSessionHandler {
 
-	private static final String PROP_REMEMBER_USER = "rememberUser";
+	private static final String SESSION_ORIGIN = "session.origin";
+	private static final String PROP_VALIDATE_ORIGIN = "validateOrigin";
 	private StrolchPrivilegeHandler privilegeHandler;
 	private Map<String, Certificate> certificateMap;
-	private boolean rememberUser;
+	private boolean validateOrigin;
 
 	/**
 	 * @param container
@@ -46,7 +48,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public void initialize(ComponentConfiguration configuration) {
-		this.rememberUser = configuration.getBoolean(PROP_REMEMBER_USER, false);
+		this.validateOrigin = configuration.getBoolean(PROP_VALIDATE_ORIGIN, false);
 		super.initialize(configuration);
 	}
 
@@ -81,63 +83,47 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		DBC.PRE.assertNotEmpty("Username must be set!", username);
 		DBC.PRE.assertNotNull("Passwort must be set", password);
 
-		String userId = getUserId(origin, username);
-		Certificate certificate;
-		if (this.rememberUser) {
-			certificate = this.certificateMap.get(userId);
-			if (certificate != null) {
-				this.privilegeHandler.isCertificateValid(certificate);
-				logger.info("Re-using session for user " + userId + " and sessionId " + certificate.getSessionId());
-				return certificate;
-			}
-		}
-
-		certificate = this.privilegeHandler.authenticate(username, password);
-		if (this.rememberUser)
-			this.certificateMap.put(userId, certificate);
-		else
-			this.certificateMap.put(certificate.getAuthToken(), certificate);
+		Certificate certificate = this.privilegeHandler.authenticate(username, password);
+		certificate.getSessionDataMap().put(SESSION_ORIGIN, origin);
+		this.certificateMap.put(certificate.getAuthToken(), certificate);
 
 		return certificate;
 	}
 
 	@Override
-	public Certificate validate(String origin, String username, String sessionId) {
-		DBC.PRE.assertNotEmpty("Origin must be set!", username);
-		DBC.PRE.assertNotEmpty("Username must be set!", username);
+	public Certificate validate(String origin, String authToken) {
+		DBC.PRE.assertNotEmpty("Origin must be set!", origin);
+		DBC.PRE.assertNotEmpty("SessionId must be set!", authToken);
 
-		Certificate certificate;
-		if (this.rememberUser)
-			certificate = this.certificateMap.get(getUserId(origin, username));
-		else
-			certificate = this.certificateMap.get(sessionId);
-
+		Certificate certificate = this.certificateMap.get(authToken);
 		if (certificate == null)
-			throw new StrolchException("No certificate exists for sessionId " + sessionId);
-
-		if (!certificate.getUsername().equals(username) || !certificate.getAuthToken().equals(sessionId)) {
-			throw new StrolchException("Illegal request for username " + username + " and sessionId " + sessionId);
-		}
+			throw new StrolchException(MessageFormat.format("No certificate exists for sessionId {0}", authToken));
 
 		this.privilegeHandler.isCertificateValid(certificate);
+
+		if (this.validateOrigin && !origin.equals(certificate.getSessionDataMap().get(SESSION_ORIGIN))) {
+			String msg = MessageFormat.format("Illegal request for origin {0} and sessionId {1}", origin, authToken);
+			throw new StrolchException(msg);
+		}
+
 		return certificate;
 	}
 
 	@Override
 	public void invalidateSession(String origin, Certificate certificate) {
-		if (this.rememberUser)
-			this.certificateMap.remove(getUserId(origin, certificate.getUsername()));
-		else
-			this.certificateMap.remove(certificate.getSessionId());
-		this.privilegeHandler.invalidateSession(certificate);
-	}
+		DBC.PRE.assertNotEmpty("Origin must be set!", origin);
+		DBC.PRE.assertNotNull("Certificate must bet given!", certificate);
 
-	/**
-	 * @param origin
-	 * @param username
-	 * @return
-	 */
-	private String getUserId(String origin, String username) {
-		return origin + "_" + username;
+		if (this.validateOrigin && !origin.equals(certificate.getSessionDataMap().get(SESSION_ORIGIN))) {
+			String msg = MessageFormat.format("Illegal request for origin {0} and sessionId {1}", origin,
+					certificate.getAuthToken());
+			throw new StrolchException(msg);
+		}
+
+		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
+		if (removedCert == null)
+			logger.error("No session was registered with token " + certificate.getAuthToken());
+
+		this.privilegeHandler.invalidateSession(certificate);
 	}
 }

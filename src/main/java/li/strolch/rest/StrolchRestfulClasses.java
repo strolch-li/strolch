@@ -24,6 +24,8 @@ import li.strolch.rest.endpoint.EnumQuery;
 import li.strolch.rest.endpoint.Inspector;
 import li.strolch.rest.endpoint.VersionQuery;
 import li.strolch.rest.filters.AccessControlResponseFilter;
+import li.strolch.rest.filters.AuthenicationRequestFilter;
+import li.strolch.rest.filters.AuthenicationResponseFilter;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -43,14 +45,13 @@ public class StrolchRestfulClasses {
 		Set<Class<?>> providerClasses = new HashSet<>();
 		providerClasses.add(StrolchRestfulExceptionMapper.class);
 		providerClasses.add(AccessControlResponseFilter.class);
+		providerClasses.add(AuthenicationRequestFilter.class);
+		providerClasses.add(AuthenicationResponseFilter.class);
 
 		StrolchRestfulClasses.restfulClasses = Collections.unmodifiableSet(restfulClasses);
 		StrolchRestfulClasses.providerClasses = Collections.unmodifiableSet(providerClasses);
 	}
 
-	/**
-	 * @return the classes
-	 */
 	public static Set<Class<?>> getRestfulClasses() {
 		return restfulClasses;
 	}
