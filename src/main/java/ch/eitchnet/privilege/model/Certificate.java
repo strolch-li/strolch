@@ -17,11 +17,13 @@ package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -43,6 +45,7 @@ public final class Certificate implements Serializable {
 	private Locale locale;
 
 	private Map<String, String> propertyMap;
+	private Map<String, String> sessionDataMap;
 
 	/**
 	 * Default constructor initializing with all information needed for this certificate
@@ -93,13 +96,26 @@ public final class Certificate implements Serializable {
 			this.propertyMap = Collections.emptyMap();
 		else
 			this.propertyMap = Collections.unmodifiableMap(propertyMap);
+
+		this.sessionDataMap = new HashMap<>();
 	}
 
 	/**
+	 * Returns the {@link User User's} property map. The map is immutable
+	 * 
 	 * @return the propertyMap
 	 */
 	public Map<String, String> getPropertyMap() {
 		return this.propertyMap;
+	}
+
+	/**
+	 * Returns a mutable {@link Map} for storing session relevant data
+	 * 
+	 * @return the sessionDataMap
+	 */
+	public Map<String, String> getSessionDataMap() {
+		return this.sessionDataMap;
 	}
 
 	/**
