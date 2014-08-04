@@ -50,6 +50,12 @@ public abstract class AbstractDao<T extends StrolchElement> implements StrolchDa
 	}
 
 	@Override
+	public boolean hasElement(String type, String id) {
+		IdOfSubTypeRef ref = getIdRef(type, id);
+		return this.tx.getObjectDao().hasElement(ref);
+	}
+
+	@Override
 	public long querySize() {
 		long size = 0;
 		Set<String> types = queryTypes();
@@ -64,7 +70,7 @@ public abstract class AbstractDao<T extends StrolchElement> implements StrolchDa
 	@Override
 	public long querySize(String type) {
 		SubTypeRef subTypeRef = getTypeRef(type);
-		return tx.getMetadataDao().querySize(subTypeRef);
+		return this.tx.getMetadataDao().querySize(subTypeRef);
 	}
 
 	@Override
