@@ -59,11 +59,11 @@ public class SystemHelper {
 	public static String asString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(SystemHelper.osName);
-		sb.append(StringHelper.EMPTY);
+		sb.append(StringHelper.SPACE);
 		sb.append(SystemHelper.osArch);
-		sb.append(StringHelper.EMPTY);
+		sb.append(StringHelper.SPACE);
 		sb.append(SystemHelper.osVersion);
-		sb.append(StringHelper.EMPTY);
+		sb.append(StringHelper.SPACE);
 		sb.append("on Java "); //$NON-NLS-1$
 		sb.append(SystemHelper.javaVendor);
 		sb.append(" version "); //$NON-NLS-1$
