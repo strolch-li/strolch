@@ -251,7 +251,17 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		} catch (Exception e) {
 			this.txResult.setState(TransactionState.ROLLING_BACK);
-			undoCommands();
+			try {
+				undoCommands();
+			} catch (Exception e2) {
+				try {
+					rollback(txResult);
+					handleRollback(start);
+				} catch (Exception e1) {
+					logger.error("Failed to roll back after failing to undo commands: " + e1.getMessage(), e1);
+				}
+				handleFailure(start, e);
+			}
 			try {
 				rollback(txResult);
 				handleRollback(start);
