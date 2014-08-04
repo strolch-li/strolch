@@ -36,6 +36,8 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.utils.helper.SystemHelper;
+
 public class ComponentContainerImpl implements ComponentContainer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerImpl.class);
@@ -290,6 +292,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		String msg = "All {0} Strolch Components started and container now ready to be used. Have fun =))"; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.controllerMap.size()));
+
+		logger.info(MessageFormat.format("Running on {0}", SystemHelper.asString())); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary())); //$NON-NLS-1$
 	}
 
 	public void stop() {
