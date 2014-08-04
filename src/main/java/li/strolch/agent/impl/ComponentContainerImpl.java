@@ -290,10 +290,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 		start(rootUpstreamComponents);
 		this.state = this.state.validateStateChange(ComponentState.STARTED);
 
-		String msg = "All {0} Strolch Components started and container now ready to be used. Have fun =))"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, this.controllerMap.size()));
-
-		logger.info(MessageFormat.format("Running on {0}", SystemHelper.asString())); //$NON-NLS-1$
+		String msg = "All {0} Strolch Components started. {1} is now ready to be used. Have fun =))"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, this.controllerMap.size(), this.getAgent().getApplicationName()));
+		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString())); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary())); //$NON-NLS-1$
 	}
 
