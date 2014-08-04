@@ -46,6 +46,13 @@ public class FileDao {
 		}
 	}
 
+	public <T> boolean exists(PersistenceContext<T> ctx) {
+		ObjectRef objectRef = ctx.getObjectRef();
+		assertIsIdRef(IoOperation.READ, objectRef);
+		File path = objectRef.getPath(this.pathBuilder);
+		return path.exists();
+	}
+
 	public <T> void performCreate(PersistenceContext<T> ctx) {
 		ObjectRef objectRef = ctx.getObjectRef();
 		assertIsIdRef(IoOperation.CREATE, objectRef);

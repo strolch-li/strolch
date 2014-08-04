@@ -165,6 +165,7 @@ public class LockingTest extends AbstractPersistenceTest {
 			this.resourceId = resourceId;
 		}
 
+		@Override
 		public void run() {
 
 			logger.info("Waiting for ok to work..."); //$NON-NLS-1$

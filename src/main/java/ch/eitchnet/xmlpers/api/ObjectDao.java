@@ -125,16 +125,16 @@ public class ObjectDao {
 		refs.add(typeRef);
 		try {
 
-			Set<String> types = tx.getMetadataDao().queryTypeSet(typeRef);
+			Set<String> types = this.tx.getMetadataDao().queryTypeSet(typeRef);
 			for (String type : types) {
-				ObjectRef childTypeRef = typeRef.getChildTypeRef(tx, type);
+				ObjectRef childTypeRef = typeRef.getChildTypeRef(this.tx, type);
 				childTypeRef.lock();
 				refs.add(childTypeRef);
 
 				Set<String> ids = queryKeySet(childTypeRef);
 				for (String id : ids) {
 
-					ObjectRef idRef = childTypeRef.getChildIdRef(tx, id);
+					ObjectRef idRef = childTypeRef.getChildIdRef(this.tx, id);
 
 					PersistenceContext<T> ctx = createCtx(idRef);
 					ctx.getObjectRef().lock();
@@ -163,7 +163,7 @@ public class ObjectDao {
 			Set<String> ids = queryKeySet(subTypeRef);
 			for (String id : ids) {
 
-				ObjectRef idRef = subTypeRef.getChildIdRef(tx, id);
+				ObjectRef idRef = subTypeRef.getChildIdRef(this.tx, id);
 
 				PersistenceContext<T> ctx = createCtx(idRef);
 				ctx.getObjectRef().lock();
@@ -206,6 +206,19 @@ public class ObjectDao {
 		}
 	}
 
+	public <T> boolean hasElement(ObjectRef objectRef) {
+		assertNotClosed();
+		assertIsIdRef(objectRef);
+
+		objectRef.lock();
+		try {
+			PersistenceContext<T> ctx = objectRef.<T> createPersistenceContext(this.tx);
+			return this.fileDao.exists(ctx);
+		} finally {
+			objectRef.unlock();
+		}
+	}
+
 	public <T> T queryById(ObjectRef objectRef) {
 		assertNotClosed();
 		assertIsIdRef(objectRef);
@@ -213,13 +226,8 @@ public class ObjectDao {
 		objectRef.lock();
 		try {
 			PersistenceContext<T> ctx = objectRef.<T> createPersistenceContext(this.tx);
-			ctx.getObjectRef().lock();
-			try {
-				this.fileDao.performRead(ctx);
-				return ctx.getObject();
-			} finally {
-				ctx.getObjectRef().unlock();
-			}
+			this.fileDao.performRead(ctx);
+			return ctx.getObject();
 		} finally {
 			objectRef.unlock();
 		}
