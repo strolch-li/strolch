@@ -53,9 +53,10 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 
 	@Override
 	public boolean hasElement(String type, String id) {
-		String sql = "select count(*) from " + getTableName() + " where type = ?";
+		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ?";
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
+			statement.setString(2, id);
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
 				long numberOfElements = result.getLong(1);
