@@ -277,7 +277,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 			DateParameter param = bag.getParameter(this.paramKey);
 			Date value = param.getValue();
 
-			return (from == null || !value.before(from)) && (to == null || !value.after(to));
+			return (this.from == null || !value.before(this.from)) && (this.to == null || !value.after(this.to));
 		}
 	}
 
