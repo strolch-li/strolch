@@ -17,6 +17,7 @@ package li.strolch.model.parameter;
 
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.visitor.ParameterVisitor;
 
 /**
@@ -104,6 +105,7 @@ public interface Parameter<T> extends StrolchElement {
 	 * 
 	 * @return
 	 */
+	@Override
 	public ParameterizedElement getParent();
 
 	/**
@@ -116,8 +118,8 @@ public interface Parameter<T> extends StrolchElement {
 	 * this {@link Parameter} means. Currently there are three definitions, but any String value can be used:
 	 * <ul>
 	 * <li>{@link Parameter#INTERPRETATION_NONE}</li>
-	 * <li>{@link Parameter#INTERPRETATION_ORDER_REF}</li>
-	 * <li>{@link Parameter#INTERPRETATION_RESOURCE_REF}</li>
+	 * <li>{@link StrolchModelConstants#INTERPRETATION_ORDER_REF}</li>
+	 * <li>{@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
 	 * 
 	 * @return string value
@@ -129,8 +131,8 @@ public interface Parameter<T> extends StrolchElement {
 	 * {@link Parameter} means. Currently there are three definitions, but any String value can be used:
 	 * <ul>
 	 * <li>{@link Parameter#INTERPRETATION_NONE}</li>
-	 * <li>{@link Parameter#INTERPRETATION_ORDER_REF}</li>
-	 * <li>{@link Parameter#INTERPRETATION_RESOURCE_REF}</li>
+	 * <li>{@link StrolchModelConstants#INTERPRETATION_ORDER_REF}</li>
+	 * <li>{@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
 	 * 
 	 * @param interpretation

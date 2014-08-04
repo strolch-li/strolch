@@ -28,43 +28,55 @@ public abstract class StrolchQuery<T extends QueryVisitor> {
 	public StrolchQuery(Navigation navigation) {
 		this.navigation = navigation;
 	}
-	
+
 	public boolean hasNavigation() {
-		return navigation != null;
-	}
-	
-	public boolean hasSelection() {
-		return selection != null && selection.hasSelection();
+		return this.navigation != null;
 	}
 
-	public void select(Selection selection) {
-		DBC.PRE.assertNull("A selection is already set! Use a boolean operator to perform multiple selections",
+	public boolean hasSelection() {
+		return this.selection != null && this.selection.hasSelection();
+	}
+
+	public Selection getSelection() {
+		return this.selection;
+	}
+
+	public void with(Selection selection) {
+		DBC.PRE.assertNull("A selection is already set! Use a boolean operator to perform multiple selections", //$NON-NLS-1$
 				this.selection);
 		this.selection = selection;
 	}
 
+	/**
+	 * @deprecated use {@link #with(Selection)} instead
+	 */
+	@Deprecated
+	public void select(Selection selection) {
+		with(selection);
+	}
+
 	public AndSelection and() {
-		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection);
+		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection); //$NON-NLS-1$
 		AndSelection and = new AndSelection();
 		this.selection = and;
 		return and;
 	}
 
 	public OrSelection or() {
-		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection);
+		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection); //$NON-NLS-1$
 		OrSelection or = new OrSelection();
 		this.selection = or;
 		return or;
 	}
 
 	public void not(Selection selection) {
-		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection);
+		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection); //$NON-NLS-1$
 		this.selection = new NotSelection(selection);
 	}
 
 	public void accept(T visitor) {
-		DBC.PRE.assertNotNull("No navigation set!", this.navigation);
-		DBC.PRE.assertNotNull("No selection defined!", this.selection);
+		DBC.PRE.assertNotNull("No navigation set!", this.navigation); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("No selection defined!", this.selection); //$NON-NLS-1$
 		this.navigation.accept(visitor);
 		this.selection.accept(visitor);
 	}

@@ -57,6 +57,7 @@ public abstract class ParameterSelection implements Selection {
 		accept((ParameterSelectionVisitor) visitor);
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -243,7 +244,7 @@ public abstract class ParameterSelection implements Selection {
 
 		public DateRangeParameterSelection(String bagKey, String paramKey, Date from, Date to) {
 			super(bagKey, paramKey);
-			DBC.PRE.assertFalse("Either 'to' or 'from' must be set! Both can not be null!", from == null && to == null);
+			DBC.PRE.assertFalse("Either 'to' or 'from' must be set! Both can not be null!", from == null && to == null); //$NON-NLS-1$
 			this.from = from;
 			this.to = to;
 		}
