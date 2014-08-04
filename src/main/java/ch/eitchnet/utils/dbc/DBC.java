@@ -17,6 +17,7 @@ package ch.eitchnet.utils.dbc;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.Collection;
 
 import ch.eitchnet.utils.helper.StringHelper;
 
@@ -72,6 +73,24 @@ public enum DBC {
 
 	public void assertNotEmpty(String msg, String value) {
 		if (StringHelper.isEmpty(value)) {
+			String ex = "Illegal empty value: {0}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
+		}
+	}
+
+	public void assertNotEmpty(String msg, Object[] array) {
+		assertNotNull(msg, array);
+		if (array.length == 0) {
+			String ex = "Illegal empty value: {0}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
+		}
+	}
+
+	public void assertNotEmpty(String msg, Collection<?> collection) {
+		assertNotNull(msg, collection);
+		if (collection.isEmpty()) {
 			String ex = "Illegal empty value: {0}"; //$NON-NLS-1$
 			ex = MessageFormat.format(ex, msg);
 			throw new DbcException(ex);
