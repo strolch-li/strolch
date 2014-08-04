@@ -21,6 +21,8 @@ package li.strolch.model.query;
 public class NameSelection extends StrolchElementSelection {
 
 	private String name;
+	private boolean contains;
+	private boolean caseInsensitive;
 
 	/**
 	 * @param name
@@ -34,6 +36,24 @@ public class NameSelection extends StrolchElementSelection {
 	 */
 	public String getName() {
 		return this.name;
+	}
+
+	public boolean isContains() {
+		return this.contains;
+	}
+
+	public boolean isCaseInsensitive() {
+		return this.caseInsensitive;
+	}
+
+	public NameSelection contains(boolean contains) {
+		this.contains = contains;
+		return this;
+	}
+
+	public NameSelection caseInsensitive(boolean caseInsensitive) {
+		this.caseInsensitive = true;
+		return this;
 	}
 
 	@Override
