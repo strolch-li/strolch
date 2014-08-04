@@ -27,7 +27,7 @@ public interface StrolchDao<T extends StrolchElement> {
 
 	public Set<String> queryKeySet();
 
-	// TODO add method hasElement(String type, String id)
+	public boolean hasElement(String type, String id);
 
 	public long querySize();
 

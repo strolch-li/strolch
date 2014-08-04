@@ -2,7 +2,6 @@ package li.strolch.persistence.inmemory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +18,14 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 
 	public InMemoryDao() {
 		this.elementMap = new HashMap<>();
+	}
+
+	@Override
+	public boolean hasElement(String type, String id) {
+		Map<String, T> byType = this.elementMap.get(type);
+		if (byType == null)
+			return false;
+		return byType.containsKey(id);
 	}
 
 	@Override
@@ -57,7 +64,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	public Set<String> queryKeySet(String type) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
-			return Collections.emptySet();
+			return new HashSet<>(0);
 		return new HashSet<>(byType.keySet());
 	}
 
@@ -91,7 +98,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	public List<T> queryAll(String type) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
-			return Collections.emptyList();
+			return new ArrayList<>(0);
 		return new ArrayList<>(byType.values());
 	}
 

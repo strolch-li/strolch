@@ -25,8 +25,7 @@ public abstract class TransactionalElementMap<T extends StrolchElement> implemen
 
 	@Override
 	public boolean hasElement(StrolchTransaction tx, String type, String id) {
-		// TODO change to dao.hasElement(type, id)
-		return getDao(tx).queryKeySet(type).contains(id);
+		return getDao(tx).hasElement(type, id);
 	}
 
 	@Override
