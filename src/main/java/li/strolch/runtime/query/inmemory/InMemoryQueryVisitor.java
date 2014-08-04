@@ -109,7 +109,8 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 
 	@Override
 	public void visit(NameSelection selection) {
-		this.selectors.add(new NameSelector<T>(selection.getName()));
+		this.selectors.add(new NameSelector<T>(selection.getName()).caseInsensitive(selection.isCaseInsensitive())
+				.contains(selection.isContains()));
 	}
 
 	@Override
@@ -148,7 +149,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 		this.selectors.add(ParameterSelector.<T> dateSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
 	}
-	
+
 	@Override
 	public void visit(DateRangeParameterSelection selection) {
 		this.selectors.add(ParameterSelector.<T> dateRangeSelector(selection.getBagKey(), selection.getParamKey(),

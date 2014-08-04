@@ -24,6 +24,8 @@ import li.strolch.model.StrolchElement;
 public class NameSelector<T extends StrolchElement> implements Selector<T> {
 
 	private String name;
+	private boolean contains;
+	private boolean caseInsensitive;
 
 	public NameSelector(String name) {
 		this.name = name;
@@ -31,6 +33,34 @@ public class NameSelector<T extends StrolchElement> implements Selector<T> {
 
 	@Override
 	public boolean select(T element) {
-		return element.getName().equals(this.name);
+		String name = element.getName();
+		if (this.contains && this.caseInsensitive)
+			return name.toLowerCase().contains(this.name.toLowerCase());
+
+		if (this.caseInsensitive)
+			return name.toLowerCase().equals(this.name.toLowerCase());
+
+		if (this.contains)
+			return name.contains(this.name);
+
+		return name.equals(this.name);
+	}
+
+	public boolean isContains() {
+		return this.contains;
+	}
+
+	public boolean isCaseInsensitive() {
+		return this.caseInsensitive;
+	}
+
+	public NameSelector<T> contains(boolean contains) {
+		this.contains = contains;
+		return this;
+	}
+
+	public NameSelector<T> caseInsensitive(boolean caseInsensitive) {
+		this.caseInsensitive = caseInsensitive;
+		return this;
 	}
 }
