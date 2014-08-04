@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import li.strolch.model.Tags;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.XmlExportModelArgument;
 import li.strolch.service.XmlExportModelService;
 import li.strolch.service.XmlImportModelArgument;
@@ -92,7 +92,7 @@ public class XmlExportServiceTest {
 		XmlExportModelArgument arg = new XmlExportModelArgument();
 		arg.modelFileName = "TestExportOnlyResTemplates.xml";
 		arg.doOrders = false;
-		arg.resourceTypes.add(Tags.TEMPLATE);
+		arg.resourceTypes.add(StrolchConstants.TEMPLATE);
 		arg.multiFile = true;
 		ServiceResult result = runtimeMock.getServiceHandler().doService(null, service, arg);
 		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);

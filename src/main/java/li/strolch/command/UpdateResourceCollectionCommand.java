@@ -62,7 +62,7 @@ public class UpdateResourceCollectionCommand extends Command {
 		}
 
 		ResourceMap resourceMap = tx().getResourceMap();
-		for (Resource resource : resources) {
+		for (Resource resource : this.resources) {
 			if (!resourceMap.hasElement(tx(), resource.getType(), resource.getId())) {
 				String msg = "The Resource {0} can not be updated as it does not exist!";
 				msg = MessageFormat.format(msg, resource.getLocator());
