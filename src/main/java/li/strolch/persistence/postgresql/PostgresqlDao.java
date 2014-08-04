@@ -52,6 +52,27 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	protected abstract T parseFromXml(String id, String type, SQLXML xml);
 
 	@Override
+	public boolean hasElement(String type, String id) {
+		String sql = "select count(*) from " + getTableName() + " where type = ?";
+		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+			statement.setString(1, type);
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				long numberOfElements = result.getLong(1);
+				if (numberOfElements == 0)
+					return false;
+				if (numberOfElements == 1)
+					return true;
+
+				String msg = MessageFormat.format("Non unique number of elements with type {0} and id {1}", type, id);
+				throw new StrolchPersistenceException(msg);
+			}
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
 	public long querySize() {
 		String sql = "select count(*) from " + getTableName();
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
@@ -66,7 +87,6 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 
 	@Override
 	public long querySize(String type) {
-
 		String sql = "select count(*) from " + getTableName() + " where type = ?";
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
