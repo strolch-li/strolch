@@ -79,4 +79,70 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	public File getDataPath() {
 		return this.dataPath;
 	}
+
+	/**
+	 * Returns the file in the config directory of the root of the application
+	 * 
+	 * @param context
+	 *            short name to define who requires this file for error handling
+	 * @param fileName
+	 *            the relative name of the config file to return
+	 * @param checkExists
+	 *            if true, then an exception is thrown, using the context as info, if the config file does not exist
+	 * 
+	 * @return the file in the config directory of the root of the application
+	 */
+	public File getConfigFile(String context, String fileName, boolean checkExists) {
+		File configFile = new File(getDataPath(), fileName);
+		if (checkExists && !configFile.isFile() || !configFile.canRead()) {
+			String msg = "[{0}] requires config file which does not exist with name: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.getName(), context, fileName);
+			throw new StrolchConfigurationException(msg);
+		}
+		return configFile;
+	}
+
+	/**
+	 * Returns the file in the data directory of the root of the application
+	 * 
+	 * @param context
+	 *            short name to define who requires this file for error handling
+	 * @param fileName
+	 *            the relative name of the data file to return
+	 * @param checkExists
+	 *            if true, then an exception is thrown, using the context as info, if the data file does not exist
+	 * 
+	 * @return the file in the data directory of the root of the application
+	 */
+	public File getDataFile(String context, String fileName, boolean checkExists) {
+		File dataFile = new File(getDataPath(), fileName);
+		if (checkExists && !dataFile.isFile() || !dataFile.canRead()) {
+			String msg = "[{0}] requires data file which does not exist with name: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.getName(), context, fileName);
+			throw new StrolchConfigurationException(msg);
+		}
+		return dataFile;
+	}
+
+	/**
+	 * Returns the directory in the data directory of the root of the application
+	 * 
+	 * @param context
+	 *            short name to define who requires this directory for error handling
+	 * @param dirName
+	 *            the relative name of the data directory to return
+	 * @param checkExists
+	 *            if true, then an exception is thrown, using the context as info, if the data directory does not exist
+	 * 
+	 * @return the directory in the data directory of the root of the application
+	 */
+	public File getDataDir(String context, String dirName, boolean checkExists) {
+		File dataDir = new File(getDataPath(), dirName);
+		if (checkExists && !dataDir.isDirectory() || !dataDir.canRead()) {
+			String msg = "[{0}] requires data directory which does not exist with name: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.getName(), context, dirName);
+			throw new StrolchConfigurationException(msg);
+		}
+		return dataDir;
+	}
 }
