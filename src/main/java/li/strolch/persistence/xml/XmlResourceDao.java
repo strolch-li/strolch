@@ -18,6 +18,7 @@ package li.strolch.persistence.xml;
 import java.util.List;
 
 import li.strolch.model.Resource;
+import li.strolch.model.ResourceVisitor;
 import li.strolch.model.Tags;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.api.ResourceDao;
@@ -35,7 +36,7 @@ public class XmlResourceDao extends AbstractDao<Resource> implements ResourceDao
 	}
 
 	@Override
-	public List<Resource> doQuery(ResourceQuery query) {
+	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
 		// TODO Auto-generated method stub
 		return null;
 	}
