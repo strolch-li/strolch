@@ -26,14 +26,14 @@ import org.xml.sax.ContentHandler;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ResourceToSaxVisitor extends StrolchElementToDomVisitor implements ResourceVisitor {
+public class ResourceToSaxVisitor extends StrolchElementToDomVisitor implements ResourceVisitor<Void> {
 
 	public ResourceToSaxVisitor(ContentHandler contentHandler) {
 		super(contentHandler);
 	}
 
 	@Override
-	public void visit(Resource res) {
+	public Void visit(Resource res) {
 		try {
 
 			this.contentHandler.startElement(null, null, Tags.RESOURCE, attributesFor(res));
@@ -45,5 +45,7 @@ public class ResourceToSaxVisitor extends StrolchElementToDomVisitor implements 
 			msg = MessageFormat.format(msg, res.getLocator(), e.getMessage());
 			throw new RuntimeException(msg, e);
 		}
+
+		return null;
 	}
 }

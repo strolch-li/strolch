@@ -15,13 +15,16 @@
  */
 package li.strolch.model.visitor;
 
+import java.util.List;
+
+import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderDeepEqualsVisitor extends StrolchElementDeepEqualsVisitor implements OrderVisitor {
+public class OrderDeepEqualsVisitor extends StrolchElementDeepEqualsVisitor implements OrderVisitor<List<Locator>> {
 
 	private Order srcOrder;
 
@@ -30,7 +33,8 @@ public class OrderDeepEqualsVisitor extends StrolchElementDeepEqualsVisitor impl
 	}
 
 	@Override
-	public void visit(Order dstOrder) {
+	public List<Locator> visit(Order dstOrder) {
 		deepEquals(this.srcOrder, dstOrder);
+		return getMismatchedLocators();
 	}
 }

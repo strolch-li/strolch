@@ -28,14 +28,14 @@ import li.strolch.model.Tags;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderToSaxWriterVisitor extends AbstractToSaxWriterVisitor implements OrderVisitor {
+public class OrderToSaxWriterVisitor extends AbstractToSaxWriterVisitor implements OrderVisitor<Void> {
 
 	public OrderToSaxWriterVisitor(XMLStreamWriter writer) {
 		super(writer);
 	}
 
 	@Override
-	public void visit(Order order) {
+	public Void visit(Order order) {
 		try {
 			writeElement(Tags.ORDER, order);
 			this.writer.flush();
@@ -44,5 +44,7 @@ public class OrderToSaxWriterVisitor extends AbstractToSaxWriterVisitor implemen
 			msg = MessageFormat.format(msg, order.getLocator(), e.getMessage());
 			throw new StrolchException(msg, e);
 		}
+
+		return null;
 	}
 }

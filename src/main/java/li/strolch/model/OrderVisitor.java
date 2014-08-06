@@ -20,8 +20,8 @@ import li.strolch.model.visitor.StrolchElementVisitor;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface OrderVisitor extends StrolchElementVisitor<Order> {
+public interface OrderVisitor<U> extends StrolchElementVisitor<Order, U> {
 
 	@Override
-	public void visit(Order element);
+	public U visit(Order element);
 }

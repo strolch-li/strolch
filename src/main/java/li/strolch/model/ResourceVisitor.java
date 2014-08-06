@@ -19,9 +19,10 @@ import li.strolch.model.visitor.StrolchElementVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
+ * @param <U>
  */
-public interface ResourceVisitor extends StrolchElementVisitor<Resource> {
+public interface ResourceVisitor<U> extends StrolchElementVisitor<Resource, U> {
 
 	@Override
-	public void visit(Resource element);
+	public U visit(Resource element);
 }

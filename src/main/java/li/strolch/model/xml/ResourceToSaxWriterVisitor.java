@@ -28,14 +28,14 @@ import li.strolch.model.Tags;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ResourceToSaxWriterVisitor extends AbstractToSaxWriterVisitor implements ResourceVisitor {
+public class ResourceToSaxWriterVisitor extends AbstractToSaxWriterVisitor implements ResourceVisitor<Void> {
 
 	public ResourceToSaxWriterVisitor(XMLStreamWriter writer) {
 		super(writer);
 	}
 
 	@Override
-	public void visit(Resource resource) {
+	public Void visit(Resource resource) {
 		try {
 			writeElement(Tags.RESOURCE, resource);
 			this.writer.flush();
@@ -44,5 +44,7 @@ public class ResourceToSaxWriterVisitor extends AbstractToSaxWriterVisitor imple
 			msg = MessageFormat.format(msg, resource.getLocator(), e.getMessage());
 			throw new StrolchException(msg, e);
 		}
+
+		return null;
 	}
 }

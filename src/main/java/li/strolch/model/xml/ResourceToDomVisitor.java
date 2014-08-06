@@ -28,7 +28,7 @@ import ch.eitchnet.utils.helper.DomUtil;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ResourceToDomVisitor implements ResourceVisitor {
+public class ResourceToDomVisitor implements ResourceVisitor<Document> {
 
 	private Document document;
 
@@ -40,12 +40,13 @@ public class ResourceToDomVisitor implements ResourceVisitor {
 	}
 
 	@Override
-	public void visit(Resource resource) {
+	public Document visit(Resource resource) {
 		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
 		Document document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
 
 		Element resourceDom = resource.toDom(document);
 		document.appendChild(resourceDom);
 		this.document = document;
+		return this.document;
 	}
 }

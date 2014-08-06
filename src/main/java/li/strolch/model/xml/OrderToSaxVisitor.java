@@ -27,14 +27,14 @@ import org.xml.sax.SAXException;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderToSaxVisitor extends StrolchElementToDomVisitor implements OrderVisitor {
+public class OrderToSaxVisitor extends StrolchElementToDomVisitor implements OrderVisitor<Void> {
 
 	public OrderToSaxVisitor(ContentHandler contentHandler) {
 		super(contentHandler);
 	}
 
 	@Override
-	public void visit(Order order) {
+	public Void visit(Order order) {
 		try {
 
 			this.contentHandler.startElement(null, null, Tags.ORDER, attributesFor(order));
@@ -46,5 +46,7 @@ public class OrderToSaxVisitor extends StrolchElementToDomVisitor implements Ord
 			msg = MessageFormat.format(msg, order.getLocator(), e.getMessage());
 			throw new RuntimeException(msg, e);
 		}
+
+		return null;
 	}
 }

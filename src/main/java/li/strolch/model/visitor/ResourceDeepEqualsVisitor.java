@@ -15,13 +15,17 @@
  */
 package li.strolch.model.visitor;
 
+import java.util.List;
+
+import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ResourceDeepEqualsVisitor extends StrolchElementDeepEqualsVisitor implements ResourceVisitor {
+public class ResourceDeepEqualsVisitor extends StrolchElementDeepEqualsVisitor implements
+		ResourceVisitor<List<Locator>> {
 
 	private Resource srcRes;
 
@@ -30,7 +34,8 @@ public class ResourceDeepEqualsVisitor extends StrolchElementDeepEqualsVisitor i
 	}
 
 	@Override
-	public void visit(Resource dstRes) {
+	public List<Locator> visit(Resource dstRes) {
 		deepEquals(this.srcRes, dstRes);
+		return getMismatchedLocators();
 	}
 }

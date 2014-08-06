@@ -28,7 +28,7 @@ import ch.eitchnet.utils.helper.DomUtil;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderToDomVisitor implements OrderVisitor {
+public class OrderToDomVisitor implements OrderVisitor<Document> {
 
 	private Document document;
 
@@ -40,12 +40,13 @@ public class OrderToDomVisitor implements OrderVisitor {
 	}
 
 	@Override
-	public void visit(Order order) {
+	public Document visit(Order order) {
 		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
 		Document document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
 
 		Element orderDom = order.toDom(document);
 		document.appendChild(orderDom);
 		this.document = document;
+		return this.document;
 	}
 }
