@@ -41,37 +41,41 @@ public abstract class StrolchQuery<T extends QueryVisitor> {
 		return this.selection;
 	}
 
-	public void with(Selection selection) {
-		DBC.PRE.assertNull("A selection is already set! Use a boolean operator to perform multiple selections", //$NON-NLS-1$
-				this.selection);
+	public StrolchQuery<T> with(Selection selection) {
+		assertNoSelectionYetSet();
 		this.selection = selection;
+		return this;
 	}
 
-	/**
-	 * @deprecated use {@link #with(Selection)} instead
-	 */
-	@Deprecated
-	public void select(Selection selection) {
-		with(selection);
+	private void assertNoSelectionYetSet() {
+		String msg = "A selection is already set! Use a cascaded boolean operators to perform multiple selections"; //$NON-NLS-1$
+		DBC.PRE.assertNull(msg, this.selection);
+	}
+
+	public StrolchQuery<T> withAny() {
+		assertNoSelectionYetSet();
+		this.selection = new AnySelection();
+		return this;
 	}
 
 	public AndSelection and() {
-		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection); //$NON-NLS-1$
+		assertNoSelectionYetSet();
 		AndSelection and = new AndSelection();
 		this.selection = and;
 		return and;
 	}
 
 	public OrSelection or() {
-		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection); //$NON-NLS-1$
+		assertNoSelectionYetSet();
 		OrSelection or = new OrSelection();
 		this.selection = or;
 		return or;
 	}
 
-	public void not(Selection selection) {
-		DBC.PRE.assertNull("A selection is already set! Create hierarchical boolean selections", this.selection); //$NON-NLS-1$
+	public StrolchQuery<T> not(Selection selection) {
+		assertNoSelectionYetSet();
 		this.selection = new NotSelection(selection);
+		return this;
 	}
 
 	public void accept(T visitor) {

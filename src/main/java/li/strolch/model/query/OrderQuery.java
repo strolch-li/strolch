@@ -34,6 +34,24 @@ public class OrderQuery extends StrolchQuery<OrderQueryVisitor> {
 		super(navigation);
 	}
 
+	@Override
+	public OrderQuery with(Selection selection) {
+		super.with(selection);
+		return this;
+	}
+
+	@Override
+	public OrderQuery not(Selection selection) {
+		super.not(selection);
+		return this;
+	}
+
+	@Override
+	public OrderQuery withAny() {
+		super.withAny();
+		return this;
+	}
+
 	public static OrderQuery query(Navigation navigation) {
 		return new OrderQuery(navigation);
 	}

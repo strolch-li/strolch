@@ -18,13 +18,15 @@ package li.strolch.model.query;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface QueryVisitor {
+public class AnySelection implements Selection {
 
-	public void visitAny();
-	
-	public void visitAnd(AndSelection andSelection);
+	@Override
+	public void accept(QueryVisitor visitor) {
+		visitor.visitAny();
+	}
 
-	public void visitOr(OrSelection orSelection);
-
-	public void visitNot(NotSelection notSelection);
+	@Override
+	public boolean hasSelection() {
+		return true;
+	}
 }

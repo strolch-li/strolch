@@ -38,6 +38,24 @@ public class ResourceQuery extends StrolchQuery<ResourceQueryVisitor> {
 		super(navigation);
 	}
 
+	@Override
+	public ResourceQuery with(Selection selection) {
+		super.with(selection);
+		return this;
+	}
+
+	@Override
+	public ResourceQuery not(Selection selection) {
+		super.not(selection);
+		return this;
+	}
+
+	@Override
+	public ResourceQuery withAny() {
+		super.withAny();
+		return this;
+	}
+
 	public static ResourceQuery query(Navigation navigation) {
 		return new ResourceQuery(navigation);
 	}
