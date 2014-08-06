@@ -41,7 +41,6 @@ public class EnumValue {
 	 * @param value
 	 */
 	public EnumValue(String id, String value) {
-		super();
 		this.id = id;
 		this.value = value;
 	}

@@ -22,7 +22,9 @@ import java.util.Locale;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -35,11 +37,15 @@ public class StrolchEnum {
 
 	@XmlAttribute(name = "name")
 	private String name;
+
 	@XmlAttribute(name = "locale")
 	private String locale;
-	private Locale localeL;
-	@XmlAttribute(name = "values")
+
+	@XmlElement(name = "values")
 	private List<EnumValue> values;
+
+	@XmlTransient
+	private Locale localeL;
 
 	public StrolchEnum() {
 		// no-arg constructor for JAXB
@@ -65,10 +71,27 @@ public class StrolchEnum {
 	}
 
 	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
 	 * @return the locale as string
 	 */
 	public String getLocale() {
-		return this.locale.toString();
+		return this.locale;
+	}
+
+	/**
+	 * @param locale
+	 *            the locale to set
+	 */
+	public void setLocale(String locale) {
+		this.localeL = new Locale(locale);
+		this.locale = locale;
 	}
 
 	/**
@@ -79,10 +102,27 @@ public class StrolchEnum {
 	}
 
 	/**
+	 * @param localeL
+	 *            the localeL to set
+	 */
+	public void setLocaleL(Locale localeL) {
+		this.locale = localeL.getLanguage() + "_" + localeL.getCountry();
+		this.localeL = localeL;
+	}
+
+	/**
 	 * @return the values
 	 */
 	public List<EnumValue> getValues() {
 		return this.values;
+	}
+
+	/**
+	 * @param values
+	 *            the values to set
+	 */
+	public void setValues(List<EnumValue> values) {
+		this.values = values;
 	}
 
 	/**
