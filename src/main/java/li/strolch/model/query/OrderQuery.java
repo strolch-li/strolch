@@ -52,7 +52,7 @@ public class OrderQuery<U> extends StrolchQuery<OrderQueryVisitor> {
 	 * @param navigation
 	 * @return
 	 */
-	public static OrderQuery<Order> orderQuery(Navigation navigation) {
+	public static OrderQuery<Order> query(Navigation navigation) {
 		return new OrderQuery<Order>(navigation, new NoStrategyOrderVisitor());
 	}
 
@@ -64,7 +64,7 @@ public class OrderQuery<U> extends StrolchQuery<OrderQueryVisitor> {
 	 *            the type of Order to navigate to
 	 * @return
 	 */
-	public static OrderQuery<Order> orderQuery(String type) {
+	public static OrderQuery<Order> query(String type) {
 		return new OrderQuery<Order>(new StrolchTypeNavigation(type), new NoStrategyOrderVisitor());
 	}
 
@@ -78,7 +78,7 @@ public class OrderQuery<U> extends StrolchQuery<OrderQueryVisitor> {
 	 *            the visitor to use for transformation
 	 * @return
 	 */
-	public static <U> OrderQuery<U> orderQuery(String type, OrderVisitor<U> orderVisitor) {
+	public static <U> OrderQuery<U> query(String type, OrderVisitor<U> orderVisitor) {
 		return new OrderQuery<U>(new StrolchTypeNavigation(type), orderVisitor);
 	}
 }

@@ -58,7 +58,7 @@ public class ResourceQuery<U> extends StrolchQuery<ResourceQueryVisitor> {
 	 * @param navigation
 	 * @return
 	 */
-	public static ResourceQuery<Resource> resourceQuery(Navigation navigation) {
+	public static ResourceQuery<Resource> query(Navigation navigation) {
 		return new ResourceQuery<Resource>(navigation, new NoStrategyResourceVisitor());
 	}
 
@@ -70,7 +70,7 @@ public class ResourceQuery<U> extends StrolchQuery<ResourceQueryVisitor> {
 	 *            the type of {@link Resource} to navigate to
 	 * @return
 	 */
-	public static ResourceQuery<Resource> resourceQuery(String type) {
+	public static ResourceQuery<Resource> query(String type) {
 		return new ResourceQuery<Resource>(new StrolchTypeNavigation(type), new NoStrategyResourceVisitor());
 	}
 
@@ -84,7 +84,7 @@ public class ResourceQuery<U> extends StrolchQuery<ResourceQueryVisitor> {
 	 *            the visitor to use for transformation
 	 * @return
 	 */
-	public static <U> ResourceQuery<U> resourceQuery(String type, ResourceVisitor<U> resourceVisitor) {
+	public static <U> ResourceQuery<U> query(String type, ResourceVisitor<U> resourceVisitor) {
 		return new ResourceQuery<U>(new StrolchTypeNavigation(type), resourceVisitor);
 	}
 }
