@@ -15,13 +15,13 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.ResourceQueryVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.persistence.api.ResourceDao;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -38,8 +38,8 @@ public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource,
 		return new InMemoryResourceQueryVisitor();
 	}
 
-	public <U> InMemoryQuery<Resource, U> visit(ResourceQuery<U> resourceQuery) {
-		DBC.PRE.assertNotNull("ResourceVisitor may not be null!", resourceQuery.getElementVisitor());
+	public <U> InMemoryQuery<Resource, U> visit(ResourceQuery resourceQuery, ResourceVisitor<U> resourceVisitor) {
+		DBC.PRE.assertNotNull("ResourceVisitor may not be null!", resourceVisitor);
 		resourceQuery.accept(this);
 
 		if (this.navigator == null) {
@@ -47,12 +47,11 @@ public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource,
 			throw new QueryException(msg);
 		}
 
-		ResourceVisitor<U> elementVisitor = resourceQuery.getElementVisitor();
 		if (this.selectors.isEmpty())
-			return new InMemoryQuery<>(this.navigator, null, elementVisitor);
+			return new InMemoryQuery<>(this.navigator, null, resourceVisitor);
 
 		DBC.INTERIM.assertTrue("Invalid query as it may only contain one selector!", this.selectors.size() == 1); //$NON-NLS-1$
-		return new InMemoryQuery<>(this.navigator, this.selectors.get(0), elementVisitor);
+		return new InMemoryQuery<>(this.navigator, this.selectors.get(0), resourceVisitor);
 	}
 
 	@Override

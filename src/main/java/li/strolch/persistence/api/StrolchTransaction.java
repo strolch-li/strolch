@@ -22,8 +22,10 @@ import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
+import li.strolch.model.OrderVisitor;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
+import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
@@ -64,9 +66,13 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	public void addCommand(Command command);
 
-	public <U> List<U> doQuery(OrderQuery<U> query);
+	public List<Order> doQuery(OrderQuery query);
 
-	public <U> List<U> doQuery(ResourceQuery<U> query);
+	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor);
+
+	public List<Resource> doQuery(ResourceQuery query);
+
+	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor);
 
 	/**
 	 * <p>

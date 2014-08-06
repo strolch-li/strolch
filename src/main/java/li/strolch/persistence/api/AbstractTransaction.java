@@ -28,13 +28,19 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
+import li.strolch.model.Order;
+import li.strolch.model.OrderVisitor;
 import li.strolch.model.ParameterBag;
+import li.strolch.model.Resource;
+import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
+import li.strolch.model.visitor.NoStrategyOrderVisitor;
+import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.persistence.inmemory.InMemoryTransaction;
 import li.strolch.runtime.observer.ObserverHandler;
 import li.strolch.service.api.Command;
@@ -164,13 +170,23 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public <U> List<U> doQuery(OrderQuery<U> query) {
-		return getPersistenceHandler().getOrderDao(this).doQuery(query);
+	public List<Order> doQuery(OrderQuery query) {
+		return getPersistenceHandler().getOrderDao(this).doQuery(query, new NoStrategyOrderVisitor());
 	}
 
 	@Override
-	public <U> List<U> doQuery(ResourceQuery<U> query) {
-		return getPersistenceHandler().getResourceDao(this).doQuery(query);
+	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor) {
+		return getPersistenceHandler().getOrderDao(this).doQuery(query, orderVisitor);
+	}
+
+	@Override
+	public List<Resource> doQuery(ResourceQuery query) {
+		return getPersistenceHandler().getResourceDao(this).doQuery(query, new NoStrategyResourceVisitor());
+	}
+
+	@Override
+	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
+		return getPersistenceHandler().getResourceDao(this).doQuery(query, resourceVisitor);
 	}
 
 	@SuppressWarnings("unchecked")

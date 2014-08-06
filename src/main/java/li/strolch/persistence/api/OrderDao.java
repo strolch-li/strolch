@@ -18,6 +18,7 @@ package li.strolch.persistence.api;
 import java.util.List;
 
 import li.strolch.model.Order;
+import li.strolch.model.OrderVisitor;
 import li.strolch.model.query.OrderQuery;
 
 /**
@@ -25,5 +26,5 @@ import li.strolch.model.query.OrderQuery;
  */
 public interface OrderDao extends StrolchDao<Order> {
 
-	public <U> List<U> doQuery(OrderQuery<U> query);
+	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor);
 }

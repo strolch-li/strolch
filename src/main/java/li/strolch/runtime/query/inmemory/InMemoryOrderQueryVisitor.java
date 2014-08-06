@@ -39,8 +39,8 @@ public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order, Order
 		return new InMemoryOrderQueryVisitor();
 	}
 
-	public <U> InMemoryQuery<Order, U> visit(OrderQuery<U> orderQuery) {
-		DBC.PRE.assertNotNull("OrderVisitor may not be null!", orderQuery.getElementVisitor());
+	public <U> InMemoryQuery<Order, U> visit(OrderQuery orderQuery, OrderVisitor<U> orderVisitor) {
+		DBC.PRE.assertNotNull("OrderVisitor may not be null!", orderVisitor);
 		orderQuery.accept(this);
 
 		if (this.navigator == null) {
@@ -48,12 +48,11 @@ public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order, Order
 			throw new QueryException(msg);
 		}
 
-		OrderVisitor<U> elementVisitor = orderQuery.getElementVisitor();
 		if (this.selectors.isEmpty())
-			return new InMemoryQuery<>(this.navigator, null, elementVisitor);
+			return new InMemoryQuery<>(this.navigator, null, orderVisitor);
 
 		DBC.PRE.assertTrue("Invalid query as it may only contain one selector!", this.selectors.size() == 1); //$NON-NLS-1$
-		return new InMemoryQuery<>(this.navigator, this.selectors.get(0), elementVisitor);
+		return new InMemoryQuery<>(this.navigator, this.selectors.get(0), orderVisitor);
 	}
 
 	@Override

@@ -18,6 +18,7 @@ package li.strolch.persistence.api;
 import java.util.List;
 
 import li.strolch.model.Resource;
+import li.strolch.model.ResourceVisitor;
 import li.strolch.model.query.ResourceQuery;
 
 /**
@@ -25,5 +26,5 @@ import li.strolch.model.query.ResourceQuery;
  */
 public interface ResourceDao extends StrolchDao<Resource> {
 
-	public <U> List<U> doQuery(ResourceQuery<U> query);
+	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor);
 }
