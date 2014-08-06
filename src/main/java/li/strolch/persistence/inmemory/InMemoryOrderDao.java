@@ -11,9 +11,9 @@ import li.strolch.runtime.query.inmemory.InMemoryQuery;
 public class InMemoryOrderDao extends InMemoryDao<Order> implements OrderDao {
 
 	@Override
-	public List<Order> doQuery(OrderQuery orderQuery) {
+	public <U> List<U> doQuery(OrderQuery<U> orderQuery) {
 		InMemoryOrderQueryVisitor visitor = new InMemoryOrderQueryVisitor();
-		InMemoryQuery<Order> query = visitor.visit(orderQuery);
+		InMemoryQuery<Order, U> query = visitor.visit(orderQuery);
 		return query.doQuery(this);
 	}
 }

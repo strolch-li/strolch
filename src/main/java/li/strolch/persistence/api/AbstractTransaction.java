@@ -28,9 +28,7 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
-import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
@@ -166,12 +164,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public List<Order> doQuery(OrderQuery query) {
+	public <U> List<U> doQuery(OrderQuery<U> query) {
 		return getPersistenceHandler().getOrderDao(this).doQuery(query);
 	}
 
 	@Override
-	public List<Resource> doQuery(ResourceQuery query) {
+	public <U> List<U> doQuery(ResourceQuery<U> query) {
 		return getPersistenceHandler().getResourceDao(this).doQuery(query);
 	}
 

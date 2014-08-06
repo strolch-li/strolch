@@ -64,9 +64,9 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	public void addCommand(Command command);
 
-	public List<Order> doQuery(OrderQuery query);
+	public <U> List<U> doQuery(OrderQuery<U> query);
 
-	public List<Resource> doQuery(ResourceQuery query);
+	public <U> List<U> doQuery(ResourceQuery<U> query);
 
 	/**
 	 * <p>

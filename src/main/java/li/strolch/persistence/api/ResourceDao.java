@@ -25,5 +25,5 @@ import li.strolch.model.query.ResourceQuery;
  */
 public interface ResourceDao extends StrolchDao<Resource> {
 
-	public List<Resource> doQuery(ResourceQuery query);
+	public <U> List<U> doQuery(ResourceQuery<U> query);
 }

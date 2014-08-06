@@ -25,5 +25,5 @@ import li.strolch.model.query.OrderQuery;
  */
 public interface OrderDao extends StrolchDao<Order> {
 
-	public List<Order> doQuery(OrderQuery query);
+	public <U> List<U> doQuery(OrderQuery<U> query);
 }

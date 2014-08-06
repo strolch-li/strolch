@@ -29,17 +29,9 @@ import li.strolch.model.State;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.visitor.NoStrategyVisitor;
 import li.strolch.persistence.inmemory.InMemoryOrderDao;
 import li.strolch.persistence.inmemory.InMemoryResourceDao;
-import li.strolch.runtime.query.inmemory.AndSelector;
-import li.strolch.runtime.query.inmemory.AnyNavigator;
-import li.strolch.runtime.query.inmemory.BooleanSelector;
-import li.strolch.runtime.query.inmemory.IdSelector;
-import li.strolch.runtime.query.inmemory.InMemoryQuery;
-import li.strolch.runtime.query.inmemory.NameSelector;
-import li.strolch.runtime.query.inmemory.OrSelector;
-import li.strolch.runtime.query.inmemory.ParameterSelector;
-import li.strolch.runtime.query.inmemory.Selector;
 
 import org.junit.Test;
 
@@ -56,9 +48,10 @@ public class InMemoryQueryTest {
 		InMemoryOrderDao dao = new InMemoryOrderDao();
 		dao.saveAll(orders);
 
-		InMemoryQuery<Order> orderQuery = new InMemoryQuery<>();
+		InMemoryQuery<Order, Order> orderQuery = new InMemoryQuery<>();
 		orderQuery.setNavigator(new AnyNavigator<Order>());
 		orderQuery.setSelector(new IdSelector<Order>("@1"));
+		orderQuery.setElementVisitor(new NoStrategyVisitor<Order>());
 
 		List<Order> result = orderQuery.doQuery(dao);
 		assertEquals(1, result.size());
@@ -72,9 +65,10 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		InMemoryQuery<Resource> resourceQuery = new InMemoryQuery<>();
+		InMemoryQuery<Resource, Resource> resourceQuery = new InMemoryQuery<>();
 		resourceQuery.setNavigator(new AnyNavigator<Resource>());
 		resourceQuery.setSelector(new IdSelector<Resource>("@1"));
+		resourceQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
 
 		List<Resource> result = resourceQuery.doQuery(dao);
 		assertEquals(1, result.size());
@@ -88,8 +82,9 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		InMemoryQuery<Resource> resourceQuery = new InMemoryQuery<>();
+		InMemoryQuery<Resource, Resource> resourceQuery = new InMemoryQuery<>();
 		resourceQuery.setNavigator(new AnyNavigator<Resource>());
+		resourceQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
 		BooleanSelector<Resource> andSelector = new OrSelector<>(new IdSelector<Resource>("@3"),
 				new IdSelector<Resource>("@4"));
 		resourceQuery.setSelector(andSelector);
@@ -107,8 +102,9 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		InMemoryQuery<Resource> resourceQuery = new InMemoryQuery<>();
+		InMemoryQuery<Resource, Resource> resourceQuery = new InMemoryQuery<>();
 		resourceQuery.setNavigator(new AnyNavigator<Resource>());
+		resourceQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
 		List<Selector<Resource>> andSelectors = new ArrayList<>();
 		andSelectors.add(new IdSelector<Resource>("@3"));
 		andSelectors.add(new NameSelector<Resource>("Res 3"));
@@ -127,8 +123,9 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		InMemoryQuery<Resource> resourceQuery = new InMemoryQuery<>();
+		InMemoryQuery<Resource, Resource> resourceQuery = new InMemoryQuery<>();
 		resourceQuery.setNavigator(new AnyNavigator<Resource>());
+		resourceQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
 		List<Selector<Resource>> andSelectors = new ArrayList<>();
 		andSelectors.add(new IdSelector<Resource>("@3"));
 		andSelectors.add(new NameSelector<Resource>("Res 4"));
@@ -147,8 +144,9 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		InMemoryQuery<Resource> ballQuery = new InMemoryQuery<>();
+		InMemoryQuery<Resource, Resource> ballQuery = new InMemoryQuery<>();
 		ballQuery.setNavigator(new AnyNavigator<Resource>());
+		ballQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
 		AndSelector<Resource> andSelector = new AndSelector<>();
 		andSelector.with(ParameterSelector.<Resource> stringSelector("parameters", "color", "red"));
 		andSelector.with(ParameterSelector.<Resource> booleanSelector("parameters", "forChildren", true));

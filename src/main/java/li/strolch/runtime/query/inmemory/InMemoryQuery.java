@@ -15,28 +15,33 @@
  */
 package li.strolch.runtime.query.inmemory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.model.StrolchElement;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.persistence.api.StrolchDao;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InMemoryQuery<T extends StrolchElement> {
+public class InMemoryQuery<T extends StrolchElement, U> {
 
 	private Navigator<T> navigator;
 	private Selector<T> selector;
+	private StrolchElementVisitor<T, U> elementVisitor;
 
 	public InMemoryQuery() {
 		// empty constructor
 	}
 
-	public InMemoryQuery(Navigator<T> navigator, Selector<T> selector) {
+	public InMemoryQuery(Navigator<T> navigator, Selector<T> selector, StrolchElementVisitor<T, U> elementVisitor) {
 		this.navigator = navigator;
 		this.selector = selector;
+		this.elementVisitor = elementVisitor;
 	}
 
 	/**
@@ -47,24 +52,39 @@ public class InMemoryQuery<T extends StrolchElement> {
 		this.navigator = navigator;
 	}
 
+	/**
+	 * @param selector
+	 *            the selector to set
+	 */
 	public void setSelector(Selector<T> selector) {
 		this.selector = selector;
 	}
 
-	public List<T> doQuery(StrolchDao<T> dao) {
+	/**
+	 * @param elementVisitor
+	 *            the elementVisitor to set
+	 */
+	public void setElementVisitor(StrolchElementVisitor<T, U> elementVisitor) {
+		this.elementVisitor = elementVisitor;
+	}
+
+	public List<U> doQuery(StrolchDao<T> dao) {
 
 		if (this.selector == null)
 			return Collections.emptyList();
 
+		List<U> result = new ArrayList<U>();
 		List<T> elements = this.navigator.navigate(dao);
 		Iterator<T> iter = elements.iterator();
 		while (iter.hasNext()) {
 			T element = iter.next();
-			if (!this.selector.select(element)) {
-				iter.remove();
+			if (this.selector.select(element)) {
+				U returnValue = this.elementVisitor.visit(element);
+				DBC.INTERIM.assertNotNull("Visitor may not return null in query!", returnValue);
+				result.add(returnValue);
 			}
 		}
 
-		return elements;
+		return result;
 	}
 }

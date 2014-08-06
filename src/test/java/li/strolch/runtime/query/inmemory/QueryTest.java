@@ -35,7 +35,6 @@ import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ParameterSelection;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.Selection;
-import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 
@@ -64,14 +63,14 @@ public class QueryTest {
 			tx.getResourceMap().add(tx, res1);
 		}
 
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+		ResourceQuery<Resource> query = ResourceQuery.resourceQuery("MyType");
 		List<Selection> elementAndSelections = new ArrayList<>();
 		elementAndSelections.add(new IdSelection("@1"));
 		elementAndSelections.add(ParameterSelection.integerSelection(BAG_ID, "nbOfBooks", 33));
 		query.and().with(elementAndSelections);
 
 		InMemoryResourceQueryVisitor resourceQuery = new InMemoryResourceQueryVisitor();
-		InMemoryQuery<Resource> inMemoryQuery = resourceQuery.visit(query);
+		InMemoryQuery<Resource, Resource> inMemoryQuery = resourceQuery.visit(query);
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			result = inMemoryQuery.doQuery(tx.getPersistenceHandler().getResourceDao(tx));
@@ -94,14 +93,14 @@ public class QueryTest {
 			tx.getOrderMap().add(tx, o1);
 		}
 
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType"));
+		OrderQuery<Order> query = OrderQuery.orderQuery("MyType");
 		List<Selection> elementAndSelections = new ArrayList<>();
 		elementAndSelections.add(new IdSelection("@1"));
 		elementAndSelections.add(ParameterSelection.integerSelection(BAG_ID, "nbOfBooks", 33));
 		query.and().with(elementAndSelections);
 
 		InMemoryOrderQueryVisitor orderQuery = new InMemoryOrderQueryVisitor();
-		InMemoryQuery<Order> inMemoryQuery = orderQuery.visit(query);
+		InMemoryQuery<Order, Order> inMemoryQuery = orderQuery.visit(query);
 		List<Order> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
 			result = inMemoryQuery.doQuery(tx.getPersistenceHandler().getOrderDao(tx));
@@ -122,7 +121,7 @@ public class QueryTest {
 			tx.getResourceMap().add(tx, res1);
 		}
 
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+		ResourceQuery<Resource> query = ResourceQuery.resourceQuery("MyType");
 		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "olch").contains(true));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
@@ -144,7 +143,7 @@ public class QueryTest {
 			tx.getResourceMap().add(tx, res1);
 		}
 
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+		ResourceQuery<Resource> query = ResourceQuery.resourceQuery("MyType");
 		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "str").contains(true));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
@@ -165,7 +164,7 @@ public class QueryTest {
 			tx.getResourceMap().add(tx, res1);
 		}
 
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+		ResourceQuery<Resource> query = ResourceQuery.resourceQuery("MyType");
 		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch").caseInsensitive(true));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
@@ -187,7 +186,7 @@ public class QueryTest {
 			tx.getResourceMap().add(tx, res1);
 		}
 
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+		ResourceQuery<Resource> query = ResourceQuery.resourceQuery("MyType");
 		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch"));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
@@ -211,7 +210,7 @@ public class QueryTest {
 		}
 
 		{
-			ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+			ResourceQuery<Resource> query = ResourceQuery.resourceQuery("MyType");
 			query.not(new IdSelection("@1"));
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
@@ -222,7 +221,7 @@ public class QueryTest {
 		}
 
 		{
-			ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+			ResourceQuery<Resource> query = ResourceQuery.resourceQuery("MyType");
 			query.not(new IdSelection("@2"));
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
@@ -233,7 +232,7 @@ public class QueryTest {
 		}
 
 		{
-			ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType"));
+			ResourceQuery<Resource> query = ResourceQuery.resourceQuery("MyType");
 			query.not(new IdSelection("@1", "@2"));
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
