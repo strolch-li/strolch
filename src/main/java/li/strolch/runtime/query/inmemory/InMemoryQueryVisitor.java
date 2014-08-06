@@ -16,6 +16,7 @@
 package li.strolch.runtime.query.inmemory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import li.strolch.model.GroupedParameterizedElement;
@@ -37,6 +38,8 @@ import li.strolch.model.query.ParameterSelectionVisitor;
 import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchElementSelectionVisitor;
 import li.strolch.persistence.api.StrolchDao;
+import li.strolch.runtime.query.inmemory.ParameterSelector.StringParameterSelector;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -44,19 +47,27 @@ import li.strolch.persistence.api.StrolchDao;
 public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement, S extends StrolchDao<?>> implements
 		StrolchElementSelectionVisitor, ParameterSelectionVisitor {
 
-	protected Navigator<T> navigator;
-	protected List<Selector<T>> selectors;
+	private Navigator<T> navigator;
+	private List<Selector<T>> selectors;
+	private boolean any;
 
 	public InMemoryQueryVisitor() {
 		this.selectors = new ArrayList<>();
 	}
 
 	public List<Selector<T>> getSelectors() {
-		return this.selectors;
+		return Collections.unmodifiableList(this.selectors);
 	}
 
 	public Navigator<T> getNavigator() {
 		return this.navigator;
+	}
+
+	/**
+	 * @param navigator
+	 */
+	protected void setNavigator(StrolchTypeNavigator<T> navigator) {
+		this.navigator = navigator;
 	}
 
 	/**
@@ -66,30 +77,49 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	 */
 	protected abstract InMemoryQueryVisitor<T, S> newInstance();
 
+	private void assertNotAny() {
+		DBC.INTERIM.assertFalse("Not allowed to use further Selections with Any!", this.any);
+	}
+
+	protected void addSelector(Selector<T> selector) {
+		assertNotAny();
+		this.selectors.add(selector);
+	}
+
+	@Override
+	public void visitAny() {
+		DBC.PRE.assertEmpty("Only one selection allow when using Any!", this.selectors);
+		addSelector(new AnySelector<T>());
+		this.any = true;
+	}
+
 	@Override
 	public void visitAnd(AndSelection andSelection) {
+		assertNotAny();
 		InMemoryQueryVisitor<T, S> query = newInstance();
 		List<Selection> selections = andSelection.getSelections();
 		for (Selection selection : selections) {
 			selection.accept(query);
 		}
 		AndSelector<T> andSelector = new AndSelector<>(query.getSelectors());
-		this.selectors.add(andSelector);
+		addSelector(andSelector);
 	}
 
 	@Override
 	public void visitOr(OrSelection orSelection) {
+		assertNotAny();
 		InMemoryQueryVisitor<T, S> query = newInstance();
 		List<Selection> selections = orSelection.getSelections();
 		for (Selection selection : selections) {
 			selection.accept(query);
 		}
 		OrSelector<T> orSelector = new OrSelector<>(query.getSelectors());
-		this.selectors.add(orSelector);
+		addSelector(orSelector);
 	}
 
 	@Override
 	public void visitNot(NotSelection notSelection) {
+		assertNotAny();
 		InMemoryQueryVisitor<T, S> query = newInstance();
 		List<Selection> selections = notSelection.getSelections();
 		for (Selection selection : selections) {
@@ -98,67 +128,74 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 		List<Selector<T>> notSelectors = query.getSelectors();
 		if (!notSelectors.isEmpty()) {
 			NotSelector<T> notSelector = new NotSelector<>(notSelectors.get(0));
-			this.selectors.add(notSelector);
+			addSelector(notSelector);
 		}
 	}
 
 	@Override
 	public void visit(IdSelection selection) {
-		this.selectors.add(new IdSelector<T>(selection.getIds()));
+		addSelector(new IdSelector<T>(selection.getIds()));
 	}
 
 	@Override
 	public void visit(NameSelection selection) {
-		this.selectors.add(new NameSelector<T>(selection.getName()).caseInsensitive(selection.isCaseInsensitive())
-				.contains(selection.isContains()));
+		addSelector(new NameSelector<T>(selection.getName()).caseInsensitive(selection.isCaseInsensitive()).contains(
+				selection.isContains()));
 	}
 
 	@Override
 	public void visit(StringParameterSelection selection) {
-		this.selectors.add(ParameterSelector
-				.<T> stringSelector(selection.getBagKey(), selection.getParamKey(), selection.getValue())
-				.contains(selection.isContains()).caseInsensitive(selection.isCaseInsensitive()));
+		StringParameterSelector<T> stringSelector = //
+		ParameterSelector.<T> stringSelector( //
+				selection.getBagKey(), //
+				selection.getParamKey(), //
+				selection.getValue() //
+				)//
+				.contains(selection.isContains()) //
+				.caseInsensitive(selection.isCaseInsensitive());
+
+		addSelector(stringSelector);
 	}
 
 	@Override
 	public void visit(IntegerParameterSelection selection) {
-		this.selectors.add(ParameterSelector.<T> integerSelector(selection.getBagKey(), selection.getParamKey(),
+		addSelector(ParameterSelector.<T> integerSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
 	}
 
 	@Override
 	public void visit(BooleanParameterSelection selection) {
-		this.selectors.add(ParameterSelector.<T> booleanSelector(selection.getBagKey(), selection.getParamKey(),
+		addSelector(ParameterSelector.<T> booleanSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
 	}
 
 	@Override
 	public void visit(LongParameterSelection selection) {
-		this.selectors.add(ParameterSelector.<T> longSelector(selection.getBagKey(), selection.getParamKey(),
+		addSelector(ParameterSelector.<T> longSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
 	}
 
 	@Override
 	public void visit(FloatParameterSelection selection) {
-		this.selectors.add(ParameterSelector.<T> floatSelector(selection.getBagKey(), selection.getParamKey(),
+		addSelector(ParameterSelector.<T> floatSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
 	}
 
 	@Override
 	public void visit(DateParameterSelection selection) {
-		this.selectors.add(ParameterSelector.<T> dateSelector(selection.getBagKey(), selection.getParamKey(),
+		addSelector(ParameterSelector.<T> dateSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
 	}
 
 	@Override
 	public void visit(DateRangeParameterSelection selection) {
-		this.selectors.add(ParameterSelector.<T> dateRangeSelector(selection.getBagKey(), selection.getParamKey(),
+		addSelector(ParameterSelector.<T> dateRangeSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getFrom(), selection.getTo()));
 	}
 
 	@Override
 	public void visit(StringListParameterSelection selection) {
-		this.selectors.add(ParameterSelector.<T> stringListSelector(selection.getBagKey(), selection.getParamKey(),
+		addSelector(ParameterSelector.<T> stringListSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
 	}
 }

@@ -15,6 +15,8 @@
  */
 package li.strolch.runtime.query.inmemory;
 
+import java.util.List;
+
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 import li.strolch.model.query.DateSelection;
@@ -43,30 +45,32 @@ public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order, Order
 		DBC.PRE.assertNotNull("OrderVisitor may not be null!", orderVisitor);
 		orderQuery.accept(this);
 
-		if (this.navigator == null) {
+		Navigator<Order> navigator = getNavigator();
+		if (navigator == null) {
 			String msg = "Query is missing a navigation!"; //$NON-NLS-1$
 			throw new QueryException(msg);
 		}
 
-		if (this.selectors.isEmpty())
-			return new InMemoryQuery<>(this.navigator, null, orderVisitor);
+		List<Selector<Order>> selectors = getSelectors();
+		if (selectors.isEmpty())
+			return new InMemoryQuery<>(navigator, null, orderVisitor);
 
-		DBC.PRE.assertTrue("Invalid query as it may only contain one selector!", this.selectors.size() == 1); //$NON-NLS-1$
-		return new InMemoryQuery<>(this.navigator, this.selectors.get(0), orderVisitor);
+		DBC.PRE.assertTrue("Invalid query as it may only contain one selector!", selectors.size() == 1); //$NON-NLS-1$
+		return new InMemoryQuery<>(navigator, selectors.get(0), orderVisitor);
 	}
 
 	@Override
 	public void visit(StrolchTypeNavigation navigation) {
-		this.navigator = new OrderTypeNavigator(navigation.getType());
+		setNavigator(new OrderTypeNavigator(navigation.getType()));
 	}
 
 	@Override
 	public void visit(DateSelection selection) {
-		this.selectors.add(new DateSelector(selection.getDate()));
+		addSelector(new DateSelector(selection.getDate()));
 	}
 
 	@Override
 	public void visit(StateSelection selection) {
-		this.selectors.add(new StateSelector(selection.getState()));
+		addSelector(new StateSelector(selection.getState()));
 	}
 }

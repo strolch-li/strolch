@@ -15,6 +15,8 @@
  */
 package li.strolch.runtime.query.inmemory;
 
+import java.util.List;
+
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 import li.strolch.model.query.ResourceQuery;
@@ -42,20 +44,22 @@ public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource,
 		DBC.PRE.assertNotNull("ResourceVisitor may not be null!", resourceVisitor);
 		resourceQuery.accept(this);
 
-		if (this.navigator == null) {
+		Navigator<Resource> navigator = getNavigator();
+		if (navigator == null) {
 			String msg = "Query is missing a navigation!"; //$NON-NLS-1$
 			throw new QueryException(msg);
 		}
 
-		if (this.selectors.isEmpty())
-			return new InMemoryQuery<>(this.navigator, null, resourceVisitor);
+		List<Selector<Resource>> selectors = getSelectors();
+		if (selectors.isEmpty())
+			return new InMemoryQuery<>(navigator, null, resourceVisitor);
 
-		DBC.INTERIM.assertTrue("Invalid query as it may only contain one selector!", this.selectors.size() == 1); //$NON-NLS-1$
-		return new InMemoryQuery<>(this.navigator, this.selectors.get(0), resourceVisitor);
+		DBC.INTERIM.assertTrue("Invalid query as it may only contain one selector!", selectors.size() == 1); //$NON-NLS-1$
+		return new InMemoryQuery<>(navigator, selectors.get(0), resourceVisitor);
 	}
 
 	@Override
 	public void visit(StrolchTypeNavigation navigation) {
-		this.navigator = new ResourceTypeNavigator(navigation.getType());
+		setNavigator(new ResourceTypeNavigator(navigation.getType()));
 	}
 }
