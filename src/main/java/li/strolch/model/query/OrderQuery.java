@@ -15,12 +15,70 @@
  */
 package li.strolch.model.query;
 
+import li.strolch.model.Order;
+import li.strolch.model.OrderVisitor;
+import li.strolch.model.parameter.Parameter;
+import li.strolch.model.visitor.NoStrategyOrderVisitor;
+
 /**
+ * {@link OrderQuery} is the user API to query {@link Order Orders} in Strolch. The {@link Navigation} is used to
+ * navigate to a type of order on which any further {@link Selection Selections} will be performed. The
+ * {@link OrderVisitor} is used to transform the returned object into a domain specific object (if required). This
+ * mechanism allows you to query only the values of a {@link Parameter} instead of having to return all the elements and
+ * then performing this transformation.
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderQuery extends StrolchQuery<OrderQueryVisitor> {
+public class OrderQuery<U> extends StrolchQuery<OrderQueryVisitor> {
 
-	public OrderQuery(Navigation navigation) {
+	private OrderVisitor<U> elementVisitor;
+
+	public OrderQuery(Navigation navigation, OrderVisitor<U> elementVisitor) {
 		super(navigation);
+		this.elementVisitor = elementVisitor;
+	}
+
+	/**
+	 * @return the elementVisitor
+	 */
+	public OrderVisitor<U> getElementVisitor() {
+		return this.elementVisitor;
+	}
+
+	/**
+	 * Returns an instance of {@link OrderQuery} where the visitor used is the {@link NoStrategyOrderVisitor} thus
+	 * returning the actual Order, i.e. no transformation is performed
+	 * 
+	 * @param navigation
+	 * @return
+	 */
+	public static OrderQuery<Order> orderQuery(Navigation navigation) {
+		return new OrderQuery<Order>(navigation, new NoStrategyOrderVisitor());
+	}
+
+	/**
+	 * Returns an instance of {@link OrderQuery} where the visitor used is the {@link NoStrategyOrderVisitor} thus
+	 * returning the actual Order, i.e. no transformation is performed
+	 * 
+	 * @param type
+	 *            the type of Order to navigate to
+	 * @return
+	 */
+	public static OrderQuery<Order> orderQuery(String type) {
+		return new OrderQuery<Order>(new StrolchTypeNavigation(type), new NoStrategyOrderVisitor());
+	}
+
+	/**
+	 * Returns an instance of {@link OrderQuery} using the given {@link OrderVisitor} thus performing the given
+	 * transformation
+	 * 
+	 * @param type
+	 *            the type of Order to navigate to
+	 * @param orderVisitor
+	 *            the visitor to use for transformation
+	 * @return
+	 */
+	public static <U> OrderQuery<U> orderQuery(String type, OrderVisitor<U> orderVisitor) {
+		return new OrderQuery<U>(new StrolchTypeNavigation(type), orderVisitor);
 	}
 }

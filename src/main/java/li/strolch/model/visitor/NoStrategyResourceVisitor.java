@@ -13,32 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model.query;
+package li.strolch.model.visitor;
+
+import li.strolch.model.Resource;
+import li.strolch.model.ResourceVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class StrolchTypeNavigation implements Navigation {
-
-	private String type;
-
-	public StrolchTypeNavigation(String type) {
-		this.type = type;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		return this.type;
-	}
+public class NoStrategyResourceVisitor implements ResourceVisitor<Resource> {
 
 	@Override
-	public void accept(QueryVisitor visitor) {
-		accept((StrolchElementSelectionVisitor) visitor);
-	}
-
-	public void accept(StrolchElementSelectionVisitor visitor) {
-		visitor.visit(this);
+	public Resource visit(Resource element) {
+		return element;
 	}
 }
