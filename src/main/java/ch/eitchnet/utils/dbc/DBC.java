@@ -71,6 +71,32 @@ public enum DBC {
 		}
 	}
 
+	public void assertEmpty(String msg, String value) {
+		if (!StringHelper.isEmpty(value)) {
+			String ex = "Illegal non-empty value: {0}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
+		}
+	}
+
+	public void assertEmpty(String msg, Object[] array) {
+		assertNotNull(msg, array);
+		if (array.length != 0) {
+			String ex = "Illegal non-empty value: {0}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
+		}
+	}
+
+	public void assertEmpty(String msg, Collection<?> collection) {
+		assertNotNull(msg, collection);
+		if (!collection.isEmpty()) {
+			String ex = "Illegal non-empty value: {0}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg);
+			throw new DbcException(ex);
+		}
+	}
+
 	public void assertNotEmpty(String msg, String value) {
 		if (StringHelper.isEmpty(value)) {
 			String ex = "Illegal empty value: {0}"; //$NON-NLS-1$
