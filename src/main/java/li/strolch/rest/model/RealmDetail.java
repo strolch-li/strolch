@@ -79,4 +79,9 @@ public class RealmDetail {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "RealmDetail [elementMapOverviews=" + this.elementMapOverviews + "]";
+	}
 }

@@ -46,4 +46,15 @@
 			<rememberUser>true</rememberUser>
 		</Properties>
 	</Component>
+		<Component>
+		<name>EnumHandler</name>
+		<api>li.strolch.runtime.query.enums.EnumHandler</api>
+		<impl>li.strolch.runtime.query.enums.DefaultEnumHandler</impl>
+		<depends>RealmHandler</depends>
+		<Properties>
+			<realm>defaultRealm</realm>
+			<salutation>Resource/Enumeration/salutation</salutation>
+			<sex>Resource/Enumeration/sex</sex>
+		</Properties>
+	</Component>
 </StrolchConfiguration>

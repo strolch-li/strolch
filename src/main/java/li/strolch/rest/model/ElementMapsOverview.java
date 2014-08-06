@@ -162,4 +162,10 @@ public class ElementMapsOverview {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "ElementMapsOverview [name=" + this.name + ", elementMapType=" + this.elementMapType + ", nrOfElements="
+				+ this.nrOfElements + ", types=" + this.types + "]";
+	}
 }

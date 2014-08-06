@@ -50,7 +50,7 @@ public class InspectorTest extends AbstractRestfulTest {
 
 		// expected result
 		List<RealmOverview> realms = new ArrayList<>(1);
-		realms.add(new RealmOverview("defaultRealm", 4));
+		realms.add(new RealmOverview("defaultRealm", 6));
 		AgentOverview expectedAgentOverview = new AgentOverview(realms);
 
 		// query
@@ -70,7 +70,8 @@ public class InspectorTest extends AbstractRestfulTest {
 		Set<String> resourceTypes = new HashSet<>();
 		resourceTypes.add("Template");
 		resourceTypes.add("TestType");
-		elementMapOverviews.add(new ElementMapsOverview(ElementMapType.RESOURCE, 2, resourceTypes));
+		resourceTypes.add("Enumeration");
+		elementMapOverviews.add(new ElementMapsOverview(ElementMapType.RESOURCE, 4, resourceTypes));
 		Set<String> orderTypes = new HashSet<>();
 		orderTypes.add("Template");
 		orderTypes.add("TestType");
@@ -92,6 +93,7 @@ public class InspectorTest extends AbstractRestfulTest {
 		// expected result
 		String elementMapName = "Resource";
 		List<TypeOverview> typeOverviews = new ArrayList<>(2);
+		typeOverviews.add(new TypeOverview("Enumeration", 2));
 		typeOverviews.add(new TypeOverview("Template", 1));
 		typeOverviews.add(new TypeOverview("TestType", 1));
 		ElementMapOverview expectedElementMapOverview = new ElementMapOverview(elementMapName, typeOverviews);
