@@ -31,6 +31,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
 
 import li.strolch.model.Order;
+import li.strolch.model.OrderVisitor;
 import li.strolch.model.Tags;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.xml.OrderToSaxVisitor;
@@ -155,7 +156,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	}
 
 	@Override
-	public List<Order> doQuery(OrderQuery query) {
+	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor) {
 		// TODO Auto-generated method stub
 		return null;
 	}

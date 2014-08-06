@@ -29,6 +29,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
 
 import li.strolch.model.Resource;
+import li.strolch.model.ResourceVisitor;
 import li.strolch.model.Tags;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.xml.ResourceToSaxVisitor;
@@ -144,7 +145,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	}
 
 	@Override
-	public List<Resource> doQuery(ResourceQuery query) {
+	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
 		// TODO Auto-generated method stub
 		return null;
 	}
