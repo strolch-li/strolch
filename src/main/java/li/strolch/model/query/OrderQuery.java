@@ -18,7 +18,6 @@ package li.strolch.model.query;
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.model.visitor.NoStrategyOrderVisitor;
 
 /**
  * {@link OrderQuery} is the user API to query {@link Order Orders} in Strolch. The {@link Navigation} is used to
@@ -29,56 +28,17 @@ import li.strolch.model.visitor.NoStrategyOrderVisitor;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderQuery<U> extends StrolchQuery<OrderQueryVisitor> {
+public class OrderQuery extends StrolchQuery<OrderQueryVisitor> {
 
-	private OrderVisitor<U> elementVisitor;
-
-	public OrderQuery(Navigation navigation, OrderVisitor<U> elementVisitor) {
+	public OrderQuery(Navigation navigation) {
 		super(navigation);
-		this.elementVisitor = elementVisitor;
 	}
 
-	/**
-	 * @return the elementVisitor
-	 */
-	public OrderVisitor<U> getElementVisitor() {
-		return this.elementVisitor;
+	public static OrderQuery query(Navigation navigation) {
+		return new OrderQuery(navigation);
 	}
 
-	/**
-	 * Returns an instance of {@link OrderQuery} where the visitor used is the {@link NoStrategyOrderVisitor} thus
-	 * returning the actual Order, i.e. no transformation is performed
-	 * 
-	 * @param navigation
-	 * @return
-	 */
-	public static OrderQuery<Order> query(Navigation navigation) {
-		return new OrderQuery<Order>(navigation, new NoStrategyOrderVisitor());
-	}
-
-	/**
-	 * Returns an instance of {@link OrderQuery} where the visitor used is the {@link NoStrategyOrderVisitor} thus
-	 * returning the actual Order, i.e. no transformation is performed
-	 * 
-	 * @param type
-	 *            the type of Order to navigate to
-	 * @return
-	 */
-	public static OrderQuery<Order> query(String type) {
-		return new OrderQuery<Order>(new StrolchTypeNavigation(type), new NoStrategyOrderVisitor());
-	}
-
-	/**
-	 * Returns an instance of {@link OrderQuery} using the given {@link OrderVisitor} thus performing the given
-	 * transformation
-	 * 
-	 * @param type
-	 *            the type of Order to navigate to
-	 * @param orderVisitor
-	 *            the visitor to use for transformation
-	 * @return
-	 */
-	public static <U> OrderQuery<U> query(String type, OrderVisitor<U> orderVisitor) {
-		return new OrderQuery<U>(new StrolchTypeNavigation(type), orderVisitor);
+	public static OrderQuery query(String type) {
+		return new OrderQuery(new StrolchTypeNavigation(type));
 	}
 }
