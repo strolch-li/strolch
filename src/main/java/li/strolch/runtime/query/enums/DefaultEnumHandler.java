@@ -18,9 +18,7 @@ package li.strolch.runtime.query.enums;
 import static ch.eitchnet.utils.helper.StringHelper.UNDERLINE;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -91,10 +89,10 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 			ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, locale);
 
 			Set<String> parameterKeySet = enumValuesByLanguage.getParameterKeySet();
-			List<EnumValue> values = new ArrayList<>(parameterKeySet.size());
+			Map<String, EnumValue> values = new HashMap<>(parameterKeySet.size());
 			for (String paramKey : parameterKeySet) {
 				StringParameter enumParam = enumValuesByLanguage.getParameter(paramKey);
-				values.add(new EnumValue(paramKey, enumParam.getValue()));
+				values.put(paramKey, new EnumValue(paramKey, enumParam.getValue()));
 			}
 
 			StrolchEnum strolchEnum = new StrolchEnum(name, locale, values);

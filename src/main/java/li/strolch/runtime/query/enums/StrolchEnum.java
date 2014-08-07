@@ -16,8 +16,11 @@
 package li.strolch.runtime.query.enums;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -41,8 +44,7 @@ public class StrolchEnum {
 	@XmlAttribute(name = "locale")
 	private String locale;
 
-	@XmlElement(name = "values")
-	private List<EnumValue> values;
+	private Map<String, EnumValue> values;
 
 	@XmlTransient
 	private Locale localeL;
@@ -56,7 +58,7 @@ public class StrolchEnum {
 	 * @param locale
 	 * @param values
 	 */
-	public StrolchEnum(String name, Locale locale, List<EnumValue> values) {
+	public StrolchEnum(String name, Locale locale, Map<String, EnumValue> values) {
 		this.name = name;
 		this.locale = locale.toString();
 		this.localeL = locale;
@@ -113,28 +115,29 @@ public class StrolchEnum {
 	/**
 	 * @return the values
 	 */
-	public List<EnumValue> getValues() {
-		return this.values;
+	@XmlElement(name = "values")
+	public Collection<EnumValue> getValues() {
+		if (this.values == null)
+			return null;
+		return this.values.values();
 	}
 
 	/**
 	 * @param values
 	 *            the values to set
 	 */
-	public void setValues(List<EnumValue> values) {
-		this.values = values;
+	public void setValues(Collection<EnumValue> values) {
+		this.values = new HashMap<>(values.size());
+		for (EnumValue enumValue : values) {
+			this.values.put(enumValue.getId(), enumValue);
+		}
 	}
 
 	/**
 	 * @return the list of {@link EnumValue#getId()}
 	 */
 	public List<String> getEnumValueIds() {
-		List<String> values = new ArrayList<>(this.values.size());
-		for (EnumValue enumValue : this.values) {
-			values.add(enumValue.getId());
-		}
-
-		return values;
+		return new ArrayList<>(this.values.keySet());
 	}
 
 	/**
@@ -142,10 +145,25 @@ public class StrolchEnum {
 	 */
 	public List<String> getEnumValues() {
 		List<String> values = new ArrayList<>(this.values.size());
-		for (EnumValue enumValue : this.values) {
+		for (EnumValue enumValue : this.values.values()) {
 			values.add(enumValue.getValue());
 		}
 
 		return values;
+	}
+
+	/**
+	 * Returns the actual value for the given id
+	 * 
+	 * @param id
+	 *            the id of the value to return
+	 * 
+	 * @return the actual value for the given id, or null if it does not exist
+	 */
+	public String getValue(String id) {
+		EnumValue enumValue = this.values.get(id);
+		if (enumValue == null)
+			return null;
+		return enumValue.getValue();
 	}
 }
