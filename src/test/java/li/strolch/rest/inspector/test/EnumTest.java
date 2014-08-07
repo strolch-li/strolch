@@ -39,7 +39,8 @@ public class EnumTest extends AbstractRestfulTest {
 	public void shouldQuerySex() {
 
 		// query
-		Response result = target().path(ROOT_PATH + "/sex").request(MediaType.APPLICATION_JSON).get();
+		Response result = target().path(ROOT_PATH + "/sex").request(MediaType.APPLICATION_JSON)
+				.acceptLanguage(Locale.ENGLISH).get();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		StrolchEnum strolchEnum = result.readEntity(StrolchEnum.class);
 		assertNotNull(strolchEnum);
@@ -51,7 +52,8 @@ public class EnumTest extends AbstractRestfulTest {
 	public void shouldQuerySalutation() {
 
 		// query
-		Response result = target().path(ROOT_PATH + "/salutation").request(MediaType.APPLICATION_JSON).get();
+		Response result = target().path(ROOT_PATH + "/salutation").request(MediaType.APPLICATION_JSON)
+				.acceptLanguage(Locale.ENGLISH).get();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		StrolchEnum strolchEnum = result.readEntity(StrolchEnum.class);
 		assertNotNull(strolchEnum);
