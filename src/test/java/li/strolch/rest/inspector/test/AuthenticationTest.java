@@ -21,7 +21,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.util.Locale;
+
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -56,6 +59,35 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		assertNotNull(loginResult);
 		assertEquals("jill", loginResult.getUsername());
 		assertEquals(64, loginResult.getSessionId().length());
+		assertNull(loginResult.getMsg());
+
+		// logout
+		result = target().path(ROOT_PATH + "/" + loginResult.getSessionId()).request(MediaType.APPLICATION_JSON)
+				.delete();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		assertNotNull(loginResult);
+		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
+		assertNotNull(logoutResult);
+		assertNull(logoutResult.getMsg());
+	}
+
+	@Test
+	public void shouldUseRequestedLanguage() {
+
+		// login
+		Login login = new Login();
+		login.setUsername("jill");
+		login.setPassword("jill");
+		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
+		Builder builder = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON);
+		builder = builder.acceptLanguage(Locale.ITALY);
+		Response result = builder.post(loginEntity);
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		LoginResult loginResult = result.readEntity(LoginResult.class);
+		assertNotNull(loginResult);
+		assertEquals("jill", loginResult.getUsername());
+		assertEquals(64, loginResult.getSessionId().length());
+		assertEquals(Locale.ITALY.toString(), loginResult.getLocale());
 		assertNull(loginResult.getMsg());
 
 		// logout

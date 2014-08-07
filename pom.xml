@@ -30,8 +30,8 @@
 	</scm>
 
 	<properties>
-		<jersey.version>2.7</jersey.version>
-		<org.eclipse.persistence.version>2.5.1</org.eclipse.persistence.version>
+		<jersey.version>2.11</jersey.version>
+<!-- 		<org.eclipse.persistence.version>2.5.1</org.eclipse.persistence.version> -->
 	</properties>
 
 	<dependencyManagement>
@@ -44,16 +44,16 @@
 				<scope>import</scope>
 			</dependency>
 			<!-- due to bug in persistence 2.5.0 -->
-			<dependency>
-				<groupId>org.eclipse.persistence</groupId>
-				<artifactId>org.eclipse.persistence.moxy</artifactId>
-				<version>${org.eclipse.persistence.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.persistence</groupId>
-				<artifactId>org.eclipse.persistence.antlr</artifactId>
-				<version>${org.eclipse.persistence.version}</version>
-			</dependency>
+<!-- 			<dependency> -->
+<!-- 				<groupId>org.eclipse.persistence</groupId> -->
+<!-- 				<artifactId>org.eclipse.persistence.moxy</artifactId> -->
+<!-- 				<version>${org.eclipse.persistence.version}</version> -->
+<!-- 			</dependency> -->
+<!-- 			<dependency> -->
+<!-- 				<groupId>org.eclipse.persistence</groupId> -->
+<!-- 				<artifactId>org.eclipse.persistence.antlr</artifactId> -->
+<!-- 				<version>${org.eclipse.persistence.version}</version> -->
+<!-- 			</dependency> -->
 		</dependencies>
 	</dependencyManagement>
 

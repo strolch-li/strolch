@@ -15,6 +15,8 @@
  */
 package li.strolch.rest.endpoint;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -24,6 +26,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -31,6 +34,7 @@ import javax.ws.rs.core.Response.Status;
 import li.strolch.exception.StrolchException;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchSessionHandler;
+import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
 import li.strolch.rest.model.LogoutResult;
@@ -50,13 +54,10 @@ public class AuthenticationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
-	@Context
-	HttpServletRequest request;
-
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response login(Login login) {
+	public Response login(Login login, @Context HttpServletRequest request, @Context HttpHeaders headers) {
 
 		LoginResult loginResult = new LoginResult();
 		GenericEntity<LoginResult> entity = new GenericEntity<LoginResult>(loginResult, LoginResult.class) {
@@ -83,9 +84,12 @@ public class AuthenticationService {
 			Certificate certificate = sessionHandler.authenticate(origin, login.getUsername(), login.getPassword()
 					.getBytes());
 
+			Locale locale = RestfulHelper.getLocale(headers);
+			certificate.setLocale(locale);
+
 			loginResult.setSessionId(certificate.getAuthToken());
 			loginResult.setUsername(certificate.getUsername());
-			loginResult.setLocale(certificate.getLocale().getLanguage() + "_" + certificate.getLocale().getCountry());
+			loginResult.setLocale(locale.toString());
 			loginResult.setParameters(certificate.getPropertyMap());
 
 			return Response.ok().entity(entity).build();
@@ -106,7 +110,7 @@ public class AuthenticationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
-	public Response logout(@PathParam("authToken") String authToken) {
+	public Response logout(@PathParam("authToken") String authToken, @Context HttpServletRequest request) {
 
 		LogoutResult logoutResult = new LogoutResult();
 

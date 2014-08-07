@@ -18,6 +18,8 @@ package li.strolch.rest.inspector.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Locale;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -55,5 +57,20 @@ public class EnumTest extends AbstractRestfulTest {
 		assertNotNull(strolchEnum);
 		assertEquals("salutation", strolchEnum.getName());
 		assertEquals(3, strolchEnum.getValues().size());
+		assertEquals("Mrs", strolchEnum.getValue("mrs"));
+	}
+
+	@Test
+	public void shouldQueryGermanSalutation() {
+
+		// query
+		Response result = target().path(ROOT_PATH + "/salutation").request(MediaType.APPLICATION_JSON)
+				.acceptLanguage(Locale.GERMAN).get();
+		assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		StrolchEnum strolchEnum = result.readEntity(StrolchEnum.class);
+		assertNotNull(strolchEnum);
+		assertEquals("salutation", strolchEnum.getName());
+		assertEquals(3, strolchEnum.getValues().size());
+		assertEquals("Frau", strolchEnum.getValue("mrs"));
 	}
 }

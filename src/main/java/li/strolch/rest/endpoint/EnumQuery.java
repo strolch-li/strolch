@@ -21,11 +21,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import li.strolch.rest.RestfulStrolchComponent;
+import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.runtime.query.enums.EnumHandler;
 import li.strolch.runtime.query.enums.StrolchEnum;
 
@@ -43,12 +46,14 @@ public class EnumQuery {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{name}")
-	public Response getEnum(@PathParam("name") String name) {
+	public Response getEnum(@PathParam("name") String name, @Context HttpHeaders headers) {
 		try {
 
 			EnumHandler enumHandler = RestfulStrolchComponent.getInstance().getContainer()
 					.getComponent(EnumHandler.class);
-			StrolchEnum strolchEnum = enumHandler.getEnum(name, Locale.getDefault());
+
+			Locale locale = RestfulHelper.getLocale(headers);
+			StrolchEnum strolchEnum = enumHandler.getEnum(name, locale);
 
 			GenericEntity<StrolchEnum> entity = new GenericEntity<StrolchEnum>(strolchEnum, StrolchEnum.class) {
 			};

@@ -16,22 +16,22 @@
 package li.strolch.rest.inspector.test;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.ws.rs.core.Application;
-import javax.ws.rs.ext.ContextResolver;
 
+import li.strolch.rest.endpoint.Inspector;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.moxy.json.MoxyJsonConfig;
+import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.server.TracingConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.TestProperties;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 	private static HttpServer server;
 
 	@BeforeClass
-	public static void beforeClass() {
+	public static void beforeClass() throws IllegalArgumentException, IOException {
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
@@ -58,7 +58,7 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		server = GrizzlyHttpServerFactory.createHttpServer(BASE_URI, createApp());
+		server = GrizzlyWebContainerFactory.create(BASE_URI);
 	}
 
 	@AfterClass
@@ -69,26 +69,32 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 
 	@Override
 	protected Application configure() {
-		enable(TestProperties.LOG_TRAFFIC);
-		enable(TestProperties.DUMP_ENTITY);
+//		enable(TestProperties.LOG_TRAFFIC);
+//		enable(TestProperties.DUMP_ENTITY);
 
 		return createApp();
 	}
 
 	@Override
 	protected void configureClient(ClientConfig config) {
-		config.register(createMoxyJsonResolver());
+		//config.register(createMoxyJsonResolver());
 	}
 
 	public static ResourceConfig createApp() {
-		return new ResourceConfig().packages("li.strolch.rest.endpoint").register(createMoxyJsonResolver());
+		return new ResourceConfig()//
+				.packages(Inspector.class.getPackage().getName())//
+				//.register(createMoxyJsonResolver())
+				// Logging.
+				.register(LoggingFilter.class)
+				// Tracing support.
+				.property(ServerProperties.TRACING, TracingConfig.ON_DEMAND.name());
 	}
 
-	public static ContextResolver<MoxyJsonConfig> createMoxyJsonResolver() {
-		final MoxyJsonConfig moxyJsonConfig = new MoxyJsonConfig();
-		Map<String, String> namespacePrefixMapper = new HashMap<String, String>(1);
-		namespacePrefixMapper.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
-		moxyJsonConfig.setNamespacePrefixMapper(namespacePrefixMapper).setNamespaceSeparator(':');
-		return moxyJsonConfig.resolver();
-	}
+//	public static ContextResolver<MoxyJsonConfig> createMoxyJsonResolver() {
+//		final MoxyJsonConfig moxyJsonConfig = new MoxyJsonConfig();
+//		Map<String, String> namespacePrefixMapper = new HashMap<String, String>(1);
+//		namespacePrefixMapper.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+//		moxyJsonConfig.setNamespacePrefixMapper(namespacePrefixMapper).setNamespaceSeparator(':');
+//		return moxyJsonConfig.resolver();
+//	}
 }

@@ -7,6 +7,11 @@
 			<Parameter Id="ms" Name="Ms" Type="String" Value="Ms" />
 			<Parameter Id="mrs" Name="Mrs" Type="String" Value="Mrs" />
 		</ParameterBag>
+		<ParameterBag Id="de" Name="Salutations" Type="Enumeration">
+			<Parameter Id="mr" Name="Mr" Type="String" Value="Herr" />
+			<Parameter Id="ms" Name="Ms" Type="String" Value="Frau" />
+			<Parameter Id="mrs" Name="Mrs" Type="String" Value="Frau" />
+		</ParameterBag>
 	</Resource>
 
 	<Resource Id="sex" Name="Sex" Type="Enumeration">
