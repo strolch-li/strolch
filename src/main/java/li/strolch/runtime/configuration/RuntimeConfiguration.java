@@ -17,15 +17,18 @@ package li.strolch.runtime.configuration;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Map;
 
 public class RuntimeConfiguration extends AbstractionConfiguration {
 
+	public static final String PROP_LOCALE = "locale";
 	public static final String RUNTIME = "Runtime"; //$NON-NLS-1$
 	public static final String PATH_CONFIG = "config"; //$NON-NLS-1$
 	public static final String PATH_DATA = "data"; //$NON-NLS-1$
 
 	private final String applicationName;
+	private Locale locale;
 	private final File rootPath;
 	private final File configPath;
 	private final File dataPath;
@@ -62,6 +65,8 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		this.rootPath = rootPathF;
 		this.configPath = configPathF;
 		this.dataPath = dataPathF;
+
+		this.locale = new Locale(getString(PROP_LOCALE, Locale.getDefault().toString()));
 	}
 
 	public String getApplicationName() {
@@ -78,6 +83,10 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	public File getDataPath() {
 		return this.dataPath;
+	}
+
+	public Locale getLocale() {
+		return this.locale;
 	}
 
 	/**

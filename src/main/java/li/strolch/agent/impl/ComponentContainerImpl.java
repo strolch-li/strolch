@@ -19,6 +19,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +31,7 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 
@@ -244,7 +246,14 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	public void setup(StrolchConfiguration strolchConfiguration) {
 
-		// first set up the container itself
+		// set the application locale
+		RuntimeConfiguration runtimeConfiguration = strolchConfiguration.getRuntimeConfiguration();
+		Locale locale = runtimeConfiguration.getLocale();
+		Locale.setDefault(locale);
+		String localeMsg = "Application {0} is using locale {1}";
+		logger.info(MessageFormat.format(localeMsg, runtimeConfiguration.getApplicationName(), Locale.getDefault()));
+
+		// set up the container itself
 		this.strolchConfiguration = strolchConfiguration;
 		Map<Class<?>, StrolchComponent> componentMap = new HashMap<>();
 		Map<String, ComponentController> controllerMap = new HashMap<>();
