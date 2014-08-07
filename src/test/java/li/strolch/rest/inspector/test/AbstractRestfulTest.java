@@ -21,11 +21,11 @@ import java.net.URI;
 
 import javax.ws.rs.core.Application;
 
+import li.strolch.rest.StrolchRestfulExceptionMapper;
 import li.strolch.rest.endpoint.Inspector;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -69,32 +69,17 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 
 	@Override
 	protected Application configure() {
-//		enable(TestProperties.LOG_TRAFFIC);
-//		enable(TestProperties.DUMP_ENTITY);
-
 		return createApp();
-	}
-
-	@Override
-	protected void configureClient(ClientConfig config) {
-		//config.register(createMoxyJsonResolver());
 	}
 
 	public static ResourceConfig createApp() {
 		return new ResourceConfig()//
 				.packages(Inspector.class.getPackage().getName())//
+				.register(StrolchRestfulExceptionMapper.class)
 				//.register(createMoxyJsonResolver())
 				// Logging.
 				.register(LoggingFilter.class)
 				// Tracing support.
 				.property(ServerProperties.TRACING, TracingConfig.ON_DEMAND.name());
 	}
-
-//	public static ContextResolver<MoxyJsonConfig> createMoxyJsonResolver() {
-//		final MoxyJsonConfig moxyJsonConfig = new MoxyJsonConfig();
-//		Map<String, String> namespacePrefixMapper = new HashMap<String, String>(1);
-//		namespacePrefixMapper.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
-//		moxyJsonConfig.setNamespacePrefixMapper(namespacePrefixMapper).setNamespaceSeparator(':');
-//		return moxyJsonConfig.resolver();
-//	}
 }

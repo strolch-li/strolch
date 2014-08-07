@@ -31,11 +31,10 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
-
 		String sessionId = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		if (sessionId != null) {
 			try {
-				String origin = request.getRemoteAddr();
+				String origin = request == null ? "test" : request.getRemoteAddr();
 				StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getComponent(
 						StrolchSessionHandler.class);
 				Certificate certificate = sessionHandler.validate(origin, sessionId);
