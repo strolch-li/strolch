@@ -126,6 +126,10 @@ public class MapOfMaps<T, U, V> {
 		return map.containsKey(u);
 	}
 
+	public int sizeKeys() {
+		return this.mapOfMaps.size();
+	}
+
 	public int size() {
 		int size = 0;
 		Set<Entry<T, Map<U, V>>> entrySet = this.mapOfMaps.entrySet();
@@ -137,6 +141,9 @@ public class MapOfMaps<T, U, V> {
 	}
 
 	public int size(T t) {
-		return this.mapOfMaps.get(t).size();
+		Map<U, V> map = this.mapOfMaps.get(t);
+		if (map == null)
+			return 0;
+		return map.size();
 	}
 }

@@ -1,0 +1,360 @@
+/*
+ * Copyright (c) 2012, Robert von Burg
+ *
+ * All rights reserved.
+ *
+ * This file is part of the XXX.
+ *
+ *  XXX is free software: you can redistribute 
+ *  it and/or modify it under the terms of the GNU General Public License as 
+ *  published by the Free Software Foundation, either version 3 of the License, 
+ *  or (at your option) any later version.
+ *
+ *  XXX is distributed in the hope that it will 
+ *  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with XXX.  If not, see 
+ *  <http://www.gnu.org/licenses/>.
+ */
+package ch.eitchnet.communication;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.communication.IoMessage.State;
+import ch.eitchnet.utils.collections.MapOfLists;
+import ch.eitchnet.utils.helper.StringHelper;
+
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
+public class CommunicationConnection implements Runnable {
+
+	protected static final Logger logger = LoggerFactory.getLogger(CommunicationConnection.class);
+
+	private String id;
+	private ConnectionMode mode;
+	private Map<String, String> parameters;
+
+	private ConnectionState state;
+	private String stateMsg;
+
+	private BlockingDeque<IoMessage> messageQueue;
+	private Thread queueThread;
+	private volatile boolean run;
+	private MapOfLists<CommandKey, ConnectionObserver> connectionObservers;
+
+	private CommunicationEndpoint endpoint;
+	private IoMessageVisitor converter;
+
+	public CommunicationConnection(String id, ConnectionMode mode, Map<String, String> parameters,
+			CommunicationEndpoint endpoint, IoMessageVisitor converter) {
+		this.id = id;
+		this.mode = mode;
+		this.parameters = parameters;
+		this.endpoint = endpoint;
+		this.converter = converter;
+
+		this.state = ConnectionState.CREATED;
+		this.stateMsg = this.state.toString();
+		this.messageQueue = new LinkedBlockingDeque<>();
+		this.connectionObservers = new MapOfLists<>();
+	}
+
+	public String getId() {
+		return this.id;
+	}
+
+	public int getQueueSize() {
+		return this.messageQueue.size();
+	}
+
+	public ConnectionState getState() {
+		return this.state;
+	}
+
+	public String getStateMsg() {
+		return this.stateMsg;
+	}
+
+	public ConnectionMode getMode() {
+		return this.mode;
+	}
+
+	public Map<String, String> getParameters() {
+		return this.parameters;
+	}
+
+	public void clearQueue() {
+		this.messageQueue.clear();
+	}
+
+	public void addConnectionObserver(CommandKey key, ConnectionObserver observer) {
+		synchronized (this.connectionObservers) {
+			this.connectionObservers.addElement(key, observer);
+		}
+	}
+
+	public void removeConnectionObserver(CommandKey key, ConnectionObserver observer) {
+		synchronized (this.connectionObservers) {
+			this.connectionObservers.removeElement(key, observer);
+		}
+	}
+
+	public void notifyStateChange(ConnectionState state, String stateMsg) {
+		this.state = state;
+		this.stateMsg = stateMsg;
+	}
+
+	public void switchMode(ConnectionMode mode) {
+		ConnectionMessages.assertConfigured(this, "Can not switch modes yet!"); //$NON-NLS-1$
+		if (mode == ConnectionMode.OFF) {
+			stop();
+		} else if (mode == ConnectionMode.ON) {
+			stop();
+			start();
+		}
+
+		this.mode = mode;
+	}
+
+	/**
+	 * Configure the underlying {@link CommunicationEndpoint} and {@link IoMessageVisitor}
+	 */
+	public void configure() {
+		this.converter.configure(this);
+		this.endpoint.configure(this, this.converter);
+		this.notifyStateChange(ConnectionState.INITIALIZED, ConnectionState.INITIALIZED.name());
+	}
+
+	public void start() {
+		ConnectionMessages.assertConfigured(this, "Can not start yet!"); //$NON-NLS-1$
+
+		switch (this.mode) {
+		case OFF:
+			logger.info("Not connecting as mode is currently OFF"); //$NON-NLS-1$
+			break;
+		case SIMULATION:
+			logger.info("Started SIMULATION connection!"); //$NON-NLS-1$
+			break;
+		case ON:
+			logger.info("Connecting..."); //$NON-NLS-1$
+			if (this.queueThread != null) {
+				logger.warn(MessageFormat.format("{0}: Already connected!", this.id)); //$NON-NLS-1$
+			} else {
+				logger.info(MessageFormat.format("Starting Integration connection {0}...", this.id)); //$NON-NLS-1$
+				this.run = true;
+				this.queueThread = new Thread(this, MessageFormat.format("{0}_OUT", this.id)); //$NON-NLS-1$
+				this.queueThread.start();
+
+				connectEndpoint();
+			}
+			break;
+		default:
+			logger.error("Unhandled mode " + this.mode); //$NON-NLS-1$
+			break;
+		}
+	}
+
+	public void stop() {
+		ConnectionMessages.assertConfigured(this, "Can not stop yet!"); //$NON-NLS-1$
+
+		switch (this.mode) {
+		case OFF:
+			break;
+		case SIMULATION:
+			logger.info("Disconnected SIMULATION connection!"); //$NON-NLS-1$
+			break;
+		case ON:
+			logger.info("Disconnecting..."); //$NON-NLS-1$
+			if (this.queueThread == null) {
+				logger.warn(MessageFormat.format("{0}: Already disconnected!", this.id)); //$NON-NLS-1$
+			} else {
+				this.run = false;
+
+				try {
+					disconnectEndpoint();
+				} catch (Exception e) {
+					String msg = "Caught exception while disconnecting endpoint: {0}"; //$NON-NLS-1$
+					logger.error(MessageFormat.format(msg, e.getLocalizedMessage()), e);
+				}
+
+				try {
+					this.queueThread.interrupt();
+				} catch (Exception e) {
+					String msg = "Caught exception while stopping queue thread: {0}"; //$NON-NLS-1$
+					logger.warn(MessageFormat.format(msg, e.getLocalizedMessage()));
+				}
+				String msg = "{0} is stopped"; //$NON-NLS-1$
+				logger.info(MessageFormat.format(msg, this.queueThread.getName()));
+				this.queueThread = null;
+			}
+			break;
+		default:
+			logger.error("Unhandled mode " + this.mode); //$NON-NLS-1$
+			break;
+		}
+	}
+
+	/**
+	 * Called by the underlying entpoint when a new message has been received and parsed
+	 * 
+	 * @param message
+	 */
+	public void notify(IoMessage message) {
+		ConnectionMessages.assertConfigured(this, "Can not be notified of new message yet!"); //$NON-NLS-1$
+
+		// if the state of the message is already later than ACCEPTED 
+		// then an underlying component has already set the state, so 
+		// we don't need to set it
+		if (message.getState().compareTo(State.ACCEPTED) < 0)
+			message.setState(State.ACCEPTED, StringHelper.DASH);
+
+		List<ConnectionObserver> observers;
+		synchronized (this.connectionObservers) {
+			List<ConnectionObserver> list = this.connectionObservers.getList(message.getKey());
+			if (list == null)
+				return;
+
+			observers = new ArrayList<>(list);
+		}
+
+		for (ConnectionObserver observer : observers) {
+			try {
+				observer.notify(message.getKey(), message);
+			} catch (Exception e) {
+				String msg = "Failed to notify observer for key {0} on message with id {1}"; //$NON-NLS-1$
+				logger.error(MessageFormat.format(msg, message.getKey(), message.getId()));
+			}
+		}
+	}
+
+	@Override
+	public void run() {
+		while (this.run) {
+
+			IoMessage message = null;
+
+			try {
+
+				message = this.messageQueue.take();
+				logger.info(MessageFormat.format("Processing message {0}...", message.getId())); //$NON-NLS-1$
+
+				this.endpoint.send(message);
+
+				// notify the caller that the message has been processed
+				if (message.getState().compareTo(State.DONE) < 0)
+					message.setState(State.DONE, StringHelper.DASH);
+
+				done(message);
+
+			} catch (InterruptedException e) {
+				logger.warn(MessageFormat.format("{0} connection has been interruped!", this.id)); //$NON-NLS-1$
+
+				// an interrupted exception means the thread must stop
+				this.run = false;
+
+				if (message != null) {
+					logger.error(MessageFormat.format("Can not send message {0}", message.getId())); //$NON-NLS-1$
+					message.setState(State.FATAL, e.getLocalizedMessage());
+					done(message);
+				}
+
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+
+				if (message != null) {
+					logger.error(MessageFormat.format("Can not send message {0}", message.getId())); //$NON-NLS-1$
+					message.setState(State.FATAL, e.getLocalizedMessage());
+					done(message);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Called when the message has been handled
+	 * 
+	 * @param message
+	 */
+	public void done(IoMessage message) {
+		ConnectionMessages.assertConfigured(this, "Can not notify observers yet!"); //$NON-NLS-1$
+
+		switch (message.getState()) {
+		case ACCEPTED:
+		case CREATED:
+		case DONE:
+		case PENDING:
+			logger.info(MessageFormat.format("Sent message {0}", message.toString())); //$NON-NLS-1$
+			break;
+		case FAILED:
+		case FATAL:
+			logger.error(MessageFormat.format("Failed to send message {0}", message.toString())); //$NON-NLS-1$
+			break;
+		default:
+			logger.error(MessageFormat.format("Unhandled state for message {0}", message.toString())); //$NON-NLS-1$
+			break;
+
+		}
+		synchronized (this.connectionObservers) {
+			List<ConnectionObserver> observers = this.connectionObservers.getList(message.getKey());
+			for (ConnectionObserver observer : observers) {
+				observer.notify(message.getKey(), message);
+			}
+		}
+	}
+
+	public String getUri() {
+		return this.endpoint == null ? "0.0.0.0:0" : this.endpoint.getRemoteUri(); //$NON-NLS-1$
+	}
+
+	public void reset() {
+		ConnectionMessages.assertConfigured(this, "Can not resest yet!"); //$NON-NLS-1$
+		this.endpoint.reset();
+	}
+
+	/**
+	 * Called when the connection is connected, thus the underlying endpoint can be started
+	 */
+	protected void connectEndpoint() {
+		this.endpoint.start();
+	}
+
+	/**
+	 * Called when the connection is disconnected, thus the underlying endpoint must be stopped
+	 */
+	protected void disconnectEndpoint() {
+		this.endpoint.stop();
+	}
+
+	/**
+	 * Send the message using the underlying endpoint. Do not change the state of the message, this will be done by the
+	 * caller
+	 * 
+	 * @param message
+	 */
+	public void send(IoMessage message) {
+		ConnectionMessages.assertConfigured(this, "Can not send yet"); //$NON-NLS-1$
+		if (this.mode == ConnectionMode.OFF)
+			throw ConnectionMessages.throwNotConnected(this, message);
+
+		message.setState(State.PENDING, State.PENDING.name());
+
+		if (this.mode == ConnectionMode.SIMULATION) {
+			message.setState(State.DONE, State.DONE.name());
+			done(message);
+		} else {
+			this.messageQueue.add(message);
+		}
+	}
+}
