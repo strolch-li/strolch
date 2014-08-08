@@ -88,7 +88,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 
 	@Override
 	public void visitAny() {
-		DBC.PRE.assertEmpty("Only one selection allow when using Any!", this.selectors);
+		DBC.PRE.assertEmpty("Only one selection allowed when using Any!", this.selectors);
 		addSelector(new AnySelector<T>());
 		this.any = true;
 	}
