@@ -227,6 +227,16 @@ public class AsciiHelper {
 	public static final char DEL = (char) 127; // Delete
 
 	/**
+	 * Returns the ASCII Text of a certain bye value
+	 * 
+	 * @param b
+	 * @return String
+	 */
+	public static String getAsciiText(byte b) {
+		return getAsciiText((char) b);
+	}
+
+	/**
 	 * Returns the ASCII Text of a certain char value
 	 * 
 	 * @param c
