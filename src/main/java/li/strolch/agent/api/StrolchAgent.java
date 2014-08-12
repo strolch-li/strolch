@@ -30,6 +30,8 @@ import li.strolch.runtime.configuration.StrolchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.utils.helper.StringHelper;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -37,11 +39,6 @@ public class StrolchAgent {
 
 	private static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties"; //$NON-NLS-1$
 	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
-
-	/**
-	 * the semi-unique id which is incremented on every {@link #getUniqueId()}-method call
-	 */
-	private static long uniqueId = System.currentTimeMillis() - 1119953500000l;
 
 	private ComponentContainerImpl container;
 	private StrolchConfiguration strolchConfiguration;
@@ -90,7 +87,7 @@ public class StrolchAgent {
 		this.strolchConfiguration = ConfigurationParser.parseConfiguration(path);
 
 		ComponentContainerImpl container = new ComponentContainerImpl(this);
-		container.setup(strolchConfiguration);
+		container.setup(this.strolchConfiguration);
 
 		this.container = container;
 
@@ -109,13 +106,7 @@ public class StrolchAgent {
 	 * @return Returns the pseudo unique Id to be used during object creation from external services.
 	 */
 	public static synchronized String getUniqueId() {
-
-		if (uniqueId == Long.MAX_VALUE - 1) {
-			uniqueId = 0;
-		}
-
-		uniqueId += 1;
-		return Long.toString(uniqueId);
+		return StringHelper.getUniqueId();
 	}
 
 	private VersionQueryResult versionQueryResult;

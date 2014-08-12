@@ -30,6 +30,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import ch.eitchnet.utils.helper.StringHelper;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -108,7 +110,7 @@ public class StrolchEnum {
 	 *            the localeL to set
 	 */
 	public void setLocaleL(Locale localeL) {
-		this.locale = localeL.getLanguage() + "_" + localeL.getCountry();
+		this.locale = localeL.getLanguage() + StringHelper.UNDERLINE + localeL.getCountry();
 		this.localeL = localeL;
 	}
 

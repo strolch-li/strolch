@@ -80,7 +80,7 @@ public class InMemoryQuery<T extends StrolchElement, U> {
 			T element = iter.next();
 			if (this.selector.select(element)) {
 				U returnValue = this.elementVisitor.visit(element);
-				DBC.INTERIM.assertNotNull("Visitor may not return null in query!", returnValue);
+				DBC.INTERIM.assertNotNull("Visitor may not return null in query!", returnValue); //$NON-NLS-1$
 				result.add(returnValue);
 			}
 		}

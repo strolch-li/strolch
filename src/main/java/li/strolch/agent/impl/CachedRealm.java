@@ -86,7 +86,7 @@ public class CachedRealm extends StrolchRealm {
 			for (String type : resourceTypes) {
 				List<Resource> resources = resourceDao.queryAll(type);
 				for (Resource resource : resources) {
-					resourceMap.insert(resource, null);
+					this.resourceMap.insert(resource, null);
 					nrOfResources++;
 				}
 			}
@@ -98,7 +98,7 @@ public class CachedRealm extends StrolchRealm {
 			for (String type : orderTypes) {
 				List<Order> orders = orderDao.queryAll(type);
 				for (Order order : orders) {
-					orderMap.insert(order, null);
+					this.orderMap.insert(order, null);
 					nrOfOrders++;
 				}
 			}

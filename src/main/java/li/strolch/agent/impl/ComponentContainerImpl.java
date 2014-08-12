@@ -206,7 +206,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			try {
 				component.stop();
 			} catch (Exception e) {
-				msg = "Failed to stop component {0} due to {1}";
+				msg = "Failed to stop component {0} due to {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, componentName, e.getMessage());
 				logger.error(msg, e);
 			}
@@ -232,7 +232,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			try {
 				component.destroy();
 			} catch (Exception e) {
-				msg = "Failed to destroy component {0} due to {1}";
+				msg = "Failed to destroy component {0} due to {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, componentName, e.getMessage());
 				logger.error(msg, e);
 			}
@@ -250,7 +250,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		RuntimeConfiguration runtimeConfiguration = strolchConfiguration.getRuntimeConfiguration();
 		Locale locale = runtimeConfiguration.getLocale();
 		Locale.setDefault(locale);
-		String localeMsg = "Application {0} is using locale {1}";
+		String localeMsg = "Application {0} is using locale {1}"; //$NON-NLS-1$
 		logger.info(MessageFormat.format(localeMsg, runtimeConfiguration.getApplicationName(), Locale.getDefault()));
 
 		// set up the container itself
