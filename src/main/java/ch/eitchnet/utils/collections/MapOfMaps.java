@@ -15,8 +15,10 @@
  */
 package ch.eitchnet.utils.collections;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -78,6 +80,23 @@ public class MapOfMaps<T, U, V> {
 			this.mapOfMaps.put(t, map);
 		}
 		return map.put(u, v);
+	}
+
+	public List<V> getAllElements() {
+		List<V> all = new ArrayList<>();
+		for (Map<U, V> u : this.mapOfMaps.values()) {
+			all.addAll(u.values());
+		}
+		return all;
+	}
+
+	public List<V> getAllElements(T t) {
+		List<V> all = new ArrayList<>();
+		Map<U, V> map = this.mapOfMaps.get(t);
+		if (map != null) {
+			all.addAll(map.values());
+		}
+		return all;
 	}
 
 	public void addMap(T t, Map<U, V> u) {
