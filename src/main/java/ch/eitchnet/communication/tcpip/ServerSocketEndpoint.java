@@ -27,7 +27,8 @@ import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.communication.CommunicationConnection;
 import ch.eitchnet.communication.CommunicationEndpoint;
@@ -55,7 +56,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 
-	protected static final Logger logger = Logger.getLogger(ServerSocketEndpoint.class);
+	protected static final Logger logger = LoggerFactory.getLogger(ServerSocketEndpoint.class);
 
 	private Thread serverThread;
 
@@ -228,7 +229,7 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 				} else {
 					String msg = "Error while opening socket for inbound connection {0}"; //$NON-NLS-1$
 					logger.error(MessageFormat.format(msg, this.connection.getId()));
-					logger.error(e, e);
+					logger.error(e.getMessage(), e);
 					this.connected = false;
 					this.connection.notifyStateChange(ConnectionState.BROKEN, e.getLocalizedMessage());
 				}
@@ -532,8 +533,8 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 						this.serverSocket = new ServerSocket(this.localInputPort, 1, this.localInputAddress);
 						this.serverSocket.setReuseAddress(true);
 					} catch (BindException e) {
-						logger.fatal("Fatal BindException occurred! Port is already in use, or address is illegal!"); //$NON-NLS-1$
-						logger.fatal(e, e);
+						logger.error("Fatal BindException occurred! Port is already in use, or address is illegal!"); //$NON-NLS-1$
+						logger.error(e.getMessage(), e);
 						this.closed = true;
 						this.fatal = true;
 
@@ -559,7 +560,7 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 				if (e instanceof InterruptedException) {
 					logger.error("Interrupted!"); //$NON-NLS-1$
 				} else {
-					logger.error(e, e);
+					logger.error(e.getMessage(), e);
 				}
 				this.connection.notifyStateChange(ConnectionState.BROKEN, e.getLocalizedMessage());
 			} finally {
