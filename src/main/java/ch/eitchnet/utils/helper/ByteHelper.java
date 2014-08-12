@@ -17,7 +17,6 @@ package ch.eitchnet.utils.helper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class ByteHelper {
 

@@ -42,8 +42,8 @@ package ch.eitchnet.utils.iso8601;
  * minutes and seconds
  * </p>
  * 
- * @author msmock
- * @author gattom (reimplementation using enum)
+ * @author Martin Smock <smock.martin@gmail.com>
+ * @author Michael Gatto <michael@gatto.ch> (reimplementation using enum)
  */
 @SuppressWarnings("nls")
 public class ISO8601Duration implements DurationFormat {

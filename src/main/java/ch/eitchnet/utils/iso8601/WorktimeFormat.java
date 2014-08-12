@@ -18,7 +18,7 @@ package ch.eitchnet.utils.iso8601;
 /**
  * interface for the worktime format
  * 
- * @author msmock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 public interface WorktimeFormat {
 

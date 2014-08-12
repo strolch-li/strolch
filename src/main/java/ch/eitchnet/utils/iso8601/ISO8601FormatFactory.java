@@ -22,7 +22,7 @@ import ch.eitchnet.utils.helper.MathHelper;
 /**
  * Default factory for date formats used for serialization.
  * 
- * @author msmock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 public class ISO8601FormatFactory implements FormatFactory {
 

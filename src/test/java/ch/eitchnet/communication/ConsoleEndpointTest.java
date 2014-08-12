@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 Robert von Burg <eitch@eitchnet.ch>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ch.eitchnet.communication;
 
 import static org.junit.Assert.assertEquals;
@@ -12,6 +27,9 @@ import org.slf4j.Logger;
 import ch.eitchnet.communication.console.ConsoleEndpoint;
 import ch.eitchnet.communication.console.ConsoleMessageVisitor;
 
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
 public class ConsoleEndpointTest extends AbstractEndpointTest {
 
 	private static final String CONNECTION_ID = "Console"; //$NON-NLS-1$
@@ -34,7 +52,7 @@ public class ConsoleEndpointTest extends AbstractEndpointTest {
 		this.connection.start();
 		
 		CommandKey key = CommandKey.key(CONNECTION_ID, "logger"); //$NON-NLS-1$
-		TestIoMessage msg = createTestMessage(key);
+		TestIoMessage msg = createTestMessage(key, CONNECTION_ID);
 
 		TestConnectionObserver observer = new TestConnectionObserver();
 		this.connection.addConnectionObserver(key, observer);

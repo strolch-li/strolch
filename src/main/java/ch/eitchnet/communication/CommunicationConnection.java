@@ -1,23 +1,17 @@
 /*
- * Copyright (c) 2012, Robert von Burg
- *
- * All rights reserved.
- *
- * This file is part of the XXX.
- *
- *  XXX is free software: you can redistribute 
- *  it and/or modify it under the terms of the GNU General Public License as 
- *  published by the Free Software Foundation, either version 3 of the License, 
- *  or (at your option) any later version.
- *
- *  XXX is distributed in the hope that it will 
- *  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XXX.  If not, see 
- *  <http://www.gnu.org/licenses/>.
+ * Copyright 2014 Robert von Burg <eitch@eitchnet.ch>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package ch.eitchnet.communication;
 
@@ -33,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.communication.IoMessage.State;
 import ch.eitchnet.utils.collections.MapOfLists;
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -55,20 +50,37 @@ public class CommunicationConnection implements Runnable {
 	private MapOfLists<CommandKey, ConnectionObserver> connectionObservers;
 
 	private CommunicationEndpoint endpoint;
-	private IoMessageVisitor converter;
+	private IoMessageVisitor messageVisitor;
+
+	private IoMessageArchive archive;
 
 	public CommunicationConnection(String id, ConnectionMode mode, Map<String, String> parameters,
-			CommunicationEndpoint endpoint, IoMessageVisitor converter) {
+			CommunicationEndpoint endpoint, IoMessageVisitor messageVisitor) {
+
+		DBC.PRE.assertNotEmpty("Id must be set!", id); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("ConnectionMode must be set!", mode); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Paramerters must not be null!", parameters); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Endpoint must be set!", endpoint); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("IoMessageVisitor must be set!", messageVisitor); //$NON-NLS-1$
+
 		this.id = id;
 		this.mode = mode;
 		this.parameters = parameters;
 		this.endpoint = endpoint;
-		this.converter = converter;
+		this.messageVisitor = messageVisitor;
 
 		this.state = ConnectionState.CREATED;
 		this.stateMsg = this.state.toString();
 		this.messageQueue = new LinkedBlockingDeque<>();
 		this.connectionObservers = new MapOfLists<>();
+	}
+
+	public void setArchive(IoMessageArchive archive) {
+		this.archive = archive;
+	}
+
+	public IoMessageArchive getArchive() {
+		return this.archive;
 	}
 
 	public String getId() {
@@ -132,8 +144,8 @@ public class CommunicationConnection implements Runnable {
 	 * Configure the underlying {@link CommunicationEndpoint} and {@link IoMessageVisitor}
 	 */
 	public void configure() {
-		this.converter.configure(this);
-		this.endpoint.configure(this, this.converter);
+		this.messageVisitor.configure(this);
+		this.endpoint.configure(this, this.messageVisitor);
 		this.notifyStateChange(ConnectionState.INITIALIZED, ConnectionState.INITIALIZED.name());
 	}
 
@@ -152,7 +164,7 @@ public class CommunicationConnection implements Runnable {
 			if (this.queueThread != null) {
 				logger.warn(MessageFormat.format("{0}: Already connected!", this.id)); //$NON-NLS-1$
 			} else {
-				logger.info(MessageFormat.format("Starting Integration connection {0}...", this.id)); //$NON-NLS-1$
+				logger.info(MessageFormat.format("Starting Connection {0}...", this.id)); //$NON-NLS-1$
 				this.run = true;
 				this.queueThread = new Thread(this, MessageFormat.format("{0}_OUT", this.id)); //$NON-NLS-1$
 				this.queueThread.start();
@@ -207,7 +219,7 @@ public class CommunicationConnection implements Runnable {
 	}
 
 	/**
-	 * Called by the underlying entpoint when a new message has been received and parsed
+	 * Called by the underlying endpoint when a new message has been received and parsed
 	 * 
 	 * @param message
 	 */
@@ -237,6 +249,9 @@ public class CommunicationConnection implements Runnable {
 				logger.error(MessageFormat.format(msg, message.getKey(), message.getId()));
 			}
 		}
+
+		if (this.archive != null)
+			this.archive.archive(message);
 	}
 
 	@Override
@@ -277,6 +292,10 @@ public class CommunicationConnection implements Runnable {
 					logger.error(MessageFormat.format("Can not send message {0}", message.getId())); //$NON-NLS-1$
 					message.setState(State.FATAL, e.getLocalizedMessage());
 					done(message);
+				}
+			} finally {
+				if (message != null && this.archive != null) {
+					this.archive.archive(message);
 				}
 			}
 		}

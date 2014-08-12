@@ -1,3 +1,18 @@
+/*
+ * Copyright 2014 Robert von Burg <eitch@eitchnet.ch>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ch.eitchnet.communication;
 
 import static org.junit.Assert.assertEquals;
@@ -22,6 +37,9 @@ import ch.eitchnet.communication.tcpip.ServerSocketEndpoint;
 import ch.eitchnet.communication.tcpip.SocketEndpointConstants;
 import ch.eitchnet.communication.tcpip.SocketMessageVisitor;
 
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
 public class SocketEndpointTest extends AbstractEndpointTest {
 
 	private static final String PORT = "45678"; //$NON-NLS-1$
@@ -85,7 +103,7 @@ public class SocketEndpointTest extends AbstractEndpointTest {
 		CommandKey outboundKey = CommandKey.key(CLIENT_CONNECTION_ID, "lines"); //$NON-NLS-1$
 		this.clientConnection.addConnectionObserver(outboundKey, clientObserver);
 
-		TestIoMessage outboundMsg = createTestMessage(outboundKey);
+		TestIoMessage outboundMsg = createTestMessage(outboundKey, CLIENT_CONNECTION_ID);
 		this.clientConnection.send(outboundMsg);
 		waitForMessage(clientObserver);
 		assertEquals(outboundMsg.getKey(), clientObserver.getMessage().getKey());
@@ -128,7 +146,8 @@ public class SocketEndpointTest extends AbstractEndpointTest {
 			}
 			logger.info(MessageFormat.format("Read {0} lines from stream.", lines.size())); //$NON-NLS-1$
 
-			return new TestIoMessage(UUID.randomUUID().toString(), CommandKey.key(SERVER_CONNECTION_ID, "lines"), lines); //$NON-NLS-1$
+			return new TestIoMessage(UUID.randomUUID().toString(),
+					CommandKey.key(SERVER_CONNECTION_ID, "lines"), SERVER_CONNECTION_ID, lines); //$NON-NLS-1$
 		}
 	}
 }

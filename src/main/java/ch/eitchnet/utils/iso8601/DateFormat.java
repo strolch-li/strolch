@@ -18,9 +18,9 @@ package ch.eitchnet.utils.iso8601;
 import java.util.Date;
 
 /**
- * interface for all date formats internally used by rsp applications
+ * Interface for date formatting
  * 
- * @author msmock
+ * Martin Smock <smock.martin@gmail.com>
  */
 public interface DateFormat {
 

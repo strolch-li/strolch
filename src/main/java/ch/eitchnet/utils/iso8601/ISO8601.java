@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
- * 
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("nls")
 public class ISO8601 implements DateFormat {

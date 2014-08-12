@@ -19,7 +19,6 @@ import java.util.Arrays;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class ArraysHelper {
 

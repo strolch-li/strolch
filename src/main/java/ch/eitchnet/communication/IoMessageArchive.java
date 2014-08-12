@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright 2014 Robert von Burg <eitch@eitchnet.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.eitchnet.utils.exceptions;
+package ch.eitchnet.communication;
 
-/**
- * @author Robert von Burg <eitch@eitchnet.ch>
- */
-public class XmlException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+import java.util.List;
 
-	/**
-	 * @param message
-	 */
-	public XmlException(String message) {
-		super(message);
-	}
+public interface IoMessageArchive {
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public XmlException(String message, Throwable cause) {
-		super(message, cause);
-	}
+	public int getMaxSize();
+
+	public void setMaxSize(int maxSize);
+
+	public int getTrimSize();
+
+	public void setTrimSize(int trimSize);
+
+	public int size();
+
+	public List<IoMessage> getAll();
+
+	public List<IoMessage> getBy(String connectionId);
+
+	public List<IoMessage> getBy(String connectionId, CommandKey key);
+
+	public void clearArchive();
+
+	public void archive(IoMessage message);
 }

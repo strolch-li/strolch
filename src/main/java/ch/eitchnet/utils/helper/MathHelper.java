@@ -21,7 +21,8 @@ import java.math.RoundingMode;
 /**
  * A helper class that contains mathematical computations that can be used throughout.
  * 
- * @author msmock, gattom
+ * @author Martin Smock <smock.martin@gmail.com>
+ * @author Michael Gatto <michael@gatto.ch>
  */
 public class MathHelper {
 

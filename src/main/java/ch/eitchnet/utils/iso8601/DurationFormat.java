@@ -16,9 +16,9 @@
 package ch.eitchnet.utils.iso8601;
 
 /**
- * interface for all duration formats internally used by the platform
+ * Interface for duration formatting
  * 
- * @author msmock
+ * Martin Smock <smock.martin@gmail.com>
  */
 public interface DurationFormat {
 

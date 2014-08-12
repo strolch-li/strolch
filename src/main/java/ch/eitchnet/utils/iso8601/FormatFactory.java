@@ -21,42 +21,42 @@ import java.util.Date;
  * This interface defines methods for formatting values for UI representation and also defines factory methods for
  * formatters for parsing and formatting duration and date values
  * 
- * @author msmock
+ * Martin Smock <smock.martin@gmail.com>
  */
 public interface FormatFactory {
 
 	/**
 	 * return the formatter for dates
 	 * 
-	 * @return RSPDurationFormat
+	 * @return {@link DurationFormat}
 	 */
 	public DateFormat getDateFormat();
 
 	/**
 	 * return the formatter for durations
 	 * 
-	 * @return RSPDurationFormat
+	 * @return {@link DurationFormat}
 	 */
 	public DurationFormat getDurationFormat();
 
 	/**
 	 * return the formatter for work time
 	 * 
-	 * @return RSPWorktimeFormat
+	 * @return {@link WorktimeFormat}
 	 */
 	public WorktimeFormat getWorktimeFormat();
 
 	/**
 	 * the date format used in xml import and export
 	 * 
-	 * @return RSPDateFormat
+	 * @return {@link DateFormat}
 	 */
 	public DateFormat getXmlDateFormat();
 
 	/**
 	 * the duration format used in xml import and export
 	 * 
-	 * @return RSPDurationFormat
+	 * @return {@link DurationFormat}
 	 */
 	public DurationFormat getXmlDurationFormat();
 
