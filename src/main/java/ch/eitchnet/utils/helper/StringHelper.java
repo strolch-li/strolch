@@ -47,6 +47,11 @@ public class StringHelper {
 	private static final Logger logger = LoggerFactory.getLogger(StringHelper.class);
 
 	/**
+	 * the semi-unique id which is incremented on every {@link #getUniqueId()}-method call
+	 */
+	private static long uniqueId = System.currentTimeMillis() - 1119953500000l;
+
+	/**
 	 * Hex char table for fast calculating of hex values
 	 */
 	private static final byte[] HEX_CHAR_TABLE = { (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4',
@@ -628,5 +633,20 @@ public class StringHelper {
 			msg = MessageFormat.format(msg, value);
 			throw new RuntimeException(msg);
 		}
+	}
+
+	/**
+	 * Return a pseudo unique id which is incremented on each call. The id is initialized from the current time
+	 * 
+	 * @return a pseudo unique id
+	 */
+	public static synchronized String getUniqueId() {
+
+		if (uniqueId == Long.MAX_VALUE - 1) {
+			uniqueId = 0;
+		}
+
+		uniqueId += 1;
+		return Long.toString(uniqueId);
 	}
 }
