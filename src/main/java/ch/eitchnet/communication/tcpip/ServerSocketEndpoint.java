@@ -82,12 +82,13 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 	// connection
 	private ServerSocket serverSocket;
 	private Socket socket;
-	private DataOutputStream outputStream;
-	private DataInputStream inputStream;
 
-	private CommunicationConnection connection;
+	protected DataOutputStream outputStream;
+	protected DataInputStream inputStream;
 
-	private SocketMessageVisitor messageVisitor;
+	protected CommunicationConnection connection;
+
+	protected SocketMessageVisitor messageVisitor;
 
 	/**
 	 * Default constructor
