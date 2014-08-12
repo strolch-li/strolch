@@ -147,9 +147,7 @@ public class FileHelper {
 	public static final void writeToFile(byte[] bytes, File dstFile) {
 
 		try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dstFile));) {
-
 			out.write(bytes);
-
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath()); //$NON-NLS-1$
 		} catch (IOException e) {
@@ -168,10 +166,7 @@ public class FileHelper {
 	public static final void writeStringToFile(String string, File dstFile) {
 
 		try (BufferedWriter bufferedwriter = new BufferedWriter(new FileWriter(dstFile));) {
-
 			bufferedwriter.write(string);
-			bufferedwriter.close();
-
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath()); //$NON-NLS-1$
 		} catch (IOException e) {
@@ -297,9 +292,7 @@ public class FileHelper {
 				outBuffer.write(theByte);
 			}
 
-			inBuffer.close();
 			outBuffer.flush();
-			outBuffer.close();
 
 			if (checksum) {
 				String fromFileMD5 = StringHelper.getHexString(FileHelper.hashFileMd5(fromFile));
@@ -554,7 +547,6 @@ public class FileHelper {
 					complete.update(buffer, 0, numRead);
 				}
 			} while (numRead != -1);
-			fis.close();
 
 			return complete.digest();
 		} catch (Exception e) {
