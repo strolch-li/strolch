@@ -7,6 +7,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.runtime.configuration.StrolchEnvironment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,10 @@ public class StartupListener implements ServletContextListener {
 
 		String realPath = sce.getServletContext().getRealPath("/WEB-INF");
 		File pathF = new File(realPath);
+		String environment = StrolchEnvironment.getEnvironmentFromEnvProperties(pathF);
 		logger.info("Starting Agent...");
 		this.agent = new StrolchAgent();
-		this.agent.setup(pathF);
+		this.agent.setup(environment, pathF);
 		this.agent.initialize();
 		this.agent.start();
 		logger.info("Agent started.");
