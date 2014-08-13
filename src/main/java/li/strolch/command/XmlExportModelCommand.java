@@ -234,7 +234,7 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	private void writeOrdersByType(XMLStreamWriter writer, OrderMap orderMap, String type) {
-		OrderVisitor visitor = new OrderToSaxWriterVisitor(writer);
+		OrderVisitor<?> visitor = new OrderToSaxWriterVisitor(writer);
 		Set<String> keysByType = new TreeSet<>(orderMap.getKeysBy(tx(), type));
 		for (String id : keysByType) {
 			Order order = orderMap.getBy(tx(), type, id);
@@ -252,7 +252,7 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	private void writeResourcesByType(XMLStreamWriter writer, ResourceMap resourceMap, String type) {
-		ResourceVisitor visitor = new ResourceToSaxWriterVisitor(writer);
+		ResourceVisitor<?> visitor = new ResourceToSaxWriterVisitor(writer);
 		Set<String> keysByType = new TreeSet<>(resourceMap.getKeysBy(tx(), type));
 		for (String id : keysByType) {
 			Resource resource = resourceMap.getBy(tx(), type, id);
