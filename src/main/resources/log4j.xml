@@ -8,14 +8,14 @@
 			<param name="ConversionPattern" value="%d %5p [%t] %C{1} %M - %m%n" />
 		</layout>
 	</appender>
-	<appender name="FILE" class="org.apache.log4j.FileAppender">
-		<param name="File" value="data/log/tutorialapp.log" />
-		<param name="BufferedIO" value="true" />
-		<param name="Append" value="true" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d %5p [%t] %C{1} %M - %m%n" />
-		</layout>
-	</appender>
+	<!-- <appender name="FILE" class="org.apache.log4j.FileAppender"> -->
+	<!-- <param name="File" value="data/log/tutorialapp.log" /> -->
+	<!-- <param name="BufferedIO" value="true" /> -->
+	<!-- <param name="Append" value="true" /> -->
+	<!-- <layout class="org.apache.log4j.PatternLayout"> -->
+	<!-- <param name="ConversionPattern" value="%d %5p [%t] %C{1} %M - %m%n" /> -->
+	<!-- </layout> -->
+	<!-- </appender> -->
 
 	<logger name="ch.eitchnet">
 		<level value="info" />
@@ -24,7 +24,7 @@
 	<root>
 		<priority value="info" />
 		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="FILE" />
+		<!-- <appender-ref ref="FILE" /> -->
 	</root>
 
 </log4j:configuration>
