@@ -15,17 +15,23 @@
  */
 package li.strolch.runtime.configuration;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.text.MessageFormat;
+import java.util.Properties;
 
 import li.strolch.runtime.StrolchConstants;
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class StrolchSystemProperties {
+public class StrolchEnvironment {
 
-	public static String getEnvironment() {
+	public static final String ENV_PROPERTIES_FILE = "ENV.properties";
+
+	public static String getEnvironmentFromSystemProperties() {
 		String environment = System.getProperties().getProperty(StrolchConstants.ENV_STROLCH);
 		if (StringHelper.isEmpty(environment)) {
 			String msg = "The system property {0} is missing!";
@@ -35,4 +41,23 @@ public class StrolchSystemProperties {
 		return environment;
 	}
 
+	public static String getEnvironmentFromEnvProperties(File rootPath) {
+		File envF = new File(rootPath, ENV_PROPERTIES_FILE);
+		DBC.PRE.assertExists(ENV_PROPERTIES_FILE + " does not exist in " + rootPath.getAbsolutePath(), envF);
+		Properties envP = new Properties();
+		try (FileInputStream fin = new FileInputStream(envF)) {
+			envP.load(fin);
+		} catch (Exception e) {
+			throw new StrolchConfigurationException("Failed to load " + ENV_PROPERTIES_FILE + " in " + rootPath, e);
+		}
+
+		String environment = envP.getProperty(StrolchConstants.ENV_STROLCH);
+		if (StringHelper.isEmpty(environment)) {
+			String msg = "The property {0} does not exist in {1}";
+			msg = MessageFormat.format(msg, StrolchConstants.ENV_STROLCH, envF.getAbsolutePath());
+			throw new StrolchConfigurationException(msg);
+		}
+
+		return environment;
+	}
 }
