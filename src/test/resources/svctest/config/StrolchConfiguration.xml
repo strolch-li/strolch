@@ -1,59 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <StrolchConfiguration>
-	<Runtime>
-		<applicationName>StrolchRuntimeTest</applicationName>
-		<Properties>
-			<verbose>true</verbose>
-		</Properties>
-	</Runtime>
-	<Component>
-		<name>RealmHandler</name>
-		<api>li.strolch.agent.api.RealmHandler</api>
-		<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
-		<depends>PersistenceHandler</depends>
-		<Properties>
-			<realms>svcTransient, svcCached, svcTransactional</realms>
+	<env id="dev">
+		<Runtime>
+			<applicationName>StrolchRuntimeTest</applicationName>
+			<Properties>
+				<verbose>true</verbose>
+			</Properties>
+		</Runtime>
+		<Component>
+			<name>RealmHandler</name>
+			<api>li.strolch.agent.api.RealmHandler</api>
+			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+			<depends>PersistenceHandler</depends>
+			<Properties>
+				<realms>svcTransient, svcCached, svcTransactional</realms>
 
-			<tryLockTimeUnit.svcTransient>SECONDS</tryLockTimeUnit.svcTransient>
-			<tryLockTime.svcTransient>1</tryLockTime.svcTransient>
-			<dataStoreMode.svcTransient>TRANSIENT</dataStoreMode.svcTransient>
-			<dataStoreFile.svcTransient>StrolchModel.xml</dataStoreFile.svcTransient>
+				<tryLockTimeUnit.svcTransient>SECONDS</tryLockTimeUnit.svcTransient>
+				<tryLockTime.svcTransient>1</tryLockTime.svcTransient>
+				<dataStoreMode.svcTransient>TRANSIENT</dataStoreMode.svcTransient>
+				<dataStoreFile.svcTransient>StrolchModel.xml</dataStoreFile.svcTransient>
 
-			<tryLockTimeUnit.svcCached>SECONDS</tryLockTimeUnit.svcCached>
-			<tryLockTime.svcCached>1</tryLockTime.svcCached>
-			<dataStoreMode.svcCached>CACHED</dataStoreMode.svcCached>
+				<tryLockTimeUnit.svcCached>SECONDS</tryLockTimeUnit.svcCached>
+				<tryLockTime.svcCached>1</tryLockTime.svcCached>
+				<dataStoreMode.svcCached>CACHED</dataStoreMode.svcCached>
 
-			<tryLockTimeUnit.svcTransactional>SECONDS</tryLockTimeUnit.svcTransactional>
-			<tryLockTime.svcTransactional>1</tryLockTime.svcTransactional>
-			<dataStoreMode.svcTransactional>TRANSACTIONAL</dataStoreMode.svcTransactional>
-		</Properties>
-	</Component>
+				<tryLockTimeUnit.svcTransactional>SECONDS</tryLockTimeUnit.svcTransactional>
+				<tryLockTime.svcTransactional>1</tryLockTime.svcTransactional>
+				<dataStoreMode.svcTransactional>TRANSACTIONAL</dataStoreMode.svcTransactional>
+			</Properties>
+		</Component>
 
-	<Component>
-		<name>PersistenceHandler</name>
-		<api>li.strolch.persistence.api.PersistenceHandler</api>
-		<impl>li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler</impl>
-		<Properties>
-			<allowSchemaCreation>true</allowSchemaCreation>
-			<allowSchemaDrop>true</allowSchemaDrop>
+		<Component>
+			<name>PersistenceHandler</name>
+			<api>li.strolch.persistence.api.PersistenceHandler</api>
+			<impl>li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler</impl>
+			<Properties>
+				<allowSchemaCreation>true</allowSchemaCreation>
+				<allowSchemaDrop>true</allowSchemaDrop>
 
-			<db.url.svcCached>jdbc:postgresql://localhost/cacheduserdb</db.url.svcCached>
-			<db.username.svcCached>cacheduser</db.username.svcCached>
-			<db.password.svcCached>test</db.password.svcCached>
+				<db.url.svcCached>jdbc:postgresql://localhost/cacheduserdb</db.url.svcCached>
+				<db.username.svcCached>cacheduser</db.username.svcCached>
+				<db.password.svcCached>test</db.password.svcCached>
 
-			<db.url.svcTransactional>jdbc:postgresql://localhost/transactionaluserdb</db.url.svcTransactional>
-			<db.username.svcTransactional>transactionaluser</db.username.svcTransactional>
-			<db.password.svcTransactional>test</db.password.svcTransactional>
+				<db.url.svcTransactional>jdbc:postgresql://localhost/transactionaluserdb</db.url.svcTransactional>
+				<db.username.svcTransactional>transactionaluser</db.username.svcTransactional>
+				<db.password.svcTransactional>test</db.password.svcTransactional>
 
-		</Properties>
-	</Component>
+			</Properties>
+		</Component>
 
-	<Component>
-		<name>ServiceHandler</name>
-		<api>li.strolch.service.api.ServiceHandler</api>
-		<impl>li.strolch.service.api.DefaultServiceHandler</impl>
-		<Properties>
-			<verbose>true</verbose>
-		</Properties>
-	</Component>
+		<Component>
+			<name>ServiceHandler</name>
+			<api>li.strolch.service.api.ServiceHandler</api>
+			<impl>li.strolch.service.api.DefaultServiceHandler</impl>
+			<Properties>
+				<verbose>true</verbose>
+			</Properties>
+		</Component>
+	</env>
 </StrolchConfiguration>

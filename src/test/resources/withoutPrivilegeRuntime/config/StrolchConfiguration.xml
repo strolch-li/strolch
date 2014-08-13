@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <StrolchConfiguration>
-	<Runtime>
-		<applicationName>StrolchPersistenceTest</applicationName>
-		<Properties>
-			<verbose>true</verbose>
-		</Properties>
-	</Runtime>
-	<Component>
-		<name>RealmHandler</name>
-		<api>li.strolch.agent.api.RealmHandler</api>
-		<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
-		<Properties>
-			<dataStoreMode>EMPTY</dataStoreMode>
-		</Properties>
-	</Component>
-	<Component>
-		<name>ServiceHandler</name>
-		<api>li.strolch.service.api.ServiceHandler</api>
-		<impl>li.strolch.service.api.DefaultServiceHandler</impl>
-		<Properties>
-			<verbose>true</verbose>
-		</Properties>
-	</Component>
+	<env id="dev">
+		<Runtime>
+			<applicationName>StrolchPersistenceTest</applicationName>
+			<Properties>
+				<verbose>true</verbose>
+			</Properties>
+		</Runtime>
+		<Component>
+			<name>RealmHandler</name>
+			<api>li.strolch.agent.api.RealmHandler</api>
+			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+			<Properties>
+				<dataStoreMode>EMPTY</dataStoreMode>
+			</Properties>
+		</Component>
+		<Component>
+			<name>ServiceHandler</name>
+			<api>li.strolch.service.api.ServiceHandler</api>
+			<impl>li.strolch.service.api.DefaultServiceHandler</impl>
+			<Properties>
+				<verbose>true</verbose>
+			</Properties>
+		</Component>
+	</env>
 </StrolchConfiguration>
