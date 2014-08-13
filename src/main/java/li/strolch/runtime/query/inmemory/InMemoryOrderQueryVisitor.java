@@ -42,7 +42,7 @@ public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order, Order
 	}
 
 	public <U> InMemoryQuery<Order, U> visit(OrderQuery orderQuery, OrderVisitor<U> orderVisitor) {
-		DBC.PRE.assertNotNull("OrderVisitor may not be null!", orderVisitor);
+		DBC.PRE.assertNotNull("OrderVisitor may not be null!", orderVisitor); //$NON-NLS-1$
 		orderQuery.accept(this);
 
 		Navigator<Order> navigator = getNavigator();

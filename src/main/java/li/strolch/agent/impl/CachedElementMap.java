@@ -401,7 +401,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 		long daoRemoved = getDao(tx).removeAll();
 
 		if (removed != daoRemoved) {
-			String msg = "Removed {0} elements from cached map, but dao removed {1} elements!";
+			String msg = "Removed {0} elements from cached map, but dao removed {1} elements!"; //$NON-NLS-1$
 			logger.error(MessageFormat.format(msg, removed, daoRemoved));
 		}
 
@@ -429,7 +429,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 		long daoRemoved = getDao(tx).removeAllBy(type);
 
 		if (removed != daoRemoved) {
-			msg = "Removed {0} elements from cached map for type {1}, but dao removed {3} elements!";
+			msg = "Removed {0} elements from cached map for type {1}, but dao removed {3} elements!"; //$NON-NLS-1$
 			logger.error(MessageFormat.format(msg, removed, type, daoRemoved));
 		}
 

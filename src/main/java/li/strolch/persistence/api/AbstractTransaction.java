@@ -247,7 +247,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public void autoCloseableCommit() {
 		long start = System.nanoTime();
 		if (logger.isDebugEnabled()) {
-			logger.info("Committing TX for realm " + getRealmName() + "..."); //$NON-NLS-1$
+			logger.info(MessageFormat.format("Committing TX for realm {0}...", getRealmName())); //$NON-NLS-1$
 		}
 
 		try {
@@ -269,21 +269,21 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				undoCommands();
 			} catch (Exception e2) {
 				try {
-					rollback(txResult);
+					rollback(this.txResult);
 					handleRollback(start);
 				} catch (Exception e1) {
-					logger.error("Failed to roll back after failing to undo commands: " + e1.getMessage(), e1);
+					logger.error("Failed to roll back after failing to undo commands: " + e1.getMessage(), e1); //$NON-NLS-1$
 				}
 				handleFailure(start, e);
 			}
 			try {
-				rollback(txResult);
+				rollback(this.txResult);
 				handleRollback(start);
 			} catch (Exception e1) {
 				handleFailure(start, e);
 			}
 
-			String msg = "Strolch Transaction for realm {0} failed due to {1}";
+			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
 			throw new StrolchPersistenceException(msg, e);
 
@@ -295,7 +295,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void autoCloseableRollback() {
 		long start = System.nanoTime();
-		logger.warn("Rolling back TX for realm " + getRealmName() + "..."); //$NON-NLS-1$
+		logger.warn(MessageFormat.format("Rolling back TX for realm {0}...", getRealmName())); //$NON-NLS-1$
 		try {
 			undoCommands();
 			rollback(this.txResult);
@@ -314,7 +314,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private void handleCommit(long start, long observerUpdateDuration) {
 
 		long end = System.nanoTime();
-		long txDuration = end - txResult.getStartNanos();
+		long txDuration = end - this.txResult.getStartNanos();
 		long closeDuration = end - start;
 
 		this.txResult.setState(TransactionState.COMMITTED);
@@ -322,13 +322,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setCloseDuration(closeDuration);
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("TX for realm ");
+		sb.append("TX for realm "); //$NON-NLS-1$
 		sb.append(getRealmName());
 		sb.append(" was completed after "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(txDuration));
 		sb.append(" with close operation taking "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(closeDuration));
-		sb.append(" and observer updates took ");
+		sb.append(" and observer updates took "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(observerUpdateDuration));
 		logger.info(sb.toString());
 	}
@@ -355,7 +355,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setCloseDuration(closeDuration);
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("TX");
+		sb.append("TX"); //$NON-NLS-1$
 		sb.append(getRealmName());
 		sb.append(" has failed after "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(txDuration));
@@ -363,7 +363,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append(StringHelper.formatNanoDuration(closeDuration));
 		logger.info(sb.toString());
 
-		String msg = "Strolch Transaction for realm {0} failed due to {1}";
+		String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
 		msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
 		throw new StrolchPersistenceException(msg, e);
 	}

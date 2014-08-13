@@ -46,7 +46,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 *            the privilegeContext to set
 	 */
 	public final void setPrivilegeContext(PrivilegeContext privilegeContext) {
-		DBC.PRE.assertNull("PrivilegeContext is already set!", this.privilegeContext);
+		DBC.PRE.assertNull("PrivilegeContext is already set!", this.privilegeContext); //$NON-NLS-1$
 		this.privilegeContext = privilegeContext;
 	}
 

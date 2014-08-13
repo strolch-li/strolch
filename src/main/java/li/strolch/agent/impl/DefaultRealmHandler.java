@@ -57,7 +57,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 
 	@Override
 	public StrolchRealm getRealm(String realm) throws StrolchException {
-		DBC.PRE.assertNotEmpty("Realm name must be set!", realm);
+		DBC.PRE.assertNotEmpty("Realm name must be set!", realm); //$NON-NLS-1$
 		StrolchRealm strolchRealm = this.realms.get(realm);
 		if (strolchRealm == null) {
 			String msg = "No realm is configured with the name {0}"; //$NON-NLS-1$

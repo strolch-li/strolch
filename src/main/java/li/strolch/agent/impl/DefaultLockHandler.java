@@ -44,9 +44,11 @@ public class DefaultLockHandler implements LockHandler {
 	private Map<Locator, ReentrantLock> lockMap;
 
 	public DefaultLockHandler(String realm, TimeUnit tryLockTimeUnit, long tryLockTime) {
-		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
-		DBC.PRE.assertNotNull("TimeUnit must be set!", tryLockTimeUnit);
-		DBC.PRE.assertNotEquals("try lock time must not be 0", 0, tryLockTime);
+
+		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("TimeUnit must be set!", tryLockTimeUnit); //$NON-NLS-1$
+		DBC.PRE.assertNotEquals("try lock time must not be 0", 0, tryLockTime); //$NON-NLS-1$
+
 		this.realm = realm;
 		this.tryLockTimeUnit = tryLockTimeUnit;
 		this.tryLockTime = tryLockTime;
@@ -74,7 +76,7 @@ public class DefaultLockHandler implements LockHandler {
 		Locator locator = element.getLocator();
 		ReentrantLock lock = this.lockMap.get(locator);
 		if (lock == null || !lock.isHeldByCurrentThread()) {
-			logger.error("Trying to unlock not locked element " + locator);
+			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", locator)); //$NON-NLS-1$
 		} else {
 			unlock(lock);
 		}

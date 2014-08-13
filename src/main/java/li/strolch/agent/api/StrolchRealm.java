@@ -17,6 +17,7 @@ package li.strolch.agent.api;
 
 import static ch.eitchnet.utils.helper.StringHelper.DOT;
 
+import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.impl.DataStoreMode;
@@ -36,14 +37,14 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public abstract class StrolchRealm {
 
-	private static final String PROP_TRY_LOCK_TIME_UNIT = "tryLockTimeUnit";
-	private static final String PROP_TRY_LOCK_TIME = "tryLockTime";
+	private static final String PROP_TRY_LOCK_TIME_UNIT = "tryLockTimeUnit"; //$NON-NLS-1$
+	private static final String PROP_TRY_LOCK_TIME = "tryLockTime"; //$NON-NLS-1$
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchRealm.class);
 	private String realm;
 	private LockHandler lockHandler;
 
 	public StrolchRealm(String realm) {
-		DBC.PRE.assertNotEmpty("RealmName may not be empty!", realm);
+		DBC.PRE.assertNotEmpty("RealmName may not be empty!", realm); //$NON-NLS-1$
 		this.realm = realm;
 	}
 
@@ -52,7 +53,7 @@ public abstract class StrolchRealm {
 	}
 
 	public void lock(StrolchRootElement element) {
-		DBC.PRE.assertNotNull("Can not lock a null pointer =)", element);
+		DBC.PRE.assertNotNull("Can not lock a null pointer =)", element); //$NON-NLS-1$
 		this.lockHandler.lock(element);
 	}
 
@@ -71,8 +72,8 @@ public abstract class StrolchRealm {
 
 		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(propTryLockTimeUnit, TimeUnit.SECONDS.name()));
 		long time = configuration.getLong(propTryLockTime, 10);
-		logger.info("Using a locking try timeout of " + timeUnit.toSeconds(time) + "s");
-		this.lockHandler = new DefaultLockHandler(realm, timeUnit, time);
+		logger.info(MessageFormat.format("Using a locking try timeout of {0}s", timeUnit.toSeconds(time))); //$NON-NLS-1$
+		this.lockHandler = new DefaultLockHandler(this.realm, timeUnit, time);
 	}
 
 	public abstract DataStoreMode getMode();
@@ -88,5 +89,4 @@ public abstract class StrolchRealm {
 	public abstract ResourceMap getResourceMap();
 
 	public abstract OrderMap getOrderMap();
-
 }

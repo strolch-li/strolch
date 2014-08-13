@@ -75,11 +75,11 @@ public class TransactionalRealm extends StrolchRealm {
 		int nrOfResources = 0;
 
 		try (StrolchTransaction tx = openTx()) {
-			nrOfOrders = orderMap.getAllKeys(tx).size();
+			nrOfOrders = this.orderMap.getAllKeys(tx).size();
 		}
 
 		try (StrolchTransaction tx = openTx()) {
-			nrOfResources = resourceMap.getAllKeys(tx).size();
+			nrOfResources = this.resourceMap.getAllKeys(tx).size();
 		}
 
 		long duration = System.nanoTime() - start;

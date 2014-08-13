@@ -41,7 +41,7 @@ public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource,
 	}
 
 	public <U> InMemoryQuery<Resource, U> visit(ResourceQuery resourceQuery, ResourceVisitor<U> resourceVisitor) {
-		DBC.PRE.assertNotNull("ResourceVisitor may not be null!", resourceVisitor);
+		DBC.PRE.assertNotNull("ResourceVisitor may not be null!", resourceVisitor); //$NON-NLS-1$
 		resourceQuery.accept(this);
 
 		Navigator<Resource> navigator = getNavigator();

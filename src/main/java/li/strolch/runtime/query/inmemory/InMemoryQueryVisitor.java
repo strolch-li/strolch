@@ -78,7 +78,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	protected abstract InMemoryQueryVisitor<T, S> newInstance();
 
 	private void assertNotAny() {
-		DBC.INTERIM.assertFalse("Not allowed to use further Selections with Any!", this.any);
+		DBC.INTERIM.assertFalse("Not allowed to use further Selections with Any!", this.any); //$NON-NLS-1$
 	}
 
 	protected void addSelector(Selector<T> selector) {

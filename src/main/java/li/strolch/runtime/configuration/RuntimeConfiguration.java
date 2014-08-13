@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class RuntimeConfiguration extends AbstractionConfiguration {
 
-	public static final String PROP_LOCALE = "locale";
+	public static final String PROP_LOCALE = "locale"; //$NON-NLS-1$
 	public static final String RUNTIME = "Runtime"; //$NON-NLS-1$
 	public static final String PATH_CONFIG = "config"; //$NON-NLS-1$
 	public static final String PATH_DATA = "data"; //$NON-NLS-1$

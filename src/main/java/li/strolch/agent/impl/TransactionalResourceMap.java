@@ -1,6 +1,9 @@
 package li.strolch.agent.impl;
 
 import static li.strolch.runtime.StrolchConstants.INTERPRETATION_RESOURCE_REF;
+
+import java.text.MessageFormat;
+
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
@@ -15,13 +18,13 @@ public class TransactionalResourceMap extends TransactionalElementMap<Resource> 
 	public Resource getBy(StrolchTransaction tx, StringParameter refP) throws StrolchException {
 
 		if (!refP.getInterpretation().equals(INTERPRETATION_RESOURCE_REF)) {
-			throw new StrolchException(refP.getLocator()
-					+ " is not an Resource reference as its interpretation is not " + INTERPRETATION_RESOURCE_REF);
+			String msg = "{0} is not an Resource reference as its interpretation is not {1}"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, refP.getLocator(), INTERPRETATION_RESOURCE_REF));
 		}
 
 		if (refP.getUom().equals(Parameter.UOM_NONE)) {
-			throw new StrolchException(refP.getLocator()
-					+ " is not an Resource reference as its UOM is not set to a type!");
+			String msg = "{0} is not an Resource reference as its UOM is not set to a type!"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, refP.getLocator()));
 		}
 
 		String type = refP.getUom();
