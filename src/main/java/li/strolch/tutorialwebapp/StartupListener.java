@@ -23,6 +23,7 @@ public class StartupListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent sce) {
 
 		String realPath = sce.getServletContext().getRealPath("/WEB-INF");
+
 		File pathF = new File(realPath);
 		String environment = StrolchEnvironment.getEnvironmentFromEnvProperties(pathF);
 		logger.info("Starting Agent...");

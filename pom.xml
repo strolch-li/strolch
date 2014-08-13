@@ -1,134 +1,167 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>li.strolch</groupId>
-        <artifactId>li.strolch.parent</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
-        <relativePath>../li.strolch.parent/pom.xml</relativePath>
-    </parent>
+	<parent>
+		<groupId>li.strolch</groupId>
+		<artifactId>li.strolch.parent</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+		<relativePath>../li.strolch.parent/pom.xml</relativePath>
+	</parent>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <warFinalName>tutorialwebapp</warFinalName>
-        <tomcat7ServerId>tomcat7.eitchnet.ch</tomcat7ServerId>
-        <tomcat7Url>http://appsrv:8080/manager/text</tomcat7Url>
-        <m2eclipse.wtp.contextRoot>${warFinalName}</m2eclipse.wtp.contextRoot>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<warFinalName>tutorialwebapp</warFinalName>
+		<tomcat7ServerId>tomcat7.eitchnet.ch</tomcat7ServerId>
+		<tomcat7Url>http://appsrv:8080/manager/text</tomcat7Url>
+		<m2eclipse.wtp.contextRoot>${warFinalName}</m2eclipse.wtp.contextRoot>
+	</properties>
 
-    <artifactId>li.strolch.tutorialwebapp</artifactId>
-    <name>li.strolch.tutorialwebapp</name>
-    <description>Tutorial webapp to show case using Strolch in a servlet container</description>
-    <packaging>war</packaging>
+	<artifactId>li.strolch.tutorialwebapp</artifactId>
+	<name>li.strolch.tutorialwebapp</name>
+	<description>Tutorial webapp to show case using Strolch in a servlet container</description>
+	<packaging>war</packaging>
 
-    <url>https://github.com/eitchnet/li.strolch.tutorialwebapp</url>
+	<url>https://github.com/eitchnet/li.strolch.tutorialwebapp</url>
 
-    <inceptionYear>2011</inceptionYear>
+	<inceptionYear>2011</inceptionYear>
 
-    <issueManagement>
-        <system>Github Issues</system>
-        <url>https://github.com/eitchnet/li.strolch.tutorialwebapp/issues</url>
-    </issueManagement>
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/eitchnet/li.strolch.tutorialwebapp/issues</url>
+	</issueManagement>
 
-    <scm>
-        <connection>scm:git:https://github.com/eitchnet/li.strolch.tutorialwebapp.git</connection>
-        <developerConnection>scm:git:git@github.com:eitch/li.strolch.tutorialwebapp.git</developerConnection>
-        <url>https://github.com/eitchnet/li.strolch.tutorialwebapp</url>
-    </scm>
+	<scm>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.tutorialwebapp.git</connection>
+		<developerConnection>scm:git:git@github.com:eitch/li.strolch.tutorialwebapp.git</developerConnection>
+		<url>https://github.com/eitchnet/li.strolch.tutorialwebapp</url>
+	</scm>
 
-    <dependencies>
+	<dependencies>
 
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>li.strolch.bom</artifactId>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>li.strolch.rest</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>li.strolch.persistence.xml</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.bom</artifactId>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.rest</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.persistence.xml</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 
-        <!-- test dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+		<!-- test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
-    <build>
-        <finalName>${warFinalName}</finalName>
+	<build>
+		<finalName>${warFinalName}</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/componentVersion.properties</include>
+				</includes>
+			</resource>
+		</resources>
 
-        <plugins>
+		<plugins>
 
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-            </plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+			</plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <warName>${warFinalName}</warName>
-                </configuration>
-            </plugin>
-            
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>install-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>war</type>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                    <destFileName>${project.artifactId}-${project.version}.war</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            
-            <plugin>
-                <!-- Publish to Tomcat7: mvn tomcat7:redeploy -->
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <configuration>
-                    <url>${tomcat7Url}</url>
-                    <server>${tomcat7ServerId}</server>
-                    <path>/${warFinalName}</path>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<warName>${warFinalName}</warName>
+					<webResources>
+						<resource>
+							<directory>src/main/non-packaged-resources</directory>
+							<targetPath>WEB-INF</targetPath>
+							<filtering>true</filtering>
+							<includes>
+								<include>**/ENV.properties</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
 
+			<!-- <plugin> -->
+			<!-- <artifactId>maven-dependency-plugin</artifactId> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <id>install-jar</id> -->
+			<!-- <phase>package</phase> -->
+			<!-- <goals> -->
+			<!-- <goal>copy</goal> -->
+			<!-- </goals> -->
+			<!-- <configuration> -->
+			<!-- <artifactItems> -->
+			<!-- <artifactItem> -->
+			<!-- <groupId>${project.groupId}</groupId> -->
+			<!-- <artifactId>${project.artifactId}</artifactId> -->
+			<!-- <version>${project.version}</version> -->
+			<!-- <type>war</type> -->
+			<!-- <outputDirectory>${project.build.directory}</outputDirectory> -->
+			<!-- <destFileName>${project.artifactId}-${project.version}.war</destFileName> -->
+			<!-- </artifactItem> -->
+			<!-- </artifactItems> -->
+			<!-- </configuration> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
+
+			<plugin>
+				<!-- Publish to Tomcat7: mvn tomcat7:redeploy -->
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<configuration>
+					<url>${tomcat7Url}</url>
+					<server>${tomcat7ServerId}</server>
+					<path>/${warFinalName}</path>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>m2e</id>
+			<!-- This profile is only activated when building in Eclipse with m2e -->
+			<activation>
+				<property>
+					<name>m2e.version</name>
+				</property>
+			</activation>
+			<properties>
+				<strolch.env>dev</strolch.env>
+			</properties>
+		</profile>
+	</profiles>
 </project>
