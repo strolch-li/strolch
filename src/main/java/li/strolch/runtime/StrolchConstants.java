@@ -25,6 +25,7 @@ import li.strolch.runtime.observer.ObserverHandler;
 @SuppressWarnings("nls")
 public class StrolchConstants {
 
+	public static final String ENV_STROLCH = "ENV_STROLCH";
 	public static final String PERSISTENCE_HANDLER = PersistenceHandler.class.getSimpleName();
 	public static final String OBSERVER_HANDLER = ObserverHandler.class.getSimpleName();
 	public static final String PRIVILEGE_HANDLER = "PrivilegeHandler";
