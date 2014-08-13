@@ -21,21 +21,16 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
-import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.configuration.ConfigurationParser;
-import li.strolch.runtime.configuration.RuntimeConfiguration;
-import li.strolch.runtime.configuration.StrolchConfiguration;
-
 import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class ConfigurationParserTest {
 
 	@Test
-	public void shouldParseConfigurationFile() {
+	public void shouldParseConfigurationFileForDevEnv() {
 
 		File rootPathF = new File("src/test/resources/configtest");
-		StrolchConfiguration strolchConfiguration = ConfigurationParser.parseConfiguration(rootPathF);
+		StrolchConfiguration strolchConfiguration = ConfigurationParser.parseConfiguration("dev", rootPathF);
 		assertNotNull("Should have created a configuration object", strolchConfiguration);
 
 		//	<Runtime>
@@ -47,6 +42,7 @@ public class ConfigurationParserTest {
 		RuntimeConfiguration runtimeConfiguration = strolchConfiguration.getRuntimeConfiguration();
 		assertNotNull("Should have created a runtime configuration", runtimeConfiguration);
 		assertEquals("StrolchRuntimeTest", runtimeConfiguration.getApplicationName());
+		assertEquals("dev", runtimeConfiguration.getEnvironment());
 		assertEquals(true, runtimeConfiguration.getBoolean("verbose", null));
 
 		//	<Component>
@@ -103,5 +99,84 @@ public class ConfigurationParserTest {
 				persistenceHandlerConfiguration.getImpl());
 		assertEquals(1, persistenceHandlerConfiguration.getPropertyKeys().size());
 		assertEquals(true, persistenceHandlerConfiguration.getBoolean("verbose", null));
+
+		//	<env id="global">
+		//		<Component>
+		//			<name>RealmHandler</name>
+		// 			<api>li.strolch.agent.api.RealmHandler</api>
+		// 			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+		//		</Component>
+		//	<env id="dev">
+		//		<Component>
+		//			<name>RealmHandler</name>
+		//			<Properties>
+		//				<foo>bar</foo>
+		//			</Properties>
+		//		</Component>
+		ComponentConfiguration realmHandlerConfiguration = strolchConfiguration
+				.getComponentConfiguration("RealmHandler");
+		assertNotNull("Should have created a RealmHandler Configuration", realmHandlerConfiguration);
+		assertEquals("RealmHandler", realmHandlerConfiguration.getName());
+		assertEquals("li.strolch.agent.api.RealmHandler", realmHandlerConfiguration.getApi());
+		assertEquals("li.strolch.agent.impl.DefaultRealmHandler", realmHandlerConfiguration.getImpl());
+		assertEquals(2, realmHandlerConfiguration.getPropertyKeys().size());
+		assertEquals("EMPTY", realmHandlerConfiguration.getString("dataStoreMode", null));
+		assertEquals("bar", realmHandlerConfiguration.getString("foo", null));
+
+		//		<Component>
+		//			<name>AdditionalServiceHandler</name>
+		//			<api>li.strolch.service.api.ServiceHandler</api>
+		//			<impl>li.strolch.service.SimpleServiceHandler</impl>
+		//			<Properties>
+		//				<foo>bar</foo>
+		//			</Properties>
+		//		</Component>
+		//	</env>
+		ComponentConfiguration additionalServiceHandlerConfiguration = strolchConfiguration
+				.getComponentConfiguration("AdditionalServiceHandler");
+		assertNotNull("Should have created a AdditionalServiceHandler Configuration",
+				additionalServiceHandlerConfiguration);
+		assertEquals("AdditionalServiceHandler", additionalServiceHandlerConfiguration.getName());
+		assertEquals("li.strolch.service.api.ServiceHandler", additionalServiceHandlerConfiguration.getApi());
+		assertEquals("li.strolch.service.SimpleServiceHandler", additionalServiceHandlerConfiguration.getImpl());
+		assertEquals(1, additionalServiceHandlerConfiguration.getPropertyKeys().size());
+		assertEquals("bar", additionalServiceHandlerConfiguration.getString("foo", null));
+	}
+
+	@Test
+	public void shouldParseConfigurationFileForTestEnv() {
+
+		File rootPathF = new File("src/test/resources/configtest");
+		StrolchConfiguration strolchConfiguration = ConfigurationParser.parseConfiguration("test", rootPathF);
+		assertNotNull("Should have created a configuration object", strolchConfiguration);
+
+		RuntimeConfiguration runtimeConfiguration = strolchConfiguration.getRuntimeConfiguration();
+		assertNotNull("Should have created a runtime configuration", runtimeConfiguration);
+		assertEquals("StrolchRuntimeTest", runtimeConfiguration.getApplicationName());
+		assertEquals("test", runtimeConfiguration.getEnvironment());
+		assertEquals(true, runtimeConfiguration.getBoolean("verbose", null));
+
+		//	<env id="global">
+		//		<Component>
+		//			<name>RealmHandler</name>
+		// 			<api>li.strolch.agent.api.RealmHandler</api>
+		// 			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+		//		</Component>
+		//	<env id="test">
+		//		<Component>
+		//			<name>RealmHandler</name>
+		//			<Properties>
+		//				<foo>noob</foo>
+		//			</Properties>
+		//		</Component>
+		ComponentConfiguration realmHandlerConfiguration = strolchConfiguration
+				.getComponentConfiguration("RealmHandler");
+		assertNotNull("Should have created a RealmHandler Configuration", realmHandlerConfiguration);
+		assertEquals("RealmHandler", realmHandlerConfiguration.getName());
+		assertEquals("li.strolch.agent.api.RealmHandler", realmHandlerConfiguration.getApi());
+		assertEquals("li.strolch.agent.impl.DefaultRealmHandler", realmHandlerConfiguration.getImpl());
+		assertEquals(2, realmHandlerConfiguration.getPropertyKeys().size());
+		assertEquals("EMPTY", realmHandlerConfiguration.getString("dataStoreMode", null));
+		assertEquals("noob", realmHandlerConfiguration.getString("foo", null));
 	}
 }

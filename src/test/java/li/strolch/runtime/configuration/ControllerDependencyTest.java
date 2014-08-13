@@ -170,7 +170,7 @@ public class ControllerDependencyTest {
 		//
 
 		File rootPathF = new File("src/test/resources/configtest");
-		this.strolchConfiguration = ConfigurationParser.parseConfiguration(rootPathF);
+		this.strolchConfiguration = ConfigurationParser.parseConfiguration("dev", rootPathF);
 
 		this.controllerMap = new HashMap<>();
 

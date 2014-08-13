@@ -82,12 +82,12 @@ public class StrolchAgent {
 			this.container.destroy();
 	}
 
-	public void setup(File path) {
+	public void setup(String environment, File path) {
 
 		String msg = "Setting up Strolch Container from root {0}"; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, path.getAbsolutePath()));
 
-		this.strolchConfiguration = ConfigurationParser.parseConfiguration(path);
+		this.strolchConfiguration = ConfigurationParser.parseConfiguration(environment, path);
 
 		ComponentContainerImpl container = new ComponentContainerImpl(this);
 		container.setup(strolchConfiguration);

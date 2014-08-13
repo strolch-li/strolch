@@ -264,7 +264,7 @@ public class ComponentContainerTest {
 
 	public static StrolchAgent startContainer(File rootPathF) {
 		StrolchAgent agent = new StrolchAgent();
-		agent.setup(rootPathF);
+		agent.setup("dev", rootPathF);
 		agent.initialize();
 		agent.start();
 

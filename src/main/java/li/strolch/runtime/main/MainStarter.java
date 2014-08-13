@@ -41,6 +41,7 @@ public class MainStarter {
 	private static final Logger logger = LoggerFactory.getLogger(MainStarter.class);
 
 	private static final String OPT_ROOT_PATH = "root-path";
+	private static final String OPT_ENV = "env";
 
 	private Options options;
 	private StrolchAgent agent;
@@ -51,6 +52,11 @@ public class MainStarter {
 		rootPathOption.setOptionalArg(false);
 		rootPathOption.setRequired(true);
 		op.addOption(rootPathOption);
+
+		Option envOption = new Option("e", OPT_ENV, true, "environment to load from configuration file");
+		envOption.setOptionalArg(false);
+		envOption.setRequired(true);
+		op.addOption(envOption);
 		this.options = op;
 	}
 
@@ -69,6 +75,8 @@ public class MainStarter {
 			return 1;
 		}
 
+		String env = line.getOptionValue(OPT_ENV);
+
 		String pathS = line.getOptionValue(OPT_ROOT_PATH);
 		File pathF = new File(pathS);
 		if (!pathF.exists()) {
@@ -79,7 +87,7 @@ public class MainStarter {
 
 		logger.info("Starting Agent...");
 		this.setAgent(new StrolchAgent());
-		this.getAgent().setup(pathF);
+		this.getAgent().setup(env, pathF);
 		this.getAgent().initialize();
 		this.getAgent().start();
 

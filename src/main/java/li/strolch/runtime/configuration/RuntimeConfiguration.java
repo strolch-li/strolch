@@ -28,12 +28,15 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	public static final String PATH_DATA = "data"; //$NON-NLS-1$
 
 	private final String applicationName;
-	private Locale locale;
+	private final String environment;
 	private final File rootPath;
 	private final File configPath;
 	private final File dataPath;
 
-	public RuntimeConfiguration(String applicationName, Map<String, String> configurationValues, File rootPathF) {
+	private Locale locale;
+
+	public RuntimeConfiguration(String applicationName, String environment, Map<String, String> configurationValues,
+			File rootPathF) {
 		super(RUNTIME, configurationValues);
 
 		if (!rootPathF.isDirectory() || !rootPathF.canRead()) {
@@ -62,6 +65,8 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		}
 
 		this.applicationName = applicationName;
+		this.environment = environment;
+
 		this.rootPath = rootPathF;
 		this.configPath = configPathF;
 		this.dataPath = dataPathF;
@@ -71,6 +76,10 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	public String getApplicationName() {
 		return this.applicationName;
+	}
+
+	public String getEnvironment() {
+		return this.environment;
 	}
 
 	public File getRootPath() {
