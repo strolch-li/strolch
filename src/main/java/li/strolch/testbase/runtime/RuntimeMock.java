@@ -111,10 +111,14 @@ public final class RuntimeMock {
 	}
 
 	public void startContainer() {
+		startContainer("dev");
+	}
+
+	public void startContainer(String environment) {
 
 		try {
 			StrolchAgent agent = new StrolchAgent();
-			agent.setup(this.rootPath);
+			agent.setup(environment, this.rootPath);
 			agent.initialize();
 			agent.start();
 
