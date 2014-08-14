@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>ch.eitchnet</groupId>
 		<artifactId>ch.eitchnet.parent</artifactId>
-		<version>0.1.0-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 		<relativePath>../ch.eitchnet.parent/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>ch.eitchnet.utils</artifactId>
-	<packaging>jar</packaging>
 	<version>0.2.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>ch.eitchnet.utils</name>
 	<description>These utils contain project independent helper classes and utilities for reuse</description>
 	<url>https://github.com/eitchnet/ch.eitchnet.utils</url>
@@ -26,6 +26,7 @@
 		<connection>scm:git:https://github.com/eitchnet/ch.eitchnet.utils.git</connection>
 		<developerConnection>scm:git:git@github.com:eitchnet/ch.eitchnet.utils.git</developerConnection>
 		<url>https://github.com/eitchnet/ch.eitchnet.utils</url>
+		<tag>HEAD</tag>
 	</scm>
 
 	<dependencies>
