@@ -173,9 +173,11 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 				}
 
 				// configure the socket
-				String msg = "BufferSize (send/read): {0} / {1} SoLinger: {2} TcpNoDelay: {3}"; //$NON-NLS-1$
-				logger.info(MessageFormat.format(msg, this.socket.getSendBufferSize(),
-						this.socket.getReceiveBufferSize(), this.socket.getSoLinger(), this.socket.getTcpNoDelay()));
+				if (logger.isDebugEnabled()) {
+					String msg = "BufferSize (send/read): {0} / {1} SoLinger: {2} TcpNoDelay: {3}"; //$NON-NLS-1$
+					logger.info(MessageFormat.format(msg, this.socket.getSendBufferSize(),
+							this.socket.getReceiveBufferSize(), this.socket.getSoLinger(), this.socket.getTcpNoDelay()));
+				}
 				//outputSocket.setSendBufferSize(1);
 				//outputSocket.setSoLinger(true, 0);
 				//outputSocket.setTcpNoDelay(true);
@@ -196,7 +198,7 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 					this.inputStream.skip(available);
 				}
 
-				msg = "Connected {0}: {1}:{2} with local side {3}:{4}"; //$NON-NLS-1$
+				String msg = "Connected {0}: {1}:{2} with local side {3}:{4}"; //$NON-NLS-1$
 				logger.info(MessageFormat.format(msg, this.connection.getId(), this.remoteInputAddressS,
 						Integer.toString(this.remoteInputPort), this.socket.getLocalAddress().getHostAddress(),
 						Integer.toString(this.socket.getLocalPort())));
@@ -325,7 +327,7 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 
 		// if local output address is not set, then we will use the localhost InetAddress
 		if (this.localOutputAddressS == null || this.localOutputAddressS.length() == 0) {
-			logger.warn("No localOutputAddress set. Using localhost"); //$NON-NLS-1$
+			logger.debug("No localOutputAddress set. Using localhost"); //$NON-NLS-1$
 		} else {
 
 			// parse local output address name to InetAddress object
@@ -462,7 +464,7 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 		if (!this.closed) {
 			logger.warn(MessageFormat.format("CommunicationConnection {0} already started.", this.connection.getId())); //$NON-NLS-1$
 		} else {
-			logger.info(MessageFormat.format("Enabling connection {0}...", this.connection.getId())); //$NON-NLS-1$
+			// logger.info(MessageFormat.format("Enabling connection {0}...", this.connection.getId())); //$NON-NLS-1$
 			this.closed = false;
 			this.connection.notifyStateChange(ConnectionState.INITIALIZED, ConnectionState.INITIALIZED.toString());
 			if (this.connectOnStart) {

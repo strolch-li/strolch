@@ -187,9 +187,11 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 				}
 
 				// configure the socket
-				msg = "BufferSize (send/read): {0} / {1} SoLinger: {2} TcpNoDelay: {3}"; //$NON-NLS-1$
-				logger.info(MessageFormat.format(msg, this.socket.getSendBufferSize(),
-						this.socket.getReceiveBufferSize(), this.socket.getSoLinger(), this.socket.getTcpNoDelay()));
+				if (logger.isDebugEnabled()) {
+					msg = "BufferSize (send/read): {0} / {1} SoLinger: {2} TcpNoDelay: {3}"; //$NON-NLS-1$
+					logger.debug(MessageFormat.format(msg, this.socket.getSendBufferSize(),
+							this.socket.getReceiveBufferSize(), this.socket.getSoLinger(), this.socket.getTcpNoDelay()));
+				}
 				//inputSocket.setSendBufferSize(1);
 				//inputSocket.setSoLinger(true, 0);
 				//inputSocket.setTcpNoDelay(true);
@@ -344,7 +346,7 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 
 		// if remote address is not set, then we will use the localhost InetAddress
 		if (this.remoteOutputAddressS == null || this.remoteOutputAddressS.length() == 0) {
-			logger.warn("No remoteOutputAddress set. Allowing connection from any remote address"); //$NON-NLS-1$
+			logger.debug("No remoteOutputAddress set. Allowing connection from any remote address"); //$NON-NLS-1$
 		} else {
 
 			// parse remote output address name to InetAddress object
@@ -464,7 +466,7 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 		if (this.serverThread != null) {
 			logger.warn(MessageFormat.format("CommunicationConnection {0} already started.", this.connection.getId())); //$NON-NLS-1$
 		} else {
-			logger.info(MessageFormat.format("Enabling connection {0}...", this.connection.getId())); //$NON-NLS-1$
+			// logger.info(MessageFormat.format("Enabling connection {0}...", this.connection.getId())); //$NON-NLS-1$
 			this.closed = false;
 
 			this.serverThread = new Thread(this, this.connection.getId());
@@ -528,9 +530,9 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 				if (this.serverSocket == null || this.serverSocket.isClosed()) {
 
 					try {
-						String msg = "Opening socket on {0}:{1}..."; //$NON-NLS-1$
-						logger.info(MessageFormat.format(msg, this.localInputAddress.getHostAddress(),
-								Integer.toString(this.localInputPort)));
+						//	String msg = "Opening socket on {0}:{1}..."; //$NON-NLS-1$
+						//	logger.info(MessageFormat.format(msg, this.localInputAddress.getHostAddress(),
+						//	Integer.toString(this.localInputPort)));
 						this.serverSocket = new ServerSocket(this.localInputPort, 1, this.localInputAddress);
 						this.serverSocket.setReuseAddress(true);
 					} catch (BindException e) {

@@ -23,6 +23,16 @@ import ch.eitchnet.communication.IoMessageVisitor;
 
 public abstract class SocketMessageVisitor extends IoMessageVisitor {
 
+	protected final String connectionId;
+
+	public SocketMessageVisitor(String connectionId) {
+		this.connectionId = connectionId;
+	}
+
+	public String getConnectionId() {
+		return this.connectionId;
+	}
+
 	public abstract IoMessage visit(DataInputStream inputStream, DataOutputStream outputStream) throws Exception;
 
 	public abstract void visit(DataInputStream inputStream, DataOutputStream outputStream, IoMessage message)

@@ -48,6 +48,7 @@ public class CommunicationConnection implements Runnable {
 	private Thread queueThread;
 	private volatile boolean run;
 	private MapOfLists<CommandKey, ConnectionObserver> connectionObservers;
+	private List<ConnectionStateObserver> connectionStateObservers;
 
 	private CommunicationEndpoint endpoint;
 	private IoMessageVisitor messageVisitor;
@@ -73,6 +74,7 @@ public class CommunicationConnection implements Runnable {
 		this.stateMsg = this.state.toString();
 		this.messageQueue = new LinkedBlockingDeque<>();
 		this.connectionObservers = new MapOfLists<>();
+		this.connectionStateObservers = new ArrayList<>();
 	}
 
 	public void setArchive(IoMessageArchive archive) {
@@ -123,9 +125,31 @@ public class CommunicationConnection implements Runnable {
 		}
 	}
 
+	public void addConnectionStateObserver(ConnectionStateObserver observer) {
+		synchronized (this.connectionStateObservers) {
+			this.connectionStateObservers.add(observer);
+		}
+	}
+
+	public void removeConnectionStateObserver(ConnectionStateObserver observer) {
+		synchronized (this.connectionStateObservers) {
+			this.connectionStateObservers.remove(observer);
+		}
+	}
+
 	public void notifyStateChange(ConnectionState state, String stateMsg) {
+		ConnectionState oldState = this.state;
+		String oldStateMsg = this.stateMsg;
 		this.state = state;
 		this.stateMsg = stateMsg;
+
+		List<ConnectionStateObserver> observers;
+		synchronized (this.connectionStateObservers) {
+			observers = new ArrayList<>(this.connectionStateObservers);
+		}
+		for (ConnectionStateObserver observer : observers) {
+			observer.notify(oldState, oldStateMsg, state, stateMsg);
+		}
 	}
 
 	public void switchMode(ConnectionMode mode) {
@@ -160,7 +184,6 @@ public class CommunicationConnection implements Runnable {
 			logger.info("Started SIMULATION connection!"); //$NON-NLS-1$
 			break;
 		case ON:
-			logger.info("Connecting..."); //$NON-NLS-1$
 			if (this.queueThread != null) {
 				logger.warn(MessageFormat.format("{0}: Already connected!", this.id)); //$NON-NLS-1$
 			} else {
@@ -327,8 +350,10 @@ public class CommunicationConnection implements Runnable {
 		}
 		synchronized (this.connectionObservers) {
 			List<ConnectionObserver> observers = this.connectionObservers.getList(message.getKey());
-			for (ConnectionObserver observer : observers) {
-				observer.notify(message.getKey(), message);
+			if (observers != null) {
+				for (ConnectionObserver observer : observers) {
+					observer.notify(message.getKey(), message);
+				}
 			}
 		}
 	}

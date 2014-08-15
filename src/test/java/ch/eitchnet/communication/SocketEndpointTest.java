@@ -61,7 +61,7 @@ public class SocketEndpointTest extends AbstractEndpointTest {
 			parameters.put(SocketEndpointConstants.PARAMETER_CLOSE_AFTER_SEND, Boolean.TRUE.toString());
 
 			CommunicationEndpoint endpoint = new ClientSocketEndpoint();
-			SocketMessageVisitor messageVisitor = new SocketMessageVisitorExtension();
+			SocketMessageVisitor messageVisitor = new SocketMessageVisitorExtension(CLIENT_CONNECTION_ID);
 			this.clientConnection = new CommunicationConnection(CLIENT_CONNECTION_ID, ConnectionMode.ON, parameters,
 					endpoint, messageVisitor);
 			this.clientConnection.configure();
@@ -73,7 +73,7 @@ public class SocketEndpointTest extends AbstractEndpointTest {
 			parameters.put(SocketEndpointConstants.PARAMETER_LOCAL_INPUT_PORT, PORT);
 
 			CommunicationEndpoint endpoint = new ServerSocketEndpoint();
-			SocketMessageVisitor messageVisitor = new SocketMessageVisitorExtension();
+			SocketMessageVisitor messageVisitor = new SocketMessageVisitorExtension(SERVER_CONNECTION_ID);
 			this.serverConnection = new CommunicationConnection(SERVER_CONNECTION_ID, ConnectionMode.ON, parameters,
 					endpoint, messageVisitor);
 			this.serverConnection.configure();
@@ -114,8 +114,9 @@ public class SocketEndpointTest extends AbstractEndpointTest {
 	}
 
 	private final class SocketMessageVisitorExtension extends SocketMessageVisitor {
-		public SocketMessageVisitorExtension() {
-			// do nothing
+
+		public SocketMessageVisitorExtension(String connectionId) {
+			super(connectionId);
 		}
 
 		@Override

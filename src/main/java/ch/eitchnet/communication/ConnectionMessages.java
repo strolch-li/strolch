@@ -72,7 +72,7 @@ public class ConnectionMessages {
 			value = StringHelper.NULL;
 
 		String msg = "{0}: parameter ''{1}'' has invalid value ''{2}''"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, clazz.getName(), parameterName, value);
+		msg = MessageFormat.format(msg, clazz.getSimpleName(), parameterName, value);
 		ConnectionException e = new ConnectionException(msg);
 		return e;
 	}
@@ -88,7 +88,7 @@ public class ConnectionMessages {
 	 */
 	public static ConnectionException throwConflictingParameters(Class<?> clazz, String parameter1, String parameter2) {
 		String msg = "{0} : The parameters {1} and {2} can not be both activated as they conflict"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, clazz.getName(), parameter1, parameter1);
+		msg = MessageFormat.format(msg, clazz.getSimpleName(), parameter1, parameter1);
 		ConnectionException e = new ConnectionException(msg);
 		return e;
 	}
@@ -101,10 +101,12 @@ public class ConnectionMessages {
 	 * @param defValue
 	 */
 	public static void warnUnsetParameter(Class<?> clazz, String parameterName, String defValue) {
-		String msg = "{0}: parameter ''{1}'' is not set, using default value ''{2}''"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, clazz.getName(), parameterName, defValue);
-		Map<String, String> properties = new HashMap<String, String>();
-		logger.warn(MessageFormat.format(msg, properties));
+		if (logger.isDebugEnabled()) {
+			String msg = "{0}: parameter ''{1}'' is not set, using default value ''{2}''"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, clazz.getSimpleName(), parameterName, defValue);
+			Map<String, String> properties = new HashMap<String, String>();
+			logger.warn(MessageFormat.format(msg, properties));
+		}
 	}
 
 	/**
