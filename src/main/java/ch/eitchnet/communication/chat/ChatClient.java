@@ -37,6 +37,7 @@ public class ChatClient implements ConnectionObserver, ConnectionStateObserver {
 		ConnectionMode mode = ConnectionMode.ON;
 
 		Map<String, String> parameters = new HashMap<>();
+		parameters.put(SocketEndpointConstants.PARAMETER_RETRY, "10000"); //$NON-NLS-1$
 		parameters.put(SocketEndpointConstants.PARAMETER_USE_TIMEOUT, Boolean.FALSE.toString());
 		parameters.put(SocketEndpointConstants.PARAMETER_REMOTE_INPUT_ADDRESS, this.host.getHostAddress());
 		parameters.put(SocketEndpointConstants.PARAMETER_REMOTE_INPUT_PORT, Integer.toString(this.port));
