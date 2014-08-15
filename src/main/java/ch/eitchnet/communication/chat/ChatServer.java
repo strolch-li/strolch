@@ -3,6 +3,7 @@ package ch.eitchnet.communication.chat;
 import static ch.eitchnet.communication.chat.ChatMessageVisitor.inboundKey;
 import static ch.eitchnet.communication.chat.ChatMessageVisitor.outboundKey;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -21,11 +22,13 @@ import ch.eitchnet.communication.tcpip.SocketMessageVisitor;
 public class ChatServer implements ConnectionObserver, ConnectionStateObserver {
 
 	private static final String id = "ChatServer"; //$NON-NLS-1$
+	private InetAddress address;
 	private int port;
 	private String username;
 	private boolean connected;
 
-	public ChatServer(int port, String username) {
+	public ChatServer(InetAddress address, int port, String username) {
+		this.address = address;
 		this.port = port;
 		this.username = username;
 	}
@@ -36,6 +39,7 @@ public class ChatServer implements ConnectionObserver, ConnectionStateObserver {
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put(SocketEndpointConstants.PARAMETER_RETRY, "10000"); //$NON-NLS-1$
 		parameters.put(SocketEndpointConstants.PARAMETER_USE_TIMEOUT, Boolean.FALSE.toString());
+		parameters.put(SocketEndpointConstants.PARAMETER_LOCAL_INPUT_ADDRESS, this.address.getHostAddress());
 		parameters.put(SocketEndpointConstants.PARAMETER_LOCAL_INPUT_PORT, Integer.toString(this.port));
 		parameters.put(SocketEndpointConstants.PARAMETER_CLOSE_AFTER_SEND, Boolean.FALSE.toString());
 		parameters.put(SocketEndpointConstants.PARAMETER_CLOSE_AFTER_SEND, Boolean.FALSE.toString());

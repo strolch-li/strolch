@@ -1,8 +1,11 @@
 package ch.eitchnet.communication.chat;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
+import java.util.Enumeration;
 
 import ch.eitchnet.utils.helper.StringHelper;
 
@@ -10,25 +13,51 @@ public class Chat {
 
 	public static void main(String[] args) {
 
-		if (args.length < 3)
+		if (args.length < 4)
 			printIllegalArgsAndExit(args);
 
 		if (args[0].equals("server")) { //$NON-NLS-1$
-			if (args.length != 3)
-				printIllegalArgsAndExit(args);
 			startServer(args);
 		} else if (args[0].equals("client")) { //$NON-NLS-1$
-			if (args.length != 4)
-				printIllegalArgsAndExit(args);
 			startClient(args);
 		}
 	}
 
 	private static void startServer(String[] args) {
 
+		// server
+		InetAddress host;
+		String hostS = args[1];
+		try {
+			host = InetAddress.getByName(hostS);
+		} catch (UnknownHostException e1) {
+			System.err.println(MessageFormat.format("Illegal server address: {0}", hostS)); //$NON-NLS-1$
+			printIllegalArgsAndExit(args);
+			return;
+		}
+		boolean isHostAddress = false;
+		try {
+			for (Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces(); interfaces
+					.hasMoreElements();) {
+				NetworkInterface iface = interfaces.nextElement();
+				for (Enumeration<InetAddress> addresses = iface.getInetAddresses(); addresses.hasMoreElements();) {
+					InetAddress inetAddress = addresses.nextElement();
+					if (inetAddress.getHostAddress().equals(host.getHostAddress()))
+						isHostAddress = true;
+				}
+			}
+		} catch (SocketException e) {
+			System.err.println("Oops: " + e.getMessage()); //$NON-NLS-1$
+		}
+
+		if (!isHostAddress) {
+			System.err.println(MessageFormat.format("The address {0} is not an address of this host!", hostS)); //$NON-NLS-1$
+			printIllegalArgsAndExit(args);
+		}
+
 		// port
 		int port;
-		String portS = args[1];
+		String portS = args[2];
 		try {
 			port = Integer.parseInt(portS);
 		} catch (NumberFormatException e) {
@@ -43,10 +72,10 @@ public class Chat {
 		}
 
 		// username
-		String username = args[2];
+		String username = args[3];
 
 		// start
-		ChatServer chatServer = new ChatServer(port, username);
+		ChatServer chatServer = new ChatServer(host, port, username);
 		chatServer.start();
 	}
 
@@ -97,7 +126,7 @@ public class Chat {
 			}
 		}
 		System.err.println();
-		System.err.println("Usage: java ...Chat server <port> <username>"); //$NON-NLS-1$
+		System.err.println("Usage: java ...Chat server <local_address> <port> <username>"); //$NON-NLS-1$
 		System.err.println("Usage: java ...Chat client <server> <port> <username>"); //$NON-NLS-1$
 		System.exit(1);
 	}

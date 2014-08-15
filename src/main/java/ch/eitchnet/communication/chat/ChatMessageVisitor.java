@@ -38,8 +38,8 @@ public class ChatMessageVisitor extends SocketMessageVisitor {
 	@Override
 	public void visit(DataInputStream inputStream, DataOutputStream outputStream, IoMessage message) throws Exception {
 		ChatIoMessage chatIoMessage = (ChatIoMessage) message;
-		outputStream.writeBytes(chatIoMessage.getChatMsg());
-		outputStream.writeByte('\n');
+		outputStream.writeChars(chatIoMessage.getChatMsg());
+		outputStream.writeChar('\n');
 		outputStream.flush();
 	}
 }
