@@ -33,11 +33,11 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class StrolchElementToDomVisitor {
+public abstract class StrolchElementToSaxVisitor {
 
 	protected ContentHandler contentHandler;
 
-	protected StrolchElementToDomVisitor(ContentHandler contentHandler) {
+	protected StrolchElementToSaxVisitor(ContentHandler contentHandler) {
 		this.contentHandler = contentHandler;
 	}
 

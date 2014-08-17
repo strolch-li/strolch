@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderToSaxVisitor extends StrolchElementToDomVisitor implements OrderVisitor<Void> {
+public class OrderToSaxVisitor extends StrolchElementToSaxVisitor implements OrderVisitor<Void> {
 
 	public OrderToSaxVisitor(ContentHandler contentHandler) {
 		super(contentHandler);

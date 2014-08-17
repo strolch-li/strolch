@@ -26,7 +26,7 @@ import org.xml.sax.ContentHandler;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ResourceToSaxVisitor extends StrolchElementToDomVisitor implements ResourceVisitor<Void> {
+public class ResourceToSaxVisitor extends StrolchElementToSaxVisitor implements ResourceVisitor<Void> {
 
 	public ResourceToSaxVisitor(ContentHandler contentHandler) {
 		super(contentHandler);
