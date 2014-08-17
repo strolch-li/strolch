@@ -23,21 +23,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ch.eitchnet.xmlpers.api.DomParser;
-import ch.eitchnet.xmlpers.test.model.Parameter;
-import ch.eitchnet.xmlpers.test.model.Resource;
+import ch.eitchnet.xmlpers.test.model.MyParameter;
+import ch.eitchnet.xmlpers.test.model.MyModel;
 import ch.eitchnet.xmlpers.util.DomUtil;
 
-public class ResourceDomParser implements DomParser<Resource> {
+public class MyModelDomParser implements DomParser<MyModel> {
 
-	private Resource resource;
+	private MyModel resource;
 
 	@Override
-	public Resource getObject() {
+	public MyModel getObject() {
 		return this.resource;
 	}
 
 	@Override
-	public void setObject(Resource resource) {
+	public void setObject(MyModel resource) {
 		this.resource = resource;
 	}
 
@@ -56,7 +56,7 @@ public class ResourceDomParser implements DomParser<Resource> {
 		element.setAttribute("type", this.resource.getType());
 
 		for (String paramId : this.resource.getParameterKeySet()) {
-			Parameter param = this.resource.getParameterBy(paramId);
+			MyParameter param = this.resource.getParameterBy(paramId);
 			Element paramElement = document.createElement("Parameter");
 			element.appendChild(paramElement);
 
@@ -79,7 +79,7 @@ public class ResourceDomParser implements DomParser<Resource> {
 		String name = rootElement.getAttribute("name");
 		String type = rootElement.getAttribute("type");
 
-		Resource resource = new Resource(id, name, type);
+		MyModel resource = new MyModel(id, name, type);
 
 		NodeList children = rootElement.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
@@ -93,7 +93,7 @@ public class ResourceDomParser implements DomParser<Resource> {
 			String paramType = paramElement.getAttribute("type");
 			String paramValue = paramElement.getAttribute("value");
 
-			Parameter param = new Parameter(paramId, paramName, paramType, paramValue);
+			MyParameter param = new MyParameter(paramId, paramName, paramType, paramValue);
 			resource.addParameter(param);
 		}
 

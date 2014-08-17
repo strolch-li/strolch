@@ -38,7 +38,7 @@ import ch.eitchnet.xmlpers.impl.DefaultPersistenceRealm;
 import ch.eitchnet.xmlpers.impl.DefaultPersistenceTransaction;
 import ch.eitchnet.xmlpers.impl.PathBuilder;
 import ch.eitchnet.xmlpers.objref.ObjectReferenceCache;
-import ch.eitchnet.xmlpers.test.model.Resource;
+import ch.eitchnet.xmlpers.test.model.MyModel;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -90,12 +90,12 @@ public class FileDaoTest extends AbstractPersistenceTest {
 
 	private void testCrud(PersistenceContextFactoryDelegator ctxFactoryDelegator, FileDao fileDao) {
 
-		Resource resource = createResource();
+		MyModel resource = createResource();
 		assertResource(resource);
-		Class<? extends Resource> classType = resource.getClass();
-		PersistenceContextFactory<Resource> ctxFactory = ctxFactoryDelegator.getCtxFactory(classType);
+		Class<? extends MyModel> classType = resource.getClass();
+		PersistenceContextFactory<MyModel> ctxFactory = ctxFactoryDelegator.getCtxFactory(classType);
 		ObjectReferenceCache objectRefCache = this.realm.getObjectRefCache();
-		PersistenceContext<Resource> context = ctxFactory.createCtx(objectRefCache, resource);
+		PersistenceContext<MyModel> context = ctxFactory.createCtx(objectRefCache, resource);
 		context.setObject(resource);
 		fileDao.performCreate(context);
 

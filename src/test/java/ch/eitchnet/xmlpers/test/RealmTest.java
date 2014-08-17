@@ -30,7 +30,7 @@ import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.objref.ObjectRef;
 import ch.eitchnet.xmlpers.test.impl.TestConstants;
 import ch.eitchnet.xmlpers.test.model.ModelBuilder;
-import ch.eitchnet.xmlpers.test.model.Resource;
+import ch.eitchnet.xmlpers.test.model.MyModel;
 
 @SuppressWarnings("nls")
 public class RealmTest extends AbstractPersistenceTest {
@@ -62,21 +62,21 @@ public class RealmTest extends AbstractPersistenceTest {
 
 		// create in first realm
 		try (PersistenceTransaction txRealm1 = this.persistenceManager.openTx(REALM_1);) {
-			Resource resource1 = ModelBuilder.createResource(id, name, type);
+			MyModel resource1 = ModelBuilder.createResource(id, name, type);
 			txRealm1.getObjectDao().add(resource1);
 		}
 
 		// find in first realm
 		try (PersistenceTransaction txRealm1 = this.persistenceManager.openTx(REALM_1);) {
 			ObjectRef objectRef = txRealm1.getObjectRefCache().getIdOfSubTypeRef(objType, type, id);
-			Resource resource = txRealm1.getObjectDao().queryById(objectRef);
+			MyModel resource = txRealm1.getObjectDao().queryById(objectRef);
 			assertNotNull("Resource was not found in first realm!", resource);
 		}
 
 		// fail to find in second realm
 		try (PersistenceTransaction txRealm2 = this.persistenceManager.openTx(REALM_2);) {
 			ObjectRef objectRef = txRealm2.getObjectRefCache().getIdOfSubTypeRef(objType, type, id);
-			Resource resource = txRealm2.getObjectDao().queryById(objectRef);
+			MyModel resource = txRealm2.getObjectDao().queryById(objectRef);
 			assertNull("Resource was not created in second realm, thus not expected to be found there!", resource);
 		}
 	}
@@ -92,13 +92,13 @@ public class RealmTest extends AbstractPersistenceTest {
 
 		// create in first realm
 		try (PersistenceTransaction txRealm1 = this.persistenceManager.openTx(REALM_1);) {
-			Resource resource1 = ModelBuilder.createResource(id, name, subType);
+			MyModel resource1 = ModelBuilder.createResource(id, name, subType);
 			txRealm1.getObjectDao().add(resource1);
 		}
 
 		// create in second realm
 		try (PersistenceTransaction txRealm2 = this.persistenceManager.openTx(REALM_2);) {
-			Resource resource1 = ModelBuilder.createResource(id, name, subType);
+			MyModel resource1 = ModelBuilder.createResource(id, name, subType);
 			txRealm2.getObjectDao().add(resource1);
 		}
 
@@ -111,14 +111,14 @@ public class RealmTest extends AbstractPersistenceTest {
 		// fail to find in second realm
 		try (PersistenceTransaction txRealm2 = this.persistenceManager.openTx(REALM_2);) {
 			ObjectRef objectRef = txRealm2.getObjectRefCache().getIdOfSubTypeRef(objType, subType, id);
-			Resource resource = txRealm2.getObjectDao().queryById(objectRef);
+			MyModel resource = txRealm2.getObjectDao().queryById(objectRef);
 			assertNull("Resource was not deleted from second realm, thus not expected to be found there!", resource);
 		}
 
 		// find in first realm
 		try (PersistenceTransaction txRealm1 = this.persistenceManager.openTx(REALM_1);) {
 			ObjectRef objectRef = txRealm1.getObjectRefCache().getIdOfSubTypeRef(objType, subType, id);
-			Resource resource = txRealm1.getObjectDao().queryById(objectRef);
+			MyModel resource = txRealm1.getObjectDao().queryById(objectRef);
 			assertNotNull("Resource was not found in first realm!", resource);
 		}
 	}

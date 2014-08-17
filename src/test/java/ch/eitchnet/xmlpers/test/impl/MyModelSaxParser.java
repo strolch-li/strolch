@@ -23,20 +23,20 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import ch.eitchnet.xmlpers.api.SaxParser;
 import ch.eitchnet.xmlpers.api.XmlPersistenceStreamWriter;
-import ch.eitchnet.xmlpers.test.model.Parameter;
-import ch.eitchnet.xmlpers.test.model.Resource;
+import ch.eitchnet.xmlpers.test.model.MyParameter;
+import ch.eitchnet.xmlpers.test.model.MyModel;
 
-class ResourceSaxParser extends DefaultHandler implements SaxParser<Resource> {
+class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 
-	private Resource resource;
+	private MyModel resource;
 
 	@Override
-	public Resource getObject() {
+	public MyModel getObject() {
 		return this.resource;
 	}
 
 	@Override
-	public void setObject(Resource object) {
+	public void setObject(MyModel object) {
 		this.resource = object;
 	}
 
@@ -54,7 +54,7 @@ class ResourceSaxParser extends DefaultHandler implements SaxParser<Resource> {
 		writer.writeAttribute("name", this.resource.getName());
 		writer.writeAttribute("type", this.resource.getType());
 		for (String paramId : this.resource.getParameterKeySet()) {
-			Parameter param = this.resource.getParameterBy(paramId);
+			MyParameter param = this.resource.getParameterBy(paramId);
 			writer.writeEmptyElement("Parameter");
 			writer.writeAttribute("id", param.getId());
 			writer.writeAttribute("name", param.getName());
@@ -72,7 +72,7 @@ class ResourceSaxParser extends DefaultHandler implements SaxParser<Resource> {
 			String id = attributes.getValue("id");
 			String name = attributes.getValue("name");
 			String type = attributes.getValue("type");
-			Resource resource = new Resource(id, name, type);
+			MyModel resource = new MyModel(id, name, type);
 			this.resource = resource;
 			break;
 		case "Parameter":
@@ -80,7 +80,7 @@ class ResourceSaxParser extends DefaultHandler implements SaxParser<Resource> {
 			name = attributes.getValue("name");
 			type = attributes.getValue("type");
 			String value = attributes.getValue("value");
-			Parameter param = new Parameter(id, name, type, value);
+			MyParameter param = new MyParameter(id, name, type, value);
 			this.resource.addParameter(param);
 			break;
 		default:

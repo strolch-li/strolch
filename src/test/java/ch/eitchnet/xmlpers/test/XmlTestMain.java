@@ -47,8 +47,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import ch.eitchnet.utils.exceptions.XmlException;
 import ch.eitchnet.utils.helper.XmlHelper;
 import ch.eitchnet.xmlpers.test.model.ModelBuilder;
-import ch.eitchnet.xmlpers.test.model.Parameter;
-import ch.eitchnet.xmlpers.test.model.Resource;
+import ch.eitchnet.xmlpers.test.model.MyParameter;
+import ch.eitchnet.xmlpers.test.model.MyModel;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -59,7 +59,7 @@ public class XmlTestMain {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlTestMain.class);
 
-	private static Resource res;
+	private static MyModel res;
 
 	public static void main(String[] args) throws Exception {
 
@@ -70,7 +70,7 @@ public class XmlTestMain {
 		writeSax(res);
 		writeDom(res);
 
-		List<Resource> resoures;
+		List<MyModel> resoures;
 		resoures = readDom();
 		logger.info("Parsed Resources:\n" + resoures);
 		resoures = readSax();
@@ -81,7 +81,7 @@ public class XmlTestMain {
 	 * @return
 	 * 
 	 */
-	private static List<Resource> readDom() throws Exception {
+	private static List<MyModel> readDom() throws Exception {
 
 		File file = new File("target/res_dom.xml");
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
@@ -89,7 +89,7 @@ public class XmlTestMain {
 		Document document = docBuilder.parse(file);
 		Element rootElement = document.getDocumentElement();
 
-		List<Resource> resources = new ArrayList<Resource>();
+		List<MyModel> resources = new ArrayList<MyModel>();
 
 		NodeList resElements = rootElement.getElementsByTagName("Resource");
 		for (int i = 0; i < resElements.getLength(); i++) {
@@ -98,7 +98,7 @@ public class XmlTestMain {
 			String name = resElement.getAttribute("name");
 			String type = resElement.getAttribute("type");
 
-			Resource res = new Resource();
+			MyModel res = new MyModel();
 			res.setId(id);
 			res.setName(name);
 			res.setType(type);
@@ -114,7 +114,7 @@ public class XmlTestMain {
 		return resources;
 	}
 
-	private static void parseParameters(Resource res, NodeList paramElements) {
+	private static void parseParameters(MyModel res, NodeList paramElements) {
 		for (int i = 0; i < paramElements.getLength(); i++) {
 			Element paramElement = (Element) paramElements.item(i);
 			String id = paramElement.getAttribute("id");
@@ -122,7 +122,7 @@ public class XmlTestMain {
 			String type = paramElement.getAttribute("type");
 			String value = paramElement.getAttribute("value");
 
-			Parameter param = new Parameter();
+			MyParameter param = new MyParameter();
 			param.setId(id);
 			param.setName(name);
 			param.setType(type);
@@ -136,10 +136,10 @@ public class XmlTestMain {
 	 * @return
 	 * 
 	 */
-	private static List<Resource> readSax() throws Exception {
+	private static List<MyModel> readSax() throws Exception {
 
-		final List<Resource> resources = new ArrayList<>();
-		final Resource[] currentRes = new Resource[1];
+		final List<MyModel> resources = new ArrayList<>();
+		final MyModel[] currentRes = new MyModel[1];
 
 		DefaultHandler xmlHandler = new DefaultHandler() {
 
@@ -149,7 +149,7 @@ public class XmlTestMain {
 
 				switch (qName) {
 				case "Resource":
-					Resource res = new Resource();
+					MyModel res = new MyModel();
 					res.setId(attributes.getValue("id"));
 					res.setName(attributes.getValue("name"));
 					res.setType(attributes.getValue("type"));
@@ -157,7 +157,7 @@ public class XmlTestMain {
 					resources.add(res);
 					break;
 				case "Parameter":
-					Parameter param = new Parameter();
+					MyParameter param = new MyParameter();
 					param.setId(attributes.getValue("id"));
 					param.setName(attributes.getValue("name"));
 					param.setType(attributes.getValue("type"));
@@ -182,7 +182,7 @@ public class XmlTestMain {
 		return resources;
 	}
 
-	private static void writeDom(Resource res) throws Exception {
+	private static void writeDom(MyModel res) throws Exception {
 
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
@@ -194,7 +194,7 @@ public class XmlTestMain {
 		resElement.setAttribute("type", res.getType());
 
 		for (String paramId : res.getParameterKeySet()) {
-			Parameter param = res.getParameterBy(paramId);
+			MyParameter param = res.getParameterBy(paramId);
 			Element paramElement = doc.createElement("Parameter");
 			paramElement.setAttribute("id", param.getId());
 			paramElement.setAttribute("name", param.getName());
@@ -250,7 +250,7 @@ public class XmlTestMain {
 		}
 	}
 
-	private static void writeSax(Resource res) throws Exception {
+	private static void writeSax(MyModel res) throws Exception {
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 
 		File file = new File("target/res_sax.xml");
@@ -268,7 +268,7 @@ public class XmlTestMain {
 			writer.writeAttribute("type", res.getType());
 
 			for (String paramId : res.getParameterKeySet()) {
-				Parameter param = res.getParameterBy(paramId);
+				MyParameter param = res.getParameterBy(paramId);
 				writer.writeEmptyElement("Parameter");
 				writer.writeAttribute("id", param.getId());
 				writer.writeAttribute("name", param.getName());

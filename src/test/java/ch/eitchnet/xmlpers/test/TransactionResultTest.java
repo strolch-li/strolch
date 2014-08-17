@@ -38,7 +38,7 @@ import ch.eitchnet.xmlpers.api.PersistenceConstants;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.api.TransactionResult;
 import ch.eitchnet.xmlpers.test.model.Book;
-import ch.eitchnet.xmlpers.test.model.Resource;
+import ch.eitchnet.xmlpers.test.model.MyModel;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -95,14 +95,14 @@ public class TransactionResultTest extends AbstractPersistenceTest {
 	private void performChanges(TransactionResult txResult) {
 
 		// create a list of resources
-		List<Resource> resources = new ArrayList<>(10);
+		List<MyModel> resources = new ArrayList<>(10);
 		int i = 0;
 		for (; i < 10; i++) {
 			String id = RES_ID + "_" + i; //$NON-NLS-1$
 			String name = "Tx Result Test 1 Object. " + i; //$NON-NLS-1$
 			String type = "testTxResult1"; //$NON-NLS-1$
 
-			Resource resource = createResource(id, name, type);
+			MyModel resource = createResource(id, name, type);
 			resources.add(resource);
 		}
 		for (; i < 20; i++) {
@@ -110,7 +110,7 @@ public class TransactionResultTest extends AbstractPersistenceTest {
 			String name = "Tx Result Test 2 Object. " + i; //$NON-NLS-1$
 			String type = "testTxResult2"; //$NON-NLS-1$
 
-			Resource resource = createResource(id, name, type);
+			MyModel resource = createResource(id, name, type);
 			resources.add(resource);
 		}
 

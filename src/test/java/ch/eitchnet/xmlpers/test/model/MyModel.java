@@ -15,17 +15,22 @@
  */
 package ch.eitchnet.xmlpers.test.model;
 
-public class Parameter {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+public class MyModel {
 
 	private String id;
 	private String name;
 	private String type;
-	private String value;
+	private Map<String, MyParameter> parameters = new HashMap<String, MyParameter>();
 
 	/**
-	 * 
+	 *
 	 */
-	public Parameter() {
+	public MyModel() {
 		// empty constructor
 	}
 
@@ -33,28 +38,29 @@ public class Parameter {
 	 * @param id
 	 * @param name
 	 * @param type
-	 * @param value
 	 */
-	public Parameter(String id, String name, String type, String value) {
+	public MyModel(String id, String name, String type) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.type = type;
-		this.value = value;
 	}
 
 	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Parameter [id=");
+		builder.append("Resource [id=");
 		builder.append(this.id);
 		builder.append(", name=");
 		builder.append(this.name);
 		builder.append(", type=");
 		builder.append(this.type);
-		builder.append(", value=");
-		builder.append(this.value);
+		builder.append(", parameters=");
+		for (Entry<String, MyParameter> param : this.parameters.entrySet()) {
+			builder.append("\n");
+			builder.append("  " + param.getKey() + " = " + param.getValue());
+		}
 		builder.append("]");
 		return builder.toString();
 	}
@@ -67,8 +73,7 @@ public class Parameter {
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param id the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
@@ -82,8 +87,7 @@ public class Parameter {
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -97,25 +101,21 @@ public class Parameter {
 	}
 
 	/**
-	 * @param type
-	 *            the type to set
+	 * @param type the type to set
 	 */
 	public void setType(String type) {
 		this.type = type;
 	}
 
-	/**
-	 * @return the value
-	 */
-	public String getValue() {
-		return this.value;
+	public void addParameter(MyParameter parameter) {
+		this.parameters.put(parameter.getId(), parameter);
 	}
 
-	/**
-	 * @param value
-	 *            the value to set
-	 */
-	public void setValue(String value) {
-		this.value = value;
+	public Set<String> getParameterKeySet() {
+		return this.parameters.keySet();
+	}
+
+	public MyParameter getParameterBy(String id) {
+		return this.parameters.get(id);
 	}
 }

@@ -35,7 +35,7 @@ import ch.eitchnet.xmlpers.api.PersistenceConstants;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.objref.IdOfSubTypeRef;
 import ch.eitchnet.xmlpers.objref.LockableObject;
-import ch.eitchnet.xmlpers.test.model.Resource;
+import ch.eitchnet.xmlpers.test.model.MyModel;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -117,7 +117,7 @@ public class LockingTest extends AbstractPersistenceTest {
 
 		// create resource which is to be updated
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			Resource resource = createResource(resourceId);
+			MyModel resource = createResource(resourceId);
 			tx.getObjectDao().add(resource);
 		}
 
@@ -208,7 +208,7 @@ public class LockingTest extends AbstractPersistenceTest {
 
 		@Override
 		protected void doWork(PersistenceTransaction tx) {
-			Resource resource = createResource(this.resourceId);
+			MyModel resource = createResource(this.resourceId);
 			tx.getObjectDao().add(resource);
 		}
 	}
@@ -223,7 +223,7 @@ public class LockingTest extends AbstractPersistenceTest {
 		protected void doWork(PersistenceTransaction tx) {
 
 			IdOfSubTypeRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, RES_TYPE, this.resourceId);
-			Resource resource = tx.getObjectDao().queryById(objectRef);
+			MyModel resource = tx.getObjectDao().queryById(objectRef);
 			assertNotNull(resource);
 			updateResource(resource);
 

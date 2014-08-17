@@ -15,22 +15,17 @@
  */
 package ch.eitchnet.xmlpers.test.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-public class Resource {
+public class MyParameter {
 
 	private String id;
 	private String name;
 	private String type;
-	private Map<String, Parameter> parameters = new HashMap<String, Parameter>();
+	private String value;
 
 	/**
-	 *
+	 * 
 	 */
-	public Resource() {
+	public MyParameter() {
 		// empty constructor
 	}
 
@@ -38,29 +33,28 @@ public class Resource {
 	 * @param id
 	 * @param name
 	 * @param type
+	 * @param value
 	 */
-	public Resource(String id, String name, String type) {
+	public MyParameter(String id, String name, String type, String value) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.type = type;
+		this.value = value;
 	}
 
 	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Resource [id=");
+		builder.append("Parameter [id=");
 		builder.append(this.id);
 		builder.append(", name=");
 		builder.append(this.name);
 		builder.append(", type=");
 		builder.append(this.type);
-		builder.append(", parameters=");
-		for (Entry<String, Parameter> param : this.parameters.entrySet()) {
-			builder.append("\n");
-			builder.append("  " + param.getKey() + " = " + param.getValue());
-		}
+		builder.append(", value=");
+		builder.append(this.value);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -73,7 +67,8 @@ public class Resource {
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
@@ -87,7 +82,8 @@ public class Resource {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -101,21 +97,25 @@ public class Resource {
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param type
+	 *            the type to set
 	 */
 	public void setType(String type) {
 		this.type = type;
 	}
 
-	public void addParameter(Parameter parameter) {
-		this.parameters.put(parameter.getId(), parameter);
+	/**
+	 * @return the value
+	 */
+	public String getValue() {
+		return this.value;
 	}
 
-	public Set<String> getParameterKeySet() {
-		return this.parameters.keySet();
-	}
-
-	public Parameter getParameterBy(String id) {
-		return this.parameters.get(id);
+	/**
+	 * @param value
+	 *            the value to set
+	 */
+	public void setValue(String value) {
+		this.value = value;
 	}
 }

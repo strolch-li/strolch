@@ -27,10 +27,10 @@ import ch.eitchnet.xmlpers.api.PersistenceConstants;
 import ch.eitchnet.xmlpers.api.PersistenceManager;
 import ch.eitchnet.xmlpers.api.PersistenceManagerLoader;
 import ch.eitchnet.xmlpers.test.impl.BookContextFactory;
-import ch.eitchnet.xmlpers.test.impl.ResourceContextFactory;
+import ch.eitchnet.xmlpers.test.impl.MyModelContextFactory;
 import ch.eitchnet.xmlpers.test.impl.TestConstants;
 import ch.eitchnet.xmlpers.test.model.Book;
-import ch.eitchnet.xmlpers.test.model.Resource;
+import ch.eitchnet.xmlpers.test.model.MyModel;
 
 public abstract class AbstractPersistenceTest {
 
@@ -67,8 +67,8 @@ public abstract class AbstractPersistenceTest {
 	protected void setup(Properties properties) {
 		properties.setProperty(PersistenceConstants.PROP_VERBOSE, "true"); //$NON-NLS-1$
 		this.persistenceManager = PersistenceManagerLoader.load(properties);
-		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(Resource.class,
-				TestConstants.TYPE_RES, new ResourceContextFactory());
+		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(MyModel.class,
+				TestConstants.TYPE_RES, new MyModelContextFactory());
 		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(Book.class, TestConstants.TYPE_BOOK,
 				new BookContextFactory());
 	}

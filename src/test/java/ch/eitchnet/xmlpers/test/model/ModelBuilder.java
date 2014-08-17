@@ -43,22 +43,22 @@ public class ModelBuilder {
 	public static final String BOOK_PRESS_2 = "Another press";
 	public static final double BOOK_PRICE = 45.55D;
 
-	public static Resource createResource() {
+	public static MyModel createResource() {
 		return createResource(RES_ID, RES_NAME, RES_TYPE);
 	}
 	
-	public static Resource createResource(String id) {
+	public static MyModel createResource(String id) {
 		return createResource(id, RES_NAME, RES_TYPE);
 	}
 
-	public static Resource createResource(String id, String name, String type) {
-		Resource resource = new Resource(id, name, type);
-		Parameter param = new Parameter(PARAM_ID, PARAM_NAME, PARAM_TYPE, PARAM_VALUE_1);
+	public static MyModel createResource(String id, String name, String type) {
+		MyModel resource = new MyModel(id, name, type);
+		MyParameter param = new MyParameter(PARAM_ID, PARAM_NAME, PARAM_TYPE, PARAM_VALUE_1);
 		resource.addParameter(param);
 		return resource;
 	}
 
-	public static void updateResource(Resource resource) {
+	public static void updateResource(MyModel resource) {
 		resource.setName(RES_NAME_MODIFIED);
 		resource.getParameterBy(PARAM_ID).setValue(PARAM_VALUE_2);
 	}
@@ -95,12 +95,12 @@ public class ModelBuilder {
 		Assert.assertEquals(BOOK_PRICE, book.getPrice(), 0.0);
 	}
 
-	public static void assertResource(Resource resource) {
+	public static void assertResource(MyModel resource) {
 		Assert.assertNotNull(resource);
 		Assert.assertEquals(RES_ID, resource.getId());
 		Assert.assertEquals(RES_NAME, resource.getName());
 		Assert.assertEquals(RES_TYPE, resource.getType());
-		Parameter param = resource.getParameterBy(PARAM_ID);
+		MyParameter param = resource.getParameterBy(PARAM_ID);
 		Assert.assertNotNull(param);
 		Assert.assertEquals(PARAM_ID, param.getId());
 		Assert.assertEquals(PARAM_NAME, param.getName());
@@ -108,12 +108,12 @@ public class ModelBuilder {
 		Assert.assertEquals(PARAM_VALUE_1, param.getValue());
 	}
 
-	public static void assertResourceUpdated(Resource resource) {
+	public static void assertResourceUpdated(MyModel resource) {
 		Assert.assertNotNull(resource);
 		Assert.assertEquals(RES_ID, resource.getId());
 		Assert.assertEquals(RES_NAME_MODIFIED, resource.getName());
 		Assert.assertEquals(RES_TYPE, resource.getType());
-		Parameter param = resource.getParameterBy(PARAM_ID);
+		MyParameter param = resource.getParameterBy(PARAM_ID);
 		Assert.assertNotNull(param);
 		Assert.assertEquals(PARAM_ID, param.getId());
 		Assert.assertEquals(PARAM_NAME, param.getName());

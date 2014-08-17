@@ -18,17 +18,17 @@ package ch.eitchnet.xmlpers.test.impl;
 import ch.eitchnet.xmlpers.api.DomParser;
 import ch.eitchnet.xmlpers.api.ParserFactory;
 import ch.eitchnet.xmlpers.api.SaxParser;
-import ch.eitchnet.xmlpers.test.model.Resource;
+import ch.eitchnet.xmlpers.test.model.MyModel;
 
-public class ResourceParserFactory implements ParserFactory<Resource> {
+public class MyModelParserFactory implements ParserFactory<MyModel> {
 
 	@Override
-	public DomParser<Resource> getDomParser() {
-		return new ResourceDomParser();
+	public DomParser<MyModel> getDomParser() {
+		return new MyModelDomParser();
 	}
 
 	@Override
-	public SaxParser<Resource> getSaxParser() {
-		return new ResourceSaxParser();
+	public SaxParser<MyModel> getSaxParser() {
+		return new MyModelSaxParser();
 	}
 }
