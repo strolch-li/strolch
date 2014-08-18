@@ -29,8 +29,10 @@ import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
 
 public interface StrolchTransaction extends AutoCloseable {
@@ -102,4 +104,32 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *             variable to which the result is to be is stored is a {@link Resource}, etc.
 	 */
 	public <T extends StrolchElement> T findElement(Locator locator) throws StrolchException, ClassCastException;
+
+	/**
+	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference
+	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and
+	 * the UOM must be set to the resource's type and the value is the id of the resource
+	 * 
+	 * @param refP
+	 *            the {@link StringParameter} which references a {@link Resource}
+	 * @return the resource referenced by the parameter, or null if it does not exist
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	public Resource getResourceBy(StringParameter refP) throws StrolchException;
+
+	/**
+	 * Returns the {@link Order} which is referenced by the given {@link StringParameter}. A reference {@link Parameter}
+	 * must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to
+	 * the order's type and the value is the id of the order
+	 * 
+	 * @param refP
+	 *            the {@link StringParameter} which references an {@link Order}
+	 * @return the order referenced by the parameter, or null if it does not exist
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	public Order getOrderBy(StringParameter refP) throws StrolchException;
 }

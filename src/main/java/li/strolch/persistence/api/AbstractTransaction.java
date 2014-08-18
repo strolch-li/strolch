@@ -37,6 +37,7 @@ import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
@@ -241,6 +242,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		String parameterId = elements.get(4);
 		Parameter<?> parameter = bag.getParameter(parameterId);
 		return (T) parameter;
+	}
+
+	@Override
+	public Order getOrderBy(StringParameter refP) throws StrolchException {
+		return getOrderMap().getBy(this, refP);
+	}
+
+	@Override
+	public Resource getResourceBy(StringParameter refP) throws StrolchException {
+		return getResourceMap().getBy(this, refP);
 	}
 
 	@Override
