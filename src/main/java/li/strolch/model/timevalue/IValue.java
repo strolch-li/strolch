@@ -49,4 +49,9 @@ public interface IValue<T> {
 	 * @return a copy of this
 	 */
 	IValue<T> getCopy();
+	
+	/**
+	 * @return this value in string representation
+	 */
+	String getValueAsString();
 }

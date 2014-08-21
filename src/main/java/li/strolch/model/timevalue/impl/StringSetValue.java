@@ -15,15 +15,17 @@
  */
 package li.strolch.model.timevalue.impl;
 
-import ch.eitchnet.utils.helper.StringHelper;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import li.strolch.exception.StrolchException;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
+import ch.eitchnet.utils.dbc.DBC;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * {@link IValue} implementation to work with String valued {@link ITimeValue} objects. Since a java.util.String object
@@ -44,12 +46,7 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 	}
 
 	public StringSetValue(final Set<AString> aStrings) {
-		// assert no null values in set
-		for (AString aString : aStrings) {
-			if (StringHelper.isEmpty(aString.getString())) {
-				throw new StrolchException("StringSetValue may not contain null values in set!");
-			}
-		}
+		DBC.PRE.assertNotNull("Value may not be null!", aStrings);
 		this.aStrings = aStrings;
 	}
 
@@ -105,12 +102,29 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 		return new StringSetValue(new HashSet<>(this.aStrings));
 	}
 
+	@Override
+	public String getValueAsString() {
+		if (this.aStrings.isEmpty())
+			return StringHelper.EMPTY;
+		if (this.aStrings.size() == 1)
+			return this.aStrings.iterator().next().getString();
+
+		StringBuilder sb = new StringBuilder();
+		Iterator<AString> iter = aStrings.iterator();
+		while (iter.hasNext()) {
+			sb.append(iter.next());
+			if (iter.hasNext())
+				sb.append(", ");
+		}
+		return sb.toString();
+	}
+
 	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("StringSetValue [aStrings=");
-		sb.append(this.aStrings);
+		sb.append(getValueAsString());
 		sb.append("]");
 		return sb.toString();
 	}

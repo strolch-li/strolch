@@ -15,6 +15,9 @@
  */
 package li.strolch.model.parameter;
 
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+
 import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
@@ -82,7 +85,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	@Override
 	public void setInterpretation(String interpretation) {
 		if (StringHelper.isEmpty(interpretation)) {
-			this.interpretation = Parameter.INTERPRETATION_NONE;
+			this.interpretation = INTERPRETATION_NONE;
 		} else {
 			this.interpretation = interpretation;
 		}
@@ -96,7 +99,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	@Override
 	public void setUom(String uom) {
 		if (StringHelper.isEmpty(uom)) {
-			this.uom = Parameter.UOM_NONE;
+			this.uom = UOM_NONE;
 		} else {
 			this.uom = uom;
 		}
@@ -134,10 +137,10 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 		element.setAttribute(Tags.VALUE, getValueAsString());
 
-		if (!this.interpretation.equals(Parameter.INTERPRETATION_NONE)) {
+		if (!this.interpretation.equals(INTERPRETATION_NONE)) {
 			element.setAttribute(Tags.INTERPRETATION, this.interpretation);
 		}
-		if (!this.uom.equals(Parameter.UOM_NONE)) {
+		if (!this.uom.equals(UOM_NONE)) {
 			element.setAttribute(Tags.UOM, this.uom);
 		}
 		if (this.hidden) {
@@ -196,8 +199,8 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	}
 
 	@Override
-	protected void fillLocator(LocatorBuilder locatorBuilder) {
-		locatorBuilder.append(this.id);
+	protected void fillLocator(LocatorBuilder lb) {
+		lb.append(this.id);
 	}
 
 	@Override
@@ -211,9 +214,11 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	/**
 	 * Validates that the value is legal. This is the case when it is not null in this implementation
 	 *
-	 * @param value the value to check for this parameter instance
+	 * @param value
+	 *            the value to check for this parameter instance
 	 *
-	 * @throws StrolchException if the value is null
+	 * @throws StrolchException
+	 *             if the value is null
 	 */
 	protected void validateValue(T value) throws StrolchException {
 		if (value == null) {

@@ -15,6 +15,7 @@
  */
 package li.strolch.model;
 
+import static li.strolch.model.ModelGenerator.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -22,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
-
+import static li.strolch.model.Tags.*;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.FloatParameter;
@@ -31,6 +32,9 @@ import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.timedstate.BooleanTimedState;
+import li.strolch.model.timedstate.FloatTimedState;
+import li.strolch.model.timedstate.IntegerTimedState;
+import li.strolch.model.timedstate.StringSetTimedState;
 import li.strolch.model.timevalue.impl.BooleanValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
@@ -44,23 +48,44 @@ public class ModelTest {
 	@Test
 	public void shouldCreateResource() {
 
-		Resource resource = ModelGenerator.createResource("@res01", "Test resource", "MyType");
-		ParameterBag bag = resource.getParameterBag(ModelGenerator.BAG_ID);
+		Resource resource = createResource("@res01", "Test resource", "MyType");
+		ParameterBag bag = resource.getParameterBag(BAG_ID);
 		validateBag(bag);
+		validateStates(resource);
 	}
 
 	@Test
 	public void shouldCreateOrder() {
 
-		Order order = ModelGenerator.createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
-		ParameterBag bag = order.getParameterBag(ModelGenerator.BAG_ID);
+		Order order = createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
+		ParameterBag bag = order.getParameterBag(BAG_ID);
 		validateBag(bag);
 	}
 
 	@Test
+	public void shouldCreateLocators() {
+
+		Resource resource = createResource("@res01", "Test resource", "MyType");
+		assertEquals(Locator.valueOf(RESOURCE, "MyType", "@res01"), resource.getLocator());
+		ParameterBag bag = resource.getParameterBag(BAG_ID);
+		assertEquals(Locator.valueOf(RESOURCE, "MyType", "@res01", BAG, BAG_ID), bag.getLocator());
+		StringParameter sP = bag.getParameter(PARAM_STRING_ID);
+		assertEquals(Locator.valueOf(RESOURCE, "MyType", "@res01", BAG, BAG_ID, PARAM_STRING_ID), sP.getLocator());
+		FloatTimedState floatS = resource.getTimedState(STATE_FLOAT_ID);
+		assertEquals(Locator.valueOf(RESOURCE, "MyType", "@res01", STATE, STATE_FLOAT_ID), floatS.getLocator());
+
+		Order order = createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
+		assertEquals(Locator.valueOf(ORDER, "MyType", "@ord01"), order.getLocator());
+		bag = order.getParameterBag(BAG_ID);
+		assertEquals(Locator.valueOf(ORDER, "MyType", "@ord01", BAG, BAG_ID), bag.getLocator());
+		sP = bag.getParameter(PARAM_STRING_ID);
+		assertEquals(Locator.valueOf(ORDER, "MyType", "@ord01", BAG, BAG_ID, PARAM_STRING_ID), sP.getLocator());
+	}
+
+	@Test
 	public void shouldPerformDeepResourceEquals() {
-		Resource srcRes = ModelGenerator.createResource("@res01", "Test resource", "MyType");
-		Resource dstRes = ModelGenerator.createResource("@res01", "Test resource", "MyType");
+		Resource srcRes = createResource("@res01", "Test resource", "MyType");
+		Resource dstRes = createResource("@res01", "Test resource", "MyType");
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
 		visitor.visit(dstRes);
 		assertTrue("Same Resource should be deep equal!", visitor.isEqual());
@@ -68,11 +93,11 @@ public class ModelTest {
 
 	@Test
 	public void shouldFailDeepResourceEquals1() {
-		Resource srcRes = ModelGenerator.createResource("@res01", "Test resource", "MyType");
-		Resource dstRes = ModelGenerator.createResource("@res01", "Test resource", "MyType");
-		ParameterBag bag = dstRes.getParameterBag(ModelGenerator.BAG_ID);
+		Resource srcRes = createResource("@res01", "Test resource", "MyType");
+		Resource dstRes = createResource("@res01", "Test resource", "MyType");
+		ParameterBag bag = dstRes.getParameterBag(BAG_ID);
 		bag.setName("Bla bla");
-		FloatParameter fParam = bag.getParameter(ModelGenerator.PARAM_FLOAT_ID);
+		FloatParameter fParam = bag.getParameter(PARAM_FLOAT_ID);
 		fParam.setValue(23434234.234);
 		fParam.setName("Ohla");
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
@@ -83,9 +108,9 @@ public class ModelTest {
 
 	@Test
 	public void shouldFailDeepResourceEquals2() {
-		Resource srcRes = ModelGenerator.createResource("@res01", "Test resource", "MyType");
-		Resource dstRes = ModelGenerator.createResource("@res01", "Test resource", "MyType");
-		BooleanTimedState timedState = dstRes.getTimedState(ModelGenerator.STATE_BOOLEAN_ID);
+		Resource srcRes = createResource("@res01", "Test resource", "MyType");
+		Resource dstRes = createResource("@res01", "Test resource", "MyType");
+		BooleanTimedState timedState = dstRes.getTimedState(STATE_BOOLEAN_ID);
 		timedState.applyChange(new ValueChange<>(System.currentTimeMillis(), new BooleanValue(Boolean.TRUE)));
 		timedState.setName("Ohla");
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
@@ -97,8 +122,8 @@ public class ModelTest {
 	@Test
 	public void shouldPerformDeepOrderEquals() {
 		Date date = new Date();
-		Order srcOrder = ModelGenerator.createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
-		Order dstOrder = ModelGenerator.createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		Order dstOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
 		visitor.visit(dstOrder);
 		assertTrue("Same Order should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
@@ -108,45 +133,78 @@ public class ModelTest {
 
 		assertNotNull(bag);
 
-		assertEquals(ModelGenerator.BAG_ID, bag.getId());
-		assertEquals(ModelGenerator.BAG_NAME, bag.getName());
-		assertEquals(ModelGenerator.BAG_TYPE, bag.getType());
+		assertEquals(BAG_ID, bag.getId());
+		assertEquals(BAG_NAME, bag.getName());
+		assertEquals(BAG_TYPE, bag.getType());
 
 		validateParams(bag);
 	}
 
 	public static void validateParams(ParameterBag bag) {
 
-		BooleanParameter boolParam = bag.getParameter(ModelGenerator.PARAM_BOOLEAN_ID);
-		assertNotNull("Boolean Param missing with id " + ModelGenerator.PARAM_BOOLEAN_ID, boolParam);
+		BooleanParameter boolParam = bag.getParameter(PARAM_BOOLEAN_ID);
+		assertNotNull("Boolean Param missing with id " + PARAM_BOOLEAN_ID, boolParam);
 		assertEquals(true, boolParam.getValue().booleanValue());
 
-		FloatParameter floatParam = bag.getParameter(ModelGenerator.PARAM_FLOAT_ID);
-		assertNotNull("Float Param missing with id " + ModelGenerator.PARAM_FLOAT_ID, floatParam);
+		FloatParameter floatParam = bag.getParameter(PARAM_FLOAT_ID);
+		assertNotNull("Float Param missing with id " + PARAM_FLOAT_ID, floatParam);
 		assertEquals(44.3, floatParam.getValue().doubleValue(), 0.0001);
 
-		IntegerParameter integerParam = bag.getParameter(ModelGenerator.PARAM_INTEGER_ID);
-		assertNotNull("Integer Param missing with id " + ModelGenerator.PARAM_INTEGER_ID, integerParam);
+		IntegerParameter integerParam = bag.getParameter(PARAM_INTEGER_ID);
+		assertNotNull("Integer Param missing with id " + PARAM_INTEGER_ID, integerParam);
 		assertEquals(77, integerParam.getValue().intValue());
 
-		LongParameter longParam = bag.getParameter(ModelGenerator.PARAM_LONG_ID);
-		assertNotNull("Long Param missing with id " + ModelGenerator.PARAM_LONG_ID, longParam);
+		LongParameter longParam = bag.getParameter(PARAM_LONG_ID);
+		assertNotNull("Long Param missing with id " + PARAM_LONG_ID, longParam);
 		assertEquals(4453234566L, longParam.getValue().longValue());
 
-		StringParameter stringParam = bag.getParameter(ModelGenerator.PARAM_STRING_ID);
-		assertNotNull("String Param missing with id " + ModelGenerator.PARAM_STRING_ID, stringParam);
+		StringParameter stringParam = bag.getParameter(PARAM_STRING_ID);
+		assertNotNull("String Param missing with id " + PARAM_STRING_ID, stringParam);
 		assertEquals("Strolch", stringParam.getValue());
 
-		DateParameter dateParam = bag.getParameter(ModelGenerator.PARAM_DATE_ID);
-		assertNotNull("Date Param missing with id " + ModelGenerator.PARAM_DATE_ID, dateParam);
+		DateParameter dateParam = bag.getParameter(PARAM_DATE_ID);
+		assertNotNull("Date Param missing with id " + PARAM_DATE_ID, dateParam);
 		assertEquals(1354295525628L, dateParam.getValue().getTime());
 
-		StringListParameter stringListP = bag.getParameter(ModelGenerator.PARAM_LIST_STRING_ID);
-		assertNotNull("StringList Param missing with id " + ModelGenerator.PARAM_LIST_STRING_ID, stringListP);
+		StringListParameter stringListP = bag.getParameter(PARAM_LIST_STRING_ID);
+		assertNotNull("StringList Param missing with id " + PARAM_LIST_STRING_ID, stringListP);
 
 		ArrayList<String> stringList = new ArrayList<>();
 		stringList.add("Hello");
 		stringList.add("World");
 		assertEquals(stringList, stringListP.getValue());
+	}
+
+	/**
+	 * @param resource
+	 */
+	private void validateStates(Resource resource) {
+		BooleanTimedState booleanState = resource.getTimedState(STATE_BOOLEAN_ID);
+		assertNotNull("Boolean State missing with id " + STATE_BOOLEAN_ID, booleanState);
+		assertEquals(STATE_BOOLEAN_TIME_0, booleanState.getStateAt(STATE_TIME_0).getValue().getValue());
+		assertEquals(STATE_BOOLEAN_TIME_10, booleanState.getStateAt(STATE_TIME_10).getValue().getValue());
+		assertEquals(STATE_BOOLEAN_TIME_20, booleanState.getStateAt(STATE_TIME_20).getValue().getValue());
+		assertEquals(STATE_BOOLEAN_TIME_30, booleanState.getStateAt(STATE_TIME_30).getValue().getValue());
+
+		FloatTimedState floatState = resource.getTimedState(STATE_FLOAT_ID);
+		assertNotNull("Float State missing with id " + STATE_FLOAT_ID, floatState);
+		assertEquals(STATE_FLOAT_TIME_0, floatState.getStateAt(STATE_TIME_0).getValue().getValue());
+		assertEquals(STATE_FLOAT_TIME_10, floatState.getStateAt(STATE_TIME_10).getValue().getValue());
+		assertEquals(STATE_FLOAT_TIME_20, floatState.getStateAt(STATE_TIME_20).getValue().getValue());
+		assertEquals(STATE_FLOAT_TIME_30, floatState.getStateAt(STATE_TIME_30).getValue().getValue());
+
+		IntegerTimedState integerState = resource.getTimedState(STATE_INTEGER_ID);
+		assertNotNull("Integer State missing with id " + STATE_INTEGER_ID, integerState);
+		assertEquals(STATE_INTEGER_TIME_0, integerState.getStateAt(STATE_TIME_0).getValue().getValue());
+		assertEquals(STATE_INTEGER_TIME_10, integerState.getStateAt(STATE_TIME_10).getValue().getValue());
+		assertEquals(STATE_INTEGER_TIME_20, integerState.getStateAt(STATE_TIME_20).getValue().getValue());
+		assertEquals(STATE_INTEGER_TIME_30, integerState.getStateAt(STATE_TIME_30).getValue().getValue());
+
+		StringSetTimedState stringState = resource.getTimedState(STATE_STRING_ID);
+		assertNotNull("String State missing with id " + STATE_STRING_ID, stringState);
+		assertEquals(STATE_STRING_TIME_0, stringState.getStateAt(STATE_TIME_0).getValue().getValueAsString());
+		assertEquals(STATE_STRING_TIME_10, stringState.getStateAt(STATE_TIME_10).getValue().getValueAsString());
+		assertEquals(STATE_STRING_TIME_20, stringState.getStateAt(STATE_TIME_20).getValue().getValueAsString());
+		assertEquals(STATE_STRING_TIME_30, stringState.getStateAt(STATE_TIME_30).getValue().getValueAsString());
 	}
 }

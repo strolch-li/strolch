@@ -15,6 +15,12 @@
  */
 package li.strolch.model.timedstate;
 
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+
+import java.text.MessageFormat;
+
+import li.strolch.exception.StrolchException;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
@@ -26,6 +32,12 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+import li.strolch.model.visitor.TimedStateVisitor;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -35,6 +47,11 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 		StrolchTimedState<T> {
 
 	private static final long serialVersionUID = 1L;
+
+	protected boolean hidden = false;
+	protected int index;
+	protected String interpretation = INTERPRETATION_NONE;
+	protected String uom = UOM_NONE;
 
 	protected Resource parent;
 	protected ITimedState<T> state;
@@ -46,6 +63,54 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	public AbstractStrolchTimedState(String id, String name) {
 		super(id, name);
 		this.state = new TimedState<>();
+	}
+
+	@Override
+	public boolean isHidden() {
+		return this.hidden;
+	}
+
+	@Override
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+
+	@Override
+	public String getInterpretation() {
+		return this.interpretation;
+	}
+
+	@Override
+	public void setInterpretation(String interpretation) {
+		if (StringHelper.isEmpty(interpretation)) {
+			this.interpretation = INTERPRETATION_NONE;
+		} else {
+			this.interpretation = interpretation;
+		}
+	}
+
+	@Override
+	public String getUom() {
+		return this.uom;
+	}
+
+	@Override
+	public void setUom(String uom) {
+		if (StringHelper.isEmpty(uom)) {
+			this.uom = UOM_NONE;
+		} else {
+			this.uom = uom;
+		}
+	}
+
+	@Override
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	@Override
+	public int getIndex() {
+		return this.index;
 	}
 
 	@Override
@@ -89,9 +154,75 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	}
 
 	@Override
-	protected void fillLocator(LocatorBuilder locatorBuilder) {
-		locatorBuilder.append(Tags.TIMED_STATE);
-		locatorBuilder.append(getId());
+	public Element toDom(Document doc) {
+		Element element = doc.createElement(Tags.PARAMETER);
+		fillElement(element);
+
+		if (!this.interpretation.equals(INTERPRETATION_NONE)) {
+			element.setAttribute(Tags.INTERPRETATION, this.interpretation);
+		}
+		if (!this.uom.equals(UOM_NONE)) {
+			element.setAttribute(Tags.UOM, this.uom);
+		}
+		if (this.hidden) {
+			element.setAttribute(Tags.HIDDEN, Boolean.toString(this.hidden));
+		}
+		if (this.index != 0) {
+			element.setAttribute(Tags.INDEX, Integer.toString(this.index));
+		}
+
+		return element;
+	}
+
+	@Override
+	public void fromDom(Element element) {
+
+		super.fromDom(element);
+
+		String typeS = element.getAttribute(Tags.TYPE);
+		if (StringHelper.isEmpty(typeS)) {
+			String msg = "Type must be set on element with id {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.id);
+			throw new StrolchException(msg);
+		} else if (!typeS.equals(getType())) {
+			String msg = "{0} must have type {1}, not: {2}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, getClass().getSimpleName(), getType(), typeS);
+			throw new StrolchException(msg);
+		}
+
+		String interpretation = element.getAttribute(Tags.INTERPRETATION);
+		String hidden = element.getAttribute(Tags.HIDDEN);
+		String uom = element.getAttribute(Tags.UOM);
+		String index = element.getAttribute(Tags.INDEX);
+
+		setInterpretation(interpretation);
+		setUom(uom);
+
+		if (StringHelper.isEmpty(index)) {
+			this.index = 0;
+		} else {
+			this.index = Integer.valueOf(index);
+		}
+
+		if (StringHelper.isEmpty(hidden)) {
+			setHidden(false);
+		} else {
+			if (hidden.equalsIgnoreCase(Boolean.TRUE.toString())) {
+				setHidden(true);
+			} else if (hidden.equalsIgnoreCase(Boolean.FALSE.toString())) {
+				setHidden(false);
+			} else {
+				String msg = "Boolean string must be either {0} or {1}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, Boolean.TRUE.toString(), Boolean.FALSE.toString());
+				throw new StrolchException(msg);
+			}
+		}
+	}
+
+	@Override
+	protected void fillLocator(LocatorBuilder lb) {
+		lb.append(Tags.STATE);
+		lb.append(this.id);
 	}
 
 	@Override
@@ -105,6 +236,11 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	protected void fillClone(AbstractStrolchTimedState<T> clone) {
 		super.fillClone(clone);
 		clone.state = this.state.getCopy();
+	}
+
+	@Override
+	public <U> U accept(TimedStateVisitor visitor) {
+		return visitor.visitTimedState(this);
 	}
 
 	@SuppressWarnings("nls")

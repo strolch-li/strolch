@@ -17,6 +17,8 @@ package li.strolch.model.xml;
 
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
@@ -34,6 +36,17 @@ import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.timedstate.BooleanTimedState;
+import li.strolch.model.timedstate.FloatTimedState;
+import li.strolch.model.timedstate.IntegerTimedState;
+import li.strolch.model.timedstate.StringSetTimedState;
+import li.strolch.model.timedstate.StrolchTimedState;
+import li.strolch.model.timevalue.IValue;
+import li.strolch.model.timevalue.impl.AString;
+import li.strolch.model.timevalue.impl.BooleanValue;
+import li.strolch.model.timevalue.impl.FloatValue;
+import li.strolch.model.timevalue.impl.IntegerValue;
+import li.strolch.model.timevalue.impl.StringSetValue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +69,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 	private GroupedParameterizedElement parameterizedElement;
 	private ParameterBag pBag;
+	private StrolchTimedState<? extends IValue<?>> state;
+	private String stateType;
 
 	public XmlModelSaxReader(StrolchElementListener listener) {
 		this.listener = listener;
@@ -165,6 +180,63 @@ public class XmlModelSaxReader extends DefaultHandler {
 			}
 			break;
 
+		case Tags.TIMED_STATE:
+			String stateId = attributes.getValue(Tags.ID);
+			String stateName = attributes.getValue(Tags.NAME);
+			this.stateType = attributes.getValue(Tags.TYPE);
+
+			switch (this.stateType) {
+			case FloatTimedState.TYPE:
+				this.state = new FloatTimedState(stateId, stateName);
+				break;
+			case IntegerTimedState.TYPE:
+				this.state = new IntegerTimedState(stateId, stateName);
+				break;
+			case BooleanTimedState.TYPE:
+				this.state = new BooleanTimedState(stateId, stateName);
+				break;
+			case StringSetTimedState.TYPE:
+				this.state = new StringSetTimedState(stateId, stateName);
+				break;
+			default:
+				break;
+			}
+
+			break;
+
+		case Tags.VALUE:
+			String valueTime = attributes.getValue(Tags.TIME);
+			String valueValue = attributes.getValue(Tags.VALUE);
+			switch (this.stateType) {
+			case FloatTimedState.TYPE:
+				((FloatTimedState) this.state).getTimeEvolution().setValueAt(Long.valueOf(valueTime),
+						new FloatValue(valueValue));
+				break;
+			case IntegerTimedState.TYPE:
+				((IntegerTimedState) this.state).getTimeEvolution().setValueAt(Long.valueOf(valueTime),
+						new IntegerValue(valueValue));
+				break;
+			case BooleanTimedState.TYPE:
+				((BooleanTimedState) this.state).getTimeEvolution().setValueAt(Long.valueOf(valueTime),
+						new BooleanValue(valueValue));
+				break;
+			case StringSetTimedState.TYPE:
+
+				Set<AString> value = new HashSet<>();
+				String[] values = valueValue.split(",");
+				for (String s : values) {
+					value.add(new AString(s.trim()));
+				}
+
+				StringSetValue stringSetValue = new StringSetValue(value);
+				((StringSetTimedState) this.state).getTimeEvolution().setValueAt(Long.valueOf(valueTime),
+						stringSetValue);
+				break;
+			default:
+				break;
+			}
+			break;
+
 		default:
 			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
 		}
@@ -192,6 +264,11 @@ public class XmlModelSaxReader extends DefaultHandler {
 		case Tags.PARAMETER:
 			break;
 		case Tags.INCLUDE_FILE:
+			break;
+		case Tags.TIMED_STATE:
+			((Resource) this.parameterizedElement).addTimedState(state);
+			break;
+		case Tags.VALUE:
 			break;
 		default:
 			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$

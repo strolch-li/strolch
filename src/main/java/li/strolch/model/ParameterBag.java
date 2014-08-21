@@ -15,6 +15,8 @@
  */
 package li.strolch.model;
 
+import li.strolch.model.Locator.LocatorBuilder;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -57,6 +59,13 @@ public class ParameterBag extends ParameterizedElement {
 		ParameterBag clone = new ParameterBag();
 		super.fillClone(clone);
 		return clone;
+	}
+
+	@Override
+	public void fillLocator(LocatorBuilder lb) {
+		this.parent.fillLocator(lb);
+		lb.append(Tags.BAG);
+		lb.append(this.id);
 	}
 
 	@Override

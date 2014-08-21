@@ -40,4 +40,5 @@ public class Tags {
 	public static final String INCLUDE_FILE = "IncludeFile";
 	public static final String FILE = "file";
 
+	public static final String BAG = "Bag";
 }

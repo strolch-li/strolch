@@ -22,19 +22,8 @@ import li.strolch.model.visitor.ParameterVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface Parameter<T> extends StrolchElement {
-
-	/**
-	 * This interpretation value indicates that the {@link Parameter} has no defined interpretation
-	 */
-	public static final String INTERPRETATION_NONE = "None"; //$NON-NLS-1$
-
-	/**
-	 * This uom value indicates that the {@link Parameter} has no defined uom
-	 */
-	public static final String UOM_NONE = "None"; //$NON-NLS-1$
 
 	/**
 	 * the value of the parameter as string
@@ -101,23 +90,10 @@ public interface Parameter<T> extends StrolchElement {
 	public void setIndex(int index);
 
 	/**
-	 * The {@link ParameterizedElement} parent to which this {@link Parameter} belongs
-	 * 
-	 * @return
-	 */
-	@Override
-	public ParameterizedElement getParent();
-
-	/**
-	 * Sets the parent for this {@link Parameter}
-	 */
-	public void setParent(ParameterizedElement parent);
-
-	/**
 	 * Returns the interpretation of this {@link Parameter}. The interpretation semantic describes what the value of
 	 * this {@link Parameter} means. Currently there are three definitions, but any String value can be used:
 	 * <ul>
-	 * <li>{@link Parameter#INTERPRETATION_NONE}</li>
+	 * <li>{@link StrolchModelConstants#INTERPRETATION_NONE}</li>
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_ORDER_REF}</li>
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
@@ -130,7 +106,7 @@ public interface Parameter<T> extends StrolchElement {
 	 * Set the interpretation of this {@link Parameter}. The interpretation semantic describes what the value of this
 	 * {@link Parameter} means. Currently there are three definitions, but any String value can be used:
 	 * <ul>
-	 * <li>{@link Parameter#INTERPRETATION_NONE}</li>
+	 * <li>{@link StrolchModelConstants#INTERPRETATION_NONE}</li>
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_ORDER_REF}</li>
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
@@ -138,6 +114,19 @@ public interface Parameter<T> extends StrolchElement {
 	 * @param interpretation
 	 */
 	public void setInterpretation(String interpretation);
+
+	/**
+	 * The {@link ParameterizedElement} parent to which this {@link Parameter} belongs
+	 * 
+	 * @return
+	 */
+	@Override
+	public ParameterizedElement getParent();
+
+	/**
+	 * Sets the parent for this {@link Parameter}
+	 */
+	public void setParent(ParameterizedElement parent);
 
 	@Override
 	public int hashCode();

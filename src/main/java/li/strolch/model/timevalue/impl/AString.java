@@ -17,6 +17,8 @@ package li.strolch.model.timevalue.impl;
 
 import java.io.Serializable;
 
+import ch.eitchnet.utils.dbc.DBC;
+
 /**
  * Wrapper for java.util.String object defining a inverse to support algebraic operations.
  *
@@ -30,11 +32,15 @@ public class AString implements Serializable {
 	private final boolean inverse;
 
 	public AString(final String string) {
+		DBC.PRE.assertNotNull("Value may not be null!", string);
+		DBC.PRE.assertFalse("Comma not allowed in value!", string.contains(","));
 		this.string = string;
 		this.inverse = false;
 	}
 
 	public AString(final String string, final boolean inverse) {
+		DBC.PRE.assertNotNull("Value may not be null!", string);
+		DBC.PRE.assertFalse("Comma not allowed in value!", string.contains(","));
 		this.string = string;
 		this.inverse = inverse;
 	}

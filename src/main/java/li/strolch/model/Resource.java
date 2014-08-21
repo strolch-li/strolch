@@ -15,7 +15,6 @@
  */
 package li.strolch.model;
 
-import ch.eitchnet.utils.dbc.DBC;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.timedstate.BooleanTimedState;
@@ -31,10 +31,14 @@ import li.strolch.model.timedstate.FloatTimedState;
 import li.strolch.model.timedstate.IntegerTimedState;
 import li.strolch.model.timedstate.StringSetTimedState;
 import li.strolch.model.timedstate.StrolchTimedState;
+import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -43,7 +47,7 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 
 	private static final long serialVersionUID = 0L;
 
-	private Map<String, StrolchTimedState<?>> timedStateMap;
+	private Map<String, StrolchTimedState<IValue<?>>> timedStateMap;
 
 	/**
 	 * Empty constructor
@@ -79,16 +83,16 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 			DBC.PRE.assertNotEmpty("Type must be set on TimedState for resource with id " + id, typeS);
 
 			if (typeS.equals(FloatTimedState.TYPE)) {
-				StrolchTimedState timedState = new FloatTimedState(timedStateElem);
+				FloatTimedState timedState = new FloatTimedState(timedStateElem);
 				addTimedState(timedState);
 			} else if (typeS.equals(IntegerTimedState.TYPE)) {
-				StrolchTimedState timedState = new IntegerTimedState(timedStateElem);
+				IntegerTimedState timedState = new IntegerTimedState(timedStateElem);
 				addTimedState(timedState);
 			} else if (typeS.equals(BooleanTimedState.TYPE)) {
-				StrolchTimedState timedState = new BooleanTimedState(timedStateElem);
+				BooleanTimedState timedState = new BooleanTimedState(timedStateElem);
 				addTimedState(timedState);
 			} else if (typeS.equals(StringSetTimedState.TYPE)) {
-				StrolchTimedState timedState = new StringSetTimedState(timedStateElem);
+				StringSetTimedState timedState = new StringSetTimedState(timedStateElem);
 				addTimedState(timedState);
 			} else {
 				String msg = "What kind of TimedState is this: {0}"; //$NON-NLS-1$
@@ -98,16 +102,17 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void addTimedState(StrolchTimedState<?> strolchTimedState) {
 		if (this.timedStateMap == null) {
 			this.timedStateMap = new HashMap<>();
 		}
 
-		this.timedStateMap.put(strolchTimedState.getId(), strolchTimedState);
+		this.timedStateMap.put(strolchTimedState.getId(), (StrolchTimedState<IValue<?>>) strolchTimedState);
 		strolchTimedState.setParent(this);
 	}
 
-	@SuppressWarnings({"rawtypes", "unchecked"})
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public <T extends StrolchTimedState> T getTimedState(String id) {
 		if (this.timedStateMap == null) {
 			return null;
@@ -115,7 +120,7 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 		return (T) this.timedStateMap.get(id);
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T extends StrolchTimedState> T removeTimedState(String id) {
 		if (this.timedStateMap == null) {
 			return null;
@@ -130,7 +135,7 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 		return new HashSet<>(this.timedStateMap.keySet());
 	}
 
-	public List<StrolchTimedState<?>> getTimedStates() {
+	public List<StrolchTimedState<IValue<?>>> getTimedStates() {
 		if (this.timedStateMap == null) {
 			return Collections.emptyList();
 		}

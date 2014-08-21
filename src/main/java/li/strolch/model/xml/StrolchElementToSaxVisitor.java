@@ -15,6 +15,9 @@
  */
 package li.strolch.model.xml;
 
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+
 import java.util.Set;
 
 import li.strolch.model.GroupedParameterizedElement;
@@ -61,10 +64,10 @@ public abstract class StrolchElementToSaxVisitor {
 		AttributesImpl attributes = attributesFor((StrolchElement) parameter);
 		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, parameter.getValueAsString());
 
-		if (!Parameter.UOM_NONE.equals(parameter.getUom())) {
+		if (!UOM_NONE.equals(parameter.getUom())) {
 			attributes.addAttribute(null, null, Tags.UOM, Tags.CDATA, parameter.getUom());
 		}
-		if (!Parameter.INTERPRETATION_NONE.equals(parameter.getInterpretation())) {
+		if (!INTERPRETATION_NONE.equals(parameter.getInterpretation())) {
 			attributes.addAttribute(null, null, Tags.INTERPRETATION, Tags.CDATA, parameter.getInterpretation());
 		}
 		if (parameter.isHidden()) {

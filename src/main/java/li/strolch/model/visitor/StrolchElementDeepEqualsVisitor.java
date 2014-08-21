@@ -18,6 +18,7 @@ package li.strolch.model.visitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
@@ -78,21 +79,21 @@ public class StrolchElementDeepEqualsVisitor {
 
 		Set<String> srcTimedStateKeySet = srcRes.getTimedStateKeySet();
 		for (String timedStateKey : srcTimedStateKeySet) {
-			StrolchTimedState srcTimedState = srcRes.getTimedState(timedStateKey);
+			StrolchTimedState<?> srcTimedState = srcRes.getTimedState(timedStateKey);
 
 			if (!dstRes.hasTimedState(timedStateKey)) {
 				this.mismatchedLocators.add(srcTimedState.getLocator());
 				continue;
 			}
 
-			StrolchTimedState dstTimedState = dstRes.getTimedState(timedStateKey);
+			StrolchTimedState<?> dstTimedState = dstRes.getTimedState(timedStateKey);
 			deepEquals(srcTimedState, dstTimedState);
 		}
 
 		Set<String> dstTimedStateKeySet = dstRes.getTimedStateKeySet();
 		for (String timedStateKey : dstTimedStateKeySet) {
 			if (!srcRes.hasTimedState(timedStateKey)) {
-				StrolchTimedState dstTimedState = dstRes.getTimedState(timedStateKey);
+				StrolchTimedState<?> dstTimedState = dstRes.getTimedState(timedStateKey);
 				this.mismatchedLocators.add(dstTimedState.getLocator());
 			}
 		}

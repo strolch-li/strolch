@@ -15,22 +15,32 @@
  */
 package li.strolch.model.xml;
 
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.model.GroupedParameterizedElement;
+import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.ParameterizedElement;
+import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.timedstate.StrolchTimedState;
+import li.strolch.model.timevalue.ITimeValue;
+import li.strolch.model.timevalue.ITimeVariable;
+import li.strolch.model.timevalue.IValue;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -44,12 +54,52 @@ public abstract class AbstractToSaxWriterVisitor {
 		this.writer = writer;
 	}
 
-	protected void writeElement(String tag, GroupedParameterizedElement element) throws XMLStreamException {
-		boolean isEmpty = !element.hasParameterBags();
-		writeStartStrolchElement(tag, isEmpty, element);
-		if (!isEmpty) {
-			writeParameterBags(element);
+	protected void writeElement(String tag, Order order) throws XMLStreamException {
+		boolean empty = !order.hasParameterBags();
+		writeElement(tag, empty, (GroupedParameterizedElement) order);
+		if (!empty)
 			this.writer.writeEndElement();
+	}
+
+	protected void writeElement(String tag, Resource resource) throws XMLStreamException {
+		boolean empty = !resource.hasParameterBags() && !resource.hasTimedStates();
+		writeElement(tag, empty, (GroupedParameterizedElement) resource);
+
+		if (resource.hasTimedStates())
+			writeTimedStates(resource);
+
+		if (!empty)
+			this.writer.writeEndElement();
+	}
+
+	/**
+	 * @param resource
+	 * @throws XMLStreamException
+	 */
+	private void writeTimedStates(Resource resource) throws XMLStreamException {
+		List<StrolchTimedState<IValue<?>>> timedStates = resource.getTimedStates();
+		for (StrolchTimedState<IValue<?>> timedState : timedStates) {
+			ITimeVariable<IValue<?>> timeEvolution = timedState.getTimeEvolution();
+			SortedSet<ITimeValue<IValue<?>>> values = timeEvolution.getValues();
+
+			writeStartStrolchElement(Tags.TIMED_STATE, !values.isEmpty(), timedState);
+
+			for (ITimeValue<IValue<?>> timeValue : values) {
+				writer.writeEmptyElement(Tags.VALUE);
+				writer.writeAttribute(Tags.TIME, timeValue.getTime().toString());
+				writer.writeAttribute(Tags.VALUE, timeValue.getValue().getValueAsString());
+			}
+
+			if (!values.isEmpty())
+				writer.writeEndElement();
+		}
+	}
+
+	protected void writeElement(String tag, boolean empty, GroupedParameterizedElement element)
+			throws XMLStreamException {
+		writeStartStrolchElement(tag, empty, element);
+		if (!empty) {
+			writeParameterBags(element);
 		}
 	}
 
@@ -68,6 +118,19 @@ public abstract class AbstractToSaxWriterVisitor {
 		this.writer.writeAttribute(Tags.TYPE, element.getType());
 	}
 
+	protected void writeParameterBags(GroupedParameterizedElement element) throws XMLStreamException {
+		Set<String> bagKeySet = new TreeSet<>(element.getParameterBagKeySet());
+		for (String bagKey : bagKeySet) {
+			ParameterBag parameterBag = element.getParameterBag(bagKey);
+			boolean isEmpty = !parameterBag.hasParameters();
+			writeStartStrolchElement(Tags.PARAMETER_BAG, isEmpty, parameterBag);
+			if (!isEmpty) {
+				writeParameters(parameterBag);
+				this.writer.writeEndElement();
+			}
+		}
+	}
+
 	protected void writeParameters(ParameterizedElement element) throws XMLStreamException {
 
 		List<Parameter<?>> parameters = new ArrayList<>(element.getParameters());
@@ -80,10 +143,10 @@ public abstract class AbstractToSaxWriterVisitor {
 		for (Parameter<?> parameter : parameters) {
 			writeStartStrolchElement(Tags.PARAMETER, true, parameter);
 
-			if (!Parameter.INTERPRETATION_NONE.equals(parameter.getInterpretation())) {
+			if (!INTERPRETATION_NONE.equals(parameter.getInterpretation())) {
 				this.writer.writeAttribute(Tags.INTERPRETATION, parameter.getInterpretation());
 			}
-			if (!Parameter.UOM_NONE.equals(parameter.getUom())) {
+			if (!UOM_NONE.equals(parameter.getUom())) {
 				this.writer.writeAttribute(Tags.UOM, parameter.getUom());
 			}
 			if (parameter.isHidden()) {
@@ -94,19 +157,6 @@ public abstract class AbstractToSaxWriterVisitor {
 			}
 
 			this.writer.writeAttribute(Tags.VALUE, parameter.getValueAsString());
-		}
-	}
-
-	protected void writeParameterBags(GroupedParameterizedElement element) throws XMLStreamException {
-		Set<String> bagKeySet = new TreeSet<>(element.getParameterBagKeySet());
-		for (String bagKey : bagKeySet) {
-			ParameterBag parameterBag = element.getParameterBag(bagKey);
-			boolean isEmpty = !parameterBag.hasParameters();
-			writeStartStrolchElement(Tags.PARAMETER_BAG, isEmpty, parameterBag);
-			if (!isEmpty) {
-				writeParameters(parameterBag);
-				this.writer.writeEndElement();
-			}
 		}
 	}
 }

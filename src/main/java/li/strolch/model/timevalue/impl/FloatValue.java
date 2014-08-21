@@ -64,6 +64,11 @@ public class FloatValue implements IValue<Double>, Serializable {
 		return this.value;
 	}
 
+	@Override
+	public String getValueAsString() {
+		return this.value.toString();
+	}
+
 	@SuppressWarnings("nls")
 	@Override
 	public String toString() {

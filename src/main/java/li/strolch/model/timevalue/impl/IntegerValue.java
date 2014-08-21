@@ -65,6 +65,11 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 	public IntegerValue getInverse() {
 		return new IntegerValue(-getValue());
 	}
+	
+	@Override
+	public String getValueAsString() {
+		return this.value.toString();
+	}
 
 	@SuppressWarnings("nls")
 	@Override

@@ -15,8 +15,6 @@
  */
 package li.strolch.model;
 
-import ch.eitchnet.utils.dbc.DBC;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +38,7 @@ import li.strolch.model.parameter.StringParameter;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -194,10 +193,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	}
 
 	@Override
-	public void fillLocator(LocatorBuilder lb) {
-		this.parent.fillLocator(lb);
-		lb.append(this.id);
-	}
+	public abstract void fillLocator(LocatorBuilder lb);
 
 	@Override
 	public Locator getLocator() {

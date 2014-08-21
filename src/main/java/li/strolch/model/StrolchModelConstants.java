@@ -20,4 +20,15 @@ public class StrolchModelConstants {
 	 * to an {@link Order}
 	 */
 	public static final String INTERPRETATION_ORDER_REF = "Order-Ref"; //$NON-NLS-1$
+	
+
+	/**
+	 * This interpretation value indicates that the {@link Parameter} has no defined interpretation
+	 */
+	public static final String INTERPRETATION_NONE = "None"; //$NON-NLS-1$
+
+	/**
+	 * This uom value indicates that the {@link Parameter} has no defined uom
+	 */
+	public static final String UOM_NONE = "None"; //$NON-NLS-1$
 }
