@@ -32,7 +32,7 @@ public class RemoveParameterServiceTest extends AbstractRealmServiceTest {
 
 		RemoveParameterService svc = new RemoveParameterService();
 		RemoveParameterArg arg = new RemoveParameterArg();
-		arg.locator = Locator.valueOf("Resource/Ball/yellow/parameters/owner");
+		arg.locator = Locator.valueOf("Resource/Ball/yellow/Bag/parameters/owner");
 
 		runServiceInAllRealmTypes(svc, arg);
 	}

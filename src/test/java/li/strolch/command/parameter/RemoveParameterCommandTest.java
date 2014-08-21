@@ -34,7 +34,7 @@ public class RemoveParameterCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		this.locator = Locator.valueOf("Resource/Ball/yellow/parameters");
+		this.locator = Locator.valueOf("Resource/Ball/yellow/Bag/parameters");
 		this.parameterId = "owner";
 	}
 

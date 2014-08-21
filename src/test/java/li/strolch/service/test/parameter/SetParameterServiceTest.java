@@ -32,7 +32,7 @@ public class SetParameterServiceTest extends AbstractRealmServiceTest {
 
 		SetParameterService svc = new SetParameterService();
 		SetParameterArg arg = new SetParameterArg();
-		arg.locator = Locator.valueOf("Resource/Ball/yellow/parameters/owner");
+		arg.locator = Locator.valueOf("Resource/Ball/yellow/Bag/parameters/owner");
 		arg.name = "The Owner";
 		arg.interpretation = "Changing The Interpretation";
 		arg.uom = "Owners";

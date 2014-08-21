@@ -33,7 +33,7 @@ public class AddParameterServiceTest extends AbstractRealmServiceTest {
 
 		AddParameterService svc = new AddParameterService();
 		AddParameterArg arg = new AddParameterArg();
-		arg.locator = Locator.valueOf("Resource/Ball/yellow/parameters");
+		arg.locator = Locator.valueOf("Resource/Ball/yellow/Bag/parameters");
 		FloatParameter parameter = new FloatParameter("diameter", "Diameter", 22.0);
 		parameter.setInterpretation("Dimension");
 		parameter.setUom("cm");

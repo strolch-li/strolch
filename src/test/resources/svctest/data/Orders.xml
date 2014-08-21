@@ -54,5 +54,7 @@
 			<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
 			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
 		</ParameterBag>
+		<ParameterBag Id="@bag02" Name="Test Bag" Type="TestBag" />
 	</Order>
+	<Order Id="@4" Name="Test Name" Type="Something" Date="2013-11-20T07:42:57.699+01:00" State="CREATED" />
 </StrolchModel>

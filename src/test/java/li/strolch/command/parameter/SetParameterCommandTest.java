@@ -35,7 +35,7 @@ public class SetParameterCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		this.locator = Locator.valueOf("Resource/Ball/yellow/parameters/owner");
+		this.locator = Locator.valueOf("Resource/Ball/yellow/Bag/parameters/owner");
 		this.valueAsString = "someOtherDude";
 	}
 
