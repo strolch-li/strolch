@@ -71,18 +71,22 @@
                         <p>Strolch isn't feature complete by a long shot, but it sure has got many features which make it useable in a concrete project, thus making sure it is not vaporware =)</p>
                         <p>The following is a list of key features, many of which were driven by concrete project requirements:</p>
                         <ul>
+                            <li>Separate containers for models (mandates)</li>
                             <li>Parameterized model with full <a href="http://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUD</a> for Resource and Order objects</li>
                             <li>Timed values on Resources to map values by time</li>
-                            <li>Transparent runtime modes: TRANSIENT, CACHED, TRANSACTIONAL</li>
-                            <li>Separate containers for models (mandates)</li>
+                            <li>Built-in versioning of model - configurable by Realm</li>
+                            <li>Transparent runtime modes: TRANSIENT, CACHED, TRANSACTIONAL<sup>*</sup></li>
                             <li>Service and Command pattern for reusing functionality</li>
-                            <li><a href="https://github.com/eitchnet/ch.eitchnet.xmlpers">XML File based persistence layer</a></li>
-                            <li><a href="http://www.postgresql.org/">PostgreSQL</a> persistence layer</li>
+                            <li><a href="https://github.com/eitchnet/ch.eitchnet.xmlpers">XML File based persistence layer</a><sup>*</sup></li>
+                            <li><a href="http://www.postgresql.org/">PostgreSQL</a> persistence layer<sup>*</sup></li>
                             <li>Querying using a <a href="http://en.wikipedia.org/wiki/Fluent_API">fluent API</a></li>
+                            <li>Services to import and export a model to XML</li>
                             <li>Integrated authentication and authorization to validate user privileges using <a href="https://github.com/eitchnet/ch.eitchnet.privilege">Privilege</a></li>
                             <li>Ready to use <a href="http://en.wikipedia.org/wiki/Observer_pattern">Observer</a> pattern</li>
                             <li>(currently) Read-only <a href="http://en.wikipedia.org/wiki/Restful">REST</a> API to access the agent model remotely</li>
                             <li>Configurable environments</li>
+                            <li>Built-in audit trail</li>
+                            <li>Basic components required to <a href="https://github.com/eitchnet/ch.eitchnet.utils/tree/master/src/main/java/ch/eitchnet/communication">communicate</a> with external devices using TCP/IP</li>
                         </ul>
                         <p>With the light weight implementation, where there are basically no third party libraries required for the normal runtime, Strolch has a minimal foot print which allows it to run on small devices for instance a <a href="http://beagleboard.org/Products/BeagleBone+Black">BeagleBone Black</a>. Using the in-memory mode, it is an easy feat to set up test environments with little to no further requirements than the JVM.</p>
 
@@ -90,15 +94,19 @@
                         <p>So what is planned for the future? Although Strolch has quite a few interesting features, it is by no way feature complete. The greatest wish is for Strolch to become a community driven platform, so many new features will arise in the future, but at least one major future feature which will be tackled in the near future and will certainly drive the next major release is a planning and scheduling engine using a <a href="http://en.wikipedia.org/wiki/Gantt_chart">Gantt</a> chart to visualize the schedule.</p>
                         <p>The planning engine will use the timed values on Resources extensively to create a planning engine on which Workflows can be placed and allowing to detect violations and bottlenecks.</p>
                         <p>An extension of the planning of the scheduling engine will allow more than just placing Workflows on Resources, but actually searching groups of Resources for a time slot of when to place tasks. This will allow to use capacity constraints to plan and schedule workflows using different algorithms, and respecting calendars etc.</p>
+                        <p>Further time will be spent on giving Strolch it's own UI. Currently the idea is to use <a href="http://www.polymer-project.org/">Google's Polymer</a> to implement the UI, thus creating reusable widgets that can be used in projects.</p>
 
                         <h3>Take it for a spin</h3>
                         <p>So, now the important part is for new users to start using Strolch for their own projects. Go ahead, check out the
                             <a href="downloads.html">Downloads</a> page for the latest release and then checkout the two tutorial applications to get yourself up to speed!</p>
                         <p>Don't hesitate to send us feedback or questions, we will be delighted to help you get your Strolch-based application up and running, or provide feedback to your concerns!</p>
 
-                        Robert von Burg<br />
+                        <h3>Developers</h3>
+                        <p>Robert von Burg<br />
                         Reto Breitenmoser<br />
-                        Dr. Martin Smock<br />
+                        Dr. Martin Smock<br /></p>
+
+                        <p><sup>*</sup> Currently Transactional mode is missing concrete implementation for querying</p>
 
                     </div><!-- /.blog-post -->
 
