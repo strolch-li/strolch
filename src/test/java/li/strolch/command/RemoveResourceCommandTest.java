@@ -33,7 +33,7 @@ public class RemoveResourceCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		locator = Locator.newBuilder(Tags.RESOURCE).append("Enumeration").append("sex").build();
+		locator = Locator.newBuilder(Tags.RESOURCE, "Enumeration", "sex").build();
 	}
 
 	@Override

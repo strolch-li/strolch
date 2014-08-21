@@ -32,7 +32,7 @@ public class RemoveResourceServiceTest extends AbstractRealmServiceTest {
 
 		RemoveResourceService svc = new RemoveResourceService();
 		RemoveResourceArg arg = new RemoveResourceArg();
-		arg.locator = Locator.newBuilder(Tags.RESOURCE).append("Enumeration").append("sex").build();
+		arg.locator = Locator.newBuilder(Tags.RESOURCE, "Enumeration", "sex").build();
 
 		runServiceInAllRealmTypes(svc, arg);
 	}

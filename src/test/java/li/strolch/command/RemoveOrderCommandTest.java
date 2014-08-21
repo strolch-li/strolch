@@ -33,7 +33,7 @@ public class RemoveOrderCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		locator = Locator.newBuilder(Tags.ORDER).append("TestType").append("@3").build();
+		locator = Locator.newBuilder(Tags.ORDER, "TestType", "@3").build();
 	}
 
 	@Override

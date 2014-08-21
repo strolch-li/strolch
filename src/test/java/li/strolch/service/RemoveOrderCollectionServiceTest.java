@@ -36,9 +36,9 @@ public class RemoveOrderCollectionServiceTest extends AbstractRealmServiceTest {
 		RemoveOrderCollectionArg arg = new RemoveOrderCollectionArg();
 
 		ArrayList<Locator> locators = new ArrayList<>();
-		locators.add(Locator.newBuilder(Tags.ORDER).append("TestType").append("@1").build());
-		locators.add(Locator.newBuilder(Tags.ORDER).append("TestType").append("@2").build());
-		locators.add(Locator.newBuilder(Tags.ORDER).append("TestType").append("@3").build());
+		locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@1").build());
+		locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@2").build());
+		locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@3").build());
 
 		arg.locators = locators;
 

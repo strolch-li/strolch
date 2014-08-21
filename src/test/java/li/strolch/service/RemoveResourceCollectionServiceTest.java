@@ -36,9 +36,9 @@ public class RemoveResourceCollectionServiceTest extends AbstractRealmServiceTes
 		RemoveResourceCollectionArg arg = new RemoveResourceCollectionArg();
 
 		ArrayList<Locator> locators = new ArrayList<>();
-		locators.add(Locator.newBuilder(Tags.RESOURCE).append("Enumeration").append("salutations").build());
-		locators.add(Locator.newBuilder(Tags.RESOURCE).append("Enumeration").append("sex").build());
-		locators.add(Locator.newBuilder(Tags.RESOURCE).append("Enumeration").append("religions").build());
+		locators.add(Locator.newBuilder(Tags.RESOURCE, "Enumeration", "salutations").build());
+		locators.add(Locator.newBuilder(Tags.RESOURCE, "Enumeration", "sex").build());
+		locators.add(Locator.newBuilder(Tags.RESOURCE, "Enumeration", "religions").build());
 
 		arg.locators = locators;
 

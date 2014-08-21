@@ -37,9 +37,9 @@ public class RemoveOrderCollectionCommandTest extends AbstractRealmCommandTest {
 	@Before
 	public void before() {
 		locators = new ArrayList<>();
-		locators.add(Locator.newBuilder(Tags.ORDER).append("TestType").append("@1").build());
-		locators.add(Locator.newBuilder(Tags.ORDER).append("TestType").append("@2").build());
-		locators.add(Locator.newBuilder(Tags.ORDER).append("TestType").append("@3").build());
+		locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@1").build());
+		locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@2").build());
+		locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@3").build());
 	}
 
 	@Override

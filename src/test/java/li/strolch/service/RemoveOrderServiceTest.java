@@ -32,7 +32,7 @@ public class RemoveOrderServiceTest extends AbstractRealmServiceTest {
 
 		RemoveOrderService svc = new RemoveOrderService();
 		RemoveOrderArg arg = new RemoveOrderArg();
-		arg.locator = Locator.newBuilder(Tags.ORDER).append("TestType").append("@3").build();
+		arg.locator = Locator.newBuilder(Tags.ORDER, "TestType", "@3").build();
 
 		runServiceInAllRealmTypes(svc, arg);
 	}
