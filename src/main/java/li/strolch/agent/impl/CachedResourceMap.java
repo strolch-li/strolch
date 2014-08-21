@@ -1,13 +1,13 @@
 package li.strolch.agent.impl;
 
-import static li.strolch.runtime.StrolchConstants.INTERPRETATION_RESOURCE_REF;
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_RESOURCE_REF;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
-import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -23,7 +23,7 @@ public class CachedResourceMap extends CachedElementMap<Resource> implements Res
 			throw new StrolchException(msg);
 		}
 
-		if (refP.getUom().equals(Parameter.UOM_NONE)) {
+		if (refP.getUom().equals(UOM_NONE)) {
 			String msg = MessageFormat.format("{0} is not an Resource reference as its UOM is not set to a type!", //$NON-NLS-1$
 					refP.getLocator());
 			throw new StrolchException(msg);

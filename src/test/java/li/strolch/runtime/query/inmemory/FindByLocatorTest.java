@@ -24,6 +24,7 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.timedstate.IntegerTimedState;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 
@@ -45,21 +46,41 @@ public class FindByLocatorTest {
 		ComponentContainer container = agent.getContainer();
 
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
-			Locator locResStringParam = Locator.valueOf("Resource/TestType/MyTestResource/@bag01/@param5");
-			StringParameter resStringParam = tx.findElement(locResStringParam);
-			assertNotNull("Should have found a StringParameter with the locator " + locResStringParam, resStringParam);
 
-			Locator locOrderFloatParam = Locator.valueOf("Order/TestType/MyTestOrder/@bag01/@param2");
-			FloatParameter orderFloatP = tx.findElement(locOrderFloatParam);
-			assertNotNull("Should have found a FloatParameter with the locator " + locOrderFloatParam, orderFloatP);
-
-			Locator locOrderBag = Locator.valueOf("Order/TestType/MyTestOrder/@bag01");
-			ParameterBag orderBag = tx.findElement(locOrderBag);
-			assertNotNull("Should have found a FloatParameter with the locator " + locOrderBag, orderBag);
-
+			// Resource
 			Locator locResource = Locator.valueOf("Resource/TestType/MyTestResource");
 			Resource resource = tx.findElement(locResource);
 			assertNotNull("Should have found a FloatParameter with the locator " + locResource, resource);
+
+			// Order
+			Locator locOrderBag = Locator.valueOf("Order/TestType/MyTestOrder/Bag/@bag01");
+			ParameterBag orderBag = tx.findElement(locOrderBag);
+			assertNotNull("Should have found a FloatParameter with the locator " + locOrderBag, orderBag);
+
+			// Bag on Resource
+			Locator locResBag = Locator.valueOf("Resource/TestType/MyTestResource/Bag/@bag01");
+			ParameterBag resBag = tx.findElement(locResBag);
+			assertNotNull("Should have found a ParameterBag with the locator " + locResBag, resBag);
+
+			// Bag on Order
+			Locator locOrdBag = Locator.valueOf("Order/TestType/MyTestOrder/Bag/@bag01");
+			ParameterBag ordBag = tx.findElement(locOrdBag);
+			assertNotNull("Should have found a ParameterBag with the locator " + ordBag, locOrdBag);
+
+			// Parameter on Resource
+			Locator locResStringParam = Locator.valueOf("Resource/TestType/MyTestResource/Bag/@bag01/@param5");
+			StringParameter resStringParam = tx.findElement(locResStringParam);
+			assertNotNull("Should have found a StringParameter with the locator " + locResStringParam, resStringParam);
+
+			// Parameter on Order
+			Locator locOrderFloatParam = Locator.valueOf("Order/TestType/MyTestOrder/Bag/@bag01/@param2");
+			FloatParameter orderFloatP = tx.findElement(locOrderFloatParam);
+			assertNotNull("Should have found a FloatParameter with the locator " + locOrderFloatParam, orderFloatP);
+
+			// TimedState on Resource
+			Locator locResIntegerState = Locator.valueOf("Resource/TestType/MyTestResource/State/@integerState");
+			IntegerTimedState integerS = tx.findElement(locResIntegerState);
+			assertNotNull("Should have found a IntegerTimedState with the locator " + locResIntegerState, integerS);
 		}
 	}
 }

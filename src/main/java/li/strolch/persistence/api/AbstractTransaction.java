@@ -40,6 +40,8 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
+import li.strolch.model.timedstate.StrolchTimedState;
+import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.persistence.inmemory.InMemoryTransaction;
@@ -194,13 +196,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public <T extends StrolchElement> T findElement(Locator locator) {
 
+		// Resource/<type>/<id>
+		// Resource/<type>/<id>/Bag/<id>
+		// Resource/<type>/<id>/Bag/<id>/<param_id>
+		// Resource/<type>/<id>/State/<id>
+		// Order/<type>/<id>
+		// Order/<type>/<id>/Bag/<id>
+		// Order/<type>/<id>/Bag/<id>/<param_id>
+
 		if (locator.getSize() < 3) {
 			String msg = "The locator is invalid as it does not have at least three path elements (e.g. Resource/MyType/@id): {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, locator.toString());
-			throw new StrolchException(msg);
-		} else if (locator.getSize() > 5) {
-			// TODO handle state variables, which will probably be separated by an additional part so we can differentiate between parameters and state variables on a parameter bag
-			String msg = "The locator is invalid as it has more than 5 parts. The fifth part references a Parameter, which is the deepest fetchable entry: {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, locator.toString());
 			throw new StrolchException(msg);
 		}
@@ -229,19 +234,40 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (elements.size() == 3)
 			return (T) groupedParameterizedElement;
 
-		String parameterBagId = elements.get(3);
-		ParameterBag bag = groupedParameterizedElement.getParameterBag(parameterBagId);
-		if (bag == null) {
-			String msg = "Could not find ParameterBag for locator {0} on element {1}"; //$NON-NLS-1$
-			throw new StrolchException(MessageFormat.format(msg, locator, groupedParameterizedElement.getLocator()));
+		// state or bag
+		String stateOrBag = elements.get(3);
+		if (stateOrBag.equals(Tags.BAG)) {
+
+			String parameterBagId = elements.get(4);
+			ParameterBag bag = groupedParameterizedElement.getParameterBag(parameterBagId);
+			if (bag == null) {
+				String msg = "Could not find ParameterBag for locator {0} on element {1}"; //$NON-NLS-1$
+				throw new StrolchException(MessageFormat.format(msg, locator, groupedParameterizedElement.getLocator()));
+			}
+
+			if (elements.size() == 5)
+				return (T) bag;
+
+			String parameterId = elements.get(5);
+			Parameter<?> parameter = bag.getParameter(parameterId);
+			return (T) parameter;
+
+		} else if (stateOrBag.equals(Tags.STATE)) {
+
+			if (elements.size() != 5) {
+				String msg = "Missing state Id on locator {0}"; //$NON-NLS-1$
+				throw new StrolchException(MessageFormat.format(msg, locator));
+			}
+
+			Resource resource = (Resource) groupedParameterizedElement;
+			String stateId = elements.get(4);
+
+			StrolchTimedState<IValue<?>> timedState = resource.getTimedState(stateId);
+			return (T) timedState;
 		}
 
-		if (elements.size() == 4)
-			return (T) bag;
-
-		String parameterId = elements.get(4);
-		Parameter<?> parameter = bag.getParameter(parameterId);
-		return (T) parameter;
+		String msg = "Invalid locator {0} on with part {1}"; //$NON-NLS-1$
+		throw new StrolchException(MessageFormat.format(msg, locator, stateOrBag));
 	}
 
 	@Override

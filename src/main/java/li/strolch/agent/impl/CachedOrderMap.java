@@ -1,13 +1,13 @@
 package li.strolch.agent.impl;
 
-import static li.strolch.runtime.StrolchConstants.INTERPRETATION_ORDER_REF;
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ORDER_REF;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.OrderMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
-import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -22,7 +22,7 @@ public class CachedOrderMap extends CachedElementMap<Order> implements OrderMap 
 			throw new StrolchException(MessageFormat.format(msg, refP.getLocator(), INTERPRETATION_ORDER_REF));
 		}
 
-		if (refP.getUom().equals(Parameter.UOM_NONE)) {
+		if (refP.getUom().equals(UOM_NONE)) {
 			String msg = "{0} is not an Order reference as its UOM is not set to a type!"; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, refP.getLocator()));
 		}
