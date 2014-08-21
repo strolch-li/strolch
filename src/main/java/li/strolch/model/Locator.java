@@ -275,6 +275,18 @@ public class Locator {
 	}
 
 	/**
+	 * Creates a new {@link LocatorBuilder} instance and appends the given elements to it
+	 *
+	 * @param path
+	 *            the first element on the {@link Locator}
+	 *
+	 * @return a new {@link LocatorBuilder} instance with the given root element tag as the first element
+	 */
+	public static LocatorBuilder newBuilder(String... path) {
+		return new LocatorBuilder().append(path);
+	}
+
+	/**
 	 * Creates a new {@link LocatorBuilder} instance and appends the given root element tag to it
 	 *
 	 * @param rootElement
@@ -301,6 +313,21 @@ public class Locator {
 		 */
 		public LocatorBuilder() {
 			this.pathElements = new ArrayList<String>();
+		}
+
+		/**
+		 * Append the given elements to the path
+		 *
+		 * @param path
+		 *            the path elements to add
+		 *
+		 * @return this instance for chaining
+		 */
+		public LocatorBuilder append(String... path) {
+			for (String element : path) {
+				this.pathElements.add(element);
+			}
+			return this;
 		}
 
 		/**
