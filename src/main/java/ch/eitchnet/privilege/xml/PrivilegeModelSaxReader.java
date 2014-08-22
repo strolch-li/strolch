@@ -206,7 +206,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 
 //	<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
 //	  <Firstname>Application</Firstname>
-//	  <Surname>Administrator</Surname>
+//	  <Lastname>Administrator</Lastname>
 //	  <State>ENABLED</State>
 //	  <Locale>en_GB</Locale>
 //	  <Roles>
@@ -227,7 +227,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 		String username;
 		String password;
 		String firstName;
-		String surname;
+		String lastname;
 		UserState userState;
 		Locale locale;
 		Set<String> userRoles;
@@ -259,8 +259,8 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 
 			if (qName.equals(XmlConstants.XML_FIRSTNAME)) {
 				this.firstName = this.text.toString().trim();
-			} else if (qName.equals(XmlConstants.XML_SURNAME)) {
-				this.surname = this.text.toString().trim();
+			} else if (qName.equals(XmlConstants.XML_LASTNAME)) {
+				this.lastname = this.text.toString().trim();
 			} else if (qName.equals(XmlConstants.XML_STATE)) {
 				this.userState = UserState.valueOf(this.text.toString().trim());
 			} else if (qName.equals(XmlConstants.XML_LOCALE)) {
@@ -269,7 +269,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 				this.userRoles.add(this.text.toString().trim());
 			} else if (qName.equals(XmlConstants.XML_USER)) {
 
-				User user = new User(this.userId, this.username, this.password, this.firstName, this.surname,
+				User user = new User(this.userId, this.username, this.password, this.firstName, this.lastname,
 						this.userState, this.userRoles, this.locale, this.parameters);
 				logger.info(MessageFormat.format("New User: {0}", user)); //$NON-NLS-1$
 				getUsers().add(user);

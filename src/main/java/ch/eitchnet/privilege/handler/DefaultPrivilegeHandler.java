@@ -129,7 +129,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String selUserId = selectorRep.getUserId();
 		String selUsername = selectorRep.getUsername();
 		String selFirstname = selectorRep.getFirstname();
-		String selSurname = selectorRep.getSurname();
+		String selLastname = selectorRep.getLastname();
 		UserState selUserState = selectorRep.getUserState();
 		Locale selLocale = selectorRep.getLocale();
 		Set<String> selRoles = selectorRep.getRoles();
@@ -143,7 +143,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			boolean userIdSelected;
 			boolean usernameSelected;
 			boolean firstnameSelected;
-			boolean surnameSelected;
+			boolean lastnameSelected;
 			boolean userStateSelected;
 			boolean localeSelected;
 			boolean roleSelected;
@@ -173,13 +173,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			else
 				firstnameSelected = false;
 
-			// surname
-			if (selSurname == null)
-				surnameSelected = true;
-			else if (selSurname.equals(user.getSurname()))
-				surnameSelected = true;
+			// lastname
+			if (selLastname == null)
+				lastnameSelected = true;
+			else if (selLastname.equals(user.getLastname()))
+				lastnameSelected = true;
 			else
-				surnameSelected = false;
+				lastnameSelected = false;
 
 			// user state
 			if (selUserState == null)
@@ -203,7 +203,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// properties
 			propertySelected = isSelectedByProperty(selPropertyMap, user.getProperties());
 
-			boolean selected = userIdSelected && usernameSelected && firstnameSelected && surnameSelected
+			boolean selected = userIdSelected && usernameSelected && firstnameSelected && lastnameSelected
 					&& userStateSelected && localeSelected && roleSelected && propertySelected;
 
 			if (selected)
@@ -303,7 +303,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// create new user
 			User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(),
-					userRep.getSurname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
+					userRep.getLastname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
 					userRep.getProperties());
 
 			// delegate to persistence handler
@@ -387,7 +387,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		newRoles.add(roleName);
 
 		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
-				user.getSurname(), user.getUserState(), newRoles, user.getLocale(), user.getProperties());
+				user.getLastname(), user.getUserState(), newRoles, user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -467,7 +467,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Set<String> newRoles = new HashSet<String>(currentRoles);
 		newRoles.remove(roleName);
 		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
-				user.getSurname(), user.getUserState(), newRoles, user.getLocale(), user.getProperties());
+				user.getLastname(), user.getUserState(), newRoles, user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -505,14 +505,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
-				user.getSurname(), user.getUserState(), user.getRoles(), locale, user.getProperties());
+				user.getLastname(), user.getUserState(), user.getRoles(), locale, user.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
 	}
 
 	@Override
-	public void setUserName(Certificate certificate, String username, String firstname, String surname) {
+	public void setUserName(Certificate certificate, String username, String firstname, String lastname) {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -524,7 +524,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), firstname, surname,
+		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), firstname, lastname,
 				user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
@@ -569,7 +569,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// create new user
 			User newUser = new User(user.getUserId(), user.getUsername(), passwordHash, user.getFirstname(),
-					user.getSurname(), user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties());
+					user.getLastname(), user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties());
 
 			// delegate user replacement to persistence handler
 			this.persistenceHandler.addOrReplaceUser(newUser);
@@ -598,7 +598,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
-				user.getSurname(), state, user.getRoles(), user.getLocale(), user.getProperties());
+				user.getLastname(), state, user.getRoles(), user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.addOrReplaceUser(newUser);
@@ -673,8 +673,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String sessionId = nextSessionId();
 
 			// create a new certificate, with details of the user
-			certificate = new Certificate(sessionId, System.currentTimeMillis(), username, authToken, user.getLocale(),
-					new HashMap<String, String>(user.getProperties()));
+			certificate = new Certificate(sessionId, System.currentTimeMillis(), username, user.getFirstname(),
+					user.getLastname(), authToken, user.getLocale(), new HashMap<String, String>(user.getProperties()));
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1055,7 +1055,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create a new certificate, with details of the user
 		Certificate systemUserCertificate = new Certificate(sessionId, System.currentTimeMillis(), systemUsername,
-				authToken, user.getLocale(), new HashMap<String, String>(user.getProperties()));
+				null, null, authToken, user.getLocale(), new HashMap<String, String>(user.getProperties()));
 
 		// create and save a new privilege context
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);

@@ -45,7 +45,7 @@ Copyright 2013 Robert von Burg &lt;eitch@eitchnet.ch&gt;
 		<sequence>
 			
 			<element type="string" name="Firstname" minOccurs="1" maxOccurs="1" />
-			<element type="string" name="Surname" minOccurs="1" maxOccurs="1" />
+			<element type="string" name="Lastname" minOccurs="1" maxOccurs="1" />
 			<element type="string" name="State" minOccurs="1" maxOccurs="1" />
 			<element type="string" name="Locale" minOccurs="0" maxOccurs="1" />
 			

@@ -39,7 +39,7 @@ public class UserRep implements Serializable {
 	private final String userId;
 	private String username;
 	private String firstname;
-	private String surname;
+	private String lastname;
 	private UserState userState;
 	private Set<String> roles;
 	private Locale locale;
@@ -54,8 +54,8 @@ public class UserRep implements Serializable {
 	 *            the user's login name
 	 * @param firstname
 	 *            the user's first name
-	 * @param surname
-	 *            the user's surname
+	 * @param lastname
+	 *            the user's last name
 	 * @param userState
 	 *            the user's {@link UserState}
 	 * @param roles
@@ -65,12 +65,12 @@ public class UserRep implements Serializable {
 	 * @param propertyMap
 	 *            a {@link Map} containing string value pairs of properties for this user
 	 */
-	public UserRep(String userId, String username, String firstname, String surname, UserState userState,
+	public UserRep(String userId, String username, String firstname, String lastname, UserState userState,
 			Set<String> roles, Locale locale, Map<String, String> propertyMap) {
 		this.userId = userId;
 		this.username = username;
 		this.firstname = firstname;
-		this.surname = surname;
+		this.lastname = lastname;
 		this.userState = userState;
 		this.roles = roles;
 		this.locale = locale;
@@ -97,8 +97,8 @@ public class UserRep implements Serializable {
 			if (StringHelper.isEmpty(this.firstname))
 				throw new PrivilegeException("firstname is null or empty"); //$NON-NLS-1$
 
-			if (StringHelper.isEmpty(this.surname))
-				throw new PrivilegeException("surname is null or empty"); //$NON-NLS-1$
+			if (StringHelper.isEmpty(this.lastname))
+				throw new PrivilegeException("lastname is null or empty"); //$NON-NLS-1$
 		}
 
 		if (this.roles == null)
@@ -143,18 +143,18 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @return the surname
+	 * @return the lastname
 	 */
-	public String getSurname() {
-		return this.surname;
+	public String getLastname() {
+		return this.lastname;
 	}
 
 	/**
-	 * @param surname
-	 *            the surname to set
+	 * @param lastname
+	 *            the lastname to set
 	 */
-	public void setSurname(String surname) {
-		this.surname = surname;
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
 	}
 
 	/**
@@ -259,8 +259,8 @@ public class UserRep implements Serializable {
 		builder.append(this.username);
 		builder.append(", firstname=");
 		builder.append(this.firstname);
-		builder.append(", surname=");
-		builder.append(this.surname);
+		builder.append(", lastname=");
+		builder.append(this.lastname);
 		builder.append(", userState=");
 		builder.append(this.userState);
 		builder.append(", locale=");

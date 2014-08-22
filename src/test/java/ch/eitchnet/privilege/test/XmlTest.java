@@ -183,7 +183,7 @@ public class XmlTest {
 		assertEquals("admin", admin.getUsername());
 		assertEquals("8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", admin.getPassword());
 		assertEquals("Application", admin.getFirstname());
-		assertEquals("Administrator", admin.getSurname());
+		assertEquals("Administrator", admin.getLastname());
 		assertEquals(UserState.ENABLED, admin.getUserState());
 		assertEquals("en_gb", admin.getLocale().toString());
 		assertThat(admin.getRoles(), containsInAnyOrder("PrivilegeAdmin", "AppUser"));
@@ -198,7 +198,7 @@ public class XmlTest {
 		assertEquals("system_admin", systemAdmin.getUsername());
 		assertEquals(null, systemAdmin.getPassword());
 		assertEquals("System User", systemAdmin.getFirstname());
-		assertEquals("Administrator", systemAdmin.getSurname());
+		assertEquals("Administrator", systemAdmin.getLastname());
 		assertEquals(UserState.SYSTEM, systemAdmin.getUserState());
 		assertEquals("en_gb", systemAdmin.getLocale().toString());
 		assertThat(systemAdmin.getRoles(), containsInAnyOrder("system_admin_privileges"));
@@ -338,6 +338,6 @@ public class XmlTest {
 		configSaxWriter.write();
 
 		String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(modelFile));
-		assertEquals("a2127d20a61e00bcdbb61569cd2b200c4f0f111c972bac3b1e54df3b2fcdc8be", fileHash);
+		assertEquals("c9732a05bf0ed53d89b3d12e7c8d7216150b6a91412d1bf47fbe3e6f3be750ff", fileHash);
 	}
 }

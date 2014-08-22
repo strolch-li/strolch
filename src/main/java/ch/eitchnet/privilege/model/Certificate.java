@@ -40,6 +40,8 @@ public final class Certificate implements Serializable {
 	private final String sessionId;
 	private final long loginTime;
 	private final String username;
+	private final String firstname;
+	private final String lastname;
 	private final String authToken;
 
 	private Locale locale;
@@ -59,6 +61,10 @@ public final class Certificate implements Serializable {
 	 *            the users session id
 	 * @param username
 	 *            the users login name
+	 * @param firstname
+	 *            the users first name
+	 * @param lastname
+	 *            the users last name
 	 * @param authToken
 	 *            the authentication token defining the users unique session and is a private field of this certificate.
 	 * @param locale
@@ -67,8 +73,8 @@ public final class Certificate implements Serializable {
 	 *            a {@link Map} containing string value pairs of properties for the logged in user. These properties can
 	 *            be edited and can be used for the user to change settings of this session
 	 */
-	public Certificate(String sessionId, long loginTime, String username, String authToken, Locale locale,
-			Map<String, String> propertyMap) {
+	public Certificate(String sessionId, long loginTime, String username, String firstname, String lastname,
+			String authToken, Locale locale, Map<String, String> propertyMap) {
 
 		// validate arguments are not null
 		if (StringHelper.isEmpty(sessionId)) {
@@ -84,6 +90,8 @@ public final class Certificate implements Serializable {
 		this.sessionId = sessionId;
 		this.loginTime = loginTime;
 		this.username = username;
+		this.firstname = firstname;
+		this.lastname = lastname;
 		this.authToken = authToken;
 
 		// if no locale is given, set default
@@ -148,6 +156,20 @@ public final class Certificate implements Serializable {
 	}
 
 	/**
+	 * @return the firstname
+	 */
+	public String getFirstname() {
+		return this.firstname;
+	}
+
+	/**
+	 * @return the lastname
+	 */
+	public String getLastname() {
+		return this.lastname;
+	}
+
+	/**
 	 * @return the loginTime
 	 */
 	public long getLoginTime() {
@@ -176,6 +198,17 @@ public final class Certificate implements Serializable {
 		builder.append(this.sessionId);
 		builder.append(", username=");
 		builder.append(this.username);
+
+		if (StringHelper.isNotEmpty(this.firstname)) {
+			builder.append(", firstname=");
+			builder.append(this.firstname);
+		}
+
+		if (StringHelper.isNotEmpty(this.lastname)) {
+			builder.append(", lastname=");
+			builder.append(this.lastname);
+		}
+
 		builder.append(", locale=");
 		builder.append(this.locale);
 		builder.append("]");

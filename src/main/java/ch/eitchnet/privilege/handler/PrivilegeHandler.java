@@ -256,7 +256,7 @@ public interface PrivilegeHandler {
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
-	 * Changes the name of the user. This changes the first name and the surname. If either value is null, then that
+	 * Changes the name of the user. This changes the first name and the lastname. If either value is null, then that
 	 * value is not changed
 	 * 
 	 * @param certificate
@@ -265,15 +265,15 @@ public interface PrivilegeHandler {
 	 *            the username of the {@link User} for which the name is to be changed
 	 * @param firstname
 	 *            the new first name
-	 * @param surname
-	 *            the new surname
+	 * @param lastname
+	 *            the new lastname
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public void setUserName(Certificate certificate, String username, String firstname, String surname)
+	public void setUserName(Certificate certificate, String username, String firstname, String lastname)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**

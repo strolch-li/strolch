@@ -134,9 +134,9 @@ public class XmlConstants {
 	public static final String XML_FIRSTNAME = "Firstname";
 
 	/**
-	 * XML_SURNAME = "Surname" :
+	 * XML_LASTNAME = "Lastname" :
 	 */
-	public static final String XML_SURNAME = "Surname";
+	public static final String XML_LASTNAME = "Lastname";
 
 	/**
 	 * XML_STATE = "State" :

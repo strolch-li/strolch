@@ -72,10 +72,10 @@ public class PrivilegeModelDomWriter {
 			firstnameElement.setTextContent(user.getFirstname());
 			userElement.appendChild(firstnameElement);
 
-			// add surname element
-			Element surnameElement = doc.createElement(XmlConstants.XML_SURNAME);
-			surnameElement.setTextContent(user.getSurname());
-			userElement.appendChild(surnameElement);
+			// add lastname element
+			Element lastnameElement = doc.createElement(XmlConstants.XML_LASTNAME);
+			lastnameElement.setTextContent(user.getLastname());
+			userElement.appendChild(lastnameElement);
 
 			// add state element
 			Element stateElement = doc.createElement(XmlConstants.XML_STATE);

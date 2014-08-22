@@ -29,7 +29,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * This class defines the actual login information for a given user which can be granted privileges. Every user is
- * granted a set of {@link Role}s and has a {@link UserState} including detail information like first name and surname
+ * granted a set of {@link Role}s and has a {@link UserState} including detail information like first name and lastname
  * 
  * <p>
  * Note: This is an internal object which is not to be serialized or passed to clients, {@link UserRep}s are used for
@@ -46,7 +46,7 @@ public final class User {
 	private final String password;
 
 	private final String firstname;
-	private final String surname;
+	private final String lastname;
 
 	private final UserState userState;
 
@@ -67,8 +67,8 @@ public final class User {
 	 *            the user's password (hashed)
 	 * @param firstname
 	 *            the user's first name
-	 * @param surname
-	 *            the user's surname
+	 * @param lastname
+	 *            the user's lastname
 	 * @param userState
 	 *            the user's {@link UserState}
 	 * @param roles
@@ -78,7 +78,7 @@ public final class User {
 	 * @param propertyMap
 	 *            a {@link Map} containing string value pairs of properties for this user
 	 */
-	public User(String userId, String username, String password, String firstname, String surname, UserState userState,
+	public User(String userId, String username, String password, String firstname, String lastname, UserState userState,
 			Set<String> roles, Locale locale, Map<String, String> propertyMap) {
 
 		if (StringHelper.isEmpty(userId)) {
@@ -91,8 +91,8 @@ public final class User {
 			throw new PrivilegeException("No username defined!"); //$NON-NLS-1$
 		}
 		if (userState != UserState.SYSTEM) {
-			if (StringHelper.isEmpty(surname)) {
-				throw new PrivilegeException("No surname defined!"); //$NON-NLS-1$
+			if (StringHelper.isEmpty(lastname)) {
+				throw new PrivilegeException("No lastname defined!"); //$NON-NLS-1$
 			}
 			if (StringHelper.isEmpty(firstname)) {
 				throw new PrivilegeException("No firstname defined!"); //$NON-NLS-1$
@@ -111,7 +111,7 @@ public final class User {
 		this.userState = userState;
 
 		this.firstname = firstname;
-		this.surname = surname;
+		this.lastname = lastname;
 
 		if (roles == null)
 			this.roles = Collections.emptySet();
@@ -153,17 +153,17 @@ public final class User {
 	}
 
 	/**
-	 * @return the firstname
+	 * @return the first name
 	 */
 	public String getFirstname() {
 		return this.firstname;
 	}
 
 	/**
-	 * @return the surname
+	 * @return the last name
 	 */
-	public String getSurname() {
-		return this.surname;
+	public String getLastname() {
+		return this.lastname;
 	}
 
 	/**
@@ -233,7 +233,7 @@ public final class User {
 	 * @return a {@link UserRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public UserRep asUserRep() {
-		return new UserRep(this.userId, this.username, this.firstname, this.surname, this.userState,
+		return new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState,
 				new HashSet<String>(this.roles), this.locale, new HashMap<String, String>(this.propertyMap));
 	}
 
@@ -252,8 +252,8 @@ public final class User {
 		builder.append(this.username);
 		builder.append(", firstname=");
 		builder.append(this.firstname);
-		builder.append(", surname=");
-		builder.append(this.surname);
+		builder.append(", lastname=");
+		builder.append(this.lastname);
 		builder.append(", locale=");
 		builder.append(this.locale);
 		builder.append(", userState=");

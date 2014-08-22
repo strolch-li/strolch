@@ -5,7 +5,7 @@
 
 		<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
 			<Firstname>Application</Firstname>
-			<Surname>Administrator</Surname>
+			<Lastname>Administrator</Lastname>
 			<State>ENABLED</State>
 			<Locale>en_GB</Locale>
 			<Roles>
@@ -20,7 +20,7 @@
 
 		<User userId="2" username="system_admin">
 			<Firstname>System User</Firstname>
-			<Surname>Administrator</Surname>
+			<Lastname>Administrator</Lastname>
 			<State>SYSTEM</State>
 			<Locale>en_GB</Locale>
 			<Roles>
@@ -30,7 +30,7 @@
 
 		<User userId="3" username="system_admin2">
 			<Firstname>System User</Firstname>
-			<Surname>Administrator</Surname>
+			<Lastname>Administrator</Lastname>
 			<State>SYSTEM</State>
 			<Locale>en_GB</Locale>
 			<Roles>
