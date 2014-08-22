@@ -90,14 +90,16 @@ public class UserRep implements Serializable {
 		if (StringHelper.isEmpty(this.username))
 			throw new PrivilegeException("username is null or empty"); //$NON-NLS-1$
 
-		if (StringHelper.isEmpty(this.firstname))
-			throw new PrivilegeException("firstname is null or empty"); //$NON-NLS-1$
-
-		if (StringHelper.isEmpty(this.surname))
-			throw new PrivilegeException("surname is null or empty"); //$NON-NLS-1$
-
 		if (this.userState == null)
 			throw new PrivilegeException("userState is null"); //$NON-NLS-1$
+
+		if (this.userState != UserState.SYSTEM) {
+			if (StringHelper.isEmpty(this.firstname))
+				throw new PrivilegeException("firstname is null or empty"); //$NON-NLS-1$
+
+			if (StringHelper.isEmpty(this.surname))
+				throw new PrivilegeException("surname is null or empty"); //$NON-NLS-1$
+		}
 
 		if (this.roles == null)
 			throw new PrivilegeException("roles is null"); //$NON-NLS-1$

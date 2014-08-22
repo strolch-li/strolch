@@ -84,17 +84,19 @@ public final class User {
 		if (StringHelper.isEmpty(userId)) {
 			throw new PrivilegeException("No UserId defined!"); //$NON-NLS-1$
 		}
+		if (userState == null) {
+			throw new PrivilegeException("No userState defined!"); //$NON-NLS-1$
+		}
 		if (StringHelper.isEmpty(username)) {
 			throw new PrivilegeException("No username defined!"); //$NON-NLS-1$
 		}
-		if (StringHelper.isEmpty(firstname)) {
-			throw new PrivilegeException("No firstname defined!"); //$NON-NLS-1$
-		}
-		if (StringHelper.isEmpty(surname)) {
-			throw new PrivilegeException("No surname defined!"); //$NON-NLS-1$
-		}
-		if (userState == null) {
-			throw new PrivilegeException("No userState defined!"); //$NON-NLS-1$
+		if (userState != UserState.SYSTEM) {
+			if (StringHelper.isEmpty(surname)) {
+				throw new PrivilegeException("No surname defined!"); //$NON-NLS-1$
+			}
+			if (StringHelper.isEmpty(firstname)) {
+				throw new PrivilegeException("No firstname defined!"); //$NON-NLS-1$
+			}
 		}
 
 		// password may be null, meaning not able to login
