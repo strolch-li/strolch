@@ -641,12 +641,21 @@ public class StringHelper {
 	 * @return a pseudo unique id
 	 */
 	public static synchronized String getUniqueId() {
+		return Long.toString(getUniqueIdLong());
+	}
+
+	/**
+	 * Return a pseudo unique id which is incremented on each call. The id is initialized from the current time
+	 * 
+	 * @return a pseudo unique id
+	 */
+	public static synchronized long getUniqueIdLong() {
 
 		if (uniqueId == Long.MAX_VALUE - 1) {
 			uniqueId = 0;
 		}
 
 		uniqueId += 1;
-		return Long.toString(uniqueId);
+		return uniqueId;
 	}
 }
