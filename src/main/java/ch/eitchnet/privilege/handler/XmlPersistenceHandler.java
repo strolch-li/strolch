@@ -189,6 +189,19 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		logger.info(MessageFormat.format("Read {0} Users", this.userMap.size())); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Read {0} Roles", this.roleMap.size())); //$NON-NLS-1$
 
+		// validate referenced roles exist
+		for (User user : users) {
+			for (String roleName : user.getRoles()) {
+
+				// validate that role exists
+				if (getRole(roleName) == null) {
+					String msg = "Role {0} does not exist referenced by user {1}";
+					msg = MessageFormat.format(msg, roleName, user.getUsername()); //$NON-NLS-1$
+					throw new PrivilegeException(msg);
+				}
+			}
+		}
+
 		// validate we have a user with PrivilegeAdmin access
 		boolean privilegeAdminExists = false;
 		for (String username : this.userMap.keySet()) {
