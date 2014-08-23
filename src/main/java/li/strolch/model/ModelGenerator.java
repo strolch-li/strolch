@@ -15,13 +15,16 @@
  */
 package li.strolch.model;
 
-import ch.eitchnet.utils.helper.StringHelper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+
+import li.strolch.model.audit.AccessType;
+import li.strolch.model.audit.Audit;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.FloatParameter;
@@ -41,6 +44,7 @@ import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.StringSetValue;
 import li.strolch.model.timevalue.impl.ValueChange;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * Class which can be used to generate objects which implement {@link StrolchElement}. These generated classes can then
@@ -117,9 +121,12 @@ public class ModelGenerator {
 	 * Creates an {@link Resource} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param id the id of the {@link Resource}
-	 * @param name the name of the {@link Resource}
-	 * @param type the type of the {@link Resource}
+	 * @param id
+	 *            the id of the {@link Resource}
+	 * @param name
+	 *            the name of the {@link Resource}
+	 * @param type
+	 *            the type of the {@link Resource}
 	 *
 	 * @return the newly created {@link Resource}
 	 */
@@ -135,7 +142,8 @@ public class ModelGenerator {
 	/**
 	 * Creates {@link StrolchTimedState} instances and adds them to the {@link Resource}
 	 *
-	 * @param resource the resource to which to addd the newly created {@link StrolchTimedState}
+	 * @param resource
+	 *            the resource to which to addd the newly created {@link StrolchTimedState}
 	 */
 	public static void addTimedStates(Resource resource) {
 
@@ -150,8 +158,7 @@ public class ModelGenerator {
 
 		// integer state
 		IntegerTimedState integerTimedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
-		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_0,
-				new IntegerValue(STATE_INTEGER_TIME_0)));
+		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 		IntegerValue integerValueChange = new IntegerValue(STATE_INTEGER_TIME_10);
 		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_10, integerValueChange));
 		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_20, integerValueChange));
@@ -160,8 +167,7 @@ public class ModelGenerator {
 
 		// boolean state
 		BooleanTimedState booleanTimedState = new BooleanTimedState(STATE_BOOLEAN_ID, STATE_BOOLEAN_NAME);
-		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_0,
-				new BooleanValue(STATE_BOOLEAN_TIME_0)));
+		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new BooleanValue(STATE_BOOLEAN_TIME_0)));
 		BooleanValue booleanValueChange = new BooleanValue(STATE_BOOLEAN_TIME_10);
 		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_10, booleanValueChange));
 		booleanValueChange = booleanValueChange.getInverse();
@@ -207,11 +213,16 @@ public class ModelGenerator {
 	 * Creates a list of {@link Resource Resources} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param idStart id range start
-	 * @param count the number of elements to create
-	 * @param idPrefix the prefix to generate IDs for the {@link Resource Resources}
-	 * @param name the name of the {@link Resource}
-	 * @param type the type of the {@link Resource}
+	 * @param idStart
+	 *            id range start
+	 * @param count
+	 *            the number of elements to create
+	 * @param idPrefix
+	 *            the prefix to generate IDs for the {@link Resource Resources}
+	 * @param name
+	 *            the name of the {@link Resource}
+	 * @param type
+	 *            the type of the {@link Resource}
 	 *
 	 * @return the list of newly created {@link Resource Resources}
 	 */
@@ -228,9 +239,12 @@ public class ModelGenerator {
 	 * Creates an {@link Order} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param id the id of the {@link Order}
-	 * @param name the name of the {@link Order}
-	 * @param type the type of the {@link Order}
+	 * @param id
+	 *            the id of the {@link Order}
+	 * @param name
+	 *            the name of the {@link Order}
+	 * @param type
+	 *            the type of the {@link Order}
 	 *
 	 * @return the newly created {@link Order}
 	 */
@@ -242,11 +256,16 @@ public class ModelGenerator {
 	 * Creates an {@link Order} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param id the id of the {@link Order}
-	 * @param name the name of the {@link Order}
-	 * @param type the type of the {@link Order}
-	 * @param date the date of the {@link Order}
-	 * @param state the {@link State} of the {@link Order}
+	 * @param id
+	 *            the id of the {@link Order}
+	 * @param name
+	 *            the name of the {@link Order}
+	 * @param type
+	 *            the type of the {@link Order}
+	 * @param date
+	 *            the date of the {@link Order}
+	 * @param state
+	 *            the {@link State} of the {@link Order}
 	 *
 	 * @return the newly created {@link Order}
 	 */
@@ -263,11 +282,16 @@ public class ModelGenerator {
 	 * Creates a list of {@link Order Orders} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param idStart id range start
-	 * @param count the number of elements to create
-	 * @param idPrefix the prefix to generate IDs for the {@link Order Orders}
-	 * @param name the name of the {@link Order}
-	 * @param type the type of the {@link Order}
+	 * @param idStart
+	 *            id range start
+	 * @param count
+	 *            the number of elements to create
+	 * @param idPrefix
+	 *            the prefix to generate IDs for the {@link Order Orders}
+	 * @param name
+	 *            the name of the {@link Order}
+	 * @param type
+	 *            the type of the {@link Order}
 	 *
 	 * @return the list of newly created {@link Order Orders}
 	 */
@@ -284,9 +308,12 @@ public class ModelGenerator {
 	 * Creates a {@link ParameterBag} with the given values and calls {@link #addAllParameters(ParameterBag)} to add
 	 * {@link Parameter}s
 	 *
-	 * @param id the id of the {@link ParameterBag}
-	 * @param name the name of the {@link ParameterBag}
-	 * @param type the type of the {@link ParameterBag}
+	 * @param id
+	 *            the id of the {@link ParameterBag}
+	 * @param name
+	 *            the name of the {@link ParameterBag}
+	 * @param type
+	 *            the type of the {@link ParameterBag}
 	 *
 	 * @return the newly created {@link ParameterBag}
 	 */
@@ -344,5 +371,34 @@ public class ModelGenerator {
 				stringList);
 		stringListP.setIndex(7);
 		bag.addParameter(stringListP);
+	}
+
+	private static String randomValue(Random rand, String[] values) {
+		return values[rand.nextInt(values.length)];
+	}
+
+	public static Audit randomAudit() {
+
+		Random rand = new Random(234234L);
+		String[] usernames = new String[] { "bob", "alice", "jenny" };
+		String[] firstnames = new String[] { "Bob", "Alice", "Jenny" };
+		String[] lastnames = new String[] { "Richards", "Kennedy", "Davids" };
+		String[] types = new String[] { Tags.RESOURCE, Tags.ORDER, Tags.AUDIT };
+		String[] actions = new String[] { "AddResourceService", "UpdateResourceService", "RemoveResourceService",
+				"AddOrderService", "UpdateOrderService", "RemoveOrderService" };
+
+		Audit audit = new Audit();
+		audit.setId(StringHelper.getUniqueIdLong());
+		audit.setUsername(randomValue(rand, usernames));
+		audit.setFirstname(randomValue(rand, firstnames));
+		audit.setLastname(randomValue(rand, lastnames));
+		audit.setDate(new Date(rand.nextInt(5000)));
+		audit.setElementType(randomValue(rand, types));
+		audit.setElementAccessed(StringHelper.getUniqueId());
+		audit.setNewVersion(new Date(rand.nextInt(5000)));
+		audit.setAction(randomValue(rand, actions));
+		audit.setAccessType(AccessType.values()[rand.nextInt(AccessType.values().length)]);
+
+		return audit;
 	}
 }

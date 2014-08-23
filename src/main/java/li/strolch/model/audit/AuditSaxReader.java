@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model;
+package li.strolch.model.audit;
 
-import li.strolch.model.visitor.StrolchRootElementVisitor;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Root element for all top level {@link StrolchElement}. These are elements which have no parent, e.g. {@link Resource
- * Resources} and {@link Order Orders}
- *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchRootElement extends StrolchElement {
+public class AuditSaxReader extends DefaultHandler {
 
-	public <T> T accept(StrolchRootElementVisitor<T> visitor);
 }

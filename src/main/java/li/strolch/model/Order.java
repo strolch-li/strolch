@@ -112,7 +112,8 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 	}
 
 	/**
-	 * @param date the date to set
+	 * @param date
+	 *            the date to set
 	 */
 	public void setDate(Date date) {
 		this.date = date;
@@ -126,7 +127,8 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 	}
 
 	/**
-	 * @param state the state to set
+	 * @param state
+	 *            the state to set
 	 */
 	public void setState(State state) {
 		this.state = state;
@@ -179,7 +181,7 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 	}
 
 	@Override
-	public <T> T accept(StrolchRootElementVisitor visitor) {
+	public <T> T accept(StrolchRootElementVisitor<T> visitor) {
 		return visitor.visitOrder(this);
 	}
 

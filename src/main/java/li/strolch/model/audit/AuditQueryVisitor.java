@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model;
+package li.strolch.model.audit;
 
-import li.strolch.model.visitor.StrolchRootElementVisitor;
 
 /**
- * Root element for all top level {@link StrolchElement}. These are elements which have no parent, e.g. {@link Resource
- * Resources} and {@link Order Orders}
- *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchRootElement extends StrolchElement {
+public interface AuditQueryVisitor {
 
-	public <T> T accept(StrolchRootElementVisitor<T> visitor);
+	public void visit(ElementSelection selection);
+
+	public void visit(IdentitySelection selection);
+
+	public void visit(DateRangeSelection selection);
+
+	public void visit(ActionSelection selection);
+
+	public void visit(AuditQuery auditQuery);
 }

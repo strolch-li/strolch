@@ -198,7 +198,7 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 	}
 
 	@Override
-	public <T> T accept(StrolchRootElementVisitor visitor) {
+	public <T> T accept(StrolchRootElementVisitor<T> visitor) {
 		return visitor.visitResource(this);
 	}
 

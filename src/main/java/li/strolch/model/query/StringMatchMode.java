@@ -13,17 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model;
-
-import li.strolch.model.visitor.StrolchRootElementVisitor;
+package li.strolch.model.query;
 
 /**
- * Root element for all top level {@link StrolchElement}. These are elements which have no parent, e.g. {@link Resource
- * Resources} and {@link Order Orders}
- *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchRootElement extends StrolchElement {
+public enum StringMatchMode {
+	EQUALS_CASE_SENSITIVE(true, true),
+	EQUALS_CASE_INSENSITIVE(true, false),
+	CONTAINS_CASE_SENSITIVE(false, true),
+	CONTAINS_CASE_INSENSITIVE(false, false);
 
-	public <T> T accept(StrolchRootElementVisitor<T> visitor);
+	private final boolean equals;
+	private final boolean caseSensitve;
+
+	private StringMatchMode(boolean equals, boolean caseSensitive) {
+		this.equals = equals;
+		this.caseSensitve = caseSensitive;
+	}
+
+	/**
+	 * @return the caseSensitve
+	 */
+	public boolean isCaseSensitve() {
+		return this.caseSensitve;
+	}
+
+	/**
+	 * @return the equals
+	 */
+	public boolean isEquals() {
+		return this.equals;
+	}
 }

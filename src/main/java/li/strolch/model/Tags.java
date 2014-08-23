@@ -39,6 +39,22 @@ public class Tags {
 	public static final String STROLCH_MODEL = "StrolchModel";
 	public static final String INCLUDE_FILE = "IncludeFile";
 	public static final String FILE = "file";
-
 	public static final String BAG = "Bag";
+	public static final String AUDIT = "Audit";
+
+	public class Audit {
+		public static final String ID = Tags.ID;
+
+		public static final String USERNAME = "Username";
+		public static final String FIRSTNAME = "Firstname";
+		public static final String LASTNAME = "Lastname";
+		public static final String DATE = "Date";
+
+		public static final String ELEMENT_TYPE = "ElementType";
+		public static final String ELEMENT_ACCESSED = "ElementAccessed";
+		public static final String NEW_VERSION = "NewVersion";
+
+		public static final String ACTION = "Action";
+		public static final String ACCESS_TYPE = "AccessType";
+	}
 }

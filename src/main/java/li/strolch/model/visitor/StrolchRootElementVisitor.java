@@ -21,9 +21,9 @@ import li.strolch.model.Resource;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchRootElementVisitor extends StrolchVisitor {
+public interface StrolchRootElementVisitor<T> extends StrolchVisitor {
 
-	public <T> T visitOrder(Order order);
+	public T visitOrder(Order order);
 
-	public <T> T visitResource(Resource resource);
+	public T visitResource(Resource resource);
 }
