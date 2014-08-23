@@ -18,19 +18,20 @@ package li.strolch.persistence.inmemory;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class InMemoryPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
-	private InMemoryPersistence persistenceHandler;
+	private InMemoryPersistence persistence;
 
 	/**
 	 * @param container
@@ -42,22 +43,27 @@ public class InMemoryPersistenceHandler extends StrolchComponent implements Pers
 
 	@Override
 	public void initialize(ComponentConfiguration configuration) {
-		this.persistenceHandler = new InMemoryPersistence();
+		this.persistence = new InMemoryPersistence();
 		super.initialize(configuration);
 	}
 
 	@Override
-	public StrolchTransaction openTx(StrolchRealm realm) {
-		return this.persistenceHandler.openTx(realm);
+	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
+		return this.persistence.openTx(realm, certificate, action);
 	}
 
 	@Override
 	public OrderDao getOrderDao(StrolchTransaction tx) {
-		return this.persistenceHandler.getOrderDao(tx);
+		return this.persistence.getOrderDao(tx);
 	}
 
 	@Override
 	public ResourceDao getResourceDao(StrolchTransaction tx) {
-		return this.persistenceHandler.getResourceDao(tx);
+		return this.persistence.getResourceDao(tx);
+	}
+
+	@Override
+	public AuditDao getAuditDao(StrolchTransaction tx) {
+		return this.persistence.getAuditDao(tx);
 	}
 }

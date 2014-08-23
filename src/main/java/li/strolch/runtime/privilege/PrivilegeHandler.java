@@ -16,7 +16,6 @@
 package li.strolch.runtime.privilege;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.handler.SystemUserAction;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeContext;
@@ -24,7 +23,7 @@ import ch.eitchnet.privilege.model.PrivilegeContext;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchPrivilegeHandler {
+public interface PrivilegeHandler {
 
 	/**
 	 * @param username
@@ -71,6 +70,7 @@ public interface StrolchPrivilegeHandler {
 	 * @return
 	 * @throws PrivilegeException
 	 */
-	public abstract PrivilegeHandler getPrivilegeHandler(Certificate certificate) throws PrivilegeException;
+	public abstract ch.eitchnet.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
+			throws PrivilegeException;
 
 }

@@ -30,6 +30,7 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -37,6 +38,7 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public class DefaultRealmHandler extends StrolchComponent implements RealmHandler {
 
+	public static final String PROP_ENABLE_AUDIT_TRAIL = "enableAuditTrail"; //$NON-NLS-1$
 	public static final String PREFIX_DATA_STORE_MODE = "dataStoreMode"; //$NON-NLS-1$
 	public static final String PROP_REALMS = "realms"; //$NON-NLS-1$
 
@@ -73,16 +75,20 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 		this.realms = new HashMap<>();
 		String[] realms = configuration.getStringArray(PROP_REALMS, StrolchConstants.DEFAULT_REALM);
 		for (String realmName : realms) {
-			String dataStoreModeKey = PREFIX_DATA_STORE_MODE;
-			if (!realmName.equals(StrolchConstants.DEFAULT_REALM))
-				dataStoreModeKey += DOT + realmName;
-
+			String dataStoreModeKey = makeRealmKey(realmName, PREFIX_DATA_STORE_MODE);
 			String realmMode = configuration.getString(dataStoreModeKey, null);
 			DataStoreMode dataStoreMode = DataStoreMode.parseDataStoreMode(realmMode);
 			StrolchRealm realm = dataStoreMode.createRealm(realmName);
 			this.realms.put(realmName, realm);
 		}
 		super.setup(configuration);
+	}
+
+	public static String makeRealmKey(String realmName, String key) {
+		String realmKey = key;
+		if (!realmName.equals(StrolchConstants.DEFAULT_REALM))
+			realmKey += DOT + realmName;
+		return realmKey;
 	}
 
 	@Override
@@ -96,12 +102,16 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 		super.initialize(configuration);
 	}
 
+	Map<String, StrolchRealm> getRealms() {
+		return this.realms;
+	}
+
 	@Override
 	public void start() {
-		for (String realmName : this.realms.keySet()) {
-			StrolchRealm realm = this.realms.get(realmName);
-			realm.start();
-		}
+
+		PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
+		privilegeHandler.runAsSystem("agent", new StartRealms(this));
+
 		super.start();
 	}
 

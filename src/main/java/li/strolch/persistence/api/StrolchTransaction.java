@@ -17,6 +17,7 @@ package li.strolch.persistence.api;
 
 import java.util.List;
 
+import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
@@ -28,6 +29,9 @@ import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.audit.Audit;
+import li.strolch.model.audit.AuditQuery;
+import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.OrderQuery;
@@ -58,6 +62,8 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	public boolean isRolledBack();
 
+	public AuditTrail getAuditTrail();
+
 	public ResourceMap getResourceMap();
 
 	public OrderMap getOrderMap();
@@ -75,6 +81,10 @@ public interface StrolchTransaction extends AutoCloseable {
 	public List<Resource> doQuery(ResourceQuery query);
 
 	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor);
+
+	public List<Audit> doQuery(AuditQuery query);
+
+	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor);
 
 	/**
 	 * <p>

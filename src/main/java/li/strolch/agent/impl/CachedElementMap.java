@@ -24,15 +24,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.agent.api.ElementMap;
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -67,12 +68,22 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 	@Override
 	public long querySize(StrolchTransaction tx) {
-		return getAllKeys(tx).size();
+		long size = 0L;
+
+		for (String type : this.elementMap.keySet()) {
+			Map<String, T> byType = this.elementMap.get(type);
+			size += byType.size();
+		}
+
+		return size;
 	}
 
 	@Override
 	public long querySize(StrolchTransaction tx, String type) {
-		return getKeysBy(tx, type).size();
+		Map<String, T> byType = this.elementMap.get(type);
+		if (byType == null)
+			return 0L;
+		return byType.size();
 	}
 
 	@Override

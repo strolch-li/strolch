@@ -109,6 +109,13 @@ public class StrolchAgent {
 		return StringHelper.getUniqueId();
 	}
 
+	/**
+	 * @return Returns the pseudo unique Id to be used during object creation from external services.
+	 */
+	public static synchronized Long getUniqueIdLong() {
+		return StringHelper.getUniqueIdLong();
+	}
+
 	private VersionQueryResult versionQueryResult;
 
 	public VersionQueryResult getVersion() {

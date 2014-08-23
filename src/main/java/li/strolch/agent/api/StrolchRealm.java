@@ -30,6 +30,8 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -37,8 +39,8 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public abstract class StrolchRealm {
 
-	private static final String PROP_TRY_LOCK_TIME_UNIT = "tryLockTimeUnit"; //$NON-NLS-1$
-	private static final String PROP_TRY_LOCK_TIME = "tryLockTime"; //$NON-NLS-1$
+	public static final String PROP_TRY_LOCK_TIME_UNIT = "tryLockTimeUnit"; //$NON-NLS-1$
+	public static final String PROP_TRY_LOCK_TIME = "tryLockTime"; //$NON-NLS-1$
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchRealm.class);
 	private String realm;
 	private LockHandler lockHandler;
@@ -78,15 +80,19 @@ public abstract class StrolchRealm {
 
 	public abstract DataStoreMode getMode();
 
-	public abstract void start();
+	public abstract void start(PrivilegeContext privilegeContext);
 
 	public abstract void stop();
 
 	public abstract void destroy();
 
-	public abstract StrolchTransaction openTx();
+	public abstract StrolchTransaction openTx(Certificate certificate, Class<?> clazz);
+
+	public abstract StrolchTransaction openTx(Certificate certificate, String action);
 
 	public abstract ResourceMap getResourceMap();
 
 	public abstract OrderMap getOrderMap();
+
+	public abstract AuditTrail getAuditTrail();
 }

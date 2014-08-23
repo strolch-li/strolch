@@ -22,8 +22,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
@@ -36,12 +38,18 @@ import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.audit.AccessType;
+import li.strolch.model.audit.Audit;
+import li.strolch.model.audit.AuditQuery;
+import li.strolch.model.audit.AuditVisitor;
+import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.model.visitor.ElementTypeVisitor;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.persistence.inmemory.InMemoryTransaction;
@@ -51,6 +59,8 @@ import li.strolch.service.api.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -69,8 +79,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private List<Command> commands;
 	private Set<StrolchRootElement> lockedElements;
 
-	public AbstractTransaction(StrolchRealm realm) {
+	private String action;
+	private Certificate certificate;
+
+	public AbstractTransaction(StrolchRealm realm, Certificate certificate, String action) {
+		DBC.PRE.assertNotNull("realm must be set!", realm);
+		DBC.PRE.assertNotNull("certificate must be set!", certificate);
+		DBC.PRE.assertNotNull("action must be set!", action);
+
 		this.realm = realm;
+		this.action = action;
+		this.certificate = certificate;
+
 		this.commands = new ArrayList<>();
 		this.lockedElements = new HashSet<>();
 		this.closeStrategy = TransactionCloseStrategy.COMMIT;
@@ -173,6 +193,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public AuditTrail getAuditTrail() {
+		return this.realm.getAuditTrail();
+	}
+
+	@Override
 	public List<Order> doQuery(OrderQuery query) {
 		return getPersistenceHandler().getOrderDao(this).doQuery(query, new NoStrategyOrderVisitor());
 	}
@@ -190,6 +215,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
 		return getPersistenceHandler().getResourceDao(this).doQuery(query, resourceVisitor);
+	}
+
+	@Override
+	public List<Audit> doQuery(AuditQuery query) {
+		return getPersistenceHandler().getAuditDao(this).doQuery(query, new NoStrategyAuditVisitor());
+	}
+
+	@Override
+	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor) {
+		return getPersistenceHandler().getAuditDao(this).doQuery(query, auditVisitor);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -292,13 +327,15 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			validateCommands();
 			doCommands();
-			commit(this.txResult);
+			writeChanges(this.txResult);
 
-			long observerUpdateStart = System.nanoTime();
-			updateObservers();
-			long observerUpdateDuration = System.nanoTime() - observerUpdateStart;
+			long auditTrailDuration = writeAuditTrail();
+			long updateObserversDuration = updateObservers();
 
-			handleCommit(start, observerUpdateDuration);
+			// commit and close the connection
+			commit();
+
+			handleCommit(start, auditTrailDuration, updateObserversDuration);
 
 		} catch (Exception e) {
 			this.txResult.setState(TransactionState.ROLLING_BACK);
@@ -325,6 +362,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			throw new StrolchPersistenceException(msg, e);
 
 		} finally {
+			try {
+
+			} catch (Exception e) {
+				logger.error("Failed to close connection: " + e.getMessage(), e); //$NON-NLS-1$
+			}
 			unlockElements();
 		}
 	}
@@ -344,11 +386,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		}
 	}
 
-	protected abstract void commit(TransactionResult txResult) throws Exception;
+	protected abstract void writeChanges(TransactionResult txResult) throws Exception;
 
 	protected abstract void rollback(TransactionResult txResult) throws Exception;
 
-	private void handleCommit(long start, long observerUpdateDuration) {
+	protected abstract void commit() throws Exception;
+
+	private void handleCommit(long start, long auditTrailDuration, long observerUpdateDuration) {
 
 		long end = System.nanoTime();
 		long txDuration = end - this.txResult.getStartNanos();
@@ -361,11 +405,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TX for realm "); //$NON-NLS-1$
 		sb.append(getRealmName());
-		sb.append(" was completed after "); //$NON-NLS-1$
+		sb.append(" took "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(txDuration));
-		sb.append(" with close operation taking "); //$NON-NLS-1$
+		sb.append(" close took "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(closeDuration));
-		sb.append(" and observer updates took "); //$NON-NLS-1$
+		if (isAuditTrailEnabled()) {
+			sb.append(" auditTrail took "); //$NON-NLS-1$
+			sb.append(StringHelper.formatNanoDuration(auditTrailDuration));
+		}
+		if (observerUpdateDuration > 0L)
+			sb.append(" updates took "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(observerUpdateDuration));
 		logger.info(sb.toString());
 	}
@@ -394,9 +443,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TX"); //$NON-NLS-1$
 		sb.append(getRealmName());
-		sb.append(" has failed after "); //$NON-NLS-1$
+		sb.append(" failed took "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(txDuration));
-		sb.append(" with close operation taking "); //$NON-NLS-1$
+		sb.append(" close took "); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(closeDuration));
 		logger.info(sb.toString());
 
@@ -405,18 +454,84 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		throw new StrolchPersistenceException(msg, e);
 	}
 
-	private void updateObservers() {
-		if (!this.suppressUpdates && this.observerHandler != null) {
+	private boolean isAuditTrailEnabled() {
+		return getAuditTrail().isEnabled();
+	}
 
-			Set<String> keys = this.txResult.getKeys();
-			for (String key : keys) {
-				ModificationResult modificationResult = this.txResult.getModificationResult(key);
+	private long updateObservers() {
+		if (isObserverUpdatesEnabled())
+			return 0L;
 
-				this.observerHandler.add(key, modificationResult.<StrolchElement> getCreated());
-				this.observerHandler.update(key, modificationResult.<StrolchElement> getUpdated());
-				this.observerHandler.remove(key, modificationResult.<StrolchElement> getDeleted());
+		long observerUpdateStart = System.nanoTime();
+		Set<String> keys = this.txResult.getKeys();
+		for (String key : keys) {
+			ModificationResult modificationResult = this.txResult.getModificationResult(key);
+
+			this.observerHandler.add(key, modificationResult.<StrolchElement> getCreated());
+			this.observerHandler.update(key, modificationResult.<StrolchElement> getUpdated());
+			this.observerHandler.remove(key, modificationResult.<StrolchElement> getDeleted());
+		}
+		long observerUpdateDuration = System.nanoTime() - observerUpdateStart;
+		return observerUpdateDuration;
+	}
+
+	private boolean isObserverUpdatesEnabled() {
+		return this.suppressUpdates || this.observerHandler == null;
+	}
+
+	private long writeAuditTrail() {
+		if (!isAuditTrailEnabled())
+			return 0L;
+
+		Set<String> keys = this.txResult.getKeys();
+		if (keys.isEmpty())
+			return 0L;
+
+		long auditTrailStart = System.nanoTime();
+
+		List<Audit> audits = new ArrayList<>();
+		for (String key : keys) {
+			ModificationResult modificationResult = this.txResult.getModificationResult(key);
+
+			List<StrolchElement> created = modificationResult.getCreated();
+			for (StrolchElement strolchElement : created) {
+				audits.add(auditFrom(AccessType.CREATE, (StrolchRootElement) strolchElement));
+			}
+
+			List<StrolchElement> updated = modificationResult.getUpdated();
+			for (StrolchElement strolchElement : updated) {
+				audits.add(auditFrom(AccessType.UPDATE, (StrolchRootElement) strolchElement));
+			}
+
+			List<StrolchElement> deleted = modificationResult.getDeleted();
+			for (StrolchElement strolchElement : deleted) {
+				audits.add(auditFrom(AccessType.DELETE, (StrolchRootElement) strolchElement));
 			}
 		}
+
+		getAuditTrail().addAll(this, audits);
+		long auditTrailDuration = System.nanoTime() - auditTrailStart;
+		return auditTrailDuration;
+	}
+
+	private Audit auditFrom(AccessType accessType, StrolchRootElement element) {
+		Audit audit = new Audit();
+
+		audit.setId(StrolchAgent.getUniqueIdLong());
+		audit.setUsername(this.certificate.getUsername());
+		audit.setFirstname(this.certificate.getFirstname());
+		audit.setLastname(this.certificate.getLastname());
+		audit.setDate(new Date());
+
+		audit.setElementType(element.accept(new ElementTypeVisitor()));
+		audit.setElementAccessed(element.getId());
+
+		//audit.setNewVersion();
+
+		audit.setAction(this.action);
+		audit.setAccessType(accessType);
+
+		return audit;
 	}
 
 	/**

@@ -21,8 +21,7 @@
 			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
 			<depends>PrivilegeHandler</depends>
 			<Properties>
-				<dataStoreMode>CACHED</dataStoreMode>
-				<dataStoreFile>StrolchModel.xml</dataStoreFile>
+				<dataStoreMode>EMPTY</dataStoreMode>
 			</Properties>
 		</Component>
 		<Component>
@@ -32,19 +31,6 @@
 			<depends>RealmHandler</depends>
 			<Properties>
 			</Properties>
-		</Component>
-		<Component>
-			<name>PostInitializer</name>
-			<api>li.strolch.runtime.configuration.model.PostInitializerTest</api>
-			<impl>li.strolch.runtime.configuration.model.PostInitializerTestImpl</impl>
-			<depends>ServiceHandler</depends>
-			<Properties>
-			</Properties>
-		</Component>
-		<Component>
-			<name>PersistenceHandler</name>
-			<api>li.strolch.persistence.api.PersistenceHandler</api>
-			<impl>li.strolch.persistence.inmemory.InMemoryPersistenceHandler</impl>
 		</Component>
 	</env>
 </StrolchConfiguration>

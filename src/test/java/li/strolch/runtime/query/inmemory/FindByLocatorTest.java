@@ -30,6 +30,8 @@ import li.strolch.runtime.StrolchConstants;
 
 import org.junit.Test;
 
+import ch.eitchnet.privilege.model.Certificate;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -45,7 +47,9 @@ public class FindByLocatorTest {
 				ComponentContainerTest.PATH_TRANSIENT_CONTAINER);
 		ComponentContainer container = agent.getContainer();
 
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
+		Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".getBytes());
+
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 
 			// Resource
 			Locator locResource = Locator.valueOf("Resource/TestType/MyTestResource");

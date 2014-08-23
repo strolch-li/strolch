@@ -17,10 +17,12 @@ package li.strolch.runtime.query.enums;
 
 import java.util.Locale;
 
+import ch.eitchnet.privilege.model.Certificate;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface EnumHandler {
 
-	public StrolchEnum getEnum(String name, Locale locale);
+	public StrolchEnum getEnum(Certificate certificate, String name, Locale locale);
 }

@@ -19,6 +19,7 @@ import java.util.Set;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.StrolchConstants;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -33,12 +34,14 @@ public interface ComponentContainer {
 
 	public abstract <T> T getComponent(Class<T> clazz) throws IllegalArgumentException;
 
+	public abstract PrivilegeHandler getPrivilegeHandler() throws IllegalArgumentException;
+
 	public abstract Set<Class<?>> getComponentTypes();
 
 	public abstract Set<String> getRealmNames();
 
 	/**
-	 * Returns the {@link StrolchRealm} with the given name. To get the default realm, use the constante
+	 * Returns the {@link StrolchRealm} with the given name. To get the default realm, use the constant
 	 * {@link StrolchConstants#DEFAULT_REALM}.
 	 * 
 	 * @param realm

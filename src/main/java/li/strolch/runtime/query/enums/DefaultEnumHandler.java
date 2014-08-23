@@ -33,6 +33,7 @@ import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -75,7 +76,7 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 	}
 
 	@Override
-	public StrolchEnum getEnum(String name, Locale locale) {
+	public StrolchEnum getEnum(Certificate certificate, String name, Locale locale) {
 
 		DBC.PRE.assertNotEmpty("Enum name must be given!", name); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Locale must be given!", locale); //$NON-NLS-1$
@@ -84,7 +85,8 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 		if (enumLocator == null)
 			throw new StrolchException(MessageFormat.format("No enumeration is configured for the name {0}", name)); //$NON-NLS-1$
 
-		try (StrolchTransaction tx = getContainer().getRealm(this.realm).openTx()) {
+		try (StrolchTransaction tx = getContainer().getRealm(this.realm).openTx(certificate,
+				EnumHandler.class)) {
 			Resource enumeration = tx.findElement(enumLocator);
 			ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, locale);
 

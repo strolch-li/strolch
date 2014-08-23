@@ -24,10 +24,10 @@ import java.util.Locale;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
-import li.strolch.runtime.query.enums.EnumHandler;
-import li.strolch.runtime.query.enums.StrolchEnum;
 
 import org.junit.Test;
+
+import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -44,8 +44,10 @@ public class EnumHandlerTest {
 				ComponentContainerTest.PATH_TRANSIENT_CONTAINER);
 		ComponentContainer container = agent.getContainer();
 
+		Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".getBytes());
+
 		EnumHandler enumHandler = container.getComponent(EnumHandler.class);
-		StrolchEnum sexEnum = enumHandler.getEnum("sex", Locale.ENGLISH);
+		StrolchEnum sexEnum = enumHandler.getEnum(certificate, "sex", Locale.ENGLISH);
 		assertEquals("sex", sexEnum.getName());
 		assertEquals("en", sexEnum.getLocale());
 		assertEquals(3, sexEnum.getValues().size());
@@ -53,7 +55,7 @@ public class EnumHandlerTest {
 		Collections.sort(values);
 		assertEquals("both", values.get(0));
 
-		StrolchEnum salutationsEnum = enumHandler.getEnum("salutations", Locale.UK);
+		StrolchEnum salutationsEnum = enumHandler.getEnum(certificate, "salutations", Locale.UK);
 		assertEquals("salutations", salutationsEnum.getName());
 		assertEquals("en_GB", salutationsEnum.getLocale());
 		assertEquals(3, salutationsEnum.getValues().size());
@@ -61,7 +63,7 @@ public class EnumHandlerTest {
 		Collections.sort(values);
 		assertEquals("Mr", values.get(0));
 
-		StrolchEnum religionsEnum = enumHandler.getEnum("religions", Locale.CANADA);
+		StrolchEnum religionsEnum = enumHandler.getEnum(certificate, "religions", Locale.CANADA);
 		assertEquals("religions", religionsEnum.getName());
 		assertEquals("en_CA", religionsEnum.getLocale());
 		assertEquals(9, religionsEnum.getValues().size());

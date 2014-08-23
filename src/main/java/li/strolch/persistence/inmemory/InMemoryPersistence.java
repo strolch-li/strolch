@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
+import ch.eitchnet.privilege.model.Certificate;
 
 public class InMemoryPersistence implements PersistenceHandler {
 
@@ -18,8 +20,8 @@ public class InMemoryPersistence implements PersistenceHandler {
 	}
 
 	@Override
-	public StrolchTransaction openTx(StrolchRealm realm) {
-		return new InMemoryTransaction(realm, this);
+	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
+		return new InMemoryTransaction(realm, certificate, action, this);
 	}
 
 	@Override
@@ -34,10 +36,16 @@ public class InMemoryPersistence implements PersistenceHandler {
 		return daoCache.getResourceDao();
 	}
 
+	@Override
+	public AuditDao getAuditDao(StrolchTransaction tx) {
+		DaoCache daoCache = getDaoCache(tx);
+		return daoCache.getAuditDao();
+	}
+
 	private synchronized DaoCache getDaoCache(StrolchTransaction tx) {
 		DaoCache daoCache = this.daoCache.get(tx.getRealmName());
 		if (daoCache == null) {
-			daoCache = new DaoCache(new InMemoryOrderDao(), new InMemoryResourceDao());
+			daoCache = new DaoCache(new InMemoryOrderDao(), new InMemoryResourceDao(), new InMemoryAuditDao());
 			this.daoCache.put(tx.getRealmName(), daoCache);
 		}
 		return daoCache;
@@ -46,10 +54,12 @@ public class InMemoryPersistence implements PersistenceHandler {
 	private class DaoCache {
 		private OrderDao orderDao;
 		private ResourceDao resourceDao;
+		private AuditDao auditDao;
 
-		public DaoCache(OrderDao orderDao, ResourceDao resourceDao) {
+		public DaoCache(OrderDao orderDao, ResourceDao resourceDao, AuditDao auditDao) {
 			this.orderDao = orderDao;
 			this.resourceDao = resourceDao;
+			this.auditDao = auditDao;
 		}
 
 		public OrderDao getOrderDao() {
@@ -58,6 +68,10 @@ public class InMemoryPersistence implements PersistenceHandler {
 
 		public ResourceDao getResourceDao() {
 			return this.resourceDao;
+		}
+
+		public AuditDao getAuditDao() {
+			return this.auditDao;
 		}
 	}
 }

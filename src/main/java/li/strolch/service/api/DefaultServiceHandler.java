@@ -22,7 +22,7 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
-import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.utils.helper.StringHelper;
@@ -33,7 +33,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 public class DefaultServiceHandler extends StrolchComponent implements ServiceHandler {
 
 	private RuntimeConfiguration runtimeConfiguration;
-	private StrolchPrivilegeHandler privilegeHandler;
+	private PrivilegeHandler privilegeHandler;
 
 	/**
 	 * @param container
@@ -45,8 +45,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 	@Override
 	public void initialize(ComponentConfiguration configuration) {
-		if (getContainer().hasComponent(StrolchPrivilegeHandler.class))
-			this.privilegeHandler = getContainer().getComponent(StrolchPrivilegeHandler.class);
+		this.privilegeHandler = getContainer().getPrivilegeHandler();
 		this.runtimeConfiguration = configuration.getRuntimeConfiguration();
 		super.initialize(configuration);
 	}
@@ -71,11 +70,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		long start = System.nanoTime();
 
 		// first check that the caller may perform this service
-		PrivilegeContext privilegeContext = null;
-		if (this.privilegeHandler != null) {
-			privilegeContext = this.privilegeHandler.getPrivilegeContext(certificate);
-			privilegeContext.validateAction(service);
-		}
+		PrivilegeContext privilegeContext = this.privilegeHandler.getPrivilegeContext(certificate);
+		privilegeContext.validateAction(service);
 
 		try {
 			// then perform the service

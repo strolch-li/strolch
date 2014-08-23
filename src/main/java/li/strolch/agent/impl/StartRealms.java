@@ -13,21 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
+package li.strolch.agent.impl;
 
 import li.strolch.agent.api.StrolchRealm;
-import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.handler.SystemUserAction;
+import ch.eitchnet.privilege.model.PrivilegeContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface PersistenceHandler {
+public class StartRealms implements SystemUserAction {
 
-	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action);
+	private final DefaultRealmHandler defaultRealmHandler;
 
-	public OrderDao getOrderDao(StrolchTransaction tx);
+	/**
+	 * @param defaultRealmHandler
+	 */
+	StartRealms(DefaultRealmHandler defaultRealmHandler) {
+		this.defaultRealmHandler = defaultRealmHandler;
+	}
 
-	public ResourceDao getResourceDao(StrolchTransaction tx);
+	@Override
+	public void execute(PrivilegeContext privilegeContext) {
+		for (String realmName : this.defaultRealmHandler.getRealms().keySet()) {
+			StrolchRealm realm = this.defaultRealmHandler.getRealms().get(realmName);
 
-	public AuditDao getAuditDao(StrolchTransaction tx);
+			realm.start(privilegeContext);
+		}
+	}
 }

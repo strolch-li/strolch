@@ -8,9 +8,19 @@
 			</Properties>
 		</Runtime>
 		<Component>
+			<name>PrivilegeHandler</name>
+			<api>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</api>
+			<impl>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</impl>
+			<depends>PersistenceHandler</depends>
+			<Properties>
+				<privilegeConfigFile>PrivilegeConfig.xml</privilegeConfigFile>
+			</Properties>
+		</Component>
+		<Component>
 			<name>RealmHandler</name>
 			<api>li.strolch.agent.api.RealmHandler</api>
 			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+			<depends>PrivilegeHandler</depends>
 			<Properties>
 				<dataStoreMode>EMPTY</dataStoreMode>
 			</Properties>
@@ -21,15 +31,6 @@
 			<impl>li.strolch.service.SimpleServiceHandler</impl>
 			<depends>RealmHandler</depends>
 			<Properties>
-			</Properties>
-		</Component>
-		<Component>
-			<name>PrivilegeHandler</name>
-			<api>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</api>
-			<impl>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</impl>
-			<depends>PersistenceHandler</depends>
-			<Properties>
-				<privilegeConfigFile>PrivilegeConfig.xml</privilegeConfigFile>
 			</Properties>
 		</Component>
 		<Component>

@@ -9,9 +9,24 @@
 			</Properties>
 		</Runtime>
 		<Component>
+			<name>PrivilegeHandler</name>
+			<api>li.strolch.runtime.privilege.PrivilegeHandler</api>
+			<impl>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</impl>
+			<Properties>
+				<privilegeConfigFile>PrivilegeConfig.xml</privilegeConfigFile>
+			</Properties>
+		</Component>
+		<Component>
+			<name>PersistenceHandler</name>
+			<api>li.strolch.persistence.api.PersistenceHandler</api>
+			<impl>li.strolch.persistence.inmemory.InMemoryPersistenceHandler</impl>
+		</Component>
+		<Component>
 			<name>RealmHandler</name>
 			<api>li.strolch.agent.api.RealmHandler</api>
 			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+			<depends>PrivilegeHandler</depends>
+			<depends>PersistenceHandler</depends>
 			<Properties>
 				<realms>defaultRealm, myRealm, otherRealm, cachedRealm, transactionalRealm, emptyRealm</realms>
 				<dataStoreMode>TRANSIENT</dataStoreMode>
@@ -48,11 +63,6 @@
 			<Properties>
 				<verbose>true</verbose>
 			</Properties>
-		</Component>
-		<Component>
-			<name>PersistenceHandler</name>
-			<api>li.strolch.persistence.api.PersistenceHandler</api>
-			<impl>li.strolch.persistence.inmemory.InMemoryPersistenceHandler</impl>
 		</Component>
 	</env>
 </StrolchConfiguration>

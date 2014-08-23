@@ -34,6 +34,7 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +87,11 @@ public class ComponentContainerImpl implements ComponentContainer {
 			throw new IllegalArgumentException(msg);
 		}
 		return component;
+	}
+
+	@Override
+	public PrivilegeHandler getPrivilegeHandler() throws IllegalArgumentException {
+		return getComponent(PrivilegeHandler.class);
 	}
 
 	@Override

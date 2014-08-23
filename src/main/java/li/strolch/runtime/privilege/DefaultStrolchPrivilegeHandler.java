@@ -30,7 +30,6 @@ import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.DefaultPrivilegeHandler;
 import ch.eitchnet.privilege.handler.EncryptionHandler;
 import ch.eitchnet.privilege.handler.PersistenceHandler;
-import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.handler.SystemUserAction;
 import ch.eitchnet.privilege.handler.XmlPersistenceHandler;
 import ch.eitchnet.privilege.helper.PrivilegeInitializationHelper;
@@ -41,12 +40,12 @@ import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
 import ch.eitchnet.privilege.xml.PrivilegeConfigSaxReader;
 import ch.eitchnet.utils.helper.XmlHelper;
 
-public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements StrolchPrivilegeHandler {
+public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements PrivilegeHandler {
 
 	public static final String PROP_PRIVILEGE_CONFIG_FILE = "privilegeConfigFile"; //$NON-NLS-1$
 	public static final String PRIVILEGE_CONFIG_XML = "PrivilegeConfig.xml"; //$NON-NLS-1$
 
-	private PrivilegeHandler privilegeHandler;
+	private ch.eitchnet.privilege.handler.PrivilegeHandler privilegeHandler;
 
 	public DefaultStrolchPrivilegeHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -60,7 +59,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
 		File privilegeConfigFile = configuration.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML,
 				runtimeConfiguration);
-		PrivilegeHandler privilegeHandler = initializeFromXml(configuration, privilegeConfigFile);
+		ch.eitchnet.privilege.handler.PrivilegeHandler privilegeHandler = initializeFromXml(configuration,
+				privilegeConfigFile);
 		this.privilegeHandler = privilegeHandler;
 	}
 
@@ -73,7 +73,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
 	 *         {@link PersistenceHandler} are set and initialized as well
 	 */
-	private PrivilegeHandler initializeFromXml(ComponentConfiguration configuration, File privilegeXmlFile) {
+	private ch.eitchnet.privilege.handler.PrivilegeHandler initializeFromXml(ComponentConfiguration configuration,
+			File privilegeXmlFile) {
 
 		// make sure file exists
 		if (!privilegeXmlFile.exists()) {
@@ -168,7 +169,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public PrivilegeHandler getPrivilegeHandler(Certificate certificate) throws PrivilegeException {
+	public ch.eitchnet.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
+			throws PrivilegeException {
 		assertContainerStarted();
 		this.privilegeHandler.assertIsPrivilegeAdmin(certificate);
 		return this.privilegeHandler;

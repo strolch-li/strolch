@@ -17,6 +17,7 @@ package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
 
+import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
@@ -24,6 +25,9 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -33,6 +37,7 @@ public class TransactionalRealm extends StrolchRealm {
 
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;
+	private AuditTrail auditTrail;
 	private PersistenceHandler persistenceHandler;
 
 	public TransactionalRealm(String realm) {
@@ -45,8 +50,15 @@ public class TransactionalRealm extends StrolchRealm {
 	}
 
 	@Override
-	public StrolchTransaction openTx() {
-		return this.persistenceHandler.openTx(this);
+	public StrolchTransaction openTx(Certificate certificate, String action) {
+		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
+		return this.persistenceHandler.openTx(this, certificate, action);
+	}
+
+	@Override
+	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz) {
+		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
+		return this.persistenceHandler.openTx(this, certificate, clazz.getName());
 	}
 
 	@Override
@@ -60,25 +72,42 @@ public class TransactionalRealm extends StrolchRealm {
 	}
 
 	@Override
+	public AuditTrail getAuditTrail() {
+		return this.auditTrail;
+	}
+
+	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		super.initialize(container, configuration);
 		this.resourceMap = new TransactionalResourceMap();
 		this.orderMap = new TransactionalOrderMap();
+
+		String enableAuditKey = DefaultRealmHandler.makeRealmKey(getRealm(),
+				DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
+
+		if (configuration.getBoolean(enableAuditKey, Boolean.FALSE)) {
+			this.auditTrail = new TransactionalAuditTrail();
+			logger.info("Enabling AuditTrail for realm " + getRealm());
+		} else {
+			this.auditTrail = new NoStrategyAuditTrail();
+			logger.info("AuditTrail is disabled for realm " + getRealm());
+		}
+
 		this.persistenceHandler = container.getComponent(PersistenceHandler.class);
 	}
 
 	@Override
-	public void start() {
+	public void start(PrivilegeContext privilegeContext) {
 
 		long start = System.nanoTime();
 		int nrOfOrders = 0;
 		int nrOfResources = 0;
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "agent_boot")) {
 			nrOfOrders = this.orderMap.getAllKeys(tx).size();
 		}
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "agent_boot")) {
 			nrOfResources = this.resourceMap.getAllKeys(tx).size();
 		}
 

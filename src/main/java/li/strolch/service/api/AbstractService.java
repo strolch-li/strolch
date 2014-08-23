@@ -107,7 +107,16 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * @return
 	 */
 	protected final StrolchTransaction openTx(String realm) {
-		return this.container.getRealm(realm).openTx();
+		return this.container.getRealm(realm).openTx(getCertificate(), getClass());
+	}
+
+	/**
+	 * @param realm
+	 * @param action
+	 * @return
+	 */
+	protected final StrolchTransaction openTx(String realm, String action) {
+		return this.container.getRealm(realm).openTx(getCertificate(), action);
 	}
 
 	@Override
