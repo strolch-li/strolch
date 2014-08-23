@@ -37,9 +37,6 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	protected PostgreSqlStrolchTransaction tx;
 	protected List<DaoCommand> commands;
 
-	/**
-	 * @param tx
-	 */
 	public PostgresqlDao(PostgreSqlStrolchTransaction tx) {
 		this.tx = tx;
 		this.commands = new ArrayList<>();

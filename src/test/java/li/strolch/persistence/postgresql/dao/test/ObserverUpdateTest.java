@@ -17,6 +17,10 @@ package li.strolch.persistence.postgresql.dao.test;
 
 import static li.strolch.model.ModelGenerator.createOrder;
 import static li.strolch.model.ModelGenerator.createResource;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_PASSWORD;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_URL;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_USERNAME;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -36,12 +40,14 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.observer.Observer;
 import li.strolch.runtime.observer.ObserverHandler;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
+
+import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -113,15 +119,18 @@ public class ObserverUpdateTest {
 		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.ORDER, observer);
 		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.RESOURCE, observer);
 
+		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
+		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
+
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			tx.getOrderMap().add(tx, newOrder);
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx();) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test");) {
 			tx.getResourceMap().add(tx, newResource);
 		}
 

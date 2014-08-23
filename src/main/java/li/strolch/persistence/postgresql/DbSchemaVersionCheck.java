@@ -76,7 +76,7 @@ public class DbSchemaVersionCheck {
 			String username = connectionInfo.getUsername();
 			String password = connectionInfo.getPassword();
 
-			logger.info(MessageFormat.format("[{0}] Checking Schema version...", realm));
+			logger.info(MessageFormat.format("[{0}] Checking Schema version for: {1}@{2}", realm, username, url));
 
 			try (Connection con = DriverManager.getConnection(url, username, password);
 					Statement st = con.createStatement();) {
@@ -202,5 +202,4 @@ public class DbSchemaVersionCheck {
 		dropSchema(realm, dbVersion, st);
 		createSchema(realm, dbVersion, st);
 	}
-
 }

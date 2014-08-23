@@ -27,6 +27,7 @@ import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.AbstractModelTest;
 import li.strolch.testbase.runtime.RuntimeMock;
 
@@ -34,6 +35,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import ch.eitchnet.privilege.model.Certificate;
 
 public class RealmTest extends AbstractModelTest {
 
@@ -74,15 +77,18 @@ public class RealmTest extends AbstractModelTest {
 		String expectedId2 = "@realmTestId2";
 		String type = "Bla";
 
+		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
+		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
+
 		{
 			StrolchRealm firstRealm = runtimeMock.getRealm("first");
 			assertEquals(DataStoreMode.TRANSACTIONAL, firstRealm.getMode());
 			Resource expectedRes1 = ModelGenerator.createResource(expectedId1, "Bla bla", type);
-			try (StrolchTransaction tx = firstRealm.openTx()) {
+			try (StrolchTransaction tx = firstRealm.openTx(certificate, "test")) {
 				tx.getResourceMap().add(tx, expectedRes1);
 			}
 
-			try (StrolchTransaction tx = firstRealm.openTx()) {
+			try (StrolchTransaction tx = firstRealm.openTx(certificate, "test")) {
 				Resource res = tx.getResourceMap().getBy(tx, type, expectedId1);
 				assertEquals("Should find object previously added in same realm!", expectedRes1, res);
 			}
@@ -92,11 +98,11 @@ public class RealmTest extends AbstractModelTest {
 			StrolchRealm secondRealm = runtimeMock.getRealm("second");
 			assertEquals(DataStoreMode.TRANSACTIONAL, secondRealm.getMode());
 			Resource expectedRes2 = ModelGenerator.createResource(expectedId2, "Bla bla", type);
-			try (StrolchTransaction tx = secondRealm.openTx()) {
+			try (StrolchTransaction tx = secondRealm.openTx(certificate, "test")) {
 				tx.getResourceMap().add(tx, expectedRes2);
 			}
 
-			try (StrolchTransaction tx = secondRealm.openTx()) {
+			try (StrolchTransaction tx = secondRealm.openTx(certificate, "test")) {
 				Resource res = tx.getResourceMap().getBy(tx, type, expectedId2);
 				assertEquals("Should find object previously added in same realm!", expectedRes2, res);
 			}
@@ -104,7 +110,7 @@ public class RealmTest extends AbstractModelTest {
 
 		{
 			StrolchRealm secondRealm = runtimeMock.getRealm("second");
-			try (StrolchTransaction tx = secondRealm.openTx()) {
+			try (StrolchTransaction tx = secondRealm.openTx(certificate, "test")) {
 				Resource res = tx.getResourceMap().getBy(tx, type, expectedId1);
 				assertNull("Should not find object added in differenct realm!", res);
 			}

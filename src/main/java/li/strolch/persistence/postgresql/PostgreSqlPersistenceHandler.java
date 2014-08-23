@@ -29,6 +29,7 @@ import java.util.Set;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.DbConnectionInfo;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
@@ -39,6 +40,7 @@ import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.observer.ObserverHandler;
+import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -128,8 +130,9 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		super.start();
 	}
 
-	public StrolchTransaction openTx(StrolchRealm realm) {
-		PostgreSqlStrolchTransaction tx = new PostgreSqlStrolchTransaction(realm, this);
+	@Override
+	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
+		PostgreSqlStrolchTransaction tx = new PostgreSqlStrolchTransaction(realm, certificate, action, this);
 		if (getContainer().hasComponent(ObserverHandler.class)) {
 			tx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
 		}
@@ -164,5 +167,10 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	@Override
 	public ResourceDao getResourceDao(StrolchTransaction tx) {
 		return ((PostgreSqlStrolchTransaction) tx).getResourceDao();
+	}
+
+	@Override
+	public AuditDao getAuditDao(StrolchTransaction tx) {
+		return ((PostgreSqlStrolchTransaction) tx).getAuditDao();
 	}
 }

@@ -19,6 +19,7 @@ import java.sql.Connection;
 
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.AbstractTransaction;
+import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
@@ -27,6 +28,8 @@ import li.strolch.persistence.api.TransactionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.model.Certificate;
+
 public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 
 	private static final Logger logger = LoggerFactory.getLogger(PostgreSqlStrolchTransaction.class);
@@ -34,15 +37,17 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 
 	private PostgresqlDao<?> orderDao;
 	private PostgresqlDao<?> resourceDao;
+	private AuditDao auditDao;
 	private Connection connection;
 
-	public PostgreSqlStrolchTransaction(StrolchRealm realm, PostgreSqlPersistenceHandler persistenceHandler) {
-		super(realm);
+	public PostgreSqlStrolchTransaction(StrolchRealm realm, Certificate certificate, String action,
+			PostgreSqlPersistenceHandler persistenceHandler) {
+		super(realm, certificate, action);
 		this.persistenceHandler = persistenceHandler;
 	}
 
 	@Override
-	protected void commit(TransactionResult txResult) throws Exception {
+	protected void writeChanges(TransactionResult txResult) throws Exception {
 
 		// first perform DAOs
 		if (this.orderDao != null)
@@ -50,13 +55,7 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 		if (this.resourceDao != null)
 			this.resourceDao.commit(txResult);
 
-		// then commit the SQL connection
-		if (this.connection != null) {
-			this.connection.commit();
-
-			// and close the connection, but not catching, as otherwise we can't rollback in exception case
-			this.connection.close();
-		}
+		// don't commit the connection, this is done in postCommit when we close the connection
 	}
 
 	@Override
@@ -74,6 +73,14 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 		}
 	}
 
+	@Override
+	protected void commit() throws Exception {
+		if (this.connection != null) {
+			this.connection.commit();
+			this.connection.close();
+		}
+	}
+
 	OrderDao getOrderDao() {
 		if (this.orderDao == null)
 			this.orderDao = new PostgreSqlOrderDao(this);
@@ -84,6 +91,15 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 		if (this.resourceDao == null)
 			this.resourceDao = new PostgreSqlResourceDao(this);
 		return (ResourceDao) this.resourceDao;
+	}
+
+	/**
+	 * @return
+	 */
+	public AuditDao getAuditDao() {
+		if (this.auditDao == null)
+			this.auditDao = new PostgreSqlAuditDao(this);
+		return (AuditDao) this.auditDao;
 	}
 
 	Connection getConnection() {
@@ -97,4 +113,5 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	public PersistenceHandler getPersistenceHandler() {
 		return this.persistenceHandler;
 	}
+
 }
