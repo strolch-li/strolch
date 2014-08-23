@@ -21,17 +21,21 @@ import java.net.URI;
 
 import javax.ws.rs.core.Application;
 
-import li.strolch.rest.StrolchRestfulExceptionMapper;
-import li.strolch.rest.endpoint.Inspector;
+import li.strolch.rest.StrolchRestfulClasses;
 import li.strolch.testbase.runtime.RuntimeMock;
 
-import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.filter.LoggingFilter;
-import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.TracingConfig;
+import org.glassfish.jersey.servlet.ServletProperties;
+import org.glassfish.jersey.test.DeploymentContext;
 import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.ServletDeploymentContext;
+import org.glassfish.jersey.test.TestProperties;
+import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
+import org.glassfish.jersey.test.spi.TestContainerException;
+import org.glassfish.jersey.test.spi.TestContainerFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -47,7 +51,6 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 	private static final String RUNTIME_PATH = "target/withPrivilegeRuntime/"; //$NON-NLS-1$
 	private static final String CONFIG_SRC = "src/test/resources/withPrivilegeRuntime"; //$NON-NLS-1$
 	private static RuntimeMock runtimeMock;
-	private static HttpServer server;
 
 	@BeforeClass
 	public static void beforeClass() throws IllegalArgumentException, IOException {
@@ -57,29 +60,52 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
+	}
 
-		server = GrizzlyWebContainerFactory.create(BASE_URI);
+	@Override
+	protected URI getBaseUri() {
+		return BASE_URI;
 	}
 
 	@AfterClass
 	public static void afterClass() {
-		server.shutdownNow();
 		runtimeMock.destroyRuntime();
 	}
 
 	@Override
+	protected TestContainerFactory getTestContainerFactory() throws TestContainerException {
+		return new GrizzlyWebTestContainerFactory();
+	}
+
+	@Override
+	protected DeploymentContext configureDeployment() {
+		return ServletDeploymentContext.builder(configure()).contextPath("rest").build();
+	}
+
+	@Override
 	protected Application configure() {
+		forceEnable(TestProperties.LOG_TRAFFIC);
+		enable(TestProperties.DUMP_ENTITY);
 		return createApp();
 	}
 
 	public static ResourceConfig createApp() {
-		return new ResourceConfig()//
-				.packages(Inspector.class.getPackage().getName())//
-				.register(StrolchRestfulExceptionMapper.class)
-				//.register(createMoxyJsonResolver())
-				// Logging.
-				.register(LoggingFilter.class)
-				// Tracing support.
-				.property(ServerProperties.TRACING, TracingConfig.ON_DEMAND.name());
+		ResourceConfig resourceConfig = new ResourceConfig();
+		resourceConfig.setApplicationName("RestTest");
+
+		for (Class<?> clazz : StrolchRestfulClasses.restfulClasses) {
+			resourceConfig.register(clazz);
+		}
+		for (Class<?> clazz : StrolchRestfulClasses.providerClasses) {
+			resourceConfig.register(clazz);
+		}
+
+		resourceConfig.register(LoggingFilter.class);
+		//.register(createMoxyJsonResolver())
+		// Logging
+		// Tracing support.
+		resourceConfig.property(ServerProperties.TRACING, TracingConfig.ALL.name());
+		resourceConfig.property(ServletProperties.FILTER_FORWARD_ON_404, true);
+		return resourceConfig;
 	}
 }

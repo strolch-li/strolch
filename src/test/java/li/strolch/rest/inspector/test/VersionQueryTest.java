@@ -27,11 +27,13 @@ import li.strolch.agent.api.AgentVersion;
 import li.strolch.agent.api.ComponentVersion;
 import li.strolch.agent.api.VersionQueryResult;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@Ignore
 public class VersionQueryTest extends AbstractRestfulTest {
 
 	private static final String ROOT_PATH = "strolch/version";

@@ -47,13 +47,14 @@ public class EnumQuery {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{name}")
 	public Response getEnum(@PathParam("name") String name, @Context HttpHeaders headers) {
+
 		try {
 
 			EnumHandler enumHandler = RestfulStrolchComponent.getInstance().getContainer()
 					.getComponent(EnumHandler.class);
 
 			Locale locale = RestfulHelper.getLocale(headers);
-			StrolchEnum strolchEnum = enumHandler.getEnum(name, locale);
+			StrolchEnum strolchEnum = enumHandler.getEnum(null, name, locale);
 
 			GenericEntity<StrolchEnum> entity = new GenericEntity<StrolchEnum>(strolchEnum, StrolchEnum.class) {
 			};

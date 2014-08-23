@@ -33,14 +33,13 @@ import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
 import li.strolch.rest.model.LogoutResult;
 
+import org.junit.Ignore;
 import org.junit.Test;
-
-//import com.sun.jersey.api.client.ClientResponse;
-//import com.sun.jersey.api.representation.Form;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@Ignore
 public class AuthenticationTest extends AbstractRestfulTest {
 
 	private static final String ROOT_PATH = "strolch/authentication";

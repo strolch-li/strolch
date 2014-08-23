@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -35,18 +36,23 @@ import li.strolch.rest.model.RealmDetail;
 import li.strolch.rest.model.RealmOverview;
 import li.strolch.rest.model.TypeOverview;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
+@Ignore
 public class InspectorTest extends AbstractRestfulTest {
 
 	private static final String ROOT_PATH = "strolch/inspector/";
 
 	@Test
 	public void shouldGetAgent() {
+
+		Response response = target().path("/").request(MediaType.TEXT_HTML).get();
+		assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
 		// expected result
 		List<RealmOverview> realms = new ArrayList<>(1);
@@ -132,8 +138,10 @@ public class InspectorTest extends AbstractRestfulTest {
 	public void shouldGetResourceTypeDetails() {
 
 		// query
-		Response result = target().path(ROOT_PATH + "defaultRealm/resource/Template")
-				.request(MediaType.APPLICATION_JSON).get();
+
+		WebTarget target = target();
+		Response result = target.path(ROOT_PATH + "defaultRealm/resource/Template").request(MediaType.APPLICATION_JSON)
+				.get();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String entity = result.readEntity(String.class);
 		String expected = "{\"type\":\"Template\",\"resources\":[{\"id\":\"TestType\",\"name\":\"TestType Template\",\"type\":\"Template\"}]}";

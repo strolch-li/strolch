@@ -23,7 +23,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.dbc.DBC;
 
@@ -34,7 +34,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	private static final String SESSION_ORIGIN = "session.origin";
 	private static final String PROP_VALIDATE_ORIGIN = "validateOrigin";
-	private StrolchPrivilegeHandler privilegeHandler;
+	private PrivilegeHandler privilegeHandler;
 	private Map<String, Certificate> certificateMap;
 	private boolean validateOrigin;
 
@@ -54,7 +54,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public void start() {
-		this.privilegeHandler = getContainer().getComponent(StrolchPrivilegeHandler.class);
+		this.privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
 		this.certificateMap = new HashMap<>();
 		super.start();
 	}
