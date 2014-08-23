@@ -27,7 +27,9 @@ public class MyModelContextFactory implements PersistenceContextFactory<MyModel>
 	@Override
 	public PersistenceContext<MyModel> createCtx(ObjectReferenceCache objectRefCache, MyModel t) {
 		IdOfSubTypeRef objectRef = objectRefCache.getIdOfSubTypeRef(TestConstants.TYPE_RES, t.getType(), t.getId());
-		return createCtx(objectRef);
+		PersistenceContext<MyModel> ctx = createCtx(objectRef);
+		ctx.setObject(t);
+		return ctx;
 	}
 
 	@Override

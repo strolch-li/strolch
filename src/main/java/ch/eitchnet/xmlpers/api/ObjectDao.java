@@ -53,7 +53,6 @@ public class ObjectDao {
 		assertNotClosed();
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
-		ctx.setObject(object);
 		ctx.getObjectRef().lock();
 		this.objectFilter.add(ctx.getObjectRef().getType(), ctx);
 	}
@@ -64,7 +63,6 @@ public class ObjectDao {
 		if (!objects.isEmpty()) {
 			for (T object : objects) {
 				PersistenceContext<T> ctx = createCtx(object);
-				ctx.setObject(object);
 				ctx.getObjectRef().lock();
 				this.objectFilter.add(ctx.getObjectRef().getType(), ctx);
 			}
@@ -75,7 +73,6 @@ public class ObjectDao {
 		assertNotClosed();
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
-		ctx.setObject(object);
 		ctx.getObjectRef().lock();
 		this.objectFilter.update(ctx.getObjectRef().getType(), ctx);
 	}
@@ -86,7 +83,6 @@ public class ObjectDao {
 		if (!objects.isEmpty()) {
 			for (T object : objects) {
 				PersistenceContext<T> ctx = createCtx(object);
-				ctx.setObject(object);
 				ctx.getObjectRef().lock();
 				this.objectFilter.update(ctx.getObjectRef().getType(), ctx);
 			}
@@ -97,7 +93,6 @@ public class ObjectDao {
 		assertNotClosed();
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
-		ctx.setObject(object);
 		ctx.getObjectRef().lock();
 		this.objectFilter.remove(ctx.getObjectRef().getType(), ctx);
 	}
@@ -108,7 +103,6 @@ public class ObjectDao {
 		if (!objects.isEmpty()) {
 			for (T object : objects) {
 				PersistenceContext<T> ctx = createCtx(object);
-				ctx.setObject(object);
 				ctx.getObjectRef().lock();
 				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx);
 			}
@@ -293,12 +287,12 @@ public class ObjectDao {
 		}
 	}
 
-	private <T> PersistenceContext<T> createCtx(T object) {
+	public <T> PersistenceContext<T> createCtx(T object) {
 		return this.ctxFactoryDelegator.<T> getCtxFactory(object.getClass()).createCtx(this.tx.getObjectRefCache(),
 				object);
 	}
 
-	private <T> PersistenceContext<T> createCtx(ObjectRef objectRef) {
+	public <T> PersistenceContext<T> createCtx(ObjectRef objectRef) {
 		String type = objectRef.getType();
 		PersistenceContextFactory<T> ctxFactory = this.ctxFactoryDelegator.<T> getCtxFactory(type);
 		return ctxFactory.createCtx(objectRef);

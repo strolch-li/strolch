@@ -34,6 +34,8 @@ public class BookContextFactory implements PersistenceContextFactory<Book> {
 	@Override
 	public PersistenceContext<Book> createCtx(ObjectReferenceCache objectRefCache, Book t) {
 		IdOfTypeRef objectRef = objectRefCache.getIdOfTypeRef(TestConstants.TYPE_BOOK, t.getId().toString());
-		return createCtx(objectRef);
+		PersistenceContext<Book> ctx = createCtx(objectRef);
+		ctx.setObject(t);
+		return ctx;
 	}
 }
