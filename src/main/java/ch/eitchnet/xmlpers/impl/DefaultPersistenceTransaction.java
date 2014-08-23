@@ -115,6 +115,11 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 	}
 
 	@Override
+	public FileDao getFileDao() {
+		return this.fileDao;
+	}
+
+	@Override
 	public ObjectReferenceCache getObjectRefCache() {
 		return this.realm.getObjectRefCache();
 	}

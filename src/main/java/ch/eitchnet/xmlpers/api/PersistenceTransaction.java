@@ -54,6 +54,8 @@ public interface PersistenceTransaction extends AutoCloseable {
 
 	public MetadataDao getMetadataDao();
 
+	public FileDao getFileDao();
+
 	public ObjectReferenceCache getObjectRefCache();
 
 	public PersistenceRealm getRealm();
