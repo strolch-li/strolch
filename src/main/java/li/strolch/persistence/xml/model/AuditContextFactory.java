@@ -15,28 +15,29 @@
  */
 package li.strolch.persistence.xml.model;
 
-import li.strolch.model.Resource;
 import li.strolch.model.Tags;
+import li.strolch.model.audit.Audit;
 import ch.eitchnet.xmlpers.api.PersistenceContext;
 import ch.eitchnet.xmlpers.api.PersistenceContextFactory;
 import ch.eitchnet.xmlpers.objref.IdOfSubTypeRef;
 import ch.eitchnet.xmlpers.objref.ObjectRef;
 import ch.eitchnet.xmlpers.objref.ObjectReferenceCache;
 
-public class ResourceContextFactory implements PersistenceContextFactory<Resource> {
+public class AuditContextFactory implements PersistenceContextFactory<Audit> {
 
 	@Override
-	public PersistenceContext<Resource> createCtx(ObjectRef objectRef) {
-		PersistenceContext<Resource> ctx = new PersistenceContext<>(objectRef);
-		ctx.setParserFactory(new ResourceParserFactory());
+	public PersistenceContext<Audit> createCtx(ObjectRef objectRef) {
+		PersistenceContext<Audit> ctx = new PersistenceContext<>(objectRef);
+		ctx.setParserFactory(new AuditParserFactory());
 		return ctx;
 	}
 
 	@Override
-	public PersistenceContext<Resource> createCtx(ObjectReferenceCache objectRefCache, Resource t) {
-		IdOfSubTypeRef objectRef = objectRefCache.getIdOfSubTypeRef(Tags.RESOURCE, t.getType(), t.getId());
-		PersistenceContext<Resource> ctx = createCtx(objectRef);
-		ctx.setObject(t);
+	public PersistenceContext<Audit> createCtx(ObjectReferenceCache objectRefCache, Audit audit) {
+		IdOfSubTypeRef objectRef = objectRefCache.getIdOfSubTypeRef(Tags.AUDIT, audit.getElementType(), audit.getId()
+				.toString());
+		PersistenceContext<Audit> ctx = createCtx(objectRef);
+		ctx.setObject(audit);
 		return ctx;
 	}
 }

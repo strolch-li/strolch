@@ -15,39 +15,20 @@
  */
 package li.strolch.persistence.xml.model;
 
-import li.strolch.model.Order;
-import li.strolch.model.xml.OrderToDomVisitor;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
+import li.strolch.model.audit.Audit;
 import ch.eitchnet.xmlpers.api.DomParser;
+import ch.eitchnet.xmlpers.api.ParserFactory;
+import ch.eitchnet.xmlpers.api.SaxParser;
 
-public class OrderDomParser implements DomParser<Order> {
-
-	private Order order;
+public class AuditParserFactory implements ParserFactory<Audit> {
 
 	@Override
-	public Order getObject() {
-		return this.order;
+	public DomParser<Audit> getDomParser() {
+		return new AuditDomParser();
 	}
 
 	@Override
-	public void setObject(Order object) {
-		this.order = object;
-	}
-
-	@Override
-	public Document toDom() {
-		OrderToDomVisitor orderDomVisitor = new OrderToDomVisitor();
-		orderDomVisitor.visit(this.order);
-		return orderDomVisitor.getDocument();
-	}
-
-	@Override
-	public void fromDom(Document document) {
-		Element rootElement = document.getDocumentElement();
-		Order order = new Order(rootElement);
-		this.order = order;
+	public SaxParser<Audit> getSaxParser() {
+		throw new UnsupportedOperationException("Not yet implemented!"); //$NON-NLS-1$
 	}
 }

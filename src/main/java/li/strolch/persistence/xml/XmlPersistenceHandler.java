@@ -24,14 +24,18 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
+import li.strolch.model.audit.Audit;
+import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.xml.model.AuditContextFactory;
 import li.strolch.persistence.xml.model.OrderContextFactory;
 import li.strolch.persistence.xml.model.ResourceContextFactory;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.observer.ObserverHandler;
+import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.xmlpers.api.IoMode;
 import ch.eitchnet.xmlpers.api.PersistenceConstants;
 import ch.eitchnet.xmlpers.api.PersistenceManager;
@@ -67,14 +71,16 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 				new ResourceContextFactory());
 		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(Order.class, Tags.ORDER,
 				new OrderContextFactory());
+		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(Audit.class, Tags.AUDIT,
+				new AuditContextFactory());
 
 		super.initialize(componentConfiguration);
 	}
 
 	@Override
-	public StrolchTransaction openTx(StrolchRealm realm) {
+	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
 		PersistenceTransaction tx = this.persistenceManager.openTx(realm.getRealm());
-		XmlStrolchTransaction strolchTx = new XmlStrolchTransaction(realm, tx, this);
+		XmlStrolchTransaction strolchTx = new XmlStrolchTransaction(realm, certificate, action, tx, this);
 		if (getContainer().hasComponent(ObserverHandler.class)) {
 			strolchTx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
 		}
@@ -89,5 +95,10 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	@Override
 	public ResourceDao getResourceDao(StrolchTransaction tx) {
 		return new XmlResourceDao(tx);
+	}
+
+	@Override
+	public AuditDao getAuditDao(StrolchTransaction tx) {
+		return new XmlAuditDao(tx);
 	}
 }

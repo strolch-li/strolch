@@ -15,39 +15,39 @@
  */
 package li.strolch.persistence.xml.model;
 
-import li.strolch.model.Order;
-import li.strolch.model.xml.OrderToDomVisitor;
+import li.strolch.model.audit.Audit;
+import li.strolch.model.audit.AuditFromDomReader;
+import li.strolch.model.audit.AuditToDomVisitor;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ch.eitchnet.xmlpers.api.DomParser;
 
-public class OrderDomParser implements DomParser<Order> {
+public class AuditDomParser implements DomParser<Audit> {
 
-	private Order order;
+	private Audit audit;
 
 	@Override
-	public Order getObject() {
-		return this.order;
+	public Audit getObject() {
+		return this.audit;
 	}
 
 	@Override
-	public void setObject(Order object) {
-		this.order = object;
+	public void setObject(Audit audit) {
+		this.audit = audit;
 	}
 
 	@Override
 	public Document toDom() {
-		OrderToDomVisitor orderDomVisitor = new OrderToDomVisitor();
-		orderDomVisitor.visit(this.order);
-		return orderDomVisitor.getDocument();
+		AuditToDomVisitor auditDomVisitor = new AuditToDomVisitor();
+		return auditDomVisitor.visitAudit(this.audit);
 	}
 
 	@Override
 	public void fromDom(Document document) {
 		Element rootElement = document.getDocumentElement();
-		Order order = new Order(rootElement);
-		this.order = order;
+		Audit audit = new AuditFromDomReader().from(rootElement);
+		this.audit = audit;
 	}
 }

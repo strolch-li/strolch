@@ -35,7 +35,8 @@ public class OrderContextFactory implements PersistenceContextFactory<Order> {
 	@Override
 	public PersistenceContext<Order> createCtx(ObjectReferenceCache objectRefCache, Order t) {
 		IdOfSubTypeRef objectRef = objectRefCache.getIdOfSubTypeRef(Tags.ORDER, t.getType(), t.getId());
-		return createCtx(objectRef);
+		PersistenceContext<Order> ctx = createCtx(objectRef);
+		ctx.setObject(t);
+		return ctx;
 	}
-
 }

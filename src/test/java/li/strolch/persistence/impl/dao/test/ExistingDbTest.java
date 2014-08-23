@@ -23,11 +23,14 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import ch.eitchnet.privilege.model.Certificate;
 
 public class ExistingDbTest {
 
@@ -55,7 +58,10 @@ public class ExistingDbTest {
 	@Test
 	public void shouldQueryExistingData() {
 
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
+		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
+		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
+
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			Resource resource = tx.getResourceMap().getBy(tx, "MyType", "@1");
 			assertNotNull("Should be able to read existing element from db", resource);
 

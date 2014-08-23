@@ -34,12 +34,14 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.observer.Observer;
 import li.strolch.runtime.observer.ObserverHandler;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.xmlpers.api.ModificationResult;
 
 /**
@@ -110,15 +112,18 @@ public class ObserverUpdateTest {
 		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.ORDER, observer); //$NON-NLS-1$
 		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.RESOURCE, observer); //$NON-NLS-1$
 
+		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
+		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
+
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			tx.getOrderMap().add(tx, newOrder);
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx()) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			tx.getResourceMap().add(tx, newResource);
 		}
 

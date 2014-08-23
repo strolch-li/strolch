@@ -15,12 +15,17 @@
  */
 package li.strolch.persistence.xml;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.PersistenceHandler;
+import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.xmlpers.api.ModificationResult;
+import ch.eitchnet.xmlpers.api.PersistenceContext;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.api.TransactionResult;
 
@@ -29,8 +34,9 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 	private XmlPersistenceHandler persistenceHandler;
 	private PersistenceTransaction tx;
 
-	public XmlStrolchTransaction(StrolchRealm realm, PersistenceTransaction tx, XmlPersistenceHandler persistenceHandler) {
-		super(realm);
+	public XmlStrolchTransaction(StrolchRealm realm, Certificate certificate, String action, PersistenceTransaction tx,
+			XmlPersistenceHandler persistenceHandler) {
+		super(realm, certificate, action);
 		this.persistenceHandler = persistenceHandler;
 		this.tx = tx;
 	}
@@ -40,15 +46,43 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 	}
 
 	@Override
-	protected void commit(li.strolch.persistence.api.TransactionResult txResult) throws Exception {
+	protected void writeChanges(li.strolch.persistence.api.TransactionResult txResult) throws Exception {
 		TransactionResult result = new TransactionResult();
 		this.tx.setTransactionResult(result);
 		this.tx.autoCloseableCommit();
 		Set<String> keys = result.getKeys();
 		for (String key : keys) {
 			ModificationResult modificationResult = result.getModificationResult(key);
+
+			List<StrolchRootElement> created = new ArrayList<>();
+			List<StrolchRootElement> updated = new ArrayList<>();
+			List<StrolchRootElement> deleted = new ArrayList<>();
+
+			List<Object> createdCtx = modificationResult.getCreated();
+			for (Object object : createdCtx) {
+				@SuppressWarnings("unchecked")
+				PersistenceContext<StrolchRootElement> ctx = (PersistenceContext<StrolchRootElement>) object;
+				if (ctx.getObject() != null)
+					created.add(ctx.getObject());
+			}
+			List<Object> updatedCtx = modificationResult.getUpdated();
+			for (Object object : updatedCtx) {
+				@SuppressWarnings("unchecked")
+				PersistenceContext<StrolchRootElement> ctx = (PersistenceContext<StrolchRootElement>) object;
+				if (ctx.getObject() != null)
+					updated.add(ctx.getObject());
+			}
+			List<Object> deletedCtx = modificationResult.getDeleted();
+			for (Object object : deletedCtx) {
+				@SuppressWarnings("unchecked")
+				PersistenceContext<StrolchRootElement> ctx = (PersistenceContext<StrolchRootElement>) object;
+				if (ctx.getObject() != null)
+					deleted.add(ctx.getObject());
+			}
+
 			li.strolch.persistence.api.ModificationResult mr = new li.strolch.persistence.api.ModificationResult(key,
-					modificationResult.getCreated(), modificationResult.getUpdated(), modificationResult.getDeleted());
+					created, updated, deleted);
+
 			txResult.addModificationResult(mr);
 		}
 	}
@@ -56,6 +90,11 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 	@Override
 	protected void rollback(li.strolch.persistence.api.TransactionResult txResult) throws Exception {
 		this.tx.autoCloseableRollback();
+	}
+
+	@Override
+	protected void commit() throws Exception {
+		// no-op
 	}
 
 	@Override
