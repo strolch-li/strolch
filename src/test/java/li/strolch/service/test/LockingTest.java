@@ -37,6 +37,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ch.eitchnet.privilege.model.Certificate;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -67,6 +69,10 @@ public class LockingTest {
 
 	public static ServiceHandler getServiceHandler() {
 		return runtimeMock.getContainer().getComponent(ServiceHandler.class);
+	}
+
+	public static Certificate login() {
+		return runtimeMock.getPrivilegeHandler().authenticate("admin", "admin".getBytes());
 	}
 
 	@Test
@@ -112,7 +118,7 @@ public class LockingTest {
 		LockingArgumentTest arg = new LockingArgumentTest();
 		arg.longRunning = false;
 		arg.resourceLoc = Locator.valueOf(RESOURCE_LOCATOR);
-		ServiceResult result = getServiceHandler().doService(null, svc, arg);
+		ServiceResult result = getServiceHandler().doService(login(), svc, arg);
 		assertEquals(ServiceResultState.SUCCESS, result.getState());
 	}
 
@@ -140,7 +146,7 @@ public class LockingTest {
 				continue;
 			}
 
-			this.result = getServiceHandler().doService(null, svc, arg);
+			this.result = getServiceHandler().doService(login(), svc, arg);
 		}
 
 		public ServiceResult getResult() {

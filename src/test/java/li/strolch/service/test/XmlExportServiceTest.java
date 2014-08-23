@@ -33,6 +33,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ch.eitchnet.privilege.model.Certificate;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -41,6 +43,7 @@ public class XmlExportServiceTest {
 	private static final String RUNTIME_PATH = "target/transienttest/"; //$NON-NLS-1$
 	private static final String CONFIG_SRC = "src/test/resources/transienttest"; //$NON-NLS-1$
 	protected static RuntimeMock runtimeMock;
+	private static Certificate certificate;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -50,6 +53,8 @@ public class XmlExportServiceTest {
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
+
+		certificate = runtimeMock.getPrivilegeHandler().authenticate("admin", "admin".getBytes());
 	}
 
 	@AfterClass
@@ -64,7 +69,7 @@ public class XmlExportServiceTest {
 		XmlExportModelArgument arg = new XmlExportModelArgument();
 		arg.modelFileName = "TestExportSingle.xml";
 		arg.multiFile = false;
-		ServiceResult result = runtimeMock.getServiceHandler().doService(null, service, arg);
+		ServiceResult result = runtimeMock.getServiceHandler().doService(certificate, service, arg);
 		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 		assertNumberOfFilesCreated(arg.modelFileName.split("\\.")[0], 1);
 
@@ -78,7 +83,7 @@ public class XmlExportServiceTest {
 		XmlExportModelArgument arg = new XmlExportModelArgument();
 		arg.modelFileName = "TestExportMulti.xml";
 		arg.multiFile = true;
-		ServiceResult result = runtimeMock.getServiceHandler().doService(null, service, arg);
+		ServiceResult result = runtimeMock.getServiceHandler().doService(certificate, service, arg);
 		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 		assertNumberOfFilesCreated(arg.modelFileName.split("\\.")[0], 6);
 
@@ -94,7 +99,7 @@ public class XmlExportServiceTest {
 		arg.doOrders = false;
 		arg.resourceTypes.add(StrolchConstants.TEMPLATE);
 		arg.multiFile = true;
-		ServiceResult result = runtimeMock.getServiceHandler().doService(null, service, arg);
+		ServiceResult result = runtimeMock.getServiceHandler().doService(certificate, service, arg);
 		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 		assertNumberOfFilesCreated(arg.modelFileName.split("\\.")[0], 2);
 
@@ -105,7 +110,7 @@ public class XmlExportServiceTest {
 		XmlImportModelService importService = new XmlImportModelService();
 		XmlImportModelArgument importArgument = new XmlImportModelArgument();
 		importArgument.modelFileName = modelFileName;
-		ServiceResult result = runtimeMock.getServiceHandler().doService(null, importService, importArgument);
+		ServiceResult result = runtimeMock.getServiceHandler().doService(certificate, importService, importArgument);
 		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 	}
 

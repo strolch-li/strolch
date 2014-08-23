@@ -35,19 +35,18 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest {
 		Runner validator = new Runner() {
 			@Override
 			public void run(StrolchRealm strolchRealm, ComponentContainer container) {
-				try (StrolchTransaction tx = strolchRealm.openTx()) {
+				try (StrolchTransaction tx = strolchRealm.openTx(certificate, "test")) {
 					assertEquals(0, tx.getResourceMap().querySize(tx));
 					assertEquals(0, tx.getOrderMap().querySize(tx));
 				}
 			}
 		};
 
-		ClearModelService svc = new ClearModelService();
 		ClearModelArgument arg = new ClearModelArgument();
 		arg.clearOrders = true;
 		arg.clearResources = true;
 
-		runServiceInAllRealmTypes(svc, arg, null, validator, null);
+		runServiceInAllRealmTypes(ClearModelService.class, arg, null, validator, null);
 	}
 
 	@Test
@@ -56,19 +55,18 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest {
 		Runner validator = new Runner() {
 			@Override
 			public void run(StrolchRealm strolchRealm, ComponentContainer container) {
-				try (StrolchTransaction tx = strolchRealm.openTx()) {
+				try (StrolchTransaction tx = strolchRealm.openTx(certificate, "test")) {
 					assertNotEquals(0, tx.getResourceMap().querySize(tx));
 					assertEquals(0, tx.getOrderMap().querySize(tx));
 				}
 			}
 		};
 
-		ClearModelService svc = new ClearModelService();
 		ClearModelArgument arg = new ClearModelArgument();
 		arg.clearOrders = true;
 		arg.clearResources = false;
 
-		runServiceInAllRealmTypes(svc, arg, null, validator, null);
+		runServiceInAllRealmTypes(ClearModelService.class, arg, null, validator, null);
 	}
 
 	@Test
@@ -77,19 +75,18 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest {
 		Runner validator = new Runner() {
 			@Override
 			public void run(StrolchRealm strolchRealm, ComponentContainer container) {
-				try (StrolchTransaction tx = strolchRealm.openTx()) {
+				try (StrolchTransaction tx = strolchRealm.openTx(certificate, "test")) {
 					assertNotEquals(0, tx.getOrderMap().querySize(tx));
 					assertEquals(0, tx.getResourceMap().querySize(tx));
 				}
 			}
 		};
 
-		ClearModelService svc = new ClearModelService();
 		ClearModelArgument arg = new ClearModelArgument();
 		arg.clearOrders = false;
 		arg.clearResources = true;
 
-		runServiceInAllRealmTypes(svc, arg, null, validator, null);
+		runServiceInAllRealmTypes(ClearModelService.class, arg, null, validator, null);
 	}
 
 }

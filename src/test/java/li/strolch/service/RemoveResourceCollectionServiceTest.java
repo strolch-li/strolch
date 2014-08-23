@@ -32,7 +32,6 @@ public class RemoveResourceCollectionServiceTest extends AbstractRealmServiceTes
 	@Test
 	public void runTest() {
 
-		RemoveResourceCollectionService svc = new RemoveResourceCollectionService();
 		RemoveResourceCollectionArg arg = new RemoveResourceCollectionArg();
 
 		ArrayList<Locator> locators = new ArrayList<>();
@@ -42,6 +41,6 @@ public class RemoveResourceCollectionServiceTest extends AbstractRealmServiceTes
 
 		arg.locators = locators;
 
-		runServiceInAllRealmTypes(svc, arg);
+		runServiceInAllRealmTypes(RemoveResourceCollectionService.class, arg);
 	}
 }

@@ -39,12 +39,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import ch.eitchnet.privilege.model.Certificate;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class AbstractRealmCommandTest {
 
 	protected static RuntimeMock runtimeMock;
+
+	protected static Certificate certificate;
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
@@ -61,8 +65,9 @@ public abstract class AbstractRealmCommandTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		importFromXml(REALM_CACHED, getServiceHandler());
-		importFromXml(REALM_TRANSACTIONAL, getServiceHandler());
+		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		importFromXml(REALM_CACHED, certificate, getServiceHandler());
+		importFromXml(REALM_TRANSACTIONAL, certificate, getServiceHandler());
 	}
 
 	@AfterClass
@@ -81,7 +86,7 @@ public abstract class AbstractRealmCommandTest {
 		expectedException.expectMessage("Fail on purpose after do command!");
 
 		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
-		try (StrolchTransaction tx = realm.openTx()) {
+		try (StrolchTransaction tx = realm.openTx(certificate, "test")) {
 
 			Command command = getCommandInstance(runtimeMock.getContainer(), tx);
 
@@ -92,7 +97,7 @@ public abstract class AbstractRealmCommandTest {
 
 	protected void doCommand(String realmName) {
 		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
-		try (StrolchTransaction tx = realm.openTx()) {
+		try (StrolchTransaction tx = realm.openTx(certificate, "test")) {
 			Command command = getCommandInstance(runtimeMock.getContainer(), tx);
 			tx.addCommand(command);
 		}

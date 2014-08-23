@@ -32,7 +32,6 @@ public class AddResourceCollectionServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		AddResourceCollectionService svc = new AddResourceCollectionService();
 		AddResourceCollectionArg arg = new AddResourceCollectionArg();
 
 		ArrayList<Resource> resources = new ArrayList<>();
@@ -42,6 +41,6 @@ public class AddResourceCollectionServiceTest extends AbstractRealmServiceTest {
 
 		arg.resources = resources;
 
-		runServiceInAllRealmTypes(svc, arg);
+		runServiceInAllRealmTypes(AddResourceCollectionService.class, arg);
 	}
 }

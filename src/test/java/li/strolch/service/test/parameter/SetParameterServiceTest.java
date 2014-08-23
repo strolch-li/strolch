@@ -30,7 +30,6 @@ public class SetParameterServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		SetParameterService svc = new SetParameterService();
 		SetParameterArg arg = new SetParameterArg();
 		arg.locator = Locator.valueOf("Resource/Ball/yellow/Bag/parameters/owner");
 		arg.name = "The Owner";
@@ -40,6 +39,6 @@ public class SetParameterServiceTest extends AbstractRealmServiceTest {
 		arg.index = 99;
 		arg.valueAsString = "someotherdude";
 
-		runServiceInAllRealmTypes(svc, arg);
+		runServiceInAllRealmTypes(SetParameterService.class, arg);
 	}
 }

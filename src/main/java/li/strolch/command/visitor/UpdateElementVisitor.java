@@ -23,9 +23,8 @@ import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public class UpdateElementVisitor implements StrolchRootElementVisitor {
+public class UpdateElementVisitor implements StrolchRootElementVisitor<StrolchRootElement> {
 
 	private StrolchTransaction tx;
 
@@ -37,15 +36,13 @@ public class UpdateElementVisitor implements StrolchRootElementVisitor {
 		return rootElement.accept(this);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T visitOrder(Order order) {
-		return (T) tx.getOrderMap().update(tx, order);
+	public StrolchRootElement visitOrder(Order order) {
+		return tx.getOrderMap().update(tx, order);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T visitResource(Resource resource) {
-		return (T) tx.getResourceMap().update(tx, resource);
+	public StrolchRootElement visitResource(Resource resource) {
+		return tx.getResourceMap().update(tx, resource);
 	}
 }

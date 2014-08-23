@@ -32,7 +32,6 @@ public class AddOrderCollectionServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		AddOrderCollectionService svc = new AddOrderCollectionService();
 		AddOrderCollectionArg arg = new AddOrderCollectionArg();
 
 		ArrayList<Order> orders = new ArrayList<>();
@@ -42,6 +41,6 @@ public class AddOrderCollectionServiceTest extends AbstractRealmServiceTest {
 
 		arg.orders = orders;
 
-		runServiceInAllRealmTypes(svc, arg);
+		runServiceInAllRealmTypes(AddOrderCollectionService.class, arg);
 	}
 }

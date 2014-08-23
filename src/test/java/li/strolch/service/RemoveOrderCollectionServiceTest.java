@@ -32,7 +32,6 @@ public class RemoveOrderCollectionServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		RemoveOrderCollectionService svc = new RemoveOrderCollectionService();
 		RemoveOrderCollectionArg arg = new RemoveOrderCollectionArg();
 
 		ArrayList<Locator> locators = new ArrayList<>();
@@ -42,6 +41,6 @@ public class RemoveOrderCollectionServiceTest extends AbstractRealmServiceTest {
 
 		arg.locators = locators;
 
-		runServiceInAllRealmTypes(svc, arg);
+		runServiceInAllRealmTypes(RemoveOrderCollectionService.class, arg);
 	}
 }

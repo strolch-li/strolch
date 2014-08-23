@@ -2,10 +2,16 @@
 <UsersAndRoles>
 
 	<Users>
+		<User userId="0" username="agent">
+			<State>SYSTEM</State>
+			<Roles>
+				<Role>agent</Role>
+			</Roles>
+		</User>
 
 		<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
 			<Firstname>Application</Firstname>
-			<Surname>Administrator</Surname>
+			<Lastname>Administrator</Lastname>
 			<State>ENABLED</State>
 			<Locale>en_GB</Locale>
 			<Roles>
@@ -20,7 +26,7 @@
 
 		<User userId="2" username="bob" password="81b637d8fcd2c6da6359e6963113a1170de795e4b725b84d1e0b4cfd9ec58ce9">
 			<Firstname>Bob</Firstname>
-			<Surname>Bernstein</Surname>
+			<Lastname>Bernstein</Lastname>
 			<State>ENABLED</State>
 			<Locale>en_GB</Locale>
 			<Roles>
@@ -30,7 +36,7 @@
 		</User>
 		<User userId="3" username="jill" password="8cf37351b60f00084392043ce2e6256b96cea92949f90c7abce464cf164fbfa6">
 			<Firstname>Jill</Firstname>
-			<Surname>Johnson</Surname>
+			<Lastname>Johnson</Lastname>
 			<State>ENABLED</State>
 			<Locale>en_GB</Locale>
 			<Roles>
@@ -40,7 +46,7 @@
 		</User>
 		<User userId="4" username="sysAdmin" password="8cffb494ef5ff3f74a571206e141d4fb84f833e431b98c8b3be43727c4cbddc1">
 			<Firstname>System User</Firstname>
-			<Surname>Administrator</Surname>
+			<Lastname>Administrator</Lastname>
 			<State>SYSTEM</State>
 			<Locale>en_GB</Locale>
 			<Roles>
@@ -52,18 +58,19 @@
 	</Users>
 
 	<Roles>
-
 		<Role name="PrivilegeAdmin" />
-
+		<Role name="agent">
+			<Privilege name="li.strolch.agent.impl.StartRealms" policy="DefaultPrivilege">
+				<AllAllowed>true</AllAllowed>
+			</Privilege>
+		</Role>
 		<Role name="AppUser">
 			<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>
-
 		<Role name="sysAdmin">
 		</Role>
-
 		<Role name="OnlyGreetingServiceRole">
 			<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
 				<Allow>li.strolch.service.test.model.GreetingService</Allow>

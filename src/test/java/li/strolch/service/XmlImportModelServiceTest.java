@@ -27,10 +27,9 @@ public class XmlImportModelServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		XmlImportModelService svc = new XmlImportModelService();
 		XmlImportModelArgument arg = new XmlImportModelArgument();
 		arg.modelFileName = "Enums.xml";
 
-		runServiceInAllRealmTypes(svc, arg);
+		runServiceInAllRealmTypes(XmlImportModelService.class, arg);
 	}
 }

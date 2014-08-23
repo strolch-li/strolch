@@ -29,10 +29,9 @@ public class AddOrderServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		AddOrderService svc = new AddOrderService();
 		AddOrderArg arg = new AddOrderArg();
 		arg.order = ModelGenerator.createOrder("firstOrder", "First Order", "AdditionalOrders");
 
-		runServiceInAllRealmTypes(svc, arg);
+		runServiceInAllRealmTypes(AddOrderService.class, arg);
 	}
 }

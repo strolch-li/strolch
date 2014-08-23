@@ -29,10 +29,9 @@ public class UpdateResourceServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		UpdateResourceService svc = new UpdateResourceService();
 		UpdateResourceArg arg = new UpdateResourceArg();
 		arg.resource = ModelGenerator.createResource("yellow", "Modified Yellow Ball", "Ball");
 
-		runServiceInAllRealmTypes(svc, arg);
+		runServiceInAllRealmTypes(UpdateResourceService.class, arg);
 	}
 }

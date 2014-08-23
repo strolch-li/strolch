@@ -37,6 +37,8 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.After;
 import org.junit.Before;
 
+import ch.eitchnet.privilege.model.Certificate;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -49,6 +51,7 @@ public abstract class AbstractRealmServiceTest {
 	public static final String CONFIG_SRC = "src/test/resources/svctest"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
+	protected Certificate certificate;
 
 	@Before
 	public void before() throws SQLException {
@@ -62,8 +65,9 @@ public abstract class AbstractRealmServiceTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		importFromXml(REALM_CACHED, getServiceHandler());
-		importFromXml(REALM_TRANSACTIONAL, getServiceHandler());
+		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		importFromXml(REALM_CACHED, certificate, getServiceHandler());
+		importFromXml(REALM_TRANSACTIONAL, certificate, getServiceHandler());
 	}
 
 	@After
@@ -79,13 +83,13 @@ public abstract class AbstractRealmServiceTest {
 		}
 	}
 
-	public static void importFromXml(String realm, ServiceHandler serviceHandler) {
+	public static void importFromXml(String realm, Certificate certificate, ServiceHandler serviceHandler) {
 
 		XmlImportModelService svc = new XmlImportModelService();
 		XmlImportModelArgument arg = new XmlImportModelArgument();
 		arg.realm = realm;
 		arg.modelFileName = "StrolchModel.xml";
-		ServiceResult result = serviceHandler.doService(null, svc, arg);
+		ServiceResult result = serviceHandler.doService(certificate, svc, arg);
 		assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 	}
 
@@ -97,7 +101,8 @@ public abstract class AbstractRealmServiceTest {
 			before.run(runtimeMock.getContainer().getRealm(realm), runtimeMock.getContainer());
 
 		arg.realm = realm;
-		ServiceResult result = getServiceHandler().doService(null, svc, arg);
+
+		ServiceResult result = getServiceHandler().doService(certificate, svc, arg);
 		assertServiceResult(expectedState, expectedServiceResultType, result);
 
 		if (validator != null)
@@ -115,17 +120,21 @@ public abstract class AbstractRealmServiceTest {
 		public void run(StrolchRealm strolchRealm, ComponentContainer container);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(Service<T, U> svc,
-			T arg) {
-		runServiceInAllRealmTypes(svc, arg, null, null, null);
+	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(
+			Class<? extends Service<T, U>> svcClass, T arg) {
+		runServiceInAllRealmTypes(svcClass, arg, null, null, null);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(Service<T, U> svc,
-			T arg, Runner before, Runner validator, Runner after) {
+	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(
+			Class<? extends Service<T, U>> svcClass, T arg, Runner before, Runner validator, Runner after) {
 
-		runTransient(svc, arg, before, validator, after);
-		runCached(svc, arg, before, validator, after);
-		runTransactional(svc, arg, before, validator, after);
+		try {
+			runTransient(svcClass.newInstance(), arg, before, validator, after);
+			runCached(svcClass.newInstance(), arg, before, validator, after);
+			runTransactional(svcClass.newInstance(), arg, before, validator, after);
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException("Failed to instantiate class " + svcClass.getName() + ": " + e.getMessage(), e);
+		}
 	}
 
 	private <T extends ServiceArgument, U extends ServiceResult> void runTransactional(Service<T, U> svc, T arg,

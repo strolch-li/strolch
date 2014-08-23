@@ -31,7 +31,6 @@ public class AddParameterServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		AddParameterService svc = new AddParameterService();
 		AddParameterArg arg = new AddParameterArg();
 		arg.locator = Locator.valueOf("Resource/Ball/yellow/Bag/parameters");
 		FloatParameter parameter = new FloatParameter("diameter", "Diameter", 22.0);
@@ -39,6 +38,6 @@ public class AddParameterServiceTest extends AbstractRealmServiceTest {
 		parameter.setUom("cm");
 		arg.parameter = parameter;
 
-		runServiceInAllRealmTypes(svc, arg);
+		runServiceInAllRealmTypes(AddParameterService.class, arg);
 	}
 }
