@@ -25,7 +25,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
-import li.strolch.runtime.privilege.StrolchPrivilegeHandler;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
@@ -54,8 +54,8 @@ public final class RuntimeMock {
 		return this.agent;
 	}
 
-	public StrolchPrivilegeHandler getPrivilegeHandler() {
-		return this.container.getComponent(StrolchPrivilegeHandler.class);
+	public PrivilegeHandler getPrivilegeHandler() {
+		return this.container.getPrivilegeHandler();
 	}
 
 	public ServiceHandler getServiceHandler() {

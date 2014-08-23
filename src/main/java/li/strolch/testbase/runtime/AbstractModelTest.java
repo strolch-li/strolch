@@ -2,8 +2,11 @@ package li.strolch.testbase.runtime;
 
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 
 import org.junit.Test;
+
+import ch.eitchnet.privilege.model.Certificate;
 
 public abstract class AbstractModelTest {
 
@@ -13,7 +16,9 @@ public abstract class AbstractModelTest {
 
 	@Test
 	public void shouldStartContainer() {
-		try (StrolchTransaction tx = getRuntimeMock().getRealm(this.realmName).openTx()) {
+		PrivilegeHandler privilegeHandler = getRuntimeMock().getContainer().getPrivilegeHandler();
+		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
+		try (StrolchTransaction tx = getRuntimeMock().getRealm(this.realmName).openTx(certificate, "test")) {
 			tx.getOrderMap().getAllKeys(tx);
 		}
 	}
@@ -72,5 +77,11 @@ public abstract class AbstractModelTest {
 
 		ResourceModelTestRunner testRunner = new ResourceModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runBulkOperationTests();
+	}
+
+	@Test
+	public void shouldTestAudits() {
+		AuditModelTestRunner testRunner = new AuditModelTestRunner(getRuntimeMock(), this.realmName);
+		testRunner.runTestForAudits();
 	}
 }
