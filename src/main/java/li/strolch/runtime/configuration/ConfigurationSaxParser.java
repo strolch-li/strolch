@@ -15,6 +15,19 @@
  */
 package li.strolch.runtime.configuration;
 
+import static li.strolch.runtime.configuration.ConfigurationTags.API;
+import static li.strolch.runtime.configuration.ConfigurationTags.APPLICATION_NAME;
+import static li.strolch.runtime.configuration.ConfigurationTags.DEPENDS;
+import static li.strolch.runtime.configuration.ConfigurationTags.ENV_GLOBAL;
+import static li.strolch.runtime.configuration.ConfigurationTags.ID;
+import static li.strolch.runtime.configuration.ConfigurationTags.IMPL;
+import static li.strolch.runtime.configuration.ConfigurationTags.NAME;
+import static li.strolch.runtime.configuration.ConfigurationTags.STROLCH_CONFIGURATION_ENV;
+import static li.strolch.runtime.configuration.ConfigurationTags.STROLCH_CONFIGURATION_ENV_COMPONENT;
+import static li.strolch.runtime.configuration.ConfigurationTags.STROLCH_CONFIGURATION_ENV_COMPONENT_PROPERTIES;
+import static li.strolch.runtime.configuration.ConfigurationTags.STROLCH_CONFIGURATION_ENV_RUNTIME;
+import static li.strolch.runtime.configuration.ConfigurationTags.STROLCH_CONFIGURATION_ENV_RUNTIME_PROPERTIES;
+
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayDeque;
@@ -40,7 +53,6 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 	//private static final Logger logger = LoggerFactory.getLogger(ConfigurationSaxParser.class);
 
-	private static final String ENV_GLOBAL = "global";
 	private final String environment;
 	private String currentEnvironment;
 
@@ -92,20 +104,20 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		switch (locator.toString()) {
 
-		case "StrolchConfiguration/env": //$NON-NLS-1$
-			String env = attributes.getValue("id");
-			DBC.PRE.assertNotEmpty("attribute 'id' must be set on element 'env'", env);
+		case STROLCH_CONFIGURATION_ENV:
+			String env = attributes.getValue(ID);
+			DBC.PRE.assertNotEmpty("attribute 'id' must be set on element 'env'", env); //$NON-NLS-1$
 			if (this.envBuilders.containsKey(env)) {
-				String msg = "Environment {0} already exists!";
+				String msg = "Environment {0} already exists!"; //$NON-NLS-1$
 				throw new IllegalStateException(MessageFormat.format(msg, env));
 			}
 			this.currentEnvironment = env;
 			ConfigurationBuilder newEnvBuilder = new ConfigurationBuilder();
-			newEnvBuilder.runtimeBuilder().setEnvironment(currentEnvironment);
+			newEnvBuilder.runtimeBuilder().setEnvironment(this.currentEnvironment);
 			this.envBuilders.put(env, newEnvBuilder);
 			break;
 
-		case "StrolchConfiguration/env/Runtime": //$NON-NLS-1$
+		case STROLCH_CONFIGURATION_ENV_RUNTIME:
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				RuntimeHandler runtimeHandler = new RuntimeHandler(configurationBuilder, locator);
@@ -113,7 +125,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 			}
 			break;
 
-		case "StrolchConfiguration/env/Runtime/Properties": //$NON-NLS-1$
+		case STROLCH_CONFIGURATION_ENV_RUNTIME_PROPERTIES:
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				PropertiesHandler runtimePropertiesHandler = new PropertiesHandler(configurationBuilder, locator);
@@ -122,7 +134,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 			}
 			break;
 
-		case "StrolchConfiguration/env/Component": //$NON-NLS-1$
+		case STROLCH_CONFIGURATION_ENV_COMPONENT:
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				configurationBuilder.nextComponentBuilder();
@@ -131,7 +143,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 			}
 			break;
 
-		case "StrolchConfiguration/env/Component/Properties": //$NON-NLS-1$
+		case STROLCH_CONFIGURATION_ENV_COMPONENT_PROPERTIES:
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				PropertiesHandler componentPropertiesHandler = new PropertiesHandler(configurationBuilder, locator);
@@ -148,13 +160,14 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 	private ConfigurationBuilder getEnvBuilder(String environment) {
 		if (StringHelper.isEmpty(environment))
-			throw new IllegalStateException("environment must be set!");
+			throw new IllegalStateException("environment must be set!"); //$NON-NLS-1$
 		else if (environment.equals(ENV_GLOBAL))
-			return globalEnvBuilder;
+			return this.globalEnvBuilder;
 
 		ConfigurationBuilder envBuilder = this.envBuilders.get(environment);
 		if (envBuilder == null)
-			throw new IllegalStateException("No ConfigurationBuilder exists for env " + environment);
+			throw new IllegalStateException(MessageFormat.format(
+					"No ConfigurationBuilder exists for env {0}", environment)); //$NON-NLS-1$
 
 		return envBuilder;
 	}
@@ -167,16 +180,16 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		switch (locator.toString()) {
 
-		case "StrolchConfiguration/env": //$NON-NLS-1$
+		case STROLCH_CONFIGURATION_ENV:
 			break;
 
-		case "StrolchConfiguration/env/Runtime": //$NON-NLS-1$
+		case STROLCH_CONFIGURATION_ENV_RUNTIME:
 			if (isRequiredEnv(this.currentEnvironment)) {
 				assertExpectedLocator(locator, this.delegateHandlers.pop().getLocator());
 			}
 			break;
 
-		case "StrolchConfiguration/env/Runtime/Properties": //$NON-NLS-1$
+		case STROLCH_CONFIGURATION_ENV_RUNTIME_PROPERTIES:
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				assertExpectedLocator(locator, this.delegateHandlers.pop().getLocator());
@@ -184,13 +197,13 @@ public class ConfigurationSaxParser extends DefaultHandler {
 			}
 			break;
 
-		case "StrolchConfiguration/env/Component": //$NON-NLS-1$
+		case STROLCH_CONFIGURATION_ENV_COMPONENT:
 			if (isRequiredEnv(this.currentEnvironment)) {
 				assertExpectedLocator(locator, this.delegateHandlers.pop().getLocator());
 			}
 			break;
 
-		case "StrolchConfiguration/env/Component/Properties": //$NON-NLS-1$
+		case STROLCH_CONFIGURATION_ENV_COMPONENT_PROPERTIES:
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				assertExpectedLocator(locator, this.delegateHandlers.pop().getLocator());
@@ -220,8 +233,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		protected StringBuilder valueBuffer;
 
 		public ElementHandler(ConfigurationBuilder configurationBuilder, Locator locator) {
-			DBC.PRE.assertNotNull("configurationBuilder must be set!", configurationBuilder);
-			DBC.PRE.assertNotNull("locator must be set!", locator);
+			DBC.PRE.assertNotNull("configurationBuilder must be set!", configurationBuilder); //$NON-NLS-1$
+			DBC.PRE.assertNotNull("locator must be set!", locator); //$NON-NLS-1$
 			this.configurationBuilder = configurationBuilder;
 			this.locator = locator;
 		}
@@ -246,7 +259,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 			switch (qName) {
-			case "applicationName": //$NON-NLS-1$
+			case APPLICATION_NAME:
 				this.valueBuffer = new StringBuilder();
 				break;
 			default:
@@ -257,7 +270,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 			switch (qName) {
-			case "applicationName": //$NON-NLS-1$
+			case APPLICATION_NAME:
 				String applicationName = this.valueBuffer.toString();
 				this.configurationBuilder.runtimeBuilder().setApplicationName(applicationName);
 				this.valueBuffer = null;
@@ -277,16 +290,16 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 			switch (qName) {
-			case "name": //$NON-NLS-1$
+			case NAME:
 				this.valueBuffer = new StringBuilder();
 				break;
-			case "api": //$NON-NLS-1$
+			case API:
 				this.valueBuffer = new StringBuilder();
 				break;
-			case "impl": //$NON-NLS-1$
+			case IMPL:
 				this.valueBuffer = new StringBuilder();
 				break;
-			case "depends": //$NON-NLS-1$
+			case DEPENDS:
 				this.valueBuffer = new StringBuilder();
 				break;
 			default:
@@ -297,21 +310,21 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 			switch (qName) {
-			case "name": //$NON-NLS-1$
+			case NAME:
 				String name = this.valueBuffer.toString();
 				this.configurationBuilder.componentBuilder().setName(name);
 				this.valueBuffer = null;
 				break;
-			case "api": //$NON-NLS-1$
+			case API:
 				String api = this.valueBuffer.toString();
 				this.configurationBuilder.componentBuilder().setApi(api);
 				this.valueBuffer = null;
 				break;
-			case "impl": //$NON-NLS-1$
+			case IMPL:
 				String impl = this.valueBuffer.toString();
 				this.configurationBuilder.componentBuilder().setImpl(impl);
 				break;
-			case "depends": //$NON-NLS-1$
+			case DEPENDS:
 				String depends = this.valueBuffer.toString();
 				this.configurationBuilder.componentBuilder().addDependency(depends);
 				break;
@@ -472,7 +485,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 
 		public RuntimeConfiguration build(File rootPathF) {
-			RuntimeConfiguration configuration = new RuntimeConfiguration(this.applicationName, environment,
+			RuntimeConfiguration configuration = new RuntimeConfiguration(this.applicationName, this.environment,
 					getProperties(), rootPathF);
 			return configuration;
 		}

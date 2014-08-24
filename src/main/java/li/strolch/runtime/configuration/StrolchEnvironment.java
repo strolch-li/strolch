@@ -29,12 +29,12 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class StrolchEnvironment {
 
-	public static final String ENV_PROPERTIES_FILE = "ENV.properties";
+	public static final String ENV_PROPERTIES_FILE = "ENV.properties"; //$NON-NLS-1$
 
 	public static String getEnvironmentFromSystemProperties() {
 		String environment = System.getProperties().getProperty(StrolchConstants.ENV_STROLCH);
 		if (StringHelper.isEmpty(environment)) {
-			String msg = "The system property {0} is missing!";
+			String msg = "The system property {0} is missing!"; //$NON-NLS-1$
 			throw new StrolchConfigurationException(MessageFormat.format(msg, StrolchConstants.ENV_STROLCH));
 		}
 
@@ -43,17 +43,20 @@ public class StrolchEnvironment {
 
 	public static String getEnvironmentFromEnvProperties(File rootPath) {
 		File envF = new File(rootPath, ENV_PROPERTIES_FILE);
-		DBC.PRE.assertExists(ENV_PROPERTIES_FILE + " does not exist in " + rootPath.getAbsolutePath(), envF);
+		DBC.PRE.assertExists(
+				MessageFormat.format("{0} does not exist in {1}", ENV_PROPERTIES_FILE, rootPath.getAbsolutePath()), //$NON-NLS-1$
+				envF);
 		Properties envP = new Properties();
 		try (FileInputStream fin = new FileInputStream(envF)) {
 			envP.load(fin);
 		} catch (Exception e) {
-			throw new StrolchConfigurationException("Failed to load " + ENV_PROPERTIES_FILE + " in " + rootPath, e);
+			throw new StrolchConfigurationException(MessageFormat.format(
+					"Failed to load {0} in {1}", ENV_PROPERTIES_FILE, rootPath), e); //$NON-NLS-1$
 		}
 
 		String environment = envP.getProperty(StrolchConstants.ENV_STROLCH);
 		if (StringHelper.isEmpty(environment)) {
-			String msg = "The property {0} does not exist in {1}";
+			String msg = "The property {0} does not exist in {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, StrolchConstants.ENV_STROLCH, envF.getAbsolutePath());
 			throw new StrolchConfigurationException(msg);
 		}

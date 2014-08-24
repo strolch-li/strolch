@@ -78,8 +78,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			if (service instanceof AbstractService) {
 				AbstractService<?, ?> abstractService = (AbstractService<?, ?>) service;
 				abstractService.setContainer(getContainer());
-				if (privilegeContext != null)
-					abstractService.setPrivilegeContext(privilegeContext);
+				abstractService.setPrivilegeContext(privilegeContext);
 			}
 
 			U serviceResult = service.doService(argument);
