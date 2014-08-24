@@ -34,7 +34,6 @@ import li.strolch.persistence.xml.model.AuditContextFactory;
 import li.strolch.persistence.xml.model.OrderContextFactory;
 import li.strolch.persistence.xml.model.ResourceContextFactory;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.observer.ObserverHandler;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.xmlpers.api.IoMode;
 import ch.eitchnet.xmlpers.api.PersistenceConstants;
@@ -81,11 +80,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
 		PersistenceTransaction tx = this.persistenceManager.openTx(realm.getRealm());
-		XmlStrolchTransaction strolchTx = new XmlStrolchTransaction(realm, certificate, action, tx, this);
-		if (getContainer().hasComponent(ObserverHandler.class)) {
-			strolchTx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
-		}
-		return strolchTx;
+		return new XmlStrolchTransaction(realm, certificate, action, tx, this);
 	}
 
 	@Override

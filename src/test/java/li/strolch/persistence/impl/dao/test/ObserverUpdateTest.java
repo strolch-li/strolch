@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import li.strolch.agent.api.Observer;
+import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
@@ -32,8 +34,6 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.observer.Observer;
-import li.strolch.runtime.observer.ObserverHandler;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
