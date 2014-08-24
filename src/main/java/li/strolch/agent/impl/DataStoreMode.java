@@ -17,8 +17,6 @@ package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
 
-import li.strolch.agent.api.StrolchRealm;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
@@ -31,7 +29,7 @@ public enum DataStoreMode {
 		}
 
 		@Override
-		public StrolchRealm createRealm(String realm) {
+		public InternalStrolchRealm createRealm(String realm) {
 			return new EmptyRealm(realm);
 		}
 	}, //
@@ -42,7 +40,7 @@ public enum DataStoreMode {
 		}
 
 		@Override
-		public StrolchRealm createRealm(String realm) {
+		public InternalStrolchRealm createRealm(String realm) {
 			return new TransientRealm(realm);
 		}
 	}, //
@@ -53,7 +51,7 @@ public enum DataStoreMode {
 		}
 
 		@Override
-		public StrolchRealm createRealm(String realm) {
+		public InternalStrolchRealm createRealm(String realm) {
 			return new CachedRealm(realm);
 		}
 	}, //
@@ -64,12 +62,12 @@ public enum DataStoreMode {
 		}
 
 		@Override
-		public StrolchRealm createRealm(String realm) {
+		public InternalStrolchRealm createRealm(String realm) {
 			return new TransactionalRealm(realm);
 		}
 	}; //
 
-	public abstract StrolchRealm createRealm(String realm);
+	public abstract InternalStrolchRealm createRealm(String realm);
 
 	public abstract boolean isTransient();
 

@@ -21,7 +21,6 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.inmemory.InMemoryPersistence;
@@ -33,7 +32,7 @@ import ch.eitchnet.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class EmptyRealm extends StrolchRealm {
+public class EmptyRealm extends InternalStrolchRealm {
 
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;

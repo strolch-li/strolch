@@ -15,8 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import static ch.eitchnet.utils.helper.StringHelper.DOT;
-
 import java.io.File;
 import java.text.MessageFormat;
 
@@ -24,13 +22,11 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.inmemory.InMemoryPersistence;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import ch.eitchnet.privilege.model.Certificate;
@@ -41,7 +37,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class TransientRealm extends StrolchRealm {
+public class TransientRealm extends InternalStrolchRealm {
 
 	public static final String PREFIX_DATA_STORE_FILE = "dataStoreFile"; //$NON-NLS-1$
 
@@ -92,10 +88,7 @@ public class TransientRealm extends StrolchRealm {
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		super.initialize(container, configuration);
 
-		String key = PREFIX_DATA_STORE_FILE;
-		if (!getRealm().equals(StrolchConstants.DEFAULT_REALM))
-			key += DOT + getRealm();
-
+		String key = DefaultRealmHandler.makeRealmKey(getRealm(), PREFIX_DATA_STORE_FILE);
 		if (!configuration.hasProperty(key)) {
 			String msg = "There is no data store file for realm {0}. Set a property with key {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, getRealm(), key);
@@ -108,9 +101,7 @@ public class TransientRealm extends StrolchRealm {
 		this.resourceMap = new TransactionalResourceMap();
 		this.orderMap = new TransactionalOrderMap();
 
-		String enableAuditKey = DefaultRealmHandler.makeRealmKey(getRealm(),
-				DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
-		if (configuration.getBoolean(enableAuditKey, Boolean.FALSE)) {
+		if (isAuditTrailEnabled()) {
 			this.auditTrail = new TransactionalAuditTrail();
 			logger.info("Enabling AuditTrail for realm " + getRealm()); //$NON-NLS-1$
 		} else {

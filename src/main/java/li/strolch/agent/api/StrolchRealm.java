@@ -15,84 +15,29 @@
  */
 package li.strolch.agent.api;
 
-import static ch.eitchnet.utils.helper.StringHelper.DOT;
-
-import java.text.MessageFormat;
-import java.util.concurrent.TimeUnit;
-
 import li.strolch.agent.impl.DataStoreMode;
-import li.strolch.agent.impl.DefaultLockHandler;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.configuration.ComponentConfiguration;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
-import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class StrolchRealm {
+public interface StrolchRealm {
 
-	public static final String PROP_TRY_LOCK_TIME_UNIT = "tryLockTimeUnit"; //$NON-NLS-1$
-	public static final String PROP_TRY_LOCK_TIME = "tryLockTime"; //$NON-NLS-1$
-	protected static final Logger logger = LoggerFactory.getLogger(StrolchRealm.class);
-	private String realm;
-	private LockHandler lockHandler;
+	public String getRealm();
 
-	public StrolchRealm(String realm) {
-		DBC.PRE.assertNotEmpty("RealmName may not be empty!", realm); //$NON-NLS-1$
-		this.realm = realm;
-	}
+	public void lock(StrolchRootElement element);
 
-	public String getRealm() {
-		return this.realm;
-	}
+	public void unlock(StrolchRootElement lockedElement);
 
-	public void lock(StrolchRootElement element) {
-		DBC.PRE.assertNotNull("Can not lock a null pointer =)", element); //$NON-NLS-1$
-		this.lockHandler.lock(element);
-	}
+	public DataStoreMode getMode();
 
-	public void unlock(StrolchRootElement lockedElement) {
-		this.lockHandler.unlock(lockedElement);
-	}
+	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz);
 
-	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
+	public StrolchTransaction openTx(Certificate certificate, String action);
 
-		String propTryLockTimeUnit = PROP_TRY_LOCK_TIME_UNIT;
-		String propTryLockTime = PROP_TRY_LOCK_TIME;
-		if (!StrolchConstants.DEFAULT_REALM.equals(this.realm)) {
-			propTryLockTimeUnit += DOT + this.realm;
-			propTryLockTime += DOT + this.realm;
-		}
+	public boolean isAuditTrailEnabledForRead();
 
-		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(propTryLockTimeUnit, TimeUnit.SECONDS.name()));
-		long time = configuration.getLong(propTryLockTime, 10);
-		logger.info(MessageFormat.format("Using a locking try timeout of {0}s", timeUnit.toSeconds(time))); //$NON-NLS-1$
-		this.lockHandler = new DefaultLockHandler(this.realm, timeUnit, time);
-	}
-
-	public abstract DataStoreMode getMode();
-
-	public abstract void start(PrivilegeContext privilegeContext);
-
-	public abstract void stop();
-
-	public abstract void destroy();
-
-	public abstract StrolchTransaction openTx(Certificate certificate, Class<?> clazz);
-
-	public abstract StrolchTransaction openTx(Certificate certificate, String action);
-
-	public abstract ResourceMap getResourceMap();
-
-	public abstract OrderMap getOrderMap();
-
-	public abstract AuditTrail getAuditTrail();
+	public boolean isAuditTrailEnabled();
 }

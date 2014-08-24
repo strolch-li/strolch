@@ -72,6 +72,8 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	public <T extends StrolchRootElement> void lock(T element);
 
+	public <T extends StrolchRootElement> void unlock(T element);
+
 	public void addCommand(Command command);
 
 	public List<Order> doQuery(OrderQuery query);

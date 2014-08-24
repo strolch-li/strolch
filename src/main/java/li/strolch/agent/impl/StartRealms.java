@@ -15,7 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import li.strolch.agent.api.StrolchRealm;
 import ch.eitchnet.privilege.handler.SystemUserAction;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 
@@ -36,8 +35,7 @@ public class StartRealms implements SystemUserAction {
 	@Override
 	public void execute(PrivilegeContext privilegeContext) {
 		for (String realmName : this.defaultRealmHandler.getRealms().keySet()) {
-			StrolchRealm realm = this.defaultRealmHandler.getRealms().get(realmName);
-
+			InternalStrolchRealm realm = this.defaultRealmHandler.getRealms().get(realmName);
 			realm.start(privilegeContext);
 		}
 	}

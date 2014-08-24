@@ -23,7 +23,7 @@ import java.util.Map;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
 /**
@@ -49,7 +49,7 @@ public class DefaultObserverHandler extends StrolchComponent implements Observer
 	}
 
 	@Override
-	public void add(String key, List<StrolchElement> elements) {
+	public void add(String key, List<StrolchRootElement> elements) {
 		List<Observer> observerList = this.observerMap.get(key);
 		if (observerList != null && !observerList.isEmpty()) {
 			for (Observer observer : observerList) {
@@ -65,7 +65,7 @@ public class DefaultObserverHandler extends StrolchComponent implements Observer
 	}
 
 	@Override
-	public void update(String key, List<StrolchElement> elements) {
+	public void update(String key, List<StrolchRootElement> elements) {
 		List<Observer> observerList = this.observerMap.get(key);
 		if (observerList != null && !observerList.isEmpty()) {
 			for (Observer observer : observerList) {
@@ -81,7 +81,7 @@ public class DefaultObserverHandler extends StrolchComponent implements Observer
 	}
 
 	@Override
-	public void remove(String key, List<StrolchElement> elements) {
+	public void remove(String key, List<StrolchRootElement> elements) {
 		List<Observer> observerList = this.observerMap.get(key);
 		if (observerList != null && !observerList.isEmpty()) {
 			for (Observer observer : observerList) {

@@ -23,7 +23,6 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.OrderDao;
@@ -39,7 +38,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class CachedRealm extends StrolchRealm {
+public class CachedRealm extends InternalStrolchRealm {
 
 	private PersistenceHandler persistenceHandler;
 	private CachedResourceMap resourceMap;
@@ -85,13 +84,12 @@ public class CachedRealm extends StrolchRealm {
 	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		super.initialize(container, configuration);
+
 		this.persistenceHandler = container.getComponent(PersistenceHandler.class);
 		this.resourceMap = new CachedResourceMap();
 		this.orderMap = new CachedOrderMap();
 
-		String enableAuditKey = DefaultRealmHandler.makeRealmKey(getRealm(),
-				DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
-		if (configuration.getBoolean(enableAuditKey, Boolean.FALSE)) {
+		if (isAuditTrailEnabled()) {
 			this.auditTrail = new CachedAuditTrail();
 			logger.info("Enabling AuditTrail for realm " + getRealm()); //$NON-NLS-1$
 		} else {

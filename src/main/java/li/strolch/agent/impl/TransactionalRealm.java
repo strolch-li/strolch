@@ -21,7 +21,6 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -33,7 +32,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class TransactionalRealm extends StrolchRealm {
+public class TransactionalRealm extends InternalStrolchRealm {
 
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;
@@ -82,10 +81,7 @@ public class TransactionalRealm extends StrolchRealm {
 		this.resourceMap = new TransactionalResourceMap();
 		this.orderMap = new TransactionalOrderMap();
 
-		String enableAuditKey = DefaultRealmHandler.makeRealmKey(getRealm(),
-				DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
-
-		if (configuration.getBoolean(enableAuditKey, Boolean.FALSE)) {
+		if (isAuditTrailEnabled()) {
 			this.auditTrail = new TransactionalAuditTrail();
 			logger.info("Enabling AuditTrail for realm " + getRealm()); //$NON-NLS-1$
 		} else {

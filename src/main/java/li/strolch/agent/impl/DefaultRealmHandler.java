@@ -42,10 +42,11 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	public static final String AGENT_BOOT = "agent_boot"; //$NON-NLS-1$
 
 	public static final String PROP_ENABLE_AUDIT_TRAIL = "enableAuditTrail"; //$NON-NLS-1$
+	public static final String PROP_ENABLE_AUDIT_TRAIL_FOR_READ = "enableAuditTrailForRead"; //$NON-NLS-1$
 	public static final String PREFIX_DATA_STORE_MODE = "dataStoreMode"; //$NON-NLS-1$
 	public static final String PROP_REALMS = "realms"; //$NON-NLS-1$
 
-	protected Map<String, StrolchRealm> realms;
+	protected Map<String, InternalStrolchRealm> realms;
 
 	/**
 	 * @param container
@@ -81,7 +82,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 			String dataStoreModeKey = makeRealmKey(realmName, PREFIX_DATA_STORE_MODE);
 			String realmMode = configuration.getString(dataStoreModeKey, null);
 			DataStoreMode dataStoreMode = DataStoreMode.parseDataStoreMode(realmMode);
-			StrolchRealm realm = dataStoreMode.createRealm(realmName);
+			InternalStrolchRealm realm = dataStoreMode.createRealm(realmName);
 			this.realms.put(realmName, realm);
 		}
 		super.setup(configuration);
@@ -98,14 +99,14 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	public void initialize(ComponentConfiguration configuration) {
 
 		for (String realmName : this.realms.keySet()) {
-			StrolchRealm realm = this.realms.get(realmName);
+			InternalStrolchRealm realm = this.realms.get(realmName);
 			realm.initialize(getContainer(), configuration);
 		}
 
 		super.initialize(configuration);
 	}
 
-	Map<String, StrolchRealm> getRealms() {
+	Map<String, InternalStrolchRealm> getRealms() {
 		return this.realms;
 	}
 
@@ -121,7 +122,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	@Override
 	public void stop() {
 		for (String realmName : this.realms.keySet()) {
-			StrolchRealm realm = this.realms.get(realmName);
+			InternalStrolchRealm realm = this.realms.get(realmName);
 			realm.stop();
 		}
 		super.stop();
