@@ -86,7 +86,7 @@ public class XmlAuditDao implements AuditDao {
 		SubTypeRef subTypeRef = getTypeRef(type);
 		Set<String> keySet = this.tx.getMetadataDao().queryKeySet(subTypeRef);
 		for (String key : keySet) {
-			ObjectRef objectRef = subTypeRef.getChildIdRef(tx, key);
+			ObjectRef objectRef = subTypeRef.getChildIdRef(this.tx, key);
 			Audit audit = this.tx.getObjectDao().queryById(objectRef);
 			if (dateRange.contains(audit.getDate()))
 				size++;
@@ -117,7 +117,7 @@ public class XmlAuditDao implements AuditDao {
 		SubTypeRef subTypeRef = getTypeRef(type);
 		Set<String> keySet = this.tx.getMetadataDao().queryKeySet(subTypeRef);
 		for (String key : keySet) {
-			ObjectRef objectRef = subTypeRef.getChildIdRef(tx, key);
+			ObjectRef objectRef = subTypeRef.getChildIdRef(this.tx, key);
 			Audit audit = this.tx.getObjectDao().queryById(objectRef);
 			if (dateRange.contains(audit.getDate()))
 				audits.add(audit);
@@ -177,7 +177,7 @@ public class XmlAuditDao implements AuditDao {
 		SubTypeRef subTypeRef = getTypeRef(type);
 		Set<String> keySet = this.tx.getMetadataDao().queryKeySet(subTypeRef);
 		for (String key : keySet) {
-			ObjectRef objectRef = subTypeRef.getChildIdRef(tx, key);
+			ObjectRef objectRef = subTypeRef.getChildIdRef(this.tx, key);
 			Audit audit = this.tx.getObjectDao().queryById(objectRef);
 			if (dateRange.contains(audit.getDate())) {
 				PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(objectRef);

@@ -15,17 +15,13 @@
  */
 package li.strolch.persistence.xml;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.PersistenceHandler;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.xmlpers.api.ModificationResult;
-import ch.eitchnet.xmlpers.api.PersistenceContext;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import ch.eitchnet.xmlpers.api.TransactionResult;
 
@@ -53,37 +49,9 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 		Set<String> keys = result.getKeys();
 		for (String key : keys) {
 			ModificationResult modificationResult = result.getModificationResult(key);
-
-			List<StrolchRootElement> created = new ArrayList<>();
-			List<StrolchRootElement> updated = new ArrayList<>();
-			List<StrolchRootElement> deleted = new ArrayList<>();
-
-			List<Object> createdCtx = modificationResult.getCreated();
-			for (Object object : createdCtx) {
-				@SuppressWarnings("unchecked")
-				PersistenceContext<StrolchRootElement> ctx = (PersistenceContext<StrolchRootElement>) object;
-				if (ctx.getObject() != null)
-					created.add(ctx.getObject());
-			}
-			List<Object> updatedCtx = modificationResult.getUpdated();
-			for (Object object : updatedCtx) {
-				@SuppressWarnings("unchecked")
-				PersistenceContext<StrolchRootElement> ctx = (PersistenceContext<StrolchRootElement>) object;
-				if (ctx.getObject() != null)
-					updated.add(ctx.getObject());
-			}
-			List<Object> deletedCtx = modificationResult.getDeleted();
-			for (Object object : deletedCtx) {
-				@SuppressWarnings("unchecked")
-				PersistenceContext<StrolchRootElement> ctx = (PersistenceContext<StrolchRootElement>) object;
-				if (ctx.getObject() != null)
-					deleted.add(ctx.getObject());
-			}
-
-			li.strolch.persistence.api.ModificationResult mr = new li.strolch.persistence.api.ModificationResult(key,
-					created, updated, deleted);
-
-			txResult.addModificationResult(mr);
+			txResult.incCreated(modificationResult.getCreated().size());
+			txResult.incUpdated(modificationResult.getUpdated().size());
+			txResult.incDeleted(modificationResult.getDeleted().size());
 		}
 	}
 

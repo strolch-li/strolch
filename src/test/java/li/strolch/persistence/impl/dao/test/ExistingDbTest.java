@@ -34,6 +34,7 @@ import ch.eitchnet.privilege.model.Certificate;
 
 public class ExistingDbTest {
 
+	private static final String TEST = "test"; //$NON-NLS-1$
 	public static final String RUNTIME_PATH = "target/existingDbRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/test/resources/existingDbRuntime"; //$NON-NLS-1$
@@ -59,14 +60,14 @@ public class ExistingDbTest {
 	public void shouldQueryExistingData() {
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
-		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
+		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.getBytes());
 
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
-			Resource resource = tx.getResourceMap().getBy(tx, "MyType", "@1");
-			assertNotNull("Should be able to read existing element from db", resource);
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, TEST)) {
+			Resource resource = tx.getResourceMap().getBy(tx, "MyType", "@1"); //$NON-NLS-1$ //$NON-NLS-2$
+			assertNotNull("Should be able to read existing element from db", resource); //$NON-NLS-1$
 
-			Order order = tx.getOrderMap().getBy(tx, "MyType", "@1");
-			assertNotNull("Should be able to read existing element from db", order);
+			Order order = tx.getOrderMap().getBy(tx, "MyType", "@1"); //$NON-NLS-1$//$NON-NLS-2$
+			assertNotNull("Should be able to read existing element from db", order); //$NON-NLS-1$
 		}
 	}
 }

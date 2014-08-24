@@ -28,7 +28,7 @@ import java.util.Map;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
@@ -49,6 +49,7 @@ import ch.eitchnet.xmlpers.api.ModificationResult;
  */
 public class ObserverUpdateTest {
 
+	private static final String TEST = "test"; //$NON-NLS-1$
 	public static final String RUNTIME_PATH = "target/observerUpdateStrolchRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/test/resources/cachedruntime"; //$NON-NLS-1$
@@ -89,17 +90,17 @@ public class ObserverUpdateTest {
 		}
 
 		@Override
-		public void update(String key, List<StrolchElement> elements) {
+		public void update(String key, List<StrolchRootElement> elements) {
 			getModificationResult(key).getUpdated().addAll(elements);
 		}
 
 		@Override
-		public void remove(String key, List<StrolchElement> elements) {
+		public void remove(String key, List<StrolchRootElement> elements) {
 			getModificationResult(key).getDeleted().addAll(elements);
 		}
 
 		@Override
-		public void add(String key, List<StrolchElement> elements) {
+		public void add(String key, List<StrolchRootElement> elements) {
 			getModificationResult(key).getCreated().addAll(elements);
 		}
 	}
@@ -109,26 +110,26 @@ public class ObserverUpdateTest {
 
 		// register an observer for orders and resources
 		ElementAddedObserver observer = new ElementAddedObserver();
-		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.ORDER, observer); //$NON-NLS-1$
-		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.RESOURCE, observer); //$NON-NLS-1$
+		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.ORDER, observer);
+		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.RESOURCE, observer);
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
-		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
+		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.getBytes());
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, TEST)) {
 			tx.getOrderMap().add(tx, newOrder);
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, TEST)) {
 			tx.getResourceMap().add(tx, newResource);
 		}
 
 		assertEquals(2, observer.results.size());
-		assertEquals(1, observer.results.get(Tags.ORDER).getCreated().size()); //$NON-NLS-1$
-		assertEquals(1, observer.results.get(Tags.RESOURCE).getCreated().size()); //$NON-NLS-1$
+		assertEquals(1, observer.results.get(Tags.ORDER).getCreated().size());
+		assertEquals(1, observer.results.get(Tags.RESOURCE).getCreated().size());
 	}
 }

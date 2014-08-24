@@ -77,6 +77,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 		super.initialize(componentConfiguration);
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
 		PersistenceTransaction tx = this.persistenceManager.openTx(realm.getRealm());
