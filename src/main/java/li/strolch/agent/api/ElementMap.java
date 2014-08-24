@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -28,7 +28,7 @@ import li.strolch.runtime.StrolchConstants;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface ElementMap<T extends StrolchElement> {
+public interface ElementMap<T extends StrolchRootElement> {
 
 	public boolean hasType(StrolchTransaction tx, String type);
 

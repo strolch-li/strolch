@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.agent.api.ElementMap;
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -39,7 +39,7 @@ import ch.eitchnet.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class CachedElementMap<T extends StrolchElement> implements ElementMap<T> {
+public abstract class CachedElementMap<T extends StrolchRootElement> implements ElementMap<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(CachedElementMap.class);
 	private Set<String> allKeys;
@@ -208,7 +208,7 @@ public abstract class CachedElementMap<T extends StrolchElement> implements Elem
 
 	/**
 	 * Special method used when starting the container to cache the values. Not to be used anywhere else but from the
-	 * {@link CachedRealm} and of course through the {@link #add(StrolchTransaction, StrolchElement)}-call to not
+	 * {@link CachedRealm} and of course through the {@link #add(StrolchTransaction, StrolchRootElement)}-call to not
 	 * duplicate code
 	 * 
 	 * @param element

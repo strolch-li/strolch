@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import li.strolch.agent.api.ElementMap;
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
@@ -14,7 +14,7 @@ import li.strolch.runtime.StrolchConstants;
  * 
  * @param <T>
  */
-public abstract class TransactionalElementMap<T extends StrolchElement> implements ElementMap<T> {
+public abstract class TransactionalElementMap<T extends StrolchRootElement> implements ElementMap<T> {
 
 	protected abstract StrolchDao<T> getDao(StrolchTransaction tx);
 
