@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import li.strolch.agent.api.Observer;
-import li.strolch.agent.api.ObserverHandler;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
@@ -110,21 +110,22 @@ public class ObserverUpdateTest {
 
 		// register an observer for orders and resources
 		ElementAddedObserver observer = new ElementAddedObserver();
-		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.ORDER, observer);
-		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.RESOURCE, observer);
+		StrolchRealm realm = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM);
+		realm.getObserverHandler().registerObserver(Tags.ORDER, observer);
+		realm.getObserverHandler().registerObserver(Tags.RESOURCE, observer);
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
 		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.getBytes());
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, TEST)) {
+		try (StrolchTransaction tx = realm.openTx(certificate, TEST)) {
 			tx.getOrderMap().add(tx, newOrder);
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, TEST)) {
+		try (StrolchTransaction tx = realm.openTx(certificate, TEST)) {
 			tx.getResourceMap().add(tx, newResource);
 		}
 
