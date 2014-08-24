@@ -17,7 +17,7 @@ while read project; do
     exit 1
   fi
 
-  echo "Pushing ${name}..."
+  echo "== Pushing ${name}..."
   cd ${name}
   git push
   cd ..

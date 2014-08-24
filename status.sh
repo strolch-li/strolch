@@ -17,7 +17,7 @@ while read project; do
     exit 1
   fi
 
-  echo "Status of ${name}..."
+  echo "== Status of ${name}..."
   cd ${name}
   git status -s
   cd ..

@@ -19,6 +19,7 @@ while read project; do
     exit 1
   fi
 
+  echo "== Cloning ${project}..."
   if [ -d "${name}" ] ; then
     echo "Project ${name} already cloned."
   else

@@ -17,12 +17,13 @@ while read project; do
     exit 1
   fi
 
-  echo "Pulling ${project}..."
+  echo "== Pulling ${project}..."
   cd ${name}
-  git pull
+  git pull origin ${tag}
   git checkout ${tag}
   cd ..
   echo
+
 done < ${projectsFile}
 
 echo "Done."
