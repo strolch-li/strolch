@@ -38,6 +38,9 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public class DefaultRealmHandler extends StrolchComponent implements RealmHandler {
 
+	private static final String SYSTEM_USER_AGENT = "agent"; //$NON-NLS-1$
+	public static final String AGENT_BOOT = "agent_boot"; //$NON-NLS-1$
+
 	public static final String PROP_ENABLE_AUDIT_TRAIL = "enableAuditTrail"; //$NON-NLS-1$
 	public static final String PREFIX_DATA_STORE_MODE = "dataStoreMode"; //$NON-NLS-1$
 	public static final String PROP_REALMS = "realms"; //$NON-NLS-1$
@@ -110,7 +113,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	public void start() {
 
 		PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
-		privilegeHandler.runAsSystem("agent", new StartRealms(this));
+		privilegeHandler.runAsSystem(SYSTEM_USER_AGENT, new StartRealms(this));
 
 		super.start();
 	}

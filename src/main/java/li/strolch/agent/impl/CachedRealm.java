@@ -57,13 +57,13 @@ public class CachedRealm extends StrolchRealm {
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action) {
-		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
+		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
 		return this.persistenceHandler.openTx(this, certificate, action);
 	}
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz) {
-		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
+		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
 		return this.persistenceHandler.openTx(this, certificate, clazz.getName());
 	}
 
@@ -93,10 +93,10 @@ public class CachedRealm extends StrolchRealm {
 				DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
 		if (configuration.getBoolean(enableAuditKey, Boolean.FALSE)) {
 			this.auditTrail = new CachedAuditTrail();
-			logger.info("Enabling AuditTrail for realm " + getRealm());
+			logger.info("Enabling AuditTrail for realm " + getRealm()); //$NON-NLS-1$
 		} else {
 			this.auditTrail = new NoStrategyAuditTrail();
-			logger.info("AuditTrail is disabled for realm " + getRealm());
+			logger.info("AuditTrail is disabled for realm " + getRealm()); //$NON-NLS-1$
 		}
 	}
 
@@ -107,7 +107,7 @@ public class CachedRealm extends StrolchRealm {
 		int nrOfOrders = 0;
 		int nrOfResources = 0;
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "agent_boot")) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
 			ResourceDao resourceDao = tx.getPersistenceHandler().getResourceDao(tx);
 			Set<String> resourceTypes = resourceDao.queryTypes();
 			for (String type : resourceTypes) {
@@ -119,7 +119,7 @@ public class CachedRealm extends StrolchRealm {
 			}
 		}
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "agent_boot")) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
 			OrderDao orderDao = tx.getPersistenceHandler().getOrderDao(tx);
 			Set<String> orderTypes = orderDao.queryTypes();
 			for (String type : orderTypes) {
