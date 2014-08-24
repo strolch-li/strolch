@@ -24,6 +24,7 @@
 			<Properties>
 				<dataStoreMode>CACHED</dataStoreMode>
 				<enableAuditTrail>true</enableAuditTrail>
+				<enableObserverUpdates>true</enableObserverUpdates>
 			</Properties>
 		</Component>
 		<Component>
