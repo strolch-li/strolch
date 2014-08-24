@@ -7,6 +7,7 @@ function logAheadCount() {
 #  if [ "${aheadCount}" -ne 0 ] ; then
     project="${PWD}"
   	project="${project##*/}"
+  	echo "== Status: ${project}..."
     echo "${aheadCount} commits need pushing for ${project}"
 #  fi
 }
@@ -16,7 +17,17 @@ while read project; do
   if [ "${project}" == "" ] ; then
   	continue;
   fi
-  cd "${project}"
+
+  array=(${project//:/ })
+  name="${array[0]}"
+  tag="${array[1]}"
+
+  if [ "${name}" == "" ] ||  [ "${tag}" == "" ] ; then
+    echo -e "ERROR: Invalid project: ${project}! Must have form <git_name:tag>"
+    exit 1
+  fi
+
+  cd "${name}"
   logAheadCount
   cd ..
 done < ${projectsFile}
