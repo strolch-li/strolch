@@ -40,32 +40,42 @@ while read project; do
   if [ "${project}" == "" ] ; then
   	continue;
   fi
-  if ! cd "${project}" ; then
-    echo "ERROR: Could not switch to directory ${project}"
+
+  array=(${project//:/ })
+  name="${array[0]}"
+  tag="${array[1]}"
+
+  if [ "${name}" == "" ] ||  [ "${tag}" == "" ] ; then
+    echo -e "ERROR: Invalid project: ${project}! Must have form <git_name:tag>"
     exit 1
   fi
 
-  echo "INFO: Copying ${project} packages..."
+  if ! cd "${name}" ; then
+    echo "ERROR: Could not switch to directory ${name}"
+    exit 1
+  fi
+
+  echo "INFO: Copying ${name} packages..."
   if ls target/*.jar 2>/dev/null ; then
     if ! cp target/*.jar "${workDir}" ; then
-      echo "ERROR: Failed to copy package for project ${project}."
+      echo "ERROR: Failed to copy package for project ${name}."
       exit 1
     fi
     if ! cp target/*.jar "${DIST_STROLCH}" ; then
-      echo "ERROR: Failed to publish package for project ${project}."
+      echo "ERROR: Failed to publish package for project ${name}."
       exit 1
     fi
   elif ls target/*.war 2>/dev/null ; then
     if ! cp target/*.war "${workDir}" ; then
-      echo "ERROR: Failed to copy wars for project ${project}."
+      echo "ERROR: Failed to copy wars for project ${name}."
       exit 1
     fi
     if ! cp target/*.war "${DIST_STROLCH}" ; then
-      echo "ERROR: Failed to publish wars for project ${project}."
+      echo "ERROR: Failed to publish wars for project ${name}."
       exit 1
     fi
   else
-    echo "INFO: Project ${project} has no target, skipping."
+    echo "INFO: Project ${name} has no target, skipping."
   fi
 
   cd ..
