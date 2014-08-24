@@ -15,7 +15,7 @@
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<buildTimestamp>${maven.build.timestamp}</buildTimestamp>
 	</properties>
-
+	
 	<!-- POM Reference: http://maven.apache.org/pom.html#Licenses -->
 
 	<licenses>
@@ -202,7 +202,6 @@
 
 		<pluginManagement>
 			<plugins>
-
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>versions-maven-plugin</artifactId>
