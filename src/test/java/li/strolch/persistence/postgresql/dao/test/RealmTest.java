@@ -40,6 +40,12 @@ import ch.eitchnet.privilege.model.Certificate;
 
 public class RealmTest extends AbstractModelTest {
 
+	private static final String TESTUSER2 = "testuser2"; //$NON-NLS-1$
+	private static final String TESTUSER1 = "testuser1"; //$NON-NLS-1$
+	private static final String SECOND = "second"; //$NON-NLS-1$
+	private static final String TEST = "test"; //$NON-NLS-1$
+	private static final String FIRST = "first"; //$NON-NLS-1$
+
 	public static final String RUNTIME_PATH = "target/realmtest/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/test/resources/realmtest"; //$NON-NLS-1$
@@ -54,8 +60,8 @@ public class RealmTest extends AbstractModelTest {
 	@BeforeClass
 	public static void beforeClass() throws SQLException {
 
-		dropSchema("jdbc:postgresql://localhost/testdb1", "testuser1", "test");
-		dropSchema("jdbc:postgresql://localhost/testdb2", "testuser2", "test");
+		dropSchema("jdbc:postgresql://localhost/testdb1", TESTUSER1, TEST); //$NON-NLS-1$
+		dropSchema("jdbc:postgresql://localhost/testdb2", TESTUSER2, TEST); //$NON-NLS-1$
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
@@ -67,52 +73,52 @@ public class RealmTest extends AbstractModelTest {
 
 	@Before
 	public void before() {
-		this.realmName = "second";
+		this.realmName = SECOND;
 	}
 
 	@Test
 	public void testDifferentRealms() {
 
-		String expectedId1 = "@realmTestId1";
-		String expectedId2 = "@realmTestId2";
-		String type = "Bla";
+		String expectedId1 = "@realmTestId1"; //$NON-NLS-1$
+		String expectedId2 = "@realmTestId2"; //$NON-NLS-1$
+		String type = "Bla"; //$NON-NLS-1$
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
-		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
+		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.getBytes());
 
 		{
-			StrolchRealm firstRealm = runtimeMock.getRealm("first");
+			StrolchRealm firstRealm = runtimeMock.getRealm(FIRST);
 			assertEquals(DataStoreMode.TRANSACTIONAL, firstRealm.getMode());
-			Resource expectedRes1 = ModelGenerator.createResource(expectedId1, "Bla bla", type);
-			try (StrolchTransaction tx = firstRealm.openTx(certificate, "test")) {
+			Resource expectedRes1 = ModelGenerator.createResource(expectedId1, "Bla bla", type); //$NON-NLS-1$
+			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST)) {
 				tx.getResourceMap().add(tx, expectedRes1);
 			}
 
-			try (StrolchTransaction tx = firstRealm.openTx(certificate, "test")) {
+			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST)) {
 				Resource res = tx.getResourceMap().getBy(tx, type, expectedId1);
-				assertEquals("Should find object previously added in same realm!", expectedRes1, res);
+				assertEquals("Should find object previously added in same realm!", expectedRes1, res); //$NON-NLS-1$
 			}
 		}
 
 		{
-			StrolchRealm secondRealm = runtimeMock.getRealm("second");
+			StrolchRealm secondRealm = runtimeMock.getRealm(SECOND);
 			assertEquals(DataStoreMode.TRANSACTIONAL, secondRealm.getMode());
-			Resource expectedRes2 = ModelGenerator.createResource(expectedId2, "Bla bla", type);
-			try (StrolchTransaction tx = secondRealm.openTx(certificate, "test")) {
+			Resource expectedRes2 = ModelGenerator.createResource(expectedId2, "Bla bla", type); //$NON-NLS-1$
+			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
 				tx.getResourceMap().add(tx, expectedRes2);
 			}
 
-			try (StrolchTransaction tx = secondRealm.openTx(certificate, "test")) {
+			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
 				Resource res = tx.getResourceMap().getBy(tx, type, expectedId2);
-				assertEquals("Should find object previously added in same realm!", expectedRes2, res);
+				assertEquals("Should find object previously added in same realm!", expectedRes2, res); //$NON-NLS-1$
 			}
 		}
 
 		{
-			StrolchRealm secondRealm = runtimeMock.getRealm("second");
-			try (StrolchTransaction tx = secondRealm.openTx(certificate, "test")) {
+			StrolchRealm secondRealm = runtimeMock.getRealm(SECOND);
+			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
 				Resource res = tx.getResourceMap().getBy(tx, type, expectedId1);
-				assertNull("Should not find object added in differenct realm!", res);
+				assertNull("Should not find object added in differenct realm!", res); //$NON-NLS-1$
 			}
 		}
 	}

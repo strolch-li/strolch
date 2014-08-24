@@ -33,7 +33,7 @@ import java.util.Map;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.ModificationResult;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -96,17 +96,17 @@ public class ObserverUpdateTest {
 		}
 
 		@Override
-		public void update(String key, List<StrolchElement> elements) {
+		public void update(String key, List<StrolchRootElement> elements) {
 			getModificationResult(key).getUpdated().addAll(elements);
 		}
 
 		@Override
-		public void remove(String key, List<StrolchElement> elements) {
+		public void remove(String key, List<StrolchRootElement> elements) {
 			getModificationResult(key).getDeleted().addAll(elements);
 		}
 
 		@Override
-		public void add(String key, List<StrolchElement> elements) {
+		public void add(String key, List<StrolchRootElement> elements) {
 			getModificationResult(key).getCreated().addAll(elements);
 		}
 	}
@@ -120,17 +120,17 @@ public class ObserverUpdateTest {
 		runtimeMock.getContainer().getComponent(ObserverHandler.class).registerObserver(Tags.RESOURCE, observer);
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
-		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
+		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) { //$NON-NLS-1$
 			tx.getOrderMap().add(tx, newOrder);
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test");) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test");) { //$NON-NLS-1$
 			tx.getResourceMap().add(tx, newResource);
 		}
 

@@ -50,7 +50,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public boolean hasElement(String type, Long id) {
-		String sql = "select count(*) from audits where element_type = ? and id = ?";
+		String sql = "select count(*) from audits where element_type = ? and id = ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -64,18 +64,18 @@ public class PostgreSqlAuditDao implements AuditDao {
 				if (numberOfElements == 1)
 					return true;
 
-				String msg = MessageFormat.format("Non unique number of elements with type {0} and id {1}", type, id);
+				String msg = MessageFormat.format("Non unique number of elements with type {0} and id {1}", type, id); //$NON-NLS-1$
 				throw new StrolchPersistenceException(msg);
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e); //$NON-NLS-1$
 		}
 	}
 
 	@Override
 	public long querySize(DateRange dateRange) {
-		String sql = "select count(*) from audits where date between ? and ?";
+		String sql = "select count(*) from audits where date between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setDate(1, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
@@ -87,13 +87,13 @@ public class PostgreSqlAuditDao implements AuditDao {
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e); //$NON-NLS-1$
 		}
 	}
 
 	@Override
 	public long querySize(String type, DateRange dateRange) {
-		String sql = "select count(*) from audits where element_type = ? and date between ? and ?";
+		String sql = "select count(*) from audits where element_type = ? and date between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -106,7 +106,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e); //$NON-NLS-1$
 		}
 	}
 
@@ -114,15 +114,15 @@ public class PostgreSqlAuditDao implements AuditDao {
 	public Set<String> queryTypes() {
 		Set<String> keySet = new HashSet<>();
 
-		String sql = "select distinct element_type from audits";
+		String sql = "select distinct element_type from audits"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
-					keySet.add(result.getString("element_type"));
+					keySet.add(result.getString("element_type")); //$NON-NLS-1$
 				}
 			}
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e); //$NON-NLS-1$
 		}
 
 		return keySet;
@@ -131,7 +131,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public Audit queryBy(String type, Long id) {
 
-		String sql = "select id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type from audits where element_type = ? and id = ?";
+		String sql = "select id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type from audits where element_type = ? and id = ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -143,18 +143,18 @@ public class PostgreSqlAuditDao implements AuditDao {
 				}
 				Audit audit = auditFrom(result);
 				if (result.next())
-					throw new StrolchPersistenceException("Non unique result for query: " + sql);
+					throw new StrolchPersistenceException("Non unique result for query: " + sql); //$NON-NLS-1$
 				return audit;
 			}
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e); //$NON-NLS-1$
 		}
 	}
 
 	@Override
 	public List<Audit> queryAll(String type, DateRange dateRange) {
 		List<Audit> list = new ArrayList<>();
-		String sql = "select id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type from audits where element_type = ? and date between ? and ?";
+		String sql = "select id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type from audits where element_type = ? and date between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -168,7 +168,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e); //$NON-NLS-1$
 		}
 
 		return list;
@@ -176,19 +176,19 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void save(Audit audit) {
-		String sql = "insert into audits (id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type)";
-		try (PreparedStatement preparedStatement = tx.getConnection().prepareStatement(sql)) {
+		String sql = "insert into audits (id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type)"; //$NON-NLS-1$
+		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			setAuditFields(audit, preparedStatement);
 
 			int count = preparedStatement.executeUpdate();
 			if (count != 1) {
 				throw new StrolchPersistenceException(MessageFormat.format(
-						"Expected to create 1 record, but created {0} for audit {2}", count, audit.getId()));
+						"Expected to create 1 record, but created {0} for audit {2}", count, audit.getId())); //$NON-NLS-1$
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Audit {0} due to {1}", audit,
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Audit {0} due to {1}", audit, //$NON-NLS-1$
 					e.getLocalizedMessage()), e);
 		}
 	}
@@ -202,8 +202,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void update(Audit audit) {
-		String sql = "update audits set id = ?, username = ?, firstname = ?, lastname = ?, date = ?, element_type = ?, element_accessed = ?, new_version = ?, action = ?, access_type = ?::access_type where id = ?";
-		try (PreparedStatement preparedStatement = tx.getConnection().prepareStatement(sql)) {
+		String sql = "update audits set id = ?, username = ?, firstname = ?, lastname = ?, date = ?, element_type = ?, element_accessed = ?, new_version = ?, action = ?, access_type = ?::access_type where id = ?"; //$NON-NLS-1$
+		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			setAuditFields(audit, preparedStatement);
 			preparedStatement.setLong(11, audit.getId());
@@ -211,11 +211,11 @@ public class PostgreSqlAuditDao implements AuditDao {
 			int count = preparedStatement.executeUpdate();
 			if (count != 1) {
 				throw new StrolchPersistenceException(MessageFormat.format(
-						"Expected to update 1 record, but updated {0} for audit {2}", count, audit.getId()));
+						"Expected to update 1 record, but updated {0} for audit {2}", count, audit.getId())); //$NON-NLS-1$
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Audit {0} due to {1}", audit,
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Audit {0} due to {1}", audit, //$NON-NLS-1$
 					e.getLocalizedMessage()), e);
 		}
 	}
@@ -229,20 +229,20 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void remove(Audit audit) {
-		String sql = "delete from audits where id = ?";
+		String sql = "delete from audits where id = ?"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setLong(1, audit.getId());
 
 			int count = preparedStatement.executeUpdate();
 			if (count != 1) {
-				String msg = "Expected to delete 1 audit with id {0} but deleted {1} elements!";
+				String msg = "Expected to delete 1 audit with id {0} but deleted {1} elements!"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, audit.getId(), count);
 				throw new StrolchPersistenceException(msg);
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {2}",
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {2}", //$NON-NLS-1$
 					audit.getId(), e.getLocalizedMessage()), e);
 		}
 	}
@@ -256,7 +256,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public long removeAll(String type, DateRange dateRange) {
-		String sql = "delete from audits where element_type = ? and date between ? and ?";
+		String sql = "delete from audits where element_type = ? and date between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setString(1, type);
@@ -267,7 +267,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 			return modCount;
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove all elements due to {0}",
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove all elements due to {0}", //$NON-NLS-1$
 					e.getLocalizedMessage()), e);
 		}
 	}

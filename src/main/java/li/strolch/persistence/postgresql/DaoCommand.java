@@ -15,12 +15,12 @@
  */
 package li.strolch.persistence.postgresql;
 
-import li.strolch.persistence.api.ModificationResult;
+import li.strolch.persistence.api.TransactionResult;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface DaoCommand {
 
-	public void doComand(ModificationResult modificationResult);
+	public void doComand(TransactionResult txResult);
 }

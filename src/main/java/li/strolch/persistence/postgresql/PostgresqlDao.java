@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 
 import li.strolch.model.StrolchElement;
-import li.strolch.persistence.api.ModificationResult;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionResult;
@@ -224,9 +223,9 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	public void save(final T res) {
 		this.commands.add(new DaoCommand() {
 			@Override
-			public void doComand(ModificationResult modificationResult) {
+			public void doComand(TransactionResult txResult) {
 				internalSave(res);
-				modificationResult.getCreated().add(res);
+				txResult.incCreated(1);
 			}
 		});
 	}
@@ -235,11 +234,11 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	public void saveAll(final List<T> elements) {
 		this.commands.add(new DaoCommand() {
 			@Override
-			public void doComand(ModificationResult modificationResult) {
+			public void doComand(TransactionResult txResult) {
 				for (T element : elements) {
 					internalSave(element);
 				}
-				modificationResult.getCreated().addAll(elements);
+				txResult.incCreated(elements.size());
 			}
 		});
 	}
@@ -248,9 +247,9 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	public void update(final T element) {
 		this.commands.add(new DaoCommand() {
 			@Override
-			public void doComand(ModificationResult modificationResult) {
+			public void doComand(TransactionResult txResult) {
 				internalUpdate(element);
-				modificationResult.getUpdated().add(element);
+				txResult.incUpdated(1);
 			}
 		});
 	}
@@ -259,11 +258,11 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	public void updateAll(final List<T> elements) {
 		this.commands.add(new DaoCommand() {
 			@Override
-			public void doComand(ModificationResult modificationResult) {
+			public void doComand(TransactionResult txResult) {
 				for (T element : elements) {
 					internalUpdate(element);
 				}
-				modificationResult.getUpdated().addAll(elements);
+				txResult.incUpdated(elements.size());
 			}
 		});
 	}
@@ -272,9 +271,9 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	public void remove(final T element) {
 		this.commands.add(new DaoCommand() {
 			@Override
-			public void doComand(ModificationResult modificationResult) {
+			public void doComand(TransactionResult txResult) {
 				internalRemove(element);
-				modificationResult.getDeleted().add(element);
+				txResult.incDeleted(1);
 			}
 		});
 	}
@@ -283,11 +282,11 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	public void removeAll(final List<T> elements) {
 		this.commands.add(new DaoCommand() {
 			@Override
-			public void doComand(ModificationResult modificationResult) {
+			public void doComand(TransactionResult txResult) {
 				for (T element : elements) {
 					internalRemove(element);
 				}
-				modificationResult.getDeleted().addAll(elements);
+				txResult.incDeleted(elements.size());
 			}
 		});
 	}
@@ -299,8 +298,9 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 
 		this.commands.add(new DaoCommand() {
 			@Override
-			public void doComand(ModificationResult modificationResult) {
+			public void doComand(TransactionResult txResult) {
 				internalRemoveAll(toRemove);
+				txResult.incDeleted(toRemove);
 			}
 		});
 
@@ -314,8 +314,9 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 
 		this.commands.add(new DaoCommand() {
 			@Override
-			public void doComand(ModificationResult modificationResult) {
+			public void doComand(TransactionResult txResult) {
 				internalRemoveAllBy(toRemove, type);
+				txResult.incDeleted(toRemove);
 			}
 		});
 
@@ -384,10 +385,8 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	}
 
 	void commit(TransactionResult txResult) {
-		ModificationResult modificationResult = new ModificationResult(getClassName());
-		txResult.addModificationResult(modificationResult);
 		for (DaoCommand command : this.commands) {
-			command.doComand(modificationResult);
+			command.doComand(txResult);
 		}
 	}
 
