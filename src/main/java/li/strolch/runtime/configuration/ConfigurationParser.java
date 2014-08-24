@@ -18,7 +18,6 @@ package li.strolch.runtime.configuration;
 import java.io.File;
 import java.text.MessageFormat;
 
-import li.strolch.model.Tags;
 import li.strolch.runtime.configuration.ConfigurationSaxParser.ConfigurationBuilder;
 import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.XmlHelper;
@@ -32,7 +31,7 @@ public class ConfigurationParser {
 	public static StrolchConfiguration parseConfiguration(String environment, File rootPathF) {
 		DBC.PRE.assertNotEmpty("environment value must be set!", environment); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("roothPath must be set!", rootPathF); //$NON-NLS-1$
-		DBC.PRE.assertNotEquals("environment must be a value other than 'global'!", Tags.GLOBAL, environment); //$NON-NLS-1$
+		DBC.PRE.assertNotEquals("environment must be a value other than 'global'!", ConfigurationTags.ENV_GLOBAL, environment); //$NON-NLS-1$
 
 		if (!rootPathF.isDirectory() || !rootPathF.canRead()) {
 			String msg = "Root path is not readable at {0}"; //$NON-NLS-1$
