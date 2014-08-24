@@ -17,6 +17,7 @@ package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,10 @@ public class DefaultObserverHandler implements ObserverHandler {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultObserverHandler.class);
 
 	private Map<String, List<Observer>> observerMap;
+
+	public DefaultObserverHandler() {
+		this.observerMap = new HashMap<>();
+	}
 
 	@Override
 	public void add(String key, List<StrolchRootElement> elements) {

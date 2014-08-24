@@ -101,25 +101,16 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		this.lockHandler = new DefaultLockHandler(this.realm, timeUnit, time);
 	}
 
-	/**
-	 * @return the auditTrailEnabled
-	 */
 	@Override
 	public boolean isAuditTrailEnabled() {
 		return this.auditTrailEnabled;
 	}
 
-	/**
-	 * @return the auditTrailEnabledForRead
-	 */
 	@Override
 	public boolean isAuditTrailEnabledForRead() {
 		return this.auditTrailEnabledForRead;
 	}
 
-	/**
-	 * @return
-	 */
 	@Override
 	public boolean isUpdateObservers() {
 		return this.updateObservers;
@@ -127,6 +118,8 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 
 	@Override
 	public ObserverHandler getObserverHandler() {
+		if (!this.updateObservers)
+			throw new IllegalArgumentException("ObserverUpdates are not enabled!"); //$NON-NLS-1$
 		return this.observerHandler;
 	}
 
