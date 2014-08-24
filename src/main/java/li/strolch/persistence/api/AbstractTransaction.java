@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import li.strolch.agent.api.AuditTrail;
+import li.strolch.agent.api.ObserverHandler;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchAgent;
@@ -56,7 +57,6 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.persistence.inmemory.InMemoryTransaction;
-import li.strolch.runtime.observer.ObserverHandler;
 import li.strolch.service.api.Command;
 
 import org.slf4j.Logger;
@@ -75,7 +75,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private InternalStrolchRealm realm;
 
 	private TransactionCloseStrategy closeStrategy;
-	private ObserverHandler observerHandler;
 	private boolean suppressUpdates;
 	private TransactionResult txResult;
 
@@ -162,14 +161,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	 */
 	public boolean isSuppressUpdates() {
 		return this.suppressUpdates;
-	}
-
-	/**
-	 * @param observerHandler
-	 *            the observerHandler to set
-	 */
-	public void setObserverHandler(ObserverHandler observerHandler) {
-		this.observerHandler = observerHandler;
 	}
 
 	@Override
@@ -483,18 +474,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		long observerUpdateStart = System.nanoTime();
 
+		ObserverHandler observerHandler = this.realm.getObserverHandler();
+
 		if (this.orderMap != null) {
-			this.observerHandler.add(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getCreated()));
-			this.observerHandler.update(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getUpdated()));
-			this.observerHandler.remove(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getDeleted()));
+			observerHandler.add(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getCreated()));
+			observerHandler.update(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getUpdated()));
+			observerHandler.remove(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getDeleted()));
 		}
 
 		if (this.resourceMap != null) {
-			this.observerHandler.add(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getCreated()));
-			this.observerHandler
-					.update(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getUpdated()));
-			this.observerHandler
-					.remove(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getDeleted()));
+			observerHandler.add(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getCreated()));
+			observerHandler.update(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getUpdated()));
+			observerHandler.remove(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getDeleted()));
 		}
 
 		long observerUpdateDuration = System.nanoTime() - observerUpdateStart;
@@ -502,7 +493,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	private boolean isObserverUpdatesEnabled() {
-		return this.suppressUpdates || this.observerHandler == null;
+		return this.suppressUpdates || this.realm.isUpdateObservers();
 	}
 
 	private long writeAuditTrail() {

@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.LockHandler;
+import li.strolch.agent.api.ObserverHandler;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
@@ -51,6 +52,8 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	private LockHandler lockHandler;
 	private boolean auditTrailEnabled;
 	private boolean auditTrailEnabledForRead;
+	private boolean updateObservers;
+	private ObserverHandler observerHandler;
 
 	public InternalStrolchRealm(String realm) {
 		DBC.PRE.assertNotEmpty("RealmName may not be empty!", realm); //$NON-NLS-1$
@@ -86,6 +89,12 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 				DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL_FOR_READ);
 		this.auditTrailEnabledForRead = configuration.getBoolean(enableAuditForReadKey, Boolean.FALSE);
 
+		String updateObserversKey = DefaultRealmHandler.makeRealmKey(getRealm(),
+				DefaultRealmHandler.PROP_ENABLE_OBSERVER_UPDATES);
+		this.updateObservers = configuration.getBoolean(updateObserversKey, Boolean.FALSE);
+		if (this.updateObservers)
+			this.observerHandler = new DefaultObserverHandler();
+
 		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(propTryLockTimeUnit, TimeUnit.SECONDS.name()));
 		long time = configuration.getLong(propTryLockTime, 10);
 		logger.info(MessageFormat.format("Using a locking try timeout of {0}s", timeUnit.toSeconds(time))); //$NON-NLS-1$
@@ -108,6 +117,19 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		return this.auditTrailEnabledForRead;
 	}
 
+	/**
+	 * @return
+	 */
+	@Override
+	public boolean isUpdateObservers() {
+		return this.updateObservers;
+	}
+
+	@Override
+	public ObserverHandler getObserverHandler() {
+		return this.observerHandler;
+	}
+
 	public abstract void start(PrivilegeContext privilegeContext);
 
 	public abstract void stop();
@@ -119,4 +141,5 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	public abstract OrderMap getOrderMap();
 
 	public abstract AuditTrail getAuditTrail();
+
 }

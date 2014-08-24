@@ -13,40 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.runtime.observer;
+package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.api.Observer;
+import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchRootElement;
-import li.strolch.runtime.configuration.ComponentConfiguration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public class DefaultObserverHandler extends StrolchComponent implements ObserverHandler {
+public class DefaultObserverHandler implements ObserverHandler {
+
+	private static final Logger logger = LoggerFactory.getLogger(DefaultObserverHandler.class);
 
 	private Map<String, List<Observer>> observerMap;
-
-	@Override
-	public void initialize(ComponentConfiguration configuration) {
-		this.observerMap = new HashMap<>();
-		super.initialize(configuration);
-	}
-
-	/**
-	 * @param container
-	 * @param componentName
-	 */
-	public DefaultObserverHandler(ComponentContainer container, String componentName) {
-		super(container, componentName);
-	}
 
 	@Override
 	public void add(String key, List<StrolchRootElement> elements) {

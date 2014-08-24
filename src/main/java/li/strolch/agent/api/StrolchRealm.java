@@ -40,4 +40,8 @@ public interface StrolchRealm {
 	public boolean isAuditTrailEnabledForRead();
 
 	public boolean isAuditTrailEnabled();
+
+	public boolean isUpdateObservers();
+
+	public ObserverHandler getObserverHandler();
 }

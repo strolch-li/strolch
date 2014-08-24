@@ -15,9 +15,9 @@
  */
 package li.strolch.runtime;
 
+import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.persistence.api.PersistenceHandler;
-import li.strolch.runtime.observer.ObserverHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
