@@ -39,7 +39,6 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
-import li.strolch.runtime.observer.ObserverHandler;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
@@ -132,11 +131,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
-		PostgreSqlStrolchTransaction tx = new PostgreSqlStrolchTransaction(realm, certificate, action, this);
-		if (getContainer().hasComponent(ObserverHandler.class)) {
-			tx.setObserverHandler(getContainer().getComponent(ObserverHandler.class));
-		}
-		return tx;
+		return new PostgreSqlStrolchTransaction(realm, certificate, action, this);
 	}
 
 	Connection getConnection(String realm) {

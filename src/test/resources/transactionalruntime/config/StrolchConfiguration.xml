@@ -38,10 +38,5 @@
 				<db.password>test</db.password>
 			</Properties>
 		</Component>
-		<Component>
-			<name>ObserverHandler</name>
-			<api>li.strolch.runtime.observer.ObserverHandler</api>
-			<impl>li.strolch.runtime.observer.DefaultObserverHandler</impl>
-		</Component>
 	</env>
 </StrolchConfiguration>
