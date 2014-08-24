@@ -469,7 +469,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	private long updateObservers() {
-		if (isObserverUpdatesEnabled())
+		if (!isObserverUpdatesEnabled())
 			return 0L;
 
 		long observerUpdateStart = System.nanoTime();
@@ -493,7 +493,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	private boolean isObserverUpdatesEnabled() {
-		return this.suppressUpdates || this.realm.isUpdateObservers();
+		return !this.suppressUpdates && this.realm.isUpdateObservers();
 	}
 
 	private long writeAuditTrail() {
