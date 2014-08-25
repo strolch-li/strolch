@@ -37,7 +37,7 @@ public class XmlResourceDao extends AbstractDao<Resource> implements ResourceDao
 
 	@Override
 	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO implement XML file based querying...
+		throw new UnsupportedOperationException("not yet implemented!");
 	}
 }

@@ -37,7 +37,7 @@ public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
 
 	@Override
 	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO implement XML file based querying...
+		throw new UnsupportedOperationException("not yet implemented!");
 	}
 }

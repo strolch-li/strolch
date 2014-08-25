@@ -82,7 +82,7 @@ public class XmlAuditDao implements AuditDao {
 	public long querySize(String type, DateRange dateRange) {
 		long size = 0;
 
-		// TODO re-think this nonsense... this has a huge performance penalty
+		// TODO re-think this nonsense... this might have a huge performance penalty
 		SubTypeRef subTypeRef = getTypeRef(type);
 		Set<String> keySet = this.tx.getMetadataDao().queryKeySet(subTypeRef);
 		for (String key : keySet) {
@@ -191,7 +191,7 @@ public class XmlAuditDao implements AuditDao {
 
 	@Override
 	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO implement XML file based querying...
+		throw new UnsupportedOperationException("not yet implemented!");
 	}
 }
