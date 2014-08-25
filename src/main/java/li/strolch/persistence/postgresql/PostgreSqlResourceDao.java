@@ -18,9 +18,11 @@ package li.strolch.persistence.postgresql;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLXML;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,6 +46,8 @@ import org.xml.sax.SAXException;
 @SuppressWarnings("nls")
 public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements ResourceDao {
 
+	public static final String RESOURCES = "resources";
+
 	protected PostgreSqlResourceDao(PostgreSqlStrolchTransaction tx) {
 		super(tx);
 	}
@@ -55,7 +59,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 	@Override
 	protected String getTableName() {
-		return "resources";
+		return RESOURCES;
 	}
 
 	@Override
@@ -146,7 +150,29 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 	@Override
 	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
-		// TODO Auto-generated method stub
-		return null;
+
+		PostgreSqlResourceQueryVisitor queryVisitor = new PostgreSqlResourceQueryVisitor("id, asxml");
+		query.accept(queryVisitor);
+		queryVisitor.validate();
+
+		List<U> list = new ArrayList<>();
+
+		String sql = queryVisitor.getSql();
+		try (PreparedStatement ps = PostgreSqlResourceDao.this.tx.getConnection().prepareStatement(sql)) {
+			queryVisitor.setValues(ps);
+
+			try (ResultSet result = ps.executeQuery()) {
+				while (result.next()) {
+					String id = result.getString("id");
+					SQLXML sqlxml = result.getSQLXML("asxml");
+					Resource t = parseFromXml(id, queryVisitor.getType(), sqlxml);
+					list.add(resourceVisitor.visit(t));
+				}
+			}
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to perform query due to: " + e.getMessage(), e);
+		}
+
+		return list;
 	}
 }

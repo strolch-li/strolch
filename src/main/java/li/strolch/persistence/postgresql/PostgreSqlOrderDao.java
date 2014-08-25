@@ -19,9 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLXML;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -46,6 +48,8 @@ import org.xml.sax.SAXException;
 @SuppressWarnings("nls")
 public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao {
 
+	public static final String ORDERS = "orders";
+
 	/**
 	 * @param tx
 	 */
@@ -60,7 +64,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 	@Override
 	protected String getTableName() {
-		return "orders";
+		return ORDERS;
 	}
 
 	@Override
@@ -157,7 +161,29 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 	@Override
 	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor) {
-		// TODO Auto-generated method stub
-		return null;
+
+		PostgreSqlOrderQueryVisitor queryVisitor = new PostgreSqlOrderQueryVisitor("id, asxml");
+		query.accept(queryVisitor);
+		queryVisitor.validate();
+
+		List<U> list = new ArrayList<>();
+
+		String sql = queryVisitor.getSql();
+		try (PreparedStatement ps = PostgreSqlOrderDao.this.tx.getConnection().prepareStatement(sql)) {
+			queryVisitor.setValues(ps);
+
+			try (ResultSet result = ps.executeQuery()) {
+				while (result.next()) {
+					String id = result.getString("id");
+					SQLXML sqlxml = result.getSQLXML("asxml");
+					Order t = parseFromXml(id, queryVisitor.getType(), sqlxml);
+					list.add(orderVisitor.visit(t));
+				}
+			}
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to perform query due to: " + e.getMessage(), e);
+		}
+
+		return list;
 	}
 }
