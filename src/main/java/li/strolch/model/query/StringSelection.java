@@ -15,6 +15,8 @@
  */
 package li.strolch.model.query;
 
+import ch.eitchnet.utils.StringMatchMode;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */

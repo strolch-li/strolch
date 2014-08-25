@@ -15,7 +15,7 @@
  */
 package li.strolch.model.audit;
 
-import li.strolch.model.query.StringMatchMode;
+import ch.eitchnet.utils.StringMatchMode;
 import li.strolch.model.query.StringSelection;
 
 /**

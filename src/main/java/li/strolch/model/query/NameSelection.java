@@ -15,20 +15,23 @@
  */
 package li.strolch.model.query;
 
+import ch.eitchnet.utils.StringMatchMode;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class NameSelection extends StrolchElementSelection {
 
+	private StringMatchMode matchMode;
 	private String name;
-	private boolean contains;
-	private boolean caseInsensitive;
 
 	/**
 	 * @param name
+	 * @param matchMode
 	 */
-	public NameSelection(String name) {
+	public NameSelection(String name, StringMatchMode matchMode) {
 		this.name = name;
+		this.matchMode = matchMode;
 	}
 
 	/**
@@ -38,22 +41,11 @@ public class NameSelection extends StrolchElementSelection {
 		return this.name;
 	}
 
-	public boolean isContains() {
-		return this.contains;
-	}
-
-	public boolean isCaseInsensitive() {
-		return this.caseInsensitive;
-	}
-
-	public NameSelection contains(boolean contains) {
-		this.contains = contains;
-		return this;
-	}
-
-	public NameSelection caseInsensitive(boolean caseInsensitive) {
-		this.caseInsensitive = true;
-		return this;
+	/**
+	 * @return the matchMode
+	 */
+	public StringMatchMode getMatchMode() {
+		return this.matchMode;
 	}
 
 	@Override

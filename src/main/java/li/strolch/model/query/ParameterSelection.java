@@ -18,6 +18,7 @@ package li.strolch.model.query;
 import java.util.Date;
 import java.util.List;
 
+import ch.eitchnet.utils.StringMatchMode;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -71,8 +72,9 @@ public abstract class ParameterSelection implements Selection {
 
 	public abstract void accept(ParameterSelectionVisitor visitor);
 
-	public static StringParameterSelection stringSelection(String bagKey, String paramKey, String value) {
-		return new StringParameterSelection(bagKey, paramKey, value);
+	public static StringParameterSelection stringSelection(String bagKey, String paramKey, String value,
+			StringMatchMode matchMode) {
+		return new StringParameterSelection(bagKey, paramKey, value, matchMode);
 	}
 
 	public static IntegerParameterSelection integerSelection(String bagKey, String paramKey, int value) {
@@ -105,35 +107,21 @@ public abstract class ParameterSelection implements Selection {
 
 	public static class StringParameterSelection extends ParameterSelection {
 
+		private StringMatchMode matchMode;
 		private String value;
-		private boolean contains;
-		private boolean caseInsensitive;
 
-		public StringParameterSelection(String bagKey, String paramKey, String value) {
+		public StringParameterSelection(String bagKey, String paramKey, String value, StringMatchMode matchMode) {
 			super(bagKey, paramKey);
 			this.value = value;
+			this.matchMode = matchMode;
 		}
 
 		public String getValue() {
 			return this.value;
 		}
 
-		public boolean isContains() {
-			return this.contains;
-		}
-
-		public boolean isCaseInsensitive() {
-			return this.caseInsensitive;
-		}
-
-		public StringParameterSelection contains(boolean contains) {
-			this.contains = contains;
-			return this;
-		}
-
-		public StringParameterSelection caseInsensitive(boolean caseInsensitive) {
-			this.caseInsensitive = true;
-			return this;
+		public StringMatchMode getMatchMode() {
+			return this.matchMode;
 		}
 
 		@Override
