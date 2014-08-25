@@ -39,6 +39,7 @@ import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchElementSelectionVisitor;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.runtime.query.inmemory.ParameterSelector.StringParameterSelector;
+import ch.eitchnet.utils.StringMatchMode;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -139,8 +140,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 
 	@Override
 	public void visit(NameSelection selection) {
-		addSelector(new NameSelector<T>(selection.getName()).caseInsensitive(selection.isCaseInsensitive()).contains(
-				selection.isContains()));
+		addSelector(new NameSelector<T>(selection.getName(), selection.getMatchMode()));
 	}
 
 	@Override
@@ -150,9 +150,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 				selection.getBagKey(), //
 				selection.getParamKey(), //
 				selection.getValue() //
-				)//
-				.contains(selection.isContains()) //
-				.caseInsensitive(selection.isCaseInsensitive());
+				, StringMatchMode.EQUALS_CASE_SENSITIVE);
 
 		addSelector(stringSelector);
 	}

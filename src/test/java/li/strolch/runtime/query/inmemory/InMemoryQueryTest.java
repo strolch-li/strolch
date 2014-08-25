@@ -35,6 +35,8 @@ import li.strolch.persistence.inmemory.InMemoryResourceDao;
 
 import org.junit.Test;
 
+import ch.eitchnet.utils.StringMatchMode;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -107,7 +109,7 @@ public class InMemoryQueryTest {
 		resourceQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
 		List<Selector<Resource>> andSelectors = new ArrayList<>();
 		andSelectors.add(new IdSelector<Resource>("@3"));
-		andSelectors.add(new NameSelector<Resource>("Res 3"));
+		andSelectors.add(new NameSelector<Resource>("Res 3", StringMatchMode.EQUALS_CASE_SENSITIVE));
 		BooleanSelector<Resource> andSelector = new AndSelector<Resource>(andSelectors);
 		resourceQuery.setSelector(andSelector);
 
@@ -128,7 +130,7 @@ public class InMemoryQueryTest {
 		resourceQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
 		List<Selector<Resource>> andSelectors = new ArrayList<>();
 		andSelectors.add(new IdSelector<Resource>("@3"));
-		andSelectors.add(new NameSelector<Resource>("Res 4"));
+		andSelectors.add(new NameSelector<Resource>("Res 4", StringMatchMode.EQUALS_CASE_SENSITIVE));
 		BooleanSelector<Resource> andSelector = new AndSelector<Resource>(andSelectors);
 		resourceQuery.setSelector(andSelector);
 
@@ -148,7 +150,8 @@ public class InMemoryQueryTest {
 		ballQuery.setNavigator(new AnyNavigator<Resource>());
 		ballQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
 		AndSelector<Resource> andSelector = new AndSelector<>();
-		andSelector.with(ParameterSelector.<Resource> stringSelector("parameters", "color", "red"));
+		andSelector.with(ParameterSelector.<Resource> stringSelector("parameters", "color", "red",
+				StringMatchMode.EQUALS_CASE_SENSITIVE));
 		andSelector.with(ParameterSelector.<Resource> booleanSelector("parameters", "forChildren", true));
 		andSelector.with(ParameterSelector.<Resource> floatSelector("parameters", "diameter", 22.0));
 		ballQuery.setSelector(andSelector);

@@ -43,6 +43,7 @@ import li.strolch.runtime.StrolchConstants;
 import org.junit.Test;
 
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -136,7 +137,9 @@ public class QueryTest {
 		}
 
 		ResourceQuery query = ResourceQuery.query("MyType");
-		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "olch").contains(true));
+		query.and().with(
+				ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "olch",
+						StringMatchMode.CONTAINS_CASE_SENSITIVE));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			result = tx.doQuery(query);
@@ -160,7 +163,9 @@ public class QueryTest {
 		}
 
 		ResourceQuery query = ResourceQuery.query("MyType");
-		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "str").contains(true));
+		query.and().with(
+				ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "str",
+						StringMatchMode.CONTAINS_CASE_SENSITIVE));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			result = tx.doQuery(query);
@@ -183,7 +188,9 @@ public class QueryTest {
 		}
 
 		ResourceQuery query = ResourceQuery.query("MyType");
-		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch").caseInsensitive(true));
+		query.and().with(
+				ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch",
+						StringMatchMode.EQUALS_CASE_INSENSITIVE));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			result = tx.doQuery(query);
@@ -207,7 +214,9 @@ public class QueryTest {
 		}
 
 		ResourceQuery query = ResourceQuery.query("MyType");
-		query.and().with(ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch"));
+		query.and().with(
+				ParameterSelection.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch",
+						StringMatchMode.EQUALS_CASE_SENSITIVE));
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			result = tx.doQuery(query);

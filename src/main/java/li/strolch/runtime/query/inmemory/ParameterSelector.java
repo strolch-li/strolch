@@ -27,6 +27,7 @@ import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+import ch.eitchnet.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -45,8 +46,8 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 	public abstract boolean select(GroupedParameterizedElement element);
 
 	public static <T extends GroupedParameterizedElement> StringParameterSelector<T> stringSelector(String bagKey,
-			String paramKey, String value) {
-		return new StringParameterSelector<>(bagKey, paramKey, value);
+			String paramKey, String value, StringMatchMode matchMode) {
+		return new StringParameterSelector<>(bagKey, paramKey, value, matchMode);
 	}
 
 	public static <T extends GroupedParameterizedElement> IntegerParameterSelector<T> integerSelector(String bagKey,
@@ -86,31 +87,17 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 
 	public static class StringParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
 
+		private StringMatchMode matchMode;
 		private String value;
-		private boolean contains;
-		private boolean caseInsensitive;
 
-		public StringParameterSelector(String bagKey, String paramKey, String value) {
+		public StringParameterSelector(String bagKey, String paramKey, String value, StringMatchMode matchMode) {
 			super(bagKey, paramKey);
 			this.value = value;
+			this.matchMode = matchMode;
 		}
 
-		public boolean isContains() {
-			return this.contains;
-		}
-
-		public boolean isCaseInsensitive() {
-			return this.caseInsensitive;
-		}
-
-		public StringParameterSelector<T> contains(boolean contains) {
-			this.contains = contains;
-			return this;
-		}
-
-		public StringParameterSelector<T> caseInsensitive(boolean caseInsensitive) {
-			this.caseInsensitive = caseInsensitive;
-			return this;
+		public StringMatchMode getMatchMode() {
+			return this.matchMode;
 		}
 
 		@Override
@@ -126,16 +113,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 			StringParameter param = bag.getParameter(this.paramKey);
 			String paramValue = param.getValue();
 
-			if (this.contains && this.caseInsensitive)
-				return paramValue.toLowerCase().contains(this.value.toLowerCase());
-
-			if (this.caseInsensitive)
-				return paramValue.toLowerCase().equals(this.value.toLowerCase());
-
-			if (this.contains)
-				return paramValue.contains(this.value);
-
-			return paramValue.equals(this.value);
+			return this.matchMode.matches(paramValue, this.value);
 		}
 	}
 
