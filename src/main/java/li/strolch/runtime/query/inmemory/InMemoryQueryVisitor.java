@@ -149,8 +149,8 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 		ParameterSelector.<T> stringSelector( //
 				selection.getBagKey(), //
 				selection.getParamKey(), //
-				selection.getValue() //
-				, StringMatchMode.EQUALS_CASE_SENSITIVE);
+				selection.getValue(),//
+				selection.getMatchMode());
 
 		addSelector(stringSelector);
 	}
