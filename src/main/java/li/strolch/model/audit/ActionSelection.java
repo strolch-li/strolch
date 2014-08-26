@@ -15,8 +15,8 @@
  */
 package li.strolch.model.audit;
 
-import ch.eitchnet.utils.StringMatchMode;
 import li.strolch.model.query.StringSelection;
+import ch.eitchnet.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -42,6 +42,10 @@ public class ActionSelection extends AuditSelection {
 
 	public AccessType[] getAccessTypes() {
 		return this.accessTypes;
+	}
+
+	public StringSelection getActionSelection() {
+		return this.actionSelection;
 	}
 
 	public boolean isWildcardActionType() {

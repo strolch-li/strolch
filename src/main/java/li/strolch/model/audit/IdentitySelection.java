@@ -15,8 +15,8 @@
  */
 package li.strolch.model.audit;
 
-import ch.eitchnet.utils.StringMatchMode;
 import li.strolch.model.query.StringSelection;
+import ch.eitchnet.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -77,6 +77,10 @@ public class IdentitySelection extends AuditSelection {
 
 	public boolean isUsernameWildcard() {
 		return this.usernameSelection == null || this.usernameSelection.isWildCard();
+	}
+
+	public boolean isWildcard() {
+		return isFirstnameWildcard() && isLastnameWildcard() && isUsernameWildcard();
 	}
 
 	@Override

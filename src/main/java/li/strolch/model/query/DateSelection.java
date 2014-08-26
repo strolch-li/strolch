@@ -17,19 +17,59 @@ package li.strolch.model.query;
 
 import java.util.Date;
 
+import ch.eitchnet.utils.collections.DateRange;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DateSelection extends OrderSelection {
 
-	private Date date;
+	private DateRange dateRange;
 
-	public DateSelection(Date date) {
-		this.date = date;
+	public DateSelection() {
+		this.dateRange = new DateRange();
 	}
 
-	public Date getDate() {
-		return this.date;
+	public DateSelection from(Date from, boolean inclusive) {
+		this.dateRange.from(from, inclusive);
+		return this;
+	}
+
+	public DateSelection to(Date to, boolean inclusive) {
+		this.dateRange.to(to, inclusive);
+		return this;
+	}
+
+	public Date getFromDate() {
+		return this.dateRange.getFromDate();
+	}
+
+	public Date getToDate() {
+		return this.dateRange.getToDate();
+	}
+
+	public boolean isFromBounded() {
+		return this.dateRange.isFromBounded();
+	}
+
+	public boolean isToBounded() {
+		return this.dateRange.isToBounded();
+	}
+
+	public boolean isUnbounded() {
+		return this.dateRange.isUnbounded();
+	}
+
+	public boolean isBounded() {
+		return this.dateRange.isBounded();
+	}
+
+	public boolean contains(Date date) {
+		return this.dateRange.contains(date);
+	}
+
+	public DateRange getDateRange() {
+		return this.dateRange;
 	}
 
 	@Override

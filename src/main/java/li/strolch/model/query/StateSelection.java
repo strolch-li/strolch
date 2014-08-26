@@ -19,9 +19,8 @@ import li.strolch.model.State;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
-public class StateSelection {
+public class StateSelection extends OrderSelection {
 
 	private State state;
 
@@ -29,10 +28,12 @@ public class StateSelection {
 		this.state = state;
 	}
 
-	/**
-	 * @return the state
-	 */
 	public State getState() {
 		return this.state;
+	}
+
+	@Override
+	public void accept(OrderSelectionVisitor visitor) {
+		visitor.visit(this);
 	}
 }

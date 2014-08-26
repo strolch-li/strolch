@@ -15,8 +15,8 @@
  */
 package li.strolch.model.audit;
 
-import ch.eitchnet.utils.StringMatchMode;
 import li.strolch.model.query.StringSelection;
+import ch.eitchnet.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -54,6 +54,10 @@ public class ElementSelection extends AuditSelection {
 
 	public boolean isElementsAccessedWildcard() {
 		return this.elementAccessedSelection == null || this.elementAccessedSelection.isWildCard();
+	}
+
+	public boolean isWildcard() {
+		return this.isElementsAccessedWildcard() && this.isElementTypesWildcard();
 	}
 
 	@Override

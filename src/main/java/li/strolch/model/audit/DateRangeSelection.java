@@ -28,6 +28,7 @@ public class DateRangeSelection extends AuditSelection {
 
 	public DateRangeSelection(AuditQuery query) {
 		super(query);
+		this.dateRange = new DateRange();
 	}
 
 	public DateRange from(Date from, boolean inclusive) {
