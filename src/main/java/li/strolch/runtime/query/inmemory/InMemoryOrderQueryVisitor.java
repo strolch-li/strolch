@@ -66,7 +66,7 @@ public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order, Order
 
 	@Override
 	public void visit(DateSelection selection) {
-		addSelector(new DateSelector(selection.getDate()));
+		addSelector(new DateSelector(selection.getDateRange()));
 	}
 
 	@Override

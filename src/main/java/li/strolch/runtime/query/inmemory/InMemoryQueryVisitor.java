@@ -39,7 +39,6 @@ import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchElementSelectionVisitor;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.runtime.query.inmemory.ParameterSelector.StringParameterSelector;
-import ch.eitchnet.utils.StringMatchMode;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**

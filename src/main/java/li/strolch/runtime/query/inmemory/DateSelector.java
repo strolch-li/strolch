@@ -15,27 +15,29 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import java.util.Date;
-
 import li.strolch.model.Order;
+import ch.eitchnet.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class DateSelector implements Selector<Order> {
 
-	private Date date;
+	private DateRange dateRange;
+
+	public DateSelector(DateRange dateRange) {
+		this.dateRange = dateRange;
+	}
 
 	/**
-	 * @param date
+	 * @return the dateRange
 	 */
-	public DateSelector(Date date) {
-		this.date = date;
+	public DateRange getDateRange() {
+		return this.dateRange;
 	}
 
 	@Override
 	public boolean select(Order element) {
-		return this.date.equals(element.getDate());
+		return this.dateRange.contains(element.getDate());
 	}
 }
