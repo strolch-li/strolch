@@ -90,6 +90,13 @@ public class DateRange {
 		return this.fromDate != null && this.toDate != null;
 	}
 
+	/**
+	 * @return true if both from and to date are set and they are both equal
+	 */
+	public boolean isDate() {
+		return isBounded() && this.fromDate.equals(this.toDate);
+	}
+
 	public boolean contains(Date date) {
 		DBC.PRE.assertNotNull("Date must be given!", date);
 		if (this.fromDate == null && this.toDate == null)

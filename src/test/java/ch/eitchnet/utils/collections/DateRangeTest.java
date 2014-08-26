@@ -83,6 +83,23 @@ public class DateRangeTest {
 	}
 
 	/**
+	 * Test method for {@link ch.eitchnet.utils.collections.DateRange#isDate()}.
+	 */
+	@Test
+	public void testIsDate() {
+
+		Date from = new Date(10);
+		Date to = new Date(20);
+		DateRange dateRange = new DateRange();
+		dateRange.from(from, false).to(to, false);
+		assertFalse(dateRange.isDate());
+
+		dateRange = new DateRange();
+		dateRange.from(from, false).to(from, false);
+		assertTrue(dateRange.isDate());
+	}
+
+	/**
 	 * Test method for {@link ch.eitchnet.utils.collections.DateRange#contains(java.util.Date)}.
 	 */
 	@Test
