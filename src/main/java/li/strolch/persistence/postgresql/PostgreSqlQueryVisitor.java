@@ -15,6 +15,8 @@
  */
 package li.strolch.persistence.postgresql;
 
+import static li.strolch.persistence.postgresql.PostgreSqlHelper.toSql;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -96,13 +98,6 @@ public abstract class PostgreSqlQueryVisitor implements StrolchElementSelectionV
 		return this.any;
 	}
 
-	/**
-	 * @return the values
-	 */
-	public List<Object> getValues() {
-		return this.values;
-	}
-
 	public String getType() {
 		return this.type;
 	}
@@ -148,27 +143,8 @@ public abstract class PostgreSqlQueryVisitor implements StrolchElementSelectionV
 	public void visit(NameSelection selection) {
 		this.sb.append(this.indent);
 		String name = selection.getName();
-
-		//       CS     EQ
-		// 1.    x      x
-		// 2.    x      o
-		// 3.    o      x
-		// 4.    o      o
-
 		StringMatchMode mm = selection.getMatchMode();
-		if (mm.isCaseSensitve() && mm.isEquals()) {
-			this.sb.append("name = ?\n");
-			this.values.add(name);
-		} else if (!mm.isCaseSensitve() && mm.isEquals()) {
-			this.sb.append("lower(name) = lower(?)\n");
-			this.values.add(name);
-		} else if (!mm.isEquals() && mm.isCaseSensitve()) {
-			this.sb.append("name like ?");
-			this.values.add("%" + name + "%");
-		} else {
-			this.sb.append("lower(name) like ?");
-			this.values.add(name.toLowerCase());
-		}
+		this.sb.append(toSql(this.indent, mm, this.values, name));
 	}
 
 	@Override
@@ -240,8 +216,8 @@ public abstract class PostgreSqlQueryVisitor implements StrolchElementSelectionV
 	}
 
 	private void xpath(String bagKey, String paramKey, String paramValue) {
-		this.sb.append(this.indent);
 		String xpath = "cast(xpath('//Resource/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\" and @Value=\"${paramValue}\"]', asxml) as text[]) != '{}'\n";
+		this.sb.append(this.indent);
 		xpath = xpath.replace("${bagKey}", bagKey);
 		xpath = xpath.replace("${paramKey}", paramKey);
 		xpath = xpath.replace("${paramValue}", paramValue);
@@ -250,7 +226,50 @@ public abstract class PostgreSqlQueryVisitor implements StrolchElementSelectionV
 
 	@Override
 	public void visit(StringParameterSelection selection) {
-		xpath(selection.getBagKey(), selection.getParamKey(), selection.getValue());
+		String value = selection.getValue();
+
+		String xpath = "xpath('//Resource/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]/@Value', asxml))::TEXT AS content";
+		xpath = xpath.replace("${bagKey}", selection.getBagKey());
+		xpath = xpath.replace("${paramKey}", selection.getParamKey());
+
+		sb.append(this.indent);
+		sb.append("id in (\n");
+		sb.append(this.indent);
+		sb.append("  SELECT id\n");
+		sb.append(this.indent);
+		sb.append("  FROM (\n");
+		sb.append(this.indent);
+		sb.append("    SELECT id, UNNEST(");
+		sb.append(xpath);
+		sb.append("\n");
+		sb.append(this.indent);
+		sb.append("from ");
+		sb.append(getTableName());
+		sb.append("\n");
+		sb.append(this.indent);
+		sb.append(") AS alias\n");
+		sb.append(this.indent);
+		sb.append("WHERE ");
+
+		if (selection.getMatchMode().isEquals()) {
+			if (selection.getMatchMode().isCaseSensitve()) {
+				sb.append("content = ?\n");
+			} else {
+				sb.append("content ILIKE ?\n");
+			}
+		} else {
+			value = "%" + value + "%";
+			if (selection.getMatchMode().isCaseSensitve()) {
+				sb.append("content LIKE ?\n");
+			} else {
+				sb.append("content ILIKE ?\n");
+			}
+		}
+
+		sb.append(this.indent);
+		sb.append(")\n");
+
+		this.values.add(value);
 	}
 
 	@Override

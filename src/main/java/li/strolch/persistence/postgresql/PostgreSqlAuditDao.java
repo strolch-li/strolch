@@ -39,6 +39,9 @@ import ch.eitchnet.utils.collections.DateRange;
  */
 public class PostgreSqlAuditDao implements AuditDao {
 
+	public static final String FIELDS = "id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type";
+	public static final String TABLE_NAME = "audits";
+
 	private PostgreSqlStrolchTransaction tx;
 
 	/**
@@ -50,7 +53,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public boolean hasElement(String type, Long id) {
-		String sql = "select count(*) from audits where element_type = ? and id = ?"; //$NON-NLS-1$
+		String sql = "select count(*) from " + TABLE_NAME + " where element_type = ? and id = ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -75,7 +78,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public long querySize(DateRange dateRange) {
-		String sql = "select count(*) from audits where date between ? and ?"; //$NON-NLS-1$
+		String sql = "select count(*) from " + TABLE_NAME + " where date between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setDate(1, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
@@ -93,7 +96,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public long querySize(String type, DateRange dateRange) {
-		String sql = "select count(*) from audits where element_type = ? and date between ? and ?"; //$NON-NLS-1$
+		String sql = "select count(*) from " + TABLE_NAME + " where element_type = ? and date between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -114,7 +117,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 	public Set<String> queryTypes() {
 		Set<String> keySet = new HashSet<>();
 
-		String sql = "select distinct element_type from audits"; //$NON-NLS-1$
+		String sql = "select distinct element_type from " + TABLE_NAME; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
@@ -131,7 +134,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public Audit queryBy(String type, Long id) {
 
-		String sql = "select id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type from audits where element_type = ? and id = ?"; //$NON-NLS-1$
+		String sql = "select " + FIELDS + " from " + TABLE_NAME + " where element_type = ? and id = ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -154,7 +157,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public List<Audit> queryAll(String type, DateRange dateRange) {
 		List<Audit> list = new ArrayList<>();
-		String sql = "select id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type from audits where element_type = ? and date between ? and ?"; //$NON-NLS-1$
+		String sql = "select " + FIELDS + " from " + TABLE_NAME + " where element_type = ? and date between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -176,7 +179,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void save(Audit audit) {
-		String sql = "insert into audits (id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type)"; //$NON-NLS-1$
+		String sql = "insert into " + TABLE_NAME + " (" + FIELDS + ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type)"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			setAuditFields(audit, preparedStatement);
@@ -202,7 +205,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void update(Audit audit) {
-		String sql = "update audits set id = ?, username = ?, firstname = ?, lastname = ?, date = ?, element_type = ?, element_accessed = ?, new_version = ?, action = ?, access_type = ?::access_type where id = ?"; //$NON-NLS-1$
+		String sql = "update " + TABLE_NAME + " set id = ?, username = ?, firstname = ?, lastname = ?, date = ?, element_type = ?, element_accessed = ?, new_version = ?, action = ?, access_type = ?::access_type where id = ?"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			setAuditFields(audit, preparedStatement);
@@ -229,7 +232,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void remove(Audit audit) {
-		String sql = "delete from audits where id = ?"; //$NON-NLS-1$
+		String sql = "delete from " + TABLE_NAME + " where id = ?"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setLong(1, audit.getId());
@@ -256,7 +259,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public long removeAll(String type, DateRange dateRange) {
-		String sql = "delete from audits where element_type = ? and date between ? and ?"; //$NON-NLS-1$
+		String sql = "delete from " + TABLE_NAME + " where element_type = ? and date between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setString(1, type);
@@ -274,7 +277,9 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor) {
-		// TODO Auto-generated method stub
+
+		PostgreSqlAuditQueryVisitor queryVisitor = new PostgreSqlAuditQueryVisitor(FIELDS);
+		query.accept(queryVisitor);
 		return null;
 	}
 

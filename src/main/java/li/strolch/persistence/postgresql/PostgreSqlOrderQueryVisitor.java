@@ -15,10 +15,13 @@
  */
 package li.strolch.persistence.postgresql;
 
+import java.sql.Date;
+
 import li.strolch.model.Tags;
 import li.strolch.model.query.DateSelection;
 import li.strolch.model.query.OrderQueryVisitor;
 import li.strolch.model.query.StateSelection;
+import ch.eitchnet.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -42,15 +45,34 @@ public class PostgreSqlOrderQueryVisitor extends PostgreSqlQueryVisitor implemen
 
 	@Override
 	public void visit(DateSelection selection) {
-		sb.append(indent);
-		sb.append("date = ?\n");
-		values.add(selection.getDate());
+
+		// TODO handle inclusive and exclusive date ranges
+
+		DateRange dateRange = selection.getDateRange();
+		if (dateRange.isDate()) {
+			sb.append(indent);
+			sb.append("date = ?\n");
+			values.add(new Date(dateRange.getFromDate().getTime()));
+		} else if (dateRange.isBounded()) {
+			sb.append(indent);
+			sb.append("date between ? and ?\n");
+			values.add(new Date(dateRange.getFromDate().getTime()));
+			values.add(new Date(dateRange.getToDate().getTime()));
+		} else if (dateRange.isToBounded()) {
+			sb.append(indent);
+			sb.append("date < ?\n");
+			values.add(new Date(dateRange.getToDate().getTime()));
+		} else if (dateRange.isFromBounded()) {
+			sb.append(indent);
+			sb.append("date > ?\n");
+			values.add(new Date(dateRange.getFromDate().getTime()));
+		}
 	}
 
 	@Override
 	public void visit(StateSelection selection) {
 		sb.append(indent);
-		sb.append("stae = ?\n");
+		sb.append("state = ?::order_state\n");
 		values.add(selection.getState().name());
 	}
 }
