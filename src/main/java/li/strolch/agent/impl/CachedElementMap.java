@@ -46,19 +46,19 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	private Map<String, Map<String, T>> elementMap;
 
 	public CachedElementMap() {
-		this.allKeys = Collections.synchronizedSet(new HashSet<String>());
-		this.elementMap = Collections.synchronizedMap(new HashMap<String, Map<String, T>>());
+		this.allKeys = new HashSet<String>();
+		this.elementMap = new HashMap<String, Map<String, T>>();
 	}
 
 	protected abstract StrolchDao<T> getDao(StrolchTransaction tx);
 
 	@Override
-	public boolean hasType(StrolchTransaction tx, String type) {
+	public synchronized boolean hasType(StrolchTransaction tx, String type) {
 		return this.elementMap.containsKey(type);
 	}
 
 	@Override
-	public boolean hasElement(StrolchTransaction tx, String type, String id) {
+	public synchronized boolean hasElement(StrolchTransaction tx, String type, String id) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return false;
@@ -67,7 +67,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public long querySize(StrolchTransaction tx) {
+	public synchronized long querySize(StrolchTransaction tx) {
 		long size = 0L;
 
 		for (String type : this.elementMap.keySet()) {
@@ -79,7 +79,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public long querySize(StrolchTransaction tx, String type) {
+	public synchronized long querySize(StrolchTransaction tx, String type) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return 0L;
@@ -87,12 +87,12 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public T getTemplate(StrolchTransaction tx, String type) {
+	public synchronized T getTemplate(StrolchTransaction tx, String type) {
 		return getBy(tx, StrolchConstants.TEMPLATE, type);
 	}
 
 	@Override
-	public T getBy(StrolchTransaction tx, String type, String id) {
+	public synchronized T getBy(StrolchTransaction tx, String type, String id) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return null;
@@ -101,7 +101,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public List<T> getAllElements(StrolchTransaction tx) {
+	public synchronized List<T> getAllElements(StrolchTransaction tx) {
 		List<T> allElements = new ArrayList<>();
 		for (String type : this.elementMap.keySet()) {
 			Map<String, T> byType = this.elementMap.get(type);
@@ -112,7 +112,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public List<T> getElementsBy(StrolchTransaction tx, String type) {
+	public synchronized List<T> getElementsBy(StrolchTransaction tx, String type) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return Collections.emptyList();
@@ -120,12 +120,12 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public Set<String> getTypes(StrolchTransaction tx) {
+	public synchronized Set<String> getTypes(StrolchTransaction tx) {
 		return new HashSet<>(this.elementMap.keySet());
 	}
 
 	@Override
-	public Set<String> getAllKeys(StrolchTransaction tx) {
+	public synchronized Set<String> getAllKeys(StrolchTransaction tx) {
 		Set<String> keys = new HashSet<>();
 		for (String type : this.elementMap.keySet()) {
 			Map<String, T> byType = this.elementMap.get(type);
@@ -135,7 +135,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public Set<String> getKeysBy(StrolchTransaction tx, String type) {
+	public synchronized Set<String> getKeysBy(StrolchTransaction tx, String type) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return Collections.emptySet();
@@ -143,7 +143,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public void add(StrolchTransaction tx, T element) {
+	public synchronized void add(StrolchTransaction tx, T element) {
 		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Element may not be null!", element); //$NON-NLS-1$
 
@@ -151,7 +151,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public T update(StrolchTransaction tx, T element) {
+	public synchronized T update(StrolchTransaction tx, T element) {
 		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Element may not be null!", element); //$NON-NLS-1$
 
@@ -162,48 +162,41 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 			throw new StrolchPersistenceException(msg);
 		}
 
-		T replacedElement;
-		synchronized (byType) {
-			if (byType.remove(element.getId()) == null) {
-				msg = MessageFormat.format(msg, element.getLocator());
-				throw new StrolchPersistenceException(msg);
-			}
-			replacedElement = byType.put(element.getId(), element);
-			getDao(tx).update(element);
+		if (byType.remove(element.getId()) == null) {
+			msg = MessageFormat.format(msg, element.getLocator());
+			throw new StrolchPersistenceException(msg);
 		}
+		T replacedElement = byType.put(element.getId(), element);
+		getDao(tx).update(element);
 
 		return replacedElement;
 	}
 
 	@Override
-	public void remove(StrolchTransaction tx, T element) {
+	public synchronized void remove(StrolchTransaction tx, T element) {
 		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Element may not be null!", element); //$NON-NLS-1$
 
 		String msg = "The element {0} can not be removed as it does not exist!"; //$NON-NLS-1$
 
-		synchronized (this.elementMap) {
-			Map<String, T> byType = this.elementMap.get(element.getType());
-			if (byType == null) {
-				msg = MessageFormat.format(msg, element.getLocator());
-				throw new StrolchPersistenceException(msg);
-			}
+		Map<String, T> byType = this.elementMap.get(element.getType());
+		if (byType == null) {
+			msg = MessageFormat.format(msg, element.getLocator());
+			throw new StrolchPersistenceException(msg);
+		}
 
-			synchronized (byType) {
-				if (byType.remove(element.getId()) == null) {
-					msg = MessageFormat.format(msg, element.getLocator());
-					throw new StrolchPersistenceException(msg);
-				}
-				if (byType.isEmpty()) {
-					synchronized (this.elementMap) {
-						if (byType.isEmpty())
-							this.elementMap.remove(element.getType());
-					}
-				}
-				this.allKeys.remove(element.getId());
-				getDao(tx).remove(element);
+		if (byType.remove(element.getId()) == null) {
+			msg = MessageFormat.format(msg, element.getLocator());
+			throw new StrolchPersistenceException(msg);
+		}
+		if (byType.isEmpty()) {
+			synchronized (this.elementMap) {
+				if (byType.isEmpty())
+					this.elementMap.remove(element.getType());
 			}
 		}
+		this.allKeys.remove(element.getId());
+		getDao(tx).remove(element);
 	}
 
 	/**
@@ -214,33 +207,28 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	 * @param element
 	 * @param tx
 	 */
-	void insert(T element, StrolchTransaction tx) {
+	synchronized void insert(T element, StrolchTransaction tx) {
 		if (this.allKeys.contains(element.getId())) {
 			String msg = "An element already exists with the id " + element.getId() //$NON-NLS-1$
 					+ ". Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
 			throw new StrolchPersistenceException(msg);
 		}
 
-		Map<String, T> byType;
-		synchronized (this.elementMap) {
-			byType = this.elementMap.get(element.getType());
-			if (byType == null) {
-				byType = Collections.synchronizedMap(new HashMap<String, T>());
-				this.elementMap.put(element.getType(), byType);
-			}
+		Map<String, T> byType = this.elementMap.get(element.getType());
+		if (byType == null) {
+			byType = Collections.synchronizedMap(new HashMap<String, T>());
+			this.elementMap.put(element.getType(), byType);
 		}
 
-		synchronized (byType) {
-			if (byType.containsKey(element.getId())) {
-				String msg = MessageFormat.format("The element {0} already exists!", element.getLocator()); //$NON-NLS-1$
-				throw new StrolchPersistenceException(msg);
-			}
-
-			byType.put(element.getId(), element);
-			this.allKeys.add(element.getId());
-			if (tx != null)
-				getDao(tx).save(element);
+		if (byType.containsKey(element.getId())) {
+			String msg = MessageFormat.format("The element {0} already exists!", element.getLocator()); //$NON-NLS-1$
+			throw new StrolchPersistenceException(msg);
 		}
+
+		byType.put(element.getId(), element);
+		this.allKeys.add(element.getId());
+		if (tx != null)
+			getDao(tx).save(element);
 	}
 
 	private Map<String, List<T>> sortElementsToType(List<T> elements) {
@@ -257,7 +245,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public void addAll(StrolchTransaction tx, List<T> elements) {
+	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
 		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Elements may not be null!", elements); //$NON-NLS-1$
 
@@ -271,26 +259,22 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		for (String type : map.keySet()) {
 
 			Map<String, T> byType;
-			synchronized (this.elementMap) {
-				byType = this.elementMap.get(type);
-				if (byType == null) {
-					byType = new HashMap<>();
-					this.elementMap.put(type, byType);
+			byType = this.elementMap.get(type);
+			if (byType == null) {
+				byType = new HashMap<>();
+				this.elementMap.put(type, byType);
+			}
+
+			List<T> newByType = map.get(type);
+			for (T element : newByType) {
+				if (byType.containsKey(element.getId())) {
+					String msg = "An element already exists with the id {0}. Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, element.getId());
+					throw new StrolchPersistenceException(msg);
 				}
 
-				List<T> newByType = map.get(type);
-				for (T element : newByType) {
-					synchronized (byType) {
-						if (byType.containsKey(element.getId())) {
-							String msg = "An element already exists with the id {0}. Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
-							msg = MessageFormat.format(msg, element.getId());
-							throw new StrolchPersistenceException(msg);
-						}
-
-						byType.put(element.getId(), element);
-						this.allKeys.add(element.getId());
-					}
-				}
+				byType.put(element.getId(), element);
+				this.allKeys.add(element.getId());
 			}
 		}
 
@@ -299,7 +283,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public List<T> updateAll(StrolchTransaction tx, List<T> elements) {
+	public synchronized List<T> updateAll(StrolchTransaction tx, List<T> elements) {
 		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Elements may not be null!", elements); //$NON-NLS-1$
 
@@ -317,24 +301,20 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		for (String type : map.keySet()) {
 			List<T> list = map.get(type);
 
-			synchronized (this.elementMap) {
-				Map<String, T> byType = this.elementMap.get(type);
-				if (byType == null) {
-					msg = MessageFormat.format(msg, list.get(0).getLocator());
+			Map<String, T> byType = this.elementMap.get(type);
+			if (byType == null) {
+				msg = MessageFormat.format(msg, list.get(0).getLocator());
+				throw new StrolchPersistenceException(msg);
+			}
+
+			for (T element : list) {
+				T replacedElement = byType.remove(element.getId());
+				if (replacedElement == null) {
+					msg = MessageFormat.format(msg, element.getLocator());
 					throw new StrolchPersistenceException(msg);
 				}
-
-				synchronized (byType) {
-					for (T element : list) {
-						T replacedElement = byType.remove(element.getId());
-						if (replacedElement == null) {
-							msg = MessageFormat.format(msg, element.getLocator());
-							throw new StrolchPersistenceException(msg);
-						}
-						byType.put(element.getId(), element);
-						replacedElements.add(replacedElement);
-					}
-				}
+				byType.put(element.getId(), element);
+				replacedElements.add(replacedElement);
 			}
 		}
 
@@ -345,7 +325,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public void removeAll(StrolchTransaction tx, List<T> elements) {
+	public synchronized void removeAll(StrolchTransaction tx, List<T> elements) {
 		DBC.PRE.assertNotNull("Transaction may not be null!", tx); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Elements may not be null!", elements); //$NON-NLS-1$
 
@@ -361,26 +341,22 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		for (String type : map.keySet()) {
 			List<T> list = map.get(type);
 
-			synchronized (this.elementMap) {
-				Map<String, T> byType = this.elementMap.get(type);
-				if (byType == null) {
-					msg = MessageFormat.format(msg, list.get(0).getLocator());
+			Map<String, T> byType = this.elementMap.get(type);
+			if (byType == null) {
+				msg = MessageFormat.format(msg, list.get(0).getLocator());
+				throw new StrolchPersistenceException(msg);
+			}
+			for (T element : list) {
+				if (byType.remove(element.getId()) == null) {
+					msg = MessageFormat.format(msg, element.getLocator());
 					throw new StrolchPersistenceException(msg);
 				}
-				synchronized (byType) {
-					for (T element : list) {
-						if (byType.remove(element.getId()) == null) {
-							msg = MessageFormat.format(msg, element.getLocator());
-							throw new StrolchPersistenceException(msg);
-						}
-						this.allKeys.remove(element.getId());
+				this.allKeys.remove(element.getId());
 
-						if (byType.isEmpty()) {
-							synchronized (this.elementMap) {
-								if (byType.isEmpty())
-									this.elementMap.remove(type);
-							}
-						}
+				if (byType.isEmpty()) {
+					synchronized (this.elementMap) {
+						if (byType.isEmpty())
+							this.elementMap.remove(type);
 					}
 				}
 			}
@@ -391,21 +367,19 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public long removeAll(StrolchTransaction tx) {
+	public synchronized long removeAll(StrolchTransaction tx) {
 
 		if (this.elementMap.isEmpty())
 			return 0;
 
 		long removed = 0;
 
-		synchronized (this.elementMap) {
-			Set<String> types = this.elementMap.keySet();
-			for (String type : types) {
+		Set<String> types = this.elementMap.keySet();
+		for (String type : types) {
 
-				Map<String, T> byType = this.elementMap.get(type);
-				removed += byType.size();
-				byType.clear();
-			}
+			Map<String, T> byType = this.elementMap.get(type);
+			removed += byType.size();
+			byType.clear();
 		}
 
 		// last is to perform DB changes
@@ -420,21 +394,19 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public long removeAllBy(StrolchTransaction tx, String type) {
+	public synchronized long removeAllBy(StrolchTransaction tx, String type) {
 
 		long removed = 0;
 		String msg = "The elements with type {0} can not be removed as they do not exist!"; //$NON-NLS-1$
 
-		synchronized (this.elementMap) {
-			Map<String, T> byType = this.elementMap.get(type);
-			if (byType == null) {
-				msg = MessageFormat.format(msg, type);
-				throw new StrolchPersistenceException(msg);
-			}
-
-			removed = byType.size();
-			byType.clear();
+		Map<String, T> byType = this.elementMap.get(type);
+		if (byType == null) {
+			msg = MessageFormat.format(msg, type);
+			throw new StrolchPersistenceException(msg);
 		}
+
+		removed = byType.size();
+		byType.clear();
 
 		// last is to perform DB changes
 		long daoRemoved = getDao(tx).removeAllBy(type);

@@ -56,7 +56,8 @@ public class CachedAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public boolean hasAudit(StrolchTransaction tx, String type, Long id) {
+	public synchronized boolean hasAudit(StrolchTransaction tx, String type, Long id) {
+
 		return this.auditMap.containsElement(type, id);
 	}
 
@@ -73,7 +74,7 @@ public class CachedAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public long querySize(StrolchTransaction tx, String type, DateRange dateRange) {
+	public synchronized long querySize(StrolchTransaction tx, String type, DateRange dateRange) {
 		long size = 0;
 
 		Map<Long, Audit> byType = this.auditMap.getMap(type);
@@ -89,17 +90,17 @@ public class CachedAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public Set<String> getTypes(StrolchTransaction tx) {
+	public synchronized Set<String> getTypes(StrolchTransaction tx) {
 		return new HashSet<>(this.auditMap.keySet());
 	}
 
 	@Override
-	public Audit getBy(StrolchTransaction tx, String type, Long id) {
+	public synchronized Audit getBy(StrolchTransaction tx, String type, Long id) {
 		return this.auditMap.getElement(type, id);
 	}
 
 	@Override
-	public List<Audit> getAllElements(StrolchTransaction tx, String type, DateRange dateRange) {
+	public synchronized List<Audit> getAllElements(StrolchTransaction tx, String type, DateRange dateRange) {
 		List<Audit> elements = new ArrayList<>();
 
 		Map<Long, Audit> byType = this.auditMap.getMap(type);
@@ -115,14 +116,14 @@ public class CachedAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public void add(StrolchTransaction tx, Audit audit) {
+	public synchronized void add(StrolchTransaction tx, Audit audit) {
 		this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
 		// last is to perform DB changes
 		getDao(tx).save(audit);
 	}
 
 	@Override
-	public void addAll(StrolchTransaction tx, List<Audit> audits) {
+	public synchronized void addAll(StrolchTransaction tx, List<Audit> audits) {
 		for (Audit audit : audits) {
 			this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
 		}
@@ -131,7 +132,7 @@ public class CachedAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public Audit update(StrolchTransaction tx, Audit audit) {
+	public synchronized Audit update(StrolchTransaction tx, Audit audit) {
 		Audit replacedAudit = this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
 		// last is to perform DB changes
 		getDao(tx).update(audit);
@@ -139,7 +140,7 @@ public class CachedAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public List<Audit> updateAll(StrolchTransaction tx, List<Audit> audits) {
+	public synchronized List<Audit> updateAll(StrolchTransaction tx, List<Audit> audits) {
 		List<Audit> replacedAudits = new ArrayList<>();
 		for (Audit audit : audits) {
 			Audit replacedAudit = this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
@@ -152,14 +153,14 @@ public class CachedAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public void remove(StrolchTransaction tx, Audit audit) {
+	public synchronized void remove(StrolchTransaction tx, Audit audit) {
 		this.auditMap.removeElement(audit.getElementType(), audit.getId());
 		// last is to perform DB changes
 		getDao(tx).remove(audit);
 	}
 
 	@Override
-	public void removeAll(StrolchTransaction tx, List<Audit> audits) {
+	public synchronized void removeAll(StrolchTransaction tx, List<Audit> audits) {
 		for (Audit audit : audits) {
 			this.auditMap.removeElement(audit.getElementType(), audit.getId());
 		}
@@ -169,7 +170,7 @@ public class CachedAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public long removeAll(StrolchTransaction tx, String type, DateRange dateRange) {
+	public synchronized long removeAll(StrolchTransaction tx, String type, DateRange dateRange) {
 
 		Map<Long, Audit> byType = this.auditMap.getMap(type);
 		if (byType == null)

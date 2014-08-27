@@ -21,7 +21,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public boolean hasElement(String type, String id) {
+	public synchronized boolean hasElement(String type, String id) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return false;
@@ -29,7 +29,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public long querySize() {
+	public synchronized long querySize() {
 		long size = 0;
 		for (String type : this.elementMap.keySet()) {
 			Map<String, T> byType = this.elementMap.get(type);
@@ -39,7 +39,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public long querySize(String type) {
+	public synchronized long querySize(String type) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return 0;
@@ -47,7 +47,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public Set<String> queryKeySet() {
+	public synchronized Set<String> queryKeySet() {
 
 		Set<String> keySet = new HashSet<>();
 		for (String type : this.elementMap.keySet()) {
@@ -61,7 +61,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public Set<String> queryKeySet(String type) {
+	public synchronized Set<String> queryKeySet(String type) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return new HashSet<>(0);
@@ -69,12 +69,12 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public Set<String> queryTypes() {
+	public synchronized Set<String> queryTypes() {
 		return new HashSet<>(this.elementMap.keySet());
 	}
 
 	@Override
-	public T queryBy(String type, String id) {
+	public synchronized T queryBy(String type, String id) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return null;
@@ -82,7 +82,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public List<T> queryAll() {
+	public synchronized List<T> queryAll() {
 		List<T> elements = new ArrayList<>();
 		for (String type : this.elementMap.keySet()) {
 			Map<String, T> byType = this.elementMap.get(type);
@@ -95,7 +95,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public List<T> queryAll(String type) {
+	public synchronized List<T> queryAll(String type) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return new ArrayList<>(0);
@@ -103,7 +103,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public void save(T element) {
+	public synchronized void save(T element) {
 		Map<String, T> byType = this.elementMap.get(element.getType());
 		if (byType == null) {
 			byType = new HashMap<>();
@@ -120,14 +120,14 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public void saveAll(List<T> elements) {
+	public synchronized void saveAll(List<T> elements) {
 		for (T element : elements) {
 			save(element);
 		}
 	}
 
 	@Override
-	public void update(T element) {
+	public synchronized void update(T element) {
 		Map<String, T> byType = this.elementMap.get(element.getType());
 		if (byType == null) {
 			byType = new HashMap<>();
@@ -138,14 +138,14 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public void updateAll(List<T> elements) {
+	public synchronized void updateAll(List<T> elements) {
 		for (T element : elements) {
 			update(element);
 		}
 	}
 
 	@Override
-	public void remove(T element) {
+	public synchronized void remove(T element) {
 		Map<String, T> byType = this.elementMap.get(element.getType());
 		if (byType != null) {
 			byType.remove(element.getId());
@@ -157,14 +157,14 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public void removeAll(List<T> elements) {
+	public synchronized void removeAll(List<T> elements) {
 		for (T element : elements) {
 			remove(element);
 		}
 	}
 
 	@Override
-	public long removeAll() {
+	public synchronized long removeAll() {
 		long removed = 0;
 
 		Set<String> keySet = new HashSet<String>(this.elementMap.keySet());
@@ -178,7 +178,7 @@ public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
 	}
 
 	@Override
-	public long removeAllBy(String type) {
+	public synchronized long removeAllBy(String type) {
 		Map<String, T> byType = this.elementMap.remove(type);
 		if (byType == null)
 			return 0;

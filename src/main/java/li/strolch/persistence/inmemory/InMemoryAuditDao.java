@@ -39,7 +39,7 @@ public class InMemoryAuditDao implements AuditDao {
 	}
 
 	@Override
-	public boolean hasElement(String type, Long id) {
+	public synchronized boolean hasElement(String type, Long id) {
 		Map<Long, Audit> byType = this.auditMap.getMap(type);
 		if (byType == null)
 			return false;
@@ -47,7 +47,7 @@ public class InMemoryAuditDao implements AuditDao {
 	}
 
 	@Override
-	public long querySize(DateRange dateRange) {
+	public synchronized long querySize(DateRange dateRange) {
 		long size = 0L;
 
 		for (String type : this.auditMap.keySet()) {
@@ -62,7 +62,7 @@ public class InMemoryAuditDao implements AuditDao {
 	}
 
 	@Override
-	public long querySize(String type, DateRange dateRange) {
+	public synchronized long querySize(String type, DateRange dateRange) {
 		long size = 0L;
 		Map<Long, Audit> byType = this.auditMap.getMap(type);
 		for (Audit audit : byType.values()) {
@@ -73,17 +73,17 @@ public class InMemoryAuditDao implements AuditDao {
 	}
 
 	@Override
-	public Audit queryBy(String type, Long id) {
+	public synchronized Audit queryBy(String type, Long id) {
 		return this.auditMap.getElement(type, id);
 	}
 
 	@Override
-	public Set<String> queryTypes() {
+	public synchronized Set<String> queryTypes() {
 		return this.auditMap.keySet();
 	}
 
 	@Override
-	public List<Audit> queryAll(String type, DateRange dateRange) {
+	public synchronized List<Audit> queryAll(String type, DateRange dateRange) {
 		List<Audit> audits = new ArrayList<>();
 		Map<Long, Audit> byType = this.auditMap.getMap(type);
 		if (byType == null)
@@ -97,43 +97,43 @@ public class InMemoryAuditDao implements AuditDao {
 	}
 
 	@Override
-	public void save(Audit audit) {
+	public synchronized void save(Audit audit) {
 		this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
 	}
 
 	@Override
-	public void saveAll(List<Audit> audits) {
+	public synchronized void saveAll(List<Audit> audits) {
 		for (Audit audit : audits) {
 			this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
 		}
 	}
 
 	@Override
-	public void update(Audit audit) {
+	public synchronized void update(Audit audit) {
 		this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
 	}
 
 	@Override
-	public void updateAll(List<Audit> audits) {
+	public synchronized void updateAll(List<Audit> audits) {
 		for (Audit audit : audits) {
 			this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
 		}
 	}
 
 	@Override
-	public void remove(Audit audit) {
+	public synchronized void remove(Audit audit) {
 		this.auditMap.removeElement(audit.getElementType(), audit.getId());
 	}
 
 	@Override
-	public void removeAll(List<Audit> audits) {
+	public synchronized void removeAll(List<Audit> audits) {
 		for (Audit audit : audits) {
 			this.auditMap.removeElement(audit.getElementType(), audit.getId());
 		}
 	}
 
 	@Override
-	public long removeAll(String type, DateRange dateRange) {
+	public synchronized long removeAll(String type, DateRange dateRange) {
 
 		Map<Long, Audit> byType = this.auditMap.getMap(type);
 		if (byType == null)
