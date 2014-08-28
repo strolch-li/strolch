@@ -21,6 +21,6 @@ package li.strolch.model.query;
 public interface Selection {
 
 	public void accept(QueryVisitor visitor);
-	
+
 	public boolean hasSelection();
 }

@@ -18,42 +18,35 @@ package li.strolch.model.audit;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.eitchnet.utils.collections.DateRange;
+import ch.eitchnet.utils.dbc.DBC;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class AuditQuery {
 
-	private int maxResults;
-
+	private String elementTypeSelection;
 	private List<AuditSelection> selections;
+	private DateRange dateRange;
 
-	public AuditQuery() {
+	public AuditQuery(String elementTypeSelection, DateRange dateRange) {
+		DBC.PRE.assertFalse("dateRange may not be unbounded!", dateRange.isUnbounded());
+		this.elementTypeSelection = elementTypeSelection;
+		this.dateRange = dateRange;
 		this.selections = new ArrayList<>();
 	}
 
-	/**
-	 * @return the maxResults
-	 */
-	public int getMaxResults() {
-		return this.maxResults;
+	public String getElementTypeSelection() {
+		return this.elementTypeSelection;
 	}
 
-	/**
-	 * @param maxResults
-	 *            the maxResults to set
-	 */
-	public void setMaxResults(int maxResults) {
-		this.maxResults = maxResults;
+	public DateRange getDateRange() {
+		return this.dateRange;
 	}
 
 	public ActionSelection action() {
 		ActionSelection selection = new ActionSelection(this);
-		this.selections.add(selection);
-		return selection;
-	}
-
-	public DateRangeSelection dateRange() {
-		DateRangeSelection selection = new DateRangeSelection(this);
 		this.selections.add(selection);
 		return selection;
 	}
@@ -71,6 +64,8 @@ public class AuditQuery {
 	}
 
 	public void accept(AuditQueryVisitor visitor) {
+		DBC.PRE.assertNotNull("No elementTypeSelection (navigation) set!", this.elementTypeSelection); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("No dateRange set!", this.dateRange); //$NON-NLS-1$
 		visitor.visit(this);
 		for (AuditSelection selection : selections) {
 			selection.accept(visitor);

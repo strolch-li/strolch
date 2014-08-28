@@ -74,4 +74,12 @@ public class StringSelection {
 	public boolean isWildCard() {
 		return this.values == null || this.values.length == 0;
 	}
+
+	public boolean matches(String value) {
+		for (String sel : values) {
+			if (this.matchMode.matches(value, sel))
+				return true;
+		}
+		return false;
+	}
 }

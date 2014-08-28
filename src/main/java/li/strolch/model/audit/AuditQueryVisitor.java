@@ -15,7 +15,6 @@
  */
 package li.strolch.model.audit;
 
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -24,8 +23,6 @@ public interface AuditQueryVisitor {
 	public void visit(ElementSelection selection);
 
 	public void visit(IdentitySelection selection);
-
-	public void visit(DateRangeSelection selection);
 
 	public void visit(ActionSelection selection);
 
