@@ -635,6 +635,24 @@ public class StringHelper {
 		}
 	}
 
+	public static String commaSeparated(String... values) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < values.length; i++) {
+			sb.append(values[i]);
+			if (i < values.length - 1)
+				sb.append(", ");
+		}
+		return sb.toString();
+	}
+
+	public static String[] splitCommaSeparated(String values) {
+		String[] split = values.split(",");
+		for (int i = 0; i < split.length; i++) {
+			split[i] = split[i].trim();
+		}
+		return split;
+	}
+
 	/**
 	 * Return a pseudo unique id which is incremented on each call. The id is initialized from the current time
 	 * 
