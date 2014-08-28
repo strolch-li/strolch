@@ -15,17 +15,47 @@
  */
 package li.strolch.persistence.postgresql;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.eitchnet.utils.StringMatchMode;
+import ch.eitchnet.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PostgreSqlHelper {
 
-	public static String toSql(String indent, StringMatchMode mm, List<Object> values, String... query) {
+	public static void toSql(String indent, StringBuilder sb, List<Object> values, String column, DateRange dateRange) {
+
+		// TODO handle inclusive/exclusive: between is inclusive
+
+		if (dateRange.isDate()) {
+			sb.append(indent);
+			sb.append(column);
+			sb.append(" = ?\n");
+			values.add(new Date(dateRange.getFromDate().getTime()));
+		} else if (dateRange.isBounded()) {
+			sb.append(indent);
+			sb.append(column);
+			sb.append(" between ? and ?\n");
+			values.add(new Date(dateRange.getFromDate().getTime()));
+			values.add(new Date(dateRange.getToDate().getTime()));
+		} else if (dateRange.isToBounded()) {
+			sb.append(indent);
+			sb.append(column);
+			sb.append(" <= ?\n");
+			values.add(new Date(dateRange.getToDate().getTime()));
+		} else if (dateRange.isFromBounded()) {
+			sb.append(indent);
+			sb.append(column);
+			sb.append(" >= ?\n");
+			values.add(new Date(dateRange.getFromDate().getTime()));
+		}
+	}
+
+	public static String toSql(String column, String indent, StringMatchMode mm, List<Object> values, String... query) {
 
 		//       CS     EQ
 		// 1.    x      x
@@ -36,10 +66,10 @@ public class PostgreSqlHelper {
 		StringBuilder sb = new StringBuilder();
 		if (mm.isCaseSensitve() && mm.isEquals()) {
 			if (query.length == 1) {
-				sb.append("name = ?\n");
+				sb.append(column + " = ?\n");
 				values.add(query[0]);
 			} else {
-				sb.append("name in ( ");
+				sb.append(column + " in ( ");
 				for (int i = 0; i < query.length; i++) {
 					sb.append("?");
 					values.add(query[i]);
@@ -50,10 +80,10 @@ public class PostgreSqlHelper {
 			}
 		} else if (!mm.isCaseSensitve() && mm.isEquals()) {
 			if (query.length == 1) {
-				sb.append("lower(name) = ?\n");
+				sb.append("lower(" + column + ") = ?\n");
 				values.add(query[0].toLowerCase());
 			} else {
-				sb.append("lower(name) in ( ");
+				sb.append("lower(" + column + ") in ( ");
 				for (int i = 0; i < query.length; i++) {
 					sb.append("?");
 					values.add(query[i].toLowerCase());
@@ -64,14 +94,14 @@ public class PostgreSqlHelper {
 			}
 		} else if (!mm.isEquals() && mm.isCaseSensitve()) {
 			if (query.length == 1) {
-				sb.append("name like ?\n");
+				sb.append(column + " like ?\n");
 				values.add("%" + query[0] + "%");
 			} else {
 				sb.append("(\n");
 				for (int i = 0; i < query.length; i++) {
 					sb.append(indent);
 					sb.append("  ");
-					sb.append("name like ?");
+					sb.append(column + " like ?");
 					values.add("%" + query[i] + "%");
 					if (i < query.length - 1)
 						sb.append(" or");
@@ -81,14 +111,14 @@ public class PostgreSqlHelper {
 			}
 		} else {
 			if (query.length == 1) {
-				sb.append("lower(name) like ?\n");
+				sb.append("lower(" + column + ") like ?\n");
 				values.add("%" + query[0].toLowerCase() + "%");
 			} else {
 				sb.append("(\n");
 				for (int i = 0; i < query.length; i++) {
 					sb.append(indent);
 					sb.append("  ");
-					sb.append("lower(name) like ?");
+					sb.append("lower(" + column + ") like ?");
 					values.add("%" + query[i].toLowerCase() + "%");
 					if (i < query.length - 1)
 						sb.append(" or");
@@ -103,35 +133,35 @@ public class PostgreSqlHelper {
 
 	public static void main(String[] args) {
 		ArrayList<Object> values = new ArrayList<>();
-		String sql = toSql("  ", StringMatchMode.CONTAINS_CASE_INSENSITIVE, values, "foo", "bar", "fub");
+		String sql = toSql("name", "  ", StringMatchMode.CONTAINS_CASE_INSENSITIVE, values, "foo", "bar", "fub");
 		System.out.println(sql);
 		System.out.println();
 
-		sql = toSql("  ", StringMatchMode.CONTAINS_CASE_INSENSITIVE, values, "foo");
+		sql = toSql("name", "  ", StringMatchMode.CONTAINS_CASE_INSENSITIVE, values, "foo");
 		System.out.println(sql);
 		System.out.println();
 
-		sql = toSql("  ", StringMatchMode.CONTAINS_CASE_SENSITIVE, values, "foo", "bar", "fub");
+		sql = toSql("name", "  ", StringMatchMode.CONTAINS_CASE_SENSITIVE, values, "foo", "bar", "fub");
 		System.out.println(sql);
 		System.out.println();
 
-		sql = toSql("  ", StringMatchMode.CONTAINS_CASE_SENSITIVE, values, "foo");
+		sql = toSql("name", "  ", StringMatchMode.CONTAINS_CASE_SENSITIVE, values, "foo");
 		System.out.println(sql);
 		System.out.println();
 
-		sql = toSql("  ", StringMatchMode.EQUALS_CASE_INSENSITIVE, values, "foo", "bar", "fub");
+		sql = toSql("name", "  ", StringMatchMode.EQUALS_CASE_INSENSITIVE, values, "foo", "bar", "fub");
 		System.out.println(sql);
 		System.out.println();
 
-		sql = toSql("  ", StringMatchMode.EQUALS_CASE_INSENSITIVE, values, "foo");
+		sql = toSql("name", "  ", StringMatchMode.EQUALS_CASE_INSENSITIVE, values, "foo");
 		System.out.println(sql);
 		System.out.println();
 
-		sql = toSql("  ", StringMatchMode.EQUALS_CASE_SENSITIVE, values, "foo", "bar", "fub");
+		sql = toSql("name", "  ", StringMatchMode.EQUALS_CASE_SENSITIVE, values, "foo", "bar", "fub");
 		System.out.println(sql);
 		System.out.println();
 
-		sql = toSql("  ", StringMatchMode.EQUALS_CASE_SENSITIVE, values, "foo");
+		sql = toSql("name", "  ", StringMatchMode.EQUALS_CASE_SENSITIVE, values, "foo");
 		System.out.println(sql);
 		System.out.println();
 	}

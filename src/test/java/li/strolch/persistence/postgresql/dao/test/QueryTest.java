@@ -331,7 +331,7 @@ public class QueryTest {
 		PostgreSqlOrderQueryVisitor visitor = new PostgreSqlOrderQueryVisitor("id");
 		query.accept(visitor);
 		List<String> ids = queryIds(visitor);
-		assertEquals(expected, ids);
+		assertEquals(new HashSet<>(expected), new HashSet<>(ids));
 	}
 
 	private void performResourceQuery(ResourceQuery query, List<String> expected) throws SQLException {

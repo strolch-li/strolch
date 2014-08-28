@@ -33,13 +33,26 @@ import li.strolch.model.audit.AuditVisitor;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import ch.eitchnet.utils.collections.DateRange;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PostgreSqlAuditDao implements AuditDao {
 
-	public static final String FIELDS = "id, username, firstname, lastname, date, element_type, element_accessed, new_version, action, access_type";
+	public static final String ID = "id";
+	public static final String ACCESS_TYPE = "access_type";
+	public static final String ACCESS_TYPE_TYPE = "::access_type";
+	public static final String ACTION = "action";
+	public static final String NEW_VERSION = "new_version";
+	public static final String ELEMENT_ACCESSED = "element_accessed";
+	public static final String ELEMENT_TYPE = "element_type";
+	public static final String DATE = "date";
+	public static final String LASTNAME = "lastname";
+	public static final String FIRSTNAME = "firstname";
+	public static final String USERNAME = "username";
+	public static final String FIELDS = StringHelper.commaSeparated(ID, USERNAME, FIRSTNAME, LASTNAME, DATE,
+			ELEMENT_TYPE, ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE);
 	public static final String TABLE_NAME = "audits";
 
 	private PostgreSqlStrolchTransaction tx;
@@ -53,7 +66,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public boolean hasElement(String type, Long id) {
-		String sql = "select count(*) from " + TABLE_NAME + " where element_type = ? and id = ?"; //$NON-NLS-1$
+		String sql = "select count(*) from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + ID + " = ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -78,7 +91,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public long querySize(DateRange dateRange) {
-		String sql = "select count(*) from " + TABLE_NAME + " where date between ? and ?"; //$NON-NLS-1$
+		String sql = "select count(*) from " + TABLE_NAME + " where " + DATE + " between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setDate(1, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
@@ -96,7 +109,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public long querySize(String type, DateRange dateRange) {
-		String sql = "select count(*) from " + TABLE_NAME + " where element_type = ? and date between ? and ?"; //$NON-NLS-1$
+		String sql = "select count(*) from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + DATE + " between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -117,11 +130,11 @@ public class PostgreSqlAuditDao implements AuditDao {
 	public Set<String> queryTypes() {
 		Set<String> keySet = new HashSet<>();
 
-		String sql = "select distinct element_type from " + TABLE_NAME; //$NON-NLS-1$
+		String sql = "select distinct " + ELEMENT_TYPE + " from " + TABLE_NAME; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
-					keySet.add(result.getString("element_type")); //$NON-NLS-1$
+					keySet.add(result.getString(ELEMENT_TYPE)); //$NON-NLS-1$
 				}
 			}
 		} catch (SQLException e) {
@@ -134,7 +147,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public Audit queryBy(String type, Long id) {
 
-		String sql = "select " + FIELDS + " from " + TABLE_NAME + " where element_type = ? and id = ?"; //$NON-NLS-1$
+		String sql = "select " + FIELDS + " from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + ID + " = ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -157,7 +170,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public List<Audit> queryAll(String type, DateRange dateRange) {
 		List<Audit> list = new ArrayList<>();
-		String sql = "select " + FIELDS + " from " + TABLE_NAME + " where element_type = ? and date between ? and ?"; //$NON-NLS-1$
+		String sql = "select " + FIELDS + " from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + DATE + " between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -205,7 +218,9 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void update(Audit audit) {
-		String sql = "update " + TABLE_NAME + " set id = ?, username = ?, firstname = ?, lastname = ?, date = ?, element_type = ?, element_accessed = ?, new_version = ?, action = ?, access_type = ?::access_type where id = ?"; //$NON-NLS-1$
+		String sql = "update " + TABLE_NAME + " set " + ID + " = ?, " + USERNAME + " = ?, " + FIRSTNAME + " = ?, "
+				+ LASTNAME + " = ?, " + DATE + " = ?, " + ELEMENT_TYPE + " = ?, " + ELEMENT_ACCESSED + " = ?, "
+				+ NEW_VERSION + " = ?, " + ACTION + " = ?, " + ACCESS_TYPE + " = ?::access_type where " + ID + " = ?"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			setAuditFields(audit, preparedStatement);
@@ -232,7 +247,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void remove(Audit audit) {
-		String sql = "delete from " + TABLE_NAME + " where id = ?"; //$NON-NLS-1$
+		String sql = "delete from " + TABLE_NAME + " where " + ID + " = ?"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setLong(1, audit.getId());
@@ -259,7 +274,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public long removeAll(String type, DateRange dateRange) {
-		String sql = "delete from " + TABLE_NAME + " where element_type = ? and date between ? and ?"; //$NON-NLS-1$
+		String sql = "delete from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + DATE + " between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setString(1, type);

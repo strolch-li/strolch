@@ -144,7 +144,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchElementSelectionV
 		this.sb.append(this.indent);
 		String name = selection.getName();
 		StringMatchMode mm = selection.getMatchMode();
-		this.sb.append(toSql(this.indent, mm, this.values, name));
+		this.sb.append(toSql("name", this.indent, mm, this.values, name));
 	}
 
 	@Override

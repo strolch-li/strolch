@@ -24,7 +24,6 @@ import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.ActionSelection;
 import li.strolch.model.audit.AuditQuery;
 import li.strolch.model.audit.AuditQueryVisitor;
-import li.strolch.model.audit.DateRangeSelection;
 import li.strolch.model.audit.ElementSelection;
 import li.strolch.model.audit.IdentitySelection;
 import li.strolch.model.query.StringSelection;
@@ -63,31 +62,28 @@ public class PostgreSqlAuditQueryVisitor implements AuditQueryVisitor {
 			return sqlAsString;
 
 		this.sql.append("\nwhere\n");
-		this.sql.append(this.indent);
 		this.sql.append(this.sb.toString());
 		sqlAsString = this.sql.toString();
 		return sqlAsString;
 	}
 
 	@Override
-	public void visit(ElementSelection selection) {
-		if (selection.isWildcard())
-			return;
-
-		if (!selection.isElementsAccessedWildcard()) {
-			StringSelection sel = selection.getElementAccessedSelection();
-			toSql(sel.getMatchMode(), sel.getValues());
-		}
-
-		if (!selection.isElementTypesWildcard()) {
-			StringSelection sel = selection.getElementTypeSelection();
-			toSql(sel.getMatchMode(), sel.getValues());
-		}
+	public void visit(AuditQuery auditQuery) {
+		ensureAnd();
+		this.sb.append(this.indent);
+		this.sb.append(PostgreSqlAuditDao.ELEMENT_TYPE);
+		this.sb.append(" = ?\n");
+		ensureAnd();
+		this.values.add(auditQuery.getElementTypeSelection());
+		PostgreSqlHelper.toSql(this.indent, this.sb, this.values, PostgreSqlAuditDao.DATE, auditQuery.getDateRange());
 	}
 
-	private void toSql(StringMatchMode mm, String[] values) {
-		this.sb.append(this.indent);
-		this.sb.append(PostgreSqlHelper.toSql(this.indent, mm, this.values, values));
+	@Override
+	public void visit(ElementSelection selection) {
+		if (!selection.isElementsAccessedWildcard()) {
+			StringSelection sel = selection.getElementAccessedSelection();
+			toSql(PostgreSqlAuditDao.ELEMENT_ACCESSED, sel.getMatchMode(), sel.getValues());
+		}
 	}
 
 	@Override
@@ -97,59 +93,68 @@ public class PostgreSqlAuditQueryVisitor implements AuditQueryVisitor {
 
 		if (!selection.isFirstnameWildcard()) {
 			StringSelection sel = selection.getFirstnameSelection();
-			toSql(sel.getMatchMode(), sel.getValues());
+			toSql(PostgreSqlAuditDao.FIRSTNAME, sel.getMatchMode(), sel.getValues());
 		}
 
 		if (!selection.isLastnameWildcard()) {
 			StringSelection sel = selection.getLastnameSelection();
-			toSql(sel.getMatchMode(), sel.getValues());
+			toSql(PostgreSqlAuditDao.LASTNAME, sel.getMatchMode(), sel.getValues());
 		}
 
 		if (!selection.isUsernameWildcard()) {
 			StringSelection sel = selection.getUsernameSelection();
-			toSql(sel.getMatchMode(), sel.getValues());
+			toSql(PostgreSqlAuditDao.USERNAME, sel.getMatchMode(), sel.getValues());
 		}
-	}
-
-	@Override
-	public void visit(DateRangeSelection selection) {
-
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void visit(ActionSelection selection) {
 		if (!selection.isWildcardAction()) {
 			StringSelection sel = selection.getActionSelection();
-			toSql(sel.getMatchMode(), sel.getValues());
+			toSql(PostgreSqlAuditDao.ACTION, sel.getMatchMode(), sel.getValues());
 		}
 
 		if (!selection.isWildcardActionType()) {
 
 			AccessType[] accessTypes = selection.getAccessTypes();
-			String[] query = new String[accessTypes.length];
-			for (int i = 0; i < accessTypes.length; i++) {
-				query[i] = accessTypes[i].name();
+			ensureAnd();
+			this.sb.append(this.indent);
+			if (accessTypes.length == 1) {
+				sb.append(PostgreSqlAuditDao.ACCESS_TYPE + " = ?");
+				sb.append(PostgreSqlAuditDao.ACCESS_TYPE_TYPE);
+				sb.append("\n");
+				this.values.add(accessTypes[0].name());
+			} else {
+				sb.append(PostgreSqlAuditDao.ACCESS_TYPE + " in (");
+				for (int i = 0; i < accessTypes.length; i++) {
+					sb.append("?");
+					sb.append(PostgreSqlAuditDao.ACCESS_TYPE_TYPE);
+					values.add(accessTypes[i].name());
+					if (i < accessTypes.length - 1)
+						sb.append(", ");
+				}
+				sb.append(" )\n");
+				sb.append("\n");
 			}
-
-			toSql(StringMatchMode.EQUALS_CASE_SENSITIVE, query);
 		}
 	}
 
-	@Override
-	public void visit(AuditQuery auditQuery) {
-		// TODO Auto-generated method stub
-
+	private void toSql(String column, StringMatchMode mm, String[] values) {
+		ensureAnd();
+		this.sb.append(this.indent);
+		this.sb.append(PostgreSqlHelper.toSql(column, this.indent, mm, this.values, values));
 	}
 
-	/**
-	 * @param ps
-	 * @throws SQLException
-	 */
 	public void setValues(PreparedStatement ps) throws SQLException {
 		for (int i = 0; i < this.values.size(); i++) {
 			ps.setObject(i + 1, this.values.get(i));
+		}
+	}
+
+	private void ensureAnd() {
+		if (this.sb.length() > 0) {
+			this.sb.append(this.indent);
+			this.sb.append("and \n");
 		}
 	}
 }
