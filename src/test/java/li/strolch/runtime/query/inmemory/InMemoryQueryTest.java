@@ -29,7 +29,14 @@ import li.strolch.model.State;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.StringParameter;
-import li.strolch.model.visitor.NoStrategyVisitor;
+import li.strolch.model.query.IdSelection;
+import li.strolch.model.query.NameSelection;
+import li.strolch.model.query.OrderQuery;
+import li.strolch.model.query.ParameterSelection;
+import li.strolch.model.query.ResourceQuery;
+import li.strolch.model.query.StrolchTypeNavigation;
+import li.strolch.model.visitor.NoStrategyOrderVisitor;
+import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.persistence.inmemory.InMemoryOrderDao;
 import li.strolch.persistence.inmemory.InMemoryResourceDao;
 
@@ -50,12 +57,9 @@ public class InMemoryQueryTest {
 		InMemoryOrderDao dao = new InMemoryOrderDao();
 		dao.saveAll(orders);
 
-		InMemoryQuery<Order, Order> orderQuery = new InMemoryQuery<>();
-		orderQuery.setNavigator(new AnyNavigator<Order>());
-		orderQuery.setSelector(new IdSelector<Order>("@1"));
-		orderQuery.setElementVisitor(new NoStrategyVisitor<Order>());
-
-		List<Order> result = orderQuery.doQuery(dao);
+		OrderQuery orderQuery = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		orderQuery.with(new IdSelection("@1"));
+		List<Order> result = dao.doQuery(orderQuery, new NoStrategyOrderVisitor());
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
 	}
@@ -67,12 +71,10 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		InMemoryQuery<Resource, Resource> resourceQuery = new InMemoryQuery<>();
-		resourceQuery.setNavigator(new AnyNavigator<Resource>());
-		resourceQuery.setSelector(new IdSelector<Resource>("@1"));
-		resourceQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
+		ResourceQuery resourceQuery = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		resourceQuery.with(new IdSelection("@1"));
 
-		List<Resource> result = resourceQuery.doQuery(dao);
+		List<Resource> result = dao.doQuery(resourceQuery, new NoStrategyResourceVisitor());
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
 	}
@@ -84,14 +86,10 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		InMemoryQuery<Resource, Resource> resourceQuery = new InMemoryQuery<>();
-		resourceQuery.setNavigator(new AnyNavigator<Resource>());
-		resourceQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
-		BooleanSelector<Resource> andSelector = new OrSelector<>(new IdSelector<Resource>("@3"),
-				new IdSelector<Resource>("@4"));
-		resourceQuery.setSelector(andSelector);
+		ResourceQuery resourceQuery = new ResourceQuery(new StrolchTypeNavigation("MyType2"));
+		resourceQuery.or().with(new IdSelection("@3"), new IdSelection("@4"));
 
-		List<Resource> result = resourceQuery.doQuery(dao);
+		List<Resource> result = dao.doQuery(resourceQuery, new NoStrategyResourceVisitor());
 		assertEquals(2, result.size());
 		assertEquals("@3", result.get(0).getId());
 		assertEquals("@4", result.get(1).getId());
@@ -104,16 +102,11 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		InMemoryQuery<Resource, Resource> resourceQuery = new InMemoryQuery<>();
-		resourceQuery.setNavigator(new AnyNavigator<Resource>());
-		resourceQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
-		List<Selector<Resource>> andSelectors = new ArrayList<>();
-		andSelectors.add(new IdSelector<Resource>("@3"));
-		andSelectors.add(new NameSelector<Resource>("Res 3", StringMatchMode.EQUALS_CASE_SENSITIVE));
-		BooleanSelector<Resource> andSelector = new AndSelector<Resource>(andSelectors);
-		resourceQuery.setSelector(andSelector);
+		ResourceQuery resourceQuery = new ResourceQuery(new StrolchTypeNavigation("MyType2"));
+		resourceQuery.and().with(new IdSelection("@3"),
+				new NameSelection("Res 3", StringMatchMode.EQUALS_CASE_SENSITIVE));
 
-		List<Resource> result = resourceQuery.doQuery(dao);
+		List<Resource> result = dao.doQuery(resourceQuery, new NoStrategyResourceVisitor());
 		assertEquals(1, result.size());
 		assertEquals("@3", result.get(0).getId());
 	}
@@ -125,16 +118,10 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		InMemoryQuery<Resource, Resource> resourceQuery = new InMemoryQuery<>();
-		resourceQuery.setNavigator(new AnyNavigator<Resource>());
-		resourceQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
-		List<Selector<Resource>> andSelectors = new ArrayList<>();
-		andSelectors.add(new IdSelector<Resource>("@3"));
-		andSelectors.add(new NameSelector<Resource>("Res 4", StringMatchMode.EQUALS_CASE_SENSITIVE));
-		BooleanSelector<Resource> andSelector = new AndSelector<Resource>(andSelectors);
-		resourceQuery.setSelector(andSelector);
+		ResourceQuery resourceQuery = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		resourceQuery.and().with(new IdSelection("@3"), new NameSelection("@4", StringMatchMode.EQUALS_CASE_SENSITIVE));
 
-		List<Resource> result = resourceQuery.doQuery(dao);
+		List<Resource> result = dao.doQuery(resourceQuery, new NoStrategyResourceVisitor());
 		assertEquals(0, result.size());
 	}
 
@@ -146,17 +133,15 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		InMemoryQuery<Resource, Resource> ballQuery = new InMemoryQuery<>();
-		ballQuery.setNavigator(new AnyNavigator<Resource>());
-		ballQuery.setElementVisitor(new NoStrategyVisitor<Resource>());
-		AndSelector<Resource> andSelector = new AndSelector<>();
-		andSelector.with(ParameterSelector.<Resource> stringSelector("parameters", "color", "red",
-				StringMatchMode.EQUALS_CASE_SENSITIVE));
-		andSelector.with(ParameterSelector.<Resource> booleanSelector("parameters", "forChildren", true));
-		andSelector.with(ParameterSelector.<Resource> floatSelector("parameters", "diameter", 22.0));
-		ballQuery.setSelector(andSelector);
+		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ballQuery
+				.and()
+				.with( //
+				ParameterSelection.stringSelection("parameters", "color", "red", StringMatchMode.EQUALS_CASE_SENSITIVE),
+						ParameterSelection.booleanSelection("parameters", "forChildren", true),
+						ParameterSelection.floatSelection("parameters", "diameter", 22.0));
 
-		List<Resource> result = ballQuery.doQuery(dao);
+		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
 		assertEquals(1, result.size());
 	}
 

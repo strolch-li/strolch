@@ -17,16 +17,25 @@ package li.strolch.runtime.query.inmemory;
 
 import java.util.List;
 
-import li.strolch.model.StrolchElement;
-import li.strolch.persistence.api.StrolchDao;
+import li.strolch.model.audit.Audit;
+import li.strolch.persistence.api.AuditDao;
+import ch.eitchnet.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AnyNavigator<T extends StrolchElement> implements Navigator<T> {
+public class AuditTypeNavigator implements AuditNavigator {
+
+	private String type;
+	private DateRange dateRange;
+
+	public AuditTypeNavigator(String type, DateRange dateRange) {
+		this.type = type;
+		this.dateRange = dateRange;
+	}
 
 	@Override
-	public List<T> navigate(StrolchDao<T> dao) {
-		return dao.queryAll();
+	public List<Audit> navigate(AuditDao dao) {
+		return dao.queryAll(this.type, this.dateRange);
 	}
 }

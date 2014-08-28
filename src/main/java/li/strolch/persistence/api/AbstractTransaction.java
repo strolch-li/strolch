@@ -76,6 +76,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private TransactionCloseStrategy closeStrategy;
 	private boolean suppressUpdates;
+	private boolean suppressAudits;
 	private TransactionResult txResult;
 
 	private List<Command> commands;
@@ -161,6 +162,21 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	 */
 	public boolean isSuppressUpdates() {
 		return this.suppressUpdates;
+	}
+
+	/**
+	 * @param suppressAudits
+	 *            the suppressAudits to set
+	 */
+	public void setSuppressAudits(boolean suppressAudits) {
+		this.suppressAudits = suppressAudits;
+	}
+
+	/**
+	 * @return the suppressAudits
+	 */
+	public boolean isSuppressAudits() {
+		return this.suppressAudits;
 	}
 
 	@Override
@@ -498,6 +514,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private long writeAuditTrail() {
 		if (!isAuditTrailEnabled())
+			return 0L;
+		if (isSuppressAudits())
 			return 0L;
 
 		long auditTrailStart = System.nanoTime();

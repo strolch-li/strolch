@@ -24,6 +24,8 @@ import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
 import li.strolch.model.audit.AuditVisitor;
 import li.strolch.persistence.api.AuditDao;
+import li.strolch.runtime.query.inmemory.InMemoryAuditQuery;
+import li.strolch.runtime.query.inmemory.InMemoryAuditQueryVisitor;
 import ch.eitchnet.utils.collections.DateRange;
 import ch.eitchnet.utils.collections.MapOfMaps;
 
@@ -155,8 +157,9 @@ public class InMemoryAuditDao implements AuditDao {
 	}
 
 	@Override
-	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor) {
-		// TODO Auto-generated method stub
-		return null;
+	public <U> List<U> doQuery(AuditQuery auditQuery, AuditVisitor<U> auditVisitor) {
+		InMemoryAuditQueryVisitor visitor = new InMemoryAuditQueryVisitor();
+		InMemoryAuditQuery<U> query = visitor.visit(auditQuery, auditVisitor);
+		return query.doQuery(this);
 	}
 }
