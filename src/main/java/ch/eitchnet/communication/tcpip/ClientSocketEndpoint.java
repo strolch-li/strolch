@@ -283,6 +283,8 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 	 * <li>clearOnConnect - if true, then the after a successful connect the input is cleared by discarding all
 	 * available bytes. This can be useful in cases where the channel is clogged with stale data. default is
 	 * {@link SocketEndpointConstants#CLEAR_ON_CONNECT}</li>
+	 * <li>connectOnStart - if true, then when the connection is started, the connection to the remote address is
+	 * attempted. default is {@link SocketEndpointConstants#CONNECT_ON_START}
 	 * </ul>
 	 * 
 	 * @see CommunicationEndpoint#configure(CommunicationConnection, IoMessageVisitor)

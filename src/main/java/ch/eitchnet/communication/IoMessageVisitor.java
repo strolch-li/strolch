@@ -15,6 +15,9 @@
  */
 package ch.eitchnet.communication;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.eitchnet.communication.console.ConsoleMessageVisitor;
 
 /**
@@ -31,6 +34,8 @@ import ch.eitchnet.communication.console.ConsoleMessageVisitor;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class IoMessageVisitor {
+
+	protected static final Logger logger = LoggerFactory.getLogger(IoMessageVisitor.class);
 
 	protected CommunicationConnection connection;
 
