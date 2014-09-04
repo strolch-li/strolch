@@ -145,6 +145,51 @@ public class InMemoryQueryTest {
 		assertEquals(1, result.size());
 	}
 
+	@Test
+	public void shouldQueryByNullParameter1() {
+		List<Resource> resources = getResources();
+		resources.add(getBallResource());
+		InMemoryResourceDao dao = new InMemoryResourceDao();
+		dao.saveAll(resources);
+
+		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ballQuery.and().with( //
+				ParameterSelection.nullSelection("parameters", "color"));
+
+		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		assertEquals(0, result.size());
+	}
+
+	@Test
+	public void shouldQueryByNullParameter2() {
+		List<Resource> resources = getResources();
+		resources.add(getBallResource());
+		InMemoryResourceDao dao = new InMemoryResourceDao();
+		dao.saveAll(resources);
+
+		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ballQuery.and().with( //
+				ParameterSelection.nullSelection("parameters", "weight"));
+
+		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		assertEquals(1, result.size());
+	}
+	
+	@Test
+	public void shouldQueryByNullParameter3() {
+		List<Resource> resources = getResources();
+		resources.add(getBallResource());
+		InMemoryResourceDao dao = new InMemoryResourceDao();
+		dao.saveAll(resources);
+
+		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ballQuery.and().with( //
+				ParameterSelection.nullSelection("parameters", "weight"));
+
+		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		assertEquals(1, result.size());
+	}
+
 	private Resource getBallResource() {
 		Resource res1 = new Resource("childrensBall", "Ball 1", "Ball");
 		ParameterBag bag = new ParameterBag("parameters", "Ball Details", "Parameters");

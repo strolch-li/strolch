@@ -85,6 +85,29 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		return new StringListParameterSelector<>(bagKey, paramKey, value);
 	}
 
+	public static <T extends GroupedParameterizedElement> NullParameterSelector<T> nullSelector(String bagKey,
+			String paramKey) {
+		return new NullParameterSelector<>(bagKey, paramKey);
+	}
+
+	public static class NullParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+
+		public NullParameterSelector(String bagKey, String key) {
+			super(bagKey, key);
+		}
+
+		@Override
+		public boolean select(GroupedParameterizedElement element) {
+
+			ParameterBag bag = element.getParameterBag(this.bagKey);
+			if (bag == null) {
+				return false;
+			}
+
+			return !bag.hasParameter(this.paramKey);
+		}
+	}
+
 	public static class StringParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
 
 		private StringMatchMode matchMode;

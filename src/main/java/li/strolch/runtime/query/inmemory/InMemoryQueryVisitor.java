@@ -26,18 +26,22 @@ import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
 import li.strolch.model.query.NotSelection;
 import li.strolch.model.query.OrSelection;
+import li.strolch.model.query.ParameterBagSelection;
+import li.strolch.model.query.ParameterBagSelection.NullParameterBagSelection;
 import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateRangeParameterSelection;
 import li.strolch.model.query.ParameterSelection.FloatParameterSelection;
 import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
 import li.strolch.model.query.ParameterSelection.LongParameterSelection;
+import li.strolch.model.query.ParameterSelection.NullParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringListParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringParameterSelection;
 import li.strolch.model.query.ParameterSelectionVisitor;
 import li.strolch.model.query.Selection;
-import li.strolch.model.query.StrolchElementSelectionVisitor;
+import li.strolch.model.query.StrolchRootElementSelectionVisitor;
 import li.strolch.persistence.api.StrolchDao;
+import li.strolch.runtime.query.inmemory.ParameterBagSelector.NullParameterBagSelector;
 import li.strolch.runtime.query.inmemory.ParameterSelector.StringParameterSelector;
 import ch.eitchnet.utils.dbc.DBC;
 
@@ -45,7 +49,7 @@ import ch.eitchnet.utils.dbc.DBC;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement, S extends StrolchDao<?>> implements
-		StrolchElementSelectionVisitor, ParameterSelectionVisitor {
+		StrolchRootElementSelectionVisitor, ParameterSelectionVisitor {
 
 	private Navigator<T> navigator;
 	private List<Selector<T>> selectors;
@@ -194,5 +198,20 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	public void visit(StringListParameterSelection selection) {
 		addSelector(ParameterSelector.<T> stringListSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
+	}
+
+	@Override
+	public void visit(NullParameterSelection selection) {
+		addSelector(ParameterSelector.<T> nullSelector(selection.getBagKey(), selection.getParamKey()));
+	}
+
+	@Override
+	public void visit(NullParameterBagSelection selection) {
+		addSelector(new NullParameterBagSelector<T>(selection.getBagKey()));
+	}
+
+	@Override
+	public void visit(ParameterBagSelection selection) {
+		addSelector(new ParameterBagSelector<T>(selection.getBagKey()));
 	}
 }
