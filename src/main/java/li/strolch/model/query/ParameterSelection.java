@@ -105,6 +105,22 @@ public abstract class ParameterSelection implements Selection {
 		return new StringListParameterSelection(bagKey, paramKey, value);
 	}
 
+	public static NullParameterSelection nullSelection(String bagKey, String paramKey) {
+		return new NullParameterSelection(bagKey, paramKey);
+	}
+
+	public static class NullParameterSelection extends ParameterSelection {
+
+		public NullParameterSelection(String bagKey, String paramKey) {
+			super(bagKey, paramKey);
+		}
+
+		@Override
+		public void accept(ParameterSelectionVisitor visitor) {
+			visitor.visit(this);
+		}
+	}
+
 	public static class StringParameterSelection extends ParameterSelection {
 
 		private StringMatchMode matchMode;

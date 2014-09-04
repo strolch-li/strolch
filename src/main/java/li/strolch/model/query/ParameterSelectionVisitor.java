@@ -21,6 +21,7 @@ import li.strolch.model.query.ParameterSelection.DateRangeParameterSelection;
 import li.strolch.model.query.ParameterSelection.FloatParameterSelection;
 import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
 import li.strolch.model.query.ParameterSelection.LongParameterSelection;
+import li.strolch.model.query.ParameterSelection.NullParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringListParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringParameterSelection;
 
@@ -40,8 +41,10 @@ public interface ParameterSelectionVisitor extends QueryVisitor {
 	public void visit(FloatParameterSelection selection);
 
 	public void visit(DateParameterSelection selection);
-	
+
 	public void visit(DateRangeParameterSelection selection);
 
 	public void visit(StringListParameterSelection selection);
+
+	public void visit(NullParameterSelection nullParameterSelection);
 }

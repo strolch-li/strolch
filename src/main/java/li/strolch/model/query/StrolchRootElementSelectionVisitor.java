@@ -15,13 +15,14 @@
  */
 package li.strolch.model.query;
 
+import li.strolch.model.query.ParameterBagSelection.NullParameterBagSelection;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
-public interface OrderSelectionVisitor extends StrolchRootElementSelectionVisitor {
+public interface StrolchRootElementSelectionVisitor extends StrolchElementSelectionVisitor {
 
-	public void visit(DateSelection selection);
+	public void visit(ParameterBagSelection selection);
 
-	public void visit(StateSelection selection);
+	public void visit(NullParameterBagSelection selection);
 }

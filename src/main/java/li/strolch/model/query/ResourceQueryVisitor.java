@@ -17,9 +17,8 @@ package li.strolch.model.query;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
-public interface ResourceQueryVisitor extends StrolchElementSelectionVisitor, ParameterSelectionVisitor {
+public interface ResourceQueryVisitor extends StrolchRootElementSelectionVisitor, ParameterSelectionVisitor {
 
 	// marker interface
 }
