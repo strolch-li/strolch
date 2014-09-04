@@ -47,6 +47,8 @@ import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
 import li.strolch.model.query.OrSelection;
 import li.strolch.model.query.OrderQuery;
+import li.strolch.model.query.ParameterBagSelection;
+import li.strolch.model.query.ParameterBagSelection.NullParameterBagSelection;
 import li.strolch.model.query.ParameterSelection;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StateSelection;
@@ -324,7 +326,34 @@ public class QueryTest {
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
 		query.and().with(ParameterSelection.dateSelection("@bag01", "@param6", new Date(1354295525628L)));
 		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
+	}
 
+	@Test
+	public void shouldQueryResourceByNullParam1() throws SQLException {
+		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		query.and().with(ParameterSelection.nullSelection("@bag01", "@param6"));
+		performResourceQuery(query, Arrays.<String> asList());
+	}
+
+	@Test
+	public void shouldQueryResourceByNullParam2() throws SQLException {
+		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		query.and().with(ParameterSelection.nullSelection("@bag01", "@param"));
+		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
+	}
+
+	@Test
+	public void shouldQueryResourceByBag() throws SQLException {
+		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		query.and().with(new ParameterBagSelection("@bag01"));
+		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
+	}
+
+	@Test
+	public void shouldQueryResourceByNullBag() throws SQLException {
+		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		query.and().with(new NullParameterBagSelection("@bag01"));
+		performResourceQuery(query, Arrays.<String> asList());
 	}
 
 	private void performOrderQuery(OrderQuery query, List<String> expected) throws SQLException {

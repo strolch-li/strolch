@@ -28,17 +28,20 @@ import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
 import li.strolch.model.query.NotSelection;
 import li.strolch.model.query.OrSelection;
+import li.strolch.model.query.ParameterBagSelection;
+import li.strolch.model.query.ParameterBagSelection.NullParameterBagSelection;
 import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateRangeParameterSelection;
 import li.strolch.model.query.ParameterSelection.FloatParameterSelection;
 import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
 import li.strolch.model.query.ParameterSelection.LongParameterSelection;
+import li.strolch.model.query.ParameterSelection.NullParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringListParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringParameterSelection;
 import li.strolch.model.query.ParameterSelectionVisitor;
 import li.strolch.model.query.Selection;
-import li.strolch.model.query.StrolchElementSelectionVisitor;
+import li.strolch.model.query.StrolchRootElementSelectionVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
 import ch.eitchnet.utils.StringMatchMode;
 import ch.eitchnet.utils.dbc.DBC;
@@ -47,7 +50,7 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class PostgreSqlQueryVisitor implements StrolchElementSelectionVisitor, ParameterSelectionVisitor {
+public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelectionVisitor, ParameterSelectionVisitor {
 
 	protected StringBuilder sql;
 	protected StringBuilder sb;
@@ -296,6 +299,31 @@ public abstract class PostgreSqlQueryVisitor implements StrolchElementSelectionV
 	public void visit(DateParameterSelection selection) {
 		xpath(selection.getBagKey(), selection.getParamKey(),
 				ISO8601FormatFactory.getInstance().formatDate(selection.getValue()));
+	}
+
+	@Override
+	public void visit(NullParameterSelection selection) {
+		String xpath = "cast(xpath('//Resource/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]', asxml) as text[]) = '{}'\n";
+		this.sb.append(this.indent);
+		xpath = xpath.replace("${bagKey}", selection.getBagKey());
+		xpath = xpath.replace("${paramKey}", selection.getParamKey());
+		this.sb.append(xpath);
+	}
+
+	@Override
+	public void visit(ParameterBagSelection selection) {
+		String xpath = "cast(xpath('//Resource/ParameterBag[@Id=\"${bagKey}\"]', asxml) as text[]) != '{}'\n";
+		this.sb.append(this.indent);
+		xpath = xpath.replace("${bagKey}", selection.getBagKey());
+		this.sb.append(xpath);
+	}
+
+	@Override
+	public void visit(NullParameterBagSelection selection) {
+		String xpath = "cast(xpath('//Resource/ParameterBag[@Id=\"${bagKey}\"]', asxml) as text[]) = '{}'\n";
+		this.sb.append(this.indent);
+		xpath = xpath.replace("${bagKey}", selection.getBagKey());
+		this.sb.append(xpath);
 	}
 
 	@Override
