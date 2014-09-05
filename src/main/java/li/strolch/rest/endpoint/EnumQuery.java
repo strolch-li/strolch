@@ -17,6 +17,7 @@ package li.strolch.rest.endpoint;
 
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -28,12 +29,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import li.strolch.rest.RestfulStrolchComponent;
+import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.runtime.query.enums.EnumHandler;
 import li.strolch.runtime.query.enums.StrolchEnum;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -46,15 +50,17 @@ public class EnumQuery {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{name}")
-	public Response getEnum(@PathParam("name") String name, @Context HttpHeaders headers) {
+	public Response getEnum(@PathParam("name") String name, @Context HttpServletRequest request,
+			@Context HttpHeaders headers) {
 
 		try {
 
 			EnumHandler enumHandler = RestfulStrolchComponent.getInstance().getContainer()
 					.getComponent(EnumHandler.class);
 
+			Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 			Locale locale = RestfulHelper.getLocale(headers);
-			StrolchEnum strolchEnum = enumHandler.getEnum(null, name, locale);
+			StrolchEnum strolchEnum = enumHandler.getEnum(cert, name, locale);
 
 			GenericEntity<StrolchEnum> entity = new GenericEntity<StrolchEnum>(strolchEnum, StrolchEnum.class) {
 			};
