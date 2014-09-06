@@ -342,8 +342,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public Order getOrderBy(String type, String id) {
+		return getOrderMap().getBy(this, type, id);
+	}
+
+	@Override
 	public Resource getResourceBy(StringParameter refP) throws StrolchException {
 		return getResourceMap().getBy(this, refP);
+	}
+
+	@Override
+	public Resource getResourceBy(String type, String id) {
+		return getResourceMap().getBy(this, type, id);
 	}
 
 	@Override

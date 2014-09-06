@@ -118,6 +118,18 @@ public interface StrolchTransaction extends AutoCloseable {
 	public <T extends StrolchElement> T findElement(Locator locator) throws StrolchException, ClassCastException;
 
 	/**
+	 * Returns the {@link Resource} with the given type and id, or null if it does not exist
+	 * 
+	 * @param type
+	 *            the type of the {@link Resource}
+	 * @param id
+	 *            the id of the {@link Resource}
+	 * 
+	 * @return the {@link Resource} with the given type and id, or null if it does not exist
+	 */
+	public Resource getResourceBy(String type, String id);
+
+	/**
 	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference
 	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and
 	 * the UOM must be set to the resource's type and the value is the id of the resource
@@ -130,6 +142,18 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
 	 */
 	public Resource getResourceBy(StringParameter refP) throws StrolchException;
+
+	/**
+	 * Returns the {@link Order} with the given type and id, or null if it does not exist
+	 * 
+	 * @param type
+	 *            the type of the {@link Order}
+	 * @param id
+	 *            the id of the {@link Order}
+	 * 
+	 * @return the {@link Order} with the given type and id, or null if it does not exist
+	 */
+	public Order getOrderBy(String type, String id);
 
 	/**
 	 * Returns the {@link Order} which is referenced by the given {@link StringParameter}. A reference {@link Parameter}
