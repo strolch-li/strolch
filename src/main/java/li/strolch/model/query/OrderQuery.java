@@ -28,7 +28,7 @@ import li.strolch.model.parameter.Parameter;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderQuery extends StrolchQuery<OrderQueryVisitor> {
+public class OrderQuery extends StrolchElementQuery<OrderQueryVisitor> {
 
 	public OrderQuery(Navigation navigation) {
 		super(navigation);

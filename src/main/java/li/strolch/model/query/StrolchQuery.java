@@ -15,73 +15,12 @@
  */
 package li.strolch.model.query;
 
-import ch.eitchnet.utils.dbc.DBC;
+import ch.eitchnet.privilege.model.Restrictable;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class StrolchQuery<T extends QueryVisitor> {
+public interface StrolchQuery extends Restrictable {
 
-	private Navigation navigation;
-	private Selection selection;
-
-	public StrolchQuery(Navigation navigation) {
-		this.navigation = navigation;
-	}
-
-	public boolean hasNavigation() {
-		return this.navigation != null;
-	}
-
-	public boolean hasSelection() {
-		return this.selection != null && this.selection.hasSelection();
-	}
-
-	public Selection getSelection() {
-		return this.selection;
-	}
-
-	public StrolchQuery<T> with(Selection selection) {
-		assertNoSelectionYetSet();
-		this.selection = selection;
-		return this;
-	}
-
-	private void assertNoSelectionYetSet() {
-		String msg = "A selection is already set! Use a cascaded boolean operators to perform multiple selections"; //$NON-NLS-1$
-		DBC.PRE.assertNull(msg, this.selection);
-	}
-
-	public StrolchQuery<T> withAny() {
-		assertNoSelectionYetSet();
-		this.selection = new AnySelection();
-		return this;
-	}
-
-	public AndSelection and() {
-		assertNoSelectionYetSet();
-		AndSelection and = new AndSelection();
-		this.selection = and;
-		return and;
-	}
-
-	public OrSelection or() {
-		assertNoSelectionYetSet();
-		OrSelection or = new OrSelection();
-		this.selection = or;
-		return or;
-	}
-
-	public StrolchQuery<T> not(Selection selection) {
-		assertNoSelectionYetSet();
-		this.selection = new NotSelection(selection);
-		return this;
-	}
-
-	public void accept(T visitor) {
-		DBC.PRE.assertNotNull("No navigation set!", this.navigation); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("No selection defined!", this.selection); //$NON-NLS-1$
-		this.navigation.accept(visitor);
-		this.selection.accept(visitor);
-	}
+	// marker interface
 }

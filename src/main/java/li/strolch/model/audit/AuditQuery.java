@@ -18,13 +18,14 @@ package li.strolch.model.audit;
 import java.util.ArrayList;
 import java.util.List;
 
+import li.strolch.model.query.StrolchQuery;
 import ch.eitchnet.utils.collections.DateRange;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AuditQuery {
+public class AuditQuery implements StrolchQuery {
 
 	private String elementTypeSelection;
 	private List<AuditSelection> selections;
@@ -70,5 +71,21 @@ public class AuditQuery {
 		for (AuditSelection selection : selections) {
 			selection.accept(visitor);
 		}
+	}
+
+	/**
+	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeName()
+	 */
+	@Override
+	public String getPrivilegeName() {
+		return StrolchQuery.class.getName();
+	}
+
+	/**
+	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeValue()
+	 */
+	@Override
+	public Object getPrivilegeValue() {
+		return getClass().getName();
 	}
 }

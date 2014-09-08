@@ -28,7 +28,7 @@ import li.strolch.model.parameter.Parameter;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ResourceQuery extends StrolchQuery<ResourceQueryVisitor> {
+public class ResourceQuery extends StrolchElementQuery<ResourceQueryVisitor> {
 
 	/**
 	 * @param navigation

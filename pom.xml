@@ -32,6 +32,10 @@
 			<groupId>ch.eitchnet</groupId>
 			<artifactId>ch.eitchnet.utils</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>ch.eitchnet</groupId>
+			<artifactId>ch.eitchnet.privilege</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
