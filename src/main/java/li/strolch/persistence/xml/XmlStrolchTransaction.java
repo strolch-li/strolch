@@ -20,6 +20,7 @@ import java.util.Set;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.xmlpers.api.ModificationResult;
 import ch.eitchnet.xmlpers.api.PersistenceTransaction;
@@ -30,9 +31,9 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 	private XmlPersistenceHandler persistenceHandler;
 	private PersistenceTransaction tx;
 
-	public XmlStrolchTransaction(StrolchRealm realm, Certificate certificate, String action, PersistenceTransaction tx,
-			XmlPersistenceHandler persistenceHandler) {
-		super(realm, certificate, action);
+	public XmlStrolchTransaction(PrivilegeHandler privilegeHandler, StrolchRealm realm, Certificate certificate,
+			String action, PersistenceTransaction tx, XmlPersistenceHandler persistenceHandler) {
+		super(privilegeHandler, realm, certificate, action);
 		this.persistenceHandler = persistenceHandler;
 		this.tx = tx;
 	}

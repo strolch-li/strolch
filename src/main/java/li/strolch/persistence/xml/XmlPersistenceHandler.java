@@ -80,7 +80,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
 		PersistenceTransaction tx = this.persistenceManager.openTx(realm.getRealm());
-		return new XmlStrolchTransaction(realm, certificate, action, tx, this);
+		return new XmlStrolchTransaction(getContainer().getPrivilegeHandler(), realm, certificate, action, tx, this);
 	}
 
 	@Override
