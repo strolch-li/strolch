@@ -78,7 +78,7 @@ public class EmptyRealm extends InternalStrolchRealm {
 	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		super.initialize(container, configuration);
-		this.persistenceHandler = new InMemoryPersistence();
+		this.persistenceHandler = new InMemoryPersistence(container.getPrivilegeHandler());
 		this.resourceMap = new TransactionalResourceMap();
 		this.orderMap = new TransactionalOrderMap();
 

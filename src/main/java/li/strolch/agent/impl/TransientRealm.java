@@ -97,7 +97,7 @@ public class TransientRealm extends InternalStrolchRealm {
 
 		this.modelFile = configuration.getDataFile(key, null, configuration.getRuntimeConfiguration(), true);
 
-		this.persistenceHandler = new InMemoryPersistence();
+		this.persistenceHandler = new InMemoryPersistence(container.getPrivilegeHandler());
 		this.resourceMap = new TransactionalResourceMap();
 		this.orderMap = new TransactionalOrderMap();
 

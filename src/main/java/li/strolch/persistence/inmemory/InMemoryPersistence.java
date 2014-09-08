@@ -9,19 +9,22 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 
 public class InMemoryPersistence implements PersistenceHandler {
 
 	private Map<String, DaoCache> daoCache;
+	private PrivilegeHandler privilegeHandler;
 
-	public InMemoryPersistence() {
+	public InMemoryPersistence(PrivilegeHandler privilegeHandler) {
+		this.privilegeHandler = privilegeHandler;
 		this.daoCache = new HashMap<>();
 	}
 
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
-		return new InMemoryTransaction(realm, certificate, action, this);
+		return new InMemoryTransaction(this.privilegeHandler, realm, certificate, action, this);
 	}
 
 	@Override

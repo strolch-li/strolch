@@ -52,17 +52,20 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
+import li.strolch.model.query.StrolchQuery;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.persistence.inmemory.InMemoryTransaction;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.Command;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 
@@ -88,12 +91,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private String action;
 	private Certificate certificate;
+	private PrivilegeHandler privilegeHandler;
 
-	public AbstractTransaction(StrolchRealm realm, Certificate certificate, String action) {
+	public AbstractTransaction(PrivilegeHandler privilegeHandler, StrolchRealm realm, Certificate certificate,
+			String action) {
+		DBC.PRE.assertNotNull("privilegeHandler must be set!", privilegeHandler); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("realm must be set!", realm); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("certificate must be set!", certificate); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("action must be set!", action); //$NON-NLS-1$
 
+		this.privilegeHandler = privilegeHandler;
 		this.realm = (InternalStrolchRealm) realm;
 		this.action = action;
 		this.certificate = certificate;
@@ -228,33 +235,44 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return this.auditTrail;
 	}
 
+	private void assertQueryAllowed(StrolchQuery query) {
+		PrivilegeContext privilegeContext = this.privilegeHandler.getPrivilegeContext(this.certificate);
+		privilegeContext.validateAction(query);
+	}
+
 	@Override
 	public List<Order> doQuery(OrderQuery query) {
+		assertQueryAllowed(query);
 		return getPersistenceHandler().getOrderDao(this).doQuery(query, new NoStrategyOrderVisitor());
 	}
 
 	@Override
 	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor) {
+		assertQueryAllowed(query);
 		return getPersistenceHandler().getOrderDao(this).doQuery(query, orderVisitor);
 	}
 
 	@Override
 	public List<Resource> doQuery(ResourceQuery query) {
+		assertQueryAllowed(query);
 		return getPersistenceHandler().getResourceDao(this).doQuery(query, new NoStrategyResourceVisitor());
 	}
 
 	@Override
 	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
+		assertQueryAllowed(query);
 		return getPersistenceHandler().getResourceDao(this).doQuery(query, resourceVisitor);
 	}
 
 	@Override
 	public List<Audit> doQuery(AuditQuery query) {
+		assertQueryAllowed(query);
 		return getPersistenceHandler().getAuditDao(this).doQuery(query, new NoStrategyAuditVisitor());
 	}
 
 	@Override
 	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor) {
+		assertQueryAllowed(query);
 		return getPersistenceHandler().getAuditDao(this).doQuery(query, auditVisitor);
 	}
 

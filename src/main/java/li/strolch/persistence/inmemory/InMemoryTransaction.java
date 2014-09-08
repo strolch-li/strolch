@@ -5,15 +5,16 @@ import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.TransactionResult;
 import li.strolch.persistence.api.TransactionState;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 
 public class InMemoryTransaction extends AbstractTransaction {
 
 	private InMemoryPersistence persistenceHandler;
 
-	public InMemoryTransaction(StrolchRealm realm, Certificate certificate, String action,
-			InMemoryPersistence persistenceHandler) {
-		super(realm, certificate, action);
+	public InMemoryTransaction(PrivilegeHandler privilegeHandler, StrolchRealm realm, Certificate certificate,
+			String action, InMemoryPersistence persistenceHandler) {
+		super(privilegeHandler, realm, certificate, action);
 		this.persistenceHandler = persistenceHandler;
 	}
 
