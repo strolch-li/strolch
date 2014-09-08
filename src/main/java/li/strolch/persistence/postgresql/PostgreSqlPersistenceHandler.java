@@ -131,7 +131,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
-		return new PostgreSqlStrolchTransaction(realm, certificate, action, this);
+		return new PostgreSqlStrolchTransaction(getContainer().getPrivilegeHandler(), realm, certificate, action, this);
 	}
 
 	Connection getConnection(String realm) {

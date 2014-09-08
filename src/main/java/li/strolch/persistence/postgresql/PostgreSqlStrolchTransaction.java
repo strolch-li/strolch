@@ -24,6 +24,7 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.TransactionResult;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +41,9 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	private AuditDao auditDao;
 	private Connection connection;
 
-	public PostgreSqlStrolchTransaction(StrolchRealm realm, Certificate certificate, String action,
-			PostgreSqlPersistenceHandler persistenceHandler) {
-		super(realm, certificate, action);
+	public PostgreSqlStrolchTransaction(PrivilegeHandler privilegeHandler, StrolchRealm realm, Certificate certificate,
+			String action, PostgreSqlPersistenceHandler persistenceHandler) {
+		super(privilegeHandler, realm, certificate, action);
 		this.persistenceHandler = persistenceHandler;
 	}
 
