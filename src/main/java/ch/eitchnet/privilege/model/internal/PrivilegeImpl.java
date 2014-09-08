@@ -15,6 +15,7 @@
  */
 package ch.eitchnet.privilege.model.internal;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -76,13 +77,13 @@ public final class PrivilegeImpl implements IPrivilege {
 			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
 		}
 		if (StringHelper.isEmpty(policy)) {
-			throw new PrivilegeException("Policy may not be empty!"); //$NON-NLS-1$
+			throw new PrivilegeException(MessageFormat.format("Policy may not be empty for Privilege {0}!", name)); //$NON-NLS-1$
 		}
 		if (denyList == null) {
-			throw new PrivilegeException("denyList is null!"); //$NON-NLS-1$
+			throw new PrivilegeException(MessageFormat.format("denyList is null for Privilege {0}!", name)); //$NON-NLS-1$
 		}
 		if (allowList == null) {
-			throw new PrivilegeException("allowList is null!"); //$NON-NLS-1$
+			throw new PrivilegeException(MessageFormat.format("allowList is null for Privilege {0}!", name)); //$NON-NLS-1$
 		}
 
 		this.name = name;

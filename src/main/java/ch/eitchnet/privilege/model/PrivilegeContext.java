@@ -16,8 +16,10 @@
 package ch.eitchnet.privilege.model;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,6 +71,18 @@ public class PrivilegeContext {
 
 	public Set<String> getPrivilegeNames() {
 		return this.privileges.keySet();
+	}
+
+	public IPrivilege getPrivilege(String privilegeName) {
+		return this.privileges.get(privilegeName);
+	}
+
+	public List<String> getFlatAllowList() {
+		List<String> allowList = new ArrayList<>();
+		for (IPrivilege privilege : this.privileges.values()) {
+			allowList.addAll(privilege.getAllowList());
+		}
+		return allowList;
 	}
 
 	// 
