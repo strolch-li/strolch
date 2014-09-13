@@ -15,6 +15,9 @@
  */
 package li.strolch.rest.endpoint;
 
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,12 +41,14 @@ import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
 import li.strolch.rest.model.LogoutResult;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -61,47 +66,56 @@ public class AuthenticationService {
 
 		LoginResult loginResult = new LoginResult();
 		GenericEntity<LoginResult> entity = new GenericEntity<LoginResult>(loginResult, LoginResult.class) {
+			//
 		};
 
 		try {
 
 			StringBuilder sb = new StringBuilder();
 			if (StringHelper.isEmpty(login.getUsername())) {
-				sb.append("Username was not given. ");
+				sb.append("Username was not given. "); //$NON-NLS-1$
 			}
 			if (StringHelper.isEmpty(login.getPassword())) {
-				sb.append("Password was not given.");
+				sb.append("Password was not given."); //$NON-NLS-1$
 			}
 
 			if (sb.length() != 0) {
-				loginResult.setMsg("Could not log in due to: " + sb.toString());
+				loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", sb.toString())); //$NON-NLS-1$
 				return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
 			}
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getComponent(
 					StrolchSessionHandler.class);
-			String origin = request == null ? "test" : request.getRemoteAddr();
+			String origin = request == null ? "test" : request.getRemoteAddr(); //$NON-NLS-1$
 			Certificate certificate = sessionHandler.authenticate(origin, login.getUsername(), login.getPassword()
 					.getBytes());
 
 			Locale locale = RestfulHelper.getLocale(headers);
 			certificate.setLocale(locale);
 
+			PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getPrivilegeHandler();
+			PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
 			loginResult.setSessionId(certificate.getAuthToken());
 			loginResult.setUsername(certificate.getUsername());
 			loginResult.setLocale(locale.toString());
 			loginResult.setParameters(certificate.getPropertyMap());
 
+			List<String> allowList = privilegeContext.getFlatAllowList();
+			if (allowList.isEmpty())
+				loginResult.setPrivileges(Arrays.asList("*")); //$NON-NLS-1$
+			else
+				loginResult.setPrivileges(allowList);
+
 			return Response.ok().entity(entity).build();
 
 		} catch (StrolchException e) {
 			logger.error(e.getMessage(), e);
-			loginResult.setMsg("Could not log in due to: " + e.getMessage());
+			loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
 			return Response.status(Status.UNAUTHORIZED).entity(entity).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
-			loginResult.setMsg(e.getClass().getName() + ": " + msg);
+			loginResult.setMsg(MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
 			return Response.serverError().entity(entity).build();
 		}
 	}
@@ -115,12 +129,13 @@ public class AuthenticationService {
 		LogoutResult logoutResult = new LogoutResult();
 
 		GenericEntity<LogoutResult> entity = new GenericEntity<LogoutResult>(logoutResult, LogoutResult.class) {
+			//
 		};
 		try {
 
 			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance().getComponent(
 					StrolchSessionHandler.class);
-			String origin = request == null ? "test" : request.getRemoteAddr();
+			String origin = request == null ? "test" : request.getRemoteAddr(); //$NON-NLS-1$
 			Certificate certificate = sessionHandlerHandler.validate(origin, authToken);
 			sessionHandlerHandler.invalidateSession(origin, certificate);
 
@@ -128,12 +143,12 @@ public class AuthenticationService {
 
 		} catch (StrolchException | PrivilegeException e) {
 			logger.error(e.getMessage(), e);
-			logoutResult.setMsg("Could not logout due to: " + e.getMessage());
+			logoutResult.setMsg(MessageFormat.format("Could not logout due to: {0}", e.getMessage())); //$NON-NLS-1$
 			return Response.status(Status.UNAUTHORIZED).entity(entity).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
-			logoutResult.setMsg(e.getClass().getName() + ": " + msg);
+			logoutResult.setMsg(MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
 			return Response.serverError().entity(entity).build();
 		}
 	}

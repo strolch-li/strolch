@@ -80,8 +80,13 @@ public class RealmDetail {
 		return true;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		return "RealmDetail [elementMapOverviews=" + this.elementMapOverviews + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("RealmDetail [elementMapOverviews=");
+		sb.append(this.elementMapOverviews);
+		sb.append("]");
+		return sb.toString();
 	}
 }

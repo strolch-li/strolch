@@ -63,6 +63,7 @@ public class EnumQuery {
 			StrolchEnum strolchEnum = enumHandler.getEnum(cert, name, locale);
 
 			GenericEntity<StrolchEnum> entity = new GenericEntity<StrolchEnum>(strolchEnum, StrolchEnum.class) {
+				//
 			};
 			return Response.ok().entity(entity).build();
 

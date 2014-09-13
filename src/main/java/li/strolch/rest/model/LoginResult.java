@@ -15,6 +15,8 @@
  */
 package li.strolch.rest.model;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -31,14 +33,21 @@ public class LoginResult {
 
 	@XmlAttribute(name = "username")
 	private String username;
+
 	@XmlAttribute(name = "sessionId")
 	private String sessionId;
+
 	@XmlAttribute(name = "locale")
 	private String locale;
+
 	@XmlAttribute(name = "parameters")
 	private Map<String, String> parameters;
+
 	@XmlAttribute(name = "msg")
 	private String msg;
+
+	@XmlAttribute(name = "privileges")
+	private List<String> privileges;
 
 	public LoginResult() {
 		// no-arg constructor for JAXB
@@ -90,6 +99,14 @@ public class LoginResult {
 	}
 
 	/**
+	 * @param locale
+	 *            the locale to set
+	 */
+	public void setLocale(Locale locale) {
+		this.locale = this.locale.toString();
+	}
+
+	/**
 	 * @return the parameters
 	 */
 	public Map<String, String> getParameters() {
@@ -117,5 +134,20 @@ public class LoginResult {
 	 */
 	public void setMsg(String msg) {
 		this.msg = msg;
+	}
+
+	/**
+	 * @return the privileges
+	 */
+	public List<String> getPrivileges() {
+		return this.privileges;
+	}
+
+	/**
+	 * @param privileges
+	 *            the privileges to set
+	 */
+	public void setPrivileges(List<String> privileges) {
+		this.privileges = privileges;
 	}
 }

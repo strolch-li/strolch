@@ -1,5 +1,8 @@
 package li.strolch.rest;
 
+import java.text.MessageFormat;
+
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -16,7 +19,7 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 
 	@Override
 	public Response toResponse(Exception ex) {
-		logger.error("Handling exception " + ex.getClass(), ex);
-		return Response.status(500).entity(StringHelper.formatException(ex)).type("text/plain").build();
+		logger.error(MessageFormat.format("Handling exception {0}", ex.getClass()), ex); //$NON-NLS-1$
+		return Response.status(500).entity(StringHelper.formatException(ex)).type(MediaType.TEXT_PLAIN).build();
 	}
 }

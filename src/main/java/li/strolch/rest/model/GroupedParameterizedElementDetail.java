@@ -43,21 +43,12 @@ public class GroupedParameterizedElementDetail extends StrolchElementDetail {
 		// no-arg constructor for JAXB
 	}
 
-	/**
-	 * @param id
-	 * @param name
-	 * @param type
-	 * @param parameterizedElements
-	 */
 	public GroupedParameterizedElementDetail(String id, String name, String type,
 			List<ParameterizedElementDetail> parameterizedElements) {
 		super(id, name, type);
 		this.parameterizedElements = parameterizedElements;
 	}
 
-	/**
-	 * @param strolchElement
-	 */
 	public GroupedParameterizedElementDetail(GroupedParameterizedElement groupedParameterizedElement) {
 		super(groupedParameterizedElement);
 

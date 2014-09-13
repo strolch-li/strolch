@@ -48,6 +48,7 @@ public class VersionQuery {
 		VersionQueryResult versionQueryResult = container.getAgent().getVersion();
 		GenericEntity<VersionQueryResult> entity = new GenericEntity<VersionQueryResult>(versionQueryResult,
 				VersionQueryResult.class) {
+			//
 		};
 		return Response.ok().entity(entity).build();
 	}

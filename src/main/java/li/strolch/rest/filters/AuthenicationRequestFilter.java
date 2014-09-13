@@ -34,7 +34,7 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 		String sessionId = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		if (sessionId != null) {
 			try {
-				String origin = request == null ? "test" : request.getRemoteAddr();
+				String origin = this.request == null ? "test" : this.request.getRemoteAddr(); //$NON-NLS-1$
 				StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getComponent(
 						StrolchSessionHandler.class);
 				Certificate certificate = sessionHandler.validate(origin, sessionId);

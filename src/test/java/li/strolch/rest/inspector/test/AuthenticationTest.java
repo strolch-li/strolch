@@ -40,6 +40,7 @@ import org.junit.Test;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Ignore
+@SuppressWarnings("nls")
 public class AuthenticationTest extends AbstractRestfulTest {
 
 	private static final String ROOT_PATH = "strolch/authentication";

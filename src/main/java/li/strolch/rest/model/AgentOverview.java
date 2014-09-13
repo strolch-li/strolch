@@ -15,6 +15,7 @@
  */
 package li.strolch.rest.model;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -82,6 +83,6 @@ public class AgentOverview {
 
 	@Override
 	public String toString() {
-		return "AgentOverview [realms=" + this.realms + "]";
+		return MessageFormat.format("AgentOverview [realms={0}]", this.realms); //$NON-NLS-1$
 	}
 }

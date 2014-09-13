@@ -19,6 +19,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -26,6 +27,7 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public class RestfulStrolchComponent extends StrolchComponent {
 
+	private static final String PARAM_CORS_ENABLED = "corsEnabled"; //$NON-NLS-1$
 	private static RestfulStrolchComponent instance;
 
 	/**
@@ -39,9 +41,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	@Override
 	public void initialize(ComponentConfiguration configuration) {
 
-		if (configuration.getBoolean("corsEnabled", Boolean.FALSE)) {
-			String origin = configuration.getString("corsOrigin", null);
-			logger.info("Enabling CORS for origin: " + origin);
+		if (configuration.getBoolean(PARAM_CORS_ENABLED, Boolean.FALSE)) {
+			String origin = configuration.getString(PARAM_CORS_ENABLED, null);
+			logger.info("Enabling CORS for origin: " + origin); //$NON-NLS-1$
 			AccessControlResponseFilter.setCorsEnabled(true);
 			AccessControlResponseFilter.setOrigin(origin);
 		}
@@ -51,7 +53,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	@Override
 	public void start() {
-		DBC.PRE.assertNull("Instance is already set! This component is a singleton resource!", instance);
+		DBC.PRE.assertNull("Instance is already set! This component is a singleton resource!", instance); //$NON-NLS-1$
 		instance = this;
 		super.start();
 	}
@@ -66,7 +68,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 * @return the RestfulStrolchComponent
 	 */
 	public static RestfulStrolchComponent getInstance() {
-		DBC.PRE.assertNotNull("Not yet initialized!", instance);
+		DBC.PRE.assertNotNull("Not yet initialized!", instance); //$NON-NLS-1$
 		return instance;
 	}
 
@@ -77,5 +79,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	public <T> T getComponent(Class<T> clazz) {
 		return getContainer().getComponent(clazz);
+	}
+
+	public PrivilegeHandler getPrivilegeHandler() {
+		return getContainer().getPrivilegeHandler();
 	}
 }

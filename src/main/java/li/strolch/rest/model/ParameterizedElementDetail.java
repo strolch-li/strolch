@@ -40,20 +40,11 @@ public class ParameterizedElementDetail extends StrolchElementDetail {
 		// no-arg constructor for JAXB
 	}
 
-	/**
-	 * @param id
-	 * @param name
-	 * @param type
-	 * @param parameters
-	 */
 	public ParameterizedElementDetail(String id, String name, String type, List<ParameterDetail> parameters) {
 		super(id, name, type);
 		this.parameters = parameters;
 	}
 
-	/**
-	 * @param strolchElement
-	 */
 	public ParameterizedElementDetail(ParameterizedElement parameterizedElement) {
 		super(parameterizedElement);
 

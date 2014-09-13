@@ -163,9 +163,19 @@ public class ElementMapsOverview {
 		return true;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		return "ElementMapsOverview [name=" + this.name + ", elementMapType=" + this.elementMapType + ", nrOfElements="
-				+ this.nrOfElements + ", types=" + this.types + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("ElementMapsOverview [name=");
+		sb.append(this.name);
+		sb.append(", elementMapType=");
+		sb.append(this.elementMapType);
+		sb.append(", nrOfElements=");
+		sb.append(this.nrOfElements);
+		sb.append(", types=");
+		sb.append(this.types);
+		sb.append("]");
+		return sb.toString();
 	}
 }

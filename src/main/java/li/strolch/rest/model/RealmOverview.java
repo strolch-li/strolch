@@ -103,8 +103,15 @@ public class RealmOverview {
 		return true;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		return "RealmOverview [realmName=" + this.realmName + ", size=" + this.size + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("RealmOverview [realmName=");
+		sb.append(this.realmName);
+		sb.append(", size=");
+		sb.append(this.size);
+		sb.append("]");
+		return sb.toString();
 	}
 }

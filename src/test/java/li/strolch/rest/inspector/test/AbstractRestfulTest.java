@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public abstract class AbstractRestfulTest extends JerseyTest {
 
 	private static final URI BASE_URI = URI.create("http://localhost:8888/base");

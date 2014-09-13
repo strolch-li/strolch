@@ -32,8 +32,8 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public class DefaultStrolchSessionHandler extends StrolchComponent implements StrolchSessionHandler {
 
-	private static final String SESSION_ORIGIN = "session.origin";
-	private static final String PROP_VALIDATE_ORIGIN = "validateOrigin";
+	private static final String PARAM_SESSION_ORIGIN = "session.origin"; //$NON-NLS-1$
+	private static final String PARAM_VALIDATE_ORIGIN = "validateOrigin"; //$NON-NLS-1$
 	private PrivilegeHandler privilegeHandler;
 	private Map<String, Certificate> certificateMap;
 	private boolean validateOrigin;
@@ -48,7 +48,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public void initialize(ComponentConfiguration configuration) {
-		this.validateOrigin = configuration.getBoolean(PROP_VALIDATE_ORIGIN, false);
+		this.validateOrigin = configuration.getBoolean(PARAM_VALIDATE_ORIGIN, false);
 		super.initialize(configuration);
 	}
 
@@ -79,12 +79,12 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public Certificate authenticate(String origin, String username, byte[] password) {
-		DBC.PRE.assertNotEmpty("Origin must be set!", username);
-		DBC.PRE.assertNotEmpty("Username must be set!", username);
-		DBC.PRE.assertNotNull("Passwort must be set", password);
+		DBC.PRE.assertNotEmpty("Origin must be set!", username); //$NON-NLS-1$
+		DBC.PRE.assertNotEmpty("Username must be set!", username); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Passwort must be set", password); //$NON-NLS-1$
 
 		Certificate certificate = this.privilegeHandler.authenticate(username, password);
-		certificate.getSessionDataMap().put(SESSION_ORIGIN, origin);
+		certificate.getSessionDataMap().put(PARAM_SESSION_ORIGIN, origin);
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 
 		return certificate;
@@ -92,17 +92,17 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public Certificate validate(String origin, String authToken) {
-		DBC.PRE.assertNotEmpty("Origin must be set!", origin);
-		DBC.PRE.assertNotEmpty("SessionId must be set!", authToken);
+		DBC.PRE.assertNotEmpty("Origin must be set!", origin); //$NON-NLS-1$
+		DBC.PRE.assertNotEmpty("SessionId must be set!", authToken); //$NON-NLS-1$
 
 		Certificate certificate = this.certificateMap.get(authToken);
 		if (certificate == null)
-			throw new StrolchException(MessageFormat.format("No certificate exists for sessionId {0}", authToken));
+			throw new StrolchException(MessageFormat.format("No certificate exists for sessionId {0}", authToken)); //$NON-NLS-1$
 
 		this.privilegeHandler.isCertificateValid(certificate);
 
-		if (this.validateOrigin && !origin.equals(certificate.getSessionDataMap().get(SESSION_ORIGIN))) {
-			String msg = MessageFormat.format("Illegal request for origin {0} and sessionId {1}", origin, authToken);
+		if (this.validateOrigin && !origin.equals(certificate.getSessionDataMap().get(PARAM_SESSION_ORIGIN))) {
+			String msg = MessageFormat.format("Illegal request for origin {0} and sessionId {1}", origin, authToken); //$NON-NLS-1$
 			throw new StrolchException(msg);
 		}
 
@@ -111,18 +111,18 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public void invalidateSession(String origin, Certificate certificate) {
-		DBC.PRE.assertNotEmpty("Origin must be set!", origin);
-		DBC.PRE.assertNotNull("Certificate must bet given!", certificate);
+		DBC.PRE.assertNotEmpty("Origin must be set!", origin); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Certificate must bet given!", certificate); //$NON-NLS-1$
 
-		if (this.validateOrigin && !origin.equals(certificate.getSessionDataMap().get(SESSION_ORIGIN))) {
-			String msg = MessageFormat.format("Illegal request for origin {0} and sessionId {1}", origin,
+		if (this.validateOrigin && !origin.equals(certificate.getSessionDataMap().get(PARAM_SESSION_ORIGIN))) {
+			String msg = MessageFormat.format("Illegal request for origin {0} and sessionId {1}", origin, //$NON-NLS-1$
 					certificate.getAuthToken());
 			throw new StrolchException(msg);
 		}
 
 		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
-			logger.error("No session was registered with token " + certificate.getAuthToken());
+			logger.error(MessageFormat.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
 
 		this.privilegeHandler.invalidateSession(certificate);
 	}

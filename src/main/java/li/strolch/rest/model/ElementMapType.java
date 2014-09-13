@@ -15,11 +15,13 @@
  */
 package li.strolch.rest.model;
 
+import li.strolch.model.Tags;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public enum ElementMapType {
-	RESOURCE("Resource"), ORDER("Order");
+	RESOURCE(Tags.RESOURCE), ORDER(Tags.ORDER);
 	private String name;
 
 	private ElementMapType(String name) {
