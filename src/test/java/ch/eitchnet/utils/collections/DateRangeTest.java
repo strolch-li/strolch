@@ -45,7 +45,7 @@ public class DateRangeTest {
 	}
 
 	/**
-	 * Test method for {@link ch.eitchnet.utils.collections.DateRange#to(java.util.Date)}.
+	 * Test method for {@link ch.eitchnet.utils.collections.DateRange#to(java.util.Date, boolean)}.
 	 */
 	@Test
 	public void testTo() {
@@ -59,7 +59,7 @@ public class DateRangeTest {
 	}
 
 	/**
-	 * Test method for {@link ch.eitchnet.utils.collections.DateRange#to(java.util.Date)}.
+	 * Test method for {@link ch.eitchnet.utils.collections.DateRange#to(java.util.Date,boolean)}.
 	 */
 	@Test
 	public void testFromTo() {
@@ -75,7 +75,7 @@ public class DateRangeTest {
 
 	@Test
 	public void shouldNotOverlap() {
-		exception.expect(DbcException.class);
+		this.exception.expect(DbcException.class);
 		Date from = new Date(10);
 		Date to = new Date(20);
 		DateRange dateRange = new DateRange();

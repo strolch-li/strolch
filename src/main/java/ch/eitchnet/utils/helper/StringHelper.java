@@ -640,13 +640,13 @@ public class StringHelper {
 		for (int i = 0; i < values.length; i++) {
 			sb.append(values[i]);
 			if (i < values.length - 1)
-				sb.append(", ");
+				sb.append(", "); //$NON-NLS-1$
 		}
 		return sb.toString();
 	}
 
 	public static String[] splitCommaSeparated(String values) {
-		String[] split = values.split(",");
+		String[] split = values.split(","); //$NON-NLS-1$
 		for (int i = 0; i < split.length; i++) {
 			split[i] = split[i].trim();
 		}

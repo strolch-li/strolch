@@ -44,8 +44,8 @@ public class DateRange {
 	}
 
 	private void validate() {
-		if (toDate != null && fromDate != null)
-			DBC.INTERIM.assertTrue("From must be before to!", toDate.compareTo(fromDate) >= 0);
+		if (this.toDate != null && this.fromDate != null)
+			DBC.INTERIM.assertTrue("From must be before to!", this.toDate.compareTo(this.fromDate) >= 0); //$NON-NLS-1$
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class DateRange {
 	}
 
 	public boolean contains(Date date) {
-		DBC.PRE.assertNotNull("Date must be given!", date);
+		DBC.PRE.assertNotNull("Date must be given!", date); //$NON-NLS-1$
 		if (this.fromDate == null && this.toDate == null)
 			return true;
 
@@ -107,7 +107,7 @@ public class DateRange {
 
 		if (this.toDate != null) {
 			int compare = this.toDate.compareTo(date);
-			if (toInclusive)
+			if (this.toInclusive)
 				toContains = compare >= 0;
 			else
 				toContains = compare > 0;
@@ -115,7 +115,7 @@ public class DateRange {
 
 		if (this.fromDate != null) {
 			int compare = this.fromDate.compareTo(date);
-			if (fromInclusive)
+			if (this.fromInclusive)
 				fromContains = compare <= 0;
 			else
 				fromContains = compare < 0;

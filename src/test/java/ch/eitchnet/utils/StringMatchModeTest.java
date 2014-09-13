@@ -51,6 +51,7 @@ public class StringMatchModeTest {
 	/**
 	 * Test method for {@link ch.eitchnet.utils.StringMatchMode#matches(java.lang.String, java.lang.String)}.
 	 */
+	@SuppressWarnings("nls")
 	@Test
 	public void testMatches() {
 		assertTrue(StringMatchMode.CONTAINS_CASE_INSENSITIVE.matches("hello", "el"));

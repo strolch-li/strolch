@@ -104,7 +104,7 @@ public class ConnectionMessages {
 		if (logger.isDebugEnabled()) {
 			String msg = "{0}: parameter ''{1}'' is not set, using default value ''{2}''"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, clazz.getSimpleName(), parameterName, defValue);
-			Map<String, String> properties = new HashMap<String, String>();
+			Map<String, String> properties = new HashMap<>();
 			logger.warn(MessageFormat.format(msg, properties));
 		}
 	}

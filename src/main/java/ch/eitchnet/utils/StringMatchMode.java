@@ -49,8 +49,8 @@ public enum StringMatchMode {
 	}
 
 	public boolean matches(String value1, String value2) {
-		DBC.PRE.assertNotNull("value1 must be set!", value1);
-		DBC.PRE.assertNotNull("value2 must be set!", value2);
+		DBC.PRE.assertNotNull("value1 must be set!", value1); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("value2 must be set!", value2); //$NON-NLS-1$
 		if (!this.isEquals() && !this.isCaseSensitve())
 			return value1.toLowerCase().contains(value2.toLowerCase());
 
