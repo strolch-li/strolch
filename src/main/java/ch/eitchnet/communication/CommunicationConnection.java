@@ -187,7 +187,7 @@ public class CommunicationConnection implements Runnable {
 			if (this.queueThread != null) {
 				logger.warn(MessageFormat.format("{0}: Already connected!", this.id)); //$NON-NLS-1$
 			} else {
-				logger.info(MessageFormat.format("Starting Connection {0}...", this.id)); //$NON-NLS-1$
+				logger.info(MessageFormat.format("Starting Connection {0} to {1}...", this.id, this.getRemoteUri())); //$NON-NLS-1$
 				this.run = true;
 				this.queueThread = new Thread(this, MessageFormat.format("{0}_OUT", this.id)); //$NON-NLS-1$
 				this.queueThread.start();
@@ -358,8 +358,12 @@ public class CommunicationConnection implements Runnable {
 		}
 	}
 
-	public String getUri() {
+	public String getRemoteUri() {
 		return this.endpoint == null ? "0.0.0.0:0" : this.endpoint.getRemoteUri(); //$NON-NLS-1$
+	}
+
+	public String getLocalUri() {
+		return this.endpoint == null ? "0.0.0.0:0" : this.endpoint.getLocalUri(); //$NON-NLS-1$
 	}
 
 	public void reset() {
