@@ -33,6 +33,7 @@ import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
 import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
@@ -136,12 +137,29 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 
 	 * @param refP
 	 *            the {@link StringParameter} which references a {@link Resource}
+	 * 
 	 * @return the resource referenced by the parameter, or null if it does not exist
 	 * 
 	 * @throws StrolchException
 	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
 	 */
 	public Resource getResourceBy(StringParameter refP) throws StrolchException;
+
+	/**
+	 * Returns all {@link Resource Resources} which are referenced by the given {@link StringListParameter}. A reference
+	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and
+	 * the UOM must be set to the resource's type and the value is the id of the resource
+	 * 
+	 * @param refP
+	 *            the {@link StringListParameter} which references a list of {@link Resource Resources}
+	 * 
+	 * @return the resources referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any
+	 *         missing resources are not returned!
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 */
+	public List<Resource> getResourcesBy(StringListParameter refP) throws StrolchException;
 
 	/**
 	 * Returns the {@link Order} with the given type and id, or null if it does not exist
@@ -162,10 +180,27 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 
 	 * @param refP
 	 *            the {@link StringParameter} which references an {@link Order}
+	 * 
 	 * @return the order referenced by the parameter, or null if it does not exist
 	 * 
 	 * @throws StrolchException
 	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
 	 */
 	public Order getOrderBy(StringParameter refP) throws StrolchException;
+
+	/**
+	 * Returns all {@link Order Orders} which are referenced by the given {@link StringListParameter}. A reference
+	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ORDER_REF} and the
+	 * UOM must be set to the order's type and the value is the id of the order
+	 * 
+	 * @param refP
+	 *            the {@link StringListParameter} which references a list of {@link Order Orders}
+	 * 
+	 * @return the orders referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any missing
+	 *         orders are not returned!
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 */
+	public List<Order> getOrdersBy(StringListParameter refP) throws StrolchException;
 }

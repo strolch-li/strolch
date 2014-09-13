@@ -1,10 +1,15 @@
 package li.strolch.agent.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import li.strolch.agent.api.ElementMap;
+import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringListParameter;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
@@ -46,6 +51,33 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 	@Override
 	public T getBy(StrolchTransaction tx, String type, String id) {
 		return getDao(tx).queryBy(type, id);
+	}
+
+	protected abstract void assertIsRefParam(Parameter<?> refP);
+
+	@Override
+	public T getBy(StrolchTransaction tx, StringParameter refP) throws StrolchException {
+		assertIsRefParam(refP);
+		String type = refP.getUom();
+		String id = refP.getValue();
+		return getBy(tx, type, id);
+	}
+
+	@Override
+	public List<T> getBy(StrolchTransaction tx, StringListParameter refP) throws StrolchException {
+		assertIsRefParam(refP);
+
+		List<T> elements = new ArrayList<>();
+		String type = refP.getUom();
+		List<String> ids = refP.getValue();
+
+		for (String id : ids) {
+			T element = getBy(tx, type, id);
+			if (element != null)
+				elements.add(element);
+		}
+
+		return elements;
 	}
 
 	@Override

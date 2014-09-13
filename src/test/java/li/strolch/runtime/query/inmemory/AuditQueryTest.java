@@ -43,6 +43,7 @@ import ch.eitchnet.utils.collections.DateRange;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@SuppressWarnings("nls")
 public class AuditQueryTest {
 
 	private static Date past;

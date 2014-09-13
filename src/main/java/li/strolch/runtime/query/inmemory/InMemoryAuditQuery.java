@@ -39,9 +39,9 @@ public class InMemoryAuditQuery<U> {
 	 * @param auditVisitor
 	 */
 	public InMemoryAuditQuery(AuditTypeNavigator navigator, List<AuditSelector> selectors, AuditVisitor<U> auditVisitor) {
-		DBC.PRE.assertNotNull("Navigator must be set!", navigator);
-		DBC.PRE.assertNotNull("selectors must be set!", selectors);
-		DBC.PRE.assertNotNull("auditVisitor must be set!", auditVisitor);
+		DBC.PRE.assertNotNull("Navigator must be set!", navigator); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("selectors must be set!", selectors); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("auditVisitor must be set!", auditVisitor); //$NON-NLS-1$
 		this.navigator = navigator;
 		this.selectors = selectors;
 		this.auditVisitor = auditVisitor;
@@ -49,7 +49,7 @@ public class InMemoryAuditQuery<U> {
 
 	public List<U> doQuery(InMemoryAuditDao dao) {
 
-		List<U> result = new ArrayList<U>();
+		List<U> result = new ArrayList<>();
 		List<Audit> elements = this.navigator.navigate(dao);
 		for (Audit audit : elements) {
 

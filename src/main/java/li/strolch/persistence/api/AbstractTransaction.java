@@ -49,6 +49,7 @@ import li.strolch.model.audit.AuditQuery;
 import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
@@ -360,12 +361,22 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public List<Order> getOrdersBy(StringListParameter refP) throws StrolchException {
+		return getOrderMap().getBy(this, refP);
+	}
+
+	@Override
 	public Order getOrderBy(String type, String id) {
 		return getOrderMap().getBy(this, type, id);
 	}
 
 	@Override
 	public Resource getResourceBy(StringParameter refP) throws StrolchException {
+		return getResourceMap().getBy(this, refP);
+	}
+
+	@Override
+	public List<Resource> getResourcesBy(StringListParameter refP) throws StrolchException {
 		return getResourceMap().getBy(this, refP);
 	}
 

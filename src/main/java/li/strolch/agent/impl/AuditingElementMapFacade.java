@@ -30,6 +30,7 @@ import java.util.Set;
 import li.strolch.agent.api.ElementMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import ch.eitchnet.utils.dbc.DBC;
@@ -193,6 +194,14 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 		if (this.observeAccessReads)
 			this.read.add(element);
 		return element;
+	}
+
+	@Override
+	public List<T> getBy(StrolchTransaction tx, StringListParameter refP) throws StrolchException {
+		List<T> elements = this.elementMap.getBy(tx, refP);
+		if (this.observeAccessReads)
+			this.read.addAll(elements);
+		return elements;
 	}
 
 	/**

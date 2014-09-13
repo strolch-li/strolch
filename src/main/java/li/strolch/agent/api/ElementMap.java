@@ -21,6 +21,7 @@ import java.util.Set;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
@@ -79,6 +80,25 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
 	 */
 	public T getBy(StrolchTransaction tx, StringParameter refP) throws StrolchException;
+
+	/**
+	 * Returns all elements which are referenced by the given {@link StringListParameter}. A reference {@link Parameter}
+	 * must have its interpretation set to the element type being referenced e.g. s
+	 * {@link StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the element's type and the value is
+	 * the id of the element
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param refP
+	 *            the {@link StringListParameter} which references an element
+	 * 
+	 * @return the list of elements found, or the empty list if they do not exist. <b>Note:</b> Any missing elements are
+	 *         not returned!
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	public List<T> getBy(StrolchTransaction tx, StringListParameter refP) throws StrolchException;
 
 	public List<T> getAllElements(StrolchTransaction tx);
 

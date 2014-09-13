@@ -8,14 +8,14 @@ import java.text.MessageFormat;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
-import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
 public class TransactionalResourceMap extends TransactionalElementMap<Resource> implements ResourceMap {
 
 	@Override
-	public Resource getBy(StrolchTransaction tx, StringParameter refP) throws StrolchException {
+	protected void assertIsRefParam(Parameter<?> refP) {
 
 		if (!refP.getInterpretation().equals(INTERPRETATION_RESOURCE_REF)) {
 			String msg = "{0} is not an Resource reference as its interpretation is not {1}"; //$NON-NLS-1$
@@ -26,11 +26,6 @@ public class TransactionalResourceMap extends TransactionalElementMap<Resource> 
 			String msg = "{0} is not an Resource reference as its UOM is not set to a type!"; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, refP.getLocator()));
 		}
-
-		String type = refP.getUom();
-		String id = refP.getValue();
-
-		return getBy(tx, type, id);
 	}
 
 	@Override
