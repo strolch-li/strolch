@@ -1,17 +1,23 @@
 /*
- * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (c) 2012, Robert von Burg
+ *
+ * All rights reserved.
+ *
+ * This file is part of the XXX.
+ *
+ *  XXX is free software: you can redistribute 
+ *  it and/or modify it under the terms of the GNU General Public License as 
+ *  published by the Free Software Foundation, either version 3 of the License, 
+ *  or (at your option) any later version.
+ *
+ *  XXX is distributed in the hope that it will 
+ *  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with XXX.  If not, see 
+ *  <http://www.gnu.org/licenses/>.
  */
 package li.strolch.rest.model;
 
@@ -23,9 +29,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@XmlRootElement(name = "Logout")
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "LogoutResult")
-public class LogoutResult {
+public class Logout {
 
 	@XmlAttribute(name = "username")
 	private String username;
@@ -33,26 +39,8 @@ public class LogoutResult {
 	@XmlAttribute(name = "sessionId")
 	private String sessionId;
 
-	@XmlAttribute(name = "msg")
-	private String msg;
-
-	public LogoutResult() {
+	public Logout() {
 		// no-arg constructor for JAXB
-	}
-
-	/**
-	 * @return the msg
-	 */
-	public String getMsg() {
-		return this.msg;
-	}
-
-	/**
-	 * @param msg
-	 *            the msg to set
-	 */
-	public void setMsg(String msg) {
-		this.msg = msg;
 	}
 
 	/**
