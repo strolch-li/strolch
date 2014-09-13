@@ -139,6 +139,7 @@ public class AuthenticationService {
 			Certificate certificate = sessionHandlerHandler.validate(origin, authToken);
 			sessionHandlerHandler.invalidateSession(origin, certificate);
 
+			logoutResult.setMsg(MessageFormat.format("{0} has been logged out.", certificate.getUsername())); //$NON-NLS-1$
 			return Response.ok().entity(entity).build();
 
 		} catch (StrolchException | PrivilegeException e) {
