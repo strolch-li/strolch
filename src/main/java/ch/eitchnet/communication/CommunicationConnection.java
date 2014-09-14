@@ -170,7 +170,7 @@ public class CommunicationConnection implements Runnable {
 	public void configure() {
 		this.messageVisitor.configure(this);
 		this.endpoint.configure(this, this.messageVisitor);
-		this.notifyStateChange(ConnectionState.INITIALIZED, ConnectionState.INITIALIZED.name());
+		notifyStateChange(ConnectionState.INITIALIZED, ConnectionState.INITIALIZED.name());
 	}
 
 	public void start() {
@@ -187,7 +187,7 @@ public class CommunicationConnection implements Runnable {
 			if (this.queueThread != null) {
 				logger.warn(MessageFormat.format("{0}: Already connected!", this.id)); //$NON-NLS-1$
 			} else {
-				logger.info(MessageFormat.format("Starting Connection {0} to {1}...", this.id, this.getRemoteUri())); //$NON-NLS-1$
+				logger.info(MessageFormat.format("Starting Connection {0} to {1}...", this.id, getRemoteUri())); //$NON-NLS-1$
 				this.run = true;
 				this.queueThread = new Thread(this, MessageFormat.format("{0}_OUT", this.id)); //$NON-NLS-1$
 				this.queueThread.start();

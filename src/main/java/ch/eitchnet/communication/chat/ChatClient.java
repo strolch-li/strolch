@@ -86,7 +86,7 @@ public class ChatClient implements ConnectionObserver, ConnectionStateObserver {
 		this.connected = newState == ConnectionState.CONNECTED || newState == ConnectionState.IDLE
 				|| newState == ConnectionState.WORKING;
 		synchronized (this) {
-			this.notifyAll();
+			notifyAll();
 		}
 	}
 }

@@ -50,7 +50,7 @@ public class ConsoleEndpointTest extends AbstractEndpointTest {
 	public void testConsoleEndpoint() throws InterruptedException {
 
 		this.connection.start();
-		
+
 		CommandKey key = CommandKey.key(CONNECTION_ID, "logger"); //$NON-NLS-1$
 		TestIoMessage msg = createTestMessage(key, CONNECTION_ID);
 

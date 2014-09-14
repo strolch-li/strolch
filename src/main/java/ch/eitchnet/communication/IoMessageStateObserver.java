@@ -37,7 +37,7 @@ public class IoMessageStateObserver implements ConnectionObserver {
 			this.state = message.getState();
 
 			synchronized (this) {
-				this.notifyAll();
+				notifyAll();
 			}
 		}
 	}

@@ -75,9 +75,9 @@ public class ConsoleEndpoint implements CommunicationEndpoint {
 			this.connection.notifyStateChange(ConnectionState.IDLE, ConnectionState.IDLE.toString());
 		}
 	}
-	
+
 	@Override
 	public void simulate(IoMessage message) throws Exception {
-		this.send(message);
+		send(message);
 	}
 }

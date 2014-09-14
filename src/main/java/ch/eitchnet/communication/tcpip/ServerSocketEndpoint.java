@@ -584,7 +584,7 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 
 	@Override
 	public void simulate(IoMessage message) throws Exception {
-		this.send(message);
+		send(message);
 	}
 
 	@Override

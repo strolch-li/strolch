@@ -63,7 +63,7 @@ public class SocketEndpointConstants {
 	 * Default is to connect on start of the connection
 	 */
 	public static final boolean CONNECT_ON_START = true;
-	
+
 	/**
 	 * Default is to not close after sending
 	 */

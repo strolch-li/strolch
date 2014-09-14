@@ -48,8 +48,8 @@ public interface FileClient {
 	public boolean deleteFile(FileDeletion fileDeletion) throws RemoteException;
 
 	/**
-	 * Remote method which a client can request part of a file. The server will fill the given {@link FilePart} with
-	 * a byte array of the file, with bytes from the file, respecting the desired offset. It is up to the client to call
+	 * Remote method which a client can request part of a file. The server will fill the given {@link FilePart} with a
+	 * byte array of the file, with bytes from the file, respecting the desired offset. It is up to the client to call
 	 * this method multiple times for the entire file. It is a decision of the concrete implementation how much data is
 	 * returned in each part, the client may pass a request, but this is not definitive
 	 * 
