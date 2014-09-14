@@ -42,4 +42,8 @@ public abstract class IoMessageVisitor {
 	public void configure(CommunicationConnection connection) {
 		this.connection = connection;
 	}
+
+	public void simulate(IoMessage ioMessage) {
+		// allow for subclasses to implement
+	}
 }

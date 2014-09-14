@@ -583,6 +583,11 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 	}
 
 	@Override
+	public void simulate(IoMessage message) throws Exception {
+		this.send(message);
+	}
+
+	@Override
 	public void send(IoMessage message) throws Exception {
 		String msg = "The Server Socket can not send messages, use the {0} implementation instead!"; //$NON-NLS-1$
 		throw new UnsupportedOperationException(MessageFormat.format(msg, ClientSocketEndpoint.class.getName()));

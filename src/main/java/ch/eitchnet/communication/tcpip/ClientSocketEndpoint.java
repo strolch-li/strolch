@@ -498,6 +498,11 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 	}
 
 	@Override
+	public void simulate(IoMessage message) throws Exception {
+		this.messageVisitor.simulate(message);
+	}
+
+	@Override
 	public void send(IoMessage message) throws Exception {
 
 		while (!this.closed && message.getState() == State.PENDING) {

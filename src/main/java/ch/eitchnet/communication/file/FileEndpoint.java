@@ -174,6 +174,11 @@ public class FileEndpoint implements CommunicationEndpoint, Runnable {
 	}
 
 	@Override
+	public void simulate(IoMessage message) throws Exception {
+		this.messageVisitor.simulate(message);
+	}
+
+	@Override
 	public void run() {
 
 		File file = new File(this.inboundFilename);

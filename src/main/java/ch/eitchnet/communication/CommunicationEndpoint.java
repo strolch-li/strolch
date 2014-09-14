@@ -25,7 +25,7 @@ public interface CommunicationEndpoint {
 	public void start();
 
 	public void stop();
-	
+
 	public void reset();
 
 	public String getLocalUri();
@@ -33,4 +33,6 @@ public interface CommunicationEndpoint {
 	public String getRemoteUri();
 
 	public void send(IoMessage message) throws Exception;
+
+	public void simulate(IoMessage message) throws Exception;
 }

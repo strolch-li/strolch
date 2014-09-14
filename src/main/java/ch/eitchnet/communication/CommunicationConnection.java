@@ -288,7 +288,10 @@ public class CommunicationConnection implements Runnable {
 				message = this.messageQueue.take();
 				logger.info(MessageFormat.format("Processing message {0}...", message.getId())); //$NON-NLS-1$
 
-				this.endpoint.send(message);
+				if (this.mode == ConnectionMode.ON)
+					this.endpoint.send(message);
+				else if (this.mode == ConnectionMode.SIMULATION)
+					this.endpoint.simulate(message);
 
 				// notify the caller that the message has been processed
 				if (message.getState().compareTo(State.DONE) < 0)
@@ -398,11 +401,7 @@ public class CommunicationConnection implements Runnable {
 
 		message.setState(State.PENDING, State.PENDING.name());
 
-		if (this.mode == ConnectionMode.SIMULATION) {
-			message.setState(State.DONE, State.DONE.name());
-			done(message);
-		} else {
-			this.messageQueue.add(message);
-		}
+		this.messageQueue.add(message);
+		this.messageQueue.add(message);
 	}
 }

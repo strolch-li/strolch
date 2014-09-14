@@ -33,6 +33,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ConnectionInfo {
 
+	@XmlAttribute(name = "id")
+	private String id;
+
 	@XmlAttribute(name = "localUri")
 	private String localUri;
 
@@ -50,6 +53,21 @@ public class ConnectionInfo {
 
 	@XmlAttribute(name = "stateMsg")
 	private String stateMsg;
+
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return this.id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	/**
 	 * @return the localUri
@@ -143,6 +161,7 @@ public class ConnectionInfo {
 
 	public static ConnectionInfo valueOf(CommunicationConnection connection) {
 		ConnectionInfo info = new ConnectionInfo();
+		info.setId(connection.getId());
 		info.setLocalUri(connection.getLocalUri());
 		info.setRemoteUri(connection.getRemoteUri());
 		info.setMode(connection.getMode());
