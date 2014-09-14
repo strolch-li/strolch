@@ -34,9 +34,9 @@ public class PostInitializer extends SimplePostInitializer {
 
 	@Override
 	public void start() {
-		
+
 		logger.info("Started PostInitializer."); //$NON-NLS-1$
-		
+
 		super.start();
 	}
 }
