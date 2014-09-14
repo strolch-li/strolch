@@ -30,10 +30,12 @@ public class PostgreSqlResourceQueryVisitor extends PostgreSqlQueryVisitor imple
 		super(fields);
 	}
 
+	@Override
 	protected String getClassName() {
 		return Tags.RESOURCE;
 	}
 
+	@Override
 	protected String getTableName() {
 		return PostgreSqlResourceDao.RESOURCES;
 	}

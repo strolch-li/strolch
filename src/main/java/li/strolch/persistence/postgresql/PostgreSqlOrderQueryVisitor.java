@@ -32,10 +32,12 @@ public class PostgreSqlOrderQueryVisitor extends PostgreSqlQueryVisitor implemen
 		super(fields);
 	}
 
+	@Override
 	protected String getClassName() {
 		return Tags.ORDER;
 	}
 
+	@Override
 	protected String getTableName() {
 		return PostgreSqlOrderDao.ORDERS;
 	}
@@ -47,8 +49,8 @@ public class PostgreSqlOrderQueryVisitor extends PostgreSqlQueryVisitor implemen
 
 	@Override
 	public void visit(StateSelection selection) {
-		sb.append(indent);
-		sb.append("state = ?::order_state\n");
-		values.add(selection.getState().name());
+		this.sb.append(this.indent);
+		this.sb.append("state = ?::order_state\n");
+		this.values.add(selection.getState().name());
 	}
 }

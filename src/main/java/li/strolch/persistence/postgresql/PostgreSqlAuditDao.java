@@ -134,7 +134,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
-					keySet.add(result.getString(ELEMENT_TYPE)); //$NON-NLS-1$
+					keySet.add(result.getString(ELEMENT_TYPE));
 				}
 			}
 		} catch (SQLException e) {

@@ -75,23 +75,23 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 	}
 
 	public String getSql() {
-		if (sqlAsString != null)
-			return sqlAsString;
+		if (this.sqlAsString != null)
+			return this.sqlAsString;
 
 		this.sql.append("\nwhere\n");
 		this.sql.append(this.indent);
 
 		if (this.any) {
 			this.sql.append("type = ?");
-			sqlAsString = this.sql.toString();
-			return sqlAsString;
+			this.sqlAsString = this.sql.toString();
+			return this.sqlAsString;
 		}
 
 		this.sql.append("type = ? and\n");
 
 		this.sql.append(this.sb.toString());
-		sqlAsString = this.sql.toString();
-		return sqlAsString;
+		this.sqlAsString = this.sql.toString();
+		return this.sqlAsString;
 	}
 
 	/**
@@ -235,42 +235,42 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 		xpath = xpath.replace("${bagKey}", selection.getBagKey());
 		xpath = xpath.replace("${paramKey}", selection.getParamKey());
 
-		sb.append(this.indent);
-		sb.append("id in (\n");
-		sb.append(this.indent);
-		sb.append("  SELECT id\n");
-		sb.append(this.indent);
-		sb.append("  FROM (\n");
-		sb.append(this.indent);
-		sb.append("    SELECT id, UNNEST(");
-		sb.append(xpath);
-		sb.append("\n");
-		sb.append(this.indent);
-		sb.append("from ");
-		sb.append(getTableName());
-		sb.append("\n");
-		sb.append(this.indent);
-		sb.append(") AS alias\n");
-		sb.append(this.indent);
-		sb.append("WHERE ");
+		this.sb.append(this.indent);
+		this.sb.append("id in (\n");
+		this.sb.append(this.indent);
+		this.sb.append("  SELECT id\n");
+		this.sb.append(this.indent);
+		this.sb.append("  FROM (\n");
+		this.sb.append(this.indent);
+		this.sb.append("    SELECT id, UNNEST(");
+		this.sb.append(xpath);
+		this.sb.append("\n");
+		this.sb.append(this.indent);
+		this.sb.append("from ");
+		this.sb.append(getTableName());
+		this.sb.append("\n");
+		this.sb.append(this.indent);
+		this.sb.append(") AS alias\n");
+		this.sb.append(this.indent);
+		this.sb.append("WHERE ");
 
 		if (selection.getMatchMode().isEquals()) {
 			if (selection.getMatchMode().isCaseSensitve()) {
-				sb.append("content = ?\n");
+				this.sb.append("content = ?\n");
 			} else {
-				sb.append("content ILIKE ?\n");
+				this.sb.append("content ILIKE ?\n");
 			}
 		} else {
 			value = "%" + value + "%";
 			if (selection.getMatchMode().isCaseSensitve()) {
-				sb.append("content LIKE ?\n");
+				this.sb.append("content LIKE ?\n");
 			} else {
-				sb.append("content ILIKE ?\n");
+				this.sb.append("content ILIKE ?\n");
 			}
 		}
 
-		sb.append(this.indent);
-		sb.append(")\n");
+		this.sb.append(this.indent);
+		this.sb.append(")\n");
 
 		this.values.add(value);
 	}

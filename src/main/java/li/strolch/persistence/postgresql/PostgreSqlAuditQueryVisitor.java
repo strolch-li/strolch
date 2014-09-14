@@ -58,13 +58,13 @@ public class PostgreSqlAuditQueryVisitor implements AuditQueryVisitor {
 	}
 
 	public String getSql() {
-		if (sqlAsString != null)
-			return sqlAsString;
+		if (this.sqlAsString != null)
+			return this.sqlAsString;
 
 		this.sql.append("\nwhere\n");
 		this.sql.append(this.sb.toString());
-		sqlAsString = this.sql.toString();
-		return sqlAsString;
+		this.sqlAsString = this.sql.toString();
+		return this.sqlAsString;
 	}
 
 	@Override
@@ -120,21 +120,21 @@ public class PostgreSqlAuditQueryVisitor implements AuditQueryVisitor {
 			ensureAnd();
 			this.sb.append(this.indent);
 			if (accessTypes.length == 1) {
-				sb.append(PostgreSqlAuditDao.ACCESS_TYPE + " = ?");
-				sb.append(PostgreSqlAuditDao.ACCESS_TYPE_TYPE);
-				sb.append("\n");
+				this.sb.append(PostgreSqlAuditDao.ACCESS_TYPE + " = ?");
+				this.sb.append(PostgreSqlAuditDao.ACCESS_TYPE_TYPE);
+				this.sb.append("\n");
 				this.values.add(accessTypes[0].name());
 			} else {
-				sb.append(PostgreSqlAuditDao.ACCESS_TYPE + " in (");
+				this.sb.append(PostgreSqlAuditDao.ACCESS_TYPE + " in (");
 				for (int i = 0; i < accessTypes.length; i++) {
-					sb.append("?");
-					sb.append(PostgreSqlAuditDao.ACCESS_TYPE_TYPE);
-					values.add(accessTypes[i].name());
+					this.sb.append("?");
+					this.sb.append(PostgreSqlAuditDao.ACCESS_TYPE_TYPE);
+					this.values.add(accessTypes[i].name());
 					if (i < accessTypes.length - 1)
-						sb.append(", ");
+						this.sb.append(", ");
 				}
-				sb.append(" )\n");
-				sb.append("\n");
+				this.sb.append(" )\n");
+				this.sb.append("\n");
 			}
 		}
 	}

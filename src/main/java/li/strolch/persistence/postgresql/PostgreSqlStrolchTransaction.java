@@ -100,7 +100,7 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	public AuditDao getAuditDao() {
 		if (this.auditDao == null)
 			this.auditDao = new PostgreSqlAuditDao(this);
-		return (AuditDao) this.auditDao;
+		return this.auditDao;
 	}
 
 	Connection getConnection() {
