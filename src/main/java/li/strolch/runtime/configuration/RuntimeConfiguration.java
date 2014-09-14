@@ -114,7 +114,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		File configFile = new File(getDataPath(), fileName);
 		if (checkExists && !configFile.isFile() || !configFile.canRead()) {
 			String msg = "[{0}] requires config file which does not exist with name: {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.getName(), context, fileName);
+			msg = MessageFormat.format(msg, getName(), context, fileName);
 			throw new StrolchConfigurationException(msg);
 		}
 		return configFile;
@@ -136,7 +136,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		File dataFile = new File(getDataPath(), fileName);
 		if (checkExists && !dataFile.isFile() || !dataFile.canRead()) {
 			String msg = "[{0}] requires data file which does not exist with name: {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.getName(), context, fileName);
+			msg = MessageFormat.format(msg, getName(), context, fileName);
 			throw new StrolchConfigurationException(msg);
 		}
 		return dataFile;
@@ -158,7 +158,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		File dataDir = new File(getDataPath(), dirName);
 		if (checkExists && !dataDir.isDirectory() || !dataDir.canRead()) {
 			String msg = "[{0}] requires data directory which does not exist with name: {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.getName(), context, dirName);
+			msg = MessageFormat.format(msg, getName(), context, dirName);
 			throw new StrolchConfigurationException(msg);
 		}
 		return dataDir;

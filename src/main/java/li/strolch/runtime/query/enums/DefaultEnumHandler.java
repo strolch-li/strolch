@@ -85,8 +85,7 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 		if (enumLocator == null)
 			throw new StrolchException(MessageFormat.format("No enumeration is configured for the name {0}", name)); //$NON-NLS-1$
 
-		try (StrolchTransaction tx = getContainer().getRealm(this.realm).openTx(certificate,
-				EnumHandler.class)) {
+		try (StrolchTransaction tx = getContainer().getRealm(this.realm).openTx(certificate, EnumHandler.class)) {
 			Resource enumeration = tx.findElement(enumLocator);
 			ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, locale);
 

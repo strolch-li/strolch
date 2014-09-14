@@ -63,9 +63,8 @@ public class AgentVersion extends AbstractVersion {
 	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		return "AgentVersion [agentName=" + this.agentName + ", groupId=" + this.getGroupId() + ", artifactId="
-				+ this.getArtifactId() + ", artifactVersion=" + this.getArtifactVersion() + ", scmRevision="
-				+ this.getScmRevision() + ", scmBranch=" + this.getScmBranch() + ", buildTimestamp="
-				+ this.getBuildTimestamp() + "]";
+		return "AgentVersion [agentName=" + this.agentName + ", groupId=" + getGroupId() + ", artifactId="
+				+ getArtifactId() + ", artifactVersion=" + getArtifactVersion() + ", scmRevision=" + getScmRevision()
+				+ ", scmBranch=" + getScmBranch() + ", buildTimestamp=" + getBuildTimestamp() + "]";
 	}
 }

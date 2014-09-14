@@ -174,7 +174,7 @@ public class InMemoryQueryTest {
 		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
 		assertEquals(1, result.size());
 	}
-	
+
 	@Test
 	public void shouldQueryByNullParameter3() {
 		List<Resource> resources = getResources();

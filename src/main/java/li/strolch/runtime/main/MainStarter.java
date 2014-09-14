@@ -86,10 +86,10 @@ public class MainStarter {
 		}
 
 		logger.info("Starting Agent...");
-		this.setAgent(new StrolchAgent());
-		this.getAgent().setup(env, pathF);
-		this.getAgent().initialize();
-		this.getAgent().start();
+		setAgent(new StrolchAgent());
+		getAgent().setup(env, pathF);
+		getAgent().initialize();
+		getAgent().start();
 
 		final AtomicBoolean atomicBoolean = new AtomicBoolean();
 
@@ -113,7 +113,7 @@ public class MainStarter {
 		});
 
 		logger.info("");
-		logger.info("Strolch application " + this.getAgent().getApplicationName() + " started ");
+		logger.info("Strolch application " + getAgent().getApplicationName() + " started ");
 		while (!atomicBoolean.get()) {
 			synchronized (MainStarter.class) {
 				try {

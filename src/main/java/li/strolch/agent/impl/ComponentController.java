@@ -63,7 +63,7 @@ public class ComponentController {
 
 	public void addUpstreamDependency(ComponentController controller) {
 
-		if (this.equals(controller)) {
+		if (equals(controller)) {
 			String msg = "{0} can not depend on itself!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, controller);
 			throw new StrolchConfigurationException(msg);

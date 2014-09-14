@@ -90,11 +90,11 @@ public class DefaultLockHandler implements LockHandler {
 
 			if (!lock.tryLock(tryLockTime, timeUnit)) {
 				String msg = "Failed to acquire lock after {0}s for {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, timeUnit.toSeconds(tryLockTime), this.toString());
+				msg = MessageFormat.format(msg, timeUnit.toSeconds(tryLockTime), toString());
 				throw new StrolchException(msg);
 			}
 			if (logger.isDebugEnabled())
-				logger.debug("locked " + this.toString()); //$NON-NLS-1$
+				logger.debug("locked " + toString()); //$NON-NLS-1$
 		} catch (InterruptedException e) {
 			throw new StrolchException("Thread interrupted: " + e.getMessage(), e); //$NON-NLS-1$
 		}
@@ -106,6 +106,6 @@ public class DefaultLockHandler implements LockHandler {
 	private void unlock(ReentrantLock lock) {
 		lock.unlock();
 		if (logger.isDebugEnabled())
-			logger.debug("unlocking " + this.toString()); //$NON-NLS-1$
+			logger.debug("unlocking " + toString()); //$NON-NLS-1$
 	}
 }

@@ -52,7 +52,7 @@ public class TransactionalAuditTrail implements AuditTrail {
 	public long querySize(StrolchTransaction tx, String type, DateRange dateRange) {
 		return getDao(tx).querySize(type, dateRange);
 	}
-	
+
 	@Override
 	public Set<String> getTypes(StrolchTransaction tx) {
 		return getDao(tx).queryTypes();

@@ -54,8 +54,8 @@ public interface StrolchDao<T extends StrolchElement> {
 	public void remove(T element);
 
 	public void removeAll(List<T> elements);
-	
+
 	public long removeAll();
-	
+
 	public long removeAllBy(String type);
 }
