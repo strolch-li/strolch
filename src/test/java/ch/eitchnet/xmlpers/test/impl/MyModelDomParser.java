@@ -23,8 +23,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ch.eitchnet.xmlpers.api.DomParser;
-import ch.eitchnet.xmlpers.test.model.MyParameter;
 import ch.eitchnet.xmlpers.test.model.MyModel;
+import ch.eitchnet.xmlpers.test.model.MyParameter;
 import ch.eitchnet.xmlpers.util.DomUtil;
 
 public class MyModelDomParser implements DomParser<MyModel> {

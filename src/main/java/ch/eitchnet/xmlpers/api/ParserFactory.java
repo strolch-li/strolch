@@ -15,7 +15,6 @@
  */
 package ch.eitchnet.xmlpers.api;
 
-
 public interface ParserFactory<T> {
 
 	public DomParser<T> getDomParser();

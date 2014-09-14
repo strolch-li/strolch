@@ -60,7 +60,7 @@ public class LockingTest extends AbstractPersistenceTest {
 		properties.setProperty(PersistenceConstants.PROP_LOCK_TIME_MILLIS, Long.toString(500L));
 		setup(properties);
 
-		this.waitForWorkersTime = LockableObject.getLockTime() + this.getWaitForWorkersTime() + 300L;
+		this.waitForWorkersTime = LockableObject.getLockTime() + getWaitForWorkersTime() + 300L;
 	}
 
 	@Test
@@ -128,10 +128,10 @@ public class LockingTest extends AbstractPersistenceTest {
 
 	private int runWorkers(List<? extends AbstractWorker> workers) throws InterruptedException {
 
-		this.setRun(true);
+		setRun(true);
 
 		for (AbstractWorker worker : workers) {
-			worker.join(this.getWaitForWorkersTime() + 2000L);
+			worker.join(getWaitForWorkersTime() + 2000L);
 		}
 
 		int nrOfSuccess = 0;
@@ -169,7 +169,7 @@ public class LockingTest extends AbstractPersistenceTest {
 		public void run() {
 
 			logger.info("Waiting for ok to work..."); //$NON-NLS-1$
-			while (!LockingTest.this.isRun()) {
+			while (!isRun()) {
 				try {
 					Thread.sleep(10L);
 				} catch (InterruptedException e) {

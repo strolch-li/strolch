@@ -47,8 +47,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import ch.eitchnet.utils.exceptions.XmlException;
 import ch.eitchnet.utils.helper.XmlHelper;
 import ch.eitchnet.xmlpers.test.model.ModelBuilder;
-import ch.eitchnet.xmlpers.test.model.MyParameter;
 import ch.eitchnet.xmlpers.test.model.MyModel;
+import ch.eitchnet.xmlpers.test.model.MyParameter;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

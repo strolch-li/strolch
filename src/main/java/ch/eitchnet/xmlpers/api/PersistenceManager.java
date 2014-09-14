@@ -15,7 +15,6 @@
  */
 package ch.eitchnet.xmlpers.api;
 
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  *
@@ -23,10 +22,10 @@ package ch.eitchnet.xmlpers.api;
 public interface PersistenceManager {
 
 	public static final String DEFAULT_REALM = "defaultRealm"; //$NON-NLS-1$
-	
+
 	public PersistenceContextFactoryDelegator getCtxFactory();
-	
+
 	public PersistenceTransaction openTx();
-	
+
 	public PersistenceTransaction openTx(String realm);
 }

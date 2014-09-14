@@ -72,7 +72,7 @@ public class SubTypeRef extends ObjectRef {
 	public File getPath(PathBuilder pathBuilder) {
 		return pathBuilder.getSubTypePath(this.type, this.subType);
 	}
-	
+
 	@Override
 	public <T> PersistenceContext<T> createPersistenceContext(PersistenceTransaction tx) {
 		String msg = MessageFormat.format("{0} is not a leaf and can thus not have a Persistence Context", getName()); //$NON-NLS-1$

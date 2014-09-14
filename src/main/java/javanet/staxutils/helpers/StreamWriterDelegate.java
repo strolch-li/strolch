@@ -36,182 +36,178 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
- * Abstract class for writing filtered XML streams. This class provides methods
- * that merely delegate to the contained stream. Subclasses should override some
- * of these methods, and may also provide additional methods and fields.
+ * Abstract class for writing filtered XML streams. This class provides methods that merely delegate to the contained
+ * stream. Subclasses should override some of these methods, and may also provide additional methods and fields.
  *
  * @author <a href="mailto:jk2006@engineer.com">John Kristian</a>
  */
 public abstract class StreamWriterDelegate implements XMLStreamWriter {
 
-    protected StreamWriterDelegate(XMLStreamWriter out) {
-        this.out = out;
-    }
+	protected StreamWriterDelegate(XMLStreamWriter out) {
+		this.out = out;
+	}
 
-    protected XMLStreamWriter out;
+	protected XMLStreamWriter out;
 
-    @Override
+	@Override
 	public Object getProperty(String name) throws IllegalArgumentException {
-        return this.out.getProperty(name);
-    }
+		return this.out.getProperty(name);
+	}
 
-    @Override
+	@Override
 	public NamespaceContext getNamespaceContext() {
-        return this.out.getNamespaceContext();
-    }
+		return this.out.getNamespaceContext();
+	}
 
-    @Override
+	@Override
 	public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
-        this.out.setNamespaceContext(context);
-    }
+		this.out.setNamespaceContext(context);
+	}
 
-    @Override
+	@Override
 	public void setDefaultNamespace(String uri) throws XMLStreamException {
-        this.out.setDefaultNamespace(uri);
-    }
+		this.out.setDefaultNamespace(uri);
+	}
 
-    @Override
+	@Override
 	public void writeStartDocument() throws XMLStreamException {
-        this.out.writeStartDocument();
-    }
+		this.out.writeStartDocument();
+	}
 
-    @Override
+	@Override
 	public void writeStartDocument(String version) throws XMLStreamException {
-        this.out.writeStartDocument(version);
-    }
+		this.out.writeStartDocument(version);
+	}
 
-    @Override
+	@Override
 	public void writeStartDocument(String encoding, String version) throws XMLStreamException {
-        this.out.writeStartDocument(encoding, version);
-    }
+		this.out.writeStartDocument(encoding, version);
+	}
 
-    @Override
+	@Override
 	public void writeDTD(String dtd) throws XMLStreamException {
-        this.out.writeDTD(dtd);
-    }
+		this.out.writeDTD(dtd);
+	}
 
-    @Override
+	@Override
 	public void writeProcessingInstruction(String target) throws XMLStreamException {
-        this.out.writeProcessingInstruction(target);
-    }
+		this.out.writeProcessingInstruction(target);
+	}
 
-    @Override
+	@Override
 	public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
-        this.out.writeProcessingInstruction(target, data);
-    }
+		this.out.writeProcessingInstruction(target, data);
+	}
 
-    @Override
+	@Override
 	public void writeComment(String data) throws XMLStreamException {
-        this.out.writeComment(data);
-    }
+		this.out.writeComment(data);
+	}
 
-    @Override
+	@Override
 	public void writeEmptyElement(String localName) throws XMLStreamException {
-        this.out.writeEmptyElement(localName);
-    }
+		this.out.writeEmptyElement(localName);
+	}
 
-    @Override
+	@Override
 	public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
-        this.out.writeEmptyElement(namespaceURI, localName);
-    }
+		this.out.writeEmptyElement(namespaceURI, localName);
+	}
 
-    @Override
-	public void writeEmptyElement(String prefix, String localName, String namespaceURI)
-            throws XMLStreamException {
-        this.out.writeEmptyElement(prefix, localName, namespaceURI);
-    }
+	@Override
+	public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+		this.out.writeEmptyElement(prefix, localName, namespaceURI);
+	}
 
-    @Override
+	@Override
 	public void writeStartElement(String localName) throws XMLStreamException {
-        this.out.writeStartElement(localName);
-    }
+		this.out.writeStartElement(localName);
+	}
 
-    @Override
+	@Override
 	public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
-        this.out.writeStartElement(namespaceURI, localName);
-    }
+		this.out.writeStartElement(namespaceURI, localName);
+	}
 
-    @Override
-	public void writeStartElement(String prefix, String localName, String namespaceURI)
-            throws XMLStreamException {
-        this.out.writeStartElement(prefix, localName, namespaceURI);
-    }
+	@Override
+	public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+		this.out.writeStartElement(prefix, localName, namespaceURI);
+	}
 
-    @Override
+	@Override
 	public void writeDefaultNamespace(String namespaceURI) throws XMLStreamException {
-        this.out.writeDefaultNamespace(namespaceURI);
-    }
+		this.out.writeDefaultNamespace(namespaceURI);
+	}
 
-    @Override
+	@Override
 	public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {
-        this.out.writeNamespace(prefix, namespaceURI);
-    }
+		this.out.writeNamespace(prefix, namespaceURI);
+	}
 
-    @Override
+	@Override
 	public String getPrefix(String uri) throws XMLStreamException {
-        return this.out.getPrefix(uri);
-    }
+		return this.out.getPrefix(uri);
+	}
 
-    @Override
+	@Override
 	public void setPrefix(String prefix, String uri) throws XMLStreamException {
-        this.out.setPrefix(prefix, uri);
-    }
+		this.out.setPrefix(prefix, uri);
+	}
 
-    @Override
+	@Override
 	public void writeAttribute(String localName, String value) throws XMLStreamException {
-        this.out.writeAttribute(localName, value);
-    }
+		this.out.writeAttribute(localName, value);
+	}
 
-    @Override
-	public void writeAttribute(String namespaceURI, String localName, String value)
-            throws XMLStreamException {
-        this.out.writeAttribute(namespaceURI, localName, value);
-    }
+	@Override
+	public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
+		this.out.writeAttribute(namespaceURI, localName, value);
+	}
 
-    @Override
+	@Override
 	public void writeAttribute(String prefix, String namespaceURI, String localName, String value)
-            throws XMLStreamException {
-        this.out.writeAttribute(prefix, namespaceURI, localName, value);
-    }
+			throws XMLStreamException {
+		this.out.writeAttribute(prefix, namespaceURI, localName, value);
+	}
 
-    @Override
+	@Override
 	public void writeCharacters(String text) throws XMLStreamException {
-        this.out.writeCharacters(text);
-    }
+		this.out.writeCharacters(text);
+	}
 
-    @Override
+	@Override
 	public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
-        this.out.writeCharacters(text, start, len);
-    }
+		this.out.writeCharacters(text, start, len);
+	}
 
-    @Override
+	@Override
 	public void writeCData(String data) throws XMLStreamException {
-        this.out.writeCData(data);
-    }
+		this.out.writeCData(data);
+	}
 
-    @Override
+	@Override
 	public void writeEntityRef(String name) throws XMLStreamException {
-        this.out.writeEntityRef(name);
-    }
+		this.out.writeEntityRef(name);
+	}
 
-    @Override
+	@Override
 	public void writeEndElement() throws XMLStreamException {
-        this.out.writeEndElement();
-    }
+		this.out.writeEndElement();
+	}
 
-    @Override
+	@Override
 	public void writeEndDocument() throws XMLStreamException {
-        this.out.writeEndDocument();
-    }
+		this.out.writeEndDocument();
+	}
 
-    @Override
+	@Override
 	public void flush() throws XMLStreamException {
-        this.out.flush();
-    }
+		this.out.flush();
+	}
 
-    @Override
+	@Override
 	public void close() throws XMLStreamException {
-        this.out.close();
-    }
+		this.out.close();
+	}
 
 }

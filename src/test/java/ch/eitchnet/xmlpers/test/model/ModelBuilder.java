@@ -46,7 +46,7 @@ public class ModelBuilder {
 	public static MyModel createResource() {
 		return createResource(RES_ID, RES_NAME, RES_TYPE);
 	}
-	
+
 	public static MyModel createResource(String id) {
 		return createResource(id, RES_NAME, RES_TYPE);
 	}
