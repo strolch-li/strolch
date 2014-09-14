@@ -138,9 +138,9 @@ public class ResourceModelTestRunner {
 
 		// create 15 resources
 		List<Resource> resources = new ArrayList<>();
-		resources.addAll(createResources(resources.size(), 5, "@", "My Resource ", "MyType1"));
-		resources.addAll(createResources(resources.size(), 5, "@", "Other Resource ", "MyType2"));
-		resources.addAll(createResources(resources.size(), 5, "@", "Further Resource ", "MyType3"));
+		resources.addAll(createResources(resources.size(), 5, "@", "My Resource", "MyType1"));
+		resources.addAll(createResources(resources.size(), 5, "@", "Other Resource", "MyType2"));
+		resources.addAll(createResources(resources.size(), 5, "@", "Further Resource", "MyType3"));
 
 		// sort them so we know which order our objects are
 		Comparator<Resource> comparator = new Comparator<Resource>() {
@@ -236,11 +236,11 @@ public class ResourceModelTestRunner {
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(certificate, "test")) {
-			Resource resource = tx.getResourceMap().getBy(tx, "MyType1", "@_00000001");
+			Resource resource = tx.getResourceMap().getBy(tx, "MyType1", "@00000001");
 			assertNotNull(resource);
-			resource = tx.getResourceMap().getBy(tx, "MyType2", "@_00000006");
+			resource = tx.getResourceMap().getBy(tx, "MyType2", "@00000006");
 			assertNotNull(resource);
-			resource = tx.getResourceMap().getBy(tx, "MyType3", "@_00000011");
+			resource = tx.getResourceMap().getBy(tx, "MyType3", "@00000011");
 			assertNotNull(resource);
 		}
 	}

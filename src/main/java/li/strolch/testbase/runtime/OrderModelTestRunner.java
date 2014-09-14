@@ -138,9 +138,9 @@ public class OrderModelTestRunner {
 
 		// create 15 orders
 		List<Order> orders = new ArrayList<>();
-		orders.addAll(createOrders(orders.size(), 5, "@", "My Order ", "MyType1"));
-		orders.addAll(createOrders(orders.size(), 5, "@", "Other Order ", "MyType2"));
-		orders.addAll(createOrders(orders.size(), 5, "@", "Further Order ", "MyType3"));
+		orders.addAll(createOrders(orders.size(), 5, "@", "My Order", "MyType1"));
+		orders.addAll(createOrders(orders.size(), 5, "@", "Other Order", "MyType2"));
+		orders.addAll(createOrders(orders.size(), 5, "@", "Further Order", "MyType3"));
 
 		// sort them so we know which order our objects are
 		Comparator<Order> comparator = new Comparator<Order>() {
@@ -236,11 +236,11 @@ public class OrderModelTestRunner {
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(certificate, "test")) {
-			Order order = tx.getOrderMap().getBy(tx, "MyType1", "@_00000001");
+			Order order = tx.getOrderMap().getBy(tx, "MyType1", "@00000001");
 			assertNotNull(order);
-			order = tx.getOrderMap().getBy(tx, "MyType2", "@_00000006");
+			order = tx.getOrderMap().getBy(tx, "MyType2", "@00000006");
 			assertNotNull(order);
-			order = tx.getOrderMap().getBy(tx, "MyType3", "@_00000011");
+			order = tx.getOrderMap().getBy(tx, "MyType3", "@00000011");
 			assertNotNull(order);
 		}
 	}
