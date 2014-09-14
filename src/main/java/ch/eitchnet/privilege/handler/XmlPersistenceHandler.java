@@ -196,7 +196,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 				// validate that role exists
 				if (getRole(roleName) == null) {
 					String msg = "Role {0} does not exist referenced by user {1}";
-					msg = MessageFormat.format(msg, roleName, user.getUsername()); //$NON-NLS-1$
+					msg = MessageFormat.format(msg, roleName, user.getUsername());
 					throw new PrivilegeException(msg);
 				}
 			}

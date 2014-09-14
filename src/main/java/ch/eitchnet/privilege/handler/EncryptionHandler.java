@@ -40,7 +40,7 @@ public interface EncryptionHandler {
 	 * @return the hash of the string after converting
 	 */
 	public String convertToHash(String string);
-	
+
 	/**
 	 * Converts a given byte array, e.g. a password to a hash which is defined by the concrete implementation
 	 * 

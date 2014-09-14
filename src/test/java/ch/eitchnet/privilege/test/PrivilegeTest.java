@@ -185,8 +185,8 @@ public class PrivilegeTest {
 	}
 
 	public void testFailAuthenticationNOk() throws Exception {
-		exception.expect(AccessDeniedException.class);
-		exception.expectMessage("blabla");
+		this.exception.expect(AccessDeniedException.class);
+		this.exception.expectMessage("blabla");
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_BAD));
 		} finally {
@@ -195,8 +195,8 @@ public class PrivilegeTest {
 	}
 
 	public void testFailAuthenticationPWNull() throws Exception {
-		exception.expect(PrivilegeException.class);
-		exception.expectMessage("blabla");
+		this.exception.expect(PrivilegeException.class);
+		this.exception.expectMessage("blabla");
 		try {
 			login(ADMIN, null);
 		} finally {
@@ -250,8 +250,8 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testPerformSystemRestrictableFailPrivilege() throws Exception {
-		exception.expect(PrivilegeException.class);
-		exception
+		this.exception.expect(PrivilegeException.class);
+		this.exception
 				.expectMessage("User system_admin does not have Privilege ch.eitchnet.privilege.test.model.TestSystemUserActionDeny");
 		try {
 			// create the action to be performed as a system user
@@ -269,8 +269,9 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testPerformSystemRestrictableFailNoAdditionalPrivilege() throws Exception {
-		exception.expect(PrivilegeException.class);
-		exception.expectMessage("User system_admin2 does not have Privilege ch.eitchnet.privilege.test.model.TestRestrictable");
+		this.exception.expect(PrivilegeException.class);
+		this.exception
+				.expectMessage("User system_admin2 does not have Privilege ch.eitchnet.privilege.test.model.TestRestrictable");
 		try {
 			// create the action to be performed as a system user
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
@@ -287,8 +288,8 @@ public class PrivilegeTest {
 	 */
 	@Test
 	public void testLoginSystemUser() throws Exception {
-		exception.expect(AccessDeniedException.class);
-		exception.expectMessage("User system_admin is a system user and may not login!");
+		this.exception.expect(AccessDeniedException.class);
+		this.exception.expectMessage("User system_admin is a system user and may not login!");
 		try {
 			login(SYSTEM_USER_ADMIN, SYSTEM_USER_ADMIN.getBytes());
 		} finally {

@@ -78,8 +78,8 @@ public final class User {
 	 * @param propertyMap
 	 *            a {@link Map} containing string value pairs of properties for this user
 	 */
-	public User(String userId, String username, String password, String firstname, String lastname, UserState userState,
-			Set<String> roles, Locale locale, Map<String, String> propertyMap) {
+	public User(String userId, String username, String password, String firstname, String lastname,
+			UserState userState, Set<String> roles, Locale locale, Map<String, String> propertyMap) {
 
 		if (StringHelper.isEmpty(userId)) {
 			throw new PrivilegeException("No UserId defined!"); //$NON-NLS-1$
