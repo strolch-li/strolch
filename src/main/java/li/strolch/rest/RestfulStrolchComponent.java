@@ -28,6 +28,7 @@ import ch.eitchnet.utils.dbc.DBC;
 public class RestfulStrolchComponent extends StrolchComponent {
 
 	private static final String PARAM_CORS_ENABLED = "corsEnabled"; //$NON-NLS-1$
+	private static final String PARAM_CORS_ORIGIN = "corsOrigin"; //$NON-NLS-1$
 	private static RestfulStrolchComponent instance;
 
 	/**
@@ -42,7 +43,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	public void initialize(ComponentConfiguration configuration) {
 
 		if (configuration.getBoolean(PARAM_CORS_ENABLED, Boolean.FALSE)) {
-			String origin = configuration.getString(PARAM_CORS_ENABLED, null);
+			String origin = configuration.getString(PARAM_CORS_ORIGIN, null);
 			logger.info("Enabling CORS for origin: " + origin); //$NON-NLS-1$
 			AccessControlResponseFilter.setCorsEnabled(true);
 			AccessControlResponseFilter.setOrigin(origin);
