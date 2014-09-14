@@ -103,7 +103,7 @@ public class LoginResult {
 	 *            the locale to set
 	 */
 	public void setLocale(Locale locale) {
-		this.locale = this.locale.toString();
+		this.locale = locale.toString();
 	}
 
 	/**
