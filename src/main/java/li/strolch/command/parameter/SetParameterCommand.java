@@ -114,7 +114,7 @@ public class SetParameterCommand extends Command {
 
 	@Override
 	public void validate() {
-		DBC.PRE.assertNotNull("Parameter may not be null!", this.parameter);
+		DBC.PRE.assertNotNull("Parameter may not be null!", this.parameter); //$NON-NLS-1$
 	}
 
 	@Override
@@ -151,7 +151,7 @@ public class SetParameterCommand extends Command {
 		}
 
 		if (hasChanges()) {
-			replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
+			this.replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
 		}
 	}
 
@@ -186,7 +186,7 @@ public class SetParameterCommand extends Command {
 			}
 
 			if (hasChanges() && this.replacedElement != null && this.replacedElement != this.parameter.getRootElement()) {
-				new UpdateElementVisitor(tx()).update(replacedElement);
+				new UpdateElementVisitor(tx()).update(this.replacedElement);
 			}
 		}
 	}

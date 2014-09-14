@@ -36,17 +36,17 @@ public class RemoveOrderCollectionCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		locators = new ArrayList<>();
-		locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@1").build());
-		locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@2").build());
-		locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@3").build());
+		this.locators = new ArrayList<>();
+		this.locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@1").build());
+		this.locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@2").build());
+		this.locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@3").build());
 	}
 
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
-		List<Order> orders = new ArrayList<>(locators.size());
-		for (Locator locator : locators) {
+		List<Order> orders = new ArrayList<>(this.locators.size());
+		for (Locator locator : this.locators) {
 			orders.add((Order) tx.findElement(locator));
 		}
 

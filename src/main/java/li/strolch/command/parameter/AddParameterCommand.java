@@ -79,7 +79,7 @@ public class AddParameterCommand extends Command {
 		tx().lock(rootElement);
 
 		this.element.addParameter(this.parameter);
-		replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
+		this.replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
 	}
 
 	@Override

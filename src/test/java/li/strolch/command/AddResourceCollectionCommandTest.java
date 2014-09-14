@@ -35,17 +35,17 @@ public class AddResourceCollectionCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		resources = new ArrayList<>();
-		resources.add(ModelGenerator.createResource("firstRes", "First Resource", "AdditionalResources"));
-		resources.add(ModelGenerator.createResource("secondRes", "Second Resource", "AdditionalResources"));
-		resources.add(ModelGenerator.createResource("thirdRes", "Third Resource", "AdditionalResources"));
+		this.resources = new ArrayList<>();
+		this.resources.add(ModelGenerator.createResource("firstRes", "First Resource", "AdditionalResources"));
+		this.resources.add(ModelGenerator.createResource("secondRes", "Second Resource", "AdditionalResources"));
+		this.resources.add(ModelGenerator.createResource("thirdRes", "Third Resource", "AdditionalResources"));
 	}
 
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
 		AddResourceCollectionCommand command = new AddResourceCollectionCommand(container, tx);
-		command.setResources(resources);
+		command.setResources(this.resources);
 		return command;
 	}
 }

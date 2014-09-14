@@ -38,11 +38,11 @@ public class UpdateElementVisitor implements StrolchRootElementVisitor<StrolchRo
 
 	@Override
 	public StrolchRootElement visitOrder(Order order) {
-		return tx.getOrderMap().update(tx, order);
+		return this.tx.getOrderMap().update(this.tx, order);
 	}
 
 	@Override
 	public StrolchRootElement visitResource(Resource resource) {
-		return tx.getResourceMap().update(tx, resource);
+		return this.tx.getResourceMap().update(this.tx, resource);
 	}
 }

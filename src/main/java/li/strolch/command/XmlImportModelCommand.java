@@ -61,17 +61,17 @@ public class XmlImportModelCommand extends Command {
 
 		InMemoryElementListener elementListener = new InMemoryElementListener(tx());
 
-		elementListener.setAddOrders(addOrders);
-		elementListener.setAddResources(addResources);
-		elementListener.setUpdateOrders(updateOrders);
-		elementListener.setUpdateResources(updateResources);
-		elementListener.setOrderTypes(orderTypes);
-		elementListener.setResourceTypes(resourceTypes);
+		elementListener.setAddOrders(this.addOrders);
+		elementListener.setAddResources(this.addResources);
+		elementListener.setUpdateOrders(this.updateOrders);
+		elementListener.setUpdateResources(this.updateResources);
+		elementListener.setOrderTypes(this.orderTypes);
+		elementListener.setResourceTypes(this.resourceTypes);
 
-		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, modelFile);
+		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile);
 		handler.parseFile();
 
-		statistics = handler.getStatistics();
+		this.statistics = handler.getStatistics();
 	}
 
 	@Override

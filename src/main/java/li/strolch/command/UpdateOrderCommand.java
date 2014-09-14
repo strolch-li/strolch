@@ -56,7 +56,7 @@ public class UpdateOrderCommand extends Command {
 	@Override
 	public void doCommand() {
 
-		tx().lock(order);
+		tx().lock(this.order);
 
 		OrderMap orderMap = tx().getOrderMap();
 		if (!orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
@@ -71,7 +71,7 @@ public class UpdateOrderCommand extends Command {
 	@Override
 	public void undo() {
 		if (this.replacedElement != null && tx().isRollingBack()) {
-			tx().getOrderMap().update(tx(), replacedElement);
+			tx().getOrderMap().update(tx(), this.replacedElement);
 		}
 	}
 }

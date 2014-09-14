@@ -74,7 +74,7 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest {
 		arg.multiFile = true;
 		arg.modelFileName = TMP_XML_EXPORT_XML;
 
-		ServiceResult result = getServiceHandler().doService(certificate, svc, arg);
+		ServiceResult result = getServiceHandler().doService(this.certificate, svc, arg);
 		assertServiceResult(ServiceResultState.FAILED, ServiceResult.class, result);
 		assertThat(result.getMessage(), containsString("Model File already exists with name"));
 	}
@@ -97,7 +97,7 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest {
 		arg.multiFile = true;
 		arg.modelFileName = TMP_XML_EXPORT_XML;
 
-		ServiceResult result = getServiceHandler().doService(certificate, svc, arg);
+		ServiceResult result = getServiceHandler().doService(this.certificate, svc, arg);
 		assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 	}
 }

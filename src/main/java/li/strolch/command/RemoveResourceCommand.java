@@ -55,7 +55,7 @@ public class RemoveResourceCommand extends Command {
 	@Override
 	public void doCommand() {
 
-		tx().lock(resource);
+		tx().lock(this.resource);
 
 		ResourceMap resourceMap = tx().getResourceMap();
 		if (!resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {

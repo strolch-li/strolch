@@ -82,8 +82,8 @@ public abstract class AbstractRealmCommandTest {
 	protected abstract Command getCommandInstance(ComponentContainer container, StrolchTransaction tx);
 
 	protected void doCommandAsFail(String realmName) {
-		expectedException.expect(RuntimeException.class);
-		expectedException.expectMessage("Fail on purpose after do command!");
+		this.expectedException.expect(RuntimeException.class);
+		this.expectedException.expectMessage("Fail on purpose after do command!");
 
 		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
 		try (StrolchTransaction tx = realm.openTx(certificate, "test")) {

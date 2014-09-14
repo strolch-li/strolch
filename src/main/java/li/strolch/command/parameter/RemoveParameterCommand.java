@@ -81,7 +81,7 @@ public class RemoveParameterCommand extends Command {
 		tx().lock(rootElement);
 
 		this.removedParameter = this.element.removeParameter(this.parameterId);
-		replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
+		this.replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
 	}
 
 	@Override

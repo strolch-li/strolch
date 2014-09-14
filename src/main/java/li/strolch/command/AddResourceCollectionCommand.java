@@ -61,14 +61,14 @@ public class AddResourceCollectionCommand extends Command {
 		}
 
 		ResourceMap resourceMap = tx().getResourceMap();
-		for (Resource resource : resources) {
+		for (Resource resource : this.resources) {
 			if (resourceMap.hasElement(tx(), resource.getType(), resource.getId())) {
 				String msg = MessageFormat.format("The Resource {0} already exists!", resource.getLocator());
 				throw new StrolchException(msg);
 			}
 		}
 
-		resourceMap.addAll(tx(), resources);
+		resourceMap.addAll(tx(), this.resources);
 	}
 
 	@Override

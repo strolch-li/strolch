@@ -122,7 +122,7 @@ public class XmlExportModelCommand extends Command {
 			if (!this.resourceTypes.isEmpty())
 				resourceTypesToExport.retainAll(this.resourceTypes);
 			for (String type : resourceTypesToExport) {
-				nrOfResourcesToExport += resourceMap.querySize(tx(), type);
+				this.nrOfResourcesToExport += resourceMap.querySize(tx(), type);
 			}
 		}
 
@@ -133,14 +133,14 @@ public class XmlExportModelCommand extends Command {
 				orderTypesToExport.retainAll(this.orderTypes);
 
 			for (String type : orderTypesToExport) {
-				nrOfOrdersToExport += orderMap.querySize(tx(), type);
+				this.nrOfOrdersToExport += orderMap.querySize(tx(), type);
 			}
 		}
 
-		this.elementsToWrite = nrOfResourcesToExport + nrOfOrdersToExport;
-		logger.info("Exporting " + elementsToWrite + " Elements...");
-		logger.info("Exporting " + nrOfResourcesToExport + " Resources...");
-		logger.info("Exporting " + nrOfOrdersToExport + " Orders...");
+		this.elementsToWrite = this.nrOfResourcesToExport + this.nrOfOrdersToExport;
+		logger.info("Exporting " + this.elementsToWrite + " Elements...");
+		logger.info("Exporting " + this.nrOfResourcesToExport + " Resources...");
+		logger.info("Exporting " + this.nrOfOrdersToExport + " Orders...");
 
 		try (FileOutputStream out = new FileOutputStream(this.modelFile)) {
 			createdFiles.add(this.modelFile);
@@ -156,7 +156,7 @@ public class XmlExportModelCommand extends Command {
 				resourceTypesToExport = new TreeSet<>(resourceTypesToExport);
 				for (String type : resourceTypesToExport) {
 
-					if (!multiFile) {
+					if (!this.multiFile) {
 						writeResourcesByType(writer, resourceMap, type);
 					} else {
 						String typeXmlFile = exportName + UNDERLINE + Tags.RESOURCE + UNDERLINE + type
@@ -164,7 +164,7 @@ public class XmlExportModelCommand extends Command {
 						writer.writeEmptyElement(Tags.INCLUDE_FILE);
 						writer.writeAttribute(Tags.FILE, typeXmlFile);
 
-						File typeXmlFileF = new File(modelFile.getParentFile(), typeXmlFile);
+						File typeXmlFileF = new File(this.modelFile.getParentFile(), typeXmlFile);
 						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
 						logger.info("Writing " + resourceMap.querySize(tx(), type) + " " + type
 								+ " Resources to path: " + typeXmlFileF.getAbsolutePath() + "...");
@@ -187,14 +187,14 @@ public class XmlExportModelCommand extends Command {
 				orderTypesToExport = new TreeSet<>(orderTypesToExport);
 				for (String type : orderTypesToExport) {
 
-					if (!multiFile) {
+					if (!this.multiFile) {
 						writeOrdersByType(writer, orderMap, type);
 					} else {
 						String typeXmlFile = exportName + UNDERLINE + Tags.ORDER + UNDERLINE + type + XML_FILE_SUFFIX;
 						writer.writeEmptyElement(Tags.INCLUDE_FILE);
 						writer.writeAttribute(Tags.FILE, typeXmlFile);
 
-						File typeXmlFileF = new File(modelFile.getParentFile(), typeXmlFile);
+						File typeXmlFileF = new File(this.modelFile.getParentFile(), typeXmlFile);
 						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
 						logger.info("Writing " + orderMap.querySize(tx(), type) + " " + type + " Orders to path: "
 								+ typeXmlFileF.getAbsolutePath() + "...");

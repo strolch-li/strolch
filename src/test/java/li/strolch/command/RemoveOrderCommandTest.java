@@ -33,13 +33,13 @@ public class RemoveOrderCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		locator = Locator.newBuilder(Tags.ORDER, "TestType", "@3").build();
+		this.locator = Locator.newBuilder(Tags.ORDER, "TestType", "@3").build();
 	}
 
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
-		Order order = tx.findElement(locator);
+		Order order = tx.findElement(this.locator);
 
 		RemoveOrderCommand command = new RemoveOrderCommand(container, tx);
 		command.setOrder(order);

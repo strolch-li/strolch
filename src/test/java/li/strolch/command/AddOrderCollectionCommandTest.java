@@ -35,17 +35,17 @@ public class AddOrderCollectionCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		orders = new ArrayList<>();
-		orders.add(ModelGenerator.createOrder("firstOrder", "First Order", "AdditionalOrders"));
-		orders.add(ModelGenerator.createOrder("secondOrder", "Second Order", "AdditionalOrders"));
-		orders.add(ModelGenerator.createOrder("thirdOrder", "Third Order", "AdditionalOrders"));
+		this.orders = new ArrayList<>();
+		this.orders.add(ModelGenerator.createOrder("firstOrder", "First Order", "AdditionalOrders"));
+		this.orders.add(ModelGenerator.createOrder("secondOrder", "Second Order", "AdditionalOrders"));
+		this.orders.add(ModelGenerator.createOrder("thirdOrder", "Third Order", "AdditionalOrders"));
 	}
 
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
 		AddOrderCollectionCommand command = new AddOrderCollectionCommand(container, tx);
-		command.setOrders(orders);
+		command.setOrders(this.orders);
 		return command;
 	}
 }

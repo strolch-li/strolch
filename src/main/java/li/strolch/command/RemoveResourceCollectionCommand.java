@@ -61,7 +61,7 @@ public class RemoveResourceCollectionCommand extends Command {
 		}
 
 		ResourceMap resourceMap = tx().getResourceMap();
-		for (Resource resource : resources) {
+		for (Resource resource : this.resources) {
 			if (!resourceMap.hasElement(tx(), resource.getType(), resource.getId())) {
 				String msg = "The Resource {0} can not be removed as it does not exist!";
 				msg = MessageFormat.format(msg, resource.getLocator());
@@ -69,7 +69,7 @@ public class RemoveResourceCollectionCommand extends Command {
 			}
 		}
 
-		resourceMap.removeAll(tx(), resources);
+		resourceMap.removeAll(tx(), this.resources);
 	}
 
 	@Override

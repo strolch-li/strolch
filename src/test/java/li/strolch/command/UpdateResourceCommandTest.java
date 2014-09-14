@@ -32,14 +32,14 @@ public class UpdateResourceCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		resource = ModelGenerator.createResource("yellow", "Modified Yellow Ball", "Ball");
+		this.resource = ModelGenerator.createResource("yellow", "Modified Yellow Ball", "Ball");
 	}
 
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
 		UpdateResourceCommand command = new UpdateResourceCommand(container, tx);
-		command.setResource(resource);
+		command.setResource(this.resource);
 		return command;
 	}
 }

@@ -70,14 +70,14 @@ public class UpdateResourceCollectionCommand extends Command {
 			}
 		}
 
-		this.replacedElements = resourceMap.updateAll(tx(), resources);
+		this.replacedElements = resourceMap.updateAll(tx(), this.resources);
 	}
 
 	@Override
 	public void undo() {
 		if (this.replacedElements != null && tx().isRollingBack()) {
 			ResourceMap resourceMap = tx().getResourceMap();
-			resourceMap.updateAll(tx(), replacedElements);
+			resourceMap.updateAll(tx(), this.replacedElements);
 		}
 	}
 }

@@ -65,9 +65,9 @@ public abstract class AbstractRealmServiceTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
-		importFromXml(REALM_CACHED, certificate, getServiceHandler());
-		importFromXml(REALM_TRANSACTIONAL, certificate, getServiceHandler());
+		this.certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		importFromXml(REALM_CACHED, this.certificate, getServiceHandler());
+		importFromXml(REALM_TRANSACTIONAL, this.certificate, getServiceHandler());
 	}
 
 	@After
@@ -102,7 +102,7 @@ public abstract class AbstractRealmServiceTest {
 
 		arg.realm = realm;
 
-		ServiceResult result = getServiceHandler().doService(certificate, svc, arg);
+		ServiceResult result = getServiceHandler().doService(this.certificate, svc, arg);
 		assertServiceResult(expectedState, expectedServiceResultType, result);
 
 		if (validator != null)

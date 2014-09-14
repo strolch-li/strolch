@@ -61,7 +61,7 @@ public class RemoveOrderCollectionCommand extends Command {
 		}
 
 		OrderMap orderMap = tx().getOrderMap();
-		for (Order order : orders) {
+		for (Order order : this.orders) {
 			if (!orderMap.hasElement(tx(), order.getType(), order.getId())) {
 				String msg = "The Order {0} can not be removed as it does not exist!";
 				msg = MessageFormat.format(msg, order.getLocator());
@@ -69,7 +69,7 @@ public class RemoveOrderCollectionCommand extends Command {
 			}
 		}
 
-		orderMap.removeAll(tx(), orders);
+		orderMap.removeAll(tx(), this.orders);
 	}
 
 	@Override

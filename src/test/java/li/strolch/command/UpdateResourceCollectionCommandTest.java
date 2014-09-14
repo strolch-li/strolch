@@ -35,17 +35,17 @@ public class UpdateResourceCollectionCommandTest extends AbstractRealmCommandTes
 
 	@Before
 	public void before() {
-		resources = new ArrayList<>();
-		resources.add(ModelGenerator.createResource("salutations", "Modified Enumeration", "Enumeration"));
-		resources.add(ModelGenerator.createResource("sex", "Modified Enumeration", "Enumeration"));
-		resources.add(ModelGenerator.createResource("religions", "Modified Enumeration", "Enumeration"));
+		this.resources = new ArrayList<>();
+		this.resources.add(ModelGenerator.createResource("salutations", "Modified Enumeration", "Enumeration"));
+		this.resources.add(ModelGenerator.createResource("sex", "Modified Enumeration", "Enumeration"));
+		this.resources.add(ModelGenerator.createResource("religions", "Modified Enumeration", "Enumeration"));
 	}
 
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
 		UpdateResourceCollectionCommand command = new UpdateResourceCollectionCommand(container, tx);
-		command.setResources(resources);
+		command.setResources(this.resources);
 		return command;
 	}
 }

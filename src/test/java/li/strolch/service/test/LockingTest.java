@@ -146,7 +146,7 @@ public class LockingTest {
 				continue;
 			}
 
-			this.result = getServiceHandler().doService(login(), svc, arg);
+			this.result = getServiceHandler().doService(login(), this.svc, this.arg);
 		}
 
 		public ServiceResult getResult() {

@@ -56,7 +56,7 @@ public class UpdateResourceCommand extends Command {
 	@Override
 	public void doCommand() {
 
-		tx().lock(resource);
+		tx().lock(this.resource);
 
 		ResourceMap resourceMap = tx().getResourceMap();
 		if (!resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {
@@ -71,7 +71,7 @@ public class UpdateResourceCommand extends Command {
 	@Override
 	public void undo() {
 		if (this.replacedElement != null && tx().isRollingBack()) {
-			tx().getResourceMap().update(tx(), replacedElement);
+			tx().getResourceMap().update(tx(), this.replacedElement);
 		}
 	}
 }

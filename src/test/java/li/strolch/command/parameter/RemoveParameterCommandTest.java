@@ -41,11 +41,11 @@ public class RemoveParameterCommandTest extends AbstractRealmCommandTest {
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
-		ParameterizedElement element = tx.findElement(locator);
+		ParameterizedElement element = tx.findElement(this.locator);
 
 		RemoveParameterCommand command = new RemoveParameterCommand(container, tx);
 		command.setElement(element);
-		command.setParameterId(parameterId);
+		command.setParameterId(this.parameterId);
 		return command;
 	}
 }

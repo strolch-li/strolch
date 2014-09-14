@@ -17,7 +17,6 @@ package li.strolch.command.parameter;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.AbstractRealmCommandTest;
-import li.strolch.command.parameter.SetParameterCommand;
 import li.strolch.model.Locator;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -42,10 +41,10 @@ public class SetParameterCommandTest extends AbstractRealmCommandTest {
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
-		Parameter<?> parameter = tx.findElement(locator);
+		Parameter<?> parameter = tx.findElement(this.locator);
 
 		SetParameterCommand command = new SetParameterCommand(container, tx);
-		command.setValueAsString(valueAsString);
+		command.setValueAsString(this.valueAsString);
 		command.setParameter(parameter);
 		return command;
 	}

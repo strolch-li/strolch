@@ -36,16 +36,16 @@ public class RemoveResourceCollectionCommandTest extends AbstractRealmCommandTes
 
 	@Before
 	public void before() {
-		locators = new ArrayList<>();
-		locators.add(Locator.newBuilder(Tags.RESOURCE, "Enumeration", "salutations").build());
-		locators.add(Locator.newBuilder(Tags.RESOURCE, "Enumeration", "sex").build());
-		locators.add(Locator.newBuilder(Tags.RESOURCE, "Enumeration", "religions").build());
+		this.locators = new ArrayList<>();
+		this.locators.add(Locator.newBuilder(Tags.RESOURCE, "Enumeration", "salutations").build());
+		this.locators.add(Locator.newBuilder(Tags.RESOURCE, "Enumeration", "sex").build());
+		this.locators.add(Locator.newBuilder(Tags.RESOURCE, "Enumeration", "religions").build());
 	}
 
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
-		List<Resource> resources = new ArrayList<>(locators.size());
+		List<Resource> resources = new ArrayList<>(this.locators.size());
 		for (Locator locator : this.locators) {
 			resources.add((Resource) tx.findElement(locator));
 		}

@@ -33,13 +33,13 @@ public class RemoveResourceCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		locator = Locator.newBuilder(Tags.RESOURCE, "Enumeration", "sex").build();
+		this.locator = Locator.newBuilder(Tags.RESOURCE, "Enumeration", "sex").build();
 	}
 
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
-		Resource resource = tx.findElement(locator);
+		Resource resource = tx.findElement(this.locator);
 
 		RemoveResourceCommand command = new RemoveResourceCommand(container, tx);
 		command.setResource(resource);

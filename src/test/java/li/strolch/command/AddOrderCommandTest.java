@@ -32,14 +32,14 @@ public class AddOrderCommandTest extends AbstractRealmCommandTest {
 
 	@Before
 	public void before() {
-		order = ModelGenerator.createOrder("firstOrder", "First Order", "AdditionalOrders");
+		this.order = ModelGenerator.createOrder("firstOrder", "First Order", "AdditionalOrders");
 	}
 
 	@Override
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
 		AddOrderCommand command = new AddOrderCommand(container, tx);
-		command.setOrder(order);
+		command.setOrder(this.order);
 		return command;
 	}
 }

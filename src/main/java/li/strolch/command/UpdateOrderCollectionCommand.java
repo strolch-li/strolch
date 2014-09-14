@@ -62,7 +62,7 @@ public class UpdateOrderCollectionCommand extends Command {
 		}
 
 		OrderMap orderMap = tx().getOrderMap();
-		for (Order order : orders) {
+		for (Order order : this.orders) {
 			if (!orderMap.hasElement(tx(), order.getType(), order.getId())) {
 				String msg = "The Order {0} can not be updated as it does not exist!";
 				msg = MessageFormat.format(msg, order.getLocator());
@@ -70,14 +70,14 @@ public class UpdateOrderCollectionCommand extends Command {
 			}
 		}
 
-		replacedElements = orderMap.updateAll(tx(), orders);
+		this.replacedElements = orderMap.updateAll(tx(), this.orders);
 	}
 
 	@Override
 	public void undo() {
 		if (this.replacedElements != null && tx().isRollingBack()) {
 			OrderMap orderMap = tx().getOrderMap();
-			orderMap.updateAll(tx(), replacedElements);
+			orderMap.updateAll(tx(), this.replacedElements);
 		}
 	}
 }

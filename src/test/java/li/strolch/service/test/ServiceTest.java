@@ -19,8 +19,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import li.strolch.service.test.model.GreetingResult;
 import li.strolch.service.test.model.GreetingService;
-import li.strolch.service.test.model.TestService;
 import li.strolch.service.test.model.GreetingService.GreetingArgument;
+import li.strolch.service.test.model.TestService;
 
 import org.junit.Rule;
 import org.junit.Test;

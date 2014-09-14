@@ -55,7 +55,7 @@ public class AddOrderCommand extends Command {
 	@Override
 	public void doCommand() {
 
-		tx().lock(order);
+		tx().lock(this.order);
 
 		OrderMap orderMap = tx().getOrderMap();
 		if (orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
