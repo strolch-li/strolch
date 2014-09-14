@@ -15,8 +15,11 @@
  */
 package li.strolch.model.timedstate;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.model.timevalue.ITimeValue;
@@ -25,7 +28,7 @@ import li.strolch.model.timevalue.impl.BooleanValue;
 import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.StringSetValue;
-import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 /**

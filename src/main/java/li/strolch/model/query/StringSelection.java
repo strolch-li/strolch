@@ -76,7 +76,7 @@ public class StringSelection {
 	}
 
 	public boolean matches(String value) {
-		for (String sel : values) {
+		for (String sel : this.values) {
 			if (this.matchMode.matches(value, sel))
 				return true;
 		}

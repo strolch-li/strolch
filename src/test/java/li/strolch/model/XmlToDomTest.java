@@ -15,11 +15,12 @@
  */
 package li.strolch.model;
 
+import static org.junit.Assert.assertTrue;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
 import li.strolch.model.xml.OrderToDomVisitor;
 import li.strolch.model.xml.ResourceToDomVisitor;
-import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,8 +46,7 @@ public class XmlToDomTest extends ModelTest {
 
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
 		visitor.visit(parsedOrder);
-		assertTrue("To DOM and back should equal same Order:\n" + visitor.getMismatchedLocators(),
-				visitor.isEqual());
+		assertTrue("To DOM and back should equal same Order:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
 	}
 
 	@Test
@@ -63,7 +63,6 @@ public class XmlToDomTest extends ModelTest {
 
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(resource);
 		visitor.visit(parsedResource);
-		assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(),
-				visitor.isEqual());
+		assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
 	}
 }

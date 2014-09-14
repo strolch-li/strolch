@@ -15,7 +15,46 @@
  */
 package li.strolch.model;
 
-import static li.strolch.model.ModelGenerator.*;
+import static li.strolch.model.ModelGenerator.BAG_ID;
+import static li.strolch.model.ModelGenerator.BAG_NAME;
+import static li.strolch.model.ModelGenerator.BAG_TYPE;
+import static li.strolch.model.ModelGenerator.PARAM_BOOLEAN_ID;
+import static li.strolch.model.ModelGenerator.PARAM_DATE_ID;
+import static li.strolch.model.ModelGenerator.PARAM_FLOAT_ID;
+import static li.strolch.model.ModelGenerator.PARAM_INTEGER_ID;
+import static li.strolch.model.ModelGenerator.PARAM_LIST_STRING_ID;
+import static li.strolch.model.ModelGenerator.PARAM_LONG_ID;
+import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
+import static li.strolch.model.ModelGenerator.STATE_BOOLEAN_ID;
+import static li.strolch.model.ModelGenerator.STATE_BOOLEAN_TIME_0;
+import static li.strolch.model.ModelGenerator.STATE_BOOLEAN_TIME_10;
+import static li.strolch.model.ModelGenerator.STATE_BOOLEAN_TIME_20;
+import static li.strolch.model.ModelGenerator.STATE_BOOLEAN_TIME_30;
+import static li.strolch.model.ModelGenerator.STATE_FLOAT_ID;
+import static li.strolch.model.ModelGenerator.STATE_FLOAT_TIME_0;
+import static li.strolch.model.ModelGenerator.STATE_FLOAT_TIME_10;
+import static li.strolch.model.ModelGenerator.STATE_FLOAT_TIME_20;
+import static li.strolch.model.ModelGenerator.STATE_FLOAT_TIME_30;
+import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
+import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
+import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_10;
+import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_20;
+import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_30;
+import static li.strolch.model.ModelGenerator.STATE_STRING_ID;
+import static li.strolch.model.ModelGenerator.STATE_STRING_TIME_0;
+import static li.strolch.model.ModelGenerator.STATE_STRING_TIME_10;
+import static li.strolch.model.ModelGenerator.STATE_STRING_TIME_20;
+import static li.strolch.model.ModelGenerator.STATE_STRING_TIME_30;
+import static li.strolch.model.ModelGenerator.STATE_TIME_0;
+import static li.strolch.model.ModelGenerator.STATE_TIME_10;
+import static li.strolch.model.ModelGenerator.STATE_TIME_20;
+import static li.strolch.model.ModelGenerator.STATE_TIME_30;
+import static li.strolch.model.ModelGenerator.createOrder;
+import static li.strolch.model.ModelGenerator.createResource;
+import static li.strolch.model.Tags.BAG;
+import static li.strolch.model.Tags.ORDER;
+import static li.strolch.model.Tags.RESOURCE;
+import static li.strolch.model.Tags.STATE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -23,7 +62,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
-import static li.strolch.model.Tags.*;
+
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.FloatParameter;

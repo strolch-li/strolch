@@ -36,8 +36,7 @@ public class ModelStatistics {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getClass().getSimpleName() + " [startTime=");
-		builder.append(this.startTime == null ? NULL : ISO8601FormatFactory.getInstance()
-				.formatDate(this.startTime));
+		builder.append(this.startTime == null ? NULL : ISO8601FormatFactory.getInstance().formatDate(this.startTime));
 		builder.append(", durationNanos=");
 		builder.append(StringHelper.formatNanoDuration(this.durationNanos));
 		builder.append(", nrOfResources=");

@@ -56,14 +56,14 @@ public abstract class AbstractToSaxWriterVisitor {
 
 	protected void writeElement(String tag, Order order) throws XMLStreamException {
 		boolean empty = !order.hasParameterBags();
-		writeElement(tag, empty, (GroupedParameterizedElement) order);
+		writeElement(tag, empty, order);
 		if (!empty)
 			this.writer.writeEndElement();
 	}
 
 	protected void writeElement(String tag, Resource resource) throws XMLStreamException {
 		boolean empty = !resource.hasParameterBags() && !resource.hasTimedStates();
-		writeElement(tag, empty, (GroupedParameterizedElement) resource);
+		writeElement(tag, empty, resource);
 
 		if (resource.hasTimedStates())
 			writeTimedStates(resource);
@@ -85,13 +85,13 @@ public abstract class AbstractToSaxWriterVisitor {
 			writeStartStrolchElement(Tags.TIMED_STATE, !values.isEmpty(), timedState);
 
 			for (ITimeValue<IValue<?>> timeValue : values) {
-				writer.writeEmptyElement(Tags.VALUE);
-				writer.writeAttribute(Tags.TIME, timeValue.getTime().toString());
-				writer.writeAttribute(Tags.VALUE, timeValue.getValue().getValueAsString());
+				this.writer.writeEmptyElement(Tags.VALUE);
+				this.writer.writeAttribute(Tags.TIME, timeValue.getTime().toString());
+				this.writer.writeAttribute(Tags.VALUE, timeValue.getValue().getValueAsString());
 			}
 
 			if (!values.isEmpty())
-				writer.writeEndElement();
+				this.writer.writeEndElement();
 		}
 	}
 

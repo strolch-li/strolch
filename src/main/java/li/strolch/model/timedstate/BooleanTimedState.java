@@ -16,10 +16,12 @@
 package li.strolch.model.timedstate;
 
 import java.util.SortedSet;
+
 import li.strolch.model.StrolchElement;
 import li.strolch.model.Tags;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.impl.BooleanValue;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

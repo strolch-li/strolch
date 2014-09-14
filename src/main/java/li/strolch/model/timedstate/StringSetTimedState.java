@@ -19,11 +19,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
+
 import li.strolch.model.StrolchElement;
 import li.strolch.model.Tags;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.impl.AString;
 import li.strolch.model.timevalue.impl.StringSetValue;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

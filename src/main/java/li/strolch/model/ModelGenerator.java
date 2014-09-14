@@ -230,7 +230,7 @@ public class ModelGenerator {
 		List<Resource> resources = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			String id = StringHelper.normalizeLength(String.valueOf((i + idStart)), 8, true, '0');
-			resources.add(createResource(idPrefix + "_" + id, name + " " + i, type));
+			resources.add(createResource(idPrefix + id, name + " " + i, type));
 		}
 		return resources;
 	}
@@ -299,7 +299,7 @@ public class ModelGenerator {
 		List<Order> orders = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			String id = StringHelper.normalizeLength(String.valueOf((i + idStart)), 8, true, '0');
-			orders.add(createOrder(idPrefix + "_" + id, name + " " + i, type));
+			orders.add(createOrder(idPrefix + id, name + " " + i, type));
 		}
 		return orders;
 	}

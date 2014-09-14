@@ -80,7 +80,7 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 			Element timedStateElem = (Element) timedStateElems.item(i);
 			String typeS = timedStateElem.getAttribute(Tags.TYPE);
 
-			DBC.PRE.assertNotEmpty("Type must be set on TimedState for resource with id " + id, typeS);
+			DBC.PRE.assertNotEmpty("Type must be set on TimedState for resource with id " + this.id, typeS);
 
 			if (typeS.equals(FloatTimedState.TYPE)) {
 				FloatTimedState timedState = new FloatTimedState(timedStateElem);

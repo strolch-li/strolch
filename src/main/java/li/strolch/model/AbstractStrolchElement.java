@@ -45,8 +45,10 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	/**
 	 * Default constructor
 	 *
-	 * @param id id of this {@link StrolchElement}
-	 * @param name name of this {@link StrolchElement}
+	 * @param id
+	 *            id of this {@link StrolchElement}
+	 * @param name
+	 *            name of this {@link StrolchElement}
 	 */
 	public AbstractStrolchElement(String id, String name) {
 		setId(id);
@@ -97,8 +99,8 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	 * Used to build a {@link Locator} for this {@link StrolchElement}. It must be implemented by the concrete
 	 * implemented as parents must first add their {@link Locator} information
 	 *
-	 * @param locatorBuilder the {@link LocatorBuilder} to which the {@link StrolchElement} must add its locator
-	 * information
+	 * @param locatorBuilder
+	 *            the {@link LocatorBuilder} to which the {@link StrolchElement} must add its locator information
 	 */
 	protected abstract void fillLocator(LocatorBuilder locatorBuilder);
 

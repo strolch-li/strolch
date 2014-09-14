@@ -110,7 +110,7 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 			return this.aStrings.iterator().next().getString();
 
 		StringBuilder sb = new StringBuilder();
-		Iterator<AString> iter = aStrings.iterator();
+		Iterator<AString> iter = this.aStrings.iterator();
 		while (iter.hasNext()) {
 			sb.append(iter.next());
 			if (iter.hasNext())

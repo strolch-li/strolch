@@ -266,7 +266,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 		case Tags.INCLUDE_FILE:
 			break;
 		case Tags.TIMED_STATE:
-			((Resource) this.parameterizedElement).addTimedState(state);
+			((Resource) this.parameterizedElement).addTimedState(this.state);
 			break;
 		case Tags.VALUE:
 			break;

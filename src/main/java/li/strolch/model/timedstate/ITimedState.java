@@ -25,7 +25,8 @@ import li.strolch.model.timevalue.IValueChange;
  *
  * @author Martin Smock <smock.martin@gmail.com>
  *
- * @param <T> IValue implementation representing the state at a given time
+ * @param <T>
+ *            IValue implementation representing the state at a given time
  */
 @SuppressWarnings("rawtypes")
 public interface ITimedState<T extends IValue> {
@@ -41,7 +42,8 @@ public interface ITimedState<T extends IValue> {
 	ITimeValue<T> getPreviousMatch(final Long time, T value);
 
 	/**
-	 * @param change the state change to be applied
+	 * @param change
+	 *            the state change to be applied
 	 */
 	<U extends IValueChange<T>> void applyChange(final U change);
 

@@ -65,7 +65,7 @@ public class BooleanValue implements IValue<Boolean>, Serializable {
 	public BooleanValue getInverse() {
 		return new BooleanValue(!getValue());
 	}
-	
+
 	@Override
 	public String getValueAsString() {
 		return this.value.toString();

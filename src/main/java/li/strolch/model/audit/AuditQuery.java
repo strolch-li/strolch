@@ -68,7 +68,7 @@ public class AuditQuery implements StrolchQuery {
 		DBC.PRE.assertNotNull("No elementTypeSelection (navigation) set!", this.elementTypeSelection); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("No dateRange set!", this.dateRange); //$NON-NLS-1$
 		visitor.visit(this);
-		for (AuditSelection selection : selections) {
+		for (AuditSelection selection : this.selections) {
 			selection.accept(visitor);
 		}
 	}

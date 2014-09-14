@@ -21,7 +21,7 @@ package li.strolch.model.query;
 public interface QueryVisitor {
 
 	public void visitAny();
-	
+
 	public void visitAnd(AndSelection andSelection);
 
 	public void visitOr(OrSelection orSelection);

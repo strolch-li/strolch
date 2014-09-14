@@ -28,7 +28,8 @@ public class NotSelection extends BooleanSelection {
 	}
 
 	/**
-	 * @throws UnsupportedOperationException because a {@link NotSelection} can only work on a single {@link Selection}
+	 * @throws UnsupportedOperationException
+	 *             because a {@link NotSelection} can only work on a single {@link Selection}
 	 */
 	@Override
 	public NotSelection with(Selection selection) {

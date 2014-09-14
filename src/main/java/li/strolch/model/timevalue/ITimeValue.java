@@ -22,7 +22,8 @@ import li.strolch.model.timevalue.impl.TimeVariable;
  *
  * @author Martin Smock <smock.martin@gmail.com>
  *
- * @param <T> the backing value of the timed value object
+ * @param <T>
+ *            the backing value of the timed value object
  */
 @SuppressWarnings("rawtypes")
 public interface ITimeValue<T extends IValue> extends Comparable<ITimeValue<T>> {

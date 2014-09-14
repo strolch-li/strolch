@@ -63,6 +63,7 @@ public class ParameterBagSelection implements Selection {
 			super(bagKey);
 		}
 
+		@Override
 		public void accept(StrolchRootElementSelectionVisitor visitor) {
 			visitor.visit(this);
 		}

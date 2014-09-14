@@ -215,7 +215,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 			Element paramElement = (Element) parameterElements.item(i);
 			String paramtype = paramElement.getAttribute(Tags.TYPE);
 
-			DBC.PRE.assertNotEmpty("Type must be set on Parameter for bag with id " + id, paramtype);
+			DBC.PRE.assertNotEmpty("Type must be set on Parameter for bag with id " + this.id, paramtype);
 
 			if (paramtype.equals(StringParameter.TYPE)) {
 				StringParameter param = new StringParameter(paramElement);

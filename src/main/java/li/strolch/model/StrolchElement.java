@@ -79,8 +79,9 @@ public interface StrolchElement extends Serializable, Comparable<StrolchElement>
 	/**
 	 * Returns an {@link Element} object which is an XML representation of this object
 	 *
-	 * @param doc the document to which this element is being written. The client must not append to the document, the
-	 * caller will perform this as needed
+	 * @param doc
+	 *            the document to which this element is being written. The client must not append to the document, the
+	 *            caller will perform this as needed
 	 *
 	 * @return
 	 */
