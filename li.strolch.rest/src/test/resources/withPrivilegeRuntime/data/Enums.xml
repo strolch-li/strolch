@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchModel>
+
+	<Resource Id="salutation" Name="Salutations" Type="Enumeration">
+		<ParameterBag Id="en" Name="Salutations" Type="Enumeration">
+			<Parameter Id="mr" Name="Mr" Type="String" Value="Mr" />
+			<Parameter Id="ms" Name="Ms" Type="String" Value="Ms" />
+			<Parameter Id="mrs" Name="Mrs" Type="String" Value="Mrs" />
+		</ParameterBag>
+		<ParameterBag Id="de" Name="Salutations" Type="Enumeration">
+			<Parameter Id="mr" Name="Mr" Type="String" Value="Herr" />
+			<Parameter Id="ms" Name="Ms" Type="String" Value="Frau" />
+			<Parameter Id="mrs" Name="Mrs" Type="String" Value="Frau" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="sex" Name="Sex" Type="Enumeration">
+		<ParameterBag Id="en" Name="Sex" Type="Enumeration">
+			<Parameter Id="undefined" Name="Undefined" Type="String" Value="undefined" />
+			<Parameter Id="both" Name="Both" Type="String" Value="both" />
+			<Parameter Id="female" Name="Female" Type="String" Value="female" />
+			<Parameter Id="male" Name="Male" Type="String" Value="male" />
+		</ParameterBag>
+	</Resource>
+
+</StrolchModel>
