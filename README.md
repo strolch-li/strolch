@@ -1,19 +1,19 @@
 Strolch
 ==================
 
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.agent/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.agent/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.bom/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.bom/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.dev/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.dev/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.model/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.model/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.parent/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.parent/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.persistence.postgresql/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.persistence.postgresql/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.persistence.xml/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.persistence.xml/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.rest/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.rest/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.service/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.service/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.testbase/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.testbase/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.tutorialapp/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.tutorialapp/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.tutorialwebapp/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.tutorialwebapp/)
-[![Build Status](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.website/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.website/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.agent/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.agent/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.bom/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.bom/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.dev/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.dev/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.model/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.model/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.parent/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.parent/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.persistence.postgresql/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.persistence.postgresql/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.persistence.xml/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.persistence.xml/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.rest/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.rest/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.service/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.service/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.testbase/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.testbase/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.tutorialapp/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.tutorialapp/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.tutorialwebapp/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.tutorialwebapp/)
+[![Build Status](https://jenkins.eitchnet.ch/view/strolch/job/li.strolch.website/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.website/)
 
 The main repository which contains all of Strolch.
 
