@@ -1,0 +1,102 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<parent>
+		<groupId>li.strolch</groupId>
+		<artifactId>li.strolch.parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../li.strolch.parent/pom.xml</relativePath>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>li.strolch.persistence.postgresql</artifactId>
+
+	<name>li.strolch.persistence.postgresql</name>
+	<description>PostgreSQL Persistence Implementation for Strolch</description>
+
+	<url>https://github.com/eitchnet/li.strolch.persistence.postgresql</url>
+
+	<inceptionYear>2011</inceptionYear>
+
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/eitchnet/li.strolch.persistence.postgresql/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.persistence.postgresql.git</connection>
+		<developerConnection>scm:git:git@github.com:eitch/li.strolch.persistence.postgresql.git</developerConnection>
+		<url>https://github.com/eitchnet/li.strolch.persistence.postgresql</url>
+	</scm>
+
+	<dependencies>
+		<!-- main -->
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.model</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.agent</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.3-1100-jdbc41</version>
+		</dependency>
+
+		<!-- test -->
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.testbase</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/componentVersion.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/componentVersion.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

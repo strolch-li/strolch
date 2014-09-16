@@ -1,0 +1,8 @@
+
+DROP TABLE IF EXISTS resources;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS audits;
+DROP TABLE IF EXISTS db_version;
+
+DROP TYPE IF EXISTS order_state;
+DROP TYPE IF EXISTS access_type;
