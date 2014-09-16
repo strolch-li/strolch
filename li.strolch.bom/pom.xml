@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>li.strolch</groupId>
+		<artifactId>li.strolch.parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../li.strolch.parent</relativePath>
+	</parent>
+
+	<artifactId>li.strolch.bom</artifactId>
+	<packaging>pom</packaging>
+	<name>li.strolch.bom</name>
+	<description>The default set of dependencies to start working with strolch projects</description>
+	
+	<scm>
+		<tag>1.0.0</tag>
+	</scm>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.model</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.agent</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.service</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.persistence.xml</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.persistence.postgresql</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.rest</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			
+			<!-- test -->
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.testbase</artifactId>
+				<version>${project.version}</version>
+				<scope>test</scope>
+			</dependency>
+			
+		</dependencies>
+	</dependencyManagement>
+</project>
