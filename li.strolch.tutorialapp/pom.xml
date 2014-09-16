@@ -1,0 +1,127 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>li.strolch</groupId>
+		<artifactId>li.strolch.parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../li.strolch.parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>li.strolch.tutorialapp</artifactId>
+
+	<name>li.strolch.tutorialapp</name>
+	<description>Tutorial Application for Strolch</description>
+
+	<url>https://github.com/eitchnet/li.strolch.tutorialapp</url>
+
+	<inceptionYear>2011</inceptionYear>
+
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/eitchnet/li.strolch.tutorialapp/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:https://github.com/eitchnet/li.strolch.tutorialapp.git</connection>
+		<developerConnection>scm:git:git@github.com:eitch/li.strolch.tutorialapp.git</developerConnection>
+		<url>https://github.com/eitchnet/li.strolch.tutorialapp</url>
+	</scm>
+	
+	<dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.bom</artifactId>
+			<type>pom</type>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.bom</artifactId>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.persistence.xml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/componentVersion.properties</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+
+							<!-- When creating an executable jar, use copy-dependencies plugin with libs in lib/ dir: -->
+							<mainClass>li.strolch.tutorialapp.main.Main</mainClass>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptor>src/assembly/bin.xml</descriptor>
+					<finalName>tutorial-app-${project.version}</finalName>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
