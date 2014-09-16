@@ -1,0 +1,14 @@
+.release, .snapshot {
+	float: left;
+	padding: 20px;
+}
+.release {
+	width: 350px;
+}
+.snapshot {
+	width: 350px;
+}
+
+.previousRelease {
+    clear: both;
+}

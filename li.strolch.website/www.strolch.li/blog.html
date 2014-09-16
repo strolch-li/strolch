@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="shortcut icon" href="ico/favicon.ico">
+
+        <title>Strolch: Blog</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom styles for this template -->
+        <link href="css/custom.css" rel="stylesheet">
+        <link href="css/blog.css" rel="stylesheet">
+
+        <!-- Just for debugging purposes. Don't actually copy this line! -->
+        <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="index.html">Strolch</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="index.html">Overview</a></li>
+                        <li><a href="downloads.html">Downloads</a></li>
+                        <li><a href="development.html">Development</a></li>
+                        <li class="active"><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </div>
+
+        <div class="container">
+
+            <div class="page-header">
+                <h1 class="page-title">The Strolch Blog</h1>
+                <p class="lead page-description">The official Strolch blog with news, ideas, and thoughts on using Strolch.</p>
+            </div>
+
+            <!-- container for whole blog -->
+            <div class="row">
+
+                <!-- blog items -->
+                <div class="col-sm-8 blog-main">
+
+                    <!-- blog main -->
+                    <div class="blog-post">
+                        <h2 class="blog-post-title">Release 1.0.0</h2>
+                        <p class="blog-post-meta">August 20, 2014 by <a href="#">Robert</a></p>
+
+                        <p>With the Go-Live of a Strolch-based application around the corner, it is time to release Version 1.0.0 of Strolch</p>
+                        <hr>
+                        <h3>Story</h3>
+                        <p>Strolch as a component based software agent has been two years in the making. The concepts in Strolch have been taken from a proprietary planning, scheduling and controlling software agent, which was, and is been, used in industrial automation, logistics and production. Strolch was created to bring the concepts, which were working well for small teams to go-live with large projects in short to medium time-frames to the open source world.</p>
+                        <p>Strolch was completely rewritten using the key concepts of a parameterized object model and a component based agent but remembering which clutches the original implementation had, thus trying to eradicate those without bringing in new ones. It might not be perfect in version 1.0.0, but it is a starting point form which to carry on from.</p>
+                        <h3>Features</h3>
+                        <p>Strolch isn't feature complete by a long shot, but it sure has got many features which make it useable in a concrete project, thus making sure it is not vaporware =)</p>
+                        <p>The following is a list of key features, many of which were driven by concrete project requirements:</p>
+                        <ul>
+                            <li>Separate containers for models (mandates)</li>
+                            <li>Parameterized model with full <a href="http://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUD</a> for Resource and Order objects</li>
+                            <li>Timed values on Resources to map values by time</li>
+                            <li>Built-in versioning of model - configurable by Realm</li>
+                            <li>Transparent runtime modes: TRANSIENT, CACHED, TRANSACTIONAL<sup>*</sup></li>
+                            <li>Service and Command pattern for reusing functionality</li>
+                            <li><a href="https://github.com/eitchnet/ch.eitchnet.xmlpers">XML File based persistence layer</a><sup>*</sup></li>
+                            <li><a href="http://www.postgresql.org/">PostgreSQL</a> persistence layer<sup>*</sup></li>
+                            <li>Querying using a <a href="http://en.wikipedia.org/wiki/Fluent_API">fluent API</a></li>
+                            <li>Services to import and export a model to XML</li>
+                            <li>Integrated authentication and authorization to validate user privileges using <a href="https://github.com/eitchnet/ch.eitchnet.privilege">Privilege</a></li>
+                            <li>Ready to use <a href="http://en.wikipedia.org/wiki/Observer_pattern">Observer</a> pattern</li>
+                            <li>(currently) Read-only <a href="http://en.wikipedia.org/wiki/Restful">REST</a> API to access the agent model remotely</li>
+                            <li>Configurable environments</li>
+                            <li>Opt-in audit trail (including read access, and the audits themselves)</li>
+                            <li>Basic components required to <a href="https://github.com/eitchnet/ch.eitchnet.utils/tree/master/src/main/java/ch/eitchnet/communication">communicate</a> with external devices using TCP/IP</li>
+                        </ul>
+                        <p>With the light weight implementation, where there are basically no third party libraries required for the normal runtime, Strolch has a minimal foot print which allows it to run on small devices for instance a <a href="http://beagleboard.org/Products/BeagleBone+Black">BeagleBone Black</a>. Using the in-memory mode, it is an easy feat to set up test environments with little to no further requirements than the JVM.</p>
+
+                        <h3>Future</h3>
+                        <p>So what is planned for the future? Although Strolch has quite a few interesting features, it is by no way feature complete. The greatest wish is for Strolch to become a community driven platform, so many new features will arise in the future, but at least one major future feature which will be tackled in the near future and will certainly drive the next major release is a planning and scheduling engine using a <a href="http://en.wikipedia.org/wiki/Gantt_chart">Gantt</a> chart to visualize the schedule.</p>
+                        <p>The planning engine will use the timed values on Resources extensively to create a planning engine on which Workflows can be placed and allowing to detect violations and bottlenecks.</p>
+                        <p>An extension of the planning of the scheduling engine will allow more than just placing Workflows on Resources, but actually searching groups of Resources for a time slot of when to place tasks. This will allow to use capacity constraints to plan and schedule workflows using different algorithms, and respecting calendars etc.</p>
+                        <p>Further time will be spent on giving Strolch it's own UI. Currently the idea is to use <a href="http://www.polymer-project.org/">Google's Polymer</a> to implement the UI, thus creating reusable widgets that can be used in projects.</p>
+
+                        <h3>Take it for a spin</h3>
+                        <p>So, now the important part is for new users to start using Strolch for their own projects. Go ahead, check out the
+                            <a href="downloads.html">Downloads</a> page for the latest release and then checkout the two tutorial applications to get yourself up to speed!</p>
+                        <p>Don't hesitate to send us feedback or questions, we will be delighted to help you get your Strolch-based application up and running, or provide feedback to your concerns!</p>
+
+                        <h3>Developers</h3>
+                        <p>Robert von Burg<br />
+                        Reto Breitenmoser<br />
+                        Dr. Martin Smock<br /></p>
+
+                        <p><sup>*</sup> Currently Transactional mode is missing concrete implementation for querying for the XML persistence</p>
+
+                    </div><!-- /.blog-post -->
+
+                    <!-- blog item -->
+                    <!--div class="blog-post">
+                        <h2 class="blog-post-title">Another blog post</h2>
+                        <p class="blog-post-meta">December 23, 2013 by <a href="#">Jacob</a></p>
+
+                        <p>Lorem ipsum</p>
+                        <hr>
+                        <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+                        <blockquote>
+                            <p>Curabitur blandit tempus porttitor. <strong>Nullam quis risus eget urna mollis</strong> ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+                        </blockquote>
+                        <p>dfgdfg</p>
+                        <h3>Story</h3>
+                        <p>dfgdfg</p>
+                        <h3>dfghdfkjghdfg</h3>
+                    </div--><!-- /.blog-post -->
+
+                    <!-- pagination -->
+                    <ul class="pager">
+                        <li><a href="#">Previous</a></li>
+                        <li><a href="#">Next</a></li>
+                    </ul>
+
+                </div><!-- /.blog-main -->
+
+                <!-- sidebar -->
+                <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+                    <div class="sidebar-module sidebar-module-inset">
+                        <h4>About</h4>
+                        <p>Strolch is an open source component based software agent written in Java and can be compared, in a light sense, with the Java EE stack: Strolch takes care of persistence, implements Services for use cases, Commands as re-usable algorithms and has a parameterized data model.</p>
+                    </div>
+                    <div class="sidebar-module">
+                        <h4>Archives</h4>
+                        <ol class="list-unstyled">
+                            <li><a href="#">August 2014</a></li>
+                            <!--
+                            <li><a href="#">February 2014</a></li>
+                            <li><a href="#">January 2014</a></li>
+                            <li><a href="#">December 2013</a></li>
+                            <li><a href="#">November 2013</a></li>
+                            <li><a href="#">October 2013</a></li>
+                            <li><a href="#">September 2013</a></li>
+                            <li><a href="#">August 2013</a></li>
+                            <li><a href="#">July 2013</a></li>
+                            <li><a href="#">June 2013</a></li>
+                            <li><a href="#">May 2013</a></li>
+                            <li><a href="#">April 2013</a></li>
+                            -->
+                        </ol>
+                    </div>
+                    <div class="sidebar-module">
+                        <h4>Elsewhere</h4>
+                        <ol class="list-unstyled">
+                            <li><a href="https://github.com/eitchnet">GitHub</a></li>
+                            <li><a href="https://twitter.com/eitchme">Twitter</a></li>
+                            <li><a href="https://www.facebook.com/strolch.li">Facebook</a></li>
+                            <li><a href="https://plus.google.com/u/0/communities/100208129798096060842">Google+</a></li>
+                        </ol>
+                    </div>
+                </div><!-- /.blog-sidebar -->
+
+            </div><!-- /.row -->
+
+            <div id="footer">
+                <div class="container">
+                    <p class="text-muted">&copy; Strolch / <a href="mailto:eitch@eitchnet.ch">Robert von Burg</a> / Hosting by <a href="http://www.eitchnet.ch">eitchnet.ch</a></p>
+                </div>
+            </div>
+
+        </div><!-- /.container -->
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="js/bootstrap.min.js"></script>
+
+        <!-- Piwik -->
+        <script type="text/javascript">
+            var _paq = _paq || [];
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            (function() {
+                var u=(("https:" == document.location.protocol) ? "https" : "http") + "://piwik.eitchnet.ch/";
+                _paq.push(['setTrackerUrl', u+'piwik.php']);
+                _paq.push(['setSiteId', 2]);
+                var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+                g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+            })();
+        </script>
+        <noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
+        <!-- End Piwik Code -->
+
+    </body>
+</html>
