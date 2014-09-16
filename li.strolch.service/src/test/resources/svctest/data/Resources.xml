@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<StrolchModel>
+	<Resource Id="yellow" Name="Yellow Ball" Type="Ball">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="owner" Name="Owner" Type="String" Value="eitch" />
+		</ParameterBag>
+		<ParameterBag Id="something" Name="Something" Type="Something" />
+		<TimedState Id="@state1" Name="State" Type="FloatState" />
+		<TimedState Id="@state2" Name="State" Type="FloatState">
+			<Value Time="0" Value="0.0" />
+			<Value Time="1" Value="1.0" />
+			<Value Time="2" Value="2.0" />
+			<Value Time="3" Value="1.0" />
+		</TimedState>
+		<TimedState Id="@state3" Name="State" Type="IntegerState" />
+		<TimedState Id="@state4" Name="State" Type="IntegerState">
+			<Value Time="0" Value="0" />
+			<Value Time="1" Value="1" />
+			<Value Time="2" Value="2" />
+			<Value Time="3" Value="1" />
+		</TimedState>
+		<TimedState Id="@state5" Name="State" Type="BooleanState" />
+		<TimedState Id="@state6" Name="State" Type="BooleanState">
+			<Value Time="0" Value="false" />
+			<Value Time="1" Value="true" />
+			<Value Time="2" Value="false" />
+			<Value Time="3" Value="true" />
+		</TimedState>
+	</Resource>
+	<Resource Id="something" Name="Something" Type="Something" />
+</StrolchModel>
