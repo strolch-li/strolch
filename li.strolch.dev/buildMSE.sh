@@ -29,12 +29,11 @@ if ! mvn clean ; then
 fi
 
 echo "INFO Packaging..."
-cd ../..
-if ! tar --exclude="*/target" --exclude="*/.git*" -cvzf strolch_mse.tar.gz strolch_mse ; then
+cd ../
+if ! tar --exclude="*/target" --exclude="*/.git*" -cvzf strolch_mse.tar.gz * ; then
   echo "ERROR: Failed to build package!"
   exit 1
 fi
-rm -rf strolch_mse/
 
 if ! mv strolch_mse.tar.gz ${DIST_STROLCH}/strolch_mse.tar.gz ; then
   echo "ERROR: Failed to publish MSE file!"
