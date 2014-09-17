@@ -1,7 +1,7 @@
 #!/bin/bash
 
 projectName=strolch_bundle
-projectVersion=0.1.0-SNAPSHOT
+projectVersion=1.0.0-SNAPSHOT
 DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 workDir="${PWD}/target/strolch_bundle"
 projectsFile="${PWD}/projects.lst"
@@ -35,7 +35,6 @@ fi
 echo "INFO: Bundling projects..."
 
 # Now copy those packages to our work dir
-cd ..
 while read project; do
   if [ "${project}" == "" ] ; then
   	continue;
@@ -50,7 +49,7 @@ while read project; do
     exit 1
   fi
 
-  if ! cd "${name}" ; then
+  if ! cd "../${name}" ; then
     echo "ERROR: Could not switch to directory ${name}"
     exit 1
   fi
@@ -77,8 +76,6 @@ while read project; do
   else
     echo "INFO: Project ${name} has no target, skipping."
   fi
-
-  cd ..
 
 done < ${projectsFile}
 
