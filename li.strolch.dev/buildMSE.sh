@@ -3,15 +3,7 @@
 VERVEINE="/data/programs/verveinej/verveinej.sh"
 DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 
-## Prepare a new environment
-mkdir -p target/strolch_mse
-cd target/strolch_mse
-if ! git clone $(cd ../.. ; pwd) ; then
-  echo "ERROR: Failed to clone for new environment."
-  exit 1
-fi
-cd li.strolch.dev
-
+## Prepare the environment
 echo "INFO Bootstrapping..."
 if ! ./bootstrap_https.sh ; then
   echo "ERROR: Failed to boostrap!"
