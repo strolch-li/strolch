@@ -22,7 +22,6 @@ blockquote {
 
 .page-header {
     padding-top: 20px;
-    padding-bottom: 20px;
 }
 .page-title {
     margin-top: 30px;
@@ -31,6 +30,7 @@ blockquote {
     font-weight: normal;
 }
 .page-description {
+    padding-top: 20px;
     font-size: 1.6em;
     color: #999;
 }

@@ -35,6 +35,7 @@
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         <li><a href="index.html">Overview</a></li>
+                        <li><a href="api.html">API</a></li>
                         <li><a href="downloads.html">Downloads</a></li>
                         <li class="active"><a href="development.html">Development</a></li>
                         <li><a href="blog.html">Blog</a></li>
@@ -60,19 +61,375 @@
 
                 <h2>Getting Started</h2>
                 <p>Setting up Strolch is just a few lines:</p>
-                <pre class="pre-scrollable">
+                <pre class="pre">
 mkdir strolch
 cd strolch
 git clone https://github.com/eitchnet/li.strolch.dev.git
 cd li.strolch.dev
 ./bootstrap_https.sh
-mvn clean package -DskipTests=true</pre>
+mvn clean install -DskipTests</pre>
 
                 <p><b>Note:</b> If you want to run the tests, then either install a PostgreSQL DB and configure the users as is required by the project, or remove the project from the li.strolch.dev module build, otherwise the build will fail =))</p>
 
                 <p>After running the Maven build, you will have a full build of all Strolch projects. Now you can start modifying the projects, and add your own features, or, far more interesting, start developing your projects using the Strolch agent.</p>
 
+                <h2>Strolch Project Configuration</h2>
                 <p>To use Strolch in your own projects, look at the two tutorial apps on how they are configured. You can also simply copy the projects, modify the Maven POMs and remove what ever you do not need.</p>
+
+                <p>The following sections describe the Strolch configuration files and folder structure.</p>
+
+                <h3>Project Structure</h3>
+                <p>Strolch requires two main directories under the Strolch root:</p>
+                <ul>
+                    <li>../config/ &rarr; contains the Strolch runtime configuration
+                        <ul>
+                            <li>StrolchConfiguration.xml &rarr; Main Strolch configuration file. There you configure the different realms, environments etc. </li>
+                            <li>PrivilegeConfig.xml &rarr; Configuration of the Privilege library</li>
+                            <li>PrivilegeModel.xml &rarr; Configuration file with the differen users, roles and privileges</li>
+                        </ul>
+                    </li>
+                    <li>../data/ &rarr; contains the Strolch model and any other data which is modified at runtime.
+                        <ul>
+                            <li>StrolchModel.xml &rarr; main model file which is read when Strolch is in <i>TRANSIENT</i> mode.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>Maven POM</h3>
+                <p>Strolch is built using Maven, so here we show the minimum Maven POM.</p>
+
+                <h4>Simple Java App POM</h4>
+                <p>This POM creates a compressed file which contains a runnable Strolch instance. Just unpack and run the <i>startup.sh</i> script.</p>
+                <pre class="pre-scrollable">
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+  &lt;properties&gt;
+    &lt;strolch.version&gt;1.0.0-SNAPSHOT&lt;/strolch.version&gt;
+    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+    &lt;finalName&gt;strolch_app&lt;/finalName&gt;
+    &lt;m2eclipse.wtp.contextRoot&gt;${finalName}&lt;/m2eclipse.wtp.contextRoot&gt;
+    &lt;buildTimestamp&gt;${maven.build.timestamp}&lt;/buildTimestamp&gt;
+  &lt;/properties&gt;
+
+  &lt;groupId&gt;org.example&lt;/groupId&gt;
+  &lt;artifactId&gt;org.example.strolch.app&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+  &lt;name&gt;org.example.strolch.app&lt;/name&gt;
+
+  &lt;scm&gt;
+    &lt;developerConnection&gt;scm:git:https://git.example.org/strolch_app.git&lt;/developerConnection&gt;
+  &lt;/scm&gt;
+
+  &lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+        &lt;artifactId&gt;li.strolch.bom&lt;/artifactId&gt;
+        &lt;type&gt;pom&lt;/type&gt;
+        &lt;version&gt;${strolch.version}&lt;/version&gt;
+      &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+  &lt;/dependencyManagement&gt;
+
+  &lt;dependencies&gt;
+    &lt;!-- main --&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+      &lt;artifactId&gt;li.strolch.model&lt;/artifactId&gt;
+      &lt;version&gt;${strolch.version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+      &lt;artifactId&gt;li.strolch.agent&lt;/artifactId&gt;
+      &lt;version&gt;${strolch.version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+      &lt;artifactId&gt;li.strolch.service&lt;/artifactId&gt;
+      &lt;version&gt;${strolch.version}&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+      &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
+      &lt;scope&gt;runtime&lt;/scope&gt;
+      &lt;version&gt;1.7.2&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- test dependencies --&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;junit&lt;/groupId&gt;
+      &lt;artifactId&gt;junit&lt;/artifactId&gt;
+      &lt;scope&gt;test&lt;/scope&gt;
+      &lt;version&gt;4.11&lt;/version&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+
+  &lt;build&gt;
+    &lt;finalName&gt;${finalName}&lt;/finalName&gt;
+    &lt;resources&gt;
+      &lt;resource&gt;
+        &lt;directory&gt;src/main/resources&lt;/directory&gt;
+        &lt;filtering&gt;true&lt;/filtering&gt;
+        &lt;includes&gt;
+          &lt;include&gt;**/componentVersion.properties&lt;/include&gt;
+        &lt;/includes&gt;
+      &lt;/resource&gt;
+      &lt;resource&gt;
+        &lt;directory&gt;src/main/resources&lt;/directory&gt;
+        &lt;filtering&gt;false&lt;/filtering&gt;
+        &lt;excludes&gt;
+          &lt;exclude&gt;**/componentVersion.properties&lt;/exclude&gt;
+        &lt;/excludes&gt;
+      &lt;/resource&gt;
+    &lt;/resources&gt;
+    &lt;plugins&gt;
+
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+        &lt;version&gt;3.0&lt;/version&gt;
+        &lt;configuration&gt;
+          &lt;source&gt;1.7&lt;/source&gt;
+          &lt;target&gt;1.7&lt;/target&gt;
+          &lt;showDeprecation&gt;true&lt;/showDeprecation&gt;
+          &lt;showWarnings&gt;true&lt;/showWarnings&gt;
+          &lt;compilerArgument&gt;-Xlint:all&lt;/compilerArgument&gt;
+        &lt;/configuration&gt;
+      &lt;/plugin&gt;
+
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+        &lt;artifactId&gt;buildnumber-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;1.2&lt;/version&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;phase&gt;validate&lt;/phase&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;create&lt;/goal&gt;
+            &lt;/goals&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;
+        &lt;configuration&gt;
+          &lt;doCheck&gt;false&lt;/doCheck&gt;
+          &lt;doUpdate&gt;false&lt;/doUpdate&gt;
+        &lt;/configuration&gt;
+      &lt;/plugin&gt;
+
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;
+        &lt;configuration&gt;
+          &lt;archive&gt;
+            &lt;manifest&gt;
+              &lt;addDefaultImplementationEntries&gt;true&lt;/addDefaultImplementationEntries&gt;
+              &lt;addDefaultSpecificationEntries&gt;true&lt;/addDefaultSpecificationEntries&gt;
+
+              &lt;!-- When creating an executable jar, use copy-dependencies plugin with libs in lib/ dir: --&gt;
+              &lt;mainClass&gt;li.strolch.tutorialapp.main.Main&lt;/mainClass&gt;
+              &lt;addClasspath&gt;true&lt;/addClasspath&gt;
+              &lt;classpathPrefix&gt;lib/&lt;/classpathPrefix&gt;
+            &lt;/manifest&gt;
+          &lt;/archive&gt;
+        &lt;/configuration&gt;
+      &lt;/plugin&gt;
+
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt;
+        &lt;configuration&gt;
+          &lt;descriptor&gt;src/assembly/bin.xml&lt;/descriptor&gt;
+          &lt;finalName&gt;tutorial-app-${project.version}&lt;/finalName&gt;
+        &lt;/configuration&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;phase&gt;package&lt;/phase&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;single&lt;/goal&gt;
+            &lt;/goals&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;
+      &lt;/plugin&gt;
+    &lt;/plugins&gt;
+  &lt;/build&gt;
+&lt;/project&gt;</pre>
+
+                <h4>Webapp POM</h4>
+                <p>This creates a simple WAR which starts Strolch after deployed to a servlet container.</p>
+                <pre class="pre-scrollable">
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"&gt;
+  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+  &lt;properties&gt;
+    &lt;strolch.version&gt;1.0.0-SNAPSHOT&lt;/strolch.version&gt;
+    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+    &lt;warFinalName&gt;strolch_webapp&lt;/warFinalName&gt;
+    &lt;m2eclipse.wtp.contextRoot&gt;${warFinalName}&lt;/m2eclipse.wtp.contextRoot&gt;
+    &lt;buildTimestamp&gt;${maven.build.timestamp}&lt;/buildTimestamp&gt;
+  &lt;/properties&gt;
+
+  &lt;groupId&gt;org.example&lt;/groupId&gt;
+  &lt;artifactId&gt;org.example.strolch.webapp&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+  &lt;name&gt;org.example.strolch.webapp&lt;/name&gt;
+  &lt;packaging&gt;war&lt;/packaging&gt;
+
+  &lt;scm&gt;
+    &lt;developerConnection&gt;scm:git:https://git.example.org/strolch_webapp.git&lt;/developerConnection&gt;
+  &lt;/scm&gt;
+
+  &lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+        &lt;artifactId&gt;li.strolch.bom&lt;/artifactId&gt;
+        &lt;type&gt;pom&lt;/type&gt;
+        &lt;version&gt;${strolch.version}&lt;/version&gt;
+      &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+  &lt;/dependencyManagement&gt;
+
+  &lt;dependencies&gt;
+    &lt;!-- main --&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+      &lt;artifactId&gt;li.strolch.model&lt;/artifactId&gt;
+      &lt;version&gt;${strolch.version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+      &lt;artifactId&gt;li.strolch.agent&lt;/artifactId&gt;
+      &lt;version&gt;${strolch.version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+      &lt;artifactId&gt;li.strolch.service&lt;/artifactId&gt;
+      &lt;version&gt;${strolch.version}&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+      &lt;artifactId&gt;li.strolch.rest&lt;/artifactId&gt;
+      &lt;version&gt;${strolch.version}&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+      &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
+      &lt;scope&gt;runtime&lt;/scope&gt;
+      &lt;version&gt;1.7.2&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+      &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+      &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
+      &lt;version&gt;3.0.1&lt;/version&gt;
+      &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- test dependencies --&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;junit&lt;/groupId&gt;
+      &lt;artifactId&gt;junit&lt;/artifactId&gt;
+      &lt;scope&gt;test&lt;/scope&gt;
+      &lt;version&gt;4.11&lt;/version&gt;
+    &lt;/dependency&gt;
+
+  &lt;/dependencies&gt;
+
+  &lt;build&gt;
+    &lt;finalName&gt;${warFinalName}&lt;/finalName&gt;
+    &lt;resources&gt;
+      &lt;resource&gt;
+        &lt;directory&gt;src/main/resources&lt;/directory&gt;
+        &lt;filtering&gt;true&lt;/filtering&gt;
+        &lt;includes&gt;
+          &lt;include&gt;**/componentVersion.properties&lt;/include&gt;
+        &lt;/includes&gt;
+      &lt;/resource&gt;
+      &lt;resource&gt;
+        &lt;directory&gt;src/main/resources&lt;/directory&gt;
+        &lt;filtering&gt;false&lt;/filtering&gt;
+        &lt;excludes&gt;
+          &lt;exclude&gt;**/componentVersion.properties&lt;/exclude&gt;
+        &lt;/excludes&gt;
+      &lt;/resource&gt;
+    &lt;/resources&gt;
+
+    &lt;plugins&gt;
+
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+        &lt;version&gt;3.0&lt;/version&gt;
+        &lt;configuration&gt;
+          &lt;source&gt;1.7&lt;/source&gt;
+          &lt;target&gt;1.7&lt;/target&gt;
+          &lt;showDeprecation&gt;true&lt;/showDeprecation&gt;
+          &lt;showWarnings&gt;true&lt;/showWarnings&gt;
+          &lt;compilerArgument&gt;-Xlint:all&lt;/compilerArgument&gt;
+        &lt;/configuration&gt;
+      &lt;/plugin&gt;
+
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+        &lt;artifactId&gt;buildnumber-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;1.2&lt;/version&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;phase&gt;validate&lt;/phase&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;create&lt;/goal&gt;
+            &lt;/goals&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;
+        &lt;configuration&gt;
+          &lt;doCheck&gt;false&lt;/doCheck&gt;
+          &lt;doUpdate&gt;false&lt;/doUpdate&gt;
+        &lt;/configuration&gt;
+      &lt;/plugin&gt;
+
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-war-plugin&lt;/artifactId&gt;
+        &lt;configuration&gt;
+          &lt;failOnMissingWebXml&gt;false&lt;/failOnMissingWebXml&gt;
+          &lt;warName&gt;${warFinalName}&lt;/warName&gt;
+          &lt;webResources&gt;
+            &lt;resource&gt;
+              &lt;directory&gt;src/main/non-packaged-resources&lt;/directory&gt;
+              &lt;targetPath&gt;WEB-INF&lt;/targetPath&gt;
+              &lt;filtering&gt;true&lt;/filtering&gt;
+              &lt;includes&gt;
+                &lt;include&gt;**/ENV.properties&lt;/include&gt;
+              &lt;/includes&gt;
+            &lt;/resource&gt;
+          &lt;/webResources&gt;
+        &lt;/configuration&gt;
+      &lt;/plugin&gt;
+
+    &lt;/plugins&gt;
+  &lt;/build&gt;
+
+  &lt;profiles&gt;
+    &lt;profile&gt;
+      &lt;id&gt;m2e&lt;/id&gt;
+      &lt;!-- This profile is only activated when building in Eclipse with m2e --&gt;
+      &lt;activation&gt;
+        &lt;property&gt;
+          &lt;name&gt;m2e.version&lt;/name&gt;
+        &lt;/property&gt;
+      &lt;/activation&gt;
+      &lt;properties&gt;
+        &lt;strolch.env&gt;dev&lt;/strolch.env&gt;
+      &lt;/properties&gt;
+    &lt;/profile&gt;
+  &lt;/profiles&gt;
+&lt;/project&gt;</pre>
+
+
 
                 <p>Happy coding =))</p>
 

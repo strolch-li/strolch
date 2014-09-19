@@ -36,6 +36,7 @@
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         <li class="active"><a href="index.html">Overview</a></li>
+                        <li><a href="api.html">API</a></li>
                         <li><a href="downloads.html">Downloads</a></li>
                         <li><a href="development.html">Development</a></li>
                         <li><a href="blog.html">Blog</a></li>
@@ -87,15 +88,15 @@
                 <p>Strolch is written in Java and is programmed against the JDK 7. Strolch runs on any JRE 7 compliant environment. Strolch is tested on the Oracle JRE 7.</p>
 
                 <h3>Dependencies</h3>
-                <p>Strolch strives to use as few external dependencies as possible, so that the Strolch runtime is not bloated unnecessarily. The following list of Strolch dependencies is a summary and was created using mvn dependency:tree on the li.strolch.dev project on the 2014-03-08.</p>
+                <p>Strolch strives to use as few external dependencies as possible, so that the Strolch runtime is not bloated unnecessarily. The following list of Strolch dependencies is a summary and was created using mvn dependency:tree on the li.strolch.dev project on the 2014-09-18.</p>
 
                 <h4>Basic runtime dependencies</h4>
                 <ul>
-                    <li>ch.eitchnet:ch.eitchnet.privilege:jar:0.2.0-SNAPSHOT:compile
+                    <li>ch.eitchnet:ch.eitchnet.privilege:jar:1.0.0-SNAPSHOT:compile
                         <p>implements the authorization and authentication in Strolch</p></li>
-                    <li>ch.eitchnet:ch.eitchnet.utils:jar:0.2.0-SNAPSHOT:compile
+                    <li>ch.eitchnet:ch.eitchnet.utils:jar:1.0.0-SNAPSHOT:compile
                         <p>Consists of utility classes for recurring problems</p></li>
-                    <li>ch.eitchnet:ch.eitchnet.xmlpers:jar:0.3.0-SNAPSHOT:compile
+                    <li>ch.eitchnet:ch.eitchnet.xmlpers:jar:1.0.0-SNAPSHOT:compile
                         <p>Implements the XML Persistence layer used by li.strolch.persistence.xml</p></li>
                     <li>org.postgresql:postgresql:jar:9.3-1100-jdbc41:compile
                         <p>Implements the PostgreSQL Persistence layer used by li.strolch.persistence.postgresql</p></li>
@@ -104,19 +105,20 @@
                     <li>junit:junit:jar:4.11:compile
                         <p>Testing facilities</p></li>
                     <li>org.slf4j:slf4j-api:jar:1.7.2:compile
-                        <p>Logging facilities</p></li>
+                        <p>Logging facilities API</p></li>
+                    <li>log4j:log4j:jar:1.2.17:runtime
+                        <p>Logging facilities Implementation</p></li>
                 </ul>
 
 
                 <h4>Web Restful dependencies</h4>
-                Sadly Restful services development requires quite a few extra dependencies:
+                <p>If you want to access Strolch using the RESTful API, then we got you covered - but sadly RESTful service development requires quite a few extra dependencies:</p>
                 <ul>
                     <li>com.google.guava:guava:jar:14.0.1:compile</li>
                     <li>javax.annotation:javax.annotation-api:jar:1.2:compile</li>
                     <li>javax.servlet:javax.servlet-api:jar:3.0.1:provided</li>
                     <li>javax.validation:validation-api:jar:1.1.0.Final:compile</li>
                     <li>javax.ws.rs:javax.ws.rs-api:jar:2.0:compile</li>
-                    <li>log4j:log4j:jar:1.2.17:runtime</li>
                     <li>org.eclipse.persistence:org.eclipse.persistence.antlr:jar:2.5.0:compile</li>
                     <li>org.eclipse.persistence:org.eclipse.persistence.asm:jar:2.5.0:compile</li>
                     <li>org.eclipse.persistence:org.eclipse.persistence.core:jar:2.5.0:compile</li>
@@ -137,288 +139,8 @@
                     <li>org.glassfish.jersey.media:jersey-media-moxy:jar:2.5.1:compile</li>
                 </ul>
 
-                <h2>Model</h2>
-                <p>The Strolch model is implemented in the project li.strolch.model.</p>
-
-                The Strolch model consists of two root level elements: Resource and Order. Each element has at least the following attributes:
-                <ul>
-                    <li>Id &rarr; the element's id</li>
-                    <li>Name &rarr; the element's name</li>
-                    <li>Type &rarr; the element's type</li>
-                </ul>
-
-                <p>Each root element can have any number of ParameterBag instances on it, which in turn can have any number of Parameters on it. Accessing these objects is always done by their IDs. Strolch root elements are always stored in the respective ElementMaps in their Strolch realm. Thus accessing a certain parameter from a Resource would look like this:</p>
-                <pre class="pre-scrollable">
-try (StrolchTransaction tx = realm.openTx()) {
-  Resource resource = tx.getResourceMap().getBy(tx, "TestType", "MyTestResource");
-  DateParameter dateP = resource.getParameter("@bag01", "@param6");
-  Date date = dateP.getValue();
-  logger.info("@param6 date is " + date);
-}</pre>
-
-                XML Presentation of Strolch's top level elements:
-                <pre class="pre-scrollable">
-&lt;!-- Resource instance --&gt;
-&lt;Resource Id="MyTestResource" Name="Test Name" Type="TestType"&gt;
-  &lt;ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag"&gt;
-    &lt;Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World" /&gt;
-    &lt;Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00" /&gt;
-    &lt;Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch" /&gt;
-  &lt;/ParameterBag&gt;
-  &lt;ParameterBag Id="@bag02" Name="Test Bag" Type="TestBag"&gt;
-    &lt;Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566" /&gt;
-    &lt;Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77" /&gt;
-    &lt;Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" /&gt;
-    &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" /&gt;
-  &lt;/ParameterBag&gt;
-&lt;/Resource&gt;
-
-&lt;!-- Order instance --&gt;
-&lt;Order Id="MyTestOrder" Name="Test Name" Type="TestType" Date="2013-11-20T07:42:57.699+01:00" State="CREATED"&gt;
-  &lt;ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag"&gt;
-    &lt;Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World" /&gt;
-    &lt;Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00" /&gt;
-    &lt;Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch" /&gt;
-  &lt;/ParameterBag&gt;
-  &lt;ParameterBag Id="@bag02" Name="Test Bag" Type="TestBag"&gt;
-    &lt;Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566" /&gt;
-    &lt;Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77" /&gt;
-    &lt;Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" /&gt;
-    &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" /&gt;
-  &lt;/ParameterBag&gt;
-&lt;/Order&gt;</pre>
-
-
-                <h2>Realms</h2>
-                Strolch realms implement the multi-client capability which is thus baked right into the Strolch runtime. When configuring a Strolch runtime, realms are configured and for each realm the data store mode is set. Each realm has its own persistence configuration and can thus run in one of the 4 modes that the Strolch agent implements:
-                <ul>
-                    <li>EMPTY
-                        <p>This is a transient data store mode, where no model changes are persisted, but they are only kept in memory. When the Strolch agent is started, this realm stays empty as no data is loaded.</p></li>
-                    <li>TRANSIENT
-                        <p>This is the same as EMPTY, but with the difference that when the Strolch agent is started, an XML file is parsed and the in memory realm is populated with the elements parsed from that XML file.</p></li>
-                    <li>CACHED
-                        <p>In this mode, all data is stored in memory, and any changes made are written back to the persistence layer. This allows for fast in-memory quries, but makes sure no data is lost when the agent is restarted.</p></li>
-                    <li>TRANSACTIONAL
-                        <p>In this mode no data is kept in memory and every query, and root element retrieval is passed to the persistence layer to be retrieved from the underlying database. This is what comes closest to a typical Java+Hibernate implementation.</p></li>
-                </ul>
-
-                <p>Strolch Realms are also responsible for opening Transactions, as these are bound to the persistence layer configured for this realm. At runtime, a realm is then accessed from the ComponentContainer:</p>
-                <pre class="pre-scrollable">
-ComponentContainer container = getAgent().getContainer();
-StrolchRealm realm = container.getRealm(StrolchConstants.DEFAULT_REALM);
-try(StrolchTransaction tx = realm.openTx()) {
-  Resource resource = tx.getResourceMap().getBy(tx, "TestType", "MyTestResource");
-  ...
-}</pre>
-                In a Service implementation there is a convenience method, so that this is as simple as calling <i>openTx(String)</i>.
-
-                <h2>Services and Commands</h2>
-                <p>In the motivation section, it was discusses that writing business logic is what developing is about and a reason why Strolch is a different approach to the Java EE ecosystem. So this is where Services and Commands come into play, and tries to make writing business logic a first class citizen.</p>
-
-                <p>Services are to be used once for each use case. Services are not re-used or called by other services. Services open transactions are implement the calling of the re-usable commands. Thus when writing projects using Strolch, the first thing to do after configuring the runtime environmet for your situation, Services will be implemented.</p>
-
-                <p>Commands on the other hand are re-usable and should be implemented in such a way, that the encapsulate the use case's different actions. Commands are then passed to a transaction for execution and, when the transaction is comitted, will be executed. Commands also implement undoing its operation in the case of exceptions. Strolch transactions handle the life-cycle of a command. A further function of Commands is to lock the relevant Strolch elements before execution.</p>
-
-                <p>A typical Service and Command implementation would look as follows:</p>
-                <pre class="pre-scrollable">
-public class SetParameterService extends AbstractService&lt;SetParameterArg, ServiceResult&gt; {
-
-  public static final long serialVersionUID = 1L;
-
-  @Override
-  protected ServiceResult internalDoService(SetParameterArg arg) {
-
-    // open a new transaction
-    try (StrolchTransaction tx = openTx(arg.realm)) {
-
-      // find parameter to modify
-      Parameter&lt;?&gt; parameter = tx.findElement(arg.locator);
-
-      // instantiate the command
-      SetParameterCommand command = new SetParameterCommand(getContainer(), tx);
-      
-      // set the arguments
-      command.setParameter(parameter);
-      command.setName(arg.name);
-      command.setInterpretation(arg.interpretation);
-      command.setUom(arg.uom);
-      command.setHidden(arg.hidden);
-      command.setIndex(arg.index);
-      command.setValueAsString(arg.valueAsString);
-
-      // add the command to the transaction
-      tx.addCommand(command);
-    }
-
-    // return the execution result of the service
-    return ServiceResult.success();
-  }
-
-  /**
-   * The argument class for this service
-   */
-  public static class SetParameterArg extends ServiceArgument {
-    public static final long serialVersionUID = 1L;
-    public Locator locator;
-
-    public String name;
-    public String interpretation;
-    public String uom;
-    public Boolean hidden;
-    public Integer index;
-
-    public String valueAsString;
-  }
-
-  @Override
-  protected ServiceResult getResultInstance() {
-    return new ServiceResult();
-  }
-}
-                </pre>
-
-                <pre class="pre-scrollable">
-public class SetParameterCommand extends Command {
-
-  // input fields
-  private Parameter&lt;?&gt; parameter;
-  private String valueAsString;
-
-  // undo fields
-  private String oldValueAsString;
-
-  private StrolchRootElement replacedElement;
-
-  /**
-   * @param container
-   * @param tx
-   */
-  public SetParameterCommand(ComponentContainer container, StrolchTransaction tx) {
-    super(container, tx);
-  }
-
-  // setters for input ...
-  // getters for output ...
-
-  @Override
-  public void validate() {
-    DBC.PRE.assertNotNull("Parameter may not be null!", this.parameter);
-  }
-
-  @Override
-  public void doCommand() {
-
-    // lock the element to be modified
-    StrolchRootElement rootElement = this.parameter.getRootElement();
-    tx().lock(rootElement);
-
-    // perform changes
-    if (this.valueAsString != null) {
-      this.oldValueAsString = this.parameter.getValueAsString();
-      SetParameterValueVisitor visitor = new SetParameterValueVisitor();
-      visitor.setValue(this.parameter, this.valueAsString);
-    }
-
-    // update root element
-    if (hasChanges()) {
-      replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
-    }
-  }
-
-  private boolean hasChanges() {
-    return this.oldValueAsString != null || this.oldName != null || this.oldInterpretation != null
-        || this.oldUom != null || this.oldHidden != null || this.oldIndex != null;
-  }
-
-  @Override
-  public void undo() {
-
-      // undo changes
-      if (this.oldValueAsString != null) {
-        SetParameterValueVisitor visitor = new SetParameterValueVisitor();
-        visitor.setValue(this.parameter, this.oldValueAsString);
-      }
-
-      // update root element
-      if (hasChanges() && this.replacedElement != null && this.replacedElement != this.parameter.getRootElement()) {
-        new UpdateElementVisitor(tx()).update(replacedElement);
-      }
-    }
-  }
-}</pre>
-
-                <h2>Code</h2>
-                <p>The Strolch code can be retrieved from GitHub, where the code is hosted. Each commit triggers a continuous integration build, so that SNAPSHOT builds can be quickly integrated in projects if needed.</p>
-
-                <p>Strolch is divided up into different projects on GitHub so that these projects can be developed, or bugfixed independently and not all parts are required in every context.</p>
-
-                <p><a href="https://github.com/search?q=%40eitch+li.strolch">All Strolch projects on GitHub</a></p>
-
-                <h3>Main Strolch components</h3>
-                <ul>
-                    <li><a href="https://github.com/eitchnet/li.strolch.model">li.strolch.model</a>
-                        <p>This project implements the Strolch model. This is where you will find the different elements that can store data at runtime. Currently there are two root elements: Resource and Order</p></li>
-                    <li><a href="https://github.com/eitchnet/li.strolch.agent">li.strolch.agent</a>
-                        <p>The agent is the Strolch runtime and is the component which implements the core Agent functionality. That is:</p>
-                        <ul>
-                            <li>Provide the Agent instance which loads the configuration and is the entry point to the runtime</li>
-                            <li>Provide the ComponentContainer instance from which the registered components can be accessed</li>
-                            <li>Configure and maintain the realms, which implement the multi-client capability</li>
-                            <li>Provide a default ServiceHandler to perform Services at runtime</li>
-                            <li>Implements the realms which each can operate in different modes data store modes: TRANSACTIONAL, CACHED, TRANSIENT</li>
-                        </ul>
-                    </li>
-                    <li><a href="https://github.com/eitchnet/li.strolch.service">li.strolch.service</a>
-                        <p>Implements the basic Services and the re-usable Commands:</p>
-                        <ul>
-                            <li>CRUD Services and Commands to modify the model</li>
-                            <li>Commands to import and export the model to XML</li>
-                            <li>Further services and commands...</li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <h3>Additional components</h3>
-                <ul>
-                    <li><a href="https://github.com/eitchnet/li.strolch.persistence.postgresql">li.strolch.persistence.postgresql</a>
-                        <p>Implements a PostgreSQL persistence layer so that the Strolch model can be persisted to a PostgreSQL RDBMS when the realm is configured to have a data store mode of either CACHED or TRANSACTIONAL</p>
-                    </li>
-                    <li><a href="https://github.com/eitchnet/li.strolch.persistence.xml">li.strolch.persistence.xml</a>
-                        <p>Implements an XML persistence layer so that the Strolch model can be persisted to XML files when the realm is configured to have a data store mode of either CACHED or TRANSACTIONAL. This implementation uses the <a href="xmlpers">xmlpers project</a>.</p>
-                    </li>
-                    <li><a href="https://github.com/eitchnet/li.strolch.rest">li.strolch.rest</a>
-                        <p>Implements a Restful API to communicate with the Strolch runtime from clients and external systems.</p>
-                    </li>
-                </ul>
-
-                <h3>Meta projects</h3>
-                <ul>
-                    <li><a href="https://github.com/eitchnet/li.strolch.dev">li.strolch.dev</a>
-                        <p>To quickly get started developing Strolch, this projects provides scripts to checkout all the relevant projects and implements a Maven module so that building this projects builds all Strolch projects.</p>
-                    </li>
-                    <li><a href="https://github.com/eitchnet/li.strolch.parent">li.strolch.parent</a>
-                        <p>A Maven parent project for the Strolch projects to synchronize the maven project structure</p>
-                    </li>
-                    <li><a href="https://github.com/eitchnet/li.strolch.bom">li.strolch.bom</a>
-                        <p>This bill of material is a Maven project which, when imported in one's own Strolch project, pulls in all required dependencies needed to set up a minimal working Strolch environment.</p>
-                    </li>
-                    <li><a href="https://github.com/eitchnet/li.strolch.testbase">li.strolch.testbase</a>
-                        <p>Implements a test base so that writing tests for Strolch is easy. It provides a RuntimeMock, which handles setting up and tearing down Strolch runtimes during tests.</p>
-                    </li>
-                </ul>
-
-                <h3>Example projects</h3>
-                <ul>
-                    <li><a href="https://github.com/eitchnet/li.strolch.tutorialapp">li.strolch.tutorialapp</a>
-                        <p>A tutorial application which showcases how to setup Strolch as a standalone Java SE project and starts the Strolch runtime by means of a main-class.</p>
-                    </li>
-                    <li><a href="https://github.com/eitchnet/li.strolch.tutorialwebapp">li.strolch.tutorialwebapp</a>
-                        <p>A tutorial application which showcases how to setup Strolch as a standalone Java Webapp which can be deployed to a servlet container e.g. Apache Tomcat 7.</p>
-                    </li>
-                </ul>
-
-                <h2>Development</h2>
-                <p>To start getting involved with Strolch Development, or create your own applications using Strolch, then see the <a href="development.html">development page</a></p>
+                <h4>API</h4>
+                <p>Check out the <a href="api.html">API page</a> to see how to use Strolch.</p>
 
             </div><!-- /.content -->
 
