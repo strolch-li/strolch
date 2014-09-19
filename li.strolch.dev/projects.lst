@@ -1,4 +1,5 @@
-ch.eitchnet.parent:1.0.0
+ch.eitchnet:master
+ch.eitchnet.parent:master
 ch.eitchnet.privilege:master
 ch.eitchnet.utils:master
 ch.eitchnet.xmlpers:master
