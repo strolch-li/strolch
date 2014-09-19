@@ -4,32 +4,36 @@ projectName=strolch_bundle
 projectVersion=1.0.0-SNAPSHOT
 DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 workDir="${PWD}/target/strolch_bundle"
-projectsFile="${PWD}/projects.lst"
+projectsFile="${PWD}/projects_all.lst"
 
-echo "INFO Bootstrapping..."
-if ! ./bootstrap_https.sh ; then
-  echo "ERROR: Failed to boostrap!"
-  exit 1
-fi
-
-echo "INFO Pulling..."
-if ! ./pull.sh ; then
-  echo "ERROR: Failed to pull from upstream!"
-  exit 1
-fi
-
-# first we create all needed packages
-if ! mvn -DskipTests clean package ; then
-  echo "ERROR: Failed to build packages!"
-  exit 1
-fi
+#echo "INFO Bootstrapping..."
+#if ! ./bootstrap_https.sh ; then
+#  echo "ERROR: Failed to boostrap!"
+#  exit 1
+#fi
+#
+#echo "INFO Pulling..."
+#if ! ./pull.sh ; then
+#  echo "ERROR: Failed to pull from upstream!"
+#  exit 1
+#fi
+#
+## first we create all needed packages
+#if ! mvn -DskipTests clean package ; then
+#  echo "ERROR: Failed to build packages!"
+#  exit 1
+#fi
 
 # Make sure the work directory exists
-if ! [ -d "${workDir}" ] ; then
-  if ! mkdir -p "${workDir}" ; then
-    echo "ERROR: Failed to create work dir ${workDir}."
+if [ -d "${workDir}" ] ; then
+  if ! rm -rf "${workDir}" ; then
+    echo "ERROR: Failed to clean work dir ${workDir}."
     exit 1
   fi
+fi
+if ! mkdir -p "${workDir}" ; then
+  echo "ERROR: Failed to create work dir ${workDir}."
+  exit 1
 fi
 
 echo "INFO: Bundling projects..."
@@ -49,6 +53,10 @@ while read project; do
     exit 1
   fi
 
+  if [ "${name}" == "li.strolch.dev" ] ; then
+  	continue;
+  fi
+
   if ! cd "../${name}" ; then
     echo "ERROR: Could not switch to directory ${name}"
     exit 1
@@ -60,21 +68,18 @@ while read project; do
       echo "ERROR: Failed to copy package for project ${name}."
       exit 1
     fi
-    if ! cp target/*.jar "${DIST_STROLCH}" ; then
-      echo "ERROR: Failed to publish package for project ${name}."
-      exit 1
-    fi
-  elif ls target/*.war 2>/dev/null ; then
+  fi
+  if ls target/*.war 2>/dev/null ; then
     if ! cp target/*.war "${workDir}" ; then
       echo "ERROR: Failed to copy wars for project ${name}."
       exit 1
     fi
-    if ! cp target/*.war "${DIST_STROLCH}" ; then
-      echo "ERROR: Failed to publish wars for project ${name}."
+  fi
+  if ls target/*.tar.gz 2>/dev/null ; then
+    if ! cp target/*.tar.gz "${workDir}" ; then
+      echo "ERROR: Failed to copy tarballs for project ${name}."
       exit 1
     fi
-  else
-    echo "INFO: Project ${name} has no target, skipping."
   fi
 
 done < ${projectsFile}
@@ -85,10 +90,15 @@ if ! tar -cvzf ${projectName}-${projectVersion}.tar.gz ${projectName} ; then
   exit 1
 fi
 
-if ! mv ${projectName}-${projectVersion}.tar.gz "${DIST_STROLCH}" ; then
-  echo "ERROR: Failed to publish bundle."
-  exit 1
-fi
+#if ! cp "${workDir}" "${DIST_STROLCH}" ; then
+#  echo "ERROR: Failed to publish package for project ${name}."
+#  exit 1
+#fi
+#
+#if ! mv ${projectName}-${projectVersion}.tar.gz "${DIST_STROLCH}" ; then
+#  echo "ERROR: Failed to publish bundle."
+#  exit 1
+#fi
 
 echo "Done."
 exit 0
