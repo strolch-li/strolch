@@ -94,7 +94,7 @@ if ! tar -cvzf ${projectName}-${projectVersion}.tar.gz ${projectName} ; then
 fi
 
 if [ "$(hostname -f)" == "${DEPLOY_SERVER}" ] ; then
-  if ! cp "${workDir}/*" "${DIST_STROLCH}" ; then
+  if ! cp ${workDir}/* "${DIST_STROLCH}" ; then
     echo "ERROR: Failed to publish packages."
     exit 1
   fi
