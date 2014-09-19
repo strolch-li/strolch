@@ -1,0 +1,12 @@
+[submodule "ch.eitchnet.parent"]
+	path = ch.eitchnet.parent
+	url = git@github.com:eitchnet/ch.eitchnet.parent.git
+[submodule "ch.eitchnet.utils"]
+	path = ch.eitchnet.utils
+	url = git@github.com:eitchnet/ch.eitchnet.utils.git
+[submodule "ch.eitchnet.privilege"]
+	path = ch.eitchnet.privilege
+	url = git@github.com:eitchnet/ch.eitchnet.privilege.git
+[submodule "ch.eitchnet.xmlpers"]
+	path = ch.eitchnet.xmlpers
+	url = git@github.com:eitchnet/ch.eitchnet.xmlpers.git
