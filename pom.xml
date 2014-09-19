@@ -38,11 +38,12 @@
 	</scm>
 
 	<modules>
+		<module>ch.eitchnet.parent</module>
 		<module>ch.eitchnet.privilege</module>
 		<module>ch.eitchnet.utils</module>
 		<module>ch.eitchnet.xmlpers</module>
-		<module>ch.eitchnet.parent</module>
 		<module>li.strolch.parent</module>
+		<module>li.strolch.dev</module>
 		<module>li.strolch.bom</module>
 		<module>li.strolch.model</module>
 		<module>li.strolch.testbase</module>
