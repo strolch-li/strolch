@@ -19,6 +19,7 @@ new_version="$2"
 
 root="${PWD}"
 
+cd "${root}"
 xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml
 xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml
 xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml
@@ -28,6 +29,8 @@ for project in li.* ; do
   xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml
   xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml
 done
+
+cd "${root}"
 for project in ch.* ; do
   cd "${root}/${project}"
   xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml
@@ -35,4 +38,5 @@ for project in ch.* ; do
   xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml
 done
 
+cd "${root}"
 sed --in-place "s/${old_version}/${new_version}/" li.strolch.dev/createBundle.sh
