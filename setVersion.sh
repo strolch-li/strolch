@@ -14,8 +14,8 @@ fi
 #    exit 1
 #fi
 
-old_version="${$1}"
-new_version="${$2}"
+old_version="$1"
+new_version="$2"
 
 root="${PWD}"
 
