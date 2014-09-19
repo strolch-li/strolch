@@ -11,10 +11,10 @@ if ! ./bootstrap_https.sh ; then
 fi
 
 echo "INFO: Copying dependencies"
+cd ..
 mvn -DskipTests=true clean dependency:copy-dependencies
 
 echo "INFO Running verveinej..."
-cd ..
 if ! ${VERVEINE} -- -autocp . . ; then
   echo "ERROR: Failed to run verveinej!"
   exit 1
@@ -28,7 +28,6 @@ if ! mvn clean ; then
 fi
 
 echo "INFO Packaging..."
-cd ../
 if ! tar --exclude="*/target" --exclude="*/.git*" -cvzf strolch_mse.tar.gz * ; then
   echo "ERROR: Failed to build package!"
   exit 1
