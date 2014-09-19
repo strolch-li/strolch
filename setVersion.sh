@@ -19,24 +19,49 @@ new_version="$2"
 
 root="${PWD}"
 
+function fail() {
+  echo "ERROR: Failed to set version of $1"
+  exit 1
+}
+
 cd "${root}"
-xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml
-xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml
-xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml
+if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
+  fail "${root}/pom.xml"
+fi
+if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
+  fail "${root}/pom.xml"
+fi
+if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
+  fail "${root}/pom.xml"
+fi
 for project in li.* ; do
   cd "${root}/${project}"
-  xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml
-  xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml
-  xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml
+  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
+    fail "${root}/${project}/pom.xml"
+  fi
+  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
+    fail "${root}/${project}/pom.xml"
+  fi
+  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
+    fail "${root}/${project}/pom.xml"
+  fi
 done
 
 cd "${root}"
 for project in ch.* ; do
   cd "${root}/${project}"
-  xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml
-  xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml
-  xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml
+  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
+    fail "${root}/${project}/pom.xml"
+  fi
+  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
+    fail "${root}/${project}/pom.xml"
+  fi
+  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
+    fail "${root}/${project}/pom.xml"
+  fi
 done
 
 cd "${root}"
-sed --in-place "s/${old_version}/${new_version}/" li.strolch.dev/createBundle.sh
+if ! sed --in-place "s/${old_version}/${new_version}/" li.strolch.dev/createBundle.sh 2>/dev/null
+  fail "${root}/li.strolch.dev/createBundle.sh"
+fi
