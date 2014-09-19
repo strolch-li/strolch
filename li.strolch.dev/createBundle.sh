@@ -4,8 +4,9 @@ projectName=strolch_bundle
 projectVersion=1.0.0-SNAPSHOT
 DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 DEPLOY_SERVER="appsrv.gsi.local"
-workDir="${PWD}/target/strolch_bundle"
-projectsFile="${PWD}/projects_all.lst"
+ROOT="${PWD}"
+workDir="${ROOT}/target/strolch_bundle"
+projectsFile="${ROOT}/projects_all.lst"
 
 echo "INFO Bootstrapping..."
 if ! ./bootstrap_https.sh ; then
@@ -59,7 +60,7 @@ while read project; do
   	continue;
   fi
 
-  if ! cd "../${name}" ; then
+  if ! cd "${ROOT}/../${name}" ; then
     echo "ERROR: Could not switch to directory ${name}"
     exit 1
   fi

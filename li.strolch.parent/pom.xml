@@ -51,19 +51,6 @@
 		</developer>
 	</developers>
 
-	<distributionManagement>
-		<repository>
-			<id>nexus.eitchnet.ch</id>
-			<name>Internal Releases</name>
-			<url>http://nexus.eitchnet.ch/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus.eitchnet.ch</id>
-			<name>Internal Releases</name>
-			<url>http://nexus.eitchnet.ch/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>

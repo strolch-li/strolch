@@ -18,6 +18,19 @@
 	<description>Module build for strolch</description>
 	<packaging>pom</packaging>
 
+	<distributionManagement>
+		<repository>
+			<id>nexus.eitchnet.ch</id>
+			<name>Internal Releases</name>
+			<url>http://nexus.eitchnet.ch/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus.eitchnet.ch</id>
+			<name>Internal Releases</name>
+			<url>http://nexus.eitchnet.ch/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<scm>
 		<connection>scm:git:https://github.com/eitchnet/strolch.git</connection>
 		<developerConnection>scm:git:git@github.com:eitch/strolch.git</developerConnection>
