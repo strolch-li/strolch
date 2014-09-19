@@ -20,6 +20,7 @@ if ! ./pull.sh ; then
 fi
 
 # first we create all needed packages
+cd ..
 if ! mvn -DskipTests clean package ; then
   echo "ERROR: Failed to build packages!"
   exit 1

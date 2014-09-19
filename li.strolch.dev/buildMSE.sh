@@ -22,7 +22,6 @@ fi
 mv output.mse Strolch.mse
 
 echo "INFO Cleaning sources..."
-cd li.strolch.dev
 if ! mvn clean ; then
   echo "ERROR: Failed to run mvn clean!"
   exit 1

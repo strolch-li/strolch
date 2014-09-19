@@ -20,20 +20,4 @@
 		<url>https://github.com/eitchnet/strolch</url>
 	</scm>
 
-	<modules>
-		<module>../ch.eitchnet.privilege</module>
-		<module>../ch.eitchnet.utils</module>
-		<module>../ch.eitchnet.xmlpers</module>
-		<module>../li.strolch.parent</module>
-		<module>../li.strolch.bom</module>
-		<module>../li.strolch.model</module>
-		<module>../li.strolch.testbase</module>
-		<module>../li.strolch.persistence.xml</module>
-		<module>../li.strolch.persistence.postgresql</module>
-		<module>../li.strolch.agent</module>
-		<module>../li.strolch.service</module>
-		<module>../li.strolch.rest</module>
-		<module>../li.strolch.tutorialapp</module>
-		<module>../li.strolch.tutorialwebapp</module>
-	</modules>
 </project>
