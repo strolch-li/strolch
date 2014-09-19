@@ -24,16 +24,27 @@ function fail() {
   exit 1
 }
 
+
 cd "${root}"
 if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
-  fail "${root}/pom.xml"
-fi
-if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
   fail "${root}/pom.xml"
 fi
 if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
   fail "${root}/pom.xml"
 fi
+if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version" -v ${new_version} pom.xml 2>/dev/null ; then
+  fail "${root}/pom.xml"
+fi
+if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.xmlpers.version" -v ${new_version} pom.xml 2>/dev/null ; then
+  fail "${root}/pom.xml"
+fi
+if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.utils.version" -v ${new_version} pom.xml 2>/dev/null ; then
+  fail "${root}/pom.xml"
+fi
+if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.privilege.version" -v ${new_version} pom.xml 2>/dev/null ; then
+  fail "${root}/pom.xml"
+fi
+
 
 cd "${root}" 
 for project in li.* ; do
