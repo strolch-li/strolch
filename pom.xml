@@ -38,7 +38,6 @@
 	</scm>
 
 	<modules>
-		<module>ch.eitchnet</module>
 		<module>ch.eitchnet.privilege</module>
 		<module>ch.eitchnet.utils</module>
 		<module>ch.eitchnet.xmlpers</module>
