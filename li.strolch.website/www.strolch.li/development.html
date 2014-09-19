@@ -62,11 +62,10 @@
                 <h2>Getting Started</h2>
                 <p>Setting up Strolch is just a few lines:</p>
                 <pre class="pre">
-mkdir strolch
+git clone https://github.com/eitchnet/strolch.git
 cd strolch
-git clone https://github.com/eitchnet/li.strolch.dev.git
-cd li.strolch.dev
-./bootstrap_https.sh
+git submodule init
+git submodule update
 mvn clean install -DskipTests</pre>
 
                 <p><b>Note:</b> If you want to run the tests, then either install a PostgreSQL DB and configure the users as is required by the project, or remove the project from the li.strolch.dev module build, otherwise the build will fail =))</p>
