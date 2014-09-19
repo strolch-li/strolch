@@ -18,6 +18,12 @@
 	
 	<!-- POM Reference: http://maven.apache.org/pom.html#Licenses -->
 
+	<scm>
+		<connection>scm:git:https://github.com/eitchnet/strolch.git</connection>
+		<developerConnection>scm:git:git@github.com:eitch/strolch.git</developerConnection>
+		<url>https://github.com/eitchnet/strolch</url>
+	</scm>
+
 	<licenses>
 		<license>
 			<name>Apache License 2.0</name>

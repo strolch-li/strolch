@@ -32,9 +32,9 @@
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitchnet/li.strolch.tutorialwebapp.git</connection>
-		<developerConnection>scm:git:git@github.com:eitch/li.strolch.tutorialwebapp.git</developerConnection>
-		<url>https://github.com/eitchnet/li.strolch.tutorialwebapp</url>
+		<connection>scm:git:https://github.com/eitchnet/strolch.git</connection>
+		<developerConnection>scm:git:git@github.com:eitch/strolch.git</developerConnection>
+		<url>https://github.com/eitchnet/strolch</url>
 	</scm>
 
 	<dependencyManagement>

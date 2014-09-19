@@ -24,9 +24,9 @@
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitchnet/li.strolch.service.git</connection>
-		<developerConnection>scm:git:git@github.com:eitch/li.strolch.service.git</developerConnection>
-		<url>https://github.com/eitchnet/li.strolch.service</url>
+		<connection>scm:git:https://github.com/eitchnet/strolch.git</connection>
+		<developerConnection>scm:git:git@github.com:eitch/strolch.git</developerConnection>
+		<url>https://github.com/eitchnet/strolch</url>
 	</scm>
 
 	<dependencies>

@@ -24,11 +24,11 @@
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitchnet/li.strolch.tutorialapp.git</connection>
-		<developerConnection>scm:git:git@github.com:eitch/li.strolch.tutorialapp.git</developerConnection>
-		<url>https://github.com/eitchnet/li.strolch.tutorialapp</url>
+		<connection>scm:git:https://github.com/eitchnet/strolch.git</connection>
+		<developerConnection>scm:git:git@github.com:eitch/strolch.git</developerConnection>
+		<url>https://github.com/eitchnet/strolch</url>
 	</scm>
-	
+
 	<dependencyManagement>
 	<dependencies>
 		<dependency>

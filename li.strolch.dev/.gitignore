@@ -11,3 +11,4 @@ li.strolch.persistence.api
 li.strolch.persistence.xml
 li.strolch.parent
 /.DS_Store
+/.idea/
