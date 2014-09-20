@@ -153,6 +153,8 @@ fi
 
 git submodule update
 
+git push origin ${new_version}
+
 echo -e "\nINFO: Released version ${new_version}"
 
 exit 0
