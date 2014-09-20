@@ -4,12 +4,6 @@ VERVEINE="/data/programs/verveinej/verveinej.sh"
 DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 
 ## Prepare the environment
-echo "INFO Bootstrapping..."
-if ! ./bootstrap_https.sh ; then
-  echo "ERROR: Failed to boostrap!"
-  exit 1
-fi
-
 echo "INFO: Copying dependencies"
 cd ..
 mvn -DskipTests=true clean dependency:copy-dependencies
