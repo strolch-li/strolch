@@ -109,9 +109,6 @@ if ! git submodule foreach git status --short ; then
   fail
 fi
 
-echo "Do you want to carry on?"
-read
-
 if ! git submodule foreach git add . ; then
   fail
 fi
@@ -135,19 +132,19 @@ if ! git tag ${new_version} ; then
   fail
 fi
 
-if ! git submodule foreach git checkout ${branch}
+if ! git submodule foreach git checkout ${branch} ; then
   fail
 fi
 if [ -n "${create_release_branch}" ] ; then
-  if ! git submodule foreach git branch -D ${release_branch}
+  if ! git submodule foreach git branch -D ${release_branch} ; then
     fail
   fi
 fi
-if ! git checkout ${branch}
+if ! git checkout ${branch} ; then
   fail
 fi
 if [ -n "${create_release_branch}" ] ; then
-  if ! git branch -D ${release_branch}
+  if ! git branch -D ${release_branch} ; then
     fail
   fi
 fi
