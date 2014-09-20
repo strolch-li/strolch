@@ -58,7 +58,6 @@ else
   echo "NOT creating release branch."
 fi
 
-exit
 
 function fail() {
   git submodule foreach git reset --hard origin/${branch}
