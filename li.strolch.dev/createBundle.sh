@@ -1,24 +1,12 @@
 #!/bin/bash
 
 projectName=strolch_bundle
-projectVersion=1.0.0-RC1
+projectVersion=1.0.0-SNAPSHOT
 DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 DEPLOY_SERVER="appsrv.gsi.local"
 ROOT="${PWD}"
-workDir="${ROOT}/target/strolch_bundle"
+workDir="${ROOT}/target/strolch_bundle-${projectVersion}"
 projectsFile="${ROOT}/projects_all.lst"
-
-echo "INFO Bootstrapping..."
-if ! ./bootstrap_https.sh ; then
-  echo "ERROR: Failed to boostrap!"
-  exit 1
-fi
-
-echo "INFO Pulling..."
-if ! ./pull.sh ; then
-  echo "ERROR: Failed to pull from upstream!"
-  exit 1
-fi
 
 # first we create all needed packages
 cd ..
