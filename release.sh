@@ -67,7 +67,6 @@ else
   echo "NOT pusing to origin."
 fi
 
-exit
 
 function fail() {
   git submodule foreach git reset --hard origin/${branch}
@@ -165,8 +164,11 @@ if ! git submodule update ; then
   fail
 fi
 
-git push origin ${new_version}
-git submodule foreach git push origin ${new_version}
+# push to origin
+if [ -n "${push}" ] ; then
+  git push origin ${new_version}
+  git submodule foreach git push origin ${new_version}
+fi
 
 echo -e "\nINFO: Released version ${new_version}"
 
