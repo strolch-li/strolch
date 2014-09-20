@@ -109,6 +109,7 @@ if ! git submodule foreach git status --short ; then
   fail
 fi
 
+# commit and tag submodules
 if ! git submodule foreach git add . ; then
   fail
 fi
@@ -119,6 +120,7 @@ if ! git submodule foreach git tag ${new_version} ; then
   fail
 fi
 
+# commit and tag including ref to submodules
 if ! git submodule sync ; then
   fail
 fi
@@ -148,6 +150,8 @@ if [ -n "${create_release_branch}" ] ; then
     fail
   fi
 fi
+
+git submodule update
 
 echo -e "\nINFO: Released version ${new_version}"
 
