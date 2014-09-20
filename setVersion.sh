@@ -20,7 +20,7 @@ new_version="$2"
 root="${PWD}"
 
 function fail() {
-  echo "ERROR: Failed to set version of $1"
+  echo -e "\nERROR: Failed to set version of $1"
   exit 1
 }
 
@@ -78,3 +78,7 @@ cd "${root}"
 if ! sed --in-place "s/${old_version}/${new_version}/" li.strolch.dev/createBundle.sh 2>/dev/null ; then
   fail "${root}/li.strolch.dev/createBundle.sh"
 fi
+
+echo -e "\nINFO: Bumped version from ${old_version} to ${new_version}"
+
+exit 0
