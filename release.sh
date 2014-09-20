@@ -1,14 +1,17 @@
 #!/bin/bash
 
 function usage() {
-  echo "Usage: $0 [-c] [-r <release_branch>] [-b <branch>] [-o <old_version>] [-n <new_version>]" 1>&2;
+  echo "Usage: $0 [-c] [-p] [-r <release_branch>] [-b <branch>] [-o <old_version>] [-n <new_version>]" 1>&2;
   exit 1;
 }
 
-while getopts ":b:o:n:r:c" arg; do
+while getopts ":b:o:n:r:cp" arg; do
     case "${arg}" in
         c)
             c="true"
+            ;;
+        p)
+            p="true"
             ;;
         r)
             r=${OPTARG}
@@ -45,6 +48,7 @@ release_branch="${r}"
 branch="${b}"
 old_version="${o}"
 new_version="${n}"
+push="${p}"
 
 root="${PWD}"
 
@@ -57,7 +61,13 @@ if [ -n "${create_release_branch}" ] ; then
 else
   echo "NOT creating release branch."
 fi
+if [ -n "${push}" ] ; then
+  echo "Pushing to origin."
+else
+  echo "NOT pusing to origin."
+fi
 
+exit
 
 function fail() {
   git submodule foreach git reset --hard origin/${branch}
@@ -134,6 +144,7 @@ if ! git tag ${new_version} ; then
   fail
 fi
 
+# update local working directory to original branch
 if ! git submodule foreach git checkout ${branch} ; then
   fail
 fi
@@ -150,10 +161,12 @@ if [ -n "${create_release_branch}" ] ; then
     fail
   fi
 fi
-
-git submodule update
+if ! git submodule update ; then
+  fail
+fi
 
 git push origin ${new_version}
+git submodule foreach git push origin ${new_version}
 
 echo -e "\nINFO: Released version ${new_version}"
 
