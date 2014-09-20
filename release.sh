@@ -63,13 +63,15 @@ function fail() {
   git submodule foreach git reset --hard origin/${branch}
   git submodule foreach git checkout ${branch}
   if [ -n "${create_release_branch}" ] ; then
-    git submodule foreach git branch -d ${release_branch}
+    git submodule foreach git branch -D ${release_branch}
   fi
   git submodule foreach git tag -d ${new_version}
 
   git checkout ${branch}
   git reset --hard origin/${branch}
-  git branch -d ${release_branch}
+  if [ -n "${create_release_branch}" ] ; then
+    git branch -D ${release_branch}
+  fi
   git tag -d ${new_version}
 
   echo -e "\nERROR: Failed to release version ${new_version}"
@@ -133,13 +135,21 @@ if ! git tag ${new_version} ; then
   fail
 fi
 
-git submodule foreach git checkout ${branch}
-if [ -n "${create_release_branch}" ] ; then
-  git submodule foreach git branch -d ${release_branch}
+if ! git submodule foreach git checkout ${branch}
+  fail
 fi
-git checkout ${branch}
 if [ -n "${create_release_branch}" ] ; then
-  git branch -d ${release_branch}
+  if ! git submodule foreach git branch -D ${release_branch}
+    fail
+  fi
+fi
+if ! git checkout ${branch}
+  fail
+fi
+if [ -n "${create_release_branch}" ] ; then
+  if ! git branch -D ${release_branch}
+    fail
+  fi
 fi
 
 echo -e "\nINFO: Released version ${new_version}"
