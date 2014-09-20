@@ -35,10 +35,10 @@ if [ -z "${r}" ] || [ -z "${b}" ] || [ -z "${o}" ] || [ -z "${n}" ] ; then
   usage
 fi
 
-#if [ "$(git status --short)" != "" ] ; then 
-#  echo "You have uncommitted changes!"
-#  exit 1
-#fi
+if [ "$(git status --short)" != "" ] ; then 
+  echo "You have uncommitted changes!"
+  exit 1
+fi
 
 create_release_branch="${c}"
 release_branch="${r}"
