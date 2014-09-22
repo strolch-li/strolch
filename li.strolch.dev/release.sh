@@ -43,10 +43,10 @@ if [ -z "${r}" ] || [ -z "${b}" ] || [ -z "${o}" ] || [ -z "${n}" ] ; then
   usage
 fi
 
-#if [ "$(git status --short)" != "" ] ; then
-#  echo "You have uncommitted changes!"
-#  exit 1
-#fi
+if [ "$(git status --short)" != "" ] ; then
+  echo "You have uncommitted changes!"
+  exit 1
+fi
 
 
 declare SCRIPT_NAME="${0##*/}"
@@ -78,7 +78,6 @@ else
   echo "NOT pusing to origin."
 fi
 
-echo ""
 echo ""
 
 function fail() {
@@ -132,8 +131,6 @@ if [ $? -ne 0 ] ; then
   fail
 fi
 
-echo aaaa
-exit 1
 
 # show status
 echo -e "\nINFO: Git Status:"

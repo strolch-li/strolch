@@ -87,7 +87,7 @@ done
 
 
 cd "${root}"
-if ! sed --in-place "s/${old_version}/${new_version}/" li.strolch.dev/createBundle.sh 2>/dev/null ; then
+if ! sed -i.bck "s/${old_version}/${new_version}/" "li.strolch.dev/createBundle.sh" 2>/dev/null ; then
   fail "${root}/li.strolch.dev/createBundle.sh"
 fi
 
