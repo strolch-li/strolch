@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<eitchnet.utils.version>1.0.0-SNAPSHOT</eitchnet.utils.version>
-		<eitchnet.xmlpers.version>1.0.0-SNAPSHOT</eitchnet.xmlpers.version>
-		<eitchnet.privilege.version>1.0.0-SNAPSHOT</eitchnet.privilege.version>
-		<strolch.version>1.0.0-SNAPSHOT</strolch.version>
+		<eitchnet.utils.version>1.0.0-RC2</eitchnet.utils.version>
+		<eitchnet.xmlpers.version>1.0.0-RC2</eitchnet.xmlpers.version>
+		<eitchnet.privilege.version>1.0.0-RC2</eitchnet.privilege.version>
+		<strolch.version>1.0.0-RC2</strolch.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<buildTimestamp>${maven.build.timestamp}</buildTimestamp>
@@ -14,7 +14,7 @@
 
 	<groupId>li.strolch</groupId>
 	<artifactId>li.strolch</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0-RC2</version>
 	<name>li.strolch</name>
 	<description>Module build for strolch</description>
 	<packaging>pom</packaging>
