@@ -1,28 +1,26 @@
 #!/bin/bash
 
-projectsFile="${PWD}/projects.lst"
+function fail() {
+  echo -e "\nERROR: Failed to push to upstream"
+  exit 1
+}
+
+current_branch="$(git branch --quiet | grep "*" | cut -d ' ' -f 2)"
+if [ "${current_branch}" == "" ] ; then
+  echo -e "\nERROR: No local branch found!"
+  fail
+fi
 
 cd ..
-while read project; do
-  if [ "${project}" == "" ] ; then
-  	continue;
-  fi
 
-  array=(${project//:/ })
-  name="${array[0]}"
-  tag="${array[1]}"
+echo "INFO: Pushing Strolch..."
+if ! git push origin "${current_branch}:${current_branch}" ; then
+  fail
+fi
+echo "INFO: Pushing submodules..."
+if ! git submodule foreach git push origin "${current_branch}:${current_branch}" ; then
+  fail
+fi
 
-  if [ "${name}" == "" ] ||  [ "${tag}" == "" ] ; then
-    echo -e "ERROR: Invalid project: ${project}! Must have form <git_name:tag>"
-    exit 1
-  fi
-
-  echo "== Pushing ${name}..."
-  cd ${name}
-  git push
-  cd ..
-  echo
-done < ${projectsFile}
-
-echo "Done."
+echo -e "\nINFO: Pushed all Strolch projects."
 exit 0
