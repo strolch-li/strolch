@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ ! $(which xmlstarlet) ] ; then
+  echo "ERROR: xmlstarlet is missing!"s
+  exit 1
+fi
+
 function usage() {
   echo "Usage: $0 [-c] [-p] [-r <release_branch>] [-b <branch>] [-o <old_version>] [-n <new_version>]" 1>&2;
   exit 1;

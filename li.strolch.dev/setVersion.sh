@@ -5,6 +5,11 @@ if [ "$#" != "2" ] ; then
     exit 1
 fi
 
+if [ ! $(which xmlstarlet) ] ; then
+  echo "ERROR: xmlstarlet is missing!"s
+  exit 1
+fi
+
 #if ! mvn -f pom.xml versions:set -DnewVersion="${1}" -DallowSnapshots=true -DgenerateBackupPoms=false ; then
 #    echo "ERROR: Failed to change version in root!"
 #    exit 1
@@ -19,7 +24,7 @@ new_version="$2"
 
 declare SCRIPT_NAME="${0##*/}"
 declare SCRIPT_DIR="$(cd ${0%/*} ; pwd)"
-root="${SCRIPT_DIR}"
+root="$(cd ${SCRIPT_DIR}/.. ; pwd)"
 
 function fail() {
   echo -e "\nERROR: Failed to set version of $1"
