@@ -43,6 +43,10 @@ if [ "$(git status --short)" != "" ] ; then
   exit 1
 fi
 
+
+declare SCRIPT_NAME="${0##*/}"
+declare SCRIPT_DIR="$(cd ${0%/*} ; pwd)"
+
 create_release_branch="${c}"
 release_branch="${r}"
 branch="${b}"
@@ -50,8 +54,10 @@ old_version="${o}"
 new_version="${n}"
 push="${p}"
 
-root="${PWD}"
+root="$(cd ${SCRIPT_DIR}/.. ; pwd)"
 
+
+echo "root=${root}"
 echo "old_version=${old_version}"
 echo "new_version=${new_version}"
 echo "branch=${branch}"
@@ -87,6 +93,7 @@ function fail() {
   exit 1
 }
 
+
 # create release branch
 if [ -n "${create_release_branch}" ] ; then
   if ! git branch ${release_branch} ${branch} ; then
@@ -97,6 +104,7 @@ if [ -n "${create_release_branch}" ] ; then
   fi
 fi
 
+
 # checkout release branch
 if ! git checkout ${release_branch} ; then
   fail
@@ -105,10 +113,12 @@ if ! git submodule foreach git checkout ${release_branch} ; then
   fail
 fi
 
+
 # bump version
-if ! ./setVersion.sh ${old_version} ${new_version} ; then
+if ! "${root}/li.strolch.dev/setVersion.sh" ${old_version} ${new_version} ; then
   fail
 fi
+
 
 # show status
 if ! git status --short ; then
@@ -117,6 +127,7 @@ fi
 if ! git submodule foreach git status --short ; then
   fail
 fi
+
 
 # commit and tag submodules
 if ! git submodule foreach git add . ; then
@@ -128,6 +139,7 @@ fi
 if ! git submodule foreach git tag ${new_version} ; then
   fail
 fi
+
 
 # commit and tag including ref to submodules
 if ! git submodule sync ; then
@@ -142,6 +154,7 @@ fi
 if ! git tag ${new_version} ; then
   fail
 fi
+
 
 # update local working directory to original branch
 if ! git submodule foreach git checkout ${branch} ; then
@@ -164,11 +177,13 @@ if ! git submodule update ; then
   fail
 fi
 
+
 # push to origin
 if [ -n "${push}" ] ; then
   git push origin ${new_version}
   git submodule foreach git push origin ${new_version}
 fi
+
 
 echo -e "\nINFO: Released version ${new_version}"
 

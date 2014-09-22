@@ -17,7 +17,9 @@ fi
 old_version="$1"
 new_version="$2"
 
-root="${PWD}"
+declare SCRIPT_NAME="${0##*/}"
+declare SCRIPT_DIR="$(cd ${0%/*} ; pwd)"
+root="${SCRIPT_DIR}"
 
 function fail() {
   echo -e "\nERROR: Failed to set version of $1"
@@ -60,6 +62,7 @@ for project in li.* ; do
   fi
 done
 
+
 cd "${root}"
 for project in ch.* ; do
   cd "${root}/${project}"
@@ -74,10 +77,12 @@ for project in ch.* ; do
   fi
 done
 
+
 cd "${root}"
 if ! sed --in-place "s/${old_version}/${new_version}/" li.strolch.dev/createBundle.sh 2>/dev/null ; then
   fail "${root}/li.strolch.dev/createBundle.sh"
 fi
+
 
 echo -e "\nINFO: Bumped version from ${old_version} to ${new_version}"
 
