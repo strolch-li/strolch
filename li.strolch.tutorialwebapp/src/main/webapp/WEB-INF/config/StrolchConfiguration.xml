@@ -2,7 +2,7 @@
 <StrolchConfiguration>
 	<env id="dev">
 		<Runtime>
-			<applicationName>StrolchTutorialApp</applicationName>
+			<applicationName>StrolchTutorialWebApp</applicationName>
 			<Properties>
 				<verbose>true</verbose>
 			</Properties>
