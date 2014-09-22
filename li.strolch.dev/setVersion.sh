@@ -6,7 +6,7 @@ if [ "$#" != "2" ] ; then
 fi
 
 if [ ! $(which xmlstarlet) ] ; then
-  echo "ERROR: xmlstarlet is missing!"s
+  echo "ERROR: xmlstarlet is missing!"
   exit 1
 fi
 
