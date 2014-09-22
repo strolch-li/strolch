@@ -43,10 +43,10 @@ if [ -z "${r}" ] || [ -z "${b}" ] || [ -z "${o}" ] || [ -z "${n}" ] ; then
   usage
 fi
 
-if [ "$(git status --short)" != "" ] ; then 
-  echo "You have uncommitted changes!"
-  exit 1
-fi
+#if [ "$(git status --short)" != "" ] ; then
+#  echo "You have uncommitted changes!"
+#  exit 1
+#fi
 
 
 declare SCRIPT_NAME="${0##*/}"
@@ -78,8 +78,11 @@ else
   echo "NOT pusing to origin."
 fi
 
+echo ""
+echo ""
 
 function fail() {
+  echo -e "\nWARN: Cleaning up after fail..."
   git submodule foreach git reset --hard origin/${branch}
   git submodule foreach git checkout ${branch}
   if [ -n "${create_release_branch}" ] ; then
@@ -101,6 +104,7 @@ function fail() {
 
 # create release branch
 if [ -n "${create_release_branch}" ] ; then
+  echo -e "\nINFO: Creating release branch..."
   if ! git branch ${release_branch} ${branch} ; then
     fail
   fi
@@ -111,21 +115,28 @@ fi
 
 
 # checkout release branch
+echo -e "\nINFO: Checking out release branch..."
 if ! git checkout ${release_branch} ; then
   fail
 fi
+echo -e "\nINFO: Checking out submodules..."
 if ! git submodule foreach git checkout ${release_branch} ; then
   fail
 fi
 
 
 # bump version
-if ! "${root}/li.strolch.dev/setVersion.sh" ${old_version} ${new_version} ; then
+echo -e "\nINFO: Bumping versions..."
+${root}/li.strolch.dev/setVersion.sh ${old_version} ${new_version}
+if [ $? -ne 0 ] ; then
   fail
 fi
 
+echo aaaa
+exit 1
 
 # show status
+echo -e "\nINFO: Git Status:"
 if ! git status --short ; then
   fail
 fi
@@ -135,6 +146,7 @@ fi
 
 
 # commit and tag submodules
+echo -e "\nINFO: Committing and tagging submodules..."
 if ! git submodule foreach git add . ; then
   fail
 fi
@@ -147,9 +159,11 @@ fi
 
 
 # commit and tag including ref to submodules
+echo -e "\nINFO: Synching submodules..."
 if ! git submodule sync ; then
   fail
 fi
+echo -e "\nINFO: Committing and tagging..."
 if ! git add . ; then
   fail
 fi
@@ -162,22 +176,27 @@ fi
 
 
 # update local working directory to original branch
+echo -e "\nINFO: Updating local work directory..."
 if ! git submodule foreach git checkout ${branch} ; then
   fail
 fi
 if [ -n "${create_release_branch}" ] ; then
+  echo -e "\nINFO: Removing submodule release branches..."
   if ! git submodule foreach git branch -D ${release_branch} ; then
     fail
   fi
 fi
+echo -e "\nINFO: Checking out branch..."
 if ! git checkout ${branch} ; then
   fail
 fi
+echo -e "\nINFO: Removing release branch..."
 if [ -n "${create_release_branch}" ] ; then
   if ! git branch -D ${release_branch} ; then
     fail
   fi
 fi
+echo -e "\nINFO: Updating submodules..."
 if ! git submodule update ; then
   fail
 fi
@@ -185,6 +204,7 @@ fi
 
 # push to origin
 if [ -n "${push}" ] ; then
+  echo -e "\nINFO: Pushing to origin..."
   git push origin ${new_version}
   git submodule foreach git push origin ${new_version}
 fi

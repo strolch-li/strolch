@@ -33,7 +33,7 @@ function fail() {
 
 
 cd "${root}"
-if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
+if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml  ; then
   fail "${root}/pom.xml"
 fi
 if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
