@@ -2,10 +2,11 @@
 
 projectName=strolch_bundle
 projectVersion=1.0.0-SNAPSHOT
+bundle_name="${projectName}-${projectVersion}"
 DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 DEPLOY_SERVER="appsrv.gsi.local"
 ROOT="${PWD}"
-workDir="${ROOT}/target/strolch_bundle-${projectVersion}"
+workDir="${ROOT}/target/${bundle_name}"
 projectsFile="${ROOT}/projects_all.lst"
 
 # first we create all needed packages
@@ -76,7 +77,7 @@ while read project; do
 done < ${projectsFile}
 
 cd ${workDir}/..
-if ! tar -cvzf ${projectName}-${projectVersion}.tar.gz ${projectName} ; then
+if ! tar -cvzf ${bundle_name}.tar.gz ${bundle_name} ; then
   echo "ERROR: Failed to make bundle."
   exit 1
 fi
@@ -87,7 +88,7 @@ if [ "$(hostname -f)" == "${DEPLOY_SERVER}" ] ; then
     exit 1
   fi
 
-  if ! mv ${projectName}-${projectVersion}.tar.gz "${DIST_STROLCH}" ; then
+  if ! mv ${bundle_name}.tar.gz "${DIST_STROLCH}" ; then
     echo "ERROR: Failed to publish bundle."
     exit 1
   fi
