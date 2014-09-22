@@ -25,6 +25,9 @@ new_version="$2"
 declare SCRIPT_NAME="${0##*/}"
 declare SCRIPT_DIR="$(cd ${0%/*} ; pwd)"
 root="$(cd ${SCRIPT_DIR}/.. ; pwd)"
+echo "old_version=${old_version}"
+echo "new_version=${new_version}"
+echo "root=${root}"
 
 function fail() {
   echo -e "\nERROR: Failed to set version of $1"
