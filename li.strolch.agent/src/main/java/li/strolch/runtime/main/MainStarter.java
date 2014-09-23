@@ -31,6 +31,8 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.utils.helper.StringHelper;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
@@ -44,9 +46,13 @@ public class MainStarter {
 	private static final String OPT_ENV = "env";
 
 	private Options options;
+	private String env;
+	private File pathF;
+
 	private StrolchAgent agent;
 
 	public MainStarter() {
+
 		Options op = new Options();
 		Option rootPathOption = new Option("p", OPT_ROOT_PATH, true, "root path to strolch runtime");
 		rootPathOption.setOptionalArg(false);
@@ -61,6 +67,17 @@ public class MainStarter {
 	}
 
 	public int start(String[] args) {
+		int ret = parseArgs(args);
+		if (ret != 0)
+			return ret;
+
+		setup();
+		initialize();
+		start();
+		return keepAlive();
+	}
+
+	public int parseArgs(String[] args) {
 
 		// create the parser
 		CommandLineParser parser = new GnuParser();
@@ -75,21 +92,46 @@ public class MainStarter {
 			return 1;
 		}
 
-		String env = line.getOptionValue(OPT_ENV);
-
-		String pathS = line.getOptionValue(OPT_ROOT_PATH);
-		File pathF = new File(pathS);
-		if (!pathF.exists()) {
-			logger.info(MessageFormat.format("Path parameter does not exist at: {0}", pathS));
+		this.env = line.getOptionValue(OPT_ENV);
+		if (StringHelper.isEmpty(this.env)) {
+			logger.error("env argument is missing!");
 			printUsage();
 			return 1;
 		}
 
-		logger.info("Starting Agent...");
-		setAgent(new StrolchAgent());
-		getAgent().setup(env, pathF);
+		String pathS = line.getOptionValue(OPT_ROOT_PATH);
+		this.pathF = new File(pathS);
+		if (!this.pathF.exists()) {
+			logger.error(MessageFormat.format("Path parameter does not exist at: {0}", pathS));
+			printUsage();
+			return 1;
+		}
+
+		return 0;
+	}
+
+	public void setup() {
+		this.agent = new StrolchAgent();
+		getAgent().setup(this.env, this.pathF);
+	}
+
+	public void initialize() {
 		getAgent().initialize();
+	}
+
+	public void start() {
 		getAgent().start();
+	}
+
+	public void stop() {
+		getAgent().stop();
+	}
+
+	public void destroy() {
+		getAgent().destroy();
+	}
+
+	public int keepAlive() {
 
 		final AtomicBoolean atomicBoolean = new AtomicBoolean();
 
@@ -128,23 +170,11 @@ public class MainStarter {
 	}
 
 	private void printUsage() {
-
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp("java -classpath lib/ -jar <jar.containing.main.class>.jar <options>", this.options);
 	}
 
-	/**
-	 * @return the agent
-	 */
 	public StrolchAgent getAgent() {
 		return this.agent;
-	}
-
-	/**
-	 * @param agent
-	 *            the agent to set
-	 */
-	public void setAgent(StrolchAgent agent) {
-		this.agent = agent;
 	}
 }

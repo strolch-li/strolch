@@ -32,11 +32,11 @@ public enum ComponentState {
 				throw getIllegalStateEx(newState);
 			break;
 		case SETUP:
-			if (newState != ComponentState.INITIALIZED && newState != STOPPED)
+			if (newState != ComponentState.INITIALIZED && newState != STOPPED && newState != DESTROYED)
 				throw getIllegalStateEx(newState);
 			break;
 		case INITIALIZED:
-			if (newState != ComponentState.STARTED && newState != STOPPED)
+			if (newState != ComponentState.STARTED && newState != STOPPED && newState != DESTROYED)
 				throw getIllegalStateEx(newState);
 			break;
 		case STARTED:

@@ -32,6 +32,7 @@ import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
 import org.slf4j.Logger;
@@ -78,18 +79,18 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 
-		String propTryLockTimeUnit = DefaultRealmHandler.makeRealmKey(this.realm, PROP_TRY_LOCK_TIME_UNIT);
-		String propTryLockTime = DefaultRealmHandler.makeRealmKey(this.realm, PROP_TRY_LOCK_TIME);
+		String propTryLockTimeUnit = StrolchConstants.makeRealmKey(this.realm, PROP_TRY_LOCK_TIME_UNIT);
+		String propTryLockTime = StrolchConstants.makeRealmKey(this.realm, PROP_TRY_LOCK_TIME);
 
-		String enableAuditKey = DefaultRealmHandler.makeRealmKey(getRealm(),
+		String enableAuditKey = StrolchConstants.makeRealmKey(getRealm(),
 				DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
 		this.auditTrailEnabled = configuration.getBoolean(enableAuditKey, Boolean.FALSE);
 
-		String enableAuditForReadKey = DefaultRealmHandler.makeRealmKey(getRealm(),
+		String enableAuditForReadKey = StrolchConstants.makeRealmKey(getRealm(),
 				DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL_FOR_READ);
 		this.auditTrailEnabledForRead = configuration.getBoolean(enableAuditForReadKey, Boolean.FALSE);
 
-		String updateObserversKey = DefaultRealmHandler.makeRealmKey(getRealm(),
+		String updateObserversKey = StrolchConstants.makeRealmKey(getRealm(),
 				DefaultRealmHandler.PROP_ENABLE_OBSERVER_UPDATES);
 		this.updateObservers = configuration.getBoolean(updateObserversKey, Boolean.FALSE);
 		if (this.updateObservers)

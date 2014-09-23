@@ -53,6 +53,8 @@ public class DbConnectionCheck {
 			String username = connectionInfo.getUsername();
 			String password = connectionInfo.getPassword();
 
+			logger.info("Checking connection " + username + "@" + url);
+
 			try (Connection con = DriverManager.getConnection(url, username, password);
 					Statement st = con.createStatement();) {
 
@@ -68,5 +70,7 @@ public class DbConnectionCheck {
 				throw new StrolchConfigurationException(msg, e);
 			}
 		}
+
+		logger.info("All connections OK");
 	}
 }

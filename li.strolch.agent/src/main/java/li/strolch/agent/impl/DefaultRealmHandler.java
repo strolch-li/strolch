@@ -15,8 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import static ch.eitchnet.utils.helper.StringHelper.DOT;
-
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,13 +36,11 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public class DefaultRealmHandler extends StrolchComponent implements RealmHandler {
 
-	private static final String SYSTEM_USER_AGENT = "agent"; //$NON-NLS-1$
-	public static final String AGENT_BOOT = "agent_boot"; //$NON-NLS-1$
-
 	public static final String PROP_ENABLE_AUDIT_TRAIL = "enableAuditTrail"; //$NON-NLS-1$
 	public static final String PROP_ENABLE_AUDIT_TRAIL_FOR_READ = "enableAuditTrailForRead"; //$NON-NLS-1$
 	public static final String PROP_ENABLE_OBSERVER_UPDATES = "enableObserverUpdates"; //$NON-NLS-1$
 	public static final String PREFIX_DATA_STORE_MODE = "dataStoreMode"; //$NON-NLS-1$
+	public static final String PREFIX_DATA_STORE_FILE = "dataStoreFile"; //$NON-NLS-1$
 	public static final String PROP_REALMS = "realms"; //$NON-NLS-1$
 
 	protected Map<String, InternalStrolchRealm> realms;
@@ -80,20 +76,13 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 		this.realms = new HashMap<>();
 		String[] realms = configuration.getStringArray(PROP_REALMS, StrolchConstants.DEFAULT_REALM);
 		for (String realmName : realms) {
-			String dataStoreModeKey = makeRealmKey(realmName, PREFIX_DATA_STORE_MODE);
+			String dataStoreModeKey = StrolchConstants.makeRealmKey(realmName, PREFIX_DATA_STORE_MODE);
 			String realmMode = configuration.getString(dataStoreModeKey, null);
 			DataStoreMode dataStoreMode = DataStoreMode.parseDataStoreMode(realmMode);
 			InternalStrolchRealm realm = dataStoreMode.createRealm(realmName);
 			this.realms.put(realmName, realm);
 		}
 		super.setup(configuration);
-	}
-
-	public static String makeRealmKey(String realmName, String key) {
-		String realmKey = key;
-		if (!realmName.equals(StrolchConstants.DEFAULT_REALM))
-			realmKey += DOT + realmName;
-		return realmKey;
 	}
 
 	@Override

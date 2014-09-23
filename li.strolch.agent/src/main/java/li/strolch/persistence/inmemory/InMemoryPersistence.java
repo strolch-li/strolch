@@ -45,6 +45,11 @@ public class InMemoryPersistence implements PersistenceHandler {
 		return daoCache.getAuditDao();
 	}
 
+	@Override
+	public void performDbInitialization() {
+		// no-op
+	}
+
 	private synchronized DaoCache getDaoCache(StrolchTransaction tx) {
 		DaoCache daoCache = this.daoCache.get(tx.getRealmName());
 		if (daoCache == null) {

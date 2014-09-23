@@ -15,6 +15,9 @@
  */
 package li.strolch.persistence.postgresql;
 
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.PROP_DB_VERSION;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.RESOURCE_DB_VERSION;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -23,13 +26,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.MessageFormat;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.persistence.api.DbConnectionInfo;
-import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 
 import org.slf4j.Logger;
@@ -44,79 +46,95 @@ import ch.eitchnet.utils.helper.FileHelper;
 @SuppressWarnings(value = "nls")
 public class DbSchemaVersionCheck {
 
-	private static final String RESOURCE_DB_VERSION = "/db_version.properties";
-	private static final String PROP_DB_VERSION = "db_version";
-	private static final String PROP_ALLOW_SCHEMA_CREATION = "allowSchemaCreation";
-	private static final String PROP_ALLOW_SCHEMA_DROP = "allowSchemaDrop";
-
 	private static final Logger logger = LoggerFactory.getLogger(DbSchemaVersionCheck.class);
-	private Map<String, DbConnectionInfo> connetionInfoMap;
 	private boolean allowSchemaCreation;
 	private boolean allowSchemaDrop;
+	private Map<String, DbMigrationState> dbMigrationStates;
 
 	/**
-	 * @param connetionInfoMap
-	 * @param componentConfiguration
+	 * @param allowSchemaCreation
+	 * @param allowSchemaDrop
+	 * @param allowDataInitOnSchemaCreate
 	 */
-	public DbSchemaVersionCheck(Map<String, DbConnectionInfo> connetionInfoMap,
-			ComponentConfiguration componentConfiguration) {
-		this.connetionInfoMap = connetionInfoMap;
-
-		this.allowSchemaCreation = componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
-		this.allowSchemaDrop = componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_DROP, Boolean.FALSE);
+	public DbSchemaVersionCheck(boolean allowSchemaCreation, boolean allowSchemaDrop) {
+		this.allowSchemaCreation = allowSchemaCreation;
+		this.allowSchemaDrop = allowSchemaDrop;
+		this.dbMigrationStates = new HashMap<>();
 	}
 
-	public void checkSchemaVersion() {
+	/**
+	 * @return the dbMigrationStates
+	 */
+	public Map<String, DbMigrationState> getDbMigrationStates() {
+		return this.dbMigrationStates;
+	}
 
-		Collection<DbConnectionInfo> values = this.connetionInfoMap.values();
-
-		for (DbConnectionInfo connectionInfo : values) {
-			String realm = connectionInfo.getRealm();
-			String url = connectionInfo.getUrl();
-			String username = connectionInfo.getUsername();
-			String password = connectionInfo.getPassword();
-
-			logger.info(MessageFormat.format("[{0}] Checking Schema version for: {1}@{2}", realm, username, url));
-
-			try (Connection con = DriverManager.getConnection(url, username, password);
-					Statement st = con.createStatement();) {
-
-				String expectedDbVersion = getExpectedDbVersion();
-
-				// first see if we have any schema
-				String msg = "select table_schema, table_name, table_type from information_schema.tables where table_name=''{0}'';";
-				String checkSchemaExistsSql = MessageFormat.format(msg, PROP_DB_VERSION);
-				try (ResultSet rs = st.executeQuery(checkSchemaExistsSql)) {
-					if (!rs.next()) {
-						createSchema(realm, expectedDbVersion, st);
-					} else {
-						checkCurrentVersion(realm, st, expectedDbVersion);
-					}
-				}
-
-			} catch (SQLException e) {
-				String msg = "Failed to open DB connection to URL {0} due to: {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, url, e.getMessage());
-				throw new StrolchConfigurationException(msg, e);
-			}
+	public void checkSchemaVersion(Map<String, DbConnectionInfo> connectionInfoMap) {
+		for (DbConnectionInfo connectionInfo : connectionInfoMap.values()) {
+			DbMigrationState dbMigrationState = checkSchemaVersion(connectionInfo);
+			dbMigrationStates.put(connectionInfo.getRealm(), dbMigrationState);
 		}
 	}
 
-	private void checkCurrentVersion(String realm, Statement st, String expectedDbVersion) throws SQLException {
+	/**
+	 * Returns true if the schema existed or was only migrated, false if the schema was created
+	 * 
+	 * @param connectionInfo
+	 * 
+	 * @return true if the schema existed or was only migrated, false if the schema was created
+	 */
+	public DbMigrationState checkSchemaVersion(DbConnectionInfo connectionInfo) {
+		String realm = connectionInfo.getRealm();
+		String url = connectionInfo.getUrl();
+		String username = connectionInfo.getUsername();
+		String password = connectionInfo.getPassword();
+
+		logger.info(MessageFormat.format("[{0}] Checking Schema version for: {1}@{2}", realm, username, url));
+
+		DbMigrationState migrationType;
+
+		try (Connection con = DriverManager.getConnection(url, username, password);
+				Statement st = con.createStatement();) {
+
+			String expectedDbVersion = getExpectedDbVersion();
+
+			// first see if we have any schema
+			String msg = "select table_schema, table_name, table_type from information_schema.tables where table_name=''{0}'';";
+			String checkSchemaExistsSql = MessageFormat.format(msg, PROP_DB_VERSION);
+			try (ResultSet rs = st.executeQuery(checkSchemaExistsSql)) {
+				if (!rs.next()) {
+					migrationType = createSchema(realm, expectedDbVersion, st);
+				} else {
+					migrationType = checkCurrentVersion(realm, st, expectedDbVersion);
+				}
+			}
+
+			return migrationType;
+
+		} catch (SQLException e) {
+			String msg = "Failed to open DB connection to URL {0} due to: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, url, e.getMessage());
+			throw new StrolchConfigurationException(msg, e);
+		}
+	}
+
+	private DbMigrationState checkCurrentVersion(String realm, Statement st, String expectedDbVersion)
+			throws SQLException {
 		try (ResultSet rs = st.executeQuery("select id, version from db_version order by id desc;")) {
 			if (!rs.next()) {
-				createSchema(realm, expectedDbVersion, st);
+				return createSchema(realm, expectedDbVersion, st);
 			} else {
 				String currentVersion = rs.getString(2);
 				if (expectedDbVersion.equals(currentVersion)) {
 					String msg = "[{0}] Schema version {1} is the current version. No changes needed.";
 					msg = MessageFormat.format(msg, realm, currentVersion);
 					logger.info(msg);
+					return DbMigrationState.NOTHING;
 				} else {
 					String msg = "[{0}] Schema version is not current. Need to upgrade from {1} to {2}";
 					msg = MessageFormat.format(msg, realm, currentVersion, expectedDbVersion);
 					logger.warn(msg);
-					upgradeSchema(realm, expectedDbVersion, st);
+					return upgradeSchema(realm, expectedDbVersion, st);
 				}
 			}
 		}
@@ -152,10 +170,17 @@ public class DbSchemaVersionCheck {
 	}
 
 	/**
+	 * 
 	 * @param realm
+	 *            the realm to create the schema for (a {@link DbConnectionInfo} must exist for it)
+	 * @param dbVersion
+	 *            the version to upgrade to
 	 * @param st
+	 *            the open database {@link Statement} to which the SQL statements will be written
+	 * 
+	 * @return true if the schema was created, false if it was not
 	 */
-	private void createSchema(String realm, String dbVersion, Statement st) {
+	private DbMigrationState createSchema(String realm, String dbVersion, Statement st) {
 
 		if (!this.allowSchemaCreation) {
 			String msg = "[{0}] No schema exists, or is not valid. Schema generation is disabled, thus can not continue!";
@@ -174,8 +199,17 @@ public class DbSchemaVersionCheck {
 		}
 
 		logger.info(MessageFormat.format("[{0}] Successfully created schema for version {1}", realm, dbVersion));
+		return DbMigrationState.CREATED;
 	}
 
+	/**
+	 * @param realm
+	 *            the realm for which the schema must be dropped (a {@link DbConnectionInfo} must exist for it)
+	 * @param dbVersion
+	 *            the version with which to to drop the schema
+	 * @param st
+	 *            the open database {@link Statement} to which the SQL statements will be written
+	 */
 	private void dropSchema(String realm, String dbVersion, Statement st) {
 
 		if (!this.allowSchemaDrop) {
@@ -196,10 +230,21 @@ public class DbSchemaVersionCheck {
 	}
 
 	/**
+	 * Upgrades the schema to the given version. If the current version is below the given version, then currently this
+	 * method drops the schema and recreates it. Real migration must still be implemented
+	 * 
+	 * @param realm
+	 *            the realm to migrate (a {@link DbConnectionInfo} must exist for it)
+	 * @param dbVersion
+	 *            the version to upgrade to
 	 * @param st
+	 *            the open database {@link Statement} to which the SQL statements will be written
+	 * 
+	 * @return true if the schema was recreated, false if it was simply migrated
 	 */
-	private void upgradeSchema(String realm, String dbVersion, Statement st) {
+	private DbMigrationState upgradeSchema(String realm, String dbVersion, Statement st) {
 		dropSchema(realm, dbVersion, st);
 		createSchema(realm, dbVersion, st);
+		return DbMigrationState.DROPPED_CREATED;
 	}
 }

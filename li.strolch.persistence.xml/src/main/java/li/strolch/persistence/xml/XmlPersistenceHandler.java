@@ -97,4 +97,9 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	public AuditDao getAuditDao(StrolchTransaction tx) {
 		return new XmlAuditDao(tx);
 	}
+
+	@Override
+	public void performDbInitialization() {
+		throw new UnsupportedOperationException("Not yet implemented!");
+	}
 }

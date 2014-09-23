@@ -15,7 +15,13 @@
  */
 package li.strolch.persistence.api;
 
+import li.strolch.agent.api.AuditTrail;
+import li.strolch.agent.api.OrderMap;
+import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
+import li.strolch.model.audit.Audit;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
@@ -23,11 +29,59 @@ import ch.eitchnet.privilege.model.Certificate;
  */
 public interface PersistenceHandler {
 
+	/**
+	 * Opens a {@link StrolchTransaction} on the given {@link StrolchRealm}. The transaction is the main object to be
+	 * used when accessing and modifying the elements of a realm.
+	 * 
+	 * @param realm
+	 *            the realm for which the transaction is to be opened
+	 * @param certificate
+	 *            the certificate which has access to the realm
+	 * @param action
+	 *            the name of the transaction used for auditing
+	 * 
+	 * @return the newly created {@link StrolchTransaction}
+	 */
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action);
 
+	/**
+	 * Returns the {@link OrderDao} for the given transaction. Use this only if you want to bypass certain transaction
+	 * features. Accessing {@link Order Orders} should be done through the {@link OrderMap} accessed from the
+	 * transaction
+	 * 
+	 * @param tx
+	 *            the transaction for which the {@link OrderDao} is to be returned
+	 * 
+	 * @return the {@link OrderDao}
+	 */
 	public OrderDao getOrderDao(StrolchTransaction tx);
 
+	/**
+	 * Returns the {@link ResourceDao} for the given transaction. Use this only if you want to bypass certain
+	 * transaction features. Accessing {@link Resource Resources} should be done through the {@link ResourceMap}
+	 * accessed from the transaction
+	 * 
+	 * @param tx
+	 *            the transaction for which the {@link ResourceDao} is to be returned
+	 * 
+	 * @return the {@link ResourceDao}
+	 */
 	public ResourceDao getResourceDao(StrolchTransaction tx);
 
+	/**
+	 * Returns the {@link AuditDao} for the given transaction. Use this only if you want to bypass certain transaction
+	 * features. Accessing {@link Audit Audits} should be done through the {@link AuditTrail} accessed from the
+	 * transaction
+	 * 
+	 * @param tx
+	 *            the transaction for which the {@link AuditDao} is to be returned
+	 * 
+	 * @return the {@link AuditDao}
+	 */
 	public AuditDao getAuditDao(StrolchTransaction tx);
+
+	/**
+	 * Performs a database specific initialization of the underlying database for each realm.
+	 */
+	public void performDbInitialization();
 }

@@ -27,6 +27,7 @@ import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.inmemory.InMemoryPersistence;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import ch.eitchnet.privilege.model.Certificate;
@@ -38,8 +39,6 @@ import ch.eitchnet.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class TransientRealm extends InternalStrolchRealm {
-
-	public static final String PREFIX_DATA_STORE_FILE = "dataStoreFile"; //$NON-NLS-1$
 
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;
@@ -88,7 +87,7 @@ public class TransientRealm extends InternalStrolchRealm {
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		super.initialize(container, configuration);
 
-		String key = DefaultRealmHandler.makeRealmKey(getRealm(), PREFIX_DATA_STORE_FILE);
+		String key = StrolchConstants.makeRealmKey(getRealm(), DefaultRealmHandler.PREFIX_DATA_STORE_FILE);
 		if (!configuration.hasProperty(key)) {
 			String msg = "There is no data store file for realm {0}. Set a property with key {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, getRealm(), key);

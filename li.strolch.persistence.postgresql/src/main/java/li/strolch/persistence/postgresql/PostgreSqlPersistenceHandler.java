@@ -15,7 +15,8 @@
  */
 package li.strolch.persistence.postgresql;
 
-import static ch.eitchnet.utils.helper.StringHelper.DOT;
+import static li.strolch.agent.api.RealmHandler.SYSTEM_USER_DB_INITIALIZER;
+import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -27,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.RealmHandler;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.AuditDao;
@@ -36,9 +39,10 @@ import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
@@ -46,9 +50,14 @@ import ch.eitchnet.privilege.model.Certificate;
  */
 public class PostgreSqlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
-	private static final String PROP_DB_URL = "db.url"; //$NON-NLS-1$
-	private static final String PROP_DB_USERNAME = "db.username"; //$NON-NLS-1$
-	private static final String PROP_DB_PASSWORD = "db.password"; //$NON-NLS-1$
+	public static final String PROP_DB_URL = "db.url"; //$NON-NLS-1$
+	public static final String PROP_DB_USERNAME = "db.username"; //$NON-NLS-1$
+	public static final String PROP_DB_PASSWORD = "db.password"; //$NON-NLS-1$
+	public static final String PROP_ALLOW_SCHEMA_CREATION = "allowSchemaCreation";
+	public static final String PROP_ALLOW_SCHEMA_DROP = "allowSchemaDrop";
+	public static final String PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE = "allowDataInitOnSchemaCreate";
+	public static final String PROP_DB_VERSION = "db_version";
+	public static final String RESOURCE_DB_VERSION = "/db_version.properties";
 
 	private ComponentConfiguration componentConfiguration;
 	private Map<String, DbConnectionInfo> connetionInfoMap;
@@ -70,14 +79,9 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 			if (realm.getMode().isTransient())
 				continue;
 
-			String dbUrlKey = PROP_DB_URL;
-			String dbUsernameKey = PROP_DB_USERNAME;
-			String dbPasswordKey = PROP_DB_PASSWORD;
-			if (!realmName.equals(StrolchConstants.DEFAULT_REALM)) {
-				dbUrlKey += DOT + realmName;
-				dbUsernameKey += DOT + realmName;
-				dbPasswordKey += DOT + realmName;
-			}
+			String dbUrlKey = makeRealmKey(realmName, PROP_DB_URL);
+			String dbUsernameKey = makeRealmKey(realmName, PROP_DB_USERNAME);
+			String dbPasswordKey = makeRealmKey(realmName, PROP_DB_PASSWORD);
 
 			String dbUrl = componentConfiguration.getString(dbUrlKey, null);
 			String username = componentConfiguration.getString(dbUsernameKey, null);
@@ -112,7 +116,15 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		msg = MessageFormat.format(msg, connectionInfo.getRealm(), compliant, driver.getMajorVersion(),
 				driver.getMinorVersion());
 		logger.info(msg);
+	}
 
+	/**
+	 * Returns the map of {@link DbConnectionInfo} which can be used in maintenance mode
+	 * 
+	 * @return the connetionInfoMap
+	 */
+	public Map<String, DbConnectionInfo> getConnetionInfoMap() {
+		return this.connetionInfoMap;
 	}
 
 	@Override
@@ -122,9 +134,27 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		DbConnectionCheck connectionCheck = new DbConnectionCheck(this.connetionInfoMap);
 		connectionCheck.checkConnections();
 
-		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(this.connetionInfoMap,
-				this.componentConfiguration);
-		schemaVersionCheck.checkSchemaVersion();
+		boolean allowSchemaCreation = componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
+		boolean allowSchemaDrop = componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_DROP, Boolean.FALSE);
+		boolean allowDataInitOnSchemaCreate = componentConfiguration.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE,
+				Boolean.FALSE);
+
+		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(allowSchemaCreation, allowSchemaDrop);
+		schemaVersionCheck.checkSchemaVersion(this.connetionInfoMap);
+
+		// if allowed, perform DB initialization
+		if (!allowSchemaCreation || !allowSchemaDrop || !allowDataInitOnSchemaCreate) {
+			logger.info("Data Initialization not enabled, so not checking if needed.");
+		} else {
+			Map<String, DbMigrationState> dbMigrationStates = schemaVersionCheck.getDbMigrationStates();
+			String msg = "Data Initialization is enabled, checking for {0} realms if DB initialization is required...";
+			logger.info(MessageFormat.format(msg, dbMigrationStates.size()));
+			PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler();
+			StrolchAgent agent = getContainer().getAgent();
+			PostgreSqlSchemaInitializer schemaInitializer = new PostgreSqlSchemaInitializer(agent, this,
+					dbMigrationStates);
+			privilegeHandler.runAsSystem(SYSTEM_USER_DB_INITIALIZER, schemaInitializer);
+		}
 
 		super.start();
 	}
@@ -167,5 +197,16 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	@Override
 	public AuditDao getAuditDao(StrolchTransaction tx) {
 		return ((PostgreSqlStrolchTransaction) tx).getAuditDao();
+	}
+
+	@Override
+	public void performDbInitialization() {
+		ComponentContainer container = getContainer();
+		StrolchAgent agent = container.getAgent();
+		PrivilegeHandler privilegeHandler = container.getPrivilegeHandler();
+		StrolchConfiguration strolchConfiguration = this.getContainer().getAgent().getStrolchConfiguration();
+		PostgreSqlDbInitializer sqlDbInitializer = new PostgreSqlDbInitializer(agent, this,
+				strolchConfiguration.getComponentConfiguration(getName()));
+		privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_DB_INITIALIZER, sqlDbInitializer);
 	}
 }

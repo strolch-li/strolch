@@ -15,6 +15,7 @@
  */
 package li.strolch.runtime;
 
+import static ch.eitchnet.utils.helper.StringHelper.DOT;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.persistence.api.PersistenceHandler;
@@ -49,4 +50,11 @@ public class StrolchConstants {
 	 * @see StrolchModelConstants#INTERPRETATION_ORDER_REF
 	 */
 	public static final String INTERPRETATION_ORDER_REF = StrolchModelConstants.INTERPRETATION_ORDER_REF;
+
+	public static String makeRealmKey(String realmName, String key) {
+		String realmKey = key;
+		if (!realmName.equals(DEFAULT_REALM))
+			realmKey += DOT + realmName;
+		return realmKey;
+	}
 }

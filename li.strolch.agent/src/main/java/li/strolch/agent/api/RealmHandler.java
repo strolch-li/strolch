@@ -26,6 +26,21 @@ import li.strolch.runtime.StrolchConstants;
 public interface RealmHandler {
 
 	/**
+	 * Name of the transaction which boots the agent
+	 */
+	public static final String SYSTEM_USER_AGENT = "agent"; //$NON-NLS-1$
+
+	/**
+	 * Name of the system user which boots the agent
+	 */
+	public static final String AGENT_BOOT = "agent_boot"; //$NON-NLS-1$
+
+	/**
+	 * Name of the system user which performs DB Initialization
+	 */
+	public static final String SYSTEM_USER_DB_INITIALIZER = "db_initializer";
+
+	/**
 	 * Returns the names of the configured {@link StrolchRealm StrolchRealms}
 	 * 
 	 * @return the set of names of the configured {@link StrolchRealm StrolchRealms}

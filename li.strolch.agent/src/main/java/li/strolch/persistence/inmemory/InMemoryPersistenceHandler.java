@@ -66,4 +66,9 @@ public class InMemoryPersistenceHandler extends StrolchComponent implements Pers
 	public AuditDao getAuditDao(StrolchTransaction tx) {
 		return this.persistence.getAuditDao(tx);
 	}
+
+	@Override
+	public void performDbInitialization() {
+		// no-op
+	}
 }
