@@ -58,22 +58,35 @@
                 <!-- blog items -->
                 <div class="col-sm-8 blog-main">
 
-                    <!-- blog main -->
+                    <!-- blog post -->
+                    <div class="blog-post">
+                        <h2 class="blog-post-title">DB Initialization: Release 1.0.0-RC3</h2>
+                        <p class="blog-post-meta">August 24, 2014 by <a href="#">Robert</a></p>
+
+                        <p>Important feature <i>Database Initialization</i> added: Release of 1.0.0-RC3 which can be downloaded on the <a href="downloads.html">download</a> page.</p>
+                        <hr>
+                        <p>When living <i>continuous integration</i> and <i>continuous delivery</i>, it is vital that things like database migrations and initialization are performed in a controlled, but automatic way.</p>
+                        <p>A Strolch-based application is using the PostgreSQL persistence layer. The implementation understands the concepts of migration, and validating the database schema, but currently a mechanism to automatically initialize the database with a minimal set of data was missing.</p>
+                        <p>Migrating a database for Strolch is mostly a one time thing. The object model in Strolch is quite static, so there is seldom a need to migrate the database. Domain specific changes, i.e. new Resources, or adding Parameters to Resources, is not a schema change. Thus, instead of going the way other frameworks go, e.g. Ruby on Rails, we built the data initialization right into the <i>PersistenceHandler</i>.</p>
+                        <p>Now if the PostgreSQL <i>PersistenceHandler</i> creates the schema, then it might also initialize the minimal set of data. For this to work, the <i>PersistenceHandler</i> checks if the flags <i>allowSchemaCreation</i>, <i>allowSchemaDrop</i> and <i>allowDbInitOnSchemaCreate</i>. If those flags are enabled, and the schema was created during initialization, then the database is also initialized with the contents of the XML file configured under key <i>dataStoreFile</i> of the relevant <i>Realm</i>.</p>
+                        <p>The database initialization is done as a system user action which must have the name <i>db_initializer</i>. This is another fail-safe, so that on a production system, this user can simply be deleted.</p>
+
+                        <p>So, Strolch 1.0.0-RC3 is out the door, go ahead and <a href="downloads.html">try it out</a>.</p>
+
+                    </div><!-- /.blog-post -->
+
+                    <!-- blog post -->
                     <div class="blog-post">
                         <h2 class="blog-post-title">Release 1.0.0-RC2</h2>
-                        <p class="blog-post-meta">August 20, 2014 by <a href="#">Robert</a></p>
+                        <p class="blog-post-meta">August 22, 2014 by <a href="#">Robert</a></p>
 
                         <p>Scratch that RC1, here is the brand new 1.0.0-RC2 which can be downloaded on the <a href="downloads.html">download</a> page.</p>
                         <hr>
                         <p>So, as expected there were a few bugs, for instance the Strolch tutorial apps didn't start, so now i fixed those and released an RC2. Go <a href="downloads.html">get it</a> and give it a try!</p>
 
                     </div><!-- /.blog-post -->
-                </div>
 
-                <!-- blog items -->
-                <div class="col-sm-8 blog-main">
-
-                    <!-- blog main -->
+                    <!-- blog post -->
                     <div class="blog-post">
                         <h2 class="blog-post-title">Release 1.0.0-RC1</h2>
                         <p class="blog-post-meta">August 20, 2014 by <a href="#">Robert</a></p>
@@ -125,23 +138,6 @@
                         <p><sup>*</sup> Currently Transactional mode is missing concrete implementation for querying for the XML persistence</p>
 
                     </div><!-- /.blog-post -->
-
-                    <!-- blog item -->
-                    <!--div class="blog-post">
-                        <h2 class="blog-post-title">Another blog post</h2>
-                        <p class="blog-post-meta">December 23, 2013 by <a href="#">Jacob</a></p>
-
-                        <p>Lorem ipsum</p>
-                        <hr>
-                        <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
-                        <blockquote>
-                            <p>Curabitur blandit tempus porttitor. <strong>Nullam quis risus eget urna mollis</strong> ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-                        </blockquote>
-                        <p>dfgdfg</p>
-                        <h3>Story</h3>
-                        <p>dfgdfg</p>
-                        <h3>dfghdfkjghdfg</h3>
-                    </div--><!-- /.blog-post -->
 
                     <!-- pagination -->
                     <ul class="pager">
