@@ -118,6 +118,18 @@ public final class Certificate implements Serializable {
 	}
 
 	/**
+	 * Returns the property with the given key
+	 * 
+	 * @param key
+	 *            the key for which the property is to be returned
+	 * 
+	 * @return the value of the property with the given key, or null if it does not exist
+	 */
+	public String getProperty(String key) {
+		return this.propertyMap.get(key);
+	}
+
+	/**
 	 * Returns a mutable {@link Map} for storing session relevant data
 	 * 
 	 * @return the sessionDataMap
