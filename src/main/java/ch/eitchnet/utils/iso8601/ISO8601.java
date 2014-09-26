@@ -291,7 +291,7 @@ public class ISO8601 implements DateFormat {
 			return cal.getTime();
 		}
 
-		String msg = "Input string " + s + " cannot be parsed to date.";
+		String msg = "Input string '" + s + "' cannot be parsed to date.";
 		throw new IllegalArgumentException(msg);
 	}
 }
