@@ -73,4 +73,11 @@ public interface PrivilegeHandler {
 	public abstract ch.eitchnet.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
 			throws PrivilegeException;
 
+	/**
+	 * @param certificate
+	 * @param password
+	 * @throws PrivilegeException
+	 * @see {@link ch.eitchnet.privilege.handler.PrivilegeHandler#checkPassword(Certificate, byte[])}
+	 */
+	public void checkPassword(Certificate certificate, byte[] password) throws PrivilegeException;
 }

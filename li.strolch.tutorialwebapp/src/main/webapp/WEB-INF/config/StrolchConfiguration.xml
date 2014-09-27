@@ -80,7 +80,7 @@
 			<impl>li.strolch.rest.DefaultStrolchSessionHandler</impl>
 			<depends>PrivilegeHandler</depends>
 			<Properties>
-				<rememberUser>true</rememberUser>
+				<session.ttl.minutes>1</session.ttl.minutes>
 			</Properties>
 		</Component>
 	</env>

@@ -19,7 +19,6 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.privilege.PrivilegeHandler;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -82,7 +81,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return getContainer().getComponent(clazz);
 	}
 
-	public PrivilegeHandler getPrivilegeHandler() {
-		return getContainer().getPrivilegeHandler();
+	public StrolchSessionHandler getSessionHandler() {
+		return getContainer().getComponent(StrolchSessionHandler.class);
 	}
 }

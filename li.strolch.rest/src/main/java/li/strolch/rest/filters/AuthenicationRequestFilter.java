@@ -7,10 +7,8 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
@@ -26,18 +24,14 @@ import ch.eitchnet.privilege.model.Certificate;
 @Provider
 public class AuthenicationRequestFilter implements ContainerRequestFilter {
 
-	@Context
-	HttpServletRequest request;
-
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
 		String sessionId = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		if (sessionId != null) {
 			try {
-				String origin = this.request == null ? "test" : this.request.getRemoteAddr(); //$NON-NLS-1$
 				StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getComponent(
 						StrolchSessionHandler.class);
-				Certificate certificate = sessionHandler.validate(origin, sessionId);
+				Certificate certificate = sessionHandler.validate(sessionId);
 				requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 			} catch (Exception e) {
 				requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)

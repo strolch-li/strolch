@@ -45,7 +45,7 @@
 			<api>li.strolch.rest.StrolchSessionHandler</api>
 			<impl>li.strolch.rest.DefaultStrolchSessionHandler</impl>
 			<Properties>
-				<rememberUser>true</rememberUser>
+				<session.ttl.minutes>1</session.ttl.minutes>
 			</Properties>
 		</Component>
 		<Component>

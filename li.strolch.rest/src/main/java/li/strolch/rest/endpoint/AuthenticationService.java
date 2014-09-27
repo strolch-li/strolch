@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
@@ -62,7 +61,7 @@ public class AuthenticationService {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response login(Login login, @Context HttpServletRequest request, @Context HttpHeaders headers) {
+	public Response login(Login login, @Context HttpHeaders headers) {
 
 		LoginResult loginResult = new LoginResult();
 		GenericEntity<LoginResult> entity = new GenericEntity<LoginResult>(loginResult, LoginResult.class) {
@@ -84,16 +83,14 @@ public class AuthenticationService {
 				return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
 			}
 
-			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getComponent(
-					StrolchSessionHandler.class);
-			String origin = request == null ? "test" : request.getRemoteAddr(); //$NON-NLS-1$
-			Certificate certificate = sessionHandler.authenticate(origin, login.getUsername(), login.getPassword()
-					.getBytes());
+			RestfulStrolchComponent restfulStrolchComponent = RestfulStrolchComponent.getInstance();
+			StrolchSessionHandler sessionHandler = restfulStrolchComponent.getComponent(StrolchSessionHandler.class);
+			Certificate certificate = sessionHandler.authenticate(login.getUsername(), login.getPassword().getBytes());
 
 			Locale locale = RestfulHelper.getLocale(headers);
 			certificate.setLocale(locale);
 
-			PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getPrivilegeHandler();
+			PrivilegeHandler privilegeHandler = restfulStrolchComponent.getContainer().getPrivilegeHandler();
 			PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
 			loginResult.setSessionId(certificate.getAuthToken());
 			loginResult.setUsername(certificate.getUsername());
@@ -124,7 +121,7 @@ public class AuthenticationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
-	public Response logout(@PathParam("authToken") String authToken, @Context HttpServletRequest request) {
+	public Response logout(@PathParam("authToken") String authToken) {
 
 		LogoutResult logoutResult = new LogoutResult();
 
@@ -135,9 +132,8 @@ public class AuthenticationService {
 
 			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance().getComponent(
 					StrolchSessionHandler.class);
-			String origin = request == null ? "test" : request.getRemoteAddr(); //$NON-NLS-1$
-			Certificate certificate = sessionHandlerHandler.validate(origin, authToken);
-			sessionHandlerHandler.invalidateSession(origin, certificate);
+			Certificate certificate = sessionHandlerHandler.validate(authToken);
+			sessionHandlerHandler.invalidateSession(certificate);
 
 			logoutResult.setMsg(MessageFormat.format("{0} has been logged out.", certificate.getUsername())); //$NON-NLS-1$
 			return Response.ok().entity(entity).build();

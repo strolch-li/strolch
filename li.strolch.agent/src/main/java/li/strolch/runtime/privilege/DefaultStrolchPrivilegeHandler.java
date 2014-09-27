@@ -106,13 +106,6 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		}
 	}
 
-	/**
-	 * @param username
-	 * @param password
-	 * @return
-	 * 
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#authenticate(String, byte[])
-	 */
 	@Override
 	public Certificate authenticate(String username, byte[] password) {
 		assertContainerStarted();
@@ -123,46 +116,29 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		}
 	}
 
-	/**
-	 * @param certificate
-	 * @throws PrivilegeException
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#isCertificateValid(Certificate)
-	 */
 	@Override
 	public void isCertificateValid(Certificate certificate) throws PrivilegeException {
 		assertContainerStarted();
 		this.privilegeHandler.isCertificateValid(certificate);
 	}
 
-	/**
-	 * @param certificate
-	 * @return
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#invalidateSession(ch.eitchnet.privilege.model.Certificate)
-	 */
+	@Override
+	public void checkPassword(Certificate certificate, byte[] password) throws PrivilegeException {
+		assertContainerStarted();
+		this.privilegeHandler.checkPassword(certificate, password);
+	}
+
 	@Override
 	public boolean invalidateSession(Certificate certificate) {
 		assertContainerStarted();
 		return this.privilegeHandler.invalidateSession(certificate);
 	}
 
-	/**
-	 * @param certificate
-	 * @return
-	 * @throws PrivilegeException
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getPrivilegeContext(ch.eitchnet.privilege.model.Certificate)
-	 */
 	@Override
 	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException {
 		return this.privilegeHandler.getPrivilegeContext(certificate);
 	}
 
-	/**
-	 * @param systemUsername
-	 * @param action
-	 * @throws PrivilegeException
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#runAsSystem(java.lang.String,
-	 *      ch.eitchnet.privilege.handler.SystemUserAction)
-	 */
 	@Override
 	public void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException {
 		this.privilegeHandler.runAsSystem(systemUsername, action);

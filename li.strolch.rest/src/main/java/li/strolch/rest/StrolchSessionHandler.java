@@ -22,9 +22,11 @@ import ch.eitchnet.privilege.model.Certificate;
  */
 public interface StrolchSessionHandler {
 
-	public Certificate authenticate(String origin, String username, byte[] password);
+	public Certificate authenticate(String username, byte[] password);
 
-	public Certificate validate(String origin, String authToken);
+	public Certificate validate(String authToken);
 
-	public void invalidateSession(String origin, Certificate certificate);
+	public Certificate validate(Certificate certificate);
+
+	public void invalidateSession(Certificate certificate);
 }
