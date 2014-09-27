@@ -45,6 +45,7 @@ public final class Certificate implements Serializable {
 	private final String authToken;
 
 	private Locale locale;
+	private long lastAccess;
 
 	private Map<String, String> propertyMap;
 	private Map<String, String> sessionDataMap;
@@ -198,6 +199,21 @@ public final class Certificate implements Serializable {
 	}
 
 	/**
+	 * @return the lastAccess
+	 */
+	public long getLastAccess() {
+		return this.lastAccess;
+	}
+
+	/**
+	 * @param lastAccess
+	 *            the lastAccess to set
+	 */
+	public void setLastAccess(long lastAccess) {
+		this.lastAccess = lastAccess;
+	}
+
+	/**
 	 * Returns a string representation of this object displaying its concrete type and its values
 	 * 
 	 * @see java.lang.Object#toString()
@@ -223,6 +239,7 @@ public final class Certificate implements Serializable {
 
 		builder.append(", locale=");
 		builder.append(this.locale);
+
 		builder.append("]");
 		return builder.toString();
 	}

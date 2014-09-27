@@ -352,6 +352,20 @@ public interface PrivilegeHandler {
 	public void isCertificateValid(Certificate certificate) throws PrivilegeException;
 
 	/**
+	 * Checks that the given password belongs to the given {@link Certificate}. If it doesn't, then a
+	 * {@link PrivilegeException} is thrown
+	 * 
+	 * @param certificate
+	 *            the certificate for which to check the password
+	 * @param password
+	 *            the password to check against the user from the certificate
+	 * 
+	 * @throws PrivilegeException
+	 *             if the certificate is invalid or the password does not match
+	 */
+	public void checkPassword(Certificate certificate, byte[] password) throws PrivilegeException;
+
+	/**
 	 * Returns the {@link PrivilegeContext} for the given {@link Certificate}. The {@link PrivilegeContext} is an
 	 * encapsulated state of a user's privileges so that for the duration of a user's call, the user can perform their
 	 * actions and do not need to access the {@link PrivilegeHandler} anymore

@@ -622,42 +622,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new PrivilegeException(msg);
 			}
 
-			// and validate the password
-			validatePassword(password);
-
-			// we only work with hashed passwords
-			String passwordHash = this.encryptionHandler.convertToHash(password);
-
-			// get user object
-			User user = this.persistenceHandler.getUser(username);
-			// no user means no authentication
-			if (user == null) {
-				String msg = MessageFormat.format("There is no user defined with the username {0}", username); //$NON-NLS-1$
-				throw new AccessDeniedException(msg);
-			}
-
-			// make sure not a system user - they may not login in
-			if (user.getUserState() == UserState.SYSTEM) {
-				String msg = "User {0} is a system user and may not login!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, username);
-				throw new AccessDeniedException(msg);
-			}
-
-			// validate password
-			String pwHash = user.getPassword();
-			if (pwHash == null)
-				throw new AccessDeniedException(MessageFormat.format(
-						"User {0} has no password and may not login!", username)); //$NON-NLS-1$
-			if (!pwHash.equals(passwordHash))
-				throw new AccessDeniedException(MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
-
-			// validate if user is allowed to login
-			// this also capture the trying to login of SYSTEM user
-			if (user.getUserState() != UserState.ENABLED) {
-				String msg = "User {0} does not have state {1} and can not login!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, username, UserState.ENABLED);
-				throw new AccessDeniedException(msg);
-			}
+			// check the password
+			User user = checkCredentialsAndUserState(username, password);
 
 			// validate user has at least one role
 			Set<String> userRoles = user.getRoles();
@@ -694,6 +660,60 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// return the certificate
 		return certificate;
+	}
+
+	/**
+	 * Checks the credentials and validates that the user may log in.
+	 * 
+	 * @param username
+	 *            the username of the {@link User} to check against
+	 * @param password
+	 *            the password of this user
+	 * 
+	 * @return the {@link User} if the credentials are valid and the user may login
+	 * 
+	 * @throws AccessDeniedException
+	 *             if anything is wrong with the credentials or the user state
+	 */
+	private User checkCredentialsAndUserState(String username, byte[] password) throws AccessDeniedException {
+
+		// and validate the password
+		validatePassword(password);
+
+		// we only work with hashed passwords
+		String passwordHash = this.encryptionHandler.convertToHash(password);
+
+		// get user object
+		User user = this.persistenceHandler.getUser(username);
+		// no user means no authentication
+		if (user == null) {
+			String msg = MessageFormat.format("There is no user defined with the username {0}", username); //$NON-NLS-1$
+			throw new AccessDeniedException(msg);
+		}
+
+		// make sure not a system user - they may not login in
+		if (user.getUserState() == UserState.SYSTEM) {
+			String msg = "User {0} is a system user and may not login!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, username);
+			throw new AccessDeniedException(msg);
+		}
+
+		// validate password
+		String pwHash = user.getPassword();
+		if (pwHash == null)
+			throw new AccessDeniedException(MessageFormat.format(
+					"User {0} has no password and may not login!", username)); //$NON-NLS-1$
+		if (!pwHash.equals(passwordHash))
+			throw new AccessDeniedException(MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
+
+		// validate if user is allowed to login
+		// this also capture the trying to login of SYSTEM user
+		if (user.getUserState() != UserState.ENABLED) {
+			String msg = "User {0} does not have state {1} and can not login!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, username, UserState.ENABLED);
+			throw new AccessDeniedException(msg);
+		}
+		return user;
 	}
 
 	/**
@@ -799,6 +819,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// everything is ok
+	}
+
+	@Override
+	public void checkPassword(Certificate certificate, byte[] password) throws PrivilegeException {
+		try {
+			isCertificateValid(certificate);
+			checkCredentialsAndUserState(certificate.getUsername(), password);
+		} finally {
+			clearPassword(password);
+		}
 	}
 
 	@Override
