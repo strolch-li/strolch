@@ -20,6 +20,7 @@ import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.Locator;
+import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.FloatParameter;
@@ -57,9 +58,9 @@ public class FindByLocatorTest {
 			assertNotNull("Should have found a FloatParameter with the locator " + locResource, resource);
 
 			// Order
-			Locator locOrderBag = Locator.valueOf("Order/TestType/MyTestOrder/Bag/@bag01");
-			ParameterBag orderBag = tx.findElement(locOrderBag);
-			assertNotNull("Should have found a FloatParameter with the locator " + locOrderBag, orderBag);
+			Locator locOrder = Locator.valueOf("Order/TestType/MyTestOrder");
+			Order order = tx.findElement(locOrder);
+			assertNotNull("Should have found an Order with the locator " + locOrder, order);
 
 			// Bag on Resource
 			Locator locResBag = Locator.valueOf("Resource/TestType/MyTestResource/Bag/@bag01");
