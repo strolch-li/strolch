@@ -172,8 +172,10 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 
 		super.fillClone(clone);
 
-		for (StrolchTimedState<IValue<?>> timedState : this.timedStateMap.values()) {
-			clone.addTimedState(timedState.getClone());
+		if (this.timedStateMap != null) {
+			for (StrolchTimedState<IValue<?>> timedState : this.timedStateMap.values()) {
+				clone.addTimedState(timedState.getClone());
+			}
 		}
 
 		return clone;
