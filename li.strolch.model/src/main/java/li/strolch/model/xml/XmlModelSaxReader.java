@@ -213,19 +213,18 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 		case Tags.VALUE:
 			String valueTime = attributes.getValue(Tags.TIME);
+			Date date = ISO8601FormatFactory.getInstance().parseDate(valueTime);
+			long time = date.getTime();
 			String valueValue = attributes.getValue(Tags.VALUE);
 			switch (this.stateType) {
 			case FloatTimedState.TYPE:
-				((FloatTimedState) this.state).getTimeEvolution().setValueAt(Long.valueOf(valueTime),
-						new FloatValue(valueValue));
+				((FloatTimedState) this.state).getTimeEvolution().setValueAt(time, new FloatValue(valueValue));
 				break;
 			case IntegerTimedState.TYPE:
-				((IntegerTimedState) this.state).getTimeEvolution().setValueAt(Long.valueOf(valueTime),
-						new IntegerValue(valueValue));
+				((IntegerTimedState) this.state).getTimeEvolution().setValueAt(time, new IntegerValue(valueValue));
 				break;
 			case BooleanTimedState.TYPE:
-				((BooleanTimedState) this.state).getTimeEvolution().setValueAt(Long.valueOf(valueTime),
-						new BooleanValue(valueValue));
+				((BooleanTimedState) this.state).getTimeEvolution().setValueAt(time, new BooleanValue(valueValue));
 				break;
 			case StringSetTimedState.TYPE:
 
@@ -236,8 +235,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 				}
 
 				StringSetValue stringSetValue = new StringSetValue(value);
-				((StringSetTimedState) this.state).getTimeEvolution().setValueAt(Long.valueOf(valueTime),
-						stringSetValue);
+				((StringSetTimedState) this.state).getTimeEvolution().setValueAt(time, stringSetValue);
 				break;
 			default:
 				break;

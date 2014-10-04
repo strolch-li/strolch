@@ -15,6 +15,7 @@
  */
 package li.strolch.model.timedstate;
 
+import java.util.Date;
 import java.util.SortedSet;
 
 import li.strolch.model.Tags;
@@ -24,6 +25,8 @@ import li.strolch.model.timevalue.impl.IntegerValue;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -50,7 +53,10 @@ public class IntegerTimedState extends AbstractStrolchTimedState<IntegerValue> {
 		NodeList timeValueElems = element.getElementsByTagName(Tags.VALUE);
 		for (int i = 0; i < timeValueElems.getLength(); i++) {
 			Element timeValueElem = (Element) timeValueElems.item(i);
-			Long time = Long.valueOf(timeValueElem.getAttribute(Tags.TIME));
+			String timeS = timeValueElem.getAttribute(Tags.TIME);
+			Date date = ISO8601FormatFactory.getInstance().parseDate(timeS);
+			long time = date.getTime();
+
 			Integer value = Integer.valueOf(timeValueElem.getAttribute(Tags.VALUE));
 			IntegerValue integerValue = new IntegerValue(value);
 			this.state.getTimeEvolution().setValueAt(time, integerValue);
@@ -67,7 +73,7 @@ public class IntegerTimedState extends AbstractStrolchTimedState<IntegerValue> {
 			Long time = timeValue.getTime();
 			IntegerValue value = timeValue.getValue();
 			Element valueElem = doc.createElement(Tags.VALUE);
-			valueElem.setAttribute(Tags.TIME, time.toString());
+			valueElem.setAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(time));
 			valueElem.setAttribute(Tags.VALUE, value.getValue().toString());
 			stateElement.appendChild(valueElem);
 		}

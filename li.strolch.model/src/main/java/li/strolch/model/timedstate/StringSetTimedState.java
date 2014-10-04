@@ -15,6 +15,7 @@
  */
 package li.strolch.model.timedstate;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -28,6 +29,8 @@ import li.strolch.model.timevalue.impl.StringSetValue;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -54,7 +57,9 @@ public class StringSetTimedState extends AbstractStrolchTimedState<StringSetValu
 		NodeList timeValueElems = element.getElementsByTagName(Tags.VALUE);
 		for (int i = 0; i < timeValueElems.getLength(); i++) {
 			Element timeValueElem = (Element) timeValueElems.item(i);
-			Long time = Long.valueOf(timeValueElem.getAttribute(Tags.TIME));
+			String timeS = timeValueElem.getAttribute(Tags.TIME);
+			Date date = ISO8601FormatFactory.getInstance().parseDate(timeS);
+			long time = date.getTime();
 
 			String valueAsString = timeValueElem.getAttribute(Tags.VALUE);
 			Set<AString> value = new HashSet<>();
@@ -90,7 +95,7 @@ public class StringSetTimedState extends AbstractStrolchTimedState<StringSetValu
 			String valueAsString = sb.toString();
 
 			Element valueElem = doc.createElement(Tags.VALUE);
-			valueElem.setAttribute(Tags.TIME, time.toString());
+			valueElem.setAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(time));
 			valueElem.setAttribute(Tags.VALUE, valueAsString);
 			stateElement.appendChild(valueElem);
 		}
