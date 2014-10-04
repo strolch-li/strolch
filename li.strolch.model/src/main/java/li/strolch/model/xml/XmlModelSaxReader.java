@@ -30,6 +30,7 @@ import li.strolch.model.State;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
+import li.strolch.model.parameter.DurationParameter;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.LongParameter;
@@ -130,6 +131,9 @@ public class XmlModelSaxReader extends DefaultHandler {
 			break;
 
 		case Tags.PARAMETER:
+
+			// TODO refactor this code into using visitors
+
 			String paramId = attributes.getValue(Tags.ID);
 			String paramName = attributes.getValue(Tags.NAME);
 			String paramType = attributes.getValue(Tags.TYPE);
@@ -158,6 +162,9 @@ public class XmlModelSaxReader extends DefaultHandler {
 					break;
 				case DateParameter.TYPE:
 					param = new DateParameter(paramId, paramName, DateParameter.parseFromString(paramValue));
+					break;
+				case DurationParameter.TYPE:
+					param = new DurationParameter(paramId, paramName, DurationParameter.parseFromString(paramValue));
 					break;
 				case StringListParameter.TYPE:
 					param = new StringListParameter(paramId, paramName, StringListParameter.parseFromString(paramValue));

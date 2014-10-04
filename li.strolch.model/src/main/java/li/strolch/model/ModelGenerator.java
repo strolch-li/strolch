@@ -27,6 +27,7 @@ import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
+import li.strolch.model.parameter.DurationParameter;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.LongParameter;
@@ -45,6 +46,7 @@ import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.StringSetValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * Class which can be used to generate objects which implement {@link StrolchElement}. These generated classes can then
@@ -75,6 +77,9 @@ public class ModelGenerator {
 
 	public static final String PARAM_LIST_STRING_ID = "@param7";
 	public static final String PARAM_LIST_STRING_NAME = "StringList Param";
+
+	public static final String PARAM_DURATION_ID = "@param8";
+	public static final String PARAM_DURATION_NAME = "Duration Param";
 
 	public static final String STATE_FLOAT_ID = "@state1";
 	public static final String STATE_FLOAT_NAME = "Float State";
@@ -371,6 +376,11 @@ public class ModelGenerator {
 				stringList);
 		stringListP.setIndex(7);
 		bag.addParameter(stringListP);
+
+		DurationParameter durationParam = new DurationParameter(PARAM_DURATION_ID, PARAM_DURATION_NAME,
+				ISO8601FormatFactory.getInstance().getDurationFormat().parse("P1D"));
+		durationParam.setIndex(8);
+		bag.addParameter(durationParam);
 	}
 
 	private static String randomValue(Random rand, String[] values) {

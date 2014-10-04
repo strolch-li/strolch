@@ -28,6 +28,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
+import li.strolch.model.parameter.DurationParameter;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.LongParameter;
@@ -231,6 +232,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 				addParameter(param);
 			} else if (paramtype.equals(DateParameter.TYPE)) {
 				DateParameter param = new DateParameter(paramElement);
+				addParameter(param);
+			} else if (paramtype.equals(DurationParameter.TYPE)) {
+				DurationParameter param = new DurationParameter(paramElement);
 				addParameter(param);
 			} else if (paramtype.equals(BooleanParameter.TYPE)) {
 				BooleanParameter param = new BooleanParameter(paramElement);

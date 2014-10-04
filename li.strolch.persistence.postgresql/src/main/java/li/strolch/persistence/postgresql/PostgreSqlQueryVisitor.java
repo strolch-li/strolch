@@ -33,6 +33,7 @@ import li.strolch.model.query.ParameterBagSelection.NullParameterBagSelection;
 import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateRangeParameterSelection;
+import li.strolch.model.query.ParameterSelection.DurationParameterSelection;
 import li.strolch.model.query.ParameterSelection.FloatParameterSelection;
 import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
 import li.strolch.model.query.ParameterSelection.LongParameterSelection;
@@ -299,6 +300,12 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 	public void visit(DateParameterSelection selection) {
 		xpath(selection.getBagKey(), selection.getParamKey(),
 				ISO8601FormatFactory.getInstance().formatDate(selection.getValue()));
+	}
+
+	@Override
+	public void visit(DurationParameterSelection selection) {
+		xpath(selection.getBagKey(), selection.getParamKey(),
+				ISO8601FormatFactory.getInstance().formatDuration(selection.getValue()));
 	}
 
 	@Override

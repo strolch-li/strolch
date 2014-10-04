@@ -31,6 +31,7 @@ import li.strolch.model.query.ParameterBagSelection.NullParameterBagSelection;
 import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateRangeParameterSelection;
+import li.strolch.model.query.ParameterSelection.DurationParameterSelection;
 import li.strolch.model.query.ParameterSelection.FloatParameterSelection;
 import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
 import li.strolch.model.query.ParameterSelection.LongParameterSelection;
@@ -185,6 +186,12 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	@Override
 	public void visit(DateParameterSelection selection) {
 		addSelector(ParameterSelector.<T> dateSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
+	}
+
+	@Override
+	public void visit(DurationParameterSelection selection) {
+		addSelector(ParameterSelector.<T> durationSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
 	}
 

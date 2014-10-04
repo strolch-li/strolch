@@ -15,10 +15,12 @@
  */
 package li.strolch.model.query;
 
+import li.strolch.model.visitor.StrolchVisitor;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface QueryVisitor {
+public interface QueryVisitor extends StrolchVisitor {
 
 	public void visitAny();
 

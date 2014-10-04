@@ -5,6 +5,7 @@
 
 	<Order Id="MyTestOrder" Name="Test Name" Type="TestType" Date="2013-11-20T07:42:57.699+01:00" State="CREATED">
 		<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+			<Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D" />
 			<Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World" />
 			<Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00" />
 			<Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch" />

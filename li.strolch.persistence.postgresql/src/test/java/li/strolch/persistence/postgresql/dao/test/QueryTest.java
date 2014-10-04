@@ -329,6 +329,13 @@ public class QueryTest {
 	}
 
 	@Test
+	public void shouldQueryResourceByDurationParam() throws SQLException {
+		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		query.and().with(ParameterSelection.durationSelection("@bag01", "@param8", "P1D"));
+		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
+	}
+
+	@Test
 	public void shouldQueryResourceByNullParam1() throws SQLException {
 		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
 		query.and().with(ParameterSelection.nullSelection("@bag01", "@param6"));

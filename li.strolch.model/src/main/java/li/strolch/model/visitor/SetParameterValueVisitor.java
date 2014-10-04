@@ -17,6 +17,7 @@ package li.strolch.model.visitor;
 
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
+import li.strolch.model.parameter.DurationParameter;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.ListParameter;
@@ -64,6 +65,12 @@ public class SetParameterValueVisitor implements ParameterVisitor {
 	}
 
 	@Override
+	public <T> T visitDurationParam(DurationParameter param) {
+		param.setValue(DurationParameter.parseFromString(this.value));
+		return null;
+	}
+
+	@Override
 	public <T> T visitFloatParam(FloatParameter param) {
 		param.setValue(FloatParameter.parseFromString(this.value));
 		return null;
@@ -92,5 +99,4 @@ public class SetParameterValueVisitor implements ParameterVisitor {
 		param.setValue(StringListParameter.parseFromString(this.value));
 		return null;
 	}
-
 }
