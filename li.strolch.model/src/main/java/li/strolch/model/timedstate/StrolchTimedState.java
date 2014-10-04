@@ -112,5 +112,8 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 
 	public void setParent(Resource aThis);
 
+	@Override
+	public StrolchTimedState<T> getClone();
+
 	public <U> U accept(TimedStateVisitor visitor);
 }

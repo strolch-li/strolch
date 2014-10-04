@@ -131,6 +131,25 @@ public class ModelTest {
 	}
 
 	@Test
+	public void shouldPerformResourceClone() {
+		Resource srcRes = createResource("@res01", "Test resource", "MyType");
+		Resource dstRes = srcRes.getClone();
+		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
+		visitor.visit(dstRes);
+		assertTrue("Cloned Resource should be deep equal!", visitor.isEqual());
+	}
+
+	@Test
+	public void shouldPerformOrderClone() {
+		Date date = new Date();
+		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		Order dstOrder = srcOrder.getClone();
+		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
+		visitor.visit(dstOrder);
+		assertTrue("Cloned Order should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
+	}
+
+	@Test
 	public void shouldFailDeepResourceEquals1() {
 		Resource srcRes = createResource("@res01", "Test resource", "MyType");
 		Resource dstRes = createResource("@res01", "Test resource", "MyType");

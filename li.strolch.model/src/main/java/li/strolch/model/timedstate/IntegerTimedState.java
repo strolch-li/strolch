@@ -17,7 +17,6 @@ package li.strolch.model.timedstate;
 
 import java.util.SortedSet;
 
-import li.strolch.model.StrolchElement;
 import li.strolch.model.Tags;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
@@ -82,7 +81,7 @@ public class IntegerTimedState extends AbstractStrolchTimedState<IntegerValue> {
 	}
 
 	@Override
-	public StrolchElement getClone() {
+	public IntegerTimedState getClone() {
 		IntegerTimedState clone = new IntegerTimedState();
 		fillClone(clone);
 		return clone;

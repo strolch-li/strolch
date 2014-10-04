@@ -14,5 +14,31 @@
 			<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
 			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
 		</ParameterBag>
+		<TimedState Id="@booleanState" Name="Boolean State" Type="BooleanState">
+			<Value Time="0" Value="false" />
+			<Value Time="1" Value="true" />
+			<Value Time="2" Value="false" />
+		</TimedState>
+		<TimedState Id="@integerState" Name="Integer State" Type="IntegerState">
+			<Value Time="0" Value="1" />
+			<Value Time="1" Value="2" />
+			<Value Time="2" Value="3" />
+			<Value Time="3" Value="2" />
+			<Value Time="4" Value="1" />
+			<Value Time="5" Value="0" />
+		</TimedState>
+		<TimedState Id="@floatState" Name="Float State" Type="FloatState">
+			<Value Time="0" Value="1.1" />
+			<Value Time="1" Value="2.2" />
+			<Value Time="2" Value="3.3" />
+			<Value Time="3" Value="2.2" />
+			<Value Time="4" Value="1.1" />
+			<Value Time="5" Value="0.0" />
+		</TimedState>
+		<TimedState Id="@stringSetState" Name="StringSet State" Type="StringSetState">
+			<Value Time="0" Value="foo" />
+			<Value Time="1" Value="foo, bar" />
+			<Value Time="2" Value="bar" />
+		</TimedState>
 	</Resource>
 </StrolchModel>

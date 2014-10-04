@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 
-import li.strolch.model.StrolchElement;
 import li.strolch.model.Tags;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.impl.AString;
@@ -105,7 +104,7 @@ public class StringSetTimedState extends AbstractStrolchTimedState<StringSetValu
 	}
 
 	@Override
-	public StrolchElement getClone() {
+	public StringSetTimedState getClone() {
 		StringSetTimedState clone = new StringSetTimedState();
 		fillClone(clone);
 		return clone;

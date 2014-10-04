@@ -17,7 +17,6 @@ package li.strolch.model.timedstate;
 
 import java.util.SortedSet;
 
-import li.strolch.model.StrolchElement;
 import li.strolch.model.Tags;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.impl.BooleanValue;
@@ -82,7 +81,7 @@ public class BooleanTimedState extends AbstractStrolchTimedState<BooleanValue> {
 	}
 
 	@Override
-	public StrolchElement getClone() {
+	public BooleanTimedState getClone() {
 		BooleanTimedState clone = new BooleanTimedState();
 		fillClone(clone);
 		return clone;
