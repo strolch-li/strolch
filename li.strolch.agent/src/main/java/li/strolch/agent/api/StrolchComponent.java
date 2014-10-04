@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class StrolchComponent {
 
-	private static final String COMPONENT_VERSION_PROPERTIES = "/componentVersion.properties"; //$NON-NLS-1$
+	public static final String COMPONENT_VERSION_PROPERTIES = "/componentVersion.properties"; //$NON-NLS-1$
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchComponent.class);
 	private final ComponentContainer container;
 	private final String componentName;

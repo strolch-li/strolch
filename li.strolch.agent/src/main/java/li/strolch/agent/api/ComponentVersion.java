@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "ComponentVersion")
-public class ComponentVersion extends AbstractVersion {
+public class ComponentVersion extends StrolchVersion {
 
 	@XmlAttribute(name = "componentName")
 	private String componentName;

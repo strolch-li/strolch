@@ -25,35 +25,42 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @XmlAccessorType(XmlAccessType.NONE)
-public abstract class AbstractVersion {
+public class StrolchVersion {
 
-	@XmlAttribute(name = "groupId")
+	public static final String BUILD_TIMESTAMP = "buildTimestamp";
+	public static final String SCM_BRANCH = "scmBranch";
+	public static final String SCM_REVISION = "scmRevision";
+	public static final String ARTIFACT_VERSION = "artifactVersion";
+	public static final String ARTIFACT_ID = "artifactId";
+	public static final String GROUP_ID = "groupId";
+
+	@XmlAttribute(name = GROUP_ID)
 	private String groupId;
-	@XmlAttribute(name = "artifactId")
+	@XmlAttribute(name = ARTIFACT_ID)
 	private String artifactId;
-	@XmlAttribute(name = "artifactVersion")
+	@XmlAttribute(name = ARTIFACT_VERSION)
 	private String artifactVersion;
-	@XmlAttribute(name = "scmRevision")
+	@XmlAttribute(name = SCM_REVISION)
 	private String scmRevision;
-	@XmlAttribute(name = "scmBranch")
+	@XmlAttribute(name = SCM_BRANCH)
 	private String scmBranch;
-	@XmlAttribute(name = "buildTimestamp")
+	@XmlAttribute(name = BUILD_TIMESTAMP)
 	private String buildTimestamp;
 
-	public AbstractVersion() {
+	public StrolchVersion() {
 		// no-arg constructor for JAXB
 	}
 
 	/**
 	 * @param properties
 	 */
-	public AbstractVersion(Properties properties) {
-		this.groupId = properties.getProperty("groupId"); //$NON-NLS-1$
-		this.artifactId = properties.getProperty("artifactId"); //$NON-NLS-1$
-		this.artifactVersion = properties.getProperty("artifactVersion"); //$NON-NLS-1$
-		this.scmRevision = properties.getProperty("scmRevision"); //$NON-NLS-1$
-		this.scmBranch = properties.getProperty("scmBranch"); //$NON-NLS-1$
-		this.buildTimestamp = properties.getProperty("buildTimestamp"); //$NON-NLS-1$
+	public StrolchVersion(Properties properties) {
+		this.groupId = properties.getProperty(GROUP_ID); //$NON-NLS-1$
+		this.artifactId = properties.getProperty(ARTIFACT_ID); //$NON-NLS-1$
+		this.artifactVersion = properties.getProperty(ARTIFACT_VERSION); //$NON-NLS-1$
+		this.scmRevision = properties.getProperty(SCM_REVISION); //$NON-NLS-1$
+		this.scmBranch = properties.getProperty(SCM_BRANCH); //$NON-NLS-1$
+		this.buildTimestamp = properties.getProperty(BUILD_TIMESTAMP); //$NON-NLS-1$
 	}
 
 	/**

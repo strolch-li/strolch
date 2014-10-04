@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "AgentVersion")
-public class AgentVersion extends AbstractVersion {
+public class AgentVersion extends StrolchVersion {
 
 	@XmlAttribute(name = "agentName")
 	private String agentName;
