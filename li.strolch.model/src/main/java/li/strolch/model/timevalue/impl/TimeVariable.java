@@ -119,6 +119,11 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	}
 
 	@Override
+	public void clear() {
+		this.container.clear();
+	}
+
+	@Override
 	public ITimeVariable<T> getCopy() {
 		TimeVariable<T> clone = new TimeVariable<>();
 		for (ITimeValue<T> timeValue : this.container) {

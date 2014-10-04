@@ -85,6 +85,11 @@ public interface ITimeVariable<T extends IValue> {
 	void compact();
 
 	/**
+	 * Clears all values on this time variable
+	 */
+	void clear();
+
+	/**
 	 * @return a copy of this time variable
 	 */
 	ITimeVariable<T> getCopy();
