@@ -71,6 +71,16 @@ public interface FormatFactory {
 	public String formatDate(Date date);
 
 	/**
+	 * Formats a long as date using {@link #getDateFormat()}
+	 * 
+	 * @param date
+	 *            the date to format to string
+	 * 
+	 * @return String representation of the date
+	 */
+	public String formatDate(long date);
+
+	/**
 	 * Formats a duration using {@link #getDateFormat()}
 	 * 
 	 * @param duration
@@ -99,4 +109,34 @@ public interface FormatFactory {
 	 * @return the floating point formatted as a string
 	 */
 	public String formatFloat(double value);
+
+	/**
+	 * Parses a date using {@link #getDateFormat()}
+	 * 
+	 * @param date
+	 *            the string to parse to date
+	 * 
+	 * @return the date
+	 */
+	public Date parseDate(String date);
+
+	/**
+	 * Parses a duration using {@link #getDateFormat()}
+	 * 
+	 * @param duration
+	 *            the string to parse to duration
+	 * 
+	 * @return the duration
+	 */
+	public long parseDuration(String duration);
+
+	/**
+	 * Parses a work time duration using {@link #getDateFormat()}
+	 * 
+	 * @param worktime
+	 *            the string duration to parse to work time
+	 * 
+	 * @return the work time
+	 */
+	public long parseWorktime(String worktime);
 }

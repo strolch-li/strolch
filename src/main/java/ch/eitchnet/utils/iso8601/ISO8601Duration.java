@@ -130,7 +130,7 @@ public class ISO8601Duration implements DurationFormat {
 		long newResult = 0;
 
 		// throw exception, if the string is not of length > 2
-		if (s.length() < 3)
+		if (s == null || s.length() < 3)
 			throw new NumberFormatException(s + " cannot be parsed to ISO 8601 Duration");
 
 		char p = s.charAt(0);

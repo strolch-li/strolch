@@ -73,6 +73,11 @@ public class ISO8601FormatFactory implements FormatFactory {
 	}
 
 	@Override
+	public String formatDate(long date) {
+		return getDateFormat().format(date);
+	}
+
+	@Override
 	public String formatDuration(long duration) {
 		return getDurationFormat().format(duration);
 	}
@@ -85,5 +90,20 @@ public class ISO8601FormatFactory implements FormatFactory {
 	@Override
 	public String formatFloat(double value) {
 		return Double.toString(MathHelper.toPrecision(value));
+	}
+
+	@Override
+	public Date parseDate(String date) {
+		return getDateFormat().parse(date);
+	}
+
+	@Override
+	public long parseDuration(String duration) {
+		return getDurationFormat().parse(duration);
+	}
+
+	@Override
+	public long parseWorktime(String worktime) {
+		return getDurationFormat().parse(worktime);
 	}
 }
