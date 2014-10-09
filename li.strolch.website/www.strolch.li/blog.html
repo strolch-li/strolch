@@ -60,6 +60,30 @@
 
                     <!-- blog post -->
                     <div class="blog-post">
+                        <h2 class="blog-post-title">DurationParameter and other minor changes: Release 1.0.0-RC4</h2>
+                        <p class="blog-post-meta">October 9, 2014 by <a href="#">Robert</a></p>
+
+                        <p>New <i>DurationParameter</i> and additional minor changes: Release of 1.0.0-RC4 which can be downloaded on the <a href="downloads.html">download</a> page.</p>
+                        <hr>
+                        <p>While implementing a use case in a Strolch based application it was detected that an essential parameter type was missing, the <i>DurationParameter</i>. This parameter currently stores the value as a long in memory and serializes to <a href="http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO8601</a>. As soon as we move Strolch to Java8, we will change this to use the <i>Period</i> class in the new Java8 date and time API.</p>
+
+                        <p>In addition to the new parameter, a couple of other changes were made:</p>
+                        <ul>
+                            <li>32c1785 [Major] Added Session timeout handling</li>
+                            <li>d55371e [Minor] fixed component version descriptions</li>
+                            <li>c1cdfbb [Bugfix] added missing cloning of StringSetTimedState in Resources</li>
+                            <li>8f50a15 [Major] changed XML format of time value of TimedStates to be ISO8601</li>
+                            <li>5fbbe50 [Bugfix] fix NPE when cloning Resources with no state vars</li>
+                            <li>b77f4b2 [New] added TimeVariable.clear()-method</li>
+                            <li>Updated sub-module ch.eitchnet.utils to 906d24d</li>
+                            <li>Updated sub-module ch.eitchnet.privilege to aa16887</li>
+                        </ul>
+
+                        <p>So, Strolch 1.0.0-RC4 is out the door, go ahead and <a href="downloads.html">try it out</a>.</p>
+
+                    </div><!-- /.blog-post -->
+                    <!-- blog post -->
+                    <div class="blog-post">
                         <h2 class="blog-post-title">DB Initialization: Release 1.0.0-RC3</h2>
                         <p class="blog-post-meta">August 24, 2014 by <a href="#">Robert</a></p>
 
