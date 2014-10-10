@@ -244,9 +244,11 @@ else
   echo "\nINFO: To push tags perform the following:"
   echo "git push origin ${new_version}"
   echo "git submodule foreach git push origin ${new_version}"
+  echo "\nINFO: Or to delete the tags:"
+  echo "git submodule foreach git tag -d ${new_version}"
+  echo "git tag -d ${new_version}"
 fi
 
 
 echo -e "\nINFO: Released version ${new_version}"
-
 exit 0
