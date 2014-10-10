@@ -1,7 +1,7 @@
 #!/bin/bash
 
 projectName=strolch_bundle
-projectVersion=1.0.0-SNAPSHOT
+projectVersion=1.0.0-RC4
 bundle_name="${projectName}-${projectVersion}"
 DIST_STROLCH="/var/www/eitch/www.strolch.li/dist/snapshot"
 DEPLOY_SERVER="appsrv.gsi.local"
