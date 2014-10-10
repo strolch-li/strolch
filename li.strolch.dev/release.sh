@@ -122,6 +122,18 @@ function build() {
   fi
 }
 
+function createBundle() {
+  cd "${root}/li.strolch.dev"
+  if ./createBundle.sh 1> /dev/null ; then
+    echo "INFO: Bundle creation OK"
+    return 0;
+  else
+    echo "ERROR: Bundle creation failed!"
+    echo "INFO: Run ${root}/li.strolch.dev/createBundle.sh to see the bundle creation problems!"
+    return 1;
+  fi
+}
+
 
 # create release branch
 if [ -n "${create_release_branch}" ] ; then
@@ -204,6 +216,13 @@ if ! git commit -m "[Project] bumped version from ${old_version} to ${new_versio
   fail
 fi
 if ! git tag ${new_version} ; then
+  fail
+fi
+
+
+# create bundle for new version
+echo "Creating bundle for version ${new_version}..."
+if ! createBundle ; then
   fail
 fi
 
