@@ -241,12 +241,12 @@ if [ -n "${push}" ] ; then
   git push origin ${new_version}
   git submodule foreach git push origin ${new_version}
 else
-  echo "\nINFO: To push tags perform the following:"
-  echo "git push origin ${new_version}"
-  echo "git submodule foreach git push origin ${new_version}"
-  echo "\nINFO: Or to delete the tags:"
-  echo "git submodule foreach git tag -d ${new_version}"
-  echo "git tag -d ${new_version}"
+  echo -e "\nINFO: To push tags perform the following:"
+  echo -e "git push origin ${new_version}"
+  echo -e "git submodule foreach git push origin ${new_version}"
+  echo -e "\nINFO: Or to delete the tags:"
+  echo -e "git submodule foreach git tag -d ${new_version}"
+  echo -e "git tag -d ${new_version}"
 fi
 
 
