@@ -7,6 +7,13 @@ fi
 
 function usage() {
   echo "Usage: $0 [-c] [-p] [-r <release_branch>] [-b <branch>] [-o <old_version>] [-n <new_version>]" 1>&2;
+  echo "  -c                    create release branch"
+  echo "  -p                    push tags"
+  echo "  -r <release_branch>   release branch to create or using for tagging and checkout"
+  echo "  -b <branch>           branch to checkout from (important when creating the release_branch)"
+  echo "  -o <old_version>      version from which to release from e.g. 1.0.0-SNAPSHOT"
+  echo "  -n <new_version>      release version e.g. 1.0.0-RC3"
+  echo ""
   exit 1;
 }
 
