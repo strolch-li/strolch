@@ -1,5 +1,9 @@
 #!/bin/bash
 
+declare SCRIPT_NAME="${0##*/}"
+declare SCRIPT_DIR="$(cd ${0%/*} ; pwd)"
+root="$(cd ${SCRIPT_DIR}/.. ; pwd)"
+
 if [ ! $(which xmlstarlet) ] ; then
   echo "ERROR: xmlstarlet is missing!"s
   exit 1
@@ -17,6 +21,7 @@ function usage() {
   exit 1;
 }
 
+# get arguments
 while getopts ":b:o:n:r:cp" arg; do
     case "${arg}" in
         c)
@@ -45,6 +50,7 @@ while getopts ":b:o:n:r:cp" arg; do
 done
 shift $((OPTIND-1))
 
+# validate arguments
 if [ -z "${r}" ] || [ -z "${b}" ] || [ -z "${o}" ] || [ -z "${n}" ] ; then
   echo "ERROR: Missing an argument!"
   usage
@@ -56,9 +62,7 @@ if [ "$(git status --short)" != "" ] ; then
 fi
 
 
-declare SCRIPT_NAME="${0##*/}"
-declare SCRIPT_DIR="$(cd ${0%/*} ; pwd)"
-
+# set vars
 create_release_branch="${c}"
 release_branch="${r}"
 branch="${b}"
@@ -66,9 +70,8 @@ old_version="${o}"
 new_version="${n}"
 push="${p}"
 
-root="$(cd ${SCRIPT_DIR}/.. ; pwd)"
 
-
+# log what we are doing
 echo "root=${root}"
 echo "old_version=${old_version}"
 echo "new_version=${new_version}"
@@ -107,6 +110,18 @@ function fail() {
   exit 1
 }
 
+function build() {
+  cd ${root}
+  if mvn clean package -DskipTests 1> /dev/null ; then
+    echo "INFO: Build OK"
+    return 0;
+  else
+    echo "ERROR: Build failed!"
+    echo "INFO: Run mvn clean package -DskipTests to see the build problems!"
+    return 1;
+  fi
+}
+
 
 # create release branch
 if [ -n "${create_release_branch}" ] ; then
@@ -131,6 +146,13 @@ if ! git submodule foreach git checkout ${release_branch} ; then
 fi
 
 
+# build with old version
+echo "INFO: Building current version ${old_version}..."
+if ! build ; then
+  fail
+fi
+
+
 # bump version
 echo -e "\nINFO: Bumping versions..."
 ${root}/li.strolch.dev/setVersion.sh ${old_version} ${new_version}
@@ -145,6 +167,13 @@ if ! git status --short ; then
   fail
 fi
 if ! git submodule foreach git status --short ; then
+  fail
+fi
+
+
+# build with new version
+echo "Building new version ${new_version}..."
+if ! build ; then
   fail
 fi
 
