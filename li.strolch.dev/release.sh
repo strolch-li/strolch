@@ -240,6 +240,10 @@ if [ -n "${push}" ] ; then
   echo -e "\nINFO: Pushing to origin..."
   git push origin ${new_version}
   git submodule foreach git push origin ${new_version}
+else
+  echo "\nINFO: To push tags perform the following:"
+  echo "git push origin ${new_version}"
+  echo "git submodule foreach git push origin ${new_version}"
 fi
 
 
