@@ -87,10 +87,11 @@ done
 
 
 cd "${root}"
-if ! sed -i.bck "s/${old_version}/${new_version}/" "li.strolch.dev/createBundle.sh" 2>/dev/null ; then
-  fail "${root}/li.strolch.dev/createBundle.sh"
+create_script="li.strolch.dev/createBundle.sh"
+if ! sed -i.bck "s/${old_version}/${new_version}/" "${create_script}" 2>/dev/null ; then
+  fail "${root}/${create_script}"
 fi
-
+rm -f "${create_script}.bck"
 
 echo -e "\nINFO: Bumped version from ${old_version} to ${new_version}"
 

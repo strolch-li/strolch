@@ -85,7 +85,7 @@ fi
 if [ -n "${push}" ] ; then
   echo "Pushing to origin."
 else
-  echo "NOT pusing to origin."
+  echo "NOT pushing to origin."
 fi
 
 echo ""
