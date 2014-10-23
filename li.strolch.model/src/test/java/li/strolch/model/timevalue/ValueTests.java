@@ -1,6 +1,4 @@
-/*
- * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
+/* 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,13 +22,19 @@ import li.strolch.model.timevalue.impl.AString;
 import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.StringSetValue;
+import li.strolch.model.timevalue.impl.TimeVariable;
 
 import org.junit.Test;
 
+/**
+ * Basic tests for a {@link TimeVariable} with {@link StringValue}.
+ *
+ * @author Martin Smock <smock.martin@gmail.com>
+ */
 public class ValueTests {
 
 	/**
-	 * check, that adding the inverse results in the neutral element (=0)
+	 * check, that adding the inverse returns the neutral element (=0)
 	 */
 	@Test
 	public void testDoubleInverse() {
@@ -41,7 +45,7 @@ public class ValueTests {
 	}
 
 	/**
-	 * check, that adding the inverse results in the neutral element (=0)
+	 * check, that adding the inverse returns the neutral element (=0)
 	 */
 	@Test
 	public void testIntegerInverse() {
@@ -52,7 +56,7 @@ public class ValueTests {
 	}
 
 	/**
-	 * check, that adding the inverse results in the neutral element (empty Set)
+	 * check, that adding the inverse returns the neutral element (empty Set)
 	 */
 	@Test
 	public void testStringSetInverse() {

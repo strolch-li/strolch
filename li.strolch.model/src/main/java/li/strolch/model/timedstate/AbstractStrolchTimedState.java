@@ -40,6 +40,8 @@ import org.w3c.dom.Element;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
+ * Wrapper for a {@link IntegerTimedState}
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("rawtypes")

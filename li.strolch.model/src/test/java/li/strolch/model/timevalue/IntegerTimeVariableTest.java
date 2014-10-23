@@ -1,6 +1,4 @@
 /*
- * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +31,7 @@ import org.junit.Test;
 /**
  * Basic tests for a {@link TimeVariable} with integer values.
  *
- * @author martin_smock
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 public class IntegerTimeVariableTest {
 

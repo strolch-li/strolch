@@ -1,6 +1,4 @@
 /*
- * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +31,11 @@ import li.strolch.model.timevalue.impl.ValueChange;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Basic tests for a {@link TimeVariable} with {@link StringValue}.
+ *
+ * @author Martin Smock <smock.martin@gmail.com>
+ */
 public class StringTimeVariableTest {
 
 	private static final Long MAX = 100L;

@@ -15,26 +15,48 @@
  */
 package li.strolch.model.timevalue;
 
+import li.strolch.model.timedstate.AbstractStrolchTimedState;
+import li.strolch.model.timevalue.impl.TimeVariable;
+
 /**
- * Interface for operators to be used to change the values of {@link ITimeValue} in a {@link ITimeVariable}.
- *
+ * Interface for operators to be used to change the values of {@link ITimeValue}
+ * in a {@link ITimeVariable} or {@link AbstractStrolchTimedState}.
+ * 
  * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("rawtypes")
 public interface IValueChange<T extends IValue> {
 
 	/**
+	 * @return the id of the {@link AbstractStrolchTimedState} the change
+	 *         applies to
+	 */
+	String getStateId();
+
+	/**
+	 * @param id
+	 *            the id of the {@link AbstractStrolchTimedState} the change
+	 *            applies to
+	 */
+	void setStateId(String id);
+
+	/**
 	 * @return the time this change has to be applied
 	 */
 	Long getTime();
+	
+	void setTime(Long time); 
 
 	/**
 	 * @return the value of the change
 	 */
 	T getValue();
+	
+	void setValue(T value); 
 
 	/**
-	 * @return the inverse neutralizing a change. Very useful to undo changes applied.
+	 * @return the inverse neutralizing a change. Very useful to undo changes
+	 *         made to a {@link TimeVariable}.
 	 */
 	IValueChange<T> getInverse();
 
