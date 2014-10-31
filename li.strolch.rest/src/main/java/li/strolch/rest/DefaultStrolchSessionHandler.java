@@ -106,6 +106,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		synchronized (this.certificateMap) {
 			Certificate certificate = this.privilegeHandler.authenticate(username, password);
+			certificate.setLastAccess(System.currentTimeMillis());
 			this.certificateMap.put(certificate.getAuthToken(), certificate);
 
 			logger.info(this.certificateMap.size() + " sessions currently active.");
