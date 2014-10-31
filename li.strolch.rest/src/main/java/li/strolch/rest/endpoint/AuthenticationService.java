@@ -71,16 +71,18 @@ public class AuthenticationService {
 		try {
 
 			StringBuilder sb = new StringBuilder();
-			if (StringHelper.isEmpty(login.getUsername())) {
-				sb.append("Username was not given. "); //$NON-NLS-1$
+			if (StringHelper.isEmpty(login.getUsername()) || login.getUsername().length() < 2) {
+				sb.append("Username was not given or is too short!"); //$NON-NLS-1$
 			}
-			if (StringHelper.isEmpty(login.getPassword())) {
-				sb.append("Password was not given."); //$NON-NLS-1$
+			if (StringHelper.isEmpty(login.getPassword()) || login.getPassword().length() < 3) {
+				if (sb.length() > 0)
+					sb.append("\n");
+				sb.append("Password was not given or was too short!"); //$NON-NLS-1$
 			}
 
 			if (sb.length() != 0) {
 				loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", sb.toString())); //$NON-NLS-1$
-				return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
+				return Response.status(Status.BAD_REQUEST).entity(loginResult).build();
 			}
 
 			RestfulStrolchComponent restfulStrolchComponent = RestfulStrolchComponent.getInstance();
@@ -103,12 +105,14 @@ public class AuthenticationService {
 			else
 				loginResult.setPrivileges(allowList);
 
-			return Response.ok().entity(entity).build();
+			return Response.ok().entity(entity)//
+					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken())//
+					.build();
 
-		} catch (StrolchException e) {
+		} catch (StrolchException | PrivilegeException e) {
 			logger.error(e.getMessage(), e);
 			loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
-			return Response.status(Status.UNAUTHORIZED).entity(entity).build();
+			return Response.status(Status.FORBIDDEN).entity(entity).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
