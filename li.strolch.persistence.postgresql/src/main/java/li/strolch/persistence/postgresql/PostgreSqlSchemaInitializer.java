@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import li.strolch.agent.api.StrolchAgent;
+import ch.eitchnet.db.DbMigrationState;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 

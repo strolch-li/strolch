@@ -42,6 +42,7 @@ import java.util.Set;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -176,7 +177,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 
 		Locator locator = this.locatorBuilder.build();
-		//logger.info("path: " + locator.toString()); //$NON-NLS-1$
+		LoggerFactory.getLogger(getClass()).info("path: " + locator.toString()); //$NON-NLS-1$
 
 		switch (locator.toString()) {
 
@@ -345,6 +346,12 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+			if (this.propertyName != null) {
+				String msg = "Opening another tag {0} although {1} is still open!"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, this.propertyName, qName);
+				throw new IllegalStateException(msg);
+			}
+
 			this.propertyName = qName;
 			this.valueBuffer = new StringBuilder();
 		}
@@ -352,7 +359,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 			if (this.propertyName == null || !this.propertyName.equals(qName)) {
-				String msg = "Previous tag '{0}' was not closed before new tag {1}!"; //$NON-NLS-1$
+				String msg = "Previous tag {0} was not closed before new tag {1}!"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, this.propertyName, qName);
 				throw new IllegalStateException(msg);
 			}

@@ -24,7 +24,6 @@ import static li.strolch.service.test.AbstractRealmServiceTest.dropSchema;
 import static li.strolch.service.test.AbstractRealmServiceTest.importFromXml;
 
 import java.io.File;
-import java.sql.SQLException;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
@@ -54,7 +53,7 @@ public abstract class AbstractRealmCommandTest {
 	public ExpectedException expectedException = ExpectedException.none();
 
 	@BeforeClass
-	public static void beforeClass() throws SQLException {
+	public static void beforeClass() throws Exception {
 
 		dropSchema("jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
 		dropSchema("jdbc:postgresql://localhost/transactionaluserdb", "transactionaluser", "test");
@@ -72,7 +71,8 @@ public abstract class AbstractRealmCommandTest {
 
 	@AfterClass
 	public static void afterClass() {
-		runtimeMock.destroyRuntime();
+		if (runtimeMock != null)
+			runtimeMock.destroyRuntime();
 	}
 
 	public static ServiceHandler getServiceHandler() {

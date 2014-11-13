@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.io.File;
-import java.sql.SQLException;
 
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.DataStoreMode;
@@ -58,7 +57,7 @@ public class RealmTest extends AbstractModelTest {
 	}
 
 	@BeforeClass
-	public static void beforeClass() throws SQLException {
+	public static void beforeClass() throws Exception {
 
 		dropSchema("jdbc:postgresql://localhost/testdb1", TESTUSER1, TEST); //$NON-NLS-1$
 		dropSchema("jdbc:postgresql://localhost/testdb2", TESTUSER2, TEST); //$NON-NLS-1$

@@ -75,7 +75,7 @@ public class AuditQueryTest {
 	private static Date future;
 
 	@BeforeClass
-	public static void beforeClass() throws SQLException {
+	public static void beforeClass() throws Exception {
 
 		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
 

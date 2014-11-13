@@ -34,6 +34,7 @@ import li.strolch.runtime.configuration.StrolchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.db.DbMigrationState;
 import ch.eitchnet.privilege.handler.SystemUserAction;
 import ch.eitchnet.privilege.model.Certificate;
 

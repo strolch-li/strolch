@@ -44,7 +44,8 @@ public abstract class AbstractServiceTest {
 
 	@AfterClass
 	public static void afterClass() {
-		runtimeMock.destroyRuntime();
+		if (runtimeMock != null)
+			runtimeMock.destroyRuntime();
 	}
 
 	public static ServiceHandler getServiceHandler() {

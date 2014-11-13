@@ -24,7 +24,6 @@ import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchem
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +64,7 @@ public class ObserverUpdateTest {
 	}
 
 	@BeforeClass
-	public static void beforeClass() throws SQLException {
+	public static void beforeClass() throws Exception {
 
 		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
 

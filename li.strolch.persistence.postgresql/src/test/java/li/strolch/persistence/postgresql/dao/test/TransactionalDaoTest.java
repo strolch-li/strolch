@@ -21,7 +21,6 @@ import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_USERNA
 import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
 
 import java.io.File;
-import java.sql.SQLException;
 
 import li.strolch.testbase.runtime.AbstractModelTest;
 import li.strolch.testbase.runtime.RuntimeMock;
@@ -43,7 +42,7 @@ public class TransactionalDaoTest extends AbstractModelTest {
 	}
 
 	@BeforeClass
-	public static void beforeClass() throws SQLException {
+	public static void beforeClass() throws Exception {
 
 		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
 

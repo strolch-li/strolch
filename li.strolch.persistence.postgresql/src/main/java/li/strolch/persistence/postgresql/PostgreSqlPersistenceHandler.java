@@ -15,17 +15,15 @@
  */
 package li.strolch.persistence.postgresql;
 
+import static ch.eitchnet.db.DbConstants.PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE;
+import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_CREATION;
+import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_DROP;
+import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_MIGRATION;
 import static li.strolch.agent.api.RealmHandler.SYSTEM_USER_DB_INITIALIZER;
-import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 
 import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.RealmHandler;
@@ -33,16 +31,22 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.AuditDao;
-import li.strolch.persistence.api.DbConnectionInfo;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.DbConnectionBuilder;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import ch.eitchnet.db.DbConnectionCheck;
+import ch.eitchnet.db.DbConnectionInfo;
+import ch.eitchnet.db.DbDriverLoader;
+import ch.eitchnet.db.DbException;
+import ch.eitchnet.db.DbMigrationState;
+import ch.eitchnet.db.DbSchemaVersionCheck;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
@@ -50,15 +54,7 @@ import ch.eitchnet.privilege.model.Certificate;
  */
 public class PostgreSqlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
-	public static final String PROP_DB_URL = "db.url"; //$NON-NLS-1$
-	public static final String PROP_DB_USERNAME = "db.username"; //$NON-NLS-1$
-	public static final String PROP_DB_PASSWORD = "db.password"; //$NON-NLS-1$
-	public static final String PROP_ALLOW_SCHEMA_CREATION = "allowSchemaCreation";
-	public static final String PROP_ALLOW_SCHEMA_DROP = "allowSchemaDrop";
-	public static final String PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE = "allowDataInitOnSchemaCreate";
-	public static final String PROP_DB_VERSION = "db_version";
-	public static final String RESOURCE_DB_VERSION = "/db_version.properties";
-
+	public static final String SCRIPT_PREFIX = "strolch";
 	private ComponentConfiguration componentConfiguration;
 	private Map<String, DbConnectionInfo> connetionInfoMap;
 
@@ -70,52 +66,23 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	public void initialize(ComponentConfiguration componentConfiguration) {
 
 		this.componentConfiguration = componentConfiguration;
-		this.connetionInfoMap = new HashMap<>();
 
-		Set<String> realmNames = getContainer().getRealmNames();
-		for (String realmName : realmNames) {
+		// server loader does not seem to work in all contexts, thus:
+		org.postgresql.Driver.getLogLevel();
 
-			StrolchRealm realm = getContainer().getRealm(realmName);
-			if (realm.getMode().isTransient())
-				continue;
-
-			String dbUrlKey = makeRealmKey(realmName, PROP_DB_URL);
-			String dbUsernameKey = makeRealmKey(realmName, PROP_DB_USERNAME);
-			String dbPasswordKey = makeRealmKey(realmName, PROP_DB_PASSWORD);
-
-			String dbUrl = componentConfiguration.getString(dbUrlKey, null);
-			String username = componentConfiguration.getString(dbUsernameKey, null);
-			String password = componentConfiguration.getString(dbPasswordKey, null);
-
-			DbConnectionInfo connectionInfo = new DbConnectionInfo(realmName, dbUrl);
-			connectionInfo.setUsername(username);
-			connectionInfo.setPassword(password);
-
-			loadDriverForConnection(connectionInfo);
-			this.connetionInfoMap.put(realmName, connectionInfo);
+		DbConnectionBuilder connectionBuilder = new DbConnectionBuilder(getContainer(), componentConfiguration);
+		Map<String, DbConnectionInfo> connectionInfoMap = connectionBuilder.build();
+		for (DbConnectionInfo connectionInfo : connectionInfoMap.values()) {
+			try {
+				DbDriverLoader.loadDriverForConnection(connectionInfo);
+			} catch (DbException e) {
+				throw new StrolchConfigurationException("Could not load driver for connection "
+						+ connectionInfo.getUrl(), e);
+			}
 		}
 
+		this.connetionInfoMap = connectionInfoMap;
 		super.initialize(componentConfiguration);
-	}
-
-	private void loadDriverForConnection(DbConnectionInfo connectionInfo) {
-		Driver driver;
-		try {
-			// server loader does not seem to work in all contexts, thus:
-			org.postgresql.Driver.getLogLevel();
-
-			driver = DriverManager.getDriver(connectionInfo.getUrl());
-		} catch (SQLException e) {
-			String msg = "Failed to load DB driver for URL {0} due to: {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, connectionInfo.getUrl(), e.getMessage());
-			throw new StrolchConfigurationException(msg, e);
-		}
-
-		String compliant = driver.jdbcCompliant() ? "" : "non"; //$NON-NLS-1$ //$NON-NLS-2$
-		String msg = "Realm {0}: Using {1} JDBC compliant Driver {2}.{3}"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, connectionInfo.getRealm(), compliant, driver.getMajorVersion(),
-				driver.getMinorVersion());
-		logger.info(msg);
 	}
 
 	/**
@@ -132,15 +99,26 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 		// test all connections
 		DbConnectionCheck connectionCheck = new DbConnectionCheck(this.connetionInfoMap);
-		connectionCheck.checkConnections();
+		try {
+			connectionCheck.checkConnections();
+		} catch (DbException e) {
+			throw new StrolchConfigurationException("At least one connection failed: " + e.getMessage(), e);
+		}
 
 		boolean allowSchemaCreation = componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
+		boolean allowSchemaMigration = componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION, Boolean.FALSE);
 		boolean allowSchemaDrop = componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_DROP, Boolean.FALSE);
 		boolean allowDataInitOnSchemaCreate = componentConfiguration.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE,
 				Boolean.FALSE);
 
-		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(allowSchemaCreation, allowSchemaDrop);
-		schemaVersionCheck.checkSchemaVersion(this.connetionInfoMap);
+		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX, this.getClass(),
+				allowSchemaCreation, allowSchemaMigration, allowSchemaDrop);
+		try {
+			schemaVersionCheck.checkSchemaVersion(this.connetionInfoMap);
+		} catch (DbException e) {
+			throw new StrolchConfigurationException(
+					"Failed to validate the schema for a connection: " + e.getMessage(), e);
+		}
 
 		// if allowed, perform DB initialization
 		if (!allowSchemaCreation || !allowSchemaDrop || !allowDataInitOnSchemaCreate) {
@@ -172,15 +150,10 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		}
 
 		try {
-			String url = dbInfo.getUrl();
-			String username = dbInfo.getUsername();
-			String password = dbInfo.getPassword();
-			Connection connection = DriverManager.getConnection(url, username, password);
-			connection.setAutoCommit(false);
-			return connection;
-		} catch (SQLException e) {
-			String msg = MessageFormat.format("Failed to get a connection for {0} due to {1}", dbInfo, e.getMessage()); //$NON-NLS-1$
-			throw new StrolchPersistenceException(msg, e);
+			return dbInfo.openConnection();
+		} catch (DbException e) {
+			throw new StrolchPersistenceException("Failed to open a connection to " + dbInfo + " due to "
+					+ e.getMessage(), e);
 		}
 	}
 
