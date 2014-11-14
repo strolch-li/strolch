@@ -15,6 +15,8 @@
  */
 package li.strolch.rest;
 
+import java.text.MessageFormat;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.rest.filters.AccessControlResponseFilter;
@@ -113,6 +115,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 		this.restTracing = configuration.getString(PARAM_REST_TRACING, "OFF"); //$NON-NLS-1$
 		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "SUMMARY"); //$NON-NLS-1$
+
+		String msg = "Set restTracing={0} with threshold={1}"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, this.restTracing, this.restTracingThreshold));
 
 		super.initialize(configuration);
 	}

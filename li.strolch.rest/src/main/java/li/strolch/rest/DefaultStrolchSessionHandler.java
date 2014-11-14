@@ -65,7 +65,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		this.privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
 		this.certificateMap = new HashMap<>();
 
-		this.sessionTimeoutTimer = new Timer("SessionTimeoutTimer");
+		this.sessionTimeoutTimer = new Timer("SessionTimeoutTimer"); //$NON-NLS-1$
 		long checkInterval = TimeUnit.MINUTES.toMillis(1);
 		this.sessionTimeoutTimer.schedule(new SessionTimeoutTask(), checkInterval, checkInterval);
 
@@ -109,7 +109,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			certificate.setLastAccess(System.currentTimeMillis());
 			this.certificateMap.put(certificate.getAuthToken(), certificate);
 
-			logger.info(this.certificateMap.size() + " sessions currently active.");
+			logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
 			return certificate;
 		}
 	}
@@ -174,11 +174,11 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 				certificateMap = new HashMap<>(map);
 			}
 
-			long reqLastAccessTime = System.currentTimeMillis() - sessionTtl;
+			long reqLastAccessTime = System.currentTimeMillis() - DefaultStrolchSessionHandler.this.sessionTtl;
 
 			for (Certificate certificate : certificateMap.values()) {
 				if (certificate.getLastAccess() < reqLastAccessTime) {
-					String msg = "Session {0} for user {1} has expired, invalidating session...";
+					String msg = "Session {0} for user {1} has expired, invalidating session..."; //$NON-NLS-1$
 					logger.info(MessageFormat.format(msg, certificate.getAuthToken(), certificate.getUsername()));
 					invalidateSession(certificate);
 				}
