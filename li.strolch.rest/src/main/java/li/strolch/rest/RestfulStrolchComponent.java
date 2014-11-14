@@ -137,8 +137,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.restTracing = configuration.getString(PARAM_REST_TRACING, "OFF"); //$NON-NLS-1$
 		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "TRACE"); //$NON-NLS-1$
 
-		String msg = "Set restTracing={0} with threshold={1}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, this.restTracing, this.restTracingThreshold));
+		String msg = "Set restLogging={0} with logEntities={1} restTracing={2} with threshold={3}"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, this.restLogging, this.restLoggingEntity, this.restTracing,
+				this.restTracingThreshold));
 
 		super.initialize(configuration);
 	}
