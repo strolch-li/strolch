@@ -19,6 +19,9 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+
+import org.glassfish.jersey.server.ServerProperties;
+
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -28,7 +31,38 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	private static final String PARAM_CORS_ENABLED = "corsEnabled"; //$NON-NLS-1$
 	private static final String PARAM_CORS_ORIGIN = "corsOrigin"; //$NON-NLS-1$
+
+	/**
+	 * Allowed values:
+	 * <ul>
+	 * <li>{@code SUMMARY}</li>
+	 * <li>{@code TRACE}</li>
+	 * <li>{@code VERBOSE}</li>
+	 * </ul>
+	 * 
+	 * @see ServerProperties#TRACING_THRESHOLD
+	 */
+	private static final String PARAM_REST_TRACING = "restTracing"; //$NON-NLS-1$
+
+	/**
+	 * Allowed values:
+	 * <ul>
+	 * <li>{@code OFF} - tracing support is disabled.</li>
+	 * <li>{@code ON_DEMAND} - tracing support is in 'stand by' mode, it is enabled on demand by existence of request
+	 * HTTP header</li>
+	 * <li>{@code ALL} - tracing support is enabled for every request.</li>
+	 * </ul>
+	 * 
+	 * @see ServerProperties#TRACING
+	 */
+	private static final String PARAM_REST_TRACING_THRESHOLD = "restTracingThreshold"; //$NON-NLS-1$
+
 	private static RestfulStrolchComponent instance;
+
+	private String restTracing;
+	private String restTracingThreshold;
+	private boolean corsEnabled;
+	private String corsOrigin;
 
 	/**
 	 * @param container
@@ -38,15 +72,47 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		super(container, componentName);
 	}
 
+	/**
+	 * @return the corsEnabled
+	 */
+	public boolean isCorsEnabled() {
+		return this.corsEnabled;
+	}
+
+	/**
+	 * @return the origin
+	 */
+	public String getCorsOrigin() {
+		return this.corsOrigin;
+	}
+
+	/**
+	 * @return the restTracing
+	 */
+	public String getRestTracing() {
+		return this.restTracing;
+	}
+
+	/**
+	 * @return the restTracingThreshold
+	 */
+	public String getRestTracingThreshold() {
+		return this.restTracingThreshold;
+	}
+
 	@Override
 	public void initialize(ComponentConfiguration configuration) {
 
-		if (configuration.getBoolean(PARAM_CORS_ENABLED, Boolean.FALSE)) {
-			String origin = configuration.getString(PARAM_CORS_ORIGIN, null);
-			logger.info("Enabling CORS for origin: " + origin); //$NON-NLS-1$
+		this.corsEnabled = configuration.getBoolean(PARAM_CORS_ENABLED, Boolean.FALSE);
+		if (this.corsEnabled) {
+			this.corsOrigin = configuration.getString(PARAM_CORS_ORIGIN, null);
+			logger.info("Enabling CORS for origin: " + this.corsOrigin); //$NON-NLS-1$
 			AccessControlResponseFilter.setCorsEnabled(true);
-			AccessControlResponseFilter.setOrigin(origin);
+			AccessControlResponseFilter.setOrigin(this.corsOrigin);
 		}
+
+		this.restTracing = configuration.getString(PARAM_REST_TRACING, "OFF"); //$NON-NLS-1$
+		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "SUMMARY"); //$NON-NLS-1$
 
 		super.initialize(configuration);
 	}
