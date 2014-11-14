@@ -17,7 +17,6 @@ package li.strolch.model.parameter;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -99,14 +98,14 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 
 	@Override
 	public List<String> getValue() {
-		return new ArrayList<String>(this.value);
+		return new ArrayList<>(this.value);
 	}
 
 	@Override
 	public void setValue(List<String> value) {
 		validateValue(value);
 		if (this.value == null) {
-			this.value = new ArrayList<String>(value.size());
+			this.value = new ArrayList<>(value.size());
 		}
 		this.value.clear();
 		this.value.addAll(value);
@@ -149,6 +148,10 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 		}
 
 		String[] valueArr = value.split(VALUE_SEPARATOR);
-		return Arrays.asList(valueArr);
+		List<String> values = new ArrayList<>();
+		for (String val : valueArr) {
+			values.add(val.trim());
+		}
+		return values;
 	}
 }
