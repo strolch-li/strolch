@@ -42,7 +42,6 @@ import java.util.Set;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 
-import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -177,7 +176,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 
 		Locator locator = this.locatorBuilder.build();
-		LoggerFactory.getLogger(getClass()).info("path: " + locator.toString()); //$NON-NLS-1$
+		//LoggerFactory.getLogger(getClass()).info("path: " + locator.toString()); //$NON-NLS-1$
 
 		switch (locator.toString()) {
 
