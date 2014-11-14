@@ -33,18 +33,8 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	private static final String PARAM_CORS_ENABLED = "corsEnabled"; //$NON-NLS-1$
 	private static final String PARAM_CORS_ORIGIN = "corsOrigin"; //$NON-NLS-1$
-
-	/**
-	 * Allowed values:
-	 * <ul>
-	 * <li>{@code SUMMARY}</li>
-	 * <li>{@code TRACE}</li>
-	 * <li>{@code VERBOSE}</li>
-	 * </ul>
-	 * 
-	 * @see ServerProperties#TRACING_THRESHOLD
-	 */
-	private static final String PARAM_REST_TRACING = "restTracing"; //$NON-NLS-1$
+	private static final String PARAM_REST_LOGGING = "restLogging"; //$NON-NLS-1$
+	private static final String PARAM_REST_LOGGING_ENTITY = "restLoggingEntity"; //$NON-NLS-1$
 
 	/**
 	 * Allowed values:
@@ -57,6 +47,18 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 * 
 	 * @see ServerProperties#TRACING
 	 */
+	private static final String PARAM_REST_TRACING = "restTracing"; //$NON-NLS-1$
+
+	/**
+	 * Allowed values:
+	 * <ul>
+	 * <li>{@code SUMMARY}</li>
+	 * <li>{@code TRACE}</li>
+	 * <li>{@code VERBOSE}</li>
+	 * </ul>
+	 * 
+	 * @see ServerProperties#TRACING_THRESHOLD
+	 */
 	private static final String PARAM_REST_TRACING_THRESHOLD = "restTracingThreshold"; //$NON-NLS-1$
 
 	private static RestfulStrolchComponent instance;
@@ -65,6 +67,8 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private String restTracingThreshold;
 	private boolean corsEnabled;
 	private String corsOrigin;
+	private boolean restLogging;
+	private boolean restLoggingEntity;
 
 	/**
 	 * @param container
@@ -102,6 +106,20 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return this.restTracingThreshold;
 	}
 
+	/**
+	 * @return the restLogging
+	 */
+	public boolean isRestLogging() {
+		return this.restLogging;
+	}
+
+	/**
+	 * @return the restLoggingEntity
+	 */
+	public boolean isRestLoggingEntity() {
+		return this.restLoggingEntity;
+	}
+
 	@Override
 	public void initialize(ComponentConfiguration configuration) {
 
@@ -113,8 +131,11 @@ public class RestfulStrolchComponent extends StrolchComponent {
 			AccessControlResponseFilter.setOrigin(this.corsOrigin);
 		}
 
+		// restful logging and tracing
+		this.restLogging = configuration.getBoolean(PARAM_REST_LOGGING, false);
+		this.restLoggingEntity = configuration.getBoolean(PARAM_REST_LOGGING_ENTITY, false);
 		this.restTracing = configuration.getString(PARAM_REST_TRACING, "OFF"); //$NON-NLS-1$
-		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "SUMMARY"); //$NON-NLS-1$
+		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "TRACE"); //$NON-NLS-1$
 
 		String msg = "Set restTracing={0} with threshold={1}"; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.restTracing, this.restTracingThreshold));
