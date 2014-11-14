@@ -91,8 +91,8 @@ public class StrolchAgent {
 
 		this.container = container;
 
-		RuntimeConfiguration runtimeConfiguration = this.strolchConfiguration.getRuntimeConfiguration();
-		logger.info(MessageFormat.format("Setup Agent {0}", runtimeConfiguration.getApplicationName())); //$NON-NLS-1$
+		RuntimeConfiguration config = this.strolchConfiguration.getRuntimeConfiguration();
+		logger.info(MessageFormat.format("Setup Agent {0}:{1}", config.getApplicationName(), config.getEnvironment())); //$NON-NLS-1$
 	}
 
 	protected void assertContainerStarted() {
