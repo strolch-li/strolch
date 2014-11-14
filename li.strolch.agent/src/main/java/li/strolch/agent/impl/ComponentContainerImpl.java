@@ -253,11 +253,12 @@ public class ComponentContainerImpl implements ComponentContainer {
 	public void setup(StrolchConfiguration strolchConfiguration) {
 
 		// set the application locale
-		RuntimeConfiguration runtimeConfiguration = strolchConfiguration.getRuntimeConfiguration();
-		Locale locale = runtimeConfiguration.getLocale();
+		RuntimeConfiguration runConf = strolchConfiguration.getRuntimeConfiguration();
+		Locale locale = runConf.getLocale();
 		Locale.setDefault(locale);
-		String localeMsg = "Application {0} is using locale {1}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(localeMsg, runtimeConfiguration.getApplicationName(), Locale.getDefault()));
+		String localeMsg = "Application {0}:{1} is using locale {2}"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(localeMsg, runConf.getApplicationName(), runConf.getEnvironment(),
+				Locale.getDefault()));
 
 		// set up the container itself
 		this.strolchConfiguration = strolchConfiguration;
