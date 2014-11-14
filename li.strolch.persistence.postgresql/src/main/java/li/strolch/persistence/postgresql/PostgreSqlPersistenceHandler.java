@@ -54,7 +54,7 @@ import ch.eitchnet.privilege.model.Certificate;
  */
 public class PostgreSqlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
-	public static final String SCRIPT_PREFIX = "strolch";
+	public static final String SCRIPT_PREFIX = "strolch"; //$NON-NLS-1$
 	private ComponentConfiguration componentConfiguration;
 	private Map<String, DbConnectionInfo> connetionInfoMap;
 
@@ -76,8 +76,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 			try {
 				DbDriverLoader.loadDriverForConnection(connectionInfo);
 			} catch (DbException e) {
-				throw new StrolchConfigurationException("Could not load driver for connection "
-						+ connectionInfo.getUrl(), e);
+				String msg = "Could not load driver for connection {0}"; //$NON-NLS-1$
+				throw new StrolchConfigurationException(MessageFormat.format(msg, connectionInfo.getUrl()), e);
 			}
 		}
 
@@ -102,30 +102,32 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		try {
 			connectionCheck.checkConnections();
 		} catch (DbException e) {
-			throw new StrolchConfigurationException("At least one connection failed: " + e.getMessage(), e);
+			String msg = "At least one connection failed: {0}"; //$NON-NLS-1$
+			throw new StrolchConfigurationException(MessageFormat.format(msg, e.getMessage()), e);
 		}
 
-		boolean allowSchemaCreation = componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
-		boolean allowSchemaMigration = componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION, Boolean.FALSE);
-		boolean allowSchemaDrop = componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_DROP, Boolean.FALSE);
-		boolean allowDataInitOnSchemaCreate = componentConfiguration.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE,
+		boolean allowSchemaCreation = this.componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
+		boolean allowSchemaMigration = this.componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION,
 				Boolean.FALSE);
+		boolean allowSchemaDrop = this.componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_DROP, Boolean.FALSE);
+		boolean allowDataInitOnSchemaCreate = this.componentConfiguration.getBoolean(
+				PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE, Boolean.FALSE);
 
 		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX, this.getClass(),
 				allowSchemaCreation, allowSchemaMigration, allowSchemaDrop);
 		try {
 			schemaVersionCheck.checkSchemaVersion(this.connetionInfoMap);
 		} catch (DbException e) {
-			throw new StrolchConfigurationException(
-					"Failed to validate the schema for a connection: " + e.getMessage(), e);
+			String msg = "Failed to validate the schema for a connection: {0}"; //$NON-NLS-1$
+			throw new StrolchConfigurationException(MessageFormat.format(msg, e.getMessage()), e);
 		}
 
 		// if allowed, perform DB initialization
-		if (!allowSchemaCreation || !allowSchemaDrop || !allowDataInitOnSchemaCreate) {
-			logger.info("Data Initialization not enabled, so not checking if needed.");
+		if (!allowSchemaCreation || !allowDataInitOnSchemaCreate) {
+			logger.info("Data Initialization not enabled as either 'allowSchemaCreation or 'allowDataInitOnSchemaCreate' is false!, so not checking if needed."); //$NON-NLS-1$
 		} else {
 			Map<String, DbMigrationState> dbMigrationStates = schemaVersionCheck.getDbMigrationStates();
-			String msg = "Data Initialization is enabled, checking for {0} realms if DB initialization is required...";
+			String msg = "Data Initialization is enabled, checking for {0} realms if DB initialization is required..."; //$NON-NLS-1$
 			logger.info(MessageFormat.format(msg, dbMigrationStates.size()));
 			PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler();
 			StrolchAgent agent = getContainer().getAgent();
@@ -152,8 +154,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		try {
 			return dbInfo.openConnection();
 		} catch (DbException e) {
-			throw new StrolchPersistenceException("Failed to open a connection to " + dbInfo + " due to "
-					+ e.getMessage(), e);
+			String msg = "Failed to open a connection to {0} due to {1}"; //$NON-NLS-1$
+			throw new StrolchPersistenceException(MessageFormat.format(msg, dbInfo, e.getMessage()), e);
 		}
 	}
 
@@ -177,7 +179,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		ComponentContainer container = getContainer();
 		StrolchAgent agent = container.getAgent();
 		PrivilegeHandler privilegeHandler = container.getPrivilegeHandler();
-		StrolchConfiguration strolchConfiguration = this.getContainer().getAgent().getStrolchConfiguration();
+		StrolchConfiguration strolchConfiguration = getContainer().getAgent().getStrolchConfiguration();
 		PostgreSqlDbInitializer sqlDbInitializer = new PostgreSqlDbInitializer(agent, this,
 				strolchConfiguration.getComponentConfiguration(getName()));
 		privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_DB_INITIALIZER, sqlDbInitializer);
