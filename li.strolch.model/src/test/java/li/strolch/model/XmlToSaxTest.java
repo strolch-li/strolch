@@ -15,33 +15,38 @@
  */
 package li.strolch.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
-import li.strolch.model.xml.OrderToDomVisitor;
-import li.strolch.model.xml.ResourceToDomVisitor;
+import li.strolch.model.xml.OrderToSaxVisitor;
+import li.strolch.model.xml.ResourceToSaxVisitor;
+import li.strolch.model.xml.SimpleStrolchElementListener;
+import li.strolch.model.xml.XmlModelSaxReader;
 
 import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
-public class XmlToDomTest extends ModelTest {
+public class XmlToSaxTest extends ModelTest {
 
 	@Test
 	public void shouldFormatAndParseOrder() {
 
 		Order order = ModelGenerator.createOrder("@1", "My Order 1", "MyOrder");
 
-		OrderToDomVisitor domVisitor = new OrderToDomVisitor();
-		domVisitor.visit(order);
-		Document document = domVisitor.getDocument();
+		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
+		XmlModelSaxReader saxReader = new XmlModelSaxReader(listener);
 
-		Element rootElement = document.getDocumentElement();
-		Order parsedOrder = new Order(rootElement);
+		OrderToSaxVisitor domVisitor = new OrderToSaxVisitor(saxReader);
+		domVisitor.visit(order);
+
+		assertEquals(1, listener.getOrders().size());
+		assertNull(listener.getResources());
+		Order parsedOrder = listener.getOrders().get(0);
 
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
 		visitor.visit(parsedOrder);
@@ -53,12 +58,15 @@ public class XmlToDomTest extends ModelTest {
 
 		Resource resource = ModelGenerator.createResource("@1", "My Resource 1", "MyResource");
 
-		ResourceToDomVisitor domVisitor = new ResourceToDomVisitor();
-		domVisitor.visit(resource);
-		Document document = domVisitor.getDocument();
+		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
+		XmlModelSaxReader saxReader = new XmlModelSaxReader(listener);
 
-		Element rootElement = document.getDocumentElement();
-		Resource parsedResource = new Resource(rootElement);
+		ResourceToSaxVisitor domVisitor = new ResourceToSaxVisitor(saxReader);
+		domVisitor.visit(resource);
+
+		assertEquals(1, listener.getResources().size());
+		assertNull(listener.getOrders());
+		Resource parsedResource = listener.getResources().get(0);
 
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(resource);
 		visitor.visit(parsedResource);
