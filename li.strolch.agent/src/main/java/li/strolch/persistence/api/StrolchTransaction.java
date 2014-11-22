@@ -83,7 +83,8 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	public List<Resource> doQuery(ResourceQuery query);
 
-	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor);
+	public <U> List<U> doQuery(ResourceQuery query,
+			ResourceVisitor<U> resourceVisitor);
 
 	public List<Audit> doQuery(AuditQuery query);
 
@@ -95,112 +96,233 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * </p>
 	 * 
 	 * <p>
-	 * A Locator has the form <i>&lt;ObjectClassType&gt;/&lt;Type&gt;/&lt;Id&gt;</i> - this is the least amount of path
-	 * elements to find an object. Thus to query a {@link Resource} of type "MyType" and the id "@1" use the following
-	 * path: <i>Resourcee/MyType/@1</i>
+	 * A Locator has the form
+	 * <i>&lt;ObjectClassType&gt;/&lt;Type&gt;/&lt;Id&gt;</i> - this is the
+	 * least amount of path elements to find an object. Thus to query a
+	 * {@link Resource} of type "MyType" and the id "@1" use the following path:
+	 * <i>Resourcee/MyType/@1</i>
 	 * </p>
 	 * 
 	 * <p>
-	 * This method can also be used to find a deeper element, e.g. a specific {@link Parameter} on an
-	 * {@link ParameterBag} on an {@link Order}. This would be done as follows: <i>Order/MyType/@1/myParam</i>
+	 * This method can also be used to find a deeper element, e.g. a specific
+	 * {@link Parameter} on an {@link ParameterBag} on an {@link Order}. This
+	 * would be done as follows: <i>Order/MyType/@1/myParam</i>
 	 * </p>
 	 * 
 	 * @param locator
-	 *            the locator defining the path to the element which is to be found
+	 *            the locator defining the path to the element which is to be
+	 *            found
 	 * 
 	 * @return the element described by the locator
 	 * 
 	 * @throws StrolchException
 	 *             if the element could not be found
 	 * @throws ClassCastException
-	 *             if the querying code is not asking for the correct instance. Do not query a {@link Parameter} if the
-	 *             variable to which the result is to be is stored is a {@link Resource}, etc.
+	 *             if the querying code is not asking for the correct instance.
+	 *             Do not query a {@link Parameter} if the variable to which the
+	 *             result is to be is stored is a {@link Resource}, etc.
 	 */
-	public <T extends StrolchElement> T findElement(Locator locator) throws StrolchException, ClassCastException;
+	public <T extends StrolchElement> T findElement(Locator locator)
+			throws StrolchException, ClassCastException;
 
 	/**
-	 * Returns the {@link Resource} with the given type and id, or null if it does not exist
+	 * Returns the {@link Resource} with the given type and id, or null if it
+	 * does not exist
 	 * 
 	 * @param type
 	 *            the type of the {@link Resource}
 	 * @param id
 	 *            the id of the {@link Resource}
 	 * 
-	 * @return the {@link Resource} with the given type and id, or null if it does not exist
+	 * @return the {@link Resource} with the given type and id, or null if it
+	 *         does not exist
 	 */
 	public Resource getResourceBy(String type, String id);
 
 	/**
-	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference
-	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and
-	 * the UOM must be set to the resource's type and the value is the id of the resource
+	 * Returns the {@link Resource} with the given type and id, or null if it
+	 * does not exist
 	 * 
-	 * @param refP
-	 *            the {@link StringParameter} which references a {@link Resource}
+	 * @param type
+	 *            the type of the {@link Resource}
+	 * @param id
+	 *            the id of the {@link Resource}
+	 * @param assertExists
+	 *            if true, and resource does not exist, then a
+	 *            {@link StrolchException} is thrown
 	 * 
-	 * @return the resource referenced by the parameter, or null if it does not exist
+	 * @return the {@link Resource} with the given type and id, or null if it
+	 *         does not exist
 	 * 
 	 * @throws StrolchException
-	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
+	 *             if the resource does not exist, and assertExists is true
+	 */
+	public Resource getResourceBy(String type, String id, boolean assertExists)
+			throws StrolchException;
+
+	/**
+	 * Returns the {@link Resource} which is referenced by the given
+	 * {@link StringParameter}. A reference {@link Parameter} must have its
+	 * interpretation set to
+	 * {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be
+	 * set to the resource's type and the value is the id of the resource
+	 * 
+	 * @param refP
+	 *            the {@link StringParameter} which references a
+	 *            {@link Resource}
+	 * 
+	 * @return the resource referenced by the parameter, or null if it does not
+	 *         exist
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringParameter} is not a properly configured
+	 *             as a reference parameter
 	 */
 	public Resource getResourceBy(StringParameter refP) throws StrolchException;
 
 	/**
-	 * Returns all {@link Resource Resources} which are referenced by the given {@link StringListParameter}. A reference
-	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and
-	 * the UOM must be set to the resource's type and the value is the id of the resource
+	 * Returns the {@link Resource} which is referenced by the given
+	 * {@link StringParameter}. A reference {@link Parameter} must have its
+	 * interpretation set to
+	 * {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be
+	 * set to the resource's type and the value is the id of the resource
 	 * 
 	 * @param refP
-	 *            the {@link StringListParameter} which references a list of {@link Resource Resources}
+	 *            the {@link StringParameter} which references a
+	 *            {@link Resource}
+	 * @param assertExists
+	 *            if true, and resource does not exist, then a
+	 *            {@link StrolchException} is thrown
 	 * 
-	 * @return the resources referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any
-	 *         missing resources are not returned!
+	 * @return the resource referenced by the parameter, or null if it does not
+	 *         exist
 	 * 
 	 * @throws StrolchException
-	 *             if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 *             if the {@link StringParameter} is not a properly configured
+	 *             as a reference parameter, or if the resource does not exist,
+	 *             and assertExists is true
 	 */
-	public List<Resource> getResourcesBy(StringListParameter refP) throws StrolchException;
+	public Resource getResourceBy(StringParameter refP, boolean assertExists)
+			throws StrolchException;
 
 	/**
-	 * Returns the {@link Order} with the given type and id, or null if it does not exist
+	 * Returns all {@link Resource Resources} which are referenced by the given
+	 * {@link StringListParameter}. A reference {@link Parameter} must have its
+	 * interpretation set to
+	 * {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be
+	 * set to the resource's type and the value is the id of the resource
+	 * 
+	 * @param refP
+	 *            the {@link StringListParameter} which references a list of
+	 *            {@link Resource Resources}
+	 * 
+	 * @return the resources referenced by the parameter, or the empty list if
+	 *         they do not exist. <b>Note:</b> Any missing resources are not
+	 *         returned!
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringListParameter} is not a properly
+	 *             configured as a reference parameter
+	 */
+	public List<Resource> getResourcesBy(StringListParameter refP)
+			throws StrolchException;
+
+	/**
+	 * Returns the {@link Order} with the given type and id, or null if it does
+	 * not exist
 	 * 
 	 * @param type
 	 *            the type of the {@link Order}
 	 * @param id
 	 *            the id of the {@link Order}
 	 * 
-	 * @return the {@link Order} with the given type and id, or null if it does not exist
+	 * @return the {@link Order} with the given type and id, or null if it does
+	 *         not exist
 	 */
 	public Order getOrderBy(String type, String id);
 
 	/**
-	 * Returns the {@link Order} which is referenced by the given {@link StringParameter}. A reference {@link Parameter}
-	 * must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to
-	 * the order's type and the value is the id of the order
+	 * Returns the {@link Order} with the given type and id, or null if it does
+	 * not exist
+	 * 
+	 * @param type
+	 *            the type of the {@link Order}
+	 * @param id
+	 *            the id of the {@link Order}
+	 * @param assertExists
+	 *            if true, and order does not exist, then a
+	 *            {@link StrolchException} is thrown
+	 * 
+	 * @return the {@link Order} with the given type and id, or null if it does
+	 *         not exist
+	 * 
+	 * @throws StrolchException
+	 *             if the order does not exist, and assertExists is true
+	 */
+	public Order getOrderBy(String type, String id, boolean assertExists)
+			throws StrolchException;
+
+	/**
+	 * Returns the {@link Order} which is referenced by the given
+	 * {@link StringParameter}. A reference {@link Parameter} must have its
+	 * interpretation set to {@link StrolchConstants#INTERPRETATION_ORDER_REF}
+	 * and the UOM must be set to the order's type and the value is the id of
+	 * the order
 	 * 
 	 * @param refP
 	 *            the {@link StringParameter} which references an {@link Order}
 	 * 
-	 * @return the order referenced by the parameter, or null if it does not exist
+	 * @return the order referenced by the parameter, or null if it does not
+	 *         exist
 	 * 
 	 * @throws StrolchException
-	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
+	 *             if the {@link StringParameter} is not a properly configured
+	 *             as a reference parameter
 	 */
 	public Order getOrderBy(StringParameter refP) throws StrolchException;
 
 	/**
-	 * Returns all {@link Order Orders} which are referenced by the given {@link StringListParameter}. A reference
-	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ORDER_REF} and the
-	 * UOM must be set to the order's type and the value is the id of the order
+	 * Returns the {@link Order} which is referenced by the given
+	 * {@link StringParameter}. A reference {@link Parameter} must have its
+	 * interpretation set to {@link StrolchConstants#INTERPRETATION_ORDER_REF}
+	 * and the UOM must be set to the order's type and the value is the id of
+	 * the order
 	 * 
 	 * @param refP
-	 *            the {@link StringListParameter} which references a list of {@link Order Orders}
+	 *            the {@link StringParameter} which references an {@link Order}
+	 * @param assertExists
+	 *            if true, and order does not exist, then a
+	 *            {@link StrolchException} is thrown
 	 * 
-	 * @return the orders referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any missing
-	 *         orders are not returned!
+	 * @return the order referenced by the parameter, or null if it does not
+	 *         exist
 	 * 
 	 * @throws StrolchException
-	 *             if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 *             if the {@link StringParameter} is not a properly configured
+	 *             as a reference parameter, or if the order does not exist, and
+	 *             assertExists is true
 	 */
-	public List<Order> getOrdersBy(StringListParameter refP) throws StrolchException;
+	public Order getOrderBy(StringParameter refP, boolean assertExists)
+			throws StrolchException;
+
+	/**
+	 * Returns all {@link Order Orders} which are referenced by the given
+	 * {@link StringListParameter}. A reference {@link Parameter} must have its
+	 * interpretation set to {@link StrolchConstants#INTERPRETATION_ORDER_REF}
+	 * and the UOM must be set to the order's type and the value is the id of
+	 * the order
+	 * 
+	 * @param refP
+	 *            the {@link StringListParameter} which references a list of
+	 *            {@link Order Orders}
+	 * 
+	 * @return the orders referenced by the parameter, or the empty list if they
+	 *         do not exist. <b>Note:</b> Any missing orders are not returned!
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringListParameter} is not a properly
+	 *             configured as a reference parameter
+	 */
+	public List<Order> getOrdersBy(StringListParameter refP)
+			throws StrolchException;
 }
