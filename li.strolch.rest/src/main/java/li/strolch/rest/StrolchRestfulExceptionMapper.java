@@ -20,6 +20,6 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 	@Override
 	public Response toResponse(Exception ex) {
 		logger.error(MessageFormat.format("Handling exception {0}", ex.getClass()), ex); //$NON-NLS-1$
-		return Response.status(500).entity(StringHelper.formatException(ex)).type(MediaType.TEXT_PLAIN).build();
+		return Response.status(500).entity(StringHelper.formatExceptionMessage(ex)).type(MediaType.TEXT_PLAIN).build();
 	}
 }
