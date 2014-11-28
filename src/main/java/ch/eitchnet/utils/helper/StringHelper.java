@@ -579,6 +579,36 @@ public class StringHelper {
 	}
 
 	/**
+	 * Formats the given {@link Throwable}'s message including causes to a string
+	 * 
+	 * @param t
+	 *            the throwable for which the messages are to be formatted to a string
+	 * 
+	 * @return a string representation of the given {@link Throwable}'s messages including causes
+	 */
+	public static String formatExceptionMessage(Throwable t) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(t.getMessage());
+		sb.append("\n");
+
+		appendCause(sb, t);
+		return sb.toString();
+	}
+
+	private static void appendCause(StringBuilder sb, Throwable e) {
+		Throwable cause = e.getCause();
+		if (cause == null)
+			return;
+
+		sb.append("cause:\n");
+		sb.append(cause.getMessage());
+		sb.append("\n");
+
+		if (cause.getCause() != null)
+			appendCause(sb, cause.getCause());
+	}
+
+	/**
 	 * Simply returns true if the value is null, or empty
 	 * 
 	 * @param value
