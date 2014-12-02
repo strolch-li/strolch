@@ -18,7 +18,6 @@ package li.strolch.rest.endpoint;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -36,7 +35,6 @@ import javax.ws.rs.core.Response.Status;
 import li.strolch.exception.StrolchException;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchSessionHandler;
-import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
 import li.strolch.rest.model.LogoutResult;
@@ -89,14 +87,11 @@ public class AuthenticationService {
 			StrolchSessionHandler sessionHandler = restfulStrolchComponent.getComponent(StrolchSessionHandler.class);
 			Certificate certificate = sessionHandler.authenticate(login.getUsername(), login.getPassword().getBytes());
 
-			Locale locale = RestfulHelper.getLocale(headers);
-			certificate.setLocale(locale);
-
 			PrivilegeHandler privilegeHandler = restfulStrolchComponent.getContainer().getPrivilegeHandler();
 			PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
 			loginResult.setSessionId(certificate.getAuthToken());
 			loginResult.setUsername(certificate.getUsername());
-			loginResult.setLocale(locale.toString());
+			loginResult.setLocale(certificate.getLocale());
 			loginResult.setParameters(certificate.getPropertyMap());
 
 			List<String> allowList = privilegeContext.getFlatAllowList();
