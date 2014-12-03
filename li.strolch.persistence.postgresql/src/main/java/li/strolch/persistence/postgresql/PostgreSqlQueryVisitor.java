@@ -220,8 +220,9 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 	}
 
 	private void xpath(String bagKey, String paramKey, String paramValue) {
-		String xpath = "cast(xpath('//Resource/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\" and @Value=\"${paramValue}\"]', asxml) as text[]) != '{}'\n";
+		String xpath = "cast(xpath('//${className}/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\" and @Value=\"${paramValue}\"]', asxml) as text[]) != '{}'\n";
 		this.sb.append(this.indent);
+		xpath = xpath.replace("${className}", getClassName());
 		xpath = xpath.replace("${bagKey}", bagKey);
 		xpath = xpath.replace("${paramKey}", paramKey);
 		xpath = xpath.replace("${paramValue}", paramValue);
@@ -232,7 +233,8 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 	public void visit(StringParameterSelection selection) {
 		String value = selection.getValue();
 
-		String xpath = "xpath('//Resource/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]/@Value', asxml))::TEXT AS content";
+		String xpath = "xpath('//${className}/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]/@Value', asxml))::TEXT AS content";
+		xpath = xpath.replace("${className}", getClassName());
 		xpath = xpath.replace("${bagKey}", selection.getBagKey());
 		xpath = xpath.replace("${paramKey}", selection.getParamKey());
 
@@ -310,8 +312,9 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 
 	@Override
 	public void visit(NullParameterSelection selection) {
-		String xpath = "cast(xpath('//Resource/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]', asxml) as text[]) = '{}'\n";
+		String xpath = "cast(xpath('//${className}/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]', asxml) as text[]) = '{}'\n";
 		this.sb.append(this.indent);
+		xpath = xpath.replace("${className}", getClassName());
 		xpath = xpath.replace("${bagKey}", selection.getBagKey());
 		xpath = xpath.replace("${paramKey}", selection.getParamKey());
 		this.sb.append(xpath);
@@ -319,16 +322,18 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 
 	@Override
 	public void visit(ParameterBagSelection selection) {
-		String xpath = "cast(xpath('//Resource/ParameterBag[@Id=\"${bagKey}\"]', asxml) as text[]) != '{}'\n";
+		String xpath = "cast(xpath('//${className}/ParameterBag[@Id=\"${bagKey}\"]', asxml) as text[]) != '{}'\n";
 		this.sb.append(this.indent);
+		xpath = xpath.replace("${className}", getClassName());
 		xpath = xpath.replace("${bagKey}", selection.getBagKey());
 		this.sb.append(xpath);
 	}
 
 	@Override
 	public void visit(NullParameterBagSelection selection) {
-		String xpath = "cast(xpath('//Resource/ParameterBag[@Id=\"${bagKey}\"]', asxml) as text[]) = '{}'\n";
+		String xpath = "cast(xpath('//${className}/ParameterBag[@Id=\"${bagKey}\"]', asxml) as text[]) = '{}'\n";
 		this.sb.append(this.indent);
+		xpath = xpath.replace("${className}", getClassName());
 		xpath = xpath.replace("${bagKey}", selection.getBagKey());
 		this.sb.append(xpath);
 	}
