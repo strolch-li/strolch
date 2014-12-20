@@ -27,12 +27,8 @@ import ch.eitchnet.utils.helper.StringHelper;
 public class RestfulHelper {
 
 	public static Locale getLocale(HttpHeaders headers) {
-		Locale locale;
 		if (headers == null || StringHelper.isEmpty(headers.getHeaderString(HttpHeaders.ACCEPT_LANGUAGE)))
-			locale = Locale.getDefault();
-		else
-			locale = headers.getAcceptableLanguages().get(0);
-
-		return locale;
+			return null;
+		return headers.getAcceptableLanguages().get(0);
 	}
 }
