@@ -77,4 +77,9 @@ public class ParameterBag extends ParameterizedElement {
 
 		return element;
 	}
+
+	@Override
+	public boolean isRootElement() {
+		return false;
+	}
 }

@@ -55,6 +55,12 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public boolean isRootElement() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 	@Override
 	public StrolchElement getClone() {

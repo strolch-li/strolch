@@ -179,6 +179,11 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 	public Order getRootElement() {
 		return this;
 	}
+	
+	@Override
+	public boolean isRootElement() {
+		return true;
+	}
 
 	@Override
 	public <T> T accept(StrolchRootElementVisitor<T> visitor) {

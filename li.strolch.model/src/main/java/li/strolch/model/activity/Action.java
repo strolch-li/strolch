@@ -144,6 +144,12 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public boolean isRootElement() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 	@Override
 	public StrolchElement getClone() {

@@ -131,6 +131,11 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	}
 
 	@Override
+	public boolean isRootElement() {
+		return false;
+	}
+
+	@Override
 	public Element toDom(Document doc) {
 		Element element = doc.createElement(Tags.PARAMETER);
 		fillElement(element);

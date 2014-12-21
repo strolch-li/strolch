@@ -156,6 +156,11 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	}
 
 	@Override
+	public boolean isRootElement() {
+		return false;
+	}
+
+	@Override
 	public Element toDom(Document doc) {
 		Element element = doc.createElement(Tags.PARAMETER);
 		fillElement(element);
