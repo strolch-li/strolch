@@ -135,7 +135,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Set<String> selRoles = selectorRep.getRoles();
 		Map<String, String> selPropertyMap = selectorRep.getProperties();
 
-		List<UserRep> result = new ArrayList<UserRep>();
+		List<UserRep> result = new ArrayList<>();
 		List<User> allUsers = this.persistenceHandler.getAllUsers();
 		for (User user : allUsers) {
 
@@ -342,7 +342,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		IPrivilege newPrivilege = new PrivilegeImpl(privilegeRep);
 		// copy existing privileges
 		Set<String> existingPrivilegeNames = role.getPrivilegeNames();
-		Map<String, IPrivilege> privilegeMap = new HashMap<String, IPrivilege>(existingPrivilegeNames.size() + 1);
+		Map<String, IPrivilege> privilegeMap = new HashMap<>(existingPrivilegeNames.size() + 1);
 		for (String name : existingPrivilegeNames) {
 			IPrivilege privilege = role.getPrivilege(name);
 			privilegeMap.put(name, privilege);
@@ -383,7 +383,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		Set<String> newRoles = new HashSet<String>(currentRoles);
+		Set<String> newRoles = new HashSet<>(currentRoles);
 		newRoles.add(roleName);
 
 		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), user.getFirstname(),
@@ -640,7 +640,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// create a new certificate, with details of the user
 			certificate = new Certificate(sessionId, System.currentTimeMillis(), username, user.getFirstname(),
-					user.getLastname(), authToken, user.getLocale(), new HashMap<String, String>(user.getProperties()));
+					user.getLastname(), authToken, user.getLocale(), userRoles, new HashMap<>(user.getProperties()));
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1085,7 +1085,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create a new certificate, with details of the user
 		Certificate systemUserCertificate = new Certificate(sessionId, System.currentTimeMillis(), systemUsername,
-				null, null, authToken, user.getLocale(), new HashMap<String, String>(user.getProperties()));
+				null, null, authToken, user.getLocale(), user.getRoles(), new HashMap<>(user.getProperties()));
 
 		// create and save a new privilege context
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);

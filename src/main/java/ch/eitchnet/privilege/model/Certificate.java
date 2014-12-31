@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
@@ -47,6 +48,7 @@ public final class Certificate implements Serializable {
 	private Locale locale;
 	private long lastAccess;
 
+	private Set<String> userRoles;
 	private Map<String, String> propertyMap;
 	private Map<String, String> sessionDataMap;
 
@@ -70,12 +72,14 @@ public final class Certificate implements Serializable {
 	 *            the authentication token defining the users unique session and is a private field of this certificate.
 	 * @param locale
 	 *            the users {@link Locale}
+	 * @param userRoles
+	 *            the user's roles
 	 * @param propertyMap
 	 *            a {@link Map} containing string value pairs of properties for the logged in user. These properties can
 	 *            be edited and can be used for the user to change settings of this session
 	 */
 	public Certificate(String sessionId, long loginTime, String username, String firstname, String lastname,
-			String authToken, Locale locale, Map<String, String> propertyMap) {
+			String authToken, Locale locale, Set<String> userRoles, Map<String, String> propertyMap) {
 
 		// validate arguments are not null
 		if (StringHelper.isEmpty(sessionId)) {
@@ -106,7 +110,17 @@ public final class Certificate implements Serializable {
 		else
 			this.propertyMap = Collections.unmodifiableMap(propertyMap);
 
+		this.userRoles = Collections.unmodifiableSet(userRoles);
 		this.sessionDataMap = new HashMap<>();
+	}
+
+	/**
+	 * Returns the set or roles this user has
+	 * 
+	 * @return the user's roles
+	 */
+	public Set<String> getUserRoles() {
+		return userRoles;
 	}
 
 	/**
