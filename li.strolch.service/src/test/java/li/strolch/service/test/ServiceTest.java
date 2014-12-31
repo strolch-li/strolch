@@ -15,8 +15,14 @@
  */
 package li.strolch.service.test;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
+
+import java.util.HashSet;
+
+import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.model.GreetingResult;
 import li.strolch.service.test.model.GreetingService;
 import li.strolch.service.test.model.GreetingService.GreetingArgument;
@@ -40,36 +46,38 @@ public class ServiceTest extends AbstractServiceTest {
 
 	@Test
 	public void shouldFailNoCertificate() {
-		this.thrown.expect(PrivilegeException.class);
 		TestService testService = new TestService();
-		getServiceHandler().doService(null, testService);
+		ServiceResult svcResult = getServiceHandler().doService(null, testService);
+		assertThat(svcResult.getThrowable(), instanceOf(PrivilegeException.class));
 	}
 
 	@Test
 	public void shouldFailInvalidCertificate1() {
 		this.thrown.expect(PrivilegeException.class);
 		TestService testService = new TestService();
-		getServiceHandler().doService(new Certificate(null, 0, null, null, null, null, null, null, null), testService);
+		getServiceHandler().doService(
+				new Certificate(null, 0, null, null, null, null, null, new HashSet<String>(), null), testService);
 	}
 
 	@Test
 	public void shouldFailInvalidCertificate2() {
-		this.thrown.expect(AccessDeniedException.class);
 		TestService testService = new TestService();
 		Certificate badCert = new Certificate(
-				"1", System.currentTimeMillis(), "bob", "Bob", "Brown", "dsdf", null, null, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
-		getServiceHandler().doService(badCert, testService);
+				"1", System.currentTimeMillis(), "bob", "Bob", "Brown", "dsdf", null, new HashSet<String>(), null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+		ServiceResult svcResult = getServiceHandler().doService(badCert, testService);
+		assertThat(svcResult.getThrowable(), instanceOf(AccessDeniedException.class));
 	}
 
 	@Test
 	public void shouldFailWithNoAccess() {
-		this.thrown.expect(AccessDeniedException.class);
-		this.thrown.expectMessage("User jill does not have Privilege li.strolch.service.api.Service"); //$NON-NLS-1$
 
 		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
 		try {
 			TestService testService = new TestService();
-			getServiceHandler().doService(certificate, testService);
+			ServiceResult svcResult = getServiceHandler().doService(certificate, testService);
+			assertThat(svcResult.getMessage(),
+					containsString("User jill does not have Privilege li.strolch.service.api.Service")); //$NON-NLS-1$
+			assertThat(svcResult.getThrowable(), instanceOf(AccessDeniedException.class));
 		} finally {
 			runtimeMock.getPrivilegeHandler().invalidateSession(certificate);
 		}

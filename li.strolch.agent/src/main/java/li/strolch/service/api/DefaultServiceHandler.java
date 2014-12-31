@@ -72,6 +72,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		// first check that the caller may perform this service
 		PrivilegeContext privilegeContext;
+		String username = certificate == null ? "null" : certificate.getUsername();
 		try {
 			privilegeContext = this.privilegeHandler.getPrivilegeContext(certificate);
 			privilegeContext.validateAction(service);
@@ -79,7 +80,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 			long end = System.nanoTime();
 			String msg = "User {0}: Service {1} failed after {2} due to {3}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, certificate.getUsername(), service.getClass().getName(),
+			msg = MessageFormat.format(msg, username, service.getClass().getName(),
 					StringHelper.formatNanoDuration(end - start), e.getMessage());
 			logger.error(msg, e);
 
@@ -114,7 +115,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			// log the result
 			long end = System.nanoTime();
 			String msg = "User {0}: Service {1} took {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, certificate.getUsername(), service.getClass().getName(),
+			msg = MessageFormat.format(msg, username, service.getClass().getName(),
 					StringHelper.formatNanoDuration(end - start));
 			if (serviceResult.getState() == ServiceResultState.SUCCESS)
 				logger.info(msg);
@@ -128,7 +129,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		} catch (Exception e) {
 			long end = System.nanoTime();
 			String msg = "User {0}: Service failed {1} after {2} due to {3}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, certificate.getUsername(), service.getClass().getName(),
+			msg = MessageFormat.format(msg, username, service.getClass().getName(),
 					StringHelper.formatNanoDuration(end - start), e.getMessage());
 			logger.error(msg, e);
 			throw new StrolchException(msg, e);
