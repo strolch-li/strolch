@@ -508,18 +508,20 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setCloseDuration(closeDuration);
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("TX for realm "); //$NON-NLS-1$
+		sb.append("TX user=");
+		sb.append(this.certificate.getUsername());
+		sb.append(", realm="); //$NON-NLS-1$
 		sb.append(getRealmName());
-		sb.append(" took "); //$NON-NLS-1$
+		sb.append(", took="); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(txDuration));
-		sb.append(" close took "); //$NON-NLS-1$
+		sb.append(", close="); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(closeDuration));
 		if (isAuditTrailEnabled()) {
-			sb.append(" auditTrail took "); //$NON-NLS-1$
+			sb.append(", auditTrail="); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(auditTrailDuration));
 		}
 		if (observerUpdateDuration > 0L)
-			sb.append(" updates took "); //$NON-NLS-1$
+			sb.append(", updates="); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(observerUpdateDuration));
 		logger.info(sb.toString());
 	}
@@ -546,11 +548,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setCloseDuration(closeDuration);
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("TX"); //$NON-NLS-1$
+		sb.append("TX user=");
+		sb.append(this.certificate.getUsername());
+		sb.append(", realm="); //$NON-NLS-1$
 		sb.append(getRealmName());
-		sb.append(" failed took "); //$NON-NLS-1$
+		sb.append(" failed="); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(txDuration));
-		sb.append(" close took "); //$NON-NLS-1$
+		sb.append(", close="); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(closeDuration));
 		logger.info(sb.toString());
 

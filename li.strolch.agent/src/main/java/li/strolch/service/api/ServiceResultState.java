@@ -21,5 +21,5 @@ package li.strolch.service.api;
  */
 public enum ServiceResultState {
 
-	SUCCESS, WARNING, FAILED;
+	SUCCESS, WARNING, FAILED, ACCESS_DENIED;
 }

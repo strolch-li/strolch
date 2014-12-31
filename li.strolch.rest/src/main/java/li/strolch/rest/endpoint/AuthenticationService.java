@@ -16,6 +16,7 @@
 package li.strolch.rest.endpoint;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -93,6 +94,7 @@ public class AuthenticationService {
 			loginResult.setUsername(certificate.getUsername());
 			loginResult.setLocale(certificate.getLocale());
 			loginResult.setParameters(certificate.getPropertyMap());
+			loginResult.setRoles(new ArrayList<>(certificate.getUserRoles()));
 
 			List<String> allowList = privilegeContext.getFlatAllowList();
 			if (allowList.isEmpty())

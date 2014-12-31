@@ -49,7 +49,7 @@ public class ServiceTest extends AbstractServiceTest {
 	public void shouldFailInvalidCertificate1() {
 		this.thrown.expect(PrivilegeException.class);
 		TestService testService = new TestService();
-		getServiceHandler().doService(new Certificate(null, 0, null, null, null, null, null, null), testService);
+		getServiceHandler().doService(new Certificate(null, 0, null, null, null, null, null, null, null), testService);
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class ServiceTest extends AbstractServiceTest {
 		this.thrown.expect(AccessDeniedException.class);
 		TestService testService = new TestService();
 		Certificate badCert = new Certificate(
-				"1", System.currentTimeMillis(), "bob", "Bob", "Brown", "dsdf", null, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+				"1", System.currentTimeMillis(), "bob", "Bob", "Brown", "dsdf", null, null, null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
 		getServiceHandler().doService(badCert, testService);
 	}
 

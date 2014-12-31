@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -46,7 +47,10 @@ public class LoginResult {
 	@XmlAttribute(name = "msg")
 	private String msg;
 
-	@XmlAttribute(name = "privileges")
+	@XmlElement(name = "roles")
+	private List<String> roles;
+
+	@XmlElement(name = "privileges")
 	private List<String> privileges;
 
 	public LoginResult() {
@@ -134,6 +138,21 @@ public class LoginResult {
 	 */
 	public void setMsg(String msg) {
 		this.msg = msg;
+	}
+
+	/**
+	 * @return the roles
+	 */
+	public List<String> getRoles() {
+		return roles;
+	}
+
+	/**
+	 * @param roles
+	 *            the roles to set
+	 */
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
 	}
 
 	/**
