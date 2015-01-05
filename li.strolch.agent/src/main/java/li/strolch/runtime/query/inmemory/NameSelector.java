@@ -35,7 +35,7 @@ public class NameSelector<T extends StrolchElement> implements Selector<T> {
 	@Override
 	public boolean select(T element) {
 		String name = element.getName();
-		return this.matchMode.matches(this.name, name);
+		return this.matchMode.matches(name, this.name);
 	}
 
 	/**
