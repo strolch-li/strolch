@@ -135,8 +135,6 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			componentMap.put(apiClass, strolchComponent);
 			controllerMap.put(componentName, new ComponentController(strolchComponent));
-			String msg = "Initialized component {0} with API {1} and impl {2}."; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, componentName, api, impl));
 
 		} catch (NoSuchMethodException e) {
 
