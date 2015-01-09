@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -33,6 +34,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.utils.Version;
 import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.FileHelper;
 
@@ -43,7 +45,7 @@ import ch.eitchnet.utils.helper.FileHelper;
 public class DbSchemaVersionCheck {
 
 	private static final Logger logger = LoggerFactory.getLogger(DbSchemaVersionCheck.class);
-	private String scriptPrefix;
+	private String app;
 	private Class<?> ctxClass;
 	private boolean allowSchemaCreation;
 	private boolean allowSchemaMigration;
@@ -51,18 +53,18 @@ public class DbSchemaVersionCheck {
 	private Map<String, DbMigrationState> dbMigrationStates;
 
 	/**
-	 * @param scriptPrefix
+	 * @param app
 	 * @param ctxClass
 	 * @param allowSchemaCreation
 	 * @param allowSchemaDrop
 	 */
-	public DbSchemaVersionCheck(String scriptPrefix, Class<?> ctxClass, boolean allowSchemaCreation,
+	public DbSchemaVersionCheck(String app, Class<?> ctxClass, boolean allowSchemaCreation,
 			boolean allowSchemaMigration, boolean allowSchemaDrop) {
 
-		DBC.PRE.assertNotEmpty("scriptPrefix may not be empty!", scriptPrefix);
+		DBC.PRE.assertNotEmpty("app may not be empty!", app);
 		DBC.PRE.assertNotNull("ctxClass may not be null!", ctxClass);
 
-		this.scriptPrefix = scriptPrefix;
+		this.app = app;
 		this.ctxClass = ctxClass;
 		this.allowSchemaCreation = allowSchemaCreation;
 		this.allowSchemaMigration = allowSchemaMigration;
@@ -101,22 +103,27 @@ public class DbSchemaVersionCheck {
 
 		logger.info(MessageFormat.format("[{0}] Checking Schema version for: {1}@{2}", realm, username, url));
 
-		DbMigrationState migrationType;
+		Version expectedDbVersion = getExpectedDbVersion(this.app, this.ctxClass);
 
-		try (Connection con = DriverManager.getConnection(url, username, password);
-				Statement st = con.createStatement();) {
+		try (Connection con = DriverManager.getConnection(url, username, password)) {
 
-			String expectedDbVersion = getExpectedDbVersion(this.scriptPrefix, this.ctxClass);
+			// get current version
+			Version currentVersion = getCurrentVersion(con, this.app);
+			DbMigrationState migrationType = detectMigrationState(realm, expectedDbVersion, currentVersion);
 
-			// first see if we have any schema
-			String msg = "select table_schema, table_name, table_type from information_schema.tables where table_name=''{0}'';";
-			String checkSchemaExistsSql = MessageFormat.format(msg, PROP_DB_VERSION);
-			try (ResultSet rs = st.executeQuery(checkSchemaExistsSql)) {
-				if (!rs.next()) {
-					migrationType = createSchema(realm, expectedDbVersion, st);
-				} else {
-					migrationType = checkCurrentVersion(realm, st, expectedDbVersion);
-				}
+			switch (migrationType) {
+			case CREATED:
+				createSchema(con, realm, expectedDbVersion);
+				break;
+			case MIGRATED:
+				migrateSchema(con, realm, expectedDbVersion);
+				break;
+			case DROPPED_CREATED:
+				throw new DbException("Migration type " + migrationType + " not handled!");
+			case NOTHING:
+				// do nothing
+			default:
+				break;
 			}
 
 			return migrationType;
@@ -129,8 +136,38 @@ public class DbSchemaVersionCheck {
 	}
 
 	/**
+	 * @param con
+	 * @param app
+	 * 
+	 * @return
+	 * 
+	 * @throws SQLException
+	 */
+	public static Version getCurrentVersion(Connection con, String app) throws SQLException {
+
+		// first see if we have any schema
+		String sql = "select table_schema, table_name, table_type from information_schema.tables where table_name = ?";
+		try (PreparedStatement st = con.prepareStatement(sql)) {
+			st.setString(0, PROP_DB_VERSION);
+			if (!st.executeQuery().next())
+				return null;
+		}
+
+		// first find current version
+		sql = "select id, version from db_version where app = ? order by id desc;";
+		Version currentVersion = null;
+		try (PreparedStatement st = con.prepareStatement(sql)) {
+			st.setString(0, app);
+			ResultSet rs = st.executeQuery();
+			if (rs.next())
+				currentVersion = Version.valueOf(rs.getString(2));
+		}
+
+		return currentVersion;
+	}
+
+	/**
 	 * @param realm
-	 * @param st
 	 * @param expectedDbVersion
 	 * 
 	 * @return
@@ -138,32 +175,43 @@ public class DbSchemaVersionCheck {
 	 * @throws SQLException
 	 * @throws DbException
 	 */
-	public DbMigrationState checkCurrentVersion(String realm, Statement st, String expectedDbVersion)
+	public DbMigrationState detectMigrationState(String realm, Version expectedDbVersion, Version currentVersion)
 			throws SQLException, DbException {
-		try (ResultSet rs = st.executeQuery("select id, version from db_version order by id desc;")) {
-			if (!rs.next()) {
-				return createSchema(realm, expectedDbVersion, st);
-			} else {
-				String currentVersion = rs.getString(2);
-				if (expectedDbVersion.equals(currentVersion)) {
-					String msg = "[{0}] Schema version {1} is the current version. No changes needed.";
-					msg = MessageFormat.format(msg, realm, currentVersion);
-					logger.info(msg);
-					return DbMigrationState.NOTHING;
-				} else {
-					String msg = "[{0}] Schema version is not current. Need to upgrade from {1} to {2}";
-					msg = MessageFormat.format(msg, realm, currentVersion, expectedDbVersion);
-					logger.warn(msg);
-					return migrateSchema(realm, expectedDbVersion, st);
-				}
-			}
+
+		// no version, then we need to create it
+		if (currentVersion == null)
+			return DbMigrationState.CREATED;
+
+		// otherwise parse the version
+		int compare = expectedDbVersion.compareTo(currentVersion);
+		if (compare == 0) {
+			String msg = "[{0}] Schema version {1} is the current version. No changes needed.";
+			msg = MessageFormat.format(msg, realm, currentVersion);
+			logger.info(msg);
+			return DbMigrationState.NOTHING;
+		} else if (compare > 0) {
+			String msg = "[{0}] Schema version is not current. Need to upgrade from {1} to {2}";
+			msg = MessageFormat.format(msg, realm, currentVersion, expectedDbVersion);
+			logger.warn(msg);
+			return DbMigrationState.MIGRATED;
 		}
+
+		throw new DbException("Current version " + currentVersion + " is later than expected version "
+				+ expectedDbVersion);
 	}
 
-	public static String getExpectedDbVersion(String prefix, Class<?> ctxClass) throws DbException {
+	/**
+	 * @param app
+	 * @param ctxClass
+	 * 
+	 * @return
+	 * 
+	 * @throws DbException
+	 */
+	public static Version getExpectedDbVersion(String app, Class<?> ctxClass) throws DbException {
 		Properties dbVersionProps = new Properties();
 
-		String dbVersionPropFile = MessageFormat.format(RESOURCE_DB_VERSION, prefix);
+		String dbVersionPropFile = MessageFormat.format(RESOURCE_DB_VERSION, app);
 
 		try (InputStream stream = ctxClass.getResourceAsStream(dbVersionPropFile);) {
 			DBC.PRE.assertNotNull(
@@ -177,7 +225,8 @@ public class DbSchemaVersionCheck {
 		String dbVersion = dbVersionProps.getProperty(PROP_DB_VERSION);
 		String msg = "Missing property {0} in resource file {1}";
 		DBC.PRE.assertNotEmpty(MessageFormat.format(msg, PROP_DB_VERSION, dbVersionPropFile), dbVersion);
-		return dbVersion;
+
+		return Version.valueOf(dbVersion);
 	}
 
 	/**
@@ -190,7 +239,7 @@ public class DbSchemaVersionCheck {
 	 * 
 	 * @throws DbException
 	 */
-	public static String getSql(String scriptPrefix, Class<?> ctxClass, String dbVersion, String type)
+	public static String getSql(String scriptPrefix, Class<?> ctxClass, Version dbVersion, String type)
 			throws DbException {
 		String schemaResourceS = MessageFormat.format("/{0}_db_schema_{1}_{2}.sql", scriptPrefix, dbVersion, type);
 		try (InputStream stream = ctxClass.getResourceAsStream(schemaResourceS);) {
@@ -216,7 +265,7 @@ public class DbSchemaVersionCheck {
 	 * 
 	 * @throws DbException
 	 */
-	public DbMigrationState createSchema(String realm, String dbVersion, Statement st) throws DbException {
+	public DbMigrationState createSchema(Connection con, String realm, Version dbVersion) throws DbException {
 
 		if (!this.allowSchemaCreation) {
 			String msg = "[{0}] No schema exists, or is not valid. Schema generation is disabled, thus can not continue!";
@@ -226,8 +275,9 @@ public class DbSchemaVersionCheck {
 
 		logger.info(MessageFormat.format("[{0}] Creating initial schema...", realm));
 
-		String sql = getSql(this.scriptPrefix, this.ctxClass, dbVersion, "initial");
-		try {
+		String sql = getSql(this.app, this.ctxClass, dbVersion, "initial");
+
+		try (Statement st = con.createStatement()) {
 			st.execute(sql);
 		} catch (SQLException e) {
 			logger.error("Failed to execute schema creation SQL: \n" + sql);
@@ -236,6 +286,41 @@ public class DbSchemaVersionCheck {
 
 		logger.info(MessageFormat.format("[{0}] Successfully created schema for version {1}", realm, dbVersion));
 		return DbMigrationState.CREATED;
+	}
+
+	/**
+	 * Upgrades the schema to the given version. If the current version is below the given version, then currently this
+	 * method drops the schema and recreates it. Real migration must still be implemented
+	 * 
+	 * @param realm
+	 *            the realm to migrate (a {@link DbConnectionInfo} must exist for it)
+	 * @param dbVersion
+	 *            the version to upgrade to
+	 * 
+	 * @return true if the schema was recreated, false if it was simply migrated
+	 * 
+	 * @throws DbException
+	 */
+	public DbMigrationState migrateSchema(Connection con, String realm, Version dbVersion) throws DbException {
+
+		if (!this.allowSchemaMigration) {
+			String msg = "[{0}] Schema is not valid. Schema migration is disabled, thus can not continue!";
+			msg = MessageFormat.format(msg, realm);
+			throw new DbException(msg);
+		}
+
+		logger.info(MessageFormat.format("[{0}] Migrating schema...", realm));
+
+		String sql = getSql(this.app, this.ctxClass, dbVersion, "migration");
+		try (Statement st = con.createStatement()) {
+			st.execute(sql);
+		} catch (SQLException e) {
+			logger.error("Failed to execute schema migration SQL: \n" + sql);
+			throw new DbException("Failed to execute schema migration SQL: " + e.getMessage(), e);
+		}
+
+		logger.info(MessageFormat.format("[{0}] Successfully migrated schema to version {1}", realm, dbVersion));
+		return DbMigrationState.MIGRATED;
 	}
 
 	/**
@@ -248,7 +333,7 @@ public class DbSchemaVersionCheck {
 	 * 
 	 * @throws DbException
 	 */
-	public void dropSchema(String realm, String dbVersion, Statement st) throws DbException {
+	public void dropSchema(Connection con, String realm, Version dbVersion) throws DbException {
 
 		if (!this.allowSchemaDrop) {
 			String msg = "[{0}] Dropping Schema is disabled, but is required to upgrade current schema...";
@@ -258,49 +343,12 @@ public class DbSchemaVersionCheck {
 
 		logger.info(MessageFormat.format("[{0}] Dropping existing schema...", realm));
 
-		String sql = getSql(this.scriptPrefix, this.ctxClass, dbVersion, "drop");
-		try {
+		String sql = getSql(this.app, this.ctxClass, dbVersion, "drop");
+		try (Statement st = con.createStatement()) {
 			st.execute(sql);
 		} catch (SQLException e) {
 			logger.error("Failed to execute schema drop SQL: \n" + sql);
 			throw new DbException("Failed to execute schema drop SQL: " + e.getMessage(), e);
 		}
-	}
-
-	/**
-	 * Upgrades the schema to the given version. If the current version is below the given version, then currently this
-	 * method drops the schema and recreates it. Real migration must still be implemented
-	 * 
-	 * @param realm
-	 *            the realm to migrate (a {@link DbConnectionInfo} must exist for it)
-	 * @param dbVersion
-	 *            the version to upgrade to
-	 * @param st
-	 *            the open database {@link Statement} to which the SQL statements will be written
-	 * 
-	 * @return true if the schema was recreated, false if it was simply migrated
-	 * 
-	 * @throws DbException
-	 */
-	public DbMigrationState migrateSchema(String realm, String dbVersion, Statement st) throws DbException {
-
-		if (!this.allowSchemaMigration) {
-			String msg = "[{0}] Schema is not valid. Schema migration is disabled, thus can not continue!";
-			msg = MessageFormat.format(msg, realm);
-			throw new DbException(msg);
-		}
-
-		logger.info(MessageFormat.format("[{0}] Migrating schema...", realm));
-
-		String sql = getSql(this.scriptPrefix, this.ctxClass, dbVersion, "migration");
-		try {
-			st.execute(sql);
-		} catch (SQLException e) {
-			logger.error("Failed to execute schema migration SQL: \n" + sql);
-			throw new DbException("Failed to execute schema migration SQL: " + e.getMessage(), e);
-		}
-
-		logger.info(MessageFormat.format("[{0}] Successfully migrated schema to version {1}", realm, dbVersion));
-		return DbMigrationState.MIGRATED;
 	}
 }
