@@ -15,7 +15,6 @@
  */
 package li.strolch.persistence.postgresql;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -95,8 +94,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 		String sql = "select count(*) from " + TABLE_NAME + " where " + DATE + " between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
-			statement.setDate(1, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
-			statement.setDate(2, new Date(dateRange.getToDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(1, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(2, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
 
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
@@ -114,8 +113,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
-			statement.setDate(2, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
-			statement.setDate(3, new Date(dateRange.getToDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(2, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(3, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
 
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
@@ -175,8 +174,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
-			statement.setDate(2, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
-			statement.setDate(3, new Date(dateRange.getToDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(2, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(3, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
 
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
@@ -279,8 +278,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setString(1, type);
-			preparedStatement.setDate(2, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
-			preparedStatement.setDate(3, new Date(dateRange.getToDate().getTime()), Calendar.getInstance());
+			preparedStatement.setTimestamp(2, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
+			preparedStatement.setTimestamp(3, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
 
 			int modCount = preparedStatement.executeUpdate();
 			return modCount;
