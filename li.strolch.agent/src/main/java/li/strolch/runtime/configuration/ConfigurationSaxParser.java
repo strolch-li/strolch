@@ -452,6 +452,10 @@ public class ConfigurationSaxParser extends DefaultHandler {
 					if (thisComponentBuilder == null) {
 						this.componentBuilders.add(otherComponentBuilder);
 					} else {
+						if (StringHelper.isNotEmpty(otherComponentBuilder.getImpl())) {
+							thisComponentBuilder.setImpl(otherComponentBuilder.getImpl());
+							thisComponentBuilder.setDependencies(otherComponentBuilder.getDependencies());
+						}
 						thisComponentBuilder.getProperties().putAll(otherComponentBuilder.getProperties());
 					}
 				}
@@ -550,6 +554,10 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		public Set<String> getDependencies() {
 			return this.dependencies;
+		}
+
+		public void setDependencies(Set<String> dependencies) {
+			this.dependencies = dependencies;
 		}
 
 		public void addDependency(String dependency) {
