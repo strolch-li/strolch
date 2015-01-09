@@ -17,11 +17,11 @@ package li.strolch.persistence.postgresql;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLXML;
+import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -107,7 +107,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			preparedStatement.setString(2, order.getName());
 			preparedStatement.setString(3, order.getType());
 			preparedStatement.setString(4, order.getState().name());
-			preparedStatement.setDate(5, new Date(order.getDate().getTime()), Calendar.getInstance());
+			preparedStatement.setTimestamp(5, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 
 			SQLXML sqlxml = createSqlXml(order, preparedStatement);
 			preparedStatement.setSQLXML(6, sqlxml);
@@ -137,7 +137,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			preparedStatement.setString(1, order.getName());
 			preparedStatement.setString(2, order.getType());
 			preparedStatement.setString(3, order.getState().name());
-			preparedStatement.setDate(4, new Date(order.getDate().getTime()), Calendar.getInstance());
+			preparedStatement.setTimestamp(4, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 			preparedStatement.setString(6, order.getId());
 
 			SQLXML sqlxml = createSqlXml(order, preparedStatement);
