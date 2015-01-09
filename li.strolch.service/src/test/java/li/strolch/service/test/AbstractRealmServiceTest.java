@@ -38,6 +38,7 @@ import org.junit.Before;
 
 import ch.eitchnet.db.DbSchemaVersionCheck;
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.Version;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -77,7 +78,7 @@ public abstract class AbstractRealmServiceTest {
 	}
 
 	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {
-		String dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
+		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
 				PostgreSqlPersistenceHandler.class);
 		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
 				PostgreSqlPersistenceHandler.class, dbVersion, "drop"); //$NON-NLS-1$

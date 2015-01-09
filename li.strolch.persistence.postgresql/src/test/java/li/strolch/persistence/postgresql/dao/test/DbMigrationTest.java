@@ -23,7 +23,6 @@ import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchem
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.MessageFormat;
 
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
@@ -34,6 +33,7 @@ import org.junit.Test;
 
 import ch.eitchnet.db.DbException;
 import ch.eitchnet.db.DbSchemaVersionCheck;
+import ch.eitchnet.utils.Version;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -56,17 +56,16 @@ public class DbMigrationTest {
 		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(scriptPrefix, ctxClass, allowSchemaCreation,
 				allowSchemaMigration, allowSchemaDrop);
 
-		try (Connection con = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-				Statement st = con.createStatement();) {
+		try (Connection con = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
 
 			// DROP 0.2.1
-			dbCheck.dropSchema(StrolchConstants.DEFAULT_REALM, "0.2.1", st);
+			dbCheck.dropSchema(con, StrolchConstants.DEFAULT_REALM, Version.valueOf("0.2.1"));
 
 			// CREATE 0.2.0
-			dbCheck.createSchema(StrolchConstants.DEFAULT_REALM, "0.2.0", st);
+			dbCheck.createSchema(con, StrolchConstants.DEFAULT_REALM, Version.valueOf("0.2.0"));
 
 			// MIGRATE 0.2.1
-			dbCheck.migrateSchema(StrolchConstants.DEFAULT_REALM, "0.2.1", st);
+			dbCheck.migrateSchema(con, StrolchConstants.DEFAULT_REALM, Version.valueOf("0.2.1"));
 
 		} catch (SQLException e) {
 			String msg = "Failed to open DB connection to URL {0} due to: {1}"; //$NON-NLS-1$
