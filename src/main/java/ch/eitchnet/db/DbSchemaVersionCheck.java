@@ -148,7 +148,7 @@ public class DbSchemaVersionCheck {
 		// first see if we have any schema
 		String sql = "select table_schema, table_name, table_type from information_schema.tables where table_name = ?";
 		try (PreparedStatement st = con.prepareStatement(sql)) {
-			st.setString(0, PROP_DB_VERSION);
+			st.setString(1, PROP_DB_VERSION);
 			if (!st.executeQuery().next())
 				return null;
 		}
@@ -157,7 +157,7 @@ public class DbSchemaVersionCheck {
 		sql = "select id, version from db_version where app = ? order by id desc;";
 		Version currentVersion = null;
 		try (PreparedStatement st = con.prepareStatement(sql)) {
-			st.setString(0, app);
+			st.setString(1, app);
 			ResultSet rs = st.executeQuery();
 			if (rs.next())
 				currentVersion = Version.valueOf(rs.getString(2));
