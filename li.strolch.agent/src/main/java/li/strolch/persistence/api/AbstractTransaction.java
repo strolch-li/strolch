@@ -516,13 +516,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append(StringHelper.formatNanoDuration(txDuration));
 		sb.append(", close="); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(closeDuration));
+		
 		if (isAuditTrailEnabled()) {
 			sb.append(", auditTrail="); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(auditTrailDuration));
 		}
-		if (observerUpdateDuration > 0L)
+		
+		if (isObserverUpdatesEnabled()) {
 			sb.append(", updates="); //$NON-NLS-1$
-		sb.append(StringHelper.formatNanoDuration(observerUpdateDuration));
+			sb.append(StringHelper.formatNanoDuration(observerUpdateDuration));
+		}
 		logger.info(sb.toString());
 	}
 
