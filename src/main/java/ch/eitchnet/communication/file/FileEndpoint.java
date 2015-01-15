@@ -244,7 +244,7 @@ public class FileEndpoint implements CommunicationEndpoint, Runnable {
 
 			// and forward to the connection
 			if (message != null) {
-				this.connection.notify(message);
+				this.connection.handleNewMessage(message);
 			}
 		}
 	}

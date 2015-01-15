@@ -555,7 +555,7 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 					// read and write from the connected server socket
 					IoMessage message = this.messageVisitor.visit(this.inputStream, this.outputStream);
 					if (message != null) {
-						this.connection.notify(message);
+						this.connection.handleNewMessage(message);
 					}
 				}
 

@@ -16,10 +16,25 @@
 package ch.eitchnet.communication;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
+/**
+ * <p>
+ * An {@link IoMessage} is the object containing the data to be transmitted in IO. Implementations of
+ * {@link CommunicationConnection} should implement sub classes of this method to hold the actual payload.
+ * </p>
+ * 
+ * <p>
+ * This class also contains a {@link Map} to store transient meta data to the actual payload
+ * </p>
+ * 
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
 public class IoMessage {
 
 	private final String id;
@@ -28,7 +43,13 @@ public class IoMessage {
 	private Date updated;
 	private State state;
 	private String stateMsg;
+	private Map<String, Object> parameters;
 
+	/**
+	 * @param id
+	 * @param key
+	 * @param connectionId
+	 */
 	public IoMessage(String id, CommandKey key, String connectionId) {
 		this.id = id;
 		this.key = key;
@@ -36,6 +57,7 @@ public class IoMessage {
 		this.state = State.CREATED;
 		this.stateMsg = StringHelper.DASH;
 		this.updated = new Date();
+		this.parameters = new HashMap<>();
 	}
 
 	/**
@@ -99,6 +121,36 @@ public class IoMessage {
 		this.state = state;
 		this.stateMsg = stateMsg;
 		this.updated = new Date();
+	}
+
+	/**
+	 * Add a transient parameter to this message
+	 * 
+	 * @param key
+	 *            the key under which the parameter is to be stored
+	 * @param value
+	 *            the value to store under the given key
+	 */
+	public void addParam(String key, Object value) {
+		this.parameters.put(key, value);
+	}
+
+	/**
+	 * Removes the parameter with the given key
+	 * 
+	 * @param key
+	 *            The give of the parameter to be removed
+	 * @return the removed value, or null if the object didn't exist
+	 */
+	public Object removeParam(String key) {
+		return this.parameters.remove(key);
+	}
+
+	/**
+	 * @return the set of parameter keys
+	 */
+	public Set<String> getParamKeys() {
+		return this.parameters.keySet();
 	}
 
 	@SuppressWarnings("nls")

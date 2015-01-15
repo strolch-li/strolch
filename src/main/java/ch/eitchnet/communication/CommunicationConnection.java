@@ -246,7 +246,7 @@ public class CommunicationConnection implements Runnable {
 	 * 
 	 * @param message
 	 */
-	public void notify(IoMessage message) {
+	public void handleNewMessage(IoMessage message) {
 		ConnectionMessages.assertConfigured(this, "Can not be notified of new message yet!"); //$NON-NLS-1$
 
 		// if the state of the message is already later than ACCEPTED 
@@ -255,6 +255,10 @@ public class CommunicationConnection implements Runnable {
 		if (message.getState().compareTo(State.ACCEPTED) < 0)
 			message.setState(State.ACCEPTED, StringHelper.DASH);
 
+		notifyObservers(message);
+	}
+
+	public void notifyObservers(IoMessage message) {
 		List<ConnectionObserver> observers;
 		synchronized (this.connectionObservers) {
 			List<ConnectionObserver> list = this.connectionObservers.getList(message.getKey());
@@ -328,7 +332,8 @@ public class CommunicationConnection implements Runnable {
 	}
 
 	/**
-	 * Called when the message has been handled
+	 * Called when an outgoing message has been handled. This method logs the message state and then notifies all
+	 * observers
 	 * 
 	 * @param message
 	 */
@@ -349,16 +354,9 @@ public class CommunicationConnection implements Runnable {
 		default:
 			logger.error(MessageFormat.format("Unhandled state for message {0}", message.toString())); //$NON-NLS-1$
 			break;
+		}
 
-		}
-		synchronized (this.connectionObservers) {
-			List<ConnectionObserver> observers = this.connectionObservers.getList(message.getKey());
-			if (observers != null) {
-				for (ConnectionObserver observer : observers) {
-					observer.notify(message.getKey(), message);
-				}
-			}
-		}
+		notifyObservers(message);
 	}
 
 	public String getRemoteUri() {
