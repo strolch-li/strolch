@@ -78,6 +78,7 @@ public class ConfigurationParserTest {
 		assertEquals("li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler",
 				privilegeHandlerConfiguration.getImpl());
 		assertEquals(1, privilegeHandlerConfiguration.getPropertyKeys().size());
+		assertEquals(1, privilegeHandlerConfiguration.getDependencies().size());
 		assertTrue(privilegeHandlerConfiguration.getDependencies().contains("PersistenceHandler"));
 		assertEquals("PrivilegeConfig.xml", privilegeHandlerConfiguration.getString("privilegeConfigFile", null));
 
@@ -178,5 +179,26 @@ public class ConfigurationParserTest {
 		assertEquals(2, realmHandlerConfiguration.getPropertyKeys().size());
 		assertEquals("EMPTY", realmHandlerConfiguration.getString("dataStoreMode", null));
 		assertEquals("noob", realmHandlerConfiguration.getString("foo", null));
+
+		// <Component>
+		//     <name>ServiceHandler</name>
+		//     <api>li.strolch.service.api.ServiceHandler</api>
+		//     <impl>li.strolch.service.YetAnotherServiceHandler</impl>
+		//     <depends>RealmHandler</depends>
+		//     <Properties>
+		//         <bar>foo</bar>
+		//     </Properties>
+		// </Component>
+		ComponentConfiguration serviceHandlerConfiguration = strolchConfiguration
+				.getComponentConfiguration("ServiceHandler");
+		assertNotNull("Should have created a ServiceHandler Configuration", serviceHandlerConfiguration);
+		assertEquals("ServiceHandler", serviceHandlerConfiguration.getName());
+		assertEquals("li.strolch.service.api.ServiceHandler", serviceHandlerConfiguration.getApi());
+		assertEquals("li.strolch.service.YetAnotherServiceHandler", serviceHandlerConfiguration.getImpl());
+		assertEquals(2, serviceHandlerConfiguration.getDependencies().size());
+		assertTrue(serviceHandlerConfiguration.getDependencies().contains("RealmHandler"));
+		assertTrue(serviceHandlerConfiguration.getDependencies().contains("PrivilegeHandler"));
+		assertEquals(1, serviceHandlerConfiguration.getPropertyKeys().size());
+		assertEquals("foo", serviceHandlerConfiguration.getString("bar", null));
 	}
 }

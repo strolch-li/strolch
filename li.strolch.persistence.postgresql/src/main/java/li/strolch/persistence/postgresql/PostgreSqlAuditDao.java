@@ -15,10 +15,10 @@
  */
 package li.strolch.persistence.postgresql;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -94,8 +94,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 		String sql = "select count(*) from " + TABLE_NAME + " where " + DATE + " between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
-			statement.setDate(1, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
-			statement.setDate(2, new Date(dateRange.getToDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(1, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(2, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
 
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
@@ -113,8 +113,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
-			statement.setDate(2, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
-			statement.setDate(3, new Date(dateRange.getToDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(2, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(3, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
 
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
@@ -174,8 +174,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
-			statement.setDate(2, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
-			statement.setDate(3, new Date(dateRange.getToDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(2, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(3, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
 
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
@@ -278,8 +278,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setString(1, type);
-			preparedStatement.setDate(2, new Date(dateRange.getFromDate().getTime()), Calendar.getInstance());
-			preparedStatement.setDate(3, new Date(dateRange.getToDate().getTime()), Calendar.getInstance());
+			preparedStatement.setTimestamp(2, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
+			preparedStatement.setTimestamp(3, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
 
 			int modCount = preparedStatement.executeUpdate();
 			return modCount;
@@ -315,14 +315,14 @@ public class PostgreSqlAuditDao implements AuditDao {
 		ps.setString(2, audit.getUsername());
 		ps.setString(3, audit.getFirstname());
 		ps.setString(4, audit.getLastname());
-		ps.setDate(5, new Date(audit.getDate().getTime()), Calendar.getInstance());
+		ps.setTimestamp(5, new Timestamp(audit.getDate().getTime()), Calendar.getInstance());
 		ps.setString(6, audit.getElementType());
 		ps.setString(7, audit.getElementAccessed());
 
 		if (audit.getNewVersion() == null)
 			ps.setDate(8, null);
 		else
-			ps.setDate(8, new Date(audit.getNewVersion().getTime()), Calendar.getInstance());
+			ps.setTimestamp(8, new Timestamp(audit.getNewVersion().getTime()), Calendar.getInstance());
 
 		ps.setString(9, audit.getAction());
 		ps.setString(10, audit.getAccessType().name());
@@ -335,10 +335,10 @@ public class PostgreSqlAuditDao implements AuditDao {
 		audit.setUsername(resultSet.getString(2));
 		audit.setFirstname(resultSet.getString(3));
 		audit.setLastname(resultSet.getString(4));
-		audit.setDate(resultSet.getDate(5));
+		audit.setDate(resultSet.getTimestamp(5));
 		audit.setElementType(resultSet.getString(6));
 		audit.setElementAccessed(resultSet.getString(7));
-		audit.setNewVersion(resultSet.getDate(8));
+		audit.setNewVersion(resultSet.getTimestamp(8));
 		audit.setAction(resultSet.getString(9));
 		audit.setAccessType(AccessType.valueOf(resultSet.getString(10)));
 		return audit;

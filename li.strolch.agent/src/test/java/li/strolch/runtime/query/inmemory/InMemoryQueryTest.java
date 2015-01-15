@@ -189,6 +189,21 @@ public class InMemoryQueryTest {
 		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
 		assertEquals(1, result.size());
 	}
+	
+	@Test
+	public void shouldQueryByName() {
+
+		List<Resource> resources = getResources();
+		resources.add(getBallResource());
+		InMemoryResourceDao dao = new InMemoryResourceDao();
+		dao.saveAll(resources);
+
+		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ballQuery.with(new NameSelection("ball ", StringMatchMode.CONTAINS_CASE_INSENSITIVE));
+
+		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		assertEquals(1, result.size());
+	}
 
 	private Resource getBallResource() {
 		Resource res1 = new Resource("childrensBall", "Ball 1", "Ball");
