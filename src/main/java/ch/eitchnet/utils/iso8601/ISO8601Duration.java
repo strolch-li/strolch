@@ -244,7 +244,7 @@ public class ISO8601Duration implements DurationFormat {
 			throw new RuntimeException("A duration can not be negative!");
 
 		if (duration == 0l)
-			return "PT0S";
+			return "P0D";
 
 		StringBuilder sb = new StringBuilder();
 		sb.append('P');
