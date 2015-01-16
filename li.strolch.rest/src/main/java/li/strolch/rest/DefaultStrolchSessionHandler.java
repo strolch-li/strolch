@@ -65,7 +65,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		this.privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
 		this.certificateMap = new HashMap<>();
 
-		this.sessionTimeoutTimer = new Timer("SessionTimeoutTimer"); //$NON-NLS-1$
+		this.sessionTimeoutTimer = new Timer("SessionTimeoutTimer", true); //$NON-NLS-1$
 		long checkInterval = TimeUnit.MINUTES.toMillis(1);
 		this.sessionTimeoutTimer.schedule(new SessionTimeoutTask(), checkInterval, checkInterval);
 

@@ -31,6 +31,8 @@ public interface StrolchRealm {
 
 	public void unlock(StrolchRootElement lockedElement);
 
+	public void releaseLock(StrolchRootElement lockedElement);
+
 	public DataStoreMode getMode();
 
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz);

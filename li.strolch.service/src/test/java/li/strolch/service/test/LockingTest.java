@@ -96,6 +96,13 @@ public class LockingTest {
 			runners.add(new LockingRunner(svc, arg));
 		}
 
+		runRunners(runners);
+
+		// now assert that we can perform another such service, thus validating that the resource is not locked any longer
+		doLockServiceTest(false);
+	}
+
+	private void runRunners(List<LockingRunner> runners) throws InterruptedException {
 		this.run = false;
 		for (LockingRunner lockingRunner : runners) {
 			lockingRunner.start();
@@ -112,11 +119,30 @@ public class LockingTest {
 			assertEquals(ServiceResultState.FAILED, result.getState());
 			assertThat(result.getMessage(), containsString("Failed to acquire lock after"));
 		}
+	}
 
-		// now assert that we can perform another such service, thus validating that the resource is not locked any longer
+	@Test
+	public void shouldUnlockCompletelyOnMultipleLock() throws InterruptedException {
+
+		List<LockingRunner> runners = new ArrayList<>();
+
 		LockingServiceTest svc = new LockingServiceTest();
 		LockingArgumentTest arg = new LockingArgumentTest();
 		arg.longRunning = false;
+		arg.nrOfLocks = 5;
+		arg.resourceLoc = Locator.valueOf(RESOURCE_LOCATOR);
+		runners.add(new LockingRunner(svc, arg));
+
+		runRunners(runners);
+
+		// now assert that we can perform another such service, thus validating that the resource is not locked any longer
+		doLockServiceTest(false);
+	}
+
+	private void doLockServiceTest(boolean longRunning) {
+		LockingServiceTest svc = new LockingServiceTest();
+		LockingArgumentTest arg = new LockingArgumentTest();
+		arg.longRunning = longRunning;
 		arg.resourceLoc = Locator.valueOf(RESOURCE_LOCATOR);
 		ServiceResult result = getServiceHandler().doService(login(), svc, arg);
 		assertEquals(ServiceResultState.SUCCESS, result.getState());
@@ -157,6 +183,7 @@ public class LockingTest {
 	private static class LockingArgumentTest extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
 		public boolean longRunning;
+		public int nrOfLocks = 1;
 		public Locator resourceLoc;
 	}
 
@@ -177,7 +204,8 @@ public class LockingTest {
 					Thread.sleep(200l);
 
 				Resource res = tx.findElement(arg.resourceLoc);
-				tx.lock(res);
+				for (int i = 0; i < arg.nrOfLocks; i++)
+					tx.lock(res);
 
 				if (arg.longRunning)
 					Thread.sleep(5000l);

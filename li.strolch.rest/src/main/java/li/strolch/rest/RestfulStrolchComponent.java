@@ -132,8 +132,8 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		}
 
 		// restful logging and tracing
-		this.restLogging = configuration.getBoolean(PARAM_REST_LOGGING, false);
-		this.restLoggingEntity = configuration.getBoolean(PARAM_REST_LOGGING_ENTITY, false);
+		this.restLogging = configuration.getBoolean(PARAM_REST_LOGGING, Boolean.FALSE);
+		this.restLoggingEntity = configuration.getBoolean(PARAM_REST_LOGGING_ENTITY, Boolean.FALSE);
 		this.restTracing = configuration.getString(PARAM_REST_TRACING, "OFF"); //$NON-NLS-1$
 		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "TRACE"); //$NON-NLS-1$
 

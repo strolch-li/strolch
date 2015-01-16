@@ -121,33 +121,32 @@ public class AuthenticationService {
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{authToken}")
-	public Response logout(@PathParam("authToken") String authToken) {
+	@Path("{sessionId}")
+	public Response logout(@PathParam("sessionId") String sessionId) {
 
 		LogoutResult logoutResult = new LogoutResult();
 
-		GenericEntity<LogoutResult> entity = new GenericEntity<LogoutResult>(logoutResult, LogoutResult.class) {
-			//
-		};
 		try {
 
 			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance().getComponent(
 					StrolchSessionHandler.class);
-			Certificate certificate = sessionHandlerHandler.validate(authToken);
+			Certificate certificate = sessionHandlerHandler.validate(sessionId);
 			sessionHandlerHandler.invalidateSession(certificate);
 
+			logoutResult.setUsername(certificate.getUsername());
+			logoutResult.setSessionId(sessionId);
 			logoutResult.setMsg(MessageFormat.format("{0} has been logged out.", certificate.getUsername())); //$NON-NLS-1$
-			return Response.ok().entity(entity).build();
+			return Response.ok().entity(logoutResult).build();
 
 		} catch (StrolchException | PrivilegeException e) {
 			logger.error(e.getMessage(), e);
 			logoutResult.setMsg(MessageFormat.format("Could not logout due to: {0}", e.getMessage())); //$NON-NLS-1$
-			return Response.status(Status.UNAUTHORIZED).entity(entity).build();
+			return Response.status(Status.UNAUTHORIZED).entity(logoutResult).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
 			logoutResult.setMsg(MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
-			return Response.serverError().entity(entity).build();
+			return Response.serverError().entity(logoutResult).build();
 		}
 	}
 }

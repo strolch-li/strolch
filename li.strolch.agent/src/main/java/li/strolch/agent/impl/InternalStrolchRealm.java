@@ -77,13 +77,17 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		this.lockHandler.unlock(lockedElement);
 	}
 
+	@Override
+	public void releaseLock(StrolchRootElement lockedElement) {
+		this.lockHandler.releaseLock(lockedElement);
+	}
+
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 
 		String propTryLockTimeUnit = StrolchConstants.makeRealmKey(this.realm, PROP_TRY_LOCK_TIME_UNIT);
 		String propTryLockTime = StrolchConstants.makeRealmKey(this.realm, PROP_TRY_LOCK_TIME);
 
-		String enableAuditKey = StrolchConstants.makeRealmKey(getRealm(),
-				DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
+		String enableAuditKey = StrolchConstants.makeRealmKey(getRealm(), DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
 		this.auditTrailEnabled = configuration.getBoolean(enableAuditKey, Boolean.FALSE);
 
 		String enableAuditForReadKey = StrolchConstants.makeRealmKey(getRealm(),

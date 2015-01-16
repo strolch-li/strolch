@@ -199,9 +199,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.lockedElements.remove(element);
 	}
 
-	private void unlockElements() {
+	private void releaseElementLocks() {
 		for (StrolchRootElement lockedElement : this.lockedElements) {
-			this.realm.unlock(lockedElement);
+			this.realm.releaseLock(lockedElement);
 		}
 	}
 
@@ -472,7 +472,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			throw new StrolchPersistenceException(msg, e);
 
 		} finally {
-			unlockElements();
+			releaseElementLocks();
 		}
 	}
 
@@ -487,7 +487,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		} catch (Exception e) {
 			handleFailure(start, e);
 		} finally {
-			unlockElements();
+			releaseElementLocks();
 		}
 	}
 
@@ -510,19 +510,23 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TX user=");
 		sb.append(this.certificate.getUsername());
+		sb.append(", action=");
+		sb.append(this.action);
 		sb.append(", realm="); //$NON-NLS-1$
 		sb.append(getRealmName());
 		sb.append(", took="); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(txDuration));
-		sb.append(", close="); //$NON-NLS-1$
-		sb.append(StringHelper.formatNanoDuration(closeDuration));
-		
-		if (isAuditTrailEnabled()) {
+		if (closeDuration >= 100000000L) {
+			sb.append(", close="); //$NON-NLS-1$
+			sb.append(StringHelper.formatNanoDuration(closeDuration));
+		}
+
+		if (isAuditTrailEnabled() && auditTrailDuration >= 100000000L) {
 			sb.append(", auditTrail="); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(auditTrailDuration));
 		}
-		
-		if (isObserverUpdatesEnabled()) {
+
+		if (isObserverUpdatesEnabled() && observerUpdateDuration >= 100000000L) {
 			sb.append(", updates="); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(observerUpdateDuration));
 		}
