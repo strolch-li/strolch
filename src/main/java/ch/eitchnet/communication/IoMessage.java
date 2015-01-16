@@ -123,6 +123,11 @@ public class IoMessage {
 		this.updated = new Date();
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> T getParam(String key) {
+		return (T) this.parameters.get(key);
+	}
+
 	/**
 	 * Add a transient parameter to this message
 	 * 
@@ -142,8 +147,9 @@ public class IoMessage {
 	 *            The give of the parameter to be removed
 	 * @return the removed value, or null if the object didn't exist
 	 */
-	public Object removeParam(String key) {
-		return this.parameters.remove(key);
+	@SuppressWarnings("unchecked")
+	public <T> T removeParam(String key) {
+		return (T) this.parameters.remove(key);
 	}
 
 	/**
