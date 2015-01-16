@@ -273,7 +273,7 @@ public class CommunicationConnection implements Runnable {
 				observer.notify(message.getKey(), message);
 			} catch (Exception e) {
 				String msg = "Failed to notify observer for key {0} on message with id {1}"; //$NON-NLS-1$
-				logger.error(MessageFormat.format(msg, message.getKey(), message.getId()));
+				logger.error(MessageFormat.format(msg, message.getKey(), message.getId()), e);
 			}
 		}
 
