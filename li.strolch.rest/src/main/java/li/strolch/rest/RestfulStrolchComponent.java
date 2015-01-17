@@ -20,6 +20,7 @@ import java.text.MessageFormat;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.rest.filters.AccessControlResponseFilter;
+import li.strolch.rest.filters.HttpCacheResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
 import org.glassfish.jersey.server.ServerProperties;
@@ -35,6 +36,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private static final String PARAM_CORS_ORIGIN = "corsOrigin"; //$NON-NLS-1$
 	private static final String PARAM_REST_LOGGING = "restLogging"; //$NON-NLS-1$
 	private static final String PARAM_REST_LOGGING_ENTITY = "restLoggingEntity"; //$NON-NLS-1$
+	private static final String PARAM_HTTP_CACHE_MODE = "httpCacheMode"; //$NON-NLS-1$
 
 	/**
 	 * Allowed values:
@@ -69,6 +71,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private String corsOrigin;
 	private boolean restLogging;
 	private boolean restLoggingEntity;
+	private String cacheMode;
 
 	/**
 	 * @param container
@@ -140,6 +143,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		String msg = "Set restLogging={0} with logEntities={1} restTracing={2} with threshold={3}"; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.restLogging, this.restLoggingEntity, this.restTracing,
 				this.restTracingThreshold));
+		
+		// set http cache mode
+		this.cacheMode = configuration.getString(PARAM_HTTP_CACHE_MODE, HttpCacheResponseFilter.NO_CACHE);
+		logger.info("HTTP header cache mode is set to {}",cacheMode);
 
 		super.initialize(configuration);
 	}
