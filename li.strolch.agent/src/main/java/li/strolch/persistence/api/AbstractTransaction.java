@@ -510,12 +510,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TX user=");
 		sb.append(this.certificate.getUsername());
-		sb.append(", action=");
-		sb.append(this.action);
+
 		sb.append(", realm="); //$NON-NLS-1$
 		sb.append(getRealmName());
+
 		sb.append(", took="); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(txDuration));
+
+		sb.append(", action=");
+		sb.append(this.action);
+
 		if (closeDuration >= 100000000L) {
 			sb.append(", close="); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(closeDuration));
@@ -542,6 +546,26 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setState(TransactionState.ROLLED_BACK);
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("TX ROLLBACK user=");
+		sb.append(this.certificate.getUsername());
+
+		sb.append(", realm="); //$NON-NLS-1$
+		sb.append(getRealmName());
+
+		sb.append(" failed="); //$NON-NLS-1$
+		sb.append(StringHelper.formatNanoDuration(txDuration));
+
+		sb.append(", action=");
+		sb.append(this.action);
+
+		if (closeDuration >= 100000000L) {
+			sb.append(", close="); //$NON-NLS-1$
+			sb.append(StringHelper.formatNanoDuration(closeDuration));
+			logger.info(sb.toString());
+		}
+		logger.error(sb.toString());
 	}
 
 	protected void handleFailure(long closeStartNanos, Exception e) {
@@ -555,18 +579,26 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setCloseDuration(closeDuration);
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("TX user=");
+		sb.append("TX FAILED user=");
 		sb.append(this.certificate.getUsername());
+
 		sb.append(", realm="); //$NON-NLS-1$
 		sb.append(getRealmName());
+
 		sb.append(" failed="); //$NON-NLS-1$
 		sb.append(StringHelper.formatNanoDuration(txDuration));
-		sb.append(", close="); //$NON-NLS-1$
-		sb.append(StringHelper.formatNanoDuration(closeDuration));
-		logger.info(sb.toString());
 
-		String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
+		sb.append(", action=");
+		sb.append(this.action);
+
+		if (closeDuration >= 100000000L) {
+			sb.append(", close="); //$NON-NLS-1$
+			sb.append(StringHelper.formatNanoDuration(closeDuration));
+			logger.info(sb.toString());
+		}
+
+		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$
+		msg = MessageFormat.format(msg, getRealmName(), e.getMessage(), sb.toString());
 		throw new StrolchPersistenceException(msg, e);
 	}
 
