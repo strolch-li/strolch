@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -33,8 +34,10 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class DefaultServiceHandler extends StrolchComponent implements ServiceHandler {
 
+	private static final String PARAM_THROW_ON_PRIVILEGE_FAIL = "throwOnPrivilegeFail";
 	private RuntimeConfiguration runtimeConfiguration;
 	private PrivilegeHandler privilegeHandler;
+	private boolean throwOnPrivilegeFail;
 
 	/**
 	 * @param container
@@ -48,6 +51,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	public void initialize(ComponentConfiguration configuration) {
 		this.privilegeHandler = getContainer().getPrivilegeHandler();
 		this.runtimeConfiguration = configuration.getRuntimeConfiguration();
+		this.throwOnPrivilegeFail = configuration.getBoolean(PARAM_THROW_ON_PRIVILEGE_FAIL, Boolean.FALSE);
 		super.initialize(configuration);
 	}
 
@@ -84,7 +88,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 					StringHelper.formatNanoDuration(end - start), e.getMessage());
 			logger.error(msg, e);
 
-			if (service instanceof AbstractService) {
+			if (!this.throwOnPrivilegeFail && service instanceof AbstractService) {
 				AbstractService<?, ?> abstractService = (AbstractService<?, ?>) service;
 				@SuppressWarnings("unchecked")
 				U arg = (U) abstractService.getResultInstance();
@@ -93,7 +97,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				arg.setThrowable(e);
 				return arg;
 			} else {
-				throw new StrolchException(e.getMessage());
+				throw new StrolchAccessDeniedException(certificate, service, e.getMessage(), e);
 			}
 		}
 
@@ -113,16 +117,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			}
 
 			// log the result
-			long end = System.nanoTime();
-			String msg = "User {0}: Service {1} took {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, username, service.getClass().getName(),
-					StringHelper.formatNanoDuration(end - start));
-			if (serviceResult.getState() == ServiceResultState.SUCCESS)
-				logger.info(msg);
-			else if (serviceResult.getState() == ServiceResultState.WARNING)
-				logger.warn(msg);
-			else if (serviceResult.getState() == ServiceResultState.FAILED)
-				logger.error(msg);
+			logResult(service, start, username, serviceResult);
 
 			return serviceResult;
 
@@ -133,6 +128,44 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 					StringHelper.formatNanoDuration(end - start), e.getMessage());
 			logger.error(msg, e);
 			throw new StrolchException(msg, e);
+		}
+	}
+
+	private void logResult(Service<?, ?> service, long start, String username, ServiceResult serviceResult) {
+
+		long end = System.nanoTime();
+
+		String msg = "User {0}: Service {1} took {2}"; //$NON-NLS-1$
+		msg = MessageFormat.format(msg, username, service.getClass().getName(),
+				StringHelper.formatNanoDuration(end - start));
+
+		if (serviceResult.getState() == ServiceResultState.SUCCESS) {
+			logger.info(msg);
+		} else if (serviceResult.getState() == ServiceResultState.WARNING) {
+
+			msg = ServiceResultState.WARNING + " " + msg;
+			logger.warn(msg);
+
+			if (StringHelper.isNotEmpty(serviceResult.getMessage()) && serviceResult.getThrowable() != null) {
+				logger.warn("Reason: " + serviceResult.getMessage(), serviceResult.getThrowable());
+			} else if (StringHelper.isNotEmpty(serviceResult.getMessage())) {
+				logger.warn("Reason: " + serviceResult.getMessage());
+			} else if (serviceResult.getThrowable() != null) {
+				logger.warn("Reason: " + serviceResult.getThrowable().getMessage(), serviceResult.getThrowable());
+			}
+
+		} else if (serviceResult.getState() == ServiceResultState.FAILED) {
+
+			msg = ServiceResultState.FAILED + " " + msg;
+			logger.error(msg);
+
+			if (StringHelper.isNotEmpty(serviceResult.getMessage()) && serviceResult.getThrowable() != null) {
+				logger.error("Reason: " + serviceResult.getMessage(), serviceResult.getThrowable());
+			} else if (StringHelper.isNotEmpty(serviceResult.getMessage())) {
+				logger.error("Reason: " + serviceResult.getMessage());
+			} else if (serviceResult.getThrowable() != null) {
+				logger.error("Reason: " + serviceResult.getThrowable().getMessage(), serviceResult.getThrowable());
+			}
 		}
 	}
 }
