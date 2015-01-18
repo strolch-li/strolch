@@ -86,9 +86,11 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			String msg = "User {0}: Service {1} failed after {2} due to {3}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, username, service.getClass().getName(),
 					StringHelper.formatNanoDuration(end - start), e.getMessage());
-			logger.error(msg, e);
+			logger.error(msg);
 
 			if (!this.throwOnPrivilegeFail && service instanceof AbstractService) {
+				logger.error(e.getMessage(), e);
+
 				AbstractService<?, ?> abstractService = (AbstractService<?, ?>) service;
 				@SuppressWarnings("unchecked")
 				U arg = (U) abstractService.getResultInstance();
@@ -126,7 +128,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			String msg = "User {0}: Service failed {1} after {2} due to {3}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, username, service.getClass().getName(),
 					StringHelper.formatNanoDuration(end - start), e.getMessage());
-			logger.error(msg, e);
+			logger.error(msg);
 			throw new StrolchException(msg, e);
 		}
 	}

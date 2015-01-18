@@ -569,7 +569,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (closeDuration >= 100000000L) {
 			sb.append(", close="); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(closeDuration));
-			logger.info(sb.toString());
 		}
 		logger.error(sb.toString());
 	}
@@ -600,7 +599,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (closeDuration >= 100000000L) {
 			sb.append(", close="); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(closeDuration));
-			logger.info(sb.toString());
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$
