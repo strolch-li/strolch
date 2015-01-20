@@ -38,6 +38,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import ch.eitchnet.utils.dbc.DBC.DbcException;
+
 @SuppressWarnings("nls")
 public class ControllerDependencyTest {
 
@@ -201,9 +203,8 @@ public class ControllerDependencyTest {
 		this.strolchConfiguration = ConfigurationParser.parseConfiguration("dev", rootPathF);
 		for (ComponentController controller : this.controllerMap.values()) {
 			ComponentConfiguration componentConfiguration = new ComponentConfiguration(
-					this.strolchConfiguration.getRuntimeConfiguration(), controller.getComponentName(), null, null,
-					null, null);
-			this.strolchConfiguration.addConfiguration(controller.getComponentName(), componentConfiguration);
+					this.strolchConfiguration.getRuntimeConfiguration(), controller.getName(), null, null, null, null);
+			this.strolchConfiguration.addConfiguration(controller.getName(), componentConfiguration);
 		}
 	}
 
@@ -411,7 +412,7 @@ public class ControllerDependencyTest {
 				.collectDirectUpstreamDependencies(controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
-		assertTrue(directUpstreamDependencies.contains(this.conA));
+		assertTrue(directUpstreamDependencies.contains(this.conB));
 	}
 
 	@Test
@@ -448,17 +449,18 @@ public class ControllerDependencyTest {
 
 		Set<ComponentController> controllers = new HashSet<>();
 		controllers.add(this.conB1);
-		controllers.add(this.conC1);
 
 		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
 				.collectDirectUpstreamDependencies(controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
-		assertTrue(directUpstreamDependencies.contains(this.conA1));
+		assertTrue(directUpstreamDependencies.contains(this.conC1));
 	}
 
 	@Test
-	public void shouldCollectUpstreamDependencies4() {
+	public void shouldNotCollectUpstreamDependencies4() {
+		thrown.expect(DbcException.class);
+		thrown.expectMessage("Upstream C1 is one of the input controllers!");
 		assertModel();
 
 		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
@@ -489,7 +491,7 @@ public class ControllerDependencyTest {
 				.collectDirectUpstreamDependencies(controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
-		assertTrue(directUpstreamDependencies.contains(this.conA1));
+		assertTrue(directUpstreamDependencies.contains(this.conC1));
 	}
 
 	//
@@ -532,7 +534,7 @@ public class ControllerDependencyTest {
 				.collectDirectUpstreamDependencies(controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
-		assertTrue(directUpstreamDependencies.contains(this.conA2));
+		assertTrue(directUpstreamDependencies.contains(this.conB2));
 	}
 
 	//    +-> A2
@@ -590,7 +592,7 @@ public class ControllerDependencyTest {
 			assertEquals(ComponentState.UNDEFINED, controller.getState());
 
 			ComponentConfiguration componentConfiguration = this.strolchConfiguration
-					.getComponentConfiguration(controller.getComponentName());
+					.getComponentConfiguration(controller.getName());
 			controller.getComponent().setup(componentConfiguration);
 		}
 

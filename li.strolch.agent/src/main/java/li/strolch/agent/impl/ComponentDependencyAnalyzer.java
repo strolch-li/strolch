@@ -27,6 +27,7 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 
 public class ComponentDependencyAnalyzer {
@@ -63,7 +64,7 @@ public class ComponentDependencyAnalyzer {
 
 	private Set<ComponentController> collectAllUpstreamDependencies(ComponentController controller) {
 		Set<ComponentController> upstreamDependencies = new HashSet<>(controller.getUpstreamDependencies());
-		for (ComponentController upstream : upstreamDependencies) {
+		for (ComponentController upstream : controller.getUpstreamDependencies()) {
 			upstreamDependencies.addAll(collectAllUpstreamDependencies(upstream));
 		}
 
@@ -71,6 +72,15 @@ public class ComponentDependencyAnalyzer {
 	}
 
 	public Set<ComponentController> collectDirectUpstreamDependencies(Set<ComponentController> controllers) {
+
+		// assert no upstream is in this list
+		for (ComponentController controller : controllers) {
+			Set<ComponentController> upstreamDependencies = collectAllUpstreamDependencies(controller);
+			for (ComponentController upstream : upstreamDependencies) {
+				DBC.INTERIM.assertFalse("Upstream " + upstream.getName() + " is one of the input controllers!",
+						controllers.contains(upstream));
+			}
+		}
 
 		Set<ComponentController> directUpstreamDependencies = new HashSet<>();
 
@@ -92,7 +102,7 @@ public class ComponentDependencyAnalyzer {
 
 	private Set<ComponentController> collectAllDownstreamDependencies(ComponentController controller) {
 		Set<ComponentController> downstreamDependencies = new HashSet<>(controller.getDownstreamDependencies());
-		for (ComponentController downstream : downstreamDependencies) {
+		for (ComponentController downstream : controller.getDownstreamDependencies()) {
 			downstreamDependencies.addAll(collectAllDownstreamDependencies(downstream));
 		}
 
@@ -100,6 +110,15 @@ public class ComponentDependencyAnalyzer {
 	}
 
 	public Set<ComponentController> collectDirectDownstreamDependencies(Set<ComponentController> controllers) {
+
+		// assert no downstream is in this list
+		for (ComponentController controller : controllers) {
+			Set<ComponentController> downstreamDependencies = collectAllUpstreamDependencies(controller);
+			for (ComponentController downstream : downstreamDependencies) {
+				DBC.INTERIM.assertFalse("Downstream " + downstream.getName() + " is one of the input controllers!",
+						controllers.contains(downstream));
+			}
+		}
 
 		Set<ComponentController> directDownstreamDependencies = new HashSet<>();
 

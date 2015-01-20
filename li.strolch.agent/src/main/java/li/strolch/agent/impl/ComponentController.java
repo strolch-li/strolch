@@ -45,7 +45,7 @@ public class ComponentController {
 		return this.component;
 	}
 
-	public String getComponentName() {
+	public String getName() {
 		return this.component.getName();
 	}
 
