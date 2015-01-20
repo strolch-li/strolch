@@ -32,6 +32,7 @@ import li.strolch.agent.impl.AuditingAuditMapFacade;
 import li.strolch.agent.impl.AuditingOrderMap;
 import li.strolch.agent.impl.AuditingResourceMap;
 import li.strolch.agent.impl.InternalStrolchRealm;
+import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
@@ -65,6 +66,7 @@ import li.strolch.service.api.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.utils.dbc.DBC;
@@ -237,8 +239,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	private void assertQueryAllowed(StrolchQuery query) {
-		PrivilegeContext privilegeContext = this.privilegeHandler.getPrivilegeContext(this.certificate);
-		privilegeContext.validateAction(query);
+		try {
+			PrivilegeContext privilegeContext = this.privilegeHandler.getPrivilegeContext(this.certificate);
+			privilegeContext.validateAction(query);
+		} catch (PrivilegeException e) {
+			throw new StrolchAccessDeniedException(this.certificate, query, e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -563,7 +569,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (closeDuration >= 100000000L) {
 			sb.append(", close="); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(closeDuration));
-			logger.info(sb.toString());
 		}
 		logger.error(sb.toString());
 	}
@@ -594,7 +599,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (closeDuration >= 100000000L) {
 			sb.append(", close="); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(closeDuration));
-			logger.info(sb.toString());
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$

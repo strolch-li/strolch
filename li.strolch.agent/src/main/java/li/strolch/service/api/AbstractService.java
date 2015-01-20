@@ -146,14 +146,9 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 			return serviceResult;
 
 		} catch (Exception e) {
-
-			String msg = "Failed to perform service {0} due to {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, getClass(), e.getMessage());
-			logger.error(msg, e);
-
 			U result = getResultInstance();
 			result.setState(ServiceResultState.FAILED);
-			result.setMessage(msg);
+			result.setMessage(e.getMessage());
 			result.setThrowable(e);
 			return result;
 		}
