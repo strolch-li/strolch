@@ -45,6 +45,10 @@ public class ComponentController {
 		return this.component;
 	}
 
+	public String getComponentName() {
+		return this.component.getName();
+	}
+
 	public Set<ComponentController> getUpstreamDependencies() {
 		return new HashSet<>(this.upstreamDependencies);
 	}

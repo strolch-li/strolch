@@ -52,6 +52,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 	private StrolchConfiguration strolchConfiguration;
 	private ComponentState state;
 
+	private ComponentContainerStateHandler containerStateHandler;
+
 	public ComponentContainerImpl(StrolchAgent agent) {
 		this.agent = agent;
 		this.state = ComponentState.UNDEFINED;
@@ -151,103 +153,6 @@ public class ComponentContainerImpl implements ComponentContainer {
 		}
 	}
 
-	private void initialize(Set<ComponentController> controllers) {
-
-		// initialize each component
-		for (ComponentController controller : controllers) {
-			if (controller.getState() == ComponentState.INITIALIZED)
-				continue;
-
-			StrolchComponent component = controller.getComponent();
-			String componentName = component.getName();
-			ComponentConfiguration componentConfiguration = this.strolchConfiguration
-					.getComponentConfiguration(componentName);
-
-			String msg = "Initializing component {0}..."; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, componentName));
-			component.initialize(componentConfiguration);
-		}
-
-		// initialize direct downstream components
-		Set<ComponentController> dependencies = this.dependencyAnalyzer
-				.collectDirectDownstreamDependencies(controllers);
-		if (!dependencies.isEmpty())
-			initialize(dependencies);
-	}
-
-	private void start(Set<ComponentController> controllers) {
-
-		// Start each component
-		for (ComponentController controller : controllers) {
-			if (controller.getState() == ComponentState.STARTED)
-				continue;
-
-			StrolchComponent component = controller.getComponent();
-			String msg = "Starting component {0}..."; //$NON-NLS-1$
-			String componentName = component.getName();
-			logger.info(MessageFormat.format(msg, componentName));
-			component.start();
-		}
-
-		// Start direct downstream components
-		Set<ComponentController> dependencies = this.dependencyAnalyzer
-				.collectDirectDownstreamDependencies(controllers);
-		if (!dependencies.isEmpty())
-			start(dependencies);
-	}
-
-	private void stop(Set<ComponentController> controllers) {
-
-		// Stop each component
-		for (ComponentController controller : controllers) {
-			if (controller.getState() == ComponentState.STOPPED)
-				continue;
-
-			StrolchComponent component = controller.getComponent();
-			String msg = "Stopping component {0}..."; //$NON-NLS-1$
-			String componentName = component.getName();
-			logger.info(MessageFormat.format(msg, componentName));
-			try {
-				component.stop();
-			} catch (Exception e) {
-				msg = "Failed to stop component {0} due to {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, componentName, e.getMessage());
-				logger.error(msg, e);
-			}
-		}
-
-		// Stop direct upstream components
-		Set<ComponentController> dependencies = this.dependencyAnalyzer.collectDirectUpstreamDependencies(controllers);
-		if (!dependencies.isEmpty())
-			stop(dependencies);
-	}
-
-	private void destroy(Set<ComponentController> controllers) {
-
-		// Destroy each component
-		for (ComponentController controller : controllers) {
-			if (controller.getState() == ComponentState.DESTROYED)
-				continue;
-
-			StrolchComponent component = controller.getComponent();
-			String msg = "Destroying component {0}..."; //$NON-NLS-1$
-			String componentName = component.getName();
-			logger.info(MessageFormat.format(msg, componentName));
-			try {
-				component.destroy();
-			} catch (Exception e) {
-				msg = "Failed to destroy component {0} due to {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, componentName, e.getMessage());
-				logger.error(msg, e);
-			}
-		}
-
-		// Destroy direct upstream components
-		Set<ComponentController> dependencies = this.dependencyAnalyzer.collectDirectUpstreamDependencies(controllers);
-		if (!dependencies.isEmpty())
-			destroy(dependencies);
-	}
-
 	public void setup(StrolchConfiguration strolchConfiguration) {
 
 		// set the application locale
@@ -278,68 +183,84 @@ public class ComponentContainerImpl implements ComponentContainer {
 		this.controllerMap = controllerMap;
 		this.strolchConfiguration = strolchConfiguration;
 
+		// and configure the state handler
+		this.containerStateHandler = new ComponentContainerStateHandler(this.dependencyAnalyzer,
+				this.strolchConfiguration);
+
 		this.state = this.state.validateStateChange(ComponentState.SETUP);
-		String msg = "Strolch Container setup with {0} components."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, this.componentMap.size()));
+		String msg = "{0}:{1} Strolch Container setup with {2} components."; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
+				.getRuntimeConfiguration().getEnvironment(), this.componentMap.size()));
 	}
 
 	public void initialize(StrolchConfiguration strolchConfiguration) {
 
 		// now we can initialize the components
-		logger.info("Initializing strolch components..."); //$NON-NLS-1$
+		String msg = "{0}:{1} Initializing {2} Strolch Components..."; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
+				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootUpstreamComponents();
-		initialize(rootUpstreamComponents);
+		containerStateHandler.initialize(rootUpstreamComponents);
 		this.state = this.state.validateStateChange(ComponentState.INITIALIZED);
 
-		String msg = "All {0} Strolch Components have been initialized."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, this.controllerMap.size()));
+		msg = "{0}:{1} All {2} Strolch Components have been initialized."; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
+				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
 	}
 
 	public void start() {
 
-		logger.info("Starting strolch components..."); //$NON-NLS-1$
+		String msg = "{0}:{1} Starting {2} Strolch Components..."; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
+				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootUpstreamComponents();
-		start(rootUpstreamComponents);
+		containerStateHandler.start(rootUpstreamComponents);
 		this.state = this.state.validateStateChange(ComponentState.STARTED);
 
-		String msg = "All {0} Strolch Components started. {1}:{2} is now ready to be used. Have fun =))"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, this.controllerMap.size(), getAgent().getApplicationName(), getAgent()
-				.getStrolchConfiguration().getRuntimeConfiguration().getEnvironment()));
+		msg = "{0}:{1} All {2} Strolch Components started. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
+				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
 		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString())); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary())); //$NON-NLS-1$
 	}
 
 	public void stop() {
 
-		logger.info("Stopping strolch components..."); //$NON-NLS-1$
+		String msg = "{0}:{1} Stopping {2} Strolch Components..."; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
+				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
 
 		if (this.dependencyAnalyzer == null) {
-			logger.info("Strolch Components have been stopped."); //$NON-NLS-1$
+			logger.info("Strolch was not yet setup, nothing to stop"); //$NON-NLS-1$
 		} else {
 			Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
-			stop(rootUpstreamComponents);
+			containerStateHandler.stop(rootUpstreamComponents);
 			this.state = this.state.validateStateChange(ComponentState.STOPPED);
 
-			String msg = "All {0} Strolch Components have been stopped."; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, this.controllerMap.size()));
+			msg = "{0}:{1} All {2} Strolch Components have been stopped."; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
+					.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
 		}
 	}
 
 	public void destroy() {
 
-		logger.info("Destroying strolch components..."); //$NON-NLS-1$
+		String msg = "{0}:{1} Destroying {2} Strolch Components..."; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
+				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
 
 		if (this.dependencyAnalyzer == null) {
-			logger.info("Strolch Components have been destroyed."); //$NON-NLS-1$
+			logger.info("Strolch was not yet setup, nothing to destroy"); //$NON-NLS-1$
 		} else {
 			Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
-			destroy(rootUpstreamComponents);
+			containerStateHandler.destroy(rootUpstreamComponents);
 			this.state = this.state.validateStateChange(ComponentState.DESTROYED);
 
-			String msg = "All {0} Strolch Components have been destroyed!"; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, this.controllerMap.size()));
+			msg = "{0}:{1} All {2} Strolch Components have been destroyed!"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
+					.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
 			this.controllerMap.clear();
 			this.componentMap.clear();
 		}
