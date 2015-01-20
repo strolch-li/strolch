@@ -687,7 +687,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		}
 	}
 
-	private Audit auditFrom(AccessType accessType, String elementType, String id) {
+	@Override
+	public Audit auditFrom(AccessType accessType, String elementType, String id) {
 		Audit audit = new Audit();
 
 		audit.setId(StrolchAgent.getUniqueIdLong());
