@@ -1,5 +1,6 @@
 package li.strolch.agent.impl;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -56,15 +57,21 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 	protected abstract void assertIsRefParam(Parameter<?> refP);
 
 	@Override
-	public T getBy(StrolchTransaction tx, StringParameter refP) throws StrolchException {
+	public T getBy(StrolchTransaction tx, StringParameter refP, boolean assertExists) throws StrolchException {
 		assertIsRefParam(refP);
 		String type = refP.getUom();
 		String id = refP.getValue();
-		return getBy(tx, type, id);
+		T element = getBy(tx, type, id);
+		if (assertExists && element == null) {
+			String msg = "The element for refP {0} with id {1} does not exist!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, refP.getLocator(), id);
+			throw new StrolchException(msg);
+		}
+		return element;
 	}
 
 	@Override
-	public List<T> getBy(StrolchTransaction tx, StringListParameter refP) throws StrolchException {
+	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists) throws StrolchException {
 		assertIsRefParam(refP);
 
 		List<T> elements = new ArrayList<>();
@@ -73,8 +80,15 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 
 		for (String id : ids) {
 			T element = getBy(tx, type, id);
-			if (element != null)
+			if (element != null) {
 				elements.add(element);
+			} else if (assertExists) {
+				if (assertExists && element == null) {
+					String msg = "The element for refP {0} with id {1} does not exist!"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, refP.getLocator(), id);
+					throw new StrolchException(msg);
+				}
+			}
 		}
 
 		return elements;

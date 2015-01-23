@@ -65,7 +65,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	public T getBy(StrolchTransaction tx, String type, String id);
 
 	/**
-	 * Returns the Element which is referenced by the given {@link StringParameter}. A reference {@link Parameter} must
+	 * Returns the element which is referenced by the given {@link StringParameter}. A reference {@link Parameter} must
 	 * have its interpretation set to the element type being referenced e.g. s
 	 * {@link StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the element's type and the value is
 	 * the id of the element
@@ -74,12 +74,15 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *            the {@link StrolchTransaction} instance
 	 * @param refP
 	 *            the {@link StringParameter} which references an element
+	 * @param assertExists
+	 *            if true, and element does not exist, then a {@link StrolchException} is thrown
+	 * 
 	 * @return the element found, or null if it does not exist
 	 * 
 	 * @throws StrolchException
 	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
 	 */
-	public T getBy(StrolchTransaction tx, StringParameter refP) throws StrolchException;
+	public T getBy(StrolchTransaction tx, StringParameter refP, boolean assertExists) throws StrolchException;
 
 	/**
 	 * Returns all elements which are referenced by the given {@link StringListParameter}. A reference {@link Parameter}
@@ -91,6 +94,8 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *            the {@link StrolchTransaction} instance
 	 * @param refP
 	 *            the {@link StringListParameter} which references an element
+	 * @param assertExists
+	 *            if true, and element does not exist, then a {@link StrolchException} is thrown
 	 * 
 	 * @return the list of elements found, or the empty list if they do not exist. <b>Note:</b> Any missing elements are
 	 *         not returned!
@@ -98,7 +103,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchException
 	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
 	 */
-	public List<T> getBy(StrolchTransaction tx, StringListParameter refP) throws StrolchException;
+	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists) throws StrolchException;
 
 	public List<T> getAllElements(StrolchTransaction tx);
 

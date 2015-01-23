@@ -105,57 +105,26 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 		return this.deletedAllByType;
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#hasType(li.strolch.persistence.api.StrolchTransaction, java.lang.String)
-	 */
 	@Override
 	public boolean hasType(StrolchTransaction tx, String type) {
 		return this.elementMap.hasType(tx, type);
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @param id
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#hasElement(li.strolch.persistence.api.StrolchTransaction, java.lang.String,
-	 *      java.lang.String)
-	 */
 	@Override
 	public boolean hasElement(StrolchTransaction tx, String type, String id) {
 		return this.elementMap.hasElement(tx, type, id);
 	}
 
-	/**
-	 * @param tx
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#querySize(li.strolch.persistence.api.StrolchTransaction)
-	 */
 	@Override
 	public long querySize(StrolchTransaction tx) {
 		return this.elementMap.querySize(tx);
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#querySize(li.strolch.persistence.api.StrolchTransaction, java.lang.String)
-	 */
 	@Override
 	public long querySize(StrolchTransaction tx, String type) {
 		return this.elementMap.querySize(tx, type);
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#getTemplate(li.strolch.persistence.api.StrolchTransaction, java.lang.String)
-	 */
 	@Override
 	public T getTemplate(StrolchTransaction tx, String type) {
 		T template = this.elementMap.getTemplate(tx, type);
@@ -164,14 +133,6 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 		return template;
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @param id
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#getBy(li.strolch.persistence.api.StrolchTransaction, java.lang.String,
-	 *      java.lang.String)
-	 */
 	@Override
 	public T getBy(StrolchTransaction tx, String type, String id) {
 		T element = this.elementMap.getBy(tx, type, id);
@@ -180,35 +141,22 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 		return element;
 	}
 
-	/**
-	 * @param tx
-	 * @param refP
-	 * @return
-	 * @throws StrolchException
-	 * @see li.strolch.agent.api.ElementMap#getBy(li.strolch.persistence.api.StrolchTransaction,
-	 *      li.strolch.model.parameter.StringParameter)
-	 */
 	@Override
-	public T getBy(StrolchTransaction tx, StringParameter refP) throws StrolchException {
-		T element = this.elementMap.getBy(tx, refP);
+	public T getBy(StrolchTransaction tx, StringParameter refP, boolean assertExists) throws StrolchException {
+		T element = this.elementMap.getBy(tx, refP, assertExists);
 		if (this.observeAccessReads)
 			this.read.add(element);
 		return element;
 	}
 
 	@Override
-	public List<T> getBy(StrolchTransaction tx, StringListParameter refP) throws StrolchException {
-		List<T> elements = this.elementMap.getBy(tx, refP);
+	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists) throws StrolchException {
+		List<T> elements = this.elementMap.getBy(tx, refP, assertExists);
 		if (this.observeAccessReads)
 			this.read.addAll(elements);
 		return elements;
 	}
 
-	/**
-	 * @param tx
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#getAllElements(li.strolch.persistence.api.StrolchTransaction)
-	 */
 	@Override
 	public List<T> getAllElements(StrolchTransaction tx) {
 		List<T> elements = this.elementMap.getAllElements(tx);
@@ -217,13 +165,6 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 		return elements;
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#getElementsBy(li.strolch.persistence.api.StrolchTransaction,
-	 *      java.lang.String)
-	 */
 	@Override
 	public List<T> getElementsBy(StrolchTransaction tx, String type) {
 		List<T> elements = this.elementMap.getElementsBy(tx, type);
@@ -232,67 +173,33 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 		return elements;
 	}
 
-	/**
-	 * @param tx
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#getTypes(li.strolch.persistence.api.StrolchTransaction)
-	 */
 	@Override
 	public Set<String> getTypes(StrolchTransaction tx) {
 		return this.elementMap.getTypes(tx);
 	}
 
-	/**
-	 * @param tx
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#getAllKeys(li.strolch.persistence.api.StrolchTransaction)
-	 */
 	@Override
 	public Set<String> getAllKeys(StrolchTransaction tx) {
 		return this.elementMap.getAllKeys(tx);
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#getKeysBy(li.strolch.persistence.api.StrolchTransaction, java.lang.String)
-	 */
 	@Override
 	public Set<String> getKeysBy(StrolchTransaction tx, String type) {
 		return this.elementMap.getKeysBy(tx, type);
 	}
 
-	/**
-	 * @param tx
-	 * @param element
-	 * @see li.strolch.agent.api.ElementMap#add(li.strolch.persistence.api.StrolchTransaction,
-	 *      li.strolch.model.StrolchRootElement)
-	 */
 	@Override
 	public void add(StrolchTransaction tx, T element) {
 		this.elementMap.add(tx, element);
 		this.created.add(element);
 	}
 
-	/**
-	 * @param tx
-	 * @param elements
-	 * @see li.strolch.agent.api.ElementMap#addAll(li.strolch.persistence.api.StrolchTransaction, java.util.List)
-	 */
 	@Override
 	public void addAll(StrolchTransaction tx, List<T> elements) {
 		this.elementMap.addAll(tx, elements);
 		this.created.addAll(elements);
 	}
 
-	/**
-	 * @param tx
-	 * @param element
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#update(li.strolch.persistence.api.StrolchTransaction,
-	 *      li.strolch.model.StrolchRootElement)
-	 */
 	@Override
 	public T update(StrolchTransaction tx, T element) {
 		T replaced = this.elementMap.update(tx, element);
@@ -301,12 +208,6 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 
 	}
 
-	/**
-	 * @param tx
-	 * @param elements
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#updateAll(li.strolch.persistence.api.StrolchTransaction, java.util.List)
-	 */
 	@Override
 	public List<T> updateAll(StrolchTransaction tx, List<T> elements) {
 		List<T> replaced = this.elementMap.updateAll(tx, elements);
@@ -314,34 +215,18 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 		return replaced;
 	}
 
-	/**
-	 * @param tx
-	 * @param element
-	 * @see li.strolch.agent.api.ElementMap#remove(li.strolch.persistence.api.StrolchTransaction,
-	 *      li.strolch.model.StrolchRootElement)
-	 */
 	@Override
 	public void remove(StrolchTransaction tx, T element) {
 		this.elementMap.remove(tx, element);
 		this.deleted.add(element);
 	}
 
-	/**
-	 * @param tx
-	 * @param elements
-	 * @see li.strolch.agent.api.ElementMap#removeAll(li.strolch.persistence.api.StrolchTransaction, java.util.List)
-	 */
 	@Override
 	public void removeAll(StrolchTransaction tx, List<T> elements) {
 		this.elementMap.removeAll(tx, elements);
 		this.deleted.addAll(elements);
 	}
 
-	/**
-	 * @param tx
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#removeAll(li.strolch.persistence.api.StrolchTransaction)
-	 */
 	@Override
 	public long removeAll(StrolchTransaction tx) {
 		long removed = this.elementMap.removeAll(tx);
@@ -349,12 +234,6 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 		return removed;
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @return
-	 * @see li.strolch.agent.api.ElementMap#removeAllBy(li.strolch.persistence.api.StrolchTransaction, java.lang.String)
-	 */
 	@Override
 	public long removeAllBy(StrolchTransaction tx, String type) {
 		long removed = this.elementMap.removeAllBy(tx, type);

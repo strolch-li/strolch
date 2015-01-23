@@ -395,17 +395,17 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Order getOrderBy(StringParameter refP, boolean assertExists) throws StrolchException {
-		Order order = getOrderMap().getBy(this, refP);
-		if (assertExists && order == null) {
-			String msg = "No Order exists with the id {0} with type {1} for refP {2}";
-			throw new StrolchException(MessageFormat.format(msg, refP.getValue(), refP.getUom(), refP.getLocator()));
-		}
-		return order;
+		return getOrderMap().getBy(this, refP, assertExists);
 	}
 
 	@Override
 	public List<Order> getOrdersBy(StringListParameter refP) throws StrolchException {
-		return getOrderMap().getBy(this, refP);
+		return getOrderMap().getBy(this, refP, false);
+	}
+
+	@Override
+	public List<Order> getOrdersBy(StringListParameter refP, boolean assertExists) throws StrolchException {
+		return getOrderMap().getBy(this, refP, assertExists);
 	}
 
 	@Override
@@ -430,17 +430,17 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Resource getResourceBy(StringParameter refP, boolean assertExists) throws StrolchException {
-		Resource resource = getResourceMap().getBy(this, refP);
-		if (assertExists && resource == null) {
-			String msg = "No Resource exists with the id {0} with type {1} for refP {2}";
-			throw new StrolchException(MessageFormat.format(msg, refP.getValue(), refP.getUom(), refP.getLocator()));
-		}
-		return resource;
+		return getResourceMap().getBy(this, refP, assertExists);
 	}
 
 	@Override
 	public List<Resource> getResourcesBy(StringListParameter refP) throws StrolchException {
-		return getResourceMap().getBy(this, refP);
+		return getResourceMap().getBy(this, refP, false);
+	}
+
+	@Override
+	public List<Resource> getResourcesBy(StringListParameter refP, boolean assertExists) throws StrolchException {
+		return getResourceMap().getBy(this, refP, assertExists);
 	}
 
 	@Override
