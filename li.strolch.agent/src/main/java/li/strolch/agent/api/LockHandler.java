@@ -51,8 +51,10 @@ public interface LockHandler {
 	 * 
 	 * @param element
 	 *            the element for which a {@link Lock} on its {@link Locator} is to be created and/or locked
+	 * 
+	 * @throws StrolchLockException
 	 */
-	public void lock(StrolchRootElement element);
+	public void lock(StrolchRootElement element) throws StrolchLockException;
 
 	/**
 	 * <p>
@@ -67,8 +69,10 @@ public interface LockHandler {
 	 * 
 	 * @param element
 	 *            the element for which the current/last {@link Lock} is to be unlocked
+	 * 
+	 * @throws StrolchLockException
 	 */
-	public void unlock(StrolchRootElement element);
+	public void unlock(StrolchRootElement element) throws StrolchLockException;
 
 	/**
 	 * Releases the lock on the given element, by unlocking all locks, i.e. after this method is called, no lock will be
@@ -76,6 +80,8 @@ public interface LockHandler {
 	 * 
 	 * @param element
 	 *            the element for which the {@link Lock} on the {@link Locator} is to be released
+	 * 
+	 * @throws StrolchLockException
 	 */
-	public void releaseLock(StrolchRootElement element);
+	public void releaseLock(StrolchRootElement element) throws StrolchLockException;
 }

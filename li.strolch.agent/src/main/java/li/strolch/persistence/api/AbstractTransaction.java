@@ -27,6 +27,7 @@ import li.strolch.agent.api.ObserverHandler;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.StrolchLockException;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.AuditingAuditMapFacade;
 import li.strolch.agent.impl.AuditingOrderMap;
@@ -60,6 +61,7 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.persistence.inmemory.InMemoryTransaction;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.Command;
 
@@ -159,45 +161,35 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.closeStrategy.close(this);
 	}
 
-	/**
-	 * @param suppressUpdates
-	 *            the suppressUpdates to set
-	 */
+	@Override
 	public void setSuppressUpdates(boolean suppressUpdates) {
 		this.suppressUpdates = suppressUpdates;
 	}
 
-	/**
-	 * @return the suppressUpdates
-	 */
+	@Override
 	public boolean isSuppressUpdates() {
 		return this.suppressUpdates;
 	}
 
-	/**
-	 * @param suppressAudits
-	 *            the suppressAudits to set
-	 */
+	@Override
 	public void setSuppressAudits(boolean suppressAudits) {
 		this.suppressAudits = suppressAudits;
 	}
 
-	/**
-	 * @return the suppressAudits
-	 */
+	@Override
 	public boolean isSuppressAudits() {
 		return this.suppressAudits;
 	}
 
 	@Override
-	public <T extends StrolchRootElement> void lock(T element) {
+	public <T extends StrolchRootElement> void lock(T element) throws StrolchLockException {
 		this.realm.lock(element);
 		this.lockedElements.add(element);
 	}
 
 	@Override
-	public <T extends StrolchRootElement> void unlock(T element) {
-		this.realm.unlock(element);
+	public <T extends StrolchRootElement> void releaseLock(T element) throws StrolchLockException {
+		this.realm.releaseLock(element);
 		this.lockedElements.remove(element);
 	}
 
@@ -359,6 +351,26 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		String msg = "Invalid locator {0} on with part {1}"; //$NON-NLS-1$
 		throw new StrolchException(MessageFormat.format(msg, locator, stateOrBag));
+	}
+
+	@Override
+	public Resource getResourceTemplate(String type) {
+		return getResourceBy(StrolchConstants.TEMPLATE, type);
+	}
+
+	@Override
+	public Resource getResourceTemplate(String type, boolean assertExists) throws StrolchException {
+		return getResourceBy(StrolchConstants.TEMPLATE, type, assertExists);
+	}
+
+	@Override
+	public Order getOrderTemplate(String type) {
+		return getOrderBy(StrolchConstants.TEMPLATE, type);
+	}
+
+	@Override
+	public Order getOrderTemplate(String type, boolean assertExists) throws StrolchException {
+		return getOrderBy(StrolchConstants.TEMPLATE, type, assertExists);
 	}
 
 	@Override
