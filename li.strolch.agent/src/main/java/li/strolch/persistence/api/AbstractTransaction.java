@@ -152,6 +152,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public Certificate getCertificate() {
+		return certificate;
+	}
+
+	@Override
 	public void setCloseStrategy(TransactionCloseStrategy closeStrategy) {
 		this.closeStrategy = closeStrategy;
 	}

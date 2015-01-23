@@ -17,6 +17,7 @@ package li.strolch.persistence.api;
 
 import java.util.List;
 
+import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
@@ -92,6 +93,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the name of the {@link StrolchRealm} for which this transaction was opened
 	 */
 	public String getRealmName();
+
+	/**
+	 * Returns the {@link Certificate} which allowed this TX to be opened
+	 * 
+	 * @return the {@link Certificate} which allowed this TX to be opened
+	 */
+	public Certificate getCertificate();
 
 	/**
 	 * Returns a reference to the {@link AuditTrail} for the {@link StrolchRealm} for which this transaction was opened
