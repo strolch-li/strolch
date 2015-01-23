@@ -38,18 +38,35 @@ public enum ConnectionMode {
 	 * Denotes that the {@link CommunicationConnection} is off. This means it cannot accept messages, process messages
 	 * or do any other kind of work
 	 */
-	OFF,
+	OFF {
+		public boolean isSimulation() {
+			return false;
+		}
+	},
 
 	/**
 	 * Denotes that the {@link CommunicationConnection} is on. This means that the {@link CommunicationConnection}
 	 * accepts and process messages. Any connections which need to be established will automatically be connected and
 	 * re-established should an {@link IOException} occur
 	 */
-	ON,
+	ON {
+		public boolean isSimulation() {
+			return false;
+		}
+	},
 
 	/**
 	 * Denotes that the {@link CommunicationConnection} is in simulation mode. Mostly this means that the
 	 * {@link CommunicationConnection} accepts messages, but silently swallows them, instead of processing them
 	 */
-	SIMULATION;
+	SIMULATION {
+		public boolean isSimulation() {
+			return true;
+		}
+	};
+
+	/**
+	 * @return true if the current mode is simulation, false otherwise
+	 */
+	public abstract boolean isSimulation();
 }
