@@ -449,11 +449,24 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public void flush() {
+		try {
+			validateCommands();
+			doCommands();
+			writeChanges(this.txResult);
+			this.commands.clear();
+		} catch (Exception e) {
+			this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
+
+			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
+			throw new StrolchPersistenceException(msg, e);
+		}
+	}
+
+	@Override
 	public void autoCloseableCommit() {
 		long start = System.nanoTime();
-		if (logger.isDebugEnabled()) {
-			logger.info(MessageFormat.format("Committing TX for realm {0}...", getRealmName())); //$NON-NLS-1$
-		}
 
 		try {
 			this.txResult.setState(TransactionState.COMMITTING);

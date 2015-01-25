@@ -388,6 +388,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 		for (DaoCommand command : this.commands) {
 			command.doComand(txResult);
 		}
+		this.commands.clear();
 	}
 
 	void rollback() {

@@ -17,7 +17,6 @@ package li.strolch.persistence.api;
 
 import java.util.List;
 
-import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
@@ -46,6 +45,7 @@ import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
+import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * <p>
@@ -173,6 +173,17 @@ public interface StrolchTransaction extends AutoCloseable {
 	 */
 	@Override
 	public void close() throws StrolchPersistenceException;
+
+	/**
+	 * <p>
+	 * Performs all registered commands
+	 * </p>
+	 * 
+	 * <p>
+	 * This method does not release any locks, nor does it notify any observers
+	 * </p>
+	 */
+	public void flush();
 
 	/**
 	 * @return true if the transaction is still open, i.e. not being closed or rolling back, committing, etc.
