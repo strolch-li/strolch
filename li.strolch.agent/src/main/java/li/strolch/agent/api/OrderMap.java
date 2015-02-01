@@ -15,12 +15,17 @@
  */
 package li.strolch.agent.api;
 
+import java.util.List;
+
 import li.strolch.model.Order;
+import li.strolch.model.OrderVisitor;
+import li.strolch.model.query.OrderQuery;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface OrderMap extends ElementMap<Order> {
 
-	// marker interface
+	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery query, OrderVisitor<U> orderVisitor);
 }

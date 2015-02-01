@@ -247,37 +247,37 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public List<Order> doQuery(OrderQuery query) {
 		assertQueryAllowed(query);
-		return getPersistenceHandler().getOrderDao(this).doQuery(query, new NoStrategyOrderVisitor());
+		return getOrderMap().doQuery(this, query, new NoStrategyOrderVisitor());
 	}
 
 	@Override
 	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor) {
 		assertQueryAllowed(query);
-		return getPersistenceHandler().getOrderDao(this).doQuery(query, orderVisitor);
+		return getOrderMap().doQuery(this, query, orderVisitor);
 	}
 
 	@Override
 	public List<Resource> doQuery(ResourceQuery query) {
 		assertQueryAllowed(query);
-		return getPersistenceHandler().getResourceDao(this).doQuery(query, new NoStrategyResourceVisitor());
+		return getResourceMap().doQuery(this, query, new NoStrategyResourceVisitor());
 	}
 
 	@Override
 	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
 		assertQueryAllowed(query);
-		return getPersistenceHandler().getResourceDao(this).doQuery(query, resourceVisitor);
+		return getResourceMap().doQuery(this, query, resourceVisitor);
 	}
 
 	@Override
 	public List<Audit> doQuery(AuditQuery query) {
 		assertQueryAllowed(query);
-		return getPersistenceHandler().getAuditDao(this).doQuery(query, new NoStrategyAuditVisitor());
+		return getAuditTrail().doQuery(this, query, new NoStrategyAuditVisitor());
 	}
 
 	@Override
 	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor) {
 		assertQueryAllowed(query);
-		return getPersistenceHandler().getAuditDao(this).doQuery(query, auditVisitor);
+		return getAuditTrail().doQuery(this, query, auditVisitor);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -16,6 +16,7 @@
 package li.strolch.persistence.inmemory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +52,6 @@ public class InMemoryAuditDao implements AuditDao {
 	@Override
 	public synchronized long querySize(DateRange dateRange) {
 		long size = 0L;
-
 		for (String type : this.auditMap.keySet()) {
 			Map<Long, Audit> byType = this.auditMap.getMap(type);
 			for (Audit audit : byType.values()) {
@@ -65,8 +65,11 @@ public class InMemoryAuditDao implements AuditDao {
 
 	@Override
 	public synchronized long querySize(String type, DateRange dateRange) {
-		long size = 0L;
 		Map<Long, Audit> byType = this.auditMap.getMap(type);
+		if (byType == null)
+			return 0L;
+
+		long size = 0L;
 		for (Audit audit : byType.values()) {
 			if (dateRange.contains(audit.getDate()))
 				size++;
@@ -81,7 +84,7 @@ public class InMemoryAuditDao implements AuditDao {
 
 	@Override
 	public synchronized Set<String> queryTypes() {
-		return this.auditMap.keySet();
+		return new HashSet<>(this.auditMap.keySet());
 	}
 
 	@Override

@@ -55,5 +55,4 @@ public interface AuditDao {
 	public long removeAll(String type, DateRange dateRange);
 
 	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor);
-
 }

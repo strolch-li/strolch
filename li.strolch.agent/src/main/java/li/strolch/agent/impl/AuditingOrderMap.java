@@ -21,9 +21,14 @@
  */
 package li.strolch.agent.impl;
 
+import java.util.List;
+
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.model.Order;
+import li.strolch.model.OrderVisitor;
+import li.strolch.model.query.OrderQuery;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -35,5 +40,17 @@ public class AuditingOrderMap extends AuditingElementMapFacade<Order> implements
 	 */
 	public AuditingOrderMap(ElementMap<Order> elementMap, boolean observeAccessReads) {
 		super(elementMap, observeAccessReads);
+	}
+
+	@Override
+	protected OrderMap getElementMap() {
+		return (OrderMap) super.getElementMap();
+	}
+
+	@Override
+	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery query, OrderVisitor<U> orderVisitor) {
+		List<U> result = getElementMap().doQuery(tx, query, orderVisitor);
+		// TODO decide how to audit these queried elements
+		return result;
 	}
 }

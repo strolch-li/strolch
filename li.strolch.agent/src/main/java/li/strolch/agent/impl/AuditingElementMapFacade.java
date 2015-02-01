@@ -63,6 +63,10 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 		this.deletedAllByType = new HashMap<>();
 	}
 
+	protected ElementMap<T> getElementMap() {
+		return elementMap;
+	}
+
 	/**
 	 * @return the read
 	 */

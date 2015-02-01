@@ -15,12 +15,17 @@
  */
 package li.strolch.agent.api;
 
+import java.util.List;
+
 import li.strolch.model.Resource;
+import li.strolch.model.ResourceVisitor;
+import li.strolch.model.query.ResourceQuery;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface ResourceMap extends ElementMap<Resource> {
 
-	// marker interface
+	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery query, ResourceVisitor<U> resourceVisitor);
 }

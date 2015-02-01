@@ -29,6 +29,8 @@ import java.util.Set;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
+import li.strolch.model.audit.AuditQuery;
+import li.strolch.model.audit.AuditVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import ch.eitchnet.utils.collections.DateRange;
 import ch.eitchnet.utils.dbc.DBC;
@@ -103,71 +105,31 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		return this.deletedAllByType;
 	}
 
-	/**
-	 * @return
-	 * @see li.strolch.agent.api.AuditTrail#isEnabled()
-	 */
 	@Override
 	public boolean isEnabled() {
 		return this.auditTrail.isEnabled();
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @param id
-	 * @return
-	 * @see li.strolch.agent.api.AuditTrail#hasAudit(li.strolch.persistence.api.StrolchTransaction, java.lang.String,
-	 *      java.lang.Long)
-	 */
 	@Override
 	public boolean hasAudit(StrolchTransaction tx, String type, Long id) {
 		return this.auditTrail.hasAudit(tx, type, id);
 	}
 
-	/**
-	 * @param tx
-	 * @param dateRange
-	 * @return
-	 * @see li.strolch.agent.api.AuditTrail#querySize(li.strolch.persistence.api.StrolchTransaction,
-	 *      ch.eitchnet.utils.collections.DateRange)
-	 */
 	@Override
 	public long querySize(StrolchTransaction tx, DateRange dateRange) {
 		return this.auditTrail.querySize(tx, dateRange);
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @param dateRange
-	 * @return
-	 * @see li.strolch.agent.api.AuditTrail#querySize(li.strolch.persistence.api.StrolchTransaction, java.lang.String,
-	 *      ch.eitchnet.utils.collections.DateRange)
-	 */
 	@Override
 	public long querySize(StrolchTransaction tx, String type, DateRange dateRange) {
 		return this.auditTrail.querySize(tx, type, dateRange);
 	}
 
-	/**
-	 * @param tx
-	 * @return
-	 * @see li.strolch.agent.api.AuditTrail#getTypes(li.strolch.persistence.api.StrolchTransaction)
-	 */
 	@Override
 	public Set<String> getTypes(StrolchTransaction tx) {
 		return this.auditTrail.getTypes(tx);
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @param id
-	 * @return
-	 * @see li.strolch.agent.api.AuditTrail#getBy(li.strolch.persistence.api.StrolchTransaction, java.lang.String,
-	 *      java.lang.Long)
-	 */
 	@Override
 	public Audit getBy(StrolchTransaction tx, String type, Long id) {
 		Audit audit = this.auditTrail.getBy(tx, type, id);
@@ -176,14 +138,6 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		return audit;
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @param dateRange
-	 * @return
-	 * @see li.strolch.agent.api.AuditTrail#getAllElements(li.strolch.persistence.api.StrolchTransaction,
-	 *      java.lang.String, ch.eitchnet.utils.collections.DateRange)
-	 */
 	@Override
 	public List<Audit> getAllElements(StrolchTransaction tx, String type, DateRange dateRange) {
 		List<Audit> elements = this.auditTrail.getAllElements(tx, type, dateRange);
@@ -192,36 +146,18 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		return elements;
 	}
 
-	/**
-	 * @param tx
-	 * @param audit
-	 * @see li.strolch.agent.api.AuditTrail#add(li.strolch.persistence.api.StrolchTransaction,
-	 *      li.strolch.model.audit.Audit)
-	 */
 	@Override
 	public void add(StrolchTransaction tx, Audit audit) {
 		this.auditTrail.add(tx, audit);
 		this.created.add(audit);
 	}
 
-	/**
-	 * @param tx
-	 * @param audits
-	 * @see li.strolch.agent.api.AuditTrail#addAll(li.strolch.persistence.api.StrolchTransaction, java.util.List)
-	 */
 	@Override
 	public void addAll(StrolchTransaction tx, List<Audit> audits) {
 		this.auditTrail.addAll(tx, audits);
 		this.created.addAll(audits);
 	}
 
-	/**
-	 * @param tx
-	 * @param audit
-	 * @return
-	 * @see li.strolch.agent.api.AuditTrail#update(li.strolch.persistence.api.StrolchTransaction,
-	 *      li.strolch.model.audit.Audit)
-	 */
 	@Override
 	public Audit update(StrolchTransaction tx, Audit audit) {
 		Audit replaced = this.auditTrail.update(tx, audit);
@@ -229,12 +165,6 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		return replaced;
 	}
 
-	/**
-	 * @param tx
-	 * @param audits
-	 * @return
-	 * @see li.strolch.agent.api.AuditTrail#updateAll(li.strolch.persistence.api.StrolchTransaction, java.util.List)
-	 */
 	@Override
 	public List<Audit> updateAll(StrolchTransaction tx, List<Audit> audits) {
 		List<Audit> replaced = this.auditTrail.updateAll(tx, audits);
@@ -242,37 +172,18 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		return replaced;
 	}
 
-	/**
-	 * @param tx
-	 * @param audit
-	 * @see li.strolch.agent.api.AuditTrail#remove(li.strolch.persistence.api.StrolchTransaction,
-	 *      li.strolch.model.audit.Audit)
-	 */
 	@Override
 	public void remove(StrolchTransaction tx, Audit audit) {
 		this.auditTrail.remove(tx, audit);
 		this.deleted.add(audit);
 	}
 
-	/**
-	 * @param tx
-	 * @param audits
-	 * @see li.strolch.agent.api.AuditTrail#removeAll(li.strolch.persistence.api.StrolchTransaction, java.util.List)
-	 */
 	@Override
 	public void removeAll(StrolchTransaction tx, List<Audit> audits) {
 		this.auditTrail.removeAll(tx, audits);
 		this.deleted.addAll(audits);
 	}
 
-	/**
-	 * @param tx
-	 * @param type
-	 * @param dateRange
-	 * @return
-	 * @see li.strolch.agent.api.AuditTrail#removeAll(li.strolch.persistence.api.StrolchTransaction, java.lang.String,
-	 *      ch.eitchnet.utils.collections.DateRange)
-	 */
 	@Override
 	public long removeAll(StrolchTransaction tx, String type, DateRange dateRange) {
 		long removed = this.auditTrail.removeAll(tx, type, dateRange);
@@ -284,5 +195,12 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		this.deletedAllByType.put(type, byType);
 
 		return removed;
+	}
+
+	@Override
+	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery query, AuditVisitor<U> auditVisitor) {
+		List<U> elements = this.auditTrail.doQuery(tx, query, auditVisitor);
+		// TODO decide how to audit these queried elements
+		return elements;
 	}
 }

@@ -21,9 +21,14 @@
  */
 package li.strolch.agent.impl;
 
+import java.util.List;
+
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Resource;
+import li.strolch.model.ResourceVisitor;
+import li.strolch.model.query.ResourceQuery;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -35,5 +40,17 @@ public class AuditingResourceMap extends AuditingElementMapFacade<Resource> impl
 	 */
 	public AuditingResourceMap(ElementMap<Resource> elementMap, boolean observeAccessReads) {
 		super(elementMap, observeAccessReads);
+	}
+
+	@Override
+	protected ResourceMap getElementMap() {
+		return (ResourceMap) super.getElementMap();
+	}
+
+	@Override
+	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
+		List<U> result = getElementMap().doQuery(tx, query, resourceVisitor);
+		// TODO decide how to audit these queried elements
+		return result;
 	}
 }
