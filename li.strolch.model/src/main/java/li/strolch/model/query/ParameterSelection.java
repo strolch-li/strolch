@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import ch.eitchnet.utils.StringMatchMode;
+import ch.eitchnet.utils.collections.DateRange;
 import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
@@ -107,8 +108,8 @@ public abstract class ParameterSelection implements Selection {
 		return new DurationParameterSelection(bagKey, paramKey, value);
 	}
 
-	public static DateRangeParameterSelection dateRangeSelection(String bagKey, String paramKey, Date from, Date to) {
-		return new DateRangeParameterSelection(bagKey, paramKey, from, to);
+	public static DateRangeParameterSelection dateRangeSelection(String bagKey, String paramKey, DateRange dateRange) {
+		return new DateRangeParameterSelection(bagKey, paramKey, dateRange);
 	}
 
 	public static StringListParameterSelection stringListSelection(String bagKey, String paramKey, List<String> value) {
@@ -253,22 +254,16 @@ public abstract class ParameterSelection implements Selection {
 
 	public static class DateRangeParameterSelection extends ParameterSelection {
 
-		private Date from;
-		private Date to;
+		private DateRange dateRange;
 
-		public DateRangeParameterSelection(String bagKey, String paramKey, Date from, Date to) {
+		public DateRangeParameterSelection(String bagKey, String paramKey, DateRange dateRange) {
 			super(bagKey, paramKey);
-			DBC.PRE.assertFalse("Either 'to' or 'from' must be set! Both can not be null!", from == null && to == null); //$NON-NLS-1$
-			this.from = from;
-			this.to = to;
+			DBC.PRE.assertFalse("dateRange must be set!", dateRange == null); //$NON-NLS-1$
+			this.dateRange = dateRange;
 		}
 
-		public Date getFrom() {
-			return this.from;
-		}
-
-		public Date getTo() {
-			return this.to;
+		public DateRange getDateRange() {
+			return this.dateRange;
 		}
 
 		@Override

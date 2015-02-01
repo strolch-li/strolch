@@ -198,7 +198,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	@Override
 	public void visit(DateRangeParameterSelection selection) {
 		addSelector(ParameterSelector.<T> dateRangeSelector(selection.getBagKey(), selection.getParamKey(),
-				selection.getFrom(), selection.getTo()));
+				selection.getDateRange()));
 	}
 
 	@Override

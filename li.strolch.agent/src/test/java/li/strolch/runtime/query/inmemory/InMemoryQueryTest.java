@@ -15,9 +15,16 @@
  */
 package li.strolch.runtime.query.inmemory;
 
+import static ch.eitchnet.utils.StringMatchMode.ci;
+import static ch.eitchnet.utils.StringMatchMode.es;
+import static li.strolch.model.query.ParameterSelection.booleanSelection;
+import static li.strolch.model.query.ParameterSelection.floatSelection;
+import static li.strolch.model.query.ParameterSelection.stringListSelection;
+import static li.strolch.model.query.ParameterSelection.stringSelection;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +35,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
@@ -41,8 +49,6 @@ import li.strolch.persistence.inmemory.InMemoryOrderDao;
 import li.strolch.persistence.inmemory.InMemoryResourceDao;
 
 import org.junit.Test;
-
-import ch.eitchnet.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -103,8 +109,7 @@ public class InMemoryQueryTest {
 		dao.saveAll(resources);
 
 		ResourceQuery resourceQuery = new ResourceQuery(new StrolchTypeNavigation("MyType2"));
-		resourceQuery.and().with(new IdSelection("@3"),
-				new NameSelection("Res 3", StringMatchMode.EQUALS_CASE_SENSITIVE));
+		resourceQuery.and().with(new IdSelection("@3"), new NameSelection("Res 3", es()));
 
 		List<Resource> result = dao.doQuery(resourceQuery, new NoStrategyResourceVisitor());
 		assertEquals(1, result.size());
@@ -119,7 +124,7 @@ public class InMemoryQueryTest {
 		dao.saveAll(resources);
 
 		ResourceQuery resourceQuery = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
-		resourceQuery.and().with(new IdSelection("@3"), new NameSelection("@4", StringMatchMode.EQUALS_CASE_SENSITIVE));
+		resourceQuery.and().with(new IdSelection("@3"), new NameSelection("@4", es()));
 
 		List<Resource> result = dao.doQuery(resourceQuery, new NoStrategyResourceVisitor());
 		assertEquals(0, result.size());
@@ -134,14 +139,39 @@ public class InMemoryQueryTest {
 		dao.saveAll(resources);
 
 		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
-		ballQuery
-				.and()
-				.with( //
-				ParameterSelection.stringSelection("parameters", "color", "red", StringMatchMode.EQUALS_CASE_SENSITIVE),
-						ParameterSelection.booleanSelection("parameters", "forChildren", true),
-						ParameterSelection.floatSelection("parameters", "diameter", 22.0));
+		ballQuery.and().with(
+				//
+				stringSelection("parameters", "color", "red", es()),
+				booleanSelection("parameters", "forChildren", true), floatSelection("parameters", "diameter", 22.0));
 
 		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		assertEquals(1, result.size());
+	}
+
+	@Test
+	public void shouldQueryByStringListParameter() {
+
+		List<Resource> resources = getResources();
+		resources.add(getBallResource());
+		InMemoryResourceDao dao = new InMemoryResourceDao();
+		dao.saveAll(resources);
+
+		ResourceQuery ballQuery;
+		List<Resource> result;
+
+		ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ballQuery.and().with(stringListSelection("parameters", "listValues", Arrays.asList("a")));
+		result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		assertEquals(1, result.size());
+
+		ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ballQuery.and().with(stringListSelection("parameters", "listValues", Arrays.asList("a", "z")));
+		result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		assertEquals(0, result.size());
+
+		ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ballQuery.and().with(stringListSelection("parameters", "listValues", Arrays.asList("c", "b", "a")));
+		result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
 		assertEquals(1, result.size());
 	}
 
@@ -189,7 +219,7 @@ public class InMemoryQueryTest {
 		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
 		assertEquals(1, result.size());
 	}
-	
+
 	@Test
 	public void shouldQueryByName() {
 
@@ -199,7 +229,7 @@ public class InMemoryQueryTest {
 		dao.saveAll(resources);
 
 		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
-		ballQuery.with(new NameSelection("ball ", StringMatchMode.CONTAINS_CASE_INSENSITIVE));
+		ballQuery.with(new NameSelection("ball ", ci()));
 
 		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
 		assertEquals(1, result.size());
@@ -211,6 +241,7 @@ public class InMemoryQueryTest {
 		bag.addParameter(new StringParameter("color", "Color", "red"));
 		bag.addParameter(new BooleanParameter("forChildren", "Color", true));
 		bag.addParameter(new FloatParameter("diameter", "Color", 22.0));
+		bag.addParameter(new StringListParameter("listValues", "List of Values", Arrays.asList("a", "b", "c")));
 		res1.addParameterBag(bag);
 		return res1;
 	}

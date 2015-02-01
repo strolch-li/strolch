@@ -29,6 +29,7 @@ import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import ch.eitchnet.utils.StringMatchMode;
+import ch.eitchnet.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -82,8 +83,8 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 	}
 
 	public static <T extends GroupedParameterizedElement> DateRangeParameterSelector<T> dateRangeSelector(
-			String bagKey, String paramKey, Date from, Date to) {
-		return new DateRangeParameterSelector<>(bagKey, paramKey, from, to);
+			String bagKey, String paramKey, DateRange dateRange) {
+		return new DateRangeParameterSelector<>(bagKey, paramKey, dateRange);
 	}
 
 	public static <T extends GroupedParameterizedElement> StringListParameterSelector<T> stringListSelector(
@@ -263,13 +264,11 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 
 	public static class DateRangeParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
 
-		private Date from;
-		private Date to;
+		private DateRange dateRange;
 
-		public DateRangeParameterSelector(String bagKey, String paramKey, Date from, Date to) {
+		public DateRangeParameterSelector(String bagKey, String paramKey, DateRange dateRange) {
 			super(bagKey, paramKey);
-			this.from = from;
-			this.to = to;
+			this.dateRange = dateRange;
 		}
 
 		@Override
@@ -284,7 +283,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 			DateParameter param = bag.getParameter(this.paramKey);
 			Date value = param.getValue();
 
-			return (this.from == null || !value.before(this.from)) && (this.to == null || !value.after(this.to));
+			return this.dateRange.contains(value);
 		}
 	}
 
@@ -307,7 +306,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 				return false;
 
 			StringListParameter param = bag.getParameter(this.paramKey);
-			return param.getValue().equals(this.value);
+			return param.getValue().containsAll(this.value);
 		}
 	}
 
