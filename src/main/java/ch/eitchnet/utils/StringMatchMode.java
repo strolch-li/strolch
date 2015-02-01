@@ -62,4 +62,64 @@ public enum StringMatchMode {
 
 		return value1.equals(value2);
 	}
+
+	/**
+	 * <p>
+	 * Returns {@link StringMatchMode#EQUALS_CASE_SENSITIVE}
+	 * </p>
+	 * 
+	 * <p>
+	 * Short method, useful for static imports, or simply for shorter code
+	 * </p>
+	 * 
+	 * @return {@link StringMatchMode#EQUALS_CASE_SENSITIVE}
+	 */
+	public static StringMatchMode es() {
+		return EQUALS_CASE_SENSITIVE;
+	}
+
+	/**
+	 * <p>
+	 * Returns {@link #EQUALS_CASE_INSENSITIVE}
+	 * </p>
+	 * 
+	 * <p>
+	 * Short method, useful for static imports, or simply for shorter code
+	 * </p>
+	 * 
+	 * @return {@link #EQUALS_CASE_INSENSITIVE}
+	 */
+	public static StringMatchMode ei() {
+		return EQUALS_CASE_INSENSITIVE;
+	}
+
+	/**
+	 * <p>
+	 * Returns {@link #CONTAINS_CASE_SENSITIVE}
+	 * </p>
+	 * 
+	 * <p>
+	 * Short method, useful for static imports, or simply for shorter code
+	 * </p>
+	 * 
+	 * @return {@link #CONTAINS_CASE_SENSITIVE}
+	 */
+	public static StringMatchMode cs() {
+		return CONTAINS_CASE_SENSITIVE;
+	}
+
+	/**
+	 * <p>
+	 * Returns {@link #CONTAINS_CASE_INSENSITIVE}
+	 * </p>
+	 * 
+	 * <p>
+	 * Short method, useful for static imports, or simply for shorter code
+	 * </p>
+	 * 
+	 * @return {@link #CONTAINS_CASE_INSENSITIVE}
+	 */
+	public static StringMatchMode ci() {
+		return CONTAINS_CASE_INSENSITIVE;
+	}
 }
