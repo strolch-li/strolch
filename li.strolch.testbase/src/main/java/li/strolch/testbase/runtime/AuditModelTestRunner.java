@@ -92,6 +92,7 @@ public class AuditModelTestRunner {
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				auditTrail.add(tx, audit);
+				tx.commitOnClose();
 			}
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
@@ -99,6 +100,7 @@ public class AuditModelTestRunner {
 				Set<String> types = auditTrail.getTypes(tx);
 				assertEquals(1, types.size());
 				assertTrue(types.contains(audit.getElementType()));
+				tx.commitOnClose();
 			}
 
 			// has
@@ -112,34 +114,40 @@ public class AuditModelTestRunner {
 
 				dbAudit = auditTrail.getBy(tx, "Foo", audit.getId());
 				assertNull(dbAudit);
+				tx.commitOnClose();
 			}
 
 			// remove
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				auditTrail.remove(tx, audit);
+				tx.commitOnClose();
 			}
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				Audit dbAudit = auditTrail.getBy(tx, audit.getElementType(), audit.getId());
 				assertNull(dbAudit);
+				tx.commitOnClose();
 			}
 
 			// update
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				auditTrail.add(tx, audit);
+				tx.commitOnClose();
 			}
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				Audit dbAudit = auditTrail.getBy(tx, audit.getElementType(), audit.getId());
 				dbAudit.setAction("Foo");
 				auditTrail.update(tx, dbAudit);
+				tx.commitOnClose();
 			}
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				Audit dbAudit = auditTrail.getBy(tx, audit.getElementType(), audit.getId());
 				assertEquals("Foo", dbAudit.getAction());
+				tx.commitOnClose();
 			}
 		}
 
@@ -155,6 +163,7 @@ public class AuditModelTestRunner {
 				assertEquals(1, auditTrail.querySize(tx, audit.getElementType(), containsRange));
 				assertEquals(0, auditTrail.querySize(tx, audit.getElementType(), earlierRange));
 				assertEquals(0, auditTrail.querySize(tx, audit.getElementType(), laterRange));
+				tx.commitOnClose();
 			}
 		}
 
@@ -172,6 +181,7 @@ public class AuditModelTestRunner {
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				auditTrail.addAll(tx, audits);
+				tx.commitOnClose();
 			}
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
@@ -186,17 +196,20 @@ public class AuditModelTestRunner {
 				assertEquals(0, allElements.size());
 				allElements = auditTrail.getAllElements(tx, "FooBar", laterRange);
 				assertEquals(0, allElements.size());
+				tx.commitOnClose();
 			}
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				auditTrail.removeAll(tx, audits);
 				assertEquals(0, auditTrail.querySize(tx, "FooBar", containsRange));
+				tx.commitOnClose();
 			}
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				assertEquals(0, auditTrail.querySize(tx, "FooBar", containsRange));
+				tx.commitOnClose();
 			}
 		}
 
@@ -215,6 +228,7 @@ public class AuditModelTestRunner {
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				auditTrail.addAll(tx, audits);
+				tx.commitOnClose();
 			}
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
@@ -232,6 +246,7 @@ public class AuditModelTestRunner {
 				}
 
 				auditTrail.updateAll(tx, allElements);
+				tx.commitOnClose();
 			}
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
@@ -240,6 +255,7 @@ public class AuditModelTestRunner {
 				for (Audit dbAudit : allElements) {
 					assertEquals("Foo", dbAudit.getAction());
 				}
+				tx.commitOnClose();
 			}
 		}
 
@@ -271,6 +287,7 @@ public class AuditModelTestRunner {
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				auditTrail.addAll(tx, audits);
+				tx.commitOnClose();
 			}
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
@@ -279,6 +296,7 @@ public class AuditModelTestRunner {
 				assertEquals(5, auditTrail.querySize(tx, "BarBarBar", containsRange));
 				assertEquals(5, auditTrail.querySize(tx, "FooFooFoo", containsRange));
 				assertEquals(5, auditTrail.querySize(tx, "BarFooBar", containsRange));
+				tx.commitOnClose();
 			}
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test")) {
@@ -291,6 +309,7 @@ public class AuditModelTestRunner {
 
 				assertEquals(5, auditTrail.removeAll(tx, "BarFooBar", containsRange));
 				assertEquals(0, auditTrail.querySize(tx, containsRange));
+				tx.commitOnClose();
 			}
 		}
 	}
@@ -307,6 +326,7 @@ public class AuditModelTestRunner {
 			}
 
 			assertEquals(0, auditTrail.querySize(tx, dateRange));
+			tx.commitOnClose();
 		}
 	}
 

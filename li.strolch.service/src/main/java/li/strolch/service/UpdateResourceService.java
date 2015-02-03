@@ -40,7 +40,9 @@ public class UpdateResourceService extends AbstractService<UpdateResourceService
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			UpdateResourceCommand command = new UpdateResourceCommand(getContainer(), tx);
 			command.setResource(arg.resource);
+
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

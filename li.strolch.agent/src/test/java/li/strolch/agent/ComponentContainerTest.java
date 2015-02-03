@@ -201,6 +201,7 @@ public class ComponentContainerTest {
 			Resource queriedRes = resourceDao.queryBy("Test", "@testRes0");
 			assertNotNull(queriedRes);
 			assertEquals("@testRes0", queriedRes.getId());
+			tx.commitOnClose();
 		}
 
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
@@ -209,6 +210,7 @@ public class ComponentContainerTest {
 			Order queriedOrder = orderDao.queryBy("Test", "@testOrder0");
 			assertNotNull(queriedOrder);
 			assertEquals("@testOrder0", queriedOrder.getId());
+			tx.commitOnClose();
 		}
 	}
 
@@ -223,6 +225,7 @@ public class ComponentContainerTest {
 			Resource queriedRes = resourceMap.getBy(tx, "Test", "@testRes1");
 			assertNotNull(queriedRes);
 			assertEquals("@testRes1", queriedRes.getId());
+			tx.commitOnClose();
 		}
 
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
@@ -231,6 +234,7 @@ public class ComponentContainerTest {
 			Order queriedOrder = orderMap.getBy(tx, "Test", "@testOrder1");
 			assertNotNull(queriedOrder);
 			assertEquals("@testOrder1", queriedOrder.getId());
+			tx.commitOnClose();
 		}
 	}
 
@@ -251,6 +255,7 @@ public class ComponentContainerTest {
 			Order queriedOrder = orderMap.getBy(tx, "Test", "@testOrder1");
 			assertNotNull(queriedOrder);
 			assertEquals("@testOrder1", queriedOrder.getId());
+			tx.commitOnClose();
 		}
 
 		try (StrolchTransaction tx = container.getRealm("myRealm").openTx(certificate, "test")) {
@@ -267,6 +272,7 @@ public class ComponentContainerTest {
 			assertEquals("MyRealmOrder", myRealmOrder.getId());
 			Order otherRealmOrder = orderMap.getBy(tx, "TestType", "OtherRealmOrder");
 			assertNull(otherRealmOrder);
+			tx.commitOnClose();
 		}
 		try (StrolchTransaction tx = container.getRealm("otherRealm").openTx(certificate, "test")) {
 			ResourceMap resourceMap = tx.getResourceMap();
@@ -282,6 +288,7 @@ public class ComponentContainerTest {
 			assertEquals("OtherRealmOrder", otherRealmOrder.getId());
 			Order myRealmOrder = orderMap.getBy(tx, "TestType", "MyRealmOrder");
 			assertNull(myRealmOrder);
+			tx.commitOnClose();
 		}
 	}
 

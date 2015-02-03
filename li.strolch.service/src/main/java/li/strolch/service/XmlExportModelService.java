@@ -68,7 +68,9 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 			command.setDoResources(arg.doResources);
 			command.setOrderTypes(arg.orderTypes);
 			command.setResourceTypes(arg.resourceTypes);
+
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		ModelStatistics statistics = command.getStatistics();

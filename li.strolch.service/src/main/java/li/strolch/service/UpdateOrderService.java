@@ -40,7 +40,9 @@ public class UpdateOrderService extends AbstractService<UpdateOrderService.Updat
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			UpdateOrderCommand command = new UpdateOrderCommand(getContainer(), tx);
 			command.setOrder(arg.order);
+
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

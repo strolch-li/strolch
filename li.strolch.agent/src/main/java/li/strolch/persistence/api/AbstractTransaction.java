@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 import li.strolch.agent.api.AuditTrail;
@@ -112,7 +113,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		this.commands = new ArrayList<>();
 		this.lockedElements = new HashSet<>();
-		this.closeStrategy = TransactionCloseStrategy.COMMIT;
+		this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
 		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), new Date());
 		this.txResult.setState(TransactionState.OPEN);
 	}
@@ -156,14 +157,29 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return certificate;
 	}
 
-	@Override
-	public void setCloseStrategy(TransactionCloseStrategy closeStrategy) {
+	private void setCloseStrategy(TransactionCloseStrategy closeStrategy) {
 		this.closeStrategy = closeStrategy;
 	}
 
 	@Override
-	public void close() throws StrolchPersistenceException {
+	public void close() throws StrolchTransactionException {
 		this.closeStrategy.close(this);
+	}
+
+	@Override
+	public void commitOnClose() {
+		setCloseStrategy(TransactionCloseStrategy.COMMIT);
+	}
+
+	@Override
+	public void rollbackOnClose() {
+		setCloseStrategy(TransactionCloseStrategy.ROLLBACK);
+	}
+
+	@Override
+	public StrolchTransactionException fail(String string) {
+		rollbackOnClose();
+		return new StrolchTransactionException(string);
 	}
 
 	@Override
@@ -460,7 +476,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
-			throw new StrolchPersistenceException(msg, e);
+			throw new StrolchTransactionException(msg, e);
 		}
 	}
 
@@ -505,7 +521,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
-			throw new StrolchPersistenceException(msg, e);
+			throw new StrolchTransactionException(msg, e);
 
 		} finally {
 			releaseElementLocks();
@@ -633,7 +649,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$
 		msg = MessageFormat.format(msg, getRealmName(), e.getMessage(), sb.toString());
-		throw new StrolchPersistenceException(msg, e);
+		throw new StrolchTransactionException(msg, e);
 	}
 
 	private boolean isAuditTrailEnabled() {

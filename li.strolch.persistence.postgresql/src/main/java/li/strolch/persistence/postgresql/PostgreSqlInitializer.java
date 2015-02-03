@@ -83,6 +83,7 @@ public abstract class PostgreSqlInitializer implements SystemUserAction {
 			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, dataStoreF);
 			handler.parseFile();
 			statistics = handler.getStatistics();
+			tx.commitOnClose();
 		}
 		logger.info(MessageFormat.format("Realm {0} initialization statistics: {1}", realmName, statistics));
 	}

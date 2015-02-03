@@ -43,7 +43,9 @@ public class UpdateResourceCollectionService extends
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			UpdateResourceCollectionCommand command = new UpdateResourceCollectionCommand(getContainer(), tx);
 			command.setResources(arg.resources);
+
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

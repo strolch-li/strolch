@@ -68,6 +68,7 @@ public class ExistingDbTest {
 
 			Order order = tx.getOrderMap().getBy(tx, "MyType", "@1"); //$NON-NLS-1$//$NON-NLS-2$
 			assertNotNull("Should be able to read existing element from db", order); //$NON-NLS-1$
+			tx.commitOnClose();
 		}
 	}
 }

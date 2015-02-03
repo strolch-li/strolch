@@ -151,6 +151,8 @@ public class AuditQueryTest {
 			randomAudit.setAction("create");
 			randomAudit.setElementAccessed(randomAudit.getAccessType().name());
 			auditTrail.add(tx, randomAudit);
+
+			tx.commitOnClose();
 		}
 	}
 

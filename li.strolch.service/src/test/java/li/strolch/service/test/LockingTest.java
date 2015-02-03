@@ -209,6 +209,8 @@ public class LockingTest {
 
 				if (arg.longRunning)
 					Thread.sleep(5000l);
+
+				tx.commitOnClose();
 			}
 
 			return ServiceResult.success();

@@ -52,7 +52,9 @@ public class RemoveResourceCollectionService extends
 
 			RemoveResourceCollectionCommand command = new RemoveResourceCollectionCommand(getContainer(), tx);
 			command.setResources(resources);
+
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

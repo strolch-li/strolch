@@ -118,6 +118,7 @@ public class TransientRealm extends InternalStrolchRealm {
 			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile);
 			handler.parseFile();
 			statistics = handler.getStatistics();
+			tx.commitOnClose();
 		}
 
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);

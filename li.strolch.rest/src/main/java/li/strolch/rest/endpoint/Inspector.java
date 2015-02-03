@@ -96,6 +96,7 @@ public class Inspector {
 					size += tx.getOrderMap().querySize(tx);
 					RealmOverview realmOverview = new RealmOverview(realmName, size);
 					realmOverviews.add(realmOverview);
+					tx.commitOnClose();
 				}
 			}
 
@@ -146,6 +147,8 @@ public class Inspector {
 			orderOverview.setNrOfElements(orderMap.querySize(tx));
 			orderOverview.setTypes(orderMap.getTypes(tx));
 			elementMapOverviews.add(orderOverview);
+
+			tx.commitOnClose();
 		}
 
 		RealmDetail modelOverview = new RealmDetail(elementMapOverviews);
@@ -189,6 +192,7 @@ public class Inspector {
 			}
 
 			resourcesOverview = new ElementMapOverview(ElementMapType.RESOURCE.getName(), typeOverviews);
+			tx.commitOnClose();
 		}
 
 		GenericEntity<ElementMapOverview> entity = new GenericEntity<ElementMapOverview>(resourcesOverview,
@@ -232,6 +236,7 @@ public class Inspector {
 			}
 
 			ordersOverview = new ElementMapOverview(ElementMapType.ORDER.getName(), typeOverviews);
+			tx.commitOnClose();
 		}
 
 		GenericEntity<ElementMapOverview> entity = new GenericEntity<ElementMapOverview>(ordersOverview,
@@ -278,6 +283,7 @@ public class Inspector {
 				elementOverviews.add(resourceOverview);
 			}
 			typeDetail = new TypeDetail(type, elementOverviews);
+			tx.commitOnClose();
 		}
 
 		GenericEntity<TypeDetail> entity = new GenericEntity<TypeDetail>(typeDetail, TypeDetail.class) {
@@ -319,6 +325,7 @@ public class Inspector {
 				elementOverviews.add(orderOverview);
 			}
 			typeDetail = new TypeDetail(type, elementOverviews);
+			tx.commitOnClose();
 		}
 
 		GenericEntity<TypeDetail> entity = new GenericEntity<TypeDetail>(typeDetail, TypeDetail.class) {
@@ -357,6 +364,7 @@ public class Inspector {
 		Resource resource;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			resource = tx.getResourceMap().getBy(tx, type, id);
+			tx.commitOnClose();
 		}
 		if (resource == null) {
 			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
@@ -379,6 +387,7 @@ public class Inspector {
 		Order order;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			order = tx.getOrderMap().getBy(tx, type, id);
+			tx.commitOnClose();
 		}
 		if (order == null) {
 			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$

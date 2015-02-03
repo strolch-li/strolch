@@ -41,11 +41,11 @@ public class ClearModelService extends AbstractService<ClearModelArgument, Servi
 
 		ClearModelCommand command;
 		try (StrolchTransaction tx = openTx(arg.realm)) {
-
 			command = new ClearModelCommand(getContainer(), tx);
 			command.setClearOrders(arg.clearOrders);
 			command.setClearResources(arg.clearResources);
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		ModelStatistics statistics = command.getStatistics();

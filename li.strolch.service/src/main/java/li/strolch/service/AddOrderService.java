@@ -41,6 +41,7 @@ public class AddOrderService extends AbstractService<AddOrderService.AddOrderArg
 			AddOrderCommand command = new AddOrderCommand(getContainer(), tx);
 			command.setOrder(arg.order);
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
