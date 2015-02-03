@@ -89,6 +89,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private TransactionResult txResult;
 
 	private List<Command> commands;
+	private List<Command> flushedCommands;
 	private Set<StrolchRootElement> lockedElements;
 
 	private AuditingOrderMap orderMap;
@@ -112,6 +113,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.certificate = certificate;
 
 		this.commands = new ArrayList<>();
+		this.flushedCommands = new ArrayList<>();
 		this.lockedElements = new HashSet<>();
 		this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
 		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), new Date());
@@ -470,7 +472,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			validateCommands();
 			doCommands();
 			writeChanges(this.txResult);
-			this.commands.clear();
 		} catch (Exception e) {
 			this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
 
@@ -773,8 +774,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	 * so chance of a runtime exception should be small
 	 */
 	private void doCommands() {
-		for (Command command : this.commands) {
+		ListIterator<Command> iter = this.commands.listIterator();
+		while (iter.hasNext()) {
+			Command command = iter.next();
 			command.doCommand();
+			this.flushedCommands.add(command);
+			iter.remove();
 		}
 	}
 
@@ -783,8 +788,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	 * performing the commands
 	 */
 	private void undoCommands() {
-		for (Command command : this.commands) {
+		ListIterator<Command> iter = this.flushedCommands.listIterator();
+		while (iter.hasPrevious()) {
+			Command command = iter.previous();
 			command.undo();
+			iter.remove();
 		}
 	}
 }

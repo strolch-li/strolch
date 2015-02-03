@@ -5,7 +5,6 @@ import li.strolch.command.RemoveResourceCommand;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.persistence.api.TransactionCloseStrategy;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -58,6 +57,8 @@ public class FlushTxTest extends AbstractRealmServiceTest {
 				tx.addCommand(rmResCmd);
 				tx.flush();
 				DBC.PRE.assertNull("Expect to remove resource with id " + id, tx.getResourceBy(id, id));
+
+				tx.commitOnClose();
 			}
 
 			return ServiceResult.success();
@@ -89,13 +90,16 @@ public class FlushTxTest extends AbstractRealmServiceTest {
 				DBC.PRE.assertNotNull("Expected resource with id " + id, tx.getResourceBy(id, id));
 
 				// now force a rollback
-				tx.setCloseStrategy(TransactionCloseStrategy.ROLLBACK);
+				tx.rollbackOnClose();
 			}
 
 			// now make sure the new resource does not exist
 			try (StrolchTransaction tx = openTx(arg.realm)) {
-				DBC.PRE.assertNull("Did not expect resource with id after rolling back previous TX " + id,
-						tx.getResourceBy(id, id));
+
+				Resource res = tx.getResourceBy(id, id);
+				if (res != null) {
+					throw tx.fail("Did not expect resource with id after rolling back previous TX " + id);
+				}
 			}
 
 			return ServiceResult.success();
