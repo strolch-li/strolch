@@ -15,23 +15,25 @@
  */
 package li.strolch.persistence.api;
 
-import li.strolch.exception.StrolchException;
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
+public class StrolchTransactionException extends RuntimeException {
 
-public enum TransactionCloseStrategy {
+	private static final long serialVersionUID = 1L;
 
-	COMMIT() {
-		@Override
-		public void close(StrolchTransaction tx) throws StrolchException {
-			tx.autoCloseableCommit();
-		}
-	},
+	/**
+	 * @param message
+	 */
+	public StrolchTransactionException(String message) {
+		super(message);
+	}
 
-	ROLLBACK() {
-		@Override
-		public void close(StrolchTransaction tx) throws StrolchException {
-			tx.autoCloseableRollback();
-		}
-	};
-
-	public abstract void close(StrolchTransaction tx) throws StrolchException;
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public StrolchTransactionException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

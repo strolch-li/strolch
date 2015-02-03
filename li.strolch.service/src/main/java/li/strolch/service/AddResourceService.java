@@ -41,6 +41,7 @@ public class AddResourceService extends AbstractService<AddResourceService.AddRe
 			AddResourceCommand command = new AddResourceCommand(getContainer(), tx);
 			command.setResource(arg.resource);
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

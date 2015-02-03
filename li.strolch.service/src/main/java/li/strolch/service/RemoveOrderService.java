@@ -44,7 +44,9 @@ public class RemoveOrderService extends AbstractService<RemoveOrderService.Remov
 
 			RemoveOrderCommand command = new RemoveOrderCommand(getContainer(), tx);
 			command.setOrder(order);
+
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

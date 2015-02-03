@@ -115,6 +115,8 @@ public class CachedRealm extends InternalStrolchRealm {
 					nrOfResources++;
 				}
 			}
+
+			tx.commitOnClose();
 		}
 
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
@@ -127,6 +129,8 @@ public class CachedRealm extends InternalStrolchRealm {
 					nrOfOrders++;
 				}
 			}
+
+			tx.commitOnClose();
 		}
 
 		long duration = System.nanoTime() - start;

@@ -61,6 +61,7 @@ import li.strolch.service.api.Command;
  * StrolchRealm realm = strolchAgent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM);
  * try(StrolchTransaction tx = realm.openTx(certificate, getClass())){
  *   // do work e.g. add commands
+ *   tx.commitOnClose();
  * }
  * </code>
  * 
@@ -132,28 +133,18 @@ public interface StrolchTransaction extends AutoCloseable {
 	public PersistenceHandler getPersistenceHandler();
 
 	/**
-	 * Sets the strategy to be used when closing the transaction when {@link #close()} is called. The default is
-	 * {@link TransactionCloseStrategy#COMMIT}, but if the user of the transaction decides it wants to use a different
-	 * strategy, then it may set it using this method
-	 * 
-	 * @param closeStrategy
-	 *            the new {@link TransactionCloseStrategy} to use
+	 * DO NOT CALL THIS METHOD. If the currently set close strategy is {@link TransactionCloseStrategy#COMMIT}, then
+	 * when the transaction is closed, this method is called and all registered {@link Command} are performed, locks on
+	 * objects are released and any other resources are released
 	 */
-	public void setCloseStrategy(TransactionCloseStrategy closeStrategy);
+	public void autoCloseableCommit() throws StrolchTransactionException;
 
 	/**
-	 * If the currently set close strategy is {@link TransactionCloseStrategy#COMMIT}, then when the transaction is
-	 * closed, this method is called and all registered {@link Command} are performed, locks on objects are released and
-	 * any other resources are released
+	 * DO NOT CALL THIS METHOD. If the currently set close strategy is {@link TransactionCloseStrategy#ROLLBACK}, then
+	 * when the transaction is closed, no further actions are performed and any {@link Command} which were performed
+	 * have their {@link Command#undo()} method called and any DB connections are also rolled back
 	 */
-	public void autoCloseableCommit();
-
-	/**
-	 * If the currently set close strategy is {@link TransactionCloseStrategy#ROLLBACK}, then when the transaction is
-	 * closed, no further actions are performed and any {@link Command} which were performed have their
-	 * {@link Command#undo()} method called and any DB connections are also rolled back
-	 */
-	public void autoCloseableRollback();
+	public void autoCloseableRollback() throws StrolchTransactionException;
 
 	/**
 	 * <p>
@@ -166,13 +157,34 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * StrolchRealm realm = strolchAgent.getContainer().getRealm("defaultRealm");
 	 * try(StrolchTransaction tx = realm.openTx(certificate, getClass())){
 	 *   // do work
+	 *   tx.commitOnClose();
 	 * }
 	 * </code>
 	 * 
 	 * After the block is closed, the transaction is automatically closed and all allocated resources are released
 	 */
 	@Override
-	public void close() throws StrolchPersistenceException;
+	public void close() throws StrolchTransactionException;
+
+	/**
+	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#COMMIT}
+	 */
+	public void commitOnClose();
+
+	/**
+	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#ROLLBACK}
+	 */
+	public void rollbackOnClose();
+
+	/**
+	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#ROLLBACK} and returns a
+	 * {@link StrolchTransactionException} which can be thrown by the caller to stop the exception
+	 * 
+	 * @param exceptionMessage
+	 * 
+	 * @return a {@link StrolchTransactionException} to be thrown by the caller
+	 */
+	public StrolchTransactionException fail(String exceptionMessage);
 
 	/**
 	 * @return true if the transaction is still open, i.e. not being closed or rolling back, committing, etc.

@@ -97,6 +97,7 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 			}
 
 			StrolchEnum strolchEnum = new StrolchEnum(name, locale, values);
+			tx.commitOnClose();
 			return strolchEnum;
 		}
 	}

@@ -44,6 +44,7 @@ public class AddOrderCollectionService extends
 			AddOrderCollectionCommand command = new AddOrderCollectionCommand(getContainer(), tx);
 			command.setOrders(arg.orders);
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

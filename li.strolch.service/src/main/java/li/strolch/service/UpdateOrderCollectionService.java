@@ -43,7 +43,9 @@ public class UpdateOrderCollectionService extends
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 			UpdateOrderCollectionCommand command = new UpdateOrderCollectionCommand(getContainer(), tx);
 			command.setOrders(arg.orders);
+
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

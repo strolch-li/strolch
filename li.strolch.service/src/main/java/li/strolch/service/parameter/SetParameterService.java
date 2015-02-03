@@ -54,6 +54,7 @@ public class SetParameterService extends AbstractService<SetParameterService.Set
 			command.setValueAsString(arg.valueAsString);
 
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

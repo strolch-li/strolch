@@ -52,7 +52,9 @@ public class RemoveOrderCollectionService extends
 
 			RemoveOrderCollectionCommand command = new RemoveOrderCollectionCommand(getContainer(), tx);
 			command.setOrders(orders);
+
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

@@ -60,7 +60,9 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 			command.setUpdateResources(arg.updateResources);
 			command.setOrderTypes(arg.orderTypes);
 			command.setResourceTypes(arg.resourceTypes);
+
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		ModelStatistics statistics = command.getStatistics();

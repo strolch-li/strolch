@@ -44,6 +44,7 @@ public class AddResourceCollectionService extends
 			AddResourceCollectionCommand command = new AddResourceCollectionCommand(getContainer(), tx);
 			command.setResources(arg.resources);
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

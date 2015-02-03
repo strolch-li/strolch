@@ -127,6 +127,8 @@ public class QueryTest {
 			resourceMap.add(tx, ModelGenerator.createResource("@4", "Resource 4", "MyType2"));
 			resourceMap.add(tx, ModelGenerator.createResource("@5", "Resource 5", "MyType2"));
 			resourceMap.add(tx, ModelGenerator.createResource("@6", "Resource 6", "MyType2"));
+			
+			tx.commitOnClose();
 		}
 	}
 

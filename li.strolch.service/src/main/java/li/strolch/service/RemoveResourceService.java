@@ -44,7 +44,9 @@ public class RemoveResourceService extends AbstractService<RemoveResourceService
 
 			RemoveResourceCommand command = new RemoveResourceCommand(getContainer(), tx);
 			command.setResource(resource);
+
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

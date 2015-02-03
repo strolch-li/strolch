@@ -87,11 +87,11 @@ public abstract class AbstractRealmCommandTest {
 
 		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
 		try (StrolchTransaction tx = realm.openTx(certificate, "test")) {
-
 			Command command = getCommandInstance(runtimeMock.getContainer(), tx);
-
 			FailCommandFacade commandFacade = new FailCommandFacade(runtimeMock.getContainer(), tx, command);
+
 			tx.addCommand(commandFacade);
+			tx.commitOnClose();
 		}
 	}
 
@@ -100,6 +100,7 @@ public abstract class AbstractRealmCommandTest {
 		try (StrolchTransaction tx = realm.openTx(certificate, "test")) {
 			Command command = getCommandInstance(runtimeMock.getContainer(), tx);
 			tx.addCommand(command);
+			tx.commitOnClose();
 		}
 	}
 
