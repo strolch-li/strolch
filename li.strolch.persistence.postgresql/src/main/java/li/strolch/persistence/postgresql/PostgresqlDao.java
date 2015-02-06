@@ -385,9 +385,11 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	}
 
 	void commit(TransactionResult txResult) {
+		// even though we support rollback we can clear the commands here even if we performed them because the DB transaction will be rolled back
 		for (DaoCommand command : this.commands) {
 			command.doComand(txResult);
 		}
+		this.commands.clear();
 	}
 
 	void rollback() {

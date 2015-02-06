@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 import li.strolch.agent.api.AuditTrail;
@@ -88,6 +89,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private TransactionResult txResult;
 
 	private List<Command> commands;
+	private List<Command> flushedCommands;
 	private Set<StrolchRootElement> lockedElements;
 
 	private AuditingOrderMap orderMap;
@@ -111,6 +113,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.certificate = certificate;
 
 		this.commands = new ArrayList<>();
+		this.flushedCommands = new ArrayList<>();
 		this.lockedElements = new HashSet<>();
 		this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
 		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), new Date());
@@ -464,11 +467,23 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public void flush() {
+		try {
+			validateCommands();
+			doCommands();
+			writeChanges(this.txResult);
+		} catch (Exception e) {
+			this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
+
+			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
+			throw new StrolchTransactionException(msg, e);
+		}
+	}
+
+	@Override
 	public void autoCloseableCommit() {
 		long start = System.nanoTime();
-		if (logger.isDebugEnabled()) {
-			logger.info(MessageFormat.format("Committing TX for realm {0}...", getRealmName())); //$NON-NLS-1$
-		}
 
 		try {
 			this.txResult.setState(TransactionState.COMMITTING);
@@ -484,6 +499,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			commit();
 
 			handleCommit(start, auditTrailDuration, updateObserversDuration);
+
+			this.txResult.setState(TransactionState.COMMITTED);
 
 		} catch (Exception e) {
 			this.txResult.setState(TransactionState.ROLLING_BACK);
@@ -505,6 +522,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				handleFailure(start, e);
 			}
 
+			this.txResult.setState(TransactionState.FAILED);
+
 			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
 			throw new StrolchTransactionException(msg, e);
@@ -519,11 +538,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		long start = System.nanoTime();
 		logger.warn(MessageFormat.format("Rolling back TX for realm {0}...", getRealmName())); //$NON-NLS-1$
 		try {
+			this.txResult.setState(TransactionState.ROLLING_BACK);
 			undoCommands();
 			rollback(this.txResult);
 			handleRollback(start);
+			this.txResult.setState(TransactionState.ROLLED_BACK);
 		} catch (Exception e) {
 			handleFailure(start, e);
+			this.txResult.setState(TransactionState.FAILED);
 		} finally {
 			releaseElementLocks();
 		}
@@ -759,8 +781,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	 * so chance of a runtime exception should be small
 	 */
 	private void doCommands() {
-		for (Command command : this.commands) {
+		ListIterator<Command> iter = this.commands.listIterator();
+		while (iter.hasNext()) {
+			Command command = iter.next();
 			command.doCommand();
+			this.flushedCommands.add(command);
+			iter.remove();
 		}
 	}
 
@@ -769,8 +795,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	 * performing the commands
 	 */
 	private void undoCommands() {
-		for (Command command : this.commands) {
+		ListIterator<Command> iter = this.flushedCommands.listIterator(this.flushedCommands.size());
+		while (iter.hasPrevious()) {
+			Command command = iter.previous();
 			command.undo();
+			iter.remove();
 		}
 	}
 }
