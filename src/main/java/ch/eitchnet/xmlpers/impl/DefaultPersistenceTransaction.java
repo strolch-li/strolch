@@ -149,13 +149,15 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			long txDuration = end - this.startTime;
 			long closeDuration = end - start;
 
-			this.txResult.clear();
-			this.txResult.setState(this.state);
-			this.txResult.setStartTime(this.startTimeDate);
-			this.txResult.setTxDuration(txDuration);
-			this.txResult.setCloseDuration(closeDuration);
-			this.txResult.setRealm(this.realm.getRealmName());
-			this.txResult.setModificationByKey(Collections.<String, ModificationResult> emptyMap());
+			if (this.txResult != null) {
+				this.txResult.clear();
+				this.txResult.setState(this.state);
+				this.txResult.setStartTime(this.startTimeDate);
+				this.txResult.setTxDuration(txDuration);
+				this.txResult.setCloseDuration(closeDuration);
+				this.txResult.setRealm(this.realm.getRealmName());
+				this.txResult.setModificationByKey(Collections.<String, ModificationResult> emptyMap());
+			}
 		}
 	}
 
