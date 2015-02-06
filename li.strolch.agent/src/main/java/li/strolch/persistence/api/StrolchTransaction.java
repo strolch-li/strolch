@@ -133,6 +133,20 @@ public interface StrolchTransaction extends AutoCloseable {
 	public PersistenceHandler getPersistenceHandler();
 
 	/**
+	 * Returns the currently set {@link TransactionCloseStrategy}
+	 * 
+	 * @return the currently set {@link TransactionCloseStrategy}
+	 */
+	public TransactionCloseStrategy getCloseStrategy();
+
+	/**
+	 * DO NOT CALL THIS METHOD. If the currently set close strategy is {@link TransactionCloseStrategy#DO_NOTHING}, then
+	 * when the transaction is closed, this method is called no changes to the model is performed but locks on objects
+	 * are released and any other resources are released
+	 */
+	public void autoCloseableDoNothing() throws StrolchTransactionException;
+
+	/**
 	 * DO NOT CALL THIS METHOD. If the currently set close strategy is {@link TransactionCloseStrategy#COMMIT}, then
 	 * when the transaction is closed, this method is called and all registered {@link Command} are performed, locks on
 	 * objects are released and any other resources are released
@@ -167,6 +181,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	public void close() throws StrolchTransactionException;
 
 	/**
+	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#DO_NOTHING}
+	 */
+	public void doNothingOnClose();
+
+	/**
 	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#COMMIT}
 	 */
 	public void commitOnClose();
@@ -198,29 +217,26 @@ public interface StrolchTransaction extends AutoCloseable {
 	public void flush();
 
 	/**
-	 * @return true if the transaction is still open, i.e. not being closed or rolling back, committing, etc.
+	 * @return the current state of the transaction
+	 * 
+	 * @see TransactionState
 	 */
-	public boolean isOpen();
+	public TransactionState getState();
 
 	/**
-	 * @return true if the transaction is in the process of rolling back all changes
+	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#ROLLING_BACK}
 	 */
 	public boolean isRollingBack();
 
 	/**
-	 * @return true if the transaction is in the process of committing the changes
+	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#COMMITTING}
 	 */
 	public boolean isCommitting();
 
 	/**
-	 * @return if the transaction has committed all changes
+	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#CLOSING}
 	 */
-	public boolean isCommitted();
-
-	/**
-	 * @return if the transaction has rolled back all changes
-	 */
-	public boolean isRolledBack();
+	public boolean isClosing();
 
 	/**
 	 * If the given argument is true, then no observer updates are performed

@@ -115,34 +115,26 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.commands = new ArrayList<>();
 		this.flushedCommands = new ArrayList<>();
 		this.lockedElements = new HashSet<>();
-		this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
+		this.closeStrategy = TransactionCloseStrategy.DO_NOTHING;
 		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), new Date());
 		this.txResult.setState(TransactionState.OPEN);
 	}
 
 	@Override
-	public boolean isOpen() {
-		return this.txResult.getState() == TransactionState.OPEN;
+	public TransactionState getState() {
+		return this.txResult.getState();
 	}
 
-	@Override
 	public boolean isRollingBack() {
-		return this.txResult.getState() == TransactionState.ROLLING_BACK;
+		return this.txResult.getState().isRollingBack();
 	}
 
-	@Override
 	public boolean isCommitting() {
-		return this.txResult.getState() == TransactionState.COMMITTING;
+		return this.txResult.getState().isCommitting();
 	}
 
-	@Override
-	public boolean isCommitted() {
-		return this.txResult.getState() == TransactionState.COMMITTED;
-	}
-
-	@Override
-	public boolean isRolledBack() {
-		return this.txResult.getState() == TransactionState.ROLLED_BACK;
+	public boolean isClosing() {
+		return this.txResult.getState().isClosing();
 	}
 
 	@Override
@@ -159,6 +151,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return certificate;
 	}
 
+	@Override
+	public TransactionCloseStrategy getCloseStrategy() {
+		return this.closeStrategy;
+	}
+
 	private void setCloseStrategy(TransactionCloseStrategy closeStrategy) {
 		this.closeStrategy = closeStrategy;
 	}
@@ -166,6 +163,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void close() throws StrolchTransactionException {
 		this.closeStrategy.close(this);
+	}
+
+	@Override
+	public void doNothingOnClose() {
+		setCloseStrategy(TransactionCloseStrategy.DO_NOTHING);
 	}
 
 	@Override
@@ -551,11 +553,73 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		}
 	}
 
+	@Override
+	public void autoCloseableDoNothing() throws StrolchTransactionException {
+		long start = System.nanoTime();
+		try {
+			this.txResult.setState(TransactionState.CLOSING);
+
+			if (!this.commands.isEmpty()) {
+				String msg = "Current close strategy {0} is readonly and thus does not support doing commands!";
+				msg = MessageFormat.format(msg, this.closeStrategy);
+				throw fail(msg);
+			}
+
+			long auditTrailDuration = writeAuditTrail();
+
+			// rollback and release any resources
+			rollback(this.txResult);
+
+			handleDoNothing(start, auditTrailDuration);
+			this.txResult.setState(TransactionState.CLOSED);
+		} catch (Exception e) {
+			handleFailure(start, e);
+			this.txResult.setState(TransactionState.FAILED);
+		} finally {
+			releaseElementLocks();
+		}
+	}
+
 	protected abstract void writeChanges(TransactionResult txResult) throws Exception;
 
 	protected abstract void rollback(TransactionResult txResult) throws Exception;
 
 	protected abstract void commit() throws Exception;
+
+	private void handleDoNothing(long start, long auditTrailDuration) {
+
+		long end = System.nanoTime();
+		long txDuration = end - this.txResult.getStartNanos();
+		long closeDuration = end - start;
+
+		this.txResult.setTxDuration(txDuration);
+		this.txResult.setCloseDuration(closeDuration);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("TX user=");
+		sb.append(this.certificate.getUsername());
+
+		sb.append(", realm="); //$NON-NLS-1$
+		sb.append(getRealmName());
+
+		sb.append(", took="); //$NON-NLS-1$
+		sb.append(StringHelper.formatNanoDuration(txDuration));
+
+		sb.append(", action=");
+		sb.append(this.action);
+
+		if (closeDuration >= 100000000L) {
+			sb.append(", close="); //$NON-NLS-1$
+			sb.append(StringHelper.formatNanoDuration(closeDuration));
+		}
+
+		if (isAuditTrailEnabled() && auditTrailDuration >= 100000000L) {
+			sb.append(", auditTrail="); //$NON-NLS-1$
+			sb.append(StringHelper.formatNanoDuration(auditTrailDuration));
+		}
+
+		logger.info(sb.toString());
+	}
 
 	private void handleCommit(long start, long auditTrailDuration, long observerUpdateDuration) {
 
@@ -563,7 +627,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		long txDuration = end - this.txResult.getStartNanos();
 		long closeDuration = end - start;
 
-		this.txResult.setState(TransactionState.COMMITTED);
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
 
@@ -603,7 +666,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		long txDuration = end - this.txResult.getStartNanos();
 		long closeDuration = end - start;
 
-		this.txResult.setState(TransactionState.ROLLED_BACK);
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
 

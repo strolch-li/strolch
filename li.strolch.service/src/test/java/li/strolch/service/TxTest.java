@@ -1,0 +1,177 @@
+package li.strolch.service;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import li.strolch.command.AddResourceCommand;
+import li.strolch.model.ModelGenerator;
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.service.api.AbstractService;
+import li.strolch.service.api.ServiceArgument;
+import li.strolch.service.api.ServiceResult;
+import li.strolch.service.test.AbstractRealmServiceTest;
+
+import org.junit.Test;
+
+import ch.eitchnet.utils.dbc.DBC;
+
+public class TxTest extends AbstractRealmServiceTest {
+
+	@Test
+	public void shouldCommit() {
+
+		runServiceInAllRealmTypes(CommitService.class, new ServiceArgument());
+	}
+
+	@Test
+	public void shouldRollback() {
+
+		runServiceInAllRealmTypes(RollbackService.class, new ServiceArgument());
+	}
+
+	@Test
+	public void shouldDoNothing() {
+
+		runServiceInAllRealmTypes(ReadonlyService.class, new ServiceArgument());
+	}
+
+	@Test
+	public void shouldNotAllowCommandsOnDoNothibg() {
+
+		runServiceInAllRealmTypes(ReadonlyFailService.class, new ServiceArgument());
+	}
+
+	public static class CommitService extends AbstractService<ServiceArgument, ServiceResult> {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected ServiceResult getResultInstance() {
+			return new ServiceResult();
+		}
+
+		@Override
+		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+
+			String id = "flushSuccessfully";
+			Resource resource = ModelGenerator.createResource(id, id, id);
+
+			try (StrolchTransaction tx = openTx(arg.realm)) {
+
+				DBC.PRE.assertNull("Did not expect resource with id " + id, tx.getResourceBy(id, id));
+
+				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
+				addResCmd.setResource(resource);
+				tx.addCommand(addResCmd);
+				tx.flush();
+				DBC.PRE.assertNotNull("Expected resource with id " + id, tx.getResourceBy(id, id));
+
+				tx.commitOnClose();
+			}
+
+			// now make sure the new resource exists
+			try (StrolchTransaction tx = openTx(arg.realm)) {
+
+				Resource res = tx.getResourceBy(id, id);
+				if (res == null) {
+					throw tx.fail("Did not expect resource with id " + id);
+				}
+			}
+
+			return ServiceResult.success();
+		}
+	}
+
+	public static class RollbackService extends AbstractService<ServiceArgument, ServiceResult> {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected ServiceResult getResultInstance() {
+			return new ServiceResult();
+		}
+
+		@Override
+		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+
+			String id = "flushSuccessfully";
+			Resource resource = ModelGenerator.createResource(id, id, id);
+
+			try (StrolchTransaction tx = openTx(arg.realm)) {
+
+				DBC.PRE.assertNull("Did not expect resource with id " + id, tx.getResourceBy(id, id));
+
+				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
+				addResCmd.setResource(resource);
+				tx.addCommand(addResCmd);
+				tx.flush();
+				DBC.PRE.assertNotNull("Expected resource with id " + id, tx.getResourceBy(id, id));
+
+				tx.rollbackOnClose();
+			}
+
+			// now make sure the new resource does not exist
+			try (StrolchTransaction tx = openTx(arg.realm)) {
+
+				Resource res = tx.getResourceBy(id, id);
+				if (res != null) {
+					throw tx.fail("Did not find expected resource with id " + id);
+				}
+			}
+
+			return ServiceResult.success();
+		}
+	}
+
+	public static class ReadonlyService extends AbstractService<ServiceArgument, ServiceResult> {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected ServiceResult getResultInstance() {
+			return new ServiceResult();
+		}
+
+		@Override
+		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+
+			try (StrolchTransaction tx = openTx(arg.realm)) {
+				Resource yellowBall = tx.getResourceBy("Ball", "yellow");
+				assertNotNull("Expected to find the yellow ball", yellowBall);
+
+				Order myCarOrder = tx.getOrderBy("ProductionOrder", "myCarOrder");
+				assertNotNull("Expected to find the my car order", myCarOrder);
+			}
+
+			return ServiceResult.success();
+		}
+	}
+
+	public static class ReadonlyFailService extends AbstractService<ServiceArgument, ServiceResult> {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected ServiceResult getResultInstance() {
+			return new ServiceResult();
+		}
+
+		@Override
+		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+
+			String id = "flushSuccessfully";
+			Resource resource = ModelGenerator.createResource(id, id, id);
+
+			boolean txFailed = false;
+			try (StrolchTransaction tx = openTx(arg.realm)) {
+				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
+				addResCmd.setResource(resource);
+				tx.addCommand(addResCmd);
+			} catch (Exception e) {
+				// expected
+				txFailed = true;
+			}
+
+			assertTrue("TX should have failed!", txFailed);
+
+			return ServiceResult.success();
+		}
+	}
+}

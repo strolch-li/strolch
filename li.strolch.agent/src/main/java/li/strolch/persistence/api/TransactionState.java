@@ -15,11 +15,39 @@
  */
 package li.strolch.persistence.api;
 
+/**
+ * The different states of a {@link StrolchTransaction}
+ * 
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
 public enum TransactionState {
 	OPEN, // 
+	CLOSING, //
 	COMMITTING, //
 	ROLLING_BACK, //
+	CLOSED, //
 	COMMITTED, // 
 	ROLLED_BACK,
 	FAILED;
+
+	/**
+	 * @return true if this is {@link #ROLLING_BACK}
+	 */
+	public boolean isRollingBack() {
+		return this == ROLLING_BACK;
+	}
+
+	/**
+	 * @return true if this is {@link #COMMITTING}
+	 */
+	public boolean isCommitting() {
+		return this == COMMITTING;
+	}
+
+	/**
+	 * @return true if this is {@link #CLOSING}
+	 */
+	public boolean isClosing() {
+		return this == CLOSING;
+	}
 }
