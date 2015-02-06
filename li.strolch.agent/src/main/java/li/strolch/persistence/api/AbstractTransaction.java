@@ -500,6 +500,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			handleCommit(start, auditTrailDuration, updateObserversDuration);
 
+			this.txResult.setState(TransactionState.COMMITTED);
+
 		} catch (Exception e) {
 			this.txResult.setState(TransactionState.ROLLING_BACK);
 			try {
@@ -520,6 +522,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				handleFailure(start, e);
 			}
 
+			this.txResult.setState(TransactionState.FAILED);
+
 			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
 			throw new StrolchTransactionException(msg, e);
@@ -534,11 +538,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		long start = System.nanoTime();
 		logger.warn(MessageFormat.format("Rolling back TX for realm {0}...", getRealmName())); //$NON-NLS-1$
 		try {
+			this.txResult.setState(TransactionState.ROLLING_BACK);
 			undoCommands();
 			rollback(this.txResult);
 			handleRollback(start);
+			this.txResult.setState(TransactionState.ROLLED_BACK);
 		} catch (Exception e) {
 			handleFailure(start, e);
+			this.txResult.setState(TransactionState.FAILED);
 		} finally {
 			releaseElementLocks();
 		}
@@ -788,7 +795,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	 * performing the commands
 	 */
 	private void undoCommands() {
-		ListIterator<Command> iter = this.flushedCommands.listIterator();
+		ListIterator<Command> iter = this.flushedCommands.listIterator(this.flushedCommands.size());
 		while (iter.hasPrevious()) {
 			Command command = iter.previous();
 			command.undo();
