@@ -161,6 +161,7 @@ public class OrderModelTestRunner {
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			OrderMap orderMap = tx.getOrderMap();
 			orderMap.removeAll(tx, orderMap.getAllElements(tx));
+			tx.commitOnClose();
 		}
 
 		{
