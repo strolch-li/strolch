@@ -86,7 +86,6 @@ public class QueryTest {
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			result = inMemoryQuery.doQuery(tx.getPersistenceHandler().getResourceDao(tx));
-			tx.commitOnClose();
 		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
@@ -120,7 +119,6 @@ public class QueryTest {
 		List<Order> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			result = inMemoryQuery.doQuery(tx.getPersistenceHandler().getOrderDao(tx));
-			tx.commitOnClose();
 		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
@@ -148,7 +146,6 @@ public class QueryTest {
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			result = tx.doQuery(query);
-			tx.commitOnClose();
 		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
@@ -176,7 +173,6 @@ public class QueryTest {
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			result = tx.doQuery(query);
-			tx.commitOnClose();
 		}
 		assertEquals(0, result.size());
 	}
@@ -203,7 +199,6 @@ public class QueryTest {
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			result = tx.doQuery(query);
-			tx.commitOnClose();
 		}
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
@@ -231,7 +226,6 @@ public class QueryTest {
 		List<Resource> result;
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 			result = tx.doQuery(query);
-			tx.commitOnClose();
 		}
 		assertEquals(0, result.size());
 	}
@@ -259,7 +253,6 @@ public class QueryTest {
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 				result = tx.doQuery(query);
-				tx.commitOnClose();
 			}
 			assertEquals(1, result.size());
 			assertEquals("@2", result.get(0).getId());
@@ -271,7 +264,6 @@ public class QueryTest {
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 				result = tx.doQuery(query);
-				tx.commitOnClose();
 			}
 			assertEquals(1, result.size());
 			assertEquals("@1", result.get(0).getId());
@@ -283,7 +275,6 @@ public class QueryTest {
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
 				result = tx.doQuery(query);
-				tx.commitOnClose();
 			}
 			assertEquals(0, result.size());
 		}

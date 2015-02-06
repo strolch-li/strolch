@@ -88,7 +88,6 @@ public class ResourceModelTestRunner {
 
 			size = tx.getResourceMap().querySize(tx, "NonExistingType");
 			assertEquals("Should have zero objects of type 'NonExistingType'", 0, size);
-			tx.commitOnClose();
 		}
 	}
 
@@ -105,7 +104,6 @@ public class ResourceModelTestRunner {
 		Resource readResource = null;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
 			readResource = tx.getResourceMap().getBy(tx, TYPE, ID);
-			tx.commitOnClose();
 		}
 		assertNotNull("Should read Resource with id " + ID, readResource); //$NON-NLS-1$
 
@@ -122,7 +120,6 @@ public class ResourceModelTestRunner {
 		Resource updatedResource = null;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
 			updatedResource = tx.getResourceMap().getBy(tx, TYPE, ID);
-			tx.commitOnClose();
 		}
 		assertNotNull("Should read Resource with id " + ID, updatedResource); //$NON-NLS-1$
 		if (this.runtimeMock.getRealm(this.realmName).getMode() != DataStoreMode.CACHED)
@@ -140,7 +137,6 @@ public class ResourceModelTestRunner {
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
 			Resource resource = tx.getResourceMap().getBy(tx, TYPE, ID);
 			assertNull("Should no read Resource with id " + ID, resource); //$NON-NLS-1$
-			tx.commitOnClose();
 		}
 	}
 
@@ -173,7 +169,6 @@ public class ResourceModelTestRunner {
 			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 				ResourceMap resourceMap = tx.getResourceMap();
 				assertEquals(0, resourceMap.querySize(tx));
-				tx.commitOnClose();
 			}
 
 			// now add some resources
@@ -187,7 +182,6 @@ public class ResourceModelTestRunner {
 				ResourceMap resourceMap = tx.getResourceMap();
 				assertEquals(resources.size(), resourceMap.querySize(tx));
 				assertEquals(5, resourceMap.querySize(tx, "MyType3"));
-				tx.commitOnClose();
 			}
 
 			// now use the remove all by type
@@ -201,7 +195,6 @@ public class ResourceModelTestRunner {
 				ResourceMap resourceMap = tx.getResourceMap();
 				assertEquals(resources.size() - 5, resourceMap.querySize(tx));
 				assertEquals(0, resourceMap.querySize(tx, "MyType3"));
-				tx.commitOnClose();
 			}
 
 			// now use the remove all
@@ -215,7 +208,6 @@ public class ResourceModelTestRunner {
 			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 				ResourceMap resourceMap = tx.getResourceMap();
 				assertEquals(0, resourceMap.querySize(tx));
-				tx.commitOnClose();
 			}
 		}
 
@@ -234,7 +226,6 @@ public class ResourceModelTestRunner {
 			List<Resource> allResources = tx.getResourceMap().getAllElements(tx);
 			Collections.sort(allResources, comparator);
 			assertEquals(resources, allResources);
-			tx.commitOnClose();
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
@@ -253,7 +244,6 @@ public class ResourceModelTestRunner {
 				List<Resource> resourcesByType = resourceMap.getElementsBy(tx, type);
 				assertEquals(5, resourcesByType.size());
 			}
-			tx.commitOnClose();
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
@@ -263,7 +253,6 @@ public class ResourceModelTestRunner {
 			assertNotNull(resource);
 			resource = tx.getResourceMap().getBy(tx, "MyType3", "@00000011");
 			assertNotNull(resource);
-			tx.commitOnClose();
 		}
 	}
 }

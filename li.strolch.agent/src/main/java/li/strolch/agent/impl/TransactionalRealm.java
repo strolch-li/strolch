@@ -101,12 +101,10 @@ public class TransactionalRealm extends InternalStrolchRealm {
 
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
 			nrOfOrders = this.orderMap.getAllKeys(tx).size();
-			tx.commitOnClose();
 		}
 
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
 			nrOfResources = this.resourceMap.getAllKeys(tx).size();
-			tx.commitOnClose();
 		}
 
 		long duration = System.nanoTime() - start;

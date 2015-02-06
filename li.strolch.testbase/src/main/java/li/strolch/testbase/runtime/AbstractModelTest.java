@@ -20,7 +20,6 @@ public abstract class AbstractModelTest {
 		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
 		try (StrolchTransaction tx = getRuntimeMock().getRealm(this.realmName).openTx(certificate, "test")) {
 			tx.getOrderMap().getAllKeys(tx);
-			tx.commitOnClose();
 		}
 	}
 

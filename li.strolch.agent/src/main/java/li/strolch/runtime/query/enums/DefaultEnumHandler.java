@@ -96,9 +96,7 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 				values.put(paramKey, new EnumValue(paramKey, enumParam.getValue()));
 			}
 
-			StrolchEnum strolchEnum = new StrolchEnum(name, locale, values);
-			tx.commitOnClose();
-			return strolchEnum;
+			return new StrolchEnum(name, locale, values);
 		}
 	}
 

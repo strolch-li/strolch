@@ -97,7 +97,6 @@ public class RealmTest extends AbstractModelTest {
 			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST)) {
 				Resource res = tx.getResourceMap().getBy(tx, type, expectedId1);
 				assertEquals("Should find object previously added in same realm!", expectedRes1, res); //$NON-NLS-1$
-				tx.commitOnClose();
 			}
 		}
 
@@ -113,7 +112,6 @@ public class RealmTest extends AbstractModelTest {
 			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
 				Resource res = tx.getResourceMap().getBy(tx, type, expectedId2);
 				assertEquals("Should find object previously added in same realm!", expectedRes2, res); //$NON-NLS-1$
-				tx.commitOnClose();
 			}
 		}
 
@@ -122,7 +120,6 @@ public class RealmTest extends AbstractModelTest {
 			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
 				Resource res = tx.getResourceMap().getBy(tx, type, expectedId1);
 				assertNull("Should not find object added in differenct realm!", res); //$NON-NLS-1$
-				tx.commitOnClose();
 			}
 		}
 	}

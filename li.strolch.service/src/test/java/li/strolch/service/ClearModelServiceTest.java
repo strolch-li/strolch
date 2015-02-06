@@ -38,7 +38,6 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest {
 				try (StrolchTransaction tx = strolchRealm.openTx(ClearModelServiceTest.this.certificate, "test")) {
 					assertEquals(0, tx.getResourceMap().querySize(tx));
 					assertEquals(0, tx.getOrderMap().querySize(tx));
-					tx.commitOnClose();
 				}
 			}
 		};
@@ -59,7 +58,6 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest {
 				try (StrolchTransaction tx = strolchRealm.openTx(ClearModelServiceTest.this.certificate, "test")) {
 					assertNotEquals(0, tx.getResourceMap().querySize(tx));
 					assertEquals(0, tx.getOrderMap().querySize(tx));
-					tx.commitOnClose();
 				}
 			}
 		};
@@ -80,7 +78,6 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest {
 				try (StrolchTransaction tx = strolchRealm.openTx(ClearModelServiceTest.this.certificate, "test")) {
 					assertNotEquals(0, tx.getOrderMap().querySize(tx));
 					assertEquals(0, tx.getResourceMap().querySize(tx));
-					tx.commitOnClose();
 				}
 			}
 		};
