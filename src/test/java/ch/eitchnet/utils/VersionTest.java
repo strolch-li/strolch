@@ -75,4 +75,29 @@ public class VersionTest {
 		assertEquals(Version.valueOf("7.6.1.qualifier").toOsgiStyleString(), "7.6.1.qualifier");
 		assertEquals(Version.valueOf("7.6.1.qualifier").toMavenStyleString(), "7.6.1-SNAPSHOT");
 	}
+
+	@Test
+	public void shouldIncreaseVersion() {
+
+		Version increased = Version.emptyVersion.add(0, 0, 0);
+		assertEquals("0.0.0", increased.toString());
+
+		increased = increased.add(0, 0, 1);
+		assertEquals("0.0.1", increased.toString());
+
+		increased = increased.add(0, 1, 0);
+		assertEquals("0.1.1", increased.toString());
+
+		increased = increased.add(1, 0, 0);
+		assertEquals("1.1.1", increased.toString());
+
+		increased = increased.add(-1, 0, 0);
+		assertEquals("0.1.1", increased.toString());
+
+		increased = increased.add(0, -1, 0);
+		assertEquals("0.0.1", increased.toString());
+
+		increased = increased.add(0, 0, -1);
+		assertEquals("0.0.0", increased.toString());
+	}
 }

@@ -40,21 +40,22 @@ import ch.eitchnet.utils.helper.StringHelper;
  * </p>
  * 
  * <p>
- * {@code Version} objects are immutable.
+ * <b>Note:</b> {@code Version} objects are immutable and thus thread safe
  * </p>
  */
 public class Version implements Comparable<Version> {
+
+	public static final String SEPARATOR = ".";
+	public static final String OSGI_QUALIFIER_SEPARATOR = ".";
+	public static final String MAVEN_QUALIFIER_SEPARATOR = "-";
+
+	public static final String MAVEN_SNAPSHOT_QUALIFIER = "SNAPSHOT";
+	public static final String OSGI_SNAPSHOT_QUALIFIER = "qualifier";
+
 	private final int major;
 	private final int minor;
 	private final int micro;
 	private final String qualifier;
-
-	private static final String SEPARATOR = ".";
-	private static final String OSGI_QUALIFIER_SEPARATOR = ".";
-	private static final String MAVEN_QUALIFIER_SEPARATOR = "-";
-
-	private static final String MAVEN_SNAPSHOT_QUALIFIER = "SNAPSHOT";
-	private static final String OSGI_SNAPSHOT_QUALIFIER = "qualifier";
 
 	private transient String versionString;
 	private boolean osgiStyle;
@@ -313,56 +314,36 @@ public class Version implements Comparable<Version> {
 		return this.qualifier;
 	}
 
+	/**
+	 * Returns a new {@link Version} where each version number is incremented or decreased by the given parameters
+	 * 
+	 * @param major
+	 *            the value to increase or decrease the major part of the version
+	 * @param minor
+	 *            the value to increase or decrease the minor part of the version
+	 * @param micro
+	 *            the value to increase or decrease the micro part of the version
+	 * 
+	 * @return the new Version with the version parts modified as passed in by the parameters
+	 */
+	public Version add(int major, int minor, int micro) {
+		return new Version(this.major + major, this.minor + minor, this.micro + micro, this.qualifier, this.osgiStyle);
+	}
+
+	/**
+	 * @return true if this is an OSGI style version, i.e. if has a qualifier, then osgi defines how the qualifier is
+	 *         appended to the version
+	 */
 	public boolean isOsgiStyle() {
 		return this.osgiStyle;
 	}
 
 	/**
-	 * Returns the string representation of this version identifier.
-	 * 
-	 * <p>
-	 * The format of the version string will be {@code major.minor.micro} if qualifier is the empty string or
-	 * {@code major.minor.micro.qualifier} otherwise.
-	 * 
-	 * @return The string representation of this version identifier.
+	 * @return true if this version is for a snapshot version, i.e. ends with {@link #MAVEN_SNAPSHOT_QUALIFIER} or
+	 *         {@link #OSGI_SNAPSHOT_QUALIFIER}
 	 */
-	@Override
-	public String toString() {
-		if (this.versionString != null) {
-			return this.versionString;
-		}
-		this.versionString = toString(this.osgiStyle);
-		return this.versionString;
-	}
-
-	private String toString(final boolean withOsgiStyle) {
-		int q = this.qualifier.length();
-		StringBuilder result = new StringBuilder(20 + q);
-		result.append(this.major);
-		result.append(SEPARATOR);
-		result.append(this.minor);
-		result.append(SEPARATOR);
-		result.append(this.micro);
-		if (q > 0) {
-			if (withOsgiStyle) {
-				result.append(OSGI_QUALIFIER_SEPARATOR);
-			} else {
-				result.append(MAVEN_QUALIFIER_SEPARATOR);
-			}
-			result.append(createQualifier(withOsgiStyle));
-		}
-		return result.toString();
-	}
-
-	private String createQualifier(boolean withOsgiStyle) {
-		if (this.qualifier.equals(MAVEN_SNAPSHOT_QUALIFIER) || this.qualifier.equals(OSGI_SNAPSHOT_QUALIFIER)) {
-			if (withOsgiStyle) {
-				return OSGI_SNAPSHOT_QUALIFIER;
-			} else {
-				return MAVEN_SNAPSHOT_QUALIFIER;
-			}
-		}
-		return this.qualifier;
+	public boolean isSnapshot() {
+		return MAVEN_SNAPSHOT_QUALIFIER.equals(this.qualifier) || OSGI_SNAPSHOT_QUALIFIER.equals(this.qualifier);
 	}
 
 	/**
@@ -461,6 +442,52 @@ public class Version implements Comparable<Version> {
 	}
 
 	/**
+	 * Returns the string representation of this version identifier.
+	 * 
+	 * <p>
+	 * The format of the version string will be {@code major.minor.micro} if qualifier is the empty string or
+	 * {@code major.minor.micro.qualifier} otherwise.
+	 * 
+	 * @return The string representation of this version identifier.
+	 */
+	@Override
+	public String toString() {
+		if (this.versionString == null)
+			this.versionString = toString(this.osgiStyle);
+		return this.versionString;
+	}
+
+	private String toString(final boolean withOsgiStyle) {
+		int q = this.qualifier.length();
+		StringBuilder result = new StringBuilder(20 + q);
+		result.append(this.major);
+		result.append(SEPARATOR);
+		result.append(this.minor);
+		result.append(SEPARATOR);
+		result.append(this.micro);
+		if (q > 0) {
+			if (withOsgiStyle) {
+				result.append(OSGI_QUALIFIER_SEPARATOR);
+			} else {
+				result.append(MAVEN_QUALIFIER_SEPARATOR);
+			}
+			result.append(createQualifier(withOsgiStyle));
+		}
+		return result.toString();
+	}
+
+	private String createQualifier(boolean withOsgiStyle) {
+		if (this.qualifier.equals(MAVEN_SNAPSHOT_QUALIFIER) || this.qualifier.equals(OSGI_SNAPSHOT_QUALIFIER)) {
+			if (withOsgiStyle) {
+				return OSGI_SNAPSHOT_QUALIFIER;
+			} else {
+				return MAVEN_SNAPSHOT_QUALIFIER;
+			}
+		}
+		return this.qualifier;
+	}
+
+	/**
 	 * @return This version represented in a maven compatible form.
 	 */
 	public String toMavenStyleString() {
@@ -483,9 +510,5 @@ public class Version implements Comparable<Version> {
 		result.append(SEPARATOR);
 		result.append(this.minor);
 		return result.toString();
-	}
-
-	public boolean isSnapshot() {
-		return MAVEN_SNAPSHOT_QUALIFIER.equals(this.qualifier) || OSGI_SNAPSHOT_QUALIFIER.equals(this.qualifier);
 	}
 }
