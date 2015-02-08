@@ -70,6 +70,10 @@ public class MigrationsHandler extends StrolchComponent {
 	}
 
 	public MapOfLists<String, Version> queryMigrationsToRun(Certificate cert) {
+		if (!this.migrationsPath.isDirectory()) {
+			return new MapOfLists<>();
+		}
+
 		Map<String, Version> currentVersions = getCurrentVersions(cert);
 		Migrations migrations = new Migrations(getContainer(), currentVersions);
 		migrations.parseMigrations(this.migrationsPath);
@@ -156,6 +160,11 @@ public class MigrationsHandler extends StrolchComponent {
 
 		@Override
 		public void run() {
+
+			if (!MigrationsHandler.this.migrationsPath.isDirectory()) {
+				logger.info("There are no migrations required at the moment!");
+				return;
+			}
 
 			CurrentMigrationVersionQuery query = new CurrentMigrationVersionQuery(getContainer());
 			PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
