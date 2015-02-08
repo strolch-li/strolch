@@ -165,4 +165,8 @@ public class MapOfMaps<T, U, V> {
 			return 0;
 		return map.size();
 	}
+
+	public boolean isEmpty() {
+		return this.mapOfMaps.isEmpty();
+	}
 }

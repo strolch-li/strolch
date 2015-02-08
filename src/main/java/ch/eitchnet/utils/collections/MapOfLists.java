@@ -117,4 +117,8 @@ public class MapOfLists<T, U> {
 			return 0;
 		return list.size();
 	}
+
+	public boolean isEmpty() {
+		return this.mapOfLists.isEmpty();
+	}
 }
