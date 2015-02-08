@@ -35,6 +35,8 @@ import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.After;
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.db.DbSchemaVersionCheck;
 import ch.eitchnet.privilege.model.Certificate;
@@ -50,6 +52,8 @@ public abstract class AbstractRealmServiceTest {
 	public static final String REALM_TRANSIENT = "svcTransient";
 	public static final String RUNTIME_PATH = "target/svcTestRuntime/"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/test/resources/svctest"; //$NON-NLS-1$
+
+	protected static final Logger logger = LoggerFactory.getLogger(AbstractRealmServiceTest.class);
 
 	protected static RuntimeMock runtimeMock;
 	protected Certificate certificate;

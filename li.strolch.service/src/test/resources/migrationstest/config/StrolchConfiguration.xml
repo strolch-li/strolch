@@ -24,26 +24,23 @@
 			<Properties>
 				<realms>defaultRealm</realms>
 				<dataStoreMode>TRANSIENT</dataStoreMode>
-				<dataStoreFile>Model.xml</dataStoreFile>
+				<dataStoreFile>StrolchModel.xml</dataStoreFile>
 			</Properties>
 		</Component>
 		<Component>
 			<name>ServiceHandler</name>
-			<api>li.strolch.runtime.configuration.model.ServiceHandlerTest</api>
-			<impl>li.strolch.runtime.configuration.model.ServiceHandlerTestImpl</impl>
-			<depends>RealmHandler</depends>
+			<api>li.strolch.service.api.ServiceHandler</api>
+			<impl>li.strolch.service.api.DefaultServiceHandler</impl>
 		</Component>
 		<Component>
 			<name>MigrationsHandler</name>
 			<api>li.strolch.migrations.MigrationsHandler</api>
 			<impl>li.strolch.migrations.MigrationsHandler</impl>
 			<depends>ServiceHandler</depends>
-		</Component>
-		<Component>
-			<name>PostInitializer</name>
-			<api>li.strolch.runtime.configuration.model.PostInitializerTest</api>
-			<impl>li.strolch.runtime.configuration.model.PostInitializerTestImpl</impl>
-			<depends>MigrationsHandler</depends>
+			<Properties>
+				<verbose>true</verbose>
+				<runMigrationsOnStart>true</runMigrationsOnStart>
+			</Properties>
 		</Component>
 	</env>
 </StrolchConfiguration>

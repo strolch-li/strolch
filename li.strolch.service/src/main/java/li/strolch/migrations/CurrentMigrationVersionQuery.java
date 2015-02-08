@@ -1,5 +1,10 @@
 package li.strolch.migrations;
 
+import static li.strolch.migrations.Migration.BAG_PARAMETERS;
+import static li.strolch.migrations.Migration.MIGRATIONS_ID;
+import static li.strolch.migrations.Migration.MIGRATIONS_TYPE;
+import static li.strolch.migrations.Migration.PARAM_CURRENT_VERSION;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,11 +18,6 @@ import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.Version;
 
 public class CurrentMigrationVersionQuery {
-
-	public static final String MIGRATIONS_TYPE = "Migrations";
-	public static final String MIGRATIONS_ID = "migrations";
-	public static final String BAG_PARAMETERS = "parameters";
-	public static final String PARAM_CURRENT_VERSION = "currentVersion";
 
 	private ComponentContainer container;
 	private Map<String, Version> currentVersions;

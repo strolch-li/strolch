@@ -2,7 +2,6 @@ package li.strolch.migrations;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
@@ -24,18 +23,27 @@ public class Migrations {
 
 	private ComponentContainer container;
 	private Map<String, Version> currentVersions;
+	private boolean verbose;
 
 	private SortedSet<DataMigration> dataMigrations;
 	private SortedSet<CodeMigration> codeMigrations;
 
-	private Map<String, Version> migrationsRan;
+	private MapOfLists<String, Version> migrationsRan;
 
 	public Migrations(ComponentContainer container, Map<String, Version> currentVersions) {
 		this.container = container;
 		this.currentVersions = currentVersions;
 	}
 
-	public Map<String, Version> getMigrationsRan() {
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
+	}
+
+	public boolean isVerbose() {
+		return verbose;
+	}
+
+	public MapOfLists<String, Version> getMigrationsRan() {
 		return this.migrationsRan;
 	}
 
@@ -49,12 +57,13 @@ public class Migrations {
 		this.codeMigrations = loadCodeMigrations(this.currentVersions, migrationsPath);
 
 		// log found migrations
-		logDetectedMigrations(this.currentVersions, this.dataMigrations, this.codeMigrations);
+		if (this.verbose)
+			logDetectedMigrations(this.currentVersions, this.dataMigrations, this.codeMigrations);
 	}
 
 	public void runMigrations(Certificate certificate) {
 
-		Map<String, Version> migrationsRan = new HashMap<>();
+		MapOfLists<String, Version> migrationsRan = new MapOfLists<>();
 
 		for (Entry<String, Version> entry : this.currentVersions.entrySet()) {
 			String realm = entry.getKey();
@@ -69,16 +78,22 @@ public class Migrations {
 			if (!this.codeMigrations.isEmpty()) {
 				for (CodeMigration migration : this.codeMigrations.tailSet(currentCodeMigration)) {
 					migration.migrate(container, certificate);
-					migrationsRan.put(realm, migration.getVersion());
+					migrationsRan.addElement(realm, migration.getVersion());
 				}
 			}
 
 			if (!this.dataMigrations.isEmpty()) {
 				for (DataMigration migration : this.dataMigrations.tailSet(currentDataMigration)) {
 					migration.migrate(container, certificate);
-					migrationsRan.put(realm, migration.getVersion());
+					migrationsRan.addElement(realm, migration.getVersion());
 				}
 			}
+		}
+
+		if (migrationsRan.isEmpty()) {
+			logger.info("There were no migrations required!");
+		} else {
+			logger.info("Migrated " + migrationsRan.size() + " realms!");
 		}
 
 		this.migrationsRan = migrationsRan;
