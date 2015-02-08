@@ -90,8 +90,8 @@ public class MigrationsHandler extends StrolchComponent {
 
 		this.runMigrationsOnStart = configuration.getBoolean(PROP_RUN_MIGRATIONS_ON_START, Boolean.FALSE);
 		this.verbose = configuration.getBoolean(PROP_VERBOSE, Boolean.FALSE);
-		this.pollMigrations = configuration.getBoolean(PROP_VERBOSE, Boolean.FALSE);
-		this.pollWait = configuration.getInt(PROP_VERBOSE, 5);
+		this.pollMigrations = configuration.getBoolean(PROP_POLL_MIGRATIONS, Boolean.FALSE);
+		this.pollWait = configuration.getInt(PROP_POLL_WAIT, 5);
 
 		RuntimeConfiguration runtimeConf = configuration.getRuntimeConfiguration();
 		this.migrationsPath = runtimeConf.getDataDir(MigrationsHandler.class.getName(), PATH_MIGRATIONS, false);

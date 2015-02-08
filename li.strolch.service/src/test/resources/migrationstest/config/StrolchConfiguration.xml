@@ -4,7 +4,6 @@
 		<Runtime>
 			<applicationName>StrolchRuntimeTest</applicationName>
 			<Properties>
-				<dataStoreMode>TRANSIENT</dataStoreMode>
 				<verbose>true</verbose>
 			</Properties>
 		</Runtime>
@@ -36,7 +35,7 @@
 			<name>MigrationsHandler</name>
 			<api>li.strolch.migrations.MigrationsHandler</api>
 			<impl>li.strolch.migrations.MigrationsHandler</impl>
-			<depends>ServiceHandler</depends>
+			<depends>RealmHandler</depends>
 			<Properties>
 				<verbose>true</verbose>
 				<runMigrationsOnStart>true</runMigrationsOnStart>
