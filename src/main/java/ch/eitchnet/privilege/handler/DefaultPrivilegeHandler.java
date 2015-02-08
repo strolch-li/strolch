@@ -1085,7 +1085,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create a new certificate, with details of the user
 		Certificate systemUserCertificate = new Certificate(sessionId, System.currentTimeMillis(), systemUsername,
-				null, null, authToken, user.getLocale(), user.getRoles(), new HashMap<>(user.getProperties()));
+				user.getFirstname(), user.getLastname(), authToken, user.getLocale(), user.getRoles(), new HashMap<>(
+						user.getProperties()));
 
 		// create and save a new privilege context
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);
