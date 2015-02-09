@@ -75,9 +75,8 @@ public class MigrationsHandler extends StrolchComponent {
 		}
 
 		Map<String, Version> currentVersions = getCurrentVersions(cert);
-		Migrations migrations = new Migrations(getContainer(), currentVersions);
+		Migrations migrations = new Migrations(getContainer(), currentVersions, this.verbose);
 		migrations.parseMigrations(this.migrationsPath);
-		migrations.setVerbose(this.verbose);
 
 		this.migrations = migrations;
 		return this.migrations.getMigrationsToRun();
@@ -107,9 +106,8 @@ public class MigrationsHandler extends StrolchComponent {
 			privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, action);
 			Map<String, Version> currentVersions = query.getCurrentVersions();
 
-			Migrations migrations = new Migrations(getContainer(), currentVersions);
+			Migrations migrations = new Migrations(getContainer(), currentVersions, this.verbose);
 			migrations.parseMigrations(this.migrationsPath);
-			migrations.setVerbose(this.verbose);
 
 			this.migrations = migrations;
 		}
@@ -172,9 +170,8 @@ public class MigrationsHandler extends StrolchComponent {
 			privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, queryAction);
 			Map<String, Version> currentVersions = query.getCurrentVersions();
 
-			Migrations migrations = new Migrations(getContainer(), currentVersions);
+			Migrations migrations = new Migrations(getContainer(), currentVersions, MigrationsHandler.this.verbose);
 			migrations.parseMigrations(MigrationsHandler.this.migrationsPath);
-			migrations.setVerbose(MigrationsHandler.this.verbose);
 
 			MigrationsHandler.this.migrations = migrations;
 

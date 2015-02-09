@@ -55,11 +55,13 @@ public class MigrationsTest {
 		MigrationsHandler migrationsHandler = runtimeMock.getContainer().getComponent(MigrationsHandler.class);
 		Map<String, Version> currentVersions = migrationsHandler.getCurrentVersions(cert);
 		assertEquals("1.1.1", currentVersions.get(StrolchConstants.DEFAULT_REALM).toString());
+		assertEquals("0.0.0", currentVersions.get("other").toString());
 
 		MapOfLists<String, Version> lastMigrations = migrationsHandler.getLastMigrations();
 		List<Version> expectedMigrations = Arrays.asList(Version.valueOf("0.1.0"), Version.valueOf("0.1.1"),
 				Version.valueOf("0.5.2"), Version.valueOf("1.0.0"), Version.valueOf("1.0.5"), Version.valueOf("1.1.1"));
 		assertEquals(expectedMigrations, lastMigrations.getList(StrolchConstants.DEFAULT_REALM));
+		assertEquals(null, lastMigrations.getList("other"));
 
 		MapOfLists<String, Version> migrationsToRun = migrationsHandler.queryMigrationsToRun(cert);
 		assertTrue("Expected to have all migrations run", migrationsToRun.isEmpty());

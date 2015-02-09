@@ -21,9 +21,11 @@
 			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
 			<depends>PrivilegeHandler</depends>
 			<Properties>
-				<realms>defaultRealm</realms>
+				<realms>defaultRealm, other</realms>
 				<dataStoreMode>TRANSIENT</dataStoreMode>
 				<dataStoreFile>StrolchModel.xml</dataStoreFile>
+				<dataStoreMode.other>TRANSIENT</dataStoreMode.other>
+				<dataStoreFile.other>StrolchModel.xml</dataStoreFile.other>
 			</Properties>
 		</Component>
 		<Component>

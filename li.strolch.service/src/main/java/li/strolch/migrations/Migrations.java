@@ -2,6 +2,7 @@ package li.strolch.migrations;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
@@ -25,14 +26,15 @@ public class Migrations {
 	private Map<String, Version> currentVersions;
 	private boolean verbose;
 
-	private SortedSet<DataMigration> dataMigrations;
-	private SortedSet<CodeMigration> codeMigrations;
+	private Map<String, SortedSet<DataMigration>> dataMigrations;
+	private Map<String, SortedSet<CodeMigration>> codeMigrations;
 
 	private MapOfLists<String, Version> migrationsRan;
 
-	public Migrations(ComponentContainer container, Map<String, Version> currentVersions) {
+	public Migrations(ComponentContainer container, Map<String, Version> currentVersions, boolean verbose) {
 		this.container = container;
 		this.currentVersions = currentVersions;
+		this.verbose = verbose;
 	}
 
 	public void setVerbose(boolean verbose) {
@@ -75,15 +77,17 @@ public class Migrations {
 			CodeMigration currentCodeMigration = new CodeMigration(realm, nextPossibleVersion, null);
 			DataMigration currentDataMigration = new DataMigration(realm, nextPossibleVersion, null);
 
-			if (!this.codeMigrations.isEmpty()) {
-				for (CodeMigration migration : this.codeMigrations.tailSet(currentCodeMigration)) {
+			SortedSet<CodeMigration> codeMigrations = this.codeMigrations.get(realm);
+			if (codeMigrations != null && !codeMigrations.isEmpty()) {
+				for (CodeMigration migration : codeMigrations.tailSet(currentCodeMigration)) {
 					migration.migrate(container, certificate);
 					migrationsRan.addElement(realm, migration.getVersion());
 				}
 			}
 
-			if (!this.dataMigrations.isEmpty()) {
-				for (DataMigration migration : this.dataMigrations.tailSet(currentDataMigration)) {
+			SortedSet<DataMigration> dataMigrations = this.dataMigrations.get(realm);
+			if (dataMigrations != null && !dataMigrations.isEmpty()) {
+				for (DataMigration migration : dataMigrations.tailSet(currentDataMigration)) {
 					migration.migrate(container, certificate);
 					migrationsRan.addElement(realm, migration.getVersion());
 				}
@@ -100,12 +104,14 @@ public class Migrations {
 	}
 
 	private static void logDetectedMigrations(Map<String, Version> currentVersions,
-			SortedSet<DataMigration> dataMigrations, SortedSet<CodeMigration> codeMigrations) {
+			Map<String, SortedSet<DataMigration>> allDataMigrations,
+			Map<String, SortedSet<CodeMigration>> allCodeMigrations) {
 		for (Entry<String, Version> entry : currentVersions.entrySet()) {
 			String realm = entry.getKey();
 			Version currentVersion = entry.getValue();
 
-			if (codeMigrations.isEmpty()) {
+			SortedSet<CodeMigration> codeMigrations = allCodeMigrations.get(realm);
+			if (codeMigrations == null || codeMigrations.isEmpty()) {
 				logger.info("[" + realm + "] Found no code migrations.");
 			} else {
 				logger.info("[" + realm + "] Found " + codeMigrations.size() + " code migrations");
@@ -117,7 +123,8 @@ public class Migrations {
 				}
 			}
 
-			if (dataMigrations.isEmpty()) {
+			SortedSet<DataMigration> dataMigrations = allDataMigrations.get(realm);
+			if (dataMigrations == null || dataMigrations.isEmpty()) {
 				logger.info("[" + realm + "] Found no data migrations.");
 			} else {
 				logger.info("[" + realm + "] Found " + dataMigrations.size() + " data migrations");
@@ -131,68 +138,68 @@ public class Migrations {
 		}
 	}
 
-	private static SortedSet<DataMigration> loadDataMigrations(Map<String, Version> currentVersions, File migrationsPath) {
+	private static Map<String, SortedSet<DataMigration>> loadDataMigrations(Map<String, Version> currentVersions,
+			File migrationsPath) {
 
-		SortedSet<DataMigration> dataMigrations = new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
+		Map<String, SortedSet<DataMigration>> migrationsByRealm = new HashMap<>();
 
 		File dataDir = new File(migrationsPath, "data");
 		if (dataDir.exists()) {
 			DBC.PRE.assertTrue("migrations/data must be a directory!", dataDir.isDirectory());
 
-			File[] realmMigrations = dataDir.listFiles();
+			// only list directories where name is a realmName
+			File[] realmMigrations = dataDir
+					.listFiles((FileFilter) path -> currentVersions.containsKey(path.getName()));
+
 			for (File realmMigration : realmMigrations) {
-
-				DBC.PRE.assertTrue("found non directory in migrations path: " + realmMigration.getAbsolutePath(),
-						realmMigration.isDirectory());
 				String realm = realmMigration.getName();
-				if (!currentVersions.containsKey(realm)) {
-					logger.warn("Found non realm migration directory: " + realmMigration.getAbsolutePath());
-					continue;
-				}
 
-				File[] migrations = realmMigration.listFiles((FileFilter) pathname -> pathname.getName().endsWith(
+				SortedSet<DataMigration> migrations = new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(
+						o2.getVersion()));
+				migrationsByRealm.put(realm, migrations);
+
+				File[] migrationFiles = realmMigration.listFiles((FileFilter) pathname -> pathname.getName().endsWith(
 						".xml"));
-				for (File file : migrations) {
+				for (File file : migrationFiles) {
 					String name = file.getName();
 					Version version = Version.valueOf(name.substring(0, name.length() - 4));
-					dataMigrations.add(new DataMigration(realm, version, file));
+					migrations.add(new DataMigration(realm, version, file));
 				}
 			}
 		}
 
-		return dataMigrations;
+		return migrationsByRealm;
 	}
 
-	private static SortedSet<CodeMigration> loadCodeMigrations(Map<String, Version> currentVersions, File migrationsPath) {
+	private static Map<String, SortedSet<CodeMigration>> loadCodeMigrations(Map<String, Version> currentVersions,
+			File migrationsPath) {
 
-		SortedSet<CodeMigration> codeMigrations = new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
+		Map<String, SortedSet<CodeMigration>> migrationsByRealm = new HashMap<>(); //new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
 
 		File codeDir = new File(migrationsPath, "code");
 		if (codeDir.exists()) {
 			DBC.PRE.assertTrue("migrations/code must be a directory!", codeDir.isDirectory());
 
-			File[] realmMigrations = codeDir.listFiles();
+			File[] realmMigrations = codeDir
+					.listFiles((FileFilter) path -> currentVersions.containsKey(path.getName()));
 			for (File realmMigration : realmMigrations) {
-
-				DBC.PRE.assertTrue("found non directory in migrations path: " + realmMigration.getAbsolutePath(),
-						realmMigration.isDirectory());
 				String realm = realmMigration.getName();
-				if (!currentVersions.containsKey(realm)) {
-					logger.warn("Found non realm migration directory: " + realmMigration.getAbsolutePath());
-					continue;
-				}
 
-				File[] migrations = realmMigration.listFiles((FileFilter) pathname -> pathname.getName().endsWith(
+				SortedSet<CodeMigration> migrations = new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(
+						o2.getVersion()));
+				migrationsByRealm.put(realm, migrations);
+
+				File[] migrationFiles = realmMigration.listFiles((FileFilter) pathname -> pathname.getName().endsWith(
 						".xml"));
-				for (File file : migrations) {
+				for (File file : migrationFiles) {
 					String name = file.getName();
 					Version version = Version.valueOf(name.substring(0, name.length() - 4));
-					codeMigrations.add(new CodeMigration(realm, version, file));
+					migrations.add(new CodeMigration(realm, version, file));
 				}
 			}
 		}
 
-		return codeMigrations;
+		return migrationsByRealm;
 	}
 
 	public MapOfLists<String, Version> getMigrationsToRun() {
@@ -205,15 +212,22 @@ public class Migrations {
 			CodeMigration currentCodeMigration = new CodeMigration(realm, nextPossibleVersion, null);
 			DataMigration currentDataMigration = new DataMigration(realm, nextPossibleVersion, null);
 
-			SortedSet<CodeMigration> codeMigrations = this.codeMigrations.tailSet(currentCodeMigration);
-			for (CodeMigration codeMigration : codeMigrations) {
-				if (!migrationsToRun.containsElement(realm, codeMigration.getVersion()))
-					migrationsToRun.addElement(realm, codeMigration.getVersion());
+			SortedSet<CodeMigration> allCodeMigrations = this.codeMigrations.get(realm);
+			if (allCodeMigrations != null) {
+				SortedSet<CodeMigration> codeMigrations = allCodeMigrations.tailSet(currentCodeMigration);
+				for (CodeMigration codeMigration : codeMigrations) {
+					if (!migrationsToRun.containsElement(realm, codeMigration.getVersion()))
+						migrationsToRun.addElement(realm, codeMigration.getVersion());
+				}
 			}
-			SortedSet<DataMigration> dataMigrations = this.dataMigrations.tailSet(currentDataMigration);
-			for (DataMigration dataMigration : dataMigrations) {
-				if (!migrationsToRun.containsElement(realm, dataMigration.getVersion()))
-					migrationsToRun.addElement(realm, dataMigration.getVersion());
+
+			SortedSet<DataMigration> allDataMigrations = this.dataMigrations.get(realm);
+			if (allDataMigrations != null) {
+				SortedSet<DataMigration> dataMigrations = allDataMigrations.tailSet(currentDataMigration);
+				for (DataMigration dataMigration : dataMigrations) {
+					if (!migrationsToRun.containsElement(realm, dataMigration.getVersion()))
+						migrationsToRun.addElement(realm, dataMigration.getVersion());
+				}
 			}
 		}
 
