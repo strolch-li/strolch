@@ -53,6 +53,10 @@ public class VersionTest {
 		assertTrue(Version.valueOf("7.5.6-1").compareTo(Version.valueOf("7.6.1")) < 0);
 		assertTrue(Version.valueOf("7.5.6-alpha").compareTo(Version.valueOf("7.6.1-beta")) < 0);
 		assertTrue(Version.valueOf("7.7.0-0").compareTo(Version.valueOf("7.6.99-9")) > 0);
+		assertTrue(Version.valueOf("0.0.1.a").compareTo(Version.valueOf("0.0.1.b")) < 0);
+		assertTrue(Version.valueOf("0.0.1.b").compareTo(Version.valueOf("0.0.1.a")) > 0);
+		assertTrue(Version.valueOf("0.0.1.a").compareTo(Version.valueOf("0.0.1.c")) < 0);
+		assertTrue(Version.valueOf("0.0.1.a").compareTo(Version.valueOf("0.0.1.aa")) < 0);
 	}
 
 	@Test
