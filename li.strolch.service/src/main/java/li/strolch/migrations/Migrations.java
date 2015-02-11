@@ -97,7 +97,8 @@ public class Migrations {
 		}
 
 		if (migrationsRan.isEmpty()) {
-			logger.info("There were no migrations required!");
+			if (this.verbose)
+				logger.info("There were no migrations required!");
 		} else {
 			logger.info("Migrated " + migrationsRan.size() + " realms!");
 		}
@@ -144,7 +145,8 @@ public class Migrations {
 		}
 
 		if (migrationsRan.isEmpty()) {
-			logger.info("There were no migrations required!");
+			if (this.verbose)
+				logger.info("There were no migrations required!");
 		} else {
 			logger.info("Migrated " + migrationsRan.size() + " realms!");
 		}

@@ -92,6 +92,10 @@ public class MigrationsHandler extends StrolchComponent {
 		migrations.runCodeMigrations(cert, codeMigrationsByRealm);
 	}
 
+	public boolean isVerbose() {
+		return this.verbose;
+	}
+
 	@Override
 	public void initialize(ComponentConfiguration configuration) {
 
@@ -163,7 +167,8 @@ public class MigrationsHandler extends StrolchComponent {
 		public void run() {
 
 			if (!MigrationsHandler.this.migrationsPath.isDirectory()) {
-				logger.info("There are no migrations required at the moment!");
+				if (verbose)
+					logger.info("There are no migrations required at the moment!");
 				return;
 			}
 
@@ -179,7 +184,8 @@ public class MigrationsHandler extends StrolchComponent {
 			MigrationsHandler.this.migrations = migrations;
 
 			if (migrations.getMigrationsToRun().isEmpty()) {
-				logger.info("There are no migrations required at the moment!");
+				if (verbose)
+					logger.info("There are no migrations required at the moment!");
 			} else {
 				RunMigrationsAction runMigrationsAction = new RunMigrationsAction(MigrationsHandler.this.migrations);
 				privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, runMigrationsAction);
