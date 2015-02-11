@@ -48,6 +48,10 @@ public abstract class Migration {
 		return dataFile;
 	}
 
+	protected StrolchTransaction openTx(ComponentContainer container, Certificate cert) {
+		return container.getRealm(getRealm()).openTx(cert, getClass());
+	}
+
 	protected Command buildMigrationVersionChangeCommand(ComponentContainer container, StrolchTransaction tx) {
 
 		Resource migrationsRes = tx.getResourceBy(MIGRATIONS_TYPE, MIGRATIONS_ID);

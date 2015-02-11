@@ -3,6 +3,7 @@ package li.strolch.migrations;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
@@ -100,6 +101,45 @@ public class Migrations {
 			logger.info("Migrated " + migrationsRan.size() + " realms!");
 		}
 
+		this.migrationsRan = migrationsRan;
+	}
+
+	/**
+	 * @param cert
+	 * @param codeMigrationsByRealm
+	 */
+	public void runCodeMigrations(Certificate cert, MapOfLists<String, CodeMigration> codeMigrationsByRealm) {
+
+		MapOfLists<String, Version> migrationsRan = new MapOfLists<>();
+
+		for (String realm : codeMigrationsByRealm.keySet()) {
+			Version currentVersion = this.currentVersions.get(realm);
+
+			List<CodeMigration> listOfMigrations = codeMigrationsByRealm.getList(realm);
+			SortedSet<CodeMigration> migrations = new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
+			migrations.addAll(listOfMigrations);
+
+			Version nextVersion = currentVersion.add(0, 0, 1);
+			CodeMigration nextMigration = new CodeMigration(realm, nextVersion);
+
+			SortedSet<CodeMigration> migrationsToRun = migrations.tailSet(nextMigration);
+			for (CodeMigration migration : migrationsToRun) {
+				DBC.INTERIM.assertEquals("Realms do not match!", realm, migration.getRealm());
+				Version migrateVersion = migration.getVersion();
+				boolean isLaterMigration = migrateVersion.compareTo(currentVersion) > 0;
+				DBC.INTERIM.assertTrue("Current version " + currentVersion + " is not before next " + migrateVersion,
+						isLaterMigration);
+
+				migration.migrate(this.container, cert);
+				migrationsRan.addElement(realm, migration.getVersion());
+			}
+		}
+
+		if (migrationsRan.isEmpty()) {
+			logger.info("There were no migrations required!");
+		} else {
+			logger.info("Migrated " + migrationsRan.size() + " realms!");
+		}
 		this.migrationsRan = migrationsRan;
 	}
 

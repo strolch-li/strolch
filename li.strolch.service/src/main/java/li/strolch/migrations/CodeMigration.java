@@ -12,8 +12,12 @@ public class CodeMigration extends Migration {
 		super(realm, version, dataFile);
 	}
 
+	public CodeMigration(String realm, Version version) {
+		super(realm, version, null);
+	}
+
 	@Override
 	public void migrate(ComponentContainer container, Certificate certificate) {
-		logger.info("[" + this.realm + "] Running migration " + this.version);
+		logger.info("[" + this.realm + "] Running no-op migration " + this.version);
 	}
 }

@@ -8,8 +8,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.command.AddOrderCommand;
+import li.strolch.command.RemoveOrderCommand;
+import li.strolch.model.ModelGenerator;
+import li.strolch.model.Order;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
 import org.junit.AfterClass;
@@ -49,21 +54,122 @@ public class MigrationsTest {
 	@Test
 	public void shouldRunMigrations() {
 
-		PrivilegeHandler privilegeHandler = runtimeMock.getPrivilegeHandler();
-		Certificate cert = privilegeHandler.authenticate("test", "test".getBytes());
-
 		MigrationsHandler migrationsHandler = runtimeMock.getContainer().getComponent(MigrationsHandler.class);
-		Map<String, Version> currentVersions = migrationsHandler.getCurrentVersions(cert);
-		assertEquals("1.1.1", currentVersions.get(StrolchConstants.DEFAULT_REALM).toString());
+		Map<String, Version> currentVersions = migrationsHandler.getCurrentVersions(certificate);
+		String defRealm = StrolchConstants.DEFAULT_REALM;
+		assertEquals("1.1.1", currentVersions.get(defRealm).toString());
 		assertEquals("0.0.0", currentVersions.get("other").toString());
 
 		MapOfLists<String, Version> lastMigrations = migrationsHandler.getLastMigrations();
 		List<Version> expectedMigrations = Arrays.asList(Version.valueOf("0.1.0"), Version.valueOf("0.1.1"),
 				Version.valueOf("0.5.2"), Version.valueOf("1.0.0"), Version.valueOf("1.0.5"), Version.valueOf("1.1.1"));
-		assertEquals(expectedMigrations, lastMigrations.getList(StrolchConstants.DEFAULT_REALM));
+		assertEquals(expectedMigrations, lastMigrations.getList(defRealm));
 		assertEquals(null, lastMigrations.getList("other"));
 
-		MapOfLists<String, Version> migrationsToRun = migrationsHandler.queryMigrationsToRun(cert);
+		MapOfLists<String, Version> migrationsToRun = migrationsHandler.queryMigrationsToRun(certificate);
 		assertTrue("Expected to have all migrations run", migrationsToRun.isEmpty());
+
+		// assert new current version
+		currentVersions = migrationsHandler.getCurrentVersions(certificate);
+		assertEquals("1.1.1", currentVersions.get(defRealm).toString());
+		assertEquals("0.0.0", currentVersions.get("other").toString());
+
+		MapOfLists<String, CodeMigration> codeMigrationsByRealm = new MapOfLists<>();
+		// add migrations in wrong sequence - should be fixed by migration handler
+		codeMigrationsByRealm.addElement(defRealm, new MyMigration2(defRealm));
+		codeMigrationsByRealm.addElement(defRealm, new MyMigration1(defRealm));
+		codeMigrationsByRealm.addElement(defRealm, new MyMigration0(defRealm));
+		migrationsHandler.runCodeMigrations(certificate, codeMigrationsByRealm);
+
+		lastMigrations = migrationsHandler.getLastMigrations();
+		assertEquals(1, lastMigrations.keySet().size());
+		assertEquals(Arrays.asList(Version.valueOf("1.2.0"), Version.valueOf("1.3.0")),
+				lastMigrations.getList(defRealm));
+
+		// assert new current version
+		currentVersions = migrationsHandler.getCurrentVersions(certificate);
+		assertEquals("1.3.0", currentVersions.get(defRealm).toString());
+		assertEquals("0.0.0", currentVersions.get("other").toString());
+	}
+
+	private static class MyMigration0 extends CodeMigration {
+
+		private static final Version version = Version.valueOf("1.0.0");
+
+		public MyMigration0(String realm) {
+			super(realm, version);
+		}
+
+		@Override
+		public void migrate(ComponentContainer container, Certificate cert) {
+			logger.info("[" + this.realm + "] Running migration " + this.getVersion());
+
+			try (StrolchTransaction tx = openTx(container, cert)) {
+
+				Order fooOrder = ModelGenerator.createOrder("foo", "Foo", "Foo");
+
+				AddOrderCommand addOrderCommand = new AddOrderCommand(container, tx);
+				addOrderCommand.setOrder(fooOrder);
+				tx.addCommand(addOrderCommand);
+
+				tx.addCommand(buildMigrationVersionChangeCommand(container, tx));
+
+				tx.commitOnClose();
+			}
+		}
+	}
+
+	private static class MyMigration1 extends CodeMigration {
+
+		private static final Version version = Version.valueOf("1.2.0");
+
+		public MyMigration1(String realm) {
+			super(realm, version);
+		}
+
+		@Override
+		public void migrate(ComponentContainer container, Certificate cert) {
+			logger.info("[" + this.realm + "] Running migration " + this.getVersion());
+
+			try (StrolchTransaction tx = openTx(container, cert)) {
+
+				Order fooOrder = ModelGenerator.createOrder("foo", "Foo", "Foo");
+
+				AddOrderCommand addOrderCommand = new AddOrderCommand(container, tx);
+				addOrderCommand.setOrder(fooOrder);
+				tx.addCommand(addOrderCommand);
+
+				tx.addCommand(buildMigrationVersionChangeCommand(container, tx));
+
+				tx.commitOnClose();
+			}
+		}
+	}
+
+	private static class MyMigration2 extends CodeMigration {
+
+		private static final Version version = Version.valueOf("1.3.0");
+
+		public MyMigration2(String realm) {
+			super(realm, version);
+		}
+
+		@Override
+		public void migrate(ComponentContainer container, Certificate cert) {
+			logger.info("[" + this.realm + "] Running migration " + this.getVersion());
+
+			try (StrolchTransaction tx = openTx(container, cert)) {
+
+				Order fooOrder = tx.getOrderBy("Foo", "foo");
+
+				RemoveOrderCommand removeOrderCommand = new RemoveOrderCommand(container, tx);
+				removeOrderCommand.setOrder(fooOrder);
+				tx.addCommand(removeOrderCommand);
+
+				tx.addCommand(buildMigrationVersionChangeCommand(container, tx));
+
+				tx.commitOnClose();
+			}
+		}
 	}
 }

@@ -22,7 +22,7 @@ public class DataMigration extends Migration {
 	public void migrate(ComponentContainer container, Certificate certificate) {
 
 		XmlImportModelCommand command;
-		try (StrolchTransaction tx = container.getRealm(getRealm()).openTx(certificate, DataMigration.class)) {
+		try (StrolchTransaction tx = openTx(container, certificate)) {
 
 			command = new XmlImportModelCommand(container, tx);
 			command.setModelFile(getDataFile());

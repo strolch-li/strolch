@@ -46,7 +46,6 @@ public class MigrationsHandler extends StrolchComponent {
 	private boolean verbose;
 
 	private Migrations migrations;
-	private MapOfLists<String, Version> lastMigrations;
 	private File migrationsPath;
 
 	private Timer migrationTimer;
@@ -58,9 +57,9 @@ public class MigrationsHandler extends StrolchComponent {
 	}
 
 	public MapOfLists<String, Version> getLastMigrations() {
-		if (this.lastMigrations == null)
+		if (this.migrations == null)
 			return new MapOfLists<>();
-		return this.lastMigrations;
+		return this.migrations.getMigrationsRan();
 	}
 
 	public Map<String, Version> getCurrentVersions(Certificate cert) {
@@ -70,9 +69,8 @@ public class MigrationsHandler extends StrolchComponent {
 	}
 
 	public MapOfLists<String, Version> queryMigrationsToRun(Certificate cert) {
-		if (!this.migrationsPath.isDirectory()) {
+		if (!this.migrationsPath.isDirectory())
 			return new MapOfLists<>();
-		}
 
 		Map<String, Version> currentVersions = getCurrentVersions(cert);
 		Migrations migrations = new Migrations(getContainer(), currentVersions, this.verbose);
@@ -85,7 +83,13 @@ public class MigrationsHandler extends StrolchComponent {
 	public void runMigrations(Certificate cert) {
 		queryMigrationsToRun(cert);
 		this.migrations.runMigrations(cert);
-		this.lastMigrations = this.migrations.getMigrationsRan();
+	}
+
+	public void runCodeMigrations(Certificate cert, MapOfLists<String, CodeMigration> codeMigrationsByRealm) {
+		Map<String, Version> currentVersions = getCurrentVersions(cert);
+		Migrations migrations = new Migrations(getContainer(), currentVersions, this.verbose);
+		this.migrations = migrations;
+		migrations.runCodeMigrations(cert, codeMigrationsByRealm);
 	}
 
 	@Override
@@ -130,7 +134,6 @@ public class MigrationsHandler extends StrolchComponent {
 			RunMigrationsAction action = new RunMigrationsAction(this.migrations);
 
 			privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, action);
-			this.lastMigrations = this.migrations.getMigrationsRan();
 		}
 
 		super.start();
@@ -180,7 +183,6 @@ public class MigrationsHandler extends StrolchComponent {
 			} else {
 				RunMigrationsAction runMigrationsAction = new RunMigrationsAction(MigrationsHandler.this.migrations);
 				privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, runMigrationsAction);
-				MigrationsHandler.this.lastMigrations = MigrationsHandler.this.migrations.getMigrationsRan();
 			}
 		}
 	}
