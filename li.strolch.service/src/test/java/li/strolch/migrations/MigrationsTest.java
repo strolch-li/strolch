@@ -83,12 +83,12 @@ public class MigrationsTest {
 
 		lastMigrations = migrationsHandler.getLastMigrations();
 		assertEquals(1, lastMigrations.keySet().size());
-		assertEquals(Arrays.asList(Version.valueOf("1.2.0"), Version.valueOf("1.3.0")),
+		assertEquals(Arrays.asList(Version.valueOf("1.2.0"), Version.valueOf("1.2.0.a")),
 				lastMigrations.getList(defRealm));
 
 		// assert new current version
 		currentVersions = migrationsHandler.getCurrentVersions(certificate);
-		assertEquals("1.3.0", currentVersions.get(defRealm).toString());
+		assertEquals("1.2.0.a", currentVersions.get(defRealm).toString());
 		assertEquals("0.0.0", currentVersions.get("other").toString());
 	}
 
@@ -148,7 +148,7 @@ public class MigrationsTest {
 
 	private static class MyMigration2 extends CodeMigration {
 
-		private static final Version version = Version.valueOf("1.3.0");
+		private static final Version version = Version.valueOf("1.2.0.a");
 
 		public MyMigration2(String realm) {
 			super(realm, version);
