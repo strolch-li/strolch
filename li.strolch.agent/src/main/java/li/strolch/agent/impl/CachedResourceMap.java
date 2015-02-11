@@ -27,9 +27,12 @@ public class CachedResourceMap extends CachedElementMap<Resource> implements Res
 
 	@Override
 	protected void assertIsRefParam(Parameter<?> refP) {
-		if (!refP.getInterpretation().equals(INTERPRETATION_RESOURCE_REF)) {
-			String msg = MessageFormat.format("{0} is not an Resource reference as its interpretation is not {1}", //$NON-NLS-1$
-					refP.getLocator(), INTERPRETATION_RESOURCE_REF);
+
+		String interpretation = refP.getInterpretation();
+		if (!interpretation.equals(INTERPRETATION_RESOURCE_REF)) {
+			String msg = MessageFormat.format(
+					"{0} is not an Resource reference as its interpretation is not {1} it is {2}", //$NON-NLS-1$
+					refP.getLocator(), INTERPRETATION_RESOURCE_REF, interpretation);
 			throw new StrolchException(msg);
 		}
 

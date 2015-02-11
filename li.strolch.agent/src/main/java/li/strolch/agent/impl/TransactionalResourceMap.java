@@ -20,9 +20,11 @@ public class TransactionalResourceMap extends TransactionalElementMap<Resource> 
 	@Override
 	protected void assertIsRefParam(Parameter<?> refP) {
 
-		if (!refP.getInterpretation().equals(INTERPRETATION_RESOURCE_REF)) {
-			String msg = "{0} is not an Resource reference as its interpretation is not {1}"; //$NON-NLS-1$
-			throw new StrolchException(MessageFormat.format(msg, refP.getLocator(), INTERPRETATION_RESOURCE_REF));
+		String interpretation = refP.getInterpretation();
+		if (!interpretation.equals(INTERPRETATION_RESOURCE_REF)) {
+			String msg = "{0} is not an Resource reference as its interpretation is not {1} it is {2}"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, refP.getLocator(), INTERPRETATION_RESOURCE_REF,
+					interpretation));
 		}
 
 		if (refP.getUom().equals(UOM_NONE)) {

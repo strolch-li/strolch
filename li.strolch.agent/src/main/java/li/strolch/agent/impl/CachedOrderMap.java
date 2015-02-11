@@ -28,9 +28,11 @@ public class CachedOrderMap extends CachedElementMap<Order> implements OrderMap 
 	@Override
 	protected void assertIsRefParam(Parameter<?> refP) {
 
-		if (!refP.getInterpretation().equals(INTERPRETATION_ORDER_REF)) {
-			String msg = "{0} is not an Order reference as its interpretation is not {1}"; //$NON-NLS-1$
-			throw new StrolchException(MessageFormat.format(msg, refP.getLocator(), INTERPRETATION_ORDER_REF));
+		String interpretation = refP.getInterpretation();
+		if (!interpretation.equals(INTERPRETATION_ORDER_REF)) {
+			String msg = "{0} is not an Order reference as its interpretation is not {1} it is {2}"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, refP.getLocator(), INTERPRETATION_ORDER_REF,
+					interpretation));
 		}
 
 		if (refP.getUom().equals(UOM_NONE)) {
