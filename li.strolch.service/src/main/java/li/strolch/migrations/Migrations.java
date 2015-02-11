@@ -2,6 +2,7 @@ package li.strolch.migrations;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,6 +114,11 @@ public class Migrations {
 		MapOfLists<String, Version> migrationsRan = new MapOfLists<>();
 
 		for (String realm : codeMigrationsByRealm.keySet()) {
+
+			// ignore if no such realm
+			if (!this.currentVersions.containsKey(realm))
+				continue;
+
 			Version currentVersion = this.currentVersions.get(realm);
 
 			List<CodeMigration> listOfMigrations = codeMigrationsByRealm.getList(realm);
@@ -130,6 +136,8 @@ public class Migrations {
 				DBC.INTERIM.assertTrue("Current version " + currentVersion + " is not before next " + migrateVersion,
 						isLaterMigration);
 
+				String msg = "[{0}] Running code migration {1} {2}";
+				logger.info(MessageFormat.format(msg, realm, migrateVersion, migration.getClass().getName()));
 				migration.migrate(this.container, cert);
 				migrationsRan.addElement(realm, migration.getVersion());
 			}
