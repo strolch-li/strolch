@@ -213,7 +213,9 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 				this.connection.notifyStateChange(ConnectionState.DISCONNECTED, null);
 			} catch (Exception e) {
 				String msg = "Error while connecting to {0}:{1}: {2}"; //$NON-NLS-1$
-				logger.error(MessageFormat.format(msg, this.remoteInputAddressS, Integer.toString(this.remoteInputPort)), e.getMessage());
+				logger.error(
+						MessageFormat.format(msg, this.remoteInputAddressS, Integer.toString(this.remoteInputPort)),
+						e.getMessage());
 				this.connection.notifyStateChange(ConnectionState.BROKEN, e.getLocalizedMessage());
 			}
 		}
@@ -521,12 +523,13 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 					logger.warn("Socket has been closed!"); //$NON-NLS-1$
 					message.setState(State.FATAL, "Socket has been closed!"); //$NON-NLS-1$
 				} else {
+					closeConnection();
 					logger.error(e.getMessage(), e);
 					message.setState(State.FATAL, e.getLocalizedMessage());
 					this.connection.notifyStateChange(ConnectionState.BROKEN, e.getLocalizedMessage());
 				}
 			} finally {
-				if (this.closeAfterSend) {
+				if (this.closeAfterSend && !this.closed) {
 					closeConnection();
 				}
 			}
