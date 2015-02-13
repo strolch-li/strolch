@@ -269,6 +269,21 @@ public interface StrolchTransaction extends AutoCloseable {
 	public boolean isSuppressAudits();
 
 	/**
+	 * If the given argument is true, then logging of a {@link TransactionCloseStrategy#DO_NOTHING} will be suppressed
+	 * 
+	 * @param SuppressDoNothingLogging
+	 *            true to suppress logging of a {@link TransactionCloseStrategy#DO_NOTHING}, false to enable logging
+	 */
+	void setSuppressDoNothingLogging(boolean suppressDoNothingLogging);
+
+	/**
+	 * Returns true if logging of a {@link TransactionCloseStrategy#DO_NOTHING} should be suppressed
+	 * 
+	 * @return true if logging of a {@link TransactionCloseStrategy#DO_NOTHING} should be suppressed
+	 */
+	boolean isSuppressDoNothingLogging();
+
+	/**
 	 * Locks the given element and registers it on the transaction so the lock is released when the transaction is
 	 * closed
 	 * 

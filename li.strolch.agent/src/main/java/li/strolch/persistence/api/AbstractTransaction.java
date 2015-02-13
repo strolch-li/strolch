@@ -86,6 +86,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private TransactionCloseStrategy closeStrategy;
 	private boolean suppressUpdates;
 	private boolean suppressAudits;
+	private boolean suppressDoNothingLogging;
 	private TransactionResult txResult;
 
 	private List<Command> commands;
@@ -204,6 +205,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public boolean isSuppressAudits() {
 		return this.suppressAudits;
+	}
+
+	@Override
+	public boolean isSuppressDoNothingLogging() {
+		return suppressDoNothingLogging;
+	}
+
+	@Override
+	public void setSuppressDoNothingLogging(boolean quietDoNothing) {
+		this.suppressDoNothingLogging = quietDoNothing;
 	}
 
 	@Override
@@ -588,6 +599,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	protected abstract void commit() throws Exception;
 
 	private void handleDoNothing(long start, long auditTrailDuration) {
+
+		if (this.suppressDoNothingLogging)
+			return;
 
 		long end = System.nanoTime();
 		long txDuration = end - this.txResult.getStartNanos();
