@@ -17,10 +17,16 @@ package ch.eitchnet.communication.tcpip;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.Socket;
 
 import ch.eitchnet.communication.IoMessage;
 import ch.eitchnet.communication.IoMessageVisitor;
 
+/**
+ * This {@link IoMessageVisitor} implements and endpoint connecting to a {@link Socket}.
+ * 
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
 public abstract class SocketMessageVisitor extends IoMessageVisitor {
 
 	protected final String connectionId;
@@ -33,8 +39,24 @@ public abstract class SocketMessageVisitor extends IoMessageVisitor {
 		return this.connectionId;
 	}
 
+	/**
+	 * This method is called when a message is read from the underlying {@link Socket}
+	 * 
+	 * @param inputStream
+	 * @param outputStream
+	 * @return
+	 * @throws Exception
+	 */
 	public abstract IoMessage visit(DataInputStream inputStream, DataOutputStream outputStream) throws Exception;
 
+	/**
+	 * This method is called when a message is to be sent to the underlying connected endpoint
+	 * 
+	 * @param inputStream
+	 * @param outputStream
+	 * @param message
+	 * @throws Exception
+	 */
 	public abstract void visit(DataInputStream inputStream, DataOutputStream outputStream, IoMessage message)
 			throws Exception;
 }

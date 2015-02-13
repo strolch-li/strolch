@@ -22,7 +22,7 @@ import ch.eitchnet.communication.console.ConsoleMessageVisitor;
 
 /**
  * <p>
- * Visitors to read and write {@link IoMessage} using different kind of endpoints. Different entpoints will require
+ * Visitors to read and write {@link IoMessage} using different kind of endpoints. Different endpoints will require
  * different ways of writing or reading message, thus this is not defined here. Known extensions are
  * {@link ConsoleMessageVisitor}, {@link StreamMessageVisitor}.
  * </p>
