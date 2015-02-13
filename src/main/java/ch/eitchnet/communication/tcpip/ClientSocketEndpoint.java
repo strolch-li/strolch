@@ -212,9 +212,8 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 				this.closed = true;
 				this.connection.notifyStateChange(ConnectionState.DISCONNECTED, null);
 			} catch (Exception e) {
-				String msg = "Error while connecting to {0}:{1}"; //$NON-NLS-1$
-				logger.error(MessageFormat.format(msg, this.remoteInputAddressS, Integer.toString(this.remoteInputPort)));
-				logger.error(e.getMessage(), e);
+				String msg = "Error while connecting to {0}:{1}: {2}"; //$NON-NLS-1$
+				logger.error(MessageFormat.format(msg, this.remoteInputAddressS, Integer.toString(this.remoteInputPort)), e.getMessage());
 				this.connection.notifyStateChange(ConnectionState.BROKEN, e.getLocalizedMessage());
 			}
 		}
