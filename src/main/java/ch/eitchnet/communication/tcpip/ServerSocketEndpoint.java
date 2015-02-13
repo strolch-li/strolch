@@ -230,9 +230,8 @@ public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 					logger.warn("Socket closed!"); //$NON-NLS-1$
 					this.connection.notifyStateChange(ConnectionState.DISCONNECTED, null);
 				} else {
-					String msg = "Error while opening socket for inbound connection {0}"; //$NON-NLS-1$
-					logger.error(MessageFormat.format(msg, this.connection.getId()));
-					logger.error(e.getMessage(), e);
+					String msg = "Error while opening socket for inbound connection {0}: {1}"; //$NON-NLS-1$
+					logger.error(MessageFormat.format(msg, this.connection.getId()), e.getMessage());
 					this.connected = false;
 					this.connection.notifyStateChange(ConnectionState.BROKEN, e.getLocalizedMessage());
 				}
