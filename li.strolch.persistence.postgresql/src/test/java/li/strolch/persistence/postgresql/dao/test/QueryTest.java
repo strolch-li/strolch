@@ -127,7 +127,7 @@ public class QueryTest {
 			resourceMap.add(tx, ModelGenerator.createResource("@4", "Resource 4", "MyType2"));
 			resourceMap.add(tx, ModelGenerator.createResource("@5", "Resource 5", "MyType2"));
 			resourceMap.add(tx, ModelGenerator.createResource("@6", "Resource 6", "MyType2"));
-			
+
 			tx.commitOnClose();
 		}
 	}
@@ -235,28 +235,7 @@ public class QueryTest {
 				new NameSelection("order 1", StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performOrderQuery(query, Arrays.asList("@1", "@2"));
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	@Test
 	public void shouldQueryOrderByBooleParam() throws SQLException {
 		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
@@ -356,35 +335,6 @@ public class QueryTest {
 		query.and().with(new NullParameterBagSelection("@bag01"));
 		performOrderQuery(query, Arrays.<String> asList());
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 	@Test
 	public void shouldQueryResource1() throws SQLException {
@@ -460,6 +410,16 @@ public class QueryTest {
 		query.and().with(
 				ParameterSelection.stringSelection("@bag01", "@param5", "olch",
 						StringMatchMode.CONTAINS_CASE_INSENSITIVE));
+		performResourceQuery(query, expected);
+
+		query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		query.and().with(
+				ParameterSelection.stringSelection("@bag01", "@param5", "olch",
+						StringMatchMode.CONTAINS_CASE_INSENSITIVE),
+				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
+						StringMatchMode.CONTAINS_CASE_INSENSITIVE),
+				ParameterSelection.stringSelection("@bag01", "@param5", "Strolch",
+						StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performResourceQuery(query, expected);
 	}
 
