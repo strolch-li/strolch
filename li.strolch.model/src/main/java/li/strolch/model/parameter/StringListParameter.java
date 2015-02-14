@@ -127,6 +127,11 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
+	public boolean isValueEmpty() {
+		return this.value.isEmpty();
+	}
+
+	@Override
 	public String getType() {
 		return TYPE;
 	}
