@@ -22,8 +22,8 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public abstract class StrolchElementQuery<T extends QueryVisitor> implements StrolchQuery {
 
-	private Navigation navigation;
-	private Selection selection;
+	protected Navigation navigation;
+	protected Selection selection;
 
 	public StrolchElementQuery(Navigation navigation) {
 		this.navigation = navigation;
