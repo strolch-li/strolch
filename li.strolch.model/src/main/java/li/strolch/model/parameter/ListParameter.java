@@ -42,4 +42,9 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 * @return true if the value was removed, false if it did not exist
 	 */
 	public boolean removeValue(E value);
+
+	/**
+	 * Clears the list of values
+	 */
+	public void clearValue();
 }

@@ -122,6 +122,11 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
+	public void clearValue() {
+		this.value.clear();
+	}
+
+	@Override
 	public String getType() {
 		return TYPE;
 	}
