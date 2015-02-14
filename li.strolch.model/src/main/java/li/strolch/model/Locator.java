@@ -63,7 +63,7 @@ public class Locator {
 	 * @throws StrolchException
 	 *             if the path is invalid, meaning has less than two elements in it
 	 */
-	public Locator(List<String> pathElements) throws StrolchException {
+	private Locator(List<String> pathElements) throws StrolchException {
 		if (pathElements == null || pathElements.isEmpty()) {
 			throw new StrolchException("The path elements may not be null and must contain at least 1 item"); //$NON-NLS-1$
 		}
@@ -79,7 +79,7 @@ public class Locator {
 	 * @throws StrolchException
 	 *             if the path is invalid, meaning has less than two elements in it
 	 */
-	public Locator(String... path) throws StrolchException {
+	private Locator(String... path) throws StrolchException {
 		this.pathElements = Collections.unmodifiableList(Arrays.asList(path));
 	}
 
@@ -92,7 +92,7 @@ public class Locator {
 	 * @throws StrolchException
 	 *             if the path is invalid, meaning has less than two elements in it
 	 */
-	public Locator(String path) throws StrolchException {
+	private Locator(String path) throws StrolchException {
 		this.pathElements = Collections.unmodifiableList(parsePath(path));
 	}
 
