@@ -82,7 +82,7 @@ public abstract class AbstractToSaxWriterVisitor {
 			ITimeVariable<IValue<?>> timeEvolution = timedState.getTimeEvolution();
 			SortedSet<ITimeValue<IValue<?>>> values = timeEvolution.getValues();
 
-			writeStartStrolchElement(Tags.TIMED_STATE, !values.isEmpty(), timedState);
+			writeStartStrolchElement(Tags.TIMED_STATE, values.isEmpty(), timedState);
 
 			for (ITimeValue<IValue<?>> timeValue : values) {
 				this.writer.writeEmptyElement(Tags.VALUE);

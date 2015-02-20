@@ -18,10 +18,19 @@ package li.strolch.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
 import li.strolch.model.xml.OrderToSaxVisitor;
+import li.strolch.model.xml.OrderToSaxWriterVisitor;
 import li.strolch.model.xml.ResourceToSaxVisitor;
+import li.strolch.model.xml.ResourceToSaxWriterVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
 import li.strolch.model.xml.XmlModelSaxReader;
 
@@ -71,5 +80,31 @@ public class XmlToSaxTest extends ModelTest {
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(resource);
 		visitor.visit(parsedResource);
 		assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
+	}
+
+	@Test
+	public void shouldToSaxOrder() throws XMLStreamException {
+		Order order = ModelGenerator.createOrder("@1", "My Order 1", "MyOrder");
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		XMLStreamWriter writer = factory.createXMLStreamWriter(out, "UTF-8");
+		writer.writeStartDocument();
+		writer.writeStartElement(Tags.STROLCH_MODEL);
+		OrderToSaxWriterVisitor toSax = new OrderToSaxWriterVisitor(writer);
+		toSax.visit(order);
+		writer.writeEndDocument();
+	}
+
+	@Test
+	public void shouldToSaxResource() throws XMLStreamException {
+		Resource resource = ModelGenerator.createResource("@1", "My Resource 1", "MyResource");
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		XMLStreamWriter writer = factory.createXMLStreamWriter(out, "UTF-8");
+		writer.writeStartDocument();
+		writer.writeStartElement(Tags.STROLCH_MODEL);
+		ResourceToSaxWriterVisitor toSax = new ResourceToSaxWriterVisitor(writer);
+		toSax.visit(resource);
+		writer.writeEndDocument();
 	}
 }
