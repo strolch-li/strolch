@@ -19,7 +19,6 @@ import java.io.File;
 import java.text.MessageFormat;
 
 import li.strolch.command.XmlExportModelCommand;
-import li.strolch.exception.StrolchException;
 import li.strolch.model.ModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
@@ -43,14 +42,32 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 
 		DBC.PRE.assertNotEmpty("Modelfile must be set!", arg.modelFileName);
 
-		File dataPath = getRuntimeConfiguration().getDataPath();
-		File modelFile = new File(dataPath, arg.modelFileName);
-		if (modelFile.exists()) {
+		File modelFile;
 
+		File dataPath = getRuntimeConfiguration().getDataPath();
+		File modelFileName = new File(arg.modelFileName);
+		if (modelFileName.isAbsolute()) {
+			if (!arg.external)
+				return ServiceResult.error("Model file is absolute, yet service argument is not marked as external!");
+			modelFile = modelFileName;
+		} else {
+			if (arg.external)
+				return ServiceResult.error("Model file is not absolute, yet service argument is marked as externa!");
+
+			modelFile = new File(dataPath, arg.modelFileName);
+		}
+
+		if (modelFile.exists()) {
 			if (!arg.overwrite) {
-				String msg = "Model File already exists with name {0} in data path {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
-				throw new StrolchException(msg);
+				if (modelFileName.isAbsolute()) {
+					String msg = "Model File already exists at path {0}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, arg.modelFileName);
+					return ServiceResult.error(msg);
+				} else {
+					String msg = "Model File already exists with name {0} in data path {1}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
+					return ServiceResult.error(msg);
+				}
 			}
 		}
 
