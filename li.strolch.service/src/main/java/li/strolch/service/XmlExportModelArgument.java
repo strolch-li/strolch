@@ -40,7 +40,7 @@ public class XmlExportModelArgument extends ServiceArgument {
 		builder.append("external=");
 		builder.append(this.external);
 
-		builder.append("modelFileName=");
+		builder.append(", modelFileName=");
 		builder.append(this.modelFileName);
 
 		builder.append(", overwrite=");

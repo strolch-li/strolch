@@ -80,7 +80,7 @@ public abstract class PostgreSqlInitializer implements SystemUserAction {
 			File dataStoreF = getDataStoreFile(this.runtimeConfig, this.realmConfig, realmName);
 
 			StoreToDaoElementListener listener = new StoreToDaoElementListener(tx);
-			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, dataStoreF);
+			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, dataStoreF, true);
 			handler.parseFile();
 			statistics = handler.getStatistics();
 			tx.commitOnClose();

@@ -115,7 +115,7 @@ public class TransientRealm extends InternalStrolchRealm {
 		ModelStatistics statistics;
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
 			InMemoryElementListener elementListener = new InMemoryElementListener(tx);
-			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile);
+			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, true);
 			handler.parseFile();
 			statistics = handler.getStatistics();
 			tx.commitOnClose();

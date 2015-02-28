@@ -57,7 +57,7 @@ public class XmlModelDefaultHandlerTest {
 				orderMap.put(order.getId(), order);
 			}
 		};
-		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, file);
+		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, file, true);
 		handler.parseFile();
 
 		assertEquals(3, resourceMap.size());

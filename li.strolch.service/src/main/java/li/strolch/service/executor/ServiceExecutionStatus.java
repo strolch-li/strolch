@@ -40,8 +40,8 @@ public class ServiceExecutionStatus {
 		this.result = svcResult;
 	}
 
-	@XmlAttribute(name = "resultMessage")
-	public String getResultMessage() {
+	@XmlAttribute(name = "msg")
+	public String getMsg() {
 		if (this.result == null)
 			return StringHelper.DASH;
 		if (this.result.getMessage() == null)
@@ -49,8 +49,8 @@ public class ServiceExecutionStatus {
 		return this.result.getMessage();
 	}
 
-	@XmlAttribute(name = "resultState")
-	public String getResultState() {
+	@XmlAttribute(name = "state")
+	public String getState() {
 		if (this.result == null)
 			return StringHelper.DASH;
 		return this.result.getState().name();

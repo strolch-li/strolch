@@ -16,11 +16,9 @@
 package li.strolch.model.xml;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -34,19 +32,21 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
 public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
 	private File modelFile;
+	private boolean allowInclude;
 
 	/**
 	 * @param listener
 	 * @param modelFile
+	 * @param allowInclude
 	 */
-	public XmlModelSaxFileReader(StrolchElementListener listener, File modelFile) {
+	public XmlModelSaxFileReader(StrolchElementListener listener, File modelFile, boolean allowInclude) {
 		super(listener);
 		this.modelFile = modelFile;
+		this.allowInclude = allowInclude;
 	}
 
 	@Override
@@ -56,11 +56,17 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
 		case Tags.INCLUDE_FILE:
 
+			if (!this.allowInclude) {
+				String msg = "ModelFile {0} has includes which are disabled for this parse invocation!";
+				throw new IllegalArgumentException(MessageFormat.format(msg, this.modelFile.getAbsolutePath())); //$NON-NLS-1$
+			}
+
 			String includeFileS = attributes.getValue(Tags.FILE);
 			if (StringHelper.isEmpty(includeFileS)) {
 				throw new IllegalArgumentException(MessageFormat.format(
 						"The attribute {0} is missing for IncludeFile!", Tags.FILE)); //$NON-NLS-1$
 			}
+
 			File includeFile = new File(this.modelFile.getParentFile(), includeFileS);
 			if (!includeFile.exists() || !includeFile.canRead()) {
 				String msg = "The IncludeFile does not exist, or is not readable. Source model: {0} with IncludeFile: {1}"; //$NON-NLS-1$
@@ -68,7 +74,7 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 				throw new IllegalArgumentException(msg);
 			}
 
-			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(this.listener, includeFile);
+			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(this.listener, includeFile, this.allowInclude);
 			handler.parseFile();
 			this.statistics.nrOfOrders += handler.statistics.nrOfOrders;
 			this.statistics.nrOfResources += handler.statistics.nrOfResources;
@@ -96,10 +102,10 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 			logger.info(MessageFormat.format(msg, this.modelFile.getAbsolutePath(),
 					StringHelper.formatNanoDuration(this.statistics.durationNanos)));
 
-		} catch (ParserConfigurationException | SAXException | IOException e) {
+		} catch (Exception e) {
 
-			String msg = "Parsing failed due to internal error: {0}"; //$NON-NLS-1$
-			throw new StrolchException(MessageFormat.format(msg, e.getMessage()), e);
+			String msg = "Parsing of {0} failed due to internal error: {1}"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, this.modelFile.getAbsolutePath(), e.getMessage()), e);
 		}
 	}
 }

@@ -24,10 +24,53 @@ public class XmlImportModelArgument extends ServiceArgument {
 	private static final long serialVersionUID = 1L;
 
 	public String modelFileName;
+	public boolean external = false;
+	public boolean allowInclude = true;
 	public boolean addOrders = true;
 	public boolean addResources = true;
 	public boolean updateOrders = true;
 	public boolean updateResources = true;
 	public Set<String> orderTypes = new HashSet<>();
 	public Set<String> resourceTypes = new HashSet<>();
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("XmlImportModelArgument [ ");
+
+		builder.append("external=");
+		builder.append(this.external);
+		
+		builder.append(", allowInclude=");
+		builder.append(this.allowInclude);
+
+		builder.append(", modelFileName=");
+		builder.append(this.modelFileName);
+
+		if (this.addOrders)
+			builder.append(", addOrders");
+		if (this.addResources)
+			builder.append(", addResources");
+
+		if (this.updateOrders)
+			builder.append(", updateOrders");
+		if (this.updateResources)
+			builder.append(", updateResources");
+
+		if (this.resourceTypes != null && !this.resourceTypes.isEmpty()) {
+			builder.append(", resourceTypes=");
+			builder.append(this.resourceTypes);
+		} else {
+			builder.append(", resourceTypes=*");
+		}
+		if (this.orderTypes != null && !this.orderTypes.isEmpty()) {
+			builder.append(", orderTypes=");
+			builder.append(this.orderTypes);
+		} else {
+			builder.append(", orderTypes=*");
+		}
+
+		builder.append("]");
+		return builder.toString();
+	}
 }

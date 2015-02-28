@@ -42,6 +42,7 @@ public class XmlImportModelCommand extends Command {
 
 	// output
 	private ModelStatistics statistics;
+	private boolean allowInclude;
 
 	/**
 	 * @param container
@@ -68,7 +69,7 @@ public class XmlImportModelCommand extends Command {
 		elementListener.setOrderTypes(this.orderTypes);
 		elementListener.setResourceTypes(this.resourceTypes);
 
-		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile);
+		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, this.allowInclude);
 		handler.parseFile();
 
 		this.statistics = handler.getStatistics();
@@ -84,6 +85,13 @@ public class XmlImportModelCommand extends Command {
 	 */
 	public void setModelFile(File modelFileName) {
 		this.modelFile = modelFileName;
+	}
+
+	/**
+	 * @param allowInclude
+	 */
+	public void setAllowInclude(boolean allowInclude) {
+		this.allowInclude = allowInclude;
 	}
 
 	/**

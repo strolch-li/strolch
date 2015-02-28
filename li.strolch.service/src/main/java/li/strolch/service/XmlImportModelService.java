@@ -23,30 +23,49 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.ModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceResult;
+import li.strolch.service.api.ServiceResultState;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class XmlImportModelService extends AbstractService<XmlImportModelArgument, ServiceResult> {
+public class XmlImportModelService extends AbstractService<XmlImportModelArgument, XmlImportModelResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected ServiceResult getResultInstance() {
-		return new ServiceResult();
+	protected XmlImportModelResult getResultInstance() {
+		return new XmlImportModelResult();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(XmlImportModelArgument arg) {
+	protected XmlImportModelResult internalDoService(XmlImportModelArgument arg) {
 
-		File dataPath = getRuntimeConfiguration().getDataPath();
-		File modelFile = new File(dataPath, arg.modelFileName);
-		if (!modelFile.exists()) {
-			String msg = "Model File does not exist with name {0} in data path {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
-			throw new StrolchException(msg);
+		File modelFile;
+		File modelFileName = new File(arg.modelFileName);
+		if (modelFileName.isAbsolute()) {
+			if (!arg.external) {
+				return new XmlImportModelResult(ServiceResultState.FAILED,
+						"Model file is absolute, yet service argument is not marked as external!");
+			}
+
+			modelFile = modelFileName;
+
+			if (!modelFile.exists()) {
+				String msg = "Model File does not exist at {0}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, modelFile.getAbsolutePath());
+				throw new StrolchException(msg);
+			}
+
+		} else {
+			File dataPath = getRuntimeConfiguration().getDataPath();
+			modelFile = new File(dataPath, arg.modelFileName);
+
+			if (!modelFile.exists()) {
+				String msg = "Model File does not exist with name {0} in data path {1}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
+				throw new StrolchException(msg);
+			}
 		}
 
 		XmlImportModelCommand command;
@@ -54,6 +73,7 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 
 			command = new XmlImportModelCommand(getContainer(), tx);
 			command.setModelFile(modelFile);
+			command.setAllowInclude(arg.allowInclude);
 			command.setAddOrders(arg.addOrders);
 			command.setAddResources(arg.addResources);
 			command.setUpdateOrders(arg.updateOrders);
@@ -72,6 +92,6 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 
-		return ServiceResult.success();
+		return new XmlImportModelResult(statistics);
 	}
 }
