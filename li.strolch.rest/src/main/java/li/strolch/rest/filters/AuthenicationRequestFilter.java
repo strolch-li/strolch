@@ -17,6 +17,10 @@ import javax.ws.rs.ext.Provider;
 
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchSessionHandler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.helper.StringHelper;
 
@@ -26,6 +30,8 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 @Provider
 public class AuthenicationRequestFilter implements ContainerRequestFilter {
+
+	private static final Logger logger = LoggerFactory.getLogger(AuthenicationRequestFilter.class);
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -39,8 +45,10 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 
 		String sessionId = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		if (StringHelper.isEmpty(sessionId)) {
+			logger.error("No SessionID on request to URL " + requestContext.getUriInfo().getPath());
 			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Missing Authorization!").build()); //$NON-NLS-1$
+			return;
 		}
 
 		try {
@@ -49,6 +57,7 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 			Certificate certificate = sessionHandler.validate(sessionId);
 			requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("User cannot access the resource.").build()); //$NON-NLS-1$
