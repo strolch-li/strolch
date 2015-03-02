@@ -56,11 +56,19 @@ if [ -z "${r}" ] || [ -z "${b}" ] || [ -z "${o}" ] || [ -z "${n}" ] ; then
   usage
 fi
 
+# validate no uncommitted changes
 if [ "$(git status --short)" != "" ] ; then
-  echo "You have uncommitted changes!"
+  echo -e "ERROR: You have uncommitted changes! Please commit them before continuing."
   exit 1
 fi
 
+# First make sure we use SSH for pushing
+if find .git/modules -type f -name config | xargs grep "https://github.com" ; then
+  echo -e "ERROR: There is at least one submodule which has its remote set to https://github.com"
+  echo -e "ERROR:   Please change this before your continuing, using the following command:"
+  echo -e "    find .git/modules -type f -name config | xargs sed -i .bck \"s|https://github.com/|git@github.com:|g\""
+  exit 1
+fi
 
 # set vars
 create_release_branch="${c}"
