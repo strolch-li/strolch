@@ -25,6 +25,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.service.XmlImportModelArgument;
+import li.strolch.service.XmlImportModelResult;
 import li.strolch.service.XmlImportModelService;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceArgument;
@@ -98,7 +99,7 @@ public abstract class AbstractRealmServiceTest {
 		arg.realm = realm;
 		arg.modelFileName = "StrolchModel.xml";
 		ServiceResult result = serviceHandler.doService(certificate, svc, arg);
-		assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
+		assertServiceResult(ServiceResultState.SUCCESS, XmlImportModelResult.class, result);
 	}
 
 	protected <T extends ServiceArgument, U extends ServiceResult> void doService(String realm,
@@ -134,30 +135,42 @@ public abstract class AbstractRealmServiceTest {
 	}
 
 	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(
-			Class<? extends Service<T, U>> svcClass, T arg, Runner before, Runner validator, Runner after) {
+			Class<? extends Service<T, U>> svcClass, Class<?> expectedServiceResultType, T arg) {
+		runServiceInAllRealmTypes(svcClass, expectedServiceResultType, arg, null, null, null);
+	}
 
+	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(
+			Class<? extends Service<T, U>> svcClass, T arg, Runner before, Runner validator, Runner after) {
+		runServiceInAllRealmTypes(svcClass, ServiceResult.class, arg, before, validator, after);
+	}
+
+	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(
+			Class<? extends Service<T, U>> svcClass, Class<?> expectedServiceResultType, T arg, Runner before,
+			Runner validator, Runner after) {
 		try {
-			runTransient(svcClass.newInstance(), arg, before, validator, after);
-			runCached(svcClass.newInstance(), arg, before, validator, after);
-			runTransactional(svcClass.newInstance(), arg, before, validator, after);
+			runTransient(expectedServiceResultType, svcClass.newInstance(), arg, before, validator, after);
+			runCached(expectedServiceResultType, svcClass.newInstance(), arg, before, validator, after);
+			runTransactional(expectedServiceResultType, svcClass.newInstance(), arg, before, validator, after);
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException("Failed to instantiate class " + svcClass.getName() + ": " + e.getMessage(), e);
 		}
 	}
 
-	private <T extends ServiceArgument, U extends ServiceResult> void runTransactional(Service<T, U> svc, T arg,
-			Runner before, Runner validator, Runner after) {
-		doService(REALM_TRANSACTIONAL, ServiceResultState.SUCCESS, ServiceResult.class, svc, arg, before, validator,
+	private <T extends ServiceArgument, U extends ServiceResult> void runTransactional(
+			Class<?> expectedServiceResultType, Service<T, U> svc, T arg, Runner before, Runner validator, Runner after) {
+		doService(REALM_TRANSACTIONAL, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before,
+				validator, after);
+	}
+
+	private <T extends ServiceArgument, U extends ServiceResult> void runCached(Class<?> expectedServiceResultType,
+			Service<T, U> svc, T arg, Runner before, Runner validator, Runner after) {
+		doService(REALM_CACHED, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before, validator,
 				after);
 	}
 
-	private <T extends ServiceArgument, U extends ServiceResult> void runCached(Service<T, U> svc, T arg,
-			Runner before, Runner validator, Runner after) {
-		doService(REALM_CACHED, ServiceResultState.SUCCESS, ServiceResult.class, svc, arg, before, validator, after);
-	}
-
-	private <T extends ServiceArgument, U extends ServiceResult> void runTransient(Service<T, U> svc, T arg,
-			Runner before, Runner validator, Runner after) {
-		doService(REALM_TRANSIENT, ServiceResultState.SUCCESS, ServiceResult.class, svc, arg, before, validator, after);
+	private <T extends ServiceArgument, U extends ServiceResult> void runTransient(Class<?> expectedServiceResultType,
+			Service<T, U> svc, T arg, Runner before, Runner validator, Runner after) {
+		doService(REALM_TRANSIENT, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before, validator,
+				after);
 	}
 }

@@ -24,6 +24,7 @@ import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.XmlExportModelArgument;
 import li.strolch.service.XmlExportModelService;
 import li.strolch.service.XmlImportModelArgument;
+import li.strolch.service.XmlImportModelResult;
 import li.strolch.service.XmlImportModelService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
@@ -111,7 +112,7 @@ public class XmlExportServiceTest {
 		XmlImportModelArgument importArgument = new XmlImportModelArgument();
 		importArgument.modelFileName = modelFileName;
 		ServiceResult result = runtimeMock.getServiceHandler().doService(certificate, importService, importArgument);
-		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
+		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, XmlImportModelResult.class, result);
 	}
 
 	private void assertNumberOfFilesCreated(final String modelFileName, int nrOfExpectedFiles) {
