@@ -6,8 +6,9 @@ if [ ! $(which xmlstarlet) ] ; then
 fi
 
 function usage() {
-  echo "Usage: $0 [-c] [-o <old_version>] [-n <new_version>]" 1>&2;
+  echo "Usage: $0 [-c] [-p] [-o <old_version>] [-n <new_version>]" 1>&2;
   echo "  -c                    commit"
+  echo "  -p                    push to origin"
   echo "  -o <old_version>      old version e.g. 1.0.0-SNAPSHOT"
   echo "  -n <new_version>      new version e.g. 1.0.0-RC3"
   echo ""
@@ -19,6 +20,9 @@ while getopts ":b:o:n:r:cp" arg; do
     case "${arg}" in
         c)
             c="true"
+            ;;
+        p)
+            p="true"
             ;;
         o)
             o=${OPTARG}
@@ -52,6 +56,7 @@ fi
 old_version="${o}"
 new_version="${n}"
 commit="${c}"
+push="${p}"
 
 declare SCRIPT_NAME="${0##*/}"
 declare SCRIPT_DIR="$(cd ${0%/*} ; pwd)"
@@ -130,8 +135,16 @@ if [ -n "${commit}" ] ; then
   echo "INFO: Committing new version ${new_version}"
   git submodule foreach git add .
   git submodule foreach git commit -m "[Project] Bumped version from ${old_version} to ${new_version}"
+  if [ -n "${push}" ] ; then
+    echo "INFO: Pushing submodules to origin..."
+    git submodule foreach git push origin
+  fi
   git add .
   git commit -m "[Project] Bumped version from ${old_version} to ${new_version}"
+  if [ -n "${push}" ] ; then
+    echo "INFO: Pushing to origin..."
+    git push origin
+  fi
 else
   echo "INFO: NOT committing new version"
 fi
