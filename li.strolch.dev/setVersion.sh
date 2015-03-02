@@ -1,13 +1,43 @@
 #!/bin/bash
-if [ "$#" != "2" ] ; then
-    echo "ERROR: Wrong arguments!"
-    echo "Usage: $0 <old_version> <new_version>"
-    exit 1
-fi
 
 if [ ! $(which xmlstarlet) ] ; then
   echo "ERROR: xmlstarlet is missing!"
   exit 1
+fi
+
+function usage() {
+  echo "Usage: $0 [-c] [-o <old_version>] [-n <new_version>]" 1>&2;
+  echo "  -c                    commit"
+  echo "  -o <old_version>      old version e.g. 1.0.0-SNAPSHOT"
+  echo "  -n <new_version>      new version e.g. 1.0.0-RC3"
+  echo ""
+  exit 1;
+}
+
+# get arguments
+while getopts ":b:o:n:r:cp" arg; do
+    case "${arg}" in
+        c)
+            c="true"
+            ;;
+        o)
+            o=${OPTARG}
+            ;;
+        n)
+            n=${OPTARG}
+            ;;
+        *)
+            echo "ERROR: Unknown arg ${arg}"
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+# validate arguments
+if [ -z "${o}" ] || [ -z "${n}" ] ; then
+  echo "ERROR: Missing an argument!"
+  usage
 fi
 
 #if ! mvn -f pom.xml versions:set -DnewVersion="${1}" -DallowSnapshots=true -DgenerateBackupPoms=false ; then
@@ -19,8 +49,9 @@ fi
 #    exit 1
 #fi
 
-old_version="$1"
-new_version="$2"
+old_version="${o}"
+new_version="${n}"
+commit="${c}"
 
 declare SCRIPT_NAME="${0##*/}"
 declare SCRIPT_DIR="$(cd ${0%/*} ; pwd)"
@@ -92,6 +123,21 @@ if ! sed -i.bck "s/${old_version}/${new_version}/" "${create_script}" 2>/dev/nul
   fail "${root}/${create_script}"
 fi
 rm -f "${create_script}.bck"
+
+
+# Commit new version
+if [ -n "${commit}" ] ; then
+  echo "INFO: Committing new version ${new_version}"
+  git submodule foreach git add .
+  git submodule foreach git commit -m "[Project] Bumped version from ${old_version} to ${new_version}"
+  git submodule foreach git push origin develop
+  git add .
+  git commit -m "[Project] Bumped version from ${old_version} to ${new_version}"
+  git push origin develop
+else
+  echo "INFO: NOT committing new version"
+fi
+
 
 echo -e "\nINFO: Bumped version from ${old_version} to ${new_version}"
 

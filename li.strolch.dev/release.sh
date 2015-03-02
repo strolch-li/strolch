@@ -80,20 +80,20 @@ push="${p}"
 
 
 # log what we are doing
-echo "root=${root}"
-echo "old_version=${old_version}"
-echo "new_version=${new_version}"
-echo "branch=${branch}"
-echo "release_branch=${release_branch}"
+echo "INFO: root=${root}"
+echo "INFO: old_version=${old_version}"
+echo "INFO: new_version=${new_version}"
+echo "INFO: branch=${branch}"
+echo "INFO: release_branch=${release_branch}"
 if [ -n "${create_release_branch}" ] ; then
-  echo "Creating release branch."
+  echo "INFO: Creating release branch."
 else
-  echo "NOT creating release branch."
+  echo "INFO: NOT creating release branch."
 fi
 if [ -n "${push}" ] ; then
-  echo "Pushing to origin."
+  echo "INFO: Pushing to origin."
 else
-  echo "NOT pushing to origin."
+  echo "INFO: NOT pushing to origin."
 fi
 
 echo ""
@@ -192,7 +192,7 @@ fi
 
 
 # build with new version
-echo "Building new version ${new_version}..."
+echo -e "\nINFO: Building new version ${new_version}..."
 if ! build ; then
   fail
 fi
@@ -220,7 +220,7 @@ echo -e "\nINFO: Committing and tagging..."
 if ! git add . ; then
   fail
 fi
-if ! git commit -m "[Project] bumped version from ${old_version} to ${new_version}" ; then
+if ! git commit -m "[Project] Bumped version from ${old_version} to ${new_version}" ; then
   fail
 fi
 if ! git tag ${new_version} ; then
@@ -229,7 +229,7 @@ fi
 
 
 # create bundle for new version
-echo "Creating bundle for version ${new_version}..."
+echo -e "\nINFO: Creating bundle for version ${new_version}..."
 if ! createBundle ; then
   fail
 fi
@@ -269,11 +269,11 @@ if [ -n "${push}" ] ; then
   git push origin ${new_version}
 else
   echo -e "\nINFO: To push tags perform the following:"
-  echo -e "git push origin ${new_version}"
-  echo -e "git submodule foreach git push origin ${new_version}"
+  echo -e "        git push origin ${new_version}"
+  echo -e "        git submodule foreach git push origin ${new_version}"
   echo -e "\nINFO: Or to delete the tags:"
-  echo -e "git submodule foreach git tag -d ${new_version}"
-  echo -e "git tag -d ${new_version}"
+  echo -e "        git submodule foreach git tag -d ${new_version}"
+  echo -e "        git tag -d ${new_version}"
 fi
 
 
