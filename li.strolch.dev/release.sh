@@ -256,9 +256,9 @@ fi
 
 # push to origin
 if [ -n "${push}" ] ; then
-  echo -e "\nINFO: Pushing to origin..."
-  git push origin ${new_version}
+  echo -e "\nINFO: Pushing ${new_version} to origin..."
   git submodule foreach git push origin ${new_version}
+  git push origin ${new_version}
 else
   echo -e "\nINFO: To push tags perform the following:"
   echo -e "git push origin ${new_version}"
