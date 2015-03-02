@@ -130,10 +130,8 @@ if [ -n "${commit}" ] ; then
   echo "INFO: Committing new version ${new_version}"
   git submodule foreach git add .
   git submodule foreach git commit -m "[Project] Bumped version from ${old_version} to ${new_version}"
-  git submodule foreach git push origin develop
   git add .
   git commit -m "[Project] Bumped version from ${old_version} to ${new_version}"
-  git push origin develop
 else
   echo "INFO: NOT committing new version"
 fi
