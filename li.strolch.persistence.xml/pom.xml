@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>li.strolch</groupId>
 		<artifactId>li.strolch.parent</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0</version>
 		<relativePath>../li.strolch.parent/pom.xml</relativePath>
 	</parent>
 
