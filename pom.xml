@@ -16,6 +16,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<eitchnet.utils.version>1.1.0-SNAPSHOT</eitchnet.utils.version>
 	</properties>
 
 	<!-- POM Reference: http://maven.apache.org/pom.html#Licenses -->
@@ -38,7 +39,7 @@
 		<dependency>
 			<groupId>ch.eitchnet</groupId>
 			<artifactId>ch.eitchnet.utils</artifactId>
-			<version>1.1.0-SNAPSHOT</version>
+			<version>${eitchnet.utils.version}</version>
 		</dependency>
 	</dependencies>
 
