@@ -119,6 +119,9 @@ for project in ch.* ; do
   if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
     fail "${root}/${project}/pom.xml"
   fi
+  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.utils.version" -v ${new_version} pom.xml 2>/dev/null ; then
+    fail "${root}/pom.xml"
+  fi
 done
 
 
