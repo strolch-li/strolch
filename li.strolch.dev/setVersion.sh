@@ -44,15 +44,6 @@ if [ -z "${o}" ] || [ -z "${n}" ] ; then
   usage
 fi
 
-#if ! mvn -f pom.xml versions:set -DnewVersion="${1}" -DallowSnapshots=true -DgenerateBackupPoms=false ; then
-#    echo "ERROR: Failed to change version in root!"
-#    exit 1
-#fi
-#if ! mvn -f versioning_eitchnet_pom.xml versions:set -DnewVersion="${1}" -DallowSnapshots=true -DgenerateBackupPoms=false ; then
-#    echo "ERROR: Failed to change version in submodule!"
-#    exit 1
-#fi
-
 old_version="${o}"
 new_version="${n}"
 commit="${c}"
@@ -70,58 +61,61 @@ function fail() {
   exit 1
 }
 
+function setVersion() {
+
+  if [ "$#" != 2 ] ; then
+    echo -e "ERROR: Missing version and/or file name"
+    exit 1
+  fi
+
+  version="$1"
+  file="$2"
+
+  if ! [ -f "${file}" ] ; then
+    echo -e "ERROR: The file does not exist: ${file}"
+    exit 1
+  fi
+
+  i=0
+
+  if xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${version} "${file}" 2>/dev/null ; then
+    i=$((i+1))
+  fi
+  if xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${version} "${file}" 2>/dev/null ; then
+    i=$((i+1))
+  fi
+  if xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${version} "${file}" 2>/dev/null ; then
+    i=$((i+1))
+  fi
+  if xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version" -v ${version} "${file}" 2>/dev/null ; then
+    i=$((i+1))
+  fi
+  if xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.xmlpers.version" -v ${version} "${file}" 2>/dev/null ; then
+    i=$((i+1))
+  fi
+  if xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.utils.version" -v ${version} "${file}" 2>/dev/null ; then
+    i=$((i+1))
+  fi
+  if xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.privilege.version" -v ${version} "${file}" 2>/dev/null ; then
+    i=$((i+1))
+  fi
+
+  if [ $i -eq 0 ] ; then
+    echo -e "ERROR: Not one version was change for file ${file}"
+    exit 1
+  fi
+
+  return 0
+}
 
 cd "${root}"
-if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml  ; then
-  fail "${root}/pom.xml"
-fi
-if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
-  fail "${root}/pom.xml"
-fi
-if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version" -v ${new_version} pom.xml 2>/dev/null ; then
-  fail "${root}/pom.xml"
-fi
-if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.xmlpers.version" -v ${new_version} pom.xml 2>/dev/null ; then
-  fail "${root}/pom.xml"
-fi
-if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.utils.version" -v ${new_version} pom.xml 2>/dev/null ; then
-  fail "${root}/pom.xml"
-fi
-if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.privilege.version" -v ${new_version} pom.xml 2>/dev/null ; then
-  fail "${root}/pom.xml"
-fi
 
-
-cd "${root}" 
+setVersion "${new_version}" "${root}/pom.xml"
 for project in li.* ; do
-  cd "${root}/${project}"
-  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
-    fail "${root}/${project}/pom.xml"
-  fi
-  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
-    fail "${root}/${project}/pom.xml"
-  fi
-  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
-    fail "${root}/${project}/pom.xml"
-  fi
+  setVersion "${new_version}" "${root}/${project}/pom.xml"
 done
-
-
-cd "${root}"
 for project in ch.* ; do
-  cd "${root}/${project}"
-  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
-    fail "${root}/${project}/pom.xml"
-  fi
-  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:strolch.version/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
-    fail "${root}/${project}/pom.xml"
-  fi
-  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:parent/my:version" -v ${new_version} pom.xml 2>/dev/null ; then
-    fail "${root}/${project}/pom.xml"
-  fi
-  if ! xmlstarlet ed --ps -L -N my=http://maven.apache.org/POM/4.0.0 -u "/my:project/my:properties/my:eitchnet.utils.version" -v ${new_version} pom.xml 2>/dev/null ; then
-    fail "${root}/pom.xml"
-  fi
+  setVersion "${new_version}" "${root}/${project}/pom.xml"
 done
 
 
