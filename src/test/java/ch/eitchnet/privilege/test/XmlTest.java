@@ -169,7 +169,7 @@ public class XmlTest {
 		assertNotNull(roles);
 
 		assertEquals(3, users.size());
-		assertEquals(5, roles.size());
+		assertEquals(6, roles.size());
 
 		// assert model
 
