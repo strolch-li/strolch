@@ -184,7 +184,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		UserState selUserState = selectorRep.getUserState();
 		Locale selLocale = selectorRep.getLocale();
 		Set<String> selRoles = selectorRep.getRoles();
-		Map<String, String> selPropertyMap = selectorRep.getProperties();
+		Map<String, String> selPropertyMap = selectorRep.getPropertyMap();
 
 		List<UserRep> result = new ArrayList<>();
 		List<User> allUsers = this.persistenceHandler.getAllUsers();
@@ -315,16 +315,21 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return roles.containsAll(selectionRoles);
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplaceUser(ch.eitchnet.privilege.model.Certificate,
-	 *      ch.eitchnet.privilege.model.UserRep, byte[])
-	 */
 	@Override
-	public void addUser(Certificate certificate, UserRep userRep, byte[] password) {
+	public UserRep addUser(Certificate certificate, UserRep userRep, byte[] password) {
 		try {
 
 			// validate who is doing this
 			assertIsPrivilegeAdmin(certificate);
+
+			// make sure userId is not set
+			if (StringHelper.isNotEmpty(userRep.getUserId())) {
+				String msg = "UserId can not be set when adding a new user!";
+				throw new PrivilegeException(MessageFormat.format(msg, userRep.getUsername()));
+			}
+
+			// set userId
+			userRep.setUserId(StringHelper.getUniqueId());
 
 			// first validate user
 			userRep.validate();
@@ -353,17 +358,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// delegate to persistence handler
 			this.persistenceHandler.addUser(user);
 
+			return user.asUserRep();
+
 		} finally {
 			clearPassword(password);
 		}
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplaceUser(ch.eitchnet.privilege.model.Certificate,
-	 *      ch.eitchnet.privilege.model.UserRep, byte[])
-	 */
 	@Override
-	public void replaceUser(Certificate certificate, UserRep userRep, byte[] password) {
+	public UserRep replaceUser(Certificate certificate, UserRep userRep, byte[] password) {
 		try {
 
 			// validate who is doing this
@@ -375,8 +378,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			validateRolesExist(userRep);
 
 			// validate user exists
-			if (this.persistenceHandler.getUser(userRep.getUsername()) == null) {
+			User user = this.persistenceHandler.getUser(userRep.getUsername());
+			if (user == null) {
 				String msg = "User {0} can not be replaced as it does not exist!";
+				throw new PrivilegeException(MessageFormat.format(msg, userRep.getUsername()));
+			}
+
+			// validate same userId
+			if (!user.getUserId().equals(userRep.getUserId())) {
+				String msg = "UserId of existing user {0} does not match userRep {1}";
+				msg = MessageFormat.format(msg, user.getUserId(), userRep.getUserId());
 				throw new PrivilegeException(MessageFormat.format(msg, userRep.getUsername()));
 			}
 
@@ -390,10 +401,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				passwordHash = this.encryptionHandler.convertToHash(password);
 			}
 
-			User user = createUser(userRep, passwordHash);
+			user = createUser(userRep, passwordHash);
 
 			// delegate to persistence handler
 			this.persistenceHandler.replaceUser(user);
+
+			return user.asUserRep();
 
 		} finally {
 			clearPassword(password);
@@ -414,12 +427,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private User createUser(UserRep userRep, String passwordHash) {
 		User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(),
 				userRep.getLastname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
-				userRep.getProperties());
+				userRep.getPropertyMap());
 		return user;
 	}
 
 	@Override
-	public void updateUser(Certificate certificate, UserRep userRep) throws AccessDeniedException, PrivilegeException {
+	public UserRep updateUser(Certificate certificate, UserRep userRep) throws AccessDeniedException,
+			PrivilegeException {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -456,17 +470,19 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (userRep.getLocale() != null)
 			locale = userRep.getLocale();
 		if (userRep.getProperties() != null && !userRep.getProperties().isEmpty())
-			propertyMap = userRep.getProperties();
+			propertyMap = userRep.getPropertyMap();
 
 		// create new user
 		user = new User(userId, username, password, firstname, lastname, userState, roles, locale, propertyMap);
 
 		// delegate to persistence handler
 		this.persistenceHandler.replaceUser(user);
+
+		return user.asUserRep();
 	}
 
 	@Override
-	public void addRole(Certificate certificate, RoleRep roleRep) {
+	public RoleRep addRole(Certificate certificate, RoleRep roleRep) {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -488,10 +504,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate to persistence handler
 		this.persistenceHandler.addRole(role);
+
+		return role.asRoleRep();
 	}
 
 	@Override
-	public void replaceRole(Certificate certificate, RoleRep roleRep) {
+	public RoleRep replaceRole(Certificate certificate, RoleRep roleRep) {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -513,10 +531,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate to persistence handler
 		this.persistenceHandler.replaceRole(role);
+
+		return role.asRoleRep();
 	}
 
 	@Override
-	public void addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep) {
+	public RoleRep addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep) {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -541,6 +561,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new role with the additional privilege
 		IPrivilege newPrivilege = new PrivilegeImpl(privilegeRep);
+
 		// copy existing privileges
 		Set<String> existingPrivilegeNames = role.getPrivilegeNames();
 		Map<String, IPrivilege> privilegeMap = new HashMap<>(existingPrivilegeNames.size() + 1);
@@ -548,6 +569,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			IPrivilege privilege = role.getPrivilege(name);
 			privilegeMap.put(name, privilege);
 		}
+
 		// add new one
 		privilegeMap.put(newPrivilege.getName(), newPrivilege);
 
@@ -555,10 +577,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate role replacement to persistence handler
 		this.persistenceHandler.replaceRole(newRole);
+
+		return newRole.asRoleRep();
 	}
 
 	@Override
-	public void addRoleToUser(Certificate certificate, String username, String roleName) {
+	public UserRep addRoleToUser(Certificate certificate, String username, String roleName) {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -569,12 +593,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
 		}
 
-		// ignore if user already has role
+		// check that user not already has role
 		Set<String> currentRoles = user.getRoles();
 		if (currentRoles.contains(roleName)) {
 			String msg = MessageFormat.format("User {0} already has role {1}", username, roleName); //$NON-NLS-1$
-			DefaultPrivilegeHandler.logger.error(msg);
-			return;
+			throw new PrivilegeException(msg);
 		}
 
 		// validate that role exists
@@ -592,10 +615,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+
+		return newUser.asUserRep();
 	}
 
 	@Override
-	public void removePrivilegeFromRole(Certificate certificate, String roleName, String privilegeName) {
+	public RoleRep removePrivilegeFromRole(Certificate certificate, String roleName, String privilegeName) {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -626,6 +651,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceRole(newRole);
+
+		return newRole.asRoleRep();
 	}
 
 	@Override
@@ -647,16 +674,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate role removal to persistence handler
 		Role removedRole = this.persistenceHandler.removeRole(roleName);
-
-		if (removedRole == null)
-			return null;
+		if (removedRole == null) {
+			String msg = "Can not remove Role {0} because role does not exist!";
+			throw new PrivilegeException(MessageFormat.format(msg, roleName));
+		}
 
 		// return role rep if it was removed	
 		return removedRole.asRoleRep();
 	}
 
 	@Override
-	public void removeRoleFromUser(Certificate certificate, String username, String roleName) {
+	public UserRep removeRoleFromUser(Certificate certificate, String username, String roleName) {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -670,9 +698,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// ignore if user does not have role
 		Set<String> currentRoles = user.getRoles();
 		if (!currentRoles.contains(roleName)) {
-			String msg = MessageFormat.format("User {0} does not have role {1}", user, roleName); //$NON-NLS-1$
-			logger.error(msg);
-			return;
+			String msg = MessageFormat.format("User {0} does not have role {1}", user.getUsername(), roleName); //$NON-NLS-1$
+			throw new PrivilegeException(msg);
 		}
 
 		// create new user
@@ -683,6 +710,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+
+		return newUser.asUserRep();
 	}
 
 	@Override
@@ -693,17 +722,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user removal to persistence handler
 		User removedUser = this.persistenceHandler.removeUser(username);
-
-		// return user rep if it was removed
-		if (removedUser == null)
-			return null;
+		if (removedUser == null) {
+			String msg = "Can not remove User {0} because user does not exist!";
+			throw new PrivilegeException(MessageFormat.format(msg, username));
+		}
 
 		// return user rep if it was removed
 		return removedUser.asUserRep();
 	}
 
 	@Override
-	public void setUserLocale(Certificate certificate, String username, Locale locale) {
+	public UserRep setUserLocale(Certificate certificate, String username, Locale locale) {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -720,10 +749,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+
+		return newUser.asUserRep();
 	}
 
 	@Override
-	public void setUserName(Certificate certificate, String username, String firstname, String lastname) {
+	public UserRep setUserName(Certificate certificate, String username, String firstname, String lastname) {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -740,12 +771,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+
+		return newUser.asUserRep();
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#setUserPassword(ch.eitchnet.privilege.model.Certificate,
-	 *      java.lang.String, byte[])
-	 */
 	@Override
 	public void setUserPassword(Certificate certificate, String username, byte[] password) {
 		try {
@@ -796,7 +825,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public void setUserState(Certificate certificate, String username, UserState state) {
+	public UserRep setUserState(Certificate certificate, String username, UserState state) {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
@@ -813,14 +842,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+
+		return newUser.asUserRep();
 	}
 
-	/**
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#authenticate(java.lang.String, byte[])
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the user credentials are not valid
-	 */
 	@Override
 	public Certificate authenticate(String username, byte[] password) {
 

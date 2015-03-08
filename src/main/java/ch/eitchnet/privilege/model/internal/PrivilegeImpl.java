@@ -101,7 +101,7 @@ public final class PrivilegeImpl implements IPrivilege {
 	 */
 	public PrivilegeImpl(PrivilegeRep privilegeRep) {
 		this(privilegeRep.getName(), privilegeRep.getPolicy(), privilegeRep.isAllAllowed(), privilegeRep.getDenyList(),
-				privilegeRep.getDenyList());
+				privilegeRep.getAllowList());
 	}
 
 	/**

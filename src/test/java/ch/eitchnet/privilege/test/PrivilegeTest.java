@@ -21,11 +21,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -213,8 +213,7 @@ public class PrivilegeTest {
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
-			Map<String, PrivilegeRep> privilegeMap = new HashMap<String, PrivilegeRep>();
-			RoleRep roleRep = new RoleRep(ROLE_TEMP, privilegeMap);
+			RoleRep roleRep = new RoleRep(ROLE_TEMP, new ArrayList<>());
 
 			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addRole(certificate, roleRep);
@@ -564,7 +563,7 @@ public class PrivilegeTest {
 			// let's add a new user ted
 			HashSet<String> roles = new HashSet<String>();
 			roles.add(ROLE_USER);
-			userRep = new UserRep("2", TED, "Ted", "Newman", UserState.ENABLED, roles, null,
+			userRep = new UserRep(null, TED, "Ted", "Newman", UserState.ENABLED, roles, null,
 					new HashMap<String, String>());
 			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addUser(certificate, userRep, null);
@@ -636,8 +635,7 @@ public class PrivilegeTest {
 		try {
 			// add role user
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
-			Map<String, PrivilegeRep> privilegeMap = new HashMap<String, PrivilegeRep>();
-			RoleRep roleRep = new RoleRep(ROLE_USER, privilegeMap);
+			RoleRep roleRep = new RoleRep(ROLE_USER, new ArrayList<PrivilegeRep>());
 			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addRole(certificate, roleRep);
 			privilegeHandler.persist(certificate);
@@ -677,7 +675,7 @@ public class PrivilegeTest {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
 			// let's add a new user bob
-			UserRep userRep = new UserRep("1", BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(
+			UserRep userRep = new UserRep(null, BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(
 					Arrays.asList(ROLE_MY)), null, new HashMap<String, String>());
 			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addUser(certificate, userRep, null);

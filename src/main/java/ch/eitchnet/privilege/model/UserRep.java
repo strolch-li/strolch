@@ -16,6 +16,9 @@
 package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -67,7 +70,8 @@ public class UserRep implements Serializable {
 	@XmlElement(name = "roles")
 	private Set<String> roles;
 
-	private Map<String, String> propertyMap;
+	@XmlElement(name = "properties")
+	private List<XmlKeyValue> properties;
 
 	/**
 	 * Default constructor
@@ -98,7 +102,7 @@ public class UserRep implements Serializable {
 		this.userState = userState;
 		this.roles = roles;
 		this.locale = locale;
-		this.propertyMap = propertyMap;
+		this.properties = propertyMap == null ? new ArrayList<>() : XmlKeyValue.valueOf(propertyMap);
 	}
 
 	/**
@@ -138,6 +142,16 @@ public class UserRep implements Serializable {
 	 */
 	public String getUserId() {
 		return this.userId;
+	}
+
+	/**
+	 * Set the userId
+	 * 
+	 * @param userId
+	 *            to set
+	 */
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	/**
@@ -239,7 +253,13 @@ public class UserRep implements Serializable {
 	 * @return the property with the given key, or null if the property is not defined
 	 */
 	public String getProperty(String key) {
-		return this.propertyMap.get(key);
+		if (this.properties == null)
+			return null;
+		for (XmlKeyValue keyValue : this.properties) {
+			if (keyValue.getKey().equals(key))
+				return keyValue.getValue();
+		}
+		return null;
 	}
 
 	/**
@@ -251,7 +271,21 @@ public class UserRep implements Serializable {
 	 *            the value of the property to set
 	 */
 	public void setProperty(String key, String value) {
-		this.propertyMap.put(key, value);
+		if (this.properties == null)
+			this.properties = new ArrayList<>();
+
+		boolean updated = false;
+
+		for (XmlKeyValue keyValue : this.properties) {
+			if (keyValue.getKey().equals(key)) {
+				keyValue.setValue(value);
+				updated = true;
+			}
+		}
+
+		if (!updated) {
+			this.properties.add(new XmlKeyValue(key, value));
+		}
 	}
 
 	/**
@@ -260,7 +294,13 @@ public class UserRep implements Serializable {
 	 * @return the {@link Set} of keys of all properties
 	 */
 	public Set<String> getPropertyKeySet() {
-		return this.propertyMap.keySet();
+		if (this.properties == null)
+			return new HashSet<>();
+		Set<String> keySet = new HashSet<>(this.properties.size());
+		for (XmlKeyValue keyValue : this.properties) {
+			keySet.add(keyValue.getKey());
+		}
+		return keySet;
 	}
 
 	/**
@@ -268,8 +308,10 @@ public class UserRep implements Serializable {
 	 * 
 	 * @return the map of properties
 	 */
-	public Map<String, String> getProperties() {
-		return this.propertyMap;
+	public Map<String, String> getPropertyMap() {
+		if (this.properties == null)
+			return new HashMap<>();
+		return XmlKeyValue.toMap(this.properties);
 	}
 
 	/**
@@ -278,8 +320,8 @@ public class UserRep implements Serializable {
 	 * @return the string map properties of this user as a list of {@link XmlKeyValue} elements
 	 */
 	@XmlElement(name = "properties")
-	public List<XmlKeyValue> getPropertiesAsKeyValue() {
-		return XmlKeyValue.valueOf(this.propertyMap);
+	public List<XmlKeyValue> getProperties() {
+		return this.properties == null ? new ArrayList<>() : this.properties;
 	}
 
 	/**
@@ -288,8 +330,8 @@ public class UserRep implements Serializable {
 	 * @param values
 	 *            the list of {@link XmlKeyValue} from which to set the properties
 	 */
-	public void setPropertiesAsKeyValue(List<XmlKeyValue> values) {
-		this.propertyMap = XmlKeyValue.toMap(values);
+	public void setProperties(List<XmlKeyValue> values) {
+		this.properties = values;
 	}
 
 	/**

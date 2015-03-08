@@ -16,6 +16,7 @@
 package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -159,7 +160,7 @@ public class PrivilegeRep implements Serializable {
 	 * @return the denyList
 	 */
 	public Set<String> getDenyList() {
-		return this.denyList;
+		return this.denyList == null ? new HashSet<>() : this.denyList;
 	}
 
 	/**
@@ -174,7 +175,7 @@ public class PrivilegeRep implements Serializable {
 	 * @return the allowList
 	 */
 	public Set<String> getAllowList() {
-		return this.allowList;
+		return this.allowList == null ? new HashSet<>() : this.allowList;
 	}
 
 	/**

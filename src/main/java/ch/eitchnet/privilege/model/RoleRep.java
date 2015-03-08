@@ -18,9 +18,7 @@ package ch.eitchnet.privilege.model;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -48,19 +46,20 @@ public class RoleRep implements Serializable {
 	@XmlAttribute(name = "name")
 	private String name;
 
-	private Map<String, PrivilegeRep> privilegeMap;
+	@XmlElement(name = "privileges")
+	private List<PrivilegeRep> privileges;
 
 	/**
 	 * Default constructor
 	 * 
 	 * @param name
 	 *            the name of this role
-	 * @param privilegeMap
-	 *            the map of privileges granted to this role
+	 * @param privileges
+	 *            the list of privileges granted to this role
 	 */
-	public RoleRep(String name, Map<String, PrivilegeRep> privilegeMap) {
+	public RoleRep(String name, List<PrivilegeRep> privileges) {
 		this.name = name;
-		this.privilegeMap = privilegeMap;
+		this.privileges = privileges;
 	}
 
 	/**
@@ -78,8 +77,8 @@ public class RoleRep implements Serializable {
 		if (StringHelper.isEmpty(this.name))
 			throw new PrivilegeException("name is null"); //$NON-NLS-1$
 
-		if (this.privilegeMap != null && !this.privilegeMap.isEmpty()) {
-			for (PrivilegeRep privilege : this.privilegeMap.values()) {
+		if (this.privileges != null && !this.privileges.isEmpty()) {
+			for (PrivilegeRep privilege : this.privileges) {
 				try {
 					privilege.validate();
 				} catch (Exception e) {
@@ -107,20 +106,12 @@ public class RoleRep implements Serializable {
 	}
 
 	/**
-	 * @return the privilegeMap
-	 */
-	public Map<String, PrivilegeRep> getPrivilegeMap() {
-		return this.privilegeMap;
-	}
-
-	/**
 	 * Returns the privileges assigned to this Role as a list
 	 * 
 	 * @return the privileges assigned to this Role as a list
 	 */
-	@XmlElement(name = "privileges")
 	public List<PrivilegeRep> getPrivileges() {
-		return new ArrayList<>(this.privilegeMap.values());
+		return this.privileges == null ? new ArrayList<>() : this.privileges;
 	}
 
 	/**
@@ -130,14 +121,7 @@ public class RoleRep implements Serializable {
 	 *            the list of privileges to assign to this role
 	 */
 	public void setPrivileges(List<PrivilegeRep> privileges) {
-		if (this.privilegeMap == null)
-			this.privilegeMap = new HashMap<>(privileges.size());
-		else
-			this.privilegeMap.clear();
-
-		for (PrivilegeRep privilegeRep : privileges) {
-			this.privilegeMap.put(privilegeRep.getName(), privilegeRep);
-		}
+		this.privileges = privileges;
 	}
 
 	/**
@@ -152,7 +136,7 @@ public class RoleRep implements Serializable {
 		builder.append("RoleRep [name=");
 		builder.append(this.name);
 		builder.append(", privilegeMap=");
-		builder.append((this.privilegeMap == null ? "null" : this.privilegeMap));
+		builder.append((this.privileges == null ? "null" : this.privileges));
 		builder.append("]");
 		return builder.toString();
 	}

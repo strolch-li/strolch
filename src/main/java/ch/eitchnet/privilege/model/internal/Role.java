@@ -15,9 +15,12 @@
  */
 package ch.eitchnet.privilege.model.internal;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
@@ -78,14 +81,14 @@ public final class Role {
 			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
 		}
 
-		if (roleRep.getPrivilegeMap() == null) {
-			throw new PrivilegeException("No privileges defined!"); //$NON-NLS-1$
+		if (roleRep.getPrivileges() == null) {
+			throw new PrivilegeException("Privileges may not be null!"); //$NON-NLS-1$
 		}
 
-		// build privileges from reps
-		Map<String, IPrivilege> privilegeMap = new HashMap<String, IPrivilege>(roleRep.getPrivilegeMap().size());
-		for (String privilegeName : roleRep.getPrivilegeMap().keySet()) {
-			privilegeMap.put(privilegeName, new PrivilegeImpl(roleRep.getPrivilegeMap().get(privilegeName)));
+		// build privileges from rep
+		Map<String, IPrivilege> privilegeMap = new HashMap<String, IPrivilege>(roleRep.getPrivileges().size());
+		for (PrivilegeRep privilege : roleRep.getPrivileges()) {
+			privilegeMap.put(privilege.getName(), new PrivilegeImpl(privilege));
 		}
 
 		this.name = name;
@@ -133,11 +136,11 @@ public final class Role {
 	 * @return a {@link RoleRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public RoleRep asRoleRep() {
-		Map<String, PrivilegeRep> privilegeMap = new HashMap<String, PrivilegeRep>();
-		for (String privilegeName : this.privilegeMap.keySet()) {
-			privilegeMap.put(privilegeName, this.privilegeMap.get(privilegeName).asPrivilegeRep());
+		List<PrivilegeRep> privileges = new ArrayList<PrivilegeRep>();
+		for (Entry<String, IPrivilege> entry : this.privilegeMap.entrySet()) {
+			privileges.add(entry.getValue().asPrivilegeRep());
 		}
-		return new RoleRep(this.name, privilegeMap);
+		return new RoleRep(this.name, privileges);
 	}
 
 	/**

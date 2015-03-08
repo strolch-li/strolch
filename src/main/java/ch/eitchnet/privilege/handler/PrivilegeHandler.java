@@ -146,7 +146,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public void removeRoleFromUser(Certificate certificate, String username, String roleName)
+	public UserRep removeRoleFromUser(Certificate certificate, String username, String roleName)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
@@ -182,7 +182,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public void removePrivilegeFromRole(Certificate certificate, String roleName, String privilegeName)
+	public RoleRep removePrivilegeFromRole(Certificate certificate, String roleName, String privilegeName)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
@@ -209,7 +209,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or the user already exists
 	 */
-	public void addUser(Certificate certificate, UserRep userRep, byte[] password) throws AccessDeniedException,
+	public UserRep addUser(Certificate certificate, UserRep userRep, byte[] password) throws AccessDeniedException,
 			PrivilegeException;
 
 	/**
@@ -241,7 +241,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or if the user does not exist
 	 */
-	public void updateUser(Certificate certificate, UserRep userRep) throws AccessDeniedException, PrivilegeException;
+	public UserRep updateUser(Certificate certificate, UserRep userRep) throws AccessDeniedException,
+			PrivilegeException;
 
 	/**
 	 * <p>
@@ -267,7 +268,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or if the user does not exist
 	 */
-	public void replaceUser(Certificate certificate, UserRep userRep, byte[] password) throws AccessDeniedException,
+	public UserRep replaceUser(Certificate certificate, UserRep userRep, byte[] password) throws AccessDeniedException,
 			PrivilegeException;
 
 	/**
@@ -283,7 +284,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or if the role already exists
 	 */
-	public void addRole(Certificate certificate, RoleRep roleRep) throws AccessDeniedException, PrivilegeException;
+	public RoleRep addRole(Certificate certificate, RoleRep roleRep) throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * Replaces the existing role with the information from this {@link RoleRep}
@@ -298,7 +299,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or if the role does not exist
 	 */
-	public void replaceRole(Certificate certificate, RoleRep roleRep) throws AccessDeniedException, PrivilegeException;
+	public RoleRep replaceRole(Certificate certificate, RoleRep roleRep) throws AccessDeniedException,
+			PrivilegeException;
 
 	/**
 	 * Adds the role with the given roleName to the {@link User} with the given username
@@ -315,8 +317,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or if the role does not exist
 	 */
-	public void addRoleToUser(Certificate certificate, String username, String roleName) throws AccessDeniedException,
-			PrivilegeException;
+	public UserRep addRoleToUser(Certificate certificate, String username, String roleName)
+			throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * Adds the {@link PrivilegeRep} to the {@link Role} with the given roleName or replaces it, if it already exists
@@ -333,7 +335,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or the role does not exist
 	 */
-	public void addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep)
+	public RoleRep addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
@@ -382,7 +384,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public void setUserName(Certificate certificate, String username, String firstname, String lastname)
+	public UserRep setUserName(Certificate certificate, String username, String firstname, String lastname)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
@@ -400,8 +402,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public void setUserState(Certificate certificate, String username, UserState state) throws AccessDeniedException,
-			PrivilegeException;
+	public UserRep setUserState(Certificate certificate, String username, UserState state)
+			throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * Changes the {@link Locale} of the user
@@ -418,7 +420,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public void setUserLocale(Certificate certificate, String username, Locale locale) throws AccessDeniedException,
+	public UserRep setUserLocale(Certificate certificate, String username, Locale locale) throws AccessDeniedException,
 			PrivilegeException;
 
 	/**

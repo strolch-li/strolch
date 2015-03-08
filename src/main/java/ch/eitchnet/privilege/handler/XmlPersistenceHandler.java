@@ -112,7 +112,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public void addRole(Role role) {
-		if (this.userMap.containsKey(role.getName()))
+		if (this.roleMap.containsKey(role.getName()))
 			throw new IllegalStateException(MessageFormat.format("The role {0} already exists!", role.getName()));
 		this.roleMap.put(role.getName(), role);
 		this.roleMapDirty = true;
@@ -120,9 +120,9 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public void replaceRole(Role role) {
-		if (!this.userMap.containsKey(role))
+		if (!this.roleMap.containsKey(role.getName()))
 			throw new IllegalStateException(MessageFormat.format(
-					"The role {0} can not be replaced as it does not exiset!", role.getName()));
+					"The role {0} can not be replaced as it does not exist!", role.getName()));
 		this.roleMap.put(role.getName(), role);
 		this.roleMapDirty = true;
 	}
