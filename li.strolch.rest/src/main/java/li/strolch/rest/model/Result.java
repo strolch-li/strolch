@@ -32,8 +32,16 @@ public class Result {
 	@XmlAttribute(name = "msg")
 	private String msg;
 
+	@XmlAttribute(name = "exceptionMsg")
+	private String exceptionMsg;
+
 	public Result(String msg) {
 		this.msg = msg;
+	}
+
+	public Result(Exception e) {
+		this.msg = StringHelper.isEmpty(e.getMessage()) ? e.getClass().getName() : e.getMessage();
+		this.exceptionMsg = StringHelper.formatExceptionMessage(e);
 	}
 
 	public Result() {
@@ -46,5 +54,13 @@ public class Result {
 
 	public void setMsg(String msg) {
 		this.msg = msg;
+	}
+
+	public String getExceptionMsg() {
+		return exceptionMsg;
+	}
+
+	public void setExceptionMsg(String exceptionMsg) {
+		this.exceptionMsg = exceptionMsg;
 	}
 }

@@ -96,8 +96,8 @@ public class PrivilegeRolesService {
 		try {
 
 			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.addRole(cert, newRole);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			RoleRep role = privilegeHandler.addRole(cert, newRole);
+			return Response.ok(role, MediaType.APPLICATION_JSON).build();
 
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
@@ -107,9 +107,6 @@ public class PrivilegeRolesService {
 			logger.error(e.getMessage(), e);
 			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 		}
 	}
 
@@ -127,8 +124,8 @@ public class PrivilegeRolesService {
 						.type(MediaType.APPLICATION_JSON).build();
 
 			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.replaceRole(cert, updatedRole);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			RoleRep role = privilegeHandler.replaceRole(cert, updatedRole);
+			return Response.ok(role, MediaType.APPLICATION_JSON).build();
 
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
@@ -138,9 +135,6 @@ public class PrivilegeRolesService {
 			logger.error(e.getMessage(), e);
 			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 		}
 	}
 
@@ -153,8 +147,8 @@ public class PrivilegeRolesService {
 		try {
 
 			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.removeRole(cert, rolename);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			RoleRep role = privilegeHandler.removeRole(cert, rolename);
+			return Response.ok(role, MediaType.APPLICATION_JSON).build();
 
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
@@ -164,9 +158,6 @@ public class PrivilegeRolesService {
 			logger.error(e.getMessage(), e);
 			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 		}
 	}
 
@@ -180,8 +171,8 @@ public class PrivilegeRolesService {
 		try {
 
 			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.addOrReplacePrivilegeOnRole(cert, rolename, privilegeRep);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			RoleRep updatedRole = privilegeHandler.addOrReplacePrivilegeOnRole(cert, rolename, privilegeRep);
+			return Response.ok(updatedRole, MediaType.APPLICATION_JSON).build();
 
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
@@ -191,9 +182,6 @@ public class PrivilegeRolesService {
 			logger.error(e.getMessage(), e);
 			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 		}
 	}
 
@@ -207,8 +195,8 @@ public class PrivilegeRolesService {
 		try {
 
 			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.removePrivilegeFromRole(cert, rolename, privilege);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			RoleRep updatedRole = privilegeHandler.removePrivilegeFromRole(cert, rolename, privilege);
+			return Response.ok(updatedRole, MediaType.APPLICATION_JSON).build();
 
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
@@ -218,41 +206,6 @@ public class PrivilegeRolesService {
 			logger.error(e.getMessage(), e);
 			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
-		}
-	}
-
-	@PUT
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{rolename}/privileges/{privilege}")
-	public Response addOrReplacePrivilegeOnRole(@PathParam("rolename") String rolename,
-			@PathParam("privilege") String privilege, PrivilegeRep privilegeRep, @Context HttpServletRequest request) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
-
-			if (!privilege.equals(privilegeRep.getName()))
-				return Response.serverError()
-						.entity(new Result("Path privilege and data do not have same privilege name!"))
-						.type(MediaType.APPLICATION_JSON).build();
-
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.addOrReplacePrivilegeOnRole(cert, rolename, privilegeRep);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
-
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 		}
 	}
 }

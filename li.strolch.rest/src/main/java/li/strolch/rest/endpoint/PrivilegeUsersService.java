@@ -109,8 +109,8 @@ public class PrivilegeUsersService {
 		try {
 
 			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.addUser(cert, newUser, null);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			UserRep user = privilegeHandler.addUser(cert, newUser, null);
+			return Response.ok(user, MediaType.APPLICATION_JSON).build();
 
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
@@ -120,9 +120,6 @@ public class PrivilegeUsersService {
 			logger.error(e.getMessage(), e);
 			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 		}
 	}
 
@@ -135,8 +132,8 @@ public class PrivilegeUsersService {
 		try {
 
 			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.removeUser(cert, username);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			UserRep user = privilegeHandler.removeUser(cert, username);
+			return Response.ok(user, MediaType.APPLICATION_JSON).build();
 
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
@@ -146,9 +143,6 @@ public class PrivilegeUsersService {
 			logger.error(e.getMessage(), e);
 			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 		}
 	}
 
@@ -166,8 +160,8 @@ public class PrivilegeUsersService {
 						.type(MediaType.APPLICATION_JSON).build();
 
 			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.updateUser(cert, updatedFields);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			UserRep updatedUser = privilegeHandler.updateUser(cert, updatedFields);
+			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
 
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
@@ -177,9 +171,6 @@ public class PrivilegeUsersService {
 			logger.error(e.getMessage(), e);
 			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 		}
 	}
 
@@ -193,8 +184,8 @@ public class PrivilegeUsersService {
 		try {
 
 			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.addRoleToUser(cert, username, rolename);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			UserRep updatedUser = privilegeHandler.addRoleToUser(cert, username, rolename);
+			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
 
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
@@ -204,9 +195,6 @@ public class PrivilegeUsersService {
 			logger.error(e.getMessage(), e);
 			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 		}
 	}
 
@@ -220,8 +208,8 @@ public class PrivilegeUsersService {
 		try {
 
 			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
-			privilegeHandler.removeRoleFromUser(cert, username, rolename);
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			UserRep updatedUser = privilegeHandler.removeRoleFromUser(cert, username, rolename);
+			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
 
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
@@ -231,9 +219,6 @@ public class PrivilegeUsersService {
 			logger.error(e.getMessage(), e);
 			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			return Response.serverError().entity(new Result(e.getMessage())).type(MediaType.APPLICATION_JSON).build();
 		}
 	}
 

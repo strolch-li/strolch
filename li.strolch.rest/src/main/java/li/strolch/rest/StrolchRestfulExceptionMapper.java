@@ -9,6 +9,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import li.strolch.exception.StrolchAccessDeniedException;
+import li.strolch.rest.model.Result;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +45,6 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 			return Response.status(Status.FORBIDDEN).entity(sb.toString()).type(MediaType.TEXT_PLAIN).build();
 		}
 
-		String exceptionMessage = StringHelper.formatExceptionMessage(ex);
-		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(exceptionMessage).type(MediaType.TEXT_PLAIN)
-				.build();
+		return Response.serverError().entity(new Result(ex)).type(MediaType.APPLICATION_JSON).build();
 	}
 }
