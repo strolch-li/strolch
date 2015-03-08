@@ -15,7 +15,11 @@
  */
 package li.strolch.rest.endpoint;
 
+import static li.strolch.rest.StrolchRestfulConstants.ROLE_STROLCH_PRIVILEGE_ADMIN;
+
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -35,6 +39,7 @@ import javax.ws.rs.core.Response.Status;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
+import li.strolch.rest.model.PasswordField;
 import li.strolch.rest.model.Result;
 
 import org.slf4j.Logger;
@@ -45,6 +50,7 @@ import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.UserRep;
+import ch.eitchnet.privilege.model.UserState;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -55,9 +61,9 @@ public class PrivilegeUsersService {
 	private static final Logger logger = LoggerFactory.getLogger(PrivilegeUsersService.class);
 
 	private PrivilegeHandler getPrivilegeHandler(Certificate cert, boolean requiresStrolchPrivilegeAdminRole) {
-		if (requiresStrolchPrivilegeAdminRole && !cert.hasRole(StrolchRestfulConstants.ROLE_STROLCH_PRIVILEGE_ADMIN)) {
-			throw new AccessDeniedException("You may not perform the request as you are missing role "
-					+ StrolchRestfulConstants.ROLE_STROLCH_PRIVILEGE_ADMIN);
+		if (requiresStrolchPrivilegeAdminRole && !cert.hasRole(ROLE_STROLCH_PRIVILEGE_ADMIN)) {
+			String msg = "You may not perform the request as you are missing role {0}";
+			throw new AccessDeniedException(MessageFormat.format(msg, ROLE_STROLCH_PRIVILEGE_ADMIN));
 		}
 
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
@@ -222,9 +228,92 @@ public class PrivilegeUsersService {
 		}
 	}
 
-	// TODO set password on user
-	// TODO set state on user
-	// TODO set locale on user
-	// TODO change username of user
+	@PUT
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{username}/state/{state}")
+	public Response setUserState(@PathParam("username") String username, @PathParam("state") String state,
+			@Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		try {
 
+			UserState userState;
+			try {
+				userState = UserState.valueOf(state);
+			} catch (Exception e) {
+				String msg = MessageFormat.format("UserState {0} is not valid!", state);
+				return Response.serverError().entity(new Result(msg)).type(MediaType.APPLICATION_JSON).build();
+			}
+
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			UserRep updatedUser = privilegeHandler.setUserState(cert, username, userState);
+			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
+
+		} catch (AccessDeniedException e) {
+			logger.error(e.getMessage(), e);
+			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
+					.type(MediaType.APPLICATION_JSON).build();
+		} catch (PrivilegeException e) {
+			logger.error(e.getMessage(), e);
+			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
+					.type(MediaType.APPLICATION_JSON).build();
+		}
+	}
+
+	@PUT
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{username}/password")
+	public Response setUserPassword(@PathParam("username") String username, PasswordField passwordField,
+			@Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		try {
+
+			// if user changing own password, then no need for StrolchPrivilegeAdmin
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, !cert.getUsername().equals(username));
+
+			privilegeHandler.setUserPassword(cert, username, passwordField.getPassword().getBytes());
+			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+
+		} catch (AccessDeniedException e) {
+			logger.error(e.getMessage(), e);
+			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
+					.type(MediaType.APPLICATION_JSON).build();
+		} catch (PrivilegeException e) {
+			logger.error(e.getMessage(), e);
+			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
+					.type(MediaType.APPLICATION_JSON).build();
+		}
+	}
+
+	@PUT
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{username}/locale/{locale}")
+	public Response setUserLocale(@PathParam("username") String username, @PathParam("locale") String localeS,
+			@Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		try {
+
+			Locale locale;
+			try {
+				locale = new Locale(localeS);
+			} catch (Exception e) {
+				String msg = MessageFormat.format("Locale {0} is not valid!", localeS);
+				return Response.serverError().entity(new Result(msg)).type(MediaType.APPLICATION_JSON).build();
+			}
+
+			// if user changing own locale, then no need for StrolchPrivilegeAdmin
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, !cert.getUsername().equals(username));
+
+			UserRep updatedUser = privilegeHandler.setUserLocale(cert, username, locale);
+			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
+
+		} catch (AccessDeniedException e) {
+			logger.error(e.getMessage(), e);
+			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
+					.type(MediaType.APPLICATION_JSON).build();
+		} catch (PrivilegeException e) {
+			logger.error(e.getMessage(), e);
+			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
+					.type(MediaType.APPLICATION_JSON).build();
+		}
+	}
 }

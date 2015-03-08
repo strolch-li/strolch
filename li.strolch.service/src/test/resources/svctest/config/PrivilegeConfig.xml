@@ -5,7 +5,7 @@
 
 		<Parameters>
 			<!-- parameters for the container itself -->
-			<Parameter name="autoPersistOnPasswordChange" value="true" />
+			<Parameter name="autoPersistOnUserChangesData" value="true" />
 		</Parameters>
 
 		<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">

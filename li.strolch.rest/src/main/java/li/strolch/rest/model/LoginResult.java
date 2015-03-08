@@ -15,6 +15,7 @@
  */
 package li.strolch.rest.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -133,6 +134,8 @@ public class LoginResult {
 	 */
 	@XmlElement(name = "properties")
 	public List<XmlKeyValue> getPropertiesAsKeyValue() {
+		if (this.parameters == null)
+			return new ArrayList<>(0);
 		return XmlKeyValue.valueOf(this.parameters);
 	}
 
