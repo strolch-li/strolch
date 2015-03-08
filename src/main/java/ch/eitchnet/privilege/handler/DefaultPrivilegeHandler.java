@@ -70,7 +70,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * configuration parameter to define automatic persisting on password change
 	 */
-	private static final String PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE = "autoPersistOnPasswordChange"; //$NON-NLS-1$
+	private static final String PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA = "autoPersistOnUserChangesData"; //$NON-NLS-1$
 
 	/**
 	 * slf4j logger
@@ -108,9 +108,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private boolean initialized;
 
 	/**
-	 * flag to define if a persist should be performed after a user changes their password
+	 * flag to define if a persist should be performed after a user changes their own data
 	 */
-	private boolean autoPersistOnPasswordChange;
+	private boolean autoPersistOnUserChangesData;
 
 	@Override
 	public RoleRep getRole(Certificate certificate, String roleName) {
@@ -734,8 +734,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	@Override
 	public UserRep setUserLocale(Certificate certificate, String username, Locale locale) {
 
-		// validate who is doing this
-		assertIsPrivilegeAdmin(certificate);
+		// check if certificate is for same user, in which case user is changing their own locale
+		if (certificate.getUsername().equals(username)) {
+
+			// validate the certificate
+			isCertificateValid(certificate);
+
+		} else {
+
+			// otherwise validate the the certificate is for a privilege admin
+			assertIsPrivilegeAdmin(certificate);
+		}
 
 		// get User
 		User user = this.persistenceHandler.getUser(username);
@@ -750,27 +759,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
 
-		return newUser.asUserRep();
-	}
-
-	@Override
-	public UserRep setUserName(Certificate certificate, String username, String firstname, String lastname) {
-
-		// validate who is doing this
-		assertIsPrivilegeAdmin(certificate);
-
-		// get User
-		User user = this.persistenceHandler.getUser(username);
-		if (user == null) {
-			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
+		// perform automatic persisting, if enabled
+		if (this.autoPersistOnUserChangesData) {
+			this.persistenceHandler.persist();
 		}
-
-		// create new user
-		User newUser = new User(user.getUserId(), user.getUsername(), user.getPassword(), firstname, lastname,
-				user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties());
-
-		// delegate user replacement to persistence handler
-		this.persistenceHandler.replaceUser(newUser);
 
 		return newUser.asUserRep();
 	}
@@ -815,7 +807,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			this.persistenceHandler.replaceUser(newUser);
 
 			// perform automatic persisting, if enabled
-			if (this.autoPersistOnPasswordChange) {
+			if (this.autoPersistOnUserChangesData) {
 				this.persistenceHandler.persist();
 			}
 
@@ -1151,15 +1143,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.encryptionHandler = encryptionHandler;
 		this.persistenceHandler = persistenceHandler;
 
-		String autoPersistS = parameterMap.get(PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE);
+		String autoPersistS = parameterMap.get(PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA);
 		if (autoPersistS == null || autoPersistS.equals(Boolean.FALSE.toString())) {
-			this.autoPersistOnPasswordChange = false;
+			this.autoPersistOnUserChangesData = false;
 		} else if (autoPersistS.equals(Boolean.TRUE.toString())) {
-			this.autoPersistOnPasswordChange = true;
-			logger.info("Enabling automatic persistence on password change."); //$NON-NLS-1$
+			this.autoPersistOnUserChangesData = true;
+			logger.info("Enabling automatic persistence when user changes their data."); //$NON-NLS-1$
 		} else {
 			String msg = "Parameter {0} has illegal value {1}. Overriding with {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, PARAM_AUTO_PERSIST_ON_PASSWORD_CHANGE, autoPersistS, Boolean.FALSE);
+			msg = MessageFormat.format(msg, PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA, autoPersistS, Boolean.FALSE);
 			logger.error(msg);
 		}
 
