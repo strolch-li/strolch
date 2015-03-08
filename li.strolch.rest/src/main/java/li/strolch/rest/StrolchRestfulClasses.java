@@ -22,6 +22,9 @@ import java.util.Set;
 import li.strolch.rest.endpoint.AuthenticationService;
 import li.strolch.rest.endpoint.EnumQuery;
 import li.strolch.rest.endpoint.Inspector;
+import li.strolch.rest.endpoint.PrivilegePoliciesService;
+import li.strolch.rest.endpoint.PrivilegeRolesService;
+import li.strolch.rest.endpoint.PrivilegeUsersService;
 import li.strolch.rest.endpoint.VersionQuery;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.AuthenicationRequestFilter;
@@ -36,11 +39,18 @@ public class StrolchRestfulClasses {
 	public static Set<Class<?>> providerClasses;
 
 	static {
+
 		Set<Class<?>> restfulClasses = new HashSet<>();
+
 		restfulClasses.add(AuthenticationService.class);
 		restfulClasses.add(Inspector.class);
 		restfulClasses.add(VersionQuery.class);
 		restfulClasses.add(EnumQuery.class);
+
+		// privilege
+		restfulClasses.add(PrivilegeUsersService.class);
+		restfulClasses.add(PrivilegeRolesService.class);
+		restfulClasses.add(PrivilegePoliciesService.class);
 
 		Set<Class<?>> providerClasses = new HashSet<>();
 		providerClasses.add(StrolchRestfulExceptionMapper.class);

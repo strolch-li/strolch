@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import ch.eitchnet.utils.xml.XmlKeyValue;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -41,9 +43,6 @@ public class LoginResult {
 	@XmlAttribute(name = "locale")
 	private String locale;
 
-	@XmlAttribute(name = "parameters")
-	private Map<String, String> parameters;
-
 	@XmlAttribute(name = "msg")
 	private String msg;
 
@@ -52,6 +51,8 @@ public class LoginResult {
 
 	@XmlElement(name = "privileges")
 	private List<String> privileges;
+
+	private Map<String, String> parameters;
 
 	public LoginResult() {
 		// no-arg constructor for JAXB
@@ -123,6 +124,16 @@ public class LoginResult {
 	 */
 	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
+	}
+
+	/**
+	 * Returns the string map properties of this user as a list of {@link XmlKeyValue} elements
+	 * 
+	 * @return the string map properties of this user as a list of {@link XmlKeyValue} elements
+	 */
+	@XmlElement(name = "properties")
+	public List<XmlKeyValue> getPropertiesAsKeyValue() {
+		return XmlKeyValue.valueOf(this.parameters);
 	}
 
 	/**

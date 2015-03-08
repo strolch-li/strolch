@@ -13,13 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.rest;
+package li.strolch.rest.model;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class StrolchRestfulConstants {
+@XmlRootElement(name = "Result")
+@XmlAccessorType(XmlAccessType.NONE)
+public class Result {
 
-	public static final String STROLCH_CERTIFICATE = "strolch.certificate"; //$NON-NLS-1$
-	public static final String ROLE_STROLCH_PRIVILEGE_ADMIN = "StrolchPrivilegeAdmin";
+	@XmlAttribute(name = "msg")
+	private String msg;
+
+	public Result(String msg) {
+		this.msg = msg;
+	}
+
+	public Result() {
+		this.msg = StringHelper.DASH;
+	}
+
+	public String getMsg() {
+		return this.msg;
+	}
+
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
 }

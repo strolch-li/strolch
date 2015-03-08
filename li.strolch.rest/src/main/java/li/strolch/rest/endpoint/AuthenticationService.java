@@ -27,7 +27,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -63,9 +62,6 @@ public class AuthenticationService {
 	public Response login(Login login, @Context HttpHeaders headers) {
 
 		LoginResult loginResult = new LoginResult();
-		GenericEntity<LoginResult> entity = new GenericEntity<LoginResult>(loginResult, LoginResult.class) {
-			//
-		};
 
 		try {
 
@@ -102,19 +98,19 @@ public class AuthenticationService {
 			else
 				loginResult.setPrivileges(allowList);
 
-			return Response.ok().entity(entity)//
+			return Response.ok().entity(loginResult)//
 					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken())//
 					.build();
 
 		} catch (StrolchException | PrivilegeException e) {
 			logger.error(e.getMessage(), e);
 			loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
-			return Response.status(Status.FORBIDDEN).entity(entity).build();
+			return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
 			loginResult.setMsg(MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
-			return Response.serverError().entity(entity).build();
+			return Response.serverError().entity(loginResult).build();
 		}
 	}
 
