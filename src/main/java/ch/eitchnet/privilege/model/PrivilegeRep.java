@@ -18,6 +18,12 @@ package ch.eitchnet.privilege.model;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.model.internal.Role;
@@ -31,14 +37,25 @@ import ch.eitchnet.utils.helper.StringHelper;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@XmlRootElement(name = "Privilege")
+@XmlAccessorType(XmlAccessType.NONE)
 public class PrivilegeRep implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@XmlAttribute(name = "name")
 	private String name;
+
+	@XmlAttribute(name = "policy")
 	private String policy;
+
+	@XmlAttribute(name = "allAllowed")
 	private boolean allAllowed;
+
+	@XmlElement(name = "denyList")
 	private Set<String> denyList;
+
+	@XmlElement(name = "allowList")
 	private Set<String> allowList;
 
 	/**
@@ -62,8 +79,14 @@ public class PrivilegeRep implements Serializable {
 		this.allAllowed = allAllowed;
 		this.denyList = denyList;
 		this.allowList = allowList;
+	}
 
-		validate();
+	/**
+	 * 
+	 */
+	@SuppressWarnings("unused")
+	private PrivilegeRep() {
+		// no-arg constructor for JAXB
 	}
 
 	/**

@@ -45,12 +45,12 @@ public final class Certificate implements Serializable {
 	private final String lastname;
 	private final String authToken;
 
+	private final Set<String> userRoles;
+	private final Map<String, String> propertyMap;
+	private final Map<String, String> sessionDataMap;
+
 	private Locale locale;
 	private long lastAccess;
-
-	private Set<String> userRoles;
-	private Map<String, String> propertyMap;
-	private Map<String, String> sessionDataMap;
 
 	/**
 	 * Default constructor initializing with all information needed for this certificate
@@ -120,7 +120,19 @@ public final class Certificate implements Serializable {
 	 * @return the user's roles
 	 */
 	public Set<String> getUserRoles() {
-		return userRoles;
+		return this.userRoles;
+	}
+
+	/**
+	 * Returns true if the user of this certificate has the given role
+	 * 
+	 * @param role
+	 *            the role to check for
+	 * 
+	 * @return true if the user of this certificate has the given role
+	 */
+	public boolean hasRole(String role) {
+		return this.userRoles.contains(role);
 	}
 
 	/**

@@ -16,12 +16,15 @@
 package ch.eitchnet.privilege.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.AfterClass;
@@ -68,6 +71,7 @@ public class PrivilegeTest {
 	private static final String SYSTEM_USER_ADMIN2 = "system_admin2";
 	private static final byte[] PASS_BOB = "admin1".getBytes();
 	private static final String ROLE_APP_USER = "AppUser";
+	private static final String ROLE_MY = "MyRole";
 	private static final String ROLE_TEMP = "temp";
 	private static final String ROLE_USER = "user";
 	private static final byte[] PASS_DEF = "def".getBytes();
@@ -213,7 +217,7 @@ public class PrivilegeTest {
 			RoleRep roleRep = new RoleRep(ROLE_TEMP, privilegeMap);
 
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addOrReplaceRole(certificate, roleRep);
+			privilegeHandler.addRole(certificate, roleRep);
 			privilegeHandler.persist(certificate);
 		} finally {
 			logout();
@@ -308,6 +312,117 @@ public class PrivilegeTest {
 		}
 	}
 
+	@Test
+	public void shouldUpdateAdmin() {
+		try {
+			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+
+			Certificate certificate = this.ctx.getCertificate();
+
+			// validate name is not yet set
+			UserRep user = privilegeHandler.getUser(certificate, ADMIN);
+			assertNotEquals("The", user.getFirstname());
+			assertNotEquals("Admin", user.getLastname());
+
+			// let's add a new user bob
+			UserRep userRep = new UserRep(null, ADMIN, "The", "Admin", null, null, null, null);
+			privilegeHandler.updateUser(certificate, userRep);
+
+			user = privilegeHandler.getUser(certificate, ADMIN);
+			assertEquals("The", user.getFirstname());
+			assertEquals("Admin", user.getLastname());
+
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void shouldFailUpdateInexistantUser() {
+		exception.expect(PrivilegeException.class);
+		exception.expectMessage("User bob does not exist");
+		try {
+			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+
+			Certificate certificate = this.ctx.getCertificate();
+
+			// let's add a new user bob
+			UserRep userRep = new UserRep(null, BOB, null, null, null, null, null, null);
+			privilegeHandler.updateUser(certificate, userRep);
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void shouldFailUpdateAdminNoChanges() {
+		exception.expect(PrivilegeException.class);
+		exception.expectMessage("All updateable fields are empty for update of user admin");
+		try {
+			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+
+			Certificate certificate = this.ctx.getCertificate();
+
+			// let's add a new user bob
+			UserRep userRep = new UserRep(null, ADMIN, null, null, null, null, null, null);
+			privilegeHandler.updateUser(certificate, userRep);
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void shouldQueryUsers() {
+		try {
+			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+
+			Certificate certificate = this.ctx.getCertificate();
+
+			UserRep selectorRep = new UserRep(null, ADMIN, null, null, null, null, null, null);
+			List<UserRep> users = privilegeHandler.queryUsers(certificate, selectorRep);
+			assertEquals(1, users.size());
+			assertEquals(ADMIN, users.get(0).getUsername());
+
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void shouldQueryUsersByRoles() {
+		try {
+			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+
+			Certificate certificate = this.ctx.getCertificate();
+
+			UserRep selectorRep = new UserRep(null, null, null, null, null, new HashSet<>(
+					Arrays.asList("PrivilegeAdmin")), null, null);
+			List<UserRep> users = privilegeHandler.queryUsers(certificate, selectorRep);
+			assertEquals(1, users.size());
+			assertEquals(ADMIN, users.get(0).getUsername());
+
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void shouldQueryUsersByRoles2() {
+		try {
+			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+
+			Certificate certificate = this.ctx.getCertificate();
+
+			UserRep selectorRep = new UserRep(null, null, null, null, null, new HashSet<>(Arrays.asList(ROLE_TEMP)),
+					null, null);
+			List<UserRep> users = privilegeHandler.queryUsers(certificate, selectorRep);
+			assertEquals(0, users.size());
+
+		} finally {
+			logout();
+		}
+	}
+
 	/**
 	 * This test performs multiple tests which are dependent on each other as the following is done:
 	 * <ul>
@@ -328,7 +443,6 @@ public class PrivilegeTest {
 	 * <li>add app role to bob</li>
 	 * <li>perform restrictable as bob</li>
 	 * </ul>
-	 * 
 	 */
 	@Test
 	public void testUserStory() throws Exception {
@@ -336,7 +450,6 @@ public class PrivilegeTest {
 		addBobAsAdmin();
 		failAuthAsBobNotEnabled();
 		enableBob();
-		failAuthAsBobNoRole();
 		addRoleUser();
 		addRoleUserToBob();
 		authAsBob();
@@ -454,7 +567,7 @@ public class PrivilegeTest {
 			userRep = new UserRep("2", TED, "Ted", "Newman", UserState.ENABLED, roles, null,
 					new HashMap<String, String>());
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addOrReplaceUser(certificate, userRep, null);
+			privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + TED);
 			privilegeHandler.persist(certificate);
 		} finally {
@@ -487,7 +600,7 @@ public class PrivilegeTest {
 			userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<String>(), null,
 					new HashMap<String, String>());
 			certificate = this.ctx.getCertificate();
-			privilegeHandler.addOrReplaceUser(certificate, userRep, null);
+			privilegeHandler.addUser(certificate, userRep, null);
 			fail("User bob may not add a user as bob does not have admin rights!");
 		} catch (PrivilegeException e) {
 			String msg = "User does not have PrivilegeAdmin role! Certificate: " + certificate;
@@ -526,22 +639,8 @@ public class PrivilegeTest {
 			Map<String, PrivilegeRep> privilegeMap = new HashMap<String, PrivilegeRep>();
 			RoleRep roleRep = new RoleRep(ROLE_USER, privilegeMap);
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addOrReplaceRole(certificate, roleRep);
+			privilegeHandler.addRole(certificate, roleRep);
 			privilegeHandler.persist(certificate);
-		} finally {
-			logout();
-		}
-	}
-
-	private void failAuthAsBobNoRole() {
-		try {
-			// testFailAuthUserBob
-			// Will fail as user bob has no role
-			privilegeHandler.authenticate(BOB, ArraysHelper.copyOf(PASS_BOB));
-			fail("User Bob may not authenticate because the user has no role");
-		} catch (PrivilegeException e) {
-			String msg = "User bob does not have any roles defined!";
-			assertEquals(msg, e.getMessage());
 		} finally {
 			logout();
 		}
@@ -578,10 +677,10 @@ public class PrivilegeTest {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
 			// let's add a new user bob
-			UserRep userRep = new UserRep("1", BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(), null,
-					new HashMap<String, String>());
+			UserRep userRep = new UserRep("1", BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(
+					Arrays.asList(ROLE_MY)), null, new HashMap<String, String>());
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addOrReplaceUser(certificate, userRep, null);
+			privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + BOB);
 
 			// set bob's password

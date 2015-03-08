@@ -95,20 +95,36 @@ public interface PersistenceHandler {
 	public Role removeRole(String roleName);
 
 	/**
-	 * Adds a {@link User} object to the underlying database. If the {@link User} already exists, it is replaced
+	 * Adds a {@link User} object to the underlying database
 	 * 
 	 * @param user
 	 *            the {@link User} object to add
 	 */
-	public void addOrReplaceUser(User user);
+	public void addUser(User user);
 
 	/**
-	 * Adds a {@link Role} object to the underlying database. If the {@link Role} already exists, it is replaced
+	 * Replaces the existing {@link User} object in the underlying database
+	 * 
+	 * @param user
+	 *            the {@link User} object to add
+	 */
+	public void replaceUser(User user);
+
+	/**
+	 * Adds a {@link Role} object to the underlying database
 	 * 
 	 * @param role
 	 *            the {@link User} object to add
 	 */
-	public void addOrReplaceRole(Role role);
+	public void addRole(Role role);
+
+	/**
+	 * Replaces the {@link Role} object in the underlying database
+	 * 
+	 * @param role
+	 *            the {@link User} object to add
+	 */
+	public void replaceRole(Role role);
 
 	/**
 	 * Informs this {@link PersistenceHandler} to persist any changes which need to be saved

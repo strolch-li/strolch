@@ -16,7 +16,17 @@
 package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.internal.Role;
@@ -29,11 +39,15 @@ import ch.eitchnet.utils.helper.StringHelper;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@XmlRootElement(name = "Role")
+@XmlAccessorType(XmlAccessType.NONE)
 public class RoleRep implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@XmlAttribute(name = "name")
 	private String name;
+
 	private Map<String, PrivilegeRep> privilegeMap;
 
 	/**
@@ -45,11 +59,16 @@ public class RoleRep implements Serializable {
 	 *            the map of privileges granted to this role
 	 */
 	public RoleRep(String name, Map<String, PrivilegeRep> privilegeMap) {
-
 		this.name = name;
 		this.privilegeMap = privilegeMap;
+	}
 
-		validate();
+	/**
+	 * 
+	 */
+	@SuppressWarnings("unused")
+	private RoleRep() {
+		// no-arg constructor for JAXB
 	}
 
 	/**
@@ -58,6 +77,18 @@ public class RoleRep implements Serializable {
 	public void validate() {
 		if (StringHelper.isEmpty(this.name))
 			throw new PrivilegeException("name is null"); //$NON-NLS-1$
+
+		if (this.privilegeMap != null && !this.privilegeMap.isEmpty()) {
+			for (PrivilegeRep privilege : this.privilegeMap.values()) {
+				try {
+					privilege.validate();
+				} catch (Exception e) {
+					String msg = "Privilege {0} is invalid on role {1}";
+					msg = MessageFormat.format(msg, privilege.getName(), this.name);
+					throw new PrivilegeException(msg, e);
+				}
+			}
+		}
 	}
 
 	/**
@@ -80,6 +111,33 @@ public class RoleRep implements Serializable {
 	 */
 	public Map<String, PrivilegeRep> getPrivilegeMap() {
 		return this.privilegeMap;
+	}
+
+	/**
+	 * Returns the privileges assigned to this Role as a list
+	 * 
+	 * @return the privileges assigned to this Role as a list
+	 */
+	@XmlElement(name = "privileges")
+	public List<PrivilegeRep> getPrivileges() {
+		return new ArrayList<>(this.privilegeMap.values());
+	}
+
+	/**
+	 * Sets the privileges on this from a list
+	 * 
+	 * @param privileges
+	 *            the list of privileges to assign to this role
+	 */
+	public void setPrivileges(List<PrivilegeRep> privileges) {
+		if (this.privilegeMap == null)
+			this.privilegeMap = new HashMap<>(privileges.size());
+		else
+			this.privilegeMap.clear();
+
+		for (PrivilegeRep privilegeRep : privileges) {
+			this.privilegeMap.put(privilegeRep.getName(), privilegeRep);
+		}
 	}
 
 	/**

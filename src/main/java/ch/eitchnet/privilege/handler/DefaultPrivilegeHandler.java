@@ -17,13 +17,17 @@ package ch.eitchnet.privilege.handler;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +45,7 @@ import ch.eitchnet.privilege.model.internal.PrivilegeImpl;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.privilege.policy.PrivilegePolicy;
+import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * <p>
@@ -108,7 +113,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private boolean autoPersistOnPasswordChange;
 
 	@Override
-	public RoleRep getRole(String roleName) {
+	public RoleRep getRole(Certificate certificate, String roleName) {
+
+		// validate who is doing this
+		assertIsPrivilegeAdmin(certificate);
+
 		Role role = this.persistenceHandler.getRole(roleName);
 		if (role == null)
 			return null;
@@ -116,7 +125,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public UserRep getUser(String username) {
+	public UserRep getUser(Certificate certificate, String username) {
+
+		// validate who is doing this
+		assertIsPrivilegeAdmin(certificate);
+
 		User user = this.persistenceHandler.getUser(username);
 		if (user == null)
 			return null;
@@ -124,7 +137,45 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public List<UserRep> queryUsers(UserRep selectorRep) {
+	public Map<String, String> getPolicyDefs(Certificate certificate) {
+
+		// validate who is doing this
+		assertIsPrivilegeAdmin(certificate);
+
+		Map<String, String> policyDef = new HashMap<>(this.policyMap.size());
+		for (Entry<String, Class<PrivilegePolicy>> entry : this.policyMap.entrySet()) {
+			policyDef.put(entry.getKey(), entry.getValue().getName());
+		}
+		return policyDef;
+	}
+
+	@Override
+	public List<UserRep> getUsers(Certificate certificate) {
+
+		// validate who is doing this
+		assertIsPrivilegeAdmin(certificate);
+
+		Stream<User> usersStream = this.persistenceHandler.getAllUsers().stream();
+		List<UserRep> users = usersStream.map(u -> u.asUserRep()).collect(Collectors.toList());
+		return users;
+	}
+
+	@Override
+	public List<RoleRep> getRoles(Certificate certificate) {
+
+		// validate who is doing this
+		assertIsPrivilegeAdmin(certificate);
+
+		Stream<Role> rolesStream = this.persistenceHandler.getAllRoles().stream();
+		List<RoleRep> roles = rolesStream.map(r -> r.asRoleRep()).collect(Collectors.toList());
+		return roles;
+	}
+
+	@Override
+	public List<UserRep> queryUsers(Certificate certificate, UserRep selectorRep) {
+
+		// validate who is doing this
+		assertIsPrivilegeAdmin(certificate);
 
 		String selUserId = selectorRep.getUserId();
 		String selUsername = selectorRep.getUsername();
@@ -264,32 +315,27 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return roles.containsAll(selectionRoles);
 	}
 
-	@Override
-	public void addOrReplaceRole(Certificate certificate, RoleRep roleRep) {
-
-		// validate who is doing this
-		assertIsPrivilegeAdmin(certificate);
-
-		// create new role from RoleRep
-		Role role = new Role(roleRep);
-
-		// validate policy if not null
-		validatePolicies(role);
-
-		// delegate to persistence handler
-		this.persistenceHandler.addOrReplaceRole(role);
-	}
-
 	/**
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplaceUser(ch.eitchnet.privilege.model.Certificate,
 	 *      ch.eitchnet.privilege.model.UserRep, byte[])
 	 */
 	@Override
-	public void addOrReplaceUser(Certificate certificate, UserRep userRep, byte[] password) {
+	public void addUser(Certificate certificate, UserRep userRep, byte[] password) {
 		try {
 
 			// validate who is doing this
 			assertIsPrivilegeAdmin(certificate);
+
+			// first validate user
+			userRep.validate();
+
+			validateRolesExist(userRep);
+
+			// validate user does not already exist
+			if (this.persistenceHandler.getUser(userRep.getUsername()) != null) {
+				String msg = "User {0} can not be added as it already exists!";
+				throw new PrivilegeException(MessageFormat.format(msg, userRep.getUsername()));
+			}
 
 			String passwordHash = null;
 			if (password != null) {
@@ -302,16 +348,171 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			// create new user
-			User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(),
-					userRep.getLastname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
-					userRep.getProperties());
+			User user = createUser(userRep, passwordHash);
 
 			// delegate to persistence handler
-			this.persistenceHandler.addOrReplaceUser(user);
+			this.persistenceHandler.addUser(user);
 
 		} finally {
 			clearPassword(password);
 		}
+	}
+
+	/**
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#addOrReplaceUser(ch.eitchnet.privilege.model.Certificate,
+	 *      ch.eitchnet.privilege.model.UserRep, byte[])
+	 */
+	@Override
+	public void replaceUser(Certificate certificate, UserRep userRep, byte[] password) {
+		try {
+
+			// validate who is doing this
+			assertIsPrivilegeAdmin(certificate);
+
+			// first validate user
+			userRep.validate();
+
+			validateRolesExist(userRep);
+
+			// validate user exists
+			if (this.persistenceHandler.getUser(userRep.getUsername()) == null) {
+				String msg = "User {0} can not be replaced as it does not exist!";
+				throw new PrivilegeException(MessageFormat.format(msg, userRep.getUsername()));
+			}
+
+			String passwordHash = null;
+			if (password != null) {
+
+				// validate password meets basic requirements
+				validatePassword(password);
+
+				// hash password
+				passwordHash = this.encryptionHandler.convertToHash(password);
+			}
+
+			User user = createUser(userRep, passwordHash);
+
+			// delegate to persistence handler
+			this.persistenceHandler.replaceUser(user);
+
+		} finally {
+			clearPassword(password);
+		}
+	}
+
+	private void validateRolesExist(UserRep userRep) {
+		// validate all roles exist
+		for (String role : userRep.getRoles()) {
+			if (this.persistenceHandler.getRole(role) == null) {
+				String msg = "Can not add user {0} as role {1} does not exist!";
+				msg = MessageFormat.format(msg, userRep.getUsername(), role);
+				throw new PrivilegeException(msg);
+			}
+		}
+	}
+
+	private User createUser(UserRep userRep, String passwordHash) {
+		User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(),
+				userRep.getLastname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
+				userRep.getProperties());
+		return user;
+	}
+
+	@Override
+	public void updateUser(Certificate certificate, UserRep userRep) throws AccessDeniedException, PrivilegeException {
+
+		// validate who is doing this
+		assertIsPrivilegeAdmin(certificate);
+
+		// get existing user
+		User user = this.persistenceHandler.getUser(userRep.getUsername());
+		if (user == null) {
+			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", userRep.getUsername())); //$NON-NLS-1$
+		}
+
+		// if nothing to do, then stop
+		if (StringHelper.isEmpty(userRep.getFirstname()) && StringHelper.isEmpty(userRep.getLastname())
+				&& userRep.getLocale() == null
+				&& (userRep.getProperties() == null || userRep.getProperties().isEmpty())) {
+			throw new PrivilegeException(MessageFormat.format(
+					"All updateable fields are empty for update of user {0}", userRep.getUsername())); //$NON-NLS-1$
+		}
+
+		String userId = user.getUserId();
+		String username = user.getUsername();
+		String password = user.getPassword();
+		String firstname = user.getFirstname();
+		String lastname = user.getLastname();
+		UserState userState = user.getUserState();
+		Set<String> roles = user.getRoles();
+		Locale locale = user.getLocale();
+		Map<String, String> propertyMap = user.getProperties();
+
+		// get updated fields
+		if (StringHelper.isNotEmpty(userRep.getFirstname()))
+			firstname = userRep.getFirstname();
+		if (StringHelper.isNotEmpty(userRep.getLastname()))
+			lastname = userRep.getLastname();
+		if (userRep.getLocale() != null)
+			locale = userRep.getLocale();
+		if (userRep.getProperties() != null && !userRep.getProperties().isEmpty())
+			propertyMap = userRep.getProperties();
+
+		// create new user
+		user = new User(userId, username, password, firstname, lastname, userState, roles, locale, propertyMap);
+
+		// delegate to persistence handler
+		this.persistenceHandler.replaceUser(user);
+	}
+
+	@Override
+	public void addRole(Certificate certificate, RoleRep roleRep) {
+
+		// validate who is doing this
+		assertIsPrivilegeAdmin(certificate);
+
+		// first validate role
+		roleRep.validate();
+
+		// validate role does not exist
+		if (this.persistenceHandler.getRole(roleRep.getName()) != null) {
+			String msg = MessageFormat.format("Can not add role {0} as it already exists!", roleRep.getName());
+			throw new PrivilegeException(msg);
+		}
+
+		// create new role from RoleRep
+		Role role = new Role(roleRep);
+
+		// validate policy if not null
+		validatePolicies(role);
+
+		// delegate to persistence handler
+		this.persistenceHandler.addRole(role);
+	}
+
+	@Override
+	public void replaceRole(Certificate certificate, RoleRep roleRep) {
+
+		// validate who is doing this
+		assertIsPrivilegeAdmin(certificate);
+
+		// first validate role
+		roleRep.validate();
+
+		// validate role does exist
+		if (this.persistenceHandler.getRole(roleRep.getName()) == null) {
+			String msg = MessageFormat.format("Can not replace role {0} as it does not exist!", roleRep.getName());
+			throw new PrivilegeException(msg);
+		}
+
+		// create new role from RoleRep
+		Role role = new Role(roleRep);
+
+		// validate policy if not null
+		validatePolicies(role);
+
+		// delegate to persistence handler
+		this.persistenceHandler.replaceRole(role);
 	}
 
 	@Override
@@ -353,7 +554,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Role newRole = new Role(role.getName(), privilegeMap);
 
 		// delegate role replacement to persistence handler
-		this.persistenceHandler.addOrReplaceRole(newRole);
+		this.persistenceHandler.replaceRole(newRole);
 	}
 
 	@Override
@@ -377,7 +578,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// validate that role exists
-		if (getRole(roleName) == null) {
+		if (this.persistenceHandler.getRole(roleName) == null) {
 			String msg = MessageFormat.format("Role {0} does not exist!", roleName); //$NON-NLS-1$
 			throw new PrivilegeException(msg);
 		}
@@ -390,7 +591,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				user.getLastname(), user.getUserState(), newRoles, user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
-		this.persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.replaceUser(newUser);
 	}
 
 	@Override
@@ -424,7 +625,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Role newRole = new Role(role.getName(), newPrivileges);
 
 		// delegate user replacement to persistence handler
-		this.persistenceHandler.addOrReplaceRole(newRole);
+		this.persistenceHandler.replaceRole(newRole);
 	}
 
 	@Override
@@ -432,6 +633,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate who is doing this
 		assertIsPrivilegeAdmin(certificate);
+
+		// validate no user is using this role
+		Set<String> roles = new HashSet<>(Arrays.asList(roleName));
+		UserRep selector = new UserRep(null, null, null, null, null, roles, null, null);
+		List<UserRep> usersWithRole = queryUsers(certificate, selector);
+		if (!usersWithRole.isEmpty()) {
+			String usersS = usersWithRole.stream().map(UserRep::getUsername).collect(Collectors.joining(", "));
+			String msg = "The role {0} can not be removed as the following {1} user have the role assigned: {2}";
+			msg = MessageFormat.format(msg, roleName, usersWithRole.size(), usersS);
+			throw new PrivilegeException(msg);
+		}
 
 		// delegate role removal to persistence handler
 		Role removedRole = this.persistenceHandler.removeRole(roleName);
@@ -470,7 +682,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				user.getLastname(), user.getUserState(), newRoles, user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
-		this.persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.replaceUser(newUser);
 	}
 
 	@Override
@@ -488,7 +700,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// return user rep if it was removed
 		return removedUser.asUserRep();
-
 	}
 
 	@Override
@@ -508,7 +719,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				user.getLastname(), user.getUserState(), user.getRoles(), locale, user.getProperties());
 
 		// delegate user replacement to persistence handler
-		this.persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.replaceUser(newUser);
 	}
 
 	@Override
@@ -528,7 +739,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
-		this.persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.replaceUser(newUser);
 	}
 
 	/**
@@ -572,7 +783,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					user.getLastname(), user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties());
 
 			// delegate user replacement to persistence handler
-			this.persistenceHandler.addOrReplaceUser(newUser);
+			this.persistenceHandler.replaceUser(newUser);
 
 			// perform automatic persisting, if enabled
 			if (this.autoPersistOnPasswordChange) {
@@ -601,7 +812,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				user.getLastname(), state, user.getRoles(), user.getLocale(), user.getProperties());
 
 		// delegate user replacement to persistence handler
-		this.persistenceHandler.addOrReplaceUser(newUser);
+		this.persistenceHandler.replaceUser(newUser);
 	}
 
 	/**

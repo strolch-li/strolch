@@ -17,6 +17,7 @@ package ch.eitchnet.privilege.handler;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
@@ -29,6 +30,7 @@ import ch.eitchnet.privilege.model.UserRep;
 import ch.eitchnet.privilege.model.UserState;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
+import ch.eitchnet.privilege.policy.PrivilegePolicy;
 
 /**
  * The {@link PrivilegeHandler} is the centrally exposed API for accessing the privilege library. It exposes all needed
@@ -36,7 +38,6 @@ import ch.eitchnet.privilege.model.internal.User;
  * an action
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface PrivilegeHandler {
 
@@ -48,33 +49,69 @@ public interface PrivilegeHandler {
 	/**
 	 * Returns a {@link UserRep} for the given username
 	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
 	 * @param username
 	 *            the name of the {@link UserRep} to return
 	 * 
 	 * @return the {@link UserRep} for the given username, or null if it was not found
 	 */
-	public UserRep getUser(String username);
+	public UserRep getUser(Certificate certificate, String username);
 
 	/**
 	 * Returns a {@link RoleRep} for the given roleName
 	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
 	 * @param roleName
 	 *            the name of the {@link RoleRep} to return
 	 * 
 	 * @return the {@link RoleRep} for the given roleName, or null if it was not found
 	 */
-	public RoleRep getRole(String roleName);
+	public RoleRep getRole(Certificate certificate, String roleName);
+
+	/**
+	 * Returns the map of {@link PrivilegePolicy} definitions
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
+	 * 
+	 * @return the map of {@link PrivilegePolicy} definitions
+	 */
+	public Map<String, String> getPolicyDefs(Certificate certificate);
+
+	/**
+	 * Returns all {@link RoleRep RoleReps}
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
+	 * 
+	 * @return the list of {@link RoleRep RoleReps}
+	 */
+	public List<RoleRep> getRoles(Certificate certificate);
+
+	/**
+	 * Returns all {@link UserRep UserReps}
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
+	 * 
+	 * @return the list of {@link UserRep UserReps}
+	 */
+	public List<UserRep> getUsers(Certificate certificate);
 
 	/**
 	 * Method to query {@link UserRep} which meet the criteria set in the given {@link UserRep}. Null fields mean the
-	 * fields are not relevant.
+	 * fields are irrelevant.
 	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
 	 * @param selectorRep
 	 *            the {@link UserRep} to use as criteria selection
 	 * 
 	 * @return a list of {@link UserRep}s which fit the given criteria
 	 */
-	public List<UserRep> queryUsers(UserRep selectorRep);
+	public List<UserRep> queryUsers(Certificate certificate, UserRep selectorRep);
 
 	/**
 	 * Removes the user with the given username
@@ -125,7 +162,7 @@ public interface PrivilegeHandler {
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
 	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
+	 *             if there is anything wrong with this certificate or the role is still in use by a user
 	 */
 	public RoleRep removeRole(Certificate certificate, String roleName) throws AccessDeniedException,
 			PrivilegeException;
@@ -150,7 +187,7 @@ public interface PrivilegeHandler {
 
 	/**
 	 * <p>
-	 * Adds a new user, or replaces the user with the information from this {@link UserRep} if the user already exists
+	 * Adds a new user with the information from this {@link UserRep}
 	 * </p>
 	 * 
 	 * <p>
@@ -170,13 +207,71 @@ public interface PrivilegeHandler {
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
 	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
+	 *             if there is anything wrong with this certificate or the user already exists
 	 */
-	public void addOrReplaceUser(Certificate certificate, UserRep userRep, byte[] password)
-			throws AccessDeniedException, PrivilegeException;
+	public void addUser(Certificate certificate, UserRep userRep, byte[] password) throws AccessDeniedException,
+			PrivilegeException;
 
 	/**
-	 * Adds a new role, or replaces the role with the information from this {@link RoleRep} if the role already exists
+	 * <p>
+	 * Updates the fields for the user with the given user. All fields on the given {@link UserRep} which are non-null
+	 * will be updated on the existing user. The username on the given {@link UserRep} must be set and correspond to an
+	 * existing user.
+	 * </p>
+	 * 
+	 * The following fields are considered updateable:
+	 * <ul>
+	 * <li>{@link UserRep#getFirstname()}</li>
+	 * <li>{@link UserRep#getLastname()}</li>
+	 * <li>{@link UserRep#getLocale()}</li>
+	 * <li>{@link UserRep#getProperties()} - the existing properties will be replaced with the given properties</li>
+	 * </ul>
+	 * 
+	 * <p>
+	 * Any other fields will be ignored
+	 * </p>
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param userRep
+	 *            the {@link UserRep} with the fields set to their new values
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the user for this certificate may not perform the action
+	 * @throws PrivilegeException
+	 *             if there is anything wrong with this certificate or if the user does not exist
+	 */
+	public void updateUser(Certificate certificate, UserRep userRep) throws AccessDeniedException, PrivilegeException;
+
+	/**
+	 * <p>
+	 * Replaces the existing user with the information from this {@link UserRep} if the user already exists
+	 * </p>
+	 * 
+	 * <p>
+	 * If the password given is null, then the user is created, but can not not login! Otherwise the password must meet
+	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(byte[])}
+	 * </p>
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param userRep
+	 *            the {@link UserRep} containing the information to replace the existing {@link User}
+	 * @param password
+	 *            the password of the new user. If the password is null, then this is accepted but the user can not
+	 *            login, otherwise the password must be validated against
+	 *            {@link PrivilegeHandler#validatePassword(byte[])}
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the user for this certificate may not perform the action
+	 * @throws PrivilegeException
+	 *             if there is anything wrong with this certificate or if the user does not exist
+	 */
+	public void replaceUser(Certificate certificate, UserRep userRep, byte[] password) throws AccessDeniedException,
+			PrivilegeException;
+
+	/**
+	 * Adds a new role with the information from this {@link RoleRep}
 	 * 
 	 * @param certificate
 	 *            the {@link Certificate} of the user which has the privilege to perform this action
@@ -186,10 +281,24 @@ public interface PrivilegeHandler {
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
 	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
+	 *             if there is anything wrong with this certificate or if the role already exists
 	 */
-	public void addOrReplaceRole(Certificate certificate, RoleRep roleRep) throws AccessDeniedException,
-			PrivilegeException;
+	public void addRole(Certificate certificate, RoleRep roleRep) throws AccessDeniedException, PrivilegeException;
+
+	/**
+	 * Replaces the existing role with the information from this {@link RoleRep}
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param roleRep
+	 *            the {@link RoleRep} containing the information to replace the existing {@link Role}
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the user for this certificate may not perform the action
+	 * @throws PrivilegeException
+	 *             if there is anything wrong with this certificate or if the role does not exist
+	 */
+	public void replaceRole(Certificate certificate, RoleRep roleRep) throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * Adds the role with the given roleName to the {@link User} with the given username
@@ -204,25 +313,25 @@ public interface PrivilegeHandler {
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
 	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
+	 *             if there is anything wrong with this certificate or if the role does not exist
 	 */
 	public void addRoleToUser(Certificate certificate, String username, String roleName) throws AccessDeniedException,
 			PrivilegeException;
 
 	/**
-	 * Adds the {@link PrivilegeRep} to the {@link Role} with the given roleName
+	 * Adds the {@link PrivilegeRep} to the {@link Role} with the given roleName or replaces it, if it already exists
 	 * 
 	 * @param certificate
 	 *            the {@link Certificate} of the user which has the privilege to perform this action
 	 * @param roleName
 	 *            the roleName of the {@link Role} to which the privilege should be added
 	 * @param privilegeRep
-	 *            the representation of the {@link IPrivilege} which should be added to the {@link Role}
+	 *            the representation of the {@link IPrivilege} which should be added or replaced on the {@link Role}
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
 	 * @throws PrivilegeException
-	 *             if there is anything wrong with this certificate
+	 *             if there is anything wrong with this certificate or the role does not exist
 	 */
 	public void addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep)
 			throws AccessDeniedException, PrivilegeException;

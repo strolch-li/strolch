@@ -50,6 +50,8 @@
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>
+		
+		<Role name="MyRole" />
 
 		<Role name="system_admin_privileges">
 			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemUserAction" policy="DefaultPrivilege">

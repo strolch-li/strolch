@@ -16,14 +16,22 @@
 package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
 import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.utils.xml.XmlKeyValue;
 
 /**
  * To keep certain details of the {@link User} itself hidden from remote clients and make sure instances are only edited
@@ -32,17 +40,33 @@ import ch.eitchnet.utils.helper.StringHelper;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@XmlRootElement(name = "User")
+@XmlAccessorType(XmlAccessType.NONE)
 public class UserRep implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private final String userId;
+	@XmlAttribute(name = "userId")
+	private String userId;
+
+	@XmlAttribute(name = "username")
 	private String username;
+
+	@XmlAttribute(name = "firstname")
 	private String firstname;
+
+	@XmlAttribute(name = "lastname")
 	private String lastname;
+
+	@XmlAttribute(name = "userState")
 	private UserState userState;
-	private Set<String> roles;
+
+	@XmlAttribute(name = "locale")
 	private Locale locale;
+
+	@XmlElement(name = "roles")
+	private Set<String> roles;
+
 	private Map<String, String> propertyMap;
 
 	/**
@@ -75,8 +99,14 @@ public class UserRep implements Serializable {
 		this.roles = roles;
 		this.locale = locale;
 		this.propertyMap = propertyMap;
+	}
 
-		validate();
+	/**
+	 * 
+	 */
+	@SuppressWarnings("unused")
+	private UserRep() {
+		// No arg constructor for JAXB
 	}
 
 	/**
@@ -93,16 +123,14 @@ public class UserRep implements Serializable {
 		if (this.userState == null)
 			throw new PrivilegeException("userState is null"); //$NON-NLS-1$
 
-		if (this.userState != UserState.SYSTEM) {
-			if (StringHelper.isEmpty(this.firstname))
-				throw new PrivilegeException("firstname is null or empty"); //$NON-NLS-1$
+		if (StringHelper.isEmpty(this.firstname))
+			throw new PrivilegeException("firstname is null or empty"); //$NON-NLS-1$
 
-			if (StringHelper.isEmpty(this.lastname))
-				throw new PrivilegeException("lastname is null or empty"); //$NON-NLS-1$
-		}
+		if (StringHelper.isEmpty(this.lastname))
+			throw new PrivilegeException("lastname is null or empty"); //$NON-NLS-1$
 
-		if (this.roles == null)
-			throw new PrivilegeException("roles is null"); //$NON-NLS-1$
+		if (this.roles == null || this.roles.isEmpty())
+			throw new PrivilegeException("roles is null or empty"); //$NON-NLS-1$
 	}
 
 	/**
@@ -242,6 +270,26 @@ public class UserRep implements Serializable {
 	 */
 	public Map<String, String> getProperties() {
 		return this.propertyMap;
+	}
+
+	/**
+	 * Returns the string map properties of this user as a list of {@link XmlKeyValue} elements
+	 * 
+	 * @return the string map properties of this user as a list of {@link XmlKeyValue} elements
+	 */
+	@XmlElement(name = "properties")
+	public List<XmlKeyValue> getPropertiesAsKeyValue() {
+		return XmlKeyValue.valueOf(this.propertyMap);
+	}
+
+	/**
+	 * Sets the string map properties of this user from the given list of {@link XmlKeyValue}
+	 * 
+	 * @param values
+	 *            the list of {@link XmlKeyValue} from which to set the properties
+	 */
+	public void setPropertiesAsKeyValue(List<XmlKeyValue> values) {
+		this.propertyMap = XmlKeyValue.toMap(values);
 	}
 
 	/**
