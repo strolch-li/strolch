@@ -17,8 +17,8 @@ package li.strolch.rest.endpoint;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.utils.helper.StringHelper;
 
@@ -92,15 +93,16 @@ public class AuthenticationService {
 			loginResult.setParameters(certificate.getPropertyMap());
 			loginResult.setRoles(new ArrayList<>(certificate.getUserRoles()));
 
-			// TODO rethink this stupid aggregating of the allow list
-			List<String> allowList = new ArrayList<>();
+			List<LoginResult.Privilege> privileges = new ArrayList<>();
 			for (String name : privilegeContext.getPrivilegeNames()) {
-				allowList.addAll(privilegeContext.getPrivilege(name).getAllowList());
+				IPrivilege privilege = privilegeContext.getPrivilege(name);
+				Set<String> allowSet = privilege.getAllowList();
+				ArrayList<String> allowList = null;
+				if (!allowSet.isEmpty())
+					allowList = new ArrayList<>(allowSet);
+				privileges.add(new LoginResult.Privilege(name, privilege.isAllAllowed(), allowList));
 			}
-			if (allowList.isEmpty())
-				loginResult.setPrivileges(Arrays.asList("*")); //$NON-NLS-1$
-			else
-				loginResult.setPrivileges(allowList);
+			loginResult.setPrivileges(privileges);
 
 			return Response.ok().entity(loginResult)//
 					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken())//

@@ -51,7 +51,7 @@ public class LoginResult {
 	private List<String> roles;
 
 	@XmlElement(name = "privileges")
-	private List<String> privileges;
+	private List<Privilege> privileges;
 
 	private Map<String, String> parameters;
 
@@ -172,7 +172,7 @@ public class LoginResult {
 	/**
 	 * @return the privileges
 	 */
-	public List<String> getPrivileges() {
+	public List<Privilege> getPrivileges() {
 		return this.privileges;
 	}
 
@@ -180,7 +180,54 @@ public class LoginResult {
 	 * @param privileges
 	 *            the privileges to set
 	 */
-	public void setPrivileges(List<String> privileges) {
+	public void setPrivileges(List<Privilege> privileges) {
 		this.privileges = privileges;
+	}
+
+	@XmlRootElement(name = "Privilege")
+	@XmlAccessorType(XmlAccessType.NONE)
+	public static class Privilege {
+
+		@XmlAttribute(name = "name")
+		private String name;
+		@XmlAttribute(name = "allAllowed")
+		private boolean allAllowed;
+		@XmlElement(name = "allowList")
+		private List<String> allowList;
+
+		public Privilege() {
+			// no-arg constructor for JAXB
+		}
+
+		public Privilege(String name, boolean allAllowed, List<String> allowList) {
+			this.name = name;
+			this.allAllowed = allAllowed;
+			this.allowList = allowList;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return this.name;
+		}
+
+		public List<String> getAllowList() {
+			return this.allowList;
+		}
+
+		public void setAllowList(List<String> allowList) {
+			this.allowList = allowList;
+		}
+
+		public boolean isAllAllowed() {
+			return this.allAllowed;
+		}
+
+		public void setAllAllowed(boolean allAllowed) {
+			this.allAllowed = allAllowed;
+		}
+
 	}
 }
