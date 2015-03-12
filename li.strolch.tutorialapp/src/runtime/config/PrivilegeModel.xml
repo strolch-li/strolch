@@ -58,8 +58,6 @@
 
 	<Roles>
 
-		<Role name="PrivilegeAdmin" />
-
 		<Role name="agent">
 			<Privilege name="li.strolch.agent.impl.StartRealms" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
