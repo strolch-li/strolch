@@ -25,6 +25,8 @@
 
 	<Policies>
 		<Policy name="DefaultPrivilege" class="ch.eitchnet.privilege.policy.DefaultPrivilege" />
+		<Policy name="RoleAccessPrivilege" class="ch.eitchnet.privilege.policy.RoleAccessPrivilege" />
+		<Policy name="UserAccessPrivilege" class="ch.eitchnet.privilege.policy.UserAccessPrivilege" />
 	</Policies>
 
 </Privilege>
