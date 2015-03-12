@@ -14,7 +14,6 @@
 			<State>ENABLED</State>
 			<Locale>en_GB</Locale>
 			<Roles>
-				<Role>PrivilegeAdmin</Role>
 				<Role>AppUser</Role>
 			</Roles>
 			<Properties>
