@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.helper.PrivilegeInitializationHelper;
+import ch.eitchnet.privilege.i18n.PrivilegeMessages;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.PrivilegeRep;
@@ -63,6 +65,7 @@ import ch.eitchnet.utils.helper.FileHelper;
 @SuppressWarnings("nls")
 public class PrivilegeTest {
 
+	private static final String ROLE_PRIVILEGE_ADMIN = "PrivilegeAdmin";
 	private static final String ADMIN = "admin";
 	private static final byte[] PASS_ADMIN = "admin".getBytes();
 	private static final String BOB = "bob";
@@ -146,7 +149,7 @@ public class PrivilegeTest {
 
 			String pwd = System.getProperty("user.dir");
 
-			File privilegeConfigFile = new File(pwd + "/config/Privilege.xml");
+			File privilegeConfigFile = new File(pwd + "/config/PrivilegeConfig.xml");
 
 			// initialize privilege
 			privilegeHandler = PrivilegeInitializationHelper.initializeFromXml(privilegeConfigFile);
@@ -579,8 +582,8 @@ public class PrivilegeTest {
 			// testAddAdminRoleToBob
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addRoleToUser(certificate, BOB, PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
-			logger.info("Added " + PrivilegeHandler.PRIVILEGE_ADMIN_ROLE + " to " + ADMIN);
+			privilegeHandler.addRoleToUser(certificate, BOB, ROLE_PRIVILEGE_ADMIN);
+			logger.info("Added " + ROLE_PRIVILEGE_ADMIN + " to " + ADMIN);
 			privilegeHandler.persist(certificate);
 		} finally {
 			logout();
@@ -602,7 +605,8 @@ public class PrivilegeTest {
 			privilegeHandler.addUser(certificate, userRep, null);
 			fail("User bob may not add a user as bob does not have admin rights!");
 		} catch (PrivilegeException e) {
-			String msg = "User does not have PrivilegeAdmin role! Certificate: " + certificate;
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"), //$NON-NLS-1$
+					BOB, PrivilegeHandler.PRIVILEGE_ADD_USER);
 			assertEquals(msg, e.getMessage());
 		} finally {
 			logout();

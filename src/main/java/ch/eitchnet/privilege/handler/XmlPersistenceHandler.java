@@ -224,22 +224,6 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			}
 		}
 
-		// validate we have a user with PrivilegeAdmin access
-		boolean privilegeAdminExists = false;
-		for (String username : this.userMap.keySet()) {
-			User user = this.userMap.get(username);
-			if (user.hasRole(PrivilegeHandler.PRIVILEGE_ADMIN_ROLE)) {
-				privilegeAdminExists = true;
-				break;
-			}
-		}
-
-		if (!privilegeAdminExists) {
-			String msg = "No User with role ''{0}'' exists. Privilege modifications will not be possible!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, PrivilegeHandler.PRIVILEGE_ADMIN_ROLE);
-			logger.warn(msg);
-		}
-
 		return true;
 	}
 

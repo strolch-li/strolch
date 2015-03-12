@@ -169,6 +169,11 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 			} else if (qName.equals(XmlConstants.XML_PRIVILEGE)) {
 				this.privilegeName = attributes.getValue(XmlConstants.XML_ATTR_NAME);
 				this.privilegePolicy = attributes.getValue(XmlConstants.XML_ATTR_POLICY);
+			} else if (qName.equals(XmlConstants.XML_ALLOW) || qName.equals(XmlConstants.XML_DENY)
+					|| qName.equals(XmlConstants.XML_ALL_ALLOWED)) {
+				// no-op
+			} else {
+				throw new IllegalArgumentException("Unhandled tag " + qName);
 			}
 		}
 
@@ -267,12 +272,20 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 				this.locale = new Locale(this.text.toString().trim());
 			} else if (qName.equals(XmlConstants.XML_ROLE)) {
 				this.userRoles.add(this.text.toString().trim());
+			} else if (qName.equals(XmlConstants.XML_ROLES)) {
+				// NO-OP
+			} else if (qName.equals(XmlConstants.XML_PARAMETER)) {
+				// NO-OP
+			} else if (qName.equals(XmlConstants.XML_PARAMETERS)) {
+				// NO-OP
 			} else if (qName.equals(XmlConstants.XML_USER)) {
 
 				User user = new User(this.userId, this.username, this.password, this.firstName, this.lastname,
 						this.userState, this.userRoles, this.locale, this.parameters);
 				logger.info(MessageFormat.format("New User: {0}", user)); //$NON-NLS-1$
 				getUsers().add(user);
+			} else {
+				throw new IllegalArgumentException("Unhandled tag " + qName);
 			}
 		}
 
@@ -296,6 +309,10 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME);
 				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE);
 				this.parameterMap.put(key, value);
+			} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
+				// NO-OP
+			} else {
+				throw new IllegalArgumentException("Unhandled tag " + qName);
 			}
 		}
 

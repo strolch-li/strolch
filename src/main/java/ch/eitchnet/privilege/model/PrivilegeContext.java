@@ -16,10 +16,8 @@
 package ch.eitchnet.privilege.model;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,16 +71,26 @@ public class PrivilegeContext {
 		return this.privileges.keySet();
 	}
 
+	public void assertHasPrivilege(String privilegeName) {
+		if (!this.privileges.containsKey(privilegeName)) {
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"), //$NON-NLS-1$
+					userRep.getUsername(), privilegeName);
+			throw new AccessDeniedException(msg);
+		}
+	}
+
 	public IPrivilege getPrivilege(String privilegeName) {
+		assertHasPrivilege(privilegeName);
 		return this.privileges.get(privilegeName);
 	}
 
-	public List<String> getFlatAllowList() {
-		List<String> allowList = new ArrayList<>();
-		for (IPrivilege privilege : this.privileges.values()) {
-			allowList.addAll(privilege.getAllowList());
+	public PrivilegePolicy getPolicy(String policyName) {
+		PrivilegePolicy policy = this.policies.get(policyName);
+		if (policy == null) {
+			String msg = "The PrivilegePolicy {0} does not exist on the PrivilegeContext!"; //$NON-NLS-1$
+			throw new PrivilegeException(MessageFormat.format(msg, policyName));
 		}
-		return allowList;
+		return policy;
 	}
 
 	// 
@@ -115,11 +123,7 @@ public class PrivilegeContext {
 
 		// get the policy referenced by the restrictable
 		String policyName = privilege.getPolicy();
-		PrivilegePolicy policy = this.policies.get(policyName);
-		if (policy == null) {
-			String msg = "The PrivilegePolicy {0} does not exist on the PrivilegeContext!"; //$NON-NLS-1$
-			throw new PrivilegeException(MessageFormat.format(msg, policyName));
-		}
+		PrivilegePolicy policy = getPolicy(policyName);
 
 		// delegate to the policy
 		policy.validateAction(this, privilege, restrictable);

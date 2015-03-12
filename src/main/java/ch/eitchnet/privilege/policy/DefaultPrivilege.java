@@ -17,14 +17,12 @@ package ch.eitchnet.privilege.policy;
 
 import java.text.MessageFormat;
 
-import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.i18n.PrivilegeMessages;
 import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.internal.Role;
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * This is a simple implementation of {@link PrivilegePolicy} which uses the {@link Restrictable#getPrivilegeName()} to
@@ -41,29 +39,7 @@ public class DefaultPrivilege implements PrivilegePolicy {
 	 */
 	@Override
 	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable) {
-
-		if (privilege == null)
-			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.privilegeNull")); //$NON-NLS-1$
-		if (restrictable == null)
-			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.restrictableNull")); //$NON-NLS-1$
-
-		// get the PrivilegeName
-		String privilegeName = restrictable.getPrivilegeName();
-		if (StringHelper.isEmpty(privilegeName)) {
-			String msg = PrivilegeMessages.getString("Privilege.privilegeNameEmpty"); //$NON-NLS-1$
-			throw new PrivilegeException(MessageFormat.format(msg, restrictable));
-		}
-
-		// we want the privileges names to match
-		if (!privilege.getName().equals(privilegeName)) {
-			throw new PrivilegeException(MessageFormat.format(
-					PrivilegeMessages.getString("Privilege.illegalArgument.privilegeNameMismatch"), //$NON-NLS-1$
-					privilege.getName(), privilegeName));
-		}
-
-		// if everything is allowed, then no need to carry on
-		if (privilege.isAllAllowed())
-			return;
+		PrivilegePolicyHelper.preValidate(privilege, restrictable);
 
 		// get the value on which the action is to be performed
 		Object object = restrictable.getPrivilegeValue();
@@ -76,23 +52,12 @@ public class DefaultPrivilege implements PrivilegePolicy {
 			throw new PrivilegeException(msg);
 		}
 
-		String privilegeValue = (String) object;
-
-		// first check values not allowed
-		if (privilege.isDenied(privilegeValue)) {
-			// then throw access denied
-			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
-					ctx.getUsername(), privilegeName, restrictable.getClass().getName());
-			throw new AccessDeniedException(msg);
-		}
-
-		// now check values allowed
-		if (privilege.isAllowed(privilegeValue))
+		// if everything is allowed, then no need to carry on
+		if (privilege.isAllAllowed())
 			return;
 
-		// default is not allowed
-		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
-				ctx.getUsername(), privilegeName, restrictable.getClass().getName());
-		throw new AccessDeniedException(msg);
+		String privilegeValue = (String) object;
+
+		PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
 	}
 }

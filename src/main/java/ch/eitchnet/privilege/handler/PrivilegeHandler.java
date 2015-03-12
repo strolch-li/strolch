@@ -41,10 +41,85 @@ import ch.eitchnet.privilege.policy.PrivilegePolicy;
  */
 public interface PrivilegeHandler {
 
+	///
+
 	/**
-	 * PRIVILEGE_ADMIN_ROLE = PrivilegeAdmin: This is the role users must have, if they are allowed to modify objects
+	 * Privilege "PrivilegeAction" which is used for privileges which are not further categorized e.g. s
+	 * {@link #PRIVILEGE_ACTION_PERSIST} and {@link #PRIVILEGE_ACTION_GET_POLICIES}
 	 */
-	public static final String PRIVILEGE_ADMIN_ROLE = "PrivilegeAdmin"; //$NON-NLS-1$
+	public static final String PRIVILEGE_ACTION = "PrivilegeAction";
+
+	/**
+	 * For Privilege "PrivilegeAction" value required to be able to persist changes if not exempted by auto persist or
+	 * <code>allAllowed</code>
+	 */
+	public static final String PRIVILEGE_ACTION_PERSIST = "Persist";
+	/**
+	 * For Privilege "PrivilegeAction" value required to be able to reload changes if not exempted by
+	 * <code>allAllowed</code>
+	 */
+	public static final String PRIVILEGE_ACTION_RELOAD = "Reload";
+	/**
+	 * For Privilege "PrivilegeAction" value required to get currently configured policies if not
+	 * <code>allAllowed</code>
+	 */
+	public static final String PRIVILEGE_ACTION_GET_POLICIES = "GetPolicies";
+
+	///
+
+	/**
+	 * Privilege "PrivilegeGetRole" which is used to validate that a user can get a specific role
+	 */
+	public static final String PRIVILEGE_GET_ROLE = "PrivilegeGetRole";
+	/**
+	 * Privilege "PrivilegeAddRole" which is used to validate that a user can add a specific role
+	 */
+	public static final String PRIVILEGE_ADD_ROLE = "PrivilegeAddRole";
+	/**
+	 * Privilege "PrivilegeRemoveRole" which is used to validate that a user can remove a specific role
+	 */
+	public static final String PRIVILEGE_REMOVE_ROLE = "PrivilegeRemoveRole";
+	/**
+	 * Privilege "PrivilegeModifyRole" which is used to validate that a user can modify a specific role. <b>Note:</b>
+	 * This includes modifying of the privileges on the role
+	 */
+	public static final String PRIVILEGE_MODIFY_ROLE = "PrivilegeModifyRole";
+
+	///
+
+	/**
+	 * Privilege "PrivilegeGetUser" which is used to validate that a user can get a specific user
+	 */
+	public static final String PRIVILEGE_GET_USER = "PrivilegeGetUser";
+	/**
+	 * Privilege "PrivilegeAddUser" which is used to validate that a user can add a specific user
+	 */
+	public static final String PRIVILEGE_ADD_USER = "PrivilegeAddUser";
+	/**
+	 * Privilege "PrivilegeRemoveUser" which is used to validate that a user can remove a specific user
+	 */
+	public static final String PRIVILEGE_REMOVE_USER = "PrivilegeRemoveUser";
+	/**
+	 * Privilege "PrivilegeModifyUser" which is used to validate that a user can modify a specific user
+	 */
+	public static final String PRIVILEGE_MODIFY_USER = "PrivilegeModifyUser";
+	/**
+	 * Privilege "PrivilegeAddRoleToUser" which is used to validate that a user can add a specific role to a specific
+	 * user
+	 */
+	public static final String PRIVILEGE_ADD_ROLE_TO_USER = "PrivilegeAddRoleToUser";
+	/**
+	 * Privilege "PrivilegeRemoveRoleFromUser" which is used to validate that a user can remove a specific role from a
+	 * specific user
+	 */
+	public static final String PRIVILEGE_REMOVE_ROLE_FROM_USER = "PrivilegeRemoveRoleFromUser";
+
+	///
+
+	/**
+	 * configuration parameter to define automatic persisting on password change
+	 */
+	public static final String PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA = "autoPersistOnUserChangesData"; //$NON-NLS-1$
 
 	/**
 	 * Returns a {@link UserRep} for the given username
@@ -470,28 +545,6 @@ public interface PrivilegeHandler {
 	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException;
 
 	/**
-	 * <p>
-	 * Validates if this {@link Certificate} is for a {@link ch.eitchnet.privilege.model.internal.User} with
-	 * {@link Role} with name {@link PrivilegeHandler#PRIVILEGE_ADMIN_ROLE}
-	 * </p>
-	 * 
-	 * <p>
-	 * In other words, this method checks if the given certificate is for a user who has the rights to change objects
-	 * </p>
-	 * 
-	 * <p>
-	 * If the user is not the administrator, then a {@link ch.eitchnet.privilege.base.PrivilegeException} is thrown
-	 * </p>
-	 * 
-	 * @param certificate
-	 *            the {@link Certificate} for which the role should be validated against
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the user does not not have admin privileges
-	 */
-	public void assertIsPrivilegeAdmin(Certificate certificate) throws AccessDeniedException;
-
-	/**
 	 * Validate that the given password meets certain requirements. What these requirements are is a decision made by
 	 * the concrete implementation
 	 * 
@@ -502,6 +555,23 @@ public interface PrivilegeHandler {
 	 *             if the password does not implement the requirement of the concrete implementation
 	 */
 	public void validatePassword(byte[] password) throws PrivilegeException;
+
+	/**
+	 * <p>
+	 * Informs this {@link PersistenceHandler} to reload the data from the backend
+	 * </p>
+	 * 
+	 * <b>Note:</b> It depends on the underlying {@link PersistenceHandler} implementation if data really is read
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
+	 * 
+	 * @return true if the reload was successful, false if something went wrong
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the users of the given certificate does not have the privilege to perform this action
+	 */
+	public boolean reload(Certificate certificate);
 
 	/**
 	 * Persists any changes to the privilege data model. Changes are thus not persisted immediately, but must be
