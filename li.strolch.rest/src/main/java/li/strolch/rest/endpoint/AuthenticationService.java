@@ -92,7 +92,11 @@ public class AuthenticationService {
 			loginResult.setParameters(certificate.getPropertyMap());
 			loginResult.setRoles(new ArrayList<>(certificate.getUserRoles()));
 
-			List<String> allowList = privilegeContext.getFlatAllowList();
+			// TODO rethink this stupid aggregating of the allow list
+			List<String> allowList = new ArrayList<>();
+			for (String name : privilegeContext.getPrivilegeNames()) {
+				allowList.addAll(privilegeContext.getPrivilege(name).getAllowList());
+			}
 			if (allowList.isEmpty())
 				loginResult.setPrivileges(Arrays.asList("*")); //$NON-NLS-1$
 			else

@@ -148,7 +148,6 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public ch.eitchnet.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
 			throws PrivilegeException {
 		assertContainerStarted();
-		this.privilegeHandler.assertIsPrivilegeAdmin(certificate);
 		return this.privilegeHandler;
 	}
 }
