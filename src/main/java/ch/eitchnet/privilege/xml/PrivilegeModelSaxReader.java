@@ -198,6 +198,12 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 						this.denyList, this.allowList);
 				this.privileges.put(this.privilegeName, privilege);
 
+				this.privilegeName = null;
+				this.privilegePolicy = null;
+				this.allAllowed = false;
+				this.denyList = new HashSet<String>();
+				this.allowList = new HashSet<String>();
+
 			} else if (qName.equals(XmlConstants.XML_ROLE)) {
 
 				Role role = new Role(this.roleName, this.privileges);

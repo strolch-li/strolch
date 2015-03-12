@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.handler.DefaultEncryptionHandler;
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.handler.XmlPersistenceHandler;
 import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.UserState;
@@ -107,7 +108,7 @@ public class XmlTest {
 
 		PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
 		PrivilegeConfigSaxReader saxReader = new PrivilegeConfigSaxReader(containerModel);
-		File xmlFile = new File("config/Privilege.xml");
+		File xmlFile = new File("config/PrivilegeConfig.xml");
 		XmlHelper.parseDocument(xmlFile, saxReader);
 		logger.info(containerModel.toString());
 
@@ -120,7 +121,7 @@ public class XmlTest {
 		assertNotNull(containerModel.getPersistenceHandlerParameterMap());
 
 		assertEquals(1, containerModel.getParameterMap().size());
-		assertEquals(1, containerModel.getPolicies().size());
+		assertEquals(3, containerModel.getPolicies().size());
 		assertEquals(1, containerModel.getEncryptionHandlerParameterMap().size());
 		assertEquals(2, containerModel.getPersistenceHandlerParameterMap().size());
 
@@ -211,7 +212,23 @@ public class XmlTest {
 		// PrivilegeAdmin
 		Role privilegeAdmin = findRole("PrivilegeAdmin", roles);
 		assertEquals("PrivilegeAdmin", privilegeAdmin.getName());
-		assertTrue(privilegeAdmin.getPrivilegeNames().isEmpty());
+		assertEquals(11, privilegeAdmin.getPrivilegeNames().size());
+		IPrivilege privilegeAction = privilegeAdmin.getPrivilege(PrivilegeHandler.PRIVILEGE_ACTION);
+		assertFalse(privilegeAction.isAllAllowed());
+		assertEquals(3, privilegeAction.getAllowList().size());
+		assertEquals(0, privilegeAction.getDenyList().size());
+		assertEquals("DefaultPrivilege", privilegeAction.getPolicy());
+
+		IPrivilege privilegeAddRole = privilegeAdmin.getPrivilege(PrivilegeHandler.PRIVILEGE_ADD_ROLE);
+		assertTrue(privilegeAddRole.isAllAllowed());
+		assertEquals(0, privilegeAddRole.getAllowList().size());
+		assertEquals(0, privilegeAddRole.getDenyList().size());
+
+		IPrivilege privilegeRemRoleFromUser = privilegeAdmin
+				.getPrivilege(PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER);
+		assertTrue(privilegeRemRoleFromUser.isAllAllowed());
+		assertEquals(0, privilegeRemRoleFromUser.getAllowList().size());
+		assertEquals(0, privilegeRemRoleFromUser.getDenyList().size());
 
 		// AppUser
 		Role appUser = findRole("AppUser", roles);
