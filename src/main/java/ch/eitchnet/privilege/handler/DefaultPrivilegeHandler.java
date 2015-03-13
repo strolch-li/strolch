@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.base.AccessDeniedException;
+import ch.eitchnet.privilege.base.PrivilegeConflictResolution;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.IPrivilege;
@@ -110,6 +111,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * flag to define if a persist should be performed after a user changes their own data
 	 */
 	private boolean autoPersistOnUserChangesData;
+
+	private PrivilegeConflictResolution privilegeConflictResolution;
 
 	@Override
 	public RoleRep getRole(Certificate certificate, String roleName) {
@@ -397,6 +400,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// create new user
 			User newUser = createUser(userRep, passwordHash);
 
+			// detect privilege conflicts
+			assertNoPrivilegeConflict(newUser);
+
 			// validate this user may create such a user
 			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ADD_USER, new Tuple(null, newUser)));
 
@@ -448,6 +454,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			User newUser = createUser(userRep, passwordHash);
+
+			// detect privilege conflicts
+			assertNoPrivilegeConflict(newUser);
 
 			// validate this user may modify this user
 			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_USER, new Tuple(existingUser, newUser)));
@@ -525,6 +534,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// create new user
 		User newUser = new User(userId, username, password, firstname, lastname, userState, roles, locale, propertyMap);
 
+		// detect privilege conflicts
+		assertNoPrivilegeConflict(newUser);
+
 		// validate this user may modify this user
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_USER, new Tuple(existingUser, newUser)));
 
@@ -593,6 +605,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
 				existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(), newRoles,
 				existingUser.getLocale(), existingUser.getProperties());
+
+		// detect privilege conflicts
+		assertNoPrivilegeConflict(newUser);
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
@@ -815,6 +830,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// create new role from RoleRep
 		Role newRole = new Role(roleRep);
 
+		// detect privilege conflicts
+		assertNoPrivilegeConflict(newRole);
+
 		// validate that this user may modify this role
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_ROLE, new Tuple(existingRole, newRole)));
 
@@ -902,6 +920,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new role
 		Role newRole = new Role(existingRole.getName(), privilegeMap);
+
+		// detect privilege conflicts
+		assertNoPrivilegeConflict(newRole);
 
 		// validate that this user may modify this role
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_ROLE, new Tuple(existingRole, newRole)));
@@ -1078,16 +1099,40 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			Set<String> privilegeNames = role.getPrivilegeNames();
 			for (String privilegeName : privilegeNames) {
 
-				// cache the privilege
-				if (privileges.containsKey(privilegeName))
-					continue;
-
 				IPrivilege privilege = role.getPrivilege(privilegeName);
 				if (privilege == null) {
 					String msg = "The Privilege {0} does not exist for role {1}"; //$NON-NLS-1$
 					msg = MessageFormat.format(msg, privilegeName, roleName);
 					throw new PrivilegeException(msg);
 				}
+
+				// cache the privilege
+				if (privileges.containsKey(privilegeName)) {
+					if (this.privilegeConflictResolution.isStrict()) {
+						String msg = "User has conflicts for privilege {0} with role {1}";
+						msg = MessageFormat.format(msg, privilegeName, roleName);
+						throw new PrivilegeException(msg);
+					}
+
+					IPrivilege priv = privileges.get(privilegeName);
+					boolean allAllowed = priv.isAllAllowed() || privilege.isAllAllowed();
+					Set<String> allowList;
+					Set<String> denyList;
+					if (allAllowed) {
+						allowList = Collections.emptySet();
+						denyList = Collections.emptySet();
+					} else {
+						allowList = new HashSet<>(priv.getAllowList());
+						allowList.addAll(privilege.getAllowList());
+						denyList = new HashSet<>(priv.getDenyList());
+						denyList.addAll(privilege.getDenyList());
+					}
+					priv = new PrivilegeImpl(priv.getName(), priv.getPolicy(), allAllowed, denyList, allowList);
+
+					privileges.put(privilegeName, priv);
+					continue;
+				}
+
 				privileges.put(privilegeName, privilege);
 
 				// cache the policy for the privilege
@@ -1258,14 +1303,108 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			logger.error(msg);
 		}
 
+		String privilegeConflictResolutionS = parameterMap.get(PARAM_PRIVILEGE_CONFLICT_RESOLUTION);
+		if (privilegeConflictResolutionS == null) {
+			this.privilegeConflictResolution = PrivilegeConflictResolution.STRICT;
+			String msg = "No {0} parameter defined. Using {1}";
+			msg = MessageFormat.format(msg, PARAM_PRIVILEGE_CONFLICT_RESOLUTION, this.privilegeConflictResolution);
+			logger.info(msg);
+		} else {
+			try {
+				this.privilegeConflictResolution = PrivilegeConflictResolution.valueOf(privilegeConflictResolutionS);
+			} catch (Exception e) {
+				String msg = "Parameter {0} has illegal value {1}."; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, PARAM_PRIVILEGE_CONFLICT_RESOLUTION, privilegeConflictResolutionS);
+				throw new PrivilegeException(msg);
+			}
+		}
+		logger.info("Privilege conflict resolution set to " + this.privilegeConflictResolution); //$NON-NLS-1$
+
 		// validate policies on privileges of Roles
 		for (Role role : persistenceHandler.getAllRoles()) {
 			validatePolicies(role);
 		}
 
+		// validate privilege conflicts
+		validatePrivilegeConflicts();
+
 		this.lastSessionId = 0l;
 		this.privilegeContextMap = Collections.synchronizedMap(new HashMap<String, PrivilegeContext>());
 		this.initialized = true;
+	}
+
+	private void validatePrivilegeConflicts() {
+		if (!this.privilegeConflictResolution.isStrict()) {
+			return;
+		}
+
+		List<String> conflicts = new ArrayList<>();
+		List<User> users = this.persistenceHandler.getAllUsers();
+		for (User user : users) {
+			Map<String, String> privilegeNames = new HashMap<>();
+			conflicts.addAll(detectPrivilegeConflicts(privilegeNames, user));
+		}
+
+		if (!conflicts.isEmpty()) {
+			for (String conflict : conflicts) {
+				logger.error(conflict);
+			}
+			throw new PrivilegeException("There are " + conflicts.size() + " privilege conflicts!");
+		}
+	}
+
+	private void assertNoPrivilegeConflict(User user) {
+		if (this.privilegeConflictResolution.isStrict()) {
+			Map<String, String> privilegeNames = new HashMap<>();
+			List<String> conflicts = detectPrivilegeConflicts(privilegeNames, user);
+			if (!conflicts.isEmpty()) {
+				String msg = conflicts.stream().collect(Collectors.joining("\n"));
+				throw new PrivilegeException(msg);
+			}
+		}
+	}
+
+	private void assertNoPrivilegeConflict(Role role) {
+		if (!this.privilegeConflictResolution.isStrict())
+			return;
+
+		Map<String, String> privilegeNames = new HashMap<>();
+		for (String privilegeName : role.getPrivilegeNames()) {
+			privilegeNames.put(privilegeName, role.getName());
+		}
+
+		List<String> conflicts = new ArrayList<>();
+		List<User> users = this.persistenceHandler.getAllUsers();
+		for (User user : users) {
+			if (user.hasRole(role.getName()))
+				conflicts.addAll(detectPrivilegeConflicts(privilegeNames, user));
+		}
+
+		if (!conflicts.isEmpty()) {
+			String msg = conflicts.stream().collect(Collectors.joining("\n"));
+			throw new PrivilegeException(msg);
+		}
+	}
+
+	private List<String> detectPrivilegeConflicts(Map<String, String> privilegeNames, User user) {
+		List<String> conflicts = new ArrayList<>();
+
+		Set<String> userRoles = user.getRoles();
+		for (String roleName : userRoles) {
+			Role role = this.persistenceHandler.getRole(roleName);
+			for (String privilegeName : role.getPrivilegeNames()) {
+				if (!privilegeNames.containsKey(privilegeName)) {
+					privilegeNames.put(privilegeName, roleName);
+				} else {
+					String roleOrigin = privilegeNames.get(privilegeName);
+					String msg = "User has conflicts for privilege {0} on roles {1} and {2}";
+					msg = MessageFormat.format(msg, privilegeName, roleOrigin, roleName);
+					conflicts.add(msg);
+				}
+			}
+		}
+
+		return conflicts;
 	}
 
 	/**

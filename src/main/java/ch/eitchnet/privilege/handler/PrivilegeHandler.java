@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import ch.eitchnet.privilege.base.AccessDeniedException;
+import ch.eitchnet.privilege.base.PrivilegeConflictResolution;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.IPrivilege;
@@ -120,6 +121,11 @@ public interface PrivilegeHandler {
 	 * configuration parameter to define automatic persisting on password change
 	 */
 	public static final String PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA = "autoPersistOnUserChangesData"; //$NON-NLS-1$
+
+	/**
+	 * configuration parameter to define {@link PrivilegeConflictResolution}
+	 */
+	public static final String PARAM_PRIVILEGE_CONFLICT_RESOLUTION = "privilegeConflictResolution";
 
 	/**
 	 * Returns a {@link UserRep} for the given username

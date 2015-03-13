@@ -6,7 +6,7 @@
 		<Parameters>
 			<!-- parameters for the container itself -->
 			<Parameter name="autoPersistOnUserChangesData" value="true" />
-			<Parameter name="privilegeConflictResolution" value="STRICT" />
+			<Parameter name="privilegeConflictResolution" value="MERGE" />
 		</Parameters>
 
 		<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
@@ -18,7 +18,7 @@
 		<PersistenceHandler class="ch.eitchnet.privilege.handler.XmlPersistenceHandler">
 			<Parameters>
 				<Parameter name="basePath" value="./target/testPrivilege" />
-				<Parameter name="modelXmlFile" value="PrivilegeModel.xml" />
+				<Parameter name="modelXmlFile" value="PrivilegeModelMerge.xml" />
 			</Parameters>
 		</PersistenceHandler>
 

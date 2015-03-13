@@ -24,6 +24,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -75,6 +76,7 @@ public class PrivilegeTest {
 	private static final byte[] PASS_BOB = "admin1".getBytes();
 	private static final String ROLE_APP_USER = "AppUser";
 	private static final String ROLE_MY = "MyRole";
+	private static final String ROLE_MY2 = "MyRole2";
 	private static final String ROLE_TEMP = "temp";
 	private static final String ROLE_USER = "user";
 	private static final byte[] PASS_DEF = "def".getBytes();
@@ -89,10 +91,6 @@ public class PrivilegeTest {
 	private static PrivilegeHandler privilegeHandler;
 	private PrivilegeContext ctx;
 
-	/**
-	 * @throws Exception
-	 *             if something goes wrong
-	 */
 	@BeforeClass
 	public static void init() throws Exception {
 		try {
@@ -420,6 +418,35 @@ public class PrivilegeTest {
 			List<UserRep> users = privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(0, users.size());
 
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void shouldDetectPrivilegeConflict1() {
+		exception.expect(PrivilegeException.class);
+		exception.expectMessage("User has conflicts for privilege ");
+		try {
+			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+			Certificate certificate = this.ctx.getCertificate();
+			PrivilegeRep privilegeRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_ACTION, "DefaultPrivilege", true,
+					Collections.emptySet(), Collections.emptySet());
+			privilegeHandler.addOrReplacePrivilegeOnRole(certificate, ROLE_APP_USER, privilegeRep);
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void shouldDetectPrivilegeConflict2() {
+		exception.expect(PrivilegeException.class);
+		exception.expectMessage("User has conflicts for privilege ");
+		try {
+			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+			Certificate certificate = this.ctx.getCertificate();
+			privilegeHandler.addRoleToUser(certificate, ADMIN, ROLE_MY);
+			privilegeHandler.addRoleToUser(certificate, ADMIN, ROLE_MY2);
 		} finally {
 			logout();
 		}
