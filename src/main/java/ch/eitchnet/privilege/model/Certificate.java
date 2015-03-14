@@ -17,6 +17,7 @@ package ch.eitchnet.privilege.model;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -39,7 +40,7 @@ public final class Certificate implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private final String sessionId;
-	private final long loginTime;
+	private final Date loginTime;
 	private final String username;
 	private final String firstname;
 	private final String lastname;
@@ -50,7 +51,7 @@ public final class Certificate implements Serializable {
 	private final Map<String, String> sessionDataMap;
 
 	private Locale locale;
-	private long lastAccess;
+	private Date lastAccess;
 
 	/**
 	 * Default constructor initializing with all information needed for this certificate
@@ -78,7 +79,7 @@ public final class Certificate implements Serializable {
 	 *            a {@link Map} containing string value pairs of properties for the logged in user. These properties can
 	 *            be edited and can be used for the user to change settings of this session
 	 */
-	public Certificate(String sessionId, long loginTime, String username, String firstname, String lastname,
+	public Certificate(String sessionId, Date loginTime, String username, String firstname, String lastname,
 			String authToken, Locale locale, Set<String> userRoles, Map<String, String> propertyMap) {
 
 		// validate arguments are not null
@@ -211,7 +212,7 @@ public final class Certificate implements Serializable {
 	/**
 	 * @return the loginTime
 	 */
-	public long getLoginTime() {
+	public Date getLoginTime() {
 		return this.loginTime;
 	}
 
@@ -227,7 +228,7 @@ public final class Certificate implements Serializable {
 	/**
 	 * @return the lastAccess
 	 */
-	public long getLastAccess() {
+	public Date getLastAccess() {
 		return this.lastAccess;
 	}
 
@@ -235,7 +236,7 @@ public final class Certificate implements Serializable {
 	 * @param lastAccess
 	 *            the lastAccess to set
 	 */
-	public void setLastAccess(long lastAccess) {
+	public void setLastAccess(Date lastAccess) {
 		this.lastAccess = lastAccess;
 	}
 

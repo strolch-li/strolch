@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1002,8 +1003,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String sessionId = nextSessionId();
 
 			// create a new certificate, with details of the user
-			certificate = new Certificate(sessionId, System.currentTimeMillis(), username, user.getFirstname(),
-					user.getLastname(), authToken, user.getLocale(), userRoles, new HashMap<>(user.getProperties()));
+			certificate = new Certificate(sessionId, new Date(), username, user.getFirstname(), user.getLastname(),
+					authToken, user.getLocale(), userRoles, new HashMap<>(user.getProperties()));
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1554,9 +1555,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String sessionId = nextSessionId();
 
 		// create a new certificate, with details of the user
-		Certificate systemUserCertificate = new Certificate(sessionId, System.currentTimeMillis(), systemUsername,
-				user.getFirstname(), user.getLastname(), authToken, user.getLocale(), user.getRoles(), new HashMap<>(
-						user.getProperties()));
+		Certificate systemUserCertificate = new Certificate(sessionId, new Date(), systemUsername, user.getFirstname(),
+				user.getLastname(), authToken, user.getLocale(), user.getRoles(), new HashMap<>(user.getProperties()));
 
 		// create and save a new privilege context
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);
