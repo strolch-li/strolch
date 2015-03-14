@@ -25,6 +25,7 @@ import li.strolch.rest.endpoint.Inspector;
 import li.strolch.rest.endpoint.PrivilegePoliciesService;
 import li.strolch.rest.endpoint.PrivilegeRolesService;
 import li.strolch.rest.endpoint.PrivilegeUsersService;
+import li.strolch.rest.endpoint.UserSessionsService;
 import li.strolch.rest.endpoint.VersionQuery;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.AuthenicationRequestFilter;
@@ -51,6 +52,7 @@ public class StrolchRestfulClasses {
 		restfulClasses.add(PrivilegeUsersService.class);
 		restfulClasses.add(PrivilegeRolesService.class);
 		restfulClasses.add(PrivilegePoliciesService.class);
+		restfulClasses.add(UserSessionsService.class);
 
 		Set<Class<?>> providerClasses = new HashSet<>();
 		providerClasses.add(StrolchRestfulExceptionMapper.class);
