@@ -133,7 +133,7 @@ public class AuthenticationService {
 			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance().getComponent(
 					StrolchSessionHandler.class);
 			Certificate certificate = sessionHandlerHandler.validate(sessionId);
-			sessionHandlerHandler.invalidateSession(certificate);
+			sessionHandlerHandler.invalidate(certificate);
 
 			logoutResult.setUsername(certificate.getUsername());
 			logoutResult.setSessionId(sessionId);

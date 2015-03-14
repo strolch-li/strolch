@@ -15,6 +15,10 @@
  */
 package li.strolch.rest;
 
+import java.util.List;
+import java.util.Locale;
+
+import li.strolch.rest.model.UserSession;
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
@@ -28,5 +32,13 @@ public interface StrolchSessionHandler {
 
 	public Certificate validate(Certificate certificate);
 
-	public void invalidateSession(Certificate certificate);
+	public void invalidate(Certificate certificate);
+
+	public List<UserSession> getSessions(Certificate certificate);
+
+	public UserSession getSession(Certificate certificate, String sessionId);
+
+	public void invalidateSession(Certificate certificate, String sessionId);
+
+	public void setSessionLocale(Certificate certificate, String sessionId, Locale locale);
 }

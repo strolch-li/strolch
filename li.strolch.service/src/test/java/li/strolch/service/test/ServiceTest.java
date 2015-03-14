@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
+import java.util.Date;
 import java.util.HashSet;
 
 import li.strolch.service.api.ServiceResult;
@@ -56,14 +57,15 @@ public class ServiceTest extends AbstractServiceTest {
 		this.thrown.expect(PrivilegeException.class);
 		TestService testService = new TestService();
 		getServiceHandler().doService(
-				new Certificate(null, 0, null, null, null, null, null, new HashSet<String>(), null), testService);
+				new Certificate(null, new Date(), null, null, null, null, null, new HashSet<String>(), null),
+				testService);
 	}
 
 	@Test
 	public void shouldFailInvalidCertificate2() {
 		TestService testService = new TestService();
 		Certificate badCert = new Certificate(
-				"1", System.currentTimeMillis(), "bob", "Bob", "Brown", "dsdf", null, new HashSet<String>(), null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+				"1", new Date(), "bob", "Bob", "Brown", "dsdf", null, new HashSet<String>(), null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
 		ServiceResult svcResult = getServiceHandler().doService(badCert, testService);
 		assertThat(svcResult.getThrowable(), instanceOf(AccessDeniedException.class));
 	}

@@ -16,7 +16,15 @@
 package li.strolch.rest;
 
 import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,13 +33,17 @@ import java.util.concurrent.TimeUnit;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
+import li.strolch.rest.model.UserSession;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
+import ch.eitchnet.privilege.model.SimpleRestrictable;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
@@ -106,7 +118,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		synchronized (this.certificateMap) {
 			Certificate certificate = this.privilegeHandler.authenticate(username, password);
-			certificate.setLastAccess(System.currentTimeMillis());
+			certificate.setLastAccess(new Date());
 			this.certificateMap.put(certificate.getAuthToken(), certificate);
 
 			logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
@@ -132,12 +144,12 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	@Override
 	public Certificate validate(Certificate certificate) {
 		this.privilegeHandler.isCertificateValid(certificate);
-		certificate.setLastAccess(System.currentTimeMillis());
+		certificate.setLastAccess(new Date());
 		return certificate;
 	}
 
 	@Override
-	public void invalidateSession(Certificate certificate) {
+	public void invalidate(Certificate certificate) {
 		DBC.PRE.assertNotNull("Certificate must bet given!", certificate); //$NON-NLS-1$
 
 		Certificate removedCert;
@@ -174,14 +186,73 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 				certificateMap = new HashMap<>(map);
 			}
 
-			long reqLastAccessTime = System.currentTimeMillis() - DefaultStrolchSessionHandler.this.sessionTtl;
+			LocalDateTime timeOutTime = LocalDateTime.now().minus(sessionTtl, ChronoUnit.MILLIS);
+			ZoneId systemDefault = ZoneId.systemDefault();
 
 			for (Certificate certificate : certificateMap.values()) {
-				if (certificate.getLastAccess() < reqLastAccessTime) {
+				Instant lastAccess = certificate.getLastAccess().toInstant();
+				if (timeOutTime.isAfter(LocalDateTime.ofInstant(lastAccess, systemDefault))) {
 					String msg = "Session {0} for user {1} has expired, invalidating session..."; //$NON-NLS-1$
 					logger.info(MessageFormat.format(msg, certificate.getAuthToken(), certificate.getUsername()));
-					invalidateSession(certificate);
+					invalidate(certificate);
 				}
+			}
+		}
+	}
+
+	@Override
+	public UserSession getSession(Certificate certificate, String sessionId) {
+		PrivilegeContext ctx = this.privilegeHandler.getPrivilegeContext(certificate);
+		ctx.assertHasPrivilege("GetSession");
+		for (Certificate cert : certificateMap.values()) {
+			if (cert.getSessionId().equals(sessionId)) {
+				ctx.validateAction(new SimpleRestrictable("GetSession", cert));
+				return new UserSession(cert);
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public List<UserSession> getSessions(Certificate certificate) {
+		PrivilegeContext ctx = this.privilegeHandler.getPrivilegeContext(certificate);
+		ctx.assertHasPrivilege("GetSession");
+		List<UserSession> sessions = new ArrayList<>(this.certificateMap.size());
+		for (Certificate cert : certificateMap.values()) {
+			try {
+				ctx.validateAction(new SimpleRestrictable("GetSession", cert));
+				sessions.add(new UserSession(cert));
+			} catch (AccessDeniedException e) {
+				// so no, user may not get this session
+			}
+		}
+
+		return sessions;
+	}
+
+	@Override
+	public void invalidateSession(Certificate certificate, String sessionId) {
+		PrivilegeContext ctx = this.privilegeHandler.getPrivilegeContext(certificate);
+		ctx.assertHasPrivilege("InvalidateSession");
+		for (Certificate cert : certificateMap.values()) {
+			if (cert.getSessionId().equals(sessionId)) {
+				ctx.validateAction(new SimpleRestrictable("InvalidateSession", cert));
+				invalidate(cert);
+			}
+		}
+	}
+
+	@Override
+	public void setSessionLocale(Certificate certificate, String sessionId, Locale locale) {
+		if (!certificate.getSessionId().equals(sessionId)) {
+			String msg = "User''s can only change their own session locale: {0} may not change locale of session {1}";
+			throw new AccessDeniedException(MessageFormat.format(msg, certificate.getUsername(), sessionId));
+		}
+
+		for (Certificate cert : certificateMap.values()) {
+			if (cert.getSessionId().equals(sessionId)) {
+				cert.setLocale(locale);
 			}
 		}
 	}
