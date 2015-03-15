@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -77,11 +78,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * slf4j logger
 	 */
 	protected static final Logger logger = LoggerFactory.getLogger(DefaultPrivilegeHandler.class);
-
-	/**
-	 * last assigned id for the {@link Certificate}s
-	 */
-	private long lastSessionId;
 
 	/**
 	 * Map keeping a reference to all active sessions
@@ -1000,7 +996,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String authToken = this.encryptionHandler.convertToHash(this.encryptionHandler.nextToken());
 
 			// get next session id
-			String sessionId = nextSessionId();
+			String sessionId = UUID.randomUUID().toString();
 
 			// create a new certificate, with details of the user
 			certificate = new Certificate(sessionId, new Date(), username, user.getFirstname(), user.getLastname(),
@@ -1329,7 +1325,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// validate privilege conflicts
 		validatePrivilegeConflicts();
 
-		this.lastSessionId = 0l;
 		this.privilegeContextMap = Collections.synchronizedMap(new HashMap<String, PrivilegeContext>());
 		this.initialized = true;
 	}
@@ -1424,13 +1419,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new PrivilegeException(msg);
 			}
 		}
-	}
-
-	/**
-	 * @return a new session id
-	 */
-	private synchronized String nextSessionId() {
-		return Long.toString(++this.lastSessionId % Long.MAX_VALUE);
 	}
 
 	/**
@@ -1552,7 +1540,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String authToken = this.encryptionHandler.nextToken();
 
 		// get next session id
-		String sessionId = nextSessionId();
+		String sessionId = UUID.randomUUID().toString();
 
 		// create a new certificate, with details of the user
 		Certificate systemUserCertificate = new Certificate(sessionId, new Date(), systemUsername, user.getFirstname(),
