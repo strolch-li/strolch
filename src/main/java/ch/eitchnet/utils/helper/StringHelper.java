@@ -589,8 +589,6 @@ public class StringHelper {
 	public static String formatExceptionMessage(Throwable t) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(t.getMessage());
-		sb.append("\n");
-
 		appendCause(sb, t);
 		return sb.toString();
 	}
@@ -600,9 +598,10 @@ public class StringHelper {
 		if (cause == null)
 			return;
 
+		sb.append("\n");
+
 		sb.append("cause:\n");
 		sb.append(cause.getMessage());
-		sb.append("\n");
 
 		if (cause.getCause() != null)
 			appendCause(sb, cause.getCause());
