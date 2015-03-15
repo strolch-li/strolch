@@ -21,15 +21,22 @@ import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.model.Result;
 import li.strolch.rest.model.UserSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.eitchnet.privilege.model.Certificate;
 
 @Path("strolch/sessions")
 public class UserSessionsService {
 
+	private static final Logger logger = LoggerFactory.getLogger(UserSessionsService.class);
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSessions(@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		logger.info("[" + cert.getUsername() + "] Returning all sessions...");
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 		List<UserSession> sessions = sessionHandler.getSessions(cert);
 		GenericEntity<List<UserSession>> entity = new GenericEntity<List<UserSession>>(sessions) {
@@ -42,6 +49,7 @@ public class UserSessionsService {
 	@Path("{sessionId}")
 	public Response getSession(@Context HttpServletRequest request, @PathParam("sessionId") String sessionId) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		logger.info("[" + cert.getUsername() + "] Returning session " + sessionId);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 		UserSession session = sessionHandler.getSession(cert, sessionId);
 		return Response.ok(session, MediaType.APPLICATION_JSON).build();
@@ -52,6 +60,7 @@ public class UserSessionsService {
 	@Path("{sessionId}")
 	public Response invalidateSession(@Context HttpServletRequest request, @PathParam("sessionId") String sessionId) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		logger.info("[" + cert.getUsername() + "] Invalidating session " + sessionId);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 		sessionHandler.invalidateSession(cert, sessionId);
 		return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
@@ -63,6 +72,7 @@ public class UserSessionsService {
 	public Response setSessionLocale(@Context HttpServletRequest request, @PathParam("sessionId") String sessionId,
 			@PathParam("locale") String localeS) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		logger.info("[" + cert.getUsername() + "] Setting locale of session " + sessionId + " to " + localeS);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 		Locale locale;
 		try {

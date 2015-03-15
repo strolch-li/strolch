@@ -33,6 +33,10 @@ public class UserSession {
 	@XmlAttribute(name = "lastAccess")
 	private Date lastAccess;
 
+	public UserSession() {
+		// no-arg constructor for JAXB
+	}
+
 	public UserSession(Certificate certificate) {
 		this.sessionId = certificate.getSessionId();
 		this.loginTime = certificate.getLoginTime();
