@@ -275,7 +275,7 @@ public class PrivilegeTest {
 	public void testPerformSystemRestrictableFailNoAdditionalPrivilege() throws Exception {
 		this.exception.expect(PrivilegeException.class);
 		this.exception
-				.expectMessage("User system_admin2 does not have Privilege ch.eitchnet.privilege.test.model.TestRestrictable");
+				.expectMessage("User system_admin2 does not have the privilege ch.eitchnet.privilege.test.model.TestRestrictable");
 		try {
 			// create the action to be performed as a system user
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
@@ -531,7 +531,7 @@ public class PrivilegeTest {
 			this.ctx.validateAction(restrictable);
 			fail("Should fail as bob does not have role app");
 		} catch (AccessDeniedException e) {
-			String msg = "User bob does not have Privilege ch.eitchnet.privilege.test.model.TestRestrictable needed for Restrictable ch.eitchnet.privilege.test.model.TestRestrictable";
+			String msg = "User bob does not have the privilege ch.eitchnet.privilege.test.model.TestRestrictable needed for Restrictable ch.eitchnet.privilege.test.model.TestRestrictable";
 			assertEquals(msg, e.getLocalizedMessage());
 		} finally {
 			logout();
