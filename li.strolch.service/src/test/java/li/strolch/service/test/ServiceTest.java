@@ -78,7 +78,7 @@ public class ServiceTest extends AbstractServiceTest {
 			TestService testService = new TestService();
 			ServiceResult svcResult = getServiceHandler().doService(certificate, testService);
 			assertThat(svcResult.getMessage(),
-					containsString("User jill does not have Privilege li.strolch.service.api.Service")); //$NON-NLS-1$
+					containsString("User jill does not have the privilege li.strolch.service.api.Service")); //$NON-NLS-1$
 			assertThat(svcResult.getThrowable(), instanceOf(AccessDeniedException.class));
 		} finally {
 			runtimeMock.getPrivilegeHandler().invalidateSession(certificate);
