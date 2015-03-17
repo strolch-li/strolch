@@ -38,6 +38,15 @@ public class LoginResult {
 	@XmlAttribute(name = "username")
 	private String username;
 
+	@XmlAttribute(name = "firstname")
+	private String firstname;
+
+	@XmlAttribute(name = "lastname")
+	private String lastname;
+
+	@XmlAttribute(name = "authToken")
+	private String authToken;
+
 	@XmlAttribute(name = "sessionId")
 	private String sessionId;
 
@@ -72,6 +81,51 @@ public class LoginResult {
 	 */
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	/**
+	 * @return the firstname
+	 */
+	public String getFirstname() {
+		return this.firstname;
+	}
+
+	/**
+	 * @param firstname
+	 *            the firstname to set
+	 */
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+
+	/**
+	 * @return the lastname
+	 */
+	public String getLastname() {
+		return this.lastname;
+	}
+
+	/**
+	 * @param lastname
+	 *            the lastname to set
+	 */
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+	/**
+	 * @return the sessionId
+	 */
+	public String getAuthToken() {
+		return this.authToken;
+	}
+
+	/**
+	 * @param authToken
+	 *            the authToken to set
+	 */
+	public void setAuthToken(String authToken) {
+		this.authToken = authToken;
 	}
 
 	/**

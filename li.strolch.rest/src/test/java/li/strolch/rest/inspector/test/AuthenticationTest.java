@@ -58,11 +58,11 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		LoginResult loginResult = result.readEntity(LoginResult.class);
 		assertNotNull(loginResult);
 		assertEquals("jill", loginResult.getUsername());
-		assertEquals(64, loginResult.getSessionId().length());
+		assertEquals(64, loginResult.getAuthToken().length());
 		assertNull(loginResult.getMsg());
 
 		// logout
-		result = target().path(ROOT_PATH + "/" + loginResult.getSessionId()).request(MediaType.APPLICATION_JSON)
+		result = target().path(ROOT_PATH + "/" + loginResult.getAuthToken()).request(MediaType.APPLICATION_JSON)
 				.delete();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		assertNotNull(loginResult);
@@ -86,12 +86,12 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		LoginResult loginResult = result.readEntity(LoginResult.class);
 		assertNotNull(loginResult);
 		assertEquals("jill", loginResult.getUsername());
-		assertEquals(64, loginResult.getSessionId().length());
+		assertEquals(64, loginResult.getAuthToken().length());
 		assertEquals(Locale.ITALY.toString(), loginResult.getLocale());
 		assertNull(loginResult.getMsg());
 
 		// logout
-		result = target().path(ROOT_PATH + "/" + loginResult.getSessionId()).request(MediaType.APPLICATION_JSON)
+		result = target().path(ROOT_PATH + "/" + loginResult.getAuthToken()).request(MediaType.APPLICATION_JSON)
 				.delete();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		assertNotNull(loginResult);
@@ -128,7 +128,7 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		LoginResult loginResult = result.readEntity(LoginResult.class);
 		assertNotNull(loginResult);
 		assertEquals("jill", loginResult.getUsername());
-		assertEquals(64, loginResult.getSessionId().length());
+		assertEquals(64, loginResult.getAuthToken().length());
 		assertNull(loginResult.getMsg());
 
 		// logout
