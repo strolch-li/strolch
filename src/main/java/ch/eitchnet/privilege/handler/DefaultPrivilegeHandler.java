@@ -167,7 +167,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate access to each role
 		// TODO throwing and catching exception ain't cool
-		rolesStream.filter(role -> {
+		rolesStream = rolesStream.filter(role -> {
 			try {
 				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_ROLE, new Tuple(null, role)));
 				return true;
@@ -191,7 +191,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate access to each user
 		// TODO throwing and catching exception ain't cool
-		usersStream.filter(user -> {
+		usersStream = usersStream.filter(user -> {
 			try {
 				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user)));
 				return true;
