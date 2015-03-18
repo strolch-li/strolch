@@ -28,7 +28,9 @@ import ch.eitchnet.utils.collections.Tuple;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
- * TODO
+ * This {@link PrivilegePolicy} expects a {@link Tuple} as {@link Restrictable#getPrivilegeValue()} and then depending
+ * on the user specific privileges (see {@link PrivilegeHandler}), uses the basic <code>Allow</code> and
+ * <code>Deny</code> to detect if the username of the certificate is allowed
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */

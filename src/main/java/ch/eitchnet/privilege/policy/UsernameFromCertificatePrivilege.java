@@ -25,7 +25,15 @@ import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.Restrictable;
 
 /**
- * TODO
+ * <p>
+ * This {@link PrivilegePolicy} expects a {@link Certificate} as {@link Restrictable#getPrivilegeValue()} and uses the
+ * basic <code>Allow</code> and <code>Deny</code> to detect if the username of the certificate is allowed.
+ * </p>
+ * 
+ * <p>
+ * The {@link Certificate} as privilegeValue is not to be confused with the {@link Certificate} of the current user.
+ * This certificate is of the user to which access is request, i.e. modifying the session of a logged in user.
+ * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
