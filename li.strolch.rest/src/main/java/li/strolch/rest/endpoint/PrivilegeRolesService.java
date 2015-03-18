@@ -55,12 +55,7 @@ public class PrivilegeRolesService {
 
 	private static final Logger logger = LoggerFactory.getLogger(PrivilegeRolesService.class);
 
-	private PrivilegeHandler getPrivilegeHandler(Certificate cert, boolean requiresStrolchPrivilegeAdminRole) {
-		if (requiresStrolchPrivilegeAdminRole && !cert.hasRole(StrolchRestfulConstants.ROLE_STROLCH_PRIVILEGE_ADMIN)) {
-			throw new AccessDeniedException("You may not perform the request as you are missing role "
-					+ StrolchRestfulConstants.ROLE_STROLCH_PRIVILEGE_ADMIN);
-		}
-
+	private PrivilegeHandler getPrivilegeHandler(Certificate cert) {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
 		return container.getPrivilegeHandler().getPrivilegeHandler(cert);
 	}
@@ -69,7 +64,7 @@ public class PrivilegeRolesService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRoles(@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 
 		List<RoleRep> roles = privilegeHandler.getRoles(cert);
 		GenericEntity<List<RoleRep>> entity = new GenericEntity<List<RoleRep>>(roles) {
@@ -82,7 +77,7 @@ public class PrivilegeRolesService {
 	@Path("{rolename}")
 	public Response getRole(@PathParam("rolename") String rolename, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 
 		RoleRep role = privilegeHandler.getRole(cert, rolename);
 		return Response.ok(role, MediaType.APPLICATION_JSON).build();
@@ -95,7 +90,7 @@ public class PrivilegeRolesService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			RoleRep role = privilegeHandler.addRole(cert, newRole);
 			return Response.ok(role, MediaType.APPLICATION_JSON).build();
 
@@ -123,7 +118,7 @@ public class PrivilegeRolesService {
 				return Response.serverError().entity(new Result("Path rolename and data do not have same role name!"))
 						.type(MediaType.APPLICATION_JSON).build();
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			RoleRep role = privilegeHandler.replaceRole(cert, updatedRole);
 			return Response.ok(role, MediaType.APPLICATION_JSON).build();
 
@@ -146,7 +141,7 @@ public class PrivilegeRolesService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			RoleRep role = privilegeHandler.removeRole(cert, rolename);
 			return Response.ok(role, MediaType.APPLICATION_JSON).build();
 
@@ -170,7 +165,7 @@ public class PrivilegeRolesService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			RoleRep updatedRole = privilegeHandler.addOrReplacePrivilegeOnRole(cert, rolename, privilegeRep);
 			return Response.ok(updatedRole, MediaType.APPLICATION_JSON).build();
 
@@ -194,7 +189,7 @@ public class PrivilegeRolesService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			RoleRep updatedRole = privilegeHandler.removePrivilegeFromRole(cert, rolename, privilege);
 			return Response.ok(updatedRole, MediaType.APPLICATION_JSON).build();
 

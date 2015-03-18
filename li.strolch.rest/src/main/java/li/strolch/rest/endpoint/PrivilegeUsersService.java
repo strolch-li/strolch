@@ -15,8 +15,6 @@
  */
 package li.strolch.rest.endpoint;
 
-import static li.strolch.rest.StrolchRestfulConstants.ROLE_STROLCH_PRIVILEGE_ADMIN;
-
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
@@ -60,12 +58,7 @@ public class PrivilegeUsersService {
 
 	private static final Logger logger = LoggerFactory.getLogger(PrivilegeUsersService.class);
 
-	private PrivilegeHandler getPrivilegeHandler(Certificate cert, boolean requiresStrolchPrivilegeAdminRole) {
-		if (requiresStrolchPrivilegeAdminRole && !cert.hasRole(ROLE_STROLCH_PRIVILEGE_ADMIN)) {
-			String msg = "You may not perform the request as you are missing role {0}";
-			throw new AccessDeniedException(MessageFormat.format(msg, ROLE_STROLCH_PRIVILEGE_ADMIN));
-		}
-
+	private PrivilegeHandler getPrivilegeHandler(Certificate cert) {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
 		return container.getPrivilegeHandler().getPrivilegeHandler(cert);
 	}
@@ -74,7 +67,7 @@ public class PrivilegeUsersService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUsers(@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 
 		List<UserRep> users = privilegeHandler.getUsers(cert);
 		GenericEntity<List<UserRep>> entity = new GenericEntity<List<UserRep>>(users) {
@@ -87,7 +80,7 @@ public class PrivilegeUsersService {
 	@Path("{username}")
 	public Response getUser(@PathParam("username") String username, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 
 		UserRep user = privilegeHandler.getUser(cert, username);
 		return Response.ok(user, MediaType.APPLICATION_JSON).build();
@@ -99,7 +92,7 @@ public class PrivilegeUsersService {
 	@Path("query")
 	public Response queryUsers(UserRep query, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 
 		List<UserRep> users = privilegeHandler.queryUsers(cert, query);
 		GenericEntity<List<UserRep>> entity = new GenericEntity<List<UserRep>>(users) {
@@ -114,7 +107,7 @@ public class PrivilegeUsersService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			UserRep user = privilegeHandler.addUser(cert, newUser, null);
 			return Response.ok(user, MediaType.APPLICATION_JSON).build();
 
@@ -137,7 +130,7 @@ public class PrivilegeUsersService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			UserRep user = privilegeHandler.removeUser(cert, username);
 			return Response.ok(user, MediaType.APPLICATION_JSON).build();
 
@@ -165,7 +158,7 @@ public class PrivilegeUsersService {
 				return Response.serverError().entity(new Result("Path username and data do not have same username!"))
 						.type(MediaType.APPLICATION_JSON).build();
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			UserRep updatedUser = privilegeHandler.updateUser(cert, updatedFields);
 			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
 
@@ -189,7 +182,7 @@ public class PrivilegeUsersService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			UserRep updatedUser = privilegeHandler.addRoleToUser(cert, username, rolename);
 			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
 
@@ -213,7 +206,7 @@ public class PrivilegeUsersService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			UserRep updatedUser = privilegeHandler.removeRoleFromUser(cert, username, rolename);
 			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
 
@@ -244,7 +237,7 @@ public class PrivilegeUsersService {
 				return Response.serverError().entity(new Result(msg)).type(MediaType.APPLICATION_JSON).build();
 			}
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 			UserRep updatedUser = privilegeHandler.setUserState(cert, username, userState);
 			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
 
@@ -268,7 +261,7 @@ public class PrivilegeUsersService {
 		try {
 
 			// if user changing own password, then no need for StrolchPrivilegeAdmin
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, !cert.getUsername().equals(username));
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 
 			privilegeHandler.setUserPassword(cert, username, passwordField.getPassword().getBytes());
 			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
@@ -301,7 +294,7 @@ public class PrivilegeUsersService {
 			}
 
 			// if user changing own locale, then no need for StrolchPrivilegeAdmin
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, !cert.getUsername().equals(username));
+			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 
 			UserRep updatedUser = privilegeHandler.setUserLocale(cert, username, locale);
 			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();

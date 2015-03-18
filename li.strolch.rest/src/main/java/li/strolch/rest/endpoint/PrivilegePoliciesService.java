@@ -30,7 +30,6 @@ import javax.ws.rs.core.Response;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.xml.XmlKeyValue;
@@ -43,12 +42,7 @@ public class PrivilegePoliciesService {
 
 	// private static final Logger logger = LoggerFactory.getLogger(PrivilegePoliciesService.class);
 
-	private PrivilegeHandler getPrivilegeHandler(Certificate cert, boolean requiresStrolchPrivilegeAdminRole) {
-		if (requiresStrolchPrivilegeAdminRole && !cert.hasRole(StrolchRestfulConstants.ROLE_STROLCH_PRIVILEGE_ADMIN)) {
-			throw new AccessDeniedException("You may not perform the request as you are missing role "
-					+ StrolchRestfulConstants.ROLE_STROLCH_PRIVILEGE_ADMIN);
-		}
-
+	private PrivilegeHandler getPrivilegeHandler(Certificate cert) {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
 		return container.getPrivilegeHandler().getPrivilegeHandler(cert);
 	}
@@ -57,7 +51,7 @@ public class PrivilegePoliciesService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRoles(@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert, true);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
 
 		Map<String, String> policyDefs = privilegeHandler.getPolicyDefs(cert);
 		List<XmlKeyValue> values = XmlKeyValue.valueOf(policyDefs);
