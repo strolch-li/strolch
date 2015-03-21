@@ -15,11 +15,14 @@
  */
 package li.strolch.rest.model;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import li.strolch.service.api.ServiceResult;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -44,6 +47,17 @@ public class Result {
 		this.exceptionMsg = StringHelper.formatExceptionMessage(e);
 	}
 
+	public Result(ServiceResult svcResult) {
+		if (svcResult.isOk()) {
+			this.msg = StringHelper.DASH;
+		} else {
+			this.msg = svcResult.getMessage();
+			Throwable t = svcResult.getThrowable();
+			if (t != null)
+				this.exceptionMsg = StringHelper.formatExceptionMessage(t);
+		}
+	}
+
 	public Result() {
 		this.msg = StringHelper.DASH;
 	}
@@ -62,5 +76,13 @@ public class Result {
 
 	public void setExceptionMsg(String exceptionMsg) {
 		this.exceptionMsg = exceptionMsg;
+	}
+
+	public static Response toResponse(ServiceResult svcResult) {
+		Result result = new Result(svcResult);
+		if (svcResult.isOk())
+			return Response.ok(result, MediaType.APPLICATION_JSON).build();
+		else
+			return Response.serverError().type(MediaType.APPLICATION_JSON).entity(result).build();
 	}
 }
