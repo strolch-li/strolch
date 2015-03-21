@@ -564,6 +564,23 @@ public class StringHelper {
 	}
 
 	/**
+	 * <p>
+	 * Returns a message for the given {@link Throwable}
+	 * </p>
+	 * 
+	 * <p>
+	 * A {@link NullPointerException} only has <code>null</code> as the message so this methods returns the class name
+	 * in such a case
+	 * </p>
+	 * 
+	 * @param t
+	 * @return
+	 */
+	public static String getExceptionMessage(Throwable t) {
+		return StringHelper.isEmpty(t.getMessage()) ? t.getClass().getName() : t.getMessage();
+	}
+
+	/**
 	 * Formats the given {@link Throwable}'s stack trace to a string
 	 * 
 	 * @param t
