@@ -60,18 +60,69 @@
 
             <!-- blog post -->
             <div class="blog-post">
+                <h2 class="blog-post-title">Strolch Release 1.0.0</h2>
+
+                <p class="blog-post-meta">March 31, 2015 by <a href="#">Robert</a></p>
+
+                <p>Finally Version 1.0.0 of Strolch has been released and can be <a href="downloads.html">downloaded</a>
+                    immediately.</p>
+                <hr>
+                <p>Before 1.0.0 could be released, some major changes were decided, all driven by the first big project
+                    using Strolch as its underlying stack. Those changes were minor, and really major, but should make
+                    Strolch better and was important for the first release.</p>
+
+                <p>Here is a list of the most interesting changes:</p>
+                <ul>
+                    <li>Java 8 - Strolch was ported to Java 8. This gives a lot of cool features: The stream API,
+                        lambdas, the new time API, etc.
+                    </li>
+                    <li>TX refactoring: Strolch transactions are instances of <code>Closeable</code> so that they are
+                        closed using a try-with-resource block in Java7. The change that was required was to not auto
+                        commit. Now a TX is read-only and one has to set the auto commit as the last statement. See <a
+                                href="https://github.com/eitchnet/strolch/commit/46ccb921dfa94f140cbaa3f459c2e434c913d720">this</a>
+                        commit for more information.
+                    </li>
+                    <li>Added a <code>tx.flush()</code> to allow an implementation to flush part of a transaction, this
+                        feature is vital to perform parts of a transaction before deciding if the TX should be
+                        committed.
+                    </li>
+                    <li>Fixed the issue where data store mode <code>CACHED</code> performed <code>TRANSACTIONAL</code>
+                        queries, instead of staying in-memory.
+                    </li>
+                    <li><code>ParameterSelection.stringListSelection()</code> uses a <code>StringMatchMode</code>
+                        instead of just <code>equals()</code></li>
+                    <li><code>ParameterSelection.dateRangeSelection()</code> uses a <code>DateRange</code> instead of
+                        just <code>equals()</code></li>
+                    <li>Added the <code>MigrationsHandler</code> to use to perform code migrations of production data
+                        bases where data shouldn't go lost.
+                    </li>
+                    <li>And many more...</li>
+                </ul>
+
+                <p>Strolch 1.1.0 is already in development and can also be downloaded from the download page Here you
+                    can see the current change list on <a
+                            href="https://github.com/eitchnet/strolch/compare/1.0.0...develop">GitHub</a>. For instance
+                    heavy work has been done to implement privilege management by adding a REST API. Looking forward to
+                    a wonderful next Strolch release.</p>
+
+            </div>
+            <!-- /.blog-post -->
+
+            <!-- blog post -->
+            <div class="blog-post">
                 <h2 class="blog-post-title">DurationParameter and other minor changes: Release 1.0.0-RC4</h2>
 
                 <p class="blog-post-meta">October 9, 2014 by <a href="#">Robert</a></p>
 
-                <p>New <i>DurationParameter</i> and additional minor changes: Release of 1.0.0-RC4 which can be
+                <p>New <code>DurationParameter</code> and additional minor changes: Release of 1.0.0-RC4 which can be
                     downloaded on the <a href="downloads.html">download</a> page.</p>
                 <hr>
                 <p>While implementing a use case in a Strolch based application it was detected that an essential
-                    parameter type was missing, the <i>DurationParameter</i>. This parameter currently stores the value
-                    as a long in memory and serializes to <a href="http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO8601</a>.
-                    As soon as we move Strolch to Java8, we will change this to use the <i>Period</i> class in the new
-                    Java8 date and time API.</p>
+                    parameter type was missing, the <code>DurationParameter</code>. This parameter currently stores the
+                    value as a long in memory and serializes to <a
+                            href="http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO8601</a>. As soon as we move
+                    Strolch to Java8, we will change this to use the <code>Period</code> class in the new Java8 date and
+                    time API.</p>
 
                 <p>In addition to the new parameter, a couple of other changes were made:</p>
                 <ul>
@@ -109,16 +160,17 @@
                 <p>Migrating a database for Strolch is mostly a one time thing. The object model in Strolch is quite
                     static, so there is seldom a need to migrate the database. Domain specific changes, i.e. new
                     Resources, or adding Parameters to Resources, is not a schema change. Thus, instead of going the way
-                    other frameworks go, e.g. Ruby on Rails, we built the data initialization right into the <i>PersistenceHandler</i>.
+                    other frameworks go, e.g. Ruby on Rails, we built the data initialization right into the <code>PersistenceHandler</code>.
                 </p>
 
-                <p>Now if the PostgreSQL <i>PersistenceHandler</i> creates the schema, then it might also initialize the
-                    minimal set of data. For this to work, the <i>PersistenceHandler</i> checks if the flags <i>allowSchemaCreation</i>,
-                    <i>allowSchemaDrop</i> and <i>allowDbInitOnSchemaCreate</i>. If those flags are enabled, and the
-                    schema was created during initialization, then the database is also initialized with the contents of
-                    the XML file configured under key <i>dataStoreFile</i> of the relevant <i>Realm</i>.</p>
+                <p>Now if the PostgreSQL <code>PersistenceHandler</code> creates the schema, then it might also
+                    initialize the minimal set of data. For this to work, the <code>PersistenceHandler</code> checks if
+                    the flags <code>allowSchemaCreation</code>, <code>allowSchemaDrop</code> and <code>allowDbInitOnSchemaCreate</code>.
+                    If those flags are enabled, and the schema was created during initialization, then the database is
+                    also initialized with the contents of the XML file configured under key <code>dataStoreFile</code>
+                    of the relevant <code>Realm</code>.</p>
 
-                <p>The database initialization is done as a system user action which must have the name <i>db_initializer</i>.
+                <p>The database initialization is done as a system user action which must have the name <code>db_initializer</code>.
                     This is another fail-safe, so that on a production system, this user can simply be deleted.</p>
 
                 <p>So, Strolch 1.0.0-RC3 is out the door, go ahead and <a href="downloads.html">try it out</a>.</p>
