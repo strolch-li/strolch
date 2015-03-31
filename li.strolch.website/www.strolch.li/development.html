@@ -64,8 +64,7 @@
                 <pre class="pre">
 git clone https://github.com/eitchnet/strolch.git
 cd strolch
-git submodule init
-git submodule update
+git submodule update --init --recursive
 mvn clean install -DskipTests</pre>
 
                 <p><b>Note:</b> If you want to run the tests, then either install a PostgreSQL DB and configure the users as is required by the project, or remove the project from the li.strolch.dev module build, otherwise the build will fail =))</p>
