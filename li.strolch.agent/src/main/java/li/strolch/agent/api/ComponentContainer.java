@@ -65,8 +65,8 @@ public interface ComponentContainer {
 	 * @return the {@link StrolchRealm}
 	 * 
 	 * @throws StrolchException
-	 *             if the user does not have a {@link StrolchConstants#PROP_REALM} property configured, or if the realm
-	 *             does not exist with the found value
+	 *             if the user does not have a {@link StrolchConstants#PROP_REALM} property configured, and the default
+	 *             realm is not configured, or if the realm does not exist with the found value
 	 */
 	public abstract StrolchRealm getRealm(Certificate certificate) throws StrolchException;
 

@@ -114,9 +114,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		String realmName = certificate.getProperty(StrolchConstants.PROP_REALM);
 		if (StringHelper.isEmpty(realmName)) {
-			String msg = "The User {0} is missing the property {1}";
-			throw new StrolchException(
-					MessageFormat.format(msg, certificate.getUsername(), StrolchConstants.PROP_REALM));
+			if (getRealmNames().contains(StrolchConstants.DEFAULT_REALM)) {
+				realmName = StrolchConstants.DEFAULT_REALM;
+			} else {
+				String msg = "The User {0} is missing the property {1} and the Realm {2} can not be used as it does not exist!";
+				throw new StrolchException(MessageFormat.format(msg, certificate.getUsername(),
+						StrolchConstants.PROP_REALM, StrolchConstants.DEFAULT_REALM));
+			}
 		}
 
 		try {
