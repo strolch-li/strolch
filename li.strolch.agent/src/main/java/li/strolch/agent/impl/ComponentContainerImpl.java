@@ -30,6 +30,7 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
@@ -39,6 +40,8 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.helper.SystemHelper;
 
 public class ComponentContainerImpl implements ComponentContainer {
@@ -104,6 +107,25 @@ public class ComponentContainerImpl implements ComponentContainer {
 	@Override
 	public StrolchRealm getRealm(String realm) throws StrolchException {
 		return getComponent(RealmHandler.class).getRealm(realm);
+	}
+
+	@Override
+	public StrolchRealm getRealm(Certificate certificate) throws StrolchException {
+
+		String realmName = certificate.getProperty(StrolchConstants.PROP_REALM);
+		if (StringHelper.isEmpty(realmName)) {
+			String msg = "The User {0} is missing the property {1}";
+			throw new StrolchException(
+					MessageFormat.format(msg, certificate.getUsername(), StrolchConstants.PROP_REALM));
+		}
+
+		try {
+			return getComponent(RealmHandler.class).getRealm(realmName);
+		} catch (StrolchException e) {
+			String msg = "The User {0} has property {1} with value={2}, but the Realm does not eixst, or is not accessible by this user!";
+			throw new StrolchException(MessageFormat.format(msg, certificate.getUsername(),
+					StrolchConstants.PROP_REALM, realmName), e);
+		}
 	}
 
 	private void setupComponent(Map<Class<?>, StrolchComponent> componentMap,

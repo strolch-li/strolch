@@ -20,6 +20,7 @@ import java.util.Set;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -46,11 +47,27 @@ public interface ComponentContainer {
 	 * 
 	 * @param realm
 	 *            the name of the {@link StrolchRealm} to return
+	 * 
 	 * @return the {@link StrolchRealm} with the given name
 	 * 
 	 * @throws StrolchException
 	 *             if the {@link StrolchRealm} does not exist with the given name
 	 */
-	public abstract StrolchRealm getRealm(String realm);
+	public abstract StrolchRealm getRealm(String realm) throws StrolchException;
+
+	/**
+	 * Returns the default {@link StrolchRealm} for the user with the given {@link Certificate}. This is done by
+	 * querying the property {@link StrolchConstants#PROP_REALM} from the certificate.
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} from which to retrieve the name of the {@link StrolchRealm} to return
+	 * 
+	 * @return the {@link StrolchRealm}
+	 * 
+	 * @throws StrolchException
+	 *             if the user does not have a {@link StrolchConstants#PROP_REALM} property configured, or if the realm
+	 *             does not exist with the found value
+	 */
+	public abstract StrolchRealm getRealm(Certificate certificate) throws StrolchException;
 
 }

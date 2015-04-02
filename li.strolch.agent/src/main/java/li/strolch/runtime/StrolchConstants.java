@@ -31,6 +31,7 @@ public class StrolchConstants {
 	public static final String OBSERVER_HANDLER = ObserverHandler.class.getSimpleName();
 	public static final String PRIVILEGE_HANDLER = "PrivilegeHandler";
 
+	public static final String PROP_REALM = "realm";
 	public static final String DEFAULT_REALM = "defaultRealm";
 
 	public static final String DEFAULT_XML_VERSION = "1.0"; //$NON-NLS-1$
