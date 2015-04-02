@@ -32,6 +32,7 @@ public class AuditQuery implements StrolchQuery {
 	private DateRange dateRange;
 
 	public AuditQuery(String elementTypeSelection, DateRange dateRange) {
+		DBC.PRE.assertNotEmpty("No elementTypeSelection (navigation) set!", elementTypeSelection); //$NON-NLS-1$
 		DBC.PRE.assertFalse("dateRange may not be unbounded!", dateRange.isUnbounded());
 		this.elementTypeSelection = elementTypeSelection;
 		this.dateRange = dateRange;
@@ -65,8 +66,6 @@ public class AuditQuery implements StrolchQuery {
 	}
 
 	public void accept(AuditQueryVisitor visitor) {
-		DBC.PRE.assertNotNull("No elementTypeSelection (navigation) set!", this.elementTypeSelection); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("No dateRange set!", this.dateRange); //$NON-NLS-1$
 		visitor.visit(this);
 		for (AuditSelection selection : this.selections) {
 			selection.accept(visitor);

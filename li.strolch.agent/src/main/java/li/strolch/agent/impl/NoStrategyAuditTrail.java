@@ -101,6 +101,11 @@ public class NoStrategyAuditTrail implements AuditTrail {
 	}
 
 	@Override
+	public List<Audit> doQuery(StrolchTransaction tx, AuditQuery query) {
+		return null;
+	}
+
+	@Override
 	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery query, AuditVisitor<U> auditVisitor) {
 		return null;
 	}

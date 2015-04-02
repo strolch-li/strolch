@@ -67,5 +67,7 @@ public interface AuditTrail {
 
 	public long removeAll(StrolchTransaction tx, String type, DateRange dateRange);
 
+	public List<Audit> doQuery(StrolchTransaction tx, AuditQuery query);
+
 	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery query, AuditVisitor<U> auditVisitor);
 }
