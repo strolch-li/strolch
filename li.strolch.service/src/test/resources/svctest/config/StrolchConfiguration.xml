@@ -22,7 +22,9 @@
 			<depends>PrivilegeHandler</depends>
 			<depends>PersistenceHandler</depends>
 			<Properties>
-				<realms>svcTransient, svcCached, svcTransactional</realms>
+				<realms>defaultRealm, svcTransient, svcCached, svcTransactional</realms>
+
+				<dataStoreMode>EMPTY</dataStoreMode>
 
 				<tryLockTimeUnit.svcTransient>SECONDS</tryLockTimeUnit.svcTransient>
 				<tryLockTime.svcTransient>1</tryLockTime.svcTransient>

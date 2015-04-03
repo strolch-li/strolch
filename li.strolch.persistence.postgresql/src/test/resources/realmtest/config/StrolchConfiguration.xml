@@ -22,7 +22,8 @@
 			<depends>PrivilegeHandler</depends>
 			<depends>PersistenceHandler</depends>
 			<Properties>
-				<realms>first, second</realms>
+				<realms>defaultRealm, first, second</realms>
+				<dataStoreMode>EMPTY</dataStoreMode>
 				<dataStoreMode.first>TRANSACTIONAL</dataStoreMode.first>
 				<dataStoreMode.second>TRANSACTIONAL</dataStoreMode.second>
 				<enableAuditTrail.first>true</enableAuditTrail.first>
