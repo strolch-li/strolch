@@ -46,15 +46,28 @@ public abstract class AuditSelector {
 	}
 
 	private static class ElementSelector extends AuditSelector {
+		private StringSelection elementSubTypeSelection;
 		private StringSelection elementAccessedSelection;
 
 		public ElementSelector(ElementSelection selection) {
+			this.elementSubTypeSelection = selection.getElementSubTypeSelection();
 			this.elementAccessedSelection = selection.getElementAccessedSelection();
 		}
 
 		@Override
 		public boolean select(Audit audit) {
-			return this.elementAccessedSelection.matches(audit.getElementAccessed());
+
+			if (this.elementSubTypeSelection != null) {
+				if (!this.elementSubTypeSelection.matches(audit.getElementSubType()))
+					return false;
+			}
+
+			if (this.elementAccessedSelection != null) {
+				if (!this.elementAccessedSelection.matches(audit.getElementAccessed()))
+					return false;
+			}
+
+			return true;
 		}
 	}
 

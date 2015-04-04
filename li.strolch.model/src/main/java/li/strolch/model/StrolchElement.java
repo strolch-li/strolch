@@ -97,7 +97,7 @@ public interface StrolchElement extends Serializable, Comparable<StrolchElement>
 	public StrolchElement getParent();
 
 	public StrolchRootElement getRootElement();
-	
+
 	public boolean isRootElement();
 
 	/**

@@ -59,6 +59,7 @@ import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StrolchQuery;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.model.visitor.ElementTypeVisitor;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.persistence.inmemory.InMemoryTransaction;
@@ -811,19 +812,27 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private <T extends StrolchRootElement> void auditsFor(List<Audit> audits, AccessType accessType,
 			String elementType, Set<T> elements) {
 		for (StrolchRootElement element : elements) {
-			audits.add(auditFrom(accessType, elementType, element.getId()));
+			audits.add(auditFrom(accessType, element));
 		}
 	}
 
 	private <T extends StrolchRootElement> void auditsForAudits(List<Audit> audits, AccessType accessType,
 			String elementType, Set<Audit> elements) {
 		for (Audit element : elements) {
-			audits.add(auditFrom(accessType, elementType, element.getId().toString()));
+			audits.add(auditFrom(accessType, elementType, StringHelper.DASH, element.getId().toString()));
 		}
 	}
 
 	@Override
-	public Audit auditFrom(AccessType accessType, String elementType, String id) {
+	public Audit auditFrom(AccessType accessType, StrolchRootElement element) {
+		String type = element.accept(new ElementTypeVisitor());
+		String subType = element.getType();
+		String id = element.getId();
+		return auditFrom(accessType, type, subType, id);
+	}
+
+	@Override
+	public Audit auditFrom(AccessType accessType, String elementType, String elementSubType, String id) {
 		Audit audit = new Audit();
 
 		audit.setId(StrolchAgent.getUniqueIdLong());
@@ -833,6 +842,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		audit.setDate(new Date());
 
 		audit.setElementType(elementType);
+		audit.setElementSubType(elementSubType);
 		audit.setElementAccessed(id);
 
 		// audit.setNewVersion();

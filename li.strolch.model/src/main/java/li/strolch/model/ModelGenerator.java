@@ -394,6 +394,7 @@ public class ModelGenerator {
 		String[] firstnames = new String[] { "Bob", "Alice", "Jenny" };
 		String[] lastnames = new String[] { "Richards", "Kennedy", "Davids" };
 		String[] types = new String[] { Tags.RESOURCE, Tags.ORDER, Tags.AUDIT };
+		String[] subTypes = new String[] { "Ball", "Something", "Foo", "Bar" };
 		String[] actions = new String[] { "AddResourceService", "UpdateResourceService", "RemoveResourceService",
 				"AddOrderService", "UpdateOrderService", "RemoveOrderService" };
 
@@ -404,6 +405,7 @@ public class ModelGenerator {
 		audit.setLastname(randomValue(rand, lastnames));
 		audit.setDate(new Date(rand.nextInt(5000)));
 		audit.setElementType(randomValue(rand, types));
+		audit.setElementSubType(randomValue(rand, subTypes));
 		audit.setElementAccessed(StringHelper.getUniqueId());
 		audit.setNewVersion(new Date(rand.nextInt(5000)));
 		audit.setAction(randomValue(rand, actions));

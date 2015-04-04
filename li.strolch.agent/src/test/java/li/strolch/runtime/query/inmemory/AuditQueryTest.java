@@ -109,15 +109,15 @@ public class AuditQueryTest {
 		performQuery(query, Arrays.asList(1L));
 
 		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
-		query.element().elementsAccessed(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "crea");
+		query.element().elementAccessed(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "crea");
 		performQuery(query, Arrays.asList(0L, 4L));
 
 		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
-		query.element().elementsAccessed(StringMatchMode.CONTAINS_CASE_SENSITIVE, "crea");
+		query.element().elementAccessed(StringMatchMode.CONTAINS_CASE_SENSITIVE, "crea");
 		performQuery(query, Arrays.<Long> asList());
 
 		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
-		query.element().elementsAccessed(StringMatchMode.EQUALS_CASE_INSENSITIVE, "create");
+		query.element().elementAccessed(StringMatchMode.EQUALS_CASE_INSENSITIVE, "create");
 		performQuery(query, Arrays.asList(0L, 4L));
 
 		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));

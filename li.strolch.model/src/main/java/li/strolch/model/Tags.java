@@ -51,6 +51,7 @@ public class Tags {
 		public static final String DATE = "Date";
 
 		public static final String ELEMENT_TYPE = "ElementType";
+		public static final String ELEMENT_SUB_TYPE = "ElementSubType";
 		public static final String ELEMENT_ACCESSED = "ElementAccessed";
 		public static final String NEW_VERSION = "NewVersion";
 

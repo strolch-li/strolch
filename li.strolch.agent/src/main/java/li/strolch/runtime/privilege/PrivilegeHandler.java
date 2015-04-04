@@ -25,6 +25,9 @@ import ch.eitchnet.privilege.model.PrivilegeContext;
  */
 public interface PrivilegeHandler {
 
+	public static final String PRIVILEGE = "Privilege"; //$NON-NLS-1$
+	public static final String CERTIFICATE = "Certificate"; //$NON-NLS-1$
+
 	/**
 	 * @param username
 	 * @param password

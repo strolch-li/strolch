@@ -329,13 +329,28 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @param accessType
 	 *            the type of access
 	 * @param elementType
-	 *            the element type, i.e. s {@link Tags#RESOURCE}, {@link Tags#ORDER}
+	 *            the element type, i.e. {@link Tags#RESOURCE}, {@link Tags#ORDER}
+	 * @param elementType
+	 *            the element sub type, e.g. {@link Resource#getType()}
 	 * @param id
 	 *            the id of the element audited
 	 * 
 	 * @return the new audit
 	 */
-	public Audit auditFrom(AccessType accessType, String elementType, String id);
+	public Audit auditFrom(AccessType accessType, String elementType, String elementSubType, String id);
+
+	/**
+	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling
+	 * {@link AuditTrail#add(StrolchTransaction, Audit)}
+	 * 
+	 * @param accessType
+	 *            the type of access
+	 * @param element
+	 *            the element from which to to create the audit
+	 * 
+	 * @return the new audit
+	 */
+	public Audit auditFrom(AccessType accessType, StrolchRootElement element);
 
 	/**
 	 * <p>

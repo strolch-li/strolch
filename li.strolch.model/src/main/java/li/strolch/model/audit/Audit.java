@@ -58,6 +58,9 @@ public class Audit implements Comparable<Audit>, Serializable {
 	@XmlAttribute(name = "elementType")
 	private String elementType;
 
+	@XmlAttribute(name = "elementSubType")
+	private String elementSubType;
+
 	@XmlAttribute(name = "elementAccessed")
 	private String elementAccessed;
 
@@ -71,152 +74,90 @@ public class Audit implements Comparable<Audit>, Serializable {
 	@XmlAttribute(name = "accessType")
 	private AccessType accessType;
 
-	/**
-	 * @return the id
-	 */
 	public Long getId() {
 		return this.id;
 	}
 
-	/**
-	 * @param id
-	 *            the id to set
-	 */
 	public void setId(long id) {
 		this.id = id;
 	}
 
-	/**
-	 * @return the username
-	 */
 	public String getUsername() {
 		return this.username;
 	}
 
-	/**
-	 * @param username
-	 *            the username to set
-	 */
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
-	/**
-	 * @return the firstname
-	 */
 	public String getFirstname() {
 		return this.firstname;
 	}
 
-	/**
-	 * @param firstname
-	 *            the firstname to set
-	 */
 	public void setFirstname(String firstname) {
 		this.firstname = firstname;
 	}
 
-	/**
-	 * @return the lastname
-	 */
 	public String getLastname() {
 		return this.lastname;
 	}
 
-	/**
-	 * @param lastname
-	 *            the lastname to set
-	 */
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
 	}
 
-	/**
-	 * @return the date
-	 */
 	public Date getDate() {
 		return this.date;
 	}
 
-	/**
-	 * @param date
-	 *            the date to set
-	 */
 	public void setDate(Date date) {
 		this.date = date;
 	}
 
-	/**
-	 * @return the elementType
-	 */
 	public String getElementType() {
 		return this.elementType;
 	}
 
-	/**
-	 * @param elementType
-	 *            the elementType to set
-	 */
 	public void setElementType(String elementType) {
 		this.elementType = elementType;
 	}
 
-	/**
-	 * @return the elementAccessed
-	 */
+	public String getElementSubType() {
+		return elementSubType;
+	}
+
+	public void setElementSubType(String elementSubType) {
+		this.elementSubType = elementSubType;
+	}
+
 	public String getElementAccessed() {
 		return this.elementAccessed;
 	}
 
-	/**
-	 * @param elementAccessed
-	 *            the elementAccessed to set
-	 */
 	public void setElementAccessed(String elementAccessed) {
 		this.elementAccessed = elementAccessed;
 	}
 
-	/**
-	 * @return the newVersion
-	 */
 	public Date getNewVersion() {
 		return this.newVersion;
 	}
 
-	/**
-	 * @param newVersion
-	 *            the newVersion to set
-	 */
 	public void setNewVersion(Date newVersion) {
 		this.newVersion = newVersion;
 	}
 
-	/**
-	 * @return the action
-	 */
 	public String getAction() {
 		return this.action;
 	}
 
-	/**
-	 * @param action
-	 *            the action to set
-	 */
 	public void setAction(String action) {
 		this.action = action;
 	}
 
-	/**
-	 * @return the accessType
-	 */
 	public AccessType getAccessType() {
 		return this.accessType;
 	}
 
-	/**
-	 * @param accessType
-	 *            the accessType to set
-	 */
 	public void setAccessType(AccessType accessType) {
 		this.accessType = accessType;
 	}

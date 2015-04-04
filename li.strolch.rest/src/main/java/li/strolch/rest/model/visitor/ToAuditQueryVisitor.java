@@ -35,7 +35,7 @@ public class ToAuditQueryVisitor {
 		// element Id
 		String elementId = query.getElementId();
 		if (StringHelper.isNotEmpty(elementId)) {
-			auditQuery.element().elementsAccessed(StringMatchMode.ci(), elementId);
+			auditQuery.element().elementAccessed(StringMatchMode.ci(), elementId);
 		}
 
 		// action

@@ -80,7 +80,12 @@ public class PostgreSqlAuditQueryVisitor implements AuditQueryVisitor {
 
 	@Override
 	public void visit(ElementSelection selection) {
-		if (!selection.isElementsAccessedWildcard()) {
+		if (!selection.isElementSubTypesWildcard()) {
+			StringSelection sel = selection.getElementSubTypeSelection();
+			toSql(PostgreSqlAuditDao.ELEMENT_SUB_TYPE, sel.getMatchMode(), sel.getValues());
+		}
+
+		if (!selection.isElementAccessedWildcard()) {
 			StringSelection sel = selection.getElementAccessedSelection();
 			toSql(PostgreSqlAuditDao.ELEMENT_ACCESSED, sel.getMatchMode(), sel.getValues());
 		}

@@ -65,6 +65,9 @@ public class AuditFromDomReader {
 			case Tags.Audit.ELEMENT_TYPE:
 				audit.setElementType(txtContent);
 				break;
+			case Tags.Audit.ELEMENT_SUB_TYPE:
+				audit.setElementSubType(txtContent);
+				break;
 			case Tags.Audit.ELEMENT_ACCESSED:
 				audit.setElementAccessed(txtContent);
 				break;
@@ -90,6 +93,7 @@ public class AuditFromDomReader {
 		DBC.INTERIM.assertNotEmpty("Lastname" + msg, audit.getLastname());
 		DBC.INTERIM.assertNotNull("Date" + msg, audit.getDate());
 		DBC.INTERIM.assertNotEmpty("ElementType" + msg, audit.getElementType());
+		DBC.INTERIM.assertNotEmpty("ElementSubType" + msg, audit.getElementSubType());
 		DBC.INTERIM.assertNotEmpty("ElementAccessed" + msg, audit.getElementAccessed());
 		//DBC.INTERIM.assertNotNull("NewVersion" + msg, audit.getNewVersion());
 		DBC.INTERIM.assertNotEmpty("Action" + msg, audit.getAction());

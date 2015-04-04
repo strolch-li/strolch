@@ -45,14 +45,15 @@ public class PostgreSqlAuditDao implements AuditDao {
 	public static final String ACCESS_TYPE_TYPE = "::access_type";
 	public static final String ACTION = "action";
 	public static final String NEW_VERSION = "new_version";
-	public static final String ELEMENT_ACCESSED = "element_accessed";
 	public static final String ELEMENT_TYPE = "element_type";
+	public static final String ELEMENT_SUB_TYPE = "element_sub_type";
+	public static final String ELEMENT_ACCESSED = "element_accessed";
 	public static final String DATE = "date";
 	public static final String LASTNAME = "lastname";
 	public static final String FIRSTNAME = "firstname";
 	public static final String USERNAME = "username";
 	public static final String FIELDS = StringHelper.commaSeparated(ID, USERNAME, FIRSTNAME, LASTNAME, DATE,
-			ELEMENT_TYPE, ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE);
+			ELEMENT_TYPE, ELEMENT_SUB_TYPE, ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE);
 	public static final String TABLE_NAME = "audits";
 
 	private PostgreSqlStrolchTransaction tx;
@@ -192,7 +193,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void save(Audit audit) {
-		String sql = "insert into " + TABLE_NAME + " (" + FIELDS + ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type)"; //$NON-NLS-1$
+		String sql = "insert into " + TABLE_NAME + " (" + FIELDS + ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type)"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			setAuditFields(audit, preparedStatement);
@@ -219,12 +220,13 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public void update(Audit audit) {
 		String sql = "update " + TABLE_NAME + " set " + ID + " = ?, " + USERNAME + " = ?, " + FIRSTNAME + " = ?, "
-				+ LASTNAME + " = ?, " + DATE + " = ?, " + ELEMENT_TYPE + " = ?, " + ELEMENT_ACCESSED + " = ?, "
-				+ NEW_VERSION + " = ?, " + ACTION + " = ?, " + ACCESS_TYPE + " = ?::access_type where " + ID + " = ?"; //$NON-NLS-1$
+				+ LASTNAME + " = ?, " + DATE + " = ?, " + ELEMENT_TYPE + " = ?, " + ELEMENT_SUB_TYPE + " = ?, "
+				+ ELEMENT_ACCESSED + " = ?, " + NEW_VERSION + " = ?, " + ACTION + " = ?, " + ACCESS_TYPE
+				+ " = ?::access_type where " + ID + " = ?";
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			setAuditFields(audit, preparedStatement);
-			preparedStatement.setLong(11, audit.getId());
+			preparedStatement.setLong(12, audit.getId());
 
 			int count = preparedStatement.executeUpdate();
 			if (count != 1) {
@@ -306,10 +308,11 @@ public class PostgreSqlAuditDao implements AuditDao {
 		// 4  lastname = ?, 
 		// 5  date = ?, 
 		// 6  element_type = ?, 
-		// 7  element_accessed = ?, 
-		// 8  new_version = ?, 
-		// 9  action = ?, 
-		// 10 access_type = ?::access_type
+		// 7  element_sub_type = ?, 
+		// 8  element_accessed = ?, 
+		// 9  new_version = ?, 
+		// 10 action = ?, 
+		// 11 access_type = ?::access_type
 
 		ps.setLong(1, audit.getId());
 		ps.setString(2, audit.getUsername());
@@ -317,15 +320,16 @@ public class PostgreSqlAuditDao implements AuditDao {
 		ps.setString(4, audit.getLastname());
 		ps.setTimestamp(5, new Timestamp(audit.getDate().getTime()), Calendar.getInstance());
 		ps.setString(6, audit.getElementType());
-		ps.setString(7, audit.getElementAccessed());
+		ps.setString(7, audit.getElementSubType());
+		ps.setString(8, audit.getElementAccessed());
 
 		if (audit.getNewVersion() == null)
-			ps.setDate(8, null);
+			ps.setDate(9, null);
 		else
-			ps.setTimestamp(8, new Timestamp(audit.getNewVersion().getTime()), Calendar.getInstance());
+			ps.setTimestamp(9, new Timestamp(audit.getNewVersion().getTime()), Calendar.getInstance());
 
-		ps.setString(9, audit.getAction());
-		ps.setString(10, audit.getAccessType().name());
+		ps.setString(10, audit.getAction());
+		ps.setString(11, audit.getAccessType().name());
 	}
 
 	private Audit auditFrom(ResultSet resultSet) throws SQLException {
@@ -337,10 +341,11 @@ public class PostgreSqlAuditDao implements AuditDao {
 		audit.setLastname(resultSet.getString(4));
 		audit.setDate(resultSet.getTimestamp(5));
 		audit.setElementType(resultSet.getString(6));
-		audit.setElementAccessed(resultSet.getString(7));
-		audit.setNewVersion(resultSet.getTimestamp(8));
-		audit.setAction(resultSet.getString(9));
-		audit.setAccessType(AccessType.valueOf(resultSet.getString(10)));
+		audit.setElementSubType(resultSet.getString(7));
+		audit.setElementAccessed(resultSet.getString(8));
+		audit.setNewVersion(resultSet.getTimestamp(9));
+		audit.setAction(resultSet.getString(10));
+		audit.setAccessType(AccessType.valueOf(resultSet.getString(11)));
 		return audit;
 	}
 }

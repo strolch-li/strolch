@@ -23,13 +23,14 @@ import ch.eitchnet.utils.StringMatchMode;
  */
 public class ElementSelection extends AuditSelection {
 
+	private StringSelection elementSubTypeSelection;
 	private StringSelection elementAccessedSelection;
 
 	public ElementSelection(AuditQuery query) {
 		super(query);
 	}
 
-	public ElementSelection elementsAccessed(StringMatchMode matchMode, String... elementsAccessed) {
+	public ElementSelection elementAccessed(StringMatchMode matchMode, String... elementsAccessed) {
 		this.elementAccessedSelection = new StringSelection(matchMode, elementsAccessed);
 		return this;
 	}
@@ -38,8 +39,21 @@ public class ElementSelection extends AuditSelection {
 		return this.elementAccessedSelection;
 	}
 
-	public boolean isElementsAccessedWildcard() {
+	public boolean isElementAccessedWildcard() {
 		return this.elementAccessedSelection == null || this.elementAccessedSelection.isWildCard();
+	}
+
+	public ElementSelection elementSubTypes(StringMatchMode matchMode, String... elementSubTypes) {
+		this.elementSubTypeSelection = new StringSelection(matchMode, elementSubTypes);
+		return this;
+	}
+
+	public StringSelection getElementSubTypeSelection() {
+		return this.elementSubTypeSelection;
+	}
+
+	public boolean isElementSubTypesWildcard() {
+		return this.elementSubTypeSelection == null || this.elementSubTypeSelection.isWildCard();
 	}
 
 	@Override

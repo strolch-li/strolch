@@ -119,7 +119,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			try (StrolchTransaction tx = realm.openTx(certificate, getClass())) {
 				tx.setSuppressDoNothingLogging(true);
 				tx.setSuppressAudits(true);
-				Audit audit = tx.auditFrom(AccessType.CREATE, Certificate.class.getSimpleName(), username);
+				Audit audit = tx.auditFrom(AccessType.CREATE, PRIVILEGE, CERTIFICATE, username);
 				tx.getAuditTrail().add(tx, audit);
 			}
 			return certificate;
@@ -148,7 +148,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		try (StrolchTransaction tx = realm.openTx(certificate, getClass())) {
 			tx.setSuppressDoNothingLogging(true);
 			tx.setSuppressAudits(true);
-			Audit audit = tx.auditFrom(AccessType.DELETE, Certificate.class.getSimpleName(), certificate.getUsername());
+			Audit audit = tx.auditFrom(AccessType.DELETE, PRIVILEGE, CERTIFICATE, certificate.getUsername());
 			tx.getAuditTrail().add(tx, audit);
 		}
 		return invalidateSession;

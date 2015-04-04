@@ -209,15 +209,15 @@ public class AuditQueryTest {
 		performQuery(query, Arrays.asList("1"));
 
 		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
-		query.element().elementsAccessed(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "crea");
+		query.element().elementAccessed(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "crea");
 		performQuery(query, Arrays.asList("0", "4"));
 
 		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
-		query.element().elementsAccessed(StringMatchMode.CONTAINS_CASE_SENSITIVE, "crea");
+		query.element().elementAccessed(StringMatchMode.CONTAINS_CASE_SENSITIVE, "crea");
 		performQuery(query, Arrays.<String> asList());
 
 		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
-		query.element().elementsAccessed(StringMatchMode.EQUALS_CASE_INSENSITIVE, "create");
+		query.element().elementAccessed(StringMatchMode.EQUALS_CASE_INSENSITIVE, "create");
 		performQuery(query, Arrays.asList("0", "4"));
 
 		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
@@ -243,6 +243,14 @@ public class AuditQueryTest {
 		query.identity().firstnames(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "enn")
 				.lastnames(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "kennedy");
 		performQuery(query, Arrays.asList("0", "1", "2", "3", "4"));
+
+		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query.element().elementSubTypes(StringMatchMode.EQUALS_CASE_SENSITIVE, "Foo");
+		performQuery(query, Arrays.asList("0", "1", "2", "3", "4"));
+
+		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query.element().elementSubTypes(StringMatchMode.EQUALS_CASE_SENSITIVE, "Bar");
+		performQuery(query, Arrays.asList());
 	}
 
 	private void performQuery(AuditQuery query, List<String> expected) throws SQLException {
