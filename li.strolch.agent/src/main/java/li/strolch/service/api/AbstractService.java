@@ -18,6 +18,7 @@ package li.strolch.service.api;
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -42,6 +43,8 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	private PrivilegeContext privilegeContext;
 
 	/**
+	 * Called by the {@link ServiceHandler} to set the {@link PrivilegeContext} before this service is performed
+	 * 
 	 * @param privilegeContext
 	 *            the privilegeContext to set
 	 */
@@ -51,6 +54,8 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
+	 * Return the {@link PrivilegeContext} to perform further privilege authorization validation
+	 * 
 	 * @return the privilegeContext
 	 */
 	public final PrivilegeContext getPrivilegeContext() {
@@ -58,6 +63,8 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
+	 * Returns the {@link Certificate} of the user who is performing this service
+	 * 
 	 * @return the certificate
 	 */
 	protected final Certificate getCertificate() {
@@ -65,6 +72,9 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
+	 * Called by the {@link ServiceHandler} to set a reference to the {@link ComponentContainer} to be used during
+	 * service execution
+	 * 
 	 * @param container
 	 *            the container to set
 	 */
@@ -73,6 +83,8 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
+	 * Returns the reference to the {@link ComponentContainer}
+	 * 
 	 * @return the container
 	 */
 	protected final ComponentContainer getContainer() {
@@ -80,45 +92,116 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
+	 * Returns the reference to the {@link StrolchComponent} with the given name, if it exists. If it does not exist, an
+	 * {@link IllegalArgumentException} is thrown
+	 * 
 	 * @param clazz
-	 * @return
+	 * 
+	 * @return the component with the given name
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the component does not exist
 	 */
 	protected final <V> V getComponent(Class<V> clazz) {
 		return this.container.getComponent(clazz);
 	}
 
 	/**
-	 * @return
+	 * Returns the Strolch {@link RuntimeConfiguration}
+	 * 
+	 * @return the Strolch {@link RuntimeConfiguration}
 	 */
 	protected final RuntimeConfiguration getRuntimeConfiguration() {
 		return this.container.getAgent().getStrolchConfiguration().getRuntimeConfiguration();
 	}
 
 	/**
+	 * Returns the {@link StrolchRealm} with the given name. If the realm does not exist, then a
+	 * {@link StrolchException} is thrown
+	 * 
 	 * @param realm
-	 * @return
+	 *            the name of the {@link StrolchRealm} to return
+	 * @return the {@link StrolchRealm} with the given name
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StrolchRealm} does not exist with the given name
 	 */
-	protected final StrolchRealm getRealm(String realm) {
+	protected final StrolchRealm getRealm(String realm) throws StrolchException {
 		return this.container.getRealm(realm);
 	}
 
 	/**
+	 * Opens a {@link StrolchTransaction} for the given realm, the action for the TX is this implementation's class
+	 * name. This transaction should be used in a try-with-resource clause so it is properly closed
+	 * 
 	 * @param realm
-	 * @return
+	 *            the name of the realm to return
+	 * 
+	 * @return the realm with the given name
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StrolchRealm} does not exist with the given name
 	 */
-	protected final StrolchTransaction openTx(String realm) {
+	protected StrolchTransaction openTx(String realm) throws StrolchException {
 		return this.container.getRealm(realm).openTx(getCertificate(), getClass());
 	}
 
 	/**
+	 * Opens a {@link StrolchTransaction} for the given realm. This transaction should be used in a try-with-resource
+	 * clause so it is properly closed
+	 * 
 	 * @param realm
+	 *            the name of the realm to return
 	 * @param action
-	 * @return
+	 *            the action to use for the opened TX
+	 * 
+	 * @return the realm with the given name
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StrolchRealm} does not exist with the given name
 	 */
-	protected final StrolchTransaction openTx(String realm, String action) {
+	protected StrolchTransaction openTx(String realm, String action) throws StrolchException {
 		return this.container.getRealm(realm).openTx(getCertificate(), action);
 	}
 
+	/**
+	 * Opens a {@link StrolchTransaction} where the realm retrieved using
+	 * {@link ComponentContainer#getRealm(Certificate)}, the action for the TX is this implementation's class name. This
+	 * transaction should be used in a try-with-resource clause so it is properly closed
+	 * 
+	 * @return the realm with the given name
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StrolchRealm} does not exist with the given name
+	 */
+	protected StrolchTransaction openUserTx() throws StrolchException {
+		return this.container.getRealm(getCertificate()).openTx(getCertificate(), getClass());
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} where the realm retrieved using
+	 * {@link ComponentContainer#getRealm(Certificate)}. This transaction should be used in a try-with-resource clause
+	 * so it is properly closed
+	 * 
+	 * @param realm
+	 *            the name of the realm to return
+	 * @param action
+	 *            the action to use for the opened TX
+	 * 
+	 * @return the realm with the given name
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StrolchRealm} does not exist with the given name
+	 */
+	protected StrolchTransaction openUserTx(String action) throws StrolchException {
+		return this.container.getRealm(getCertificate()).openTx(getCertificate(), action);
+	}
+
+	/**
+	 * This method is final as it enforces that the argument is valid, and catches all exceptions and enforces that a
+	 * service result is returned. A concrete implementation will implement the business logic in
+	 * {@link #internalDoService(ServiceArgument)}
+	 */
 	@Override
 	public final U doService(T argument) {
 
@@ -155,6 +238,8 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
+	 * Returns true if this Service requires an argument
+	 * 
 	 * @return if true, then an argument must be set to execute the service. If the argument is missing, then the
 	 *         service execution fails immediately
 	 */
@@ -166,7 +251,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * This method is called if the service execution fails and an instance of the expected {@link ServiceResult} is
 	 * required to return to the caller
 	 * 
-	 * @return
+	 * @return an instance of the {@link ServiceResult} returned by this implementation
 	 */
 	protected abstract U getResultInstance();
 
@@ -175,6 +260,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * done in the {@link #doService(ServiceArgument)} which calls this method
 	 * 
 	 * @param arg
+	 *            the {@link ServiceArgument} containing the arguments to perform the concrete service
 	 * 
 	 * @return a {@link ServiceResult} which denotes the execution state of this {@link Service}
 	 * 

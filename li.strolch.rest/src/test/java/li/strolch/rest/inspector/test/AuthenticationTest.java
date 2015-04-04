@@ -109,7 +109,7 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		login.setPassword("blalba");
 		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
 		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(loginEntity);
-		assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
+		assertEquals(Status.FORBIDDEN.getStatusCode(), result.getStatus());
 		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
 		assertNotNull(logoutResult);
 		assertEquals("Could not log in due to: Authentication credentials are invalid", logoutResult.getMsg());
@@ -133,7 +133,7 @@ public class AuthenticationTest extends AbstractRestfulTest {
 
 		// logout
 		result = target().path(ROOT_PATH + "/blabla").request(MediaType.APPLICATION_JSON).delete();
-		assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
+		assertEquals(Status.FORBIDDEN.getStatusCode(), result.getStatus());
 		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
 		assertNotNull(logoutResult);
 		assertThat(logoutResult.getMsg(), containsString("No certificate exists for sessionId blabla"));

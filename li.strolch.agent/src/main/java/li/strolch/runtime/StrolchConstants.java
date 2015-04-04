@@ -19,6 +19,7 @@ import static ch.eitchnet.utils.helper.StringHelper.DOT;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.persistence.api.PersistenceHandler;
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -57,5 +58,36 @@ public class StrolchConstants {
 		if (!realmName.equals(DEFAULT_REALM))
 			realmKey += DOT + realmName;
 		return realmKey;
+	}
+
+	/**
+	 * Constants used for Privilege management, configuration, etc.
+	 * 
+	 * @author Robert von Burg <eitch@eitchnet.ch>
+	 */
+	public static class StrolchPrivilegeConstants {
+
+		public static final String PRIVILEGE = "Privilege"; //$NON-NLS-1$
+		public static final String CERTIFICATE = "Certificate"; //$NON-NLS-1$
+		public static final String ROLE = "Role"; //$NON-NLS-1$
+		public static final String USER = "User"; //$NON-NLS-1$
+
+		public static final String PRIVILEGE_GET_ROLE = PrivilegeHandler.PRIVILEGE_GET_ROLE;
+		public static final String PRIVILEGE_ADD_ROLE = PrivilegeHandler.PRIVILEGE_ADD_ROLE;
+		public static final String PRIVILEGE_REMOVE_ROLE = PrivilegeHandler.PRIVILEGE_REMOVE_ROLE;
+		public static final String PRIVILEGE_MODIFY_ROLE = PrivilegeHandler.PRIVILEGE_MODIFY_ROLE;
+
+		public static final String PRIVILEGE_GET_USER = PrivilegeHandler.PRIVILEGE_GET_USER;
+		public static final String PRIVILEGE_ADD_USER = PrivilegeHandler.PRIVILEGE_ADD_USER;
+		public static final String PRIVILEGE_REMOVE_USER = PrivilegeHandler.PRIVILEGE_REMOVE_USER;
+		public static final String PRIVILEGE_MODIFY_USER = PrivilegeHandler.PRIVILEGE_MODIFY_USER;
+		public static final String PRIVILEGE_ADD_ROLE_TO_USER = PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER;
+		public static final String PRIVILEGE_REMOVE_ROLE_FROM_USER = PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER;
+		public static final String PRIVILEGE_SET_USER_LOCALE = PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE;
+		public static final String PRIVILEGE_SET_USER_STATE = PrivilegeHandler.PRIVILEGE_SET_USER_STATE;
+		public static final String PRIVILEGE_SET_USER_PASSWORD = PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD;
+
+		public static final String PRIVILEGE_INVALIDATE_SESSION = "InvalidateSession";
+		public static final String PRIVILEGE_GET_SESSION = "GetSession";
 	}
 }

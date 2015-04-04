@@ -46,7 +46,7 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 		String sessionId = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		if (StringHelper.isEmpty(sessionId)) {
 			logger.error("No SessionID on request to URL " + requestContext.getUriInfo().getPath());
-			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Missing Authorization!").build()); //$NON-NLS-1$
 			return;
 		}
@@ -58,7 +58,7 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 			requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("User cannot access the resource.").build()); //$NON-NLS-1$
 		}

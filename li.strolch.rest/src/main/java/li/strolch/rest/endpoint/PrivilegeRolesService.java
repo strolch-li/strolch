@@ -36,10 +36,17 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.model.Result;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import li.strolch.service.api.ServiceHandler;
+import li.strolch.service.privilege.roles.PrivilegeAddOrReplacePrivilegeOnRoleArgument;
+import li.strolch.service.privilege.roles.PrivilegeAddOrReplacePrivilegeOnRoleService;
+import li.strolch.service.privilege.roles.PrivilegeAddRoleService;
+import li.strolch.service.privilege.roles.PrivilegeRemovePrivilegeFromRoleArgument;
+import li.strolch.service.privilege.roles.PrivilegeRemovePrivilegeFromRoleService;
+import li.strolch.service.privilege.roles.PrivilegeRemoveRoleService;
+import li.strolch.service.privilege.roles.PrivilegeRoleArgument;
+import li.strolch.service.privilege.roles.PrivilegeRoleNameArgument;
+import li.strolch.service.privilege.roles.PrivilegeRoleResult;
+import li.strolch.service.privilege.roles.PrivilegeUpdateRoleService;
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
@@ -52,8 +59,6 @@ import ch.eitchnet.privilege.model.RoleRep;
  */
 @Path("strolch/privilege/roles")
 public class PrivilegeRolesService {
-
-	private static final Logger logger = LoggerFactory.getLogger(PrivilegeRolesService.class);
 
 	private PrivilegeHandler getPrivilegeHandler(Certificate cert) {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
@@ -88,21 +93,14 @@ public class PrivilegeRolesService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addRole(RoleRep newRole, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			RoleRep role = privilegeHandler.addRole(cert, newRole);
-			return Response.ok(role, MediaType.APPLICATION_JSON).build();
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeAddRoleService svc = new PrivilegeAddRoleService();
+		PrivilegeRoleArgument arg = new PrivilegeRoleArgument();
+		arg.role = newRole;
 
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		}
+		PrivilegeRoleResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
 	}
 
 	@PUT
@@ -112,25 +110,18 @@ public class PrivilegeRolesService {
 	public Response replaceRole(@PathParam("rolename") String rolename, RoleRep updatedRole,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			if (!rolename.equals(updatedRole.getName()))
-				return Response.serverError().entity(new Result("Path rolename and data do not have same role name!"))
-						.type(MediaType.APPLICATION_JSON).build();
-
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			RoleRep role = privilegeHandler.replaceRole(cert, updatedRole);
-			return Response.ok(role, MediaType.APPLICATION_JSON).build();
-
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
+		if (!rolename.equals(updatedRole.getName()))
+			return Response.serverError().entity(new Result("Path rolename and data do not have same role name!"))
 					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		}
+
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeUpdateRoleService svc = new PrivilegeUpdateRoleService();
+		PrivilegeRoleArgument arg = new PrivilegeRoleArgument();
+		arg.role = updatedRole;
+
+		PrivilegeRoleResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
 	}
 
 	@DELETE
@@ -139,21 +130,14 @@ public class PrivilegeRolesService {
 	@Path("{rolename}")
 	public Response removeRole(@PathParam("rolename") String rolename, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			RoleRep role = privilegeHandler.removeRole(cert, rolename);
-			return Response.ok(role, MediaType.APPLICATION_JSON).build();
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeRemoveRoleService svc = new PrivilegeRemoveRoleService();
+		PrivilegeRoleNameArgument arg = new PrivilegeRoleNameArgument();
+		arg.roleName = rolename;
 
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		}
+		PrivilegeRoleResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
 	}
 
 	@PUT
@@ -163,21 +147,15 @@ public class PrivilegeRolesService {
 	public Response addOrReplacePrivilegeOnRole(@PathParam("rolename") String rolename, PrivilegeRep privilegeRep,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			RoleRep updatedRole = privilegeHandler.addOrReplacePrivilegeOnRole(cert, rolename, privilegeRep);
-			return Response.ok(updatedRole, MediaType.APPLICATION_JSON).build();
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeAddOrReplacePrivilegeOnRoleService svc = new PrivilegeAddOrReplacePrivilegeOnRoleService();
+		PrivilegeAddOrReplacePrivilegeOnRoleArgument arg = new PrivilegeAddOrReplacePrivilegeOnRoleArgument();
+		arg.roleName = rolename;
+		arg.privilegeRep = privilegeRep;
 
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		}
+		PrivilegeRoleResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
 	}
 
 	@DELETE
@@ -187,20 +165,30 @@ public class PrivilegeRolesService {
 	public Response removePrivilegeFromRole(@PathParam("rolename") String rolename,
 			@PathParam("privilege") String privilege, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			RoleRep updatedRole = privilegeHandler.removePrivilegeFromRole(cert, rolename, privilege);
-			return Response.ok(updatedRole, MediaType.APPLICATION_JSON).build();
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeRemovePrivilegeFromRoleService svc = new PrivilegeRemovePrivilegeFromRoleService();
+		PrivilegeRemovePrivilegeFromRoleArgument arg = new PrivilegeRemovePrivilegeFromRoleArgument();
+		arg.roleName = rolename;
+		arg.privilegeName = privilege;
 
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
+		PrivilegeRoleResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
+	}
+
+	private Response handleServiceResult(PrivilegeRoleResult svcResult) {
+		if (svcResult.isOk()) {
+			return Response.ok(svcResult.getRole(), MediaType.APPLICATION_JSON).build();
+		} else if (svcResult.getThrowable() != null) {
+			Throwable t = svcResult.getThrowable();
+			if (t instanceof AccessDeniedException) {
+				return Response.status(Status.FORBIDDEN).entity(new Result(t.getMessage()))
+						.type(MediaType.APPLICATION_JSON).build();
+			} else if (t instanceof PrivilegeException) {
+				return Response.status(Status.UNAUTHORIZED).entity(new Result(t.getMessage())).build();
+			}
 		}
+
+		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(new Result(svcResult.getMessage())).build();
 	}
 }

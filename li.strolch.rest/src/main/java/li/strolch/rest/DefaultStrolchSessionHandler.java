@@ -15,6 +15,9 @@
  */
 package li.strolch.rest;
 
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_SESSION;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_INVALIDATE_SESSION;
+
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -53,8 +56,6 @@ import ch.eitchnet.utils.dbc.DBC;
  */
 public class DefaultStrolchSessionHandler extends StrolchComponent implements StrolchSessionHandler {
 
-	public static final String PRIVILEGE_INVALIDATE_SESSION = "InvalidateSession";
-	public static final String PRIVILEGE_GET_SESSION = "GetSession";
 	public static final String PARAM_SESSION_TTL_MINUTES = "session.ttl.minutes"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultStrolchSessionHandler.class);

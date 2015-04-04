@@ -20,9 +20,20 @@ import java.io.Serializable;
 import ch.eitchnet.privilege.model.Restrictable;
 
 /**
+ * Interface for Strolch service's. Service's are the main object in which business logic is implemented in a Strolch
+ * agent.
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface Service<T extends ServiceArgument, U extends ServiceResult> extends Serializable, Restrictable {
 
+	/**
+	 * Performs the actual service
+	 * 
+	 * @param argument
+	 *            the argument for the service
+	 * 
+	 * @return the service result
+	 */
 	public U doService(T argument);
 }

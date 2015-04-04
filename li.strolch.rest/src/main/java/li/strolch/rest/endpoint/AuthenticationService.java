@@ -43,6 +43,7 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.IPrivilege;
@@ -111,10 +112,14 @@ public class AuthenticationService {
 					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken())//
 					.build();
 
-		} catch (StrolchException | PrivilegeException e) {
+		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
 			loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
+		} catch (StrolchException | PrivilegeException e) {
+			logger.error(e.getMessage(), e);
+			loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
+			return Response.status(Status.FORBIDDEN).entity(loginResult).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();

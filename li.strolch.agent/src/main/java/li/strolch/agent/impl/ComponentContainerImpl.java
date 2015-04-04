@@ -131,7 +131,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 					StrolchConstants.PROP_REALM, realmName), e);
 		}
 	}
-
+	
 	private void setupComponent(Map<Class<?>, StrolchComponent> componentMap,
 			Map<String, ComponentController> controllerMap, ComponentConfiguration componentConfiguration) {
 

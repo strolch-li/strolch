@@ -27,6 +27,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import ch.eitchnet.privilege.base.AccessDeniedException;
@@ -119,7 +120,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			try (StrolchTransaction tx = realm.openTx(certificate, getClass())) {
 				tx.setSuppressDoNothingLogging(true);
 				tx.setSuppressAudits(true);
-				Audit audit = tx.auditFrom(AccessType.CREATE, PRIVILEGE, CERTIFICATE, username);
+				Audit audit = tx.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE,
+						StrolchPrivilegeConstants.CERTIFICATE, username);
 				tx.getAuditTrail().add(tx, audit);
 			}
 			return certificate;
@@ -148,7 +150,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		try (StrolchTransaction tx = realm.openTx(certificate, getClass())) {
 			tx.setSuppressDoNothingLogging(true);
 			tx.setSuppressAudits(true);
-			Audit audit = tx.auditFrom(AccessType.DELETE, PRIVILEGE, CERTIFICATE, certificate.getUsername());
+			Audit audit = tx.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE,
+					StrolchPrivilegeConstants.CERTIFICATE, certificate.getUsername());
 			tx.getAuditTrail().add(tx, audit);
 		}
 		return invalidateSession;

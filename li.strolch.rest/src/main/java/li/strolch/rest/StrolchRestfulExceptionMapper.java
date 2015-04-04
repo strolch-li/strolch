@@ -42,7 +42,7 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 				sb.append(restrictable.getPrivilegeValue());
 			}
 
-			return Response.status(Status.FORBIDDEN).entity(sb.toString()).type(MediaType.TEXT_PLAIN).build();
+			return Response.status(Status.UNAUTHORIZED).entity(sb.toString()).type(MediaType.TEXT_PLAIN).build();
 		}
 
 		return Response.serverError().entity(new Result(ex)).type(MediaType.APPLICATION_JSON).build();

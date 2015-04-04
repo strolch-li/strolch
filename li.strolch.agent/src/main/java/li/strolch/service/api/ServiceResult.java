@@ -42,7 +42,6 @@ public class ServiceResult implements Serializable {
 	 * @param message
 	 */
 	public ServiceResult(ServiceResultState state, String message) {
-		super();
 		this.state = state;
 		this.message = message;
 	}

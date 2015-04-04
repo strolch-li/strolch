@@ -37,12 +37,26 @@ import javax.ws.rs.core.Response.Status;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
+import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.model.PasswordField;
 import li.strolch.rest.model.Result;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import li.strolch.service.api.ServiceHandler;
+import li.strolch.service.api.ServiceResult;
+import li.strolch.service.privilege.users.PrivilegeAddRoleToUserService;
+import li.strolch.service.privilege.users.PrivilegeAddUserService;
+import li.strolch.service.privilege.users.PrivilegeRemoveRoleFromUserService;
+import li.strolch.service.privilege.users.PrivilegeRemoveUserService;
+import li.strolch.service.privilege.users.PrivilegeRoleUserNamesArgument;
+import li.strolch.service.privilege.users.PrivilegeSetUserLocaleArgument;
+import li.strolch.service.privilege.users.PrivilegeSetUserLocaleService;
+import li.strolch.service.privilege.users.PrivilegeSetUserPasswordArgument;
+import li.strolch.service.privilege.users.PrivilegeSetUserPasswordService;
+import li.strolch.service.privilege.users.PrivilegeSetUserStateArgument;
+import li.strolch.service.privilege.users.PrivilegeSetUserStateService;
+import li.strolch.service.privilege.users.PrivilegeUpdateUserService;
+import li.strolch.service.privilege.users.PrivilegeUserArgument;
+import li.strolch.service.privilege.users.PrivilegeUserNameArgument;
+import li.strolch.service.privilege.users.PrivilegeUserResult;
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
@@ -55,8 +69,6 @@ import ch.eitchnet.privilege.model.UserState;
  */
 @Path("strolch/privilege/users")
 public class PrivilegeUsersService {
-
-	private static final Logger logger = LoggerFactory.getLogger(PrivilegeUsersService.class);
 
 	private PrivilegeHandler getPrivilegeHandler(Certificate cert) {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
@@ -105,21 +117,14 @@ public class PrivilegeUsersService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addUser(UserRep newUser, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			UserRep user = privilegeHandler.addUser(cert, newUser, null);
-			return Response.ok(user, MediaType.APPLICATION_JSON).build();
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeAddUserService svc = new PrivilegeAddUserService();
+		PrivilegeUserArgument arg = new PrivilegeUserArgument();
+		arg.user = newUser;
 
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		}
+		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
 	}
 
 	@DELETE
@@ -128,21 +133,14 @@ public class PrivilegeUsersService {
 	@Path("{username}")
 	public Response removeUser(@PathParam("username") String username, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			UserRep user = privilegeHandler.removeUser(cert, username);
-			return Response.ok(user, MediaType.APPLICATION_JSON).build();
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeRemoveUserService svc = new PrivilegeRemoveUserService();
+		PrivilegeUserNameArgument arg = new PrivilegeUserNameArgument();
+		arg.username = username;
 
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		}
+		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
 	}
 
 	@PUT
@@ -152,25 +150,14 @@ public class PrivilegeUsersService {
 	public Response updateUser(@PathParam("username") String username, UserRep updatedFields,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			if (!username.equals(updatedFields.getUsername()))
-				return Response.serverError().entity(new Result("Path username and data do not have same username!"))
-						.type(MediaType.APPLICATION_JSON).build();
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeUpdateUserService svc = new PrivilegeUpdateUserService();
+		PrivilegeUserArgument arg = new PrivilegeUserArgument();
+		arg.user = updatedFields;
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			UserRep updatedUser = privilegeHandler.updateUser(cert, updatedFields);
-			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
-
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		}
+		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
 	}
 
 	@PUT
@@ -180,21 +167,15 @@ public class PrivilegeUsersService {
 	public Response addRoleToUser(@PathParam("username") String username, @PathParam("rolename") String rolename,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			UserRep updatedUser = privilegeHandler.addRoleToUser(cert, username, rolename);
-			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeAddRoleToUserService svc = new PrivilegeAddRoleToUserService();
+		PrivilegeRoleUserNamesArgument arg = new PrivilegeRoleUserNamesArgument();
+		arg.username = username;
+		arg.rolename = rolename;
 
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		}
+		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
 	}
 
 	@DELETE
@@ -204,21 +185,15 @@ public class PrivilegeUsersService {
 	public Response removeRoleFromUser(@PathParam("username") String username, @PathParam("rolename") String rolename,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			UserRep updatedUser = privilegeHandler.removeRoleFromUser(cert, username, rolename);
-			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeRemoveRoleFromUserService svc = new PrivilegeRemoveRoleFromUserService();
+		PrivilegeRoleUserNamesArgument arg = new PrivilegeRoleUserNamesArgument();
+		arg.username = username;
+		arg.rolename = rolename;
 
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		}
+		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
 	}
 
 	@PUT
@@ -227,54 +202,39 @@ public class PrivilegeUsersService {
 	public Response setUserState(@PathParam("username") String username, @PathParam("state") String state,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		UserState userState;
 		try {
-
-			UserState userState;
-			try {
-				userState = UserState.valueOf(state);
-			} catch (Exception e) {
-				String msg = MessageFormat.format("UserState {0} is not valid!", state);
-				return Response.serverError().entity(new Result(msg)).type(MediaType.APPLICATION_JSON).build();
-			}
-
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-			UserRep updatedUser = privilegeHandler.setUserState(cert, username, userState);
-			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
-
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
+			userState = UserState.valueOf(state);
+		} catch (Exception e) {
+			String msg = MessageFormat.format("UserState {0} is not valid!", state);
+			return Response.serverError().entity(new Result(msg)).type(MediaType.APPLICATION_JSON).build();
 		}
+
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeSetUserStateService svc = new PrivilegeSetUserStateService();
+		PrivilegeSetUserStateArgument arg = new PrivilegeSetUserStateArgument();
+		arg.username = username;
+		arg.userState = userState;
+
+		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
 	}
 
-	@PUT
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/password")
-	public Response setUserPassword(@PathParam("username") String username, PasswordField passwordField,
-			@Context HttpServletRequest request) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
-
-			// if user changing own password, then no need for StrolchPrivilegeAdmin
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
-
-			privilegeHandler.setUserPassword(cert, username, passwordField.getPassword().getBytes());
-			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
-
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
+	private Response handleServiceResult(PrivilegeUserResult svcResult) {
+		if (svcResult.isOk()) {
+			return Response.ok(svcResult.getUser(), MediaType.APPLICATION_JSON).build();
+		} else if (svcResult.getThrowable() != null) {
+			Throwable t = svcResult.getThrowable();
+			if (t instanceof AccessDeniedException) {
+				return Response.status(Status.FORBIDDEN).entity(new Result(t.getMessage()))
+						.type(MediaType.APPLICATION_JSON).build();
+			} else if (t instanceof PrivilegeException) {
+				return Response.status(Status.UNAUTHORIZED).entity(new Result(t.getMessage())).build();
+			}
 		}
+
+		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(new Result(svcResult.getMessage())).build();
 	}
 
 	@PUT
@@ -283,30 +243,60 @@ public class PrivilegeUsersService {
 	public Response setUserLocale(@PathParam("username") String username, @PathParam("locale") String localeS,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		try {
 
-			Locale locale;
-			try {
-				locale = new Locale(localeS);
-			} catch (Exception e) {
-				String msg = MessageFormat.format("Locale {0} is not valid!", localeS);
-				return Response.serverError().entity(new Result(msg)).type(MediaType.APPLICATION_JSON).build();
+		Locale locale;
+		try {
+			locale = new Locale(localeS);
+		} catch (Exception e) {
+			String msg = MessageFormat.format("Locale {0} is not valid!", localeS);
+			return Response.serverError().entity(new Result(msg)).type(MediaType.APPLICATION_JSON).build();
+		}
+
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeSetUserLocaleService svc = new PrivilegeSetUserLocaleService();
+		PrivilegeSetUserLocaleArgument arg = new PrivilegeSetUserLocaleArgument();
+		arg.username = username;
+		arg.locale = locale;
+
+		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
+	}
+
+	@PUT
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{username}/password")
+	public Response setUserPassword(@PathParam("username") String username, PasswordField passwordField,
+			@Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeSetUserPasswordService svc = new PrivilegeSetUserPasswordService();
+		PrivilegeSetUserPasswordArgument arg = new PrivilegeSetUserPasswordArgument();
+		arg.username = username;
+		arg.password = passwordField.getPassword().getBytes();
+
+		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
+		if (svcResult.isOk()) {
+
+			// if user changes their own password, then invalidate the session
+			if (cert.getUsername().equals(username)) {
+				StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+				sessionHandler.invalidate(cert);
 			}
 
-			// if user changing own locale, then no need for StrolchPrivilegeAdmin
-			PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
+			// TODO invalidate any other sessions for this user
 
-			UserRep updatedUser = privilegeHandler.setUserLocale(cert, username, locale);
-			return Response.ok(updatedUser, MediaType.APPLICATION_JSON).build();
-
-		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.UNAUTHORIZED).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
-		} catch (PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			return Response.status(Status.FORBIDDEN).entity(new Result(e.getMessage()))
-					.type(MediaType.APPLICATION_JSON).build();
+			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+		} else if (svcResult.getThrowable() != null) {
+			Throwable t = svcResult.getThrowable();
+			if (t instanceof AccessDeniedException) {
+				return Response.status(Status.UNAUTHORIZED).entity(new Result(t.getMessage()))
+						.type(MediaType.APPLICATION_JSON).build();
+			} else if (t instanceof PrivilegeException) {
+				return Response.status(Status.FORBIDDEN).entity(new Result(t.getMessage())).build();
+			}
 		}
+
+		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(new Result(svcResult.getMessage())).build();
 	}
 }
