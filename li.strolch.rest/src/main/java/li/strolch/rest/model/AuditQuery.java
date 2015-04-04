@@ -21,7 +21,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -31,6 +30,9 @@ public class AuditQuery {
 
 	@XmlAttribute(name = "elementType")
 	private String elementType;
+
+	@XmlAttribute(name = "elementSubType")
+	private String elementSubType;
 
 	@XmlAttribute(name = "elementId")
 	private String elementId;
@@ -50,6 +52,14 @@ public class AuditQuery {
 
 	public void setElementType(String elementType) {
 		this.elementType = elementType;
+	}
+
+	public String getElementSubType() {
+		return elementSubType;
+	}
+
+	public void setElementSubType(String elementSubType) {
+		this.elementSubType = elementSubType;
 	}
 
 	public String getElementId() {
