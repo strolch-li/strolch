@@ -143,6 +143,18 @@ public class AuditQueryTest {
 		query.identity().firstnames(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "enn")
 				.lastnames(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "kennedy");
 		performQuery(query, Arrays.asList(0L, 1L, 2L, 3L, 4L));
+
+		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query.element().elementSubTypes(StringMatchMode.EQUALS_CASE_SENSITIVE, "Foo");
+		performQuery(query, Arrays.asList(0L, 1L, 2L, 3L, 4L));
+
+		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query.element().elementSubTypes(StringMatchMode.EQUALS_CASE_SENSITIVE, "Bar");
+		performQuery(query, Arrays.asList());
+
+		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query.limit(1).element().elementSubTypes(StringMatchMode.EQUALS_CASE_SENSITIVE, "Foo");
+		performQuery(query, Arrays.asList(2L));
 	}
 
 	private void performQuery(AuditQuery query, List<Long> expected) throws SQLException {

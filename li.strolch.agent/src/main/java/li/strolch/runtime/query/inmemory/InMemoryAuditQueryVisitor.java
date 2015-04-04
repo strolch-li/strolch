@@ -44,8 +44,10 @@ public class InMemoryAuditQueryVisitor implements AuditQueryVisitor {
 			String msg = "Query is missing a navigation!"; //$NON-NLS-1$
 			throw new QueryException(msg);
 		}
+		
+		long limit = auditQuery.getLimit();
 
-		return new InMemoryAuditQuery<U>(this.navigator, this.selectors, auditVisitor);
+		return new InMemoryAuditQuery<U>(this.navigator, limit, this.selectors, auditVisitor);
 	}
 
 	@Override

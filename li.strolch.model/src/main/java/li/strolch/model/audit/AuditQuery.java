@@ -30,6 +30,7 @@ public class AuditQuery implements StrolchQuery {
 	private String elementTypeSelection;
 	private List<AuditSelection> selections;
 	private DateRange dateRange;
+	private long limit;
 
 	public AuditQuery(String elementTypeSelection, DateRange dateRange) {
 		DBC.PRE.assertNotEmpty("No elementTypeSelection (navigation) set!", elementTypeSelection); //$NON-NLS-1$
@@ -45,6 +46,15 @@ public class AuditQuery implements StrolchQuery {
 
 	public DateRange getDateRange() {
 		return this.dateRange;
+	}
+
+	public long getLimit() {
+		return limit;
+	}
+
+	public AuditQuery limit(long limit) {
+		this.limit = limit;
+		return this;
 	}
 
 	public ActionSelection action() {

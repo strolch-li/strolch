@@ -32,6 +32,9 @@ public class ToAuditQueryVisitor {
 		// create query
 		li.strolch.model.audit.AuditQuery auditQuery = new li.strolch.model.audit.AuditQuery(elementType, dr);
 
+		// limit
+		auditQuery.limit(query.getLimit());
+
 		// element
 		String elementSubType = query.getElementSubType();
 		if (StringHelper.isNotEmpty(elementSubType)) {

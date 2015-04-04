@@ -251,6 +251,10 @@ public class AuditQueryTest {
 		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.element().elementSubTypes(StringMatchMode.EQUALS_CASE_SENSITIVE, "Bar");
 		performQuery(query, Arrays.asList());
+
+		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query.limit(1).element().elementSubTypes(StringMatchMode.EQUALS_CASE_SENSITIVE, "Foo");
+		performQuery(query, Arrays.asList("2"));
 	}
 
 	private void performQuery(AuditQuery query, List<String> expected) throws SQLException {

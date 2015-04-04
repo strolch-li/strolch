@@ -46,6 +46,9 @@ public class AuditQuery {
 	@XmlElement(name = "dateRange")
 	private DateRange dateRange;
 
+	@XmlElement(name = "limit")
+	private long limit;
+
 	public String getElementType() {
 		return elementType;
 	}
@@ -92,5 +95,13 @@ public class AuditQuery {
 
 	public void setDateRange(DateRange dateRange) {
 		this.dateRange = dateRange;
+	}
+
+	public long getLimit() {
+		return limit;
+	}
+
+	public void setLimit(long limit) {
+		this.limit = limit;
 	}
 }

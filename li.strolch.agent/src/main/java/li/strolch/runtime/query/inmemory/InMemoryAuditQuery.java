@@ -32,17 +32,15 @@ public class InMemoryAuditQuery<U> {
 	private AuditTypeNavigator navigator;
 	private List<AuditSelector> selectors;
 	private AuditVisitor<U> auditVisitor;
+	private long limit;
 
-	/**
-	 * @param navigator
-	 * @param selectors
-	 * @param auditVisitor
-	 */
-	public InMemoryAuditQuery(AuditTypeNavigator navigator, List<AuditSelector> selectors, AuditVisitor<U> auditVisitor) {
+	public InMemoryAuditQuery(AuditTypeNavigator navigator, long limit, List<AuditSelector> selectors,
+			AuditVisitor<U> auditVisitor) {
 		DBC.PRE.assertNotNull("Navigator must be set!", navigator); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("selectors must be set!", selectors); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("auditVisitor must be set!", auditVisitor); //$NON-NLS-1$
 		this.navigator = navigator;
+		this.limit = limit;
 		this.selectors = selectors;
 		this.auditVisitor = auditVisitor;
 	}
@@ -51,6 +49,9 @@ public class InMemoryAuditQuery<U> {
 
 		List<U> result = new ArrayList<>();
 		List<Audit> elements = this.navigator.navigate(dao);
+
+		elements.sort((a1, a2) -> a2.getDate().compareTo(a1.getDate()));
+
 		for (Audit audit : elements) {
 
 			if (!this.selectors.isEmpty()) {
@@ -69,6 +70,9 @@ public class InMemoryAuditQuery<U> {
 			U returnValue = this.auditVisitor.visitAudit(audit);
 			DBC.INTERIM.assertNotNull("Visitor may not return null in query!", returnValue); //$NON-NLS-1$
 			result.add(returnValue);
+
+			if (this.limit > 0 && result.size() >= this.limit)
+				break;
 		}
 
 		return result;

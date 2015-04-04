@@ -37,6 +37,9 @@ public class PostgreSqlAuditQueryVisitor implements AuditQueryVisitor {
 	protected StringBuilder sql;
 	protected StringBuilder sb;
 	protected List<Object> values;
+
+	protected long limit;
+
 	protected String indent;
 	private String sqlAsString;
 
@@ -63,6 +66,12 @@ public class PostgreSqlAuditQueryVisitor implements AuditQueryVisitor {
 
 		this.sql.append("\nwhere\n");
 		this.sql.append(this.sb.toString());
+
+		this.sql.append("ORDER BY date DESC\n");
+
+		if (limit != 0)
+			this.sql.append("LIMIT " + limit + "\n");
+
 		this.sqlAsString = this.sql.toString();
 		return this.sqlAsString;
 	}
@@ -73,6 +82,7 @@ public class PostgreSqlAuditQueryVisitor implements AuditQueryVisitor {
 		this.sb.append(this.indent);
 		this.sb.append(PostgreSqlAuditDao.ELEMENT_TYPE);
 		this.sb.append(" = ?\n");
+		this.limit = auditQuery.getLimit();
 		ensureAnd();
 		this.values.add(auditQuery.getElementTypeSelection());
 		PostgreSqlHelper.toSql(this.indent, this.sb, this.values, PostgreSqlAuditDao.DATE, auditQuery.getDateRange());
