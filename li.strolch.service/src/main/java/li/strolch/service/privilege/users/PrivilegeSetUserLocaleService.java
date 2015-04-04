@@ -43,7 +43,7 @@ public class PrivilegeSetUserLocaleService extends AbstractService<PrivilegeSetU
 
 		UserRep user = privilegeHandler.setUserLocale(getCertificate(), arg.username, arg.locale);
 
-		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_MODIFY_USER)) {
+		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
 					StrolchPrivilegeConstants.USER, user.getUsername());
@@ -55,7 +55,7 @@ public class PrivilegeSetUserLocaleService extends AbstractService<PrivilegeSetU
 
 	@Override
 	public String getPrivilegeName() {
-		return StrolchPrivilegeConstants.PRIVILEGE_MODIFY_USER;
+		return StrolchPrivilegeConstants.PRIVILEGE_SET_USER_LOCALE;
 	}
 
 	@Override

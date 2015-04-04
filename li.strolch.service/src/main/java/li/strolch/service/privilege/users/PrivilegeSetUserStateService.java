@@ -43,7 +43,7 @@ public class PrivilegeSetUserStateService extends AbstractService<PrivilegeSetUs
 
 		UserRep user = privilegeHandler.setUserState(getCertificate(), arg.username, arg.userState);
 
-		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_MODIFY_USER)) {
+		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_SET_USER_STATE)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
 					StrolchPrivilegeConstants.USER, user.getUsername());
@@ -55,7 +55,7 @@ public class PrivilegeSetUserStateService extends AbstractService<PrivilegeSetUs
 
 	@Override
 	public String getPrivilegeName() {
-		return StrolchPrivilegeConstants.PRIVILEGE_MODIFY_USER;
+		return StrolchPrivilegeConstants.PRIVILEGE_SET_USER_STATE;
 	}
 
 	@Override
