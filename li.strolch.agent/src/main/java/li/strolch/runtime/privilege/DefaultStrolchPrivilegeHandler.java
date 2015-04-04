@@ -117,7 +117,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		try {
 			Certificate certificate = this.privilegeHandler.authenticate(username, password);
 			StrolchRealm realm = getContainer().getRealm(certificate);
-			try (StrolchTransaction tx = realm.openTx(certificate, getClass())) {
+			try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.LOGIN)) {
 				tx.setSuppressDoNothingLogging(true);
 				tx.setSuppressAudits(true);
 				Audit audit = tx.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE,
@@ -147,7 +147,22 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		assertContainerStarted();
 		boolean invalidateSession = this.privilegeHandler.invalidateSession(certificate);
 		StrolchRealm realm = getContainer().getRealm(certificate);
-		try (StrolchTransaction tx = realm.openTx(certificate, getClass())) {
+		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.LOGOUT)) {
+			tx.setSuppressDoNothingLogging(true);
+			tx.setSuppressAudits(true);
+			Audit audit = tx.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE,
+					StrolchPrivilegeConstants.CERTIFICATE, certificate.getUsername());
+			tx.getAuditTrail().add(tx, audit);
+		}
+		return invalidateSession;
+	}
+
+	@Override
+	public boolean sessionTimeout(Certificate certificate) {
+		assertContainerStarted();
+		boolean invalidateSession = this.privilegeHandler.invalidateSession(certificate);
+		StrolchRealm realm = getContainer().getRealm(certificate);
+		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.SESSION_TIME_OUT)) {
 			tx.setSuppressDoNothingLogging(true);
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE,

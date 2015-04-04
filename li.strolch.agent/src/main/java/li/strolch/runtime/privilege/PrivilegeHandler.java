@@ -47,6 +47,13 @@ public interface PrivilegeHandler {
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#invalidateSession(ch.eitchnet.privilege.model.Certificate)
 	 */
 	public abstract boolean invalidateSession(Certificate certificate);
+	
+	/**
+	 * @param certificate
+	 * @return
+	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#invalidateSession(ch.eitchnet.privilege.model.Certificate)
+	 */
+	public abstract boolean sessionTimeout(Certificate certificate);
 
 	/**
 	 * @param certificate

@@ -156,7 +156,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public void invalidate(Certificate certificate) {
-		DBC.PRE.assertNotNull("Certificate must bet given!", certificate); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Certificate must be given!", certificate); //$NON-NLS-1$
 
 		Certificate removedCert;
 		synchronized (this.certificateMap) {
@@ -166,6 +166,19 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			logger.error(MessageFormat.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
 
 		this.privilegeHandler.invalidateSession(certificate);
+	}
+
+	protected void sessionTimeout(Certificate certificate) {
+		DBC.PRE.assertNotNull("Certificate must be given!", certificate); //$NON-NLS-1$
+
+		Certificate removedCert;
+		synchronized (this.certificateMap) {
+			removedCert = this.certificateMap.remove(certificate.getAuthToken());
+		}
+		if (removedCert == null)
+			logger.error(MessageFormat.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
+
+		this.privilegeHandler.sessionTimeout(certificate);
 	}
 
 	/**
@@ -200,7 +213,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 				if (timeOutTime.isAfter(LocalDateTime.ofInstant(lastAccess, systemDefault))) {
 					String msg = "Session {0} for user {1} has expired, invalidating session..."; //$NON-NLS-1$
 					logger.info(MessageFormat.format(msg, certificate.getAuthToken(), certificate.getUsername()));
-					invalidate(certificate);
+					sessionTimeout(certificate);
 				}
 			}
 		}
