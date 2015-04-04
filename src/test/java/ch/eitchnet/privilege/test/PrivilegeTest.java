@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -67,6 +68,7 @@ import ch.eitchnet.utils.helper.FileHelper;
 public class PrivilegeTest {
 
 	private static final String ROLE_PRIVILEGE_ADMIN = "PrivilegeAdmin";
+	private static final String PRIVILEGE_USER_ACCESS = "UserAccessPrivilege";
 	private static final String ADMIN = "admin";
 	private static final byte[] PASS_ADMIN = "admin".getBytes();
 	private static final String BOB = "bob";
@@ -77,6 +79,7 @@ public class PrivilegeTest {
 	private static final String ROLE_APP_USER = "AppUser";
 	private static final String ROLE_MY = "MyRole";
 	private static final String ROLE_MY2 = "MyRole2";
+	private static final String ROLE_CHANGE_PW = "changePw";
 	private static final String ROLE_TEMP = "temp";
 	private static final String ROLE_USER = "user";
 	private static final byte[] PASS_DEF = "def".getBytes();
@@ -487,11 +490,119 @@ public class PrivilegeTest {
 		addTedAsBob();
 		failAuthAsTedNoPass();
 		setPassForTedAsBob();
-		tedChangesOwnPass();
+		failSetSystemStateTed();
+		failTedChangesPwAndLocale();
+		addChangePwRoleToTed();
+		tedChangesOwnPassAndLocale();
+		failTedChangesOtherPwStateAndLocale();
 		authAsTed();
 		failPerformRestrictableAsBobNoRoleApp();
 		addRoleAppToBob();
 		performRestrictableAsBob();
+	}
+
+	private void failSetSystemStateTed() {
+		try {
+			// testEnableUserBob
+			login(BOB, ArraysHelper.copyOf(PASS_BOB));
+			Certificate certificate = this.ctx.getCertificate();
+
+			try {
+				privilegeHandler.setUserState(certificate, TED, UserState.SYSTEM);
+				fail("Should not be able to set user state to SYSTEM");
+			} catch (AccessDeniedException e) {
+				// ok
+			}
+
+		} finally {
+			logout();
+		}
+	}
+
+	private void failTedChangesOtherPwStateAndLocale() {
+		try {
+			// testTedChangesOwnPwd
+			login(TED, ArraysHelper.copyOf(PASS_TED));
+			Certificate certificate = this.ctx.getCertificate();
+
+			try {
+				privilegeHandler.setUserPassword(certificate, BOB, ArraysHelper.copyOf(PASS_TED));
+				fail("Should not be able to set password of other user, as missing privilege");
+			} catch (AccessDeniedException e) {
+				// ok
+			}
+
+			try {
+				privilegeHandler.setUserLocale(certificate, BOB, Locale.FRENCH);
+				fail("Should not be able to set locale of other user, as missing privilege");
+			} catch (AccessDeniedException e) {
+				// ok
+			}
+
+			try {
+				privilegeHandler.setUserState(certificate, BOB, UserState.DISABLED);
+				fail("Should not be able to set state of other user, as missing privilege");
+			} catch (AccessDeniedException e) {
+				// ok
+			}
+
+		} finally {
+			logout();
+		}
+	}
+
+	private void failTedChangesPwAndLocale() {
+		try {
+			// testTedChangesOwnPwd
+			login(TED, ArraysHelper.copyOf(PASS_DEF));
+			Certificate certificate = this.ctx.getCertificate();
+
+			try {
+				privilegeHandler.setUserPassword(certificate, TED, ArraysHelper.copyOf(PASS_TED));
+				fail("Should not be able to set password, as missing privilege");
+			} catch (AccessDeniedException e) {
+				// ok
+			}
+
+			try {
+				privilegeHandler.setUserLocale(certificate, TED, Locale.FRENCH);
+				fail("Should not be able to set locale, as missing privilege");
+			} catch (AccessDeniedException e) {
+				// ok
+			}
+
+			try {
+				privilegeHandler.setUserState(certificate, TED, UserState.ENABLED);
+				fail("Should not be able to set state, as missing privilege");
+			} catch (AccessDeniedException e) {
+				// ok
+			}
+
+		} finally {
+			logout();
+		}
+	}
+
+	private void addChangePwRoleToTed() {
+		try {
+			// add role user
+			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+
+			PrivilegeRep passwordRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD,
+					PRIVILEGE_USER_ACCESS, false, Collections.emptySet(), Collections.emptySet());
+			PrivilegeRep localeRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE,
+					PRIVILEGE_USER_ACCESS, false, Collections.emptySet(), Collections.emptySet());
+
+			RoleRep roleRep = new RoleRep(ROLE_CHANGE_PW, Arrays.asList(passwordRep, localeRep));
+
+			Certificate certificate = this.ctx.getCertificate();
+			privilegeHandler.addRole(certificate, roleRep);
+			privilegeHandler.addRoleToUser(certificate, TED, ROLE_CHANGE_PW);
+			logger.info("Added " + ROLE_CHANGE_PW + " to " + TED);
+			privilegeHandler.persist(certificate);
+		} finally {
+			logout();
+		}
 	}
 
 	private void performRestrictableAsBob() {
@@ -547,12 +658,13 @@ public class PrivilegeTest {
 		}
 	}
 
-	private void tedChangesOwnPass() {
+	private void tedChangesOwnPassAndLocale() {
 		try {
 			// testTedChangesOwnPwd
 			login(TED, ArraysHelper.copyOf(PASS_DEF));
 			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.setUserPassword(certificate, TED, ArraysHelper.copyOf(PASS_TED));
+			privilegeHandler.setUserLocale(certificate, TED, Locale.FRENCH);
 		} finally {
 			logout();
 		}
@@ -666,7 +778,7 @@ public class PrivilegeTest {
 		try {
 			// add role user
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
-			RoleRep roleRep = new RoleRep(ROLE_USER, new ArrayList<PrivilegeRep>());
+			RoleRep roleRep = new RoleRep(ROLE_USER, new ArrayList<>());
 			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addRole(certificate, roleRep);
 			privilegeHandler.persist(certificate);

@@ -212,7 +212,7 @@ public class XmlTest {
 		// PrivilegeAdmin
 		Role privilegeAdmin = findRole("PrivilegeAdmin", roles);
 		assertEquals("PrivilegeAdmin", privilegeAdmin.getName());
-		assertEquals(11, privilegeAdmin.getPrivilegeNames().size());
+		assertEquals(14, privilegeAdmin.getPrivilegeNames().size());
 		IPrivilege privilegeAction = privilegeAdmin.getPrivilege(PrivilegeHandler.PRIVILEGE_ACTION);
 		assertFalse(privilegeAction.isAllAllowed());
 		assertEquals(3, privilegeAction.getAllowList().size());

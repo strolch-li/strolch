@@ -114,6 +114,20 @@ public interface PrivilegeHandler {
 	 * specific user
 	 */
 	public static final String PRIVILEGE_REMOVE_ROLE_FROM_USER = "PrivilegeRemoveRoleFromUser";
+	/**
+	 * Privilege "PRIVILEGE_SET_USER_LOCALE" which is used to validate that a user can set the locale of a user, or
+	 * their own
+	 */
+	public static final String PRIVILEGE_SET_USER_LOCALE = "PrivilegeSetUserLocale";
+	/**
+	 * Privilege "PRIVILEGE_SET_USER_STATE" which is used to validate that a user can set the state of a user
+	 */
+	public static final String PRIVILEGE_SET_USER_STATE = "PrivilegeSetUserState";
+	/**
+	 * Privilege "PRIVILEGE_SET_USER_PASSWORD" which is used to validate that a user can set the password of a user, or
+	 * their own
+	 */
+	public static final String PRIVILEGE_SET_USER_PASSWORD = "PrivilegeSetUserPassword";
 
 	///
 

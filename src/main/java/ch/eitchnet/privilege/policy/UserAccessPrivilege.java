@@ -43,6 +43,10 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 		// get the value on which the action is to be performed
 		Object object = restrictable.getPrivilegeValue();
 
+		// if the object is null, then it means the validation is that the privilege must exist
+		if (object == null)
+			return;
+
 		// RoleAccessPrivilege policy expects the privilege value to be a role
 		if (!(object instanceof Tuple)) {
 			String msg = Restrictable.class.getName()
@@ -130,11 +134,56 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 
 			break;
 		}
+		case PrivilegeHandler.PRIVILEGE_SET_USER_STATE: {
+			User oldUser = tuple.getFirst();
+			User newUser = tuple.getSecond();
+
+			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", oldUser);
+			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
+
+			String privilegeValue = newUser.getUserState().name();
+			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
+
+			break;
+		}
+		case PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE: {
+			User oldUser = tuple.getFirst();
+			User newUser = tuple.getSecond();
+
+			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", oldUser);
+			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
+
+			String privilegeValue = newUser.getUsername();
+
+			// user can set their own locale
+			if (ctx.getUsername().equals(privilegeValue))
+				return;
+
+			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
+
+			break;
+		}
+		case PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD: {
+			User oldUser = tuple.getFirst();
+			User newUser = tuple.getSecond();
+
+			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", oldUser);
+			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
+
+			String privilegeValue = newUser.getUsername();
+
+			// user can set their own password
+			if (ctx.getUsername().equals(privilegeValue))
+				return;
+
+			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
+
+			break;
+		}
 
 		default:
-			String msg = Restrictable.class.getName()
-					+ PrivilegeMessages.getString("Privilege.userAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
-			msg = MessageFormat.format(msg, privilegeName);
+			String msg = PrivilegeMessages.getString("Privilege.userAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
+			msg = MessageFormat.format(msg, privilegeName, this.getClass().getName());
 			throw new PrivilegeException(msg);
 		}
 	}

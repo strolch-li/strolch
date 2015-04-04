@@ -651,18 +651,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	@Override
 	public UserRep setUserLocale(Certificate certificate, String username, Locale locale) {
 
-		// check if certificate is for same user, in which case user is changing their own locale
-		if (certificate.getUsername().equals(username)) {
-
-			// validate the certificate
-			isCertificateValid(certificate);
-
-		} else {
-
-			// validate user actually has this type of privilege
-			PrivilegeContext prvCtx = getPrivilegeContext(certificate);
-			prvCtx.assertHasPrivilege(PRIVILEGE_MODIFY_USER);
-		}
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = getPrivilegeContext(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_SET_USER_LOCALE);
 
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
@@ -677,8 +668,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// if the user is not setting their own locale, then make sure this user may set this user's locale
 		if (!certificate.getUsername().equals(username)) {
-			PrivilegeContext prvCtx = getPrivilegeContext(certificate);
-			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_USER, new Tuple(existingUser, newUser)));
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_LOCALE, new Tuple(existingUser, newUser)));
 		}
 
 		// delegate user replacement to persistence handler
@@ -696,18 +686,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public void setUserPassword(Certificate certificate, String username, byte[] password) {
 		try {
 
-			// check if certificate is for same user, in which case user is changing their own password
-			if (certificate.getUsername().equals(username)) {
-
-				// validate the certificate
-				isCertificateValid(certificate);
-
-			} else {
-
-				// validate user actually has this type of privilege
-				PrivilegeContext prvCtx = getPrivilegeContext(certificate);
-				prvCtx.assertHasPrivilege(PRIVILEGE_MODIFY_USER);
-			}
+			// validate user actually has this type of privilege
+			PrivilegeContext prvCtx = getPrivilegeContext(certificate);
+			prvCtx.assertHasPrivilege(PRIVILEGE_SET_USER_PASSWORD);
 
 			// get User
 			User existingUser = this.persistenceHandler.getUser(username);
@@ -732,8 +713,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// if the user is not setting their own password, then make sure this user may set this user's password
 			if (!certificate.getUsername().equals(username)) {
-				PrivilegeContext prvCtx = getPrivilegeContext(certificate);
-				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_USER, new Tuple(existingUser, newUser)));
+				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_PASSWORD, new Tuple(existingUser,
+						newUser)));
 			}
 
 			// delegate user replacement to persistence handler
@@ -754,7 +735,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = getPrivilegeContext(certificate);
-		prvCtx.assertHasPrivilege(PRIVILEGE_MODIFY_USER);
+		prvCtx.assertHasPrivilege(PRIVILEGE_SET_USER_STATE);
 
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
@@ -768,7 +749,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				existingUser.getLocale(), existingUser.getProperties());
 
 		// validate that this user may modify this user's state
-		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_USER, new Tuple(existingUser, newUser)));
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_STATE, new Tuple(existingUser, newUser)));
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);

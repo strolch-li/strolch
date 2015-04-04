@@ -81,6 +81,17 @@
 			<Privilege name="PrivilegeRemoveRoleFromUser" policy="UserAccessPrivilege">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
+			<Privilege name="PrivilegeSetUserLocale" policy="UserAccessPrivilege">
+				<AllAllowed>true</AllAllowed>
+			</Privilege>
+			<Privilege name="PrivilegeSetUserState" policy="UserAccessPrivilege">
+				<Allow>ENABLED</Allow>
+				<Allow>DISABLED</Allow>
+				<Deny>SYSTEM</Deny>
+			</Privilege>
+			<Privilege name="PrivilegeSetUserPassword" policy="UserAccessPrivilege">
+				<AllAllowed>true</AllAllowed>
+			</Privilege>
 		</Role>
 
 		<Role name="AppUser">

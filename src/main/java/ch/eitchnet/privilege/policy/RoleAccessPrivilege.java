@@ -44,6 +44,10 @@ public class RoleAccessPrivilege implements PrivilegePolicy {
 		// get the value on which the action is to be performed
 		Object object = restrictable.getPrivilegeValue();
 
+		// if the object is null, then it means the validation is that the privilege must exist
+		if (object == null)
+			return;
+
 		// RoleAccessPrivilege policy expects the privilege value to be a role
 		if (!(object instanceof Tuple)) {
 			String msg = Restrictable.class.getName()
