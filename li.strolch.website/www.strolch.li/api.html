@@ -176,6 +176,9 @@ public class SetParameterService extends AbstractService&lt;SetParameterArg, Ser
 
       // add the command to the transaction
       tx.addCommand(command);
+
+      // only now do we say we want to commit so that a rollback works nicely
+      tx.commitOnClose();
     }
 
     // return the execution result of the service
