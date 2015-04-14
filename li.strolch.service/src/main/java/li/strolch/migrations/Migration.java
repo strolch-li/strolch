@@ -9,7 +9,6 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.service.api.Command;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,7 @@ public abstract class Migration {
 		return container.getRealm(getRealm()).openTx(cert, getClass());
 	}
 
-	protected Command buildMigrationVersionChangeCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void buildMigrationVersionChangeCommand(ComponentContainer container, StrolchTransaction tx) {
 
 		Resource migrationsRes = tx.getResourceBy(MIGRATIONS_TYPE, MIGRATIONS_ID);
 		if (migrationsRes == null) {
@@ -67,7 +66,8 @@ public abstract class Migration {
 
 			AddResourceCommand cmd = new AddResourceCommand(container, tx);
 			cmd.setResource(migrationsRes);
-			return cmd;
+
+			tx.addCommand(cmd);
 
 		} else {
 
@@ -77,7 +77,7 @@ public abstract class Migration {
 			cmd.setParameter(currentVersionP);
 			cmd.setValueAsString(getVersion().toString());
 
-			return cmd;
+			tx.addCommand(cmd);
 		}
 	}
 

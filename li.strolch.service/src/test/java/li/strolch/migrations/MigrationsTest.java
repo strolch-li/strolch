@@ -112,7 +112,7 @@ public class MigrationsTest {
 				addOrderCommand.setOrder(fooOrder);
 				tx.addCommand(addOrderCommand);
 
-				tx.addCommand(buildMigrationVersionChangeCommand(container, tx));
+				buildMigrationVersionChangeCommand(container, tx);
 
 				tx.commitOnClose();
 			}
@@ -139,7 +139,7 @@ public class MigrationsTest {
 				addOrderCommand.setOrder(fooOrder);
 				tx.addCommand(addOrderCommand);
 
-				tx.addCommand(buildMigrationVersionChangeCommand(container, tx));
+				buildMigrationVersionChangeCommand(container, tx);
 
 				tx.commitOnClose();
 			}
@@ -166,7 +166,7 @@ public class MigrationsTest {
 				removeOrderCommand.setOrder(fooOrder);
 				tx.addCommand(removeOrderCommand);
 
-				tx.addCommand(buildMigrationVersionChangeCommand(container, tx));
+				buildMigrationVersionChangeCommand(container, tx);
 
 				tx.commitOnClose();
 			}

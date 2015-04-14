@@ -34,7 +34,7 @@ public class DataMigration extends Migration {
 			command.setResourceTypes(Collections.emptySet());
 
 			tx.addCommand(command);
-			tx.addCommand(buildMigrationVersionChangeCommand(container, tx));
+			buildMigrationVersionChangeCommand(container, tx);
 			tx.commitOnClose();
 		} catch (Exception e) {
 			String msg = MessageFormat.format("Migration of {0} failed due to {1}", getVersion(), e.getMessage());
