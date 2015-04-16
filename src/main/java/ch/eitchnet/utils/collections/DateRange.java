@@ -18,6 +18,7 @@ package ch.eitchnet.utils.collections;
 import java.util.Date;
 
 import ch.eitchnet.utils.dbc.DBC;
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -121,5 +122,12 @@ public class DateRange {
 				fromContains = compare < 0;
 		}
 		return toContains && fromContains;
+	}
+
+	@Override
+	public String toString() {
+		ISO8601FormatFactory df = ISO8601FormatFactory.getInstance();
+		return df.formatDate(this.fromDate) + (this.fromInclusive ? " (inc)" : " (exc)") + " - "
+				+ df.formatDate(this.toDate) + (this.toInclusive ? " (inc)" : " (exc)");
 	}
 }
