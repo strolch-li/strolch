@@ -75,7 +75,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			parser.parse(binaryStream, new XmlModelSaxReader(listener));
 		} catch (SQLException | IOException | SAXException | ParserConfigurationException e) {
 			throw new StrolchPersistenceException(MessageFormat.format(
-					"Failed to extract Order from sqlxml value for {0} / {1}", id, type));
+					"Failed to extract Order from sqlxml value for {0} / {1}", id, type), e);
 		}
 
 		if (listener.getOrders().size() == 0)

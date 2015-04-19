@@ -70,7 +70,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			parser.parse(binaryStream, new XmlModelSaxReader(listener));
 		} catch (SQLException | IOException | SAXException | ParserConfigurationException e) {
 			throw new StrolchPersistenceException(MessageFormat.format(
-					"Failed to extract Resource from sqlxml value for {0} / {1}", id, type));
+					"Failed to extract Resource from sqlxml value for {0} / {1}", id, type), e);
 		}
 
 		if (listener.getResources().size() == 0)
