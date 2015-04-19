@@ -4,6 +4,10 @@ import li.strolch.model.parameter.Parameter;
 
 public class StrolchModelConstants {
 
+	public static final String DEFAULT_XML_VERSION = "1.0"; //$NON-NLS-1$
+
+	public static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
+
 	/**
 	 * The type to set on {@link StrolchRootElement StrolchRootElements} when defining a template for a type of element
 	 */

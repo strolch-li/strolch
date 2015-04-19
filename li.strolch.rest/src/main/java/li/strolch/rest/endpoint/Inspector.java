@@ -37,6 +37,8 @@ import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.xml.OrderToXmlStringVisitor;
+import li.strolch.model.xml.ResourceToXmlStringVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -172,7 +174,7 @@ public class Inspector {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{realm}/resource")
+	@Path("{realm}/Resource")
 	public Response getResourcesOverview(@PathParam("realm") String realm, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
@@ -215,7 +217,7 @@ public class Inspector {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{realm}/order")
+	@Path("{realm}/Order")
 	public Response getOrdersOverview(@PathParam("realm") String realm, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
@@ -264,7 +266,7 @@ public class Inspector {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{realm}/resource/{type}")
+	@Path("{realm}/Resource/{type}")
 	public Response getResourceTypeDetails(@PathParam("realm") String realm, @PathParam("type") String type,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -305,7 +307,7 @@ public class Inspector {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{realm}/order/{type}")
+	@Path("{realm}/Order/{type}")
 	public Response getOrderTypeDetails(@PathParam("realm") String realm, @PathParam("type") String type,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -349,8 +351,8 @@ public class Inspector {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{realm}/resource/{type}/{id}")
-	public Response getResource(@PathParam("realm") String realm, @PathParam("type") String type,
+	@Path("{realm}/Resource/{type}/{id}")
+	public Response getResourceAsJson(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
@@ -370,9 +372,28 @@ public class Inspector {
 	}
 
 	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/Resource/{type}/{id}")
+	public Response getResourceAsXml(@PathParam("realm") String realm, @PathParam("type") String type,
+			@PathParam("id") String id, @Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Resource resource;
+		try (StrolchTransaction tx = openTx(cert, realm)) {
+			resource = tx.getResourceMap().getBy(tx, type, id);
+		}
+		if (resource == null) {
+			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
+		}
+
+		String asXml = new ResourceToXmlStringVisitor().visit(resource);
+		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+	}
+
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{realm}/order/{type}/{id}")
-	public Response getOrder(@PathParam("realm") String realm, @PathParam("type") String type,
+	@Path("{realm}/Order/{type}/{id}")
+	public Response getOrderAsJson(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
@@ -389,5 +410,24 @@ public class Inspector {
 			//
 		};
 		return Response.ok().entity(entity).build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/Order/{type}/{id}")
+	public Response getOrderAsXml(@PathParam("realm") String realm, @PathParam("type") String type,
+			@PathParam("id") String id, @Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Order order;
+		try (StrolchTransaction tx = openTx(cert, realm)) {
+			order = tx.getOrderMap().getBy(tx, type, id);
+		}
+		if (order == null) {
+			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
+		}
+
+		String asXml = new OrderToXmlStringVisitor().visit(order);
+		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 }

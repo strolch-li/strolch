@@ -35,8 +35,8 @@ public class StrolchConstants {
 	public static final String PROP_REALM = "realm";
 	public static final String DEFAULT_REALM = "defaultRealm";
 
-	public static final String DEFAULT_XML_VERSION = "1.0"; //$NON-NLS-1$
-	public static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
+	public static final String DEFAULT_XML_VERSION = StrolchModelConstants.DEFAULT_XML_VERSION;
+	public static final String DEFAULT_ENCODING = StrolchModelConstants.DEFAULT_ENCODING;
 
 	/**
 	 * @see StrolchModelConstants#TEMPLATE
