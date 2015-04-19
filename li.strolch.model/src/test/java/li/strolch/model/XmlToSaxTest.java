@@ -16,10 +16,10 @@
 package li.strolch.model;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -54,7 +54,7 @@ public class XmlToSaxTest extends ModelTest {
 		domVisitor.visit(order);
 
 		assertEquals(1, listener.getOrders().size());
-		assertNull(listener.getResources());
+		assertEquals(Collections.emptyList(), listener.getResources());
 		Order parsedOrder = listener.getOrders().get(0);
 
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
@@ -74,7 +74,7 @@ public class XmlToSaxTest extends ModelTest {
 		domVisitor.visit(resource);
 
 		assertEquals(1, listener.getResources().size());
-		assertNull(listener.getOrders());
+		assertEquals(Collections.emptyList(), listener.getOrders());
 		Resource parsedResource = listener.getResources().get(0);
 
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(resource);
