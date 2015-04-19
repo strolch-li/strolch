@@ -16,6 +16,7 @@
 package li.strolch.model.xml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import li.strolch.model.Order;
@@ -49,6 +50,8 @@ public class SimpleStrolchElementListener implements StrolchElementListener {
 	 * @return the resources
 	 */
 	public List<Resource> getResources() {
+		if (this.resources == null)
+			return Collections.emptyList();
 		return this.resources;
 	}
 
@@ -56,6 +59,8 @@ public class SimpleStrolchElementListener implements StrolchElementListener {
 	 * @return the orders
 	 */
 	public List<Order> getOrders() {
+		if (this.orders == null)
+			return Collections.emptyList();
 		return this.orders;
 	}
 }
