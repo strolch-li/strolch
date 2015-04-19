@@ -15,6 +15,7 @@
  */
 package li.strolch.rest.endpoint;
 
+import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +23,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -30,6 +33,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
@@ -39,6 +44,9 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.xml.OrderToXmlStringVisitor;
 import li.strolch.model.xml.ResourceToXmlStringVisitor;
+import li.strolch.model.xml.SimpleStrolchElementListener;
+import li.strolch.model.xml.XmlModelSaxReader;
+import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -52,9 +60,18 @@ import li.strolch.rest.model.RealmDetail;
 import li.strolch.rest.model.RealmOverview;
 import li.strolch.rest.model.ResourceDetail;
 import li.strolch.rest.model.ResourceOverview;
+import li.strolch.rest.model.Result;
 import li.strolch.rest.model.StrolchElementOverview;
 import li.strolch.rest.model.TypeDetail;
 import li.strolch.rest.model.TypeOverview;
+import li.strolch.service.UpdateOrderService;
+import li.strolch.service.UpdateOrderService.UpdateOrderArg;
+import li.strolch.service.UpdateResourceService;
+import li.strolch.service.UpdateResourceService.UpdateResourceArg;
+import li.strolch.service.api.ServiceResult;
+
+import org.xml.sax.InputSource;
+
 import ch.eitchnet.privilege.model.Certificate;
 
 /**
@@ -390,6 +407,48 @@ public class Inspector {
 		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
+	@PUT
+	@Produces(MediaType.APPLICATION_XML)
+	@Consumes(MediaType.APPLICATION_XML)
+	@Path("{realm}/Resource/{type}/{id}")
+	public Response updateResourceAsXml(@PathParam("realm") String realm, @PathParam("type") String type,
+			@PathParam("id") String id, String data, @Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Resource resource;
+		try {
+			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
+			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
+
+			if (listener.getResources().size() == 0)
+				throw new StrolchPersistenceException(MessageFormat.format(
+						"No Resources parsed from xml value for {0} / {1}", id, type));
+			if (listener.getResources().size() > 1)
+				throw new StrolchPersistenceException(MessageFormat.format(
+						"Multiple Resources parsed from xml value for {0} / {1}", id, type));
+
+			resource = listener.getResources().get(0);
+
+		} catch (Exception e) {
+			throw new StrolchPersistenceException(MessageFormat.format(
+					"Failed to extract Resources from xml value for {0} / {1}", id, type), e);
+		}
+
+		UpdateResourceService svc = new UpdateResourceService();
+		UpdateResourceArg arg = new UpdateResourceArg();
+		arg.resource = resource;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			String asXml = new ResourceToXmlStringVisitor().visit(resource);
+			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/Order/{type}/{id}")
@@ -429,5 +488,47 @@ public class Inspector {
 
 		String asXml = new OrderToXmlStringVisitor().visit(order);
 		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+	}
+
+	@PUT
+	@Produces(MediaType.APPLICATION_XML)
+	@Consumes(MediaType.APPLICATION_XML)
+	@Path("{realm}/Order/{type}/{id}")
+	public Response updateOrderAsXml(@PathParam("realm") String realm, @PathParam("type") String type,
+			@PathParam("id") String id, String data, @Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Order order;
+		try {
+			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
+			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
+
+			if (listener.getOrders().size() == 0)
+				throw new StrolchPersistenceException(MessageFormat.format(
+						"No Orders parsed from xml value for {0} / {1}", id, type));
+			if (listener.getOrders().size() > 1)
+				throw new StrolchPersistenceException(MessageFormat.format(
+						"Multiple Orders parsed from xml value for {0} / {1}", id, type));
+
+			order = listener.getOrders().get(0);
+
+		} catch (Exception e) {
+			throw new StrolchPersistenceException(MessageFormat.format(
+					"Failed to extract Order from xml value for {0} / {1}", id, type), e);
+		}
+
+		UpdateOrderService svc = new UpdateOrderService();
+		UpdateOrderArg arg = new UpdateOrderArg();
+		arg.order = order;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			String asXml = new OrderToXmlStringVisitor().visit(order);
+			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+		}
+
+		return Result.toResponse(result);
 	}
 }
