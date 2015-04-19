@@ -22,6 +22,7 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.HttpCacheResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.service.api.ServiceHandler;
 
 import org.glassfish.jersey.server.ServerProperties;
 
@@ -143,10 +144,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		String msg = "Set restLogging={0} with logEntities={1} restTracing={2} with threshold={3}"; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, this.restLogging, this.restLoggingEntity, this.restTracing,
 				this.restTracingThreshold));
-		
+
 		// set http cache mode
 		this.cacheMode = configuration.getString(PARAM_HTTP_CACHE_MODE, HttpCacheResponseFilter.NO_CACHE);
-		logger.info("HTTP header cache mode is set to {}",cacheMode);
+		logger.info("HTTP header cache mode is set to {}", cacheMode);
 
 		super.initialize(configuration);
 	}
@@ -183,5 +184,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	public StrolchSessionHandler getSessionHandler() {
 		return getContainer().getComponent(StrolchSessionHandler.class);
+	}
+
+	public ServiceHandler getServiceHandler() {
+		return getContainer().getComponent(ServiceHandler.class);
 	}
 }
