@@ -5,10 +5,14 @@ import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.model.Certificate;
 
 public abstract class AbstractModelTest {
+
+	protected static final Logger logger = LoggerFactory.getLogger(AbstractModelTest.class);
 
 	protected abstract RuntimeMock getRuntimeMock();
 

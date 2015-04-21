@@ -10,6 +10,8 @@ import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_MIGRATION;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.sql.DataSource;
+
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -17,7 +19,6 @@ import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import ch.eitchnet.db.DbConnectionCheck;
-import ch.eitchnet.db.DbConnectionInfo;
 import ch.eitchnet.db.DbException;
 import ch.eitchnet.db.DbMigrationState;
 import ch.eitchnet.db.DbSchemaVersionCheck;
@@ -60,8 +61,8 @@ public class PostgreSqlDbInitializer extends PostgreSqlInitializer {
 		this.certificate = privilegeContext.getCertificate();
 
 		// first make sure we can connect to the database
-		Map<String, DbConnectionInfo> connetionInfoMap = this.persistenceHandler.getConnetionInfoMap();
-		DbConnectionCheck connectionCheck = new DbConnectionCheck(connetionInfoMap);
+		Map<String, DataSource> dsMap = this.persistenceHandler.getDataSources();
+		DbConnectionCheck connectionCheck = new DbConnectionCheck(dsMap);
 		try {
 			connectionCheck.checkConnections();
 		} catch (DbException e) {
@@ -80,9 +81,9 @@ public class PostgreSqlDbInitializer extends PostgreSqlInitializer {
 		// - if it didn't exist, initialize with a set of data defined by the data store file
 		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
 				this.getClass(), this.allowSchemaCreation, this.allowSchemaMigration, this.allowSchemaDrop);
-		for (Entry<String, DbConnectionInfo> entry : connetionInfoMap.entrySet()) {
+		for (Entry<String, DataSource> entry : dsMap.entrySet()) {
 			String realmName = entry.getKey();
-			DbConnectionInfo connectionInfo = entry.getValue();
+			DataSource ds = entry.getValue();
 			StrolchRealm realm = this.agent.getContainer().getRealm(realmName);
 			if (realm.getMode().isTransient())
 				continue;
@@ -90,9 +91,9 @@ public class PostgreSqlDbInitializer extends PostgreSqlInitializer {
 			// check that the schema exists
 			DbMigrationState migrationType;
 			try {
-				migrationType = schemaVersionCheck.checkSchemaVersion(connectionInfo);
+				migrationType = schemaVersionCheck.checkSchemaVersion(realmName, ds);
 			} catch (DbException e) {
-				throw new RuntimeException("Failed to validate schema for connection " + connectionInfo.getUrl(), e);
+				throw new RuntimeException("Failed to validate schema for connection " + ds, e);
 			}
 
 			// now init the DB if needed

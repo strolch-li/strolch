@@ -20,24 +20,28 @@ import static ch.eitchnet.db.DbConstants.PROP_DB_URL;
 import static ch.eitchnet.db.DbConstants.PROP_DB_USERNAME;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+
+import javax.sql.DataSource;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
-import ch.eitchnet.db.DbConnectionInfo;
+import li.strolch.persistence.api.StrolchPersistenceException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class DbConnectionBuilder {
+public abstract class DbConnectionBuilder {
 
 	private ComponentContainer container;
 	private ComponentConfiguration configuration;
 
 	/**
-	 * 
 	 * @param container
 	 * @param persistenceHandlerConfiguration
 	 */
@@ -46,9 +50,9 @@ public class DbConnectionBuilder {
 		this.configuration = persistenceHandlerConfiguration;
 	}
 
-	public Map<String, DbConnectionInfo> build() {
+	public Map<String, DataSource> build() {
 
-		Map<String, DbConnectionInfo> connetionInfoMap = new HashMap<>();
+		Map<String, DataSource> dsMap = new HashMap<>();
 
 		Set<String> realmNames = container.getRealmNames();
 		for (String realmName : realmNames) {
@@ -65,13 +69,21 @@ public class DbConnectionBuilder {
 			String username = configuration.getString(dbUsernameKey, null);
 			String password = configuration.getString(dbPasswordKey, null);
 
-			DbConnectionInfo connectionInfo = new DbConnectionInfo(realmName, dbUrl);
-			connectionInfo.setUsername(username);
-			connectionInfo.setPassword(password);
+			DataSource ds = build(realmName, dbUrl, username, password, null);
 
-			connetionInfoMap.put(realmName, connectionInfo);
+			dsMap.put(realmName, ds);
 		}
 
-		return connetionInfoMap;
+		return dsMap;
+	}
+
+	protected abstract DataSource build(String realm, String url, String username, String password, Properties proops);
+
+	protected void validateConnection(DataSource ds) {
+		try (Connection con = ds.getConnection()) {
+			con.commit();
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to validate connection to " + ds, e);
+		}
 	}
 }

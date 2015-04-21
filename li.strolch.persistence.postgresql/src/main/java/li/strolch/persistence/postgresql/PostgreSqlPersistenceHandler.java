@@ -25,6 +25,8 @@ import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchAgent;
@@ -41,9 +43,6 @@ import li.strolch.runtime.configuration.DbConnectionBuilder;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import ch.eitchnet.db.DbConnectionCheck;
-import ch.eitchnet.db.DbConnectionInfo;
-import ch.eitchnet.db.DbDriverLoader;
 import ch.eitchnet.db.DbException;
 import ch.eitchnet.db.DbMigrationState;
 import ch.eitchnet.db.DbSchemaVersionCheck;
@@ -56,7 +55,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 	public static final String SCRIPT_PREFIX = "strolch"; //$NON-NLS-1$
 	private ComponentConfiguration componentConfiguration;
-	private Map<String, DbConnectionInfo> connetionInfoMap;
+	private Map<String, DataSource> dsMap;
 
 	public PostgreSqlPersistenceHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -70,41 +69,23 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		// server loader does not seem to work in all contexts, thus:
 		org.postgresql.Driver.getLogLevel();
 
-		DbConnectionBuilder connectionBuilder = new DbConnectionBuilder(getContainer(), componentConfiguration);
-		Map<String, DbConnectionInfo> connectionInfoMap = connectionBuilder.build();
-		for (DbConnectionInfo connectionInfo : connectionInfoMap.values()) {
-			try {
-				DbDriverLoader.loadDriverForConnection(connectionInfo);
-			} catch (DbException e) {
-				String msg = "Could not load driver for connection {0}"; //$NON-NLS-1$
-				throw new StrolchConfigurationException(MessageFormat.format(msg, connectionInfo.getUrl()), e);
-			}
-		}
-
-		this.connetionInfoMap = connectionInfoMap;
+		DbConnectionBuilder connectionBuilder = new PostgreSqlDbConnectionBuilder(getContainer(),
+				componentConfiguration);
+		this.dsMap = connectionBuilder.build();
 		super.initialize(componentConfiguration);
 	}
 
 	/**
 	 * Returns the map of {@link DbConnectionInfo} which can be used in maintenance mode
 	 * 
-	 * @return the connetionInfoMap
+	 * @return the dsMap
 	 */
-	public Map<String, DbConnectionInfo> getConnetionInfoMap() {
-		return this.connetionInfoMap;
+	public Map<String, DataSource> getDataSources() {
+		return this.dsMap;
 	}
 
 	@Override
 	public void start() {
-
-		// test all connections
-		DbConnectionCheck connectionCheck = new DbConnectionCheck(this.connetionInfoMap);
-		try {
-			connectionCheck.checkConnections();
-		} catch (DbException e) {
-			String msg = "At least one connection failed: {0}"; //$NON-NLS-1$
-			throw new StrolchConfigurationException(MessageFormat.format(msg, e.getMessage()), e);
-		}
 
 		boolean allowSchemaCreation = this.componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
 		boolean allowSchemaMigration = this.componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION,
@@ -116,7 +97,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX, this.getClass(),
 				allowSchemaCreation, allowSchemaMigration, allowSchemaDrop);
 		try {
-			schemaVersionCheck.checkSchemaVersion(this.connetionInfoMap);
+			schemaVersionCheck.checkSchemaVersion(this.dsMap);
 		} catch (DbException e) {
 			String msg = "Failed to validate the schema for a connection: {0}"; //$NON-NLS-1$
 			throw new StrolchConfigurationException(MessageFormat.format(msg, e.getMessage()), e);
@@ -145,17 +126,17 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	}
 
 	Connection getConnection(String realm) {
-		DbConnectionInfo dbInfo = this.connetionInfoMap.get(realm);
-		if (dbInfo == null) {
-			String msg = MessageFormat.format("There is no connection registered for the realm {0}", realm); //$NON-NLS-1$
+		DataSource ds = this.dsMap.get(realm);
+		if (ds == null) {
+			String msg = MessageFormat.format("There is no DataSource registered for the realm {0}", realm); //$NON-NLS-1$
 			throw new StrolchPersistenceException(msg);
 		}
 
 		try {
-			return dbInfo.openConnection();
-		} catch (DbException e) {
+			return ds.getConnection();
+		} catch (Exception e) {
 			String msg = "Failed to open a connection to {0} due to {1}"; //$NON-NLS-1$
-			throw new StrolchPersistenceException(MessageFormat.format(msg, dbInfo, e.getMessage()), e);
+			throw new StrolchPersistenceException(MessageFormat.format(msg, ds, e.getMessage()), e);
 		}
 	}
 

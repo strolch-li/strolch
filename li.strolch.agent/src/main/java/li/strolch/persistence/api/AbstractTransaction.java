@@ -62,7 +62,6 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.ElementTypeVisitor;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
-import li.strolch.persistence.inmemory.InMemoryTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.Command;
@@ -81,7 +80,7 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public abstract class AbstractTransaction implements StrolchTransaction {
 
-	protected static final Logger logger = LoggerFactory.getLogger(InMemoryTransaction.class);
+	protected static final Logger logger = LoggerFactory.getLogger(AbstractTransaction.class);
 	private InternalStrolchRealm realm;
 
 	private TransactionCloseStrategy closeStrategy;
