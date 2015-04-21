@@ -24,6 +24,7 @@ import static li.strolch.agent.api.RealmHandler.SYSTEM_USER_DB_INITIALIZER;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -38,6 +39,7 @@ import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.postgresql.PostgreSqlDbConnectionBuilder.StrolchPostgreDataSource;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.DbConnectionBuilder;
 import li.strolch.runtime.configuration.StrolchConfiguration;
@@ -118,6 +120,16 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		}
 
 		super.start();
+	}
+
+	@Override
+	public void destroy() {
+		for (Entry<String, DataSource> entry : this.dsMap.entrySet()) {
+			StrolchPostgreDataSource ds = (StrolchPostgreDataSource) entry.getValue();
+			ds.shutdown();
+		}
+
+		super.destroy();
 	}
 
 	@Override

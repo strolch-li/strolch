@@ -47,6 +47,13 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 	}
 
 	@Override
+	protected void validateConnection(DataSource dataSource) {
+		super.validateConnection(dataSource);
+		HikariDataSource ds = (HikariDataSource) dataSource;
+		ds.validate();
+	}
+
+	@Override
 	public DataSource build(String realm, String url, String username, String password, Properties props) {
 
 		HikariDataSource ds;
@@ -177,6 +184,20 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		public String toString() {
 			return "HikariDataSource for realm " + ds.getPoolName() + " for " + ds.getUsername() + " at "
 					+ ds.getJdbcUrl();
+		}
+
+		/**
+		 * @see com.zaxxer.hikari.HikariDataSource#shutdown()
+		 */
+		public void shutdown() {
+			this.ds.shutdown();
+		}
+
+		/**
+		 * @see com.zaxxer.hikari.AbstractHikariConfig#validate()
+		 */
+		public void validate() {
+			this.ds.validate();
 		}
 	}
 }
