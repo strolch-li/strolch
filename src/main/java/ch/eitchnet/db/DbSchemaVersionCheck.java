@@ -21,7 +21,6 @@ import static ch.eitchnet.db.DbConstants.RESOURCE_DB_VERSION;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,7 +28,10 @@ import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+
+import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,15 +81,20 @@ public class DbSchemaVersionCheck {
 		return this.dbMigrationStates;
 	}
 
-	public void checkSchemaVersion(Map<String, DbConnectionInfo> connectionInfoMap) throws DbException {
-		for (DbConnectionInfo connectionInfo : connectionInfoMap.values()) {
-			DbMigrationState dbMigrationState = checkSchemaVersion(connectionInfo);
-			dbMigrationStates.put(connectionInfo.getRealm(), dbMigrationState);
+	public void checkSchemaVersion(Map<String, DataSource> dsMap) throws DbException {
+		for (Entry<String, DataSource> entry : dsMap.entrySet()) {
+			String realm = entry.getKey();
+			DataSource ds = entry.getValue();
+			DbMigrationState dbMigrationState = checkSchemaVersion(realm, ds);
+			dbMigrationStates.put(realm, dbMigrationState);
 		}
 	}
 
 	/**
 	 * Returns true if the schema existed or was only migrated, false if the schema was created
+	 * 
+	 * @param ds
+	 * @param realm2
 	 * 
 	 * @param connectionInfo
 	 * 
@@ -95,18 +102,13 @@ public class DbSchemaVersionCheck {
 	 * 
 	 * @throws DbException
 	 */
-	public DbMigrationState checkSchemaVersion(DbConnectionInfo connectionInfo) throws DbException {
-		String realm = connectionInfo.getRealm();
-		String url = connectionInfo.getUrl();
-		String username = connectionInfo.getUsername();
-		String password = connectionInfo.getPassword();
+	public DbMigrationState checkSchemaVersion(String realm, DataSource ds) throws DbException {
 
-		logger.info(MessageFormat.format("[{0}:{1}] Checking Schema version for: {2}@{3}", this.app, realm, username,
-				url));
+		logger.info(MessageFormat.format("[{0}:{1}] Checking Schema version for: {2}", this.app, realm, ds));
 
 		Version expectedDbVersion = getExpectedDbVersion(this.app, this.ctxClass);
 
-		try (Connection con = DriverManager.getConnection(url, username, password)) {
+		try (Connection con = ds.getConnection()) {
 
 			// get current version
 			Version currentVersion = getCurrentVersion(con, this.app);
@@ -127,11 +129,12 @@ public class DbSchemaVersionCheck {
 				break;
 			}
 
+			con.commit();
 			return migrationType;
 
 		} catch (SQLException e) {
-			String msg = "Failed to open DB connection to URL {0} due to: {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, url, e.getMessage());
+			String msg = "Failed to open DB connection to {0} due to: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, ds, e.getMessage());
 			throw new DbException(msg, e);
 		}
 	}
