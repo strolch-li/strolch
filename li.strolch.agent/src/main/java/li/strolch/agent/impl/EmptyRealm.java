@@ -83,8 +83,7 @@ public class EmptyRealm extends InternalStrolchRealm {
 		this.resourceMap = new TransactionalResourceMap();
 		this.orderMap = new TransactionalOrderMap();
 
-		String enableAuditKey = StrolchConstants.makeRealmKey(getRealm(),
-				DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
+		String enableAuditKey = StrolchConstants.makeRealmKey(getRealm(), DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
 		if (configuration.getBoolean(enableAuditKey, Boolean.FALSE)) {
 			this.auditTrail = new TransactionalAuditTrail();
 			logger.info("Enabling AuditTrail for realm " + getRealm()); //$NON-NLS-1$
