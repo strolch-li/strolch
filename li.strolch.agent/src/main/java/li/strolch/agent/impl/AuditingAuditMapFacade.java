@@ -1,23 +1,17 @@
 /*
- * Copyright (c) 2012, Robert von Burg
- *
- * All rights reserved.
- *
- * This file is part of the XXX.
- *
- *  XXX is free software: you can redistribute 
- *  it and/or modify it under the terms of the GNU General Public License as 
- *  published by the Free Software Foundation, either version 3 of the License, 
- *  or (at your option) any later version.
- *
- *  XXX is distributed in the hope that it will 
- *  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XXX.  If not, see 
- *  <http://www.gnu.org/licenses/>.
+ * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package li.strolch.agent.impl;
 
@@ -37,6 +31,16 @@ import ch.eitchnet.utils.collections.DateRange;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
+ * <p>
+ * This {@link AuditTrail} facade registers all actions performed i.e. it registers which {@link Audit Audits} are
+ * retrieved, created, updated and deleted.
+ * </p>
+ * 
+ * <p>
+ * In a single transaction an Audit may be created, updated and then deleted - this implementation does not "squash"
+ * such actions, but registers them separately
+ * </p>
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class AuditingAuditMapFacade implements AuditTrail {
@@ -201,14 +205,16 @@ public class AuditingAuditMapFacade implements AuditTrail {
 	@Override
 	public List<Audit> doQuery(StrolchTransaction tx, AuditQuery query) {
 		List<Audit> elements = this.auditTrail.doQuery(tx, query, new NoStrategyAuditVisitor());
-		// TODO decide how to audit these queried elements
+		this.read.addAll(elements);
 		return elements;
 	}
 
 	@Override
 	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery query, AuditVisitor<U> auditVisitor) {
-		List<U> elements = this.auditTrail.doQuery(tx, query, auditVisitor);
-		// TODO decide how to audit these queried elements
+		List<U> elements = this.auditTrail.doQuery(tx, query, audit -> {
+			this.read.add(audit);
+			return auditVisitor.visitAudit(audit);
+		});
 		return elements;
 	}
 }
