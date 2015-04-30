@@ -57,19 +57,15 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 	public DataSource build(String realm, String url, String username, String password, Properties props) {
 
 		HikariDataSource ds;
-		if (props != null) {
-			props.setProperty("dataSource.autoCommit", "false");
-			HikariConfig config = new HikariConfig(props);
-			ds = new HikariDataSource(config);
-		} else {
-			ds = new HikariDataSource();
-			ds.setAutoCommit(false);
-		}
+		HikariConfig config = new HikariConfig(props);
+		config.setAutoCommit(false);
+		config.setPoolName(realm);
+		config.setJdbcUrl(url);
+		config.setUsername(username);
+		config.setPassword(password);
 
-		ds.setPoolName(realm);
-		ds.setJdbcUrl(url);
-		ds.setUsername(username);
-		ds.setPassword(password);
+		ds = new HikariDataSource(config);
+		System.err.println(ds.getMaximumPoolSize());
 
 		return new StrolchPostgreDataSource(ds);
 	}

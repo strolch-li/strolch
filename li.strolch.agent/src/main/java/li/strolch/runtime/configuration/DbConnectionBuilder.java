@@ -32,11 +32,14 @@ import javax.sql.DataSource;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.StrolchPersistenceException;
+import li.strolch.runtime.StrolchConstants;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class DbConnectionBuilder {
+
+	private static final String PROP_DB_POOL_PREFIX = "db.pool";
 
 	private ComponentContainer container;
 	private ComponentConfiguration configuration;
@@ -69,7 +72,37 @@ public abstract class DbConnectionBuilder {
 			String username = configuration.getString(dbUsernameKey, null);
 			String password = configuration.getString(dbPasswordKey, null);
 
-			DataSource ds = build(realmName, dbUrl, username, password, null);
+			// find any pool configuration values
+			Set<String> propertyKeys = configuration.getPropertyKeys();
+			Properties props = new Properties();
+			for (String key : propertyKeys) {
+				if (!key.startsWith(PROP_DB_POOL_PREFIX))
+					continue;
+
+				// TODO we should change how properties for realms are configured
+				// since defaultRealm does not have to be on the key, we need this hack:
+				String[] segments = key.split("\\.");
+				String poolKey;
+				String foundRealm;
+				if (segments.length == 4) {
+					// ends with realm
+					foundRealm = segments[3];
+				} else if (segments.length == 3) {
+					// default realm
+					foundRealm = StrolchConstants.DEFAULT_REALM;
+				} else {
+					throw new IllegalArgumentException("Can't detect realm of this property: " + key);
+				}
+				// see if this is our realm
+				if (!foundRealm.equals(realmName))
+					continue;
+
+				poolKey = segments[2];
+				String value = configuration.getString(key, null);
+				props.setProperty(poolKey, value);
+			}
+
+			DataSource ds = build(realmName, dbUrl, username, password, props);
 
 			dsMap.put(realmName, ds);
 		}

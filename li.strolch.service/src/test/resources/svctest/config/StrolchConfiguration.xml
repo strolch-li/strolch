@@ -52,10 +52,12 @@
 				<db.url.svcCached>jdbc:postgresql://localhost/cacheduserdb</db.url.svcCached>
 				<db.username.svcCached>cacheduser</db.username.svcCached>
 				<db.password.svcCached>test</db.password.svcCached>
+				<db.pool.maximumPoolSize.svcCached>1</db.pool.maximumPoolSize.svcCached>
 
 				<db.url.svcTransactional>jdbc:postgresql://localhost/transactionaluserdb</db.url.svcTransactional>
 				<db.username.svcTransactional>transactionaluser</db.username.svcTransactional>
 				<db.password.svcTransactional>test</db.password.svcTransactional>
+				<db.pool.maximumPoolSize.svcTransactional>1</db.pool.maximumPoolSize.svcTransactional>
 
 			</Properties>
 		</Component>
