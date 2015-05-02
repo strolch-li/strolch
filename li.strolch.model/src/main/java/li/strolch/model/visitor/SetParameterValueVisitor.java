@@ -18,9 +18,12 @@ package li.strolch.model.visitor;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.DurationParameter;
+import li.strolch.model.parameter.FloatListParameter;
 import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.IntegerListParameter;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.ListParameter;
+import li.strolch.model.parameter.LongListParameter;
 import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
@@ -97,6 +100,24 @@ public class SetParameterValueVisitor implements ParameterVisitor {
 	@Override
 	public <T> T visitStringListParam(StringListParameter param) {
 		param.setValue(StringListParameter.parseFromString(this.value));
+		return null;
+	}
+
+	@Override
+	public <T> T visitFloatListParam(FloatListParameter param) {
+		param.setValue(FloatListParameter.parseFromString(this.value));
+		return null;
+	}
+
+	@Override
+	public <T> T visitIntegerListParam(IntegerListParameter param) {
+		param.setValue(IntegerListParameter.parseFromString(this.value));
+		return null;
+	}
+
+	@Override
+	public <T> T visitLongListParam(LongListParameter param) {
+		param.setValue(LongListParameter.parseFromString(this.value));
 		return null;
 	}
 }

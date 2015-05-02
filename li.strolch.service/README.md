@@ -1,13 +1,16 @@
-li.strolch.service
-==================
+
+# li.strolch.service
 
 [![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=li.strolch.service)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.service/)
 
 Service API for Strolch
 
-Running tests
-==================
-* Install PostgreSQL and create the following users:
+
+# Running tests
+
+* Start PostgreSQL console and create the users:
+$ sudo -u postgres psql
+$ postgres=# 
 create user cacheduser with password 'test';
 create database cacheduserdb;
 GRANT ALL PRIVILEGES ON DATABASE cacheduserdb to cacheduser;

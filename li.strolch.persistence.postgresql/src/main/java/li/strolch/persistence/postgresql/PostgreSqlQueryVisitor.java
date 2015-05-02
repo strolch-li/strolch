@@ -34,8 +34,11 @@ import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateRangeParameterSelection;
 import li.strolch.model.query.ParameterSelection.DurationParameterSelection;
+import li.strolch.model.query.ParameterSelection.FloatListParameterSelection;
 import li.strolch.model.query.ParameterSelection.FloatParameterSelection;
+import li.strolch.model.query.ParameterSelection.IntegerListParameterSelection;
 import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
+import li.strolch.model.query.ParameterSelection.LongListParameterSelection;
 import li.strolch.model.query.ParameterSelection.LongParameterSelection;
 import li.strolch.model.query.ParameterSelection.NullParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringListParameterSelection;
@@ -345,6 +348,21 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 
 	@Override
 	public void visit(StringListParameterSelection selection) {
+		throw new UnsupportedOperationException("Not yet supported!");
+	}
+
+	@Override
+	public void visit(IntegerListParameterSelection selection) {
+		throw new UnsupportedOperationException("Not yet supported!");
+	}
+
+	@Override
+	public void visit(FloatListParameterSelection selection) {
+		throw new UnsupportedOperationException("Not yet supported!");
+	}
+
+	@Override
+	public void visit(LongListParameterSelection selection) {
 		throw new UnsupportedOperationException("Not yet supported!");
 	}
 

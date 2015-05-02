@@ -29,8 +29,11 @@ import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.DurationParameter;
+import li.strolch.model.parameter.FloatListParameter;
 import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.IntegerListParameter;
 import li.strolch.model.parameter.IntegerParameter;
+import li.strolch.model.parameter.LongListParameter;
 import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
@@ -203,6 +206,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		return lb.build();
 	}
 
+	// TODO remove the whole fromDom methods from strolch model - we want to use the visitor pattern only!
+
 	@Override
 	protected void fromDom(Element element) {
 		super.fromDom(element);
@@ -241,6 +246,15 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 				addParameter(param);
 			} else if (paramtype.equals(StringListParameter.TYPE)) {
 				StringListParameter param = new StringListParameter(paramElement);
+				addParameter(param);
+			} else if (paramtype.equals(IntegerListParameter.TYPE)) {
+				IntegerListParameter param = new IntegerListParameter(paramElement);
+				addParameter(param);
+			} else if (paramtype.equals(FloatListParameter.TYPE)) {
+				FloatListParameter param = new FloatListParameter(paramElement);
+				addParameter(param);
+			} else if (paramtype.equals(LongListParameter.TYPE)) {
+				LongListParameter param = new LongListParameter(paramElement);
 				addParameter(param);
 			} else {
 				String msg = "What kind of parameter is this: {0}"; //$NON-NLS-1$

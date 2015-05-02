@@ -22,6 +22,9 @@ import static li.strolch.model.ModelGenerator.PARAM_BOOLEAN_ID;
 import static li.strolch.model.ModelGenerator.PARAM_DATE_ID;
 import static li.strolch.model.ModelGenerator.PARAM_FLOAT_ID;
 import static li.strolch.model.ModelGenerator.PARAM_INTEGER_ID;
+import static li.strolch.model.ModelGenerator.PARAM_LIST_FLOAT_ID;
+import static li.strolch.model.ModelGenerator.PARAM_LIST_INTEGER_ID;
+import static li.strolch.model.ModelGenerator.PARAM_LIST_LONG_ID;
 import static li.strolch.model.ModelGenerator.PARAM_LIST_STRING_ID;
 import static li.strolch.model.ModelGenerator.PARAM_LONG_ID;
 import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
@@ -65,8 +68,11 @@ import java.util.Date;
 
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
+import li.strolch.model.parameter.FloatListParameter;
 import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.IntegerListParameter;
 import li.strolch.model.parameter.IntegerParameter;
+import li.strolch.model.parameter.LongListParameter;
 import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
@@ -226,11 +232,34 @@ public class ModelTest {
 
 		StringListParameter stringListP = bag.getParameter(PARAM_LIST_STRING_ID);
 		assertNotNull("StringList Param missing with id " + PARAM_LIST_STRING_ID, stringListP);
-
 		ArrayList<String> stringList = new ArrayList<>();
 		stringList.add("Hello");
 		stringList.add("World");
 		assertEquals(stringList, stringListP.getValue());
+
+		IntegerListParameter intListP = bag.getParameter(PARAM_LIST_INTEGER_ID);
+		assertNotNull("IntegerList Param missing with id " + PARAM_LIST_INTEGER_ID, intListP);
+		ArrayList<Integer> intList = new ArrayList<>();
+		intList.add(5);
+		intList.add(10);
+		intList.add(15);
+		assertEquals(intList, intListP.getValue());
+
+		FloatListParameter floatListP = bag.getParameter(PARAM_LIST_FLOAT_ID);
+		assertNotNull("FloatList Param missing with id " + PARAM_LIST_FLOAT_ID, floatListP);
+		ArrayList<Double> floatList = new ArrayList<>();
+		floatList.add(6.0);
+		floatList.add(11.0);
+		floatList.add(16.0);
+		assertEquals(floatList, floatListP.getValue());
+
+		LongListParameter longListP = bag.getParameter(PARAM_LIST_LONG_ID);
+		assertNotNull("LongList Param missing with id " + PARAM_LIST_LONG_ID, longListP);
+		ArrayList<Long> longList = new ArrayList<>();
+		longList.add(7L);
+		longList.add(12L);
+		longList.add(17L);
+		assertEquals(longList, longListP.getValue());
 	}
 
 	/**

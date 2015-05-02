@@ -18,7 +18,10 @@ package li.strolch.runtime.query.inmemory;
 import static ch.eitchnet.utils.StringMatchMode.ci;
 import static ch.eitchnet.utils.StringMatchMode.es;
 import static li.strolch.model.query.ParameterSelection.booleanSelection;
+import static li.strolch.model.query.ParameterSelection.floatListSelection;
 import static li.strolch.model.query.ParameterSelection.floatSelection;
+import static li.strolch.model.query.ParameterSelection.integerListSelection;
+import static li.strolch.model.query.ParameterSelection.longListSelection;
 import static li.strolch.model.query.ParameterSelection.stringListSelection;
 import static li.strolch.model.query.ParameterSelection.stringSelection;
 import static org.junit.Assert.assertEquals;
@@ -34,7 +37,10 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.parameter.BooleanParameter;
+import li.strolch.model.parameter.FloatListParameter;
 import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.IntegerListParameter;
+import li.strolch.model.parameter.LongListParameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.IdSelection;
@@ -149,7 +155,7 @@ public class InMemoryQueryTest {
 	}
 
 	@Test
-	public void shouldQueryByStringListParameter() {
+	public void shouldQueryByListParameter() {
 
 		List<Resource> resources = getResources();
 		resources.add(getBallResource());
@@ -159,20 +165,77 @@ public class InMemoryQueryTest {
 		ResourceQuery ballQuery;
 		List<Resource> result;
 
-		ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
-		ballQuery.and().with(stringListSelection("parameters", "listValues", Arrays.asList("a")));
-		result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
-		assertEquals(1, result.size());
+		// string list
+		{
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("a", "z")));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(0, result.size());
 
-		ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
-		ballQuery.and().with(stringListSelection("parameters", "listValues", Arrays.asList("a", "z")));
-		result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
-		assertEquals(0, result.size());
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("a")));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(1, result.size());
 
-		ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
-		ballQuery.and().with(stringListSelection("parameters", "listValues", Arrays.asList("c", "b", "a")));
-		result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
-		assertEquals(1, result.size());
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("c", "b", "a")));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(1, result.size());
+		}
+
+		// integer list
+		{
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(1, 5)));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(0, result.size());
+
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(1)));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(1, result.size());
+
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(3, 2, 1)));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(1, result.size());
+		}
+
+		// float list
+		{
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(4.0, 8.0)));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(0, result.size());
+
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(4.0)));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(1, result.size());
+
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(6.2, 5.1, 4.0)));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(1, result.size());
+		}
+
+		// long list
+		{
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(8L, 11L)));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(0, result.size());
+
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(8L)));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(1, result.size());
+
+			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(10L, 9L, 8L)));
+			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			assertEquals(1, result.size());
+		}
 	}
 
 	@Test
@@ -241,7 +304,11 @@ public class InMemoryQueryTest {
 		bag.addParameter(new StringParameter("color", "Color", "red"));
 		bag.addParameter(new BooleanParameter("forChildren", "Color", true));
 		bag.addParameter(new FloatParameter("diameter", "Color", 22.0));
-		bag.addParameter(new StringListParameter("listValues", "List of Values", Arrays.asList("a", "b", "c")));
+		bag.addParameter(new StringListParameter("stringListValues", "List of String Values", Arrays.asList("a", "b",
+				"c")));
+		bag.addParameter(new IntegerListParameter("intListValues", "List of Integer Values", Arrays.asList(1, 2, 3)));
+		bag.addParameter(new FloatListParameter("floatListValues", "List of Float Values", Arrays.asList(4.0, 5.1, 6.2)));
+		bag.addParameter(new LongListParameter("longListValues", "List of Long Values", Arrays.asList(8L, 9L, 10L)));
 		res1.addParameterBag(bag);
 		return res1;
 	}

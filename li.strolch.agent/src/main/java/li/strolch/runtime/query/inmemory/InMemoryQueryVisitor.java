@@ -32,8 +32,11 @@ import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateRangeParameterSelection;
 import li.strolch.model.query.ParameterSelection.DurationParameterSelection;
+import li.strolch.model.query.ParameterSelection.FloatListParameterSelection;
 import li.strolch.model.query.ParameterSelection.FloatParameterSelection;
+import li.strolch.model.query.ParameterSelection.IntegerListParameterSelection;
 import li.strolch.model.query.ParameterSelection.IntegerParameterSelection;
+import li.strolch.model.query.ParameterSelection.LongListParameterSelection;
 import li.strolch.model.query.ParameterSelection.LongParameterSelection;
 import li.strolch.model.query.ParameterSelection.NullParameterSelection;
 import li.strolch.model.query.ParameterSelection.StringListParameterSelection;
@@ -204,6 +207,24 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	@Override
 	public void visit(StringListParameterSelection selection) {
 		addSelector(ParameterSelector.<T> stringListSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
+	}
+
+	@Override
+	public void visit(IntegerListParameterSelection selection) {
+		addSelector(ParameterSelector.<T> integerListSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
+	}
+
+	@Override
+	public void visit(FloatListParameterSelection selection) {
+		addSelector(ParameterSelector.<T> floatListSelector(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue()));
+	}
+
+	@Override
+	public void visit(LongListParameterSelection selection) {
+		addSelector(ParameterSelector.<T> longListSelector(selection.getBagKey(), selection.getParamKey(),
 				selection.getValue()));
 	}
 

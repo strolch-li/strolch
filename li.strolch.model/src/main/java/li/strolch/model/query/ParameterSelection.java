@@ -116,6 +116,18 @@ public abstract class ParameterSelection implements Selection {
 		return new StringListParameterSelection(bagKey, paramKey, value);
 	}
 
+	public static IntegerListParameterSelection integerListSelection(String bagKey, String paramKey, List<Integer> value) {
+		return new IntegerListParameterSelection(bagKey, paramKey, value);
+	}
+
+	public static FloatListParameterSelection floatListSelection(String bagKey, String paramKey, List<Double> value) {
+		return new FloatListParameterSelection(bagKey, paramKey, value);
+	}
+
+	public static LongListParameterSelection longListSelection(String bagKey, String paramKey, List<Long> value) {
+		return new LongListParameterSelection(bagKey, paramKey, value);
+	}
+
 	public static NullParameterSelection nullSelection(String bagKey, String paramKey) {
 		return new NullParameterSelection(bagKey, paramKey);
 	}
@@ -291,17 +303,63 @@ public abstract class ParameterSelection implements Selection {
 		}
 	}
 
-	public static class StringListParameterSelection extends ParameterSelection {
+	public static abstract class AbstractListParameterSelection<T> extends ParameterSelection {
 
-		private List<String> value;
+		private List<T> value;
 
-		public StringListParameterSelection(String bagKey, String paramKey, List<String> value) {
+		public AbstractListParameterSelection(String bagKey, String paramKey, List<T> value) {
 			super(bagKey, paramKey);
 			this.value = value;
 		}
 
-		public List<String> getValue() {
+		public List<T> getValue() {
 			return this.value;
+		}
+
+		@Override
+		public abstract void accept(ParameterSelectionVisitor visitor);
+	}
+
+	public static class StringListParameterSelection extends AbstractListParameterSelection<String> {
+
+		public StringListParameterSelection(String bagKey, String paramKey, List<String> value) {
+			super(bagKey, paramKey, value);
+		}
+
+		@Override
+		public void accept(ParameterSelectionVisitor visitor) {
+			visitor.visit(this);
+		}
+	}
+
+	public static class IntegerListParameterSelection extends AbstractListParameterSelection<Integer> {
+
+		public IntegerListParameterSelection(String bagKey, String paramKey, List<Integer> value) {
+			super(bagKey, paramKey, value);
+		}
+
+		@Override
+		public void accept(ParameterSelectionVisitor visitor) {
+			visitor.visit(this);
+		}
+	}
+
+	public static class FloatListParameterSelection extends AbstractListParameterSelection<Double> {
+
+		public FloatListParameterSelection(String bagKey, String paramKey, List<Double> value) {
+			super(bagKey, paramKey, value);
+		}
+
+		@Override
+		public void accept(ParameterSelectionVisitor visitor) {
+			visitor.visit(this);
+		}
+	}
+
+	public static class LongListParameterSelection extends AbstractListParameterSelection<Long> {
+
+		public LongListParameterSelection(String bagKey, String paramKey, List<Long> value) {
+			super(bagKey, paramKey, value);
 		}
 
 		@Override

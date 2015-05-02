@@ -18,9 +18,12 @@ package li.strolch.model.visitor;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.DurationParameter;
+import li.strolch.model.parameter.FloatListParameter;
 import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.IntegerListParameter;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.ListParameter;
+import li.strolch.model.parameter.LongListParameter;
 import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
@@ -50,4 +53,10 @@ public interface ParameterVisitor {
 	public <T> T visitListParam(ListParameter<?> param);
 
 	public <T> T visitStringListParam(StringListParameter param);
+
+	public <T> T visitIntegerListParam(IntegerListParameter param);
+
+	public <T> T visitFloatListParam(FloatListParameter param);
+
+	public <T> T visitLongListParam(LongListParameter param);
 }

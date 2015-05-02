@@ -28,8 +28,11 @@ import li.strolch.model.audit.Audit;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.DurationParameter;
+import li.strolch.model.parameter.FloatListParameter;
 import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.IntegerListParameter;
 import li.strolch.model.parameter.IntegerParameter;
+import li.strolch.model.parameter.LongListParameter;
 import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
@@ -81,17 +84,26 @@ public class ModelGenerator {
 	public static final String PARAM_DURATION_ID = "@param8";
 	public static final String PARAM_DURATION_NAME = "Duration Param";
 
+	public static final String PARAM_LIST_INTEGER_ID = "@param9";
+	public static final String PARAM_LIST_INTEGER_NAME = "IntegerList Param";
+
+	public static final String PARAM_LIST_FLOAT_ID = "@param10";
+	public static final String PARAM_LIST_FLOAT_NAME = "FloatList Param";
+
+	public static final String PARAM_LIST_LONG_ID = "@param11";
+	public static final String PARAM_LIST_LONG_NAME = "LongList Param";
+
 	public static final String STATE_FLOAT_ID = "@state1";
 	public static final String STATE_FLOAT_NAME = "Float State";
 
 	public static final String STATE_INTEGER_ID = "@state2";
-	public static final String STATE_INTEGER_NAME = "Float State";
+	public static final String STATE_INTEGER_NAME = "Integer State";
 
 	public static final String STATE_STRING_ID = "@state3";
-	public static final String STATE_STRING_NAME = "Float State";
+	public static final String STATE_STRING_NAME = "String State";
 
 	public static final String STATE_BOOLEAN_ID = "@state4";
-	public static final String STATE_BOOLEAN_NAME = "Float State";
+	public static final String STATE_BOOLEAN_NAME = "Boolean State";
 
 	public static final long STATE_TIME_0 = 0L;
 	public static final long STATE_TIME_10 = 10L;
@@ -369,7 +381,7 @@ public class ModelGenerator {
 		dateParam.setIndex(6);
 		bag.addParameter(dateParam);
 
-		ArrayList<String> stringList = new ArrayList<String>();
+		ArrayList<String> stringList = new ArrayList<>();
 		stringList.add("Hello");
 		stringList.add("World");
 		StringListParameter stringListP = new StringListParameter(PARAM_LIST_STRING_ID, PARAM_LIST_STRING_NAME,
@@ -381,6 +393,31 @@ public class ModelGenerator {
 				ISO8601FormatFactory.getInstance().getDurationFormat().parse("P1D"));
 		durationParam.setIndex(8);
 		bag.addParameter(durationParam);
+
+		ArrayList<Integer> intList = new ArrayList<>();
+		intList.add(5);
+		intList.add(10);
+		intList.add(15);
+		IntegerListParameter intListP = new IntegerListParameter(PARAM_LIST_INTEGER_ID, PARAM_LIST_INTEGER_NAME,
+				intList);
+		intListP.setIndex(9);
+		bag.addParameter(intListP);
+
+		ArrayList<Double> floatList = new ArrayList<>();
+		floatList.add(6.0);
+		floatList.add(11.0);
+		floatList.add(16.0);
+		FloatListParameter floatListP = new FloatListParameter(PARAM_LIST_FLOAT_ID, PARAM_LIST_FLOAT_NAME, floatList);
+		floatListP.setIndex(10);
+		bag.addParameter(floatListP);
+
+		ArrayList<Long> longList = new ArrayList<>();
+		longList.add(7L);
+		longList.add(12L);
+		longList.add(17L);
+		LongListParameter longListP = new LongListParameter(PARAM_LIST_LONG_ID, PARAM_LIST_LONG_NAME, longList);
+		longListP.setIndex(11);
+		bag.addParameter(longListP);
 	}
 
 	private static String randomValue(Random rand, String[] values) {

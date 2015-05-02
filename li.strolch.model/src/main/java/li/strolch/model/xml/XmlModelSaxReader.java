@@ -31,8 +31,11 @@ import li.strolch.model.Tags;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.DurationParameter;
+import li.strolch.model.parameter.FloatListParameter;
 import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.IntegerListParameter;
 import li.strolch.model.parameter.IntegerParameter;
+import li.strolch.model.parameter.LongListParameter;
 import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
@@ -168,6 +171,16 @@ public class XmlModelSaxReader extends DefaultHandler {
 					break;
 				case StringListParameter.TYPE:
 					param = new StringListParameter(paramId, paramName, StringListParameter.parseFromString(paramValue));
+					break;
+				case IntegerListParameter.TYPE:
+					param = new IntegerListParameter(paramId, paramName,
+							IntegerListParameter.parseFromString(paramValue));
+					break;
+				case FloatListParameter.TYPE:
+					param = new FloatListParameter(paramId, paramName, FloatListParameter.parseFromString(paramValue));
+					break;
+				case LongListParameter.TYPE:
+					param = new LongListParameter(paramId, paramName, LongListParameter.parseFromString(paramValue));
 					break;
 				case FloatParameter.TYPE:
 					param = new FloatParameter(paramId, paramName, FloatParameter.parseFromString(paramValue));
