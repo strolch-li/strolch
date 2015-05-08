@@ -34,12 +34,17 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.runtime.StrolchConstants;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class DbConnectionBuilder {
 
 	private static final String PROP_DB_POOL_PREFIX = "db.pool";
+
+	protected static final Logger logger = LoggerFactory.getLogger(DbConnectionBuilder.class);
 
 	private ComponentContainer container;
 	private ComponentConfiguration configuration;
