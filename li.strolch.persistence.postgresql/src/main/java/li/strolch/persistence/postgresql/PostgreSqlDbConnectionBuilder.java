@@ -65,8 +65,8 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		config.setPassword(password);
 
 		ds = new HikariDataSource(config);
-		logger.info("[" + realm + "] PostgreSQL Connection pool has a maximum pool size of " + ds.getMaximumPoolSize()
-				+ " connections");
+		logger.info("[" + realm + "] PostgreSQL Connection pool to " + url + " has a maximum pool size of "
+				+ ds.getMaximumPoolSize() + " connections");
 
 		return new StrolchPostgreDataSource(ds);
 	}

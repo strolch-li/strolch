@@ -15,6 +15,7 @@
  */
 package li.strolch.runtime.configuration;
 
+import static ch.eitchnet.db.DbConstants.PROP_DB_IGNORE_REALM;
 import static ch.eitchnet.db.DbConstants.PROP_DB_PASSWORD;
 import static ch.eitchnet.db.DbConstants.PROP_DB_URL;
 import static ch.eitchnet.db.DbConstants.PROP_DB_USERNAME;
@@ -69,9 +70,16 @@ public abstract class DbConnectionBuilder {
 			if (realm.getMode().isTransient())
 				continue;
 
+			String dbIgnoreRealmKey = makeRealmKey(realmName, PROP_DB_IGNORE_REALM);
 			String dbUrlKey = makeRealmKey(realmName, PROP_DB_URL);
 			String dbUsernameKey = makeRealmKey(realmName, PROP_DB_USERNAME);
 			String dbPasswordKey = makeRealmKey(realmName, PROP_DB_PASSWORD);
+
+			boolean dbIgnoreRealm = configuration.getBoolean(dbIgnoreRealmKey, Boolean.FALSE);
+			if (dbIgnoreRealm) {
+				logger.info("Ignoring any DB configuration for Realm " + realmName);
+				continue;
+			}
 
 			String dbUrl = configuration.getString(dbUrlKey, null);
 			String username = configuration.getString(dbUsernameKey, null);
