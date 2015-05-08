@@ -21,6 +21,7 @@ package ch.eitchnet.db;
 public class DbConstants {
 
 	public static final String PROP_DB_URL = "db.url"; //$NON-NLS-1$
+	public static final String PROP_DB_IGNORE_REALM = "db.ignore.realm"; //$NON-NLS-1$
 	public static final String PROP_DB_USERNAME = "db.username"; //$NON-NLS-1$
 	public static final String PROP_DB_PASSWORD = "db.password"; //$NON-NLS-1$
 	public static final String PROP_ALLOW_SCHEMA_CREATION = "allowSchemaCreation";
