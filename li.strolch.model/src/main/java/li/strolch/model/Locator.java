@@ -226,7 +226,23 @@ public class Locator {
 	 * Returns true if the given locator's path elements is the beginning of this locator's path elements
 	 * 
 	 * @param locator
-	 * @return
+	 * 
+	 * @return true if the given locator's path elements is the beginning of this locator's path elements
+	 */
+	public boolean isEqualOrChildOf(Locator locator) {
+		if (locator.pathElements.size() > this.pathElements.size())
+			return false;
+		return this.pathElements.subList(0, locator.pathElements.size()).equals(locator.pathElements);
+	}
+
+	/**
+	 * Returns true if the given locator's path elements is the beginning of this locator's path elements, but not if
+	 * they are the same, i.e. must be an actual child
+	 * 
+	 * @param locator
+	 * 
+	 * @return true if the given locator's path elements is the beginning of this locator's path elements, but not if
+	 *         they are the same, i.e. must be an actual child
 	 */
 	public boolean isChildOf(Locator locator) {
 		if (locator.pathElements.size() >= this.pathElements.size())

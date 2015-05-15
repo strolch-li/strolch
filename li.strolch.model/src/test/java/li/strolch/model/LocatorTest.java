@@ -94,4 +94,39 @@ public class LocatorTest {
 		Locator child = Locator.valueOf("Resource/MyType/@myObj");
 		assertFalse(child.isChildOf(parent));
 	}
+
+	@Test
+	public void shouldBeEqualOrChild1() {
+		Locator parent = Locator.valueOf("Resource/MyType/@myObj");
+		Locator child = Locator.valueOf("Resource/MyType/@myObj/Bags/@bag1/Parameters/@param1");
+		assertTrue(child.isEqualOrChildOf(parent));
+	}
+
+	@Test
+	public void shouldBeEqualOrChild2() {
+		Locator parent = Locator.valueOf("Resource/MyType/@myObj");
+		Locator child = Locator.valueOf("Resource/MyType/@myObj/Bags/");
+		assertTrue(child.isEqualOrChildOf(parent));
+	}
+
+	@Test
+	public void shouldBeEqualOrChild3() {
+		Locator parent = Locator.valueOf("Resource/MyType/@myObj");
+		Locator child = Locator.valueOf("Resource/MyType/@myObj");
+		assertTrue(child.isEqualOrChildOf(parent));
+	}
+
+	@Test
+	public void shouldNotBeEqualOrChild1() {
+		Locator parent = Locator.valueOf("Resource/MyType/@myObj");
+		Locator child = Locator.valueOf("Resource/OtherType/@myObj/Bags/");
+		assertFalse(child.isEqualOrChildOf(parent));
+	}
+
+	@Test
+	public void shouldNotBeEqualOrChild2() {
+		Locator parent = Locator.valueOf("Resource/MyType/@myObj");
+		Locator child = Locator.valueOf("Resource/MyType/@myObj1");
+		assertFalse(child.isEqualOrChildOf(parent));
+	}
 }
