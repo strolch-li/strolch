@@ -426,21 +426,25 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Order getOrderBy(StringParameter refP) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
 		return getOrderBy(refP, false);
 	}
 
 	@Override
 	public Order getOrderBy(StringParameter refP, boolean assertExists) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
 		return getOrderMap().getBy(this, refP, assertExists);
 	}
 
 	@Override
 	public List<Order> getOrdersBy(StringListParameter refP) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
 		return getOrderMap().getBy(this, refP, false);
 	}
 
 	@Override
 	public List<Order> getOrdersBy(StringListParameter refP, boolean assertExists) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
 		return getOrderMap().getBy(this, refP, assertExists);
 	}
 
@@ -461,21 +465,25 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Resource getResourceBy(StringParameter refP) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
 		return getResourceBy(refP, false);
 	}
 
 	@Override
 	public Resource getResourceBy(StringParameter refP, boolean assertExists) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
 		return getResourceMap().getBy(this, refP, assertExists);
 	}
 
 	@Override
 	public List<Resource> getResourcesBy(StringListParameter refP) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
 		return getResourceMap().getBy(this, refP, false);
 	}
 
 	@Override
 	public List<Resource> getResourcesBy(StringListParameter refP, boolean assertExists) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
 		return getResourceMap().getBy(this, refP, assertExists);
 	}
 
