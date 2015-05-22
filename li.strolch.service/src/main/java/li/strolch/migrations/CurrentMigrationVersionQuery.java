@@ -18,7 +18,8 @@ package li.strolch.migrations;
 import static li.strolch.migrations.Migration.BAG_PARAMETERS;
 import static li.strolch.migrations.Migration.MIGRATIONS_ID;
 import static li.strolch.migrations.Migration.MIGRATIONS_TYPE;
-import static li.strolch.migrations.Migration.PARAM_CURRENT_VERSION;
+import static li.strolch.migrations.Migration.PARAM_CURRENT_DATA_VERSION;
+import static li.strolch.migrations.Migration.PARAM_CURRENT_CODE_VERSION;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +36,7 @@ import ch.eitchnet.utils.Version;
 public class CurrentMigrationVersionQuery {
 
 	private ComponentContainer container;
-	private Map<String, Version> currentVersions;
+	private Map<String, MigrationVersion> currentVersions;
 
 	/**
 	 * @param container
@@ -55,29 +56,46 @@ public class CurrentMigrationVersionQuery {
 
 				Resource migrationsRes = tx.getResourceBy(MIGRATIONS_TYPE, MIGRATIONS_ID);
 				if (migrationsRes == null) {
-					this.currentVersions.put(realmName, Version.emptyVersion);
+					this.currentVersions.put(realmName, new MigrationVersion(Version.emptyVersion,Version.emptyVersion));
 					continue;
 				}
 
-				StringParameter currentVersionP = migrationsRes.getParameter(BAG_PARAMETERS, PARAM_CURRENT_VERSION);
-				if (currentVersionP == null) {
-					this.currentVersions.put(realmName, Version.emptyVersion);
-					continue;
+				StringParameter currentDataVersionP = migrationsRes.getParameter(BAG_PARAMETERS, PARAM_CURRENT_DATA_VERSION);
+				StringParameter currentCodeVersionP = migrationsRes.getParameter(BAG_PARAMETERS, PARAM_CURRENT_CODE_VERSION);
+				
+				if (currentDataVersionP == null && currentCodeVersionP == null) {
+					this.currentVersions.put(realmName, new MigrationVersion(Version.emptyVersion,Version.emptyVersion));
+				} else if(currentDataVersionP == null && currentCodeVersionP != null) {
+					Version codeVersion = getVersionFromParam(currentCodeVersionP);
+					this.currentVersions.put(realmName, new MigrationVersion(Version.emptyVersion,codeVersion));
+				} else if (currentDataVersionP != null && currentCodeVersionP == null) {
+					Version dataVersion = getVersionFromParam(currentDataVersionP);
+					this.currentVersions.put(realmName, new MigrationVersion(dataVersion,Version.emptyVersion));
+				} else {
+					Version dataVersion = getVersionFromParam(currentDataVersionP);
+					Version codeVersion = getVersionFromParam(currentCodeVersionP);
+					this.currentVersions.put(realmName, new MigrationVersion(dataVersion,codeVersion));	
 				}
-
-				String versionS = currentVersionP.getValue();
-				if (!Version.isParseable(versionS)) {
-					throw new StrolchConfigurationException("Version value " + versionS + " is not valid for "
-							+ currentVersionP.getLocator());
-				}
-
-				Version version = Version.valueOf(versionS);
-				this.currentVersions.put(realmName, version);
 			}
 		}
 	}
 
-	public Map<String, Version> getCurrentVersions() {
+	/**
+	 * @param versionS
+	 * @return
+	 */
+	private Version getVersionFromParam(StringParameter versionP) {
+		String versionS = versionP.getValue();
+		if (!Version.isParseable(versionS)) {
+			throw new StrolchConfigurationException("Version value " + versionS + " is not valid for "
+					+ versionP.getLocator());
+		}
+
+		Version version = Version.valueOf(versionS);
+		return version;
+	}
+
+	public Map<String, MigrationVersion> getCurrentVersions() {
 		return this.currentVersions;
 	}
 

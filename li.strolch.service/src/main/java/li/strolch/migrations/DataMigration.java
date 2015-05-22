@@ -21,8 +21,11 @@ import java.util.Collections;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.XmlImportModelCommand;
+import li.strolch.command.parameter.SetParameterCommand;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.ModelStatistics;
+import li.strolch.model.Resource;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.Version;
@@ -60,4 +63,13 @@ public class DataMigration extends Migration {
 		logger.info(MessageFormat
 				.format("[{0}] Data migration for {1} loaded {2} Resources and {3} Orders.", getRealm(), getVersion(), statistics.nrOfResources, statistics.nrOfOrders)); //$NON-NLS-1$
 	}
+
+	@Override
+	protected void setNewVersion(SetParameterCommand cmd, Resource migrationsRes) {
+		StringParameter currentDataVersionP = migrationsRes.getParameter(BAG_PARAMETERS, PARAM_CURRENT_DATA_VERSION);
+
+		cmd.setParameter(currentDataVersionP);
+		cmd.setValueAsString(getVersion().toString());
+	}
+
 }

@@ -18,6 +18,9 @@ package li.strolch.migrations;
 import java.io.File;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.command.parameter.SetParameterCommand;
+import li.strolch.model.Resource;
+import li.strolch.model.parameter.StringParameter;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.Version;
 
@@ -35,4 +38,15 @@ public class CodeMigration extends Migration {
 	public void migrate(ComponentContainer container, Certificate certificate) {
 		logger.info("[" + this.realm + "] Running no-op migration " + this.version);
 	}
+
+	@Override
+	protected void setNewVersion(SetParameterCommand cmd, Resource migrationsRes) {
+		StringParameter currentCodeVersionP = migrationsRes.getParameter(BAG_PARAMETERS, PARAM_CURRENT_CODE_VERSION);
+
+		cmd.setParameter(currentCodeVersionP);
+		cmd.setValueAsString(getVersion().toString());
+		
+	}
+	
+	
 }
