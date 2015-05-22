@@ -142,4 +142,10 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 		this.stateId = id;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public IValueChange<T> getClone() {
+		return new ValueChange(time, value);
+	}
+
 }

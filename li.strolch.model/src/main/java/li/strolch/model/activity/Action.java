@@ -8,6 +8,7 @@ import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.Resource;
+import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.timevalue.IValueChange;
@@ -21,38 +22,26 @@ import org.w3c.dom.Element;
  * {@link Activity} applies {@link IValueChange} objects at the start and end
  * time of the {@link Activity}.
  * 
- * @author Martin Smock <smock.martin@gmail.com>
+ * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class Action extends GroupedParameterizedElement implements IActivityElement {
 
 	protected static final long serialVersionUID = 1L;
 
 	protected Long start;
-	protected Long end; 
+	protected Long end;
 
 	protected String resourceId;
 
 	protected final List<IValueChange<?>> startChanges = new ArrayList<>();
 	protected final List<IValueChange<?>> endChanges = new ArrayList<>();
-	
-	protected ActionState state = ActionState.CREATED; 
-	
-	protected Activity parent; 
 
-	/**
-	 * no argument constructor
-	 */
-	protected Action() {
-		super();
-	}
+	protected State state = State.CREATED;
 
-	/**
-	 * Default constructor
-	 * 
-	 * @param id
-	 * @param name
-	 * @param type
-	 */
+	protected Activity parent;
+
+	private String resourceType;
+
 	public Action(String id, String name, String type) {
 		super(id, name, type);
 	}
@@ -103,7 +92,40 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @param e
+	 * @return the current <code>State</code> of the a<code>Action</code>
+	 */
+	public State getState() {
+		return state;
+	}
+
+	/**
+	 * @param state
+	 *            the target <code>State</code> of the a<code>Action</code>
+	 */
+	public void setState(State state) {
+		this.state = state;
+	}
+
+	/**
+	 * @return the type of the <code>Resource</code> this <code>Action</code>
+	 *         acts on
+	 */
+	public String getResourceType() {
+		return this.resourceType;
+	}
+
+	/**
+	 * @param resourceType
+	 */
+	public void setResourceType(String resourceType) {
+		this.resourceType = resourceType;
+	}
+
+	/**
+	 * @param add
+	 *            <code>IValueChange</code> to be applied to the
+	 *            <code>Resource</code> to time <code>Action.getStart()<code>
+	 * 
 	 * @return <tt>true</tt> (as specified by {@link Collection#add})
 	 */
 	public boolean addStartChange(IValueChange<?> change) {
@@ -112,19 +134,28 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * @param change
-	 *            the {@link IValueChange} the action applies at end time
+	 *            <code>IValueChange</code> to be applied to the
+	 *            <code>Resource</code> at time <code>Action.getEnd()<code>
 	 * @return <tt>true</tt> (as specified by {@link Collection#add})
 	 */
 	public boolean addEndChange(IValueChange<?> change) {
 		return endChanges.add(change);
 	}
 
+	/**
+	 * @return the list of <code>IValueChange</code> attached to the
+	 *         <code>Action</code> start
+	 */
 	public List<IValueChange<?>> getStartChanges() {
-		return new ArrayList<IValueChange<?>>(startChanges);
+		return startChanges;
 	}
 
+	/**
+	 * @return the list of <code>IValueChange</code> attached to the
+	 *         <code>Action</code> end
+	 */
 	public List<IValueChange<?>> getEndChanges() {
-		return new ArrayList<IValueChange<?>>(endChanges);
+		return endChanges;
 	}
 
 	@Override
@@ -135,37 +166,48 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public StrolchElement getParent() {
-		// TODO Auto-generated method stub
-		return null;
+		return parent;
 	}
 
 	@Override
 	public StrolchRootElement getRootElement() {
-		// TODO Auto-generated method stub
-		return null;
+		return (parent == null) ? null : parent.getRootElement();
 	}
-	
+
 	@Override
 	public boolean isRootElement() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public StrolchElement getClone() {
-		// TODO Auto-generated method stub
-		return null;
+		Action clone = new Action(getId(), getName(), getType());
+		clone.setDbid(getDbid());
+		clone.setEnd(end);
+		clone.setResourceId(resourceId);
+		clone.setResourceType(resourceType);
+		clone.setStart(start);
+		clone.setState(state);
+		for (IValueChange<?> change : getStartChanges()) {
+			clone.startChanges.add(change.getClone());
+		}
+		for (IValueChange<?> change : getEndChanges()) {
+			clone.endChanges.add(change.getClone());
+		}
+		return clone;
 	}
 
 	@Override
 	public Locator getLocator() {
-		// TODO Auto-generated method stub
-		return null;
+		LocatorBuilder lb = new LocatorBuilder();
+		this.parent.fillLocator(lb);
+		fillLocator(lb);
+		return lb.build();
 	}
 
 	@Override
 	protected void fillLocator(LocatorBuilder locatorBuilder) {
-		// TODO Auto-generated method stub
+		locatorBuilder.append(this.id);
 	}
 
 	@Override
@@ -177,6 +219,10 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		builder.append(this.name);
 		builder.append(", type=");
 		builder.append(this.type);
+		builder.append(", resourceId=");
+		builder.append(this.resourceId);
+		builder.append(", state=");
+		builder.append(this.state);
 		builder.append(", start=");
 		builder.append(this.start);
 		builder.append(", end=");
@@ -185,12 +231,9 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		return builder.toString();
 	}
 
-	public ActionState getState() {
-		return state;
-	}
-
-	public void setState(ActionState state) {
-		this.state = state;
+	@Override
+	public void setParent(Activity activity) {
+		this.parent = activity;
 	}
 
 }

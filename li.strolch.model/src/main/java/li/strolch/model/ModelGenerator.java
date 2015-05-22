@@ -109,6 +109,7 @@ public class ModelGenerator {
 	public static final long STATE_TIME_10 = 10L;
 	public static final long STATE_TIME_20 = 20L;
 	public static final long STATE_TIME_30 = 30L;
+	public static final long STATE_TIME_40 = 40L;
 
 	public static final Double STATE_FLOAT_TIME_0 = 0.0D;
 	public static final Double STATE_FLOAT_TIME_10 = 10.0D;

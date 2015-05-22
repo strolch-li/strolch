@@ -59,5 +59,10 @@ public interface IValueChange<T extends IValue> {
 	 *         made to a {@link TimeVariable}.
 	 */
 	IValueChange<T> getInverse();
+	
+	/**
+	 * @return a copy of this
+	 */
+	IValueChange<T> getClone(); 
 
 }

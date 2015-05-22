@@ -23,7 +23,8 @@ public enum State {
 	CREATED("Created"), //$NON-NLS-1$
 	OPEN("Open"), //$NON-NLS-1$
 	EXECUTION("Execution"), //$NON-NLS-1$
-	CLOSED("Closed"); //$NON-NLS-1$
+	CLOSED("Closed"), //$NON-NLS-1$
+	PLANNED("Planned"); //$NON-NLS-1$
 
 	private String state;
 

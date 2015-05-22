@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Martin Smock <smock.martin@gmail.com>
+ * Copyright 2015 Martin Smock <martin.smock@bluewin.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@ package li.strolch.command.plan;
 import java.util.List;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.model.Locator;
 import li.strolch.model.Resource;
+import li.strolch.model.State;
+import li.strolch.model.Tags;
 import li.strolch.model.activity.Action;
-import li.strolch.model.activity.ActionState;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -34,12 +36,11 @@ import ch.eitchnet.utils.dbc.DBC;
  * resulting changes on the {@link StrolchTimedState} objects assigned to the
  * {@link Resource}.
  * 
- * @author Martin Smock <smock.martin@gmail.com>
+ * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class PlanActionCommand extends Command {
 
 	protected Action action;
-	protected Resource resource;
 
 	/**
 	 * @param container
@@ -52,65 +53,61 @@ public class PlanActionCommand extends Command {
 	@Override
 	public void validate() {
 		DBC.PRE.assertNotNull("Action may not be null!", this.action);
-		DBC.PRE.assertNotNull("Reosurce may not be null!", this.action);
-		// TODO validate action.start, resource.state are set
+		DBC.PRE.assertNotNull("Action attribute resourceId may not be null!", this.action.getResourceId());
+		DBC.PRE.assertNotNull("Action attribute resourceType may not be null!", this.action.getResourceType());
+		DBC.PRE.assertTrue("Action attribute start must be set!", this.action.getStart() > 0);
+		DBC.PRE.assertTrue("Action attribute end must later than start!", this.action.getEnd() > this.action.getStart());
 	}
 
-	/**
-	 * Apply the {@link IValueChange} objects of the {@link Action} to the
-	 * {@link Resource} states
-	 */
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void doCommand() {
+
+		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId()).build();
+		Resource resource = tx().findElement(locator);
+		
+		tx().lock(resource); 
+
 		final List<IValueChange<?>> startChanges = action.getStartChanges();
 		for (IValueChange<?> change : startChanges) {
-			final String stateId = change.getStateId();
-			final StrolchTimedState timedState = resource.getTimedState(stateId);
+			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change);
 		}
 
 		final List<IValueChange<?>> endChanges = action.getEndChanges();
 		for (IValueChange<?> change : endChanges) {
-			final String stateId = change.getStateId();
-			final StrolchTimedState timedState = resource.getTimedState(stateId);
+			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change);
 		}
 		// finally set the action state
-		action.setState(ActionState.PLANNED);
+		action.setState(State.PLANNED);
+		action.setResourceId(resource.getId());
 	}
 
-	/**
-	 * Revert the changes induced by the {@link IValueChange} objects of the
-	 * {@link Action} to the {@link Resource} states
-	 */
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void undo() {
 
+		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId()).build();
+		Resource resource = tx().findElement(locator);
+
 		final List<IValueChange<?>> startChanges = action.getStartChanges();
 		for (IValueChange<?> change : startChanges) {
-			final String stateId = change.getStateId();
-			final StrolchTimedState timedState = resource.getTimedState(stateId);
+			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change.getInverse());
 		}
 
 		final List<IValueChange<?>> endChanges = action.getEndChanges();
 		for (IValueChange<?> change : endChanges) {
-			final String stateId = change.getStateId();
-			final StrolchTimedState timedState = resource.getTimedState(stateId);
+			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change.getInverse());
 		}
 		// finally set the action state
-		action.setState(ActionState.CREATED);
+		action.setState(State.CREATED);
 	}
 
 	public void setAction(Action action) {
 		this.action = action;
-	}
-
-	public void setResource(Resource resource) {
-		this.resource = resource;
 	}
 
 }

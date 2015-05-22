@@ -15,12 +15,23 @@
  */
 package li.strolch.model.activity;
 
+import li.strolch.model.State;
+import li.strolch.model.StrolchElement;
+
 /**
- * Marker for all child elememts of {@link Activity} objects
+ * Marker for all child elements of {@link Activity} objects
  * 
- * @author Martin Smock <smock.martin@gmail.com>
+ * @author Martin Smock <martin.smock@bluewin.ch>
  * 
  */
-public interface IActivityElement {
+public interface IActivityElement extends StrolchElement {
+
+	Long getStart();
+
+	Long getEnd();
+
+	State getState();
+	
+	void setParent(Activity activity); 
 
 }

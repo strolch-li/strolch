@@ -21,14 +21,19 @@ import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_10;
 import static li.strolch.model.ModelGenerator.STATE_TIME_20;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.SortedSet;
 
+import li.strolch.model.Locator;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
+import li.strolch.model.State;
+import li.strolch.model.Tags;
 import li.strolch.model.activity.Action;
-import li.strolch.model.activity.ActionState;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.timedstate.IntegerTimedState;
@@ -39,51 +44,62 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
+import li.strolch.persistence.api.StrolchTransaction;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author Martin Smock <smock.martin@gmail.com>
+ * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class PlanActionTest {
 
 	private Resource resource;
+	private Action action;
 
 	@Before
 	public void init() {
 
+		// add a resource with integer state variable
 		resource = ModelGenerator.createResource("@1", "Test With States", "Stated");
-
-		// add a integer state
 		final IntegerTimedState timedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
 		timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 		resource.addTimedState(timedState);
-	}
 
-	@Test
-	public void test() {
-
-		final Action action = new Action("action_1", "Action 1", "Use");
+		action = new Action("action_1", "Action 1", "Use");
 		action.setStart(STATE_TIME_10);
 		action.setEnd(STATE_TIME_20);
-		
-		Assert.assertEquals(ActionState.CREATED, action.getState()); 
 
-		final IntegerParameter iP = new IntegerParameter("quantity", "Occupation", 1);
+		Assert.assertEquals(State.CREATED, action.getState());
+
+		IntegerParameter iP = new IntegerParameter("quantity", "Occupation", 1);
 		action.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
 		action.addParameter("objective", iP);
 
 		createChanges(action);
 
-		final PlanActionCommand cmd = new PlanActionCommand(null, null);
+		action.setResourceId(resource.getId());
+		action.setResourceType(resource.getType());
+	}
+
+	@Test
+	public void test() {
+
+		StrolchTransaction tx = mock(StrolchTransaction.class);
+
+		Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
+		when(tx.findElement(eq(locator))).thenReturn(resource);
+
+		final PlanActionCommand cmd = new PlanActionCommand(null, tx);
 		cmd.setAction(action);
-		cmd.setResource(resource);
 		cmd.doCommand();
-		
-		// check the state 
-		Assert.assertEquals(ActionState.PLANNED, action.getState()); 
+
+		// check the state
+		Assert.assertEquals(State.PLANNED, action.getState());
+
+		// check the resource Id
+		Assert.assertEquals(resource.getId(), action.getResourceId());
 
 		// check if we get the expected result
 		StrolchTimedState<IValue<Integer>> timedState = resource.getTimedState(STATE_INTEGER_ID);
@@ -103,8 +119,8 @@ public class PlanActionTest {
 
 		// call undo to clean up
 		cmd.undo();
-		
-		Assert.assertEquals(ActionState.CREATED, action.getState()); 
+
+		Assert.assertEquals(State.CREATED, action.getState());
 
 		// and check again
 		values = timeEvolution.getValues();
@@ -116,23 +132,23 @@ public class PlanActionTest {
 	}
 
 	/**
-	 * problem specific method to create the {@link IValueChange} objects for
-	 * the {@link Action} to be planned
+	 * <p>
+	 * add changes to action start and end time with a value defined in the
+	 * action objective and set the stateId of the state variable to apply the change to
+	 * </p>
 	 * 
 	 * @param action
-	 *            the {@link Action} to create the {@link IValueChange} objects
-	 *            for
 	 */
-	private void createChanges(final Action action) {
+	protected static void createChanges(final Action action) {
 
-		final Parameter<Integer> parameter = action.getParameter("objective", "quantity");
-		final Integer quantity = parameter.getValue();
+		Parameter<Integer> parameter = action.getParameter("objective", "quantity");
+		Integer quantity = parameter.getValue();
 
-		final IValueChange<IntegerValue> startChange = new ValueChange<>(action.getStart(), new IntegerValue(quantity));
+		IValueChange<IntegerValue> startChange = new ValueChange<>(action.getStart(), new IntegerValue(quantity));
 		startChange.setStateId(STATE_INTEGER_ID);
 		action.addStartChange(startChange);
 
-		final IValueChange<IntegerValue> endChange = new ValueChange<>(action.getEnd(), new IntegerValue(-quantity));
+		IValueChange<IntegerValue> endChange = new ValueChange<>(action.getEnd(), new IntegerValue(-quantity));
 		endChange.setStateId(STATE_INTEGER_ID);
 		action.addEndChange(endChange);
 	}
