@@ -27,13 +27,13 @@ import ch.eitchnet.utils.Version;
 public class RunMigrationsAction implements SystemUserAction {
 
 	private Migrations migrations;
-	private Map<String, Version> currentVersions;
+	private Map<String, MigrationVersion> currentVersions;
 
 	/**
 	 * @param migrations
 	 * @param currentVersions
 	 */
-	public RunMigrationsAction(Migrations migrations, Map<String, Version> currentVersions) {
+	public RunMigrationsAction(Migrations migrations, Map<String, MigrationVersion> currentVersions) {
 		this.migrations = migrations;
 		this.currentVersions = currentVersions;
 	}

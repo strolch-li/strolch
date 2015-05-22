@@ -36,7 +36,8 @@ public abstract class Migration {
 	public static final String MIGRATIONS_TYPE = "Migrations";
 	public static final String MIGRATIONS_ID = "migrations";
 	public static final String BAG_PARAMETERS = "parameters";
-	public static final String PARAM_CURRENT_VERSION = "currentVersion";
+	public static final String PARAM_CURRENT_DATA_VERSION = "currentDataVersion";
+	public static final String PARAM_CURRENT_CODE_VERSION = "currentCodeVersion";
 
 	protected static final Logger logger = LoggerFactory.getLogger(CodeMigration.class);
 
@@ -75,9 +76,13 @@ public abstract class Migration {
 			ParameterBag bag = new ParameterBag(BAG_PARAMETERS, BAG_PARAMETERS, BAG_PARAMETERS);
 			migrationsRes.addParameterBag(bag);
 
-			StringParameter currentVersionP = new StringParameter(PARAM_CURRENT_VERSION, PARAM_CURRENT_VERSION,
-					getVersion().toString());
-			bag.addParameter(currentVersionP);
+			StringParameter currentDataVersionP = new StringParameter(PARAM_CURRENT_DATA_VERSION,
+					PARAM_CURRENT_DATA_VERSION, getVersion().toString());
+			bag.addParameter(currentDataVersionP);
+
+			StringParameter currentCodeVersionP = new StringParameter(PARAM_CURRENT_CODE_VERSION,
+					PARAM_CURRENT_CODE_VERSION, getVersion().toString());
+			bag.addParameter(currentCodeVersionP);
 
 			AddResourceCommand cmd = new AddResourceCommand(container, tx);
 			cmd.setResource(migrationsRes);
@@ -85,16 +90,15 @@ public abstract class Migration {
 			tx.addCommand(cmd);
 
 		} else {
-
-			StringParameter currentVersionP = migrationsRes.getParameter(BAG_PARAMETERS, PARAM_CURRENT_VERSION);
-
 			SetParameterCommand cmd = new SetParameterCommand(container, tx);
-			cmd.setParameter(currentVersionP);
-			cmd.setValueAsString(getVersion().toString());
+
+			setNewVersion(cmd,migrationsRes);
 
 			tx.addCommand(cmd);
 		}
 	}
 
 	public abstract void migrate(ComponentContainer container, Certificate certificate);
+	
+	protected abstract void setNewVersion(SetParameterCommand cmd,Resource migrationsRes);
 }

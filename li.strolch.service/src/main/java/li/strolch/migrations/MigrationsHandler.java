@@ -62,7 +62,7 @@ public class MigrationsHandler extends StrolchComponent {
 		return this.migrations.getMigrationsRan();
 	}
 
-	public Map<String, Version> getCurrentVersions(Certificate cert) {
+	public Map<String, MigrationVersion> getCurrentVersions(Certificate cert) {
 		CurrentMigrationVersionQuery query = new CurrentMigrationVersionQuery(getContainer());
 		query.doQuery(cert);
 		return query.getCurrentVersions();
@@ -75,7 +75,7 @@ public class MigrationsHandler extends StrolchComponent {
 		Migrations migrations = new Migrations(getContainer(), getContainer().getRealmNames(), this.verbose);
 		migrations.parseMigrations(this.migrationsPath);
 
-		Map<String, Version> currentVersions = getCurrentVersions(cert);
+		Map<String, MigrationVersion> currentVersions = getCurrentVersions(cert);
 		this.migrations = migrations;
 		return this.migrations.getMigrationsToRun(currentVersions);
 	}
@@ -87,12 +87,12 @@ public class MigrationsHandler extends StrolchComponent {
 		Migrations migrations = new Migrations(getContainer(), getContainer().getRealmNames(), this.verbose);
 		migrations.parseMigrations(this.migrationsPath);
 
-		Map<String, Version> currentVersions = getCurrentVersions(cert);
+		Map<String, MigrationVersion> currentVersions = getCurrentVersions(cert);
 		this.migrations.runMigrations(cert, currentVersions);
 	}
 
 	public void runCodeMigrations(Certificate cert, MapOfLists<String, CodeMigration> codeMigrationsByRealm) {
-		Map<String, Version> currentVersions = getCurrentVersions(cert);
+		Map<String, MigrationVersion> currentVersions = getCurrentVersions(cert);
 		Migrations migrations = new Migrations(getContainer(), getContainer().getRealmNames(), this.verbose);
 		this.migrations = migrations;
 		migrations.runCodeMigrations(cert, currentVersions, codeMigrationsByRealm);
@@ -138,7 +138,7 @@ public class MigrationsHandler extends StrolchComponent {
 			QueryCurrentVersionsAction queryAction = new QueryCurrentVersionsAction(query);
 			PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
 			privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, queryAction);
-			Map<String, Version> currentVersions = query.getCurrentVersions();
+			Map<String, MigrationVersion> currentVersions = query.getCurrentVersions();
 
 			RunMigrationsAction action = new RunMigrationsAction(this.migrations, currentVersions);
 
@@ -185,7 +185,7 @@ public class MigrationsHandler extends StrolchComponent {
 			QueryCurrentVersionsAction queryAction = new QueryCurrentVersionsAction(query);
 			PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
 			privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, queryAction);
-			Map<String, Version> currentVersions = query.getCurrentVersions();
+			Map<String, MigrationVersion> currentVersions = query.getCurrentVersions();
 
 			MigrationsHandler.this.migrations = migrations;
 			if (migrations.getMigrationsToRun(currentVersions).isEmpty()) {

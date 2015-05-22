@@ -70,10 +70,10 @@ public class MigrationsTest {
 	public void shouldRunMigrations() {
 
 		MigrationsHandler migrationsHandler = runtimeMock.getContainer().getComponent(MigrationsHandler.class);
-		Map<String, Version> currentVersions = migrationsHandler.getCurrentVersions(certificate);
+		Map<String, MigrationVersion> currentVersions = migrationsHandler.getCurrentVersions(certificate);
 		String defRealm = StrolchConstants.DEFAULT_REALM;
-		assertEquals("1.1.1", currentVersions.get(defRealm).toString());
-		assertEquals("0.0.0", currentVersions.get("other").toString());
+		assertEquals("1.1.1", currentVersions.get(defRealm).getDataVersion().toString());
+		assertEquals("0.0.0", currentVersions.get("other").getCodeVersion().toString());
 
 		MapOfLists<String, Version> lastMigrations = migrationsHandler.getLastMigrations();
 		List<Version> expectedMigrations = Arrays.asList(Version.valueOf("0.1.0"), Version.valueOf("0.1.1"),
@@ -86,8 +86,8 @@ public class MigrationsTest {
 
 		// assert new current version
 		currentVersions = migrationsHandler.getCurrentVersions(certificate);
-		assertEquals("1.1.1", currentVersions.get(defRealm).toString());
-		assertEquals("0.0.0", currentVersions.get("other").toString());
+		assertEquals("1.1.1", currentVersions.get(defRealm).getDataVersion().toString());
+		assertEquals("0.0.0", currentVersions.get("other").getCodeVersion().toString());
 
 		MapOfLists<String, CodeMigration> codeMigrationsByRealm = new MapOfLists<>();
 		// add migrations in wrong sequence - should be fixed by migration handler
@@ -98,13 +98,13 @@ public class MigrationsTest {
 
 		lastMigrations = migrationsHandler.getLastMigrations();
 		assertEquals(1, lastMigrations.keySet().size());
-		assertEquals(Arrays.asList(Version.valueOf("1.2.0"), Version.valueOf("1.2.0.a")),
+		assertEquals(Arrays.asList(Version.valueOf("1.0.0"),Version.valueOf("1.2.0"), Version.valueOf("1.2.0.a")),
 				lastMigrations.getList(defRealm));
 
 		// assert new current version
 		currentVersions = migrationsHandler.getCurrentVersions(certificate);
-		assertEquals("1.2.0.a", currentVersions.get(defRealm).toString());
-		assertEquals("0.0.0", currentVersions.get("other").toString());
+		assertEquals("1.2.0.a", currentVersions.get(defRealm).getCodeVersion().toString());
+		assertEquals("0.0.0", currentVersions.get("other").getDataVersion().toString());
 	}
 
 	private static class MyMigration0 extends CodeMigration {
@@ -148,7 +148,7 @@ public class MigrationsTest {
 
 			try (StrolchTransaction tx = openTx(container, cert)) {
 
-				Order fooOrder = ModelGenerator.createOrder("foo", "Foo", "Foo");
+				Order fooOrder = ModelGenerator.createOrder("foo1", "Foo", "Foo");
 
 				AddOrderCommand addOrderCommand = new AddOrderCommand(container, tx);
 				addOrderCommand.setOrder(fooOrder);

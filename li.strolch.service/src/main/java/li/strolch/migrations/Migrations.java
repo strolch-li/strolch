@@ -81,20 +81,21 @@ public class Migrations {
 			logDetectedMigrations(this.realmNames, this.dataMigrations, this.codeMigrations);
 	}
 
-	public void runMigrations(Certificate certificate, Map<String, Version> currentVersions) {
+	public void runMigrations(Certificate certificate, Map<String, MigrationVersion> currentVersions) {
 
 		MapOfLists<String, Version> migrationsRan = new MapOfLists<>();
 
-		for (Entry<String, Version> entry : currentVersions.entrySet()) {
+		for (Entry<String, MigrationVersion> entry : currentVersions.entrySet()) {
 			String realm = entry.getKey();
-			Version currentVersion = entry.getValue();
+			MigrationVersion currentVersion = entry.getValue();
 
 			if (this.verbose)
 				logger.info("[" + realm + "] Performing all migrations after " + currentVersion);
 
-			Version nextPossibleVersion = currentVersion.add(0, 0, 1);
-			CodeMigration currentCodeMigration = new CodeMigration(realm, nextPossibleVersion, null);
-			DataMigration currentDataMigration = new DataMigration(realm, nextPossibleVersion, null);
+			Version nextPossibleCodeVersion = currentVersion.getCodeVersion().add(0, 0, 1);
+			Version nextPossibleDataVersion = currentVersion.getDataVersion().add(0, 0, 1);
+			CodeMigration currentCodeMigration = new CodeMigration(realm, nextPossibleCodeVersion, null);
+			DataMigration currentDataMigration = new DataMigration(realm, nextPossibleDataVersion, null);
 
 			SortedSet<DataMigration> dataMigrations = this.dataMigrations.get(realm);
 			if (dataMigrations != null && !dataMigrations.isEmpty()) {
@@ -131,7 +132,7 @@ public class Migrations {
 	 * @param cert
 	 * @param codeMigrationsByRealm
 	 */
-	public void runCodeMigrations(Certificate cert, Map<String, Version> currentVersions,
+	public void runCodeMigrations(Certificate cert, Map<String, MigrationVersion> currentVersions,
 			MapOfLists<String, CodeMigration> codeMigrationsByRealm) {
 
 		MapOfLists<String, Version> migrationsRan = new MapOfLists<>();
@@ -142,21 +143,21 @@ public class Migrations {
 			if (!this.realmNames.contains(realm))
 				continue;
 
-			Version currentVersion = currentVersions.get(realm);
+			MigrationVersion currentVersion = currentVersions.get(realm);
 
 			List<CodeMigration> listOfMigrations = codeMigrationsByRealm.getList(realm);
 			SortedSet<CodeMigration> migrations = new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
 			migrations.addAll(listOfMigrations);
 
-			Version nextVersion = currentVersion.add(0, 0, 1);
+			Version nextVersion = currentVersion.getCodeVersion().add(0, 0, 1);
 			CodeMigration nextMigration = new CodeMigration(realm, nextVersion);
 
 			SortedSet<CodeMigration> migrationsToRun = migrations.tailSet(nextMigration);
 			for (CodeMigration migration : migrationsToRun) {
 				DBC.INTERIM.assertEquals("Realms do not match!", realm, migration.getRealm());
 				Version migrateVersion = migration.getVersion();
-				boolean isLaterMigration = migrateVersion.compareTo(currentVersion) > 0;
-				DBC.INTERIM.assertTrue("Current version " + currentVersion + " is not before next " + migrateVersion,
+				boolean isLaterMigration = migrateVersion.compareTo(currentVersion.getCodeVersion()) > 0;
+				DBC.INTERIM.assertTrue("Current version " + currentVersion.getCodeVersion() + " is not before next " + migrateVersion,
 						isLaterMigration);
 
 				String msg = "[{0}] Running code migration {1} {2}";
@@ -264,15 +265,16 @@ public class Migrations {
 		return migrationsByRealm;
 	}
 
-	public MapOfLists<String, Version> getMigrationsToRun(Map<String, Version> currentVersions) {
+	public MapOfLists<String, Version> getMigrationsToRun(Map<String, MigrationVersion> currentVersions) {
 
 		MapOfLists<String, Version> migrationsToRun = new MapOfLists<>();
 
-		for (Entry<String, Version> entry : currentVersions.entrySet()) {
+		for (Entry<String, MigrationVersion> entry : currentVersions.entrySet()) {
 			String realm = entry.getKey();
-			Version nextPossibleVersion = entry.getValue().add(0, 0, 1);
-			CodeMigration currentCodeMigration = new CodeMigration(realm, nextPossibleVersion, null);
-			DataMigration currentDataMigration = new DataMigration(realm, nextPossibleVersion, null);
+			Version nextPossibleCodeVersion = entry.getValue().getCodeVersion().add(0, 0, 1);
+			Version nextPossibleDataVersion = entry.getValue().getDataVersion().add(0, 0, 1);
+			CodeMigration currentCodeMigration = new CodeMigration(realm, nextPossibleCodeVersion, null);
+			DataMigration currentDataMigration = new DataMigration(realm, nextPossibleDataVersion, null);
 
 			SortedSet<CodeMigration> allCodeMigrations = this.codeMigrations.get(realm);
 			if (allCodeMigrations != null) {
