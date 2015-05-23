@@ -44,6 +44,8 @@ public class Tags {
 	
 	public static final String ACTIVITY = "Activity";
 	public static final String ACTION = "Action";
+	public static final String START = "Start";
+	public static final String END = "End";
 
 	public class Audit {
 		public static final String ID = Tags.ID;

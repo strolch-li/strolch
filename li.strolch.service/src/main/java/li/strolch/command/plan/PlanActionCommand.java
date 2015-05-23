@@ -68,14 +68,8 @@ public class PlanActionCommand extends Command {
 		
 		tx().lock(resource); 
 
-		final List<IValueChange<?>> startChanges = action.getStartChanges();
+		final List<IValueChange<?>> startChanges = action.getChanges();
 		for (IValueChange<?> change : startChanges) {
-			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
-			timedState.applyChange(change);
-		}
-
-		final List<IValueChange<?>> endChanges = action.getEndChanges();
-		for (IValueChange<?> change : endChanges) {
 			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change);
 		}
@@ -91,17 +85,12 @@ public class PlanActionCommand extends Command {
 		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId()).build();
 		Resource resource = tx().findElement(locator);
 
-		final List<IValueChange<?>> startChanges = action.getStartChanges();
+		final List<IValueChange<?>> startChanges = action.getChanges();
 		for (IValueChange<?> change : startChanges) {
 			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change.getInverse());
 		}
-
-		final List<IValueChange<?>> endChanges = action.getEndChanges();
-		for (IValueChange<?> change : endChanges) {
-			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
-			timedState.applyChange(change.getInverse());
-		}
+		
 		// finally set the action state
 		action.setState(State.CREATED);
 	}

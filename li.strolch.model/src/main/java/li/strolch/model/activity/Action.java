@@ -11,6 +11,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags;
 import li.strolch.model.timevalue.IValueChange;
 
 import org.w3c.dom.Document;
@@ -28,52 +29,15 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	protected static final long serialVersionUID = 1L;
 
-	protected Long start;
-	protected Long end;
-
+	protected Activity parent;
 	protected String resourceId;
-
-	protected final List<IValueChange<?>> startChanges = new ArrayList<>();
-	protected final List<IValueChange<?>> endChanges = new ArrayList<>();
-
+	private String resourceType;
 	protected State state = State.CREATED;
 
-	protected Activity parent;
-
-	private String resourceType;
+	protected final List<IValueChange<?>> changes = new ArrayList<>();
 
 	public Action(String id, String name, String type) {
 		super(id, name, type);
-	}
-
-	/**
-	 * @return the action start time in unix millisecond time
-	 */
-	public Long getStart() {
-		return start;
-	}
-
-	/**
-	 * @param start
-	 *            the action start time in unix millisecond time
-	 */
-	public void setStart(Long start) {
-		this.start = start;
-	}
-
-	/**
-	 * @return the action end time in unix millisecond time
-	 */
-	public Long getEnd() {
-		return end;
-	}
-
-	/**
-	 * @param end
-	 *            the action end time in unix millisecond time
-	 */
-	public void setEnd(Long end) {
-		this.end = end;
 	}
 
 	/**
@@ -124,44 +88,28 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	/**
 	 * @param add
 	 *            <code>IValueChange</code> to be applied to the
-	 *            <code>Resource</code> to time <code>Action.getStart()<code>
+	 *            <code>Resource</code>
 	 * 
 	 * @return <tt>true</tt> (as specified by {@link Collection#add})
 	 */
-	public boolean addStartChange(IValueChange<?> change) {
-		return startChanges.add(change);
-	}
-
-	/**
-	 * @param change
-	 *            <code>IValueChange</code> to be applied to the
-	 *            <code>Resource</code> at time <code>Action.getEnd()<code>
-	 * @return <tt>true</tt> (as specified by {@link Collection#add})
-	 */
-	public boolean addEndChange(IValueChange<?> change) {
-		return endChanges.add(change);
+	public boolean addChange(IValueChange<?> change) {
+		return changes.add(change);
 	}
 
 	/**
 	 * @return the list of <code>IValueChange</code> attached to the
 	 *         <code>Action</code> start
 	 */
-	public List<IValueChange<?>> getStartChanges() {
-		return startChanges;
-	}
-
-	/**
-	 * @return the list of <code>IValueChange</code> attached to the
-	 *         <code>Action</code> end
-	 */
-	public List<IValueChange<?>> getEndChanges() {
-		return endChanges;
+	public List<IValueChange<?>> getChanges() {
+		return changes;
 	}
 
 	@Override
 	public Element toDom(Document doc) {
-		// TODO Auto-generated method stub
-		return null;
+		Element element = doc.createElement(Tags.ACTION);
+		fillElement(element);
+		element.setAttribute(Tags.STATE, this.state.toString());
+		return element;
 	}
 
 	@Override
@@ -183,16 +131,11 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	public StrolchElement getClone() {
 		Action clone = new Action(getId(), getName(), getType());
 		clone.setDbid(getDbid());
-		clone.setEnd(end);
 		clone.setResourceId(resourceId);
 		clone.setResourceType(resourceType);
-		clone.setStart(start);
 		clone.setState(state);
-		for (IValueChange<?> change : getStartChanges()) {
-			clone.startChanges.add(change.getClone());
-		}
-		for (IValueChange<?> change : getEndChanges()) {
-			clone.endChanges.add(change.getClone());
+		for (IValueChange<?> change : getChanges()) {
+			clone.changes.add(change.getClone());
 		}
 		return clone;
 	}
@@ -223,10 +166,6 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		builder.append(this.resourceId);
 		builder.append(", state=");
 		builder.append(this.state);
-		builder.append(", start=");
-		builder.append(this.start);
-		builder.append(", end=");
-		builder.append(this.end);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -234,6 +173,24 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	@Override
 	public void setParent(Activity activity) {
 		this.parent = activity;
+	}
+
+	@Override
+	public Long getStart() {
+		Long start = Long.MAX_VALUE; 
+		for (IValueChange<?> change : changes){
+			start = Math.min(start, change.getTime()); 
+		}
+		return start; 
+	}
+
+	@Override
+	public Long getEnd() {
+		Long end = 0L; 
+		for (IValueChange<?> change : changes){
+			end = Math.max(end, change.getTime()); 
+		}
+		return end; 
 	}
 
 }

@@ -1,10 +1,5 @@
 package li.strolch.model.activity;
 
-import static li.strolch.model.ModelGenerator.STATE_TIME_10;
-import static li.strolch.model.ModelGenerator.STATE_TIME_20;
-import static li.strolch.model.ModelGenerator.STATE_TIME_30;
-import static li.strolch.model.ModelGenerator.STATE_TIME_40;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.State;
 
@@ -28,8 +23,6 @@ public class ActivityTest {
 
 		// create action 1
 		action_1 = new Action("action_1", "Action 1", "Use");
-		action_1.setStart(STATE_TIME_10);
-		action_1.setEnd(STATE_TIME_20);
 		action_1.setState(State.CREATED);
 
 		activity.addElement(action_1);
@@ -38,16 +31,12 @@ public class ActivityTest {
 
 		// create action 2
 		action_2 = new Action("action_2", "Action 2", "Use");
-		action_2.setStart(STATE_TIME_20);
-		action_2.setEnd(STATE_TIME_30);
 		action_2.setState(State.PLANNED);
 
 		childActivity.addElement(action_2);
 		
 		// create action 3
 		action_3 = new Action("action_3", "Action 3", "Use");
-		action_3.setStart(STATE_TIME_20);
-		action_3.setEnd(STATE_TIME_40);
 		action_3.setState(State.CREATED);
 		
 		childActivity.addElement(action_3);

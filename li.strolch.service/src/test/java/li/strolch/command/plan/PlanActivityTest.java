@@ -8,7 +8,6 @@ import static li.strolch.model.ModelGenerator.STATE_TIME_10;
 import static li.strolch.model.ModelGenerator.STATE_TIME_20;
 import static li.strolch.model.ModelGenerator.STATE_TIME_30;
 import static li.strolch.model.ModelGenerator.STATE_TIME_40;
-
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -80,14 +79,12 @@ public class PlanActivityTest {
 
 		// create action 1
 		action_1 = new Action("action_1", "Action 1", "Use");
-		action_1.setStart(STATE_TIME_10);
-		action_1.setEnd(STATE_TIME_20);
 
 		IntegerParameter iP1 = new IntegerParameter("quantity", "Occupation", 1);
 		action_1.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
 		action_1.addParameter("objective", iP1);
 
-		createChanges(action_1);
+		createChanges(action_1, STATE_TIME_10, STATE_TIME_20);
 
 		action_1.setResourceId(resource_1.getId());
 		action_1.setResourceType(resource_1.getType());
@@ -99,14 +96,12 @@ public class PlanActivityTest {
 
 		// create action 2
 		action_2 = new Action("action_2", "Action 2", "Use");
-		action_2.setStart(STATE_TIME_20);
-		action_2.setEnd(STATE_TIME_30);
 
 		IntegerParameter iP2 = new IntegerParameter("quantity", "Occupation", 1);
 		action_2.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
 		action_2.addParameter("objective", iP2);
 
-		createChanges(action_2);
+		createChanges(action_2, STATE_TIME_20, STATE_TIME_30);
 
 		action_2.setResourceId(resource_2.getId());
 		action_2.setResourceType(resource_2.getType());
@@ -115,14 +110,12 @@ public class PlanActivityTest {
 		
 		// create action 3
 		action_3 = new Action("action_3", "Action 3", "Use");
-		action_3.setStart(STATE_TIME_20);
-		action_3.setEnd(STATE_TIME_40);
 
 		IntegerParameter iP3 = new IntegerParameter("quantity", "Occupation", 1);
 		action_3.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
 		action_3.addParameter("objective", iP3);
 
-		createChanges(action_3);
+		createChanges(action_3, STATE_TIME_20, STATE_TIME_40);
 
 		action_3.setResourceId(resource_3.getId());
 		action_3.setResourceType(resource_3.getType());
@@ -213,18 +206,18 @@ public class PlanActivityTest {
 	 * action objective and set the stateId of the state variable to apply the
 	 * change to
 	 */
-	protected static void createChanges(final Action action) {
+	protected static void createChanges(Action action, Long start, Long end) {
 
 		Parameter<Integer> parameter = action.getParameter("objective", "quantity");
 		Integer quantity = parameter.getValue();
 
-		IValueChange<IntegerValue> startChange = new ValueChange<>(action.getStart(), new IntegerValue(quantity));
+		IValueChange<IntegerValue> startChange = new ValueChange<>(start, new IntegerValue(quantity));
 		startChange.setStateId(STATE_INTEGER_ID);
-		action.addStartChange(startChange);
+		action.addChange(startChange);
 
-		IValueChange<IntegerValue> endChange = new ValueChange<>(action.getEnd(), new IntegerValue(-quantity));
+		IValueChange<IntegerValue> endChange = new ValueChange<>(end, new IntegerValue(-quantity));
 		endChange.setStateId(STATE_INTEGER_ID);
-		action.addEndChange(endChange);
+		action.addChange(endChange);
 
 	}
 

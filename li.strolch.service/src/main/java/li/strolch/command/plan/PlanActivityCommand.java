@@ -66,8 +66,6 @@ public class PlanActivityCommand extends Command {
 	private void validate(Action action) {
 		DBC.PRE.assertNotNull("Action attribute resourceId may not be null!", action.getResourceId());
 		DBC.PRE.assertNotNull("Action attribute resourceType may not be null!", action.getResourceType());
-		DBC.PRE.assertTrue("Action attribute start must be set!", action.getStart() > 0);
-		DBC.PRE.assertTrue("Action attribute end must later than start!", action.getEnd() > action.getStart());
 	}
 
 	private void validate(Activity activity) {
@@ -124,14 +122,8 @@ public class PlanActivityCommand extends Command {
 
 		tx().lock(resource);
 
-		final List<IValueChange<?>> startChanges = action.getStartChanges();
+		final List<IValueChange<?>> startChanges = action.getChanges();
 		for (IValueChange<?> change : startChanges) {
-			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
-			timedState.applyChange(change);
-		}
-
-		final List<IValueChange<?>> endChanges = action.getEndChanges();
-		for (IValueChange<?> change : endChanges) {
 			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change);
 		}
@@ -166,14 +158,8 @@ public class PlanActivityCommand extends Command {
 		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId()).build();
 		Resource resource = tx().findElement(locator);
 
-		final List<IValueChange<?>> startChanges = action.getStartChanges();
+		final List<IValueChange<?>> startChanges = action.getChanges();
 		for (IValueChange<?> change : startChanges) {
-			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
-			timedState.applyChange(change.getInverse());
-		}
-
-		final List<IValueChange<?>> endChanges = action.getEndChanges();
-		for (IValueChange<?> change : endChanges) {
 			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change.getInverse());
 		}

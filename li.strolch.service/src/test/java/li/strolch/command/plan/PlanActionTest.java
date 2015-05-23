@@ -68,8 +68,6 @@ public class PlanActionTest {
 		resource.addTimedState(timedState);
 
 		action = new Action("action_1", "Action 1", "Use");
-		action.setStart(STATE_TIME_10);
-		action.setEnd(STATE_TIME_20);
 
 		Assert.assertEquals(State.CREATED, action.getState());
 
@@ -144,13 +142,13 @@ public class PlanActionTest {
 		Parameter<Integer> parameter = action.getParameter("objective", "quantity");
 		Integer quantity = parameter.getValue();
 
-		IValueChange<IntegerValue> startChange = new ValueChange<>(action.getStart(), new IntegerValue(quantity));
+		IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(quantity));
 		startChange.setStateId(STATE_INTEGER_ID);
-		action.addStartChange(startChange);
+		action.addChange(startChange);
 
-		IValueChange<IntegerValue> endChange = new ValueChange<>(action.getEnd(), new IntegerValue(-quantity));
+		IValueChange<IntegerValue> endChange = new ValueChange<>(STATE_TIME_20, new IntegerValue(-quantity));
 		endChange.setStateId(STATE_INTEGER_ID);
-		action.addEndChange(endChange);
+		action.addChange(endChange);
 	}
 
 }
