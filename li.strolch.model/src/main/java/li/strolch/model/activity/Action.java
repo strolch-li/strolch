@@ -30,8 +30,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	protected static final long serialVersionUID = 1L;
 
 	protected Activity parent;
-	protected String resourceId;
-	private String resourceType;
+	protected String resourceId, resourceType;
 	protected State state = State.CREATED;
 
 	protected final List<IValueChange<?>> changes = new ArrayList<>();
@@ -105,14 +104,6 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
-	public Element toDom(Document doc) {
-		Element element = doc.createElement(Tags.ACTION);
-		fillElement(element);
-		element.setAttribute(Tags.STATE, this.state.toString());
-		return element;
-	}
-
-	@Override
 	public StrolchElement getParent() {
 		return parent;
 	}
@@ -177,20 +168,33 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public Long getStart() {
-		Long start = Long.MAX_VALUE; 
-		for (IValueChange<?> change : changes){
-			start = Math.min(start, change.getTime()); 
+		Long start = Long.MAX_VALUE;
+		for (IValueChange<?> change : changes) {
+			start = Math.min(start, change.getTime());
 		}
-		return start; 
+		return start;
 	}
 
 	@Override
 	public Long getEnd() {
-		Long end = 0L; 
-		for (IValueChange<?> change : changes){
-			end = Math.max(end, change.getTime()); 
+		Long end = 0L;
+		for (IValueChange<?> change : changes) {
+			end = Math.max(end, change.getTime());
 		}
-		return end; 
+		return end;
+	}
+
+	@Override
+	public Element toDom(Document doc) {
+		Element element = doc.createElement(Tags.ACTION);
+		fillElement(element);
+		element.setAttribute(Tags.STATE, this.state.toString());
+		element.setAttribute(Tags.RESOURCE_ID, this.resourceId);
+		element.setAttribute(Tags.RESOURCE_TYPE, this.resourceType);
+		for (IValueChange<?> change : changes) {
+			element.appendChild(change.toDom(doc));
+		}
+		return element;
 	}
 
 }

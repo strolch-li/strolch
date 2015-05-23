@@ -146,7 +146,14 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 
 	@Override
 	public Element toDom(Document doc) {
-		throw new StrolchException("not implemented yet");
+		Element element = doc.createElement(Tags.ACTIVITY);
+		fillElement(element);
+		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
+		while (elementIterator.hasNext()) {
+			IActivityElement activityElement = elementIterator.next().getValue();
+			element.appendChild(activityElement.toDom(doc)); 
+		}
+		return element;
 	}
 
 	@Override
@@ -156,7 +163,7 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 
 	@Override
 	public StrolchRootElement getRootElement() {
-		return (parent == null) ? null : parent.getRootElement();
+		return (parent == null) ? this : parent.getRootElement();
 	}
 
 	@Override

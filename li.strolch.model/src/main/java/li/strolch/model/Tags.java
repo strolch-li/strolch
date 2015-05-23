@@ -46,6 +46,12 @@ public class Tags {
 	public static final String ACTION = "Action";
 	public static final String START = "Start";
 	public static final String END = "End";
+	public static final String VALUE_CHANGE = "ValueChange";
+	public static final String VALUE_CLASS = "Class";
+	public static final String RESOURCE_ID = "ResourceId";
+	public static final String RESOURCE_TYPE = "ResourceType";
+	public static final String STATE_ID = "StateId";
+	
 
 	public class Audit {
 		public static final String ID = Tags.ID;

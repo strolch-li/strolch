@@ -18,6 +18,9 @@ package li.strolch.model.timevalue;
 import li.strolch.model.timedstate.AbstractStrolchTimedState;
 import li.strolch.model.timevalue.impl.TimeVariable;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /**
  * Interface for operators to be used to change the values of {@link ITimeValue}
  * in a {@link ITimeVariable} or {@link AbstractStrolchTimedState}.
@@ -64,5 +67,11 @@ public interface IValueChange<T extends IValue> {
 	 * @return a copy of this
 	 */
 	IValueChange<T> getClone(); 
+	
+	/**
+	 * @param doc
+	 * @return a xml serialisation of this
+	 */
+	Element toDom(Document doc); 
 
 }

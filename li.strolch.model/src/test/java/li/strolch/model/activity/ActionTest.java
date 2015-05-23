@@ -9,7 +9,6 @@ import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -37,6 +36,8 @@ public class ActionTest {
 	public void init() {
 		// create action
 		action = new Action("action_1", "Action 1", "Use");
+		action.setResourceId("dummyRe");
+		action.setResourceType("dummyReType");
 		
 		IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(1));
 		startChange.setStateId(STATE_INTEGER_ID);
@@ -71,18 +72,15 @@ public class ActionTest {
 	@Test
 	public void testToDOM() throws ParserConfigurationException, TransformerException {
 		
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
+		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = db.newDocument(); 
 		Element dom = action.toDom(document);
 		document.appendChild(dom); 
 		
-		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer transformer = tf.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-		StringWriter writer = new StringWriter();
-		transformer.transform(new DOMSource(document), new StreamResult(writer));
-		String content = writer.getBuffer().toString();
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		StringWriter stringWriter = new StringWriter();
+		transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
+		String content = stringWriter.getBuffer().toString();
 		System.out.println(content);
 		
 	}

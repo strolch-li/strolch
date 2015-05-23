@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Activity Id="activity" Name="Activity" Type="parentType">
+  <Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="CREATED" Type="Use" />
+  <Activity Id="child_activity" Name="Child Activity" Type="childType">
+    <Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="PLANNED" Type="Use" />
+    <Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="CREATED" Type="Use" />
+  </Activity>
+</Activity>

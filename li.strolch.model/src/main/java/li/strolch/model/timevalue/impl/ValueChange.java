@@ -17,8 +17,14 @@ package li.strolch.model.timevalue.impl;
 
 import java.io.Serializable;
 
+import li.strolch.model.Tags;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Martin Smock <smock.martin@gmail.com>
@@ -146,6 +152,16 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	@Override
 	public IValueChange<T> getClone() {
 		return new ValueChange(time, value);
+	}
+
+	@Override
+	public Element toDom(Document doc) {
+		Element element = doc.createElement(Tags.VALUE_CHANGE);
+		element.setAttribute(Tags.STATE_ID, this.stateId);
+		element.setAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(time));
+		element.setAttribute(Tags.VALUE, this.value.getValueAsString());
+		element.setAttribute(Tags.VALUE_CLASS, this.value.getClass().getName());
+		return element;
 	}
 
 }
