@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Martin Smock <smock.martin@gmail.com>
+ * Copyright 2015 Martin Smock <martin.smock@bluewin.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
