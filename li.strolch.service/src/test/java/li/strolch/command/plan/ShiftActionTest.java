@@ -21,6 +21,7 @@ import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_10;
 import static li.strolch.model.ModelGenerator.STATE_TIME_20;
+import static li.strolch.model.ModelGenerator.STATE_TIME_30;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,17 +54,19 @@ import org.junit.Test;
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public class PlanActionTest {
+public class ShiftActionTest {
 
-	private Resource resource;
-	private Action action;
+	Resource resource;
+	Action action;
+	IntegerTimedState timedState;
+	StrolchTransaction tx;
 
 	@Before
 	public void init() {
 
 		// add a resource with integer state variable
 		resource = ModelGenerator.createResource("@1", "Test With States", "Stated");
-		final IntegerTimedState timedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
+		timedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
 		timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 		resource.addTimedState(timedState);
 
@@ -79,18 +82,24 @@ public class PlanActionTest {
 
 		action.setResourceId(resource.getId());
 		action.setResourceType(resource.getType());
-	}
 
-	@Test
-	public void test() {
-
-		final StrolchTransaction tx = mock(StrolchTransaction.class);
+		tx = mock(StrolchTransaction.class);
 
 		final Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
 		when(tx.findElement(eq(locator))).thenReturn(resource);
 
 		final PlanActionCommand cmd = new PlanActionCommand(null, tx);
 		cmd.setAction(action);
+		cmd.doCommand();
+
+	}
+
+	@Test
+	public void test() {
+
+		final ShiftActionCommand cmd = new ShiftActionCommand(null, tx);
+		cmd.setAction(action);
+		cmd.setShift(10L);
 		cmd.doCommand();
 
 		// check the state
@@ -102,7 +111,7 @@ public class PlanActionTest {
 		// check if we get the expected result
 		final StrolchTimedState<IValue<Integer>> timedState = resource.getTimedState(STATE_INTEGER_ID);
 		final ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
-		SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
+		final SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
 
 		Assert.assertEquals(3, values.size());
 
@@ -110,21 +119,24 @@ public class PlanActionTest {
 		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
 
 		valueAt = timeEvolution.getValueAt(STATE_TIME_10);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
+
+		valueAt = timeEvolution.getValueAt(STATE_TIME_20);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(1)));
+
+		valueAt = timeEvolution.getValueAt(STATE_TIME_30);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
+
+		// check the undo functionality
+		cmd.undo();
+
+		valueAt = timeEvolution.getValueAt(STATE_TIME_0);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
+
+		valueAt = timeEvolution.getValueAt(STATE_TIME_10);
 		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(1)));
 
 		valueAt = timeEvolution.getValueAt(STATE_TIME_20);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
-
-		// call undo to clean up
-		cmd.undo();
-
-		Assert.assertEquals(State.CREATED, action.getState());
-
-		// and check again
-		values = timeEvolution.getValues();
-		Assert.assertEquals(1, values.size());
-
-		valueAt = timeEvolution.getValueAt(STATE_TIME_0);
 		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
 
 	}

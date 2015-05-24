@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Martin Smock <martin.smock@bluewin.ch>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package li.strolch.command.plan;
 
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
@@ -49,6 +64,7 @@ public class PlanActivityTest {
 	Resource resource_1, resource_2, resource_3;
 	IntegerTimedState timedState_1, timedState_2, timedState_3;
 	Action action_1, action_2, action_3;
+	StrolchTransaction tx;
 
 	/**
 	 * initialize the resources with states and the activity with 2 actions.
@@ -67,7 +83,7 @@ public class PlanActivityTest {
 		timedState_2 = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
 		timedState_2.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 		resource_2.addTimedState(timedState_2);
-		
+
 		// create resource with integer state
 		resource_3 = ModelGenerator.createResource("@3", "Test With States 3", "Stated");
 		timedState_3 = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
@@ -80,7 +96,7 @@ public class PlanActivityTest {
 		// create action 1
 		action_1 = new Action("action_1", "Action 1", "Use");
 
-		IntegerParameter iP1 = new IntegerParameter("quantity", "Occupation", 1);
+		final IntegerParameter iP1 = new IntegerParameter("quantity", "Occupation", 1);
 		action_1.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
 		action_1.addParameter("objective", iP1);
 
@@ -90,14 +106,14 @@ public class PlanActivityTest {
 		action_1.setResourceType(resource_1.getType());
 
 		activity.addElement(action_1);
-		
-		// create child activity 
+
+		// create child activity
 		childActivity = new Activity("childActivity", "Child Activity", "childType");
 
 		// create action 2
 		action_2 = new Action("action_2", "Action 2", "Use");
 
-		IntegerParameter iP2 = new IntegerParameter("quantity", "Occupation", 1);
+		final IntegerParameter iP2 = new IntegerParameter("quantity", "Occupation", 1);
 		action_2.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
 		action_2.addParameter("objective", iP2);
 
@@ -107,11 +123,11 @@ public class PlanActivityTest {
 		action_2.setResourceType(resource_2.getType());
 
 		childActivity.addElement(action_2);
-		
+
 		// create action 3
 		action_3 = new Action("action_3", "Action 3", "Use");
 
-		IntegerParameter iP3 = new IntegerParameter("quantity", "Occupation", 1);
+		final IntegerParameter iP3 = new IntegerParameter("quantity", "Occupation", 1);
 		action_3.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
 		action_3.addParameter("objective", iP3);
 
@@ -121,10 +137,21 @@ public class PlanActivityTest {
 		action_3.setResourceType(resource_3.getType());
 
 		childActivity.addElement(action_3);
-		
-		activity.addElement(childActivity); 
+
+		activity.addElement(childActivity);
 
 		Assert.assertEquals(2, activity.getElements().size());
+
+		tx = mock(StrolchTransaction.class);
+
+		final Locator locator1 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
+		when(tx.findElement(eq(locator1))).thenReturn(resource_1);
+
+		final Locator locator2 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@2").build();
+		when(tx.findElement(eq(locator2))).thenReturn(resource_2);
+
+		final Locator locator3 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@3").build();
+		when(tx.findElement(eq(locator3))).thenReturn(resource_3);
 
 	}
 
@@ -134,18 +161,7 @@ public class PlanActivityTest {
 	@Test
 	public void test() {
 
-		StrolchTransaction tx = mock(StrolchTransaction.class);
-
-		Locator locator1 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
-		when(tx.findElement(eq(locator1))).thenReturn(resource_1);
-
-		Locator locator2 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@2").build();
-		when(tx.findElement(eq(locator2))).thenReturn(resource_2);
-
-		Locator locator3 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@3").build();
-		when(tx.findElement(eq(locator3))).thenReturn(resource_3);
-		
-		PlanActivityCommand planActivityCommand = new PlanActivityCommand(null, tx);
+		final PlanActivityCommand planActivityCommand = new PlanActivityCommand(null, tx);
 		planActivityCommand.setActivity(activity);
 		planActivityCommand.doCommand();
 
@@ -154,8 +170,8 @@ public class PlanActivityTest {
 		Assert.assertEquals(State.PLANNED, action_2.getState());
 
 		// check the resource states
-		StrolchTimedState<IValue<Integer>> timedState_1 = resource_1.getTimedState(STATE_INTEGER_ID);
-		ITimeVariable<IValue<Integer>> timeEvolution_1 = timedState_1.getTimeEvolution();
+		final StrolchTimedState<IValue<Integer>> timedState_1 = resource_1.getTimedState(STATE_INTEGER_ID);
+		final ITimeVariable<IValue<Integer>> timeEvolution_1 = timedState_1.getTimeEvolution();
 		SortedSet<ITimeValue<IValue<Integer>>> values_1 = timeEvolution_1.getValues();
 
 		Assert.assertEquals(3, values_1.size());
@@ -170,8 +186,8 @@ public class PlanActivityTest {
 		Assert.assertEquals(true, valueAt_1.getValue().equals(new IntegerValue(0)));
 
 		// the second resource
-		StrolchTimedState<IValue<Integer>> timedState_2 = resource_2.getTimedState(STATE_INTEGER_ID);
-		ITimeVariable<IValue<Integer>> timeEvolution_2 = timedState_2.getTimeEvolution();
+		final StrolchTimedState<IValue<Integer>> timedState_2 = resource_2.getTimedState(STATE_INTEGER_ID);
+		final ITimeVariable<IValue<Integer>> timeEvolution_2 = timedState_2.getTimeEvolution();
 		SortedSet<ITimeValue<IValue<Integer>>> values_2 = timeEvolution_2.getValues();
 
 		Assert.assertEquals(3, values_2.size());
@@ -208,14 +224,14 @@ public class PlanActivityTest {
 	 */
 	protected static void createChanges(Action action, Long start, Long end) {
 
-		Parameter<Integer> parameter = action.getParameter("objective", "quantity");
-		Integer quantity = parameter.getValue();
+		final Parameter<Integer> parameter = action.getParameter("objective", "quantity");
+		final Integer quantity = parameter.getValue();
 
-		IValueChange<IntegerValue> startChange = new ValueChange<>(start, new IntegerValue(quantity));
+		final IValueChange<IntegerValue> startChange = new ValueChange<>(start, new IntegerValue(quantity));
 		startChange.setStateId(STATE_INTEGER_ID);
 		action.addChange(startChange);
 
-		IValueChange<IntegerValue> endChange = new ValueChange<>(end, new IntegerValue(-quantity));
+		final IValueChange<IntegerValue> endChange = new ValueChange<>(end, new IntegerValue(-quantity));
 		endChange.setStateId(STATE_INTEGER_ID);
 		action.addChange(endChange);
 

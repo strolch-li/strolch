@@ -16,15 +16,10 @@
 package li.strolch.command.plan;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map.Entry;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Locator;
 import li.strolch.model.Resource;
-import li.strolch.model.State;
-import li.strolch.model.Tags;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -45,7 +40,7 @@ import ch.eitchnet.utils.dbc.DBC;
  * 
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public class PlanActivityCommand extends Command {
+public class PlanActivityCommand extends AbstractPlanCommand {
 
 	protected Activity activity;
 
@@ -53,7 +48,7 @@ public class PlanActivityCommand extends Command {
 	 * @param container
 	 * @param tx
 	 */
-	public PlanActivityCommand(ComponentContainer container, StrolchTransaction tx) {
+	public PlanActivityCommand(final ComponentContainer container, final StrolchTransaction tx) {
 		super(container, tx);
 	}
 
@@ -63,15 +58,15 @@ public class PlanActivityCommand extends Command {
 		validate(activity);
 	}
 
-	private void validate(Action action) {
+	private void validate(final Action action) {
 		DBC.PRE.assertNotNull("Action attribute resourceId may not be null!", action.getResourceId());
 		DBC.PRE.assertNotNull("Action attribute resourceType may not be null!", action.getResourceType());
 	}
 
-	private void validate(Activity activity) {
-		Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
+	private void validate(final Activity activity) {
+		final Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
 		while (elementIterator.hasNext()) {
-			IActivityElement activityElement = elementIterator.next().getValue();
+			final IActivityElement activityElement = elementIterator.next().getValue();
 			if (activityElement instanceof Activity)
 				validate((Activity) activityElement);
 			else if (activityElement instanceof Action)
@@ -86,85 +81,10 @@ public class PlanActivityCommand extends Command {
 		plan(activity);
 	}
 
-	/**
-	 * plan an {@link Activity} by navigating to the {#link Action} and
-	 * delegating the planning depending on the {@link IActivityElement} class.
-	 */
-	private void plan(Activity activity) {
-
-		Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
-
-		while (elementIterator.hasNext()) {
-			IActivityElement activityElement = elementIterator.next().getValue();
-			if (activityElement instanceof Activity)
-				plan((Activity) activityElement);
-			else if (activityElement instanceof Action)
-				plan((Action) activityElement);
-		}
-	}
-
-	/**
-	 * plan an {@link Action}.It iterates the {@link IValueChange} operators and
-	 * registers the changes on the {@link StrolchTimedState} objects assigned
-	 * to the {@link Resource} referenced by type and id.
-	 * 
-	 * @param action
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void plan(Action action) {
-
-		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId()).build();
-		Resource resource = tx().findElement(locator);
-
-		if (resource == null)
-			throw new StrolchException("Resource with " + locator + " referenced by " + action.getLocator()
-					+ " cannot be null!");
-
-		tx().lock(resource);
-
-		final List<IValueChange<?>> startChanges = action.getChanges();
-		for (IValueChange<?> change : startChanges) {
-			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
-			timedState.applyChange(change);
-		}
-
-		action.setState(State.PLANNED);
-	}
-
 	@Override
 	public void undo() {
 		tx().lock(activity);
-		unplanActivity(activity);
-	}
-
-	private void unplanActivity(Activity activity) {
-
-		Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
-		while (elementIterator.hasNext()) {
-
-			IActivityElement activityElement = elementIterator.next().getValue();
-
-			if (activityElement instanceof Activity)
-				unplanActivity((Activity) activityElement);
-			else if (activityElement instanceof Action)
-				unplanAction((Action) activityElement);
-
-		}
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void unplanAction(Action action) {
-
-		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId()).build();
-		Resource resource = tx().findElement(locator);
-
-		final List<IValueChange<?>> startChanges = action.getChanges();
-		for (IValueChange<?> change : startChanges) {
-			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
-			timedState.applyChange(change.getInverse());
-		}
-
-		action.setState(State.CREATED);
+		unplan(activity);
 	}
 
 	public void setActivity(Activity activity) {

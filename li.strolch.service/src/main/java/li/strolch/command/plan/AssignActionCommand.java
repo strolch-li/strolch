@@ -18,30 +18,27 @@ package li.strolch.command.plan;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Action;
-import li.strolch.model.timedstate.StrolchTimedState;
-import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.service.api.Command;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
- * Command to plan an {@link Action} to a {@link Resource}. This {@link Command}
- * assumes that the {@link IValueChange} objects of the action are already
- * constructed. It iterates the {@link IValueChange} operators and registers the
- * resulting changes on the {@link StrolchTimedState} objects assigned to the
- * {@link Resource}.
+ * Command to assign an {@link Action} to a new {@link Resource}.
  * 
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public class PlanActionCommand extends AbstractPlanCommand {
+public class AssignActionCommand extends PlanActionCommand {
 
-	protected Action action;
+	private String targetResourceType;
+	private String targetResourceId;
+
+	private String initialResourceType;
+	private String initialResourceId;
 
 	/**
 	 * @param container
 	 * @param tx
 	 */
-	public PlanActionCommand(final ComponentContainer container, final StrolchTransaction tx) {
+	public AssignActionCommand(final ComponentContainer container, final StrolchTransaction tx) {
 		super(container, tx);
 	}
 
@@ -50,21 +47,52 @@ public class PlanActionCommand extends AbstractPlanCommand {
 		DBC.PRE.assertNotNull("Action may not be null!", this.action);
 		DBC.PRE.assertNotNull("Action attribute resourceId may not be null!", action.getResourceId());
 		DBC.PRE.assertNotNull("Action attribute resourceType may not be null!", action.getResourceType());
+		DBC.PRE.assertNotNull("Target resourceId may not be null!", targetResourceId);
+		DBC.PRE.assertNotNull("Target resourceType may not be null!", targetResourceType);
 	}
 
 	@Override
 	public void doCommand() {
+
 		validate();
+
+		// bookkeeping for undo
+		initialResourceId = action.getResourceId();
+		initialResourceType = action.getResourceType();
+
+		// unplan the action
+		unplan(action);
+
+		// set target resource
+		action.setResourceId(targetResourceId);
+		action.setResourceType(targetResourceType);
+
+		// finally plan the action to the assigned resource
 		plan(action);
 	}
 
 	@Override
 	public void undo() {
+
+		validate();
+
+		// unplan the action
 		unplan(action);
+
+		// set target resource
+		action.setResourceId(initialResourceId);
+		action.setResourceType(initialResourceType);
+
+		// finally plan the action
+		plan(action);
 	}
 
-	public void setAction(Action action) {
-		this.action = action;
+	public void setTargetResourceType(String type) {
+		this.targetResourceType = type;
+	}
+
+	public void setTargetResourceId(String id) {
+		this.targetResourceId = id;
 	}
 
 }
