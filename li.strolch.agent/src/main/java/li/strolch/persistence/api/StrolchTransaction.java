@@ -479,7 +479,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @param locator
 	 *            the locator defining the path to the element which is to be found
 	 * 
-	 * @return the element described by the locator
+	 * @return the element described by the locator. If {@link Locator} references an element which does not exist, i.e.
+	 *         an inexistant {@link Resource} or an inexistand {@link Parameter} on a Resource, then a
+	 *         {@link StrolchException} is thrown
 	 * 
 	 * @throws StrolchException
 	 *             if the element could not be found
