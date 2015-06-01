@@ -65,6 +65,13 @@ public class ServiceResult implements Serializable {
 	}
 
 	/**
+	 * @return true if the state is NOT {@link ServiceResultState#SUCCESS}
+	 */
+	public boolean isNok() {
+		return this.state != ServiceResultState.SUCCESS;
+	}
+
+	/**
 	 * @return the state
 	 */
 	public ServiceResultState getState() {
