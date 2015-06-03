@@ -259,7 +259,7 @@ public class PrivilegeTest {
 	public void testPerformSystemRestrictableFailPrivilege() throws Exception {
 		this.exception.expect(PrivilegeException.class);
 		this.exception
-				.expectMessage("User system_admin does not have Privilege ch.eitchnet.privilege.test.model.TestSystemUserActionDeny");
+				.expectMessage("User system_admin does not have the privilege ch.eitchnet.privilege.handler.SystemUserAction");
 		try {
 			// create the action to be performed as a system user
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
@@ -278,7 +278,7 @@ public class PrivilegeTest {
 	public void testPerformSystemRestrictableFailNoAdditionalPrivilege() throws Exception {
 		this.exception.expect(PrivilegeException.class);
 		this.exception
-				.expectMessage("User system_admin2 does not have the privilege ch.eitchnet.privilege.test.model.TestRestrictable");
+				.expectMessage("User system_admin2 does not have the privilege ch.eitchnet.privilege.handler.SystemUserAction needed for Restrictable ch.eitchnet.privilege.test.model.TestSystemUserActionDeny");
 		try {
 			// create the action to be performed as a system user
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
@@ -429,7 +429,7 @@ public class PrivilegeTest {
 	@Test
 	public void shouldDetectPrivilegeConflict1() {
 		exception.expect(PrivilegeException.class);
-		exception.expectMessage("User has conflicts for privilege ");
+		exception.expectMessage("User admin has conflicts for privilege ");
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Certificate certificate = this.ctx.getCertificate();
@@ -444,7 +444,7 @@ public class PrivilegeTest {
 	@Test
 	public void shouldDetectPrivilegeConflict2() {
 		exception.expect(PrivilegeException.class);
-		exception.expectMessage("User has conflicts for privilege ");
+		exception.expectMessage("User admin has conflicts for privilege ");
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Certificate certificate = this.ctx.getCertificate();

@@ -35,7 +35,6 @@
 			<Locale>en_GB</Locale>
 			<Roles>
 				<Role>system_admin_privileges</Role>
-				<Role>system_admin_privileges2</Role>
 			</Roles>
 		</User>
 
@@ -113,22 +112,17 @@
 		</Role>
 
 		<Role name="system_admin_privileges">
-			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemUserAction" policy="DefaultPrivilege">
-				<AllAllowed>true</AllAllowed>
+			<Privilege name="ch.eitchnet.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
+				<Allow>ch.eitchnet.privilege.test.model.TestSystemUserAction</Allow>
+				<Deny>ch.eitchnet.privilege.test.model.TestSystemUserActionDeny</Deny>
 			</Privilege>
 			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemRestrictable" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>
 
-		<Role name="system_admin_privileges2">
-			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemUserActionDeny" policy="DefaultPrivilege">
-				<AllAllowed>true</AllAllowed>
-			</Privilege>
-		</Role>
-
 		<Role name="restrictedRole">
-			<Privilege name="ch.eitchnet.privilege.test.model.TestSystemUserAction" policy="DefaultPrivilege">
+			<Privilege name="ch.eitchnet.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
 				<Allow>hello</Allow>
 				<Deny>goodbye</Deny>
 			</Privilege>

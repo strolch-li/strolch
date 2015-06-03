@@ -17,6 +17,7 @@ package ch.eitchnet.privilege.handler;
 
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeContext;
+import ch.eitchnet.privilege.model.Restrictable;
 
 /**
  * With this interface system actions, which are to be performed in an automated fashion, i.e. by cron jobs, can be
@@ -25,7 +26,17 @@ import ch.eitchnet.privilege.model.PrivilegeContext;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface SystemUserAction {
+public abstract class SystemUserAction implements Restrictable {
+
+	@Override
+	public String getPrivilegeName() {
+		return SystemUserAction.class.getName();
+	}
+
+	@Override
+	public Object getPrivilegeValue() {
+		return this.getClass().getName();
+	}
 
 	/**
 	 * This method will be called by the {@link PrivilegeHandler} when an authorized {@link Certificate} has been
@@ -37,5 +48,5 @@ public interface SystemUserAction {
 	 * @param privilegeContext
 	 *            the {@link PrivilegeContext} which was generated for a valid system user
 	 */
-	public void execute(PrivilegeContext privilegeContext);
+	public abstract void execute(PrivilegeContext privilegeContext);
 }

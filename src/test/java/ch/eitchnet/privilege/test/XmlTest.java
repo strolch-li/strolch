@@ -170,7 +170,7 @@ public class XmlTest {
 		assertNotNull(roles);
 
 		assertEquals(3, users.size());
-		assertEquals(7, roles.size());
+		assertEquals(6, roles.size());
 
 		// assert model
 
@@ -249,16 +249,16 @@ public class XmlTest {
 		assertEquals(2, systemAdminPrivileges.getPrivilegeNames().size());
 		assertThat(
 				systemAdminPrivileges.getPrivilegeNames(),
-				containsInAnyOrder("ch.eitchnet.privilege.test.model.TestSystemUserAction",
+				containsInAnyOrder("ch.eitchnet.privilege.handler.SystemUserAction",
 						"ch.eitchnet.privilege.test.model.TestSystemRestrictable"));
 
 		IPrivilege testSystemUserAction = systemAdminPrivileges
-				.getPrivilege("ch.eitchnet.privilege.test.model.TestSystemUserAction");
-		assertEquals("ch.eitchnet.privilege.test.model.TestSystemUserAction", testSystemUserAction.getName());
+				.getPrivilege("ch.eitchnet.privilege.handler.SystemUserAction");
+		assertEquals("ch.eitchnet.privilege.handler.SystemUserAction", testSystemUserAction.getName());
 		assertEquals("DefaultPrivilege", testSystemUserAction.getPolicy());
-		assertTrue(testSystemUserAction.isAllAllowed());
-		assertEquals(0, testSystemUserAction.getAllowList().size());
-		assertEquals(0, testSystemUserAction.getDenyList().size());
+		assertFalse(testSystemUserAction.isAllAllowed());
+		assertEquals(1, testSystemUserAction.getAllowList().size());
+		assertEquals(1, testSystemUserAction.getDenyList().size());
 
 		IPrivilege testSystemRestrictable = systemAdminPrivileges
 				.getPrivilege("ch.eitchnet.privilege.test.model.TestSystemRestrictable");
@@ -273,11 +273,11 @@ public class XmlTest {
 		assertEquals("restrictedRole", restrictedRole.getName());
 		assertEquals(1, restrictedRole.getPrivilegeNames().size());
 		assertThat(restrictedRole.getPrivilegeNames(),
-				containsInAnyOrder("ch.eitchnet.privilege.test.model.TestSystemUserAction"));
+				containsInAnyOrder("ch.eitchnet.privilege.handler.SystemUserAction"));
 
 		IPrivilege testSystemUserAction2 = restrictedRole
-				.getPrivilege("ch.eitchnet.privilege.test.model.TestSystemUserAction");
-		assertEquals("ch.eitchnet.privilege.test.model.TestSystemUserAction", testSystemUserAction2.getName());
+				.getPrivilege("ch.eitchnet.privilege.handler.SystemUserAction");
+		assertEquals("ch.eitchnet.privilege.handler.SystemUserAction", testSystemUserAction2.getName());
 		assertEquals("DefaultPrivilege", testSystemUserAction2.getPolicy());
 		assertFalse(testSystemUserAction2.isAllAllowed());
 		assertEquals(1, testSystemUserAction2.getAllowList().size());

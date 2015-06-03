@@ -1374,8 +1374,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					privilegeNames.put(privilegeName, roleName);
 				} else {
 					String roleOrigin = privilegeNames.get(privilegeName);
-					String msg = "User has conflicts for privilege {0} on roles {1} and {2}";
-					msg = MessageFormat.format(msg, privilegeName, roleOrigin, roleName);
+					String msg = "User {0} has conflicts for privilege {1} on roles {2} and {3}";
+					msg = MessageFormat.format(msg, user.getUsername(), privilegeName, roleOrigin, roleName);
 					conflicts.add(msg);
 				}
 			}
@@ -1434,12 +1434,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (systemUser.getUserState() != UserState.SYSTEM)
 			throw new PrivilegeException(MessageFormat.format("User {0} is not a System user!", systemUsername)); //$NON-NLS-1$
 
-		// validate this system user may perform the given action
-		String actionClassname = action.getClass().getName();
-		checkPrivilege(actionClassname, systemUser);
-
-		// get certificate for this system user
+		// get privilegeContext for this system user
 		PrivilegeContext systemUserPrivilegeContext = getSystemUserPrivilegeContext(systemUsername);
+
+		// validate this system user may perform the given action
+		systemUserPrivilegeContext.validateAction(action);
+
 		String sessionId = systemUserPrivilegeContext.getCertificate().getSessionId();
 		this.privilegeContextMap.put(sessionId, systemUserPrivilegeContext);
 		try {
@@ -1448,34 +1448,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		} finally {
 			this.privilegeContextMap.remove(sessionId);
 		}
-	}
-
-	/**
-	 * Checks if the given user has the given privilege
-	 * 
-	 * @param privilegeName
-	 *            the name of the privilege to check on the user
-	 * @param user
-	 *            the user to check for the given privilege
-	 * 
-	 * @throws PrivilegeException
-	 *             if the user does not have the privilege
-	 */
-	private void checkPrivilege(String privilegeName, User user) throws PrivilegeException {
-
-		// check each role if it has the privilege
-		for (String roleName : user.getRoles()) {
-
-			Role role = this.persistenceHandler.getRole(roleName);
-
-			// on the first occurrence of our privilege, stop
-			if (role.hasPrivilege(privilegeName))
-				return;
-		}
-
-		// default throw exception, as the user does not have the privilege
-		String msg = MessageFormat.format("User {0} does not have Privilege {1}", user.getUsername(), privilegeName); //$NON-NLS-1$
-		throw new PrivilegeException(msg);
 	}
 
 	/**

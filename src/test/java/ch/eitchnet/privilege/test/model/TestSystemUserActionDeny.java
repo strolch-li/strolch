@@ -22,7 +22,7 @@ import ch.eitchnet.privilege.model.PrivilegeContext;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class TestSystemUserActionDeny implements SystemUserAction {
+public class TestSystemUserActionDeny extends SystemUserAction {
 
 	@Override
 	public void execute(PrivilegeContext privilegeContext) {
