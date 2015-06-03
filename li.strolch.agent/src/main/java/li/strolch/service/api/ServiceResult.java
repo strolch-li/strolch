@@ -101,6 +101,27 @@ public class ServiceResult implements Serializable {
 		this.message = message;
 	}
 
+	public String getRootMessage() {
+		Throwable t = getRootCause();
+		if (t == null)
+			return null;
+		return t.getMessage() == null ? t.getClass().getName() : (t.getClass().getName() + ": " + t.getMessage());
+	}
+
+	/**
+	 * @return the root cause of the encapsulated {@link Throwable} or null if no {@link Throwable} is set
+	 */
+	public Throwable getRootCause() {
+		if (this.throwable == null)
+			return null;
+		Throwable t = this.throwable;
+		while (t.getCause() != null) {
+			t = t.getCause();
+		}
+
+		return t;
+	}
+
 	/**
 	 * @return the throwable
 	 */

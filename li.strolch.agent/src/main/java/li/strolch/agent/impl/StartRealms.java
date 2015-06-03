@@ -21,7 +21,7 @@ import ch.eitchnet.privilege.model.PrivilegeContext;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class StartRealms implements SystemUserAction {
+public class StartRealms extends SystemUserAction {
 
 	private final DefaultRealmHandler defaultRealmHandler;
 

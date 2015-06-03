@@ -24,7 +24,7 @@ import ch.eitchnet.utils.Version;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RunMigrationsAction implements SystemUserAction {
+public class RunMigrationsAction extends SystemUserAction {
 
 	private Migrations migrations;
 	private Map<String, MigrationVersion> currentVersions;

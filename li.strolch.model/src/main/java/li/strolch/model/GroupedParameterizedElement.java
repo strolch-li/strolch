@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchModelException;
 import li.strolch.model.parameter.Parameter;
 
 import org.w3c.dom.Element;
@@ -92,15 +93,49 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
 	public <T> T getParameter(String bagKey, String paramKey) {
+		return getParameter(bagKey, paramKey, false);
+	}
+
+	/**
+	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the given bagKey, or null if
+	 * the {@link Parameter} or the {@link ParameterBag} does not exist
+	 * 
+	 * @param bagKey
+	 *            the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * @param paramKey
+	 *            the key of the {@link Parameter} which is to be returned
+	 * @param assertExists
+	 *            if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
+	 * 
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	public <T> T getParameter(String bagKey, String paramKey, boolean assertExists) {
 		if (this.parameterBagMap == null) {
+			if (assertExists) {
+				String msg = "The Parameter {0} does not exist";
+				throw new StrolchModelException(MessageFormat.format(msg,
+						getLocator().append(Tags.BAG, bagKey, paramKey)));
+			}
+
 			return null;
 		}
 		ParameterBag bag = this.parameterBagMap.get(bagKey);
 		if (bag == null) {
+			if (assertExists) {
+				String msg = "The Parameter {0} does not exist";
+				throw new StrolchModelException(MessageFormat.format(msg,
+						getLocator().append(Tags.BAG, bagKey, paramKey)));
+			}
+
 			return null;
 		}
 
-		return bag.getParameter(paramKey);
+		T parameter = bag.getParameter(paramKey);
+		if (assertExists && parameter == null) {
+			String msg = "The Parameter {0} does not exist";
+			throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(Tags.BAG, bagKey, paramKey)));
+		}
+		return parameter;
 	}
 
 	/**

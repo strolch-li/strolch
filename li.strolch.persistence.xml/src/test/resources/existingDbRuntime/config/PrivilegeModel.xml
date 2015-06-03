@@ -20,11 +20,13 @@
 	</Users>
 
 	<Roles>
+
 		<Role name="agent">
-			<Privilege name="li.strolch.agent.impl.StartRealms" policy="DefaultPrivilege">
-				<AllAllowed>true</AllAllowed>
+			<Privilege name="ch.eitchnet.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
+				<Allow>li.strolch.agent.impl.StartRealms</Allow>
 			</Privilege>
 		</Role>
+
 		<Role name="AppUser">
 			<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
@@ -33,5 +35,6 @@
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>
+
 	</Roles>
 </UsersAndRoles>

@@ -41,7 +41,7 @@ import ch.eitchnet.privilege.model.Certificate;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class PostgreSqlInitializer implements SystemUserAction {
+public abstract class PostgreSqlInitializer extends SystemUserAction {
 
 	protected static final Logger logger = LoggerFactory.getLogger(PostgreSqlInitializer.class);
 	protected StrolchAgent agent;

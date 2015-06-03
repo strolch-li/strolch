@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.migrations;
-
-import ch.eitchnet.privilege.handler.SystemUserAction;
-import ch.eitchnet.privilege.model.PrivilegeContext;
+package li.strolch.exception;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class QueryCurrentVersionsAction extends SystemUserAction {
+public class StrolchModelException extends StrolchException {
 
-	private CurrentMigrationVersionQuery query;
+	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @param container
+	 * @param message
+	 * @param cause
 	 */
-	public QueryCurrentVersionsAction(CurrentMigrationVersionQuery query) {
-		this.query = query;
+	public StrolchModelException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	@Override
-	public void execute(PrivilegeContext privilegeContext) {
-		this.query.doQuery(privilegeContext.getCertificate());
+	/**
+	 * @param message
+	 */
+	public StrolchModelException(String message) {
+		super(message);
 	}
 }

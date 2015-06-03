@@ -155,6 +155,18 @@ public class Locator {
 	public Locator append(List<String> subPathElements) {
 		return new Locator(this.pathElements, subPathElements);
 	}
+	
+	/**
+	 * Returns a new {@link Locator} where the given sub path is appended to the locator
+	 *
+	 * @param subPathElements
+	 *            the sub path to append
+	 *
+	 * @return the new locator
+	 */
+	public Locator append(String... subPathElements) {
+		return new Locator(this.pathElements, Arrays.asList(subPathElements));
+	}
 
 	/**
 	 * Returns a new {@link Locator} where the given element is appended to the locator

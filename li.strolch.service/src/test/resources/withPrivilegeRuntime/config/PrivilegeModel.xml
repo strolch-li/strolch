@@ -59,10 +59,14 @@
 	<Roles>
 
 		<Role name="agent">
-			<Privilege name="li.strolch.agent.impl.StartRealms" policy="DefaultPrivilege">
+			<Privilege name="ch.eitchnet.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
+				<Allow>li.strolch.agent.impl.StartRealms</Allow>
+			</Privilege>
+			<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>
+
 		<Role name="AppUser">
 			<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
 				<AllAllowed>true</AllAllowed>
@@ -71,8 +75,9 @@
 				<AllAllowed>true</AllAllowed>
 			</Privilege>
 		</Role>
-		<Role name="sysAdmin">
-		</Role>
+
+		<Role name="sysAdmin" />
+
 		<Role name="OnlyGreetingServiceRole">
 			<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
 				<Allow>li.strolch.service.test.model.GreetingService</Allow>
