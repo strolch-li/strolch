@@ -43,9 +43,7 @@ import li.strolch.persistence.postgresql.PostgreSqlDbConnectionBuilder.StrolchPo
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.DbConnectionBuilder;
 import li.strolch.runtime.configuration.StrolchConfiguration;
-import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import ch.eitchnet.db.DbException;
 import ch.eitchnet.db.DbMigrationState;
 import ch.eitchnet.db.DbSchemaVersionCheck;
 import ch.eitchnet.privilege.model.Certificate;
@@ -98,12 +96,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX, this.getClass(),
 				allowSchemaCreation, allowSchemaMigration, allowSchemaDrop);
-		try {
-			schemaVersionCheck.checkSchemaVersion(this.dsMap);
-		} catch (DbException e) {
-			String msg = "Failed to validate the schema for a connection: {0}"; //$NON-NLS-1$
-			throw new StrolchConfigurationException(MessageFormat.format(msg, e.getMessage()), e);
-		}
+		schemaVersionCheck.checkSchemaVersion(this.dsMap);
 
 		// if allowed, perform DB initialization
 		if (!allowSchemaCreation || !allowDataInitOnSchemaCreate) {
