@@ -54,7 +54,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration componentConfiguration) {
+	public void initialize(ComponentConfiguration componentConfiguration) throws Exception {
 
 		File basePathF = componentConfiguration.getRuntimeConfiguration().getRootPath();
 		File dbStorePathF = new File(basePathF, DB_STORE_PATH);

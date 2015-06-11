@@ -42,7 +42,7 @@ public class InMemoryPersistenceHandler extends StrolchComponent implements Pers
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 		this.persistence = new InMemoryPersistence(getContainer().getPrivilegeHandler());
 		super.initialize(configuration);
 	}

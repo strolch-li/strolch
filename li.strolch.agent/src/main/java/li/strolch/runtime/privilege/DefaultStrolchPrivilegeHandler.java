@@ -57,7 +57,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 		super.initialize(configuration);
 
 		// initialize privilege

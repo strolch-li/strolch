@@ -64,7 +64,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration componentConfiguration) {
+	public void initialize(ComponentConfiguration componentConfiguration) throws Exception {
 
 		this.componentConfiguration = componentConfiguration;
 
@@ -87,7 +87,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	}
 
 	@Override
-	public void start() {
+	public void start() throws Exception {
 
 		boolean allowSchemaCreation = this.componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
 		boolean allowSchemaMigration = this.componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION,
@@ -123,7 +123,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	}
 
 	@Override
-	public void destroy() {
+	public void destroy() throws Exception {
 		for (Entry<String, DataSource> entry : this.dsMap.entrySet()) {
 			StrolchPostgreDataSource ds = (StrolchPostgreDataSource) entry.getValue();
 			ds.shutdown();

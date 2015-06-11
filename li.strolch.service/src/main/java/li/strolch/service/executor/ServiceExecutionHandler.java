@@ -49,7 +49,7 @@ public class ServiceExecutionHandler extends StrolchComponent {
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 
 		this.serviceContextMap = Collections.synchronizedMap(new HashMap<>());
 		this.queue = new LinkedBlockingQueue<>();
@@ -84,13 +84,13 @@ public class ServiceExecutionHandler extends StrolchComponent {
 	}
 
 	@Override
-	public void start() {
+	public void start() throws Exception {
 		this.thread.start();
 		super.start();
 	}
 
 	@Override
-	public void stop() {
+	public void stop() throws Exception {
 
 		if (this.thread != null) {
 			this.thread.interrupt();
@@ -105,7 +105,7 @@ public class ServiceExecutionHandler extends StrolchComponent {
 	}
 
 	@Override
-	public void destroy() {
+	public void destroy() throws Exception {
 		this.thread = null;
 		super.destroy();
 	}

@@ -55,7 +55,7 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 
 		this.enumLocators = new HashMap<>();
 		this.realm = configuration.getString(PROP_REALM, StrolchConstants.DEFAULT_REALM);

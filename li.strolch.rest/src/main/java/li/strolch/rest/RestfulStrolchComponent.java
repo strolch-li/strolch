@@ -125,7 +125,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 
 		this.corsEnabled = configuration.getBoolean(PARAM_CORS_ENABLED, Boolean.FALSE);
 		if (this.corsEnabled) {
@@ -153,14 +153,14 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	}
 
 	@Override
-	public void start() {
+	public void start() throws Exception {
 		DBC.PRE.assertNull("Instance is already set! This component is a singleton resource!", instance); //$NON-NLS-1$
 		instance = this;
 		super.start();
 	}
 
 	@Override
-	public void stop() {
+	public void stop() throws Exception {
 		instance = null;
 		super.stop();
 	}

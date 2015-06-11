@@ -48,7 +48,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 		this.privilegeHandler = getContainer().getPrivilegeHandler();
 		this.runtimeConfiguration = configuration.getRuntimeConfiguration();
 		this.throwOnPrivilegeFail = configuration.getBoolean(PARAM_THROW_ON_PRIVILEGE_FAIL, Boolean.FALSE);

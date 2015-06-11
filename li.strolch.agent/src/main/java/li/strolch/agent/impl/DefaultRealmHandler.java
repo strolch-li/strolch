@@ -86,7 +86,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 
 		for (String realmName : this.realms.keySet()) {
 			InternalStrolchRealm realm = this.realms.get(realmName);
@@ -101,7 +101,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	}
 
 	@Override
-	public void start() {
+	public void start() throws Exception {
 
 		PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
 		privilegeHandler.runAsSystem(SYSTEM_USER_AGENT, new StartRealms(this));
@@ -110,7 +110,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	}
 
 	@Override
-	public void stop() {
+	public void stop() throws Exception {
 		for (String realmName : this.realms.keySet()) {
 			InternalStrolchRealm realm = this.realms.get(realmName);
 			realm.stop();

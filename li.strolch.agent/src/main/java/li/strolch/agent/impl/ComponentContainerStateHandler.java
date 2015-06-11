@@ -20,6 +20,7 @@ import java.util.Set;
 
 import li.strolch.agent.api.ComponentState;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 
@@ -55,7 +56,11 @@ public class ComponentContainerStateHandler {
 
 			String msg = "Initializing component {0}..."; //$NON-NLS-1$
 			logger.info(MessageFormat.format(msg, componentName));
-			component.initialize(componentConfiguration);
+			try {
+				component.initialize(componentConfiguration);
+			} catch (Exception e) {
+				throw new StrolchException(MessageFormat.format("Failed to initialize component {0}", componentName), e);
+			}
 		}
 
 		// initialize direct downstream components
@@ -76,7 +81,11 @@ public class ComponentContainerStateHandler {
 			String msg = "Starting component {0}..."; //$NON-NLS-1$
 			String componentName = component.getName();
 			logger.info(MessageFormat.format(msg, componentName));
-			component.start();
+			try {
+				component.start();
+			} catch (Exception e) {
+				throw new StrolchException(MessageFormat.format("Failed to start component {0}", componentName), e);
+			}
 		}
 
 		// Start direct downstream components

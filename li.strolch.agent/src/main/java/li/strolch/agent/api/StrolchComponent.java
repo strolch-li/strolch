@@ -73,19 +73,19 @@ public class StrolchComponent {
 		this.state = this.state.validateStateChange(ComponentState.SETUP);
 	}
 
-	public void initialize(ComponentConfiguration configuration) {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 		this.state = this.state.validateStateChange(ComponentState.INITIALIZED);
 	}
 
-	public void start() {
+	public void start() throws Exception {
 		this.state = this.state.validateStateChange(ComponentState.STARTED);
 	}
 
-	public void stop() {
+	public void stop() throws Exception {
 		this.state = this.state.validateStateChange(ComponentState.STOPPED);
 	}
 
-	public void destroy() {
+	public void destroy() throws Exception {
 		this.state = this.state.validateStateChange(ComponentState.DESTROYED);
 	}
 

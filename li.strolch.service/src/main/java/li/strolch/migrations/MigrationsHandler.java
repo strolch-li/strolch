@@ -103,7 +103,7 @@ public class MigrationsHandler extends StrolchComponent {
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 
 		this.runMigrationsOnStart = configuration.getBoolean(PROP_RUN_MIGRATIONS_ON_START, Boolean.FALSE);
 		this.verbose = configuration.getBoolean(PROP_VERBOSE, Boolean.FALSE);
@@ -130,7 +130,7 @@ public class MigrationsHandler extends StrolchComponent {
 	}
 
 	@Override
-	public void start() {
+	public void start() throws Exception {
 
 		if (this.runMigrationsOnStart && this.migrations != null) {
 
@@ -149,7 +149,7 @@ public class MigrationsHandler extends StrolchComponent {
 	}
 
 	@Override
-	public void stop() {
+	public void stop() throws Exception {
 
 		if (this.migrationTimer != null) {
 			this.migrationTimer.cancel();

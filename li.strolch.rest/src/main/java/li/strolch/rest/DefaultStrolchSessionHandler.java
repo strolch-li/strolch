@@ -73,13 +73,13 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration configuration) {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 		this.sessionTtl = TimeUnit.MINUTES.toMillis(configuration.getInt(PARAM_SESSION_TTL_MINUTES, 30));
 		super.initialize(configuration);
 	}
 
 	@Override
-	public void start() {
+	public void start() throws Exception {
 		this.privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
 		this.certificateMap = Collections.synchronizedMap(new HashMap<>());
 
@@ -91,7 +91,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public void stop() {
+	public void stop() throws Exception {
 		if (this.certificateMap != null) {
 			synchronized (this.certificateMap) {
 				for (Certificate certificate : this.certificateMap.values()) {
@@ -111,7 +111,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public void destroy() {
+	public void destroy() throws Exception {
 		this.certificateMap = null;
 		super.destroy();
 	}
