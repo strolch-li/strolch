@@ -41,6 +41,12 @@ public class StrolchModelConstants {
 	public static final String INTERPRETATION_ORDER_REF = "Order-Ref"; //$NON-NLS-1$
 
 	/**
+	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
+	 * to an {@link Activity}
+	 */
+	public static final String INTERPRETATION_ACTIVITY_REF = "Activity-Ref"; //$NON-NLS-1$
+
+	/**
 	 * This interpretation value indicates that the {@link Parameter} has no defined interpretation
 	 */
 	public static final String INTERPRETATION_NONE = "None"; //$NON-NLS-1$

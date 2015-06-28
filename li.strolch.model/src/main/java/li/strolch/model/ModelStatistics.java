@@ -49,6 +49,9 @@ public class ModelStatistics {
 	@XmlAttribute(name = "nrOfOrders")
 	public long nrOfOrders;
 
+	@XmlAttribute(name = "nrOfActivities")
+	public long nrOfActivities;
+
 	/**
 	 * @return the nrOfOrders
 	 */
@@ -70,6 +73,13 @@ public class ModelStatistics {
 		return this.nrOfOrders + this.nrOfResources;
 	}
 
+	/**
+	 * @return the nrOfActivities
+	 */
+	public long getNrOfActivities() {
+		return this.nrOfActivities;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -81,6 +91,8 @@ public class ModelStatistics {
 		builder.append(this.nrOfResources);
 		builder.append(", nrOfOrders=");
 		builder.append(this.nrOfOrders);
+		builder.append(", nrOfActivities=");
+		builder.append(this.nrOfActivities);
 		builder.append("]");
 		return builder.toString();
 	}

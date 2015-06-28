@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model.xml;
+package li.strolch.agent.api;
 
-import li.strolch.model.Order;
-import li.strolch.model.Resource;
+import java.util.List;
+
+import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.query.ActivityQuery;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
-public interface StrolchElementListener {
+public interface ActivityMap extends ElementMap<Activity> {
 
-	public void notifyResource(Resource resource);
-
-	public void notifyOrder(Order order);
-
-	public void notifyActivity(Activity activity);
+	public <U> List<U> doQuery(StrolchTransaction tx, ActivityQuery query, ActivityVisitor<U> activityVisitor);
 }

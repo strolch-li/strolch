@@ -21,6 +21,7 @@ import java.util.List;
 
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.activity.Activity;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -29,6 +30,7 @@ public class SimpleStrolchElementListener implements StrolchElementListener {
 
 	private List<Resource> resources;
 	private List<Order> orders;
+	private List<Activity> activities;
 
 	@Override
 	public void notifyResource(Resource resource) {
@@ -44,6 +46,14 @@ public class SimpleStrolchElementListener implements StrolchElementListener {
 			this.orders = new ArrayList<>();
 		}
 		this.orders.add(order);
+	}
+
+	@Override
+	public void notifyActivity(Activity activity) {
+		if (this.activities == null) {
+			this.activities = new ArrayList<>();
+		}
+		this.activities.add(activity);
 	}
 
 	/**
@@ -62,5 +72,14 @@ public class SimpleStrolchElementListener implements StrolchElementListener {
 		if (this.orders == null)
 			return Collections.emptyList();
 		return this.orders;
+	}
+
+	/**
+	 * @return the activities
+	 */
+	public List<Activity> getActivities() {
+		if (this.activities == null)
+			return Collections.emptyList();
+		return this.activities;
 	}
 }

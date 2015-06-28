@@ -17,7 +17,9 @@ package li.strolch.agent.impl;
 
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.xml.StrolchElementListener;
+import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -27,11 +29,13 @@ public class StoreToDaoElementListener implements StrolchElementListener {
 	private StrolchTransaction tx;
 	private ResourceDao resourceDao;
 	private OrderDao orderDao;
+	private ActivityDao activityDao;
 
 	public StoreToDaoElementListener(StrolchTransaction tx) {
 		this.tx = tx;
 		this.resourceDao = tx.getPersistenceHandler().getResourceDao(this.tx);
 		this.orderDao = tx.getPersistenceHandler().getOrderDao(this.tx);
+		this.activityDao = tx.getPersistenceHandler().getActivityDao(this.tx);
 	}
 
 	@Override
@@ -42,5 +46,10 @@ public class StoreToDaoElementListener implements StrolchElementListener {
 	@Override
 	public void notifyOrder(Order order) {
 		this.orderDao.save(order);
+	}
+
+	@Override
+	public void notifyActivity(Activity activity) {
+		this.activityDao.save(activity);
 	}
 }

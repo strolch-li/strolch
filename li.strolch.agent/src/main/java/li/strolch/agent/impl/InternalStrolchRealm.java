@@ -18,6 +18,7 @@ package li.strolch.agent.impl;
 import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.LockHandler;
@@ -131,6 +132,8 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	public abstract ResourceMap getResourceMap();
 
 	public abstract OrderMap getOrderMap();
+
+	public abstract ActivityMap getActivityMap();
 
 	public abstract AuditTrail getAuditTrail();
 

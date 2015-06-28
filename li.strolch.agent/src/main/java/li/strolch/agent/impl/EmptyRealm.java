@@ -17,6 +17,7 @@ package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
@@ -37,6 +38,7 @@ public class EmptyRealm extends InternalStrolchRealm {
 
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;
+	private ActivityMap activityMap;
 	private AuditTrail auditTrail;
 	private PersistenceHandler persistenceHandler;
 
@@ -69,6 +71,11 @@ public class EmptyRealm extends InternalStrolchRealm {
 	@Override
 	public OrderMap getOrderMap() {
 		return this.orderMap;
+	}
+
+	@Override
+	public ActivityMap getActivityMap() {
+		return this.activityMap;
 	}
 
 	@Override

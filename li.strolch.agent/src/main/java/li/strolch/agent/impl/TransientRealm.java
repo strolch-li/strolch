@@ -18,6 +18,7 @@ package li.strolch.agent.impl;
 import java.io.File;
 import java.text.MessageFormat;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
@@ -42,6 +43,7 @@ public class TransientRealm extends InternalStrolchRealm {
 
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;
+	private ActivityMap activityMap;
 	private AuditTrail auditTrail;
 	private PersistenceHandler persistenceHandler;
 
@@ -79,6 +81,11 @@ public class TransientRealm extends InternalStrolchRealm {
 	}
 
 	@Override
+	public ActivityMap getActivityMap() {
+		return this.activityMap;
+	}
+
+	@Override
 	public AuditTrail getAuditTrail() {
 		return this.auditTrail;
 	}
@@ -99,6 +106,7 @@ public class TransientRealm extends InternalStrolchRealm {
 		this.persistenceHandler = new InMemoryPersistence(container.getPrivilegeHandler());
 		this.resourceMap = new TransactionalResourceMap();
 		this.orderMap = new TransactionalOrderMap();
+		this.activityMap = new TransactionalActivityMap();
 
 		if (isAuditTrailEnabled()) {
 			this.auditTrail = new TransactionalAuditTrail();
@@ -126,6 +134,7 @@ public class TransientRealm extends InternalStrolchRealm {
 				"Loading XML Model file {0} for realm {1} took {2}.", this.modelFile.getName(), getRealm(), durationS)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,32 @@
  */
 package li.strolch.agent.impl;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_RESOURCE_REF;
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
 
 import java.util.List;
 
-import li.strolch.agent.api.ResourceMap;
-import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
+import li.strolch.agent.api.ActivityMap;
+import li.strolch.model.ActivityVisitor;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.model.query.ResourceQuery;
-import li.strolch.persistence.api.ResourceDao;
+import li.strolch.model.query.ActivityQuery;
+import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
-public class TransactionalResourceMap extends TransactionalElementMap<Resource> implements ResourceMap {
+public class TransactionalActivityMap extends TransactionalElementMap<Activity> implements ActivityMap {
 
 	@Override
 	protected void assertIsRefParam(Parameter<?> refP) {
-		ElementMapHelpers.assertIsRefParam(INTERPRETATION_RESOURCE_REF, refP);
+		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ACTIVITY_REF, refP);
 	}
 
 	@Override
-	protected ResourceDao getDao(StrolchTransaction tx) {
-		return tx.getPersistenceHandler().getResourceDao(tx);
+	protected ActivityDao getDao(StrolchTransaction tx) {
+		return tx.getPersistenceHandler().getActivityDao(tx);
 	}
 
 	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
-		return getDao(tx).doQuery(query, resourceVisitor);
+	public <U> List<U> doQuery(StrolchTransaction tx, ActivityQuery query, ActivityVisitor<U> activityVisitor) {
+		return getDao(tx).doQuery(query, activityVisitor);
 	}
 }

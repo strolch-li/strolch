@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import li.strolch.model.activity.Activity;
 import li.strolch.model.xml.StrolchElementListener;
 import li.strolch.model.xml.XmlModelSaxFileReader;
 
@@ -32,7 +33,6 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
 @SuppressWarnings("nls")
 public class XmlModelDefaultHandlerTest {
@@ -42,8 +42,9 @@ public class XmlModelDefaultHandlerTest {
 	@Test
 	public void shouldParseXmlModelFile() {
 
-		final Map<String, Resource> resourceMap = new HashMap<>();
-		final Map<String, Order> orderMap = new HashMap<>();
+		Map<String, Resource> resourceMap = new HashMap<>();
+		Map<String, Order> orderMap = new HashMap<>();
+		Map<String, Activity> activityMap = new HashMap<>();
 
 		File file = new File("src/test/resources/data/StrolchModel.xml");
 		StrolchElementListener listener = new StrolchElementListener() {
@@ -56,16 +57,24 @@ public class XmlModelDefaultHandlerTest {
 			public void notifyOrder(Order order) {
 				orderMap.put(order.getId(), order);
 			}
+
+			@Override
+			public void notifyActivity(Activity activity) {
+				activityMap.put(activity.getId(), activity);
+			}
 		};
+
 		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, file, true);
 		handler.parseFile();
 
 		assertEquals(3, resourceMap.size());
 		assertEquals(3, orderMap.size());
+		assertEquals(3, activityMap.size());
 
 		ModelStatistics statistics = handler.getStatistics();
 		logger.info("Parsing took " + StringHelper.formatNanoDuration(statistics.durationNanos));
 		assertEquals(3, statistics.nrOfOrders);
 		assertEquals(3, statistics.nrOfResources);
+		assertEquals(3, statistics.nrOfActivities);
 	}
 }

@@ -15,12 +15,14 @@
  */
 package li.strolch.persistence.api;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.Audit;
 import ch.eitchnet.privilege.model.Certificate;
 
@@ -67,6 +69,18 @@ public interface PersistenceHandler {
 	 * @return the {@link ResourceDao}
 	 */
 	public ResourceDao getResourceDao(StrolchTransaction tx);
+
+	/**
+	 * Returns the {@link ActivityDao} for the given transaction. Use this only if you want to bypass certain
+	 * transaction features. Accessing {@link Activity Activities} should be done through the {@link ActivityMap}
+	 * accessed from the transaction
+	 * 
+	 * @param tx
+	 *            the transaction for which the {@link ActivityDao} is to be returned
+	 * 
+	 * @return the {@link ActivityDao}
+	 */
+	public ActivityDao getActivityDao(StrolchTransaction tx);
 
 	/**
 	 * Returns the {@link AuditDao} for the given transaction. Use this only if you want to bypass certain transaction

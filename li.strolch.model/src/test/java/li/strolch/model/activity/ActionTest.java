@@ -35,54 +35,54 @@ public class ActionTest {
 	@Before
 	public void init() {
 		// create action
-		action = new Action("action_1", "Action 1", "Use");
-		action.setResourceId("dummyRe");
-		action.setResourceType("dummyReType");
-		
+		this.action = new Action("action_1", "Action 1", "Use");
+		this.action.setResourceId("dummyRe");
+		this.action.setResourceType("dummyReType");
+
 		IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(1));
 		startChange.setStateId(STATE_INTEGER_ID);
-		action.addChange(startChange);
+		this.action.addChange(startChange);
 
 		IValueChange<IntegerValue> endChange = new ValueChange<>(STATE_TIME_30, new IntegerValue(-1));
 		endChange.setStateId(STATE_INTEGER_ID);
-		action.addChange(endChange);
+		this.action.addChange(endChange);
 	}
-	
+
 	@Test
 	public void testGetStart() {
-		Assert.assertTrue(STATE_TIME_10 == action.getStart());
+		Assert.assertTrue(STATE_TIME_10 == this.action.getStart());
 	}
-	
+
 	@Test
 	public void testGetEnd() {
-		Assert.assertTrue(STATE_TIME_30 == action.getEnd());
+		Assert.assertTrue(STATE_TIME_30 == this.action.getEnd());
 	}
-	
 
 	@Test
 	public void testClone() {
-		Action clone = (Action) action.getClone();
-		Assert.assertEquals(action.toString(), clone.toString());
-		Assert.assertEquals(action.changes.size(), clone.changes.size());
-		for (int i = 0; i < action.changes.size(); i++) {
-			Assert.assertEquals(action.changes.get(i).getTime(), clone.changes.get(i).getTime());
+		Action clone = (Action) this.action.getClone();
+		Assert.assertEquals(this.action.toString(), clone.toString());
+		Assert.assertEquals(this.action.changes.size(), clone.changes.size());
+		for (int i = 0; i < this.action.changes.size(); i++) {
+			Assert.assertEquals(this.action.changes.get(i).getTime(), clone.changes.get(i).getTime());
 		}
 	}
-	
-	@Test
+
+	/**
+	 * no test. Just to see the XML serialization in the console
+	 */
+	// @Test
 	public void testToDOM() throws ParserConfigurationException, TransformerException {
-		
+
 		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document document = db.newDocument(); 
-		Element dom = action.toDom(document);
-		document.appendChild(dom); 
-		
+		Document document = db.newDocument();
+		Element dom = this.action.toDom(document);
+		document.appendChild(dom);
+
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
 		StringWriter stringWriter = new StringWriter();
 		transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
 		String content = stringWriter.getBuffer().toString();
 		System.out.println(content);
-		
 	}
-	
 }

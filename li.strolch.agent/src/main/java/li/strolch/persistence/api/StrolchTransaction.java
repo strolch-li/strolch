@@ -17,6 +17,7 @@ package li.strolch.persistence.api;
 
 import java.util.List;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
@@ -25,6 +26,7 @@ import li.strolch.agent.api.StrolchLockException;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.exception.StrolchException;
+import li.strolch.model.ActivityVisitor;
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
@@ -34,6 +36,7 @@ import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
@@ -41,6 +44,7 @@ import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.runtime.StrolchConstants;
@@ -122,6 +126,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the {@link OrderMap}
 	 */
 	public OrderMap getOrderMap();
+
+	/**
+	 * Returns a reference to the {@link ActivityMap} for the {@link StrolchRealm} for which this transaction was opened
+	 * 
+	 * @return the {@link ActivityMap}
+	 */
+	public ActivityMap getActivityMap();
 
 	/**
 	 * Returns the {@link PersistenceHandler}. If the {@link StrolchRealm} is not running in
@@ -426,6 +437,42 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
+	 * Performs the given {@link ActivityQuery} returning the resulting list of {@link Activity Activities}.
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Note:</b> Should the result be mapped to different objects, then use
+	 * {@link #doQuery(ActivityQuery, ActivityVisitor)}
+	 * </p>
+	 * 
+	 * @param query
+	 *            the query to perform
+	 * 
+	 * @return the result list, never null
+	 */
+	public List<Activity> doQuery(ActivityQuery query);
+
+	/**
+	 * <p>
+	 * Performs the given {@link ActivityQuery} and each returned {@link Activity} is passed through the
+	 * {@link ActivityVisitor} and the return value of the visitor is added to the return list
+	 * </p>
+	 * 
+	 * <p>
+	 * This method is intended for situations where the query result should not be {@link Activity} but some other
+	 * object type. For instance in a restful API, the result might have to be mapped to a POJO, thus using this method
+	 * can perform the mapping step for you
+	 * </p>
+	 * 
+	 * @param query
+	 *            the query to perform
+	 * 
+	 * @return the result list of elements as returned by the {@link ActivityVisitor}, never null
+	 */
+	public <U> List<U> doQuery(ActivityQuery query, ActivityVisitor<U> activityVisitor);
+
+	/**
+	 * <p>
 	 * Performs the given {@link AuditQuery} returning the resulting list of {@link Audit Audits}.
 	 * </p>
 	 * 
@@ -670,12 +717,110 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *            if true, and resource does not exist, then a {@link StrolchException} is thrown
 	 * 
 	 * @return the resources referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any
-	 *         missing resources are not returned!
+	 *         missing resources are not returned unless <code>assertExists</code> is true
 	 * 
 	 * @throws StrolchException
 	 *             if the {@link StringListParameter} is not a properly configured as a reference parameter
 	 */
 	public List<Resource> getResourcesBy(StringListParameter refP, boolean assertExists) throws StrolchException;
+
+	/**
+	 * Returns the {@link Activity} with the given type and id, or null if it does not exist
+	 * 
+	 * @param type
+	 *            the type of the {@link Activity}
+	 * @param id
+	 *            the id of the {@link Activity}
+	 * 
+	 * @return the {@link Activity} with the given type and id, or null if it does not exist
+	 */
+	public Activity getActivityBy(String type, String id);
+
+	/**
+	 * Returns the {@link Activity} with the given type and id, or null if it does not exist
+	 * 
+	 * @param type
+	 *            the type of the {@link Activity}
+	 * @param id
+	 *            the id of the {@link Activity}
+	 * @param assertExists
+	 *            if true, and activity does not exist, then a {@link StrolchException} is thrown
+	 * 
+	 * @return the {@link Activity} with the given type and id, or null if it does not exist
+	 * 
+	 * @throws StrolchException
+	 *             if the activity does not exist, and assertExists is true
+	 */
+	public Activity getActivityBy(String type, String id, boolean assertExists) throws StrolchException;
+
+	/**
+	 * Returns the {@link Activity} which is referenced by the given {@link StringParameter}. A reference
+	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF} and
+	 * the UOM must be set to the activity's type and the value is the id of the activity
+	 * 
+	 * @param refP
+	 *            the {@link StringParameter} which references an {@link Activity}
+	 * 
+	 * @return the activity referenced by the parameter, or null if it does not exist
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	public Activity getActivityBy(StringParameter refP) throws StrolchException;
+
+	/**
+	 * Returns the {@link Activity} which is referenced by the given {@link StringParameter}. A reference
+	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF} and
+	 * the UOM must be set to the activity's type and the value is the id of the activity
+	 * 
+	 * @param refP
+	 *            the {@link StringParameter} which references an {@link Activity}
+	 * @param assertExists
+	 *            if true, and activity does not exist, then a {@link StrolchException} is thrown
+	 * 
+	 * @return the activity referenced by the parameter, or null if it does not exist
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringParameter} is not a properly configured as a reference parameter, or if the
+	 *             activity does not exist, and assertExists is true
+	 */
+	public Activity getActivityBy(StringParameter refP, boolean assertExists) throws StrolchException;
+
+	/**
+	 * Returns all {@link Activity Activities} which are referenced by the given {@link StringListParameter}. A
+	 * reference {@link Parameter} must have its interpretation set to
+	 * {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the value
+	 * is the id of the activity
+	 * 
+	 * @param refP
+	 *            the {@link StringListParameter} which references a list of {@link Activity Activities}
+	 * 
+	 * @return the activities referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any
+	 *         missing activities are not returned!
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 */
+	public List<Activity> getActivitiesBy(StringListParameter refP) throws StrolchException;
+
+	/**
+	 * Returns all {@link Activity Activities} which are referenced by the given {@link StringListParameter}. A
+	 * reference {@link Parameter} must have its interpretation set to
+	 * {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the value
+	 * is the id of the activity
+	 * 
+	 * @param refP
+	 *            the {@link StringListParameter} which references a list of {@link Activity Activities}
+	 * @param assertExists
+	 *            if true, and activity does not exist, then a {@link StrolchException} is thrown
+	 * 
+	 * @return the activities referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any
+	 *         missing activities are not returned unless <code>assertExists</code> is true
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 */
+	public List<Activity> getActivitiesBy(StringListParameter refP, boolean assertExists) throws StrolchException;
 
 	/**
 	 * Returns the {@link Order} with the given type and id, or null if it does not exist
@@ -766,7 +911,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *            if true, and order does not exist, then a {@link StrolchException} is thrown
 	 * 
 	 * @return the orders referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any missing
-	 *         orders are not returned!
+	 *         orders are not returned unless <code>assertExists</code> is true
 	 * 
 	 * @throws StrolchException
 	 *             if the {@link StringListParameter} is not a properly configured as a reference parameter

@@ -18,10 +18,12 @@ package li.strolch.agent.impl;
 import java.util.Collections;
 import java.util.Set;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.xml.StrolchElementListener;
 import li.strolch.persistence.api.StrolchTransaction;
 
@@ -32,26 +34,34 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	private boolean addOrders;
 	private boolean addResources;
+	private boolean addActivities;
 	private boolean updateOrders;
 	private boolean updateResources;
+	private boolean updateActivities;
 	private Set<String> orderTypes;
 	private Set<String> resourceTypes;
+	private Set<String> activityTypes;
 
 	private StrolchTransaction tx;
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;
+	private ActivityMap activityMap;
 
 	public InMemoryElementListener(StrolchTransaction tx) {
 		this.tx = tx;
 		this.resourceMap = tx.getResourceMap();
 		this.orderMap = tx.getOrderMap();
+		this.activityMap = tx.getActivityMap();
 
 		this.addResources = true;
 		this.addOrders = true;
+		this.addActivities = true;
 		this.updateResources = true;
 		this.updateOrders = true;
+		this.updateActivities = true;
 		this.orderTypes = Collections.emptySet();
 		this.resourceTypes = Collections.emptySet();
+		this.activityTypes = Collections.emptySet();
 	}
 
 	/**
@@ -71,6 +81,14 @@ public class InMemoryElementListener implements StrolchElementListener {
 	}
 
 	/**
+	 * @param addActivities
+	 *            the addActivities to set
+	 */
+	public void setAddActivities(boolean addActivities) {
+		this.addActivities = addActivities;
+	}
+
+	/**
 	 * @param updateResources
 	 *            the updateResources to set
 	 */
@@ -87,6 +105,14 @@ public class InMemoryElementListener implements StrolchElementListener {
 	}
 
 	/**
+	 * @param updateActivities
+	 *            the updateActivities to set
+	 */
+	public void setUpdateActivities(boolean updateActivities) {
+		this.updateActivities = updateActivities;
+	}
+
+	/**
 	 * @param orderTypes
 	 *            the orderTypes to set
 	 */
@@ -100,6 +126,14 @@ public class InMemoryElementListener implements StrolchElementListener {
 	 */
 	public void setResourceTypes(Set<String> resourceTypes) {
 		this.resourceTypes = resourceTypes;
+	}
+
+	/**
+	 * @param activityTypes
+	 *            the activityTypes to set
+	 */
+	public void setActivityTypes(Set<String> activityTypes) {
+		this.activityTypes = activityTypes;
 	}
 
 	@Override
@@ -127,6 +161,20 @@ public class InMemoryElementListener implements StrolchElementListener {
 			}
 		} else if (this.addOrders) {
 			this.orderMap.add(this.tx, order);
+		}
+	}
+
+	@Override
+	public void notifyActivity(Activity activity) {
+		if (!this.activityTypes.isEmpty() && !this.activityTypes.contains(activity.getType()))
+			return;
+
+		if (this.activityMap.hasElement(this.tx, activity.getType(), activity.getId())) {
+			if (this.updateActivities) {
+				this.activityMap.update(this.tx, activity);
+			}
+		} else if (this.addActivities) {
+			this.activityMap.add(this.tx, activity);
 		}
 	}
 }
