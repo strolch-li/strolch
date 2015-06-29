@@ -33,6 +33,7 @@ import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
@@ -155,6 +156,11 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		return ((PostgreSqlStrolchTransaction) tx).getResourceDao();
 	}
 
+	@Override
+	public ActivityDao getActivityDao(StrolchTransaction tx) {
+		return ((PostgreSqlStrolchTransaction) tx).getActivityDao();
+	}
+	
 	@Override
 	public AuditDao getAuditDao(StrolchTransaction tx) {
 		return ((PostgreSqlStrolchTransaction) tx).getAuditDao();

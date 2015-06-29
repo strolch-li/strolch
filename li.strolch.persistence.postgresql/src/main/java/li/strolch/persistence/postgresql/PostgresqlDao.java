@@ -41,6 +41,10 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 		this.commands = new ArrayList<>();
 	}
 
+	protected PostgreSqlStrolchTransaction tx() {
+		return this.tx;
+	}
+
 	protected abstract String getClassName();
 
 	protected abstract String getTableName();
@@ -50,7 +54,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	@Override
 	public boolean hasElement(String type, String id) {
 		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ?";
-		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
 			statement.setString(2, id);
 			try (ResultSet result = statement.executeQuery()) {
@@ -72,7 +76,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	@Override
 	public long querySize() {
 		String sql = "select count(*) from " + getTableName();
-		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
 				return result.getLong(1);
@@ -85,7 +89,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	@Override
 	public long querySize(String type) {
 		String sql = "select count(*) from " + getTableName() + " where type = ?";
-		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
@@ -102,7 +106,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 		Set<String> keySet = new HashSet<>();
 
 		String sql = "select id from " + getTableName();
-		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					keySet.add(result.getString("id"));
@@ -120,7 +124,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 		Set<String> keySet = new HashSet<>();
 
 		String sql = "select id from " + getTableName() + " where type = ?";
-		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
@@ -139,7 +143,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 		Set<String> keySet = new HashSet<>();
 
 		String sql = "select distinct type from " + getTableName();
-		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					keySet.add(result.getString("type"));
@@ -156,7 +160,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 	public T queryBy(String type, String id) {
 
 		String sql = "select id, name, type, asxml from " + getTableName() + " where id = ? and type = ?";
-		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, id);
 			statement.setString(2, type);
 			try (ResultSet result = statement.executeQuery()) {
@@ -180,7 +184,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 
 		List<T> list = new ArrayList<>();
 		String sql = "select id, name, type, asxml from " + getTableName();
-		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					String id = result.getString("id");
@@ -202,7 +206,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 
 		List<T> list = new ArrayList<>();
 		String sql = "select id, name, type, asxml from " + getTableName() + " where type = ?";
-		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
@@ -335,7 +339,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 
 	protected void internalRemove(final T element) {
 		String sql = "delete from " + getTableName() + " where id = ?";
-		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setString(1, element.getId());
 			int modCount = preparedStatement.executeUpdate();
@@ -353,7 +357,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 
 	protected void internalRemoveAll(final long toRemove) {
 		String sql = "delete from " + getTableName();
-		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != toRemove) {
 				String msg = "Expected to delete {0} elements but SQL statement removed {1} elements!";
@@ -369,7 +373,7 @@ public abstract class PostgresqlDao<T extends StrolchElement> implements Strolch
 
 	protected void internalRemoveAllBy(final long toRemove, String type) {
 		String sql = "delete from " + getTableName() + " where type = ?";
-		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 			preparedStatement.setString(1, type);
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != toRemove) {
