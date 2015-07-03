@@ -15,10 +15,13 @@
  */
 package ch.eitchnet.utils.helper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -63,7 +66,7 @@ public class XmlHelper {
 	/**
 	 * DEFAULT_ENCODING = "utf-8" : defines the default UTF-8 encoding expected of XML files
 	 */
-	public static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
+	public static final String DEFAULT_ENCODING = "UTF-8"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlHelper.class);
 
@@ -113,30 +116,118 @@ public class XmlHelper {
 	}
 
 	/**
-	 * Writes a {@link Document} to an XML file on the file system
+	 * Writes an {@link Element} to an XML file on the file system
 	 * 
-	 * @param document
-	 *            the {@link Document} to write to the file system
+	 * @param rootElement
+	 *            the {@link Element} to write to the file system
 	 * @param file
 	 *            the {@link File} describing the path on the file system where the XML file should be written to
 	 * 
 	 * @throws RuntimeException
 	 *             if something went wrong while creating the XML configuration, or writing the element
 	 */
-	public static void writeDocument(Document document, File file) throws RuntimeException {
+	public static void writeElement(Element rootElement, File file) throws RuntimeException {
+		Document document = createDocument();
+		document.appendChild(rootElement);
+		XmlHelper.writeDocument(document, file, DEFAULT_ENCODING);
+	}
 
+	/**
+	 * Writes a {@link Document} to an XML file on the file system
+	 * 
+	 * @param document
+	 *            the {@link Document} to write to the file system
+	 * @param file
+	 *            the {@link File} describing the path on the file system where the XML file should be written to
+	 * @param encoding
+	 *            encoding to use to write the file
+	 * 
+	 * @throws RuntimeException
+	 *             if something went wrong while creating the XML configuration, or writing the element
+	 */
+	public static void writeDocument(Document document, File file) throws RuntimeException {
+		writeDocument(document, file, DEFAULT_ENCODING);
+	}
+
+	/**
+	 * Writes a {@link Document} to an XML file on the file system
+	 * 
+	 * @param document
+	 *            the {@link Document} to write to the file system
+	 * @param file
+	 *            the {@link File} describing the path on the file system where the XML file should be written to
+	 * @param encoding
+	 *            encoding to use to write the file
+	 * 
+	 * @throws RuntimeException
+	 *             if something went wrong while creating the XML configuration, or writing the element
+	 */
+	public static void writeDocument(Document document, File file, String encoding) throws RuntimeException {
 		String msg = "Exporting document element {0} to {1}"; //$NON-NLS-1$
 		msg = MessageFormat.format(msg, document.getNodeName(), file.getAbsolutePath());
 		XmlHelper.logger.info(msg);
+		writeDocument(document, new StreamResult(file), encoding);
+	}
+
+	/**
+	 * Writes a {@link Document} to an XML file on the file system
+	 * 
+	 * @param document
+	 *            the {@link Document} to write to the file system
+	 * @param outputStream
+	 *            stream to write document to
+	 * 
+	 * @throws RuntimeException
+	 *             if something went wrong while creating the XML configuration, or writing the element
+	 */
+	public static void writeDocument(Document document, OutputStream outputStream) throws RuntimeException {
+		writeDocument(document, new StreamResult(outputStream), DEFAULT_ENCODING);
+	}
+
+	/**
+	 * Writes a {@link Document} to an XML file on the file system
+	 * 
+	 * @param document
+	 *            the {@link Document} to write to the file system
+	 * @param outputStream
+	 *            stream to write document to
+	 * 
+	 * @throws RuntimeException
+	 *             if something went wrong while creating the XML configuration, or writing the element
+	 */
+	public static String writeToString(Document document) throws RuntimeException {
+		try {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			writeDocument(document, new StreamResult(out), DEFAULT_ENCODING);
+			return out.toString(DEFAULT_ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Writes a {@link Document} to an XML file on the file system
+	 * 
+	 * @param document
+	 *            the {@link Document} to write to the file system
+	 * @param file
+	 *            the {@link File} describing the path on the file system where the XML file should be written to
+	 * @param encoding
+	 *            encoding to use to write the file
+	 * 
+	 * @throws RuntimeException
+	 *             if something went wrong while creating the XML configuration, or writing the element
+	 */
+	public static void writeDocument(Document document, StreamResult streamResult, String encoding)
+			throws RuntimeException {
 
 		String lineSep = System.getProperty(PROP_LINE_SEPARATOR);
 		try {
 
-			String encoding = document.getInputEncoding();
-			if (encoding == null || encoding.isEmpty()) {
-				XmlHelper.logger.info(MessageFormat.format(
-						"No encoding passed. Using default encoding {0}", XmlHelper.DEFAULT_ENCODING)); //$NON-NLS-1$
-				encoding = XmlHelper.DEFAULT_ENCODING;
+			String docEncoding = document.getInputEncoding();
+			if (docEncoding == null || docEncoding.isEmpty()) {
+				XmlHelper.logger.info(MessageFormat.format("No encoding passed. Using default encoding {0}", encoding)); //$NON-NLS-1$
+				docEncoding = encoding;
 			}
 
 			if (!lineSep.equals("\n")) { //$NON-NLS-1$
@@ -150,14 +241,13 @@ public class XmlHelper {
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no"); //$NON-NLS-1$
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml"); //$NON-NLS-1$
-			transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
+			transformer.setOutputProperty(OutputKeys.ENCODING, docEncoding);
 			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-1$ //$NON-NLS-2$
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
-			StreamResult result = new StreamResult(file);
 			Source xmlSource = new DOMSource(document);
-			transformer.transform(xmlSource, result);
+			transformer.transform(xmlSource, streamResult);
 
 		} catch (Exception e) {
 
@@ -167,26 +257,6 @@ public class XmlHelper {
 
 			System.setProperty(PROP_LINE_SEPARATOR, lineSep);
 		}
-	}
-
-	/**
-	 * Writes an {@link Element} to an XML file on the file system
-	 * 
-	 * @param rootElement
-	 *            the {@link Element} to write to the file system
-	 * @param file
-	 *            the {@link File} describing the path on the file system where the XML file should be written to
-	 * @param encoding
-	 *            encoding to use to write the file
-	 * 
-	 * @throws RuntimeException
-	 *             if something went wrong while creating the XML configuration, or writing the element
-	 */
-	public static void writeElement(Element rootElement, File file, String encoding) throws RuntimeException {
-
-		Document document = createDocument();
-		document.appendChild(rootElement);
-		XmlHelper.writeDocument(document, file);
 	}
 
 	/**
