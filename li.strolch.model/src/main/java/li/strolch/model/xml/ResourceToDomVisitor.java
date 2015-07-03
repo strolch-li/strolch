@@ -28,25 +28,15 @@ import ch.eitchnet.utils.helper.DomUtil;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ResourceToDomVisitor implements ResourceVisitor<Document> {
-
-	private Document document;
-
-	/**
-	 * @return the document
-	 */
-	public Document getDocument() {
-		return this.document;
-	}
+public class ResourceToDomVisitor extends StrolchElementToDomVisitor implements ResourceVisitor<Document> {
 
 	@Override
 	public Document visit(Resource resource) {
 		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
-		Document document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
+		this.document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
 
-		Element resourceDom = resource.toDom(document);
-		document.appendChild(resourceDom);
-		this.document = document;
+		Element asDom = toDom(resource);
+		document.appendChild(asDom);
 		return this.document;
 	}
 }

@@ -15,15 +15,8 @@
  */
 package li.strolch.model.parameter;
 
-import java.text.MessageFormat;
-
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Tags;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
-
-import org.w3c.dom.Element;
-
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -31,7 +24,6 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class IntegerParameter extends AbstractParameter<Integer> {
 
-	public static final String TYPE = "Integer"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
 	private Integer value = Integer.MAX_VALUE;
@@ -55,26 +47,9 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		setValue(value);
 	}
 
-	/**
-	 * DOM Constructor
-	 *
-	 * @param element
-	 */
-	public IntegerParameter(Element element) {
-		super.fromDom(element);
-
-		String valueS = element.getAttribute(Tags.VALUE);
-		if (StringHelper.isEmpty(valueS)) {
-			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
-			throw new StrolchException(msg);
-		}
-
-		setValue(parseFromString(valueS));
-	}
-
 	@Override
 	public String getType() {
-		return IntegerParameter.TYPE;
+		return StrolchValueType.INTEGER.getType();
 	}
 
 	@Override
@@ -91,6 +66,11 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	public void setValue(Integer value) {
 		validateValue(value);
 		this.value = value;
+	}
+
+	@Override
+	public void setValueFromString(String valueAsString) {
+		setValue(parseFromString(valueAsString));
 	}
 
 	@Override

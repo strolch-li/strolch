@@ -19,11 +19,6 @@ import java.util.Date;
 
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -81,30 +76,6 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 	}
 
 	/**
-	 * DOM Constructor
-	 *
-	 * @param element
-	 */
-	public Order(Element element) {
-		super.fromDom(element);
-
-		String date = element.getAttribute(Tags.DATE);
-		String state = element.getAttribute(Tags.STATE);
-
-		if (StringHelper.isEmpty(date)) {
-			setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse("-")); //$NON-NLS-1$
-		} else {
-			setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse(date));
-		}
-
-		if (state == null || state.isEmpty()) {
-			setState(State.CREATED);
-		} else {
-			setState(State.valueOf(state));
-		}
-	}
-
-	/**
 	 * @return the date
 	 */
 	public Date getDate() {
@@ -132,18 +103,6 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 	 */
 	public void setState(State state) {
 		this.state = state;
-	}
-
-	@Override
-	public Element toDom(Document doc) {
-
-		Element orderElement = doc.createElement(Tags.ORDER);
-		fillElement(orderElement);
-
-		orderElement.setAttribute(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(this.date));
-		orderElement.setAttribute(Tags.STATE, this.state.toString());
-
-		return orderElement;
 	}
 
 	@Override
@@ -179,7 +138,7 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 	public Order getRootElement() {
 		return this;
 	}
-	
+
 	@Override
 	public boolean isRootElement() {
 		return true;

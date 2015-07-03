@@ -13,6 +13,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.State;
+import li.strolch.model.xml.ActivityToDomVisitor;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -128,7 +129,7 @@ public class ActivityTest {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		Document document = db.newDocument();
-		Element dom = this.activity.toDom(document);
+		Element dom = new ActivityToDomVisitor().toDom(this.activity);
 		document.appendChild(dom);
 
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();

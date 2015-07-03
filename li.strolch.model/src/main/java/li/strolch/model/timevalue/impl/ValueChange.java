@@ -17,14 +17,8 @@ package li.strolch.model.timevalue.impl;
 
 import java.io.Serializable;
 
-import li.strolch.model.Tags;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Martin Smock <smock.martin@gmail.com>
@@ -67,7 +61,8 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	public Long getTime() {
 		return this.time;
 	}
-	
+
+	@Override
 	public void setTime(Long time) {
 		this.time = time;
 	}
@@ -77,7 +72,8 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	public T getValue() {
 		return (T) this.value.getCopy();
 	}
-	
+
+	@Override
 	public void setValue(T value) {
 		this.value = value;
 	}
@@ -134,13 +130,15 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 		sb.append(this.time);
 		sb.append(", value=");
 		sb.append(this.value);
+		sb.append(", stateId=");
+		sb.append(this.stateId);
 		sb.append("]");
 		return sb.toString();
 	}
 
 	@Override
 	public String getStateId() {
-		return stateId;
+		return this.stateId;
 	}
 
 	@Override
@@ -151,17 +149,6 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	@SuppressWarnings("unchecked")
 	@Override
 	public IValueChange<T> getClone() {
-		return new ValueChange(time, value);
+		return new ValueChange(this.time, this.value, this.stateId);
 	}
-
-	@Override
-	public Element toDom(Document doc) {
-		Element element = doc.createElement(Tags.VALUE_CHANGE);
-		element.setAttribute(Tags.STATE_ID, this.stateId);
-		element.setAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(time));
-		element.setAttribute(Tags.VALUE, this.value.getValueAsString());
-		element.setAttribute(Tags.VALUE_CLASS, this.value.getClass().getName());
-		return element;
-	}
-
 }

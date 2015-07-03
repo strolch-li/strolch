@@ -18,12 +18,9 @@ package li.strolch.model.timevalue;
 import li.strolch.model.timedstate.AbstractStrolchTimedState;
 import li.strolch.model.timevalue.impl.TimeVariable;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 /**
- * Interface for operators to be used to change the values of {@link ITimeValue}
- * in a {@link ITimeVariable} or {@link AbstractStrolchTimedState}.
+ * Interface for operators to be used to change the values of {@link ITimeValue} in a {@link ITimeVariable} or
+ * {@link AbstractStrolchTimedState}.
  * 
  * @author Martin Smock <smock.martin@gmail.com>
  */
@@ -31,15 +28,13 @@ import org.w3c.dom.Element;
 public interface IValueChange<T extends IValue> {
 
 	/**
-	 * @return the id of the {@link AbstractStrolchTimedState} the change
-	 *         applies to
+	 * @return the id of the {@link AbstractStrolchTimedState} the change applies to
 	 */
 	String getStateId();
 
 	/**
 	 * @param id
-	 *            the id of the {@link AbstractStrolchTimedState} the change
-	 *            applies to
+	 *            the id of the {@link AbstractStrolchTimedState} the change applies to
 	 */
 	void setStateId(String id);
 
@@ -47,31 +42,23 @@ public interface IValueChange<T extends IValue> {
 	 * @return the time this change has to be applied
 	 */
 	Long getTime();
-	
-	void setTime(Long time); 
+
+	void setTime(Long time);
 
 	/**
 	 * @return the value of the change
 	 */
 	T getValue();
-	
-	void setValue(T value); 
+
+	void setValue(T value);
 
 	/**
-	 * @return the inverse neutralizing a change. Very useful to undo changes
-	 *         made to a {@link TimeVariable}.
+	 * @return the inverse neutralizing a change. Very useful to undo changes made to a {@link TimeVariable}.
 	 */
 	IValueChange<T> getInverse();
-	
+
 	/**
 	 * @return a copy of this
 	 */
-	IValueChange<T> getClone(); 
-	
-	/**
-	 * @param doc
-	 * @return a xml serialisation of this
-	 */
-	Element toDom(Document doc); 
-
+	IValueChange<T> getClone();
 }

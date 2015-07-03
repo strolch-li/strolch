@@ -108,6 +108,16 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 
 	public ITimeValue<T> getStateAt(Long time);
 
+	/**
+	 * set the value at a point in time to a given time value object from a string value
+	 *
+	 * @param time
+	 *            the time to set the {@link IValue}
+	 * @param value
+	 *            the string to parse to an {@link IValue}
+	 */
+	void setStateFromStringAt(final Long time, final String value);
+
 	public ITimeVariable<T> getTimeEvolution();
 
 	public void setParent(Resource aThis);

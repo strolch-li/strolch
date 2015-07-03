@@ -19,9 +19,6 @@ import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator.LocatorBuilder;
-
-import org.w3c.dom.Element;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -112,31 +109,6 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	protected void fillClone(StrolchElement clone) {
 		clone.setId(getId());
 		clone.setName(getName());
-	}
-
-	protected void fillElement(Element element) {
-		element.setAttribute(Tags.ID, getId());
-		element.setAttribute(Tags.NAME, getName());
-		element.setAttribute(Tags.TYPE, getType());
-	}
-
-	/**
-	 * Builds the fields of this {@link StrolchElement} from a {@link Element}
-	 *
-	 * @param element
-	 */
-	protected void fromDom(Element element) {
-		String id = element.getAttribute(Tags.ID);
-		String name = element.getAttribute(Tags.NAME);
-
-		if (id != null && name != null) {
-			setId(id);
-			setName(name);
-		} else {
-			String msg = "Check the values of the element: {0} either id or name attribute is null!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, element.getNodeName());
-			throw new StrolchException(msg);
-		}
 	}
 
 	@Override

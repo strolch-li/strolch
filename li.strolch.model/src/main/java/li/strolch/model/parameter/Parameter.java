@@ -26,11 +26,19 @@ import li.strolch.model.visitor.ParameterVisitor;
 public interface Parameter<T> extends StrolchElement {
 
 	/**
-	 * the value of the parameter as string
+	 * Returns the value of the parameter as string
 	 * 
-	 * @return String
+	 * @return the value as string
 	 */
 	public String getValueAsString();
+
+	/**
+	 * Set the value of the parameter from a string
+	 * 
+	 * @param valueAsString
+	 *            the string from which to set the value
+	 */
+	public void setValueFromString(String valueAsString);
 
 	/**
 	 * the value of the parameter

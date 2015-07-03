@@ -18,6 +18,8 @@ package li.strolch.model.activity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.model.GroupedParameterizedElement;
@@ -27,17 +29,13 @@ import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
+import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 /**
- * An {@link Action} represents a single step within an {@link Activity}, that
- * is, one that is not further decomposed within the {@link Activity}. A
- * {@link Activity} applies {@link IValueChange} objects at the start and end
- * time of the {@link Activity}.
+ * An {@link Action} represents a single step within an {@link Activity}, that is, one that is not further decomposed
+ * within the {@link Activity}. A {@link Activity} applies {@link IValueChange} objects at the start and end time of the
+ * {@link Activity}.
  * 
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
@@ -46,13 +44,20 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	protected static final long serialVersionUID = 1L;
 
 	protected Activity parent;
-	protected String resourceId, resourceType;
-	protected State state = State.CREATED;
+	protected String resourceId;
+	protected String resourceType;
+	protected State state;
 
-	protected final List<IValueChange<?>> changes = new ArrayList<>();
+	protected List<IValueChange<? extends IValue<?>>> changes;
 
 	public Action(String id, String name, String type) {
 		super(id, name, type);
+		this.state = State.CREATED;
+	}
+
+	private void initChanges() {
+		if (this.changes == null)
+			this.changes = new ArrayList<>();
 	}
 
 	/**
@@ -86,8 +91,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @return the type of the <code>Resource</code> this <code>Action</code>
-	 *         acts on
+	 * @return the type of the <code>Resource</code> this <code>Action</code> acts on
 	 */
 	public String getResourceType() {
 		return this.resourceType;
@@ -101,22 +105,38 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
+	 * Returns true if this {@link Action} contains any {@link IValueChange changes}, false if not
+	 * 
+	 * @return true if this {@link Action} contains any {@link IValueChange changes}, false if not
+	 */
+	public boolean hasChanges() {
+		return this.changes != null && !this.changes.isEmpty();
+	}
+
+	/**
 	 * @param add
-	 *            <code>IValueChange</code> to be applied to the
-	 *            <code>Resource</code>
+	 *            <code>IValueChange</code> to be applied to the <code>Resource</code>
 	 * 
 	 * @return <tt>true</tt> (as specified by {@link Collection#add})
 	 */
-	public boolean addChange(IValueChange<?> change) {
+	public boolean addChange(IValueChange<? extends IValue<?>> change) {
+		initChanges();
 		return changes.add(change);
 	}
 
 	/**
-	 * @return the list of <code>IValueChange</code> attached to the
-	 *         <code>Action</code> start
+	 * @return the list of <code>IValueChange</code> attached to the <code>Action</code> start
 	 */
-	public List<IValueChange<?>> getChanges() {
+	public List<IValueChange<? extends IValue<?>>> getChanges() {
+		if (this.changes == null)
+			return Collections.emptyList();
 		return changes;
+	}
+
+	public Iterator<IValueChange<? extends IValue<?>>> changesIterator() {
+		if (this.changes == null)
+			return Collections.<IValueChange<? extends IValue<?>>> emptyList().iterator();
+		return this.changes.iterator();
 	}
 
 	@Override
@@ -135,14 +155,16 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
-	public StrolchElement getClone() {
+	public Action getClone() {
 		Action clone = new Action(getId(), getName(), getType());
 		clone.setDbid(getDbid());
 		clone.setResourceId(resourceId);
 		clone.setResourceType(resourceType);
 		clone.setState(state);
-		for (IValueChange<?> change : getChanges()) {
-			clone.changes.add(change.getClone());
+		if (this.changes != null) {
+			for (IValueChange<? extends IValue<?>> change : getChanges()) {
+				clone.addChange(change.getClone());
+			}
 		}
 		return clone;
 	}
@@ -185,6 +207,8 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	@Override
 	public Long getStart() {
 		Long start = Long.MAX_VALUE;
+		if (this.changes == null)
+			return start;
 		for (IValueChange<?> change : changes) {
 			start = Math.min(start, change.getTime());
 		}
@@ -194,23 +218,11 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	@Override
 	public Long getEnd() {
 		Long end = 0L;
+		if (this.changes == null)
+			return end;
 		for (IValueChange<?> change : changes) {
 			end = Math.max(end, change.getTime());
 		}
 		return end;
 	}
-
-	@Override
-	public Element toDom(Document doc) {
-		Element element = doc.createElement(Tags.ACTION);
-		fillElement(element);
-		element.setAttribute(Tags.STATE, this.state.toString());
-		element.setAttribute(Tags.RESOURCE_ID, this.resourceId);
-		element.setAttribute(Tags.RESOURCE_TYPE, this.resourceType);
-		for (IValueChange<?> change : changes) {
-			element.appendChild(change.toDom(doc));
-		}
-		return element;
-	}
-
 }

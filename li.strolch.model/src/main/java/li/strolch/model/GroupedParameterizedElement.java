@@ -25,10 +25,6 @@ import java.util.Set;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.parameter.Parameter;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -289,32 +285,6 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 			return Collections.emptySet();
 		}
 		return new HashSet<String>(this.parameterBagMap.keySet());
-	}
-
-	@Override
-	public void fromDom(Element element) {
-		super.fromDom(element);
-
-		String type = element.getAttribute(Tags.TYPE);
-		setType(type);
-
-		NodeList bags = element.getElementsByTagName(Tags.PARAMETER_BAG);
-		for (int i = 0; i < bags.getLength(); i++) {
-			Element bagElement = (Element) bags.item(i);
-			ParameterBag bag = new ParameterBag(bagElement);
-			addParameterBag(bag);
-		}
-	}
-
-	@Override
-	protected void fillElement(Element element) {
-		super.fillElement(element);
-
-		if (this.parameterBagMap != null) {
-			for (ParameterBag bag : this.parameterBagMap.values()) {
-				element.appendChild(bag.toDom(element.getOwnerDocument()));
-			}
-		}
 	}
 
 	/**

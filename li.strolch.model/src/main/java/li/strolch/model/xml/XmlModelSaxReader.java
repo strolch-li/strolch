@@ -16,9 +16,9 @@
 package li.strolch.model.xml;
 
 import java.text.MessageFormat;
+import java.util.ArrayDeque;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Deque;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
@@ -27,30 +27,14 @@ import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.Tags;
-import li.strolch.model.parameter.BooleanParameter;
-import li.strolch.model.parameter.DateParameter;
-import li.strolch.model.parameter.DurationParameter;
-import li.strolch.model.parameter.FloatListParameter;
-import li.strolch.model.parameter.FloatParameter;
-import li.strolch.model.parameter.IntegerListParameter;
-import li.strolch.model.parameter.IntegerParameter;
-import li.strolch.model.parameter.LongListParameter;
-import li.strolch.model.parameter.LongParameter;
+import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringListParameter;
-import li.strolch.model.parameter.StringParameter;
-import li.strolch.model.timedstate.BooleanTimedState;
-import li.strolch.model.timedstate.FloatTimedState;
-import li.strolch.model.timedstate.IntegerTimedState;
-import li.strolch.model.timedstate.StringSetTimedState;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
-import li.strolch.model.timevalue.impl.AString;
-import li.strolch.model.timevalue.impl.BooleanValue;
-import li.strolch.model.timevalue.impl.FloatValue;
-import li.strolch.model.timevalue.impl.IntegerValue;
-import li.strolch.model.timevalue.impl.StringSetValue;
+import li.strolch.model.timevalue.impl.ValueChange;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,13 +56,15 @@ public class XmlModelSaxReader extends DefaultHandler {
 	protected ModelStatistics statistics;
 
 	private GroupedParameterizedElement parameterizedElement;
+	private Deque<Activity> activityStack;
 	private ParameterBag pBag;
 	private StrolchTimedState<? extends IValue<?>> state;
-	private String stateType;
+	private StrolchValueType stateType;
 
 	public XmlModelSaxReader(StrolchElementListener listener) {
 		this.listener = listener;
 		this.statistics = new ModelStatistics();
+		this.activityStack = new ArrayDeque<>();
 	}
 
 	/**
@@ -104,6 +90,56 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String resType = attributes.getValue(Tags.TYPE);
 			Resource resource = new Resource(resId, resName, resType);
 			this.parameterizedElement = resource;
+
+			break;
+
+		case Tags.ACTIVITY:
+
+			String activityId = attributes.getValue(Tags.ID);
+			String activityName = attributes.getValue(Tags.NAME);
+			String activityType = attributes.getValue(Tags.TYPE);
+			Activity activity = new Activity(activityId, activityName, activityType);
+			this.parameterizedElement = activity;
+			this.activityStack.push(activity);
+
+			break;
+
+		case Tags.ACTION:
+
+			// Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="CREATED" Type="Use"
+
+			String actionId = attributes.getValue(Tags.ID);
+			String actionName = attributes.getValue(Tags.NAME);
+			String actionType = attributes.getValue(Tags.TYPE);
+			String actionResourceId = attributes.getValue(Tags.RESOURCE_ID);
+			String actionResourceType = attributes.getValue(Tags.RESOURCE_TYPE);
+			String actionState = attributes.getValue(Tags.STATE);
+			Action action = new Action(actionId, actionName, actionType);
+			action.setResourceId(actionResourceId);
+			action.setResourceType(actionResourceType);
+			action.setState(State.valueOf(actionState));
+
+			this.activityStack.peek().addElement(action);
+			this.parameterizedElement = action;
+
+			break;
+
+		case Tags.VALUE_CHANGE:
+
+			// ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" ValueClass="Integer"
+
+			String valueChangeStateId = attributes.getValue(Tags.STATE_ID);
+			String valueChangeTimeS = attributes.getValue(Tags.TIME);
+			String valueChangeValue = attributes.getValue(Tags.VALUE);
+			String valueChangeType = attributes.getValue(Tags.TYPE);
+
+			IValue<?> value = StrolchValueType.parse(valueChangeType).valueInstance(valueChangeValue);
+			long valueChangeTime = ISO8601FormatFactory.getInstance().getDateFormat().parse(valueChangeTimeS).getTime();
+			ValueChange<IValue<?>> valueChange = new ValueChange<IValue<?>>(valueChangeTime, value);
+			valueChange.setStateId(valueChangeStateId);
+
+			((Action) this.parameterizedElement).addChange(valueChange);
+
 			break;
 
 		case Tags.ORDER:
@@ -122,6 +158,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 				order.setState(orderState);
 			}
 			this.parameterizedElement = order;
+
 			break;
 
 		case Tags.PARAMETER_BAG:
@@ -131,11 +168,10 @@ public class XmlModelSaxReader extends DefaultHandler {
 			ParameterBag pBag = new ParameterBag(pBagId, pBagName, pBagType);
 			this.pBag = pBag;
 			this.parameterizedElement.addParameterBag(pBag);
+
 			break;
 
 		case Tags.PARAMETER:
-
-			// TODO refactor this code into using visitors
 
 			String paramId = attributes.getValue(Tags.ID);
 			String paramName = attributes.getValue(Tags.NAME);
@@ -149,110 +185,50 @@ public class XmlModelSaxReader extends DefaultHandler {
 						.parseBoolean(paramHiddenS);
 				String paramUom = attributes.getValue(Tags.UOM);
 				String paramInterpretation = attributes.getValue(Tags.INTERPRETATION);
-				Parameter<?> param;
-				switch (paramType) {
-				case StringParameter.TYPE:
-					param = new StringParameter(paramId, paramName, paramValue);
-					break;
-				case IntegerParameter.TYPE:
-					param = new IntegerParameter(paramId, paramName, IntegerParameter.parseFromString(paramValue));
-					break;
-				case BooleanParameter.TYPE:
-					param = new BooleanParameter(paramId, paramName, BooleanParameter.parseFromString(paramValue));
-					break;
-				case LongParameter.TYPE:
-					param = new LongParameter(paramId, paramName, LongParameter.parseFromString(paramValue));
-					break;
-				case DateParameter.TYPE:
-					param = new DateParameter(paramId, paramName, DateParameter.parseFromString(paramValue));
-					break;
-				case DurationParameter.TYPE:
-					param = new DurationParameter(paramId, paramName, DurationParameter.parseFromString(paramValue));
-					break;
-				case StringListParameter.TYPE:
-					param = new StringListParameter(paramId, paramName, StringListParameter.parseFromString(paramValue));
-					break;
-				case IntegerListParameter.TYPE:
-					param = new IntegerListParameter(paramId, paramName,
-							IntegerListParameter.parseFromString(paramValue));
-					break;
-				case FloatListParameter.TYPE:
-					param = new FloatListParameter(paramId, paramName, FloatListParameter.parseFromString(paramValue));
-					break;
-				case LongListParameter.TYPE:
-					param = new LongListParameter(paramId, paramName, LongListParameter.parseFromString(paramValue));
-					break;
-				case FloatParameter.TYPE:
-					param = new FloatParameter(paramId, paramName, FloatParameter.parseFromString(paramValue));
-					break;
-				default:
-					throw new UnsupportedOperationException(MessageFormat.format(
-							"Parameters of type {0} are not supported!", paramType)); //$NON-NLS-1$
-				}
+
+				StrolchValueType type = StrolchValueType.parse(paramType);
+
+				Parameter<?> param = type.parameterInstance();
+				param.setId(paramId);
+				param.setName(paramName);
+				param.setValueFromString(paramValue);
+
 				param.setHidden(paramHidden);
 				param.setUom(paramUom);
 				param.setInterpretation(paramInterpretation);
 				param.setIndex(index);
+
 				this.pBag.addParameter(param);
+
 			} catch (Exception e) {
 				throw new StrolchException("Failed to instantiate parameter " + paramId + " for bag "
 						+ this.pBag.getLocator() + " due to " + e.getMessage(), e);
 			}
+
 			break;
 
 		case Tags.TIMED_STATE:
+
 			String stateId = attributes.getValue(Tags.ID);
 			String stateName = attributes.getValue(Tags.NAME);
-			this.stateType = attributes.getValue(Tags.TYPE);
+			String stateType = attributes.getValue(Tags.TYPE);
 
-			switch (this.stateType) {
-			case FloatTimedState.TYPE:
-				this.state = new FloatTimedState(stateId, stateName);
-				break;
-			case IntegerTimedState.TYPE:
-				this.state = new IntegerTimedState(stateId, stateName);
-				break;
-			case BooleanTimedState.TYPE:
-				this.state = new BooleanTimedState(stateId, stateName);
-				break;
-			case StringSetTimedState.TYPE:
-				this.state = new StringSetTimedState(stateId, stateName);
-				break;
-			default:
-				break;
-			}
+			this.stateType = StrolchValueType.parse(stateType);
+			this.state = this.stateType.timedStateInstance();
+			this.state.setId(stateId);
+			this.state.setName(stateName);
 
 			break;
 
 		case Tags.VALUE:
+
 			String valueTime = attributes.getValue(Tags.TIME);
 			Date date = ISO8601FormatFactory.getInstance().parseDate(valueTime);
 			long time = date.getTime();
 			String valueValue = attributes.getValue(Tags.VALUE);
-			switch (this.stateType) {
-			case FloatTimedState.TYPE:
-				((FloatTimedState) this.state).getTimeEvolution().setValueAt(time, new FloatValue(valueValue));
-				break;
-			case IntegerTimedState.TYPE:
-				((IntegerTimedState) this.state).getTimeEvolution().setValueAt(time, new IntegerValue(valueValue));
-				break;
-			case BooleanTimedState.TYPE:
-				((BooleanTimedState) this.state).getTimeEvolution().setValueAt(time, new BooleanValue(valueValue));
-				break;
-			case StringSetTimedState.TYPE:
 
-				Set<AString> value = new HashSet<>();
-				String[] values = valueValue.split(",");
-				for (String s : values) {
-					value.add(new AString(s.trim()));
-				}
+			this.state.setStateFromStringAt(time, valueValue);
 
-				StringSetValue stringSetValue = new StringSetValue(value);
-				((StringSetTimedState) this.state).getTimeEvolution().setValueAt(time, stringSetValue);
-				break;
-			default:
-				break;
-			}
 			break;
 
 		default:
@@ -264,30 +240,58 @@ public class XmlModelSaxReader extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 
 		switch (qName) {
-		case Tags.STROLCH_MODEL:
-			break;
 		case Tags.RESOURCE:
 			this.listener.notifyResource((Resource) this.parameterizedElement);
 			this.statistics.nrOfResources++;
 			this.parameterizedElement = null;
+
 			break;
+
+		case Tags.ACTIVITY:
+
+			Activity activity = this.activityStack.pop();
+			if (this.activityStack.isEmpty()) {
+				this.listener.notifyActivity(activity);
+				this.statistics.nrOfActivities++;
+			}
+			this.parameterizedElement = null;
+
+			break;
+
 		case Tags.ORDER:
+
 			this.listener.notifyOrder((Order) this.parameterizedElement);
 			this.statistics.nrOfOrders++;
 			this.parameterizedElement = null;
+
 			break;
+
+		case Tags.ACTION:
+
+			this.parameterizedElement = null;
+
+			break;
+
 		case Tags.PARAMETER_BAG:
+
 			this.pBag = null;
+
 			break;
-		case Tags.PARAMETER:
-			break;
-		case Tags.INCLUDE_FILE:
-			break;
+
 		case Tags.TIMED_STATE:
+
 			((Resource) this.parameterizedElement).addTimedState(this.state);
+
 			break;
+
+		case Tags.PARAMETER:
+		case Tags.INCLUDE_FILE:
 		case Tags.VALUE:
+		case Tags.VALUE_CHANGE:
+		case Tags.STROLCH_MODEL:
+
 			break;
+
 		default:
 			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
 		}

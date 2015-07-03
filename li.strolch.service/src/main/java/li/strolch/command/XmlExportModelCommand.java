@@ -34,16 +34,19 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
+import li.strolch.model.ActivityVisitor;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.xml.OrderToSaxWriterVisitor;
 import li.strolch.model.xml.ResourceToSaxWriterVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -258,6 +261,17 @@ public class XmlExportModelCommand extends Command {
 			Resource resource = resourceMap.getBy(tx(), type, id);
 			visitor.visit(resource);
 			this.statistics.nrOfResources++;
+			logElementsWritten();
+		}
+	}
+
+	private void writeActivitiesByType(XMLStreamWriter writer, ActivityMap activityMap, String type) {
+		ActivityVisitor<?> visitor = new ActivityToSaxWriterVisitor(writer);
+		Set<String> keysByType = new TreeSet<>(activityMap.getKeysBy(tx(), type));
+		for (String id : keysByType) {
+			Activity activity = activityMap.getBy(tx(), type, id);
+			visitor.visit(activity);
+			this.statistics.nrOfActivities++;
 			logElementsWritten();
 		}
 	}

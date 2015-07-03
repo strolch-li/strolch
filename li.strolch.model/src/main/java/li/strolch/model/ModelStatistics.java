@@ -80,6 +80,17 @@ public class ModelStatistics {
 		return this.nrOfActivities;
 	}
 
+	/**
+	 * Adds the statistics of the other statistics to this statistics instance
+	 * 
+	 * @param statistics
+	 */
+	public void add(ModelStatistics statistics) {
+		this.nrOfOrders += statistics.nrOfOrders;
+		this.nrOfResources += statistics.nrOfResources;
+		this.nrOfActivities += statistics.nrOfActivities;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

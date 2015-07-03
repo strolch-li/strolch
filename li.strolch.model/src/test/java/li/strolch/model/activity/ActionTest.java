@@ -18,6 +18,7 @@ import javax.xml.transform.stream.StreamResult;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
+import li.strolch.model.xml.ActivityToDomVisitor;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -76,7 +77,7 @@ public class ActionTest {
 
 		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document document = db.newDocument();
-		Element dom = this.action.toDom(document);
+		Element dom = new ActivityToDomVisitor().toDom(this.action);
 		document.appendChild(dom);
 
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();

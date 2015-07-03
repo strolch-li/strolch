@@ -15,15 +15,8 @@
  */
 package li.strolch.model.parameter;
 
-import java.text.MessageFormat;
-
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Tags;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
-
-import org.w3c.dom.Element;
-
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -31,7 +24,6 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class LongParameter extends AbstractParameter<Long> {
 
-	public static final String TYPE = "Long"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
 	protected Long value;
@@ -55,23 +47,6 @@ public class LongParameter extends AbstractParameter<Long> {
 		setValue(value);
 	}
 
-	/**
-	 * DOM Constructor
-	 *
-	 * @param element
-	 */
-	public LongParameter(Element element) {
-		super.fromDom(element);
-
-		String valueS = element.getAttribute(Tags.VALUE);
-		if (StringHelper.isEmpty(valueS)) {
-			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
-			throw new StrolchException(msg);
-		}
-
-		setValue(parseFromString(valueS));
-	}
-
 	@Override
 	public String getValueAsString() {
 		return this.value.toString();
@@ -89,8 +64,13 @@ public class LongParameter extends AbstractParameter<Long> {
 	}
 
 	@Override
+	public void setValueFromString(String valueAsString) {
+		setValue(parseFromString(valueAsString));
+	}
+
+	@Override
 	public String getType() {
-		return LongParameter.TYPE;
+		return StrolchValueType.LONG.getType();
 	}
 
 	@Override

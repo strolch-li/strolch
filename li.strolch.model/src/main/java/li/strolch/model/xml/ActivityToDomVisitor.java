@@ -17,8 +17,9 @@ package li.strolch.model.xml;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
+import li.strolch.model.ActivityVisitor;
+import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,15 +29,23 @@ import ch.eitchnet.utils.helper.DomUtil;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderToDomVisitor extends StrolchElementToDomVisitor implements OrderVisitor<Document> {
+public class ActivityToDomVisitor extends StrolchElementToDomVisitor implements ActivityVisitor<Document> {
 
 	@Override
-	public Document visit(Order order) {
+	public Document visit(Activity activity) {
 		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
 		this.document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
 
-		Element asDom = toDom(order);
+		Element asDom = toDom(activity);
 		document.appendChild(asDom);
 		return this.document;
+	}
+
+	public Element toDom(Action action) {
+		return super.toDom(action);
+	}
+
+	public Element toDom(Activity activity) {
+		return super.toDom(activity);
 	}
 }

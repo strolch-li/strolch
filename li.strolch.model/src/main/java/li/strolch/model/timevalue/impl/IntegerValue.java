@@ -17,6 +17,7 @@ package li.strolch.model.timevalue.impl;
 
 import java.io.Serializable;
 
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 
@@ -43,6 +44,11 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 
 	public IntegerValue(String valueAsString) throws NumberFormatException {
 		this.value = Integer.parseInt(valueAsString);
+	}
+
+	@Override
+	public String getType() {
+		return StrolchValueType.INTEGER.getType();
 	}
 
 	@Override

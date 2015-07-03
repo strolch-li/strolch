@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,26 +21,26 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
+import li.strolch.model.ActivityVisitor;
+import li.strolch.model.activity.Activity;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ResourceToSaxWriterVisitor extends AbstractToSaxWriterVisitor implements ResourceVisitor<Void> {
+public class ActivityToSaxWriterVisitor extends AbstractToSaxWriterVisitor implements ActivityVisitor<Void> {
 
-	public ResourceToSaxWriterVisitor(XMLStreamWriter writer) {
+	public ActivityToSaxWriterVisitor(XMLStreamWriter writer) {
 		super(writer);
 	}
 
 	@Override
-	public Void visit(Resource resource) {
+	public Void visit(Activity activity) {
 		try {
-			writeElement(resource);
+			writeElement(activity);
 			this.writer.flush();
 		} catch (XMLStreamException e) {
-			String msg = "Failed to write Resource {0} due to {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, resource.getLocator(), e.getMessage());
+			String msg = "Failed to write Activity {0} due to {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, activity.getLocator(), e.getMessage());
 			throw new StrolchException(msg, e);
 		}
 

@@ -86,9 +86,13 @@ import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("nls")
 public class ModelTest {
+
+	protected static final Logger logger = LoggerFactory.getLogger(ModelTest.class);
 
 	@Test
 	public void shouldCreateResource() {
