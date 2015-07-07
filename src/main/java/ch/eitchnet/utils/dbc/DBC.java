@@ -17,6 +17,7 @@ package ch.eitchnet.utils.dbc;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Collection;
 
 import ch.eitchnet.utils.helper.StringHelper;
@@ -38,8 +39,8 @@ public enum DBC {
 		if (value2 != null && value2.equals(value1))
 			return;
 
-		String ex = "Values are not equal: {0}"; //$NON-NLS-1$
-		ex = MessageFormat.format(ex, msg);
+		String ex = "{0}: {1} != {2}"; //$NON-NLS-1$
+		ex = MessageFormat.format(ex, msg, value1, value2);
 		throw new DbcException(ex);
 	}
 
@@ -50,8 +51,8 @@ public enum DBC {
 		if (value2 != null && !value2.equals(value1))
 			return;
 
-		String ex = "Values are equal: {0}"; //$NON-NLS-1$
-		ex = MessageFormat.format(ex, msg);
+		String ex = "{0}: {1} == {2}"; //$NON-NLS-1$
+		ex = MessageFormat.format(ex, msg, value1, value2);
 		throw new DbcException(ex);
 	}
 
@@ -73,8 +74,8 @@ public enum DBC {
 
 	public void assertEmpty(String msg, String value) {
 		if (!StringHelper.isEmpty(value)) {
-			String ex = "Illegal non-empty value: {0}"; //$NON-NLS-1$
-			ex = MessageFormat.format(ex, msg);
+			String ex = "{0}: Illegal non-empty value: {1}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg, value);
 			throw new DbcException(ex);
 		}
 	}
@@ -82,8 +83,8 @@ public enum DBC {
 	public void assertEmpty(String msg, Object[] array) {
 		assertNotNull(msg, array);
 		if (array.length != 0) {
-			String ex = "Illegal non-empty value: {0}"; //$NON-NLS-1$
-			ex = MessageFormat.format(ex, msg);
+			String ex = "{0}: Illegal non-empty value: {1}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg, Arrays.toString(array));
 			throw new DbcException(ex);
 		}
 	}
@@ -91,15 +92,15 @@ public enum DBC {
 	public void assertEmpty(String msg, Collection<?> collection) {
 		assertNotNull(msg, collection);
 		if (!collection.isEmpty()) {
-			String ex = "Illegal non-empty value: {0}"; //$NON-NLS-1$
-			ex = MessageFormat.format(ex, msg);
+			String ex = "{0}: Illegal non-empty value: {1}"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg, collection.toString());
 			throw new DbcException(ex);
 		}
 	}
 
 	public void assertNotEmpty(String msg, String value) {
 		if (StringHelper.isEmpty(value)) {
-			String ex = "Illegal empty value: {0}"; //$NON-NLS-1$
+			String ex = "{0}: Illegal empty value"; //$NON-NLS-1$
 			ex = MessageFormat.format(ex, msg);
 			throw new DbcException(ex);
 		}
@@ -108,7 +109,7 @@ public enum DBC {
 	public void assertNotEmpty(String msg, Object[] array) {
 		assertNotNull(msg, array);
 		if (array.length == 0) {
-			String ex = "Illegal empty value: {0}"; //$NON-NLS-1$
+			String ex = "{0}: Illegal empty value"; //$NON-NLS-1$
 			ex = MessageFormat.format(ex, msg);
 			throw new DbcException(ex);
 		}
@@ -117,7 +118,7 @@ public enum DBC {
 	public void assertNotEmpty(String msg, Collection<?> collection) {
 		assertNotNull(msg, collection);
 		if (collection.isEmpty()) {
-			String ex = "Illegal empty value: {0}"; //$NON-NLS-1$
+			String ex = "{0}: Illegal empty value"; //$NON-NLS-1$
 			ex = MessageFormat.format(ex, msg);
 			throw new DbcException(ex);
 		}
@@ -125,7 +126,7 @@ public enum DBC {
 
 	public void assertNotNull(String msg, Object value) {
 		if (value == null) {
-			String ex = "Illegal null value: {0}"; //$NON-NLS-1$
+			String ex = "{0}: Illegal null value"; //$NON-NLS-1$
 			ex = MessageFormat.format(ex, msg);
 			throw new DbcException(ex);
 		}
@@ -133,8 +134,8 @@ public enum DBC {
 
 	public void assertNull(String msg, Object value) {
 		if (value != null) {
-			String ex = "Illegal situation as value is not null: {0}"; //$NON-NLS-1$
-			ex = MessageFormat.format(ex, msg);
+			String ex = "{0}: {1} != null"; //$NON-NLS-1$
+			ex = MessageFormat.format(ex, msg, value);
 			throw new DbcException(ex);
 		}
 	}

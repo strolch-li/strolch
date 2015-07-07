@@ -16,6 +16,7 @@
 package ch.eitchnet.utils.dbc;
 
 import java.io.File;
+import java.text.MessageFormat;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -64,10 +65,10 @@ public class DBCTest {
 	@Test
 	public void testAssertEquals_2() throws Exception {
 		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Values are not equal:");
-		String msg = "";
 		Object value1 = new Object();
 		Object value2 = new Object();
+		String msg = MessageFormat.format("{0}: {1} != {2}", "", value1, value2);
+		this.exception.expectMessage(msg);
 
 		DBC.PRE.assertEquals(msg, value1, value2);
 
@@ -87,11 +88,12 @@ public class DBCTest {
 	@Test
 	public void testAssertEquals_3() throws Exception {
 		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Values are not equal:");
 
-		String msg = "";
 		Object value1 = null;
 		Object value2 = new Object();
+
+		String msg = MessageFormat.format("{0}: {1} != {2}", "", value1, value2);
+		this.exception.expectMessage(msg);
 
 		DBC.PRE.assertEquals(msg, value1, value2);
 
@@ -108,11 +110,12 @@ public class DBCTest {
 	@Test
 	public void testAssertEquals_4() throws Exception {
 		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Values are not equal:");
 
-		String msg = "";
 		Object value1 = new Object();
 		Object value2 = null;
+
+		String msg = MessageFormat.format("{0}: {1} != {2}", "", value1, value2);
+		this.exception.expectMessage(msg);
 
 		DBC.PRE.assertEquals(msg, value1, value2);
 
@@ -150,11 +153,14 @@ public class DBCTest {
 	@Test
 	public void testAssertNotEquals_1() throws Exception {
 		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Values are equal:");
 
 		String msg = "";
 		Object value1 = null;
 		Object value2 = null;
+
+		String ex = "{0}: {1} == {2}";
+		ex = MessageFormat.format(ex, msg, value1, value2);
+		this.exception.expectMessage(ex);
 
 		DBC.PRE.assertNotEquals(msg, value1, value2);
 	}
@@ -217,11 +223,14 @@ public class DBCTest {
 	@Test
 	public void testAssertNotEquals_5() throws Exception {
 		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Values are equal:");
 
 		String msg = "";
 		Object value1 = "bla";
 		Object value2 = "bla";
+
+		String ex = "{0}: {1} == {2}";
+		ex = MessageFormat.format(ex, msg, value1, value2);
+		this.exception.expectMessage(ex);
 
 		DBC.PRE.assertNotEquals(msg, value1, value2);
 	}
@@ -379,10 +388,13 @@ public class DBCTest {
 	@Test
 	public void testAssertNotNull_1() throws Exception {
 		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Illegal null value:");
 
 		String msg = "";
 		Object value = null;
+
+		String ex = "{0}: Illegal null value";
+		ex = MessageFormat.format(ex, msg, value);
+		this.exception.expectMessage(ex);
 
 		DBC.PRE.assertNotNull(msg, value);
 	}
@@ -414,10 +426,11 @@ public class DBCTest {
 	@Test
 	public void testAssertNull_1() throws Exception {
 		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Illegal situation as value is not null:");
 
-		String msg = "";
 		Object value = new Object();
+
+		String msg = MessageFormat.format("{0}: {1} != null", "", value);
+		this.exception.expectMessage(msg);
 
 		DBC.PRE.assertNull(msg, value);
 	}
