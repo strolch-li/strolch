@@ -16,8 +16,12 @@
 package li.strolch.model;
 
 import static org.junit.Assert.assertTrue;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
+import li.strolch.model.xml.ActivityFromDomVisitor;
+import li.strolch.model.xml.ActivityToDomVisitor;
 import li.strolch.model.xml.OrderFromDomVisitor;
 import li.strolch.model.xml.OrderToDomVisitor;
 import li.strolch.model.xml.ResourceFromDomVisitor;
@@ -63,4 +67,21 @@ public class XmlToDomTest extends ModelTest {
 		visitor.visit(parsedResource);
 		assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
 	}
+
+	@Test
+	public void shouldFormatAndParseActivity() {
+
+		Activity activity = ModelGenerator.createActivity("@1", "My Activity 1", "Transport");
+
+		ActivityToDomVisitor domVisitor = new ActivityToDomVisitor();
+		domVisitor.visit(activity);
+		Document document = domVisitor.getDocument();
+
+		Activity parsedActivity = new ActivityFromDomVisitor().visit(document);
+
+		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(parsedActivity);
+		visitor.visit(parsedActivity);
+		assertTrue("To DOM and back should equal same Activity:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
+	}
+
 }

@@ -19,7 +19,6 @@ import java.text.MessageFormat;
 
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
-import li.strolch.model.Tags;
 
 import org.xml.sax.ContentHandler;
 
@@ -36,9 +35,7 @@ public class ResourceToSaxVisitor extends StrolchElementToSaxVisitor implements 
 	public Void visit(Resource res) {
 		try {
 
-			this.contentHandler.startElement(null, null, Tags.RESOURCE, attributesFor(res));
 			toSax(res);
-			this.contentHandler.endElement(null, null, Tags.RESOURCE);
 
 		} catch (Exception e) {
 			String msg = "Failed to transform Resource {0} to XML due to {1}"; //$NON-NLS-1$

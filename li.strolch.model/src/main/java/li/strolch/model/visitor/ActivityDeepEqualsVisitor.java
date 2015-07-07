@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,36 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model.xml;
+package li.strolch.model.visitor;
 
-import java.text.MessageFormat;
+import java.util.List;
 
 import li.strolch.model.ActivityVisitor;
+import li.strolch.model.Locator;
 import li.strolch.model.activity.Activity;
-
-import org.xml.sax.ContentHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ActivityToSaxVisitor extends StrolchElementToSaxVisitor implements ActivityVisitor<Void> {
+public class ActivityDeepEqualsVisitor extends StrolchElementDeepEqualsVisitor implements
+		ActivityVisitor<List<Locator>> {
 
-	public ActivityToSaxVisitor(ContentHandler contentHandler) {
-		super(contentHandler);
+	private Activity sourceActivity;
+
+	public ActivityDeepEqualsVisitor(Activity sourceActivity) {
+		this.sourceActivity = sourceActivity;
 	}
 
 	@Override
-	public Void visit(Activity activity) {
-		try {
-
-			toSax(activity);
-
-		} catch (Exception e) {
-			String msg = "Failed to transform Activity {0} to XML due to {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, activity.getLocator(), e.getMessage());
-			throw new RuntimeException(msg, e);
-		}
-
-		return null;
+	public List<Locator> visit(Activity dstActivity) {
+		deepEquals(this.sourceActivity, dstActivity);
+		return getMismatchedLocators();
 	}
 }

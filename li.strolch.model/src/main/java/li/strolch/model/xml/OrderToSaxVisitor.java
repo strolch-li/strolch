@@ -19,7 +19,6 @@ import java.text.MessageFormat;
 
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
-import li.strolch.model.Tags;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -37,9 +36,7 @@ public class OrderToSaxVisitor extends StrolchElementToSaxVisitor implements Ord
 	public Void visit(Order order) {
 		try {
 
-			this.contentHandler.startElement(null, null, Tags.ORDER, attributesFor(order));
 			toSax(order);
-			this.contentHandler.endElement(null, null, Tags.ORDER);
 
 		} catch (SAXException e) {
 			String msg = "Failed to transform Order {0} to XML due to {1}"; //$NON-NLS-1$

@@ -16,7 +16,9 @@
 package li.strolch.model.visitor;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import li.strolch.model.GroupedParameterizedElement;
@@ -25,9 +27,13 @@ import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeVariable;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -53,6 +59,7 @@ public class StrolchElementDeepEqualsVisitor {
 	}
 
 	protected void deepEquals(StrolchElement srcElement, StrolchElement dstElement) {
+		DBC.PRE.assertEquals("Both elements should have the same ID", srcElement.getId(), dstElement.getId());
 		if (!srcElement.getName().equals(dstElement.getName())) {
 			this.mismatchedLocators.add(dstElement.getLocator());
 		}
@@ -96,6 +103,74 @@ public class StrolchElementDeepEqualsVisitor {
 				StrolchTimedState<?> dstTimedState = dstRes.getTimedState(timedStateKey);
 				this.mismatchedLocators.add(dstTimedState.getLocator());
 			}
+		}
+	}
+
+	protected void deepEquals(Activity srcActivity, Activity dstActivity) {
+		deepEquals((StrolchElement) srcActivity, (StrolchElement) dstActivity);
+		deepEquals((GroupedParameterizedElement) srcActivity, (GroupedParameterizedElement) dstActivity);
+
+		Iterator<Entry<String, IActivityElement>> iter = srcActivity.elementIterator();
+		while (iter.hasNext()) {
+			IActivityElement srcActivityElement = iter.next().getValue();
+
+			if (!dstActivity.hasElement(srcActivityElement.getId())) {
+				this.mismatchedLocators.add(srcActivityElement.getLocator());
+				continue;
+			}
+
+			IActivityElement dstActivityElement = dstActivity.getElement(srcActivityElement.getId());
+
+			if (!srcActivityElement.getClass().equals(dstActivityElement.getClass())) {
+				this.mismatchedLocators.add(srcActivityElement.getLocator());
+				continue;
+			}
+
+			if (srcActivityElement instanceof Activity) {
+				deepEquals((Activity) srcActivityElement, (Activity) dstActivityElement);
+			} else if (srcActivityElement instanceof Action) {
+				deepEquals((Action) srcActivityElement, (Action) dstActivityElement);
+			} else {
+				throw new UnsupportedOperationException("Unhandled instance type " + srcActivityElement.getClass());
+			}
+		}
+
+		iter = dstActivity.elementIterator();
+		while (iter.hasNext()) {
+			IActivityElement activityElement = iter.next().getValue();
+			if (!srcActivity.hasElement(activityElement.getId())) {
+				this.mismatchedLocators.add(activityElement.getLocator());
+			}
+		}
+	}
+
+	protected void deepEquals(Action srcAction, Action dstAction) {
+		deepEquals((StrolchElement) srcAction, (StrolchElement) dstAction);
+		deepEquals((GroupedParameterizedElement) srcAction, (GroupedParameterizedElement) dstAction);
+
+		if (!srcAction.getResourceId().equals(dstAction.getResourceId())) {
+			this.mismatchedLocators.add(dstAction.getLocator());
+		}
+		if (!srcAction.getResourceType().equals(dstAction.getResourceType())) {
+			this.mismatchedLocators.add(dstAction.getLocator());
+		}
+		if (!srcAction.getState().equals(dstAction.getState())) {
+			this.mismatchedLocators.add(dstAction.getLocator());
+		}
+
+		if ((srcAction.getParent() == null && srcAction.getParent() != null)
+				|| (srcAction.getParent() != null && srcAction.getParent() == null)) {
+			this.mismatchedLocators.add(dstAction.getLocator());
+		} else if (!srcAction.getParent().getId().equals(dstAction.getParent().getId())) {
+			this.mismatchedLocators.add(dstAction.getLocator());
+		} else if (!srcAction.getParent().getType().equals(dstAction.getParent().getType())) {
+			this.mismatchedLocators.add(dstAction.getLocator());
+		}
+
+		if (srcAction.hasChanges() != dstAction.hasChanges()) {
+			this.mismatchedLocators.add(dstAction.getLocator());
+		} else if (!srcAction.getChanges().equals(dstAction.getChanges())) {
+			this.mismatchedLocators.add(dstAction.getLocator());
 		}
 	}
 

@@ -91,6 +91,8 @@ public class StrolchElementToDomVisitor {
 					element.appendChild(toDom((Activity) activityElement));
 				} else if (activityElement instanceof Action) {
 					element.appendChild(toDom((Action) activityElement));
+				} else {
+					throw new IllegalArgumentException("Unhandled element " + activityElement.getClass());
 				}
 			}
 		}

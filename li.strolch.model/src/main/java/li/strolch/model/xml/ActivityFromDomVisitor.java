@@ -15,34 +15,18 @@
  */
 package li.strolch.model.xml;
 
-import java.text.MessageFormat;
-
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Activity;
 
-import org.xml.sax.ContentHandler;
+import org.w3c.dom.Document;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ActivityToSaxVisitor extends StrolchElementToSaxVisitor implements ActivityVisitor<Void> {
+public class ActivityFromDomVisitor extends StrolchElementFromDomVisitor {
 
-	public ActivityToSaxVisitor(ContentHandler contentHandler) {
-		super(contentHandler);
-	}
-
-	@Override
-	public Void visit(Activity activity) {
-		try {
-
-			toSax(activity);
-
-		} catch (Exception e) {
-			String msg = "Failed to transform Activity {0} to XML due to {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, activity.getLocator(), e.getMessage());
-			throw new RuntimeException(msg, e);
-		}
-
-		return null;
+	public Activity visit(Document doc) {
+		Activity activity = new Activity();
+		fillElement(doc.getDocumentElement(), activity);
+		return activity;
 	}
 }

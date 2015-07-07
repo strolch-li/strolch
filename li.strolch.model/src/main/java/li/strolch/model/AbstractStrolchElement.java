@@ -33,10 +33,10 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	protected String name;
 
 	/**
-	 * Empty constructor
+	 * Empty constructor - for marshalling only!
 	 */
 	public AbstractStrolchElement() {
-		//
+		super();
 	}
 
 	/**

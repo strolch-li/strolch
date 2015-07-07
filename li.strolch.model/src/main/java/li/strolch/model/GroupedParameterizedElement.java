@@ -38,10 +38,10 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	protected String type;
 
 	/**
-	 * Empty constructor
+	 * Empty constructor - for marshalling only!
 	 */
 	protected GroupedParameterizedElement() {
-		//
+		super();
 	}
 
 	/**

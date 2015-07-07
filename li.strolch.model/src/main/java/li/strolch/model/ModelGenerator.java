@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.parameter.BooleanParameter;
@@ -134,6 +136,9 @@ public class ModelGenerator {
 	public static final String BAG_ID = "@bag01";
 	public static final String BAG_NAME = "Test Bag";
 	public static final String BAG_TYPE = "TestBag";
+
+	public static final String ACTION_RES_TYPE = "ResType";
+	public static final String ACTION_RES_ID = "@resId";
 
 	/**
 	 * Creates an {@link Resource} with the given values and adds a {@link ParameterBag} by calling
@@ -322,6 +327,59 @@ public class ModelGenerator {
 		return orders;
 	}
 
+	public static Activity createActivity(String id, String name, String type) {
+
+		Activity rootActivity = new Activity(id, name, type);
+		ParameterBag bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
+		rootActivity.addParameterBag(bag);
+
+		Action action = createAction("act_" + rootActivity.getId(), "Action " + rootActivity.getName(), "Use");
+		rootActivity.addElement(action);
+
+		Activity subActivity = new Activity("sub_" + id, "sub_" + name, type);
+		bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
+		subActivity.addParameterBag(bag);
+		rootActivity.addElement(subActivity);
+
+		action = createAction("act_" + id, "Action " + name, "Use");
+		subActivity.addElement(action);
+
+		Activity subSubActivity = new Activity("subSub_" + id, "subSub_" + name, type);
+		bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
+		subSubActivity.addParameterBag(bag);
+		subActivity.addElement(subSubActivity);
+
+		action = createAction("act_" + id, "Action " + name, "Use");
+		subSubActivity.addElement(action);
+
+		return rootActivity;
+	}
+
+	public static Action createAction(String id, String name, String type) {
+		Action action = new Action(id, name, type);
+		action.setResourceId(ACTION_RES_ID);
+		action.setResourceType(ACTION_RES_TYPE);
+		ParameterBag bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
+		action.addParameterBag(bag);
+
+		action.addChange(new ValueChange<>(0L, new IntegerValue(0), STATE_INTEGER_ID));
+		action.addChange(new ValueChange<>(10L, new IntegerValue(10), STATE_INTEGER_ID));
+		action.addChange(new ValueChange<>(20L, new IntegerValue(20), STATE_INTEGER_ID));
+		action.addChange(new ValueChange<>(30L, new IntegerValue(30), STATE_INTEGER_ID));
+		action.addChange(new ValueChange<>(40L, new IntegerValue(20), STATE_INTEGER_ID));
+		action.addChange(new ValueChange<>(50L, new IntegerValue(10), STATE_INTEGER_ID));
+		action.addChange(new ValueChange<>(60L, new IntegerValue(0), STATE_INTEGER_ID));
+
+		return action;
+	}
+
+	public static Action createAction(String id, String name, String type, String resourceId, String resourceType) {
+		Action action = createAction(id, name, type);
+		action.setResourceId(resourceId);
+		action.setResourceType(resourceType);
+		return action;
+	}
+
 	/**
 	 * Creates a {@link ParameterBag} with the given values and calls {@link #addAllParameters(ParameterBag)} to add
 	 * {@link Parameter}s
@@ -336,7 +394,6 @@ public class ModelGenerator {
 	 * @return the newly created {@link ParameterBag}
 	 */
 	public static ParameterBag createParameterBag(String id, String name, String type) {
-
 		ParameterBag bag = new ParameterBag(id, name, type);
 		addAllParameters(bag);
 		return bag;

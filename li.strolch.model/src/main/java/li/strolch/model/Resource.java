@@ -38,10 +38,10 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 	private Map<String, StrolchTimedState<IValue<?>>> timedStateMap;
 
 	/**
-	 * Empty constructor
+	 * Empty constructor - for marshalling only!
 	 */
 	public Resource() {
-		//
+		super();
 	}
 
 	/**
@@ -106,7 +106,6 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 	@Override
 	public Resource getClone() {
 		Resource clone = new Resource();
-
 		super.fillClone(clone);
 
 		if (this.timedStateMap != null) {

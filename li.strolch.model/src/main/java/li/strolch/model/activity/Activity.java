@@ -30,6 +30,7 @@ import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * Parameterized object grouping a collection of {@link Activity} and {@link Action} objects defining the process to be
@@ -45,6 +46,13 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 
 	protected Map<String, IActivityElement> elements;
 
+	/**
+	 * Empty constructor - for marshalling only!
+	 */
+	public Activity() {
+		super();
+	}
+
 	public Activity(String id, String name, String type) {
 		super(id, name, type);
 	}
@@ -56,8 +64,27 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 		}
 	}
 
+	/**
+	 * Returns true if this {@link Activity} contains any children i.e. any of {@link Action} or {@link Activity}
+	 * 
+	 * @return true if this {@link Activity} contains any children i.e. any of {@link Action} or {@link Activity}
+	 */
 	public boolean hasElements() {
 		return this.elements != null && !this.elements.isEmpty();
+	}
+
+	/**
+	 * Returns true if this {@link Activity} contains a child with the given id. The element instance type is ignored,
+	 * i.e. {@link Action} or {@link Activity}
+	 * 
+	 * @param id
+	 *            the id of the element to check for
+	 * 
+	 * @return true if this {@link Activity} contains a child with the given id. The element instance type is ignored,
+	 *         i.e. {@link Action} or {@link Activity}
+	 */
+	public boolean hasElement(String id) {
+		return this.elements != null && this.elements.containsKey(id);
 	}
 
 	/**
@@ -67,6 +94,11 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 	 * @return the element added
 	 */
 	public IActivityElement addElement(IActivityElement activityElement) {
+		DBC.PRE.assertNotEquals("Can't add element to itself!", this, activityElement);
+		DBC.PRE.assertNull("Parent can't already be set!", activityElement.getParent());
+
+		// TODO make sure we can't create a circular dependency
+
 		initElements();
 		String id = activityElement.getId();
 		if (id == null)
@@ -87,10 +119,11 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 	 *            the id of the <code>IActivityElement</code>
 	 * @return IActivityElement
 	 */
-	public IActivityElement getElement(String id) {
+	@SuppressWarnings("unchecked")
+	public <T extends IActivityElement> T getElement(String id) {
 		if (this.elements == null)
 			return null;
-		return elements.get(id);
+		return (T) elements.get(id);
 	}
 
 	/**
@@ -179,9 +212,12 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 
 	@Override
 	public Activity getClone() {
-		Activity clone = new Activity(id, name, type);
+		Activity clone = new Activity();
+		super.fillClone(clone);
+
 		if (this.elements == null)
 			return clone;
+
 		for (IActivityElement element : this.elements.values()) {
 			clone.addElement(element.getClone());
 		}

@@ -27,7 +27,6 @@ import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
-import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
@@ -50,8 +49,22 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	protected List<IValueChange<? extends IValue<?>>> changes;
 
+	/**
+	 * Empty constructor - for marshalling only!
+	 */
+	public Action() {
+		super();
+	}
+
 	public Action(String id, String name, String type) {
 		super(id, name, type);
+		this.state = State.CREATED;
+	}
+
+	public Action(String id, String name, String type, String resourceId, String resourceType) {
+		super(id, name, type);
+		this.resourceId = resourceId;
+		this.resourceType = resourceType;
 		this.state = State.CREATED;
 	}
 
@@ -64,7 +77,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	 * @return the id of the {@link Resource} the {@link Action} acts on
 	 */
 	public String getResourceId() {
-		return resourceId;
+		return this.resourceId;
 	}
 
 	/**
@@ -78,8 +91,9 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	/**
 	 * @return the current <code>State</code> of the a<code>Action</code>
 	 */
+	@Override
 	public State getState() {
-		return state;
+		return this.state;
 	}
 
 	/**
@@ -121,7 +135,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	 */
 	public boolean addChange(IValueChange<? extends IValue<?>> change) {
 		initChanges();
-		return changes.add(change);
+		return this.changes.add(change);
 	}
 
 	/**
@@ -130,7 +144,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	public List<IValueChange<? extends IValue<?>>> getChanges() {
 		if (this.changes == null)
 			return Collections.emptyList();
-		return changes;
+		return this.changes;
 	}
 
 	public Iterator<IValueChange<? extends IValue<?>>> changesIterator() {
@@ -140,13 +154,13 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
-	public StrolchElement getParent() {
-		return parent;
+	public Activity getParent() {
+		return this.parent;
 	}
 
 	@Override
 	public StrolchRootElement getRootElement() {
-		return (parent == null) ? null : parent.getRootElement();
+		return (this.parent == null) ? null : this.parent.getRootElement();
 	}
 
 	@Override
@@ -156,16 +170,19 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public Action getClone() {
-		Action clone = new Action(getId(), getName(), getType());
-		clone.setDbid(getDbid());
-		clone.setResourceId(resourceId);
-		clone.setResourceType(resourceType);
-		clone.setState(state);
+		Action clone = new Action();
+		super.fillClone(clone);
+
+		clone.setResourceId(this.resourceId);
+		clone.setResourceType(this.resourceType);
+		clone.setState(this.state);
+
 		if (this.changes != null) {
 			for (IValueChange<? extends IValue<?>> change : getChanges()) {
 				clone.addChange(change.getClone());
 			}
 		}
+
 		return clone;
 	}
 
@@ -209,7 +226,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		Long start = Long.MAX_VALUE;
 		if (this.changes == null)
 			return start;
-		for (IValueChange<?> change : changes) {
+		for (IValueChange<?> change : this.changes) {
 			start = Math.min(start, change.getTime());
 		}
 		return start;
@@ -220,7 +237,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		Long end = 0L;
 		if (this.changes == null)
 			return end;
-		for (IValueChange<?> change : changes) {
+		for (IValueChange<?> change : this.changes) {
 			end = Math.max(end, change.getTime());
 		}
 		return end;

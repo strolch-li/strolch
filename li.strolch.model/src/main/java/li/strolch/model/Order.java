@@ -39,10 +39,10 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 	private State state;
 
 	/**
-	 * Empty constructor
+	 * Empty constructor - for marshalling only!
 	 */
 	public Order() {
-		//
+		super();
 	}
 
 	/**

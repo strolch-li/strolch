@@ -106,8 +106,6 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 		case Tags.ACTION:
 
-			// Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="CREATED" Type="Use"
-
 			String actionId = attributes.getValue(Tags.ID);
 			String actionName = attributes.getValue(Tags.NAME);
 			String actionType = attributes.getValue(Tags.TYPE);
@@ -119,14 +117,11 @@ public class XmlModelSaxReader extends DefaultHandler {
 			action.setResourceType(actionResourceType);
 			action.setState(State.valueOf(actionState));
 
-			this.activityStack.peek().addElement(action);
 			this.parameterizedElement = action;
 
 			break;
 
 		case Tags.VALUE_CHANGE:
-
-			// ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" ValueClass="Integer"
 
 			String valueChangeStateId = attributes.getValue(Tags.STATE_ID);
 			String valueChangeTimeS = attributes.getValue(Tags.TIME);
@@ -135,8 +130,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 			IValue<?> value = StrolchValueType.parse(valueChangeType).valueInstance(valueChangeValue);
 			long valueChangeTime = ISO8601FormatFactory.getInstance().getDateFormat().parse(valueChangeTimeS).getTime();
-			ValueChange<IValue<?>> valueChange = new ValueChange<IValue<?>>(valueChangeTime, value);
-			valueChange.setStateId(valueChangeStateId);
+			ValueChange<IValue<?>> valueChange = new ValueChange<IValue<?>>(valueChangeTime, value, valueChangeStateId);
 
 			((Action) this.parameterizedElement).addChange(valueChange);
 
@@ -167,7 +161,6 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String pBagType = attributes.getValue(Tags.TYPE);
 			ParameterBag pBag = new ParameterBag(pBagId, pBagName, pBagType);
 			this.pBag = pBag;
-			this.parameterizedElement.addParameterBag(pBag);
 
 			break;
 
@@ -253,6 +246,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 			if (this.activityStack.isEmpty()) {
 				this.listener.notifyActivity(activity);
 				this.statistics.nrOfActivities++;
+			} else {
+				this.activityStack.peek().addElement(activity);
 			}
 			this.parameterizedElement = null;
 
@@ -268,12 +263,14 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 		case Tags.ACTION:
 
+			this.activityStack.peek().addElement((Action) parameterizedElement);
 			this.parameterizedElement = null;
 
 			break;
 
 		case Tags.PARAMETER_BAG:
 
+			this.parameterizedElement.addParameterBag(pBag);
 			this.pBag = null;
 
 			break;
