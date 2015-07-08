@@ -19,6 +19,7 @@ import java.util.List;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.State;
+import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import ch.eitchnet.utils.dbc.DBC;
@@ -56,7 +57,7 @@ public class ShiftActionCommand extends PlanActionCommand {
 			unplan(action);
 
 		// iterate all changes and shift
-		final List<IValueChange<?>> changes = action.getChanges();
+		final List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
 		for (final IValueChange<?> change : changes) {
 			change.setTime(change.getTime() + shift);
 		}
@@ -74,7 +75,7 @@ public class ShiftActionCommand extends PlanActionCommand {
 			unplan(action);
 
 		// iterate all changes and shift
-		final List<IValueChange<?>> changes = action.getChanges();
+		final List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
 		for (final IValueChange<?> change : changes) {
 			change.setTime(change.getTime() - shift);
 		}
@@ -86,5 +87,4 @@ public class ShiftActionCommand extends PlanActionCommand {
 	public void setShift(Long shift) {
 		this.shift = shift;
 	}
-
 }

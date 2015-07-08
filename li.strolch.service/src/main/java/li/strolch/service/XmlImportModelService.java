@@ -76,10 +76,13 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 			command.setAllowInclude(arg.allowInclude);
 			command.setAddOrders(arg.addOrders);
 			command.setAddResources(arg.addResources);
+			command.setAddActivities(arg.addActivities);
 			command.setUpdateOrders(arg.updateOrders);
 			command.setUpdateResources(arg.updateResources);
+			command.setUpdateActivities(arg.addActivities);
 			command.setOrderTypes(arg.orderTypes);
 			command.setResourceTypes(arg.resourceTypes);
+			command.setActivityTypes(arg.activityTypes);
 
 			tx.addCommand(command);
 			tx.commitOnClose();
@@ -91,6 +94,7 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 				"Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(), arg.realm, durationS)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$
 
 		return new XmlImportModelResult(statistics);
 	}

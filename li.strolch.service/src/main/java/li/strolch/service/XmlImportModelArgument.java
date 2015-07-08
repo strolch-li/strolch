@@ -28,10 +28,13 @@ public class XmlImportModelArgument extends ServiceArgument {
 	public boolean allowInclude = true;
 	public boolean addOrders = true;
 	public boolean addResources = true;
+	public boolean addActivities = true;
 	public boolean updateOrders = true;
 	public boolean updateResources = true;
+	public boolean updateActivities = true;
 	public Set<String> orderTypes = new HashSet<>();
 	public Set<String> resourceTypes = new HashSet<>();
+	public Set<String> activityTypes = new HashSet<>();
 
 	@Override
 	public String toString() {
@@ -40,7 +43,7 @@ public class XmlImportModelArgument extends ServiceArgument {
 
 		builder.append("external=");
 		builder.append(this.external);
-		
+
 		builder.append(", allowInclude=");
 		builder.append(this.allowInclude);
 
@@ -51,11 +54,15 @@ public class XmlImportModelArgument extends ServiceArgument {
 			builder.append(", addOrders");
 		if (this.addResources)
 			builder.append(", addResources");
+		if (this.addActivities)
+			builder.append(", addActivities");
 
 		if (this.updateOrders)
 			builder.append(", updateOrders");
 		if (this.updateResources)
 			builder.append(", updateResources");
+		if (this.updateActivities)
+			builder.append(", updateActivities");
 
 		if (this.resourceTypes != null && !this.resourceTypes.isEmpty()) {
 			builder.append(", resourceTypes=");
@@ -63,11 +70,19 @@ public class XmlImportModelArgument extends ServiceArgument {
 		} else {
 			builder.append(", resourceTypes=*");
 		}
+
 		if (this.orderTypes != null && !this.orderTypes.isEmpty()) {
 			builder.append(", orderTypes=");
 			builder.append(this.orderTypes);
 		} else {
 			builder.append(", orderTypes=*");
+		}
+
+		if (this.activityTypes != null && !this.activityTypes.isEmpty()) {
+			builder.append(", activityTypes=");
+			builder.append(this.activityTypes);
+		} else {
+			builder.append(", activityTypes=*");
 		}
 
 		builder.append("]");
