@@ -36,6 +36,7 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ch.eitchnet.utils.dbc.DBC;
@@ -71,7 +72,11 @@ public class StrolchElementFromDomVisitor {
 
 		NodeList childNodes = resourceElement.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
-			Element timedStateElem = (Element) childNodes.item(i);
+			Node item = childNodes.item(i);
+			if (!(item instanceof Element))
+				continue;
+
+			Element timedStateElem = (Element) item;
 			if (!timedStateElem.getNodeName().equals(Tags.TIMED_STATE))
 				continue;
 
@@ -113,7 +118,11 @@ public class StrolchElementFromDomVisitor {
 
 			NodeList timeValueElems = timedStateElem.getChildNodes();
 			for (int j = 0; j < timeValueElems.getLength(); j++) {
-				Element timeValueElem = (Element) timeValueElems.item(j);
+				Node timeValueItem = timeValueElems.item(j);
+				if (!(timeValueItem instanceof Element))
+					continue;
+
+				Element timeValueElem = (Element) timeValueItem;
 				if (!timeValueElem.getNodeName().equals(Tags.VALUE))
 					continue;
 
@@ -151,7 +160,11 @@ public class StrolchElementFromDomVisitor {
 
 		NodeList bags = element.getChildNodes();
 		for (int i = 0; i < bags.getLength(); i++) {
-			Element bagElement = (Element) bags.item(i);
+			Node item = bags.item(i);
+			if (!(item instanceof Element))
+				continue;
+
+			Element bagElement = (Element) item;
 			if (!bagElement.getNodeName().equals(Tags.PARAMETER_BAG))
 				continue;
 
@@ -170,7 +183,11 @@ public class StrolchElementFromDomVisitor {
 		// add all the parameters
 		NodeList parameterElements = element.getChildNodes();
 		for (int i = 0; i < parameterElements.getLength(); i++) {
-			Element paramElement = (Element) parameterElements.item(i);
+			Node item = parameterElements.item(i);
+			if (!(item instanceof Element))
+				continue;
+
+			Element paramElement = (Element) item;
 			if (!paramElement.getNodeName().equals(Tags.PARAMETER))
 				continue;
 
@@ -224,7 +241,11 @@ public class StrolchElementFromDomVisitor {
 
 		NodeList childNodes = activityElement.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
-			Element childElem = (Element) childNodes.item(i);
+			Node item = childNodes.item(i);
+			if (!(item instanceof Element))
+				continue;
+
+			Element childElem = (Element) item;
 
 			switch (childElem.getNodeName()) {
 			case Tags.ACTIVITY:
@@ -259,7 +280,11 @@ public class StrolchElementFromDomVisitor {
 
 		NodeList valueChangeNodes = element.getChildNodes();
 		for (int i = 0; i < valueChangeNodes.getLength(); i++) {
-			Element valueChangeElem = (Element) valueChangeNodes.item(i);
+			Node item = valueChangeNodes.item(i);
+			if (!(item instanceof Element))
+				continue;
+
+			Element valueChangeElem = (Element) item;
 			if (!valueChangeElem.getNodeName().equals(Tags.VALUE_CHANGE))
 				continue;
 

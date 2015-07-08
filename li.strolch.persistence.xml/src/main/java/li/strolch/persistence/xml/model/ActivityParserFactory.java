@@ -15,38 +15,20 @@
  */
 package li.strolch.persistence.xml.model;
 
-import li.strolch.model.Order;
-import li.strolch.model.xml.OrderFromDomVisitor;
-import li.strolch.model.xml.OrderToDomVisitor;
-
-import org.w3c.dom.Document;
-
+import li.strolch.model.activity.Activity;
 import ch.eitchnet.xmlpers.api.DomParser;
+import ch.eitchnet.xmlpers.api.ParserFactory;
+import ch.eitchnet.xmlpers.api.SaxParser;
 
-public class OrderDomParser implements DomParser<Order> {
-
-	private Order order;
+public class ActivityParserFactory implements ParserFactory<Activity> {
 
 	@Override
-	public Order getObject() {
-		return this.order;
+	public DomParser<Activity> getDomParser() {
+		return new ActivityDomParser();
 	}
 
 	@Override
-	public void setObject(Order object) {
-		this.order = object;
-	}
-
-	@Override
-	public Document toDom() {
-		OrderToDomVisitor orderDomVisitor = new OrderToDomVisitor();
-		orderDomVisitor.visit(this.order);
-		return orderDomVisitor.getDocument();
-	}
-
-	@Override
-	public void fromDom(Document document) {
-		Order order = new OrderFromDomVisitor().visit(document);
-		this.order = order;
+	public SaxParser<Activity> getSaxParser() {
+		return new ActivitySaxParser();
 	}
 }

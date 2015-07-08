@@ -15,38 +15,38 @@
  */
 package li.strolch.persistence.xml.model;
 
-import li.strolch.model.Order;
-import li.strolch.model.xml.OrderFromDomVisitor;
-import li.strolch.model.xml.OrderToDomVisitor;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.xml.ActivityFromDomVisitor;
+import li.strolch.model.xml.ActivityToDomVisitor;
 
 import org.w3c.dom.Document;
 
 import ch.eitchnet.xmlpers.api.DomParser;
 
-public class OrderDomParser implements DomParser<Order> {
+public class ActivityDomParser implements DomParser<Activity> {
 
-	private Order order;
+	private Activity activity;
 
 	@Override
-	public Order getObject() {
-		return this.order;
+	public Activity getObject() {
+		return this.activity;
 	}
 
 	@Override
-	public void setObject(Order object) {
-		this.order = object;
+	public void setObject(Activity activity) {
+		this.activity = activity;
 	}
 
 	@Override
 	public Document toDom() {
-		OrderToDomVisitor orderDomVisitor = new OrderToDomVisitor();
-		orderDomVisitor.visit(this.order);
-		return orderDomVisitor.getDocument();
+		ActivityToDomVisitor activityDomVisitor = new ActivityToDomVisitor();
+		activityDomVisitor.visit(this.activity);
+		return activityDomVisitor.getDocument();
 	}
 
 	@Override
 	public void fromDom(Document document) {
-		Order order = new OrderFromDomVisitor().visit(document);
-		this.order = order;
+		Activity activity = new ActivityFromDomVisitor().visit(document);
+		this.activity = activity;
 	}
 }
