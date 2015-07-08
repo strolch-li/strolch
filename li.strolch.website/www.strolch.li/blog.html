@@ -61,6 +61,44 @@
 
             <!-- blog post -->
             <div class="blog-post">
+                <h2 class="blog-post-title">Activities: Beginning of the planning engine</h2>
+
+                <p class="blog-post-meta">July 8, 2015 by <a href="#">Robert</a></p>
+
+                <p>The ground work of the Strolch planning engine has been laid.</p>
+                <hr>
+                <p>One of the core ideas in building Strolch was to create a planning engine. The planning engine would
+                    work in combination of <code>Order</code> objects representing customer orders,
+                    <code>Resource</code> objects representing machines, human resources, etc., and
+                    <code>Activity</code>/<code>Action</code> hierarchies defining a workflow.</p>
+
+                <p>With the latest couple of commits to Strolch we have now added <code>Activities</code> and a basic
+                    planning of <code>Actions</code> onto <code>Resources</code>. <code>Activities</code> have an
+                    ordered list of <code>IActivityElement</code> which allows creating an arbitrary deep tree structure
+                    of <code>Activity</code> and <code>Action</code> elements.</p>
+
+                <p><code>Action</code> objects have a list of <code>IValueChange</code> objects which define the start,
+                    end and further value changes over time on a referenced <code>Resource</code>. Thus planning an
+                    <code>Activity</code> is done by iterating the <code>Activity</code> hierarchy and for every <code>Action</code>
+                    selecting a relevant <code>Resource</code> and then then applying the changes of the
+                    <code>Action</code> on to the referenced <code>TimeState</code> on the <code>Resource</code>.</p>
+
+                <p>This implementation is currently very simple as it ignores all constraints which a
+                    <code>Resource</code> might have. In further development we shall implement a <code>Violation</code>
+                    model so that UIs can be built to visualize the over-use of <code>Resources</code>.</p>
+
+                <p>In even further steps we would then start implementing algorithms to not just apply the changes onto
+                    a <code>Resource</code>, but to actually search the <code>Resource</code> for time slots when the
+                    value changes would not violate any constraints applied to the resource.</p>
+
+                <p>We are very much looking forward to these new features. Stay tuned for your updates - even though
+                    they do take their time to arrive =).</p>
+
+            </div>
+            <!-- /.blog-post -->
+
+            <!-- blog post -->
+            <div class="blog-post">
                 <h2 class="blog-post-title">Strolch Documentation</h2>
 
                 <p class="blog-post-meta">April 6, 2015 by <a href="#">Robert</a></p>
