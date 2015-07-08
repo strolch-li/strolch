@@ -16,13 +16,13 @@
 package ch.eitchnet.xmlpers.test.impl;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import ch.eitchnet.xmlpers.api.SaxParser;
-import ch.eitchnet.xmlpers.api.XmlPersistenceStreamWriter;
 import ch.eitchnet.xmlpers.test.model.MyModel;
 import ch.eitchnet.xmlpers.test.model.MyParameter;
 
@@ -47,9 +47,9 @@ class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 
 	@SuppressWarnings("nls")
 	@Override
-	public void write(XmlPersistenceStreamWriter writer) throws XMLStreamException {
+	public void write(XMLStreamWriter writer) throws XMLStreamException {
 
-		writer.writeElement("Resource");
+		writer.writeStartElement("Resource");
 		writer.writeAttribute("id", this.resource.getId());
 		writer.writeAttribute("name", this.resource.getName());
 		writer.writeAttribute("type", this.resource.getType());
@@ -61,6 +61,7 @@ class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 			writer.writeAttribute("type", param.getType());
 			writer.writeAttribute("value", param.getValue());
 		}
+		writer.writeEndElement();
 	}
 
 	@SuppressWarnings("nls")

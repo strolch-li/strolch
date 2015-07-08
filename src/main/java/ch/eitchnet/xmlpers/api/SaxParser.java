@@ -16,6 +16,7 @@
 package ch.eitchnet.xmlpers.api;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -27,5 +28,5 @@ public interface SaxParser<T> {
 
 	public DefaultHandler getDefaultHandler();
 
-	public void write(XmlPersistenceStreamWriter xmlWriter) throws XMLStreamException;
+	public void write(XMLStreamWriter xmlWriter) throws XMLStreamException;
 }

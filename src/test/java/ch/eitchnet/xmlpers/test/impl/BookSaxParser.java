@@ -16,13 +16,13 @@
 package ch.eitchnet.xmlpers.test.impl;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import ch.eitchnet.xmlpers.api.SaxParser;
-import ch.eitchnet.xmlpers.api.XmlPersistenceStreamWriter;
 import ch.eitchnet.xmlpers.test.model.Book;
 
 /**
@@ -51,7 +51,7 @@ public class BookSaxParser extends DefaultHandler implements SaxParser<Book> {
 
 	@SuppressWarnings("nls")
 	@Override
-	public void write(XmlPersistenceStreamWriter writer) throws XMLStreamException {
+	public void write(XMLStreamWriter writer) throws XMLStreamException {
 
 		writer.writeEmptyElement("Book");
 		writer.writeAttribute("id", Long.toString(this.book.getId()));

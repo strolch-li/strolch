@@ -77,10 +77,9 @@ public class FileIo {
 				writer.writeStartDocument(DEFAULT_ENCODING, DEFAULT_XML_VERSION);
 
 				// then delegate object writing to caller
-				XmlPersistenceStreamWriter xmlWriter = new XmlPersistenceStreamWriter(writer);
 				SaxParser<T> saxParser = ctx.getParserFactor().getSaxParser();
 				saxParser.setObject(ctx.getObject());
-				saxParser.write(xmlWriter);
+				saxParser.write(writer);
 
 				// and now end
 				writer.writeEndDocument();
