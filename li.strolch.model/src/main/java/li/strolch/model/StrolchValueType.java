@@ -359,8 +359,12 @@ public enum StrolchValueType {
 	}
 
 	public static StrolchValueType parse(String value) {
+
+		// TODO this is for backwards compatibility where we still had States of type BooleanState instead of Boolean
+		String strippedValue = value.replace("State", "");
+
 		for (StrolchValueType type : StrolchValueType.values()) {
-			if (type.type.equals(value))
+			if (type.type.equals(strippedValue))
 				return type;
 		}
 		throw new IllegalArgumentException("Type " + value + " does not exist!");
