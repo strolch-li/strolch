@@ -15,6 +15,8 @@
  */
 package li.strolch.model;
 
+import static li.strolch.model.ModelGenerator.ACTION_RES_ID;
+import static li.strolch.model.ModelGenerator.ACTION_RES_TYPE;
 import static li.strolch.model.ModelGenerator.BAG_ID;
 import static li.strolch.model.ModelGenerator.BAG_NAME;
 import static li.strolch.model.ModelGenerator.BAG_TYPE;
@@ -52,6 +54,7 @@ import static li.strolch.model.ModelGenerator.STATE_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_10;
 import static li.strolch.model.ModelGenerator.STATE_TIME_20;
 import static li.strolch.model.ModelGenerator.STATE_TIME_30;
+import static li.strolch.model.ModelGenerator.createActivity;
 import static li.strolch.model.ModelGenerator.createOrder;
 import static li.strolch.model.ModelGenerator.createResource;
 import static li.strolch.model.Tags.BAG;
@@ -65,7 +68,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.FloatListParameter;
@@ -80,31 +86,114 @@ import li.strolch.model.timedstate.BooleanTimedState;
 import li.strolch.model.timedstate.FloatTimedState;
 import li.strolch.model.timedstate.IntegerTimedState;
 import li.strolch.model.timedstate.StringSetTimedState;
+import li.strolch.model.timevalue.IValue;
+import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.BooleanValue;
+import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
+import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("nls")
 public class ModelTest {
+
+	protected static final Logger logger = LoggerFactory.getLogger(ModelTest.class);
 
 	@Test
 	public void shouldCreateResource() {
 
 		Resource resource = createResource("@res01", "Test resource", "MyType");
+		assertEquals("@res01", resource.getId());
+		assertEquals("Test resource", resource.getName());
+		assertEquals("MyType", resource.getType());
+
 		ParameterBag bag = resource.getParameterBag(BAG_ID);
 		validateBag(bag);
+
 		validateStates(resource);
 	}
 
 	@Test
 	public void shouldCreateOrder() {
 
-		Order order = createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
+		Date date = new Date();
+		Order order = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		assertEquals("@ord01", order.getId());
+		assertEquals("Test Order", order.getName());
+		assertEquals("MyType", order.getType());
+		assertEquals(date, order.getDate());
+		assertEquals(State.OPEN, order.getState());
+
 		ParameterBag bag = order.getParameterBag(BAG_ID);
 		validateBag(bag);
+	}
+
+	@Test
+	public void shouldCreateActivity() {
+
+		String actId = "@act01";
+		String actName = "Test Activity";
+		String actType = "MyType";
+
+		List<IValueChange<? extends IValue<?>>> changes = new ArrayList<>();
+		changes.add(new ValueChange<>(0L, new IntegerValue(0), STATE_INTEGER_ID));
+		changes.add(new ValueChange<>(10L, new IntegerValue(10), STATE_INTEGER_ID));
+		changes.add(new ValueChange<>(20L, new IntegerValue(20), STATE_INTEGER_ID));
+		changes.add(new ValueChange<>(30L, new IntegerValue(30), STATE_INTEGER_ID));
+		changes.add(new ValueChange<>(40L, new IntegerValue(20), STATE_INTEGER_ID));
+		changes.add(new ValueChange<>(50L, new IntegerValue(10), STATE_INTEGER_ID));
+		changes.add(new ValueChange<>(60L, new IntegerValue(0), STATE_INTEGER_ID));
+
+		Activity activity = createActivity(actId, actName, actType);
+		assertEquals(actId, activity.getId());
+		assertEquals(actName, activity.getName());
+		assertEquals(actType, activity.getType());
+
+		ParameterBag bag = activity.getParameterBag(BAG_ID);
+		validateBag(bag);
+
+		Action action = activity.getElement("act_" + actId);
+		assertEquals("act_" + actId, action.getId());
+		assertEquals("Action " + actName, action.getName());
+		assertEquals("Use", action.getType());
+		assertEquals(ACTION_RES_ID, action.getResourceId());
+		assertEquals(ACTION_RES_TYPE, action.getResourceType());
+		assertEquals(changes, action.getChanges());
+
+		activity = activity.getElement("sub_" + actId);
+		assertEquals("sub_" + actId, activity.getId());
+		assertEquals("sub_" + actName, activity.getName());
+		assertEquals(actType, activity.getType());
+		bag = activity.getParameterBag(BAG_ID);
+		validateBag(bag);
+
+		action = activity.getElement("act_" + actId);
+		assertEquals("act_" + actId, action.getId());
+		assertEquals("Action " + actName, action.getName());
+		assertEquals("Use", action.getType());
+		assertEquals(ACTION_RES_ID, action.getResourceId());
+		assertEquals(ACTION_RES_TYPE, action.getResourceType());
+		assertEquals(changes, action.getChanges());
+
+		activity = activity.getElement("subSub_" + actId);
+		assertEquals("subSub_" + actId, activity.getId());
+		assertEquals("subSub_" + actName, activity.getName());
+		assertEquals(actType, activity.getType());
+		bag = activity.getParameterBag(BAG_ID);
+		validateBag(bag);
+
+		action = activity.getElement("act_" + actId);
+		assertEquals("act_" + actId, action.getId());
+		assertEquals("Action " + actName, action.getName());
+		assertEquals("Use", action.getType());
+		assertEquals(ACTION_RES_ID, action.getResourceId());
+		assertEquals(ACTION_RES_TYPE, action.getResourceType());
+		assertEquals(changes, action.getChanges());
 	}
 
 	@Test
@@ -128,6 +217,71 @@ public class ModelTest {
 	}
 
 	@Test
+	public void shouldPerformDeepActivityEquals() {
+		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType");
+		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType");
+		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
+		visitor.visit(dstActivity);
+		assertTrue("Same Activity should be deep equal!", visitor.isEqual());
+	}
+
+	@Test
+	public void shouldPerformActivityClone() {
+		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType");
+		Activity dstActivity = srcActivity.getClone();
+		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
+		visitor.visit(dstActivity);
+		assertTrue("Cloned Activity should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
+	}
+
+	@Test
+	public void shouldFailDeepActivityEquals1() {
+		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType");
+		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType");
+		dstActivity.setName("Bla");
+		dstActivity.setType("BlaBla");
+		ParameterBag bag = dstActivity.getParameterBag(BAG_ID);
+		bag.setName("Bla bla");
+		FloatParameter fParam = bag.getParameter(PARAM_FLOAT_ID);
+		fParam.setValue(23434234.234);
+		fParam.setName("Ohla");
+		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
+		visitor.visit(dstActivity);
+		assertFalse("Activity should not be same if something has been changed", visitor.isEqual());
+		assertEquals("Multiple changes should be registered", 6, visitor.getMismatchedLocators().size());
+	}
+
+	@Test
+	public void shouldFailDeepActivityEquals2() {
+		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType");
+		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType");
+
+		Action action = dstActivity.getElement("act_" + "@act01");
+		action.setResourceId("Bla");
+		action.setResourceType("Bla");
+		action.setType("Bla");
+		action.setState(State.CLOSED);
+		action.addChange(new ValueChange<>(1234567890L, new IntegerValue(12345), STATE_INTEGER_ID));
+
+		Activity activity = dstActivity.getElement("sub_" + "@act01");
+		activity.addElement(new Action("bla", "Bla", "Bla"));
+
+		action = activity.getElement("act_" + "@act01");
+		action.addChange(new ValueChange<>(1234567890L, new IntegerValue(12345), STATE_INTEGER_ID));
+
+		activity = activity.getElement("subSub_" + "@act01");
+		activity.addElement(new Action("bla", "Bla", "Bla"));
+
+		action = activity.getElement("act_" + "@act01");
+		action.addChange(new ValueChange<>(1234567890L, new IntegerValue(12345), STATE_INTEGER_ID));
+
+		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
+		visitor.visit(dstActivity);
+		assertFalse("Activity should not be same if something has been changed", visitor.isEqual());
+		assertEquals("Multiple changes should be registered", 9, visitor.getMismatchedLocators().size());
+	}
+
+	@Test
 	public void shouldPerformDeepResourceEquals() {
 		Resource srcRes = createResource("@res01", "Test resource", "MyType");
 		Resource dstRes = createResource("@res01", "Test resource", "MyType");
@@ -146,16 +300,6 @@ public class ModelTest {
 	}
 
 	@Test
-	public void shouldPerformOrderClone() {
-		Date date = new Date();
-		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
-		Order dstOrder = srcOrder.getClone();
-		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
-		visitor.visit(dstOrder);
-		assertTrue("Cloned Order should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
-	}
-
-	@Test
 	public void shouldFailDeepResourceEquals1() {
 		Resource srcRes = createResource("@res01", "Test resource", "MyType");
 		Resource dstRes = createResource("@res01", "Test resource", "MyType");
@@ -167,7 +311,7 @@ public class ModelTest {
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
 		visitor.visit(dstRes);
 		assertFalse("Resource should not be same if param is changed!", visitor.isEqual());
-		assertEquals("Three changes should be registered", 3, visitor.getMismatchedLocators().size());
+		assertEquals("Multiple changes should be registered", 3, visitor.getMismatchedLocators().size());
 	}
 
 	@Test
@@ -175,12 +319,12 @@ public class ModelTest {
 		Resource srcRes = createResource("@res01", "Test resource", "MyType");
 		Resource dstRes = createResource("@res01", "Test resource", "MyType");
 		BooleanTimedState timedState = dstRes.getTimedState(STATE_BOOLEAN_ID);
-		timedState.applyChange(new ValueChange<>(System.currentTimeMillis(), new BooleanValue(Boolean.TRUE)));
+		timedState.applyChange(new ValueChange<>(System.currentTimeMillis(), new BooleanValue(Boolean.FALSE)));
 		timedState.setName("Ohla");
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
 		visitor.visit(dstRes);
 		assertFalse("Resource should not be same if param is changed!", visitor.isEqual());
-		assertEquals("One change should be registered!", 1, visitor.getMismatchedLocators().size());
+		assertEquals("Multiple change should be registered!", 2, visitor.getMismatchedLocators().size());
 	}
 
 	@Test
@@ -191,6 +335,34 @@ public class ModelTest {
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
 		visitor.visit(dstOrder);
 		assertTrue("Same Order should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
+	}
+
+	@Test
+	public void shouldPerformOrderClone() {
+		Date date = new Date();
+		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		Order dstOrder = srcOrder.getClone();
+		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
+		visitor.visit(dstOrder);
+		assertTrue("Cloned Order should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
+	}
+
+	@Test
+	public void shouldFailDeepOrderEquals1() {
+		Date date = new Date();
+		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		Order dstOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		dstOrder.setDate(new Date(1L));
+		dstOrder.setState(State.CLOSED);
+		ParameterBag bag = dstOrder.getParameterBag(BAG_ID);
+		bag.setName("Bla bla");
+		FloatParameter fParam = bag.getParameter(PARAM_FLOAT_ID);
+		fParam.setValue(23434234.234);
+		fParam.setName("Ohla");
+		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
+		visitor.visit(dstOrder);
+		assertFalse("Order should not be same if something has been changed", visitor.isEqual());
+		assertEquals("Multiple changes should be registered", 5, visitor.getMismatchedLocators().size());
 	}
 
 	public static void validateBag(ParameterBag bag) {

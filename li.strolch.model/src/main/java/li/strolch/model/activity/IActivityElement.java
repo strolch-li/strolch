@@ -22,16 +22,16 @@ import li.strolch.model.StrolchElement;
  * Marker for all child elements of {@link Activity} objects
  * 
  * @author Martin Smock <martin.smock@bluewin.ch>
- * 
  */
 public interface IActivityElement extends StrolchElement {
 
-	Long getStart();
+	public Long getStart();
 
-	Long getEnd();
+	public Long getEnd();
 
-	State getState();
-	
-	void setParent(Activity activity); 
+	public State getState();
 
+	public void setParent(Activity activity);
+
+	public IActivityElement getClone();
 }

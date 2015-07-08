@@ -19,12 +19,15 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.activity.Activity;
+import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
@@ -43,6 +46,7 @@ public class CachedRealm extends InternalStrolchRealm {
 	private PersistenceHandler persistenceHandler;
 	private CachedResourceMap resourceMap;
 	private CachedOrderMap orderMap;
+	private CachedActivityMap activityMap;
 	private AuditTrail auditTrail;
 
 	public CachedRealm(String realm) {
@@ -77,6 +81,11 @@ public class CachedRealm extends InternalStrolchRealm {
 	}
 
 	@Override
+	public ActivityMap getActivityMap() {
+		return this.activityMap;
+	}
+
+	@Override
 	public AuditTrail getAuditTrail() {
 		return this.auditTrail;
 	}
@@ -88,6 +97,7 @@ public class CachedRealm extends InternalStrolchRealm {
 		this.persistenceHandler = container.getComponent(PersistenceHandler.class);
 		this.resourceMap = new CachedResourceMap();
 		this.orderMap = new CachedOrderMap();
+		this.activityMap = new CachedActivityMap();
 
 		if (isAuditTrailEnabled()) {
 			this.auditTrail = new CachedAuditTrail();
@@ -104,6 +114,7 @@ public class CachedRealm extends InternalStrolchRealm {
 		long start = System.nanoTime();
 		int nrOfOrders = 0;
 		int nrOfResources = 0;
+		int nrOfActivities = 0;
 
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
 			ResourceDao resourceDao = tx.getPersistenceHandler().getResourceDao(tx);
@@ -133,11 +144,26 @@ public class CachedRealm extends InternalStrolchRealm {
 			tx.commitOnClose();
 		}
 
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
+			ActivityDao activityDao = tx.getPersistenceHandler().getActivityDao(tx);
+			Set<String> activityTypes = activityDao.queryTypes();
+			for (String type : activityTypes) {
+				List<Activity> activities = activityDao.queryAll(type);
+				for (Activity activity : activities) {
+					this.activityMap.insert(activity);
+					nrOfActivities++;
+				}
+			}
+
+			tx.commitOnClose();
+		}
+
 		long duration = System.nanoTime() - start;
 		String durationS = StringHelper.formatNanoDuration(duration);
 		logger.info(MessageFormat.format("Loading Model from Database for realm {0} took {1}.", getRealm(), durationS)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Orders", nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Resources", nrOfResources)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Loaded {0} Activities", nrOfActivities)); //$NON-NLS-1$
 	}
 
 	@Override

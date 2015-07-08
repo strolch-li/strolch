@@ -34,16 +34,20 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
+import li.strolch.model.ActivityVisitor;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.xml.ActivityToSaxWriterVisitor;
 import li.strolch.model.xml.OrderToSaxWriterVisitor;
 import li.strolch.model.xml.ResourceToSaxWriterVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -65,8 +69,10 @@ public class XmlExportModelCommand extends Command {
 	private boolean overwrite;
 	private boolean doOrders;
 	private boolean doResources;
+	private boolean doActivities;
 	private Set<String> orderTypes;
 	private Set<String> resourceTypes;
+	private Set<String> activityTypes;
 
 	// output
 	private ModelStatistics statistics;
@@ -74,6 +80,7 @@ public class XmlExportModelCommand extends Command {
 	private int elementsToWrite;
 	private int nrOfResourcesToExport;
 	private int nrOfOrdersToExport;
+	private int nrOfActivitiesToExport;
 
 	private long nextLogTime;
 
@@ -137,10 +144,22 @@ public class XmlExportModelCommand extends Command {
 			}
 		}
 
-		this.elementsToWrite = this.nrOfResourcesToExport + this.nrOfOrdersToExport;
+		if (this.doActivities) {
+			ActivityMap activityMap = tx().getActivityMap();
+			Set<String> activityTypesToExport = activityMap.getTypes(tx());
+			if (!this.activityTypes.isEmpty())
+				activityTypesToExport.retainAll(this.activityTypes);
+
+			for (String type : activityTypesToExport) {
+				this.nrOfActivitiesToExport += activityMap.querySize(tx(), type);
+			}
+		}
+
+		this.elementsToWrite = this.nrOfResourcesToExport + this.nrOfOrdersToExport + this.nrOfActivitiesToExport;
 		logger.info("Exporting " + this.elementsToWrite + " Elements...");
 		logger.info("Exporting " + this.nrOfResourcesToExport + " Resources...");
 		logger.info("Exporting " + this.nrOfOrdersToExport + " Orders...");
+		logger.info("Exporting " + this.nrOfActivitiesToExport + " Activities...");
 
 		try (FileOutputStream out = new FileOutputStream(this.modelFile)) {
 			createdFiles.add(this.modelFile);
@@ -149,11 +168,10 @@ public class XmlExportModelCommand extends Command {
 
 			if (this.doResources) {
 				ResourceMap resourceMap = tx().getResourceMap();
-				Set<String> resourceTypesToExport = resourceMap.getTypes(tx());
+				Set<String> resourceTypesToExport = new TreeSet<>(resourceMap.getTypes(tx()));
 				if (!this.resourceTypes.isEmpty())
 					resourceTypesToExport.retainAll(this.resourceTypes);
 
-				resourceTypesToExport = new TreeSet<>(resourceTypesToExport);
 				for (String type : resourceTypesToExport) {
 
 					if (!this.multiFile) {
@@ -180,11 +198,10 @@ public class XmlExportModelCommand extends Command {
 
 			if (this.doOrders) {
 				OrderMap orderMap = tx().getOrderMap();
-				Set<String> orderTypesToExport = orderMap.getTypes(tx());
+				Set<String> orderTypesToExport = new TreeSet<>(orderMap.getTypes(tx()));
 				if (!this.orderTypes.isEmpty())
 					orderTypesToExport.retainAll(this.orderTypes);
 
-				orderTypesToExport = new TreeSet<>(orderTypesToExport);
 				for (String type : orderTypesToExport) {
 
 					if (!this.multiFile) {
@@ -202,6 +219,36 @@ public class XmlExportModelCommand extends Command {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = openXmlStreamWriter(typeOut);
 							writeOrdersByType(typeWriter, orderMap, type);
+							typeWriter.writeEndDocument();
+						}
+					}
+				}
+			}
+
+			if (this.doActivities) {
+				ActivityMap activityMap = tx().getActivityMap();
+				Set<String> activityTypesToExport = new TreeSet<>(activityMap.getTypes(tx()));
+				if (!this.activityTypes.isEmpty())
+					activityTypesToExport.retainAll(this.activityTypes);
+
+				for (String type : activityTypesToExport) {
+
+					if (!this.multiFile) {
+						writeActivitiesByType(writer, activityMap, type);
+					} else {
+						String typeXmlFile = exportName + UNDERLINE + Tags.ACTIVITY + UNDERLINE + type
+								+ XML_FILE_SUFFIX;
+						writer.writeEmptyElement(Tags.INCLUDE_FILE);
+						writer.writeAttribute(Tags.FILE, typeXmlFile);
+
+						File typeXmlFileF = new File(this.modelFile.getParentFile(), typeXmlFile);
+						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
+						logger.info("Writing " + activityMap.querySize(tx(), type) + " " + type
+								+ " Activities to path: " + typeXmlFileF.getAbsolutePath() + "...");
+						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
+							createdFiles.add(typeXmlFileF);
+							XMLStreamWriter typeWriter = openXmlStreamWriter(typeOut);
+							writeActivitiesByType(typeWriter, activityMap, type);
 							typeWriter.writeEndDocument();
 						}
 					}
@@ -262,6 +309,17 @@ public class XmlExportModelCommand extends Command {
 		}
 	}
 
+	private void writeActivitiesByType(XMLStreamWriter writer, ActivityMap activityMap, String type) {
+		ActivityVisitor<?> visitor = new ActivityToSaxWriterVisitor(writer);
+		Set<String> keysByType = new TreeSet<>(activityMap.getKeysBy(tx(), type));
+		for (String id : keysByType) {
+			Activity activity = activityMap.getBy(tx(), type, id);
+			visitor.visit(activity);
+			this.statistics.nrOfActivities++;
+			logElementsWritten();
+		}
+	}
+
 	private XMLStreamWriter openXmlStreamWriter(FileOutputStream out) throws FactoryConfigurationError,
 			XMLStreamException {
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
@@ -306,6 +364,14 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	/**
+	 * @param doActivities
+	 *            the doActivities to set
+	 */
+	public void setDoActivities(boolean doActivities) {
+		this.doActivities = doActivities;
+	}
+
+	/**
 	 * @param orderTypes
 	 *            the orderTypes to set
 	 */
@@ -319,6 +385,14 @@ public class XmlExportModelCommand extends Command {
 	 */
 	public void setResourceTypes(Set<String> resourceTypes) {
 		this.resourceTypes = resourceTypes;
+	}
+
+	/**
+	 * @param activityTypes
+	 *            the activityTypes to set
+	 */
+	public void setActivityTypes(Set<String> activityTypes) {
+		this.activityTypes = activityTypes;
 	}
 
 	/**

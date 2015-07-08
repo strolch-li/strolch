@@ -15,14 +15,8 @@
  */
 package li.strolch.model.parameter;
 
-import java.text.MessageFormat;
-
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Tags;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
-
-import org.w3c.dom.Element;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -30,7 +24,6 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class BooleanParameter extends AbstractParameter<Boolean> {
 
-	public static final String TYPE = "Boolean"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
 	private Boolean value = Boolean.FALSE;
@@ -54,23 +47,6 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 		setValue(value);
 	}
 
-	/**
-	 * DOM Constructor
-	 * 
-	 * @param element
-	 */
-	public BooleanParameter(Element element) {
-		super.fromDom(element);
-
-		String valueS = element.getAttribute(Tags.VALUE);
-		if (StringHelper.isEmpty(valueS)) {
-			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
-			throw new StrolchException(msg);
-		}
-
-		setValue(parseFromString(valueS));
-	}
-
 	@Override
 	public String getValueAsString() {
 		return this.value.toString();
@@ -88,8 +64,13 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	}
 
 	@Override
+	public void setValueFromString(String valueAsString) {
+		setValue(parseFromString(valueAsString));
+	}
+
+	@Override
 	public String getType() {
-		return BooleanParameter.TYPE;
+		return StrolchValueType.BOOLEAN.getType();
 	}
 
 	@Override

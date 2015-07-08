@@ -76,8 +76,7 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
 			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(this.listener, includeFile, this.allowInclude);
 			handler.parseFile();
-			this.statistics.nrOfOrders += handler.statistics.nrOfOrders;
-			this.statistics.nrOfResources += handler.statistics.nrOfResources;
+			this.statistics.add(handler.statistics);
 
 			break;
 		default:

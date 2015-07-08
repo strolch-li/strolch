@@ -16,14 +16,19 @@
 package li.strolch.model;
 
 import static org.junit.Assert.assertTrue;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
+import li.strolch.model.xml.ActivityFromDomVisitor;
+import li.strolch.model.xml.ActivityToDomVisitor;
+import li.strolch.model.xml.OrderFromDomVisitor;
 import li.strolch.model.xml.OrderToDomVisitor;
+import li.strolch.model.xml.ResourceFromDomVisitor;
 import li.strolch.model.xml.ResourceToDomVisitor;
 
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -40,8 +45,7 @@ public class XmlToDomTest extends ModelTest {
 		domVisitor.visit(order);
 		Document document = domVisitor.getDocument();
 
-		Element rootElement = document.getDocumentElement();
-		Order parsedOrder = new Order(rootElement);
+		Order parsedOrder = new OrderFromDomVisitor().visit(document);
 
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
 		visitor.visit(parsedOrder);
@@ -57,11 +61,27 @@ public class XmlToDomTest extends ModelTest {
 		domVisitor.visit(resource);
 		Document document = domVisitor.getDocument();
 
-		Element rootElement = document.getDocumentElement();
-		Resource parsedResource = new Resource(rootElement);
+		Resource parsedResource = new ResourceFromDomVisitor().visit(document);
 
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(resource);
 		visitor.visit(parsedResource);
 		assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
 	}
+
+	@Test
+	public void shouldFormatAndParseActivity() {
+
+		Activity activity = ModelGenerator.createActivity("@1", "My Activity 1", "Transport");
+
+		ActivityToDomVisitor domVisitor = new ActivityToDomVisitor();
+		domVisitor.visit(activity);
+		Document document = domVisitor.getDocument();
+
+		Activity parsedActivity = new ActivityFromDomVisitor().visit(document);
+
+		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(parsedActivity);
+		visitor.visit(parsedActivity);
+		assertTrue("To DOM and back should equal same Activity:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
+	}
+
 }

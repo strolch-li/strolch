@@ -23,7 +23,6 @@ import javax.xml.stream.XMLStreamWriter;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
-import li.strolch.model.Tags;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -37,7 +36,7 @@ public class ResourceToSaxWriterVisitor extends AbstractToSaxWriterVisitor imple
 	@Override
 	public Void visit(Resource resource) {
 		try {
-			writeElement(Tags.RESOURCE, resource);
+			writeElement(resource);
 			this.writer.flush();
 		} catch (XMLStreamException e) {
 			String msg = "Failed to write Resource {0} due to {1}"; //$NON-NLS-1$

@@ -17,6 +17,7 @@ package li.strolch.model.timevalue.impl;
 
 import java.io.Serializable;
 
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 
@@ -51,6 +52,11 @@ public class FloatValue implements IValue<Double>, Serializable {
 
 	public FloatValue(String valueAsString) throws NumberFormatException {
 		this.value = Double.parseDouble(valueAsString);
+	}
+
+	@Override
+	public String getType() {
+		return StrolchValueType.FLOAT.getType();
 	}
 
 	@Override

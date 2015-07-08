@@ -29,6 +29,7 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.timedstate.StrolchTimedState;
+import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
@@ -47,16 +48,16 @@ public abstract class AbstractPlanCommand extends Command {
 	}
 
 	/**
-	 * plan an {@link Action}.It iterates the {@link IValueChange} operators and
-	 * registers the changes on the {@link StrolchTimedState} objects assigned
-	 * to the {@link Resource} referenced by type and id.
+	 * plan an {@link Action}.It iterates the {@link IValueChange} operators and registers the changes on the
+	 * {@link StrolchTimedState} objects assigned to the {@link Resource} referenced by type and id.
 	 * 
 	 * @param action
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void plan(final Action action) {
 
-		final Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId()).build();
+		final Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId())
+				.build();
 		final Resource resource = tx().findElement(locator);
 
 		if (resource == null)
@@ -65,7 +66,7 @@ public abstract class AbstractPlanCommand extends Command {
 
 		tx().lock(resource);
 
-		final List<IValueChange<?>> changes = action.getChanges();
+		final List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
 		for (final IValueChange<?> change : changes) {
 			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change);
@@ -75,10 +76,12 @@ public abstract class AbstractPlanCommand extends Command {
 	}
 
 	/**
-	 * plan an {@link Activity} by navigating to the {#link Action} and
-	 * delegating the planning depending on the {@link IActivityElement} class.
+	 * plan an {@link Activity} by navigating to the {#link Action} and delegating the planning depending on the
+	 * {@link IActivityElement} class.
 	 */
 	protected void plan(final Activity activity) {
+		
+		// TODO Martin: Use a visitor pattern so we don't start with instanceof again...
 
 		final Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
 
@@ -94,10 +97,11 @@ public abstract class AbstractPlanCommand extends Command {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void unplan(final Action action) {
 
-		final Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId()).build();
+		final Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId())
+				.build();
 		final Resource resource = tx().findElement(locator);
 
-		final List<IValueChange<?>> changes = action.getChanges();
+		final List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
 		for (final IValueChange<?> change : changes) {
 			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change.getInverse());
@@ -117,8 +121,6 @@ public abstract class AbstractPlanCommand extends Command {
 				unplan((Activity) activityElement);
 			else if (activityElement instanceof Action)
 				unplan((Action) activityElement);
-
 		}
 	}
-
 }

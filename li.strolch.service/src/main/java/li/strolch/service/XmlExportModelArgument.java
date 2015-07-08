@@ -29,8 +29,10 @@ public class XmlExportModelArgument extends ServiceArgument {
 	public boolean multiFile;
 	public boolean doOrders = true;
 	public boolean doResources = true;
+	public boolean doActivities = true;
 	public Set<String> orderTypes = new HashSet<>();
 	public Set<String> resourceTypes = new HashSet<>();
+	public Set<String> activityTypes = new HashSet<>();
 
 	@Override
 	public String toString() {
@@ -52,6 +54,8 @@ public class XmlExportModelArgument extends ServiceArgument {
 			builder.append(", resources");
 		if (this.doOrders)
 			builder.append(", orders");
+		if (this.doActivities)
+			builder.append(", activities");
 
 		if (this.resourceTypes != null && !this.resourceTypes.isEmpty()) {
 			builder.append(", resourceTypes=");
@@ -59,11 +63,19 @@ public class XmlExportModelArgument extends ServiceArgument {
 		} else {
 			builder.append(", resourceTypes=*");
 		}
+
 		if (this.orderTypes != null && !this.orderTypes.isEmpty()) {
 			builder.append(", orderTypes=");
 			builder.append(this.orderTypes);
 		} else {
 			builder.append(", orderTypes=*");
+		}
+
+		if (this.activityTypes != null && !this.activityTypes.isEmpty()) {
+			builder.append(", activityTypes=");
+			builder.append(this.activityTypes);
+		} else {
+			builder.append(", activityTypes=*");
 		}
 
 		builder.append("]");

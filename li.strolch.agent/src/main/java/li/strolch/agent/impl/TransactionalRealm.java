@@ -17,6 +17,7 @@ package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
@@ -36,6 +37,7 @@ public class TransactionalRealm extends InternalStrolchRealm {
 
 	private ResourceMap resourceMap;
 	private OrderMap orderMap;
+	private ActivityMap activityMap;
 	private AuditTrail auditTrail;
 	private PersistenceHandler persistenceHandler;
 
@@ -71,6 +73,11 @@ public class TransactionalRealm extends InternalStrolchRealm {
 	}
 
 	@Override
+	public ActivityMap getActivityMap() {
+		return this.activityMap;
+	}
+
+	@Override
 	public AuditTrail getAuditTrail() {
 		return this.auditTrail;
 	}
@@ -80,6 +87,7 @@ public class TransactionalRealm extends InternalStrolchRealm {
 		super.initialize(container, configuration);
 		this.resourceMap = new TransactionalResourceMap();
 		this.orderMap = new TransactionalOrderMap();
+		this.activityMap = new TransactionalActivityMap();
 
 		if (isAuditTrailEnabled()) {
 			this.auditTrail = new TransactionalAuditTrail();
@@ -98,6 +106,7 @@ public class TransactionalRealm extends InternalStrolchRealm {
 		long start = System.nanoTime();
 		int nrOfOrders = 0;
 		int nrOfResources = 0;
+		int nrOfActivities = 0;
 
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
 			nrOfOrders = this.orderMap.getAllKeys(tx).size();
@@ -107,12 +116,17 @@ public class TransactionalRealm extends InternalStrolchRealm {
 			nrOfResources = this.resourceMap.getAllKeys(tx).size();
 		}
 
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
+			nrOfActivities = this.activityMap.getAllKeys(tx).size();
+		}
+
 		long duration = System.nanoTime() - start;
 		String durationS = StringHelper.formatNanoDuration(duration);
 		logger.info(MessageFormat.format(
 				"Initialized Transactional Maps for realm {0} took {1}.", getRealm(), durationS)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("There are {0} Orders", nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("There are {0} Resources", nrOfResources)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("There are {0} Activities", nrOfActivities)); //$NON-NLS-1$
 	}
 
 	@Override

@@ -18,6 +18,7 @@ package li.strolch.persistence.inmemory;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
@@ -60,6 +61,11 @@ public class InMemoryPersistenceHandler extends StrolchComponent implements Pers
 	@Override
 	public ResourceDao getResourceDao(StrolchTransaction tx) {
 		return this.persistence.getResourceDao(tx);
+	}
+
+	@Override
+	public ActivityDao getActivityDao(StrolchTransaction tx) {
+		return this.persistence.getActivityDao(tx);
 	}
 
 	@Override

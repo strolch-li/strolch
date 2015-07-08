@@ -50,9 +50,6 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 	public static final String ORDERS = "orders";
 
-	/**
-	 * @param tx
-	 */
 	public PostgreSqlOrderDao(PostgreSqlStrolchTransaction tx) {
 		super(tx);
 	}
@@ -89,7 +86,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	}
 
 	protected SQLXML createSqlXml(Order order, PreparedStatement preparedStatement) throws SQLException, SAXException {
-		SQLXML sqlxml = this.tx.getConnection().createSQLXML();
+		SQLXML sqlxml = tx().getConnection().createSQLXML();
 		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
 		ContentHandler contentHandler = saxResult.getHandler();
 		contentHandler.startDocument();
@@ -102,7 +99,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	protected void internalSave(final Order order) {
 		String sql = "insert into " + getTableName()
 				+ " (id, name, type, state, date, asxml) values (?, ?, ?, ?::order_state, ?, ?)";
-		try (PreparedStatement preparedStatement = PostgreSqlOrderDao.this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 			preparedStatement.setString(1, order.getId());
 			preparedStatement.setString(2, order.getName());
 			preparedStatement.setString(3, order.getType());
@@ -132,7 +129,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	protected void internalUpdate(final Order order) {
 		String sql = "update " + getTableName()
 				+ " set name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? ";
-		try (PreparedStatement preparedStatement = PostgreSqlOrderDao.this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setString(1, order.getName());
 			preparedStatement.setString(2, order.getType());
@@ -169,7 +166,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 		List<U> list = new ArrayList<>();
 
 		String sql = queryVisitor.getSql();
-		try (PreparedStatement ps = PostgreSqlOrderDao.this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement ps = tx().getConnection().prepareStatement(sql)) {
 			queryVisitor.setValues(ps);
 
 			try (ResultSet result = ps.executeQuery()) {

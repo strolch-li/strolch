@@ -84,7 +84,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	}
 
 	protected SQLXML createSqlXml(Resource res, PreparedStatement preparedStatement) throws SQLException, SAXException {
-		SQLXML sqlxml = this.tx.getConnection().createSQLXML();
+		SQLXML sqlxml = tx().getConnection().createSQLXML();
 		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
 		ContentHandler contentHandler = saxResult.getHandler();
 		contentHandler.startDocument();
@@ -96,7 +96,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	@Override
 	protected void internalSave(final Resource res) {
 		String sql = "insert into " + getTableName() + " (id, name, type, asxml) values (?, ?, ?, ?)";
-		try (PreparedStatement preparedStatement = PostgreSqlResourceDao.this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 			preparedStatement.setString(1, res.getId());
 			preparedStatement.setString(2, res.getName());
 			preparedStatement.setString(3, res.getType());
@@ -123,7 +123,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	@Override
 	protected void internalUpdate(final Resource resource) {
 		String sql = "update " + getTableName() + " set name = ?, type = ?, asxml = ? where id = ? ";
-		try (PreparedStatement preparedStatement = PostgreSqlResourceDao.this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setString(1, resource.getName());
 			preparedStatement.setString(2, resource.getType());
@@ -158,7 +158,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 		List<U> list = new ArrayList<>();
 
 		String sql = queryVisitor.getSql();
-		try (PreparedStatement ps = PostgreSqlResourceDao.this.tx.getConnection().prepareStatement(sql)) {
+		try (PreparedStatement ps = tx().getConnection().prepareStatement(sql)) {
 			queryVisitor.setValues(ps);
 
 			try (ResultSet result = ps.executeQuery()) {

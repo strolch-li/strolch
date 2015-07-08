@@ -17,10 +17,6 @@ package li.strolch.model.timedstate;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
-
-import java.text.MessageFormat;
-
-import li.strolch.exception.StrolchException;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
@@ -33,10 +29,6 @@ import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.TimedStateVisitor;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -158,72 +150,6 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	@Override
 	public boolean isRootElement() {
 		return false;
-	}
-
-	@Override
-	public Element toDom(Document doc) {
-		Element element = doc.createElement(Tags.PARAMETER);
-		fillElement(element);
-
-		if (!this.interpretation.equals(INTERPRETATION_NONE)) {
-			element.setAttribute(Tags.INTERPRETATION, this.interpretation);
-		}
-		if (!this.uom.equals(UOM_NONE)) {
-			element.setAttribute(Tags.UOM, this.uom);
-		}
-		if (this.hidden) {
-			element.setAttribute(Tags.HIDDEN, Boolean.toString(this.hidden));
-		}
-		if (this.index != 0) {
-			element.setAttribute(Tags.INDEX, Integer.toString(this.index));
-		}
-
-		return element;
-	}
-
-	@Override
-	public void fromDom(Element element) {
-
-		super.fromDom(element);
-
-		String typeS = element.getAttribute(Tags.TYPE);
-		if (StringHelper.isEmpty(typeS)) {
-			String msg = "Type must be set on element with id {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.id);
-			throw new StrolchException(msg);
-		} else if (!typeS.equals(getType())) {
-			String msg = "{0} must have type {1}, not: {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, getClass().getSimpleName(), getType(), typeS);
-			throw new StrolchException(msg);
-		}
-
-		String interpretation = element.getAttribute(Tags.INTERPRETATION);
-		String hidden = element.getAttribute(Tags.HIDDEN);
-		String uom = element.getAttribute(Tags.UOM);
-		String index = element.getAttribute(Tags.INDEX);
-
-		setInterpretation(interpretation);
-		setUom(uom);
-
-		if (StringHelper.isEmpty(index)) {
-			this.index = 0;
-		} else {
-			this.index = Integer.valueOf(index);
-		}
-
-		if (StringHelper.isEmpty(hidden)) {
-			setHidden(false);
-		} else {
-			if (hidden.equalsIgnoreCase(Boolean.TRUE.toString())) {
-				setHidden(true);
-			} else if (hidden.equalsIgnoreCase(Boolean.FALSE.toString())) {
-				setHidden(false);
-			} else {
-				String msg = "Boolean string must be either {0} or {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, Boolean.TRUE.toString(), Boolean.FALSE.toString());
-				throw new StrolchException(msg);
-			}
-		}
 	}
 
 	@Override

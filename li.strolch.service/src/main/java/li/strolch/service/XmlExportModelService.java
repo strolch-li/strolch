@@ -83,8 +83,10 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 			command.setMultiFile(arg.multiFile);
 			command.setDoOrders(arg.doOrders);
 			command.setDoResources(arg.doResources);
+			command.setDoActivities(arg.doActivities);
 			command.setOrderTypes(arg.orderTypes);
 			command.setResourceTypes(arg.resourceTypes);
+			command.setActivityTypes(arg.activityTypes);
 
 			tx.addCommand(command);
 			tx.commitOnClose();
@@ -93,6 +95,9 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 		ModelStatistics statistics = command.getStatistics();
 		String msg = "Wrote XML Model file {0} for realm {1}: {2} at path: {3}";
 		logger.info(MessageFormat.format(msg, modelFile.getName(), arg.realm, statistics, modelFile.getAbsolutePath()));
+		logger.info(MessageFormat.format("Wrote {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Wrote {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Wrote {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$
 		return ServiceResult.success();
 	}
 }

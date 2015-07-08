@@ -29,6 +29,6 @@ public class ResourceParserFactory implements ParserFactory<Resource> {
 
 	@Override
 	public SaxParser<Resource> getSaxParser() {
-		throw new UnsupportedOperationException("Not yet implemented!"); //$NON-NLS-1$
+		return new ResourceSaxParser();
 	}
 }

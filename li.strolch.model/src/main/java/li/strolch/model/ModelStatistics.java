@@ -49,6 +49,9 @@ public class ModelStatistics {
 	@XmlAttribute(name = "nrOfOrders")
 	public long nrOfOrders;
 
+	@XmlAttribute(name = "nrOfActivities")
+	public long nrOfActivities;
+
 	/**
 	 * @return the nrOfOrders
 	 */
@@ -70,6 +73,24 @@ public class ModelStatistics {
 		return this.nrOfOrders + this.nrOfResources;
 	}
 
+	/**
+	 * @return the nrOfActivities
+	 */
+	public long getNrOfActivities() {
+		return this.nrOfActivities;
+	}
+
+	/**
+	 * Adds the statistics of the other statistics to this statistics instance
+	 * 
+	 * @param statistics
+	 */
+	public void add(ModelStatistics statistics) {
+		this.nrOfOrders += statistics.nrOfOrders;
+		this.nrOfResources += statistics.nrOfResources;
+		this.nrOfActivities += statistics.nrOfActivities;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -81,6 +102,8 @@ public class ModelStatistics {
 		builder.append(this.nrOfResources);
 		builder.append(", nrOfOrders=");
 		builder.append(this.nrOfOrders);
+		builder.append(", nrOfActivities=");
+		builder.append(this.nrOfActivities);
 		builder.append("]");
 		return builder.toString();
 	}

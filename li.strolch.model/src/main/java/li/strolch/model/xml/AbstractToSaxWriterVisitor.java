@@ -20,8 +20,9 @@ import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -36,12 +37,15 @@ import li.strolch.model.ParameterizedElement;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.model.timevalue.IValueChange;
 import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -55,16 +59,81 @@ public abstract class AbstractToSaxWriterVisitor {
 		this.writer = writer;
 	}
 
-	protected void writeElement(String tag, Order order) throws XMLStreamException {
+	protected void writeElement(Order order) throws XMLStreamException {
 		boolean empty = !order.hasParameterBags();
-		writeElement(tag, empty, order);
+
+		writeStartStrolchElement(Tags.ORDER, empty, order);
+		this.writer.writeAttribute(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
+		this.writer.writeAttribute(Tags.STATE, order.getState().name());
+
+		if (order.hasParameterBags()) {
+			writeParameterBags(order);
+		}
+
 		if (!empty)
 			this.writer.writeEndElement();
 	}
 
-	protected void writeElement(String tag, Resource resource) throws XMLStreamException {
+	protected void writeElement(Activity activity) throws XMLStreamException {
+		boolean empty = !activity.hasParameterBags() && !activity.hasElements();
+
+		writeStartStrolchElement(Tags.ACTIVITY, empty, activity);
+
+		if (activity.hasParameterBags()) {
+			writeParameterBags(activity);
+		}
+
+		if (activity.hasElements()) {
+			Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
+			while (iter.hasNext()) {
+				IActivityElement element = iter.next().getValue();
+				if (element instanceof Activity)
+					writeElement((Activity) element);
+				else if (element instanceof Action)
+					writeElement((Action) element);
+				else
+					throw new IllegalArgumentException("Unhandled Element class " + element.getClass());
+			}
+		}
+
+		if (!empty)
+			this.writer.writeEndElement();
+	}
+
+	private <T> void writeElement(Action action) throws XMLStreamException {
+		boolean empty = !action.hasParameterBags() && !action.hasChanges();
+
+		writeStartStrolchElement(Tags.ACTION, empty, action);
+		this.writer.writeAttribute(Tags.STATE, action.getState().name());
+		this.writer.writeAttribute(Tags.RESOURCE_ID, action.getResourceId());
+		this.writer.writeAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
+
+		if (action.hasParameterBags()) {
+			writeParameterBags(action);
+		}
+
+		if (action.hasChanges()) {
+			for (IValueChange<? extends IValue<?>> change : action.getChanges()) {
+				this.writer.writeEmptyElement(Tags.VALUE_CHANGE);
+				this.writer.writeAttribute(Tags.STATE_ID, change.getStateId());
+				this.writer.writeAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(change.getTime()));
+				this.writer.writeAttribute(Tags.VALUE, change.getValue().getValueAsString());
+				this.writer.writeAttribute(Tags.TYPE, change.getValue().getClass().getName());
+			}
+		}
+
+		if (!empty)
+			this.writer.writeEndElement();
+	}
+
+	protected void writeElement(Resource resource) throws XMLStreamException {
 		boolean empty = !resource.hasParameterBags() && !resource.hasTimedStates();
-		writeElement(tag, empty, resource);
+
+		writeStartStrolchElement(Tags.RESOURCE, empty, resource);
+
+		if (resource.hasParameterBags()) {
+			writeParameterBags(resource);
+		}
 
 		if (resource.hasTimedStates())
 			writeTimedStates(resource);
@@ -97,14 +166,6 @@ public abstract class AbstractToSaxWriterVisitor {
 		}
 	}
 
-	protected void writeElement(String tag, boolean empty, GroupedParameterizedElement element)
-			throws XMLStreamException {
-		writeStartStrolchElement(tag, empty, element);
-		if (!empty) {
-			writeParameterBags(element);
-		}
-	}
-
 	protected void writeStartStrolchElement(String tag, boolean empty, StrolchElement element)
 			throws XMLStreamException {
 		if (empty) {
@@ -114,9 +175,7 @@ public abstract class AbstractToSaxWriterVisitor {
 		}
 
 		this.writer.writeAttribute(Tags.ID, element.getId());
-		if (StringHelper.isNotEmpty(element.getName())) {
-			this.writer.writeAttribute(Tags.NAME, element.getName());
-		}
+		this.writer.writeAttribute(Tags.NAME, element.getName());
 		this.writer.writeAttribute(Tags.TYPE, element.getType());
 	}
 
@@ -136,12 +195,7 @@ public abstract class AbstractToSaxWriterVisitor {
 	protected void writeParameters(ParameterizedElement element) throws XMLStreamException {
 
 		List<Parameter<?>> parameters = new ArrayList<>(element.getParameters());
-		Collections.sort(parameters, new Comparator<Parameter<?>>() {
-			@Override
-			public int compare(Parameter<?> o1, Parameter<?> o2) {
-				return Integer.valueOf(o1.getIndex()).compareTo(o2.getIndex());
-			}
-		});
+		Collections.sort(parameters, (o1, o2) -> Integer.valueOf(o1.getIndex()).compareTo(o2.getIndex()));
 		for (Parameter<?> parameter : parameters) {
 			writeStartStrolchElement(Tags.PARAMETER, true, parameter);
 

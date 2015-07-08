@@ -28,25 +28,15 @@ import ch.eitchnet.utils.helper.DomUtil;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderToDomVisitor implements OrderVisitor<Document> {
-
-	private Document document;
-
-	/**
-	 * @return the document
-	 */
-	public Document getDocument() {
-		return this.document;
-	}
+public class OrderToDomVisitor extends StrolchElementToDomVisitor implements OrderVisitor<Document> {
 
 	@Override
 	public Document visit(Order order) {
 		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
-		Document document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
+		this.document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
 
-		Element orderDom = order.toDom(document);
-		document.appendChild(orderDom);
-		this.document = document;
+		Element asDom = toDom(order);
+		document.appendChild(asDom);
 		return this.document;
 	}
 }

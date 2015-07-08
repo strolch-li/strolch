@@ -16,10 +16,10 @@
 package li.strolch.persistence.xml.model;
 
 import li.strolch.model.Resource;
+import li.strolch.model.xml.ResourceFromDomVisitor;
 import li.strolch.model.xml.ResourceToDomVisitor;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import ch.eitchnet.xmlpers.api.DomParser;
 
@@ -46,8 +46,7 @@ public class ResourceDomParser implements DomParser<Resource> {
 
 	@Override
 	public void fromDom(Document document) {
-		Element rootElement = document.getDocumentElement();
-		Resource resource = new Resource(rootElement);
+		Resource resource = new ResourceFromDomVisitor().visit(document);
 		this.resource = resource;
 	}
 }

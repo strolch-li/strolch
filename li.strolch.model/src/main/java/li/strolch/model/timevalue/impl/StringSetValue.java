@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import ch.eitchnet.utils.dbc.DBC;
@@ -42,12 +43,26 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 
 	private Set<AString> aStrings = new HashSet<>();
 
-	public StringSetValue() {
+	private StringSetValue() {
 	}
 
 	public StringSetValue(final Set<AString> aStrings) {
 		DBC.PRE.assertNotNull("Value may not be null!", aStrings);
 		this.aStrings = aStrings;
+	}
+
+	public StringSetValue(String valueAsString) {
+		Set<AString> value = new HashSet<>();
+		String[] values = valueAsString.split(",");
+		for (String s : values) {
+			value.add(new AString(s.trim()));
+		}
+		this.aStrings = value;
+	}
+
+	@Override
+	public String getType() {
+		return StrolchValueType.STRING_SET.getType();
 	}
 
 	@Override

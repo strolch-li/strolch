@@ -15,6 +15,7 @@
  */
 package li.strolch.command;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
@@ -30,6 +31,7 @@ public class ClearModelCommand extends Command {
 	// input
 	private boolean clearOrders;
 	private boolean clearResources;
+	private boolean clearActivities;
 
 	// output
 	private ModelStatistics statistics;
@@ -62,6 +64,11 @@ public class ClearModelCommand extends Command {
 			statistics.nrOfResources = resourceMap.removeAll(tx());
 		}
 
+		if (this.clearActivities) {
+			ActivityMap activitiesMap = tx().getActivityMap();
+			statistics.nrOfActivities = activitiesMap.removeAll(tx());
+		}
+
 		this.statistics = statistics;
 	}
 
@@ -84,6 +91,14 @@ public class ClearModelCommand extends Command {
 	 */
 	public void setClearResources(boolean clearResources) {
 		this.clearResources = clearResources;
+	}
+
+	/**
+	 * @param clearActivities
+	 *            the clearActivities to set
+	 */
+	public void setClearActivities(boolean clearActivities) {
+		this.clearActivities = clearActivities;
 	}
 
 	/**

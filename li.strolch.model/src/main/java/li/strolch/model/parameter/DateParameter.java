@@ -15,16 +15,10 @@
  */
 package li.strolch.model.parameter;
 
-import java.text.MessageFormat;
 import java.util.Date;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Tags;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
-
-import org.w3c.dom.Element;
-
-import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -32,7 +26,6 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
  */
 public class DateParameter extends AbstractParameter<Date> {
 
-	public static final String TYPE = "Date"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
 	private Date value;
@@ -56,23 +49,6 @@ public class DateParameter extends AbstractParameter<Date> {
 		setValue(value);
 	}
 
-	/**
-	 * DOM Constructor
-	 *
-	 * @param element
-	 */
-	public DateParameter(Element element) {
-		super.fromDom(element);
-
-		String valueS = element.getAttribute(Tags.VALUE);
-		if (StringHelper.isEmpty(valueS)) {
-			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
-			throw new StrolchException(msg);
-		}
-
-		setValue(parseFromString(valueS));
-	}
-
 	@Override
 	public String getValueAsString() {
 		return ISO8601FormatFactory.getInstance().formatDate(this.value);
@@ -90,8 +66,13 @@ public class DateParameter extends AbstractParameter<Date> {
 	}
 
 	@Override
+	public void setValueFromString(String valueAsString) {
+		setValue(parseFromString(valueAsString));
+	}
+
+	@Override
 	public String getType() {
-		return DateParameter.TYPE;
+		return StrolchValueType.DATE.getType();
 	}
 
 	@Override

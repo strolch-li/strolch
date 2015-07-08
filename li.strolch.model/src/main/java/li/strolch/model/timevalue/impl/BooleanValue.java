@@ -17,6 +17,7 @@ package li.strolch.model.timevalue.impl;
 
 import java.io.Serializable;
 
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 
@@ -43,6 +44,11 @@ public class BooleanValue implements IValue<Boolean>, Serializable {
 
 	public BooleanValue(String valueAsString) throws NumberFormatException {
 		this.value = Boolean.parseBoolean(valueAsString);
+	}
+
+	@Override
+	public String getType() {
+		return StrolchValueType.BOOLEAN.getType();
 	}
 
 	@Override

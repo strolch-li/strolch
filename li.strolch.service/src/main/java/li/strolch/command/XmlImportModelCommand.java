@@ -35,10 +35,13 @@ public class XmlImportModelCommand extends Command {
 	private File modelFile;
 	private boolean addOrders;
 	private boolean addResources;
+	private boolean addActivities;
 	private boolean updateOrders;
 	private boolean updateResources;
+	private boolean updateActivities;
 	private Set<String> orderTypes;
 	private Set<String> resourceTypes;
+	private Set<String> activityTypes;
 
 	// output
 	private ModelStatistics statistics;
@@ -64,10 +67,13 @@ public class XmlImportModelCommand extends Command {
 
 		elementListener.setAddOrders(this.addOrders);
 		elementListener.setAddResources(this.addResources);
+		elementListener.setAddActivities(this.addActivities);
 		elementListener.setUpdateOrders(this.updateOrders);
 		elementListener.setUpdateResources(this.updateResources);
+		elementListener.setUpdateActivities(this.updateActivities);
 		elementListener.setOrderTypes(this.orderTypes);
 		elementListener.setResourceTypes(this.resourceTypes);
+		elementListener.setActivityTypes(this.activityTypes);
 
 		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, this.allowInclude);
 		handler.parseFile();
@@ -111,6 +117,14 @@ public class XmlImportModelCommand extends Command {
 	}
 
 	/**
+	 * @param addActivities
+	 *            the addActivities to set
+	 */
+	public void setAddActivities(boolean addActivities) {
+		this.addActivities = addActivities;
+	}
+
+	/**
 	 * @param updateOrders
 	 *            the updateOrders to set
 	 */
@@ -127,6 +141,14 @@ public class XmlImportModelCommand extends Command {
 	}
 
 	/**
+	 * @param updateActivities
+	 *            the updateActivities to set
+	 */
+	public void setUpdateActivities(boolean updateActivities) {
+		this.updateActivities = updateActivities;
+	}
+
+	/**
 	 * @param orderTypes
 	 *            the orderTypes to set
 	 */
@@ -140,6 +162,14 @@ public class XmlImportModelCommand extends Command {
 	 */
 	public void setResourceTypes(Set<String> resourceTypes) {
 		this.resourceTypes = resourceTypes;
+	}
+
+	/**
+	 * @param activityTypes
+	 *            the activityTypes to set
+	 */
+	public void setActivityTypes(Set<String> activityTypes) {
+		this.activityTypes = activityTypes;
 	}
 
 	/**

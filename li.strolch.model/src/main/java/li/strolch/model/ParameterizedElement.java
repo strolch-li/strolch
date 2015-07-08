@@ -26,23 +26,7 @@ import java.util.Set;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.parameter.BooleanParameter;
-import li.strolch.model.parameter.DateParameter;
-import li.strolch.model.parameter.DurationParameter;
-import li.strolch.model.parameter.FloatListParameter;
-import li.strolch.model.parameter.FloatParameter;
-import li.strolch.model.parameter.IntegerListParameter;
-import li.strolch.model.parameter.IntegerParameter;
-import li.strolch.model.parameter.LongListParameter;
-import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringListParameter;
-import li.strolch.model.parameter.StringParameter;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -204,75 +188,6 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		LocatorBuilder lb = new LocatorBuilder();
 		fillLocator(lb);
 		return lb.build();
-	}
-
-	// TODO remove the whole fromDom methods from strolch model - we want to use the visitor pattern only!
-
-	@Override
-	protected void fromDom(Element element) {
-		super.fromDom(element);
-
-		String type = element.getAttribute(Tags.TYPE);
-		setType(type);
-
-		// add all the parameters
-		NodeList parameterElements = element.getElementsByTagName(Tags.PARAMETER);
-		for (int i = 0; i < parameterElements.getLength(); i++) {
-			Element paramElement = (Element) parameterElements.item(i);
-			String paramtype = paramElement.getAttribute(Tags.TYPE);
-
-			DBC.PRE.assertNotEmpty("Type must be set on Parameter for bag with id " + this.id, paramtype);
-
-			if (paramtype.equals(StringParameter.TYPE)) {
-				StringParameter param = new StringParameter(paramElement);
-				addParameter(param);
-			} else if (paramtype.equals(IntegerParameter.TYPE)) {
-				IntegerParameter param = new IntegerParameter(paramElement);
-				addParameter(param);
-			} else if (paramtype.equals(FloatParameter.TYPE)) {
-				FloatParameter param = new FloatParameter(paramElement);
-				addParameter(param);
-			} else if (paramtype.equals(LongParameter.TYPE)) {
-				LongParameter param = new LongParameter(paramElement);
-				addParameter(param);
-			} else if (paramtype.equals(DateParameter.TYPE)) {
-				DateParameter param = new DateParameter(paramElement);
-				addParameter(param);
-			} else if (paramtype.equals(DurationParameter.TYPE)) {
-				DurationParameter param = new DurationParameter(paramElement);
-				addParameter(param);
-			} else if (paramtype.equals(BooleanParameter.TYPE)) {
-				BooleanParameter param = new BooleanParameter(paramElement);
-				addParameter(param);
-			} else if (paramtype.equals(StringListParameter.TYPE)) {
-				StringListParameter param = new StringListParameter(paramElement);
-				addParameter(param);
-			} else if (paramtype.equals(IntegerListParameter.TYPE)) {
-				IntegerListParameter param = new IntegerListParameter(paramElement);
-				addParameter(param);
-			} else if (paramtype.equals(FloatListParameter.TYPE)) {
-				FloatListParameter param = new FloatListParameter(paramElement);
-				addParameter(param);
-			} else if (paramtype.equals(LongListParameter.TYPE)) {
-				LongListParameter param = new LongListParameter(paramElement);
-				addParameter(param);
-			} else {
-				String msg = "What kind of parameter is this: {0}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, paramtype);
-				throw new StrolchException(msg);
-			}
-		}
-	}
-
-	@Override
-	protected void fillElement(Element element) {
-		super.fillElement(element);
-
-		if (this.parameterMap != null) {
-			for (Parameter<?> parameter : this.parameterMap.values()) {
-				element.appendChild(parameter.toDom(element.getOwnerDocument()));
-			}
-		}
 	}
 
 	@Override

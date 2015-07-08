@@ -15,15 +15,8 @@
  */
 package li.strolch.model.parameter;
 
-import java.text.MessageFormat;
-
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Tags;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
-
-import org.w3c.dom.Element;
-
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -32,7 +25,6 @@ import ch.eitchnet.utils.helper.StringHelper;
 public class StringParameter extends AbstractParameter<String> {
 
 	public static final String UNDEFINED_VALUE = "-"; //$NON-NLS-1$
-	public static final String TYPE = "String"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
 	private String value = UNDEFINED_VALUE;
@@ -57,26 +49,9 @@ public class StringParameter extends AbstractParameter<String> {
 		setValue(value);
 	}
 
-	/**
-	 * DOM Constructor
-	 *
-	 * @param element
-	 */
-	public StringParameter(Element element) {
-		super.fromDom(element);
-
-		String valueS = element.getAttribute(Tags.VALUE);
-		if (StringHelper.isEmpty(valueS)) {
-			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
-			throw new StrolchException(msg);
-		}
-
-		setValue(valueS);
-	}
-
 	@Override
 	public String getType() {
-		return StringParameter.TYPE;
+		return StrolchValueType.STRING.getType();
 	}
 
 	@Override
@@ -93,6 +68,11 @@ public class StringParameter extends AbstractParameter<String> {
 	public void setValue(String value) {
 		validateValue(value);
 		this.value = value;
+	}
+
+	@Override
+	public void setValueFromString(String valueAsString) {
+		setValue(valueAsString);
 	}
 
 	@Override

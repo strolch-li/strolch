@@ -17,9 +17,6 @@ package li.strolch.model;
 
 import java.io.Serializable;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -75,17 +72,6 @@ public interface StrolchElement extends Serializable, Comparable<StrolchElement>
 	 * @return
 	 */
 	public long getDbid();
-
-	/**
-	 * Returns an {@link Element} object which is an XML representation of this object
-	 *
-	 * @param doc
-	 *            the document to which this element is being written. The client must not append to the document, the
-	 *            caller will perform this as needed
-	 *
-	 * @return
-	 */
-	public Element toDom(Document doc);
 
 	/**
 	 * Returns the type of this {@link StrolchElement}

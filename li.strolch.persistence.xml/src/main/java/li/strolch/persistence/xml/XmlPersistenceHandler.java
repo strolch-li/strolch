@@ -25,6 +25,7 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.model.audit.Audit;
+import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
@@ -91,6 +92,11 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	@Override
 	public ResourceDao getResourceDao(StrolchTransaction tx) {
 		return new XmlResourceDao(tx);
+	}
+	
+	@Override
+	public ActivityDao getActivityDao(StrolchTransaction tx) {
+		return new XmlActivityDao(tx);
 	}
 
 	@Override

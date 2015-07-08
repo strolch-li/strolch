@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.agent.api.OrderMap;
@@ -30,12 +31,14 @@ import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchLockException;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.agent.impl.AuditingActivityMap;
 import li.strolch.agent.impl.AuditingAuditMapFacade;
 import li.strolch.agent.impl.AuditingOrderMap;
 import li.strolch.agent.impl.AuditingResourceMap;
 import li.strolch.agent.impl.InternalStrolchRealm;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
+import li.strolch.model.ActivityVisitor;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
@@ -46,6 +49,7 @@ import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
@@ -54,12 +58,14 @@ import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StrolchQuery;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.ElementTypeVisitor;
+import li.strolch.model.visitor.NoStrategyActivityVisitor;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.runtime.StrolchConstants;
@@ -95,6 +101,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private AuditingOrderMap orderMap;
 	private AuditingResourceMap resourceMap;
+	private AuditingActivityMap activityMap;
 	private AuditingAuditMapFacade auditTrail;
 
 	private String action;
@@ -258,6 +265,15 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public ActivityMap getActivityMap() {
+		if (this.activityMap == null) {
+			this.activityMap = new AuditingActivityMap(this.realm.getActivityMap(),
+					this.realm.isAuditTrailEnabledForRead());
+		}
+		return this.activityMap;
+	}
+
+	@Override
 	public AuditTrail getAuditTrail() {
 		if (this.auditTrail == null) {
 			this.auditTrail = new AuditingAuditMapFacade(this.realm.getAuditTrail(),
@@ -297,6 +313,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
 		assertQueryAllowed(query);
 		return getResourceMap().doQuery(this, query, resourceVisitor);
+	}
+	
+	@Override
+	public List<Activity> doQuery(ActivityQuery query) {
+		assertQueryAllowed(query);
+		return getActivityMap().doQuery(this, query, new NoStrategyActivityVisitor());
+	}
+	
+	@Override
+	public <U> List<U> doQuery(ActivityQuery query, ActivityVisitor<U> activityVisitor) {
+		assertQueryAllowed(query);
+		return getActivityMap().doQuery(this, query, activityVisitor);
 	}
 
 	@Override
@@ -486,7 +514,78 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotNull("refP", refP);
 		return getResourceMap().getBy(this, refP, assertExists);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
+	@Override
+	public Activity getActivityBy(String type, String id) {
+		return getActivityBy(type, id, false);
+	}
+
+	@Override
+	public Activity getActivityBy(String type, String id, boolean assertExists) throws StrolchException {
+		Activity activity = getActivityMap().getBy(this, type, id);
+		if (assertExists && activity == null) {
+			String msg = "No Activity exists with the id {0} with type {1}";
+			throw new StrolchException(MessageFormat.format(msg, id, type));
+		}
+		return activity;
+	}
+
+	@Override
+	public Activity getActivityBy(StringParameter refP) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
+		return getActivityBy(refP, false);
+	}
+
+	@Override
+	public Activity getActivityBy(StringParameter refP, boolean assertExists) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
+		return getActivityMap().getBy(this, refP, assertExists);
+	}
+
+	@Override
+	public List<Activity> getActivitiesBy(StringListParameter refP) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
+		return getActivityMap().getBy(this, refP, false);
+	}
+
+	@Override
+	public List<Activity> getActivitiesBy(StringListParameter refP, boolean assertExists) throws StrolchException {
+		DBC.PRE.assertNotNull("refP", refP);
+		return getActivityMap().getBy(this, refP, assertExists);
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	public void flush() {
 		try {

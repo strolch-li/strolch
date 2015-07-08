@@ -27,6 +27,11 @@ package li.strolch.model.timevalue;
 public interface IValue<T> {
 
 	/**
+	 * @return the type of this {@link IValue}
+	 */
+	String getType();
+
+	/**
 	 * @return the backing value
 	 */
 	T getValue();

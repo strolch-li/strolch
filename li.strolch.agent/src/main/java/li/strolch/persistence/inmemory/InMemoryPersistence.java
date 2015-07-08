@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
@@ -55,6 +56,12 @@ public class InMemoryPersistence implements PersistenceHandler {
 	}
 
 	@Override
+	public ActivityDao getActivityDao(StrolchTransaction tx) {
+		DaoCache daoCache = getDaoCache(tx);
+		return daoCache.getActivityDao();
+	}
+
+	@Override
 	public AuditDao getAuditDao(StrolchTransaction tx) {
 		DaoCache daoCache = getDaoCache(tx);
 		return daoCache.getAuditDao();
@@ -68,7 +75,8 @@ public class InMemoryPersistence implements PersistenceHandler {
 	private synchronized DaoCache getDaoCache(StrolchTransaction tx) {
 		DaoCache daoCache = this.daoCache.get(tx.getRealmName());
 		if (daoCache == null) {
-			daoCache = new DaoCache(new InMemoryOrderDao(), new InMemoryResourceDao(), new InMemoryAuditDao());
+			daoCache = new DaoCache(new InMemoryOrderDao(), new InMemoryResourceDao(), new InMemoryActivityDao(),
+					new InMemoryAuditDao());
 			this.daoCache.put(tx.getRealmName(), daoCache);
 		}
 		return daoCache;
@@ -77,11 +85,13 @@ public class InMemoryPersistence implements PersistenceHandler {
 	private class DaoCache {
 		private OrderDao orderDao;
 		private ResourceDao resourceDao;
+		private ActivityDao activityDao;
 		private AuditDao auditDao;
 
-		public DaoCache(OrderDao orderDao, ResourceDao resourceDao, AuditDao auditDao) {
+		public DaoCache(OrderDao orderDao, ResourceDao resourceDao, ActivityDao activityDao, AuditDao auditDao) {
 			this.orderDao = orderDao;
 			this.resourceDao = resourceDao;
+			this.activityDao = activityDao;
 			this.auditDao = auditDao;
 		}
 
@@ -95,6 +105,10 @@ public class InMemoryPersistence implements PersistenceHandler {
 
 		public AuditDao getAuditDao() {
 			return this.auditDao;
+		}
+
+		public ActivityDao getActivityDao() {
+			return this.activityDao;
 		}
 	}
 }

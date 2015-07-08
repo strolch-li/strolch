@@ -14,12 +14,12 @@
 			<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
 			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
 		</ParameterBag>
-		<TimedState Id="@booleanState" Name="Boolean State" Type="BooleanState">
+		<TimedState Id="@booleanState" Name="Boolean State" Type="Boolean">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="false" />
 			<Value Time="1970-01-01T00:01:00.000+01:00" Value="true" />
 			<Value Time="1970-01-01T00:02:00.000+01:00" Value="false" />
 		</TimedState>
-		<TimedState Id="@integerState" Name="Integer State" Type="IntegerState">
+		<TimedState Id="@integerState" Name="Integer State" Type="Integer">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="1" />
 			<Value Time="1970-01-01T00:01:00.000+01:00" Value="2" />
 			<Value Time="1970-01-01T00:02:00.000+01:00" Value="3" />
@@ -27,7 +27,7 @@
 			<Value Time="1970-01-01T00:04:00.000+01:00" Value="1" />
 			<Value Time="1970-01-01T00:05:00.000+01:00" Value="0" />
 		</TimedState>
-		<TimedState Id="@floatState" Name="Float State" Type="FloatState">
+		<TimedState Id="@floatState" Name="Float State" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="1.1" />
 			<Value Time="1970-01-01T00:01:00.000+01:00" Value="2.2" />
 			<Value Time="1970-01-01T00:02:00.000+01:00" Value="3.3" />
@@ -35,7 +35,7 @@
 			<Value Time="1970-01-01T00:04:00.000+01:00" Value="1.1" />
 			<Value Time="1970-01-01T00:05:00.000+01:00" Value="0.0" />
 		</TimedState>
-		<TimedState Id="@stringSetState" Name="StringSet State" Type="StringSetState">
+		<TimedState Id="@stringSetState" Name="StringSet State" Type="StringSet">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="foo" />
 			<Value Time="1970-01-01T00:01:00.000+01:00" Value="foo, bar" />
 			<Value Time="1970-01-01T00:02:00.000+01:00" Value="bar" />

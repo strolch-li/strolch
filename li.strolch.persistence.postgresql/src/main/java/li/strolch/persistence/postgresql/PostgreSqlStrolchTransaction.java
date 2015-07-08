@@ -19,6 +19,7 @@ import java.sql.Connection;
 
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.AbstractTransaction;
+import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
@@ -36,8 +37,9 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	private static final Logger logger = LoggerFactory.getLogger(PostgreSqlStrolchTransaction.class);
 	private PostgreSqlPersistenceHandler persistenceHandler;
 
-	private PostgresqlDao<?> orderDao;
-	private PostgresqlDao<?> resourceDao;
+	private PostgreSqlOrderDao orderDao;
+	private PostgreSqlResourceDao resourceDao;
+	private PostgreSqlActivityDao activityDao;
 	private AuditDao auditDao;
 	private Connection connection;
 
@@ -94,9 +96,12 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 		return (ResourceDao) this.resourceDao;
 	}
 
-	/**
-	 * @return
-	 */
+	ActivityDao getActivityDao() {
+		if (this.activityDao == null)
+			this.activityDao = new PostgreSqlActivityDao(this);
+		return (ActivityDao) this.activityDao;
+	}
+
 	public AuditDao getAuditDao() {
 		if (this.auditDao == null)
 			this.auditDao = new PostgreSqlAuditDao(this);
@@ -114,5 +119,4 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	public PersistenceHandler getPersistenceHandler() {
 		return this.persistenceHandler;
 	}
-
 }

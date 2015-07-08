@@ -15,18 +15,13 @@
  */
 package li.strolch.model.parameter;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Tags;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
-
-import org.w3c.dom.Element;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -34,7 +29,6 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class LongListParameter extends AbstractParameter<List<Long>> implements ListParameter<Long> {
 
-	public static final String TYPE = "LongList"; //$NON-NLS-1$
 	private static final long serialVersionUID = 1L;
 
 	protected List<Long> value;
@@ -57,23 +51,6 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 		super(id, name);
 
 		setValue(value);
-	}
-
-	/**
-	 * DOM Constructor
-	 *
-	 * @param element
-	 */
-	public LongListParameter(Element element) {
-		super.fromDom(element);
-
-		String valueS = element.getAttribute(Tags.VALUE);
-		if (StringHelper.isEmpty(valueS)) {
-			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
-			throw new StrolchException(msg);
-		}
-
-		setValue(parseFromString(valueS));
 	}
 
 	@Override
@@ -112,6 +89,11 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	}
 
 	@Override
+	public void setValueFromString(String valueAsString) {
+		setValue(parseFromString(valueAsString));
+	}
+
+	@Override
 	public void addValue(Long value) {
 		this.value.add(value);
 	}
@@ -133,7 +115,7 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 
 	@Override
 	public String getType() {
-		return TYPE;
+		return StrolchValueType.LONG_LIST.getType();
 	}
 
 	@Override

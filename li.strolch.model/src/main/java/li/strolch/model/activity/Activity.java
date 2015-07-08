@@ -15,6 +15,7 @@
  */
 package li.strolch.model.activity;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -29,13 +30,11 @@ import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
- * Parameterized object grouping a collection of {@link Activity} and
- * {@link Action} objects defining the process to be scheduled
+ * Parameterized object grouping a collection of {@link Activity} and {@link Action} objects defining the process to be
+ * scheduled
  * 
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
@@ -45,27 +44,68 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 
 	protected Activity parent;
 
+	protected Map<String, IActivityElement> elements;
+
+	/**
+	 * Empty constructor - for marshalling only!
+	 */
+	public Activity() {
+		super();
+	}
+
 	public Activity(String id, String name, String type) {
 		super(id, name, type);
 	}
 
-	// use a LinkedHashMap since we will iterate elements in the order added and
-	// lookup elements by ID
-	protected Map<String, IActivityElement> elements = new LinkedHashMap<String, IActivityElement>();
+	private void initElements() {
+		if (this.elements == null) {
+			// use a LinkedHashMap since we will iterate elements in the order added and lookup elements by ID
+			elements = new LinkedHashMap<String, IActivityElement>();
+		}
+	}
 
 	/**
-	 * add an activity element to the <code>LinkedHashMap</code> of
-	 * <code>IActivityElements</code>
+	 * Returns true if this {@link Activity} contains any children i.e. any of {@link Action} or {@link Activity}
+	 * 
+	 * @return true if this {@link Activity} contains any children i.e. any of {@link Action} or {@link Activity}
+	 */
+	public boolean hasElements() {
+		return this.elements != null && !this.elements.isEmpty();
+	}
+
+	/**
+	 * Returns true if this {@link Activity} contains a child with the given id. The element instance type is ignored,
+	 * i.e. {@link Action} or {@link Activity}
+	 * 
+	 * @param id
+	 *            the id of the element to check for
+	 * 
+	 * @return true if this {@link Activity} contains a child with the given id. The element instance type is ignored,
+	 *         i.e. {@link Action} or {@link Activity}
+	 */
+	public boolean hasElement(String id) {
+		return this.elements != null && this.elements.containsKey(id);
+	}
+
+	/**
+	 * add an activity element to the <code>LinkedHashMap</code> of <code>IActivityElements</code>
 	 * 
 	 * @param activityElement
 	 * @return the element added
 	 */
 	public IActivityElement addElement(IActivityElement activityElement) {
+		DBC.PRE.assertNotEquals("Can't add element to itself!", this, activityElement);
+		DBC.PRE.assertNull("Parent can't already be set!", activityElement.getParent());
+
+		// TODO make sure we can't create a circular dependency
+
+		initElements();
 		String id = activityElement.getId();
 		if (id == null)
 			throw new StrolchException("Cannot add IActivityElement without id.");
 		else if (elements.containsKey(id))
-			throw new StrolchException("Activiy " + getLocator() + " already contains an activity element with id = " + id);
+			throw new StrolchException("Activiy " + getLocator() + " already contains an activity element with id = "
+					+ id);
 		else {
 			activityElement.setParent(this);
 			return elements.put(activityElement.getId(), activityElement);
@@ -79,28 +119,35 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 	 *            the id of the <code>IActivityElement</code>
 	 * @return IActivityElement
 	 */
-	public IActivityElement getElement(String id) {
-		return elements.get(id);
+	@SuppressWarnings("unchecked")
+	public <T extends IActivityElement> T getElement(String id) {
+		if (this.elements == null)
+			return null;
+		return (T) elements.get(id);
 	}
 
 	/**
-	 * @return get the <code>LinkedHashMap</code> of
-	 *         <code>IActivityElements</code>
+	 * @return get the <code>LinkedHashMap</code> of <code>IActivityElements</code>
 	 */
 	public Map<String, IActivityElement> getElements() {
+		if (this.elements == null)
+			return Collections.emptyMap();
 		return elements;
 	}
 
 	/**
-	 * @return the iterator for entries, which include the id as key and the
-	 *         {@link IActivityElement} as value
+	 * @return the iterator for entries, which include the id as key and the {@link IActivityElement} as value
 	 */
 	public Iterator<Entry<String, IActivityElement>> elementIterator() {
+		if (this.elements == null)
+			return Collections.<String, IActivityElement> emptyMap().entrySet().iterator();
 		return elements.entrySet().iterator();
 	}
 
 	public Long getStart() {
 		Long start = Long.MAX_VALUE;
+		if (this.elements == null)
+			return start;
 		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
 		while (elementIterator.hasNext()) {
 			IActivityElement action = elementIterator.next().getValue();
@@ -111,6 +158,8 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 
 	public Long getEnd() {
 		Long end = 0L;
+		if (this.elements == null)
+			return end;
 		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
 		while (elementIterator.hasNext()) {
 			IActivityElement action = elementIterator.next().getValue();
@@ -121,6 +170,8 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 
 	public State getState() {
 		State state = State.PLANNED;
+		if (this.elements == null)
+			return state;
 		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
 		while (elementIterator.hasNext()) {
 			IActivityElement child = elementIterator.next().getValue();
@@ -145,18 +196,6 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 	}
 
 	@Override
-	public Element toDom(Document doc) {
-		Element element = doc.createElement(Tags.ACTIVITY);
-		fillElement(element);
-		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
-		while (elementIterator.hasNext()) {
-			IActivityElement activityElement = elementIterator.next().getValue();
-			element.appendChild(activityElement.toDom(doc)); 
-		}
-		return element;
-	}
-
-	@Override
 	public StrolchElement getParent() {
 		return parent;
 	}
@@ -172,12 +211,15 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 	}
 
 	@Override
-	public StrolchElement getClone() {
-		Activity clone = new Activity(id, name, type);
-		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
-		while (elementIterator.hasNext()) {
-			Entry<String, IActivityElement> next = elementIterator.next();
-			clone.elements.put(next.getKey(), (IActivityElement) next.getValue().getClone());
+	public Activity getClone() {
+		Activity clone = new Activity();
+		super.fillClone(clone);
+
+		if (this.elements == null)
+			return clone;
+
+		for (IActivityElement element : this.elements.values()) {
+			clone.addElement(element.getClone());
 		}
 		return clone;
 	}
@@ -210,5 +252,4 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 	public void setParent(Activity activity) {
 		this.parent = activity;
 	}
-
 }

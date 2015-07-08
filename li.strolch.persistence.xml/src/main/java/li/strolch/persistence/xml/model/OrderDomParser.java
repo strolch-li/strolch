@@ -16,10 +16,10 @@
 package li.strolch.persistence.xml.model;
 
 import li.strolch.model.Order;
+import li.strolch.model.xml.OrderFromDomVisitor;
 import li.strolch.model.xml.OrderToDomVisitor;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import ch.eitchnet.xmlpers.api.DomParser;
 
@@ -46,8 +46,7 @@ public class OrderDomParser implements DomParser<Order> {
 
 	@Override
 	public void fromDom(Document document) {
-		Element rootElement = document.getDocumentElement();
-		Order order = new Order(rootElement);
+		Order order = new OrderFromDomVisitor().visit(document);
 		this.order = order;
 	}
 }

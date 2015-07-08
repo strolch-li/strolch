@@ -17,6 +17,7 @@ package li.strolch.model.xml;
 
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.activity.Activity;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -27,4 +28,6 @@ public interface StrolchElementListener {
 	public void notifyResource(Resource resource);
 
 	public void notifyOrder(Order order);
+
+	public void notifyActivity(Activity activity);
 }

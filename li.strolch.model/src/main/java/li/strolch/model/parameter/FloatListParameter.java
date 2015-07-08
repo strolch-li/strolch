@@ -15,18 +15,13 @@
  */
 package li.strolch.model.parameter;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Tags;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
-
-import org.w3c.dom.Element;
-
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -34,7 +29,6 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class FloatListParameter extends AbstractParameter<List<Double>> implements ListParameter<Double> {
 
-	public static final String TYPE = "FloatList"; //$NON-NLS-1$
 	private static final long serialVersionUID = 1L;
 
 	protected List<Double> value;
@@ -57,23 +51,6 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 		super(id, name);
 
 		setValue(value);
-	}
-
-	/**
-	 * DOM Constructor
-	 *
-	 * @param element
-	 */
-	public FloatListParameter(Element element) {
-		super.fromDom(element);
-
-		String valueS = element.getAttribute(Tags.VALUE);
-		if (StringHelper.isEmpty(valueS)) {
-			String msg = MessageFormat.format("No value defined for {0}", this.id); //$NON-NLS-1$
-			throw new StrolchException(msg);
-		}
-
-		setValue(parseFromString(valueS));
 	}
 
 	@Override
@@ -112,6 +89,11 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
+	public void setValueFromString(String valueAsString) {
+		setValue(parseFromString(valueAsString));
+	}
+
+	@Override
 	public void addValue(Double value) {
 		this.value.add(value);
 	}
@@ -133,7 +115,7 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 
 	@Override
 	public String getType() {
-		return TYPE;
+		return StrolchValueType.FLOAT_LIST.getType();
 	}
 
 	@Override

@@ -53,6 +53,11 @@ public class StrolchConstants {
 	 */
 	public static final String INTERPRETATION_ORDER_REF = StrolchModelConstants.INTERPRETATION_ORDER_REF;
 
+	/**
+	 * @see StrolchModelConstants#INTERPRETATION_ACTIVITY_REF
+	 */
+	public static final String INTERPRETATION_ACTIVITY_REF = StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
+
 	public static String makeRealmKey(String realmName, String key) {
 		String realmKey = key;
 		if (!realmName.equals(DEFAULT_REALM))

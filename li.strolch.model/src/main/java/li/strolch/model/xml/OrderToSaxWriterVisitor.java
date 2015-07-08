@@ -23,7 +23,6 @@ import javax.xml.stream.XMLStreamWriter;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
-import li.strolch.model.Tags;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -37,7 +36,7 @@ public class OrderToSaxWriterVisitor extends AbstractToSaxWriterVisitor implemen
 	@Override
 	public Void visit(Order order) {
 		try {
-			writeElement(Tags.ORDER, order);
+			writeElement(order);
 			this.writer.flush();
 		} catch (XMLStreamException e) {
 			String msg = "Failed to write Order {0} due to {1}"; //$NON-NLS-1$

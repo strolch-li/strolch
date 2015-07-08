@@ -5,22 +5,22 @@
 			<Parameter Id="owner" Name="Owner" Type="String" Value="eitch" />
 		</ParameterBag>
 		<ParameterBag Id="something" Name="Something" Type="Something" />
-		<TimedState Id="@state1" Name="State" Type="FloatState" />
-		<TimedState Id="@state2" Name="State" Type="FloatState">
+		<TimedState Id="@state1" Name="State" Type="Float" />
+		<TimedState Id="@state2" Name="State" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 			<Value Time="1970-01-01T00:01:00.000+01:00" Value="1.0" />
 			<Value Time="1970-01-01T00:02:00.000+01:00" Value="2.0" />
 			<Value Time="1970-01-01T00:03:00.000+01:00" Value="1.0" />
 		</TimedState>
-		<TimedState Id="@state3" Name="State" Type="IntegerState" />
-		<TimedState Id="@state4" Name="State" Type="IntegerState">
+		<TimedState Id="@state3" Name="State" Type="Integer" />
+		<TimedState Id="@state4" Name="State" Type="Integer">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0" />
 			<Value Time="1970-01-01T00:01:00.000+01:00" Value="1" />
 			<Value Time="1970-01-01T00:02:00.000+01:00" Value="2" />
 			<Value Time="1970-01-01T00:03:00.000+01:00" Value="1" />
 		</TimedState>
-		<TimedState Id="@state5" Name="State" Type="BooleanState" />
-		<TimedState Id="@state6" Name="State" Type="BooleanState">
+		<TimedState Id="@state5" Name="State" Type="Boolean" />
+		<TimedState Id="@state6" Name="State" Type="Boolean">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="false" />
 			<Value Time="1970-01-01T00:01:00.000+01:00" Value="true" />
 			<Value Time="1970-01-01T00:02:00.000+01:00" Value="false" />

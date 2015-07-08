@@ -15,22 +15,8 @@
  */
 package li.strolch.model.timedstate;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.SortedSet;
-
-import li.strolch.model.Tags;
-import li.strolch.model.timevalue.ITimeValue;
-import li.strolch.model.timevalue.impl.AString;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.impl.StringSetValue;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -38,8 +24,6 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 public class StringSetTimedState extends AbstractStrolchTimedState<StringSetValue> {
 
 	private static final long serialVersionUID = 1L;
-
-	public static final String TYPE = "StringSetState";
 
 	public StringSetTimedState() {
 		super();
@@ -49,63 +33,14 @@ public class StringSetTimedState extends AbstractStrolchTimedState<StringSetValu
 		super(id, name);
 	}
 
-	public StringSetTimedState(Element element) {
-		super.fromDom(element);
-
-		this.state = new TimedState<>();
-
-		NodeList timeValueElems = element.getElementsByTagName(Tags.VALUE);
-		for (int i = 0; i < timeValueElems.getLength(); i++) {
-			Element timeValueElem = (Element) timeValueElems.item(i);
-			String timeS = timeValueElem.getAttribute(Tags.TIME);
-			Date date = ISO8601FormatFactory.getInstance().parseDate(timeS);
-			long time = date.getTime();
-
-			String valueAsString = timeValueElem.getAttribute(Tags.VALUE);
-			Set<AString> value = new HashSet<>();
-			String[] values = valueAsString.split(",");
-			for (String s : values) {
-				value.add(new AString(s.trim()));
-			}
-
-			StringSetValue integerValue = new StringSetValue(value);
-			this.state.getTimeEvolution().setValueAt(time, integerValue);
-		}
-	}
-
 	@Override
-	public Element toDom(Document doc) {
-
-		Element stateElement = doc.createElement(Tags.TIMED_STATE);
-		super.fillElement(stateElement);
-		SortedSet<ITimeValue<StringSetValue>> values = this.state.getTimeEvolution().getValues();
-		for (ITimeValue<StringSetValue> timeValue : values) {
-			Long time = timeValue.getTime();
-			StringSetValue stringSetValue = timeValue.getValue();
-
-			Set<AString> value = stringSetValue.getValue();
-			StringBuilder sb = new StringBuilder();
-			Iterator<AString> iter = value.iterator();
-			while (iter.hasNext()) {
-				sb.append(iter.next().getString());
-				if (iter.hasNext()) {
-					sb.append(", ");
-				}
-			}
-			String valueAsString = sb.toString();
-
-			Element valueElem = doc.createElement(Tags.VALUE);
-			valueElem.setAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(time));
-			valueElem.setAttribute(Tags.VALUE, valueAsString);
-			stateElement.appendChild(valueElem);
-		}
-
-		return stateElement;
+	public void setStateFromStringAt(Long time, String value) {
+		getTimeEvolution().setValueAt(time, new StringSetValue(value));
 	}
 
 	@Override
 	public String getType() {
-		return TYPE;
+		return StrolchValueType.STRING_SET.getType();
 	}
 
 	@Override

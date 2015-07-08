@@ -15,18 +15,8 @@
  */
 package li.strolch.model.timedstate;
 
-import java.util.Date;
-import java.util.SortedSet;
-
-import li.strolch.model.Tags;
-import li.strolch.model.timevalue.ITimeValue;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.impl.IntegerValue;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -34,8 +24,6 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 public class IntegerTimedState extends AbstractStrolchTimedState<IntegerValue> {
 
 	private static final long serialVersionUID = 1L;
-
-	public static final String TYPE = "IntegerState";
 
 	public IntegerTimedState() {
 		super();
@@ -45,45 +33,14 @@ public class IntegerTimedState extends AbstractStrolchTimedState<IntegerValue> {
 		super(id, name);
 	}
 
-	public IntegerTimedState(Element element) {
-		super.fromDom(element);
-
-		this.state = new TimedState<>();
-
-		NodeList timeValueElems = element.getElementsByTagName(Tags.VALUE);
-		for (int i = 0; i < timeValueElems.getLength(); i++) {
-			Element timeValueElem = (Element) timeValueElems.item(i);
-			String timeS = timeValueElem.getAttribute(Tags.TIME);
-			Date date = ISO8601FormatFactory.getInstance().parseDate(timeS);
-			long time = date.getTime();
-
-			Integer value = Integer.valueOf(timeValueElem.getAttribute(Tags.VALUE));
-			IntegerValue integerValue = new IntegerValue(value);
-			this.state.getTimeEvolution().setValueAt(time, integerValue);
-		}
-	}
-
 	@Override
-	public Element toDom(Document doc) {
-
-		Element stateElement = doc.createElement(Tags.TIMED_STATE);
-		super.fillElement(stateElement);
-		SortedSet<ITimeValue<IntegerValue>> values = this.state.getTimeEvolution().getValues();
-		for (ITimeValue<IntegerValue> timeValue : values) {
-			Long time = timeValue.getTime();
-			IntegerValue value = timeValue.getValue();
-			Element valueElem = doc.createElement(Tags.VALUE);
-			valueElem.setAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(time));
-			valueElem.setAttribute(Tags.VALUE, value.getValue().toString());
-			stateElement.appendChild(valueElem);
-		}
-
-		return stateElement;
+	public void setStateFromStringAt(Long time, String value) {
+		getTimeEvolution().setValueAt(time, new IntegerValue(value));
 	}
 
 	@Override
 	public String getType() {
-		return TYPE;
+		return StrolchValueType.INTEGER.getType();
 	}
 
 	@Override
