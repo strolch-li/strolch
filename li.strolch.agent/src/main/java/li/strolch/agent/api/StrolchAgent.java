@@ -81,8 +81,8 @@ public class StrolchAgent {
 
 	public void setup(String environment, File path) {
 
-		String msg = "Setting up Strolch Container from root {0}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, path.getAbsolutePath()));
+		String msg = "Setting up Strolch Container for environment {0} from root {1}"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, environment, path.getAbsolutePath()));
 
 		this.strolchConfiguration = ConfigurationParser.parseConfiguration(environment, path);
 
