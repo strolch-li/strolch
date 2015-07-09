@@ -355,6 +355,6 @@ public class XmlTest {
 		configSaxWriter.write();
 
 		String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(modelFile));
-		assertEquals("c9732a05bf0ed53d89b3d12e7c8d7216150b6a91412d1bf47fbe3e6f3be750ff", fileHash);
+		assertEquals("fd5f4554312b18ca9fd61f0a6a4c87603e7c191ee206afca6328e5bffb87f86c", fileHash);
 	}
 }
