@@ -22,9 +22,6 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import ch.eitchnet.utils.csv.CsvParser.CsvData;
-import ch.eitchnet.utils.csv.CsvParser.CsvRow;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */

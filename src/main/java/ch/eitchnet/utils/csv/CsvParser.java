@@ -18,13 +18,9 @@ package ch.eitchnet.utils.csv;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Scanner;
 
 import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.xml.XmlKeyValue;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -84,69 +80,5 @@ public class CsvParser {
 		}
 
 		return data;
-	}
-
-	public class CsvData {
-		private List<String> headers;
-		private List<CsvRow> rows;
-
-		public CsvData() {
-			this.headers = new ArrayList<>();
-			this.rows = new ArrayList<>();
-		}
-
-		public String getHeaderAtIndex(int column) {
-			if (this.headers.size() < column + 1) {
-				throw new IllegalArgumentException("No header exists at column index " + column);
-			}
-			return this.headers.get(column);
-		}
-
-		public void addHeader(String header) {
-			this.headers.add(header);
-		}
-
-		public void addRow(CsvRow row) {
-			this.rows.add(row);
-		}
-
-		public List<String> getHeaders() {
-			return this.headers;
-		}
-
-		public List<CsvRow> getRows() {
-			return this.rows;
-		}
-	}
-
-	public class CsvRow {
-		private int index;
-		private List<XmlKeyValue> values;
-
-		public CsvRow(int index) {
-			this.index = index;
-			this.values = new ArrayList<>();
-		}
-
-		public int getIndex() {
-			return this.index;
-		}
-
-		public void addColumnValue(String header, String value) {
-			this.values.add(new XmlKeyValue(header, value));
-		}
-
-		public String getColumnValue(String header) {
-			for (Iterator<XmlKeyValue> iter = this.values.iterator(); iter.hasNext();) {
-				XmlKeyValue next = iter.next();
-				if (next.getKey().equals(header))
-					return next.getValue();
-			}
-			throw new IllegalArgumentException("No value exists for header" + header);
-		}
-
-		public List<XmlKeyValue> getValues() {
-			return this.values;
-		}
 	}
 }
