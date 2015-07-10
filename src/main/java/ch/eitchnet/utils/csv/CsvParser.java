@@ -16,7 +16,6 @@
 package ch.eitchnet.utils.csv;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -53,6 +52,7 @@ public class CsvParser {
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(this.inputStream))) {
 				String line;
 				while ((line = reader.readLine()) != null) {
+					lineNr++;
 
 					line = line.trim();
 					if (line.isEmpty())
@@ -64,7 +64,7 @@ public class CsvParser {
 						scanner.useDelimiter(";");
 						if (headerRead) {
 							int column = 0;
-							CsvRow row = new CsvRow(lineNr);
+							CsvRow row = new CsvRow(lineNr - 1);
 							while (scanner.hasNext()) {
 								row.addColumnValue(data.getHeaderAtIndex(column), scanner.next());
 								column++;
@@ -77,11 +77,9 @@ public class CsvParser {
 							headerRead = true;
 						}
 					}
-
-					lineNr++;
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException("Failed to read csv data at line " + lineNr + " due to " + e.getMessage(), e);
 		}
 
