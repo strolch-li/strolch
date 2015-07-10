@@ -55,7 +55,6 @@ import ch.eitchnet.privilege.model.Certificate;
 public class PostgreSqlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
 	public static final String SCRIPT_PREFIX = "strolch"; //$NON-NLS-1$
-	private ComponentConfiguration componentConfiguration;
 	private Map<String, DataSource> dsMap;
 
 	public PostgreSqlPersistenceHandler(ComponentContainer container, String componentName) {
@@ -64,8 +63,6 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 	@Override
 	public void initialize(ComponentConfiguration componentConfiguration) throws Exception {
-
-		this.componentConfiguration = componentConfiguration;
 
 		// server loader does not seem to work in all contexts, thus:
 		org.postgresql.Driver.getLogLevel();
@@ -88,12 +85,12 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	@Override
 	public void start() throws Exception {
 
-		boolean allowSchemaCreation = this.componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
-		boolean allowSchemaMigration = this.componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION,
+		ComponentConfiguration configuration = getConfiguration();
+		boolean allowSchemaCreation = configuration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
+		boolean allowSchemaMigration = configuration.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION, Boolean.FALSE);
+		boolean allowSchemaDrop = configuration.getBoolean(PROP_ALLOW_SCHEMA_DROP, Boolean.FALSE);
+		boolean allowDataInitOnSchemaCreate = configuration.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE,
 				Boolean.FALSE);
-		boolean allowSchemaDrop = this.componentConfiguration.getBoolean(PROP_ALLOW_SCHEMA_DROP, Boolean.FALSE);
-		boolean allowDataInitOnSchemaCreate = this.componentConfiguration.getBoolean(
-				PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE, Boolean.FALSE);
 
 		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX, this.getClass(),
 				allowSchemaCreation, allowSchemaMigration, allowSchemaDrop);
@@ -160,7 +157,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	public ActivityDao getActivityDao(StrolchTransaction tx) {
 		return ((PostgreSqlStrolchTransaction) tx).getActivityDao();
 	}
-	
+
 	@Override
 	public AuditDao getAuditDao(StrolchTransaction tx) {
 		return ((PostgreSqlStrolchTransaction) tx).getAuditDao();

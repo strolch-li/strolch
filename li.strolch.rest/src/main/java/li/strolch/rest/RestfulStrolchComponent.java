@@ -18,6 +18,7 @@ package li.strolch.rest;
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.HttpCacheResponseFilter;
@@ -176,6 +177,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	@Override
 	public ComponentContainer getContainer() {
 		return super.getContainer();
+	}
+
+	public StrolchAgent getAgent() {
+		return super.getContainer().getAgent();
 	}
 
 	public <T> T getComponent(Class<T> clazz) {

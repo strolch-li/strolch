@@ -33,6 +33,7 @@ public class StrolchComponent {
 	private final String componentName;
 	private ComponentState state;
 	private ComponentVersion version;
+	private ComponentConfiguration configuration;
 
 	public StrolchComponent(ComponentContainer container, String componentName) {
 		this.container = container;
@@ -55,6 +56,10 @@ public class StrolchComponent {
 		return this.container;
 	}
 
+	protected ComponentConfiguration getConfiguration() {
+		return this.configuration;
+	}
+
 	protected void assertStarted() {
 		if (getState() != ComponentState.STARTED) {
 			String msg = "Component {0} is not yet started!"; //$NON-NLS-1$
@@ -74,6 +79,7 @@ public class StrolchComponent {
 	}
 
 	public void initialize(ComponentConfiguration configuration) throws Exception {
+		this.configuration = configuration;
 		this.state = this.state.validateStateChange(ComponentState.INITIALIZED);
 	}
 
