@@ -22,32 +22,33 @@ import java.util.List;
  */
 public class Paging<T> {
 
-	private int resultsPerPage;
-	private int indexOfPageToReturn;
+	private int pageSize;
+	private int pageToReturn;
 	private int nrOfPages;
+	private int nrOfElements;
 
 	private List<T> input;
 	private List<T> page;
 
-	private Paging(int resultsPerPage, int indexOfPageToReturn) {
-		this.resultsPerPage = resultsPerPage;
-		this.indexOfPageToReturn = indexOfPageToReturn;
+	private Paging(int pageSize, int indexOfPageToReturn) {
+		this.pageSize = pageSize;
+		this.pageToReturn = indexOfPageToReturn;
 	}
 
-	public int getResultsPerPage() {
-		return this.resultsPerPage;
+	public int getPageSize() {
+		return this.pageSize;
 	}
 
-	public void setResultsPerPage(int resultsPerPage) {
-		this.resultsPerPage = resultsPerPage;
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
 	}
 
-	public int getIndexOfPageToReturn() {
-		return this.indexOfPageToReturn;
+	public int getPageToReturn() {
+		return this.pageToReturn;
 	}
 
-	public void setIndexOfPageToReturn(int indexOfPageToReturn) {
-		this.indexOfPageToReturn = indexOfPageToReturn;
+	public void setPageToReturn(int pageToReturn) {
+		this.pageToReturn = pageToReturn;
 	}
 
 	public int getNrOfPages() {
@@ -56,6 +57,14 @@ public class Paging<T> {
 
 	public void setNrOfPages(int nrOfPages) {
 		this.nrOfPages = nrOfPages;
+	}
+
+	public int getNrOfElements() {
+		return this.nrOfElements;
+	}
+
+	public void setNrOfElements(int nrOfElements) {
+		this.nrOfElements = nrOfElements;
 	}
 
 	public List<T> getInput() {
@@ -71,19 +80,22 @@ public class Paging<T> {
 	 * 
 	 * @param list
 	 *            the list to paginate
-	 * @param resultsPerPage
+	 * @param pageSize
 	 *            The number of items to return in each page
 	 * @param page
 	 *            the page to return - start index is 1
 	 * 
 	 * @return a {@link Paging} instance from which the selected page (list) can be retrieved
 	 */
-	public static <T> Paging<T> asPage(List<T> list, int resultsPerPage, int page) {
+	public static <T> Paging<T> asPage(List<T> list, int pageSize, int page) {
 
-		Paging<T> paging = new Paging<T>(resultsPerPage, page);
+		Paging<T> paging = new Paging<T>(pageSize, page);
+		paging.nrOfElements = list.size();
 
-		if (paging.resultsPerPage < 0 || paging.indexOfPageToReturn < 0) {
-			paging.nrOfPages = -1;
+		if (paging.pageSize <= 0 || paging.pageToReturn <= 0) {
+			paging.nrOfPages = 1;
+			paging.pageSize = list.size();
+			paging.pageToReturn = 1;
 			paging.input = list;
 			paging.page = list;
 			return paging;
@@ -92,16 +104,16 @@ public class Paging<T> {
 		int size = list.size();
 
 		// calculate maximum number of pages
-		paging.nrOfPages = size / paging.resultsPerPage;
-		if (size % paging.resultsPerPage != 0)
+		paging.nrOfPages = size / paging.pageSize;
+		if (size % paging.pageSize != 0)
 			paging.nrOfPages++;
 
 		// and from this validate requested page
-		paging.indexOfPageToReturn = Math.min(paging.indexOfPageToReturn, paging.nrOfPages);
+		paging.pageToReturn = Math.min(paging.pageToReturn, paging.nrOfPages);
 
 		// now we can calculate the start and end of the page
-		int start = Math.max(0, paging.resultsPerPage * paging.indexOfPageToReturn - paging.resultsPerPage);
-		int end = Math.min(size, paging.resultsPerPage * paging.indexOfPageToReturn);
+		int start = Math.max(0, paging.pageSize * paging.pageToReturn - paging.pageSize);
+		int end = Math.min(size, paging.pageSize * paging.pageToReturn);
 
 		// and return the list
 		paging.page = list.subList(start, end);
