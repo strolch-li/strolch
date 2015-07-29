@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchElement extends Serializable, Comparable<StrolchElement> {
+public interface StrolchElement extends Serializable {
 
 	/**
 	 * Return the {@link Locator} for this element
@@ -63,42 +63,84 @@ public interface StrolchElement extends Serializable, Comparable<StrolchElement>
 	 * Set the currently set long value which defines the primary key for use in RDBM-Systems
 	 *
 	 * @param dbid
+	 *            the dbid to set
 	 */
 	public void setDbid(long dbid);
 
 	/**
 	 * Returns the currently set long value which defines the primary key for use in RDBM-Systems
 	 *
-	 * @return
+	 * @return the currently set long value which defines the primary key for use in RDBM-Systems
 	 */
 	public long getDbid();
 
 	/**
 	 * Returns the type of this {@link StrolchElement}
 	 *
-	 * @return
+	 * @return the type of this {@link StrolchElement}
 	 */
 	public String getType();
 
+	/**
+	 * @return the direct parent of this element
+	 */
 	public StrolchElement getParent();
 
+	/**
+	 * Returns the {@link StrolchRootElement} for this {@link StrolchElement}
+	 * 
+	 * @return the {@link StrolchRootElement} for this {@link StrolchElement}
+	 */
 	public StrolchRootElement getRootElement();
 
+	/**
+	 * Returns true if this element is a {@link StrolchRootElement}, false if not
+	 * 
+	 * @return true if this element is a {@link StrolchRootElement}, false if not
+	 */
 	public boolean isRootElement();
 
 	/**
 	 * Return a clone of this {@link StrolchElement}
 	 *
-	 * @return
+	 * @return a clone of this {@link StrolchElement}
 	 */
 	public StrolchElement getClone();
 
+	/**
+	 * <p>
+	 * Returns the hashcode of this element.
+	 * </p>
+	 * 
+	 * <p>
+	 * For most {@link StrolchElement} the equals and hashcode methods would only take into account the ID of the
+	 * element, but certain implementations might require more specific attributes
+	 * </p>
+	 * 
+	 * @see Object#hashCode()
+	 * 
+	 * @return the hashcode of this element
+	 */
 	@Override
 	public int hashCode();
 
+	/**
+	 * <p>
+	 * Returns true if this object equals the given parameter object
+	 * </p>
+	 * 
+	 * <p>
+	 * For most {@link StrolchElement} the equals and hashcode methods would only take into account the ID of the
+	 * element, but certain implementations might require more specific attributes
+	 * </p>
+	 * 
+	 * @see Object#equals(Object)
+	 * 
+	 * @param obj
+	 *            the object to which to check for equality
+	 * 
+	 * @return true if this object equals the given parameter object
+	 */
 	@Override
 	public boolean equals(Object obj);
-
-	@Override
-	public int compareTo(StrolchElement o);
 }

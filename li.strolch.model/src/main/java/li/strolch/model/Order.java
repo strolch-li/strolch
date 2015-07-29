@@ -31,7 +31,7 @@ import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class Order extends GroupedParameterizedElement implements StrolchRootElement {
+public class Order extends GroupedParameterizedElement implements StrolchRootElement, Comparable<Order> {
 
 	private static final long serialVersionUID = 0L;
 
@@ -168,5 +168,10 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 		builder.append("]");
 
 		return builder.toString();
+	}
+
+	@Override
+	public int compareTo(Order o) {
+		return getId().compareTo(o.getId());
 	}
 }

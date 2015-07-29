@@ -15,6 +15,7 @@
  */
 package li.strolch.model.parameter;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
 
@@ -92,5 +93,11 @@ public class FloatParameter extends AbstractParameter<Double> {
 
 	public static Double parseFromString(String valueS) {
 		return Double.valueOf(valueS);
+	}
+
+	@Override
+	public int compareTo(Parameter<?> o) {
+		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
+		return this.getValue().compareTo(((FloatParameter) o).getValue());
 	}
 }

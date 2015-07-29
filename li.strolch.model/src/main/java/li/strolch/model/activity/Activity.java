@@ -38,7 +38,8 @@ import ch.eitchnet.utils.dbc.DBC;
  * 
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public class Activity extends GroupedParameterizedElement implements IActivityElement, StrolchRootElement {
+public class Activity extends GroupedParameterizedElement implements IActivityElement, StrolchRootElement,
+		Comparable<Activity> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -241,6 +242,11 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 		builder.append(this.getEnd());
 		builder.append("]");
 		return builder.toString();
+	}
+
+	@Override
+	public int compareTo(Activity o) {
+		return getId().compareTo(o.getId());
 	}
 
 	@Override

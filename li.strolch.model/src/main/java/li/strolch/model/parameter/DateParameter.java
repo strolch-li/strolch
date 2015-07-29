@@ -19,6 +19,7 @@ import java.util.Date;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -93,5 +94,11 @@ public class DateParameter extends AbstractParameter<Date> {
 
 	public static Date parseFromString(String valueS) {
 		return ISO8601FormatFactory.getInstance().getDateFormat().parse(valueS);
+	}
+	
+	@Override
+	public int compareTo(Parameter<?> o) {
+		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
+		return this.getValue().compareTo(((DateParameter) o).getValue());
 	}
 }

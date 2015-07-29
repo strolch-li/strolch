@@ -23,7 +23,7 @@ import li.strolch.model.visitor.ParameterVisitor;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface Parameter<T> extends StrolchElement {
+public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 
 	/**
 	 * Returns the value of the parameter as string
@@ -141,9 +141,12 @@ public interface Parameter<T> extends StrolchElement {
 
 	@Override
 	public boolean equals(Object obj);
+	
+	@Override
+	public int compareTo(Parameter<?> o);
 
 	@Override
 	public Parameter<T> getClone();
 
-	public <U> U accept(ParameterVisitor visitor);
+	public <U> U accept(ParameterVisitor visitor);	
 }

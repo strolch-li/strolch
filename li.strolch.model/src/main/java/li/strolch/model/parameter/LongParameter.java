@@ -15,6 +15,7 @@
  */
 package li.strolch.model.parameter;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
 
@@ -91,5 +92,11 @@ public class LongParameter extends AbstractParameter<Long> {
 
 	public static Long parseFromString(String valueS) {
 		return Long.valueOf(valueS);
+	}
+	
+	@Override
+	public int compareTo(Parameter<?> o) {
+		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
+		return this.getValue().compareTo(((LongParameter) o).getValue());
 	}
 }

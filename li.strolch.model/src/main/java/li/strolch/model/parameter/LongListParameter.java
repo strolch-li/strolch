@@ -22,6 +22,7 @@ import java.util.List;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -145,5 +146,11 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 			values.add(Long.valueOf(val.trim()));
 		}
 		return values;
+	}
+
+	@Override
+	public int compareTo(Parameter<?> o) {
+		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
+		return Integer.valueOf(this.getValue().size()).compareTo(((LongListParameter) o).getValue().size());
 	}
 }

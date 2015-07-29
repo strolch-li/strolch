@@ -142,10 +142,5 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	}
 
 	@Override
-	public int compareTo(StrolchElement o) {
-		return getId().compareTo(o.getId());
-	}
-
-	@Override
 	public abstract String toString();
 }

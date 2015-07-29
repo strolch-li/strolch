@@ -31,7 +31,7 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class Resource extends GroupedParameterizedElement implements StrolchRootElement {
+public class Resource extends GroupedParameterizedElement implements StrolchRootElement, Comparable<Resource> {
 
 	private static final long serialVersionUID = 0L;
 
@@ -164,5 +164,10 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 		builder.append("]");
 
 		return builder.toString();
+	}
+	
+	@Override
+	public int compareTo(Resource o) {
+		return getId().compareTo(o.getId());
 	}
 }

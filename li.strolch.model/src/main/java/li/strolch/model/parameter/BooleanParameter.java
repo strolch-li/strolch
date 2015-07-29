@@ -17,6 +17,7 @@ package li.strolch.model.parameter;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 
 /**
@@ -91,5 +92,11 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 
 	public static Boolean parseFromString(String valueS) {
 		return StringHelper.parseBoolean(valueS);
+	}
+
+	@Override
+	public int compareTo(Parameter<?> o) {
+		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
+		return this.getValue().compareTo(((BooleanParameter) o).getValue());
 	}
 }

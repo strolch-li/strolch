@@ -196,4 +196,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 		return builder.toString();
 	}
+
+	@Override
+	public abstract int compareTo(Parameter<?> otherParam);
 }

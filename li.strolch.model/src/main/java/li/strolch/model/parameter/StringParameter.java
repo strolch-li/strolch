@@ -17,6 +17,7 @@ package li.strolch.model.parameter;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -89,5 +90,11 @@ public class StringParameter extends AbstractParameter<String> {
 	@Override
 	public <U> U accept(ParameterVisitor visitor) {
 		return visitor.visitStringParam(this);
+	}
+
+	@Override
+	public int compareTo(Parameter<?> o) {
+		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
+		return this.getValue().compareToIgnoreCase(((StringParameter) o).getValue());
 	}
 }
