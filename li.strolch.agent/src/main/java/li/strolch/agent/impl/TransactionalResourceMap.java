@@ -21,7 +21,6 @@ import java.util.List;
 
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.api.ResourceDao;
@@ -40,7 +39,7 @@ public class TransactionalResourceMap extends TransactionalElementMap<Resource> 
 	}
 
 	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
-		return getDao(tx).doQuery(query, resourceVisitor);
+	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery<U> query) {
+		return getDao(tx).doQuery(query);
 	}
 }

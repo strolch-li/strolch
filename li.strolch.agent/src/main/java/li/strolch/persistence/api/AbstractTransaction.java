@@ -38,14 +38,11 @@ import li.strolch.agent.impl.AuditingResourceMap;
 import li.strolch.agent.impl.InternalStrolchRealm;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
@@ -53,8 +50,6 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
-import li.strolch.model.audit.AuditVisitor;
-import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
@@ -65,9 +60,6 @@ import li.strolch.model.query.StrolchQuery;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.ElementTypeVisitor;
-import li.strolch.model.visitor.NoStrategyActivityVisitor;
-import li.strolch.model.visitor.NoStrategyOrderVisitor;
-import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.Command;
@@ -292,51 +284,31 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public List<Order> doQuery(OrderQuery query) {
+	public <U> List<U> doQuery(OrderQuery<U> query) {
 		assertQueryAllowed(query);
-		return getOrderMap().doQuery(this, query, new NoStrategyOrderVisitor());
+		DBC.PRE.assertNotNull("orderVisitor", query.getOrderVisitor());
+		return getOrderMap().doQuery(this, query);
 	}
 
 	@Override
-	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor) {
+	public <U> List<U> doQuery(ResourceQuery<U> query) {
 		assertQueryAllowed(query);
-		return getOrderMap().doQuery(this, query, orderVisitor);
+		DBC.PRE.assertNotNull("resourceVisitor", query.getResourceVisitor());
+		return getResourceMap().doQuery(this, query);
 	}
 
 	@Override
-	public List<Resource> doQuery(ResourceQuery query) {
+	public <U> List<U> doQuery(ActivityQuery<U> query) {
 		assertQueryAllowed(query);
-		return getResourceMap().doQuery(this, query, new NoStrategyResourceVisitor());
+		DBC.PRE.assertNotNull("activityVisitor", query.getActivityVisitor());
+		return getActivityMap().doQuery(this, query);
 	}
 
 	@Override
-	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
+	public <U> List<U> doQuery(AuditQuery<U> query) {
 		assertQueryAllowed(query);
-		return getResourceMap().doQuery(this, query, resourceVisitor);
-	}
-	
-	@Override
-	public List<Activity> doQuery(ActivityQuery query) {
-		assertQueryAllowed(query);
-		return getActivityMap().doQuery(this, query, new NoStrategyActivityVisitor());
-	}
-	
-	@Override
-	public <U> List<U> doQuery(ActivityQuery query, ActivityVisitor<U> activityVisitor) {
-		assertQueryAllowed(query);
-		return getActivityMap().doQuery(this, query, activityVisitor);
-	}
-
-	@Override
-	public List<Audit> doQuery(AuditQuery query) {
-		assertQueryAllowed(query);
-		return getAuditTrail().doQuery(this, query, new NoStrategyAuditVisitor());
-	}
-
-	@Override
-	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor) {
-		assertQueryAllowed(query);
-		return getAuditTrail().doQuery(this, query, auditVisitor);
+		DBC.PRE.assertNotNull("auditVisitor", query.getAuditVisitor());
+		return getAuditTrail().doQuery(this, query);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -514,18 +486,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotNull("refP", refP);
 		return getResourceMap().getBy(this, refP, assertExists);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 	@Override
 	public Activity getActivityBy(String type, String id) {
@@ -566,26 +526,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return getActivityMap().getBy(this, refP, assertExists);
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	@Override
 	public void flush() {
 		try {

@@ -23,7 +23,6 @@ import java.util.Set;
 
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
-import li.strolch.model.audit.AuditVisitor;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.runtime.query.inmemory.InMemoryAuditQuery;
 import li.strolch.runtime.query.inmemory.InMemoryAuditQueryVisitor;
@@ -160,9 +159,9 @@ public class InMemoryAuditDao implements AuditDao {
 	}
 
 	@Override
-	public <U> List<U> doQuery(AuditQuery auditQuery, AuditVisitor<U> auditVisitor) {
-		InMemoryAuditQueryVisitor visitor = new InMemoryAuditQueryVisitor();
-		InMemoryAuditQuery<U> query = visitor.visit(auditQuery, auditVisitor);
+	public <U> List<U> doQuery(AuditQuery<U> auditQuery) {
+		InMemoryAuditQueryVisitor<U> visitor = new InMemoryAuditQueryVisitor<>();
+		InMemoryAuditQuery<U> query = visitor.toInMemory(auditQuery);
 		return query.doQuery(this);
 	}
 }

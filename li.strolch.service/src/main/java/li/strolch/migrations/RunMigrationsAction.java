@@ -19,7 +19,6 @@ import java.util.Map;
 
 import ch.eitchnet.privilege.handler.SystemUserAction;
 import ch.eitchnet.privilege.model.PrivilegeContext;
-import ch.eitchnet.utils.Version;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -20,7 +20,6 @@ import java.util.Set;
 
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
-import li.strolch.model.audit.AuditVisitor;
 import ch.eitchnet.utils.collections.DateRange;
 
 /**
@@ -54,5 +53,5 @@ public interface AuditDao {
 
 	public long removeAll(String type, DateRange dateRange);
 
-	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor);
+	public <U> List<U> doQuery(AuditQuery<U> query);
 }

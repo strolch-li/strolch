@@ -30,13 +30,15 @@ import ch.eitchnet.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InMemoryAuditQueryVisitor implements AuditQueryVisitor {
+public class InMemoryAuditQueryVisitor<U> implements AuditQueryVisitor {
 
 	private AuditTypeNavigator navigator;
 	private List<AuditSelector> selectors;
 
-	public <U> InMemoryAuditQuery<U> visit(AuditQuery auditQuery, AuditVisitor<U> auditVisitor) {
-		DBC.PRE.assertNotNull("auditVisitor may not be null!", auditVisitor); //$NON-NLS-1$
+	public InMemoryAuditQuery<U> toInMemory(AuditQuery<U> auditQuery) {
+		AuditVisitor<U> auditVisitor = auditQuery.getAuditVisitor();
+		DBC.PRE.assertNotNull("auditVisitor", auditVisitor); //$NON-NLS-1$
+
 		this.selectors = new ArrayList<>();
 		auditQuery.accept(this);
 
@@ -66,7 +68,7 @@ public class InMemoryAuditQueryVisitor implements AuditQueryVisitor {
 	}
 
 	@Override
-	public void visit(AuditQuery auditQuery) {
+	public void visit(AuditQuery<?> auditQuery) {
 		String type = auditQuery.getElementTypeSelection();
 		DateRange dateRange = auditQuery.getDateRange();
 		this.navigator = new AuditTypeNavigator(type, dateRange);

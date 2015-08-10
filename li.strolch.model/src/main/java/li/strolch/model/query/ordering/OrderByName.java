@@ -13,17 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
-
-import java.util.List;
-
-import li.strolch.model.activity.Activity;
-import li.strolch.model.query.ActivityQuery;
+package li.strolch.model.query.ordering;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface ActivityDao extends StrolchDao<Activity> {
+public class OrderByName extends StrolchQueryOrdering {
 
-	public <U> List<U> doQuery(ActivityQuery<U> query);
+	/**
+	 * Creates this ordering with ascending order
+	 */
+	public OrderByName() {
+		super(true);
+	}
+
+	/**
+	 * Creates this ordering the given ascending order
+	 * 
+	 * @param ascending
+	 *            true for ascending, false for descending order
+	 */
+	public OrderByName(boolean ascending) {
+		super(ascending);
+	}
+
+	@Override
+	public void accept(StrolchQueryOrderingVisitor visitor) {
+		visitor.visit(this);
+	}
 }

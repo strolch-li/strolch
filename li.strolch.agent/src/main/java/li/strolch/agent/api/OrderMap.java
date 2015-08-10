@@ -18,7 +18,6 @@ package li.strolch.agent.api;
 import java.util.List;
 
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.persistence.api.StrolchTransaction;
 
@@ -27,5 +26,5 @@ import li.strolch.persistence.api.StrolchTransaction;
  */
 public interface OrderMap extends ElementMap<Order> {
 
-	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery query, OrderVisitor<U> orderVisitor);
+	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery<U> query);
 }

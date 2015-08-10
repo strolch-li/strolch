@@ -22,7 +22,6 @@ import java.util.Set;
 import li.strolch.model.Tags;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
-import li.strolch.model.audit.AuditVisitor;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import ch.eitchnet.utils.collections.DateRange;
@@ -190,7 +189,7 @@ public class XmlAuditDao implements AuditDao {
 	}
 
 	@Override
-	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor) {
+	public <U> List<U> doQuery(AuditQuery<U> query) {
 		// TODO implement XML file based querying...
 		throw new UnsupportedOperationException("not yet implemented!");
 	}

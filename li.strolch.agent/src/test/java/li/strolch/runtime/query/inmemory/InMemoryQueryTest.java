@@ -48,9 +48,6 @@ import li.strolch.model.query.NameSelection;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ParameterSelection;
 import li.strolch.model.query.ResourceQuery;
-import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.model.visitor.NoStrategyOrderVisitor;
-import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.persistence.inmemory.InMemoryOrderDao;
 import li.strolch.persistence.inmemory.InMemoryResourceDao;
 
@@ -69,9 +66,9 @@ public class InMemoryQueryTest {
 		InMemoryOrderDao dao = new InMemoryOrderDao();
 		dao.saveAll(orders);
 
-		OrderQuery orderQuery = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> orderQuery = OrderQuery.query("MyType1");
 		orderQuery.with(new IdSelection("@1"));
-		List<Order> result = dao.doQuery(orderQuery, new NoStrategyOrderVisitor());
+		List<Order> result = dao.doQuery(orderQuery);
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
 	}
@@ -83,10 +80,10 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		ResourceQuery resourceQuery = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> resourceQuery = ResourceQuery.query("MyType1");
 		resourceQuery.with(new IdSelection("@1"));
 
-		List<Resource> result = dao.doQuery(resourceQuery, new NoStrategyResourceVisitor());
+		List<Resource> result = dao.doQuery(resourceQuery);
 		assertEquals(1, result.size());
 		assertEquals("@1", result.get(0).getId());
 	}
@@ -98,10 +95,10 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		ResourceQuery resourceQuery = new ResourceQuery(new StrolchTypeNavigation("MyType2"));
+		ResourceQuery<Resource> resourceQuery = ResourceQuery.query("MyType2");
 		resourceQuery.or().with(new IdSelection("@3"), new IdSelection("@4"));
 
-		List<Resource> result = dao.doQuery(resourceQuery, new NoStrategyResourceVisitor());
+		List<Resource> result = dao.doQuery(resourceQuery);
 		assertEquals(2, result.size());
 		assertEquals("@3", result.get(0).getId());
 		assertEquals("@4", result.get(1).getId());
@@ -114,10 +111,10 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		ResourceQuery resourceQuery = new ResourceQuery(new StrolchTypeNavigation("MyType2"));
+		ResourceQuery<Resource> resourceQuery = ResourceQuery.query("MyType2");
 		resourceQuery.and().with(new IdSelection("@3"), new NameSelection("Res 3", es()));
 
-		List<Resource> result = dao.doQuery(resourceQuery, new NoStrategyResourceVisitor());
+		List<Resource> result = dao.doQuery(resourceQuery);
 		assertEquals(1, result.size());
 		assertEquals("@3", result.get(0).getId());
 	}
@@ -129,10 +126,10 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		ResourceQuery resourceQuery = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> resourceQuery = ResourceQuery.query("MyType1");
 		resourceQuery.and().with(new IdSelection("@3"), new NameSelection("@4", es()));
 
-		List<Resource> result = dao.doQuery(resourceQuery, new NoStrategyResourceVisitor());
+		List<Resource> result = dao.doQuery(resourceQuery);
 		assertEquals(0, result.size());
 	}
 
@@ -144,13 +141,13 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ResourceQuery<Resource> ballQuery = ResourceQuery.query("Ball");
 		ballQuery.and().with(
 				//
 				stringSelection("parameters", "color", "red", es()),
 				booleanSelection("parameters", "forChildren", true), floatSelection("parameters", "diameter", 22.0));
 
-		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		List<Resource> result = dao.doQuery(ballQuery);
 		assertEquals(1, result.size());
 	}
 
@@ -162,78 +159,78 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		ResourceQuery ballQuery;
+		ResourceQuery<Resource> ballQuery;
 		List<Resource> result;
 
 		// string list
 		{
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("a", "z")));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(0, result.size());
 
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("a")));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(1, result.size());
 
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("c", "b", "a")));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(1, result.size());
 		}
 
 		// integer list
 		{
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(1, 5)));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(0, result.size());
 
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(1)));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(1, result.size());
 
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(3, 2, 1)));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(1, result.size());
 		}
 
 		// float list
 		{
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(4.0, 8.0)));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(0, result.size());
 
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(4.0)));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(1, result.size());
 
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(6.2, 5.1, 4.0)));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(1, result.size());
 		}
 
 		// long list
 		{
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(8L, 11L)));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(0, result.size());
 
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(8L)));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(1, result.size());
 
-			ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+			ballQuery = ResourceQuery.query("Ball");
 			ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(10L, 9L, 8L)));
-			result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+			result = dao.doQuery(ballQuery);
 			assertEquals(1, result.size());
 		}
 	}
@@ -245,11 +242,11 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ResourceQuery<Resource> ballQuery = ResourceQuery.query("Ball");
 		ballQuery.and().with( //
 				ParameterSelection.nullSelection("parameters", "color"));
 
-		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		List<Resource> result = dao.doQuery(ballQuery);
 		assertEquals(0, result.size());
 	}
 
@@ -260,11 +257,11 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ResourceQuery<Resource> ballQuery = ResourceQuery.query("Ball");
 		ballQuery.and().with( //
 				ParameterSelection.nullSelection("parameters", "weight"));
 
-		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		List<Resource> result = dao.doQuery(ballQuery);
 		assertEquals(1, result.size());
 	}
 
@@ -275,11 +272,11 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ResourceQuery<Resource> ballQuery = ResourceQuery.query("Ball");
 		ballQuery.and().with( //
 				ParameterSelection.nullSelection("parameters", "weight"));
 
-		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		List<Resource> result = dao.doQuery(ballQuery);
 		assertEquals(1, result.size());
 	}
 
@@ -291,10 +288,10 @@ public class InMemoryQueryTest {
 		InMemoryResourceDao dao = new InMemoryResourceDao();
 		dao.saveAll(resources);
 
-		ResourceQuery ballQuery = new ResourceQuery(new StrolchTypeNavigation("Ball"));
+		ResourceQuery<Resource> ballQuery = ResourceQuery.query("Ball");
 		ballQuery.with(new NameSelection("ball ", ci()));
 
-		List<Resource> result = dao.doQuery(ballQuery, new NoStrategyResourceVisitor());
+		List<Resource> result = dao.doQuery(ballQuery);
 		assertEquals(1, result.size());
 	}
 

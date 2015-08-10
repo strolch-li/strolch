@@ -26,7 +26,7 @@ public class ElementSelection extends AuditSelection {
 	private StringSelection elementSubTypeSelection;
 	private StringSelection elementAccessedSelection;
 
-	public ElementSelection(AuditQuery query) {
+	public ElementSelection(AuditQuery<?> query) {
 		super(query);
 	}
 

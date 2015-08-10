@@ -31,7 +31,6 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
 
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
 import li.strolch.model.Tags;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.xml.ResourceToSaxVisitor;
@@ -149,7 +148,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	}
 
 	@Override
-	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
+	public <U> List<U> doQuery(ResourceQuery<U> query) {
 
 		PostgreSqlResourceQueryVisitor queryVisitor = new PostgreSqlResourceQueryVisitor("id, asxml");
 		query.accept(queryVisitor);
@@ -166,7 +165,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 					String id = result.getString("id");
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					Resource t = parseFromXml(id, queryVisitor.getType(), sqlxml);
-					list.add(resourceVisitor.visit(t));
+					list.add(query.getResourceVisitor().visit(t));
 				}
 			}
 		} catch (SQLException e) {

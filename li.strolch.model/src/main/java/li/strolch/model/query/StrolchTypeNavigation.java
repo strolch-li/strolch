@@ -15,6 +15,8 @@
  */
 package li.strolch.model.query;
 
+import ch.eitchnet.utils.dbc.DBC;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -23,6 +25,7 @@ public class StrolchTypeNavigation implements Navigation {
 	private String type;
 
 	public StrolchTypeNavigation(String type) {
+		DBC.PRE.assertNotEmpty("type", type);
 		this.type = type;
 	}
 

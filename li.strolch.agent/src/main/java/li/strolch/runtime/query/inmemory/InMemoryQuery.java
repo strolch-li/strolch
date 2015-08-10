@@ -17,6 +17,7 @@ package li.strolch.runtime.query.inmemory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,15 +34,18 @@ public class InMemoryQuery<T extends StrolchElement, U> {
 	private Navigator<T> navigator;
 	private Selector<T> selector;
 	private StrolchElementVisitor<T, U> elementVisitor;
+	private Comparator<T> comparator;
 
 	public InMemoryQuery() {
 		// empty constructor
 	}
 
-	public InMemoryQuery(Navigator<T> navigator, Selector<T> selector, StrolchElementVisitor<T, U> elementVisitor) {
+	public InMemoryQuery(Navigator<T> navigator, Selector<T> selector, StrolchElementVisitor<T, U> elementVisitor,
+			Comparator<T> comparator) {
 		this.navigator = navigator;
 		this.selector = selector;
 		this.elementVisitor = elementVisitor;
+		this.comparator = comparator;
 	}
 
 	/**
@@ -73,8 +77,11 @@ public class InMemoryQuery<T extends StrolchElement, U> {
 		if (this.selector == null)
 			return Collections.emptyList();
 
-		List<U> result = new ArrayList<U>();
 		List<T> elements = this.navigator.navigate(dao);
+		if (this.comparator != null)
+			elements.sort(this.comparator);
+
+		List<U> result = new ArrayList<U>();
 		Iterator<T> iter = elements.iterator();
 		while (iter.hasNext()) {
 			T element = iter.next();

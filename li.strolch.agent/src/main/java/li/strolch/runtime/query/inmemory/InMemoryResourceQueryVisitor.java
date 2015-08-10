@@ -40,8 +40,10 @@ public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource,
 		return new InMemoryResourceQueryVisitor();
 	}
 
-	public <U> InMemoryQuery<Resource, U> visit(ResourceQuery resourceQuery, ResourceVisitor<U> resourceVisitor) {
+	public <U> InMemoryQuery<Resource, U> visit(ResourceQuery<U> resourceQuery) {
+		ResourceVisitor<U> resourceVisitor = resourceQuery.getResourceVisitor();
 		DBC.PRE.assertNotNull("ResourceVisitor may not be null!", resourceVisitor); //$NON-NLS-1$
+
 		resourceQuery.accept(this);
 
 		Navigator<Resource> navigator = getNavigator();
@@ -52,10 +54,10 @@ public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource,
 
 		List<Selector<Resource>> selectors = getSelectors();
 		if (selectors.isEmpty())
-			return new InMemoryQuery<>(navigator, null, resourceVisitor);
+			return new InMemoryQuery<>(navigator, null, resourceVisitor, getComparator());
 
 		DBC.INTERIM.assertTrue("Invalid query as it may only contain one selector!", selectors.size() == 1); //$NON-NLS-1$
-		return new InMemoryQuery<>(navigator, selectors.get(0), resourceVisitor);
+		return new InMemoryQuery<>(navigator, selectors.get(0), resourceVisitor, getComparator());
 	}
 
 	@Override

@@ -18,6 +18,7 @@ package li.strolch.rest.model.visitor;
 import java.util.List;
 
 import li.strolch.model.audit.AccessType;
+import li.strolch.model.audit.Audit;
 import li.strolch.rest.model.ActionSelection;
 import li.strolch.rest.model.AuditQuery;
 import li.strolch.rest.model.DateRange;
@@ -27,7 +28,7 @@ import ch.eitchnet.utils.helper.StringHelper;
 
 public class ToAuditQueryVisitor {
 
-	public li.strolch.model.audit.AuditQuery create(AuditQuery query) {
+	public li.strolch.model.audit.AuditQuery<Audit> create(AuditQuery query) {
 
 		// validate element type
 		String elementType = query.getElementType();
@@ -45,7 +46,7 @@ public class ToAuditQueryVisitor {
 				dateRange.isToInclusive());
 
 		// create query
-		li.strolch.model.audit.AuditQuery auditQuery = new li.strolch.model.audit.AuditQuery(elementType, dr);
+		li.strolch.model.audit.AuditQuery<Audit> auditQuery = li.strolch.model.audit.AuditQuery.query(elementType, dr);
 
 		// limit
 		auditQuery.limit(query.getLimit());

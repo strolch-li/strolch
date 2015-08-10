@@ -21,7 +21,6 @@ import java.util.List;
 
 import li.strolch.agent.api.OrderMap;
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.persistence.api.OrderDao;
@@ -40,7 +39,7 @@ public class TransactionalOrderMap extends TransactionalElementMap<Order> implem
 	}
 
 	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery query, OrderVisitor<U> orderVisitor) {
-		return getDao(tx).doQuery(query, orderVisitor);
+	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery<U> query) {
+		return getDao(tx).doQuery(query);
 	}
 }

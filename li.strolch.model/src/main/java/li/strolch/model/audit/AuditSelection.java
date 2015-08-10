@@ -20,14 +20,14 @@ package li.strolch.model.audit;
  */
 public abstract class AuditSelection {
 
-	private AuditQuery query;
+	private AuditQuery<?> query;
 
-	public AuditSelection(AuditQuery query) {
+	public AuditSelection(AuditQuery<?> query) {
 		super();
 		this.query = query;
 	}
 
-	public AuditQuery query() {
+	public AuditQuery<?> query() {
 		return this.query;
 	}
 

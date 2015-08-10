@@ -22,8 +22,6 @@ import java.util.Set;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
-import li.strolch.model.audit.AuditVisitor;
-import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.inmemory.InMemoryAuditDao;
@@ -156,12 +154,7 @@ public class CachedAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public List<Audit> doQuery(StrolchTransaction tx, AuditQuery query) {
-		return getDbDao(tx).doQuery(query, new NoStrategyAuditVisitor());
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery query, AuditVisitor<U> auditVisitor) {
-		return getDbDao(tx).doQuery(query, auditVisitor);
+	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> query) {
+		return getDbDao(tx).doQuery(query);
 	}
 }

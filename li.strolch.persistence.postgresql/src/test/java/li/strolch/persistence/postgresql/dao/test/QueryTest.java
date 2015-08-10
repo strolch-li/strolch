@@ -34,13 +34,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.ModelGenerator;
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.query.DateSelection;
 import li.strolch.model.query.IdSelection;
@@ -52,7 +53,7 @@ import li.strolch.model.query.ParameterBagSelection.NullParameterBagSelection;
 import li.strolch.model.query.ParameterSelection;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StateSelection;
-import li.strolch.model.query.StrolchTypeNavigation;
+import li.strolch.model.query.ordering.OrderById;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.postgresql.PostgreSqlOrderQueryVisitor;
 import li.strolch.persistence.postgresql.PostgreSqlQueryVisitor;
@@ -149,7 +150,7 @@ public class QueryTest {
 	@Test
 	public void shouldQueryOrderAll() throws SQLException {
 
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.withAny();
 		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
@@ -157,51 +158,51 @@ public class QueryTest {
 	@Test
 	public void shouldQueryResourceAll() throws SQLException {
 
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType2"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType2", new OrderById(false));
 		query.withAny();
-		performResourceQuery(query, Arrays.asList("@4", "@5", "@6"));
+		performResourceQuery(query, Arrays.asList("@6", "@5", "@4"));
 	}
 
 	@Test
 	public void shouldQueryOrderByDate() throws SQLException {
 
 		// range
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(new DateSelection().from(earlier, false).to(later, false));
 		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
 
 		// equals current
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1");
 		query.and().with(new DateSelection().from(current, false).to(current, false));
 		performOrderQuery(query, Arrays.asList("@2"));
 
 		// equals later
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1");
 		query.and().with(new DateSelection().from(later, false).to(later, false));
 		performOrderQuery(query, Arrays.<String> asList("@3"));
 
 		// equals earlier
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1");
 		query.and().with(new DateSelection().from(earlier, false).to(earlier, false));
 		performOrderQuery(query, Arrays.<String> asList("@1"));
 
 		// past
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1");
 		query.and().with(new DateSelection().to(past, false));
 		performOrderQuery(query, Arrays.<String> asList());
 
 		// future
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1");
 		query.and().with(new DateSelection().from(future, false));
 		performOrderQuery(query, Arrays.<String> asList());
 
 		// earlier
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1");
 		query.and().with(new DateSelection().from(past, false).to(earlier, true));
 		performOrderQuery(query, Arrays.<String> asList("@1"));
 
 		// later
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1");
 		query.and().with(new DateSelection().from(later, false).to(future, true));
 		performOrderQuery(query, Arrays.<String> asList("@3"));
 	}
@@ -209,11 +210,11 @@ public class QueryTest {
 	@Test
 	public void shouldQueryOrderByState() throws SQLException {
 
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1");
 		query.and().with(new StateSelection(State.CREATED));
 		performOrderQuery(query, Arrays.asList("@1"));
 
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1");
 		query.and().with(new StateSelection(State.OPEN));
 		performOrderQuery(query, Arrays.<String> asList("@2"));
 	}
@@ -221,7 +222,7 @@ public class QueryTest {
 	@Test
 	public void shouldQueryOrder1() throws SQLException {
 
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(new IdSelection("@1", "@2"),
 				new NameSelection("Order 1", StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performOrderQuery(query, Arrays.asList("@1"));
@@ -230,7 +231,7 @@ public class QueryTest {
 	@Test
 	public void shouldQueryOrder2() throws SQLException {
 
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.or().with(new IdSelection("@1", "@2"),
 				new NameSelection("order 1", StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performOrderQuery(query, Arrays.asList("@1", "@2"));
@@ -238,28 +239,28 @@ public class QueryTest {
 
 	@Test
 	public void shouldQueryOrderByBooleParam() throws SQLException {
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.booleanSelection("@bag01", "@param1", true));
 		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryOrderByFloagParam() throws SQLException {
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.floatSelection("@bag01", "@param2", 44.3));
 		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryOrderByIntegerParam() throws SQLException {
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.integerSelection("@bag01", "@param3", 77));
 		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryOrderByLongParam() throws SQLException {
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType2"));
+		OrderQuery<Order> query = OrderQuery.query("MyType2", new OrderById());
 		query.and().with(ParameterSelection.longSelection("@bag01", "@param4", 4453234566L));
 		performOrderQuery(query, Arrays.asList("@4", "@5", "@6"));
 	}
@@ -269,25 +270,25 @@ public class QueryTest {
 
 		List<String> expected = Arrays.asList("@1", "@2", "@3");
 
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(
 				ParameterSelection.stringSelection("@bag01", "@param5", "Strolch",
 						StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performOrderQuery(query, expected);
 
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(
 				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
 						StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performOrderQuery(query, Arrays.<String> asList());
 
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(
 				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
 						StringMatchMode.EQUALS_CASE_INSENSITIVE));
 		performOrderQuery(query, expected);
 
-		query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(
 				ParameterSelection.stringSelection("@bag01", "@param5", "olch",
 						StringMatchMode.CONTAINS_CASE_INSENSITIVE));
@@ -296,42 +297,42 @@ public class QueryTest {
 
 	@Test
 	public void shouldQueryOrderByDateParam() throws SQLException {
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.dateSelection("@bag01", "@param6", new Date(1354295525628L)));
 		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryOrderByDurationParam() throws SQLException {
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.durationSelection("@bag01", "@param8", "P1D"));
 		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryOrderByNullParam1() throws SQLException {
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.nullSelection("@bag01", "@param6"));
 		performOrderQuery(query, Arrays.<String> asList());
 	}
 
 	@Test
 	public void shouldQueryOrderByNullParam2() throws SQLException {
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.nullSelection("@bag01", "@param"));
 		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryOrderByBag() throws SQLException {
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(new ParameterBagSelection("@bag01"));
 		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryOrderByNullBag() throws SQLException {
-		OrderQuery query = new OrderQuery(new StrolchTypeNavigation("MyType1"));
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
 		query.and().with(new NullParameterBagSelection("@bag01"));
 		performOrderQuery(query, Arrays.<String> asList());
 	}
@@ -339,7 +340,7 @@ public class QueryTest {
 	@Test
 	public void shouldQueryResource1() throws SQLException {
 
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.or().with(new IdSelection("@1", "@2"),
 				new NameSelection("Resource 1", StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performResourceQuery(query, Arrays.asList("@1", "@2"));
@@ -347,7 +348,7 @@ public class QueryTest {
 
 	@Test
 	public void shouldQueryResource2() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(
 				new OrSelection(new IdSelection("@1"), new IdSelection("@2")),
 				new OrSelection(new NameSelection("Resource 1", StringMatchMode.EQUALS_CASE_SENSITIVE),
@@ -357,28 +358,28 @@ public class QueryTest {
 
 	@Test
 	public void shouldQueryResourceByBooleParam() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.booleanSelection("@bag01", "@param1", true));
 		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryResourceByFloagParam() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.floatSelection("@bag01", "@param2", 44.3));
 		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryResourceByIntegerParam() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.integerSelection("@bag01", "@param3", 77));
 		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryResourceByLongParam() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType2"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType2", new OrderById());
 		query.and().with(ParameterSelection.longSelection("@bag01", "@param4", 4453234566L));
 		performResourceQuery(query, Arrays.asList("@4", "@5", "@6"));
 	}
@@ -388,31 +389,31 @@ public class QueryTest {
 
 		List<String> expected = Arrays.asList("@1", "@2", "@3");
 
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(
 				ParameterSelection.stringSelection("@bag01", "@param5", "Strolch",
 						StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performResourceQuery(query, expected);
 
-		query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(
 				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
 						StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performResourceQuery(query, Arrays.<String> asList());
 
-		query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(
 				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
 						StringMatchMode.EQUALS_CASE_INSENSITIVE));
 		performResourceQuery(query, expected);
 
-		query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(
 				ParameterSelection.stringSelection("@bag01", "@param5", "olch",
 						StringMatchMode.CONTAINS_CASE_INSENSITIVE));
 		performResourceQuery(query, expected);
 
-		query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(
 				ParameterSelection.stringSelection("@bag01", "@param5", "olch",
 						StringMatchMode.CONTAINS_CASE_INSENSITIVE),
@@ -425,58 +426,58 @@ public class QueryTest {
 
 	@Test
 	public void shouldQueryResourceByDateParam() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.dateSelection("@bag01", "@param6", new Date(1354295525628L)));
 		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryResourceByDurationParam() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.durationSelection("@bag01", "@param8", "P1D"));
 		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryResourceByNullParam1() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.nullSelection("@bag01", "@param6"));
 		performResourceQuery(query, Arrays.<String> asList());
 	}
 
 	@Test
 	public void shouldQueryResourceByNullParam2() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.nullSelection("@bag01", "@param"));
 		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryResourceByBag() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(new ParameterBagSelection("@bag01"));
 		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
 	public void shouldQueryResourceByNullBag() throws SQLException {
-		ResourceQuery query = new ResourceQuery(new StrolchTypeNavigation("MyType1"));
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(new NullParameterBagSelection("@bag01"));
 		performResourceQuery(query, Arrays.<String> asList());
 	}
 
-	private void performOrderQuery(OrderQuery query, List<String> expected) throws SQLException {
+	private void performOrderQuery(OrderQuery<Order> query, List<String> expected) throws SQLException {
 		PostgreSqlOrderQueryVisitor visitor = new PostgreSqlOrderQueryVisitor("id");
 		query.accept(visitor);
 		List<String> ids = queryIds(visitor);
-		assertEquals(new HashSet<>(expected), new HashSet<>(ids));
+		assertEquals(expected, ids);
 	}
 
-	private void performResourceQuery(ResourceQuery query, List<String> expected) throws SQLException {
+	private void performResourceQuery(ResourceQuery<Resource> query, List<String> expected) throws SQLException {
 		PostgreSqlResourceQueryVisitor visitor = new PostgreSqlResourceQueryVisitor("id");
 		query.accept(visitor);
 		List<String> ids = queryIds(visitor);
-		assertEquals(new HashSet<>(expected), new HashSet<>(ids));
+		assertEquals(expected, ids);
 	}
 
 	private List<String> queryIds(PostgreSqlQueryVisitor visitor) throws SQLException {

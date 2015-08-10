@@ -31,6 +31,7 @@ import li.strolch.model.Tags;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
+import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.persistence.inmemory.InMemoryAuditDao;
 
@@ -72,97 +73,104 @@ public class AuditQueryTest {
 	@Test
 	public void shouldQueryTypeAndDateRange() throws SQLException {
 
-		AuditQuery query = new AuditQuery(Tags.AUDIT, new DateRange().from(earlier, true).to(later, true));
+		AuditVisitor<Audit> visitor = new NoStrategyAuditVisitor();
+
+		AuditQuery<Audit> query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(earlier, true).to(later,
+				true));
 		performQuery(query, Arrays.asList(0L, 1L, 2L, 3L, 4L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(current, true).to(current, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(current, true).to(current, true));
 		performQuery(query, Arrays.asList(1L, 3L, 4L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(current, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(current, true));
 		performQuery(query, Arrays.asList(1L, 2L, 3L, 4L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().to(current, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().to(current, true));
 		performQuery(query, Arrays.asList(0L, 1L, 3L, 4L));
 
-		query = new AuditQuery(Tags.RESOURCE, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.RESOURCE, new DateRange().from(past, true).to(future, true));
 		performQuery(query, Arrays.<Long> asList());
 	}
 
 	@Test
 	public void shouldQueryAudits() throws SQLException {
-		AuditQuery query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+
+		AuditVisitor<Audit> visitor = new NoStrategyAuditVisitor();
+
+		AuditQuery<Audit> query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future,
+				true));
 		query.action().accessTypes(AccessType.CREATE, AccessType.READ);
 		performQuery(query, Arrays.asList(0L, 1L, 4L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.action().accessTypes(AccessType.CREATE);
 		performQuery(query, Arrays.asList(0L, 4L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.action().accessTypes(AccessType.CREATE, AccessType.READ)
 				.actions(StringMatchMode.EQUALS_CASE_SENSITIVE, "create", "read");
 		performQuery(query, Arrays.asList(0L, 1L, 4L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.action().accessTypes(AccessType.CREATE, AccessType.READ)
 				.actions(StringMatchMode.EQUALS_CASE_SENSITIVE, "read");
 		performQuery(query, Arrays.asList(1L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.element().elementAccessed(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "crea");
 		performQuery(query, Arrays.asList(0L, 4L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.element().elementAccessed(StringMatchMode.CONTAINS_CASE_SENSITIVE, "crea");
 		performQuery(query, Arrays.<Long> asList());
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.element().elementAccessed(StringMatchMode.EQUALS_CASE_INSENSITIVE, "create");
 		performQuery(query, Arrays.asList(0L, 4L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.identity().usernames(StringMatchMode.EQUALS_CASE_INSENSITIVE, "earlier");
 		performQuery(query, Arrays.asList(0L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.identity().usernames(StringMatchMode.EQUALS_CASE_INSENSITIVE, "earlier", "later");
 		performQuery(query, Arrays.asList(0L, 2L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.identity().usernames(StringMatchMode.EQUALS_CASE_INSENSITIVE, "earlier")
 				.firstnames(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "enn");
 		performQuery(query, Arrays.asList(0L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.identity().usernames(StringMatchMode.EQUALS_CASE_INSENSITIVE, "earlier")
 				.firstnames(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "enn")
 				.lastnames(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "kennedy");
 		performQuery(query, Arrays.asList(0L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.identity().firstnames(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "enn")
 				.lastnames(StringMatchMode.CONTAINS_CASE_INSENSITIVE, "kennedy");
 		performQuery(query, Arrays.asList(0L, 1L, 2L, 3L, 4L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.element().elementSubTypes(StringMatchMode.EQUALS_CASE_SENSITIVE, "Foo");
 		performQuery(query, Arrays.asList(0L, 1L, 2L, 3L, 4L));
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.element().elementSubTypes(StringMatchMode.EQUALS_CASE_SENSITIVE, "Bar");
 		performQuery(query, Arrays.asList());
 
-		query = new AuditQuery(Tags.AUDIT, new DateRange().from(past, true).to(future, true));
+		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.limit(1).element().elementSubTypes(StringMatchMode.EQUALS_CASE_SENSITIVE, "Foo");
 		performQuery(query, Arrays.asList(2L));
 	}
 
-	private void performQuery(AuditQuery query, List<Long> expected) throws SQLException {
+	private void performQuery(AuditQuery<Audit> query, List<Long> expected) throws SQLException {
 
 		InMemoryAuditDao dao = new InMemoryAuditDao();
 		dao.saveAll(getAudits());
 
-		List<Audit> result = dao.doQuery(query, new NoStrategyAuditVisitor());
+		List<Audit> result = dao.doQuery(query);
 		Set<Long> ids = new HashSet<>();
 		for (Audit audit : result) {
 			ids.add(audit.getId());

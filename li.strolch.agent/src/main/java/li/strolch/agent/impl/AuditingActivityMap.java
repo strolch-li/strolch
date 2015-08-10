@@ -17,6 +17,7 @@ package li.strolch.agent.impl;
 
 import java.util.List;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
@@ -47,11 +48,14 @@ public class AuditingActivityMap extends AuditingElementMapFacade<Activity> impl
 	}
 
 	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, ActivityQuery query, ActivityVisitor<U> activityVisitor) {
-		List<U> result = getElementMap().doQuery(tx, query, activity -> {
+	public <U> List<U> doQuery(StrolchTransaction tx, ActivityQuery<U> query) {
+		ActivityVisitor<U> activityVisitor = query.getActivityVisitor();
+		DBC.PRE.assertNotNull("activityVisitor on query", activityVisitor);
+		query.setActivityVisitor(activity -> {
 			this.read.add(activity);
 			return activityVisitor.visit(activity);
 		});
-		return result;
+
+		return getElementMap().doQuery(tx, query);
 	}
 }

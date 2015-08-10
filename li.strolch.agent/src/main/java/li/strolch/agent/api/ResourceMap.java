@@ -18,7 +18,6 @@ package li.strolch.agent.api;
 import java.util.List;
 
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.api.StrolchTransaction;
 
@@ -27,5 +26,5 @@ import li.strolch.persistence.api.StrolchTransaction;
  */
 public interface ResourceMap extends ElementMap<Resource> {
 
-	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery query, ResourceVisitor<U> resourceVisitor);
+	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery<U> query);
 }

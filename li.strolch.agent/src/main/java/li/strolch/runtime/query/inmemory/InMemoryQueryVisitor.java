@@ -17,6 +17,7 @@ package li.strolch.runtime.query.inmemory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import li.strolch.model.GroupedParameterizedElement;
@@ -44,6 +45,10 @@ import li.strolch.model.query.ParameterSelection.StringParameterSelection;
 import li.strolch.model.query.ParameterSelectionVisitor;
 import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchRootElementSelectionVisitor;
+import li.strolch.model.query.ordering.OrderById;
+import li.strolch.model.query.ordering.OrderByName;
+import li.strolch.model.query.ordering.OrderByParameter;
+import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.runtime.query.inmemory.ParameterBagSelector.NullParameterBagSelector;
 import li.strolch.runtime.query.inmemory.ParameterSelector.StringParameterSelector;
@@ -53,8 +58,9 @@ import ch.eitchnet.utils.dbc.DBC;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement, S extends StrolchDao<?>> implements
-		StrolchRootElementSelectionVisitor, ParameterSelectionVisitor {
+		StrolchRootElementSelectionVisitor, ParameterSelectionVisitor, StrolchQueryOrderingVisitor {
 
+	private Comparator<T> comparator;
 	private Navigator<T> navigator;
 	private List<Selector<T>> selectors;
 	private boolean any;
@@ -69,6 +75,10 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 
 	public Navigator<T> getNavigator() {
 		return this.navigator;
+	}
+
+	public Comparator<T> getComparator() {
+		return this.comparator;
 	}
 
 	/**
@@ -241,5 +251,23 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	@Override
 	public void visit(ParameterBagSelection selection) {
 		addSelector(new ParameterBagSelector<T>(selection.getBagKey()));
+	}
+
+	@Override
+	public InMemoryQueryVisitor<T, S> visit(OrderById ordering) {
+		this.comparator = new InMemoryStrolchQueryOrderingVisitor<T>().visit(ordering).getComparator();
+		return this;
+	}
+
+	@Override
+	public InMemoryQueryVisitor<T, S> visit(OrderByName ordering) {
+		this.comparator = new InMemoryStrolchQueryOrderingVisitor<T>().visit(ordering).getComparator();
+		return this;
+	}
+
+	@Override
+	public InMemoryQueryVisitor<T, S> visit(OrderByParameter ordering) {
+		this.comparator = new InMemoryStrolchQueryOrderingVisitor<T>().visit(ordering).getComparator();
+		return this;
 	}
 }

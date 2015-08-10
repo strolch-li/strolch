@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.api;
-
-import java.util.List;
-
-import li.strolch.model.activity.Activity;
-import li.strolch.model.query.ActivityQuery;
+package li.strolch.model.query.ordering;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface ActivityDao extends StrolchDao<Activity> {
+public abstract class StrolchQueryOrdering {
 
-	public <U> List<U> doQuery(ActivityQuery<U> query);
+	private boolean ascending;
+
+	public StrolchQueryOrdering(boolean ascending) {
+		this.ascending = ascending;
+	}
+
+	public boolean isAscending() {
+		return this.ascending;
+	}
+
+	public void setAscending(boolean ascending) {
+		this.ascending = ascending;
+	}
+
+	public abstract void accept(StrolchQueryOrderingVisitor visitor);
 }

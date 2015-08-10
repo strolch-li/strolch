@@ -26,5 +26,5 @@ public interface AuditQueryVisitor {
 
 	public void visit(ActionSelection selection);
 
-	public void visit(AuditQuery auditQuery);
+	public void visit(AuditQuery<?> auditQuery);
 }

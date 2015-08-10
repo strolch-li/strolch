@@ -20,6 +20,7 @@ import java.util.List;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.AuditDao;
 import ch.eitchnet.utils.collections.DateRange;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -30,6 +31,8 @@ public class AuditTypeNavigator implements AuditNavigator {
 	private DateRange dateRange;
 
 	public AuditTypeNavigator(String type, DateRange dateRange) {
+		DBC.PRE.assertNotNull("type", type);
+		DBC.PRE.assertNotNull("dateRange", dateRange);
 		this.type = type;
 		this.dateRange = dateRange;
 	}

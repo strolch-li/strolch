@@ -67,7 +67,7 @@ public class AuditsService {
 
 		try (StrolchTransaction tx = realm.openTx(cert, AuditsService.class)) {
 
-			li.strolch.model.audit.AuditQuery auditQuery = new ToAuditQueryVisitor().create(query);
+			li.strolch.model.audit.AuditQuery<Audit> auditQuery = new ToAuditQueryVisitor().create(query);
 			List<Audit> audits = tx.getAuditTrail().doQuery(tx, auditQuery);
 
 			return Response.ok(new AuditQueryResult(audits), MediaType.APPLICATION_JSON).build();

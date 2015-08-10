@@ -27,7 +27,7 @@ public class IdentitySelection extends AuditSelection {
 	private StringSelection firstnameSelection;
 	private StringSelection lastnameSelection;
 
-	public IdentitySelection(AuditQuery query) {
+	public IdentitySelection(AuditQuery<?> query) {
 		super(query);
 	}
 

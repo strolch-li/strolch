@@ -47,17 +47,24 @@ import li.strolch.model.query.ParameterSelectionVisitor;
 import li.strolch.model.query.Selection;
 import li.strolch.model.query.StrolchRootElementSelectionVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
+import li.strolch.model.query.ordering.OrderById;
+import li.strolch.model.query.ordering.OrderByName;
+import li.strolch.model.query.ordering.OrderByParameter;
+import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
 import ch.eitchnet.utils.StringMatchMode;
 import ch.eitchnet.utils.dbc.DBC;
+import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelectionVisitor, ParameterSelectionVisitor {
+public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelectionVisitor, ParameterSelectionVisitor,
+		StrolchQueryOrderingVisitor {
 
 	protected StringBuilder sql;
 	protected StringBuilder sb;
+	protected String ordering;
 	protected String type;
 	protected List<Object> values;
 	protected boolean any;
@@ -70,9 +77,9 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 		this.sb = new StringBuilder();
 		this.values = new ArrayList<>();
 
-		this.sql.append("select ");
+		this.sql.append("SELECT ");
 		this.sql.append(fields);
-		this.sql.append("\nfrom\n");
+		this.sql.append("\nFROM\n");
 		this.sql.append("  ");
 		this.sql.append(getTableName());
 		this.indent = "  ";
@@ -82,20 +89,30 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 		if (this.sqlAsString != null)
 			return this.sqlAsString;
 
-		this.sql.append("\nwhere\n");
+		this.sql.append("\nWHERE\n");
 		this.sql.append(this.indent);
 
 		if (this.any) {
 			this.sql.append("type = ?");
+			appendOrdering();
 			this.sqlAsString = this.sql.toString();
 			return this.sqlAsString;
 		}
 
-		this.sql.append("type = ? and\n");
-
+		this.sql.append("type = ? AND\n");
 		this.sql.append(this.sb.toString());
+
+		appendOrdering();
+
 		this.sqlAsString = this.sql.toString();
 		return this.sqlAsString;
+	}
+
+	private void appendOrdering() {
+		if (StringHelper.isNotEmpty(this.ordering)) {
+			this.sql.append("\n");
+			this.sql.append(this.ordering);
+		}
 	}
 
 	/**
@@ -133,7 +150,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 			this.sb.append("id = ?\n");
 			this.values.add(ids.get(0));
 		} else {
-			this.sb.append("id in (");
+			this.sb.append("id IN (");
 			Iterator<String> iter = ids.iterator();
 			while (iter.hasNext()) {
 				String id = iter.next();
@@ -172,7 +189,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 			selection.accept(this);
 			if (iter.hasNext()) {
 				this.sb.append(indent);
-				this.sb.append("and\n");
+				this.sb.append("AND\n");
 			}
 		}
 		this.indent = indent;
@@ -193,7 +210,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 			selection.accept(this);
 			if (iter.hasNext()) {
 				this.sb.append(indent);
-				this.sb.append("or\n");
+				this.sb.append("OR\n");
 			}
 		}
 		this.indent = indent;
@@ -205,7 +222,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 	public void visitNot(NotSelection notSelection) {
 		this.sb.append(this.indent);
 		List<Selection> selections = notSelection.getSelections();
-		this.sb.append("not ( \n");
+		this.sb.append("NOT ( \n");
 		Iterator<Selection> iter = selections.iterator();
 		String indent = this.indent;
 		this.indent += "  ";
@@ -214,7 +231,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 			selection.accept(this);
 			if (iter.hasNext()) {
 				this.sb.append(indent);
-				this.sb.append("and\n");
+				this.sb.append("AND\n");
 			}
 		}
 		this.indent = indent;
@@ -223,7 +240,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 	}
 
 	private void xpath(String bagKey, String paramKey, String paramValue) {
-		String xpath = "cast(xpath('//${className}/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\" and @Value=\"${paramValue}\"]', asxml) as text[]) != '{}'\n";
+		String xpath = "CAST(XPATH('//${className}/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\" and @Value=\"${paramValue}\"]', asxml) AS TEXT[]) != '{}'\n";
 		this.sb.append(this.indent);
 		xpath = xpath.replace("${className}", getClassName());
 		xpath = xpath.replace("${bagKey}", bagKey);
@@ -236,13 +253,13 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 	public void visit(StringParameterSelection selection) {
 		String value = selection.getValue();
 
-		String xpath = "xpath('//${className}/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]/@Value', asxml))::TEXT AS content";
+		String xpath = "XPATH('//${className}/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]/@Value', asxml))::TEXT AS content";
 		xpath = xpath.replace("${className}", getClassName());
 		xpath = xpath.replace("${bagKey}", selection.getBagKey());
 		xpath = xpath.replace("${paramKey}", selection.getParamKey());
 
 		this.sb.append(this.indent);
-		this.sb.append("id in (\n");
+		this.sb.append("id IN (\n");
 		this.sb.append(this.indent);
 		this.sb.append("  SELECT id\n");
 		this.sb.append(this.indent);
@@ -252,7 +269,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 		this.sb.append(xpath);
 		this.sb.append("\n");
 		this.sb.append(this.indent);
-		this.sb.append("from ");
+		this.sb.append("FROM ");
 		this.sb.append(getTableName());
 		this.sb.append("\n");
 		this.sb.append(this.indent);
@@ -315,7 +332,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 
 	@Override
 	public void visit(NullParameterSelection selection) {
-		String xpath = "cast(xpath('//${className}/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]', asxml) as text[]) = '{}'\n";
+		String xpath = "CAST(XPATH('//${className}/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]', asxml) AS text[]) = '{}'\n";
 		this.sb.append(this.indent);
 		xpath = xpath.replace("${className}", getClassName());
 		xpath = xpath.replace("${bagKey}", selection.getBagKey());
@@ -325,7 +342,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 
 	@Override
 	public void visit(ParameterBagSelection selection) {
-		String xpath = "cast(xpath('//${className}/ParameterBag[@Id=\"${bagKey}\"]', asxml) as text[]) != '{}'\n";
+		String xpath = "CAST(XPATH('//${className}/ParameterBag[@Id=\"${bagKey}\"]', asxml) AS text[]) != '{}'\n";
 		this.sb.append(this.indent);
 		xpath = xpath.replace("${className}", getClassName());
 		xpath = xpath.replace("${bagKey}", selection.getBagKey());
@@ -334,7 +351,7 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 
 	@Override
 	public void visit(NullParameterBagSelection selection) {
-		String xpath = "cast(xpath('//${className}/ParameterBag[@Id=\"${bagKey}\"]', asxml) as text[]) = '{}'\n";
+		String xpath = "CAST(XPATH('//${className}/ParameterBag[@Id=\"${bagKey}\"]', asxml) AS text[]) = '{}'\n";
 		this.sb.append(this.indent);
 		xpath = xpath.replace("${className}", getClassName());
 		xpath = xpath.replace("${bagKey}", selection.getBagKey());
@@ -363,6 +380,31 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 
 	@Override
 	public void visit(LongListParameterSelection selection) {
+		throw new UnsupportedOperationException("Not yet supported!");
+	}
+
+	@Override
+	public PostgreSqlQueryVisitor visit(OrderById ordering) {
+		if (ordering.isAscending())
+			this.ordering = "ORDER BY id";
+		else
+			this.ordering = "ORDER BY id DESC";
+
+		return this;
+	}
+
+	@Override
+	public PostgreSqlQueryVisitor visit(OrderByName ordering) {
+		if (ordering.isAscending())
+			this.ordering = "ORDER BY name";
+		else
+			this.ordering = "ORDER BY name DESC";
+
+		return this;
+	}
+
+	@Override
+	public PostgreSqlQueryVisitor visit(OrderByParameter ordering) {
 		throw new UnsupportedOperationException("Not yet supported!");
 	}
 

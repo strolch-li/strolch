@@ -33,7 +33,6 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
 
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
 import li.strolch.model.Tags;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.xml.OrderToSaxVisitor;
@@ -157,7 +156,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	}
 
 	@Override
-	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor) {
+	public <U> List<U> doQuery(OrderQuery<U> query) {
 
 		PostgreSqlOrderQueryVisitor queryVisitor = new PostgreSqlOrderQueryVisitor("id, asxml");
 		query.accept(queryVisitor);
@@ -174,7 +173,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 					String id = result.getString("id");
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					Order t = parseFromXml(id, queryVisitor.getType(), sqlxml);
-					list.add(orderVisitor.visit(t));
+					list.add(query.getOrderVisitor().visit(t));
 				}
 			}
 		} catch (SQLException e) {

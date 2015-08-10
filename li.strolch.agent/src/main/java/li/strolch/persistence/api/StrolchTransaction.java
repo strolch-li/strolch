@@ -365,31 +365,8 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
-	 * Performs the given {@link OrderQuery} returning the resulting list of {@link Order Orders}.
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Note:</b> Should the result be mapped to different objects, then use
-	 * {@link #doQuery(OrderQuery, OrderVisitor)}
-	 * </p>
-	 * 
-	 * @param query
-	 *            the query to perform
-	 * 
-	 * @return the result list, never null
-	 */
-	public List<Order> doQuery(OrderQuery query);
-
-	/**
-	 * <p>
 	 * Performs the given {@link OrderQuery} and each returned {@link Order} is passed through the {@link OrderVisitor}
-	 * and the return value of the visitor is added to the return list
-	 * </p>
-	 * 
-	 * <p>
-	 * This method is intended for situations where the query result should not be {@link Order} but some other object
-	 * type. For instance in a restful API, the result might have to be mapped to a POJO, thus using this method can
-	 * perform the mapping step for you
+	 * attached to the {@link OrderQuery} and the return value of the visitor is added to the return list
 	 * </p>
 	 * 
 	 * @param query
@@ -397,35 +374,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 
 	 * @return the result list of elements as returned by the {@link OrderVisitor}, never null
 	 */
-	public <U> List<U> doQuery(OrderQuery query, OrderVisitor<U> orderVisitor);
-
-	/**
-	 * <p>
-	 * Performs the given {@link ResourceQuery} returning the resulting list of {@link Resource Resources}.
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Note:</b> Should the result be mapped to different objects, then use
-	 * {@link #doQuery(ResourceQuery, ResourceVisitor)}
-	 * </p>
-	 * 
-	 * @param query
-	 *            the query to perform
-	 * 
-	 * @return the result list, never null
-	 */
-	public List<Resource> doQuery(ResourceQuery query);
+	public <U> List<U> doQuery(OrderQuery<U> query);
 
 	/**
 	 * <p>
 	 * Performs the given {@link ResourceQuery} and each returned {@link Resource} is passed through the
-	 * {@link ResourceVisitor} and the return value of the visitor is added to the return list
-	 * </p>
-	 * 
-	 * <p>
-	 * This method is intended for situations where the query result should not be {@link Resource} but some other
-	 * object type. For instance in a restful API, the result might have to be mapped to a POJO, thus using this method
-	 * can perform the mapping step for you
+	 * {@link ResourceVisitor} attached to the {@link ResourceQuery} and the return value of the visitor is added to the
+	 * return list
 	 * </p>
 	 * 
 	 * @param query
@@ -433,35 +388,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 
 	 * @return the result list of elements as returned by the {@link ResourceVisitor}, never null
 	 */
-	public <U> List<U> doQuery(ResourceQuery query, ResourceVisitor<U> resourceVisitor);
-
-	/**
-	 * <p>
-	 * Performs the given {@link ActivityQuery} returning the resulting list of {@link Activity Activities}.
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Note:</b> Should the result be mapped to different objects, then use
-	 * {@link #doQuery(ActivityQuery, ActivityVisitor)}
-	 * </p>
-	 * 
-	 * @param query
-	 *            the query to perform
-	 * 
-	 * @return the result list, never null
-	 */
-	public List<Activity> doQuery(ActivityQuery query);
+	public <U> List<U> doQuery(ResourceQuery<U> query);
 
 	/**
 	 * <p>
 	 * Performs the given {@link ActivityQuery} and each returned {@link Activity} is passed through the
-	 * {@link ActivityVisitor} and the return value of the visitor is added to the return list
-	 * </p>
-	 * 
-	 * <p>
-	 * This method is intended for situations where the query result should not be {@link Activity} but some other
-	 * object type. For instance in a restful API, the result might have to be mapped to a POJO, thus using this method
-	 * can perform the mapping step for you
+	 * {@link ActivityVisitor} attached to the {@link ActivityQuery} and the return value of the visitor is added to the
+	 * return list
 	 * </p>
 	 * 
 	 * @param query
@@ -469,35 +402,12 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 
 	 * @return the result list of elements as returned by the {@link ActivityVisitor}, never null
 	 */
-	public <U> List<U> doQuery(ActivityQuery query, ActivityVisitor<U> activityVisitor);
-
-	/**
-	 * <p>
-	 * Performs the given {@link AuditQuery} returning the resulting list of {@link Audit Audits}.
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Note:</b> Should the result be mapped to different objects, then use
-	 * {@link #doQuery(AuditQuery, AuditVisitor)}
-	 * </p>
-	 * 
-	 * @param query
-	 *            the query to perform
-	 * 
-	 * @return the result list, never null
-	 */
-	public List<Audit> doQuery(AuditQuery query);
+	public <U> List<U> doQuery(ActivityQuery<U> query);
 
 	/**
 	 * <p>
 	 * Performs the given {@link AuditQuery} and each returned {@link Audit} is passed through the {@link AuditVisitor}
-	 * and the return value of the visitor is added to the return list
-	 * </p>
-	 * 
-	 * <p>
-	 * This method is intended for situations where the query result should not be {@link Audit} but some other object
-	 * type. For instance in a restful API, the result might have to be mapped to a POJO, thus using this method can
-	 * perform the mapping step for you
+	 * attached to the {@link AuditQuery} and the return value of the visitor is added to the return list
 	 * </p>
 	 * 
 	 * @param query
@@ -505,7 +415,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 
 	 * @return the result list of elements as returned by the {@link AuditVisitor}, never null
 	 */
-	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor);
+	public <U> List<U> doQuery(AuditQuery<U> query);
 
 	/**
 	 * <p>

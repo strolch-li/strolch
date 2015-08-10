@@ -20,7 +20,6 @@ import java.util.Set;
 
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
-import li.strolch.model.audit.AuditVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import ch.eitchnet.utils.collections.DateRange;
 
@@ -67,7 +66,5 @@ public interface AuditTrail {
 
 	public long removeAll(StrolchTransaction tx, String type, DateRange dateRange);
 
-	public List<Audit> doQuery(StrolchTransaction tx, AuditQuery query);
-
-	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery query, AuditVisitor<U> auditVisitor);
+	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> query);
 }

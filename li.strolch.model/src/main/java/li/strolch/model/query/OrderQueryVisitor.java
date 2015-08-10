@@ -15,11 +15,13 @@
  */
 package li.strolch.model.query;
 
+import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
-public interface OrderQueryVisitor extends OrderSelectionVisitor, ParameterSelectionVisitor {
+public interface OrderQueryVisitor extends OrderSelectionVisitor, ParameterSelectionVisitor,
+		StrolchQueryOrderingVisitor {
 
 	// marker interface
 }

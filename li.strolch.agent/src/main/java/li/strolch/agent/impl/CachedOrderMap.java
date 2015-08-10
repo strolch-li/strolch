@@ -21,7 +21,6 @@ import java.util.List;
 
 import li.strolch.agent.api.OrderMap;
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.persistence.api.OrderDao;
@@ -53,7 +52,7 @@ public class CachedOrderMap extends CachedElementMap<Order> implements OrderMap 
 	}
 
 	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery query, OrderVisitor<U> orderVisitor) {
-		return getCachedDao().doQuery(query, orderVisitor);
+	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery<U> query) {
+		return getCachedDao().doQuery(query);
 	}
 }

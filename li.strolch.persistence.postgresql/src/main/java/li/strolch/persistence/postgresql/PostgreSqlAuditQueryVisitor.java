@@ -77,7 +77,7 @@ public class PostgreSqlAuditQueryVisitor implements AuditQueryVisitor {
 	}
 
 	@Override
-	public void visit(AuditQuery auditQuery) {
+	public void visit(AuditQuery<?> auditQuery) {
 		ensureAnd();
 		this.sb.append(this.indent);
 		this.sb.append(PostgreSqlAuditDao.ELEMENT_TYPE);

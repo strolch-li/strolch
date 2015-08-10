@@ -23,21 +23,41 @@ import ch.eitchnet.utils.collections.DateRange;
 import ch.eitchnet.utils.dbc.DBC;
 
 /**
+ * 
+ * <p>
+ * The {@link AuditVisitor} is intended for situations where the query result should not be {@link Audit} but some other
+ * object type. For instance in a restful API, the result might have to be mapped to a POJO, thus using this method can
+ * perform the mapping step for you
+ * </p>
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AuditQuery implements StrolchQuery {
+public class AuditQuery<U> implements StrolchQuery {
 
-	private String elementTypeSelection;
-	private List<AuditSelection> selections;
-	private DateRange dateRange;
-	private long limit;
+	protected String elementTypeSelection;
+	protected List<AuditSelection> selections;
+	protected DateRange dateRange;
+	protected long limit;
+	protected AuditVisitor<U> auditVisitor;
 
-	public AuditQuery(String elementTypeSelection, DateRange dateRange) {
+	public AuditQuery(AuditVisitor<U> auditVisitor, String elementTypeSelection, DateRange dateRange) {
+		DBC.PRE.assertNotNull("auditVisitor", auditVisitor);
 		DBC.PRE.assertNotEmpty("No elementTypeSelection (navigation) set!", elementTypeSelection); //$NON-NLS-1$
 		DBC.PRE.assertFalse("dateRange may not be unbounded!", dateRange.isUnbounded());
+		this.auditVisitor = auditVisitor;
 		this.elementTypeSelection = elementTypeSelection;
 		this.dateRange = dateRange;
 		this.selections = new ArrayList<>();
+	}
+
+	public AuditVisitor<U> getAuditVisitor() {
+		return this.auditVisitor;
+	}
+
+	public AuditQuery<U> setAuditVisitor(AuditVisitor<U> auditVisitor) {
+		DBC.PRE.assertNotNull("auditVisitor", auditVisitor);
+		this.auditVisitor = auditVisitor;
+		return this;
 	}
 
 	public String getElementTypeSelection() {
@@ -52,7 +72,7 @@ public class AuditQuery implements StrolchQuery {
 		return limit;
 	}
 
-	public AuditQuery limit(long limit) {
+	public AuditQuery<U> limit(long limit) {
 		this.limit = limit;
 		return this;
 	}
@@ -96,5 +116,13 @@ public class AuditQuery implements StrolchQuery {
 	@Override
 	public Object getPrivilegeValue() {
 		return getClass().getName();
+	}
+
+	public static AuditQuery<Audit> query(String elementTypeSelection, DateRange dateRange) {
+		return new AuditQuery<Audit>(new NoStrategyAuditVisitor(), elementTypeSelection, dateRange);
+	}
+
+	public static <U> AuditQuery<U> query(String elementTypeSelection, DateRange dateRange, AuditVisitor<U> orderVisitor) {
+		return new AuditQuery<U>(orderVisitor, elementTypeSelection, dateRange);
 	}
 }

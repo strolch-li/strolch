@@ -17,7 +17,6 @@ package li.strolch.agent.api;
 
 import java.util.List;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -27,5 +26,5 @@ import li.strolch.persistence.api.StrolchTransaction;
  */
 public interface ActivityMap extends ElementMap<Activity> {
 
-	public <U> List<U> doQuery(StrolchTransaction tx, ActivityQuery query, ActivityVisitor<U> activityVisitor);
+	public <U> List<U> doQuery(StrolchTransaction tx, ActivityQuery<U> query);
 }

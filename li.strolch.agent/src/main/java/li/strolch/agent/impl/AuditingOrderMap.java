@@ -24,6 +24,7 @@ import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.persistence.api.StrolchTransaction;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * This is the {@link AuditTrail} for {@link Order Orders}
@@ -47,11 +48,14 @@ public class AuditingOrderMap extends AuditingElementMapFacade<Order> implements
 	}
 
 	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery query, OrderVisitor<U> orderVisitor) {
-		List<U> result = getElementMap().doQuery(tx, query, order -> {
+	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery<U> query) {
+		OrderVisitor<U> orderVisitor = query.getOrderVisitor();
+		DBC.PRE.assertNotNull("orderVisitor on query", orderVisitor);
+		query.setOrderVisitor(order -> {
 			this.read.add(order);
 			return orderVisitor.visit(order);
 		});
-		return result;
+
+		return getElementMap().doQuery(tx, query);
 	}
 }

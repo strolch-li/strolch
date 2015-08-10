@@ -26,7 +26,7 @@ public class ActionSelection extends AuditSelection {
 	private StringSelection actionSelection;
 	private AccessType[] accessTypes;
 
-	public ActionSelection(AuditQuery query) {
+	public ActionSelection(AuditQuery<?> query) {
 		super(query);
 	}
 

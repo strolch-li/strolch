@@ -15,10 +15,13 @@
  */
 package li.strolch.model.query;
 
+import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface ResourceQueryVisitor extends StrolchRootElementSelectionVisitor, ParameterSelectionVisitor {
+public interface ResourceQueryVisitor extends StrolchRootElementSelectionVisitor, ParameterSelectionVisitor,
+		StrolchQueryOrderingVisitor {
 
 	// marker interface
 }

@@ -17,7 +17,6 @@ package li.strolch.persistence.inmemory;
 
 import java.util.List;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.persistence.api.ActivityDao;
@@ -27,9 +26,9 @@ import li.strolch.runtime.query.inmemory.InMemoryQuery;
 public class InMemoryActivityDao extends InMemoryDao<Activity> implements ActivityDao {
 
 	@Override
-	public <U> List<U> doQuery(ActivityQuery activityQuery, ActivityVisitor<U> activityVisitor) {
+	public <U> List<U> doQuery(ActivityQuery<U> activityQuery) {
 		InMemoryActivityQueryVisitor visitor = new InMemoryActivityQueryVisitor();
-		InMemoryQuery<Activity, U> query = visitor.visit(activityQuery, activityVisitor);
+		InMemoryQuery<Activity, U> query = visitor.visit(activityQuery);
 		return query.doQuery(this);
 	}
 }

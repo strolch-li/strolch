@@ -29,7 +29,6 @@ import java.util.Set;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
-import li.strolch.model.audit.AuditVisitor;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import ch.eitchnet.utils.collections.DateRange;
@@ -293,7 +292,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 	}
 
 	@Override
-	public <U> List<U> doQuery(AuditQuery query, AuditVisitor<U> auditVisitor) {
+	public <U> List<U> doQuery(AuditQuery<U> query) {
 
 		PostgreSqlAuditQueryVisitor queryVisitor = new PostgreSqlAuditQueryVisitor(FIELDS);
 		query.accept(queryVisitor);

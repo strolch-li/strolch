@@ -30,7 +30,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
@@ -150,7 +149,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 	}
 
 	@Override
-	public <U> List<U> doQuery(ActivityQuery query, ActivityVisitor<U> activityVisitor) {
+	public <U> List<U> doQuery(ActivityQuery<U> query) {
 
 		PostgreSqlActivityQueryVisitor queryVisitor = new PostgreSqlActivityQueryVisitor("id, asxml");
 		query.accept(queryVisitor);
@@ -167,7 +166,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 					String id = result.getString("id");
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					Activity t = parseFromXml(id, queryVisitor.getType(), sqlxml);
-					list.add(activityVisitor.visit(t));
+					list.add(query.getActivityVisitor().visit(t));
 				}
 			}
 		} catch (SQLException e) {

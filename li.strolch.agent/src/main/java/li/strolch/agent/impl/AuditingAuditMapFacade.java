@@ -25,7 +25,6 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
 import li.strolch.model.audit.AuditVisitor;
-import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import ch.eitchnet.utils.collections.DateRange;
 import ch.eitchnet.utils.dbc.DBC;
@@ -203,18 +202,13 @@ public class AuditingAuditMapFacade implements AuditTrail {
 	}
 
 	@Override
-	public List<Audit> doQuery(StrolchTransaction tx, AuditQuery query) {
-		List<Audit> elements = this.auditTrail.doQuery(tx, query, new NoStrategyAuditVisitor());
-		this.read.addAll(elements);
-		return elements;
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery query, AuditVisitor<U> auditVisitor) {
-		List<U> elements = this.auditTrail.doQuery(tx, query, audit -> {
+	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> query) {
+		AuditVisitor<U> auditVisitor = query.getAuditVisitor();
+		query.setAuditVisitor(audit -> {
 			this.read.add(audit);
 			return auditVisitor.visitAudit(audit);
 		});
-		return elements;
+
+		return this.auditTrail.doQuery(tx, query);
 	}
 }

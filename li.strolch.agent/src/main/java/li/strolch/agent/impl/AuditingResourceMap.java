@@ -24,6 +24,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.api.StrolchTransaction;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * This is the {@link AuditTrail} for {@link Resource Resources}
@@ -47,11 +48,14 @@ public class AuditingResourceMap extends AuditingElementMapFacade<Resource> impl
 	}
 
 	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery query, ResourceVisitor<U> resourceVisitor) {
-		List<U> result = getElementMap().doQuery(tx, query, resource -> {
+	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery<U> query) {
+		ResourceVisitor<U> resourceVisitor = query.getResourceVisitor();
+		DBC.PRE.assertNotNull("resourceVisitor on query", resourceVisitor);
+		query.setResourceVisitor(resource -> {
 			this.read.add(resource);
 			return resourceVisitor.visit(resource);
 		});
-		return result;
+
+		return getElementMap().doQuery(tx, query);
 	}
 }

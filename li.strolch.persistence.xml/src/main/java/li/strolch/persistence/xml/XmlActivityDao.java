@@ -17,7 +17,6 @@ package li.strolch.persistence.xml;
 
 import java.util.List;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
@@ -36,7 +35,7 @@ public class XmlActivityDao extends AbstractDao<Activity> implements ActivityDao
 	}
 
 	@Override
-	public <U> List<U> doQuery(ActivityQuery query, ActivityVisitor<U> activityVisitor) {
+	public <U> List<U> doQuery(ActivityQuery<U> query) {
 		// TODO implement XML file based querying...
 		throw new UnsupportedOperationException("not yet implemented!");
 	}

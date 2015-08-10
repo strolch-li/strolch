@@ -21,7 +21,6 @@ import java.util.Set;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
-import li.strolch.model.audit.AuditVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import ch.eitchnet.utils.collections.DateRange;
 
@@ -101,12 +100,7 @@ public class NoStrategyAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public List<Audit> doQuery(StrolchTransaction tx, AuditQuery query) {
-		return null;
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery query, AuditVisitor<U> auditVisitor) {
+	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> query) {
 		return null;
 	}
 }

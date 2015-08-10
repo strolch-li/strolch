@@ -81,7 +81,7 @@ public class PerformanceTestService extends AbstractService<ServiceArgument, Ser
 	}
 
 	private boolean run(long start) {
-		return System.currentTimeMillis() < start + TimeUnit.MINUTES.toMillis(5);
+		return System.currentTimeMillis() < start + TimeUnit.MINUTES.toMillis(1);
 	}
 
 	private void deleteResource(StrolchTransaction tx, Resource toDelete) {

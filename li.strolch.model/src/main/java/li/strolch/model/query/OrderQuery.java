@@ -18,45 +18,99 @@ package li.strolch.model.query;
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.query.ordering.StrolchQueryOrdering;
+import li.strolch.model.visitor.NoStrategyOrderVisitor;
+import ch.eitchnet.utils.dbc.DBC;
 
 /**
+ * <p>
  * {@link OrderQuery} is the user API to query {@link Order Orders} in Strolch. The {@link Navigation} is used to
  * navigate to a type of order on which any further {@link Selection Selections} will be performed. The
  * {@link OrderVisitor} is used to transform the returned object into a domain specific object (if required). This
  * mechanism allows you to query only the values of a {@link Parameter} instead of having to return all the elements and
  * then performing this transformation.
+ * </p>
+ * 
+ * <p>
+ * The {@link OrderVisitor} is intended for situations where the query result should not be {@link Order} but some other
+ * object type. For instance in a restful API, the result might have to be mapped to a POJO, thus using this method can
+ * perform the mapping step for you
+ * </p>
+ * 
+ * @param <U>
+ *            defines the return type of this query. Depending on the user {@link OrderVisitor} this query can return an
+ *            {@link Order}, or any type of object to which the visitor mapped the order
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderQuery extends StrolchElementQuery<OrderQueryVisitor> {
+public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
+
+	protected OrderVisitor<U> orderVisitor;
+	protected StrolchQueryOrdering ordering;
 
 	public OrderQuery(Navigation navigation) {
 		super(navigation);
 	}
 
+	public OrderVisitor<U> getOrderVisitor() {
+		return this.orderVisitor;
+	}
+
+	public OrderQuery<U> setOrderVisitor(OrderVisitor<U> orderVisitor) {
+		DBC.PRE.assertNotNull("orderVisitor", orderVisitor);
+		this.orderVisitor = orderVisitor;
+		return this;
+	}
+
+	public StrolchQueryOrdering getOrdering() {
+		return this.ordering;
+	}
+
+	public OrderQuery<U> setOrdering(StrolchQueryOrdering ordering) {
+		this.ordering = ordering;
+		return this;
+	}
+
 	@Override
-	public OrderQuery with(Selection selection) {
+	public OrderQuery<U> with(Selection selection) {
 		super.with(selection);
 		return this;
 	}
 
 	@Override
-	public OrderQuery not(Selection selection) {
+	public OrderQuery<U> not(Selection selection) {
 		super.not(selection);
 		return this;
 	}
 
 	@Override
-	public OrderQuery withAny() {
+	public OrderQuery<U> withAny() {
 		super.withAny();
 		return this;
 	}
 
-	public static OrderQuery query(Navigation navigation) {
-		return new OrderQuery(navigation);
+	@Override
+	public void accept(OrderQueryVisitor visitor) {
+		DBC.PRE.assertNotNull("orderVisitor", this.orderVisitor);
+		super.accept(visitor);
+		if (this.ordering != null)
+			this.ordering.accept(visitor);
 	}
 
-	public static OrderQuery query(String type) {
-		return new OrderQuery(new StrolchTypeNavigation(type));
+	public static OrderQuery<Order> query(String type) {
+		return new OrderQuery<Order>(new StrolchTypeNavigation(type)).setOrderVisitor(new NoStrategyOrderVisitor());
+	}
+
+	public static OrderQuery<Order> query(String type, StrolchQueryOrdering ordering) {
+		return new OrderQuery<Order>(new StrolchTypeNavigation(type)).setOrderVisitor(new NoStrategyOrderVisitor())
+				.setOrdering(ordering);
+	}
+
+	public static <U> OrderQuery<U> query(String type, OrderVisitor<U> orderVisitor) {
+		return new OrderQuery<U>(new StrolchTypeNavigation(type)).setOrderVisitor(orderVisitor);
+	}
+
+	public static <U> OrderQuery<U> query(String type, OrderVisitor<U> orderVisitor, StrolchQueryOrdering ordering) {
+		return new OrderQuery<U>(new StrolchTypeNavigation(type)).setOrdering(ordering).setOrderVisitor(orderVisitor);
 	}
 }
