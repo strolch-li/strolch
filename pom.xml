@@ -58,5 +58,6 @@
 		<module>li.strolch.performancetest</module>
 		<module>li.strolch.tutorialapp</module>
 		<module>li.strolch.tutorialwebapp</module>
+		<module>li.strolch.planningwebapp</module>
 	</modules>
 </project>
