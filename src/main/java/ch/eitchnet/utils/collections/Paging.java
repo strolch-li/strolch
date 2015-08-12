@@ -93,9 +93,9 @@ public class Paging<T> {
 		paging.nrOfElements = list.size();
 
 		if (paging.pageSize <= 0 || paging.pageToReturn <= 0) {
-			paging.nrOfPages = 1;
+			paging.nrOfPages = 0;
 			paging.pageSize = list.size();
-			paging.pageToReturn = 1;
+			paging.pageToReturn = 0;
 			paging.input = list;
 			paging.page = list;
 			return paging;
@@ -117,6 +117,10 @@ public class Paging<T> {
 
 		// and return the list
 		paging.page = list.subList(start, end);
+
+		// fix page size
+		if (paging.page.size() < paging.pageSize)
+			paging.pageSize = paging.page.size();
 
 		return paging;
 	}
