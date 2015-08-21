@@ -16,6 +16,10 @@
 package li.strolch.model;
 
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+import org.w3c.dom.Document;
+
 import li.strolch.model.activity.Activity;
 import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
@@ -26,9 +30,6 @@ import li.strolch.model.xml.OrderFromDomVisitor;
 import li.strolch.model.xml.OrderToDomVisitor;
 import li.strolch.model.xml.ResourceFromDomVisitor;
 import li.strolch.model.xml.ResourceToDomVisitor;
-
-import org.junit.Test;
-import org.w3c.dom.Document;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -65,7 +66,8 @@ public class XmlToDomTest extends ModelTest {
 
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(resource);
 		visitor.visit(parsedResource);
-		assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
+		assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(),
+				visitor.isEqual());
 	}
 
 	@Test
@@ -79,9 +81,9 @@ public class XmlToDomTest extends ModelTest {
 
 		Activity parsedActivity = new ActivityFromDomVisitor().visit(document);
 
-		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(parsedActivity);
+		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(activity);
 		visitor.visit(parsedActivity);
-		assertTrue("To DOM and back should equal same Activity:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
+		assertTrue("To DOM and back should equal same Activity:\n" + visitor.getMismatchedLocators(),
+				visitor.isEqual());
 	}
-
 }

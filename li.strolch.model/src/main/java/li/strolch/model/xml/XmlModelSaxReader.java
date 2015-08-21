@@ -20,7 +20,16 @@ import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.Deque;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.Order;
@@ -35,15 +44,8 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.impl.ValueChange;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.policy.PolicyDef;
+import li.strolch.policy.PolicyDefs;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -60,6 +62,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 	private ParameterBag pBag;
 	private StrolchTimedState<? extends IValue<?>> state;
 	private StrolchValueType stateType;
+	private PolicyDefs policies;
 
 	public XmlModelSaxReader(StrolchElementListener listener) {
 		this.listener = listener;
@@ -174,8 +177,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String paramIndexS = attributes.getValue(Tags.INDEX);
 			try {
 				int index = StringHelper.isEmpty(paramIndexS) ? 0 : Integer.valueOf(paramIndexS);
-				boolean paramHidden = StringHelper.isEmpty(paramHiddenS) ? false : StringHelper
-						.parseBoolean(paramHiddenS);
+				boolean paramHidden = StringHelper.isEmpty(paramHiddenS) ? false
+						: StringHelper.parseBoolean(paramHiddenS);
 				String paramUom = attributes.getValue(Tags.UOM);
 				String paramInterpretation = attributes.getValue(Tags.INTERPRETATION);
 
@@ -221,6 +224,22 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String valueValue = attributes.getValue(Tags.VALUE);
 
 			this.state.setStateFromStringAt(time, valueValue);
+
+			break;
+
+		case Tags.POLICIES:
+
+			this.policies = new PolicyDefs();
+
+			break;
+
+		case Tags.POLICY:
+
+			String policyType = attributes.getValue(Tags.TYPE);
+			String policyValue = attributes.getValue(Tags.VALUE);
+
+			PolicyDef policyDef = PolicyDef.valueOf(policyType, policyValue);
+			this.policies.addOrUpdate(policyDef);
 
 			break;
 
@@ -281,6 +300,22 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 			break;
 
+		case Tags.POLICIES:
+
+			if (this.parameterizedElement instanceof Resource) {
+				((Resource) this.parameterizedElement).setPolicyDefs(this.policies);
+			} else if (this.parameterizedElement instanceof Order) {
+				((Order) this.parameterizedElement).setPolicyDefs(this.policies);
+			} else if (this.parameterizedElement instanceof Activity) {
+				((Activity) this.parameterizedElement).setPolicyDefs(this.policies);
+			} else {
+				throw new StrolchPolicyException(
+						"Policies are currently not allowed on " + this.parameterizedElement.getClass());
+			}
+
+			this.policies = null;
+
+		case Tags.POLICY:
 		case Tags.PARAMETER:
 		case Tags.INCLUDE_FILE:
 		case Tags.VALUE:

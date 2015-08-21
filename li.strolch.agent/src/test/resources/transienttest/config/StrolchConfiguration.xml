@@ -61,5 +61,14 @@
 				<religions>Resource/Enumeration/religions</religions>
 			</Properties>
 		</Component>
+		<Component>
+			<name>PolicyHandler</name>
+			<api>li.strolch.policy.PolicyHandler</api>
+			<impl>li.strolch.policy.DefaultPolicyHandler</impl>
+			<Properties>
+				<readPolicyFile>true</readPolicyFile>
+				<policyConfigFile>StrolchPolicies.xml</policyConfigFile>
+			</Properties>
+		</Component>
 	</env>
 </StrolchConfiguration>

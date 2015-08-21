@@ -21,7 +21,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
@@ -30,7 +32,7 @@ import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.policy.PolicyDefs;
 
 /**
  * Parameterized object grouping a collection of {@link Activity} and {@link Action} objects defining the process to be
@@ -38,14 +40,14 @@ import ch.eitchnet.utils.dbc.DBC;
  * 
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public class Activity extends GroupedParameterizedElement implements IActivityElement, StrolchRootElement,
-		Comparable<Activity> {
+public class Activity extends GroupedParameterizedElement
+		implements IActivityElement, StrolchRootElement, Comparable<Activity> {
 
 	private static final long serialVersionUID = 1L;
 
 	protected Activity parent;
-
 	protected Map<String, IActivityElement> elements;
+	private PolicyDefs policyDefs;
 
 	/**
 	 * Empty constructor - for marshalling only!
@@ -105,8 +107,8 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 		if (id == null)
 			throw new StrolchException("Cannot add IActivityElement without id.");
 		else if (elements.containsKey(id))
-			throw new StrolchException("Activiy " + getLocator() + " already contains an activity element with id = "
-					+ id);
+			throw new StrolchException(
+					"Activiy " + getLocator() + " already contains an activity element with id = " + id);
 		else {
 			activityElement.setParent(this);
 			return elements.put(activityElement.getId(), activityElement);
@@ -145,6 +147,7 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 		return elements.entrySet().iterator();
 	}
 
+	@Override
 	public Long getStart() {
 		Long start = Long.MAX_VALUE;
 		if (this.elements == null)
@@ -157,6 +160,7 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 		return start;
 	}
 
+	@Override
 	public Long getEnd() {
 		Long end = 0L;
 		if (this.elements == null)
@@ -169,6 +173,7 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 		return end;
 	}
 
+	@Override
 	public State getState() {
 		State state = State.PLANNED;
 		if (this.elements == null)
@@ -182,6 +187,21 @@ public class Activity extends GroupedParameterizedElement implements IActivityEl
 			}
 		}
 		return state;
+	}
+
+	public PolicyDefs getPolicyDefs() {
+		if (this.policyDefs == null)
+			throw new StrolchPolicyException(getLocator() + " has no Policies defined!");
+		return this.policyDefs;
+	}
+
+	public boolean hasPolicyDefs() {
+		return this.policyDefs != null;
+	}
+
+	public void setPolicyDefs(PolicyDefs policyDefs) {
+		this.policyDefs = policyDefs;
+		this.policyDefs.setParent(this);
 	}
 
 	@Override

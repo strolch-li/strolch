@@ -17,9 +17,7 @@ package li.strolch.agent;
 
 import static li.strolch.agent.ComponentContainerTest.PATH_REALM_CONTAINER;
 import static li.strolch.agent.ComponentContainerTest.PATH_REALM_RUNTIME;
-import static li.strolch.agent.ComponentContainerTest.destroyContainer;
 import static li.strolch.agent.ComponentContainerTest.logger;
-import static li.strolch.agent.ComponentContainerTest.startContainer;
 import static li.strolch.agent.ComponentContainerTest.testContainer;
 import static org.junit.Assert.assertEquals;
 
@@ -27,11 +25,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.agent.impl.DataStoreMode;
-
 import org.junit.Test;
+
+import li.strolch.RuntimeMock;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.impl.DataStoreMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -43,25 +41,24 @@ public class RealmTest {
 	public void shouldStartRealmTestContainer() {
 
 		try {
-			StrolchAgent agent = startContainer(PATH_REALM_RUNTIME, PATH_REALM_CONTAINER);
-			testContainer(agent);
+			RuntimeMock.runInStrolch(PATH_REALM_RUNTIME, PATH_REALM_CONTAINER, agent -> {
+				testContainer(agent);
 
-			ComponentContainer container = agent.getContainer();
-			Set<String> realmNames = container.getRealmNames();
-			assertEquals(6, realmNames.size());
+				ComponentContainer container = agent.getContainer();
+				Set<String> realmNames = container.getRealmNames();
+				assertEquals(6, realmNames.size());
 
-			Set<String> expectedRealmNames = new HashSet<>(Arrays.asList("defaultRealm", "myRealm", "otherRealm",
-					"cachedRealm", "transactionalRealm", "emptyRealm"));
-			assertEquals(expectedRealmNames, realmNames);
+				Set<String> expectedRealmNames = new HashSet<>(Arrays.asList("defaultRealm", "myRealm", "otherRealm",
+						"cachedRealm", "transactionalRealm", "emptyRealm"));
+				assertEquals(expectedRealmNames, realmNames);
 
-			assertEquals(DataStoreMode.TRANSIENT, container.getRealm("defaultRealm").getMode());
-			assertEquals(DataStoreMode.TRANSIENT, container.getRealm("myRealm").getMode());
-			assertEquals(DataStoreMode.TRANSIENT, container.getRealm("otherRealm").getMode());
-			assertEquals(DataStoreMode.CACHED, container.getRealm("cachedRealm").getMode());
-			assertEquals(DataStoreMode.TRANSACTIONAL, container.getRealm("transactionalRealm").getMode());
-			assertEquals(DataStoreMode.EMPTY, container.getRealm("emptyRealm").getMode());
-
-			destroyContainer(agent);
+				assertEquals(DataStoreMode.TRANSIENT, container.getRealm("defaultRealm").getMode());
+				assertEquals(DataStoreMode.TRANSIENT, container.getRealm("myRealm").getMode());
+				assertEquals(DataStoreMode.TRANSIENT, container.getRealm("otherRealm").getMode());
+				assertEquals(DataStoreMode.CACHED, container.getRealm("cachedRealm").getMode());
+				assertEquals(DataStoreMode.TRANSACTIONAL, container.getRealm("transactionalRealm").getMode());
+				assertEquals(DataStoreMode.EMPTY, container.getRealm("emptyRealm").getMode());
+			});
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw e;

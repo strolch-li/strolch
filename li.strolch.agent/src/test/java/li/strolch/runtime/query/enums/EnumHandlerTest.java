@@ -21,13 +21,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import li.strolch.agent.ComponentContainerTest;
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
-
 import org.junit.Test;
 
 import ch.eitchnet.privilege.model.Certificate;
+import li.strolch.RuntimeMock;
+import li.strolch.agent.ComponentContainerTest;
+import li.strolch.agent.api.ComponentContainer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -40,35 +39,36 @@ public class EnumHandlerTest {
 	@Test
 	public void shouldFindByLocator() {
 
-		StrolchAgent agent = ComponentContainerTest.startContainer(ENUM_HANDLER_TEST_RUNTIME,
-				ComponentContainerTest.PATH_TRANSIENT_CONTAINER);
-		ComponentContainer container = agent.getContainer();
+		RuntimeMock.runInStrolch(ENUM_HANDLER_TEST_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER, agent -> {
 
-		Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".getBytes());
+			ComponentContainer container = agent.getContainer();
 
-		EnumHandler enumHandler = container.getComponent(EnumHandler.class);
-		StrolchEnum sexEnum = enumHandler.getEnum(certificate, "sex", Locale.ENGLISH);
-		assertEquals("sex", sexEnum.getName());
-		assertEquals("en", sexEnum.getLocale());
-		assertEquals(3, sexEnum.getValues().size());
-		List<String> values = sexEnum.getEnumValues();
-		Collections.sort(values);
-		assertEquals("both", values.get(0));
+			Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".getBytes());
 
-		StrolchEnum salutationsEnum = enumHandler.getEnum(certificate, "salutations", Locale.UK);
-		assertEquals("salutations", salutationsEnum.getName());
-		assertEquals("en_GB", salutationsEnum.getLocale());
-		assertEquals(3, salutationsEnum.getValues().size());
-		values = salutationsEnum.getEnumValues();
-		Collections.sort(values);
-		assertEquals("Mr", values.get(0));
+			EnumHandler enumHandler = container.getComponent(EnumHandler.class);
+			StrolchEnum sexEnum = enumHandler.getEnum(certificate, "sex", Locale.ENGLISH);
+			assertEquals("sex", sexEnum.getName());
+			assertEquals("en", sexEnum.getLocale());
+			assertEquals(3, sexEnum.getValues().size());
+			List<String> values = sexEnum.getEnumValues();
+			Collections.sort(values);
+			assertEquals("both", values.get(0));
 
-		StrolchEnum religionsEnum = enumHandler.getEnum(certificate, "religions", Locale.CANADA);
-		assertEquals("religions", religionsEnum.getName());
-		assertEquals("en_CA", religionsEnum.getLocale());
-		assertEquals(9, religionsEnum.getValues().size());
-		values = religionsEnum.getEnumValues();
-		Collections.sort(values);
-		assertEquals("Atheist", values.get(0));
+			StrolchEnum salutationsEnum = enumHandler.getEnum(certificate, "salutations", Locale.UK);
+			assertEquals("salutations", salutationsEnum.getName());
+			assertEquals("en_GB", salutationsEnum.getLocale());
+			assertEquals(3, salutationsEnum.getValues().size());
+			values = salutationsEnum.getEnumValues();
+			Collections.sort(values);
+			assertEquals("Mr", values.get(0));
+
+			StrolchEnum religionsEnum = enumHandler.getEnum(certificate, "religions", Locale.CANADA);
+			assertEquals("religions", religionsEnum.getName());
+			assertEquals("en_CA", religionsEnum.getLocale());
+			assertEquals(9, religionsEnum.getValues().size());
+			values = religionsEnum.getEnumValues();
+			Collections.sort(values);
+			assertEquals("Atheist", values.get(0));
+		});
 	}
 }

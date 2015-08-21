@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.testbase.runtime;
+package li.strolch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -21,6 +21,11 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.text.MessageFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.utils.helper.FileHelper;
+import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
@@ -30,13 +35,13 @@ import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.utils.helper.FileHelper;
-import ch.eitchnet.utils.helper.StringHelper;
-
-public final class RuntimeMock {
+/**
+ * Basically you should use the RuntimeMock class in the testbase project, but to mitigate circular dependencies, in
+ * tests of the agent project we use this implementation
+ * 
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
+public class RuntimeMock implements AutoCloseable {
 
 	private static final Logger logger = LoggerFactory.getLogger(RuntimeMock.class);
 	private static final String TARGET = "target"; //$NON-NLS-1$
@@ -45,6 +50,15 @@ public final class RuntimeMock {
 	private StrolchAgent agent;
 	private File targetPathF;
 	private File srcPathF;
+
+	public RuntimeMock(String targetPath, String srcPath) {
+		this(new File(targetPath), new File(srcPath));
+	}
+
+	public RuntimeMock(File targetPathF, File srcPathF) {
+		this.targetPathF = targetPathF;
+		this.srcPathF = srcPathF;
+	}
 
 	public ComponentContainer getContainer() {
 		return this.container;
@@ -66,10 +80,7 @@ public final class RuntimeMock {
 		return this.container.getRealm(realm);
 	}
 
-	public void mockRuntime(File targetPathF, File srcPathF) {
-
-		this.targetPathF = targetPathF;
-		this.srcPathF = srcPathF;
+	public RuntimeMock mockRuntime() {
 
 		if (!this.targetPathF.getParentFile().getName().equals(TARGET)) {
 			String msg = "Mocking path must be in a maven target: {0}"; //$NON-NLS-1$
@@ -108,13 +119,15 @@ public final class RuntimeMock {
 			msg = MessageFormat.format(msg, this.srcPathF.getAbsolutePath(), this.targetPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
+
+		return this;
 	}
 
-	public void startContainer() {
-		startContainer("dev");
+	public RuntimeMock startContainer() {
+		return startContainer("dev");
 	}
 
-	public void startContainer(String environment) {
+	public RuntimeMock startContainer(String environment) {
 
 		try {
 			StrolchAgent agent = new StrolchAgent();
@@ -130,12 +143,14 @@ public final class RuntimeMock {
 			destroyRuntime();
 			throw e;
 		}
+
+		return this;
 	}
 
-	public void destroyRuntime() {
+	public RuntimeMock destroyRuntime() {
 
 		if (this.agent == null)
-			return;
+			return this;
 
 		try {
 			this.agent.stop();
@@ -148,6 +163,13 @@ public final class RuntimeMock {
 		} catch (Exception e) {
 			logger.info("Failed to destroy container: " + e.getMessage()); //$NON-NLS-1$
 		}
+
+		return this;
+	}
+
+	@Override
+	public void close() throws RuntimeException {
+		this.destroyRuntime();
 	}
 
 	public static void assertServiceResult(ServiceResultState expectedState, Class<?> expectedResultType,
@@ -159,5 +181,19 @@ public final class RuntimeMock {
 			fail("Expected service result state " + expectedState + " but was " + result.getState() + ": Reason: "
 					+ StringHelper.formatException(result.getThrowable()));
 		}
+	}
+
+	public static void runInStrolch(String targetPath, String srcPath, StrolchRunnable runnable) {
+		try (RuntimeMock runtimeMock = new RuntimeMock(targetPath, srcPath)) {
+			runtimeMock.mockRuntime();
+			runtimeMock.startContainer();
+
+			runnable.run(runtimeMock.getAgent());
+		}
+	}
+
+	public interface StrolchRunnable {
+
+		public void run(StrolchAgent agent);
 	}
 }

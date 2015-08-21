@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
@@ -33,7 +34,8 @@ import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeVariable;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.policy.PolicyDef;
+import li.strolch.policy.PolicyDefs;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -78,11 +80,48 @@ public class StrolchElementDeepEqualsVisitor {
 		}
 
 		deepEquals((GroupedParameterizedElement) srcOrder, (GroupedParameterizedElement) dstOrder);
+
+		if (srcOrder.hasPolicyDefs() && dstOrder.hasPolicyDefs())
+			deepEquals(srcOrder.getPolicyDefs(), dstOrder.getPolicyDefs());
+		else if (srcOrder.hasPolicyDefs() != dstOrder.hasPolicyDefs())
+			this.mismatchedLocators.add(srcOrder.getLocator());
+	}
+
+	private void deepEquals(PolicyDefs srcPolicyDefs, PolicyDefs dstPolicyDefs) {
+
+		Set<String> srcTypes = srcPolicyDefs.getPolicyTypes();
+		for (String srcType : srcTypes) {
+			PolicyDef srcPolicyDef = srcPolicyDefs.getPolicyDef(srcType);
+
+			if (!dstPolicyDefs.hasPolicyDef(srcType)) {
+				this.mismatchedLocators.add(dstPolicyDefs.getParent().getLocator());
+				continue;
+			}
+
+			PolicyDef dstPolicyDef = dstPolicyDefs.getPolicyDef(srcType);
+
+			if (srcPolicyDef.getClass() != dstPolicyDef.getClass())
+				this.mismatchedLocators.add(dstPolicyDefs.getParent().getLocator());
+			if (!srcPolicyDef.getValue().equals(dstPolicyDef.getValue()))
+				this.mismatchedLocators.add(dstPolicyDefs.getParent().getLocator());
+		}
+
+		Set<String> dstTypes = dstPolicyDefs.getPolicyTypes();
+		for (String dstType : dstTypes) {
+			if (!srcPolicyDefs.hasPolicyDef(dstType)) {
+				this.mismatchedLocators.add(srcPolicyDefs.getParent().getLocator());
+			}
+		}
 	}
 
 	protected void deepEquals(Resource srcRes, Resource dstRes) {
 		deepEquals((StrolchElement) srcRes, (StrolchElement) dstRes);
 		deepEquals((GroupedParameterizedElement) srcRes, (GroupedParameterizedElement) dstRes);
+
+		if (srcRes.hasPolicyDefs() && dstRes.hasPolicyDefs())
+			deepEquals(srcRes.getPolicyDefs(), dstRes.getPolicyDefs());
+		else if (srcRes.hasPolicyDefs() != dstRes.hasPolicyDefs())
+			this.mismatchedLocators.add(srcRes.getLocator());
 
 		Set<String> srcTimedStateKeySet = srcRes.getTimedStateKeySet();
 		for (String timedStateKey : srcTimedStateKeySet) {
@@ -109,6 +148,11 @@ public class StrolchElementDeepEqualsVisitor {
 	protected void deepEquals(Activity srcActivity, Activity dstActivity) {
 		deepEquals((StrolchElement) srcActivity, (StrolchElement) dstActivity);
 		deepEquals((GroupedParameterizedElement) srcActivity, (GroupedParameterizedElement) dstActivity);
+
+		if (srcActivity.hasPolicyDefs() && dstActivity.hasPolicyDefs())
+			deepEquals(srcActivity.getPolicyDefs(), dstActivity.getPolicyDefs());
+		else if (srcActivity.hasPolicyDefs() != dstActivity.hasPolicyDefs())
+			this.mismatchedLocators.add(srcActivity.getLocator());
 
 		Iterator<Entry<String, IActivityElement>> iter = srcActivity.elementIterator();
 		while (iter.hasNext()) {
