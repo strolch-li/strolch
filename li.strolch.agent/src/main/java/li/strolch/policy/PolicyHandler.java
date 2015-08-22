@@ -15,7 +15,6 @@
  */
 package li.strolch.policy;
 
-import li.strolch.model.policy.Policy;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefVisitor;
 
@@ -51,5 +50,5 @@ public interface PolicyHandler {
 	 * 
 	 * @return the instantiated instance of the referenced policy
 	 */
-	public <T extends Policy> T getPolicy(PolicyDef policyDef);
+	public <T> T getPolicy(PolicyDef policyDef);
 }
