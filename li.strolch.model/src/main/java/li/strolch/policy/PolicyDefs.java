@@ -85,4 +85,17 @@ public class PolicyDefs {
 		sb.append("]");
 		return sb.toString();
 	}
+
+	/**
+	 * Returns a clone of this {@link PolicyDefs}
+	 * 
+	 * @return a clone of this {@link PolicyDefs}
+	 */
+	public PolicyDefs getClone() {
+		PolicyDefs clone = new PolicyDefs();
+		for (PolicyDef policyDef : this.policyDefMap.values()) {
+			clone.addOrUpdate(policyDef.getClone());
+		}
+		return clone;
+	}
 }

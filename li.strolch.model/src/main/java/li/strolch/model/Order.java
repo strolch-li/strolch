@@ -118,6 +118,9 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 		clone.setDate(this.date);
 		clone.setState(this.state);
 
+		if (this.policyDefs != null)
+			clone.setPolicyDefs(this.policyDefs.getClone());
+
 		return clone;
 	}
 

@@ -132,6 +132,9 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 			}
 		}
 
+		if (this.policyDefs != null)
+			clone.setPolicyDefs(this.policyDefs.getClone());
+
 		return clone;
 	}
 

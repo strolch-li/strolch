@@ -39,4 +39,9 @@ public class KeyPolicyDef extends PolicyDef {
 	public String getValueForXml() {
 		return XML_PREFIX + this.value;
 	}
+
+	@Override
+	public KeyPolicyDef getClone() {
+		return new KeyPolicyDef(this.type, this.value);
+	}
 }

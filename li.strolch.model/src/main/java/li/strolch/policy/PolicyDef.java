@@ -75,7 +75,20 @@ public abstract class PolicyDef {
 	 */
 	public abstract <T> T accept(PolicyDefVisitor visitor);
 
+	/**
+	 * Returns the value formatted for XML marshalling, so that the {@link #valueOf(String, String)} can then again
+	 * parse the value and instantiate a concrete {@link PolicyDef} instance
+	 * 
+	 * @return the value formatted for XML marshalling
+	 */
 	public abstract String getValueForXml();
+
+	/**
+	 * Return a clone of this {@link PolicyDef} instance
+	 * 
+	 * @return a clone of this {@link PolicyDef} instance
+	 */
+	public abstract PolicyDef getClone();
 
 	@Override
 	public String toString() {
@@ -88,13 +101,35 @@ public abstract class PolicyDef {
 		return sb.toString();
 	}
 
+	/**
+	 * Returns a {@link PolicyDef} instance which handles the given type of XML Value
+	 * 
+	 * @param type
+	 *            the type
+	 * @param xmlValue
+	 *            the XML formatted value with the prefix denoting the {@link PolicyDef} type
+	 * 
+	 * @return a {@link PolicyDef} instance which handles the given type of XML Value
+	 */
 	public static PolicyDef valueOf(String type, String xmlValue) {
+
 		if (xmlValue.startsWith(JavaPolicyDef.XML_PREFIX)) {
+
 			String value = xmlValue.substring(JavaPolicyDef.XML_PREFIX.length());
+
+			try {
+				Class.forName(value);
+			} catch (ClassNotFoundException e) {
+				throw new StrolchPolicyException("Invalid policy configuration. Policy does not exist: " + value);
+			}
+
 			return new JavaPolicyDef(type, value);
+
 		} else if (xmlValue.startsWith(KeyPolicyDef.XML_PREFIX)) {
+
 			String value = xmlValue.substring(KeyPolicyDef.XML_PREFIX.length());
 			return new KeyPolicyDef(type, value);
+
 		} else {
 			throw new StrolchPolicyException("Unhandled PolicyDef from xml value " + xmlValue);
 		}

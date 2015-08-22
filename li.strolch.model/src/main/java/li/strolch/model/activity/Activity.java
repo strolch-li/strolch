@@ -242,6 +242,10 @@ public class Activity extends GroupedParameterizedElement
 		for (IActivityElement element : this.elements.values()) {
 			clone.addElement(element.getClone());
 		}
+
+		if (this.policyDefs != null)
+			clone.setPolicyDefs(this.policyDefs.getClone());
+
 		return clone;
 	}
 

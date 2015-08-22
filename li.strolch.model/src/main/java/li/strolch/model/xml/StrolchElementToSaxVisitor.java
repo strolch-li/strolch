@@ -23,6 +23,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
+
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
@@ -37,13 +43,8 @@ import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
-
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.policy.PolicyDef;
+import li.strolch.policy.PolicyDefs;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -146,6 +147,9 @@ public abstract class StrolchElementToSaxVisitor {
 			this.contentHandler.endElement(null, null, Tags.TIMED_STATE);
 		}
 
+		if (resource.hasPolicyDefs())
+			toSax(resource.getPolicyDefs());
+
 		this.contentHandler.endElement(null, null, Tags.RESOURCE);
 	}
 
@@ -162,12 +166,18 @@ public abstract class StrolchElementToSaxVisitor {
 
 		toSax((GroupedParameterizedElement) order);
 
+		if (order.hasPolicyDefs())
+			toSax(order.getPolicyDefs());
+
 		this.contentHandler.endElement(null, null, Tags.ORDER);
 	}
 
 	protected void toSax(Activity activity) throws SAXException {
 		this.contentHandler.startElement(null, null, Tags.ACTIVITY, attributesFor(activity));
 		toSax((GroupedParameterizedElement) activity);
+
+		if (activity.hasPolicyDefs())
+			toSax(activity.getPolicyDefs());
 
 		Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
 		while (iter.hasNext()) {
@@ -183,6 +193,26 @@ public abstract class StrolchElementToSaxVisitor {
 		}
 
 		this.contentHandler.endElement(null, null, Tags.ACTIVITY);
+	}
+
+	private void toSax(PolicyDefs policyDefs) throws SAXException {
+		if (!policyDefs.hasPolicyDefs())
+			return;
+
+		this.contentHandler.startElement(null, null, Tags.POLICIES, null);
+		for (String type : policyDefs.getPolicyTypes()) {
+			PolicyDef policyDef = policyDefs.getPolicyDef(type);
+			this.contentHandler.startElement(null, null, Tags.POLICY, attributesFor(policyDef));
+			this.contentHandler.endElement(null, null, Tags.POLICY);
+		}
+		this.contentHandler.endElement(null, null, Tags.POLICIES);
+	}
+
+	protected AttributesImpl attributesFor(PolicyDef policyDef) {
+		AttributesImpl attributes = new AttributesImpl();
+		attributes.addAttribute(null, null, Tags.TYPE, Tags.CDATA, policyDef.getType());
+		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, policyDef.getValueForXml());
+		return attributes;
 	}
 
 	protected AttributesImpl attributesFor(Action action) {

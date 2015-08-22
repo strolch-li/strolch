@@ -109,6 +109,9 @@ public class StrolchElementToDomVisitor {
 		Element element = document.createElement(Tags.ACTIVITY);
 		fillElement(element, activity);
 
+		if (activity.hasPolicyDefs())
+			fillElement(element, activity.getPolicyDefs());
+
 		if (activity.hasElements()) {
 			Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
 			while (iter.hasNext()) {
@@ -122,9 +125,6 @@ public class StrolchElementToDomVisitor {
 				}
 			}
 		}
-
-		if (activity.hasPolicyDefs())
-			fillElement(element, activity.getPolicyDefs());
 
 		return element;
 	}

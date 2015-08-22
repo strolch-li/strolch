@@ -37,4 +37,9 @@ public class JavaPolicyDef extends PolicyDef {
 	public String getValueForXml() {
 		return XML_PREFIX + this.value;
 	}
+
+	@Override
+	public JavaPolicyDef getClone() {
+		return new JavaPolicyDef(this.type, this.value);
+	}
 }

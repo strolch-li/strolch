@@ -12,7 +12,7 @@
 		</ParameterBag>
 		<Policies>
 			<Policy Type="PlanningPolicy" Value="key:SimplePlanningPolicy" />
-			<Policy Type="ExecutionPolicy" Value="java:li.strolch.policy.execution.TestSimulatedExecutionPolicy" />
+			<Policy Type="ExecutionPolicy" Value="java:li.strolch.policytest.TestSimulatedExecutionPolicy" />
 			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
 		</Policies>
 	</Resource>
