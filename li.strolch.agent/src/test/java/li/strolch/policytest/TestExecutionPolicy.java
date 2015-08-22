@@ -15,12 +15,19 @@
  */
 package li.strolch.policytest;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.activity.Action;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.policy.StrolchPolicy;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface TestExecutionPolicy {
+public abstract class TestExecutionPolicy extends StrolchPolicy {
 
-	public void execute(Action action);
+	public TestExecutionPolicy(ComponentContainer container, StrolchTransaction tx) {
+		super(container, tx);
+	}
+
+	public abstract void execute(Action action);
 }

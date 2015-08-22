@@ -19,12 +19,11 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.policy.StrolchPolicy;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class TestSimplePlanningPolicy extends StrolchPolicy implements TestPlanningPolicy {
+public class TestSimplePlanningPolicy extends TestPlanningPolicy {
 
 	public TestSimplePlanningPolicy(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
@@ -33,5 +32,10 @@ public class TestSimplePlanningPolicy extends StrolchPolicy implements TestPlann
 	@Override
 	public void plan(Action action) {
 		action.setState(State.PLANNED);
+	}
+
+	@Override
+	protected void undo() {
+		// do nothing
 	}
 }

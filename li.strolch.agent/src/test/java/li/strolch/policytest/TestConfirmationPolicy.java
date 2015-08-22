@@ -15,12 +15,19 @@
  */
 package li.strolch.policytest;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.activity.Action;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.policy.StrolchPolicy;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface TestConfirmationPolicy {
+public abstract class TestConfirmationPolicy extends StrolchPolicy {
 
-	public void confirm(Action action);
+	public TestConfirmationPolicy(ComponentContainer container, StrolchTransaction tx) {
+		super(container, tx);
+	}
+
+	public abstract void confirm(Action action);
 }

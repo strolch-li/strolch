@@ -73,4 +73,9 @@ public abstract class StrolchPolicy {
 	protected StrolchTransaction tx() {
 		return this.tx;
 	}
+
+	/**
+	 * @see Command#undo()
+	 */
+	protected abstract void undo();
 }
