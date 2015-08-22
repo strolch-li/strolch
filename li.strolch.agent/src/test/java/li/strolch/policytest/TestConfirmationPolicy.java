@@ -16,12 +16,11 @@
 package li.strolch.policytest;
 
 import li.strolch.model.activity.Action;
-import li.strolch.model.policy.Policy;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface TestConfirmationPolicy extends Policy {
+public interface TestConfirmationPolicy {
 
 	public void confirm(Action action);
 }

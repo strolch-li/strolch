@@ -30,8 +30,11 @@ public interface PolicyDefVisitor {
 	 *            the {@link PolicyDef} referencing a Java Class
 	 * 
 	 * @return an instance of the policy referenced by the {@link PolicyDef#getValue()}
+	 * 
+	 * @throws ClassNotFoundException
+	 *             if the class referenced by this {@link PolicyDef} does not exist
 	 */
-	public <T> T visit(JavaPolicyDef javaPolicyDef);
+	public <T> Class<T> visit(JavaPolicyDef javaPolicyDef) throws ClassNotFoundException;
 
 	/**
 	 * This method resolves a Policy by further indirection. I.e. the {@link PolicyDef#getValue()} is a key to the
@@ -42,6 +45,9 @@ public interface PolicyDefVisitor {
 	 *            the {@link PolicyDef} using a key to reference a policy
 	 * 
 	 * @return an instance of the policy resolved by the key {@link PolicyDef#getValue()}
+	 * 
+	 * @throws ClassNotFoundException
+	 *             if the class referenced by this {@link PolicyDef} does not exist
 	 */
-	public <T> T visit(KeyPolicyDef keyPolicyDef);
+	public <T> Class<T> visit(KeyPolicyDef keyPolicyDef) throws ClassNotFoundException;
 }

@@ -15,13 +15,20 @@
  */
 package li.strolch.policytest;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.policy.StrolchPolicy;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class TestSimulatedExecutionPolicy implements TestExecutionPolicy {
+public class TestSimulatedExecutionPolicy extends StrolchPolicy implements TestExecutionPolicy {
+
+	public TestSimulatedExecutionPolicy(ComponentContainer container, StrolchTransaction tx) {
+		super(container, tx);
+	}
 
 	@Override
 	public void execute(Action action) {

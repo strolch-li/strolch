@@ -60,6 +60,7 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 			this.policyModel.getPolicyTypes().put(type, policyType);
 
 			break;
+
 		case POLICY:
 
 			String key = attributes.getValue(KEY);

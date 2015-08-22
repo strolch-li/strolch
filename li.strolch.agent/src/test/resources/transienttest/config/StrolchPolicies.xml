@@ -2,7 +2,7 @@
 <StrolchPolicies>
 
 	<PolicyType Type="PlanningPolicy" Api="li.strolch.policytest.TestPlanningPolicy">
-		<Policy Key="SimplePlanningPolicy" Class="li.strolch.policytest.TestSimplePlanningPolicy" />
+		<Policy Key="SimplePlanning" Class="li.strolch.policytest.TestSimplePlanningPolicy" />
 	</PolicyType>
 
 	<PolicyType Type="ConfirmationPolicy" Api="li.strolch.policytest.TestConfirmationPolicy">

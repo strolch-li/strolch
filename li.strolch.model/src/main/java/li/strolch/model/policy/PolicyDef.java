@@ -73,7 +73,7 @@ public abstract class PolicyDef {
 	 * @param visitor
 	 * @return
 	 */
-	public abstract <T> T accept(PolicyDefVisitor visitor);
+	public abstract <T> Class<T> accept(PolicyDefVisitor visitor) throws ClassNotFoundException;
 
 	/**
 	 * Returns the value formatted for XML marshalling, so that the {@link #valueOf(String, String)} can then again

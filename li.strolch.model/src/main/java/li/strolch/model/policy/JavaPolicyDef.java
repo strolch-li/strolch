@@ -29,7 +29,7 @@ public class JavaPolicyDef extends PolicyDef {
 	}
 
 	@Override
-	public <T> T accept(PolicyDefVisitor visitor) {
+	public <T> Class<T> accept(PolicyDefVisitor visitor) throws ClassNotFoundException {
 		return visitor.visit(this);
 	}
 

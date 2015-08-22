@@ -17,6 +17,7 @@ package li.strolch.policy;
 
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefVisitor;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * <p>
@@ -24,8 +25,8 @@ import li.strolch.model.policy.PolicyDefVisitor;
  * </p>
  * 
  * <p>
- * Objects which require delegation can use a {@link PolicyConfiguration} element and then retrieve a Policy instance
- * from this {@link PolicyHandler}.
+ * Objects which require delegation can use a {@link PolicyConfiguration} element and then retrieve a StrolchPolicy
+ * instance from this {@link PolicyHandler}.
  * </p>
  * 
  * <p>
@@ -47,8 +48,10 @@ public interface PolicyHandler {
 	 * 
 	 * @param policyDef
 	 *            the {@link PolicyDef} referencing a concrete policy
+	 * @param tx
+	 *            the current transaction for which the policy is instantiated
 	 * 
 	 * @return the instantiated instance of the referenced policy
 	 */
-	public <T> T getPolicy(PolicyDef policyDef);
+	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, StrolchTransaction tx);
 }

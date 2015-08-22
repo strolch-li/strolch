@@ -51,15 +51,15 @@ public class PolicyHandlerTest {
 				Resource res = tx.getResourceBy("TestType", "MyTestResource");
 
 				PolicyDef planningPolicyDef = res.getPolicyDefs().getPolicyDef("PlanningPolicy");
-				TestPlanningPolicy planningPolicy = policyHandler.getPolicy(planningPolicyDef);
+				TestPlanningPolicy planningPolicy = policyHandler.getPolicy(planningPolicyDef, tx);
 				assertNotNull(planningPolicy);
 
 				PolicyDef executionPolicyDef = res.getPolicyDefs().getPolicyDef("ExecutionPolicy");
-				TestExecutionPolicy executionPolicy = policyHandler.getPolicy(executionPolicyDef);
+				TestExecutionPolicy executionPolicy = policyHandler.getPolicy(executionPolicyDef, tx);
 				assertNotNull(executionPolicy);
 
 				PolicyDef confirmationPolicyDef = res.getPolicyDefs().getPolicyDef("ConfirmationPolicy");
-				TestConfirmationPolicy confirmationPolicy = policyHandler.getPolicy(confirmationPolicyDef);
+				TestConfirmationPolicy confirmationPolicy = policyHandler.getPolicy(confirmationPolicyDef, tx);
 				assertNotNull(confirmationPolicy);
 			}
 		});

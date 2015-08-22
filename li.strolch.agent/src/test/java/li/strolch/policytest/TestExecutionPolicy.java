@@ -16,12 +16,11 @@
 package li.strolch.policytest;
 
 import li.strolch.model.activity.Action;
-import li.strolch.model.policy.Policy;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface TestExecutionPolicy extends Policy {
+public interface TestExecutionPolicy {
 
 	public void execute(Action action);
 }

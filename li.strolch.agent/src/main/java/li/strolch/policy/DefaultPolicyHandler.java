@@ -16,6 +16,8 @@
 package li.strolch.policy;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -28,6 +30,7 @@ import li.strolch.model.policy.JavaPolicyDef;
 import li.strolch.model.policy.KeyPolicyDef;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefVisitor;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.StrolchPolicyFileParser.PolicyModel;
 import li.strolch.policy.StrolchPolicyFileParser.PolicyType;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -55,7 +58,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 	private static final String PROP_READ_POLICY_FILE = "readPolicyFile";
 	private static final String DEF_STROLCH_POLICIES_XML = "StrolchPolicies.xml";
 
-	private MapOfMaps<String, String, Class<?>> classByTypeMap;
+	private MapOfMaps<String, String, Class<? extends StrolchPolicy>> classByTypeMap;
 
 	public DefaultPolicyHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -68,48 +71,46 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 			File policyFile = configuration.getConfigFile(PROP_POLICY_CONFIG, DEF_STROLCH_POLICIES_XML,
 					configuration.getRuntimeConfiguration());
 			parsePolicyFile(policyFile);
+		} else {
+			logger.warn("Not loading Policy configuration file, as disabled by config");
 		}
 
 		super.initialize(configuration);
 	}
 
 	@Override
-	public <T> T getPolicy(PolicyDef policyDef) {
-		return policyDef.accept(this);
-	}
-
-	@Override
-	public <T> T visit(JavaPolicyDef policyDef) {
+	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, StrolchTransaction tx) {
 		try {
 
-			String value = policyDef.getValue();
+			Class<T> clazz = policyDef.accept(this);
+			Constructor<T> constructor = clazz.getConstructor(ComponentContainer.class, StrolchTransaction.class);
+			return constructor.newInstance(getContainer(), tx);
 
-			@SuppressWarnings("unchecked")
-			Class<T> clazz = (Class<T>) Class.forName(value);
-			return clazz.newInstance();
-
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException | ClassNotFoundException e) {
 			throw new StrolchPolicyException(
 					MessageFormat.format("Failed to instantiate policy {0} due to {1}", policyDef, e.getMessage()), e);
 		}
+	}
+
+	@Override
+	public <T> Class<T> visit(JavaPolicyDef policyDef) throws ClassNotFoundException {
+		String value = policyDef.getValue();
+		@SuppressWarnings("unchecked")
+		Class<T> clazz = (Class<T>) Class.forName(value);
+		return clazz;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T visit(KeyPolicyDef policyDef) {
-
-		try {
-			Class<?> clazz = this.classByTypeMap.getElement(policyDef.getType(), policyDef.getValue());
-			if (clazz == null)
-				throw new StrolchPolicyException(MessageFormat.format("No policy is configured for {0}", policyDef));
-
-			return (T) clazz.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new StrolchPolicyException(
-					MessageFormat.format("Failed to instantiate policy {0} due to {1}", policyDef, e.getMessage()), e);
-		}
+	public <T> Class<T> visit(KeyPolicyDef policyDef) throws ClassNotFoundException {
+		Class<?> clazz = this.classByTypeMap.getElement(policyDef.getType(), policyDef.getValue());
+		if (clazz == null)
+			throw new StrolchPolicyException(MessageFormat.format("No policy is configured for {0}", policyDef));
+		return (Class<T>) clazz;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void parsePolicyFile(File policyFile) {
 
 		// first we parse the file
@@ -142,19 +143,25 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 
 						// get the class
 						Class<?> implClass = Class.forName(className);
+
+						// assert API is a Policy
+						if (!StrolchPolicy.class.isAssignableFrom(implClass)) {
+							throw new StrolchPolicyException("Invalid " + StrolchPolicyFileParser.POLICY
+									+ " configuration for Type=" + type + " Key=" + key + " as " + className
+									+ " is not a " + StrolchPolicy.class.getName());
+						}
+
 						if (!apiClass.isAssignableFrom(implClass)) {
 							throw new StrolchPolicyException(
 									"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
 											+ " Key=" + key + " as " + className + " is not assignable from " + api);
 						}
 
-						// test that we can instantiate the instance
-						implClass.newInstance();
-
 						// store the implementation class
-						this.classByTypeMap.addElement(type, key, implClass);
+						logger.info("Loaded Policy " + type + " / " + key + " / " + className);
+						this.classByTypeMap.addElement(type, key, (Class<? extends StrolchPolicy>) implClass);
 
-					} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+					} catch (ClassNotFoundException e) {
 						throw new StrolchPolicyException("Invalid " + StrolchPolicyFileParser.POLICY
 								+ " configuration for Type=" + type + " Key=" + key + " due to " + e.getMessage(), e);
 					}
