@@ -23,10 +23,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
+import li.strolch.policy.PolicyDefs;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -36,6 +38,7 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 	private static final long serialVersionUID = 0L;
 
 	private Map<String, StrolchTimedState<IValue<?>>> timedStateMap;
+	private PolicyDefs policyDefs;
 
 	/**
 	 * Empty constructor - for marshalling only!
@@ -103,6 +106,21 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 		return this.timedStateMap != null && this.timedStateMap.containsKey(id);
 	}
 
+	public PolicyDefs getPolicyDefs() {
+		if (this.policyDefs == null)
+			throw new StrolchPolicyException(getLocator() + " has no Policies defined!");
+		return this.policyDefs;
+	}
+
+	public boolean hasPolicyDefs() {
+		return this.policyDefs != null;
+	}
+
+	public void setPolicyDefs(PolicyDefs policyDefs) {
+		this.policyDefs = policyDefs;
+		this.policyDefs.setParent(this);
+	}
+
 	@Override
 	public Resource getClone() {
 		Resource clone = new Resource();
@@ -113,6 +131,9 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 				clone.addTimedState(timedState.getClone());
 			}
 		}
+
+		if (this.policyDefs != null)
+			clone.setPolicyDefs(this.policyDefs.getClone());
 
 		return clone;
 	}
@@ -165,7 +186,7 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 
 		return builder.toString();
 	}
-	
+
 	@Override
 	public int compareTo(Resource o) {
 		return getId().compareTo(o.getId());

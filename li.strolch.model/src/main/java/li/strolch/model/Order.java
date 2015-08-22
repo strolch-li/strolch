@@ -17,9 +17,11 @@ package li.strolch.model;
 
 import java.util.Date;
 
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.policy.PolicyDefs;
 
 /**
  * The Order is an object used in the EDF to transfer data from one range to another. Orders are not to be thought of as
@@ -37,6 +39,7 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 
 	private Date date;
 	private State state;
+	private PolicyDefs policyDefs;
 
 	/**
 	 * Empty constructor - for marshalling only!
@@ -75,34 +78,35 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 		setDate(date);
 	}
 
-	/**
-	 * @return the date
-	 */
 	public Date getDate() {
 		return this.date;
 	}
 
-	/**
-	 * @param date
-	 *            the date to set
-	 */
 	public void setDate(Date date) {
 		this.date = date;
 	}
 
-	/**
-	 * @return the state
-	 */
 	public State getState() {
 		return this.state;
 	}
 
-	/**
-	 * @param state
-	 *            the state to set
-	 */
 	public void setState(State state) {
 		this.state = state;
+	}
+
+	public PolicyDefs getPolicyDefs() {
+		if (this.policyDefs == null)
+			throw new StrolchPolicyException(getLocator() + " has no Policies defined!");
+		return this.policyDefs;
+	}
+
+	public boolean hasPolicyDefs() {
+		return this.policyDefs != null;
+	}
+
+	public void setPolicyDefs(PolicyDefs policyDefs) {
+		this.policyDefs = policyDefs;
+		this.policyDefs.setParent(this);
 	}
 
 	@Override
@@ -113,6 +117,9 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 
 		clone.setDate(this.date);
 		clone.setState(this.state);
+
+		if (this.policyDefs != null)
+			clone.setPolicyDefs(this.policyDefs.getClone());
 
 		return clone;
 	}

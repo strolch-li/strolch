@@ -18,6 +18,13 @@ package li.strolch.model.xml;
 import java.text.MessageFormat;
 import java.util.Date;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import ch.eitchnet.utils.dbc.DBC;
+import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.GroupedParameterizedElement;
@@ -34,14 +41,8 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.impl.ValueChange;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.policy.PolicyDef;
+import li.strolch.policy.PolicyDefs;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -50,6 +51,10 @@ public class StrolchElementFromDomVisitor {
 
 	public void fillElement(Element element, Order order) {
 		fillElement(element, (GroupedParameterizedElement) order);
+
+		PolicyDefs defs = parsePolicies(element);
+		if (defs.hasPolicyDefs())
+			order.setPolicyDefs(defs);
 
 		String date = element.getAttribute(Tags.DATE);
 		String state = element.getAttribute(Tags.STATE);
@@ -69,6 +74,10 @@ public class StrolchElementFromDomVisitor {
 
 	public void fillElement(Element resourceElement, Resource resource) {
 		fillElement(resourceElement, (GroupedParameterizedElement) resource);
+
+		PolicyDefs defs = parsePolicies(resourceElement);
+		if (defs.hasPolicyDefs())
+			resource.setPolicyDefs(defs);
 
 		NodeList childNodes = resourceElement.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
@@ -239,6 +248,10 @@ public class StrolchElementFromDomVisitor {
 	protected void fillElement(Element activityElement, Activity activity) {
 		fillElement(activityElement, (GroupedParameterizedElement) activity);
 
+		PolicyDefs defs = parsePolicies(activityElement);
+		if (defs.hasPolicyDefs())
+			activity.setPolicyDefs(defs);
+
 		NodeList childNodes = activityElement.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node item = childNodes.item(i);
@@ -259,8 +272,8 @@ public class StrolchElementFromDomVisitor {
 				activity.addElement(childAction);
 				break;
 			case Tags.PARAMETER_BAG:
+			case Tags.POLICIES:
 				break;
-
 			default:
 				throw new IllegalArgumentException("Unexpected element tag " + childElem.getNodeName());
 			}
@@ -301,5 +314,39 @@ public class StrolchElementFromDomVisitor {
 
 			action.addChange(valueChange);
 		}
+	}
+
+	private PolicyDefs parsePolicies(Element element) {
+
+		PolicyDefs policyDefs = new PolicyDefs();
+
+		NodeList childNodes = element.getChildNodes();
+		for (int i = 0; i < childNodes.getLength(); i++) {
+			Node resourceChildItem = childNodes.item(i);
+			if (!(resourceChildItem instanceof Element))
+				continue;
+
+			Element policiesElem = (Element) resourceChildItem;
+			if (!policiesElem.getNodeName().equals(Tags.POLICIES))
+				continue;
+
+			NodeList policyChildNodes = policiesElem.getChildNodes();
+			for (int j = 0; j < policyChildNodes.getLength(); j++) {
+				Node policiesChildItem = policyChildNodes.item(j);
+				if (!(policiesChildItem instanceof Element))
+					continue;
+
+				Element policyElem = (Element) policiesChildItem;
+				if (!policyElem.getNodeName().equals(Tags.POLICY))
+					continue;
+
+				String type = policyElem.getAttribute(Tags.TYPE);
+				String value = policyElem.getAttribute(Tags.VALUE);
+
+				policyDefs.addOrUpdate(PolicyDef.valueOf(type, value));
+			}
+		}
+
+		return policyDefs;
 	}
 }

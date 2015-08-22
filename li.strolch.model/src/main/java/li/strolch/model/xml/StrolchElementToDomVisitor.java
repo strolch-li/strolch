@@ -19,6 +19,10 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Order;
@@ -35,11 +39,8 @@ import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.policy.PolicyDef;
+import li.strolch.policy.PolicyDefs;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -55,10 +56,13 @@ public class StrolchElementToDomVisitor {
 	protected Element toDom(Order order) {
 
 		Element asDom = document.createElement(Tags.ORDER);
-		fillElement(asDom, order);
-
 		asDom.setAttribute(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
 		asDom.setAttribute(Tags.STATE, order.getState().name());
+
+		fillElement(asDom, order);
+
+		if (order.hasPolicyDefs())
+			fillElement(asDom, order.getPolicyDefs());
 
 		return asDom;
 	}
@@ -76,12 +80,37 @@ public class StrolchElementToDomVisitor {
 			}
 		}
 
+		if (resource.hasPolicyDefs())
+			fillElement(asDom, resource.getPolicyDefs());
+
 		return asDom;
+	}
+
+	private void fillElement(Element asDom, PolicyDefs policyDefs) {
+		if (policyDefs == null || !policyDefs.hasPolicyDefs())
+			return;
+
+		Element policiesElem = this.document.createElement(Tags.POLICIES);
+
+		for (String type : policyDefs.getPolicyTypes()) {
+			PolicyDef policyDef = policyDefs.getPolicyDef(type);
+
+			Element policyElem = this.document.createElement(Tags.POLICY);
+			policyElem.setAttribute(Tags.TYPE, policyDef.getType());
+			policyElem.setAttribute(Tags.VALUE, policyDef.getValueForXml());
+
+			policiesElem.appendChild(policyElem);
+		}
+
+		asDom.appendChild(policiesElem);
 	}
 
 	protected Element toDom(Activity activity) {
 		Element element = document.createElement(Tags.ACTIVITY);
 		fillElement(element, activity);
+
+		if (activity.hasPolicyDefs())
+			fillElement(element, activity.getPolicyDefs());
 
 		if (activity.hasElements()) {
 			Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
@@ -165,7 +194,7 @@ public class StrolchElementToDomVisitor {
 
 	protected Element toDom(ParameterBag bag) {
 		Element bagElement = document.createElement(Tags.PARAMETER_BAG);
-		fillElement(bagElement, (ParameterizedElement) bag);
+		fillElement(bagElement, bag);
 		return bagElement;
 	}
 

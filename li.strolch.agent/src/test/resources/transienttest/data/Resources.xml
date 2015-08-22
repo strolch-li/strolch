@@ -36,5 +36,10 @@
 			<Value Time="1970-01-01T00:01:00.000+01:00" Value="foo, bar" />
 			<Value Time="1970-01-01T00:02:00.000+01:00" Value="bar" />
 		</TimedState>
+		<Policies>
+			<Policy Type="PlanningPolicy" Value="key:SimplePlanningPolicy" />
+			<Policy Type="ExecutionPolicy" Value="java:li.strolch.policytest.TestSimulatedExecutionPolicy" />
+			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
+		</Policies>
 	</Resource>
 </StrolchModel>

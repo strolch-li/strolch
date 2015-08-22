@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchPolicies>
+
+	<PolicyType Type="PlanningPolicy" Api="li.strolch.policytest.TestPlanningPolicy">
+		<Policy Key="SimplePlanningPolicy" Class="li.strolch.policytest.TestSimplePlanningPolicy" />
+	</PolicyType>
+
+	<PolicyType Type="ConfirmationPolicy" Api="li.strolch.policytest.TestConfirmationPolicy">
+		<Policy Key="NoConfirmation" Class="li.strolch.policytest.TestNoConfirmationPolicy" />
+	</PolicyType>
+
+</StrolchPolicies>

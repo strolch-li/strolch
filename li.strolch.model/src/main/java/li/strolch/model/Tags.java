@@ -41,6 +41,8 @@ public class Tags {
 	public static final String FILE = "file";
 	public static final String BAG = "Bag";
 	public static final String AUDIT = "Audit";
+	public static final String POLICIES = "Policies";
+	public static final String POLICY = "Policy";
 
 	public static final String ACTIVITY = "Activity";
 	public static final String ACTION = "Action";

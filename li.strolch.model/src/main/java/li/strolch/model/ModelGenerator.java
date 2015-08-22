@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
@@ -50,8 +52,9 @@ import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.StringSetValue;
 import li.strolch.model.timevalue.impl.ValueChange;
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.policy.JavaPolicyDef;
+import li.strolch.policy.PolicyDef;
+import li.strolch.policy.PolicyDefs;
 
 /**
  * Class which can be used to generate objects which implement {@link StrolchElement}. These generated classes can then
@@ -158,6 +161,8 @@ public class ModelGenerator {
 		ParameterBag bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
 		resource.addParameterBag(bag);
 		addTimedStates(resource);
+
+		resource.setPolicyDefs(createPolicyDefs());
 
 		return resource;
 	}
@@ -298,7 +303,21 @@ public class ModelGenerator {
 		ParameterBag bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
 		order.addParameterBag(bag);
 
+		order.setPolicyDefs(createPolicyDefs());
+
 		return order;
+	}
+
+	/**
+	 * Creates a simple {@link PolicyDefs} object with a "ObjectPolicy" with value "java:java.lang.Object"
+	 * 
+	 * @return the created {@link PolicyDefs}
+	 */
+	public static PolicyDefs createPolicyDefs() {
+		PolicyDefs policyDefs = new PolicyDefs();
+		PolicyDef policyDef = new JavaPolicyDef("ObjectPolicy", "java.lang.Object");
+		policyDefs.addOrUpdate(policyDef);
+		return policyDefs;
 	}
 
 	/**
@@ -351,6 +370,8 @@ public class ModelGenerator {
 
 		action = createAction("act_" + id, "Action " + name, "Use");
 		subSubActivity.addElement(action);
+
+		rootActivity.setPolicyDefs(createPolicyDefs());
 
 		return rootActivity;
 	}

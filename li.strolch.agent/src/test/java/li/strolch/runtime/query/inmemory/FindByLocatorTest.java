@@ -16,6 +16,11 @@
 package li.strolch.runtime.query.inmemory;
 
 import static org.junit.Assert.assertNotNull;
+
+import org.junit.Test;
+
+import ch.eitchnet.privilege.model.Certificate;
+import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
@@ -29,10 +34,6 @@ import li.strolch.model.timedstate.IntegerTimedState;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 
-import org.junit.Test;
-
-import ch.eitchnet.privilege.model.Certificate;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -43,9 +44,11 @@ public class FindByLocatorTest {
 
 	@Test
 	public void shouldFindByLocator() {
+		RuntimeMock.runInStrolch(PATH_FIND_BY_LOCATOR_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER,
+				agent -> doLocatorTest(agent));
+	}
 
-		StrolchAgent agent = ComponentContainerTest.startContainer(PATH_FIND_BY_LOCATOR_RUNTIME,
-				ComponentContainerTest.PATH_TRANSIENT_CONTAINER);
+	private void doLocatorTest(StrolchAgent agent) {
 		ComponentContainer container = agent.getContainer();
 
 		Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".getBytes());
