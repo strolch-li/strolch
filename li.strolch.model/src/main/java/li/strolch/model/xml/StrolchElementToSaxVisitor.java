@@ -39,12 +39,12 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.policy.PolicyDef;
+import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-import li.strolch.policy.PolicyDef;
-import li.strolch.policy.PolicyDefs;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -24,8 +24,8 @@ import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Resource;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.policy.PolicyDef;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.runtime.StrolchConstants;
 

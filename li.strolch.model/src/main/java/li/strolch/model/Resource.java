@@ -25,10 +25,10 @@ import java.util.Set;
 
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
-import li.strolch.policy.PolicyDefs;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

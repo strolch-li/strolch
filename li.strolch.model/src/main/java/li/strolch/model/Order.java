@@ -20,8 +20,8 @@ import java.util.Date;
 import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
-import li.strolch.policy.PolicyDefs;
 
 /**
  * The Order is an object used in the EDF to transfer data from one range to another. Orders are not to be thought of as

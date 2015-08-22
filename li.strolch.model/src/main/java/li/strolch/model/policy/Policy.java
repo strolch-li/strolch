@@ -13,33 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.policy;
+package li.strolch.model.policy;
 
 /**
- * Simple {@link PolicyDef} where the value references a concrete class which can simply be instantiated
+ * Marker interface to define hierarchy of Strolch policies
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class JavaPolicyDef extends PolicyDef {
+public interface Policy {
 
-	public static final String XML_PREFIX = "java:";
-
-	public JavaPolicyDef(String type, String value) {
-		super(type, value);
-	}
-
-	@Override
-	public <T> T accept(PolicyDefVisitor visitor) {
-		return visitor.visit(this);
-	}
-
-	@Override
-	public String getValueForXml() {
-		return XML_PREFIX + this.value;
-	}
-
-	@Override
-	public JavaPolicyDef getClone() {
-		return new JavaPolicyDef(this.type, this.value);
-	}
+	// marker interface
 }

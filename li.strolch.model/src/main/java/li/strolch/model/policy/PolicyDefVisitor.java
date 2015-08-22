@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.policy;
+package li.strolch.model.policy;
 
 /**
  * This is the visitor interface to resolve a policy from a {@link PolicyDef}

@@ -27,12 +27,12 @@ import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
-import li.strolch.policy.PolicyDefs;
 
 /**
  * Parameterized object grouping a collection of {@link Activity} and {@link Action} objects defining the process to be

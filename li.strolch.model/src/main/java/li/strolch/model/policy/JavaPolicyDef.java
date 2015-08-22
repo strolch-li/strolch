@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.policy;
+package li.strolch.model.policy;
 
 /**
- * This {@link PolicyDef} adds a further indirection in the resolving of a policy. In this {@link PolicyDef} the value
- * is a key used to look up the concrete implementation. Where the look-up is performed depends on the
- * {@link PolicyDefVisitor}
+ * Simple {@link PolicyDef} where the value references a concrete class which can simply be instantiated
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class KeyPolicyDef extends PolicyDef {
+public class JavaPolicyDef extends PolicyDef {
 
-	public static final String XML_PREFIX = "key:";
+	public static final String XML_PREFIX = "java:";
 
-	public KeyPolicyDef(String type, String value) {
+	public JavaPolicyDef(String type, String value) {
 		super(type, value);
 	}
 
@@ -41,7 +39,7 @@ public class KeyPolicyDef extends PolicyDef {
 	}
 
 	@Override
-	public KeyPolicyDef getClone() {
-		return new KeyPolicyDef(this.type, this.value);
+	public JavaPolicyDef getClone() {
+		return new JavaPolicyDef(this.type, this.value);
 	}
 }

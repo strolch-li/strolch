@@ -41,6 +41,9 @@ import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.policy.JavaPolicyDef;
+import li.strolch.model.policy.PolicyDef;
+import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.BooleanTimedState;
 import li.strolch.model.timedstate.FloatTimedState;
 import li.strolch.model.timedstate.IntegerTimedState;
@@ -52,9 +55,6 @@ import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.StringSetValue;
 import li.strolch.model.timevalue.impl.ValueChange;
-import li.strolch.policy.JavaPolicyDef;
-import li.strolch.policy.PolicyDef;
-import li.strolch.policy.PolicyDefs;
 
 /**
  * Class which can be used to generate objects which implement {@link StrolchElement}. These generated classes can then

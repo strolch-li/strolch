@@ -15,6 +15,10 @@
  */
 package li.strolch.policy;
 
+import li.strolch.model.policy.Policy;
+import li.strolch.model.policy.PolicyDef;
+import li.strolch.model.policy.PolicyDefVisitor;
+
 /**
  * <p>
  * The {@link PolicyHandler} is Strolch's mechanism of dependency injection
@@ -47,5 +51,5 @@ public interface PolicyHandler {
 	 * 
 	 * @return the instantiated instance of the referenced policy
 	 */
-	public <T> T getPolicy(PolicyDef policyDef);
+	public <T extends Policy> T getPolicy(PolicyDef policyDef);
 }

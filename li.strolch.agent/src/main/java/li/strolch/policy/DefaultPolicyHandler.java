@@ -24,6 +24,11 @@ import ch.eitchnet.utils.helper.XmlHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchPolicyException;
+import li.strolch.model.policy.JavaPolicyDef;
+import li.strolch.model.policy.KeyPolicyDef;
+import li.strolch.model.policy.Policy;
+import li.strolch.model.policy.PolicyDef;
+import li.strolch.model.policy.PolicyDefVisitor;
 import li.strolch.policy.StrolchPolicyFileParser.PolicyModel;
 import li.strolch.policy.StrolchPolicyFileParser.PolicyType;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -70,7 +75,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 	}
 
 	@Override
-	public <T> T getPolicy(PolicyDef policyDef) {
+	public <T extends Policy> T getPolicy(PolicyDef policyDef) {
 		return policyDef.accept(this);
 	}
 
