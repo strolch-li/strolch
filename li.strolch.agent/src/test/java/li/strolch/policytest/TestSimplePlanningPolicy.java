@@ -35,7 +35,7 @@ public class TestSimplePlanningPolicy extends TestPlanningPolicy {
 	}
 
 	@Override
-	protected void undo() {
+	public void undo() {
 		// do nothing
 	}
 }

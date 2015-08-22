@@ -15,14 +15,17 @@
  */
 package li.strolch.service.api;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchComponent;
-import li.strolch.persistence.api.StrolchTransaction;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.model.Restrictable;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.model.policy.PolicyDef;
+import li.strolch.model.policy.PolicyDefs;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.policy.PolicyHandler;
+import li.strolch.policy.StrolchPolicy;
 
 /**
  * <p>
@@ -76,6 +79,25 @@ public abstract class Command implements Restrictable {
 	 */
 	protected ComponentContainer getContainer() {
 		return this.container;
+	}
+
+	/**
+	 * Returns a {@link StrolchPolicy} instance from the given parameters
+	 * 
+	 * @param policyClass
+	 *            the policy type to return. The simple name of the class determines the type of Policy to return.
+	 * @param policyDefs
+	 *            the policy defs from which to get the policy by using the simple name of the policy class to determine
+	 *            the type of policy to return
+	 * 
+	 * @return the policy
+	 */
+	protected <T extends StrolchPolicy> T getPolicy(Class<T> policyClass, PolicyDefs policyDefs) {
+		PolicyDef policyDef = policyDefs.getPolicyDef(policyClass.getSimpleName());
+		PolicyHandler policyHandler = getComponent(PolicyHandler.class);
+		@SuppressWarnings("unchecked")
+		T policy = (T) policyHandler.getPolicy(policyDef, tx());
+		return policy;
 	}
 
 	/**

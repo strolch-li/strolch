@@ -35,7 +35,7 @@ public class TestSimulatedExecutionPolicy extends TestExecutionPolicy {
 	}
 
 	@Override
-	protected void undo() {
+	public void undo() {
 		// do nothing
 	}
 }

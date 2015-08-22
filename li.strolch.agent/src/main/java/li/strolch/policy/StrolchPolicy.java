@@ -15,6 +15,9 @@
  */
 package li.strolch.policy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -26,6 +29,8 @@ import li.strolch.service.api.Command;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class StrolchPolicy {
+
+	protected static final Logger logger = LoggerFactory.getLogger(StrolchPolicy.class);
 
 	private final ComponentContainer container;
 	private final StrolchTransaction tx;
@@ -77,5 +82,5 @@ public abstract class StrolchPolicy {
 	/**
 	 * @see Command#undo()
 	 */
-	protected abstract void undo();
+	public abstract void undo();
 }

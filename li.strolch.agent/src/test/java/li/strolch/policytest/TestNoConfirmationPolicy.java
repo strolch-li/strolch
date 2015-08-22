@@ -35,7 +35,7 @@ public class TestNoConfirmationPolicy extends TestConfirmationPolicy {
 	}
 
 	@Override
-	protected void undo() {
+	public void undo() {
 		// do nothing
 	}
 }
