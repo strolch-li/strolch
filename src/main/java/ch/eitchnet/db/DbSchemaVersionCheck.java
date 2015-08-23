@@ -86,7 +86,7 @@ public class DbSchemaVersionCheck {
 			String realm = entry.getKey();
 			DataSource ds = entry.getValue();
 			DbMigrationState dbMigrationState = checkSchemaVersion(realm, ds);
-			dbMigrationStates.put(realm, dbMigrationState);
+			this.dbMigrationStates.put(realm, dbMigrationState);
 		}
 	}
 
@@ -248,7 +248,8 @@ public class DbSchemaVersionCheck {
 		String schemaResourceS = MessageFormat.format("/{0}_db_schema_{1}_{2}.sql", scriptPrefix, dbVersion, type);
 		try (InputStream stream = ctxClass.getResourceAsStream(schemaResourceS);) {
 			DBC.PRE.assertNotNull(
-					MessageFormat.format("Schema Resource file with name {0} does not exist!", schemaResourceS), stream);
+					MessageFormat.format("Schema Resource file with name {0} does not exist!", schemaResourceS),
+					stream);
 			return FileHelper.readStreamToString(stream);
 		} catch (IOException e) {
 			throw new DbException("Schema creation resource file is missing or could not be read: " + schemaResourceS,
