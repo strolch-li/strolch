@@ -15,12 +15,14 @@
  */
 package li.strolch.agent.impl;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Set;
 
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
+import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
@@ -41,6 +43,8 @@ public class InMemoryElementListener implements StrolchElementListener {
 	private Set<String> orderTypes;
 	private Set<String> resourceTypes;
 	private Set<String> activityTypes;
+
+	private boolean failOnUpdate;
 
 	private StrolchTransaction tx;
 	private ResourceMap resourceMap;
@@ -136,6 +140,14 @@ public class InMemoryElementListener implements StrolchElementListener {
 		this.activityTypes = activityTypes;
 	}
 
+	/**
+	 * @param failOnUpdate
+	 *            the failOnUpdate to set
+	 */
+	public void setFailOnUpdate(boolean failOnUpdate) {
+		this.failOnUpdate = failOnUpdate;
+	}
+
 	@Override
 	public void notifyResource(Resource resource) {
 		if (!this.resourceTypes.isEmpty() && !this.resourceTypes.contains(resource.getType()))
@@ -144,10 +156,14 @@ public class InMemoryElementListener implements StrolchElementListener {
 		if (this.resourceMap.hasElement(this.tx, resource.getType(), resource.getId())) {
 			if (this.updateResources) {
 				this.resourceMap.update(this.tx, resource);
+			} else if (this.failOnUpdate) {
+				throw new StrolchException(MessageFormat
+						.format("Resource {0} already exists and updating is disallowed!", resource.getLocator()));
 			}
 		} else if (this.addResources) {
 			this.resourceMap.add(this.tx, resource);
 		}
+		// else ignore
 	}
 
 	@Override
@@ -158,10 +174,14 @@ public class InMemoryElementListener implements StrolchElementListener {
 		if (this.orderMap.hasElement(this.tx, order.getType(), order.getId())) {
 			if (this.updateOrders) {
 				this.orderMap.update(this.tx, order);
+			} else if (failOnUpdate) {
+				throw new StrolchException(MessageFormat.format("Order {0} already exists and updating is disallowed!",
+						order.getLocator()));
 			}
 		} else if (this.addOrders) {
 			this.orderMap.add(this.tx, order);
 		}
+		// else ignore
 	}
 
 	@Override
@@ -172,9 +192,13 @@ public class InMemoryElementListener implements StrolchElementListener {
 		if (this.activityMap.hasElement(this.tx, activity.getType(), activity.getId())) {
 			if (this.updateActivities) {
 				this.activityMap.update(this.tx, activity);
+			} else if (failOnUpdate) {
+				throw new StrolchException(MessageFormat
+						.format("Activity {0} already exists and updating is disallowed!", activity.getLocator()));
 			}
 		} else if (this.addActivities) {
 			this.activityMap.add(this.tx, activity);
 		}
+		// else ignore
 	}
 }

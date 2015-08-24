@@ -18,6 +18,10 @@ package li.strolch.agent.impl;
 import java.io.File;
 import java.text.MessageFormat;
 
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
+import ch.eitchnet.utils.dbc.DBC;
+import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
@@ -31,10 +35,6 @@ import li.strolch.persistence.inmemory.InMemoryPersistence;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -123,6 +123,13 @@ public class TransientRealm extends InternalStrolchRealm {
 		ModelStatistics statistics;
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
 			InMemoryElementListener elementListener = new InMemoryElementListener(tx);
+
+			// explicitly deny updating, so that we can detect XML files with duplicates
+			elementListener.setUpdateResources(false);
+			elementListener.setUpdateOrders(false);
+			elementListener.setUpdateActivities(false);
+			elementListener.setFailOnUpdate(true);
+
 			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, true);
 			handler.parseFile();
 			statistics = handler.getStatistics();
@@ -130,8 +137,8 @@ public class TransientRealm extends InternalStrolchRealm {
 		}
 
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info(MessageFormat.format(
-				"Loading XML Model file {0} for realm {1} took {2}.", this.modelFile.getName(), getRealm(), durationS)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Loading XML Model file {0} for realm {1} took {2}.", this.modelFile.getName(), //$NON-NLS-1$
+				getRealm(), durationS));
 		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$
