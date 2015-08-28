@@ -118,7 +118,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 			Action action = new Action(actionId, actionName, actionType);
 			action.setResourceId(actionResourceId);
 			action.setResourceType(actionResourceType);
-			action.setState(State.valueOf(actionState));
+			if (StringHelper.isNotEmpty(actionState))
+				action.setState(State.valueOf(actionState));
 
 			this.parameterizedElement = action;
 
@@ -150,10 +151,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 				Date orderDate = ISO8601FormatFactory.getInstance().getDateFormat().parse(orderDateS);
 				order.setDate(orderDate);
 			}
-			if (orderStateS != null) {
-				State orderState = State.valueOf(orderStateS);
-				order.setState(orderState);
-			}
+			if (StringHelper.isNotEmpty(orderStateS))
+				order.setState(State.valueOf(orderStateS));
 			this.parameterizedElement = order;
 
 			break;
