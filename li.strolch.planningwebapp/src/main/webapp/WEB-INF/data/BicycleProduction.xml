@@ -1,19 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<StrolchModel>
+<Model>
 
-	<Order Id="BicycleSale" Name="?" Type="Template" Date="2020-01-01T00:00:00.000+01:00">
+	<!--
+		Order Templates
+	-->
+	<Order Id="BicycleProduction" Name="Bicycle Production" Type="Template" Date="1970-01-01T00:00:00.000+01:00">
 		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="ProductionBicycle"
+				Value="-" />
+			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
+		</ParameterBag>
+	</Order>
+	<Order Id="GearsPurchase" Name="Gears Purchase" Type="Template" Date="1970-01-01T00:00:00.000+01:00">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="ToStockGears" Value="-" />
+			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
+		</ParameterBag>
+	</Order>
+	<Order Id="BicycleSale" Name="Bicycle Sale" Type="Template" Date="1970-01-01T00:00:00.000+01:00">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="FromStockBicycle"
+				Value="-" />
 			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
 		</ParameterBag>
 	</Order>
 
-	<Order Id="e01" Name="Bicycle sale" Type="BicycleSale" Date="2020-01-01T10:00:00.000+01:00">
+	<!--
+		Orders
+	-->
+	<Order Id="prod001" Name="Bicycle Production" Type="BicycleProduction" Date="2015-09-01T00:00:00.000+01:00">
 		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
-			<Parameter Type="Float" Id="quantity" Name="Menge" Value="1" />
+			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="ProductionBicycle"
+				Value="productionAct001" />
+			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
+		</ParameterBag>
+	</Order>
+	<Order Id="purchase001" Name="Gears Purchase" Type="GearsPurchase" Date="2015-09-01T00:00:00.000+01:00">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="ToStockGears" Value="purchaseAct001" />
+			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
+		</ParameterBag>
+	</Order>
+	<Order Id="sale001" Name="Bicycle Sale" Type="BicycleSale" Date="2015-09-01T00:00:00.000+01:00">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="FromStockBicycle"
+				Value="saleAct001" />
+			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
 		</ParameterBag>
 	</Order>
 
-	<!-- Products -->
+	<!--
+		Resource Templates
+	-->
+	<Resource Id="Product" Name="Product Template" Type="Template">
+		<TimedState Id="Capacity" Name="Inventory ??" Type="Float">
+			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
+		</TimedState>
+		<Policies>
+			<Policy Type="PlanningPolicy" Value="key:ComponentPlanning" />
+			<Policy Type="PlacementPolicy" Value="key:ExtendedProductionPlacement" />
+			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
+		</Policies>
+	</Resource>
+	<Resource Id="Article" Name="Article Template" Type="Template">
+		<TimedState Id="Capacity" Name="Inventory ??" Type="Float">
+			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
+		</TimedState>
+		<Policies>
+			<!-- Could be RemotePlanning to plan on a remote machine -->
+			<Policy Type="PlanningPolicy" Value="key:ComponentPlanning" />
+			<Policy Type="PlacementPolicy" Value="key:ExtendedProductionPlacement" />
+			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
+		</Policies>
+	</Resource>
+	<Resource Id="Machine" Name="Machine Template" Type="Template">
+		<TimedState Id="Capacity" Name="Inventory ??" Type="Float">
+			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
+		</TimedState>
+		<Policies>
+			<Policy Type="PlanningPolicy" Value="key:NoPlanning" />
+			<Policy Type="PlacementPolicy" Value="key:ExtendedProductionPlacement" />
+			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
+		</Policies>
+	</Resource>
+	<Resource Id="Assembly" Name="Assemply Template" Type="Template">
+		<TimedState Id="Capacity" Name="Inventory ??" Type="Float">
+			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
+		</TimedState>
+		<Policies>
+			<Policy Type="PlanningPolicy" Value="key:NoPlanning" />
+			<Policy Type="PlacementPolicy" Value="key:ExtendedProductionPlacement" />
+			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
+		</Policies>
+	</Resource>
+
+	<!--
+		Products
+	-->
 	<Resource Id="bicycle" Name="Bicycle Product" Type="Product">
 		<TimedState Id="Capacity" Name="Inventory Bicycles" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
@@ -25,7 +108,9 @@
 		</Policies>
 	</Resource>
 
-	<!-- Articles -->
+	<!--
+		Articles
+	-->
 	<Resource Id="gears" Name="Gears" Type="Article">
 		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
@@ -38,7 +123,7 @@
 		</Policies>
 	</Resource>
 	<Resource Id="handlebars" Name="Handlebars" Type="Article">
-		<TimedState Id="Capacity" Name="Inventory handlebar" Type="Float">
+		<TimedState Id="Capacity" Name="Inventory Handlebars" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -48,7 +133,7 @@
 		</Policies>
 	</Resource>
 	<Resource Id="frames" Name="Frames" Type="Article">
-		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
+		<TimedState Id="Capacity" Name="Inventory Frames" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -58,7 +143,7 @@
 		</Policies>
 	</Resource>
 	<Resource Id="saddles" Name="Saddles" Type="Article">
-		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
+		<TimedState Id="Capacity" Name="Inventory Saddles" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -68,7 +153,7 @@
 		</Policies>
 	</Resource>
 	<Resource Id="wheels" Name="Wheels" Type="Article">
-		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
+		<TimedState Id="Capacity" Name="Inventory Wheels" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -78,7 +163,7 @@
 		</Policies>
 	</Resource>
 	<Resource Id="brakes" Name="Brakes" Type="Article">
-		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
+		<TimedState Id="Capacity" Name="Inventory Brakes" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -88,9 +173,11 @@
 		</Policies>
 	</Resource>
 
-	<!-- Machine -->
+	<!--
+		Machine
+	-->
 	<Resource Id="handlebarProduction" Name="Handlebar production" Type="Machine">
-		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
+		<TimedState Id="Capacity" Name="Machine Usage" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -100,7 +187,7 @@
 		</Policies>
 	</Resource>
 	<Resource Id="frameProduction" Name="Frame production" Type="Machine">
-		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
+		<TimedState Id="Capacity" Name="Machine Usage" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -110,7 +197,7 @@
 		</Policies>
 	</Resource>
 	<Resource Id="saddleProduction" Name="Saddle production" Type="Machine">
-		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
+		<TimedState Id="Capacity" Name="Machine Usage" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -120,7 +207,7 @@
 		</Policies>
 	</Resource>
 	<Resource Id="wheelProduction" Name="Wheel production" Type="Machine">
-		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
+		<TimedState Id="Capacity" Name="Machine Usage" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -130,7 +217,7 @@
 		</Policies>
 	</Resource>
 	<Resource Id="brakeProduction" Name="Brakes production" Type="Machine">
-		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
+		<TimedState Id="Capacity" Name="Machine Usage" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -140,9 +227,11 @@
 		</Policies>
 	</Resource>
 
-	<!-- Assembly -->
+	<!--
+		Assembly
+	-->
 	<Resource Id="bicycleAssembly" Name="Bicycle assemply" Type="Assembly">
-		<TimedState Id="Capacity" Name="Inventory Gears" Type="Float">
+		<TimedState Id="Capacity" Name="Machine Usage" Type="Float">
 			<Value Time="1970-01-01T00:00:00.000+01:00" Value="0.0" />
 		</TimedState>
 		<Policies>
@@ -152,8 +241,13 @@
 		</Policies>
 	</Resource>
 
-	<!-- Scripts -->
-	<Activity Id="gearsPurchase" Name="Purchase Gears" Type="Series">
+	<!-- Activity Templates -->
+	<!-- TODO: Add activity templates -->
+
+	<!--
+		Activities
+	-->
+	<Activity Id="purchaseAct001" Name="Purchase Gears" Type="ToStockGears">
 		<Action Id="toStock" Name="Gears to stock" ResourceId="gears" ResourceType="Article" Type="Produce">
 			<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 				<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -162,9 +256,9 @@
 		</Action>
 	</Activity>
 
-	<Activity Id="bicycleProduction" Name="Bicycle Production" Type="Series">
+	<Activity Id="productionAct001" Name="Bicycle Production" Type="ProductionBicycle">
 
-		<Activity Id="componentProduction" Name="Production of components" Type="Series">
+		<Activity Id="componentProduction" Name="Production of components" Type="Production">
 
 			<Action Id="consumeGears" Name="Gears" ResourceId="gears" ResourceType="Article" Type="Consume">
 				<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
@@ -173,7 +267,7 @@
 				</ParameterBag>
 			</Action>
 
-			<Activity Id="handlebarProduction" Name="Production handlebar" Type="Series">
+			<Activity Id="handlebarProduction" Name="Production handlebar" Type="Production">
 				<Action Id="produce" Name="Production handlebars" ResourceId="handlebarProduction" ResourceType="Machine"
 					Type="Use">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
@@ -189,7 +283,7 @@
 				</Action>
 			</Activity>
 
-			<Activity Id="frameProduction" Name="Production frame" Type="Series">
+			<Activity Id="frameProduction" Name="Production frame" Type="Production">
 				<Action Id="produce" Name="Production frame" ResourceId="frameProduction" ResourceType="Machine" Type="Use">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -204,7 +298,7 @@
 				</Action>
 			</Activity>
 
-			<Activity Id="saddleProduction" Name="Production saddle" Type="Series">
+			<Activity Id="saddleProduction" Name="Production saddle" Type="Production">
 				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -219,7 +313,7 @@
 				</Action>
 			</Activity>
 
-			<Activity Id="wheelProduction" Name="Production wheel" Type="Series">
+			<Activity Id="wheelProduction" Name="Production wheel" Type="Production">
 				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -234,7 +328,7 @@
 				</Action>
 			</Activity>
 
-			<Activity Id="brakeProduction" Type="Series" Name="Herstellen Bremsen" TimeOrdering="Series">
+			<Activity Id="brakeProduction" Name="Herstellen Bremsen" Type="Production">
 				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -266,7 +360,7 @@
 		</Action>
 	</Activity>
 
-	<Activity Id="saleBicycle" Name="Sale of Bicycle" Type="Series">
+	<Activity Id="saleAct001" Name="Sale of Bicycle" Type="FromStockBicycle">
 		<Action Id="consumeBicycle" Name="Consume Bicycle" ResourceId="bicycle" ResourceType="Product" Type="Consume">
 			<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 				<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -275,4 +369,4 @@
 		</Action>
 	</Activity>
 
-</StrolchModel>
+</Model>
