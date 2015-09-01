@@ -4,23 +4,21 @@
 	<!--
 		Order Templates
 	-->
-	<Order Id="BicycleProduction" Name="Bicycle Production" Type="Template" Date="1970-01-01T00:00:00.000+01:00">
+	<Order Id="BicycleProduction" Name="Bicycle Production" Type="Template" Date="1970-01-01T00:00:00.000+01:00" State="CREATED">
 		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
-			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="ProductionBicycle"
-				Value="-" />
+			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="ProductionBicycle" Value="-" />
 			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
 		</ParameterBag>
 	</Order>
-	<Order Id="GearsPurchase" Name="Gears Purchase" Type="Template" Date="1970-01-01T00:00:00.000+01:00">
+	<Order Id="GearsPurchase" Name="Gears Purchase" Type="Template" Date="1970-01-01T00:00:00.000+01:00" State="CREATED">
 		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
 			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="ToStockGears" Value="-" />
 			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
 		</ParameterBag>
 	</Order>
-	<Order Id="BicycleSale" Name="Bicycle Sale" Type="Template" Date="1970-01-01T00:00:00.000+01:00">
+	<Order Id="BicycleSale" Name="Bicycle Sale" Type="Template" Date="1970-01-01T00:00:00.000+01:00" State="CREATED">
 		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
-			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="FromStockBicycle"
-				Value="-" />
+			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="FromStockBicycle" Value="-" />
 			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
 		</ParameterBag>
 	</Order>
@@ -30,8 +28,7 @@
 	-->
 	<Order Id="prod001" Name="Bicycle Production" Type="BicycleProduction" Date="2015-09-01T00:00:00.000+01:00">
 		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
-			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="ProductionBicycle"
-				Value="productionAct001" />
+			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="ProductionBicycle" Value="productionAct001" />
 			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
 		</ParameterBag>
 	</Order>
@@ -43,8 +40,7 @@
 	</Order>
 	<Order Id="sale001" Name="Bicycle Sale" Type="BicycleSale" Date="2015-09-01T00:00:00.000+01:00">
 		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
-			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="FromStockBicycle"
-				Value="saleAct001" />
+			<Parameter Id="activity" Name="Menge" Type="String" Interpretation="Activity-Ref" Uom="FromStockBicycle" Value="saleAct001" />
 			<Parameter Id="quantity" Name="Menge" Type="Float" Value="1" />
 		</ParameterBag>
 	</Order>
@@ -248,7 +244,7 @@
 		Activities
 	-->
 	<Activity Id="purchaseAct001" Name="Purchase Gears" Type="ToStockGears">
-		<Action Id="toStock" Name="Gears to stock" ResourceId="gears" ResourceType="Article" Type="Produce">
+		<Action Id="toStock" Name="Gears to stock" ResourceId="gears" ResourceType="Article" Type="Produce" State="CREATED">
 			<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 				<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 				<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT0S" />
@@ -260,7 +256,7 @@
 
 		<Activity Id="componentProduction" Name="Production of components" Type="Production">
 
-			<Action Id="consumeGears" Name="Gears" ResourceId="gears" ResourceType="Article" Type="Consume">
+			<Action Id="consumeGears" Name="Gears" ResourceId="gears" ResourceType="Article" Type="Consume" State="CREATED">
 				<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 					<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 					<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT0S" />
@@ -268,14 +264,13 @@
 			</Action>
 
 			<Activity Id="handlebarProduction" Name="Production handlebar" Type="Production">
-				<Action Id="produce" Name="Production handlebars" ResourceId="handlebarProduction" ResourceType="Machine"
-					Type="Use">
+				<Action Id="produce" Name="Production handlebars" ResourceId="handlebarProduction" ResourceType="Machine" Type="Use" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 						<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT5M" />
 					</ParameterBag>
 				</Action>
-				<Action Id="toStock" Name="Handlebars ToStock" ResourceId="handlebars" ResourceType="Article" Type="Produce">
+				<Action Id="toStock" Name="Handlebars ToStock" ResourceId="handlebars" ResourceType="Article" Type="Produce" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 						<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT1M" />
@@ -284,13 +279,13 @@
 			</Activity>
 
 			<Activity Id="frameProduction" Name="Production frame" Type="Production">
-				<Action Id="produce" Name="Production frame" ResourceId="frameProduction" ResourceType="Machine" Type="Use">
+				<Action Id="produce" Name="Production frame" ResourceId="frameProduction" ResourceType="Machine" Type="Use" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 						<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT5M" />
 					</ParameterBag>
 				</Action>
-				<Action Id="toStock" Name="Frame ToStock" ResourceId="frame" ResourceType="Article" Type="Produce">
+				<Action Id="toStock" Name="Frame ToStock" ResourceId="frame" ResourceType="Article" Type="Produce" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 						<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT1M" />
@@ -299,13 +294,13 @@
 			</Activity>
 
 			<Activity Id="saddleProduction" Name="Production saddle" Type="Production">
-				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use">
+				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 						<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT5M" />
 					</ParameterBag>
 				</Action>
-				<Action Id="toStock" Name="Saddle ToStock" ResourceId="frame" ResourceType="Article" Type="Produce">
+				<Action Id="toStock" Name="Saddle ToStock" ResourceId="frame" ResourceType="Article" Type="Produce" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 						<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT1M" />
@@ -314,13 +309,13 @@
 			</Activity>
 
 			<Activity Id="wheelProduction" Name="Production wheel" Type="Production">
-				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use">
+				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 						<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT5M" />
 					</ParameterBag>
 				</Action>
-				<Action Id="toStock" Name="Saddle ToStock" ResourceId="frame" ResourceType="Article" Type="Produce">
+				<Action Id="toStock" Name="Saddle ToStock" ResourceId="frame" ResourceType="Article" Type="Produce" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 						<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT1M" />
@@ -329,13 +324,13 @@
 			</Activity>
 
 			<Activity Id="brakeProduction" Name="Herstellen Bremsen" Type="Production">
-				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use">
+				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 						<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT5M" />
 					</ParameterBag>
 				</Action>
-				<Action Id="toStock" Name="Saddle ToStock" ResourceId="frame" ResourceType="Article" Type="Produce">
+				<Action Id="toStock" Name="Saddle ToStock" ResourceId="frame" ResourceType="Article" Type="Produce" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 						<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT1M" />
@@ -345,14 +340,14 @@
 
 		</Activity>
 
-		<Action Id="assembly" Name="Bicycle assemble" ResourceId="bicycleAssembly" ResourceType="Assembly" Type="Use">
+		<Action Id="assembly" Name="Bicycle assemble" ResourceId="bicycleAssembly" ResourceType="Assembly" Type="Use" State="CREATED">
 			<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 				<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 				<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT5M" />
 			</ParameterBag>
 		</Action>
 
-		<Action Id="toStock" Name="Bicycle to stock" ResourceId="bicycle" ResourceType="Product" Type="Produce">
+		<Action Id="toStock" Name="Bicycle to stock" ResourceId="bicycle" ResourceType="Product" Type="Produce" State="CREATED">
 			<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 				<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 				<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT1M" />
@@ -361,7 +356,7 @@
 	</Activity>
 
 	<Activity Id="saleAct001" Name="Sale of Bicycle" Type="FromStockBicycle">
-		<Action Id="consumeBicycle" Name="Consume Bicycle" ResourceId="bicycle" ResourceType="Product" Type="Consume">
+		<Action Id="consumeBicycle" Name="Consume Bicycle" ResourceId="bicycle" ResourceType="Product" Type="Consume" State="CREATED">
 			<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 				<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
 				<Parameter Id="duration" Name="Duration" Type="Duration" Value="PT0S" />
