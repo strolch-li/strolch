@@ -32,14 +32,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.rest.RestfulStrolchComponent;
-import li.strolch.rest.StrolchSessionHandler;
-import li.strolch.rest.model.Login;
-import li.strolch.rest.model.LoginResult;
-import li.strolch.rest.model.LogoutResult;
-import li.strolch.runtime.privilege.PrivilegeHandler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +41,13 @@ import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.exception.StrolchException;
+import li.strolch.rest.RestfulStrolchComponent;
+import li.strolch.rest.StrolchSessionHandler;
+import li.strolch.rest.model.Login;
+import li.strolch.rest.model.LoginResult;
+import li.strolch.rest.model.LogoutResult;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -138,8 +137,8 @@ public class AuthenticationService {
 
 		try {
 
-			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance().getComponent(
-					StrolchSessionHandler.class);
+			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance()
+					.getComponent(StrolchSessionHandler.class);
 			Certificate certificate = sessionHandlerHandler.validate(sessionId);
 			sessionHandlerHandler.invalidate(certificate);
 
