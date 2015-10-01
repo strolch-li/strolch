@@ -658,6 +658,19 @@ public class StringHelper {
 	}
 
 	/**
+	 * If the value parameter is empty, then a {@link #DASH} is returned, otherwise the value is returned
+	 * 
+	 * @param value
+	 * 
+	 * @return the non-empty value, or a {@link #DASH}
+	 */
+	public static String valueOrDash(String value) {
+		if (isNotEmpty(value))
+			return value;
+		return DASH;
+	}
+
+	/**
 	 * Return a pseudo unique id which is incremented on each call. The id is initialized from the current time
 	 * 
 	 * @return a pseudo unique id
