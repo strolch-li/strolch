@@ -41,6 +41,29 @@ public class ExceptionHelper {
 	}
 
 	/**
+	 * <p>
+	 * Returns a message for the given {@link Throwable}
+	 * </p>
+	 * 
+	 * <p>
+	 * A {@link NullPointerException} only has <code>null</code> as the message so this methods returns the class name
+	 * in such a case
+	 * </p>
+	 * 
+	 * @param t
+	 * @return
+	 */
+	public static String getExceptionMessageWithCauses(Throwable t) {
+
+		if (t.getCause() == null) {
+			return getExceptionMessage(t);
+		}
+
+		String root = getExceptionMessageWithCauses(t.getCause());
+		return getExceptionMessage(t) + "\n" + root;
+	}
+
+	/**
 	 * Formats the given {@link Throwable}'s stack trace to a string
 	 * 
 	 * @param t
@@ -64,24 +87,12 @@ public class ExceptionHelper {
 	 * @return a string representation of the given {@link Throwable}'s messages including causes
 	 */
 	public static String formatExceptionMessage(Throwable t) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(t.getMessage());
-		appendCause(sb, t);
-		return sb.toString();
+
+		if (t.getCause() == null) {
+			return getExceptionMessage(t);
+		}
+
+		String root = formatExceptionMessage(t.getCause());
+		return getExceptionMessage(t) + "\ncause:\n" + root;
 	}
-
-	private static void appendCause(StringBuilder sb, Throwable e) {
-		Throwable cause = e.getCause();
-		if (cause == null)
-			return;
-
-		sb.append("\n");
-
-		sb.append("cause:\n");
-		sb.append(cause.getMessage());
-
-		if (cause.getCause() != null)
-			appendCause(sb, cause.getCause());
-	}
-
 }
