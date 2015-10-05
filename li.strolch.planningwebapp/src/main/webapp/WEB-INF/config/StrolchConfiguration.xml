@@ -23,7 +23,7 @@
 			<depends>PrivilegeHandler</depends>
 			<Properties>
 				<dataStoreMode>TRANSIENT</dataStoreMode>
-				<dataStoreFile>StrolchModel.xml</dataStoreFile>
+				<dataStoreFile>BicycleProduction.xml</dataStoreFile>
 			</Properties>
 		</Component>
 		<Component>
