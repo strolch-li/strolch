@@ -247,8 +247,7 @@ public class XmlTest {
 		Role systemAdminPrivileges = findRole("system_admin_privileges", roles);
 		assertEquals("system_admin_privileges", systemAdminPrivileges.getName());
 		assertEquals(2, systemAdminPrivileges.getPrivilegeNames().size());
-		assertThat(
-				systemAdminPrivileges.getPrivilegeNames(),
+		assertThat(systemAdminPrivileges.getPrivilegeNames(),
 				containsInAnyOrder("ch.eitchnet.privilege.handler.SystemUserAction",
 						"ch.eitchnet.privilege.test.model.TestSystemRestrictable"));
 
@@ -355,6 +354,6 @@ public class XmlTest {
 		configSaxWriter.write();
 
 		String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(modelFile));
-		assertEquals("fd5f4554312b18ca9fd61f0a6a4c87603e7c191ee206afca6328e5bffb87f86c", fileHash);
+		assertEquals("9fac0049862b2b54b41b08b0e12a9cb105894d57a1500d6603c473661f4c7313", fileHash);
 	}
 }
