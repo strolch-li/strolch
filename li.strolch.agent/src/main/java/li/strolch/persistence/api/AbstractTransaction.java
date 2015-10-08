@@ -23,6 +23,15 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.privilege.base.PrivilegeException;
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
+import ch.eitchnet.utils.dbc.DBC;
+import ch.eitchnet.utils.helper.ExceptionHelper;
+import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ObserverHandler;
@@ -63,15 +72,6 @@ import li.strolch.model.visitor.ElementTypeVisitor;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.Command;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -125,14 +125,17 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return this.txResult.getState();
 	}
 
+	@Override
 	public boolean isRollingBack() {
 		return this.txResult.getState().isRollingBack();
 	}
 
+	@Override
 	public boolean isCommitting() {
 		return this.txResult.getState().isCommitting();
 	}
 
+	@Override
 	public boolean isClosing() {
 		return this.txResult.getState().isClosing();
 	}
@@ -279,7 +282,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			PrivilegeContext privilegeContext = this.privilegeHandler.getPrivilegeContext(this.certificate);
 			privilegeContext.validateAction(query);
 		} catch (PrivilegeException e) {
-			throw new StrolchAccessDeniedException(this.certificate, query, e.getMessage(), e);
+			throw new StrolchAccessDeniedException(this.certificate, query, ExceptionHelper.getExceptionMessage(e), e);
 		}
 	}
 
@@ -361,7 +364,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			ParameterBag bag = groupedParameterizedElement.getParameterBag(parameterBagId);
 			if (bag == null) {
 				String msg = "Could not find ParameterBag for locator {0} on element {1}"; //$NON-NLS-1$
-				throw new StrolchException(MessageFormat.format(msg, locator, groupedParameterizedElement.getLocator()));
+				throw new StrolchException(
+						MessageFormat.format(msg, locator, groupedParameterizedElement.getLocator()));
 			}
 
 			if (elements.size() == 5)
@@ -536,7 +540,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
 
 			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
+			msg = MessageFormat.format(msg, getRealmName(), ExceptionHelper.getExceptionMessage(e));
 			throw new StrolchTransactionException(msg, e);
 		}
 	}
@@ -585,7 +589,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			this.txResult.setState(TransactionState.FAILED);
 
 			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, getRealmName(), e.getMessage());
+			msg = MessageFormat.format(msg, getRealmName(), ExceptionHelper.getExceptionMessage(e));
 			throw new StrolchTransactionException(msg, e);
 
 		} finally {
@@ -619,7 +623,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			// TODO re-think this.
 			if (!this.commands.isEmpty()) {
-				logger.error("There are commands registered on a read-only transaction. Changing to rollback! Probably due to an exception!");
+				logger.error(
+						"There are commands registered on a read-only transaction. Changing to rollback! Probably due to an exception!");
 				autoCloseableRollback();
 				return;
 			}
@@ -780,7 +785,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, getRealmName(), e.getMessage(), sb.toString());
+		msg = MessageFormat.format(msg, getRealmName(), ExceptionHelper.getExceptionMessage(e), sb.toString());
 		throw new StrolchTransactionException(msg, e);
 	}
 
@@ -855,8 +860,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return auditTrailDuration;
 	}
 
-	private <T extends StrolchRootElement> void auditsFor(List<Audit> audits, AccessType accessType,
-			String elementType, Set<T> elements) {
+	private <T extends StrolchRootElement> void auditsFor(List<Audit> audits, AccessType accessType, String elementType,
+			Set<T> elements) {
 		for (StrolchRootElement element : elements) {
 			audits.add(auditFrom(accessType, element));
 		}
