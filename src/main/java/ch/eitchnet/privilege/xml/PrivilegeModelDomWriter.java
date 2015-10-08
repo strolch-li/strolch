@@ -26,6 +26,7 @@ import ch.eitchnet.privilege.helper.XmlConstants;
 import ch.eitchnet.privilege.model.IPrivilege;
 import ch.eitchnet.privilege.model.internal.Role;
 import ch.eitchnet.privilege.model.internal.User;
+import ch.eitchnet.utils.helper.StringHelper;
 import ch.eitchnet.utils.helper.XmlHelper;
 
 /**
@@ -57,7 +58,7 @@ public class PrivilegeModelDomWriter {
 		Element usersElement = doc.createElement(XmlConstants.XML_USERS);
 		rootElement.appendChild(usersElement);
 
-		for (User user : this.users) {
+		this.users.stream().sorted((u1, u2) -> u1.getUserId().compareTo(u2.getUserId())).forEach(user -> {
 
 			// create the user element
 			Element userElement = doc.createElement(XmlConstants.XML_USER);
@@ -65,17 +66,22 @@ public class PrivilegeModelDomWriter {
 
 			userElement.setAttribute(XmlConstants.XML_ATTR_USER_ID, user.getUserId());
 			userElement.setAttribute(XmlConstants.XML_ATTR_USERNAME, user.getUsername());
-			userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, user.getPassword());
+			if (StringHelper.isNotEmpty(user.getPassword()))
+				userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, user.getPassword());
 
 			// add first name element
-			Element firstnameElement = doc.createElement(XmlConstants.XML_FIRSTNAME);
-			firstnameElement.setTextContent(user.getFirstname());
-			userElement.appendChild(firstnameElement);
+			if (StringHelper.isNotEmpty(user.getFirstname())) {
+				Element firstnameElement = doc.createElement(XmlConstants.XML_FIRSTNAME);
+				firstnameElement.setTextContent(user.getFirstname());
+				userElement.appendChild(firstnameElement);
+			}
 
-			// add lastname element
-			Element lastnameElement = doc.createElement(XmlConstants.XML_LASTNAME);
-			lastnameElement.setTextContent(user.getLastname());
-			userElement.appendChild(lastnameElement);
+			// add last name element
+			if (StringHelper.isNotEmpty(user.getLastname())) {
+				Element lastnameElement = doc.createElement(XmlConstants.XML_LASTNAME);
+				lastnameElement.setTextContent(user.getLastname());
+				userElement.appendChild(lastnameElement);
+			}
 
 			// add state element
 			Element stateElement = doc.createElement(XmlConstants.XML_STATE);
@@ -97,20 +103,22 @@ public class PrivilegeModelDomWriter {
 			}
 
 			// add the parameters
-			Element parametersElement = doc.createElement(XmlConstants.XML_PARAMETERS);
-			userElement.appendChild(parametersElement);
-			for (Entry<String, String> entry : user.getProperties().entrySet()) {
-				Element paramElement = doc.createElement(XmlConstants.XML_PARAMETER);
-				paramElement.setAttribute(XmlConstants.XML_ATTR_NAME, entry.getKey());
-				paramElement.setAttribute(XmlConstants.XML_ATTR_VALUE, entry.getValue());
-				parametersElement.appendChild(paramElement);
+			if (!user.getProperties().isEmpty()) {
+				Element parametersElement = doc.createElement(XmlConstants.XML_PARAMETERS);
+				userElement.appendChild(parametersElement);
+				for (Entry<String, String> entry : user.getProperties().entrySet()) {
+					Element paramElement = doc.createElement(XmlConstants.XML_PARAMETER);
+					paramElement.setAttribute(XmlConstants.XML_ATTR_NAME, entry.getKey());
+					paramElement.setAttribute(XmlConstants.XML_ATTR_VALUE, entry.getValue());
+					parametersElement.appendChild(paramElement);
+				}
 			}
-		}
+		});
 
 		Element rolesElement = doc.createElement(XmlConstants.XML_ROLES);
 		rootElement.appendChild(rolesElement);
 
-		for (Role role : this.roles) {
+		this.roles.stream().sorted((r1, r2) -> r1.getName().compareTo(r2.getName())).forEach(role -> {
 
 			// create the role element
 			Element roleElement = doc.createElement(XmlConstants.XML_ROLE);
@@ -129,9 +137,11 @@ public class PrivilegeModelDomWriter {
 				privilegeElement.setAttribute(XmlConstants.XML_ATTR_POLICY, privilege.getPolicy());
 
 				// add the all allowed element
-				Element allAllowedElement = doc.createElement(XmlConstants.XML_ALL_ALLOWED);
-				allAllowedElement.setTextContent(Boolean.toString(privilege.isAllAllowed()));
-				privilegeElement.appendChild(allAllowedElement);
+				if (privilege.isAllAllowed()) {
+					Element allAllowedElement = doc.createElement(XmlConstants.XML_ALL_ALLOWED);
+					allAllowedElement.setTextContent(Boolean.toString(privilege.isAllAllowed()));
+					privilegeElement.appendChild(allAllowedElement);
+				}
 
 				// add all the deny values
 				for (String denyValue : privilege.getDenyList()) {
@@ -147,7 +157,7 @@ public class PrivilegeModelDomWriter {
 					privilegeElement.appendChild(allowValueElement);
 				}
 			}
-		}
+		});
 
 		// write the container file to disk
 		XmlHelper.writeDocument(doc, this.modelFile);
