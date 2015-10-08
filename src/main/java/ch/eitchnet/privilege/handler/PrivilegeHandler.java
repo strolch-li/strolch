@@ -223,8 +223,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public UserRep removeUser(Certificate certificate, String username) throws AccessDeniedException,
-			PrivilegeException;
+	public UserRep removeUser(Certificate certificate, String username)
+			throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * Removes the role with the given roleName from the user with the given username
@@ -259,8 +259,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or the role is still in use by a user
 	 */
-	public RoleRep removeRole(Certificate certificate, String roleName) throws AccessDeniedException,
-			PrivilegeException;
+	public RoleRep removeRole(Certificate certificate, String roleName)
+			throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * Removes the privilege with the given privilegeName from the role with the given roleName
@@ -304,8 +304,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or the user already exists
 	 */
-	public UserRep addUser(Certificate certificate, UserRep userRep, byte[] password) throws AccessDeniedException,
-			PrivilegeException;
+	public UserRep addUser(Certificate certificate, UserRep userRep, byte[] password)
+			throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * <p>
@@ -336,8 +336,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or if the user does not exist
 	 */
-	public UserRep updateUser(Certificate certificate, UserRep userRep) throws AccessDeniedException,
-			PrivilegeException;
+	public UserRep updateUser(Certificate certificate, UserRep userRep)
+			throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * <p>
@@ -363,8 +363,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or if the user does not exist
 	 */
-	public UserRep replaceUser(Certificate certificate, UserRep userRep, byte[] password) throws AccessDeniedException,
-			PrivilegeException;
+	public UserRep replaceUser(Certificate certificate, UserRep userRep, byte[] password)
+			throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * Adds a new role with the information from this {@link RoleRep}
@@ -394,8 +394,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or if the role does not exist
 	 */
-	public RoleRep replaceRole(Certificate certificate, RoleRep roleRep) throws AccessDeniedException,
-			PrivilegeException;
+	public RoleRep replaceRole(Certificate certificate, RoleRep roleRep)
+			throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * Adds the role with the given roleName to the {@link User} with the given username
@@ -494,8 +494,8 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public UserRep setUserLocale(Certificate certificate, String username, Locale locale) throws AccessDeniedException,
-			PrivilegeException;
+	public UserRep setUserLocale(Certificate certificate, String username, Locale locale)
+			throws AccessDeniedException, PrivilegeException;
 
 	/**
 	 * Authenticates a user by validating that a {@link User} for the given username and password exist and then returns
@@ -612,10 +612,22 @@ public interface PrivilegeHandler {
 	 * has the state {@link UserState#SYSTEM} and this user must have privilege to perform the concrete implementation
 	 * of the given {@link SystemUserAction} instance
 	 * 
+	 * 
 	 * @param systemUsername
 	 *            the username of the system user to perform the action as
 	 * @param action
 	 *            the action to be performed as the system user
+	 * 
+	 * @return the action
+	 * 
+	 * @throws PrivilegeException
 	 */
-	public void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException;
+	public <T extends SystemUserAction> T runAsSystem(String systemUsername, T action) throws PrivilegeException;
+
+	/**
+	 * Returns the {@link EncryptionHandler} instance
+	 * 
+	 * @return the {@link EncryptionHandler} instance
+	 */
+	public EncryptionHandler getEncryptionHandler() throws PrivilegeException;
 }

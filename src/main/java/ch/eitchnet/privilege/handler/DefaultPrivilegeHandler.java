@@ -72,8 +72,6 @@ import ch.eitchnet.utils.helper.StringHelper;
  */
 public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
-	///
-
 	/**
 	 * slf4j logger
 	 */
@@ -110,6 +108,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private boolean autoPersistOnUserChangesData;
 
 	private PrivilegeConflictResolution privilegeConflictResolution;
+
+	@Override
+	public EncryptionHandler getEncryptionHandler() throws PrivilegeException {
+		return this.encryptionHandler;
+	}
 
 	@Override
 	public RoleRep getRole(Certificate certificate, String roleName) {
@@ -487,8 +490,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public UserRep updateUser(Certificate certificate, UserRep userRep) throws AccessDeniedException,
-			PrivilegeException {
+	public UserRep updateUser(Certificate certificate, UserRep userRep)
+			throws AccessDeniedException, PrivilegeException {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = getPrivilegeContext(certificate);
@@ -504,8 +507,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (StringHelper.isEmpty(userRep.getFirstname()) && StringHelper.isEmpty(userRep.getLastname())
 				&& userRep.getLocale() == null
 				&& (userRep.getProperties() == null || userRep.getProperties().isEmpty())) {
-			throw new PrivilegeException(MessageFormat.format(
-					"All updateable fields are empty for update of user {0}", userRep.getUsername())); //$NON-NLS-1$
+			throw new PrivilegeException(MessageFormat.format("All updateable fields are empty for update of user {0}", //$NON-NLS-1$
+					userRep.getUsername()));
 		}
 
 		String userId = existingUser.getUserId();
@@ -626,7 +629,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// validate that this user may remove this role from this user
-		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_REMOVE_ROLE_FROM_USER, new Tuple(existingUser, roleName)));
+		prvCtx.validateAction(
+				new SimpleRestrictable(PRIVILEGE_REMOVE_ROLE_FROM_USER, new Tuple(existingUser, roleName)));
 
 		// ignore if user does not have role
 		Set<String> currentRoles = existingUser.getRoles();
@@ -713,8 +717,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// if the user is not setting their own password, then make sure this user may set this user's password
 			if (!certificate.getUsername().equals(username)) {
-				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_PASSWORD, new Tuple(existingUser,
-						newUser)));
+				prvCtx.validateAction(
+						new SimpleRestrictable(PRIVILEGE_SET_USER_PASSWORD, new Tuple(existingUser, newUser)));
 			}
 
 			// delegate user replacement to persistence handler
@@ -987,8 +991,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			this.privilegeContextMap.put(sessionId, privilegeContext);
 
 			// log
-			DefaultPrivilegeHandler.logger.info(MessageFormat.format(
-					"User {0} authenticated: {1}", username, certificate)); //$NON-NLS-1$
+			DefaultPrivilegeHandler.logger
+					.info(MessageFormat.format("User {0} authenticated: {1}", username, certificate)); //$NON-NLS-1$
 
 		} catch (RuntimeException e) {
 			String msg = "User {0} Failed to authenticate: {1}"; //$NON-NLS-1$
@@ -1042,8 +1046,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// validate password
 		String pwHash = user.getPassword();
 		if (pwHash == null)
-			throw new AccessDeniedException(MessageFormat.format(
-					"User {0} has no password and may not login!", username)); //$NON-NLS-1$
+			throw new AccessDeniedException(
+					MessageFormat.format("User {0} has no password and may not login!", username)); //$NON-NLS-1$
 		if (!pwHash.equals(passwordHash))
 			throw new AccessDeniedException(MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
 
@@ -1418,7 +1422,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException {
+	public <T extends SystemUserAction> T runAsSystem(String systemUsername, T action) throws PrivilegeException {
 
 		if (systemUsername == null)
 			throw new PrivilegeException("systemUsername may not be null!"); //$NON-NLS-1$
@@ -1448,6 +1452,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		} finally {
 			this.privilegeContextMap.remove(sessionId);
 		}
+
+		return action;
 	}
 
 	/**
