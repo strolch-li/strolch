@@ -34,6 +34,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import ch.eitchnet.privilege.base.AccessDeniedException;
+import ch.eitchnet.privilege.base.PrivilegeException;
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.UserRep;
+import ch.eitchnet.privilege.model.UserState;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -57,12 +63,6 @@ import li.strolch.service.privilege.users.PrivilegeUpdateUserService;
 import li.strolch.service.privilege.users.PrivilegeUserArgument;
 import li.strolch.service.privilege.users.PrivilegeUserNameArgument;
 import li.strolch.service.privilege.users.PrivilegeUserResult;
-import ch.eitchnet.privilege.base.AccessDeniedException;
-import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.handler.PrivilegeHandler;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.UserRep;
-import ch.eitchnet.privilege.model.UserState;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -273,7 +273,7 @@ public class PrivilegeUsersService {
 		PrivilegeSetUserPasswordService svc = new PrivilegeSetUserPasswordService();
 		PrivilegeSetUserPasswordArgument arg = new PrivilegeSetUserPasswordArgument();
 		arg.username = username;
-		arg.password = passwordField.getPassword().getBytes();
+		arg.password = passwordField.getPassword();
 
 		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
 		if (svcResult.isOk()) {

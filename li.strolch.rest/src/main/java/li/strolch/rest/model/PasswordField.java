@@ -28,13 +28,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class PasswordField {
 
 	@XmlAttribute(name = "password")
-	private String password;
+	private byte[] password;
 
-	public String getPassword() {
+	public byte[] getPassword() {
 		return password;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(byte[] password) {
 		this.password = password;
 	}
 }

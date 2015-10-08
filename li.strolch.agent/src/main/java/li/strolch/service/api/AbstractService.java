@@ -30,6 +30,7 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 
@@ -223,6 +224,21 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 */
 	protected <V extends SystemUserAction> V runAs(String username, V action) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runAsSystem(username, action);
+	}
+
+	/**
+	 * Performs the given {@link SystemUserAction} as the privileged system user
+	 * {@link StrolchConstants#PRIVILEGED_SYSTEM_USER}. Returns the action for chaining calls
+	 * 
+	 * @param action
+	 *            the action to perform
+	 * 
+	 * @return the action performed for chaining calls
+	 * 
+	 * @throws PrivilegeException
+	 */
+	protected <V extends SystemUserAction> V runPrivileged(V action) throws PrivilegeException {
+		return this.container.getPrivilegeHandler().runAsSystem(StrolchConstants.PRIVILEGED_SYSTEM_USER, action);
 	}
 
 	/**

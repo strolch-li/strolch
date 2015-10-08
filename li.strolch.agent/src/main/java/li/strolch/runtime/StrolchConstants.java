@@ -16,10 +16,11 @@
 package li.strolch.runtime;
 
 import static ch.eitchnet.utils.helper.StringHelper.DOT;
+
+import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.persistence.api.PersistenceHandler;
-import ch.eitchnet.privilege.handler.PrivilegeHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -30,7 +31,9 @@ public class StrolchConstants {
 	public static final String ENV_STROLCH = "ENV_STROLCH";
 	public static final String PERSISTENCE_HANDLER = PersistenceHandler.class.getSimpleName();
 	public static final String OBSERVER_HANDLER = ObserverHandler.class.getSimpleName();
+
 	public static final String PRIVILEGE_HANDLER = "PrivilegeHandler";
+	public static final String PRIVILEGED_SYSTEM_USER = "privileged";
 
 	public static final String PROP_REALM = "realm";
 	public static final String DEFAULT_REALM = "defaultRealm";
