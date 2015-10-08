@@ -70,7 +70,8 @@ public interface PrivilegeHandler {
 	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#runAsSystem(java.lang.String,
 	 *      ch.eitchnet.privilege.handler.SystemUserAction)
 	 */
-	public abstract void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException;
+	public abstract <T extends SystemUserAction> T runAsSystem(String systemUsername, T action)
+			throws PrivilegeException;
 
 	/**
 	 * @param certificate

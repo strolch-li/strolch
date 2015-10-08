@@ -20,16 +20,6 @@ import java.io.FileInputStream;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.api.StrolchRealm;
-import li.strolch.exception.StrolchException;
-import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
-import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
-import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.configuration.RuntimeConfiguration;
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.DefaultPrivilegeHandler;
@@ -44,6 +34,16 @@ import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
 import ch.eitchnet.privilege.xml.PrivilegeConfigSaxReader;
 import ch.eitchnet.utils.helper.XmlHelper;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.api.StrolchRealm;
+import li.strolch.exception.StrolchException;
+import li.strolch.model.audit.AccessType;
+import li.strolch.model.audit.Audit;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
+import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
 
 public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements PrivilegeHandler {
 
@@ -178,8 +178,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public void runAsSystem(String systemUsername, SystemUserAction action) throws PrivilegeException {
-		this.privilegeHandler.runAsSystem(systemUsername, action);
+	public <T extends SystemUserAction> T runAsSystem(String systemUsername, T action) throws PrivilegeException {
+		return this.privilegeHandler.runAsSystem(systemUsername, action);
 	}
 
 	@Override

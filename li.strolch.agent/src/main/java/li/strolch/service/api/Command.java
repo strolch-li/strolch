@@ -18,6 +18,8 @@ package li.strolch.service.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.privilege.base.PrivilegeException;
+import ch.eitchnet.privilege.handler.SystemUserAction;
 import ch.eitchnet.privilege.model.Restrictable;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -98,6 +100,23 @@ public abstract class Command implements Restrictable {
 		@SuppressWarnings("unchecked")
 		T policy = (T) policyHandler.getPolicy(policyDef, tx());
 		return policy;
+	}
+
+	/**
+	 * Performs the given {@link SystemUserAction} as a system user with the given username. Returns the action for
+	 * chaining calls
+	 * 
+	 * @param username
+	 *            the name of the system user to perform the action as
+	 * @param action
+	 *            the action to perform
+	 * 
+	 * @return the action performed for chaining calls
+	 * 
+	 * @throws PrivilegeException
+	 */
+	protected <V extends SystemUserAction> V runAs(String username, V action) throws PrivilegeException {
+		return this.container.getPrivilegeHandler().runAsSystem(username, action);
 	}
 
 	/**

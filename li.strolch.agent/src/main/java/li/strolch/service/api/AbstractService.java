@@ -17,19 +17,21 @@ package li.strolch.service.api;
 
 import java.text.MessageFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.privilege.base.PrivilegeException;
+import ch.eitchnet.privilege.handler.SystemUserAction;
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.PrivilegeContext;
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -89,6 +91,15 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 */
 	protected final ComponentContainer getContainer() {
 		return this.container;
+	}
+
+	/**
+	 * Returns the reference to the {@link PrivilegeHandler}
+	 * 
+	 * @return the privilege handler
+	 */
+	public PrivilegeHandler getPrivilegeHandler() throws IllegalArgumentException {
+		return this.container.getPrivilegeHandler();
 	}
 
 	/**
@@ -195,6 +206,23 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 */
 	protected StrolchTransaction openUserTx(String action) throws StrolchException {
 		return this.container.getRealm(getCertificate()).openTx(getCertificate(), action);
+	}
+
+	/**
+	 * Performs the given {@link SystemUserAction} as a system user with the given username. Returns the action for
+	 * chaining calls
+	 * 
+	 * @param username
+	 *            the name of the system user to perform the action as
+	 * @param action
+	 *            the action to perform
+	 * 
+	 * @return the action performed for chaining calls
+	 * 
+	 * @throws PrivilegeException
+	 */
+	protected <V extends SystemUserAction> V runAs(String username, V action) throws PrivilegeException {
+		return this.container.getPrivilegeHandler().runAsSystem(username, action);
 	}
 
 	/**
