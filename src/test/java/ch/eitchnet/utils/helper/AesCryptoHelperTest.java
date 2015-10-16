@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -59,8 +58,7 @@ public class AesCryptoHelperTest {
 
 			assertArrayEquals(clearTextBytes, decryptedBytes);
 		} catch (RuntimeException e) {
-			if (e.getCause() instanceof InvalidKeyException
-					&& e.getCause().getMessage().equals("Illegal key size or default parameters"))
+			if (ExceptionHelper.getRootCause(e).getMessage().equals("Illegal key size or default parameters"))
 				logger.warn("YOU ARE MISSING THE UNLIMITED JCE POLICIES and can not do AES encryption!");
 			else
 				throw e;
@@ -78,8 +76,7 @@ public class AesCryptoHelperTest {
 
 			assertArrayEquals(clearTextBytes, decryptedBytes);
 		} catch (RuntimeException e) {
-			if (e.getCause() instanceof InvalidKeyException
-					&& e.getCause().getMessage().equals("Illegal key size or default parameters"))
+			if (ExceptionHelper.getRootCause(e).getMessage().equals("Illegal key size or default parameters"))
 				logger.warn("YOU ARE MISSING THE UNLIMITED JCE POLICIES and can not do AES encryption!");
 			else
 				throw e;
@@ -88,99 +85,69 @@ public class AesCryptoHelperTest {
 
 	@Test
 	public void shouldEncryptShortFile() {
-		try {
+		// file to be encrypted
+		String clearTextFileS = "src/test/resources/crypto_test_short.txt";
+		// encrypted file
+		String encryptedFileS = "target/encrypted_short.aes";
+		// encrypted file
+		String decryptedFileS = "target/decrypted_short.txt";
 
-			// file to be encrypted
-			String clearTextFileS = "src/test/resources/crypto_test_short.txt";
-			// encrypted file
-			String encryptedFileS = "target/encrypted_short.aes";
-			// encrypted file
-			String decryptedFileS = "target/decrypted_short.txt";
-
-			testCrypto(clearTextFileS, encryptedFileS, decryptedFileS);
-
-		} catch (RuntimeException e) {
-			if (e.getCause() instanceof InvalidKeyException
-					&& e.getCause().getMessage().equals("Illegal key size or default parameters"))
-				logger.warn("YOU ARE MISSING THE UNLIMITED JCE POLICIES and can not do AES encryption!");
-			else
-				throw e;
-		}
+		testCrypto(clearTextFileS, encryptedFileS, decryptedFileS);
 	}
 
 	@Test
 	public void shouldEncryptMiddleFile() {
-		try {
+		// file to be encrypted
+		String clearTextFileS = "src/test/resources/crypto_test_middle.txt";
+		// encrypted file
+		String encryptedFileS = "target/encrypted_middle.aes";
+		// encrypted file
+		String decryptedFileS = "target/decrypted_middle.txt";
 
-			// file to be encrypted
-			String clearTextFileS = "src/test/resources/crypto_test_middle.txt";
-			// encrypted file
-			String encryptedFileS = "target/encrypted_middle.aes";
-			// encrypted file
-			String decryptedFileS = "target/decrypted_middle.txt";
-
-			testCrypto(clearTextFileS, encryptedFileS, decryptedFileS);
-
-		} catch (RuntimeException e) {
-			if (e.getCause() instanceof InvalidKeyException
-					&& e.getCause().getMessage().equals("Illegal key size or default parameters"))
-				logger.warn("YOU ARE MISSING THE UNLIMITED JCE POLICIES and can not do AES encryption!");
-			else
-				throw e;
-		}
+		testCrypto(clearTextFileS, encryptedFileS, decryptedFileS);
 	}
 
 	@Test
 	public void shouldEncryptLongFile() {
-		try {
+		// file to be encrypted
+		String clearTextFileS = "src/test/resources/crypto_test_long.txt";
+		// encrypted file
+		String encryptedFileS = "target/encrypted_long.aes";
+		// encrypted file
+		String decryptedFileS = "target/decrypted_long.txt";
 
-			// file to be encrypted
-			String clearTextFileS = "src/test/resources/crypto_test_long.txt";
-			// encrypted file
-			String encryptedFileS = "target/encrypted_long.aes";
-			// encrypted file
-			String decryptedFileS = "target/decrypted_long.txt";
-
-			testCrypto(clearTextFileS, encryptedFileS, decryptedFileS);
-
-		} catch (RuntimeException e) {
-			if (e.getCause() instanceof InvalidKeyException
-					&& e.getCause().getMessage().equals("Illegal key size or default parameters"))
-				logger.warn("YOU ARE MISSING THE UNLIMITED JCE POLICIES and can not do AES encryption!");
-			else
-				throw e;
-		}
+		testCrypto(clearTextFileS, encryptedFileS, decryptedFileS);
 	}
 
 	@Test
 	public void shouldEncryptBinaryFile() {
 
+		// file to be encrypted
+		String clearTextFileS = "src/test/resources/crypto_test_image.ico";
+		// encrypted file
+		String encryptedFileS = "target/encrypted_image.aes";
+		// encrypted file
+		String decryptedFileS = "target/decrypted_image.ico";
+
+		testCrypto(clearTextFileS, encryptedFileS, decryptedFileS);
+
+	}
+
+	private static void testCrypto(String clearTextFileS, String encryptedFileS, String decryptedFileS) {
 		try {
 
-			// file to be encrypted
-			String clearTextFileS = "src/test/resources/crypto_test_image.ico";
-			// encrypted file
-			String encryptedFileS = "target/encrypted_image.aes";
-			// encrypted file
-			String decryptedFileS = "target/decrypted_image.ico";
+			AesCryptoHelper.encrypt(password, salt, clearTextFileS, encryptedFileS);
+			AesCryptoHelper.decrypt(password, salt, encryptedFileS, decryptedFileS);
 
-			testCrypto(clearTextFileS, encryptedFileS, decryptedFileS);
+			String inputSha256 = StringHelper.getHexString(FileHelper.hashFileSha256(new File(clearTextFileS)));
+			String doutputSha256 = StringHelper.getHexString(FileHelper.hashFileSha256(new File(decryptedFileS)));
+			assertEquals(inputSha256, doutputSha256);
 
 		} catch (RuntimeException e) {
-			if (e.getCause() instanceof InvalidKeyException
-					&& e.getCause().getMessage().equals("Illegal key size or default parameters"))
+			if (ExceptionHelper.getRootCause(e).getMessage().equals("Illegal key size or default parameters"))
 				logger.warn("YOU ARE MISSING THE UNLIMITED JCE POLICIES and can not do AES encryption!");
 			else
 				throw e;
 		}
-	}
-
-	private static void testCrypto(String clearTextFileS, String encryptedFileS, String decryptedFileS) {
-		AesCryptoHelper.encrypt(password, salt, clearTextFileS, encryptedFileS);
-		AesCryptoHelper.decrypt(password, salt, encryptedFileS, decryptedFileS);
-
-		String inputSha256 = StringHelper.getHexString(FileHelper.hashFileSha256(new File(clearTextFileS)));
-		String doutputSha256 = StringHelper.getHexString(FileHelper.hashFileSha256(new File(decryptedFileS)));
-		assertEquals(inputSha256, doutputSha256);
 	}
 }

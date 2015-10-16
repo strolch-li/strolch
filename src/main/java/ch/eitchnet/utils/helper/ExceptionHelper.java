@@ -95,4 +95,20 @@ public class ExceptionHelper {
 		String root = formatExceptionMessage(t.getCause());
 		return getExceptionMessage(t) + "\ncause:\n" + root;
 	}
+
+	/**
+	 * Returns the root cause for the given {@link Throwable}
+	 * 
+	 * @param t
+	 *            the {@link Throwable} for which to get the root cause
+	 * 
+	 * @return the root cause of the given {@link Throwable}
+	 */
+	public static Throwable getRootCause(Throwable t) {
+		while (t.getCause() != null) {
+			t = t.getCause();
+		}
+
+		return t;
+	}
 }
