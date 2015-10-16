@@ -1089,7 +1089,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			certificateStubs = reader.read();
 
 		} catch (Exception e) {
-			throw new PrivilegeException("Failed to load sessions!", e);
+			logger.error("Failed to load sessions!", e);
+			this.persistSessionsPath.delete();
+			return false;
 		}
 
 		if (certificateStubs.isEmpty()) {
