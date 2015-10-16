@@ -83,7 +83,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		this.certificateMap = Collections.synchronizedMap(new HashMap<>());
 
 		if (this.reloadSessions) {
-			List<Certificate> certificates = runPrivileged(ctx -> {
+			List<Certificate> certificates = runPrivilegedRunnable(ctx -> {
 				Certificate cert = ctx.getCertificate();
 				return this.privilegeHandler.getPrivilegeHandler(cert).getCertificates(cert).stream()
 						.filter(c -> !c.getUserState().isSystem()).collect(Collectors.toList());
@@ -108,7 +108,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	public void stop() throws Exception {
 		if (this.reloadSessions) {
 
-			runPrivileged(ctx -> getContainer().getPrivilegeHandler().getPrivilegeHandler(ctx.getCertificate())
+			runPrivilegedRunnable(ctx -> getContainer().getPrivilegeHandler().getPrivilegeHandler(ctx.getCertificate())
 					.persistSessions(ctx.getCertificate()));
 
 		} else if (this.certificateMap != null) {

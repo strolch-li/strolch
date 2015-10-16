@@ -219,7 +219,7 @@ public class StrolchComponent {
 	 * 
 	 * @throws PrivilegeException
 	 */
-	protected <T> T runPrivileged(RunRunnable.Runnable<T> action) throws PrivilegeException {
+	protected <T> T runPrivilegedRunnable(RunRunnable.Runnable<T> action) throws PrivilegeException {
 		return this.container.getPrivilegeHandler()
 				.runAsSystem(StrolchConstants.PRIVILEGED_SYSTEM_USER, new RunRunnable<>(action)).getResult();
 	}
