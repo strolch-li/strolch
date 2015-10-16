@@ -225,8 +225,7 @@ public class XmlHelper {
 		try {
 
 			String docEncoding = document.getInputEncoding();
-			if (docEncoding == null || docEncoding.isEmpty()) {
-				XmlHelper.logger.info(MessageFormat.format("No encoding passed. Using default encoding {0}", encoding)); //$NON-NLS-1$
+			if (StringHelper.isEmpty(docEncoding)) {
 				docEncoding = encoding;
 			}
 
