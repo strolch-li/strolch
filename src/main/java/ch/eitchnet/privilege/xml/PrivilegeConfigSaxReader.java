@@ -32,8 +32,6 @@ import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
  */
 public class PrivilegeConfigSaxReader extends DefaultHandler {
 
-	// private static final Logger logger = LoggerFactory.getLogger(PrivilegeConfigSaxReader.class);
-
 	private Deque<ElementParser> buildersStack = new ArrayDeque<ElementParser>();
 
 	private PrivilegeContainerModel containerModel;
@@ -109,7 +107,8 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		private String currentElement;
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes)
+				throws SAXException {
 			if (qName.equals(XmlConstants.XML_CONTAINER)) {
 				this.currentElement = qName;
 			} else if (qName.equals(XmlConstants.XML_HANDLER_ENCRYPTION)) {
@@ -147,7 +146,8 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		private Map<String, String> parameterMap = new HashMap<String, String>();
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes)
+				throws SAXException {
 			if (qName.equals(XmlConstants.XML_PARAMETER)) {
 				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME);
 				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE);
@@ -168,7 +168,8 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 //	    <Policy name="DefaultPrivilege" class="ch.eitchnet.privilege.policy.DefaultPrivilege" />
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes)
+				throws SAXException {
 			if (qName.equals(XmlConstants.XML_POLICY)) {
 				String policyName = attributes.getValue(XmlConstants.XML_ATTR_NAME);
 				String policyClassName = attributes.getValue(XmlConstants.XML_ATTR_CLASS);

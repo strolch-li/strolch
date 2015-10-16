@@ -5,6 +5,10 @@
 
 		<Parameters>
 			<!-- parameters for the container itself -->
+			<Parameter name="secretKey" value="5185F447-6317-4856-B40E-573919BA0A16" />
+			<Parameter name="secretSalt" value="00F6E88C-A64F-410A-8FCF-9CD340E340F7" />
+			<Parameter name="persistSessions" value="true" />
+			<Parameter name="persistSessionsPath" value="./target/${target}/sessions.dat" />
 			<Parameter name="autoPersistOnUserChangesData" value="true" />
 			<Parameter name="privilegeConflictResolution" value="STRICT" />
 		</Parameters>
@@ -17,7 +21,7 @@
 
 		<PersistenceHandler class="ch.eitchnet.privilege.handler.XmlPersistenceHandler">
 			<Parameters>
-				<Parameter name="basePath" value="./target/testPrivilege" />
+				<Parameter name="basePath" value="./target/${target}" />
 				<Parameter name="modelXmlFile" value="PrivilegeModel.xml" />
 			</Parameters>
 		</PersistenceHandler>

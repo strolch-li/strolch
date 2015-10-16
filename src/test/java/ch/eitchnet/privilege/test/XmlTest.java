@@ -120,7 +120,7 @@ public class XmlTest {
 		assertNotNull(containerModel.getPersistenceHandlerClassName());
 		assertNotNull(containerModel.getPersistenceHandlerParameterMap());
 
-		assertEquals(2, containerModel.getParameterMap().size());
+		assertEquals(6, containerModel.getParameterMap().size());
 		assertEquals(3, containerModel.getPolicies().size());
 		assertEquals(1, containerModel.getEncryptionHandlerParameterMap().size());
 		assertEquals(2, containerModel.getPersistenceHandlerParameterMap().size());

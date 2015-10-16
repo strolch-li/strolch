@@ -18,7 +18,6 @@ package ch.eitchnet.privilege.model;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -40,15 +39,15 @@ public final class Certificate implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private final String sessionId;
-	private final Date loginTime;
 	private final String username;
 	private final String firstname;
 	private final String lastname;
+	private final UserState userState;
 	private final String authToken;
+	private final Date loginTime;
 
 	private final Set<String> userRoles;
 	private final Map<String, String> propertyMap;
-	private final Map<String, String> sessionDataMap;
 
 	private Locale locale;
 	private Date lastAccess;
@@ -79,8 +78,8 @@ public final class Certificate implements Serializable {
 	 *            a {@link Map} containing string value pairs of properties for the logged in user. These properties can
 	 *            be edited and can be used for the user to change settings of this session
 	 */
-	public Certificate(String sessionId, Date loginTime, String username, String firstname, String lastname,
-			String authToken, Locale locale, Set<String> userRoles, Map<String, String> propertyMap) {
+	public Certificate(String sessionId, String username, String firstname, String lastname, UserState userState,
+			String authToken, Date loginTime, Locale locale, Set<String> userRoles, Map<String, String> propertyMap) {
 
 		// validate arguments are not null
 		if (StringHelper.isEmpty(sessionId)) {
@@ -92,13 +91,17 @@ public final class Certificate implements Serializable {
 		if (StringHelper.isEmpty(authToken)) {
 			throw new PrivilegeException("authToken is null!"); //$NON-NLS-1$
 		}
+		if (userState == null) {
+			throw new PrivilegeException("userState is null!"); //$NON-NLS-1$
+		}
 
 		this.sessionId = sessionId;
-		this.loginTime = loginTime;
 		this.username = username;
 		this.firstname = firstname;
 		this.lastname = lastname;
+		this.userState = userState;
 		this.authToken = authToken;
+		this.loginTime = loginTime;
 
 		// if no locale is given, set default
 		if (locale == null)
@@ -112,7 +115,6 @@ public final class Certificate implements Serializable {
 			this.propertyMap = Collections.unmodifiableMap(propertyMap);
 
 		this.userRoles = Collections.unmodifiableSet(userRoles);
-		this.sessionDataMap = new HashMap<>();
 	}
 
 	/**
@@ -158,15 +160,6 @@ public final class Certificate implements Serializable {
 	}
 
 	/**
-	 * Returns a mutable {@link Map} for storing session relevant data
-	 * 
-	 * @return the sessionDataMap
-	 */
-	public Map<String, String> getSessionDataMap() {
-		return this.sessionDataMap;
-	}
-
-	/**
 	 * @return the locale
 	 */
 	public Locale getLocale() {
@@ -207,6 +200,13 @@ public final class Certificate implements Serializable {
 	 */
 	public String getLastname() {
 		return this.lastname;
+	}
+
+	/**
+	 * @return the userState
+	 */
+	public UserState getUserState() {
+		return userState;
 	}
 
 	/**

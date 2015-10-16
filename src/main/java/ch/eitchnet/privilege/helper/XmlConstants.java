@@ -49,6 +49,11 @@ public class XmlConstants {
 	public static final String XML_ROOT_PRIVILEGE_USERS_AND_ROLES = "UsersAndRoles";
 
 	/**
+	 * XML_ROOT_CERTIFICATES = "Certificates" :
+	 */
+	public static final String XML_ROOT_CERTIFICATES = "Certificates";
+
+	/**
 	 * XML_HANDLER_PERSISTENCE = "PersistenceHandler" :
 	 */
 	public static final String XML_HANDLER_PERSISTENCE = "PersistenceHandler";
@@ -77,6 +82,16 @@ public class XmlConstants {
 	 * XML_USERS = "Users" :
 	 */
 	public static final String XML_USERS = "Users";
+
+	/**
+	 * XML_CERTIFICATE = "Certificate" :
+	 */
+	public static final String XML_CERTIFICATE = "Certificate";
+
+	/**
+	 * XML_SESSION_DATA = "SessionData" :
+	 */
+	public static final String XML_SESSION_DATA = "SessionData";
 
 	/**
 	 * XML_USER = "User"
@@ -154,6 +169,16 @@ public class XmlConstants {
 	public static final String XML_ATTR_CLASS = "class";
 
 	/**
+	 * XML_ATTR_LOGIN_TIME = "loginTime" :
+	 */
+	public static final String XML_ATTR_LOGIN_TIME = "loginTime";
+
+	/**
+	 * XML_ATTR_LAST_ACCESS = "lastAccess" :
+	 */
+	public static final String XML_ATTR_LAST_ACCESS = "lastAccess";
+
+	/**
 	 * XML_ATTR_NAME = "name" :
 	 */
 	public static final String XML_ATTR_NAME = "name";
@@ -174,9 +199,24 @@ public class XmlConstants {
 	public static final String XML_ATTR_USER_ID = "userId";
 
 	/**
+	 * XML_ATTR_SESSION_ID = "sessionId" :
+	 */
+	public static final String XML_ATTR_SESSION_ID = "sessionId";
+
+	/**
 	 * XML_ATTR_USERNAME = "username" :
 	 */
 	public static final String XML_ATTR_USERNAME = "username";
+
+	/**
+	 * XML_ATTR_AUTH_TOKEN = "authToken" :
+	 */
+	public static final String XML_ATTR_AUTH_TOKEN = "authToken";
+
+	/**
+	 * XML_ATTR_LOCALE = "locale" :
+	 */
+	public static final String XML_ATTR_LOCALE = "locale";
 
 	/**
 	 * XML_ATTR_PASSWORD = "password" :

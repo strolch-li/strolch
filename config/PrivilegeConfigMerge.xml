@@ -17,7 +17,7 @@
 
 		<PersistenceHandler class="ch.eitchnet.privilege.handler.XmlPersistenceHandler">
 			<Parameters>
-				<Parameter name="basePath" value="./target/testPrivilege" />
+				<Parameter name="basePath" value="./target/${target}" />
 				<Parameter name="modelXmlFile" value="PrivilegeModelMerge.xml" />
 			</Parameters>
 		</PersistenceHandler>

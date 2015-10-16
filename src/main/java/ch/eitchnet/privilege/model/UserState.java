@@ -53,4 +53,8 @@ public enum UserState {
 	 * This is the System user state which is special and thus exempted from normal uses
 	 */
 	SYSTEM;
+
+	public boolean isSystem() {
+		return this == UserState.SYSTEM;
+	}
 }

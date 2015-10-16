@@ -56,6 +56,11 @@ public interface PrivilegeHandler {
 	 */
 	public static final String PRIVILEGE_ACTION_PERSIST = "Persist";
 	/**
+	 * For Privilege "PrivilegeAction" value required to be able to persist session if not exempted by
+	 * <code>allAllowed</code>
+	 */
+	public static final String PRIVILEGE_ACTION_PERSIST_SESSIONS = "PersistSessions";
+	/**
 	 * For Privilege "PrivilegeAction" value required to be able to reload changes if not exempted by
 	 * <code>allAllowed</code>
 	 */
@@ -65,6 +70,14 @@ public interface PrivilegeHandler {
 	 * <code>allAllowed</code>
 	 */
 	public static final String PRIVILEGE_ACTION_GET_POLICIES = "GetPolicies";
+	/**
+	 * For Privilege "PrivilegeAction" value required to get a certificate if not <code>allAllowed</code>
+	 */
+	public static final String PRIVILEGE_ACTION_GET_CERTIFICATE = "GetCertificate";
+	/**
+	 * For Privilege "PrivilegeAction" value required to get all certificates if not <code>allAllowed</code>
+	 */
+	public static final String PRIVILEGE_ACTION_GET_CERTIFICATES = "GetCertificates";
 
 	///
 
@@ -132,9 +145,29 @@ public interface PrivilegeHandler {
 	///
 
 	/**
+	 * configuration parameter to define a secret_key
+	 */
+	public static final String PARAM_SECRET_KEY = "secretKey"; //$NON-NLS-1$
+
+	/**
+	 * configuration parameter to define a secret salt
+	 */
+	public static final String PARAM_SECRET_SALT = "secretSalt"; //$NON-NLS-1$
+
+	/**
 	 * configuration parameter to define automatic persisting on password change
 	 */
 	public static final String PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA = "autoPersistOnUserChangesData"; //$NON-NLS-1$
+
+	/**
+	 * configuration parameter to define if sessions should be persisted
+	 */
+	public static final String PARAM_PERSIST_SESSIONS = "persistSessions"; //$NON-NLS-1$
+
+	/**
+	 * configuration parameter to define where sessions are to be persisted
+	 */
+	public static final String PARAM_PERSIST_SESSIONS_PATH = "persistSessionsPath"; //$NON-NLS-1$
 
 	/**
 	 * configuration parameter to define {@link PrivilegeConflictResolution}
@@ -174,6 +207,16 @@ public interface PrivilegeHandler {
 	 * @return the map of {@link PrivilegePolicy} definitions
 	 */
 	public Map<String, String> getPolicyDefs(Certificate certificate);
+
+	/**
+	 * Returns the list of {@link Certificate Certificates}
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
+	 * 
+	 * @return the list of {@link Certificate Certificates}
+	 */
+	public List<Certificate> getCertificates(Certificate certificate);
 
 	/**
 	 * Returns all {@link RoleRep RoleReps}
@@ -606,6 +649,19 @@ public interface PrivilegeHandler {
 	 *             if the users of the given certificate does not have the privilege to perform this action
 	 */
 	public boolean persist(Certificate certificate) throws AccessDeniedException;
+
+	/**
+	 * Persists all currently active sessions
+	 * 
+	 * @param certificate
+	 *            the {@link Certificate} of the user which has the privilege to perform this action
+	 * 
+	 * @return true if changes were persisted, false if not (i.e. not enabled)
+	 * 
+	 * @throws AccessDeniedException
+	 *             if the users of the given certificate does not have the privilege to perform this action
+	 */
+	public boolean persistSessions(Certificate certificate) throws AccessDeniedException;
 
 	/**
 	 * Special method to perform work as a System user, meaning the given systemUsername corresponds to an account which

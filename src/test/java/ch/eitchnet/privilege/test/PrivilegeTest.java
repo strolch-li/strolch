@@ -17,10 +17,8 @@ package ch.eitchnet.privilege.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,10 +40,8 @@ import org.slf4j.LoggerFactory;
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.PrivilegeHandler;
-import ch.eitchnet.privilege.helper.PrivilegeInitializationHelper;
 import ch.eitchnet.privilege.i18n.PrivilegeMessages;
 import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.PrivilegeRep;
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.privilege.model.RoleRep;
@@ -55,7 +51,6 @@ import ch.eitchnet.privilege.test.model.TestRestrictable;
 import ch.eitchnet.privilege.test.model.TestSystemUserAction;
 import ch.eitchnet.privilege.test.model.TestSystemUserActionDeny;
 import ch.eitchnet.utils.helper.ArraysHelper;
-import ch.eitchnet.utils.helper.FileHelper;
 
 /**
  * JUnit for performing Privilege tests. This JUnit is by no means complete, but checks the bare minimum.br />
@@ -65,7 +60,7 @@ import ch.eitchnet.utils.helper.FileHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
-public class PrivilegeTest {
+public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	private static final String ROLE_PRIVILEGE_ADMIN = "PrivilegeAdmin";
 	private static final String PRIVILEGE_USER_ACCESS = "UserAccessPrivilege";
@@ -91,96 +86,20 @@ public class PrivilegeTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
-	private static PrivilegeHandler privilegeHandler;
-	private PrivilegeContext ctx;
-
 	@BeforeClass
 	public static void init() throws Exception {
-		try {
-			destroy();
-
-			// copy configuration to tmp
-			String pwd = System.getProperty("user.dir");
-
-			File origPrivilegeModelFile = new File(pwd + "/config/PrivilegeModel.xml");
-			File tmpPrivilegeModelFile = new File(pwd + "/target/testPrivilege/PrivilegeModel.xml");
-			if (tmpPrivilegeModelFile.exists() && !tmpPrivilegeModelFile.delete()) {
-				throw new RuntimeException("Tmp configuration still exists and can not be deleted at "
-						+ tmpPrivilegeModelFile.getAbsolutePath());
-			}
-
-			File parentFile = tmpPrivilegeModelFile.getParentFile();
-			if (!parentFile.exists()) {
-				if (!parentFile.mkdirs())
-					throw new RuntimeException("Could not create parent for tmp " + tmpPrivilegeModelFile);
-			}
-
-			if (!FileHelper.copy(origPrivilegeModelFile, tmpPrivilegeModelFile, true))
-				throw new RuntimeException("Failed to copy " + origPrivilegeModelFile + " to " + tmpPrivilegeModelFile);
-
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-
-			throw new RuntimeException("Initialization failed: " + e.getLocalizedMessage(), e);
-		}
+		removeConfigs(PrivilegeTest.class.getSimpleName());
+		prepareConfigs(PrivilegeTest.class.getSimpleName(), "PrivilegeConfig.xml", "PrivilegeModel.xml");
 	}
 
 	@AfterClass
 	public static void destroy() throws Exception {
-
-		// delete temporary file
-		String pwd = System.getProperty("user.dir");
-
-		File tmpPrivilegeModelFile = new File(pwd + "/target/testPrivilege/PrivilegeModel.xml");
-		if (tmpPrivilegeModelFile.exists() && !tmpPrivilegeModelFile.delete()) {
-			throw new RuntimeException("Tmp configuration still exists and can not be deleted at "
-					+ tmpPrivilegeModelFile.getAbsolutePath());
-		}
-
-		// and temporary parent
-		File parentFile = tmpPrivilegeModelFile.getParentFile();
-		if (parentFile.exists() && !parentFile.delete()) {
-			throw new RuntimeException("Could not remove temporary parent for tmp " + tmpPrivilegeModelFile);
-		}
+		removeConfigs(PrivilegeTest.class.getSimpleName());
 	}
 
 	@Before
 	public void setup() throws Exception {
-		try {
-
-			String pwd = System.getProperty("user.dir");
-
-			File privilegeConfigFile = new File(pwd + "/config/PrivilegeConfig.xml");
-
-			// initialize privilege
-			privilegeHandler = PrivilegeInitializationHelper.initializeFromXml(privilegeConfigFile);
-
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-
-			throw new RuntimeException("Setup failed: " + e.getLocalizedMessage(), e);
-		}
-	}
-
-	private void login(String username, byte[] password) {
-		Certificate certificate = privilegeHandler.authenticate(username, password);
-		assertTrue("Certificate is null!", certificate != null);
-		PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
-		this.ctx = privilegeContext;
-	}
-
-	private void logout() {
-		if (this.ctx != null) {
-			try {
-				PrivilegeContext privilegeContext = this.ctx;
-				this.ctx = null;
-				privilegeHandler.invalidateSession(privilegeContext.getCertificate());
-			} catch (PrivilegeException e) {
-				String msg = "There is no PrivilegeContext currently bound to the ThreadLocal!";
-				if (!e.getMessage().equals(msg))
-					throw e;
-			}
-		}
+		initialize(PrivilegeTest.class.getSimpleName(), "PrivilegeConfig.xml");
 	}
 
 	@Test
@@ -258,8 +177,8 @@ public class PrivilegeTest {
 	@Test
 	public void testPerformSystemRestrictableFailPrivilege() throws Exception {
 		this.exception.expect(PrivilegeException.class);
-		this.exception
-				.expectMessage("User system_admin does not have the privilege ch.eitchnet.privilege.handler.SystemUserAction");
+		this.exception.expectMessage(
+				"User system_admin does not have the privilege ch.eitchnet.privilege.handler.SystemUserAction");
 		try {
 			// create the action to be performed as a system user
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
@@ -277,8 +196,8 @@ public class PrivilegeTest {
 	@Test
 	public void testPerformSystemRestrictableFailNoAdditionalPrivilege() throws Exception {
 		this.exception.expect(PrivilegeException.class);
-		this.exception
-				.expectMessage("User system_admin2 does not have the privilege ch.eitchnet.privilege.handler.SystemUserAction needed for Restrictable ch.eitchnet.privilege.test.model.TestSystemUserActionDeny");
+		this.exception.expectMessage(
+				"User system_admin2 does not have the privilege ch.eitchnet.privilege.handler.SystemUserAction needed for Restrictable ch.eitchnet.privilege.test.model.TestSystemUserActionDeny");
 		try {
 			// create the action to be performed as a system user
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
@@ -398,8 +317,8 @@ public class PrivilegeTest {
 
 			Certificate certificate = this.ctx.getCertificate();
 
-			UserRep selectorRep = new UserRep(null, null, null, null, null, new HashSet<>(
-					Arrays.asList("PrivilegeAdmin")), null, null);
+			UserRep selectorRep = new UserRep(null, null, null, null, null,
+					new HashSet<>(Arrays.asList("PrivilegeAdmin")), null, null);
 			List<UserRep> users = privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(1, users.size());
 			assertEquals(ADMIN, users.get(0).getUsername());
@@ -590,8 +509,8 @@ public class PrivilegeTest {
 
 			PrivilegeRep passwordRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD,
 					PRIVILEGE_USER_ACCESS, false, Collections.emptySet(), Collections.emptySet());
-			PrivilegeRep localeRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE,
-					PRIVILEGE_USER_ACCESS, false, Collections.emptySet(), Collections.emptySet());
+			PrivilegeRep localeRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE, PRIVILEGE_USER_ACCESS,
+					false, Collections.emptySet(), Collections.emptySet());
 
 			RoleRep roleRep = new RoleRep(ROLE_CHANGE_PW, Arrays.asList(passwordRep, localeRep));
 
@@ -818,8 +737,8 @@ public class PrivilegeTest {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
 			// let's add a new user bob
-			UserRep userRep = new UserRep(null, BOB, "Bob", "Newman", UserState.NEW, new HashSet<String>(
-					Arrays.asList(ROLE_MY)), null, new HashMap<String, String>());
+			UserRep userRep = new UserRep(null, BOB, "Bob", "Newman", UserState.NEW,
+					new HashSet<String>(Arrays.asList(ROLE_MY)), null, new HashMap<String, String>());
 			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + BOB);
