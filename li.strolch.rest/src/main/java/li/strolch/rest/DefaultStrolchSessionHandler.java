@@ -33,13 +33,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
-
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchComponent;
-import li.strolch.exception.StrolchException;
-import li.strolch.rest.model.UserSession;
-import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.privilege.PrivilegeHandler;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +44,12 @@ import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.privilege.model.SimpleRestrictable;
 import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.exception.StrolchException;
+import li.strolch.rest.model.UserSession;
+import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -57,17 +57,15 @@ import ch.eitchnet.utils.dbc.DBC;
 public class DefaultStrolchSessionHandler extends StrolchComponent implements StrolchSessionHandler {
 
 	public static final String PARAM_SESSION_TTL_MINUTES = "session.ttl.minutes"; //$NON-NLS-1$
+	public static final String PARAM_SESSION_RELOAD_SESSIONS = "session.reload"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultStrolchSessionHandler.class);
 	private PrivilegeHandler privilegeHandler;
 	private Map<String, Certificate> certificateMap;
+	private boolean reloadSessions;
 	private long sessionTtl;
 	private Timer sessionTimeoutTimer;
 
-	/**
-	 * @param container
-	 * @param componentName
-	 */
 	public DefaultStrolchSessionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
@@ -75,6 +73,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 		this.sessionTtl = TimeUnit.MINUTES.toMillis(configuration.getInt(PARAM_SESSION_TTL_MINUTES, 30));
+		this.reloadSessions = configuration.getBoolean(PARAM_SESSION_RELOAD_SESSIONS, false);
 		super.initialize(configuration);
 	}
 
@@ -82,6 +81,21 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	public void start() throws Exception {
 		this.privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
 		this.certificateMap = Collections.synchronizedMap(new HashMap<>());
+
+		if (this.reloadSessions) {
+			List<Certificate> certificates = runPrivileged(ctx -> {
+				Certificate cert = ctx.getCertificate();
+				return this.privilegeHandler.getPrivilegeHandler(cert).getCertificates(cert).stream()
+						.filter(c -> !c.getUserState().isSystem()).collect(Collectors.toList());
+			});
+			for (Certificate certificate : certificates) {
+				this.certificateMap.put(certificate.getAuthToken(), certificate);
+			}
+
+			checkSessionsForTimeout();
+			logger.info("Restored " + certificates.size() + " sessions of which "
+					+ (certificates.size() - this.certificateMap.size()) + " had timed out and were removed.");
+		}
 
 		this.sessionTimeoutTimer = new Timer("SessionTimeoutTimer", true); //$NON-NLS-1$
 		long checkInterval = TimeUnit.MINUTES.toMillis(1);
@@ -92,7 +106,12 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public void stop() throws Exception {
-		if (this.certificateMap != null) {
+		if (this.reloadSessions) {
+
+			runPrivileged(ctx -> getContainer().getPrivilegeHandler().getPrivilegeHandler(ctx.getCertificate())
+					.persistSessions(ctx.getCertificate()));
+
+		} else if (this.certificateMap != null) {
 			synchronized (this.certificateMap) {
 				for (Certificate certificate : this.certificateMap.values()) {
 					this.privilegeHandler.invalidateSession(certificate);
@@ -198,23 +217,26 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		@Override
 		public void run() {
+			checkSessionsForTimeout();
+		}
+	}
 
-			Map<String, Certificate> map = getCertificateMap();
-			Map<String, Certificate> certificateMap;
-			synchronized (map) {
-				certificateMap = new HashMap<>(map);
-			}
+	private void checkSessionsForTimeout() {
+		Map<String, Certificate> map = getCertificateMap();
+		Map<String, Certificate> certificateMap;
+		synchronized (map) {
+			certificateMap = new HashMap<>(map);
+		}
 
-			LocalDateTime timeOutTime = LocalDateTime.now().minus(sessionTtl, ChronoUnit.MILLIS);
-			ZoneId systemDefault = ZoneId.systemDefault();
+		LocalDateTime timeOutTime = LocalDateTime.now().minus(sessionTtl, ChronoUnit.MILLIS);
+		ZoneId systemDefault = ZoneId.systemDefault();
 
-			for (Certificate certificate : certificateMap.values()) {
-				Instant lastAccess = certificate.getLastAccess().toInstant();
-				if (timeOutTime.isAfter(LocalDateTime.ofInstant(lastAccess, systemDefault))) {
-					String msg = "Session {0} for user {1} has expired, invalidating session..."; //$NON-NLS-1$
-					logger.info(MessageFormat.format(msg, certificate.getAuthToken(), certificate.getUsername()));
-					sessionTimeout(certificate);
-				}
+		for (Certificate certificate : certificateMap.values()) {
+			Instant lastAccess = certificate.getLastAccess().toInstant();
+			if (timeOutTime.isAfter(LocalDateTime.ofInstant(lastAccess, systemDefault))) {
+				String msg = "Session {0} for user {1} has expired, invalidating session..."; //$NON-NLS-1$
+				logger.info(MessageFormat.format(msg, certificate.getSessionId(), certificate.getUsername()));
+				sessionTimeout(certificate);
 			}
 		}
 	}

@@ -3,10 +3,19 @@ package li.strolch.runtime.privilege;
 import ch.eitchnet.privilege.handler.SystemUserAction;
 import ch.eitchnet.privilege.model.PrivilegeContext;
 import li.strolch.service.api.AbstractService;
+import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 
+/**
+ * {@link SystemUserAction} to run a {@link Service} as a system user
+ * 
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ *
+ * @param <T>
+ * @param <U>
+ */
 public class RunAsAgent<T extends ServiceArgument, U extends ServiceResult> extends SystemUserAction {
 
 	private ServiceHandler svcHandler;

@@ -23,12 +23,6 @@ import static org.junit.Assert.assertThat;
 import java.util.Date;
 import java.util.HashSet;
 
-import li.strolch.service.api.ServiceResult;
-import li.strolch.service.test.model.GreetingResult;
-import li.strolch.service.test.model.GreetingService;
-import li.strolch.service.test.model.GreetingService.GreetingArgument;
-import li.strolch.service.test.model.TestService;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -36,6 +30,12 @@ import org.junit.rules.ExpectedException;
 import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.privilege.model.UserState;
+import li.strolch.service.api.ServiceResult;
+import li.strolch.service.test.model.GreetingResult;
+import li.strolch.service.test.model.GreetingService;
+import li.strolch.service.test.model.GreetingService.GreetingArgument;
+import li.strolch.service.test.model.TestService;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -57,15 +57,15 @@ public class ServiceTest extends AbstractServiceTest {
 		this.thrown.expect(PrivilegeException.class);
 		TestService testService = new TestService();
 		getServiceHandler().doService(
-				new Certificate(null, new Date(), null, null, null, null, null, new HashSet<String>(), null),
+				new Certificate(null, null, null, null, null, null, new Date(), null, new HashSet<String>(), null),
 				testService);
 	}
 
 	@Test
 	public void shouldFailInvalidCertificate2() {
 		TestService testService = new TestService();
-		Certificate badCert = new Certificate(
-				"1", new Date(), "bob", "Bob", "Brown", "dsdf", null, new HashSet<String>(), null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+		Certificate badCert = new Certificate("1", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf", new Date(), null, //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+				new HashSet<String>(), null);
 		ServiceResult svcResult = getServiceHandler().doService(badCert, testService);
 		assertThat(svcResult.getThrowable(), instanceOf(AccessDeniedException.class));
 	}

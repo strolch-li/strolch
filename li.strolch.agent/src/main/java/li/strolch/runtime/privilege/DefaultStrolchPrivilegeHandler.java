@@ -95,6 +95,17 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			try (FileInputStream inputStream = new FileInputStream(privilegeXmlFile)) {
 				XmlHelper.parseDocument(inputStream, xmlHandler);
 
+				Map<String, String> parameterMap = containerModel.getParameterMap();
+
+				// set sessions data path
+				if (Boolean.valueOf(
+						parameterMap.get(ch.eitchnet.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS))) {
+					String sessionsPath = new File(configuration.getRuntimeConfiguration().getDataPath(),
+							"sessions.dat").getAbsolutePath();
+					parameterMap.put(ch.eitchnet.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH,
+							sessionsPath);
+				}
+
 				// set base path
 				if (containerModel.getPersistenceHandlerClassName().equals(XmlPersistenceHandler.class.getName())) {
 					Map<String, String> xmlParams = containerModel.getPersistenceHandlerParameterMap();
@@ -144,7 +155,6 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 	@Override
 	public boolean invalidateSession(Certificate certificate) {
-		assertContainerStarted();
 		boolean invalidateSession = this.privilegeHandler.invalidateSession(certificate);
 		StrolchRealm realm = getContainer().getRealm(certificate);
 		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.LOGOUT)) {
@@ -185,7 +195,6 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	@Override
 	public ch.eitchnet.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
 			throws PrivilegeException {
-		assertContainerStarted();
 		return this.privilegeHandler;
 	}
 }
