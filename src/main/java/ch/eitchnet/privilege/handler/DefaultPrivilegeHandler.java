@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.base.AccessDeniedException;
+import ch.eitchnet.privilege.base.InvalidCredentialsException;
 import ch.eitchnet.privilege.base.PrivilegeConflictResolution;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
@@ -1141,8 +1142,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * 
 	 * @throws AccessDeniedException
 	 *             if anything is wrong with the credentials or the user state
+	 * @throws InvalidCredentialsException
+	 *             if the given credentials are invalid, the user does not exist, or has no password set
 	 */
-	private User checkCredentialsAndUserState(String username, byte[] password) throws AccessDeniedException {
+	private User checkCredentialsAndUserState(String username, byte[] password)
+			throws InvalidCredentialsException, AccessDeniedException {
 
 		// and validate the password
 		validatePassword(password);
@@ -1155,14 +1159,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// no user means no authentication
 		if (user == null) {
 			String msg = MessageFormat.format("There is no user defined with the username {0}", username); //$NON-NLS-1$
-			throw new AccessDeniedException(msg);
+			throw new InvalidCredentialsException(msg);
 		}
 
 		// make sure not a system user - they may not login in
 		if (user.getUserState() == UserState.SYSTEM) {
 			String msg = "User {0} is a system user and may not login!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, username);
-			throw new AccessDeniedException(msg);
+			throw new InvalidCredentialsException(msg);
 		}
 
 		// validate password
@@ -1171,7 +1175,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new AccessDeniedException(
 					MessageFormat.format("User {0} has no password and may not login!", username)); //$NON-NLS-1$
 		if (!pwHash.equals(passwordHash))
-			throw new AccessDeniedException(MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
+			throw new InvalidCredentialsException(MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
 
 		// validate if user is allowed to login
 		// this also capture the trying to login of SYSTEM user
@@ -1180,6 +1184,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			msg = MessageFormat.format(msg, username, UserState.ENABLED);
 			throw new AccessDeniedException(msg);
 		}
+
 		return user;
 	}
 
