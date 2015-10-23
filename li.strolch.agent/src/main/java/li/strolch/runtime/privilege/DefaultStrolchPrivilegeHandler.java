@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import ch.eitchnet.privilege.base.AccessDeniedException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.handler.DefaultPrivilegeHandler;
 import ch.eitchnet.privilege.handler.EncryptionHandler;
@@ -37,7 +36,6 @@ import ch.eitchnet.utils.helper.XmlHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.exception.StrolchException;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -125,20 +123,16 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	@Override
 	public Certificate authenticate(String username, byte[] password) {
 		assertContainerStarted();
-		try {
-			Certificate certificate = this.privilegeHandler.authenticate(username, password);
-			StrolchRealm realm = getContainer().getRealm(certificate);
-			try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.LOGIN)) {
-				tx.setSuppressDoNothingLogging(true);
-				tx.setSuppressAudits(true);
-				Audit audit = tx.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE,
-						StrolchPrivilegeConstants.CERTIFICATE, username);
-				tx.getAuditTrail().add(tx, audit);
-			}
-			return certificate;
-		} catch (AccessDeniedException e) {
-			throw new StrolchException("Authentication credentials are invalid", e); //$NON-NLS-1$
+		Certificate certificate = this.privilegeHandler.authenticate(username, password);
+		StrolchRealm realm = getContainer().getRealm(certificate);
+		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.LOGIN)) {
+			tx.setSuppressDoNothingLogging(true);
+			tx.setSuppressAudits(true);
+			Audit audit = tx.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE,
+					StrolchPrivilegeConstants.CERTIFICATE, username);
+			tx.getAuditTrail().add(tx, audit);
 		}
+		return certificate;
 	}
 
 	@Override

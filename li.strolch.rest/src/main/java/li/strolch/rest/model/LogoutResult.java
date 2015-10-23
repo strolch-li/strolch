@@ -30,8 +30,8 @@ public class LogoutResult {
 	@XmlAttribute(name = "username")
 	private String username;
 
-	@XmlAttribute(name = "sessionId")
-	private String sessionId;
+	@XmlAttribute(name = "authToken")
+	private String authToken;
 
 	@XmlAttribute(name = "msg")
 	private String msg;
@@ -71,17 +71,17 @@ public class LogoutResult {
 	}
 
 	/**
-	 * @return the sessionId
+	 * @return the authToken
 	 */
 	public String getSessionId() {
-		return this.sessionId;
+		return this.authToken;
 	}
 
 	/**
-	 * @param sessionId
-	 *            the sessionId to set
+	 * @param authToken
+	 *            the authToken to set
 	 */
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
+	public void setAuthToken(String authToken) {
+		this.authToken = authToken;
 	}
 }

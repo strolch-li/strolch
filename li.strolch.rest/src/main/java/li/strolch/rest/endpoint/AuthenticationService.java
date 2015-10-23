@@ -22,6 +22,7 @@ import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -35,7 +36,11 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import ch.eitchnet.privilege.base.AccessDeniedException;
+import ch.eitchnet.privilege.base.InvalidCredentialsException;
 import ch.eitchnet.privilege.base.PrivilegeException;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.privilege.model.IPrivilege;
@@ -111,6 +116,10 @@ public class AuthenticationService {
 					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken())//
 					.build();
 
+		} catch (InvalidCredentialsException e) {
+			logger.error(e.getMessage(), e);
+			loginResult.setMsg("Could not log in as the given credentials are invalid"); //$NON-NLS-1$
+			return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
 			loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
@@ -130,8 +139,8 @@ public class AuthenticationService {
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{sessionId}")
-	public Response logout(@PathParam("sessionId") String sessionId) {
+	@Path("{authToken}")
+	public Response logout(@PathParam("authToken") String authToken) {
 
 		LogoutResult logoutResult = new LogoutResult();
 
@@ -139,11 +148,11 @@ public class AuthenticationService {
 
 			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance()
 					.getComponent(StrolchSessionHandler.class);
-			Certificate certificate = sessionHandlerHandler.validate(sessionId);
+			Certificate certificate = sessionHandlerHandler.validate(authToken);
 			sessionHandlerHandler.invalidate(certificate);
 
 			logoutResult.setUsername(certificate.getUsername());
-			logoutResult.setSessionId(sessionId);
+			logoutResult.setAuthToken(authToken);
 			logoutResult.setMsg(MessageFormat.format("{0} has been logged out.", certificate.getUsername())); //$NON-NLS-1$
 			return Response.ok().entity(logoutResult).build();
 
@@ -156,6 +165,36 @@ public class AuthenticationService {
 			String msg = e.getMessage();
 			logoutResult.setMsg(MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
 			return Response.serverError().entity(logoutResult).build();
+		}
+	}
+
+	@HEAD
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{authToken}")
+	public Response validateSessions(@PathParam("authToken") String authToken) {
+
+		try {
+
+			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance()
+					.getComponent(StrolchSessionHandler.class);
+			sessionHandlerHandler.validate(authToken);
+
+			return Response.ok().build();
+
+		} catch (StrolchException | PrivilegeException e) {
+			logger.error(e.getMessage(), e);
+			JsonObject root = new JsonObject();
+			root.addProperty("msg", MessageFormat.format("Session invalid: {0}", e.getMessage()));
+			String json = new Gson().toJson(root);
+			return Response.status(Status.UNAUTHORIZED).entity(json).build();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			String msg = e.getMessage();
+			JsonObject root = new JsonObject();
+			root.addProperty("msg", MessageFormat.format("Session invalid: {0}: {1}", e.getClass().getName(), msg));
+			String json = new Gson().toJson(root);
+			return Response.serverError().entity(json).build();
 		}
 	}
 }
