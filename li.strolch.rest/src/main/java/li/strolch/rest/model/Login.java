@@ -30,7 +30,7 @@ public class Login {
 	@XmlAttribute
 	private String username;
 	@XmlAttribute
-	private String password;
+	private byte[] password;
 
 	public Login() {
 		// no-arg constructor for JAXB
@@ -54,7 +54,7 @@ public class Login {
 	/**
 	 * @return the password
 	 */
-	public String getPassword() {
+	public byte[] getPassword() {
 		return this.password;
 	}
 
@@ -62,7 +62,7 @@ public class Login {
 	 * @param password
 	 *            the password to set
 	 */
-	public void setPassword(String password) {
+	public void setPassword(byte[] password) {
 		this.password = password;
 	}
 }

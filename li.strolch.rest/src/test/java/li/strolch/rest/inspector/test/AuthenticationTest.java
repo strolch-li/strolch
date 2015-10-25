@@ -29,12 +29,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
 import li.strolch.rest.model.LogoutResult;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -51,7 +51,7 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		// login
 		Login login = new Login();
 		login.setUsername("jill");
-		login.setPassword("jill");
+		login.setPassword("jill".getBytes());
 		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
 		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(loginEntity);
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
@@ -77,7 +77,7 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		// login
 		Login login = new Login();
 		login.setUsername("jill");
-		login.setPassword("jill");
+		login.setPassword("jill".getBytes());
 		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
 		Builder builder = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON);
 		builder = builder.acceptLanguage(Locale.ITALY);
@@ -106,7 +106,7 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		// login
 		Login login = new Login();
 		login.setUsername("admin");
-		login.setPassword("blalba");
+		login.setPassword("blalba".getBytes());
 		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
 		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(loginEntity);
 		assertEquals(Status.FORBIDDEN.getStatusCode(), result.getStatus());
@@ -121,7 +121,7 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		// login
 		Login login = new Login();
 		login.setUsername("jill");
-		login.setPassword("jill");
+		login.setPassword("jill".getBytes());
 		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
 		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(loginEntity);
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());

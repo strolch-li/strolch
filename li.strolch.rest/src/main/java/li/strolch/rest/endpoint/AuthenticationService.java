@@ -75,7 +75,7 @@ public class AuthenticationService {
 			if (StringHelper.isEmpty(login.getUsername()) || login.getUsername().length() < 2) {
 				sb.append("Username was not given or is too short!"); //$NON-NLS-1$
 			}
-			if (StringHelper.isEmpty(login.getPassword()) || login.getPassword().length() < 3) {
+			if (login.getPassword() == null || login.getPassword().length < 3) {
 				if (sb.length() > 0)
 					sb.append("\n");
 				sb.append("Password was not given or was too short!"); //$NON-NLS-1$
@@ -88,7 +88,7 @@ public class AuthenticationService {
 
 			RestfulStrolchComponent restfulStrolchComponent = RestfulStrolchComponent.getInstance();
 			StrolchSessionHandler sessionHandler = restfulStrolchComponent.getComponent(StrolchSessionHandler.class);
-			Certificate certificate = sessionHandler.authenticate(login.getUsername(), login.getPassword().getBytes());
+			Certificate certificate = sessionHandler.authenticate(login.getUsername(), login.getPassword());
 
 			PrivilegeHandler privilegeHandler = restfulStrolchComponent.getContainer().getPrivilegeHandler();
 			PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
