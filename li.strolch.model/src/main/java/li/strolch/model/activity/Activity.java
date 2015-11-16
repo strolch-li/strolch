@@ -27,11 +27,11 @@ import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 
 /**
@@ -47,7 +47,7 @@ public class Activity extends GroupedParameterizedElement
 
 	protected Activity parent;
 	protected Map<String, IActivityElement> elements;
-	private PolicyDefs policyDefs;
+	protected PolicyDefs policyDefs;
 
 	/**
 	 * Empty constructor - for marshalling only!

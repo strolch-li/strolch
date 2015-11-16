@@ -102,5 +102,4 @@ public class AString implements Serializable {
 		sb.append("]");
 		return sb.toString();
 	}
-
 }

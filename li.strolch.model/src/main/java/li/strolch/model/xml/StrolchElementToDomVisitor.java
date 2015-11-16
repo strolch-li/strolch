@@ -86,25 +86,6 @@ public class StrolchElementToDomVisitor {
 		return asDom;
 	}
 
-	private void fillElement(Element asDom, PolicyDefs policyDefs) {
-		if (policyDefs == null || !policyDefs.hasPolicyDefs())
-			return;
-
-		Element policiesElem = this.document.createElement(Tags.POLICIES);
-
-		for (String type : policyDefs.getPolicyTypes()) {
-			PolicyDef policyDef = policyDefs.getPolicyDef(type);
-
-			Element policyElem = this.document.createElement(Tags.POLICY);
-			policyElem.setAttribute(Tags.TYPE, policyDef.getType());
-			policyElem.setAttribute(Tags.VALUE, policyDef.getValueForXml());
-
-			policiesElem.appendChild(policyElem);
-		}
-
-		asDom.appendChild(policiesElem);
-	}
-
 	protected Element toDom(Activity activity) {
 		Element element = document.createElement(Tags.ACTIVITY);
 		fillElement(element, activity);
@@ -136,6 +117,9 @@ public class StrolchElementToDomVisitor {
 		element.setAttribute(Tags.RESOURCE_ID, action.getResourceId());
 		element.setAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
 		element.setAttribute(Tags.STATE, action.getState().name());
+
+		if (action.hasPolicyDefs())
+			fillElement(element, action.getPolicyDefs());
 
 		if (action.hasChanges()) {
 			Iterator<IValueChange<? extends IValue<?>>> iter = action.changesIterator();
@@ -250,4 +234,22 @@ public class StrolchElementToDomVisitor {
 		}
 	}
 
+	protected void fillElement(Element asDom, PolicyDefs policyDefs) {
+		if (policyDefs == null || !policyDefs.hasPolicyDefs())
+			return;
+
+		Element policiesElem = this.document.createElement(Tags.POLICIES);
+
+		for (String type : policyDefs.getPolicyTypes()) {
+			PolicyDef policyDef = policyDefs.getPolicyDef(type);
+
+			Element policyElem = this.document.createElement(Tags.POLICY);
+			policyElem.setAttribute(Tags.TYPE, policyDef.getType());
+			policyElem.setAttribute(Tags.VALUE, policyDef.getValueForXml());
+
+			policiesElem.appendChild(policyElem);
+		}
+
+		asDom.appendChild(policiesElem);
+	}
 }

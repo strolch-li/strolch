@@ -14,5 +14,9 @@
 			<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
 			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
 		</ParameterBag>
+		<Policies>
+			<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
+			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
+		</Policies>
 	</Order>
 </StrolchModel>

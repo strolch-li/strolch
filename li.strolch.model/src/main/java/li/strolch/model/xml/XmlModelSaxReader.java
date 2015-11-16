@@ -307,6 +307,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 				((Order) this.parameterizedElement).setPolicyDefs(this.policies);
 			} else if (this.parameterizedElement instanceof Activity) {
 				((Activity) this.parameterizedElement).setPolicyDefs(this.policies);
+			} else if (this.parameterizedElement instanceof Action) {
+				((Action) this.parameterizedElement).setPolicyDefs(this.policies);
 			} else {
 				throw new StrolchPolicyException(
 						"Policies are currently not allowed on " + this.parameterizedElement.getClass());

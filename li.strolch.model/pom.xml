@@ -28,6 +28,12 @@
 	</scm>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>ch.eitchnet</groupId>
 			<artifactId>ch.eitchnet.utils</artifactId>

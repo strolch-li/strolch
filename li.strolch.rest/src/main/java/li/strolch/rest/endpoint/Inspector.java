@@ -36,12 +36,17 @@ import javax.ws.rs.core.Response;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.xml.sax.InputSource;
+
+import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.json.OrderToJsonVisitor;
+import li.strolch.model.json.ResourceToJsonVisitor;
 import li.strolch.model.xml.OrderToXmlStringVisitor;
 import li.strolch.model.xml.ResourceToXmlStringVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
@@ -54,11 +59,9 @@ import li.strolch.rest.model.AgentOverview;
 import li.strolch.rest.model.ElementMapOverview;
 import li.strolch.rest.model.ElementMapType;
 import li.strolch.rest.model.ElementMapsOverview;
-import li.strolch.rest.model.OrderDetail;
 import li.strolch.rest.model.OrderOverview;
 import li.strolch.rest.model.RealmDetail;
 import li.strolch.rest.model.RealmOverview;
-import li.strolch.rest.model.ResourceDetail;
 import li.strolch.rest.model.ResourceOverview;
 import li.strolch.rest.model.Result;
 import li.strolch.rest.model.StrolchElementOverview;
@@ -70,10 +73,6 @@ import li.strolch.service.UpdateResourceService;
 import li.strolch.service.UpdateResourceService.UpdateResourceArg;
 import li.strolch.service.api.ServiceResult;
 
-import org.xml.sax.InputSource;
-
-import ch.eitchnet.privilege.model.Certificate;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -81,8 +80,8 @@ import ch.eitchnet.privilege.model.Certificate;
 public class Inspector {
 
 	private StrolchTransaction openTx(Certificate certificate, String realm) {
-		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm)
-				.openTx(certificate, Inspector.class);
+		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm).openTx(certificate,
+				Inspector.class);
 	}
 
 	/**
@@ -381,11 +380,7 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		ResourceDetail resourceDetail = new ResourceDetail(resource);
-		GenericEntity<ResourceDetail> entity = new GenericEntity<ResourceDetail>(resourceDetail, ResourceDetail.class) {
-			//
-		};
-		return Response.ok().entity(entity).build();
+		return Response.ok().entity(ResourceToJsonVisitor.toJsonString(resource)).build();
 	}
 
 	@GET
@@ -422,17 +417,17 @@ public class Inspector {
 			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
 
 			if (listener.getResources().size() == 0)
-				throw new StrolchPersistenceException(MessageFormat.format(
-						"No Resources parsed from xml value for {0} / {1}", id, type));
+				throw new StrolchPersistenceException(
+						MessageFormat.format("No Resources parsed from xml value for {0} / {1}", id, type));
 			if (listener.getResources().size() > 1)
-				throw new StrolchPersistenceException(MessageFormat.format(
-						"Multiple Resources parsed from xml value for {0} / {1}", id, type));
+				throw new StrolchPersistenceException(
+						MessageFormat.format("Multiple Resources parsed from xml value for {0} / {1}", id, type));
 
 			resource = listener.getResources().get(0);
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"Failed to extract Resources from xml value for {0} / {1}", id, type), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to extract Resources from xml value for {0} / {1}", id, type), e);
 		}
 
 		UpdateResourceService svc = new UpdateResourceService();
@@ -464,11 +459,7 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		OrderDetail orderDetail = new OrderDetail(order);
-		GenericEntity<OrderDetail> entity = new GenericEntity<OrderDetail>(orderDetail, OrderDetail.class) {
-			//
-		};
-		return Response.ok().entity(entity).build();
+		return Response.ok().entity(OrderToJsonVisitor.toJsonString(order)).build();
 	}
 
 	@GET
@@ -505,17 +496,17 @@ public class Inspector {
 			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
 
 			if (listener.getOrders().size() == 0)
-				throw new StrolchPersistenceException(MessageFormat.format(
-						"No Orders parsed from xml value for {0} / {1}", id, type));
+				throw new StrolchPersistenceException(
+						MessageFormat.format("No Orders parsed from xml value for {0} / {1}", id, type));
 			if (listener.getOrders().size() > 1)
-				throw new StrolchPersistenceException(MessageFormat.format(
-						"Multiple Orders parsed from xml value for {0} / {1}", id, type));
+				throw new StrolchPersistenceException(
+						MessageFormat.format("Multiple Orders parsed from xml value for {0} / {1}", id, type));
 
 			order = listener.getOrders().get(0);
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"Failed to extract Order from xml value for {0} / {1}", id, type), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to extract Order from xml value for {0} / {1}", id, type), e);
 		}
 
 		UpdateOrderService svc = new UpdateOrderService();

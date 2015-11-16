@@ -85,7 +85,7 @@ public abstract class StrolchElementToSaxVisitor {
 		return attributes;
 	}
 
-	private Attributes attributesFor(StrolchTimedState<IValue<?>> state) {
+	protected Attributes attributesFor(StrolchTimedState<IValue<?>> state) {
 		AttributesImpl attributes = attributesFor((StrolchElement) state);
 
 		if (!UOM_NONE.equals(state.getUom())) {
@@ -104,7 +104,7 @@ public abstract class StrolchElementToSaxVisitor {
 		return attributes;
 	}
 
-	private Attributes attributesFor(ITimeValue<IValue<?>> value) {
+	protected Attributes attributesFor(ITimeValue<IValue<?>> value) {
 		AttributesImpl attributes = new AttributesImpl();
 		ISO8601FormatFactory df = ISO8601FormatFactory.getInstance();
 		attributes.addAttribute(null, null, Tags.TIME, Tags.CDATA, df.formatDate(value.getTime()));
@@ -195,7 +195,24 @@ public abstract class StrolchElementToSaxVisitor {
 		this.contentHandler.endElement(null, null, Tags.ACTIVITY);
 	}
 
-	private void toSax(PolicyDefs policyDefs) throws SAXException {
+	protected void toSax(Action action) throws SAXException {
+		this.contentHandler.startElement(null, null, Tags.ACTION, attributesFor(action));
+		toSax((GroupedParameterizedElement) action);
+
+		if (action.hasPolicyDefs())
+			toSax(action.getPolicyDefs());
+
+		Iterator<IValueChange<? extends IValue<?>>> iter = action.changesIterator();
+		while (iter.hasNext()) {
+			IValueChange<? extends IValue<?>> valueChange = iter.next();
+			this.contentHandler.startElement(null, null, Tags.VALUE_CHANGE, attributesFor(valueChange));
+			this.contentHandler.endElement(null, null, Tags.VALUE_CHANGE);
+		}
+
+		this.contentHandler.endElement(null, null, Tags.ACTION);
+	}
+
+	protected void toSax(PolicyDefs policyDefs) throws SAXException {
 		if (!policyDefs.hasPolicyDefs())
 			return;
 
@@ -231,19 +248,5 @@ public abstract class StrolchElementToSaxVisitor {
 		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, valueChange.getValue().getValueAsString());
 		attributes.addAttribute(null, null, Tags.TYPE, Tags.CDATA, valueChange.getValue().getType());
 		return attributes;
-	}
-
-	protected void toSax(Action action) throws SAXException {
-		this.contentHandler.startElement(null, null, Tags.ACTION, attributesFor(action));
-		toSax((GroupedParameterizedElement) action);
-
-		Iterator<IValueChange<? extends IValue<?>>> iter = action.changesIterator();
-		while (iter.hasNext()) {
-			IValueChange<? extends IValue<?>> valueChange = iter.next();
-			this.contentHandler.startElement(null, null, Tags.VALUE_CHANGE, attributesFor(valueChange));
-			this.contentHandler.endElement(null, null, Tags.VALUE_CHANGE);
-		}
-
-		this.contentHandler.endElement(null, null, Tags.ACTION);
 	}
 }

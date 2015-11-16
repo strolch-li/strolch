@@ -2,10 +2,22 @@
 <StrolchModel>
 
 	<Activity Id="activity_1" Name="Activity" Type="parentType">
+		<Policies>
+			<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
+			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
+		</Policies>
 		<Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="CREATED" Type="Use">
+			<Policies>
+				<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
+				<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
+			</Policies>
 			<ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer" />
 		</Action>
 		<Activity Id="child_activity" Name="Child Activity" Type="childType">
+			<Policies>
+				<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
+				<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
+			</Policies>
 			<Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="PLANNED" Type="Use" />
 			<Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="CREATED" Type="Use" />
 		</Activity>

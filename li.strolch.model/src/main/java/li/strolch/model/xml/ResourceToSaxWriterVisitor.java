@@ -27,7 +27,7 @@ import li.strolch.model.ResourceVisitor;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ResourceToSaxWriterVisitor extends AbstractToSaxWriterVisitor implements ResourceVisitor<Void> {
+public class ResourceToSaxWriterVisitor extends StrolchElementToSaxWriterVisitor implements ResourceVisitor<Void> {
 
 	public ResourceToSaxWriterVisitor(XMLStreamWriter writer) {
 		super(writer);

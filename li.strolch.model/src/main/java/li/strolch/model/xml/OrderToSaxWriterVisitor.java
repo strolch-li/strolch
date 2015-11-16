@@ -27,7 +27,7 @@ import li.strolch.model.OrderVisitor;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class OrderToSaxWriterVisitor extends AbstractToSaxWriterVisitor implements OrderVisitor<Void> {
+public class OrderToSaxWriterVisitor extends StrolchElementToSaxWriterVisitor implements OrderVisitor<Void> {
 
 	public OrderToSaxWriterVisitor(XMLStreamWriter writer) {
 		super(writer);

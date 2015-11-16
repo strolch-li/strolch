@@ -22,12 +22,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 
@@ -46,6 +48,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	protected String resourceId;
 	protected String resourceType;
 	protected State state;
+	protected PolicyDefs policyDefs;
 
 	protected List<IValueChange<? extends IValue<?>>> changes;
 
@@ -184,6 +187,21 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		}
 
 		return clone;
+	}
+
+	public PolicyDefs getPolicyDefs() {
+		if (this.policyDefs == null)
+			throw new StrolchPolicyException(getLocator() + " has no Policies defined!");
+		return this.policyDefs;
+	}
+
+	public boolean hasPolicyDefs() {
+		return this.policyDefs != null;
+	}
+
+	public void setPolicyDefs(PolicyDefs policyDefs) {
+		this.policyDefs = policyDefs;
+		this.policyDefs.setParent(this);
 	}
 
 	@Override

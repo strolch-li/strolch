@@ -27,7 +27,7 @@ import li.strolch.model.activity.Activity;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ActivityToSaxWriterVisitor extends AbstractToSaxWriterVisitor implements ActivityVisitor<Void> {
+public class ActivityToSaxWriterVisitor extends StrolchElementToSaxWriterVisitor implements ActivityVisitor<Void> {
 
 	public ActivityToSaxWriterVisitor(XMLStreamWriter writer) {
 		super(writer);

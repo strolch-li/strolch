@@ -21,6 +21,7 @@ import java.util.Set;
 
 import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.exception.StrolchPolicyException;
+import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 
 /**
@@ -30,7 +31,7 @@ import li.strolch.model.StrolchRootElement;
  */
 public class PolicyDefs {
 
-	private StrolchRootElement parent;
+	private StrolchElement parent;
 
 	private Map<String, PolicyDef> policyDefMap;
 
@@ -38,11 +39,11 @@ public class PolicyDefs {
 		this.policyDefMap = new HashMap<>(0);
 	}
 
-	public void setParent(StrolchRootElement parent) {
+	public void setParent(StrolchElement parent) {
 		this.parent = parent;
 	}
 
-	public StrolchRootElement getParent() {
+	public StrolchElement getParent() {
 		return this.parent;
 	}
 

@@ -37,8 +37,8 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 
 	private static final long serialVersionUID = 0L;
 
-	private Map<String, StrolchTimedState<IValue<?>>> timedStateMap;
-	private PolicyDefs policyDefs;
+	protected Map<String, StrolchTimedState<IValue<?>>> timedStateMap;
+	protected PolicyDefs policyDefs;
 
 	/**
 	 * Empty constructor - for marshalling only!

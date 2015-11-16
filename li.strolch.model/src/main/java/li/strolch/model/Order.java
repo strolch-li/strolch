@@ -37,9 +37,9 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 
 	private static final long serialVersionUID = 0L;
 
-	private Date date;
-	private State state;
-	private PolicyDefs policyDefs;
+	protected Date date;
+	protected State state;
+	protected PolicyDefs policyDefs;
 
 	/**
 	 * Empty constructor - for marshalling only!

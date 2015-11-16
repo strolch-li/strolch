@@ -245,7 +245,7 @@ public class StrolchElementFromDomVisitor {
 		}
 	}
 
-	protected void fillElement(Element activityElement, Activity activity) {
+	public void fillElement(Element activityElement, Activity activity) {
 		fillElement(activityElement, (GroupedParameterizedElement) activity);
 
 		PolicyDefs defs = parsePolicies(activityElement);
@@ -291,6 +291,10 @@ public class StrolchElementFromDomVisitor {
 		action.setResourceType(resourceType);
 		action.setState(State.valueOf(stateS));
 
+		PolicyDefs defs = parsePolicies(element);
+		if (defs.hasPolicyDefs())
+			action.setPolicyDefs(defs);
+
 		NodeList valueChangeNodes = element.getChildNodes();
 		for (int i = 0; i < valueChangeNodes.getLength(); i++) {
 			Node item = valueChangeNodes.item(i);
@@ -316,7 +320,7 @@ public class StrolchElementFromDomVisitor {
 		}
 	}
 
-	private PolicyDefs parsePolicies(Element element) {
+	protected PolicyDefs parsePolicies(Element element) {
 
 		PolicyDefs policyDefs = new PolicyDefs();
 

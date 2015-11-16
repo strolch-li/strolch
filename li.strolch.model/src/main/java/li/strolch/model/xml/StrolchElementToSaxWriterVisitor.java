@@ -30,6 +30,7 @@ import java.util.TreeSet;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
@@ -41,26 +42,46 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.policy.PolicyDef;
+import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class AbstractToSaxWriterVisitor {
+public abstract class StrolchElementToSaxWriterVisitor {
 
 	protected XMLStreamWriter writer;
 
-	public AbstractToSaxWriterVisitor(XMLStreamWriter writer) {
+	public StrolchElementToSaxWriterVisitor(XMLStreamWriter writer) {
 		this.writer = writer;
 	}
 
+	protected void writeElement(Resource resource) throws XMLStreamException {
+		boolean empty = !resource.hasParameterBags() && !resource.hasTimedStates() && !resource.hasPolicyDefs();
+
+		writeStartStrolchElement(Tags.RESOURCE, empty, resource);
+
+		if (resource.hasParameterBags()) {
+			writeParameterBags(resource);
+		}
+
+		if (resource.hasTimedStates())
+			writeTimedStates(resource);
+
+		if (resource.hasPolicyDefs())
+			writePolicyDefs(resource.getPolicyDefs());
+
+		if (!empty)
+			this.writer.writeEndElement();
+	}
+
 	protected void writeElement(Order order) throws XMLStreamException {
-		boolean empty = !order.hasParameterBags();
+		boolean empty = !order.hasParameterBags() && !order.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.ORDER, empty, order);
 		this.writer.writeAttribute(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
@@ -70,12 +91,15 @@ public abstract class AbstractToSaxWriterVisitor {
 			writeParameterBags(order);
 		}
 
+		if (order.hasPolicyDefs())
+			writePolicyDefs(order.getPolicyDefs());
+
 		if (!empty)
 			this.writer.writeEndElement();
 	}
 
 	protected void writeElement(Activity activity) throws XMLStreamException {
-		boolean empty = !activity.hasParameterBags() && !activity.hasElements();
+		boolean empty = !activity.hasParameterBags() && !activity.hasElements() && !activity.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.ACTIVITY, empty, activity);
 
@@ -96,12 +120,15 @@ public abstract class AbstractToSaxWriterVisitor {
 			}
 		}
 
+		if (activity.hasPolicyDefs())
+			writePolicyDefs(activity.getPolicyDefs());
+
 		if (!empty)
 			this.writer.writeEndElement();
 	}
 
-	private <T> void writeElement(Action action) throws XMLStreamException {
-		boolean empty = !action.hasParameterBags() && !action.hasChanges();
+	protected <T> void writeElement(Action action) throws XMLStreamException {
+		boolean empty = !action.hasParameterBags() && !action.hasChanges() && !action.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.ACTION, empty, action);
 		this.writer.writeAttribute(Tags.STATE, action.getState().name());
@@ -122,31 +149,31 @@ public abstract class AbstractToSaxWriterVisitor {
 			}
 		}
 
+		if (action.hasPolicyDefs())
+			writePolicyDefs(action.getPolicyDefs());
+
 		if (!empty)
 			this.writer.writeEndElement();
 	}
 
-	protected void writeElement(Resource resource) throws XMLStreamException {
-		boolean empty = !resource.hasParameterBags() && !resource.hasTimedStates();
+	protected void writePolicyDefs(PolicyDefs policyDefs) throws XMLStreamException {
 
-		writeStartStrolchElement(Tags.RESOURCE, empty, resource);
+		if (!policyDefs.hasPolicyDefs())
+			return;
 
-		if (resource.hasParameterBags()) {
-			writeParameterBags(resource);
+		this.writer.writeStartElement(Tags.POLICIES);
+		for (String type : policyDefs.getPolicyTypes()) {
+			PolicyDef policyDef = policyDefs.getPolicyDef(type);
+
+			this.writer.writeEmptyElement(Tags.POLICY);
+			this.writer.writeAttribute(Tags.TYPE, policyDef.getType());
+			this.writer.writeAttribute(Tags.VALUE, policyDef.getValueForXml());
+			this.writer.writeEndElement();
 		}
-
-		if (resource.hasTimedStates())
-			writeTimedStates(resource);
-
-		if (!empty)
-			this.writer.writeEndElement();
+		this.writer.writeEndElement();
 	}
 
-	/**
-	 * @param resource
-	 * @throws XMLStreamException
-	 */
-	private void writeTimedStates(Resource resource) throws XMLStreamException {
+	protected void writeTimedStates(Resource resource) throws XMLStreamException {
 		List<StrolchTimedState<IValue<?>>> timedStates = resource.getTimedStates();
 		for (StrolchTimedState<IValue<?>> timedState : timedStates) {
 			ITimeVariable<IValue<?>> timeEvolution = timedState.getTimeEvolution();
@@ -156,8 +183,8 @@ public abstract class AbstractToSaxWriterVisitor {
 
 			for (ITimeValue<IValue<?>> timeValue : values) {
 				this.writer.writeEmptyElement(Tags.VALUE);
-				this.writer.writeAttribute(Tags.TIME, ISO8601FormatFactory.getInstance()
-						.formatDate(timeValue.getTime()));
+				this.writer.writeAttribute(Tags.TIME,
+						ISO8601FormatFactory.getInstance().formatDate(timeValue.getTime()));
 				this.writer.writeAttribute(Tags.VALUE, timeValue.getValue().getValueAsString());
 			}
 

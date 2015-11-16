@@ -17,9 +17,13 @@ package li.strolch.rest.helper;
 
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.rest.StrolchRestfulConstants;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -30,5 +34,11 @@ public class RestfulHelper {
 		if (headers == null || StringHelper.isEmpty(headers.getHeaderString(HttpHeaders.ACCEPT_LANGUAGE)))
 			return null;
 		return headers.getAcceptableLanguages().get(0);
+	}
+
+	public static Certificate getCert(HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		DBC.PRE.assertNotNull("Certificate not found as request attribute!", cert);
+		return cert;
 	}
 }

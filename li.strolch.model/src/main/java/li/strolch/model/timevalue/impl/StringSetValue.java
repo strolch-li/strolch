@@ -21,12 +21,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import ch.eitchnet.utils.dbc.DBC;
+import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * {@link IValue} implementation to work with String valued {@link ITimeValue} objects. Since a java.util.String object
@@ -127,7 +127,7 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 		StringBuilder sb = new StringBuilder();
 		Iterator<AString> iter = this.aStrings.iterator();
 		while (iter.hasNext()) {
-			sb.append(iter.next());
+			sb.append(iter.next().getString());
 			if (iter.hasNext())
 				sb.append(", ");
 		}

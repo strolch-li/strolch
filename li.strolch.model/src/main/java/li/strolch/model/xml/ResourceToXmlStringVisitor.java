@@ -17,15 +17,14 @@ package li.strolch.model.xml;
 
 import java.io.StringWriter;
 
-import javanet.staxutils.IndentingXMLStreamWriter;
-
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
+import ch.eitchnet.utils.dbc.DBC;
+import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchModelConstants;
-import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -42,14 +41,15 @@ public class ResourceToXmlStringVisitor implements ResourceVisitor<String> {
 			writer = new IndentingXMLStreamWriter(writer);
 
 			// start document
-			writer.writeStartDocument(StrolchModelConstants.DEFAULT_ENCODING, StrolchModelConstants.DEFAULT_XML_VERSION);
+			writer.writeStartDocument(StrolchModelConstants.DEFAULT_ENCODING,
+					StrolchModelConstants.DEFAULT_XML_VERSION);
 			new ResourceToSaxWriterVisitor(writer).visit(element);
 			writer.writeEndDocument();
 
 			return stringWriter.toString();
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to format Element " + element.getLocator() + " to xml string due to "
-					+ e.getMessage(), e);
+			throw new RuntimeException(
+					"Failed to format Element " + element.getLocator() + " to xml string due to " + e.getMessage(), e);
 		}
 	}
 }
