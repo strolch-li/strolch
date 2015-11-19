@@ -25,12 +25,12 @@
 		<repository>
 			<id>archive.eitchnet.ch</id>
 			<name>Internal Releases</name>
-			<url>http://archive.eitchnet.ch/repository/internal/</url>
+			<url>https://archive.eitchnet.ch/repository/internal/</url>
 		</repository>
 		<snapshotRepository>
 			<id>archive.eitchnet.ch</id>
 			<name>Internal Snapshots</name>
-			<url>http://archive.eitchnet.ch/repository/snapshots/</url>
+			<url>https://archive.eitchnet.ch/repository/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
