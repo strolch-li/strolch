@@ -23,14 +23,14 @@
 
 	<distributionManagement>
 		<repository>
-			<id>nexus.eitchnet.ch</id>
+			<id>archive.eitchnet.ch</id>
 			<name>Internal Releases</name>
-			<url>http://nexus.eitchnet.ch/content/repositories/releases/</url>
+			<url>http://archive.eitchnet.ch/repository/internal/</url>
 		</repository>
 		<snapshotRepository>
-			<id>nexus.eitchnet.ch</id>
-			<name>Internal Releases</name>
-			<url>http://nexus.eitchnet.ch/content/repositories/snapshots/</url>
+			<id>archive.eitchnet.ch</id>
+			<name>Internal Snapshots</name>
+			<url>http://archive.eitchnet.ch/repository/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
