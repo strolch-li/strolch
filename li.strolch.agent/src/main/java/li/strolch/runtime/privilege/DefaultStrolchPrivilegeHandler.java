@@ -137,7 +137,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 	@Override
 	public void isCertificateValid(Certificate certificate) throws PrivilegeException {
-		assertContainerStarted();
+		assertStarted();
 		this.privilegeHandler.isCertificateValid(certificate);
 	}
 
@@ -163,7 +163,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 	@Override
 	public boolean sessionTimeout(Certificate certificate) {
-		assertContainerStarted();
+		assertStarted();
 		boolean invalidateSession = this.privilegeHandler.invalidateSession(certificate);
 		StrolchRealm realm = getContainer().getRealm(certificate);
 		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.SESSION_TIME_OUT)) {

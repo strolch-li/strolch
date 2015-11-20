@@ -98,8 +98,9 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		}
 
 		this.sessionTimeoutTimer = new Timer("SessionTimeoutTimer", true); //$NON-NLS-1$
+		long delay = TimeUnit.MINUTES.toMillis(5);
 		long checkInterval = TimeUnit.MINUTES.toMillis(1);
-		this.sessionTimeoutTimer.schedule(new SessionTimeoutTask(), checkInterval, checkInterval);
+		this.sessionTimeoutTimer.schedule(new SessionTimeoutTask(), delay, checkInterval);
 
 		super.start();
 	}
@@ -194,6 +195,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		synchronized (this.certificateMap) {
 			removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		}
+
 		if (removedCert == null)
 			logger.error(MessageFormat.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
 
