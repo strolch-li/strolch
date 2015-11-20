@@ -28,6 +28,9 @@ import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
+import ch.eitchnet.db.DbMigrationState;
+import ch.eitchnet.db.DbSchemaVersionCheck;
+import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchAgent;
@@ -45,9 +48,6 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.DbConnectionBuilder;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import ch.eitchnet.db.DbMigrationState;
-import ch.eitchnet.db.DbSchemaVersionCheck;
-import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -98,7 +98,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 		// if allowed, perform DB initialization
 		if (!allowSchemaCreation || !allowDataInitOnSchemaCreate) {
-			logger.info("Data Initialization not enabled as either 'allowSchemaCreation or 'allowDataInitOnSchemaCreate' is false!, so not checking if needed."); //$NON-NLS-1$
+			logger.info(
+					"Data Initialization not enabled as either 'allowSchemaCreation or 'allowDataInitOnSchemaCreate' is false!, so not checking if needed."); //$NON-NLS-1$
 		} else {
 			Map<String, DbMigrationState> dbMigrationStates = schemaVersionCheck.getDbMigrationStates();
 			String msg = "Data Initialization is enabled, checking for {0} realms if DB initialization is required..."; //$NON-NLS-1$
@@ -115,9 +116,11 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 	@Override
 	public void destroy() throws Exception {
-		for (Entry<String, DataSource> entry : this.dsMap.entrySet()) {
-			StrolchPostgreDataSource ds = (StrolchPostgreDataSource) entry.getValue();
-			ds.shutdown();
+		if (this.dsMap != null) {
+			for (Entry<String, DataSource> entry : this.dsMap.entrySet()) {
+				StrolchPostgreDataSource ds = (StrolchPostgreDataSource) entry.getValue();
+				ds.shutdown();
+			}
 		}
 
 		super.destroy();
