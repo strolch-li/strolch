@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<warFinalName>planningwebapp</warFinalName>
 		<tomcat7ServerId>tomcat7.eitchnet.ch</tomcat7ServerId>
-		<tomcat7Url>http://appsrv:8080/manager/text</tomcat7Url>
+		<tomcat7Url>http://tomcat.eitchnet.ch:8080/manager/text</tomcat7Url>
 		<m2eclipse.wtp.contextRoot>${warFinalName}</m2eclipse.wtp.contextRoot>
 	</properties>
 

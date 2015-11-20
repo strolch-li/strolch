@@ -26,7 +26,7 @@
 		<jersey.version>2.11</jersey.version>
 		<jaxrs.api.version>2.0</jaxrs.api.version>
 
-		<tomcat7Url>http://appsrv:8080/manager/text</tomcat7Url>
+		<tomcat7Url>http://tomcat.eitchnet.ch:8080/manager/text</tomcat7Url>
 		<tomcat7ServerId>tomcat7.eitchnet.ch</tomcat7ServerId>
 
 	</properties>
