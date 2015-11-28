@@ -66,9 +66,8 @@ public abstract class StrolchElementToSaxWriterVisitor {
 
 		writeStartStrolchElement(Tags.RESOURCE, empty, resource);
 
-		if (resource.hasParameterBags()) {
+		if (resource.hasParameterBags())
 			writeParameterBags(resource);
-		}
 
 		if (resource.hasTimedStates())
 			writeTimedStates(resource);
@@ -168,7 +167,6 @@ public abstract class StrolchElementToSaxWriterVisitor {
 			this.writer.writeEmptyElement(Tags.POLICY);
 			this.writer.writeAttribute(Tags.TYPE, policyDef.getType());
 			this.writer.writeAttribute(Tags.VALUE, policyDef.getValueForXml());
-			this.writer.writeEndElement();
 		}
 		this.writer.writeEndElement();
 	}
