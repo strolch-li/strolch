@@ -21,20 +21,22 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.text.MessageFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.helper.FileHelper;
+import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.service.api.Service;
+import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.utils.helper.FileHelper;
-import ch.eitchnet.utils.helper.StringHelper;
 
 public final class RuntimeMock {
 
@@ -64,6 +66,14 @@ public final class RuntimeMock {
 
 	public StrolchRealm getRealm(String realm) {
 		return this.container.getRealm(realm);
+	}
+
+	public Certificate loginAdmin() {
+		return getPrivilegeHandler().authenticate("admin", "admin".getBytes());
+	}
+
+	public boolean logout(Certificate cert) {
+		return getPrivilegeHandler().invalidateSession(cert);
 	}
 
 	public void mockRuntime(File targetPathF, File srcPathF) {
@@ -150,14 +160,40 @@ public final class RuntimeMock {
 		}
 	}
 
+	public <T extends ServiceArgument, U extends ServiceResult> U doService(Certificate certificate,
+			Service<T, U> service, T argument) {
+		U result = getServiceHandler().doService(certificate, service, argument);
+		assertServiceResult(ServiceResultState.SUCCESS, result);
+		return result;
+	}
+
 	public static void assertServiceResult(ServiceResultState expectedState, Class<?> expectedResultType,
 			ServiceResult result) {
 		assertEquals("Expected service result of type " + expectedResultType + " but was " + result.getClass(),
 				expectedResultType, result.getClass());
 
 		if (!expectedState.equals(result.getState())) {
+			String errorMsg;
+			if (result.getThrowable() == null)
+				errorMsg = result.getMessage();
+			else
+				errorMsg = StringHelper.formatException(result.getThrowable());
+
 			fail("Expected service result state " + expectedState + " but was " + result.getState() + ": Reason: "
-					+ StringHelper.formatException(result.getThrowable()));
+					+ errorMsg);
+		}
+	}
+
+	public static void assertServiceResult(ServiceResultState expectedState, ServiceResult result) {
+		if (!expectedState.equals(result.getState())) {
+			String errorMsg;
+			if (result.getThrowable() == null)
+				errorMsg = result.getMessage();
+			else
+				errorMsg = StringHelper.formatException(result.getThrowable());
+
+			fail("Expected service result state " + expectedState + " but was " + result.getState() + ": Reason: "
+					+ errorMsg);
 		}
 	}
 }
