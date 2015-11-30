@@ -385,6 +385,27 @@ public class StringHelper {
 	 */
 	public static String replacePropertiesIn(Properties properties, String value) {
 
+		return replacePropertiesIn(properties, '$', value);
+	}
+
+	/**
+	 * Traverses the given string searching for occurrences of <code>prefix</code>{...} sequences. Theses sequences are
+	 * replaced with a {@link Properties#getProperty(String)} value if such a value exists in the properties map. If the
+	 * value of the sequence is not in the properties, then the sequence is not replaced
+	 * 
+	 * @param properties
+	 *            the {@link Properties} in which to get the value
+	 * @param prefix
+	 *            the prefix to use, for instance use <code>$</code> to replace occurrences of <code>$</code>{...}
+	 * @param value
+	 *            the value in which to replace any system properties
+	 * 
+	 * @return a new string with all defined properties replaced or if an error occurred the original value is returned
+	 */
+	public static String replacePropertiesIn(Properties properties, char prefix, String value) {
+
+		String prefixS = String.valueOf(prefix);
+
 		// get a copy of the value
 		String tmpValue = value;
 
@@ -393,7 +414,7 @@ public class StringHelper {
 		int stop = 0;
 
 		// loop on $ character positions
-		while ((pos = tmpValue.indexOf('$', pos + 1)) != -1) {
+		while ((pos = tmpValue.indexOf(prefix, pos + 1)) != -1) {
 
 			// if pos+1 is not { character then continue
 			if (tmpValue.charAt(pos + 1) != '{') {
@@ -414,9 +435,9 @@ public class StringHelper {
 			String sequence = tmpValue.substring(pos + 2, stop);
 
 			// make sure sequence doesn't contain $ { } characters
-			if (sequence.contains("$") || sequence.contains("{") || sequence.contains("}")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				String msg = "Enclosed sequence in offsets {0} - {1} contains one of the illegal chars: $ { }: {2}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, pos, stop, sequence);
+			if (sequence.contains(prefixS) || sequence.contains("{") || sequence.contains("}")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				String msg = "Enclosed sequence in offsets {0} - {1} contains one of the illegal chars: {2} { }: {3}";
+				msg = MessageFormat.format(msg, pos, stop, prefixS, sequence);
 				logger.error(msg);
 				tmpValue = value;
 				break;
@@ -432,7 +453,7 @@ public class StringHelper {
 			}
 
 			// property exists, so replace in value
-			tmpValue = tmpValue.replace("${" + sequence + "}", property); //$NON-NLS-1$ //$NON-NLS-2$
+			tmpValue = tmpValue.replace(prefixS + "{" + sequence + "}", property); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return tmpValue;
