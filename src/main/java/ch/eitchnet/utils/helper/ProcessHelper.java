@@ -40,8 +40,8 @@ public class ProcessHelper {
 			final int[] returnValue = new int[1];
 
 			try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					final BufferedReader inputStream = new BufferedReader(new InputStreamReader(
-							process.getInputStream()));) {
+					final BufferedReader inputStream = new BufferedReader(
+							new InputStreamReader(process.getInputStream()));) {
 
 				Thread errorIn = new Thread("errorIn") { //$NON-NLS-1$
 					@Override
@@ -79,8 +79,8 @@ public class ProcessHelper {
 
 	public static ProcessResult runCommand(File workingDirectory, String... commandAndArgs) {
 
-		if (!workingDirectory.exists()) {
-			String msg = "Working directory does not exist at {0}"; //$NON-NLS-1$
+		if (!workingDirectory.isDirectory()) {
+			String msg = "Working directory does not exist or is not a directory at {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, workingDirectory.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
@@ -99,8 +99,8 @@ public class ProcessHelper {
 			int[] returnValue = new int[1];
 
 			try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					final BufferedReader inputStream = new BufferedReader(new InputStreamReader(
-							process.getInputStream()));) {
+					final BufferedReader inputStream = new BufferedReader(
+							new InputStreamReader(process.getInputStream()));) {
 
 				Thread errorIn = new Thread("errorIn") { //$NON-NLS-1$
 					@Override
