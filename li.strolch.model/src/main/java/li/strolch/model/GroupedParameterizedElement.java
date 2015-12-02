@@ -22,10 +22,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.parameter.Parameter;
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -88,7 +88,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * 
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	public <T> T getParameter(String bagKey, String paramKey) {
+	public <T extends Parameter<?>> T getParameter(String bagKey, String paramKey) {
 		return getParameter(bagKey, paramKey, false);
 	}
 
@@ -105,12 +105,12 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * 
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	public <T> T getParameter(String bagKey, String paramKey, boolean assertExists) {
+	public <T extends Parameter<?>> T getParameter(String bagKey, String paramKey, boolean assertExists) {
 		if (this.parameterBagMap == null) {
 			if (assertExists) {
 				String msg = "The Parameter {0} does not exist";
-				throw new StrolchModelException(MessageFormat.format(msg,
-						getLocator().append(Tags.BAG, bagKey, paramKey)));
+				throw new StrolchModelException(
+						MessageFormat.format(msg, getLocator().append(Tags.BAG, bagKey, paramKey)));
 			}
 
 			return null;
@@ -119,8 +119,8 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		if (bag == null) {
 			if (assertExists) {
 				String msg = "The Parameter {0} does not exist";
-				throw new StrolchModelException(MessageFormat.format(msg,
-						getLocator().append(Tags.BAG, bagKey, paramKey)));
+				throw new StrolchModelException(
+						MessageFormat.format(msg, getLocator().append(Tags.BAG, bagKey, paramKey)));
 			}
 
 			return null;
