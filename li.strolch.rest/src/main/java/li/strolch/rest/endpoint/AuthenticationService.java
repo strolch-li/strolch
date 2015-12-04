@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -30,6 +31,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -48,6 +50,7 @@ import ch.eitchnet.privilege.model.PrivilegeContext;
 import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.exception.StrolchException;
 import li.strolch.rest.RestfulStrolchComponent;
+import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
@@ -112,9 +115,12 @@ public class AuthenticationService {
 			}
 			loginResult.setPrivileges(privileges);
 
+			NewCookie cookie = new NewCookie(StrolchRestfulConstants.STROLCH_AUTHORIZATION, certificate.getAuthToken(),
+					"/", null, "Authorization header", (int) TimeUnit.DAYS.toSeconds(1),
+					restfulStrolchComponent.isSecureCookie());
+
 			return Response.ok().entity(loginResult)//
-					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken())//
-					.build();
+					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken()).cookie(cookie).build();
 
 		} catch (InvalidCredentialsException e) {
 			logger.error(e.getMessage(), e);

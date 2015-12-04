@@ -17,6 +17,9 @@ package li.strolch.rest;
 
 import java.text.MessageFormat;
 
+import org.glassfish.jersey.server.ServerProperties;
+
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
@@ -24,10 +27,6 @@ import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.HttpCacheResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.service.api.ServiceHandler;
-
-import org.glassfish.jersey.server.ServerProperties;
-
-import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -39,6 +38,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private static final String PARAM_REST_LOGGING = "restLogging"; //$NON-NLS-1$
 	private static final String PARAM_REST_LOGGING_ENTITY = "restLoggingEntity"; //$NON-NLS-1$
 	private static final String PARAM_HTTP_CACHE_MODE = "httpCacheMode"; //$NON-NLS-1$
+	private static final String PARAM_SECURE_COOKIE = "secureCookie"; //$NON-NLS-1$
 
 	/**
 	 * Allowed values:
@@ -74,6 +74,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private boolean restLogging;
 	private boolean restLoggingEntity;
 	private String cacheMode;
+	private boolean secureCookie;
 
 	/**
 	 * @param container
@@ -125,6 +126,13 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return this.restLoggingEntity;
 	}
 
+	/**
+	 * @return the secureCookie
+	 */
+	public boolean isSecureCookie() {
+		return this.secureCookie;
+	}
+
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 
@@ -149,6 +157,8 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		// set http cache mode
 		this.cacheMode = configuration.getString(PARAM_HTTP_CACHE_MODE, HttpCacheResponseFilter.NO_CACHE);
 		logger.info("HTTP header cache mode is set to {}", cacheMode);
+
+		this.secureCookie = configuration.getBoolean(PARAM_SECURE_COOKIE, true);
 
 		super.initialize(configuration);
 	}

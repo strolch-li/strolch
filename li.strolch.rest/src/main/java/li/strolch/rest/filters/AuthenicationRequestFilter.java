@@ -22,19 +22,20 @@ import java.util.List;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-
-import li.strolch.rest.RestfulStrolchComponent;
-import li.strolch.rest.StrolchSessionHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.rest.RestfulStrolchComponent;
+import li.strolch.rest.StrolchRestfulConstants;
+import li.strolch.rest.StrolchSessionHandler;
 
 /**
  * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
@@ -57,22 +58,38 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 
 		String sessionId = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		if (StringHelper.isEmpty(sessionId)) {
-			logger.error("No SessionID on request to URL " + requestContext.getUriInfo().getPath());
-			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Missing Authorization!").build()); //$NON-NLS-1$
-			return;
+
+			Cookie cookie = requestContext.getCookies().get(StrolchRestfulConstants.STROLCH_AUTHORIZATION);
+			if (cookie == null) {
+				logger.error(
+						"No Authorization header or cookie on request to URL " + requestContext.getUriInfo().getPath());
+				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Missing Authorization!") //$NON-NLS-1$
+						.build());
+				return;
+			}
+
+			sessionId = cookie.getValue();
+			if (StringHelper.isEmpty(sessionId)) {
+				logger.error("Authorization Cookie value missing on request to URL "
+						+ requestContext.getUriInfo().getPath());
+				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Missing Authorization!") //$NON-NLS-1$
+						.build());
+				return;
+			}
 		}
 
 		try {
-			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getComponent(
-					StrolchSessionHandler.class);
+			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance()
+					.getComponent(StrolchSessionHandler.class);
 			Certificate certificate = sessionHandler.validate(sessionId);
 			requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-					.entity("User cannot access the resource.").build()); //$NON-NLS-1$
+			requestContext.abortWith(
+					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("User cannot access the resource.").build()); //$NON-NLS-1$
 		}
 	}
 }
