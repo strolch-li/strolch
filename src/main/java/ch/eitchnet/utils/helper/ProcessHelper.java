@@ -39,7 +39,7 @@ public class ProcessHelper {
 	}
 
 	public static ProcessResult runCommand(File workingDirectory, String... commandAndArgs) {
-		return runCommand(1, TimeUnit.MINUTES, workingDirectory, commandAndArgs);
+		return runCommand(30, TimeUnit.SECONDS, workingDirectory, commandAndArgs);
 	}
 
 	public static ProcessResult runCommand(long timeout, TimeUnit unit, String... commandAndArgs) {
