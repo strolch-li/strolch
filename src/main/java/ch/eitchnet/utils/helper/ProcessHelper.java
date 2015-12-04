@@ -66,8 +66,8 @@ public class ProcessHelper {
 			pb.directory(workingDirectory);
 
 			long start = System.nanoTime();
-			logger.info(MessageFormat.format("Starting command (Timeout {0} {1}) {2}", unit.toMinutes(timeout),
-					unit.name(), Arrays.stream(commandAndArgs).collect(Collectors.joining(" "))));
+			logger.info(MessageFormat.format("Starting command (Timeout {0} {1}) {2}", timeout, unit.name(),
+					Arrays.stream(commandAndArgs).collect(Collectors.joining(" "))));
 			final Process process = pb.start();
 			int[] returnValue = new int[1];
 
