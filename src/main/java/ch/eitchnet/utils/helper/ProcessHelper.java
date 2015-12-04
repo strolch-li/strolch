@@ -34,60 +34,22 @@ public class ProcessHelper {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcessHelper.class);
 
-	public static ProcessResult runCommand(String command) {
-		final StringBuffer sb = new StringBuffer();
-		sb.append("=====================================\n"); //$NON-NLS-1$
-		try {
-
-			final Process process = Runtime.getRuntime().exec(command);
-			final int[] returnValue = new int[1];
-
-			try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					final BufferedReader inputStream = new BufferedReader(
-							new InputStreamReader(process.getInputStream()));) {
-
-				Thread errorIn = new Thread("errorIn") { //$NON-NLS-1$
-					@Override
-					public void run() {
-						readStream(sb, "[ERROR] ", errorStream); //$NON-NLS-1$
-					}
-				};
-				errorIn.start();
-
-				Thread infoIn = new Thread("infoIn") { //$NON-NLS-1$
-					@Override
-					public void run() {
-						readStream(sb, "[INFO] ", inputStream); //$NON-NLS-1$
-					}
-				};
-				infoIn.start();
-
-				returnValue[0] = process.waitFor();
-
-				errorIn.join(100l);
-				infoIn.join(100l);
-				sb.append("=====================================\n"); //$NON-NLS-1$
-			}
-			return new ProcessResult(returnValue[0], sb.toString(), null);
-
-		} catch (IOException e) {
-			String msg = MessageFormat.format("Failed to perform command: {0}", e.getMessage()); //$NON-NLS-1$
-			throw new RuntimeException(msg, e);
-		} catch (InterruptedException e) {
-			logger.error("Interrupted!"); //$NON-NLS-1$
-			sb.append("[FATAL] Interrupted"); //$NON-NLS-1$
-			return new ProcessResult(-1, sb.toString(), e);
-		}
+	public static ProcessResult runCommand(String... commandAndArgs) {
+		return runCommand(null, commandAndArgs);
 	}
 
 	public static ProcessResult runCommand(File workingDirectory, String... commandAndArgs) {
 		return runCommand(1, TimeUnit.MINUTES, workingDirectory, commandAndArgs);
 	}
 
+	public static ProcessResult runCommand(long timeout, TimeUnit unit, String... commandAndArgs) {
+		return runCommand(timeout, unit, null, commandAndArgs);
+	}
+
 	public static ProcessResult runCommand(long timeout, TimeUnit unit, File workingDirectory,
 			String... commandAndArgs) {
 
-		if (!workingDirectory.isDirectory()) {
+		if (workingDirectory != null && !workingDirectory.isDirectory()) {
 			String msg = "Working directory does not exist or is not a directory at {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, workingDirectory.getAbsolutePath());
 			throw new RuntimeException(msg);
@@ -99,14 +61,14 @@ public class ProcessHelper {
 		sb.append("=====================================\n"); //$NON-NLS-1$
 		try {
 
-			ProcessBuilder processBuilder = new ProcessBuilder(commandAndArgs);
-			processBuilder.environment();
-			processBuilder.directory(workingDirectory);
+			ProcessBuilder pb = new ProcessBuilder(commandAndArgs);
+			pb.environment();
+			pb.directory(workingDirectory);
 
 			long start = System.nanoTime();
 			logger.info(MessageFormat.format("Starting command (Timeout {0}m) {1}", unit.toMinutes(timeout),
 					Arrays.stream(commandAndArgs).collect(Collectors.joining(" "))));
-			final Process process = processBuilder.start();
+			final Process process = pb.start();
 			int[] returnValue = new int[1];
 
 			try (BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -120,8 +82,16 @@ public class ProcessHelper {
 
 				boolean ok = process.waitFor(timeout, unit);
 				if (!ok)
-					sb.append("[ERROR] Command failed to end before timeout or failed to execute.");
-				returnValue[0] = process.exitValue();
+					logger.error("Command failed to end before timeout or failed to execute.");
+
+				if (!process.isAlive()) {
+					returnValue[0] = process.exitValue();
+				} else {
+					logger.error("Forcibly destroying as still running...");
+					process.destroyForcibly();
+					process.waitFor(5, TimeUnit.SECONDS);
+					returnValue[0] = -1;
+				}
 
 				errorIn.join(100l);
 				infoIn.join(100l);
