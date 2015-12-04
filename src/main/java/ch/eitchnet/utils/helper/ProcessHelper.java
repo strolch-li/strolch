@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +79,11 @@ public class ProcessHelper {
 	}
 
 	public static ProcessResult runCommand(File workingDirectory, String... commandAndArgs) {
+		return runCommand(1, TimeUnit.MINUTES, workingDirectory, commandAndArgs);
+	}
+
+	public static ProcessResult runCommand(long timeout, TimeUnit unit, File workingDirectory,
+			String... commandAndArgs) {
 
 		if (!workingDirectory.isDirectory()) {
 			String msg = "Working directory does not exist or is not a directory at {0}"; //$NON-NLS-1$
@@ -98,27 +104,19 @@ public class ProcessHelper {
 			final Process process = processBuilder.start();
 			int[] returnValue = new int[1];
 
-			try (final BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					final BufferedReader inputStream = new BufferedReader(
-							new InputStreamReader(process.getInputStream()));) {
+			try (BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()));) {
 
-				Thread errorIn = new Thread("errorIn") { //$NON-NLS-1$
-					@Override
-					public void run() {
-						readStream(sb, "[ERROR] ", errorStream); //$NON-NLS-1$
-					}
-				};
+				Thread errorIn = new Thread(() -> readStream(sb, "[ERROR] ", errorStream), "errorIn");
 				errorIn.start();
 
-				Thread infoIn = new Thread("infoIn") { //$NON-NLS-1$
-					@Override
-					public void run() {
-						readStream(sb, "[INFO] ", inputStream); //$NON-NLS-1$
-					}
-				};
+				Thread infoIn = new Thread(() -> readStream(sb, "[INFO] ", inputStream), "infoIn");
 				infoIn.start();
 
-				returnValue[0] = process.waitFor();
+				boolean ok = process.waitFor(timeout, unit);
+				if (!ok)
+					sb.append("[ERROR] Command failed to end before timeout or failed to execute.");
+				returnValue[0] = process.exitValue();
 
 				errorIn.join(100l);
 				infoIn.join(100l);
