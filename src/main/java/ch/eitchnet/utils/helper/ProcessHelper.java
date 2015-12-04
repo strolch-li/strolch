@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +103,9 @@ public class ProcessHelper {
 			processBuilder.environment();
 			processBuilder.directory(workingDirectory);
 
+			long start = System.nanoTime();
+			logger.info(MessageFormat.format("Starting command (Timeout {0}m) {1}", unit.toMinutes(timeout),
+					Arrays.stream(commandAndArgs).collect(Collectors.joining(" "))));
 			final Process process = processBuilder.start();
 			int[] returnValue = new int[1];
 
@@ -123,6 +128,7 @@ public class ProcessHelper {
 				sb.append("=====================================\n"); //$NON-NLS-1$
 			}
 
+			logger.info("Command ended after " + StringHelper.formatNanoDuration(System.nanoTime() - start));
 			return new ProcessResult(returnValue[0], sb.toString(), null);
 
 		} catch (IOException e) {
