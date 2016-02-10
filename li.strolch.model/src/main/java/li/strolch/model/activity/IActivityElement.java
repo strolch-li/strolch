@@ -33,5 +33,6 @@ public interface IActivityElement extends StrolchElement {
 
 	public void setParent(Activity activity);
 
+	@Override
 	public IActivityElement getClone();
 }

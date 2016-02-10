@@ -372,8 +372,8 @@ public class SetParameterCommand extends Command {
 
       // update root element
       if (hasChanges()
-                    && this.replacedElement != null
-                    && this.replacedElement != this.parameter.getRootElement()) {
+                    &amp;&amp; this.replacedElement != null
+                    &amp;&amp; this.replacedElement != this.parameter.getRootElement()) {
         new UpdateElementVisitor(tx()).update(replacedElement);
       }
     }

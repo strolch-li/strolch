@@ -17,14 +17,13 @@ package li.strolch.model.xml;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import li.strolch.model.ActivityVisitor;
-import li.strolch.model.activity.Action;
-import li.strolch.model.activity.Activity;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ch.eitchnet.utils.helper.DomUtil;
+import li.strolch.model.ActivityVisitor;
+import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -41,10 +40,12 @@ public class ActivityToDomVisitor extends StrolchElementToDomVisitor implements 
 		return this.document;
 	}
 
+	@Override
 	public Element toDom(Action action) {
 		return super.toDom(action);
 	}
 
+	@Override
 	public Element toDom(Activity activity) {
 		return super.toDom(activity);
 	}

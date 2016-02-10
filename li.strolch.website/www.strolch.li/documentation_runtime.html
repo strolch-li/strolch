@@ -226,7 +226,7 @@
             class which implements the interface and extends the class <code>StrolchComponent</code>.</p>
 
         <p>The StrolchComponent class adds the state model to the class, which transitions as follows:<br/> <code>UNDEFINED
-            => SETUP => INITIALIZED => STARTED <=> STOPPED => DESTROYED</code></p>
+            =&gt; SETUP =&gt; INITIALIZED => STARTED &lt;=&gt; STOPPED => DESTROYED</code></p>
 
         <p>Components can switch between <code>STARTED</code> and <code>STOPPED</code>, but once <code>DESTROYED</code>
             no further state change is possible. The component's state is changed by changes to the agent's lifecycle.
