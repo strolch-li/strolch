@@ -98,9 +98,9 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				arg.setMessage(e.getMessage());
 				arg.setThrowable(e);
 				return arg;
-			} else {
-				throw new StrolchAccessDeniedException(certificate, service, e.getMessage(), e);
 			}
+
+			throw new StrolchAccessDeniedException(certificate, service, e.getMessage(), e);
 		}
 
 		try {

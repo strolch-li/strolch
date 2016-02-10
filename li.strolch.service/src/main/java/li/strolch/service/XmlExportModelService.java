@@ -18,12 +18,12 @@ package li.strolch.service;
 import java.io.File;
 import java.text.MessageFormat;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.command.XmlExportModelCommand;
 import li.strolch.model.ModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
-import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -63,11 +63,11 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 					String msg = "Model File already exists at path {0}"; //$NON-NLS-1$
 					msg = MessageFormat.format(msg, arg.modelFileName);
 					return ServiceResult.error(msg);
-				} else {
-					String msg = "Model File already exists with name {0} in data path {1}"; //$NON-NLS-1$
-					msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
-					return ServiceResult.error(msg);
 				}
+
+				String msg = "Model File already exists with name {0} in data path {1}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
+				return ServiceResult.error(msg);
 			}
 		}
 

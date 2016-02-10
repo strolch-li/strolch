@@ -22,8 +22,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import li.strolch.service.api.ServiceResult;
 import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.service.api.ServiceResult;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -82,7 +82,6 @@ public class Result {
 		Result result = new Result(svcResult);
 		if (svcResult.isOk())
 			return Response.ok(result, MediaType.APPLICATION_JSON).build();
-		else
-			return Response.serverError().type(MediaType.APPLICATION_JSON).entity(result).build();
+		return Response.serverError().type(MediaType.APPLICATION_JSON).entity(result).build();
 	}
 }
