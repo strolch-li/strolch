@@ -54,10 +54,8 @@ public class ExceptionHelper {
 	 * @return
 	 */
 	public static String getExceptionMessageWithCauses(Throwable t) {
-
-		if (t.getCause() == null) {
+		if (t.getCause() == null)
 			return getExceptionMessage(t);
-		}
 
 		String root = getExceptionMessageWithCauses(t.getCause());
 		return getExceptionMessage(t) + "\n" + root;
@@ -87,10 +85,8 @@ public class ExceptionHelper {
 	 * @return a string representation of the given {@link Throwable}'s messages including causes
 	 */
 	public static String formatExceptionMessage(Throwable t) {
-
-		if (t.getCause() == null) {
+		if (t.getCause() == null)
 			return getExceptionMessage(t);
-		}
 
 		String root = formatExceptionMessage(t.getCause());
 		return getExceptionMessage(t) + "\ncause:\n" + root;
@@ -99,12 +95,13 @@ public class ExceptionHelper {
 	/**
 	 * Returns the root cause for the given {@link Throwable}
 	 * 
-	 * @param t
+	 * @param throwable
 	 *            the {@link Throwable} for which to get the root cause
 	 * 
 	 * @return the root cause of the given {@link Throwable}
 	 */
-	public static Throwable getRootCause(Throwable t) {
+	public static Throwable getRootCause(Throwable throwable) {
+		Throwable t = throwable;
 		while (t.getCause() != null) {
 			t = t.getCause();
 		}

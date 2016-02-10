@@ -33,7 +33,7 @@ public class DefaultedHashMapTest {
 
 	@Before
 	public void setUp() {
-		this.map = new DefaultedHashMap<String, String>("foobar");
+		this.map = new DefaultedHashMap<>("foobar");
 		this.map.put("foo", "foofoo");
 	}
 

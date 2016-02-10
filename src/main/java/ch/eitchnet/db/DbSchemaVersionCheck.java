@@ -162,9 +162,10 @@ public class DbSchemaVersionCheck {
 		Version currentVersion = null;
 		try (PreparedStatement st = con.prepareStatement(sql)) {
 			st.setString(1, app);
-			ResultSet rs = st.executeQuery();
-			if (rs.next())
-				currentVersion = Version.valueOf(rs.getString(2));
+			try (ResultSet rs = st.executeQuery()) {
+				if (rs.next())
+					currentVersion = Version.valueOf(rs.getString(2));
+			}
 		}
 
 		return currentVersion;

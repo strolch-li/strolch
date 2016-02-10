@@ -378,7 +378,7 @@ public class FileHelper {
 			File file = files.get(i);
 
 			// get list of parents for this file
-			List<File> parents = new ArrayList<File>();
+			List<File> parents = new ArrayList<>();
 			File parent = file.getParentFile();
 			while (parent != null) {
 				parents.add(parent);
@@ -389,7 +389,7 @@ public class FileHelper {
 
 			// and now the same for the next file
 			File fileNext = files.get(i + 1);
-			List<File> parentsNext = new ArrayList<File>();
+			List<File> parentsNext = new ArrayList<>();
 			File parentNext = fileNext.getParentFile();
 			while (parentNext != null) {
 				parentsNext.add(parentNext);

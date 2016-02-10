@@ -89,7 +89,7 @@ public class Paging<T> {
 	 */
 	public static <T> Paging<T> asPage(List<T> list, int pageSize, int page) {
 
-		Paging<T> paging = new Paging<T>(pageSize, page);
+		Paging<T> paging = new Paging<>(pageSize, page);
 		paging.nrOfElements = list.size();
 
 		if (paging.pageSize <= 0 || paging.pageToReturn <= 0) {

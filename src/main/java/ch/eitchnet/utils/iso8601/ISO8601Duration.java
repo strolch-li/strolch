@@ -54,9 +54,13 @@ public class ISO8601Duration implements DurationFormat {
 	 * @author gattom
 	 */
 	public enum TimeDuration {
-		SECOND(1000, 'S'), MINUTE(60 * SECOND.duration(), 'M'), HOUR(60 * MINUTE.duration(), 'H'), DAY(24 * HOUR
-				.duration(), 'D'), WEEK(7 * DAY.duration(), 'W'), MONTH(30 * DAY.duration(), 'M'), YEAR(12 * MONTH
-				.duration(), 'Y');
+		SECOND(1000, 'S'),
+		MINUTE(60 * SECOND.duration(), 'M'),
+		HOUR(60 * MINUTE.duration(), 'H'),
+		DAY(24 * HOUR.duration(), 'D'),
+		WEEK(7 * DAY.duration(), 'W'),
+		MONTH(30 * DAY.duration(), 'M'),
+		YEAR(12 * MONTH.duration(), 'Y');
 
 		final long millis;
 		final char isoChar;
@@ -74,17 +78,15 @@ public class ISO8601Duration implements DurationFormat {
 			char duration = isostring.charAt(unitIndex);
 			switch (duration) {
 			case 'S':
-				if (isostring.substring(0, unitIndex).contains("T")) {
+				if (isostring.substring(0, unitIndex).contains("T"))
 					return SECOND;
-				} else
-					throw new NumberFormatException(duration
-							+ " is not a valid unit of time in ISO8601 without a preceeding T (e.g.: PT1S)");
+				throw new NumberFormatException(
+						duration + " is not a valid unit of time in ISO8601 without a preceeding T (e.g.: PT1S)");
 			case 'H':
-				if (isostring.substring(0, unitIndex).contains("T")) {
+				if (isostring.substring(0, unitIndex).contains("T"))
 					return HOUR;
-				} else
-					throw new NumberFormatException(duration
-							+ " is not a valid unit of time in ISO8601 without a preceeding T (e.g.: PT1H)");
+				throw new NumberFormatException(
+						duration + " is not a valid unit of time in ISO8601 without a preceeding T (e.g.: PT1H)");
 			case 'D':
 				return DAY;
 			case 'W':
@@ -92,11 +94,9 @@ public class ISO8601Duration implements DurationFormat {
 			case 'Y':
 				return YEAR;
 			case 'M':
-				if (isostring.substring(0, unitIndex).contains("T")) {
+				if (isostring.substring(0, unitIndex).contains("T"))
 					return MINUTE;
-				} else {
-					return MONTH;
-				}
+				return MONTH;
 			default:
 				throw new NumberFormatException(duration + " is not a valid unit of time in ISO8601");
 			}

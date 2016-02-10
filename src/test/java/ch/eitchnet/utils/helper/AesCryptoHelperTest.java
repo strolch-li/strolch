@@ -37,26 +37,27 @@ public class AesCryptoHelperTest {
 
 			// encrypt data
 			ByteArrayOutputStream encryptedOut = new ByteArrayOutputStream();
-			OutputStream outputStream = AesCryptoHelper.wrapEncrypt(password, salt, encryptedOut);
-			outputStream.write(clearTextBytes);
-			outputStream.flush();
-			outputStream.close();
+			try (OutputStream outputStream = AesCryptoHelper.wrapEncrypt(password, salt, encryptedOut)) {
+				outputStream.write(clearTextBytes);
+				outputStream.flush();
+			}
 
 			// decrypt data
 			byte[] encryptedBytes = encryptedOut.toByteArray();
 			ByteArrayInputStream encryptedIn = new ByteArrayInputStream(encryptedBytes);
-			InputStream inputStream = AesCryptoHelper.wrapDecrypt(password, salt, encryptedIn);
+			try (InputStream inputStream = AesCryptoHelper.wrapDecrypt(password, salt, encryptedIn)) {
 
-			ByteArrayOutputStream decryptedOut = new ByteArrayOutputStream();
-			byte[] readBuffer = new byte[64];
-			int read = 0;
-			while ((read = inputStream.read(readBuffer)) != -1) {
-				decryptedOut.write(readBuffer, 0, read);
+				ByteArrayOutputStream decryptedOut = new ByteArrayOutputStream();
+				byte[] readBuffer = new byte[64];
+				int read = 0;
+				while ((read = inputStream.read(readBuffer)) != -1) {
+					decryptedOut.write(readBuffer, 0, read);
+				}
+
+				byte[] decryptedBytes = decryptedOut.toByteArray();
+				assertArrayEquals(clearTextBytes, decryptedBytes);
 			}
 
-			byte[] decryptedBytes = decryptedOut.toByteArray();
-
-			assertArrayEquals(clearTextBytes, decryptedBytes);
 		} catch (RuntimeException e) {
 			if (ExceptionHelper.getRootCause(e).getMessage().equals("Illegal key size or default parameters"))
 				logger.warn("YOU ARE MISSING THE UNLIMITED JCE POLICIES and can not do AES encryption!");
@@ -75,6 +76,7 @@ public class AesCryptoHelperTest {
 			byte[] decryptedBytes = AesCryptoHelper.decrypt(password, salt, encryptedBytes);
 
 			assertArrayEquals(clearTextBytes, decryptedBytes);
+
 		} catch (RuntimeException e) {
 			if (ExceptionHelper.getRootCause(e).getMessage().equals("Illegal key size or default parameters"))
 				logger.warn("YOU ARE MISSING THE UNLIMITED JCE POLICIES and can not do AES encryption!");
@@ -141,6 +143,7 @@ public class AesCryptoHelperTest {
 
 			String inputSha256 = StringHelper.getHexString(FileHelper.hashFileSha256(new File(clearTextFileS)));
 			String doutputSha256 = StringHelper.getHexString(FileHelper.hashFileSha256(new File(decryptedFileS)));
+
 			assertEquals(inputSha256, doutputSha256);
 
 		} catch (RuntimeException e) {

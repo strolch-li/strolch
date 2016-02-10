@@ -39,7 +39,7 @@ public class GenerateReverseBaseEncodingAlphabets {
 
 	public static String generateReverseAlphabet(String name, byte[] alphabet) {
 
-		Map<Byte, Byte> valueToIndex = new HashMap<Byte, Byte>();
+		Map<Byte, Byte> valueToIndex = new HashMap<>();
 		for (byte i = 0; i < alphabet.length; i++) {
 			Byte value = Byte.valueOf(i);
 			Byte key = Byte.valueOf(alphabet[value]);

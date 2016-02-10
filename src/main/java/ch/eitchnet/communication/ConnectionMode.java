@@ -39,6 +39,7 @@ public enum ConnectionMode {
 	 * or do any other kind of work
 	 */
 	OFF {
+		@Override
 		public boolean isSimulation() {
 			return false;
 		}
@@ -50,6 +51,7 @@ public enum ConnectionMode {
 	 * re-established should an {@link IOException} occur
 	 */
 	ON {
+		@Override
 		public boolean isSimulation() {
 			return false;
 		}
@@ -60,6 +62,7 @@ public enum ConnectionMode {
 	 * {@link CommunicationConnection} accepts messages, but silently swallows them, instead of processing them
 	 */
 	SIMULATION {
+		@Override
 		public boolean isSimulation() {
 			return true;
 		}

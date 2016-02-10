@@ -77,7 +77,7 @@ public class SimpleMessageArchive implements IoMessageArchive {
 
 	@Override
 	public synchronized List<IoMessage> getBy(String connectionId) {
-		List<IoMessage> all = new ArrayList<IoMessage>();
+		List<IoMessage> all = new ArrayList<>();
 		for (IoMessage msg : this.messageArchive) {
 			if (msg.getConnectionId().equals(connectionId))
 				all.add(msg);
@@ -87,7 +87,7 @@ public class SimpleMessageArchive implements IoMessageArchive {
 
 	@Override
 	public synchronized List<IoMessage> getBy(String connectionId, CommandKey key) {
-		List<IoMessage> all = new ArrayList<IoMessage>();
+		List<IoMessage> all = new ArrayList<>();
 		for (IoMessage msg : this.messageArchive) {
 			if (msg.getConnectionId().equals(connectionId) && msg.getKey().equals(key))
 				all.add(msg);

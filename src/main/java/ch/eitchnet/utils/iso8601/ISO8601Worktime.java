@@ -73,17 +73,15 @@ public class ISO8601Worktime implements WorktimeFormat {
 			char duration = isostring.charAt(unitIndex);
 			switch (duration) {
 			case 'S':
-				if (isostring.substring(0, unitIndex).contains("T")) {
+				if (isostring.substring(0, unitIndex).contains("T"))
 					return SECOND;
-				} else
-					throw new NumberFormatException(duration
-							+ " is not a valid unit of time in ISO8601 without a preceeding T (e.g.: PT1S)");
+				throw new NumberFormatException(
+						duration + " is not a valid unit of time in ISO8601 without a preceeding T (e.g.: PT1S)");
 			case 'H':
-				if (isostring.substring(0, unitIndex).contains("T")) {
+				if (isostring.substring(0, unitIndex).contains("T"))
 					return HOUR;
-				} else
-					throw new NumberFormatException(duration
-							+ " is not a valid unit of time in ISO8601 without a preceeding T (e.g.: PT1H)");
+				throw new NumberFormatException(
+						duration + " is not a valid unit of time in ISO8601 without a preceeding T (e.g.: PT1H)");
 			case 'M':
 				return MINUTE;
 			default:
@@ -143,11 +141,9 @@ public class ISO8601Worktime implements WorktimeFormat {
 			} while (newposition < s.length());
 
 			return newResult;
-
-		} else {
-			throw new NumberFormatException(s + " cannot be parsed to ISO 8601 Duration");
 		}
 
+		throw new NumberFormatException(s + " cannot be parsed to ISO 8601 Duration");
 	}
 
 	/**

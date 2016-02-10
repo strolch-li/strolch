@@ -88,8 +88,8 @@ public class ObjectFilter {
 	 * Default constructor initializing the filter
 	 */
 	public ObjectFilter() {
-		this.cache = new HashMap<Object, ObjectCache>();
-		this.keySet = new HashSet<String>();
+		this.cache = new HashMap<>();
+		this.keySet = new HashSet<>();
 	}
 
 	/**
@@ -439,7 +439,7 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
 	public List<Object> getAdded(String key) {
-		List<Object> addedObjects = new LinkedList<Object>();
+		List<Object> addedObjects = new LinkedList<>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.ADD && (objectCache.getKey().equals(key))) {
@@ -460,7 +460,7 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
 	public <V extends Object> List<V> getAdded(Class<V> clazz, String key) {
-		List<V> addedObjects = new LinkedList<V>();
+		List<V> addedObjects = new LinkedList<>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.ADD && (objectCache.getKey().equals(key))) {
@@ -483,7 +483,7 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
 	public List<Object> getUpdated(String key) {
-		List<Object> updatedObjects = new LinkedList<Object>();
+		List<Object> updatedObjects = new LinkedList<>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.MODIFY && (objectCache.getKey().equals(key))) {
@@ -504,7 +504,7 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
 	public <V extends Object> List<V> getUpdated(Class<V> clazz, String key) {
-		List<V> updatedObjects = new LinkedList<V>();
+		List<V> updatedObjects = new LinkedList<>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.MODIFY && (objectCache.getKey().equals(key))) {
@@ -527,7 +527,7 @@ public class ObjectFilter {
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public List<Object> getRemoved(String key) {
-		List<Object> removedObjects = new LinkedList<Object>();
+		List<Object> removedObjects = new LinkedList<>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.REMOVE && (objectCache.getKey().equals(key))) {
@@ -548,7 +548,7 @@ public class ObjectFilter {
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public <V extends Object> List<V> getRemoved(Class<V> clazz, String key) {
-		List<V> removedObjects = new LinkedList<V>();
+		List<V> removedObjects = new LinkedList<>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getOperation() == Operation.REMOVE && (objectCache.getKey().equals(key))) {
@@ -573,7 +573,7 @@ public class ObjectFilter {
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public <V extends Object> List<V> getAll(Class<V> clazz, String key) {
-		List<V> objects = new LinkedList<V>();
+		List<V> objects = new LinkedList<>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getKey().equals(key)) {
@@ -596,7 +596,7 @@ public class ObjectFilter {
 	 * @return The list of all objects that of the given class
 	 */
 	public <V extends Object> List<V> getAll(Class<V> clazz) {
-		List<V> objects = new LinkedList<V>();
+		List<V> objects = new LinkedList<>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getObject().getClass() == clazz) {
@@ -618,7 +618,7 @@ public class ObjectFilter {
 	 * @return The list of objects matching the given key.
 	 */
 	public List<Object> getAll(String key) {
-		List<Object> allObjects = new LinkedList<Object>();
+		List<Object> allObjects = new LinkedList<>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getKey().equals(key)) {
@@ -638,7 +638,7 @@ public class ObjectFilter {
 	 * @return The list of objects matching the given key.
 	 */
 	public List<ObjectCache> getCache(String key) {
-		List<ObjectCache> allCache = new LinkedList<ObjectCache>();
+		List<ObjectCache> allCache = new LinkedList<>();
 		Collection<ObjectCache> allObjs = this.cache.values();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getKey().equals(key)) {

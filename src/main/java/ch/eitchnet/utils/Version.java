@@ -125,14 +125,10 @@ public class Version implements Comparable<Version> {
 	 *             If the numerical components are negative or the qualifier string is invalid.
 	 */
 	public Version(final int major, final int minor, final int micro, String qualifier, boolean osgiStyle) {
-		if (qualifier == null) {
-			qualifier = "";
-		}
-
 		this.major = major;
 		this.minor = minor;
 		this.micro = micro;
-		this.qualifier = qualifier;
+		this.qualifier = qualifier == null ? "" : qualifier;
 		this.versionString = null;
 		validate();
 	}
@@ -155,8 +151,8 @@ public class Version implements Comparable<Version> {
 		String qual = StringHelper.EMPTY;
 
 		try {
-			StringTokenizer st = new StringTokenizer(version, SEPARATOR + MAVEN_QUALIFIER_SEPARATOR
-					+ OSGI_QUALIFIER_SEPARATOR, true);
+			StringTokenizer st = new StringTokenizer(version,
+					SEPARATOR + MAVEN_QUALIFIER_SEPARATOR + OSGI_QUALIFIER_SEPARATOR, true);
 			maj = Integer.parseInt(st.nextToken());
 
 			if (st.hasMoreTokens()) { // minor
@@ -248,16 +244,14 @@ public class Version implements Comparable<Version> {
 	 *             If {@code version} is improperly formatted.
 	 */
 	public static Version valueOf(String version) {
-		if (version == null) {
+		if (version == null)
 			return emptyVersion;
-		}
 
-		version = version.trim();
-		if (version.length() == 0) {
+		String trimmedVersion = version.trim();
+		if (trimmedVersion.length() == 0)
 			return emptyVersion;
-		}
 
-		return new Version(version);
+		return new Version(trimmedVersion);
 	}
 
 	/**
@@ -478,12 +472,11 @@ public class Version implements Comparable<Version> {
 
 	private String createQualifier(boolean withOsgiStyle) {
 		if (this.qualifier.equals(MAVEN_SNAPSHOT_QUALIFIER) || this.qualifier.equals(OSGI_SNAPSHOT_QUALIFIER)) {
-			if (withOsgiStyle) {
+			if (withOsgiStyle)
 				return OSGI_SNAPSHOT_QUALIFIER;
-			} else {
-				return MAVEN_SNAPSHOT_QUALIFIER;
-			}
+			return MAVEN_SNAPSHOT_QUALIFIER;
 		}
+
 		return this.qualifier;
 	}
 
