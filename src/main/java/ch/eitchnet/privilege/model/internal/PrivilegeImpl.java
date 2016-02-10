@@ -109,8 +109,8 @@ public final class PrivilegeImpl implements IPrivilege {
 	 */
 	@Override
 	public PrivilegeRep asPrivilegeRep() {
-		return new PrivilegeRep(this.name, this.policy, this.allAllowed, new HashSet<String>(this.denyList),
-				new HashSet<String>(this.allowList));
+		return new PrivilegeRep(this.name, this.policy, this.allAllowed, new HashSet<>(this.denyList),
+				new HashSet<>(this.allowList));
 	}
 
 	/**

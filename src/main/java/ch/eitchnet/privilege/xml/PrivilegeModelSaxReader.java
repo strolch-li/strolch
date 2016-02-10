@@ -47,7 +47,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(PrivilegeModelSaxReader.class);
 
-	private Deque<ElementParser> buildersStack = new ArrayDeque<ElementParser>();
+	private Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
 	private List<User> users;
 	private List<Role> roles;
@@ -55,8 +55,8 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 	private boolean insideUser;
 
 	public PrivilegeModelSaxReader() {
-		this.users = new ArrayList<User>();
-		this.roles = new ArrayList<Role>();
+		this.users = new ArrayList<>();
+		this.roles = new ArrayList<>();
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 		}
 
 		private void init() {
-			this.privileges = new HashMap<String, IPrivilege>();
+			this.privileges = new HashMap<>();
 
 			this.text = null;
 
@@ -155,8 +155,8 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 			this.privilegeName = null;
 			this.privilegePolicy = null;
 			this.allAllowed = false;
-			this.denyList = new HashSet<String>();
-			this.allowList = new HashSet<String>();
+			this.denyList = new HashSet<>();
+			this.allowList = new HashSet<>();
 		}
 
 		@Override
@@ -201,8 +201,8 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 				this.privilegeName = null;
 				this.privilegePolicy = null;
 				this.allAllowed = false;
-				this.denyList = new HashSet<String>();
-				this.allowList = new HashSet<String>();
+				this.denyList = new HashSet<>();
+				this.allowList = new HashSet<>();
 
 			} else if (qName.equals(XmlConstants.XML_ROLE)) {
 
@@ -245,7 +245,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 		Map<String, String> parameters;
 
 		public UserParser() {
-			this.userRoles = new HashSet<String>();
+			this.userRoles = new HashSet<>();
 		}
 
 		@Override
@@ -307,7 +307,7 @@ public class PrivilegeModelSaxReader extends DefaultHandler {
 
 //	      <Property name="organizationalUnit" value="Development" />
 
-		public Map<String, String> parameterMap = new HashMap<String, String>();
+		public Map<String, String> parameterMap = new HashMap<>();
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {

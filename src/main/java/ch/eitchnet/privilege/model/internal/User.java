@@ -116,7 +116,7 @@ public final class User {
 		if (roles == null)
 			this.roles = Collections.emptySet();
 		else
-			this.roles = Collections.unmodifiableSet(new HashSet<String>(roles));
+			this.roles = Collections.unmodifiableSet(new HashSet<>(roles));
 
 		if (locale == null)
 			this.locale = Locale.getDefault();
@@ -126,7 +126,7 @@ public final class User {
 		if (propertyMap == null)
 			this.propertyMap = Collections.emptyMap();
 		else
-			this.propertyMap = Collections.unmodifiableMap(new HashMap<String, String>(propertyMap));
+			this.propertyMap = Collections.unmodifiableMap(new HashMap<>(propertyMap));
 	}
 
 	/**
@@ -234,7 +234,7 @@ public final class User {
 	 */
 	public UserRep asUserRep() {
 		return new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState,
-				new HashSet<String>(this.roles), this.locale, new HashMap<String, String>(this.propertyMap));
+				new HashSet<>(this.roles), this.locale, new HashMap<>(this.propertyMap));
 	}
 
 	/**

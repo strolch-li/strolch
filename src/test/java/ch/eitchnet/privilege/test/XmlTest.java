@@ -131,9 +131,9 @@ public class XmlTest {
 	@Test
 	public void canWriteConfig() {
 
-		Map<String, String> parameterMap = new HashMap<String, String>();
-		Map<String, String> encryptionHandlerParameterMap = new HashMap<String, String>();
-		Map<String, String> persistenceHandlerParameterMap = new HashMap<String, String>();
+		Map<String, String> parameterMap = new HashMap<>();
+		Map<String, String> encryptionHandlerParameterMap = new HashMap<>();
+		Map<String, String> persistenceHandlerParameterMap = new HashMap<>();
 
 		parameterMap.put("autoPersistOnPasswordChange", "true");
 		encryptionHandlerParameterMap.put("hashAlgorithm", "SHA-256");
@@ -189,7 +189,7 @@ public class XmlTest {
 		assertEquals("en_gb", admin.getLocale().toString());
 		assertThat(admin.getRoles(), containsInAnyOrder("PrivilegeAdmin", "AppUser"));
 		Map<String, String> properties = admin.getProperties();
-		assertEquals(new HashSet<String>(Arrays.asList("organization", "organizationalUnit")), properties.keySet());
+		assertEquals(new HashSet<>(Arrays.asList("organization", "organizationalUnit")), properties.keySet());
 		assertEquals("eitchnet.ch", properties.get("organization"));
 		assertEquals("Development", properties.get("organizationalUnit"));
 
@@ -233,7 +233,7 @@ public class XmlTest {
 		// AppUser
 		Role appUser = findRole("AppUser", roles);
 		assertEquals("AppUser", appUser.getName());
-		assertEquals(new HashSet<String>(Arrays.asList("ch.eitchnet.privilege.test.model.TestRestrictable")),
+		assertEquals(new HashSet<>(Arrays.asList("ch.eitchnet.privilege.test.model.TestRestrictable")),
 				appUser.getPrivilegeNames());
 
 		IPrivilege testRestrictable = appUser.getPrivilege("ch.eitchnet.privilege.test.model.TestRestrictable");
@@ -320,31 +320,31 @@ public class XmlTest {
 		Set<String> userRoles;
 		Map<String, IPrivilege> privilegeMap;
 
-		List<User> users = new ArrayList<User>();
-		propertyMap = new HashMap<String, String>();
+		List<User> users = new ArrayList<>();
+		propertyMap = new HashMap<>();
 		propertyMap.put("prop1", "value1");
-		userRoles = new HashSet<String>();
+		userRoles = new HashSet<>();
 		userRoles.add("role1");
 		users.add(new User("1", "user1", "blabla", "Bob", "White", UserState.DISABLED, userRoles, Locale.ENGLISH,
 				propertyMap));
 
-		propertyMap = new HashMap<String, String>();
+		propertyMap = new HashMap<>();
 		propertyMap.put("prop2", "value2");
-		userRoles = new HashSet<String>();
+		userRoles = new HashSet<>();
 		userRoles.add("role2");
 		users.add(new User("2", "user2", "haha", "Leonard", "Sheldon", UserState.ENABLED, userRoles, Locale.ENGLISH,
 				propertyMap));
 
-		List<Role> roles = new ArrayList<Role>();
+		List<Role> roles = new ArrayList<>();
 		Set<String> list = Collections.emptySet();
-		privilegeMap = new HashMap<String, IPrivilege>();
+		privilegeMap = new HashMap<>();
 		privilegeMap.put("priv1", new PrivilegeImpl("priv1", "DefaultPrivilege", true, list, list));
 		roles.add(new Role("role1", privilegeMap));
 
-		privilegeMap = new HashMap<String, IPrivilege>();
-		Set<String> denyList = new HashSet<String>();
+		privilegeMap = new HashMap<>();
+		Set<String> denyList = new HashSet<>();
 		denyList.add("myself");
-		Set<String> allowList = new HashSet<String>();
+		Set<String> allowList = new HashSet<>();
 		allowList.add("other");
 		privilegeMap.put("priv2", new PrivilegeImpl("priv2", "DefaultPrivilege", false, denyList, allowList));
 		roles.add(new Role("role2", privilegeMap));

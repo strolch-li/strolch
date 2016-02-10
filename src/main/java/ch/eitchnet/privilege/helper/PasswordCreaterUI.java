@@ -61,7 +61,7 @@ public class PasswordCreaterUI {
 		JLabel hash = new JLabel("Hash:", SwingConstants.RIGHT);
 
 		String[] digests = new String[] { "MD2", "MD5", "SHA-1", "SHA-256", "SHA-384", "SHA-512" };
-		final JComboBox<String> digestCombo = new JComboBox<String>(digests);
+		final JComboBox<String> digestCombo = new JComboBox<>(digests);
 		digestCombo.setSelectedIndex(3);
 		final JPasswordField passwordField = new JPasswordField();
 		final JTextField hashField = new JTextField(150);

@@ -51,8 +51,8 @@ public class PrivilegeContext {
 			Map<String, PrivilegePolicy> policies) {
 		this.userRep = userRep;
 		this.certificate = certificate;
-		this.privileges = Collections.unmodifiableMap(new HashMap<String, IPrivilege>(privileges));
-		this.policies = Collections.unmodifiableMap(new HashMap<String, PrivilegePolicy>(policies));
+		this.privileges = Collections.unmodifiableMap(new HashMap<>(privileges));
+		this.policies = Collections.unmodifiableMap(new HashMap<>(policies));
 	}
 
 	public UserRep getUserRep() {

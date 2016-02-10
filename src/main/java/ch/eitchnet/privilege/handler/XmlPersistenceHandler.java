@@ -58,14 +58,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public List<User> getAllUsers() {
 		synchronized (this.userMap) {
-			return new LinkedList<User>(this.userMap.values());
+			return new LinkedList<>(this.userMap.values());
 		}
 	}
 
 	@Override
 	public List<Role> getAllRoles() {
 		synchronized (this.roleMap) {
-			return new LinkedList<Role>(this.roleMap.values());
+			return new LinkedList<>(this.roleMap.values());
 		}
 	}
 
@@ -138,7 +138,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	public void initialize(Map<String, String> paramsMap) {
 
 		// copy parameter map
-		this.parameterMap = Collections.unmodifiableMap(new HashMap<String, String>(paramsMap));
+		this.parameterMap = Collections.unmodifiableMap(new HashMap<>(paramsMap));
 
 		// get and validate base bath
 		String basePath = this.parameterMap.get(XmlConstants.XML_PARAM_BASE_PATH);

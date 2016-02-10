@@ -46,7 +46,7 @@ public class PrivilegeContainerModel {
 	 * Default constructor
 	 */
 	public PrivilegeContainerModel() {
-		this.policies = new HashMap<String, Class<PrivilegePolicy>>();
+		this.policies = new HashMap<>();
 	}
 
 	/**

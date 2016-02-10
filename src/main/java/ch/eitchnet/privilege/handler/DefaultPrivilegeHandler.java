@@ -677,7 +677,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// create new user
-		Set<String> newRoles = new HashSet<String>(currentRoles);
+		Set<String> newRoles = new HashSet<>(currentRoles);
 		newRoles.remove(roleName);
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
 				existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(), newRoles,
@@ -973,7 +973,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new set of privileges with out the to removed privilege
 		Set<String> privilegeNames = existingRole.getPrivilegeNames();
-		Map<String, IPrivilege> newPrivileges = new HashMap<String, IPrivilege>(privilegeNames.size() - 1);
+		Map<String, IPrivilege> newPrivileges = new HashMap<>(privilegeNames.size() - 1);
 		for (String name : privilegeNames) {
 			IPrivilege privilege = existingRole.getPrivilege(name);
 			if (!privilege.getName().equals(privilegeName))
@@ -1053,8 +1053,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		List<Certificate> sessions = this.privilegeContextMap.values().stream().map(p -> p.getCertificate())
 				.filter(c -> !c.getUserState().isSystem()).collect(Collectors.toList());
 
-		try (OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey,
-				new FileOutputStream(this.persistSessionsPath))) {
+		try (FileOutputStream fout = new FileOutputStream(this.persistSessionsPath);
+				OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, fout)) {
 
 			CertificateStubsDomWriter writer = new CertificateStubsDomWriter(sessions, outputStream);
 			writer.write();
@@ -1083,8 +1083,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					"Sessions data file is not a file but exists at " + this.persistSessionsPath.getAbsolutePath());
 
 		List<CertificateStub> certificateStubs;
-		try (InputStream inputStream = AesCryptoHelper.wrapDecrypt(this.secretKey,
-				new FileInputStream(this.persistSessionsPath))) {
+		try (FileInputStream fin = new FileInputStream(this.persistSessionsPath);
+				InputStream inputStream = AesCryptoHelper.wrapDecrypt(this.secretKey, fin)) {
 
 			CertificateStubsSaxReader reader = new CertificateStubsSaxReader(inputStream);
 			certificateStubs = reader.read();
@@ -1199,8 +1199,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private PrivilegeContext buildPrivilegeContext(Certificate certificate, User user) {
 
 		Set<String> userRoles = user.getRoles();
-		Map<String, IPrivilege> privileges = new HashMap<String, IPrivilege>();
-		Map<String, PrivilegePolicy> policies = new HashMap<String, PrivilegePolicy>();
+		Map<String, IPrivilege> privileges = new HashMap<>();
+		Map<String, PrivilegePolicy> policies = new HashMap<>();
 
 		// get a cache of the privileges and policies for this user
 		for (String roleName : userRoles) {

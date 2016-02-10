@@ -59,8 +59,8 @@ public class PrivilegeInitializationHelper {
 		}
 
 		// delegate using input stream
-		try {
-			return initializeFromXml(new FileInputStream(privilegeXmlFile));
+		try (FileInputStream fin = new FileInputStream(privilegeXmlFile)) {
+			return initializeFromXml(fin);
 		} catch (Exception e) {
 			String msg = "Failed to load configuration from {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());

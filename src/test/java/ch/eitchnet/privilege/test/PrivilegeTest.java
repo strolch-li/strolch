@@ -622,7 +622,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// testAddUserTedAsBob
 			login(BOB, ArraysHelper.copyOf(PASS_BOB));
 			// let's add a new user ted
-			HashSet<String> roles = new HashSet<String>();
+			HashSet<String> roles = new HashSet<>();
 			roles.add(ROLE_USER);
 			userRep = new UserRep(null, TED, "Ted", "Newman", UserState.ENABLED, roles, null,
 					new HashMap<String, String>());
@@ -738,7 +738,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			// let's add a new user bob
 			UserRep userRep = new UserRep(null, BOB, "Bob", "Newman", UserState.NEW,
-					new HashSet<String>(Arrays.asList(ROLE_MY)), null, new HashMap<String, String>());
+					new HashSet<>(Arrays.asList(ROLE_MY)), null, new HashMap<String, String>());
 			Certificate certificate = this.ctx.getCertificate();
 			privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + BOB);

@@ -77,9 +77,9 @@ public class BootstrapConfigurationHelper {
 			throw new RuntimeException("Could not create path " + pathF.getAbsolutePath());
 		}
 
-		Map<String, String> parameterMap = new HashMap<String, String>();
-		Map<String, String> encryptionHandlerParameterMap = new HashMap<String, String>();
-		Map<String, String> persistenceHandlerParameterMap = new HashMap<String, String>();
+		Map<String, String> parameterMap = new HashMap<>();
+		Map<String, String> encryptionHandlerParameterMap = new HashMap<>();
+		Map<String, String> persistenceHandlerParameterMap = new HashMap<>();
 
 		// TODO ask other questions...
 		parameterMap.put("autoPersistOnPasswordChange", "true");

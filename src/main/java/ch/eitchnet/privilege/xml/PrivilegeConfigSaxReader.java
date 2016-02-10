@@ -32,7 +32,7 @@ import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
  */
 public class PrivilegeConfigSaxReader extends DefaultHandler {
 
-	private Deque<ElementParser> buildersStack = new ArrayDeque<ElementParser>();
+	private Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
 	private PrivilegeContainerModel containerModel;
 
@@ -143,7 +143,7 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 //	      <Parameter name="autoPersistOnPasswordChange" value="true" />
 
-		private Map<String, String> parameterMap = new HashMap<String, String>();
+		private Map<String, String> parameterMap = new HashMap<>();
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
