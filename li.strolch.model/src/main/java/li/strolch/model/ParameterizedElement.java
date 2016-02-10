@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.parameter.Parameter;
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -105,7 +105,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 */
 	public void addParameter(Parameter<?> parameter) {
 		if (this.parameterMap == null) {
-			this.parameterMap = new HashMap<String, Parameter<?>>();
+			this.parameterMap = new HashMap<>();
 		}
 
 		if (this.parameterMap.containsKey(parameter.getId())) {
@@ -141,7 +141,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		if (this.parameterMap == null) {
 			return Collections.emptyList();
 		}
-		return new ArrayList<Parameter<?>>(this.parameterMap.values());
+		return new ArrayList<>(this.parameterMap.values());
 	}
 
 	/**
@@ -177,7 +177,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		if (this.parameterMap == null) {
 			return Collections.emptySet();
 		}
-		return new HashSet<String>(this.parameterMap.keySet());
+		return new HashSet<>(this.parameterMap.keySet());
 	}
 
 	@Override

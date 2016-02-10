@@ -33,7 +33,8 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class Order extends GroupedParameterizedElement implements StrolchRootElement, Comparable<Order> {
+public class Order extends GroupedParameterizedElement
+		implements StrolchRootElement, Comparable<Order>, PolicyContainer {
 
 	private static final long serialVersionUID = 0L;
 
@@ -94,16 +95,19 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 		this.state = state;
 	}
 
+	@Override
 	public PolicyDefs getPolicyDefs() {
 		if (this.policyDefs == null)
 			throw new StrolchPolicyException(getLocator() + " has no Policies defined!");
 		return this.policyDefs;
 	}
 
+	@Override
 	public boolean hasPolicyDefs() {
 		return this.policyDefs != null;
 	}
 
+	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);

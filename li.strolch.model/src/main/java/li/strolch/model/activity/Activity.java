@@ -27,6 +27,7 @@ import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.PolicyContainer;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
@@ -41,7 +42,7 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class Activity extends GroupedParameterizedElement
-		implements IActivityElement, StrolchRootElement, Comparable<Activity> {
+		implements IActivityElement, StrolchRootElement, Comparable<Activity>, PolicyContainer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -63,7 +64,7 @@ public class Activity extends GroupedParameterizedElement
 	private void initElements() {
 		if (this.elements == null) {
 			// use a LinkedHashMap since we will iterate elements in the order added and lookup elements by ID
-			elements = new LinkedHashMap<String, IActivityElement>();
+			this.elements = new LinkedHashMap<>();
 		}
 	}
 
@@ -189,16 +190,19 @@ public class Activity extends GroupedParameterizedElement
 		return state;
 	}
 
+	@Override
 	public PolicyDefs getPolicyDefs() {
 		if (this.policyDefs == null)
 			throw new StrolchPolicyException(getLocator() + " has no Policies defined!");
 		return this.policyDefs;
 	}
 
+	@Override
 	public boolean hasPolicyDefs() {
 		return this.policyDefs != null;
 	}
 
+	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);

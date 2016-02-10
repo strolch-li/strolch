@@ -23,6 +23,7 @@ import ch.eitchnet.privilege.handler.SystemUserAction;
 import ch.eitchnet.privilege.model.Restrictable;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.model.PolicyContainer;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -94,7 +95,8 @@ public abstract class Command implements Restrictable {
 	 * 
 	 * @return the policy
 	 */
-	protected <T extends StrolchPolicy> T getPolicy(Class<T> policyClass, PolicyDefs policyDefs) {
+	protected <T extends StrolchPolicy> T getPolicy(Class<T> policyClass, PolicyContainer policyContainer) {
+		PolicyDefs policyDefs = policyContainer.getPolicyDefs();
 		PolicyDef policyDef = policyDefs.getPolicyDef(policyClass.getSimpleName());
 		PolicyHandler policyHandler = getComponent(PolicyHandler.class);
 		@SuppressWarnings("unchecked")
