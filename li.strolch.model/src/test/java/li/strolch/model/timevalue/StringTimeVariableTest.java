@@ -46,13 +46,13 @@ public class StringTimeVariableTest {
 
 	private TimeVariable<IValue<Set<AString>>> timeVariable;
 
-	private Map<Long, StringSetValue> testSets = new HashMap<Long, StringSetValue>();
+	private Map<Long, StringSetValue> testSets = new HashMap<>();
 
 	@Before
 	public void init() {
-		this.timeVariable = new TimeVariable<IValue<Set<AString>>>();
+		this.timeVariable = new TimeVariable<>();
 		for (Long i = 0L; i < MAX; i += STEP) {
-			Set<AString> testSet = new HashSet<AString>();
+			Set<AString> testSet = new HashSet<>();
 			StringSetValue testValue = new StringSetValue(testSet);
 			this.testSets.put(i, testValue);
 			testSet.add(new AString("string " + i)); //$NON-NLS-1$
@@ -91,15 +91,15 @@ public class StringTimeVariableTest {
 	@Test
 	public void testApplyChange() {
 
-		Set<AString> testSet = new HashSet<AString>();
+		Set<AString> testSet = new HashSet<>();
 		testSet.add(new AString("Martin")); //$NON-NLS-1$
 		StringSetValue testValue = new StringSetValue(testSet);
 
-		this.timeVariable = new TimeVariable<IValue<Set<AString>>>();
+		this.timeVariable = new TimeVariable<>();
 		this.timeVariable.setValueAt(PICK, testValue);
 
 		IValue<Set<AString>> inverseTestValue = testValue.getInverse();
-		IValueChange<IValue<Set<AString>>> change = new ValueChange<IValue<Set<AString>>>(PICK, inverseTestValue);
+		IValueChange<IValue<Set<AString>>> change = new ValueChange<>(PICK, inverseTestValue);
 		this.timeVariable.applyChange(change);
 
 		// check the future values
@@ -115,9 +115,9 @@ public class StringTimeVariableTest {
 	@Test
 	public void testCompact() {
 
-		this.timeVariable = new TimeVariable<IValue<Set<AString>>>();
+		this.timeVariable = new TimeVariable<>();
 		for (Long i = 0L; i < MAX; i += STEP) {
-			Set<AString> testSet = new HashSet<AString>();
+			Set<AString> testSet = new HashSet<>();
 			StringSetValue testValue = new StringSetValue(testSet);
 			this.testSets.put(i, testValue);
 			testSet.add(new AString("same string")); //$NON-NLS-1$

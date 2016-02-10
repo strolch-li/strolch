@@ -72,7 +72,7 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 	@SuppressWarnings("unchecked")
 	@Override
 	public ITimeValue<T> getCopy() {
-		return new TimeValue<T>(this.time, (T) this.value.getCopy());
+		return new TimeValue<>(this.time, (T) this.value.getCopy());
 	}
 
 	@SuppressWarnings("nls")

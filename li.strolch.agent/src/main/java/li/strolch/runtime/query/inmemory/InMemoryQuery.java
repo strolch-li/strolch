@@ -81,7 +81,7 @@ public class InMemoryQuery<T extends StrolchElement, U> {
 		if (this.comparator != null)
 			elements.sort(this.comparator);
 
-		List<U> result = new ArrayList<U>();
+		List<U> result = new ArrayList<>();
 		Iterator<T> iter = elements.iterator();
 		while (iter.hasNext()) {
 			T element = iter.next();

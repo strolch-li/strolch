@@ -314,7 +314,7 @@ public class StrolchElementFromDomVisitor {
 			IValue<?> value = type.valueInstance(valueS);
 
 			long time = ISO8601FormatFactory.getInstance().getDateFormat().parse(timeS).getTime();
-			ValueChange<IValue<?>> valueChange = new ValueChange<IValue<?>>(time, value, stateId);
+			ValueChange<IValue<?>> valueChange = new ValueChange<>(time, value, stateId);
 
 			action.addChange(valueChange);
 		}

@@ -35,7 +35,7 @@ public class TimedState<T extends IValue> implements ITimedState<T>, Serializabl
 
 	private static final long serialVersionUID = 1L;
 
-	private ITimeVariable<T> timeVariable = new TimeVariable<T>();
+	private ITimeVariable<T> timeVariable = new TimeVariable<>();
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -53,7 +53,7 @@ public class TimedState<T extends IValue> implements ITimedState<T>, Serializabl
 	@SuppressWarnings("unchecked")
 	public ITimeValue<T> getPreviousMatch(final Long time, final T value) {
 		Collection<ITimeValue<T>> pastValues = this.timeVariable.getPastValues(time);
-		List<ITimeValue<T>> asList = new ArrayList<ITimeValue<T>>(pastValues);
+		List<ITimeValue<T>> asList = new ArrayList<>(pastValues);
 		Collections.reverse(asList);
 		for (ITimeValue<T> iTimeValue : asList) {
 			if (iTimeValue.getValue().matches(value)) {

@@ -130,7 +130,7 @@ public class ServiceExecutionHandler extends StrolchComponent {
 			}
 		}
 
-		ServiceContext<T, U> svcCtx = new ServiceContext<T, U>(certificate, service, argument);
+		ServiceContext<T, U> svcCtx = new ServiceContext<>(certificate, service, argument);
 		try {
 			ServiceExecutionStatus status = new ServiceExecutionStatus(serviceName);
 			this.serviceContextMap.put(serviceName, status);

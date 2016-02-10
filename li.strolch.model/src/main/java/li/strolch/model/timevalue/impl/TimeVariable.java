@@ -34,7 +34,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 
 	private static final long serialVersionUID = 1L;
 
-	public SortedSet<ITimeValue<T>> container = new TreeSet<ITimeValue<T>>();
+	public SortedSet<ITimeValue<T>> container = new TreeSet<>();
 
 	@Override
 	public ITimeValue<T> getValueAt(final Long time) {
@@ -55,25 +55,25 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 		if (current != null && current.getTime().equals(time)) {
 			current.setValue(targetValue);
 		} else {
-			this.container.add(new TimeValue<T>(time, targetValue));
+			this.container.add(new TimeValue<>(time, targetValue));
 		}
 	}
 
 	@Override
 	public SortedSet<ITimeValue<T>> getFutureValues(final Long time) {
-		TimeValue<T> picker = new TimeValue<T>(time, null);
-		return new TreeSet<ITimeValue<T>>(this.container.tailSet(picker));
+		TimeValue<T> picker = new TimeValue<>(time, null);
+		return new TreeSet<>(this.container.tailSet(picker));
 	}
 
 	@Override
 	public Collection<ITimeValue<T>> getPastValues(final Long time) {
-		TimeValue<T> picker = new TimeValue<T>(time, null);
-		return new TreeSet<ITimeValue<T>>(this.container.headSet(picker));
+		TimeValue<T> picker = new TimeValue<>(time, null);
+		return new TreeSet<>(this.container.headSet(picker));
 	}
 
 	@Override
 	public SortedSet<ITimeValue<T>> getValues() {
-		return new TreeSet<ITimeValue<T>>(this.container);
+		return new TreeSet<>(this.container);
 	}
 
 	@Override
@@ -86,10 +86,10 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 
 		ITimeValue<T> initialValue = getValueAt(change.getTime());
 		if (initialValue == null) {
-			ITimeValue<T> newValue = new TimeValue<T>(change.getTime(), change.getValue());
+			ITimeValue<T> newValue = new TimeValue<>(change.getTime(), change.getValue());
 			this.container.add(newValue);
 		} else if (initialValue.getTime().longValue() < change.getTime().longValue()) {
-			ITimeValue<T> newValue = new TimeValue<T>(change.getTime(), initialValue.getValue());
+			ITimeValue<T> newValue = new TimeValue<>(change.getTime(), initialValue.getValue());
 			newValue.add(change.getValue());
 			this.container.add(newValue);
 		}

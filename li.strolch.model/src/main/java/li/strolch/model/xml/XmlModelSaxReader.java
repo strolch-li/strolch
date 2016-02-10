@@ -134,7 +134,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 			IValue<?> value = StrolchValueType.parse(valueChangeType).valueInstance(valueChangeValue);
 			long valueChangeTime = ISO8601FormatFactory.getInstance().getDateFormat().parse(valueChangeTimeS).getTime();
-			ValueChange<IValue<?>> valueChange = new ValueChange<IValue<?>>(valueChangeTime, value, valueChangeStateId);
+			ValueChange<IValue<?>> valueChange = new ValueChange<>(valueChangeTime, value, valueChangeStateId);
 
 			((Action) this.parameterizedElement).addChange(valueChange);
 

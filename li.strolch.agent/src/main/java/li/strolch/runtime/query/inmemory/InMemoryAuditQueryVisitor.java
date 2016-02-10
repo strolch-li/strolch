@@ -49,7 +49,7 @@ public class InMemoryAuditQueryVisitor<U> implements AuditQueryVisitor {
 
 		long limit = auditQuery.getLimit();
 
-		return new InMemoryAuditQuery<U>(this.navigator, limit, this.selectors, auditVisitor);
+		return new InMemoryAuditQuery<>(this.navigator, limit, this.selectors, auditVisitor);
 	}
 
 	@Override

@@ -42,14 +42,14 @@ public class IntegerTimeVariableTest {
 	private static final Long PICK = 50L;
 
 	private TimeVariable<IntegerValue> timeVariable;
-	private Map<Long, IntegerValue> expectedValues = new HashMap<Long, IntegerValue>();
+	private Map<Long, IntegerValue> expectedValues = new HashMap<>();
 
 	/**
 	 * set the values ascending with a difference of STEP
 	 */
 	@Before
 	public void init() {
-		this.timeVariable = new TimeVariable<IntegerValue>();
+		this.timeVariable = new TimeVariable<>();
 		for (int i = 0; i < MAX; i += STEP) {
 			IntegerValue expectedValue = new IntegerValue(i);
 			Long time = Long.valueOf(i);
@@ -104,7 +104,7 @@ public class IntegerTimeVariableTest {
 
 		IntegerValue integerValue = new IntegerValue(STEP.intValue());
 
-		IValueChange<IntegerValue> change = new ValueChange<IntegerValue>(PICK, integerValue);
+		IValueChange<IntegerValue> change = new ValueChange<>(PICK, integerValue);
 		this.timeVariable.applyChange(change);
 
 		Collection<ITimeValue<IntegerValue>> futureValues = this.timeVariable.getFutureValues(PICK);
@@ -124,7 +124,7 @@ public class IntegerTimeVariableTest {
 	 */
 	@Test
 	public void testCompact() {
-		this.timeVariable = new TimeVariable<IntegerValue>();
+		this.timeVariable = new TimeVariable<>();
 		for (Long i = 0L; i < MAX; i += STEP) {
 			this.timeVariable.setValueAt(i, new IntegerValue(STEP.intValue()));
 		}

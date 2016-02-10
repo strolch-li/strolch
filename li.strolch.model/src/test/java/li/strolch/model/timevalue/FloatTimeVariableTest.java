@@ -47,7 +47,7 @@ public class FloatTimeVariableTest {
 	 */
 	@Before
 	public void init() {
-		this.timeVariable = new TimeVariable<FloatValue>();
+		this.timeVariable = new TimeVariable<>();
 		for (long i = 0; i < MAX; i += STEP) {
 			this.timeVariable.setValueAt(Long.valueOf(i), new FloatValue(i));
 		}
@@ -99,7 +99,7 @@ public class FloatTimeVariableTest {
 
 		FloatValue doubleValue = new FloatValue(STEP.doubleValue());
 
-		IValueChange<FloatValue> change = new ValueChange<FloatValue>(PICK, doubleValue);
+		IValueChange<FloatValue> change = new ValueChange<>(PICK, doubleValue);
 		this.timeVariable.applyChange(change);
 
 		Collection<ITimeValue<FloatValue>> futureValues = this.timeVariable.getFutureValues(PICK);
@@ -121,11 +121,11 @@ public class FloatTimeVariableTest {
 	@Test
 	public void testApply2Change() {
 
-		this.timeVariable = new TimeVariable<FloatValue>();
+		this.timeVariable = new TimeVariable<>();
 
 		FloatValue doubleValue = new FloatValue(STEP.doubleValue());
 
-		IValueChange<FloatValue> change = new ValueChange<FloatValue>(PICK, doubleValue);
+		IValueChange<FloatValue> change = new ValueChange<>(PICK, doubleValue);
 		this.timeVariable.applyChange(change);
 
 		ITimeValue<FloatValue> actual = this.timeVariable.getValueAt(PICK);
@@ -141,7 +141,7 @@ public class FloatTimeVariableTest {
 	@Test
 	public void testCompact() {
 
-		this.timeVariable = new TimeVariable<FloatValue>();
+		this.timeVariable = new TimeVariable<>();
 		for (Long i = 0L; i < MAX; i += STEP) {
 			this.timeVariable.setValueAt(i, new FloatValue(STEP.doubleValue()));
 		}

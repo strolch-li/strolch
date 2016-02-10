@@ -28,7 +28,7 @@ import org.junit.Test;
 
 public class TimeStateTest {
 
-	private ITimedState<FloatValue> state = new TimedState<FloatValue>();
+	private ITimedState<FloatValue> state = new TimedState<>();
 
 	final FloatValue expectedValue1 = new FloatValue(Double.valueOf(100D));
 	final FloatValue expectedValue2 = new FloatValue(Double.valueOf(200D));
@@ -42,7 +42,7 @@ public class TimeStateTest {
 	@Before
 	public void before() {
 
-		final IValueChange<FloatValue> change1 = new ValueChange<FloatValue>(this.t10, this.expectedValue1);
+		final IValueChange<FloatValue> change1 = new ValueChange<>(this.t10, this.expectedValue1);
 		this.state.applyChange(change1);
 
 		final ITimeValue<FloatValue> stateAt9 = this.state.getStateAt(9L);
@@ -52,7 +52,7 @@ public class TimeStateTest {
 		assertNotNull(stateAt11);
 		assertEquals(true, stateAt11.getValue().matches(this.expectedValue1));
 
-		final IValueChange<FloatValue> change2 = new ValueChange<FloatValue>(this.t30, this.expectedValue1);
+		final IValueChange<FloatValue> change2 = new ValueChange<>(this.t30, this.expectedValue1);
 		this.state.applyChange(change2);
 
 		final ITimeValue<FloatValue> stateAt31 = this.state.getStateAt(31L);

@@ -67,7 +67,7 @@ public class Locator {
 		if (pathElements == null || pathElements.isEmpty()) {
 			throw new StrolchException("The path elements may not be null and must contain at least 1 item"); //$NON-NLS-1$
 		}
-		this.pathElements = Collections.unmodifiableList(new ArrayList<String>(pathElements));
+		this.pathElements = Collections.unmodifiableList(new ArrayList<>(pathElements));
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class Locator {
 	 *            the additional path
 	 */
 	private Locator(List<String> path, List<String> subPath) {
-		List<String> fullPath = new ArrayList<String>();
+		List<String> fullPath = new ArrayList<>();
 		fullPath.addAll(path);
 		fullPath.addAll(subPath);
 		this.pathElements = Collections.unmodifiableList(fullPath);
@@ -120,7 +120,7 @@ public class Locator {
 	 *            the additional element
 	 */
 	private Locator(List<String> path, String element) {
-		List<String> fullPath = new ArrayList<String>();
+		List<String> fullPath = new ArrayList<>();
 		fullPath.addAll(path);
 		fullPath.add(element);
 		this.pathElements = Collections.unmodifiableList(fullPath);
@@ -352,7 +352,7 @@ public class Locator {
 		 * Default constructor
 		 */
 		public LocatorBuilder() {
-			this.pathElements = new ArrayList<String>();
+			this.pathElements = new ArrayList<>();
 		}
 
 		/**

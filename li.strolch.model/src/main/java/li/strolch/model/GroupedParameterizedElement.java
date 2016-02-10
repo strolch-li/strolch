@@ -147,7 +147,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 */
 	public void addParameter(String bagKey, Parameter<?> parameter) throws StrolchException {
 		if (this.parameterBagMap == null) {
-			this.parameterBagMap = new HashMap<String, ParameterBag>();
+			this.parameterBagMap = new HashMap<>();
 		}
 		ParameterBag bag = this.parameterBagMap.get(bagKey);
 		if (bag == null) {
@@ -204,7 +204,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 */
 	public void addParameterBag(ParameterBag bag) {
 		if (this.parameterBagMap == null) {
-			this.parameterBagMap = new HashMap<String, ParameterBag>();
+			this.parameterBagMap = new HashMap<>();
 		}
 
 		if (this.parameterBagMap.containsKey(bag.getId())) {
@@ -284,7 +284,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		if (this.parameterBagMap == null) {
 			return Collections.emptySet();
 		}
-		return new HashSet<String>(this.parameterBagMap.keySet());
+		return new HashSet<>(this.parameterBagMap.keySet());
 	}
 
 	/**

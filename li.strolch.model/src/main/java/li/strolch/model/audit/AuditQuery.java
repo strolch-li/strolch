@@ -119,10 +119,10 @@ public class AuditQuery<U> implements StrolchQuery {
 	}
 
 	public static AuditQuery<Audit> query(String elementTypeSelection, DateRange dateRange) {
-		return new AuditQuery<Audit>(new NoStrategyAuditVisitor(), elementTypeSelection, dateRange);
+		return new AuditQuery<>(new NoStrategyAuditVisitor(), elementTypeSelection, dateRange);
 	}
 
 	public static <U> AuditQuery<U> query(String elementTypeSelection, DateRange dateRange, AuditVisitor<U> orderVisitor) {
-		return new AuditQuery<U>(orderVisitor, elementTypeSelection, dateRange);
+		return new AuditQuery<>(orderVisitor, elementTypeSelection, dateRange);
 	}
 }
