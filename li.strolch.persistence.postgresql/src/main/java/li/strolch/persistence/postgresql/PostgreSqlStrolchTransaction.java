@@ -87,19 +87,19 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	OrderDao getOrderDao() {
 		if (this.orderDao == null)
 			this.orderDao = new PostgreSqlOrderDao(this);
-		return (OrderDao) this.orderDao;
+		return this.orderDao;
 	}
 
 	ResourceDao getResourceDao() {
 		if (this.resourceDao == null)
 			this.resourceDao = new PostgreSqlResourceDao(this);
-		return (ResourceDao) this.resourceDao;
+		return this.resourceDao;
 	}
 
 	ActivityDao getActivityDao() {
 		if (this.activityDao == null)
 			this.activityDao = new PostgreSqlActivityDao(this);
-		return (ActivityDao) this.activityDao;
+		return this.activityDao;
 	}
 
 	public AuditDao getAuditDao() {

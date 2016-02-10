@@ -11,15 +11,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.model.State;
-import li.strolch.model.xml.ActivityToDomVisitor;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import li.strolch.exception.StrolchException;
+import li.strolch.model.State;
+import li.strolch.model.xml.ActivityToDomVisitor;
 
 public class ActivityTest {
 
@@ -100,7 +100,7 @@ public class ActivityTest {
 
 	@Test
 	public void cloneTest() {
-		Activity clone = (Activity) this.activity.getClone();
+		Activity clone = this.activity.getClone();
 		Assert.assertEquals(this.activity.toString(), clone.toString());
 		Assert.assertEquals(this.activity.getElements().size(), clone.getElements().size());
 	}

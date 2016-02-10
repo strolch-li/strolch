@@ -15,16 +15,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import li.strolch.model.timevalue.IValueChange;
-import li.strolch.model.timevalue.impl.IntegerValue;
-import li.strolch.model.timevalue.impl.ValueChange;
-import li.strolch.model.xml.ActivityToDomVisitor;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import li.strolch.model.timevalue.IValueChange;
+import li.strolch.model.timevalue.impl.IntegerValue;
+import li.strolch.model.timevalue.impl.ValueChange;
+import li.strolch.model.xml.ActivityToDomVisitor;
 
 public class ActionTest {
 
@@ -61,7 +61,7 @@ public class ActionTest {
 
 	@Test
 	public void testClone() {
-		Action clone = (Action) this.action.getClone();
+		Action clone = this.action.getClone();
 		Assert.assertEquals(this.action.toString(), clone.toString());
 		Assert.assertEquals(this.action.changes.size(), clone.changes.size());
 		for (int i = 0; i < this.action.changes.size(); i++) {
