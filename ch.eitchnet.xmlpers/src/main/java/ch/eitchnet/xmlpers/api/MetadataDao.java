@@ -149,7 +149,7 @@ public class MetadataDao {
 			throw new IllegalArgumentException(msg);
 		}
 
-		Set<String> keySet = new HashSet<String>();
+		Set<String> keySet = new HashSet<>();
 		File[] subTypeFiles = queryPath.listFiles();
 		for (File subTypeFile : subTypeFiles) {
 			if (subTypeFile.isDirectory()) {
@@ -179,7 +179,7 @@ public class MetadataDao {
 			throw new IllegalArgumentException(msg);
 		}
 
-		Set<String> keySet = new HashSet<String>();
+		Set<String> keySet = new HashSet<>();
 
 		File[] subTypeFiles = queryPath.listFiles();
 		for (File subTypeFile : subTypeFiles) {

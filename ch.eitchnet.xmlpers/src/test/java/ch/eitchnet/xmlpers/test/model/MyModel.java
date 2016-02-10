@@ -25,7 +25,7 @@ public class MyModel {
 	private String id;
 	private String name;
 	private String type;
-	private Map<String, MyParameter> parameters = new HashMap<String, MyParameter>();
+	private Map<String, MyParameter> parameters = new HashMap<>();
 
 	/**
 	 *

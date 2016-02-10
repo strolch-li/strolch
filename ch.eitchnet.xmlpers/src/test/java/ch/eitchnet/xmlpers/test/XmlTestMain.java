@@ -89,7 +89,7 @@ public class XmlTestMain {
 		Document document = docBuilder.parse(file);
 		Element rootElement = document.getDocumentElement();
 
-		List<MyModel> resources = new ArrayList<MyModel>();
+		List<MyModel> resources = new ArrayList<>();
 
 		NodeList resElements = rootElement.getElementsByTagName("Resource");
 		for (int i = 0; i < resElements.getLength(); i++) {

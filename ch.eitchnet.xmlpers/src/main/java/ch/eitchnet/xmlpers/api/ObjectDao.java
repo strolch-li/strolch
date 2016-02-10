@@ -114,7 +114,7 @@ public class ObjectDao {
 
 		long removed = 0;
 
-		Set<ObjectRef> refs = new HashSet<ObjectRef>();
+		Set<ObjectRef> refs = new HashSet<>();
 		typeRef.lock();
 		refs.add(typeRef);
 		try {
