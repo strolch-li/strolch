@@ -36,6 +36,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.StringMatchMode;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
@@ -60,15 +68,6 @@ import li.strolch.persistence.postgresql.PostgreSqlQueryVisitor;
 import li.strolch.persistence.postgresql.PostgreSqlResourceQueryVisitor;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.testbase.runtime.RuntimeMock;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -271,27 +270,23 @@ public class QueryTest {
 		List<String> expected = Arrays.asList("@1", "@2", "@3");
 
 		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
-		query.and().with(
-				ParameterSelection.stringSelection("@bag01", "@param5", "Strolch",
-						StringMatchMode.EQUALS_CASE_SENSITIVE));
+		query.and().with(ParameterSelection.stringSelection("@bag01", "@param5", "Strolch",
+				StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performOrderQuery(query, expected);
 
 		query = OrderQuery.query("MyType1", new OrderById());
-		query.and().with(
-				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
-						StringMatchMode.EQUALS_CASE_SENSITIVE));
+		query.and().with(ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
+				StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performOrderQuery(query, Arrays.<String> asList());
 
 		query = OrderQuery.query("MyType1", new OrderById());
-		query.and().with(
-				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
-						StringMatchMode.EQUALS_CASE_INSENSITIVE));
+		query.and().with(ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
+				StringMatchMode.EQUALS_CASE_INSENSITIVE));
 		performOrderQuery(query, expected);
 
 		query = OrderQuery.query("MyType1", new OrderById());
-		query.and().with(
-				ParameterSelection.stringSelection("@bag01", "@param5", "olch",
-						StringMatchMode.CONTAINS_CASE_INSENSITIVE));
+		query.and().with(ParameterSelection.stringSelection("@bag01", "@param5", "olch",
+				StringMatchMode.CONTAINS_CASE_INSENSITIVE));
 		performOrderQuery(query, expected);
 	}
 
@@ -349,8 +344,7 @@ public class QueryTest {
 	@Test
 	public void shouldQueryResource2() throws SQLException {
 		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
-		query.and().with(
-				new OrSelection(new IdSelection("@1"), new IdSelection("@2")),
+		query.and().with(new OrSelection(new IdSelection("@1"), new IdSelection("@2")),
 				new OrSelection(new NameSelection("Resource 1", StringMatchMode.EQUALS_CASE_SENSITIVE),
 						new NameSelection("Resource 2", StringMatchMode.EQUALS_CASE_SENSITIVE)));
 		performResourceQuery(query, Arrays.asList("@1", "@2"));
@@ -390,32 +384,28 @@ public class QueryTest {
 		List<String> expected = Arrays.asList("@1", "@2", "@3");
 
 		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
-		query.and().with(
-				ParameterSelection.stringSelection("@bag01", "@param5", "Strolch",
-						StringMatchMode.EQUALS_CASE_SENSITIVE));
+		query.and().with(ParameterSelection.stringSelection("@bag01", "@param5", "Strolch",
+				StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performResourceQuery(query, expected);
 
 		query = ResourceQuery.query("MyType1", new OrderById());
-		query.and().with(
-				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
-						StringMatchMode.EQUALS_CASE_SENSITIVE));
+		query.and().with(ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
+				StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performResourceQuery(query, Arrays.<String> asList());
 
 		query = ResourceQuery.query("MyType1", new OrderById());
-		query.and().with(
-				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
-						StringMatchMode.EQUALS_CASE_INSENSITIVE));
+		query.and().with(ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
+				StringMatchMode.EQUALS_CASE_INSENSITIVE));
 		performResourceQuery(query, expected);
 
 		query = ResourceQuery.query("MyType1", new OrderById());
-		query.and().with(
-				ParameterSelection.stringSelection("@bag01", "@param5", "olch",
-						StringMatchMode.CONTAINS_CASE_INSENSITIVE));
+		query.and().with(ParameterSelection.stringSelection("@bag01", "@param5", "olch",
+				StringMatchMode.CONTAINS_CASE_INSENSITIVE));
 		performResourceQuery(query, expected);
 
 		query = ResourceQuery.query("MyType1", new OrderById());
-		query.and().with(
-				ParameterSelection.stringSelection("@bag01", "@param5", "olch",
+		query.and()
+				.with(ParameterSelection.stringSelection("@bag01", "@param5", "olch",
 						StringMatchMode.CONTAINS_CASE_INSENSITIVE),
 				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
 						StringMatchMode.CONTAINS_CASE_INSENSITIVE),
@@ -488,9 +478,10 @@ public class QueryTest {
 			try (PreparedStatement ps = con.prepareStatement(sql)) {
 				visitor.setValues(ps);
 
-				ResultSet rs = ps.executeQuery();
-				while (rs.next()) {
-					ids.add(rs.getString(1));
+				try (ResultSet rs = ps.executeQuery()) {
+					while (rs.next()) {
+						ids.add(rs.getString(1));
+					}
 				}
 			}
 		}

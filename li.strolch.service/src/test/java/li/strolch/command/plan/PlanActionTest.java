@@ -27,6 +27,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.SortedSet;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import li.strolch.model.Locator;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.ParameterBag;
@@ -45,10 +49,6 @@ import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
@@ -84,56 +84,55 @@ public class PlanActionTest {
 	@Test
 	public void test() {
 
-		final StrolchTransaction tx = mock(StrolchTransaction.class);
+		try (StrolchTransaction tx = mock(StrolchTransaction.class)) {
 
-		final Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
-		when(tx.findElement(eq(locator))).thenReturn(resource);
+			final Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
+			when(tx.findElement(eq(locator))).thenReturn(resource);
 
-		final PlanActionCommand cmd = new PlanActionCommand(null, tx);
-		cmd.setAction(action);
-		cmd.doCommand();
+			final PlanActionCommand cmd = new PlanActionCommand(null, tx);
+			cmd.setAction(action);
+			cmd.doCommand();
 
-		// check the state
-		Assert.assertEquals(State.PLANNED, action.getState());
+			// check the state
+			Assert.assertEquals(State.PLANNED, action.getState());
 
-		// check the resource Id
-		Assert.assertEquals(resource.getId(), action.getResourceId());
+			// check the resource Id
+			Assert.assertEquals(resource.getId(), action.getResourceId());
 
-		// check if we get the expected result
-		final StrolchTimedState<IValue<Integer>> timedState = resource.getTimedState(STATE_INTEGER_ID);
-		final ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
-		SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
+			// check if we get the expected result
+			final StrolchTimedState<IValue<Integer>> timedState = resource.getTimedState(STATE_INTEGER_ID);
+			final ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
+			SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
 
-		Assert.assertEquals(3, values.size());
+			Assert.assertEquals(3, values.size());
 
-		ITimeValue<IValue<Integer>> valueAt = timeEvolution.getValueAt(STATE_TIME_0);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
+			ITimeValue<IValue<Integer>> valueAt = timeEvolution.getValueAt(STATE_TIME_0);
+			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
 
-		valueAt = timeEvolution.getValueAt(STATE_TIME_10);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(1)));
+			valueAt = timeEvolution.getValueAt(STATE_TIME_10);
+			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(1)));
 
-		valueAt = timeEvolution.getValueAt(STATE_TIME_20);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
+			valueAt = timeEvolution.getValueAt(STATE_TIME_20);
+			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
 
-		// call undo to clean up
-		cmd.undo();
+			// call undo to clean up
+			cmd.undo();
 
-		Assert.assertEquals(State.CREATED, action.getState());
+			Assert.assertEquals(State.CREATED, action.getState());
 
-		// and check again
-		values = timeEvolution.getValues();
-		Assert.assertEquals(1, values.size());
+			// and check again
+			values = timeEvolution.getValues();
+			Assert.assertEquals(1, values.size());
 
-		valueAt = timeEvolution.getValueAt(STATE_TIME_0);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
-
+			valueAt = timeEvolution.getValueAt(STATE_TIME_0);
+			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
+		}
 	}
 
 	/**
 	 * <p>
-	 * add changes to action start and end time with a value defined in the
-	 * action objective and set the stateId of the state variable to apply the
-	 * change to
+	 * add changes to action start and end time with a value defined in the action objective and set the stateId of the
+	 * state variable to apply the change to
 	 * </p>
 	 * 
 	 * @param action

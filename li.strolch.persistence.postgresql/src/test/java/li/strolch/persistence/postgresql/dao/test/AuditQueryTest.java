@@ -37,6 +37,15 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.StringMatchMode;
+import ch.eitchnet.utils.collections.DateRange;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.ModelGenerator;
@@ -51,16 +60,6 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.postgresql.PostgreSqlAuditQueryVisitor;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.testbase.runtime.RuntimeMock;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.StringMatchMode;
-import ch.eitchnet.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -177,8 +176,8 @@ public class AuditQueryTest {
 
 		AuditVisitor<Audit> visitor = new NoStrategyAuditVisitor();
 
-		AuditQuery<Audit> query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(earlier, true).to(later,
-				true));
+		AuditQuery<Audit> query = new AuditQuery<>(visitor, Tags.AUDIT,
+				new DateRange().from(earlier, true).to(later, true));
 		performQuery(query, Arrays.asList("0", "1", "2", "3", "4"));
 
 		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(current, true).to(current, true));
@@ -199,8 +198,8 @@ public class AuditQueryTest {
 
 		AuditVisitor<Audit> visitor = new NoStrategyAuditVisitor();
 
-		AuditQuery<Audit> query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future,
-				true));
+		AuditQuery<Audit> query = new AuditQuery<>(visitor, Tags.AUDIT,
+				new DateRange().from(past, true).to(future, true));
 		query.action().accessTypes(AccessType.CREATE, AccessType.READ);
 		performQuery(query, Arrays.asList("0", "1", "4"));
 
@@ -209,13 +208,13 @@ public class AuditQueryTest {
 		performQuery(query, Arrays.asList("0", "4"));
 
 		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
-		query.action().accessTypes(AccessType.CREATE, AccessType.READ)
-				.actions(StringMatchMode.EQUALS_CASE_SENSITIVE, "create", "read");
+		query.action().accessTypes(AccessType.CREATE, AccessType.READ).actions(StringMatchMode.EQUALS_CASE_SENSITIVE,
+				"create", "read");
 		performQuery(query, Arrays.asList("0", "1", "4"));
 
 		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
-		query.action().accessTypes(AccessType.CREATE, AccessType.READ)
-				.actions(StringMatchMode.EQUALS_CASE_SENSITIVE, "read");
+		query.action().accessTypes(AccessType.CREATE, AccessType.READ).actions(StringMatchMode.EQUALS_CASE_SENSITIVE,
+				"read");
 		performQuery(query, Arrays.asList("1"));
 
 		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
@@ -282,9 +281,10 @@ public class AuditQueryTest {
 			try (PreparedStatement ps = con.prepareStatement(sql)) {
 				visitor.setValues(ps);
 
-				ResultSet rs = ps.executeQuery();
-				while (rs.next()) {
-					ids.add(rs.getString(1));
+				try (ResultSet rs = ps.executeQuery()) {
+					while (rs.next()) {
+						ids.add(rs.getString(1));
+					}
 				}
 			}
 		}

@@ -24,13 +24,13 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.DbConnectionBuilder;
-import ch.eitchnet.utils.dbc.DBC;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -53,6 +53,7 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		ds.validate();
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public DataSource build(String realm, String url, String username, String password, Properties props) {
 
