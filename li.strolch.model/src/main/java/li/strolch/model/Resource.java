@@ -69,8 +69,8 @@ public class Resource extends GroupedParameterizedElement
 		strolchTimedState.setParent(this);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public <T extends StrolchTimedState> T getTimedState(String id) {
+	@SuppressWarnings({ "unchecked" })
+	public <T extends StrolchTimedState<?>> T getTimedState(String id) {
 		if (this.timedStateMap == null) {
 			return null;
 		}
