@@ -21,6 +21,12 @@ import static org.junit.Assert.assertNull;
 
 import java.io.File;
 
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.ModelGenerator;
@@ -29,13 +35,6 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.AbstractModelTest;
 import li.strolch.testbase.runtime.RuntimeMock;
-
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import ch.eitchnet.privilege.model.Certificate;
 
 public class RealmTest extends AbstractModelTest {
 
@@ -126,6 +125,7 @@ public class RealmTest extends AbstractModelTest {
 
 	@AfterClass
 	public static void afterClass() {
-		runtimeMock.destroyRuntime();
+		if (runtimeMock != null)
+			runtimeMock.destroyRuntime();
 	}
 }

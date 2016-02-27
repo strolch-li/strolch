@@ -159,7 +159,8 @@ public class AuditQueryTest {
 
 	@AfterClass
 	public static void afterClass() {
-		runtimeMock.destroyRuntime();
+		if (runtimeMock != null)
+			runtimeMock.destroyRuntime();
 	}
 
 	public Connection openConn() throws SQLException {

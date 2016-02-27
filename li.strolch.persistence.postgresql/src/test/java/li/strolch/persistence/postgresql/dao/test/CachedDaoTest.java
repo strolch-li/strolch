@@ -20,18 +20,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.text.MessageFormat;
 
-import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
-import li.strolch.testbase.runtime.AbstractModelTest;
-import li.strolch.testbase.runtime.RuntimeMock;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.postgresql.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.db.DbSchemaVersionCheck;
 import ch.eitchnet.utils.Version;
 import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
+import li.strolch.testbase.runtime.AbstractModelTest;
+import li.strolch.testbase.runtime.RuntimeMock;
 
 public class CachedDaoTest extends AbstractModelTest {
 
@@ -66,6 +66,10 @@ public class CachedDaoTest extends AbstractModelTest {
 	}
 
 	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {
+
+		if (!Driver.isRegistered())
+			Driver.register();
+
 		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
 				PostgreSqlPersistenceHandler.class);
 		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
@@ -79,6 +83,7 @@ public class CachedDaoTest extends AbstractModelTest {
 
 	@AfterClass
 	public static void afterClass() {
-		runtimeMock.destroyRuntime();
+		if (runtimeMock != null)
+			runtimeMock.destroyRuntime();
 	}
 }

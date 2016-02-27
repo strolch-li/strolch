@@ -78,7 +78,8 @@ public class ObserverUpdateTest {
 
 	@AfterClass
 	public static void afterClass() {
-		runtimeMock.destroyRuntime();
+		if (runtimeMock != null)
+			runtimeMock.destroyRuntime();
 	}
 
 	public final class ElementAddedObserver implements Observer {

@@ -21,6 +21,15 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+import org.junit.After;
+import org.junit.Before;
+import org.postgresql.Driver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.db.DbSchemaVersionCheck;
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.Version;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
@@ -33,15 +42,6 @@ import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.testbase.runtime.RuntimeMock;
-
-import org.junit.After;
-import org.junit.Before;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.db.DbSchemaVersionCheck;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.Version;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -83,6 +83,10 @@ public abstract class AbstractRealmServiceTest {
 	}
 
 	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {
+
+		if (!Driver.isRegistered())
+			Driver.register();
+
 		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
 				PostgreSqlPersistenceHandler.class);
 		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
@@ -157,7 +161,8 @@ public abstract class AbstractRealmServiceTest {
 	}
 
 	private <T extends ServiceArgument, U extends ServiceResult> void runTransactional(
-			Class<?> expectedServiceResultType, Service<T, U> svc, T arg, Runner before, Runner validator, Runner after) {
+			Class<?> expectedServiceResultType, Service<T, U> svc, T arg, Runner before, Runner validator,
+			Runner after) {
 		doService(REALM_TRANSACTIONAL, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before,
 				validator, after);
 	}

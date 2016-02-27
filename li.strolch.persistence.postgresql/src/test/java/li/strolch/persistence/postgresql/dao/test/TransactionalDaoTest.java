@@ -56,6 +56,7 @@ public class TransactionalDaoTest extends AbstractModelTest {
 
 	@AfterClass
 	public static void afterClass() {
-		runtimeMock.destroyRuntime();
+		if (runtimeMock != null)
+			runtimeMock.destroyRuntime();
 	}
 }
