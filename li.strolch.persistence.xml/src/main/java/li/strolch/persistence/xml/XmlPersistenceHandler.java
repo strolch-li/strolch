@@ -18,6 +18,12 @@ package li.strolch.persistence.xml;
 import java.io.File;
 import java.util.Properties;
 
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.xmlpers.api.IoMode;
+import ch.eitchnet.xmlpers.api.PersistenceConstants;
+import ch.eitchnet.xmlpers.api.PersistenceManager;
+import ch.eitchnet.xmlpers.api.PersistenceManagerLoader;
+import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
@@ -35,12 +41,6 @@ import li.strolch.persistence.xml.model.AuditContextFactory;
 import li.strolch.persistence.xml.model.OrderContextFactory;
 import li.strolch.persistence.xml.model.ResourceContextFactory;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.xmlpers.api.IoMode;
-import ch.eitchnet.xmlpers.api.PersistenceConstants;
-import ch.eitchnet.xmlpers.api.PersistenceManager;
-import ch.eitchnet.xmlpers.api.PersistenceManagerLoader;
-import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -57,7 +57,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	@Override
 	public void initialize(ComponentConfiguration componentConfiguration) throws Exception {
 
-		File basePathF = componentConfiguration.getRuntimeConfiguration().getRootPath();
+		File basePathF = componentConfiguration.getRuntimeConfiguration().getDataPath();
 		File dbStorePathF = new File(basePathF, DB_STORE_PATH);
 
 		Properties properties = new Properties();
@@ -93,7 +93,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	public ResourceDao getResourceDao(StrolchTransaction tx) {
 		return new XmlResourceDao(tx);
 	}
-	
+
 	@Override
 	public ActivityDao getActivityDao(StrolchTransaction tx) {
 		return new XmlActivityDao(tx);

@@ -39,15 +39,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import li.strolch.model.Locator;
-import li.strolch.model.Locator.LocatorBuilder;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.model.Locator;
+import li.strolch.model.Locator.LocatorBuilder;
 
 public class ConfigurationSaxParser extends DefaultHandler {
 
@@ -166,8 +165,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		ConfigurationBuilder envBuilder = this.envBuilders.get(environment);
 		if (envBuilder == null)
-			throw new IllegalStateException(MessageFormat.format(
-					"No ConfigurationBuilder exists for env {0}", environment)); //$NON-NLS-1$
+			throw new IllegalStateException(
+					MessageFormat.format("No ConfigurationBuilder exists for env {0}", environment)); //$NON-NLS-1$
 
 		return envBuilder;
 	}
@@ -257,7 +256,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes)
+				throws SAXException {
 			switch (qName) {
 			case APPLICATION_NAME:
 				this.valueBuffer = new StringBuilder();
@@ -288,7 +288,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes)
+				throws SAXException {
 			switch (qName) {
 			case NAME:
 				this.valueBuffer = new StringBuilder();
@@ -344,7 +345,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		private String propertyName;
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes)
+				throws SAXException {
 			if (this.propertyName != null) {
 				String msg = "Opening another tag {0} although {1} is still open!"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, this.propertyName, qName);
@@ -404,9 +406,9 @@ public class ConfigurationSaxParser extends DefaultHandler {
 			return this.componentBuilder;
 		}
 
-		public StrolchConfiguration build(File rootPathF) {
+		public StrolchConfiguration build(File configPathF, File dataPathF, File tempPathF) {
 
-			RuntimeConfiguration runtimeConfiguration = this.runtimeBuilder.build(rootPathF);
+			RuntimeConfiguration runtimeConfiguration = this.runtimeBuilder.build(configPathF, dataPathF, tempPathF);
 
 			Map<String, ComponentConfiguration> configurationByComponent = new HashMap<>();
 			for (ComponentBuilder componentBuilder : this.componentBuilders) {
@@ -494,9 +496,9 @@ public class ConfigurationSaxParser extends DefaultHandler {
 			return this.environment;
 		}
 
-		public RuntimeConfiguration build(File rootPathF) {
+		public RuntimeConfiguration build(File configPathF, File dataPathF, File tempPathF) {
 			RuntimeConfiguration configuration = new RuntimeConfiguration(this.applicationName, this.environment,
-					getProperties(), rootPathF);
+					getProperties(), configPathF, dataPathF, tempPathF);
 			return configuration;
 		}
 

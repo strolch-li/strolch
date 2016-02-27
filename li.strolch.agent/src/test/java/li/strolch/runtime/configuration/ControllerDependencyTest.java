@@ -19,19 +19,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import li.strolch.agent.api.ComponentState;
-import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.impl.ComponentContainerImpl;
-import li.strolch.agent.impl.ComponentContainerStateHandler;
-import li.strolch.agent.impl.ComponentController;
-import li.strolch.agent.impl.ComponentDependencyAnalyzer;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,6 +31,12 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import ch.eitchnet.utils.dbc.DBC.DbcException;
+import li.strolch.agent.api.ComponentState;
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.impl.ComponentContainerImpl;
+import li.strolch.agent.impl.ComponentContainerStateHandler;
+import li.strolch.agent.impl.ComponentController;
+import li.strolch.agent.impl.ComponentDependencyAnalyzer;
 
 @SuppressWarnings("nls")
 public class ControllerDependencyTest {
@@ -199,8 +197,7 @@ public class ControllerDependencyTest {
 
 		//
 
-		File rootPathF = new File("src/test/resources/configtest");
-		this.strolchConfiguration = ConfigurationParser.parseConfiguration("dev", rootPathF);
+		this.strolchConfiguration = ConfigurationParserTest.parseConfiguration(ControllerDependencyTest.class, "dev");
 		for (ComponentController controller : this.controllerMap.values()) {
 			ComponentConfiguration componentConfiguration = new ComponentConfiguration(
 					this.strolchConfiguration.getRuntimeConfiguration(), controller.getName(), null, null, null, null);

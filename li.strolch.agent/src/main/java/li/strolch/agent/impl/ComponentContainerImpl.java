@@ -23,6 +23,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.utils.helper.SystemHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ComponentState;
 import li.strolch.agent.api.RealmHandler;
@@ -32,17 +38,9 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.helper.SystemHelper;
 
 public class ComponentContainerImpl implements ComponentContainer {
 
@@ -127,8 +125,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 			return getComponent(RealmHandler.class).getRealm(realmName);
 		} catch (StrolchException e) {
 			String msg = "The User {0} has property {1} with value={2}, but the Realm does not eixst, or is not accessible by this user!";
-			throw new StrolchException(MessageFormat.format(msg, certificate.getUsername(),
-					StrolchConstants.PROP_REALM, realmName), e);
+			throw new StrolchException(
+					MessageFormat.format(msg, certificate.getUsername(), StrolchConstants.PROP_REALM, realmName), e);
 		}
 	}
 
@@ -180,14 +178,14 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	public void setup(StrolchConfiguration strolchConfiguration) {
+		this.state.validateStateChange(ComponentState.SETUP);
 
 		// set the application locale
-		RuntimeConfiguration runConf = strolchConfiguration.getRuntimeConfiguration();
-		Locale locale = runConf.getLocale();
-		Locale.setDefault(locale);
-		String localeMsg = "Application {0}:{1} is using locale {2}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(localeMsg, runConf.getApplicationName(), runConf.getEnvironment(),
-				Locale.getDefault()));
+		Locale.setDefault(strolchConfiguration.getRuntimeConfiguration().getLocale());
+		String msg = "Application {0}:{1} is using locale {2}"; //$NON-NLS-1$
+		String environment = getEnvironment();
+		String applicationName = getApplicationName();
+		logger.info(MessageFormat.format(msg, applicationName, environment, Locale.getDefault()));
 
 		// set up the container itself
 		this.strolchConfiguration = strolchConfiguration;
@@ -197,6 +195,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 		for (String componentName : componentNames) {
 			ComponentConfiguration componentConfiguration = strolchConfiguration
 					.getComponentConfiguration(componentName);
+
+			// setup each component
 			setupComponent(componentMap, controllerMap, componentConfiguration);
 		}
 
@@ -213,85 +213,101 @@ public class ComponentContainerImpl implements ComponentContainer {
 		this.containerStateHandler = new ComponentContainerStateHandler(this.dependencyAnalyzer,
 				this.strolchConfiguration);
 
-		this.state = this.state.validateStateChange(ComponentState.SETUP);
-		String msg = "{0}:{1} Strolch Container setup with {2} components."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
-				.getRuntimeConfiguration().getEnvironment(), this.componentMap.size()));
+		this.state = ComponentState.SETUP;
+
+		msg = "{0}:{1} Strolch Container setup with {2} components."; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.componentMap.size()));
 	}
 
 	public void initialize(StrolchConfiguration strolchConfiguration) {
+		this.state.validateStateChange(ComponentState.INITIALIZED);
 
 		// now we can initialize the components
 		String msg = "{0}:{1} Initializing {2} Strolch Components..."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
-				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
+		String environment = getEnvironment();
+		String applicationName = getApplicationName();
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootUpstreamComponents();
 		containerStateHandler.initialize(rootUpstreamComponents);
-		this.state = this.state.validateStateChange(ComponentState.INITIALIZED);
+
+		this.state = ComponentState.INITIALIZED;
 
 		msg = "{0}:{1} All {2} Strolch Components have been initialized."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
-				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 	}
 
 	public void start() {
+		this.state.validateStateChange(ComponentState.STARTED);
 
 		String msg = "{0}:{1} Starting {2} Strolch Components..."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
-				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
+		String environment = getEnvironment();
+		String applicationName = getApplicationName();
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootUpstreamComponents();
 		containerStateHandler.start(rootUpstreamComponents);
-		this.state = this.state.validateStateChange(ComponentState.STARTED);
+
+		this.state = ComponentState.STARTED;
 
 		msg = "{0}:{1} All {2} Strolch Components started. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
-				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString())); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary())); //$NON-NLS-1$
 	}
 
 	public void stop() {
+		this.state.validateStateChange(ComponentState.STOPPED);
 
 		String msg = "{0}:{1} Stopping {2} Strolch Components..."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
-				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
+		String environment = getEnvironment();
+		String applicationName = getApplicationName();
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 
 		if (this.dependencyAnalyzer == null) {
 			logger.info("Strolch was not yet setup, nothing to stop"); //$NON-NLS-1$
 		} else {
 			Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
 			containerStateHandler.stop(rootUpstreamComponents);
-			this.state = this.state.validateStateChange(ComponentState.STOPPED);
 
 			msg = "{0}:{1} All {2} Strolch Components have been stopped."; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
-					.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
+			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 		}
+
+		this.state = ComponentState.STOPPED;
 	}
 
 	public void destroy() {
+		this.state.validateStateChange(ComponentState.DESTROYED);
 
 		String msg = "{0}:{1} Destroying {2} Strolch Components..."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
-				.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
+		String environment = getEnvironment();
+		String applicationName = getApplicationName();
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 
 		if (this.dependencyAnalyzer == null) {
 			logger.info("Strolch was not yet setup, nothing to destroy"); //$NON-NLS-1$
 		} else {
 			Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
 			containerStateHandler.destroy(rootUpstreamComponents);
-			this.state = this.state.validateStateChange(ComponentState.DESTROYED);
 
 			msg = "{0}:{1} All {2} Strolch Components have been destroyed!"; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, getAgent().getApplicationName(), getAgent().getStrolchConfiguration()
-					.getRuntimeConfiguration().getEnvironment(), this.controllerMap.size()));
+			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 			this.controllerMap.clear();
 			this.componentMap.clear();
 		}
 
+		this.state = ComponentState.DESTROYED;
+
 		this.controllerMap = null;
 		this.componentMap = null;
+	}
+
+	private String getApplicationName() {
+		return getAgent().getApplicationName();
+	}
+
+	private String getEnvironment() {
+		return getAgent().getStrolchConfiguration().getRuntimeConfiguration().getEnvironment();
 	}
 }

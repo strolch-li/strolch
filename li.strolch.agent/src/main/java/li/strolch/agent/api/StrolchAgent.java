@@ -22,15 +22,14 @@ import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.Set;
 
-import li.strolch.agent.impl.ComponentContainerImpl;
-import li.strolch.runtime.configuration.ConfigurationParser;
-import li.strolch.runtime.configuration.RuntimeConfiguration;
-import li.strolch.runtime.configuration.StrolchConfiguration;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.agent.impl.ComponentContainerImpl;
+import li.strolch.runtime.configuration.ConfigurationParser;
+import li.strolch.runtime.configuration.RuntimeConfiguration;
+import li.strolch.runtime.configuration.StrolchConfiguration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -43,16 +42,10 @@ public class StrolchAgent {
 	private ComponentContainerImpl container;
 	private StrolchConfiguration strolchConfiguration;
 
-	/**
-	 * @return the strolchConfiguration
-	 */
 	public StrolchConfiguration getStrolchConfiguration() {
 		return this.strolchConfiguration;
 	}
 
-	/**
-	 * @return the container
-	 */
 	public ComponentContainer getContainer() {
 		return this.container;
 	}
@@ -62,10 +55,14 @@ public class StrolchAgent {
 	}
 
 	public void initialize() {
+		if (this.container == null)
+			throw new RuntimeException("Please call setup first!");
 		this.container.initialize(this.strolchConfiguration);
 	}
 
 	public void start() {
+		if (this.container == null)
+			throw new RuntimeException("Please call setup first!");
 		this.container.start();
 	}
 
@@ -77,14 +74,33 @@ public class StrolchAgent {
 	public void destroy() {
 		if (this.container != null)
 			this.container.destroy();
+		this.container = null;
 	}
 
-	public void setup(String environment, File path) {
+	/**
+	 * <p>
+	 * <b>Note:</b> Use {@link StrolchBootstrapper} instead of calling this method directly!
+	 * </p>
+	 * 
+	 * <p>
+	 * Sets up the agent by parsing the configuration file and initializes the given environment
+	 * </p>
+	 * 
+	 * @param environment
+	 * @param configPathF
+	 * @param dataPathF
+	 * @param tempPathF
+	 */
+	void setup(String environment, File configPathF, File dataPathF, File tempPathF) {
 
-		String msg = "Setting up Strolch Container for environment {0} from root {1}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, environment, path.getAbsolutePath()));
+		String msg = "[{0}] Setting up Strolch Container using the following paths:"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, environment));
+		logger.info(" - Config: " + configPathF.getAbsolutePath());
+		logger.info(" - Data: " + dataPathF.getAbsolutePath());
+		logger.info(" - Temp: " + tempPathF.getAbsolutePath());
 
-		this.strolchConfiguration = ConfigurationParser.parseConfiguration(environment, path);
+		this.strolchConfiguration = ConfigurationParser.parseConfiguration(environment, configPathF, dataPathF,
+				tempPathF);
 
 		ComponentContainerImpl container = new ComponentContainerImpl(this);
 		container.setup(this.strolchConfiguration);
@@ -127,8 +143,8 @@ public class StrolchAgent {
 
 			try (InputStream stream = getClass().getResourceAsStream(AGENT_VERSION_PROPERTIES);) {
 				properties.load(stream);
-				AgentVersion agentVersion = new AgentVersion(getStrolchConfiguration().getRuntimeConfiguration()
-						.getApplicationName(), properties);
+				AgentVersion agentVersion = new AgentVersion(
+						getStrolchConfiguration().getRuntimeConfiguration().getApplicationName(), properties);
 				queryResult.setAgentVersion(agentVersion);
 			} catch (IOException e) {
 				String msg = MessageFormat.format("Failed to read version properties for agent: {0}", e.getMessage()); //$NON-NLS-1$

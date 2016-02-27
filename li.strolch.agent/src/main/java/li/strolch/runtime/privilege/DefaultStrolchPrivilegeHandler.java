@@ -15,6 +15,9 @@
  */
 package li.strolch.runtime.privilege;
 
+import static ch.eitchnet.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS;
+import static ch.eitchnet.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.MessageFormat;
@@ -86,33 +89,32 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			throw new PrivilegeException(msg);
 		}
 
-		try {
+		try (FileInputStream inputStream = new FileInputStream(privilegeXmlFile)) {
+
 			// parse configuration file
 			PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
 			PrivilegeConfigSaxReader xmlHandler = new PrivilegeConfigSaxReader(containerModel);
-			try (FileInputStream inputStream = new FileInputStream(privilegeXmlFile)) {
-				XmlHelper.parseDocument(inputStream, xmlHandler);
+			XmlHelper.parseDocument(inputStream, xmlHandler);
 
-				Map<String, String> parameterMap = containerModel.getParameterMap();
+			Map<String, String> parameterMap = containerModel.getParameterMap();
+			RuntimeConfiguration runtimeConfig = configuration.getRuntimeConfiguration();
 
-				// set sessions data path
-				if (Boolean.valueOf(
-						parameterMap.get(ch.eitchnet.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS))) {
-					String sessionsPath = new File(configuration.getRuntimeConfiguration().getDataPath(),
-							"sessions.dat").getAbsolutePath();
-					parameterMap.put(ch.eitchnet.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH,
-							sessionsPath);
-				}
-
-				// set base path
-				if (containerModel.getPersistenceHandlerClassName().equals(XmlPersistenceHandler.class.getName())) {
-					Map<String, String> xmlParams = containerModel.getPersistenceHandlerParameterMap();
-					File configPath = configuration.getRuntimeConfiguration().getConfigPath();
-					xmlParams.put(XmlConstants.XML_PARAM_BASE_PATH, configPath.getPath());
-				}
-
-				return PrivilegeInitializationHelper.initializeFromXml(containerModel);
+			// set sessions data path
+			if (Boolean.valueOf(parameterMap.get(PARAM_PERSIST_SESSIONS))) {
+				File dataPath = runtimeConfig.getDataPath();
+				String sessionsPath = new File(dataPath, "sessions.dat").getAbsolutePath();
+				parameterMap.put(PARAM_PERSIST_SESSIONS_PATH, sessionsPath);
 			}
+
+			// set base path
+			if (containerModel.getPersistenceHandlerClassName().equals(XmlPersistenceHandler.class.getName())) {
+				Map<String, String> xmlParams = containerModel.getPersistenceHandlerParameterMap();
+				File configPath = runtimeConfig.getConfigPath();
+				xmlParams.put(XmlConstants.XML_PARAM_BASE_PATH, configPath.getPath());
+			}
+
+			return PrivilegeInitializationHelper.initializeFromXml(containerModel);
+
 		} catch (Exception e) {
 			String msg = "Failed to load Privilege configuration from {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());

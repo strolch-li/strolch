@@ -21,11 +21,12 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.runtime.configuration.StrolchEnvironment;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.StrolchBootstrapper;
+import li.strolch.runtime.configuration.StrolchEnvironment;
 
 @WebListener
 @SuppressWarnings("nls")
@@ -42,8 +43,7 @@ public class StartupListener implements ServletContextListener {
 		File pathF = new File(realPath);
 		String environment = StrolchEnvironment.getEnvironmentFromEnvProperties(pathF);
 		logger.info("Starting Agent...");
-		this.agent = new StrolchAgent();
-		this.agent.setup(environment, pathF);
+		this.agent = new StrolchBootstrapper().setupByRoot(environment, pathF);
 		this.agent.initialize();
 		this.agent.start();
 		logger.info("Agent started.");

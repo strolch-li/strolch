@@ -19,8 +19,6 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import li.strolch.agent.api.StrolchAgent;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -32,10 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.StrolchBootstrapper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 @SuppressWarnings("nls")
 public class MainStarter {
@@ -63,6 +62,7 @@ public class MainStarter {
 		envOption.setOptionalArg(false);
 		envOption.setRequired(true);
 		op.addOption(envOption);
+
 		this.options = op;
 	}
 
@@ -74,6 +74,7 @@ public class MainStarter {
 		setup();
 		initialize();
 		start();
+
 		return keepAlive();
 	}
 
@@ -111,8 +112,7 @@ public class MainStarter {
 	}
 
 	public void setup() {
-		this.agent = new StrolchAgent();
-		getAgent().setup(this.env, this.pathF);
+		this.agent = new StrolchBootstrapper().setupByRoot(this.env, this.pathF);
 	}
 
 	public void initialize() {
@@ -166,6 +166,7 @@ public class MainStarter {
 				}
 			}
 		}
+
 		return 0;
 	}
 

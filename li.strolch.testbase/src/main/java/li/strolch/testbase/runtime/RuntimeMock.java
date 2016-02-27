@@ -29,8 +29,8 @@ import ch.eitchnet.utils.helper.FileHelper;
 import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.StrolchBootstrapper;
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceArgument;
@@ -76,7 +76,7 @@ public final class RuntimeMock {
 		return getPrivilegeHandler().invalidateSession(cert);
 	}
 
-	public void mockRuntime(File targetPathF, File srcPathF) {
+	public RuntimeMock mockRuntime(File targetPathF, File srcPathF) {
 
 		this.targetPathF = targetPathF;
 		this.srcPathF = srcPathF;
@@ -87,7 +87,7 @@ public final class RuntimeMock {
 			throw new RuntimeException(msg);
 		}
 
-		File configSrc = new File(this.srcPathF, RuntimeConfiguration.PATH_CONFIG);
+		File configSrc = new File(this.srcPathF, StrolchBootstrapper.PATH_CONFIG);
 
 		if (!configSrc.isDirectory() || !configSrc.canRead()) {
 			String msg = "Could not find config source in: {0}"; //$NON-NLS-1$
@@ -113,11 +113,10 @@ public final class RuntimeMock {
 		logger.info(MessageFormat.format("Mocking runtime from {0} to {1}", this.srcPathF.getAbsolutePath(), //$NON-NLS-1$
 				this.targetPathF.getAbsolutePath()));
 
-		if (!FileHelper.copy(this.srcPathF.listFiles(), this.targetPathF, false)) {
-			String msg = "Failed to copy source files from {0} to {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.srcPathF.getAbsolutePath(), this.targetPathF.getAbsolutePath());
-			throw new RuntimeException(msg);
-		}
+		// setup the container
+		this.agent = new StrolchBootstrapper().setupByCopyingRoot("dev", this.srcPathF, this.targetPathF);
+
+		return this;
 	}
 
 	public void startContainer() {
@@ -127,13 +126,9 @@ public final class RuntimeMock {
 	public void startContainer(String environment) {
 
 		try {
-			StrolchAgent agent = new StrolchAgent();
-			agent.setup(environment, this.targetPathF);
-			agent.initialize();
-			agent.start();
-
-			this.agent = agent;
-			this.container = agent.getContainer();
+			this.agent.initialize();
+			this.agent.start();
+			this.container = this.agent.getContainer();
 
 		} catch (Exception e) {
 			logger.error("Failed to start mocked container due to: " + e.getMessage(), e); //$NON-NLS-1$

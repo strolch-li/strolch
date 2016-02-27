@@ -8,6 +8,11 @@
 			</Properties>
 		</Runtime>
 		<Component>
+			<name>PersistenceHandler</name>
+			<api>li.strolch.runtime.configuration.model.PersistenceHandler</api>
+			<impl>li.strolch.runtime.configuration.model.PersistenceHandlerImpl</impl>
+		</Component>
+		<Component>
 			<name>PrivilegeHandler</name>
 			<api>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</api>
 			<impl>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</impl>
@@ -27,8 +32,8 @@
 		</Component>
 		<Component>
 			<name>ServiceHandler</name>
-			<api>li.strolch.service.api.ServiceHandler</api>
-			<impl>li.strolch.service.SimpleServiceHandler</impl>
+			<api>li.strolch.runtime.configuration.model.ServiceHandlerTest</api>
+			<impl>li.strolch.runtime.configuration.model.ServiceHandlerTestImpl</impl>
 			<depends>RealmHandler</depends>
 			<Properties>
 			</Properties>
@@ -54,8 +59,8 @@
 
 		<Component>
 			<name>AdditionalServiceHandler</name>
-			<api>li.strolch.service.api.ServiceHandler</api>
-			<impl>li.strolch.service.SimpleServiceHandler</impl>
+			<api>li.strolch.runtime.configuration.model.ServiceHandlerTest</api>
+			<impl>li.strolch.runtime.configuration.model.ServiceHandlerTestImpl</impl>
 			<Properties>
 				<foo>bar</foo>
 			</Properties>
@@ -68,11 +73,11 @@
 				<foo>noob</foo>
 			</Properties>
 		</Component>
-		
+
 		<Component>
 			<name>ServiceHandler</name>
-			<api>li.strolch.service.api.ServiceHandler</api>
-			<impl>li.strolch.service.YetAnotherServiceHandler</impl>
+			<api>li.strolch.runtime.configuration.model.ServiceHandlerTest</api>
+			<impl>li.strolch.runtime.configuration.model.ServiceHandlerTestImpl2</impl>
 			<depends>RealmHandler</depends>
 			<depends>PrivilegeHandler</depends>
 			<Properties>

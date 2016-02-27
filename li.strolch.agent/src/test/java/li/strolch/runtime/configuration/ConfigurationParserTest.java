@@ -23,14 +23,29 @@ import java.io.File;
 
 import org.junit.Test;
 
+import ch.eitchnet.utils.helper.FileHelper;
+import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.StrolchBootstrapper;
+
 @SuppressWarnings("nls")
 public class ConfigurationParserTest {
+
+	public static StrolchConfiguration parseConfiguration(Class<?> clazz, String env) {
+		File rootSrcPath = new File("src/test/resources/configtest");
+		File rootDstPath = new File("target/" + clazz.getSimpleName());
+
+		if (rootDstPath.exists() && !FileHelper.deleteFile(rootDstPath, true)) {
+			throw new RuntimeException("Could not delete existing target " + rootDstPath);
+		}
+
+		StrolchAgent agent = new StrolchBootstrapper().setupByCopyingRoot(env, rootSrcPath, rootDstPath);
+		return agent.getStrolchConfiguration();
+	}
 
 	@Test
 	public void shouldParseConfigurationFileForDevEnv() {
 
-		File rootPathF = new File("src/test/resources/configtest");
-		StrolchConfiguration strolchConfiguration = ConfigurationParser.parseConfiguration("dev", rootPathF);
+		StrolchConfiguration strolchConfiguration = parseConfiguration(ConfigurationParserTest.class, "dev");
 		assertNotNull("Should have created a configuration object", strolchConfiguration);
 
 		//	<Runtime>
@@ -56,8 +71,9 @@ public class ConfigurationParserTest {
 				.getComponentConfiguration("ServiceHandler");
 		assertNotNull("Should have created a ServiceHandler Configuration", serviceHandlerConfiguration);
 		assertEquals("ServiceHandler", serviceHandlerConfiguration.getName());
-		assertEquals("li.strolch.service.api.ServiceHandler", serviceHandlerConfiguration.getApi());
-		assertEquals("li.strolch.service.SimpleServiceHandler", serviceHandlerConfiguration.getImpl());
+		assertEquals("li.strolch.runtime.configuration.model.ServiceHandlerTest", serviceHandlerConfiguration.getApi());
+		assertEquals("li.strolch.runtime.configuration.model.ServiceHandlerTestImpl",
+				serviceHandlerConfiguration.getImpl());
 		assertEquals(0, serviceHandlerConfiguration.getPropertyKeys().size());
 
 		//	<Component>
@@ -138,8 +154,10 @@ public class ConfigurationParserTest {
 		assertNotNull("Should have created a AdditionalServiceHandler Configuration",
 				additionalServiceHandlerConfiguration);
 		assertEquals("AdditionalServiceHandler", additionalServiceHandlerConfiguration.getName());
-		assertEquals("li.strolch.service.api.ServiceHandler", additionalServiceHandlerConfiguration.getApi());
-		assertEquals("li.strolch.service.SimpleServiceHandler", additionalServiceHandlerConfiguration.getImpl());
+		assertEquals("li.strolch.runtime.configuration.model.ServiceHandlerTest",
+				additionalServiceHandlerConfiguration.getApi());
+		assertEquals("li.strolch.runtime.configuration.model.ServiceHandlerTestImpl",
+				additionalServiceHandlerConfiguration.getImpl());
 		assertEquals(1, additionalServiceHandlerConfiguration.getPropertyKeys().size());
 		assertEquals("bar", additionalServiceHandlerConfiguration.getString("foo", null));
 	}
@@ -147,8 +165,7 @@ public class ConfigurationParserTest {
 	@Test
 	public void shouldParseConfigurationFileForTestEnv() {
 
-		File rootPathF = new File("src/test/resources/configtest");
-		StrolchConfiguration strolchConfiguration = ConfigurationParser.parseConfiguration("test", rootPathF);
+		StrolchConfiguration strolchConfiguration = parseConfiguration(ConfigurationParserTest.class, "test");
 		assertNotNull("Should have created a configuration object", strolchConfiguration);
 
 		RuntimeConfiguration runtimeConfiguration = strolchConfiguration.getRuntimeConfiguration();
@@ -193,8 +210,9 @@ public class ConfigurationParserTest {
 				.getComponentConfiguration("ServiceHandler");
 		assertNotNull("Should have created a ServiceHandler Configuration", serviceHandlerConfiguration);
 		assertEquals("ServiceHandler", serviceHandlerConfiguration.getName());
-		assertEquals("li.strolch.service.api.ServiceHandler", serviceHandlerConfiguration.getApi());
-		assertEquals("li.strolch.service.YetAnotherServiceHandler", serviceHandlerConfiguration.getImpl());
+		assertEquals("li.strolch.runtime.configuration.model.ServiceHandlerTest", serviceHandlerConfiguration.getApi());
+		assertEquals("li.strolch.runtime.configuration.model.ServiceHandlerTestImpl2",
+				serviceHandlerConfiguration.getImpl());
 		assertEquals(2, serviceHandlerConfiguration.getDependencies().size());
 		assertTrue(serviceHandlerConfiguration.getDependencies().contains("RealmHandler"));
 		assertTrue(serviceHandlerConfiguration.getDependencies().contains("PrivilegeHandler"));

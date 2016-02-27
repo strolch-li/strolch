@@ -24,52 +24,46 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	public static final String PROP_LOCALE = "locale"; //$NON-NLS-1$
 	public static final String RUNTIME = "Runtime"; //$NON-NLS-1$
-	public static final String PATH_CONFIG = "config"; //$NON-NLS-1$
-	public static final String PATH_DATA = "data"; //$NON-NLS-1$
 
 	private final String applicationName;
 	private final String environment;
-	private final File rootPath;
 	private final File configPath;
 	private final File dataPath;
+	private final File tempPath;
 
 	private Locale locale;
 
 	public RuntimeConfiguration(String applicationName, String environment, Map<String, String> configurationValues,
-			File rootPathF) {
+			File configPathF, File dataPathF, File tempPathF) {
 		super(RUNTIME, configurationValues);
 
-		if (!rootPathF.isDirectory() || !rootPathF.canRead()) {
-			String msg = "Root path is not readable at {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, rootPathF.getAbsolutePath());
-			throw new StrolchConfigurationException(msg);
-		}
-
-		File configPathF = new File(rootPathF, PATH_CONFIG);
+		// config path: readable directory
 		if (!configPathF.isDirectory() || !configPathF.canRead()) {
 			String msg = "Config path is not readable at {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, configPathF);
 			throw new StrolchConfigurationException(msg);
 		}
 
-		File dataPathF = new File(rootPathF, PATH_DATA);
-		if (!dataPathF.exists() && !dataPathF.mkdir()) {
-			String msg = "Could not create missing data path at {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, configPathF);
-			throw new StrolchConfigurationException(msg);
-		}
+		// data path: writable directory
 		if (!dataPathF.isDirectory() || !dataPathF.canRead() || !dataPathF.canWrite()) {
 			String msg = "Data path is not a directory or readable or writeable at {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, configPathF);
+			msg = MessageFormat.format(msg, dataPathF);
+			throw new StrolchConfigurationException(msg);
+		}
+
+		// tmp path: writable directory
+		if (!tempPathF.isDirectory() || !tempPathF.canRead() || !tempPathF.canWrite()) {
+			String msg = "Temp path is not a directory or readable or writeable at {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, tempPathF);
 			throw new StrolchConfigurationException(msg);
 		}
 
 		this.applicationName = applicationName;
 		this.environment = environment;
 
-		this.rootPath = rootPathF;
 		this.configPath = configPathF;
 		this.dataPath = dataPathF;
+		this.tempPath = tempPathF;
 
 		this.locale = new Locale(getString(PROP_LOCALE, Locale.getDefault().toString()));
 	}
@@ -82,8 +76,8 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		return this.environment;
 	}
 
-	public File getRootPath() {
-		return this.rootPath;
+	public File getTempPath() {
+		return this.tempPath;
 	}
 
 	public File getConfigPath() {

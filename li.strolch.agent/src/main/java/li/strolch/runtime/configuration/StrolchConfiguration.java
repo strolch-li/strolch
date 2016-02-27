@@ -48,10 +48,6 @@ public class StrolchConfiguration {
 		return componentConfiguration;
 	}
 
-	/**
-	 * @param name
-	 * @param configuration
-	 */
 	public void addConfiguration(String name, ComponentConfiguration configuration) {
 		this.configurationByComponent.put(name, configuration);
 	}
