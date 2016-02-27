@@ -17,16 +17,15 @@ package li.strolch.persistence.impl.dao.test;
 
 import java.io.File;
 
-import li.strolch.testbase.runtime.AbstractModelTest;
-import li.strolch.testbase.runtime.RuntimeMock;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import li.strolch.testbase.runtime.AbstractModelTest;
+import li.strolch.testbase.runtime.RuntimeMock;
 
 public class XmlCachedDaoTest extends AbstractModelTest {
 
 	public static final String RUNTIME_PATH = "target/cachedStrolchRuntime/"; //$NON-NLS-1$
-	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/test/resources/cachedruntime"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
@@ -43,7 +42,6 @@ public class XmlCachedDaoTest extends AbstractModelTest {
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
-		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
 		runtimeMock.startContainer();
 	}
 

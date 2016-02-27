@@ -41,6 +41,7 @@ import li.strolch.persistence.xml.model.AuditContextFactory;
 import li.strolch.persistence.xml.model.OrderContextFactory;
 import li.strolch.persistence.xml.model.ResourceContextFactory;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.StrolchConfigurationException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -59,6 +60,9 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 
 		File basePathF = componentConfiguration.getRuntimeConfiguration().getDataPath();
 		File dbStorePathF = new File(basePathF, DB_STORE_PATH);
+		if (!dbStorePathF.exists() && !dbStorePathF.mkdir()) {
+			throw new StrolchConfigurationException("Could not create store path at " + dbStorePathF.getAbsolutePath());
+		}
 
 		Properties properties = new Properties();
 		properties.setProperty(PersistenceConstants.PROP_VERBOSE, "true"); //$NON-NLS-1$

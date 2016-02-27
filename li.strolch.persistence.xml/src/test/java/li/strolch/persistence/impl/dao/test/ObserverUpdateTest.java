@@ -25,6 +25,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.xmlpers.api.ModificationResult;
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
@@ -37,13 +43,6 @@ import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.xmlpers.api.ModificationResult;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -51,7 +50,6 @@ public class ObserverUpdateTest {
 
 	private static final String TEST = "test"; //$NON-NLS-1$
 	public static final String RUNTIME_PATH = "target/observerUpdateStrolchRuntime/"; //$NON-NLS-1$
-	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/test/resources/cachedruntime"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
@@ -67,7 +65,6 @@ public class ObserverUpdateTest {
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
-		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
 		runtimeMock.startContainer();
 	}
 

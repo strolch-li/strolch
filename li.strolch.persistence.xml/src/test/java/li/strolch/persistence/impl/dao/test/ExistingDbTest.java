@@ -19,24 +19,24 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 
-import li.strolch.model.Order;
-import li.strolch.model.Resource;
-import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.privilege.PrivilegeHandler;
-import li.strolch.testbase.runtime.RuntimeMock;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ch.eitchnet.privilege.model.Certificate;
+import ch.eitchnet.utils.helper.FileHelper;
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.xml.XmlPersistenceHandler;
+import li.strolch.runtime.StrolchConstants;
+import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.testbase.runtime.RuntimeMock;
 
 public class ExistingDbTest {
 
 	private static final String TEST = "test"; //$NON-NLS-1$
 	public static final String RUNTIME_PATH = "target/existingDbRuntime/"; //$NON-NLS-1$
-	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/test/resources/existingDbRuntime"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
@@ -48,6 +48,16 @@ public class ExistingDbTest {
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
+
+		File dbStoreSrcPath = new File(CONFIG_SRC, "data/" + XmlPersistenceHandler.DB_STORE_PATH);
+		File dbStoreDstPath = new File(RUNTIME_PATH, "data/" + XmlPersistenceHandler.DB_STORE_PATH);
+		if (!dbStoreDstPath.exists() && !dbStoreDstPath.mkdir()) {
+			throw new RuntimeException("Could not create db store " + dbStoreDstPath.getAbsolutePath());
+		}
+		if (!FileHelper.copy(dbStoreSrcPath.listFiles(), dbStoreDstPath, false)) {
+			throw new RuntimeException("Failed to copy db store from " + dbStoreSrcPath + " to " + dbStoreDstPath);
+		}
+
 		runtimeMock.startContainer();
 	}
 
