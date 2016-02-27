@@ -22,7 +22,6 @@ import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_MIGRATION;
 import static li.strolch.agent.api.RealmHandler.SYSTEM_USER_DB_INITIALIZER;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -60,8 +59,6 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	public static final String SCRIPT_PREFIX = "strolch"; //$NON-NLS-1$
 	private Map<String, DataSource> dsMap;
 
-	private Driver driver;
-
 	public PostgreSqlPersistenceHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
@@ -69,8 +66,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	@Override
 	public void initialize(ComponentConfiguration componentConfiguration) throws Exception {
 
-		this.driver = new Driver();
-		DriverManager.registerDriver(this.driver);
+		Driver.register();
 
 		DbConnectionBuilder connectionBuilder = new PostgreSqlDbConnectionBuilder(getContainer(),
 				componentConfiguration);
@@ -128,8 +124,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 			}
 		}
 
-		if (this.driver != null)
-			DriverManager.deregisterDriver(this.driver);
+		if (Driver.isRegistered())
+			Driver.deregister();
 
 		super.destroy();
 	}
