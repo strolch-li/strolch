@@ -66,7 +66,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	@Override
 	public void initialize(ComponentConfiguration componentConfiguration) throws Exception {
 
-		if (Driver.isRegistered())
+		if (!Driver.isRegistered())
 			Driver.register();
 
 		DbConnectionBuilder connectionBuilder = new PostgreSqlDbConnectionBuilder(getContainer(),
