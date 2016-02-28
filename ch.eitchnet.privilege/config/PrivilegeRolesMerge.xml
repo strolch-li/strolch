@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Roles>
+
+	<Role name="RoleA1">
+		<Privilege name="Foo" policy="DefaultPrivilege">
+			<Allow>allow1</Allow>
+		</Privilege>
+	</Role>
+	<Role name="RoleA2">
+		<Privilege name="Foo" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+	</Role>
+
+	<Role name="RoleB1">
+		<Privilege name="Bar" policy="DefaultPrivilege">
+			<Allow>allow1</Allow>
+			<Deny>deny1</Deny>
+		</Privilege>
+	</Role>
+	<Role name="RoleB2">
+		<Privilege name="Bar" policy="DefaultPrivilege">
+			<Allow>allow2</Allow>
+			<Deny>deny2</Deny>
+		</Privilege>
+	</Role>
+
+</Roles>
