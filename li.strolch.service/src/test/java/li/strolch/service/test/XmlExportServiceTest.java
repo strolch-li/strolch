@@ -55,7 +55,7 @@ public class XmlExportServiceTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		certificate = runtimeMock.getPrivilegeHandler().authenticate("admin", "admin".getBytes());
+		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
 	}
 
 	@AfterClass

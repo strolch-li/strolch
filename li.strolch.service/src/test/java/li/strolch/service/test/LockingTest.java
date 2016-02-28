@@ -17,12 +17,18 @@ package li.strolch.service.test;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -32,12 +38,6 @@ import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.testbase.runtime.RuntimeMock;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -72,7 +72,7 @@ public class LockingTest {
 	}
 
 	public static Certificate login() {
-		return runtimeMock.getPrivilegeHandler().authenticate("admin", "admin".getBytes());
+		return runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
 	}
 
 	@Test
@@ -113,6 +113,7 @@ public class LockingTest {
 			lockingRunner.join();
 		}
 
+		assertNotNull(runners.get(0).getResult());
 		assertEquals(ServiceResultState.SUCCESS, runners.get(0).getResult().getState());
 		for (int i = 1; i < runners.size(); i++) {
 			ServiceResult result = runners.get(i).getResult();

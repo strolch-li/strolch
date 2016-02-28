@@ -5,7 +5,7 @@
 
 		<Parameters>
 			<!-- parameters for the container itself -->
-			<Parameter name="autoPersistOnUserChangesData" value="true" />
+			<Parameter name="autoPersistOnPasswordChange" value="true" />
 		</Parameters>
 
 		<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
@@ -16,8 +16,8 @@
 
 		<PersistenceHandler class="ch.eitchnet.privilege.handler.XmlPersistenceHandler">
 			<Parameters>
-				<Parameter name="basePath" value="config/" />
-				<Parameter name="modelXmlFile" value="PrivilegeModel.xml" />
+				<Parameter name="usersXmlFile" value="PrivilegeUsers.xml" />
+				<Parameter name="rolesXmlFile" value="PrivilegeRoles.xml" />
 			</Parameters>
 		</PersistenceHandler>
 
@@ -25,8 +25,6 @@
 
 	<Policies>
 		<Policy name="DefaultPrivilege" class="ch.eitchnet.privilege.policy.DefaultPrivilege" />
-		<Policy name="RoleAccessPrivilege" class="ch.eitchnet.privilege.policy.RoleAccessPrivilege" />
-		<Policy name="UserAccessPrivilege" class="ch.eitchnet.privilege.policy.UserAccessPrivilege" />
 	</Policies>
 
 </Privilege>
