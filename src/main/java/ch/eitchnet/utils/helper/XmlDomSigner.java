@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStore.TrustedCertificateEntry;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -48,26 +50,33 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import ch.eitchnet.utils.dbc.DBC;
+
 public class XmlDomSigner {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlDomSigner.class);
 
-	private PrivateKeyEntry keyEntry;
-	private X509Certificate cert;
+	private KeyStore keyStore;
+	private String privateKeyAlias;
+	private String trustAlias;
 
-	public XmlDomSigner(File keyStorePath, String alias, char[] password) {
+	private char[] password;
+
+	public XmlDomSigner(File keyStorePath, String privateKeyAlias, String trustAlias, char[] password) {
+
+		DBC.PRE.assertNotEmpty("privateKeyAlias", privateKeyAlias);
+		DBC.PRE.assertNotEmpty("trustAlias", trustAlias);
 		try {
 
-			KeyStore ks = KeyStore.getInstance("JKS");
-			ks.load(new FileInputStream(keyStorePath), password);
-			this.keyEntry = (PrivateKeyEntry) ks.getEntry(ks.aliases().nextElement(),
-					new KeyStore.PasswordProtection(password));
-
-			this.cert = (X509Certificate) this.keyEntry.getCertificate();
+			KeyStore keyStore = KeyStore.getInstance("JKS");
+			keyStore.load(new FileInputStream(keyStorePath), password);
+			this.keyStore = keyStore;
+			this.privateKeyAlias = privateKeyAlias;
+			this.trustAlias = trustAlias;
+			this.password = password;
 
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"Failed to read certificate and private key from keystore " + keyStorePath + " and alias " + alias);
+			throw new RuntimeException("Failed to read keystore " + keyStorePath);
 		}
 	}
 
@@ -93,7 +102,6 @@ public class XmlDomSigner {
 			transforms.add(fac.newTransform(CanonicalizationMethod.EXCLUSIVE, (TransformParameterSpec) null));
 			DigestMethod digestMethod = fac.newDigestMethod(DigestMethod.SHA1, null);
 			Reference ref = fac.newReference("#" + id, digestMethod, transforms, null, null);
-			//Reference ref = fac.newReference("", digestMethod, transforms, null, null);
 
 			// Create the SignedInfo.
 			SignedInfo signedInfo = fac.newSignedInfo(
@@ -102,18 +110,23 @@ public class XmlDomSigner {
 					Collections.singletonList(ref));
 
 			// Load the KeyStore and get the signing key and certificate.
+			PrivateKeyEntry keyEntry = (PrivateKeyEntry) this.keyStore.getEntry(this.privateKeyAlias,
+					new KeyStore.PasswordProtection(this.password));
+			PrivateKey privateKey = keyEntry.getPrivateKey();
+			X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
 
 			// Create the KeyInfo containing the X509Data.
 			KeyInfoFactory kif = fac.getKeyInfoFactory();
 			List<Object> x509Content = new ArrayList<>();
-			x509Content.add(this.cert.getSubjectX500Principal().getName());
-			x509Content.add(this.cert);
+
+			x509Content.add(cert.getSubjectX500Principal().getName());
+			x509Content.add(cert);
 			X509Data xd = kif.newX509Data(x509Content);
 			KeyInfo keyInfo = kif.newKeyInfo(Collections.singletonList(xd));
 
 			// Create a DOMSignContext and specify the RSA PrivateKey and
 			// location of the resulting XMLSignature's parent element.
-			DOMSignContext dsc = new DOMSignContext(this.keyEntry.getPrivateKey(), rootElement);
+			DOMSignContext dsc = new DOMSignContext(privateKey, rootElement);
 			//dsc.setDefaultNamespacePrefix("samlp");
 			dsc.putNamespacePrefix(XMLSignature.XMLNS, "ds");
 
@@ -145,17 +158,13 @@ public class XmlDomSigner {
 			}
 
 			// Load the KeyStore and get the signing key and certificate.
-			PublicKey publicKey = this.keyEntry.getCertificate().getPublicKey();
+			TrustedCertificateEntry entry = (TrustedCertificateEntry) this.keyStore.getEntry(trustAlias, null);
+			PublicKey publicKey = entry.getTrustedCertificate().getPublicKey();
 
 			// Create a DOMValidateContext and specify a KeySelector
 			// and document context.
 			Node signatureNode = nl.item(0);
 			DOMValidateContext valContext = new DOMValidateContext(publicKey, signatureNode);
-			valContext.setDefaultNamespacePrefix("samlp");
-			valContext.putNamespacePrefix(XMLSignature.XMLNS, "ds");
-			valContext.putNamespacePrefix("urn:oasis:names:tc:SAML:2.0:protocol", "samlp");
-			valContext.putNamespacePrefix("urn:oasis:names:tc:SAML:2.0:assertion", "saml");
-			valContext.setIdAttributeNS(doc.getDocumentElement(), null, "ID");
 
 			// Unmarshal the XMLSignature.
 			valContext.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);

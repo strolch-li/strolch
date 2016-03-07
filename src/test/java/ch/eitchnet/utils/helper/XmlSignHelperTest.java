@@ -24,7 +24,8 @@ public class XmlSignHelperTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		helper = new XmlDomSigner(new File("src/test/resources/test.jks"), "client", "changeit".toCharArray());
+		helper = new XmlDomSigner(new File("src/test/resources/test.jks"), "client", "server",
+				"changeit".toCharArray());
 	}
 
 	@Test
@@ -58,6 +59,7 @@ public class XmlSignHelperTest {
 
 		File signedXmlFile = new File("src/test/resources/SignedXmlFile.xml");
 		Document document = XmlDomSigner.parse(signedXmlFile);
+		setIdAttr(document);
 		helper.validate(document);
 	}
 
@@ -66,7 +68,26 @@ public class XmlSignHelperTest {
 
 		File signedXmlFile = new File("src/test/resources/SignedXmlFileWithNamespaces.xml");
 		Document document = XmlDomSigner.parse(signedXmlFile);
+		setIdAttrNs(document);
+
 		helper.validate(document);
+	}
+
+	private void setIdAttr(Document document) {
+		NodeList authnRequestNodes = document.getElementsByTagName("AuthnRequest");
+		if (authnRequestNodes.getLength() != 1)
+			throw new IllegalStateException("Multiple or no AuthnRequest Node found in document!");
+		Element authnRequestNode = (Element) authnRequestNodes.item(0);
+		authnRequestNode.setIdAttribute("ID", true);
+	}
+
+	private void setIdAttrNs(Document document) {
+		NodeList authnRequestNodes = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:protocol",
+				"AuthnRequest");
+		if (authnRequestNodes.getLength() != 1)
+			throw new IllegalStateException("Multiple or no AuthnRequest Node found in document!");
+		Element authnRequestNode = (Element) authnRequestNodes.item(0);
+		authnRequestNode.setIdAttribute("ID", true);
 	}
 
 	@Test
