@@ -36,6 +36,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -188,7 +189,6 @@ public class XmlDomSigner {
 				}
 				throw new RuntimeException("Uh-oh validation, failed!");
 			}
-
 		} catch (Exception e) {
 			if (e instanceof RuntimeException)
 				throw (RuntimeException) e;
@@ -197,10 +197,20 @@ public class XmlDomSigner {
 	}
 
 	public static byte[] transformToBytes(Document doc) {
+		return transformToBytes(doc, false);
+	}
+
+	public static byte[] transformToBytes(Document doc, boolean indent) {
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer transformer = tf.newTransformer();
+
+			if (indent) {
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
+				transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
 			transformer.transform(new DOMSource(doc), new StreamResult(out));
 			return out.toByteArray();
 		} catch (TransformerFactoryConfigurationError | TransformerException e) {
