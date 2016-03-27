@@ -15,15 +15,15 @@ jQuery(document).ready(function ($) {
 });
 
 strolch.parts.model.init = function (domParent) {
-	
-	
 
-	strolch.parts.model.registerHandlers();
+    $("#page-content").load("parts/model.html");
+
+    strolch.parts.model.registerHandlers();
 };
 
 strolch.parts.model.registerHandlers = function () {
 
-    
+
 };
 
 strolch.parts.model.start = function () {

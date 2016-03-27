@@ -59,7 +59,7 @@
 			<depends>SessionHandler</depends>
 			<Properties>
 				<corsEnabled>true</corsEnabled>
-				<corsOrigin>http://localhost:8180</corsOrigin>
+				<corsOrigin>http://localhost:8080</corsOrigin>
 			</Properties>
 		</Component>
 		<Component>

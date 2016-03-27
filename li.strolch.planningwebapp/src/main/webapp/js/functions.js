@@ -67,48 +67,48 @@ strolch.fn.setLocale = function (locale) {
     localStorage['language_locale'] = locale;
 };
 
-strolch.fn.const.version = null;
+strolch.const.version = null;
 strolch.fn.version = function () {
 
-    if (strolch.fn.const.version == null) {
-    	strolch.fn.const.version = "unknown";
+    if (strolch.const.version == null) {
+        strolch.const.version = "unknown";
         $.ajax({
                 async: false,
-                url: localStorage['url_version']
+                url: strolch.fn.url(strolch.const.urls.version)
             }
         ).done(function (data) {
-                if (data != null) {
-                    var ver = data['artifactVersion'];
-                    if (data['scmRevision'] == '${buildNumber}') {
-                    	strolch.fn.const.version = ver;
-                    } else {
-                        ver = ver ? ver.substr(0, 9) : '?';
-                        var rev = data['scmRevision'];
-                        var rev = rev ? rev.substr(0, 7) : '?';
-                        strolch.fn.const.version = ver + " - " + rev;
-                    }
+            if (data != null) {
+                var ver = data['artifactVersion'];
+                if (data['scmRevision'] == '${buildNumber}') {
+                    strolch.const.version = ver;
+                } else {
+                    ver = ver ? ver.substr(0, 9) : '?';
+                    var rev = data['scmRevision'];
+                    var rev = rev ? rev.substr(0, 7) : '?';
+                    strolch.const.version = ver + " - " + rev;
                 }
-            });
+            }
+        });
     }
-    return strolch.fn.const.version;
+    return strolch.const.version;
 };
 
-strolch.fn.const.revision = null;
+strolch.const.revision = null;
 strolch.fn.revision = function () {
 
-    if (strolch.fn.const.revision == null) {
-        strolch.fn.const.revision = Math.floor(Math.random() * 10000000);
+    if (strolch.const.revision == null) {
+        strolch.const.revision = Math.floor(Math.random() * 10000000);
         $.ajax({
                 async: false,
-                url: strolch.fn.url(subPath)
+                url: strolch.fn.url(strolch.const.urls.version)
             }
         ).done(function (data) {
-                if (data != null && data['scmRevision'] != '${buildNumber}') {
-                    uoms.fn.const.revision = data['scmRevision'];
-                }
-            });
+            if (data != null && data['scmRevision'] != '${buildNumber}') {
+                strolch.const.revision = data['scmRevision'];
+            }
+        });
     }
-    return uoms.fn.const.revision;
+    return strolch.const.revision;
 };
 
 
@@ -116,7 +116,7 @@ strolch.fn.revision = function () {
  * Session management
  */
 strolch.fn.showReAuthForm = function () {
-	$('#reauthFormModal').on('shown.bs.modal', function () {
+    $('#reauthFormModal').on('shown.bs.modal', function () {
         $('#auth-password').focus();
     });
     $('#reauthFormModal').modal('show');

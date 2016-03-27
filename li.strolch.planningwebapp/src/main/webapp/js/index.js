@@ -53,4 +53,9 @@ strolch.index.registerHandlers = function () {
 
 strolch.index.start = function () {
 
+    var components = ['model'];
+    $.forEach(components, function (index) {
+        alert(index);
+    })
+
 };
