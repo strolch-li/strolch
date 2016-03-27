@@ -5,5 +5,8 @@
   "auth.username.empty" : "Please enter a username with at least 2 characters",
   "auth.password.empty" : "Please enter a password with at least 2 characters",
   "auth-validating-token" : "Validating existing session...",
-  "auth-token-invalid" : "Existing session invalid, please login."
+  "auth-token-invalid" : "Existing session invalid, please login.",
+
+  "component.load.error" : "Component loading failed",
+  "component.load.error.msg" : "Failed to load the following components: ${components}"
 }

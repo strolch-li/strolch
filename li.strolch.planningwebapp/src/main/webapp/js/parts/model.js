@@ -10,22 +10,17 @@ if (typeof strolch.parts == 'undefined') {
 }
 strolch.parts.model = {};
 
-jQuery(document).ready(function ($) {
-    strolch.parts.model.init();
-});
-
 strolch.parts.model.init = function (domParent) {
 
-    $("#page-content").load("parts/model.html");
 
     strolch.parts.model.registerHandlers();
 };
 
 strolch.parts.model.registerHandlers = function () {
 
-
+    console.log("Registered handlers");
 };
 
-strolch.parts.model.start = function () {
+strolch.parts.model.show = function () {
 
 };

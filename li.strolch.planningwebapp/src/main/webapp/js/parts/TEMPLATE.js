@@ -11,11 +11,6 @@ if (typeof strolch.parts == 'undefined') {
 // define the namespace:
 strolch.parts.TEMPLATE_NAME = {};
 
-// set the initializer
-jQuery(document).ready(function ($) {
-    strolch.parts.TEMPLATE_NAME.init();
-});
-
 // Required function init() - called to initialize when loaded
 strolch.parts.TEMPLATE_NAME.init = function () {
 
@@ -27,7 +22,7 @@ strolch.parts.TEMPLATE_NAME.registerHandlers = function () {
 
 };
 
-// Required function start() - called when navigated to this method
-strolch.parts.TEMPLATE_NAME.start = function () {
+// Required function show() - called when navigated to this method
+strolch.parts.TEMPLATE_NAME.show = function () {
 
 };

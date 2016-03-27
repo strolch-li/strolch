@@ -389,6 +389,10 @@ strolch.fn.isEmail = function (val) {
     return isEmail;
 };
 
+strolch.fn.equalsArray = function (a, b) {
+    return $(a).not(b).length === 0 && $(b).not(a).length === 0;
+};
+
 
 /*
  * hack for multiple modals over each other - until bootstrap fixes this
