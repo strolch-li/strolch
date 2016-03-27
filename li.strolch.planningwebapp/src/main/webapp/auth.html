@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Required meta tags always come first -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+<link rel="stylesheet" href="css/external/bootstrap.css">
+<link rel="stylesheet" href="css/external/font-awesome.css">
+<link rel="stylesheet" href="css/external/alertify/alertify.css" />
+<link rel="stylesheet" href="css/external/alertify/themes/bootstrap.min.css" />
+
+<!-- Application -->
+<link rel="stylesheet" href="css/auth.css">
+
+<title>Strolch: PlanningWebApp Authentication</title>
+</head>
+<body>
+
+	<div class="container">
+
+		<div class="row" style="margin-top: 50px">
+			<div class=" col-sm-offset-4 col-sm-4">
+				<h2>Please sign in</h2>
+			</div>
+		</div>
+
+		<div class="row content" style="margin-top: 50px">
+
+			<div class=" col-sm-offset-4 col-sm-4">
+
+
+				<form id="authForm" target="form_catcher" action="about:blank" data-submit-action="navigate" data-submit-dst="index.html">
+
+					<fieldset class="form-group">
+						<label for="auth-username">Username</label> <input type="text" class="form-control" id="auth-username" placeholder="Username" required="required"
+							autofocus="autofocus">
+					</fieldset>
+					<fieldset class="form-group">
+						<label for="auth-password">Password</label> <input type="password" class="form-control" id="auth-password" placeholder="Password">
+					</fieldset>
+
+					<p id="info" class="hidden"></p>
+
+					<button type="submit" class="btn btn-secondary pull-right">
+						Login <span data-type="spinner" class="hidden fa fa-spinner fa-spin"></span>
+					</button>
+				</form>
+
+			</div>
+
+		</div>
+
+	</div>
+
+	<!--
+    use as: <form target="form_catcher" action="about:blank"> so that browser saves form data
+-->
+	<iframe name="form_catcher" style="display: none" src="about:blank"></iframe>
+
+	<!-- External JavaScript dependencies -->
+	<script src="js/external/jquery.js"></script>
+	<script src="js/external/tether.js"></script>
+	<script src="js/external/bootstrap.js"></script>
+	<script src="js/external/alertify.js"></script>
+
+	<!-- Application -->
+	<script src="js/i18n.js"></script>
+	<script src="js/constants.js"></script>
+	<script src="js/functions.js"></script>
+	<script src="js/auth.js"></script>
+
+</body>
+</html>

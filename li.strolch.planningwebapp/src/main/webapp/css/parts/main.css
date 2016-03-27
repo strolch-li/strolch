@@ -1,0 +1,48 @@
+/**
+ * Created by eitch on 2015-09-04
+ */
+
+/*
+ * Basic
+ */
+html, body {
+    background: #f5f5f5;
+}
+
+/*
+ * Sticky footer
+ */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 56px;
+}
+
+.footer {
+    height: 56px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: #f5f5f5;
+}
+
+.footer .information {
+    color: #b0b69d;
+    font-size: 1.0em;
+}
+
+.footer .version {
+    color: #b0b69d;
+    font-size: 0.8em;
+}
+
+.blur-filter {
+    -webkit-filter: blur(2px);
+    -moz-filter: blur(2px);
+    -o-filter: blur(2px);
+    -ms-filter: blur(2px);
+    filter: blur(2px);
+}

@@ -1,0 +1,9 @@
+{
+  "error" : "Error",
+  "auth.warning" : "Warning",
+  "auth.failed" : "Auth failed",
+  "auth.username.empty" : "Please enter a username with at least 2 characters",
+  "auth.password.empty" : "Please enter a password with at least 2 characters",
+  "auth-validating-token" : "Validating existing session...",
+  "auth-token-invalid" : "Existing session invalid, please login."
+}
