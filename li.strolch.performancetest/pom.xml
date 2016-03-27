@@ -52,6 +52,10 @@
 			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.persistence.postgresql</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.persistence.xml</artifactId>
+		</dependency>
 				
 		<!-- test -->
 		<dependency>

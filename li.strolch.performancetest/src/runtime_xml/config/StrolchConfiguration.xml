@@ -28,22 +28,21 @@
 					TRANSACTIONAL = only DB
 					CACHED = inmemory with persistence in DB
 				-->
-				<!-- dataStoreMode>EMPTY</dataStoreMode -->
-				<dataStoreMode>TRANSACTIONAL</dataStoreMode>
-				<enableAuditTrail>true</enableAuditTrail>
+				<realms>transactional, cached</realms>
+				
+				<dataStoreMode.transactional>TRANSACTIONAL</dataStoreMode.transactional>
+				<enableAuditTrail.transactional>true</enableAuditTrail.transactional>
+				
+				<dataStoreMode.cached>CACHED</dataStoreMode.cached>
+				<enableAuditTrail.cached>true</enableAuditTrail.cached>
 			</Properties>
 		</Component>
 		<Component>
 			<name>PersistenceHandler</name>
 			<api>li.strolch.persistence.api.PersistenceHandler</api>
-			<impl>li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler</impl>
+			<impl>li.strolch.persistence.xml.XmlPersistenceHandler</impl>
 			<Properties>
-				<allowSchemaCreation>true</allowSchemaCreation>
-				<allowSchemaDrop>true</allowSchemaDrop>
-				<db.url>jdbc:postgresql://localhost/testdb</db.url>
-				<db.username>testuser</db.username>
-				<db.password>test</db.password>
-				<db.pool.maximumPoolSize>1</db.pool.maximumPoolSize>
+				<verbose>false</verbose>
 			</Properties>
 		</Component>
 		<Component>
@@ -53,15 +52,7 @@
 			<depends>RealmHandler</depends>
 			<depends>PrivilegeHandler</depends>
 			<Properties>
-				<verbose>true</verbose>
-			</Properties>
-		</Component>
-		<Component>
-			<name>PostInitializer</name>
-			<api>li.strolch.agent.api.PostInitializer</api>
-			<impl>li.strolch.tutorialapp.postinitializer.PostInitializer</impl>
-			<depends>ServiceHandler</depends>
-			<Properties>
+				<verbose>false</verbose>
 			</Properties>
 		</Component>
 	</env>

@@ -65,7 +65,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 		}
 
 		Properties properties = new Properties();
-		properties.setProperty(PersistenceConstants.PROP_VERBOSE, "true"); //$NON-NLS-1$
+		properties.setProperty(PersistenceConstants.PROP_VERBOSE, componentConfiguration.getString("verbose", "false")); //$NON-NLS-1$
 		properties.setProperty(PersistenceConstants.PROP_XML_IO_MOD, IoMode.DOM.name());
 		properties.setProperty(PersistenceConstants.PROP_BASEPATH, dbStorePathF.getAbsolutePath());
 

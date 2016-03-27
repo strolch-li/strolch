@@ -17,6 +17,7 @@ package li.strolch.performance;
 
 import java.util.concurrent.TimeUnit;
 
+import ch.eitchnet.utils.helper.SystemHelper;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.command.AddResourceCommand;
 import li.strolch.command.RemoveResourceCommand;
@@ -24,13 +25,13 @@ import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 
-public class PerformanceTestService extends AbstractService<ServiceArgument, ServiceResult> {
+public class PerformanceTestService extends AbstractService<PerformanceTestArgument, ServiceResult> {
 
 	private static final String MY_TYPE = "MyType";
 	private static final long serialVersionUID = 1L;
+	private PerformanceTestArgument arg;
 
 	@Override
 	protected ServiceResult getResultInstance() {
@@ -39,12 +40,13 @@ public class PerformanceTestService extends AbstractService<ServiceArgument, Ser
 
 	@Override
 	protected boolean isArgumentRequired() {
-		return false;
+		return true;
 	}
 
 	@Override
-	protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+	protected ServiceResult internalDoService(PerformanceTestArgument arg) throws Exception {
 
+		this.arg = arg;
 		long start = System.currentTimeMillis();
 
 		long resolutionMillis = TimeUnit.SECONDS.toMillis(1);
@@ -53,7 +55,7 @@ public class PerformanceTestService extends AbstractService<ServiceArgument, Ser
 		long nrOfTx = 0;
 
 		String resId = null;
-		
+
 		while (run(start)) {
 
 			try (StrolchTransaction tx = openUserTx()) {
@@ -62,8 +64,7 @@ public class PerformanceTestService extends AbstractService<ServiceArgument, Ser
 					Resource toDelete = queryResource(tx, resId);
 					deleteResource(tx, toDelete);
 				}
-				resId = 
-				createResource(tx);
+				resId = createResource(tx);
 
 				tx.commitOnClose();
 			}
@@ -72,7 +73,8 @@ public class PerformanceTestService extends AbstractService<ServiceArgument, Ser
 			long now = System.currentTimeMillis();
 			if (System.currentTimeMillis() >= nextLog) {
 				nextLog = now + resolutionMillis;
-				logger.info("Performing " + (nrOfTx / resolutionSeconds) + " TXs/s");
+				logger.info("Performing " + (nrOfTx / resolutionSeconds) + " TXs/s (" + SystemHelper.getMemorySummary()
+						+ ")");
 				nrOfTx = 0;
 			}
 		}
@@ -81,7 +83,7 @@ public class PerformanceTestService extends AbstractService<ServiceArgument, Ser
 	}
 
 	private boolean run(long start) {
-		return System.currentTimeMillis() < start + TimeUnit.MINUTES.toMillis(1);
+		return System.currentTimeMillis() < start + this.arg.unit.toMillis(this.arg.duration);
 	}
 
 	private void deleteResource(StrolchTransaction tx, Resource toDelete) {
