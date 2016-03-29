@@ -115,6 +115,6 @@ strolch.index.start = function () {
             }
         });
     });
-    
+
 };
 

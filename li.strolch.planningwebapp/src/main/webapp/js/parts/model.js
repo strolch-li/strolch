@@ -23,4 +23,10 @@ strolch.parts.model.registerHandlers = function () {
 
 strolch.parts.model.show = function () {
 
+    $('#part-model').show();
+};
+
+strolch.parts.model.hide = function () {
+
+    $('#part-model').hide();
 };
