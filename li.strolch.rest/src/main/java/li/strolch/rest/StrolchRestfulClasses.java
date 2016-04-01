@@ -23,6 +23,7 @@ import li.strolch.rest.endpoint.AuditsService;
 import li.strolch.rest.endpoint.AuthenticationService;
 import li.strolch.rest.endpoint.EnumQuery;
 import li.strolch.rest.endpoint.Inspector;
+import li.strolch.rest.endpoint.ModelQuery;
 import li.strolch.rest.endpoint.PrivilegePoliciesService;
 import li.strolch.rest.endpoint.PrivilegeRolesService;
 import li.strolch.rest.endpoint.PrivilegeUsersService;
@@ -47,6 +48,7 @@ public class StrolchRestfulClasses {
 		restfulClasses.add(AuthenticationService.class);
 		restfulClasses.add(Inspector.class);
 		restfulClasses.add(VersionQuery.class);
+		restfulClasses.add(ModelQuery.class);
 		restfulClasses.add(EnumQuery.class);
 
 		// privilege

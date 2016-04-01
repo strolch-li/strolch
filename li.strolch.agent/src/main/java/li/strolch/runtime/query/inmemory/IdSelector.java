@@ -15,44 +15,26 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import ch.eitchnet.utils.StringMatchMode;
 import li.strolch.model.StrolchElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class IdSelector<T extends StrolchElement> implements Selector<T> {
 
+	private StringMatchMode matchMode;
 	private List<String> ids;
 
-	public IdSelector() {
-		this.ids = new ArrayList<>(1);
-	}
-
-	/**
-	 * @param id
-	 */
-	public IdSelector(String id) {
-		this.ids = new ArrayList<>(1);
-		this.ids.add(id);
-	}
-
 	/**
 	 * @param ids
+	 * @param matchMode
 	 */
-	public IdSelector(String... ids) {
-		this.ids = Arrays.asList(ids);
-	}
-
-	/**
-	 * @param ids
-	 */
-	public IdSelector(List<String> ids) {
+	public IdSelector(List<String> ids, StringMatchMode matchMode) {
 		this.ids = ids;
+		this.matchMode = matchMode;
 	}
 
 	/**
@@ -60,6 +42,13 @@ public class IdSelector<T extends StrolchElement> implements Selector<T> {
 	 */
 	public List<String> getIds() {
 		return this.ids;
+	}
+
+	/**
+	 * @return the matchMode
+	 */
+	public StringMatchMode getMatchMode() {
+		return this.matchMode;
 	}
 
 	/**
@@ -78,10 +67,10 @@ public class IdSelector<T extends StrolchElement> implements Selector<T> {
 
 		String elemId = element.getId();
 		if (this.ids.size() == 1)
-			return this.ids.get(0).equals(elemId);
+			return this.matchMode.matches(elemId, this.ids.get(0));
 
 		for (String id : this.ids) {
-			if (elemId.equals(id))
+			if (this.matchMode.matches(elemId, id))
 				return true;
 		}
 

@@ -17,6 +17,7 @@ package li.strolch.persistence.api;
 
 import java.util.List;
 
+import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.OrderMap;
@@ -49,7 +50,6 @@ import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
-import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * <p>

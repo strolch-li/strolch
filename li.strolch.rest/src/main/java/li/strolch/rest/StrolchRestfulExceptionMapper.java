@@ -17,20 +17,20 @@ package li.strolch.rest;
 
 import java.text.MessageFormat;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import li.strolch.exception.StrolchAccessDeniedException;
-import li.strolch.rest.model.Result;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.model.Restrictable;
 import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.exception.StrolchAccessDeniedException;
+import li.strolch.rest.model.Result;
 
 @Provider
 public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception> {
@@ -41,6 +41,9 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 	public Response toResponse(Exception ex) {
 
 		logger.error(MessageFormat.format("Handling exception {0}", ex.getClass()), ex); //$NON-NLS-1$
+
+		if (ex instanceof NotFoundException)
+			return Response.status(Status.NOT_FOUND).entity(new Result(ex)).type(MediaType.APPLICATION_JSON).build();
 
 		if (ex instanceof StrolchAccessDeniedException) {
 			StrolchAccessDeniedException e = (StrolchAccessDeniedException) ex;

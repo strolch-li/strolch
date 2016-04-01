@@ -13,7 +13,8 @@ strolch.const = {
     url_base: 'planningwebapp',
     urls: {
         auth: 'rest/strolch/authentication',
-        version: 'rest/strolch/version'
+        version: 'rest/strolch/version',
+        resources: 'rest/strolch/model/resources'
     },
 
     auth_token: 'auth_token',

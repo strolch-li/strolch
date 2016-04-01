@@ -7,6 +7,6 @@
   "auth-validating-token" : "Validating existing session...",
   "auth-token-invalid" : "Existing session invalid, please login.",
 
-  "component.load.error" : "Component loading failed",
-  "component.load.error.msg" : "Failed to load the following components: ${components}"
+  "part.load.error" : "Part loading failed",
+  "part.load.error.msg" : "Failed to load the following part: ${parts}"
 }

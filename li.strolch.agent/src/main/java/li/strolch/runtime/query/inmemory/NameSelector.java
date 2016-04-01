@@ -15,12 +15,11 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import li.strolch.model.StrolchElement;
 import ch.eitchnet.utils.StringMatchMode;
+import li.strolch.model.StrolchElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class NameSelector<T extends StrolchElement> implements Selector<T> {
 

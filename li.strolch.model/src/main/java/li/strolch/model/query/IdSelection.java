@@ -19,36 +19,74 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ch.eitchnet.utils.StringMatchMode;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class IdSelection extends StrolchElementSelection {
 
 	private List<String> ids;
-
-	public IdSelection() {
-		this.ids = new ArrayList<>(1);
-	}
+	private StringMatchMode matchMode;
 
 	/**
+	 * Instantiate using {@link StringMatchMode#es()}
+	 * 
 	 * @param id
 	 */
 	public IdSelection(String id) {
 		this.ids = new ArrayList<>(1);
 		this.ids.add(id);
+		this.matchMode = StringMatchMode.es();
 	}
 
 	/**
+	 * @param id
+	 * @param matchMode
+	 */
+	public IdSelection(String id, StringMatchMode matchMode) {
+		this.ids = new ArrayList<>(1);
+		this.ids.add(id);
+		this.matchMode = matchMode;
+	}
+
+	/**
+	 * Instantiate using {@link StringMatchMode#es()}
+	 * 
+	 * @param matchMode
 	 * @param ids
 	 */
 	public IdSelection(String... ids) {
+		this.matchMode = StringMatchMode.es();
+		this.ids = Arrays.asList(ids);
+	}
+
+	/**
+	 * @param matchMode
+	 * @param ids
+	 */
+	public IdSelection(StringMatchMode matchMode, String... ids) {
+		this.matchMode = matchMode;
 		this.ids = Arrays.asList(ids);
 	}
 
 	/**
 	 * @param ids
+	 * @param matchMode
+	 */
+	public IdSelection(List<String> ids, StringMatchMode matchMode) {
+		this.matchMode = matchMode;
+		this.ids = ids;
+	}
+
+	/**
+	 * Instantiate using {@link StringMatchMode#es()}
+	 * 
+	 * @param ids
+	 * @param matchMode
 	 */
 	public IdSelection(List<String> ids) {
+		this.matchMode = StringMatchMode.es();
 		this.ids = ids;
 	}
 
@@ -60,7 +98,15 @@ public class IdSelection extends StrolchElementSelection {
 	}
 
 	/**
+	 * @return the matchMode
+	 */
+	public StringMatchMode getMatchMode() {
+		return this.matchMode;
+	}
+
+	/**
 	 * @param id
+	 * 
 	 * @return
 	 */
 	public IdSelection with(String id) {

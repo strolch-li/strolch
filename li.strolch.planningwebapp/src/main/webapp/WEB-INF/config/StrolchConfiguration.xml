@@ -58,6 +58,7 @@
 			<impl>li.strolch.rest.RestfulStrolchComponent</impl>
 			<depends>SessionHandler</depends>
 			<Properties>
+				<secureCookie>false</secureCookie>
 				<corsEnabled>true</corsEnabled>
 				<corsOrigin>http://localhost:8080</corsOrigin>
 			</Properties>

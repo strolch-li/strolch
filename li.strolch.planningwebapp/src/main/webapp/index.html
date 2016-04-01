@@ -6,10 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-   <link rel="stylesheet" href="css/external/bootstrap.css">
-<link rel="stylesheet" href="css/external/font-awesome.css">
-<link rel="stylesheet" href="css/external/alertify/alertify.css" />
-<link rel="stylesheet" href="css/external/alertify/themes/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/external/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/external/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="css/external/alertify/alertify.css"/>
+    <link rel="stylesheet" type="text/css" href="css/external/alertify/themes/bootstrap.min.css"/>
+
+    <!--link rel="stylesheet" type="text/css" href="css/external/jquery.dataTables.css"/-->
+    <link rel="stylesheet" type="text/css" href="css/external/dataTables.bootstrap4.css"/>
+    <link rel="stylesheet" type="text/css" href="css/external/responsive.bootstrap.css"/>
+
 
     <!-- Application -->
     <link rel="stylesheet" href="css/application.css">
@@ -24,7 +29,9 @@
         <div class="col-sm-offset-3 col-sm-9">
             <div class="row">
                 <div class="col-sm-2 nav-row">
-                    <a href="#"> <span class="fa fa-database nav-icon"></span><br/> <span class="nav-text">Model</span>
+                    <a href="#model" data-function="navigate" data-target="model"> <span
+                            class="fa fa-database nav-icon"></span><br/> <span
+                            class="nav-text">Model</span>
                     </a>
                 </div>
                 <div class="col-sm-2 nav-row">
@@ -39,7 +46,7 @@
 
         <div id="page-content" class="col-sm-12">
 
-			<!-- is loaded dynamically by each parts initializer -->
+            <!-- is loaded dynamically by each parts initializer -->
 
         </div>
     </div>
@@ -109,10 +116,14 @@
 <iframe name="form_catcher" class="hidden" src="about:blank"></iframe>
 
 <!-- External JavaScript dependencies -->
-<script src="js/external/jquery.js"></script>
-<script src="js/external/tether.js"></script>
-<script src="js/external/bootstrap.js"></script>
-<script src="js/external/alertify.js"></script>
+<script type="text/javascript" src="js/external/jquery.js"></script>
+<script type="text/javascript" src="js/external/tether.js"></script>
+<script type="text/javascript" src="js/external/bootstrap.js"></script>
+<script type="text/javascript" src="js/external/alertify.js"></script>
+
+<script type="text/javascript" src="js/external/jquery.dataTables.js"></script>
+<script type="text/javascript" src="js/external/dataTables.bootstrap4.js"></script>
+<script type="text/javascript" src="js/external/dataTables.responsive.js"></script>
 
 <!-- Application -->
 <script src="js/i18n.js"></script>

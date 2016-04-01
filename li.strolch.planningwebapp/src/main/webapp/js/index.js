@@ -10,6 +10,7 @@ if (typeof strolch == 'undefined') {
 }
 strolch.index = {};
 
+strolch.const.partNames = ['model'];
 
 jQuery(document).ready(function ($) {
     strolch.index.init();
@@ -26,8 +27,14 @@ strolch.index.init = function () {
         return;
     }
 
+    // multiple Modal hack
     strolch.fn.multipleModalsHack();
-    strolch.index.registerHandlers();
+
+    // re-auth modal form handler
+    strolch.fn.onModalShow('#reauthFormModal', strolch.fn.logout);
+    strolch.fn.onModalFormSubmit('#reauthFormModal', '#reauthForm', function () {
+        setTimeout(strolch.fn.reAuth, 3000);
+    });
 
     // validate session still alive
     console.log('AuthToken exists, validating...');
@@ -43,78 +50,98 @@ strolch.index.init = function () {
     });
 };
 
-strolch.index.registerHandlers = function () {
-
-    strolch.fn.onModalShow('#reauthFormModal', strolch.fn.logout);
-    strolch.fn.onModalFormSubmit('#reauthFormModal', '#reauthForm', function () {
-        setTimeout(strolch.fn.reAuth, 3000);
-    });
-};
 
 strolch.index.start = function () {
 
-    var components = ['model'];
-    var componentsLoaded = [];
-    var componentsFailed = [];
+    strolch.index.loadParts();
+    strolch.index.registerHandlers();
+};
 
-    var handleLoadDone = function () {
 
-        if (!strolch.fn.equalsArray(components, componentsLoaded)) {
+strolch.index.registerHandlers = function () {
+
+    strolch.index.registerNavigationHandlers();
+};
+
+
+strolch.index.registerNavigationHandlers = function () {
+
+    $('*[data-function=navigate]').unbind('click').click(function (e) {
+
+        var target = $(this).data('target');
+        var part = strolch.parts[target];
+        if (part === 'undefined') {
+            alertify.alert(i18n.t('navigate.error'), i18n.t('navigate.error.missingpart', {part: part}));
             return;
         }
 
-        if (componentsFailed.length != 0) {
-            alertify.alert(i18n.t('component.load.error'), i18n.t('component.load.error.msg', {components: componentsFailed}));
+        $.each(strolch.const.partNames, function (index, value) {
+            strolch.parts[value].hide();
+        });
+        part.show();
+    });
+};
+
+strolch.index.loadParts = function () {
+    var partsLoaded = [];
+    var partsFailed = [];
+
+    var handleLoadDone = function () {
+
+        if (!strolch.fn.equalsArray(strolch.const.partNames, partsLoaded)) {
+            return;
+        }
+
+        if (partsFailed.length != 0) {
+            alertify.alert(i18n.t('part.load.error'), i18n.t('part.load.error.msg', {parts: partsFailed}));
             return;
         }
 
         console.log("Finished loading parts.");
     };
 
-    $.each(components, function (index, value) {
+    $.each(strolch.const.partNames, function (index, value) {
 
-        var component = value;
+        var partName = value;
 
-        $("#page-content").load("parts/" + component + ".html", function (responseText, textStatus, req) {
+        $("#page-content").load("parts/" + partName + ".html", function (responseText, textStatus, req) {
 
             if (req.status != 200) {
 
-                console.error("Failed to load HTML for " + component + " due to status " + req.status);
-                componentsFailed.push(component);
-                componentsLoaded.push(component);
+                console.error("Failed to load HTML for " + partName + " due to status " + req.status);
+                partsFailed.push(partName);
+                partsLoaded.push(partName);
                 handleLoadDone();
 
             } else {
 
-                console.log("Loaded HTML for " + component);
+                console.log("Loaded HTML for " + partName);
 
-                $.getScript("js/parts/" + component + ".js", function (responseText, textStatus, req) {
-                    console.log("Loaded JS for " + component);
+                $.getScript("js/parts/" + partName + ".js", function (responseText, textStatus, req) {
+                    console.log("Loaded JS for " + partName);
 
                     if (req.status != 200) {
-                        console.error("Failed to load JS for " + component + " due to status " + req.status);
-                        componentsFailed.push(component);
+                        console.error("Failed to load JS for " + partName + " due to status " + req.status);
+                        partsFailed.push(partName);
                     } else {
 
-                        var componentNs = strolch.parts[component];
-                        if (componentNs === 'undefined' || componentNs.init === 'undefined' || componentNs.show === 'undefined') {
-                            componentsFailed.push(component + "(missing NS, init() or show())");
+                        var part = strolch.parts[partName];
+                        if (part === 'undefined' || part.init === 'undefined' || part.show === 'undefined') {
+                            partsFailed.push(partName + "(missing part, init() or show())");
                         }
 
                         try {
-                            componentNs.init();
+                            part.init();
                         } catch (e) {
-                            console.error(e);
-                            componentsFailed.push(component + "(init failed!)");
+                            strolch.fn.logException(e);
+                            partsFailed.push(partName + "(init failed!)");
                         }
                     }
 
-                    componentsLoaded.push(component);
+                    partsLoaded.push(partName);
                     handleLoadDone();
                 });
             }
         });
     });
-
 };
-

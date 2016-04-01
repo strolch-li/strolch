@@ -51,7 +51,7 @@ strolch.auth.init = function () {
                     strolch.fn.toggleSubmitBtn('#authForm');
                 }
             });
-        }, 3000);
+        }, 300);
     } else if (sessionData) {
 
         usernameTxt.prop('disabled', false).val(strolch.fn.getSessionData().username);
@@ -77,5 +77,5 @@ strolch.auth.submitAuthForm = function (e) {
     strolch.fn.toggleSubmitBtn('#authForm');
     setTimeout(function () {
         strolch.fn.doAuth('#authForm', username, password);
-    }, 3000);
+    }, 300);
 };

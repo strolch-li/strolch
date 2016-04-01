@@ -116,7 +116,8 @@ public abstract class ParameterSelection implements Selection {
 		return new StringListParameterSelection(bagKey, paramKey, value);
 	}
 
-	public static IntegerListParameterSelection integerListSelection(String bagKey, String paramKey, List<Integer> value) {
+	public static IntegerListParameterSelection integerListSelection(String bagKey, String paramKey,
+			List<Integer> value) {
 		return new IntegerListParameterSelection(bagKey, paramKey, value);
 	}
 
@@ -130,6 +131,36 @@ public abstract class ParameterSelection implements Selection {
 
 	public static NullParameterSelection nullSelection(String bagKey, String paramKey) {
 		return new NullParameterSelection(bagKey, paramKey);
+	}
+
+	public static AnyTypeParameterSelection anyTypeSelection(String bagKey, String paramKey, String value,
+			StringMatchMode matchMode) {
+		return new AnyTypeParameterSelection(bagKey, paramKey, value, matchMode);
+	}
+
+	public static class AnyTypeParameterSelection extends ParameterSelection {
+
+		private StringMatchMode matchMode;
+		private String value;
+
+		public AnyTypeParameterSelection(String bagKey, String paramKey, String value, StringMatchMode matchMode) {
+			super(bagKey, paramKey);
+			this.value = value;
+			this.matchMode = matchMode;
+		}
+
+		public String getValue() {
+			return this.value;
+		}
+
+		public StringMatchMode getMatchMode() {
+			return this.matchMode;
+		}
+
+		@Override
+		public void accept(ParameterSelectionVisitor visitor) {
+			visitor.visit(this);
+		}
 	}
 
 	public static class NullParameterSelection extends ParameterSelection {

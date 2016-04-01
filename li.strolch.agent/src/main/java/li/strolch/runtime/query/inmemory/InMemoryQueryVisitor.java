@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.query.AndSelection;
 import li.strolch.model.query.BooleanSelection;
@@ -29,6 +30,7 @@ import li.strolch.model.query.NotSelection;
 import li.strolch.model.query.OrSelection;
 import li.strolch.model.query.ParameterBagSelection;
 import li.strolch.model.query.ParameterBagSelection.NullParameterBagSelection;
+import li.strolch.model.query.ParameterSelection.AnyTypeParameterSelection;
 import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateRangeParameterSelection;
@@ -52,13 +54,12 @@ import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.runtime.query.inmemory.ParameterBagSelector.NullParameterBagSelector;
 import li.strolch.runtime.query.inmemory.ParameterSelector.StringParameterSelector;
-import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement, S extends StrolchDao<?>> implements
-		StrolchRootElementSelectionVisitor, ParameterSelectionVisitor, StrolchQueryOrderingVisitor {
+public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement, S extends StrolchDao<?>>
+		implements StrolchRootElementSelectionVisitor, ParameterSelectionVisitor, StrolchQueryOrderingVisitor {
 
 	private Comparator<T> comparator;
 	private Navigator<T> navigator;
@@ -152,7 +153,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 
 	@Override
 	public void visit(IdSelection selection) {
-		addSelector(new IdSelector<T>(selection.getIds()));
+		addSelector(new IdSelector<T>(selection.getIds(), selection.getMatchMode()));
 	}
 
 	@Override
@@ -163,11 +164,11 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	@Override
 	public void visit(StringParameterSelection selection) {
 		StringParameterSelector<T> stringSelector = //
-		ParameterSelector.<T> stringSelector( //
-				selection.getBagKey(), //
-				selection.getParamKey(), //
-				selection.getValue(),//
-				selection.getMatchMode());
+				ParameterSelector.<T> stringSelector( //
+						selection.getBagKey(), //
+						selection.getParamKey(), //
+						selection.getValue(), //
+						selection.getMatchMode());
 
 		addSelector(stringSelector);
 	}
@@ -251,6 +252,12 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	@Override
 	public void visit(ParameterBagSelection selection) {
 		addSelector(new ParameterBagSelector<T>(selection.getBagKey()));
+	}
+
+	@Override
+	public void visit(AnyTypeParameterSelection selection) {
+		addSelector(ParameterSelector.<T> anyTypeSelection(selection.getBagKey(), selection.getParamKey(),
+				selection.getValue(), selection.getMatchMode()));
 	}
 
 	@Override

@@ -268,6 +268,46 @@ strolch.fn.toggleSubmitBtn = function (formId) {
 };
 
 /*
+ * DataTable helpers
+ */
+strolch.fn.initDataTable = function (tableId, columns, url, queryData) {
+
+    var table = $('#' + tableId);
+    if ($.fn.dataTable.isDataTable(table)) {
+        table.DataTable().destroy();
+        table.empty();
+    }
+
+    // init table
+    table.dataTable({
+        columns: columns,
+        lengthMenu: [[5, 10, 20, -1], [5, 10, 20, 'All']],
+        processing: true,
+        serverSide: true,
+        ajax: function (data, callback, settings) {
+
+            queryData.draw = data.draw;
+            queryData.pageSize = data.length;
+            queryData.page = data.start / data.length + 1;
+            queryData.sortBy = data.columns[data.order[0].column].data;
+            queryData.ascending = data.order[0].dir == 'asc';
+            queryData.query = data.search.value;
+
+            $.ajax({
+                dataType: 'json',
+                url: url,
+                data: queryData,
+                success: function (data) {
+                    data.recordsTotal = data.dataSetSize;
+                    data.recordsFiltered = data.nrOfElements;
+                    callback(data);
+                }
+            });
+        }
+    });
+};
+
+/*
  * Part loading
  */
 strolch.fn.loadPart = function (part, domParent) {
@@ -393,6 +433,9 @@ strolch.fn.equalsArray = function (a, b) {
     return $(a).not(b).length === 0 && $(b).not(a).length === 0;
 };
 
+strolch.fn.logException = function (e) {
+    (console.error || console.log).call(console, e, e.stack || e);
+};
 
 /*
  * hack for multiple modals over each other - until bootstrap fixes this

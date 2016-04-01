@@ -1,4 +1,3 @@
-
 // THIS IS A TEMPLATE - EXTEND FOR OWN PART
 
 /*
@@ -9,12 +8,14 @@ if (typeof strolch.parts == 'undefined') {
 }
 
 // define the namespace:
-strolch.parts.TEMPLATE_NAME = {};
+strolch.parts.TEMPLATE_NAME = {
+    name: TEMPLATE
+};
 
 // Required function init() - called to initialize when loaded
 strolch.parts.TEMPLATE_NAME.init = function () {
 
-	strolch.parts.TEMPLATE_NAME.registerHandlers();    
+    strolch.parts.TEMPLATE_NAME.registerHandlers();
 };
 
 // delegate function to register handlers (called from init)

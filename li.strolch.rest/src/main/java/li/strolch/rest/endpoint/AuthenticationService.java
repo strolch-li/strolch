@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.HEAD;
@@ -68,7 +69,7 @@ public class AuthenticationService {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response login(Login login, @Context HttpHeaders headers) {
+	public Response login(Login login, @Context HttpServletRequest request, @Context HttpHeaders headers) {
 
 		LoginResult loginResult = new LoginResult();
 
@@ -115,9 +116,13 @@ public class AuthenticationService {
 			}
 			loginResult.setPrivileges(privileges);
 
+			boolean secureCookie = restfulStrolchComponent.isSecureCookie();
+			if (secureCookie && !request.getScheme().equals("https")) {
+				logger.warn(
+						"Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!");
+			}
 			NewCookie cookie = new NewCookie(StrolchRestfulConstants.STROLCH_AUTHORIZATION, certificate.getAuthToken(),
-					"/", null, "Authorization header", (int) TimeUnit.DAYS.toSeconds(1),
-					restfulStrolchComponent.isSecureCookie());
+					"/", null, "Authorization header", (int) TimeUnit.DAYS.toSeconds(1), secureCookie);
 
 			return Response.ok().entity(loginResult)//
 					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken()).cookie(cookie).build();
