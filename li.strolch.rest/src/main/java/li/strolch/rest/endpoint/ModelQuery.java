@@ -69,7 +69,7 @@ public class ModelQuery {
 		List<Resource> resources = new ArrayList<>();
 
 		Set<String> queryBy = queryData.getQueryByNames();
-		Set<String> queryTypes = queryData.getTypes();
+		Set<String> queryTypes = queryData.getTypesAsSet();
 
 		long dataSetSize = 0L;
 		try (StrolchTransaction tx = openTx(cert, realmName)) {
@@ -182,6 +182,6 @@ public class ModelQuery {
 
 	private StrolchTransaction openTx(Certificate certificate, String realm) {
 		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm).openTx(certificate,
-				Inspector.class);
+				ModelQuery.class);
 	}
 }

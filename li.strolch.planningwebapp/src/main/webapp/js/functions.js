@@ -289,9 +289,11 @@ strolch.fn.initDataTable = function (tableId, columns, url, queryData) {
             queryData.draw = data.draw;
             queryData.pageSize = data.length;
             queryData.page = data.start / data.length + 1;
+            queryData.query = data.search.value;
             queryData.sortBy = data.columns[data.order[0].column].data;
             queryData.ascending = data.order[0].dir == 'asc';
-            queryData.query = data.search.value;
+
+            console.log('Searching for ' + queryData.query);
 
             $.ajax({
                 dataType: 'json',

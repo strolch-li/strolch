@@ -45,11 +45,15 @@ strolch.parts.model.prepareResourceTable = function () {
 
     // prepare query data
     var data = {
+        realmName: '',
+        draw: 1,
+        pageSize: 1,
+        page: 0,
         query: '',
-        queryBy: '',
-        sortBy: '',
-        ascending: true,
-        pageSize: 1
+        queryBy: 'Id, Name',
+        types: '',
+        orderBy: '',
+        ascending: true
     };
 
     var url = strolch.fn.url(strolch.const.urls.resources);

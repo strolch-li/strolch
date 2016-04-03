@@ -2,8 +2,8 @@ package li.strolch.rest.endpoint;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.QueryParam;
 
@@ -15,17 +15,11 @@ public class QueryData {
 	public static final String NAME = "Name";
 	public static final String TYPE = "Type";
 
-	@QueryParam("realm")
+	@QueryParam("realmName")
 	private String realmName;
 
 	@QueryParam("draw")
 	private int draw;
-
-	@QueryParam("orderBy")
-	private String orderBy;
-
-	@QueryParam("ascending")
-	private boolean ascending;
 
 	@QueryParam("pageSize")
 	private int pageSize;
@@ -40,7 +34,13 @@ public class QueryData {
 	private String queryBy;
 
 	@QueryParam("types")
-	private String type;
+	private String types;
+
+	@QueryParam("orderBy")
+	private String orderBy;
+
+	@QueryParam("ascending")
+	private boolean ascending;
 
 	public String getRealmName() {
 		return this.realmName;
@@ -106,20 +106,20 @@ public class QueryData {
 		this.queryBy = queryBy;
 	}
 
-	public String getType() {
-		return this.type;
+	public String getTypes() {
+		return this.types;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setTypes(String types) {
+		this.types = types;
 	}
 
 	public Set<String> getQueryByNames() {
 		return toSet(this.queryBy);
 	}
 
-	public Set<String> getTypes() {
-		return toSet(this.type);
+	public Set<String> getTypesAsSet() {
+		return toSet(this.types);
 	}
 
 	private Set<String> toSet(String value) {
@@ -127,8 +127,8 @@ public class QueryData {
 			return Collections.emptySet();
 
 		if (!value.contains(","))
-			return Collections.singleton(value);
+			return Collections.singleton(value.trim());
 
-		return new HashSet<>(Arrays.asList(value.split(",")));
+		return Arrays.stream(value.split(",")).map(s -> s.trim()).collect(Collectors.toSet());
 	}
 }
