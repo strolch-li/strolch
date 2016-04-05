@@ -15,12 +15,12 @@
  */
 package li.strolch.model.query;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
-import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * <p>
@@ -47,6 +47,10 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 
 	protected ResourceVisitor<U> resourceVisitor;
 	protected StrolchQueryOrdering ordering;
+
+	public ResourceQuery() {
+		super();
+	}
 
 	public ResourceQuery(Navigation navigation) {
 		super(navigation);
@@ -103,8 +107,8 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 	}
 
 	public static ResourceQuery<Resource> query(String type, StrolchQueryOrdering ordering) {
-		return new ResourceQuery<Resource>(new StrolchTypeNavigation(type)).setResourceVisitor(
-				new NoStrategyResourceVisitor()).setOrdering(ordering);
+		return new ResourceQuery<Resource>(new StrolchTypeNavigation(type))
+				.setResourceVisitor(new NoStrategyResourceVisitor()).setOrdering(ordering);
 	}
 
 	public static <U> ResourceQuery<U> query(String type, ResourceVisitor<U> resourceVisitor) {
@@ -113,7 +117,7 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 
 	public static <U> ResourceQuery<U> query(String type, ResourceVisitor<U> resourceVisitor,
 			StrolchQueryOrdering ordering) {
-		return new ResourceQuery<U>(new StrolchTypeNavigation(type)).setResourceVisitor(resourceVisitor).setOrdering(
-				ordering);
+		return new ResourceQuery<U>(new StrolchTypeNavigation(type)).setResourceVisitor(resourceVisitor)
+				.setOrdering(ordering);
 	}
 }

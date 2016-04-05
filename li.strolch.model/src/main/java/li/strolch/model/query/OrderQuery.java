@@ -15,12 +15,12 @@
  */
 package li.strolch.model.query;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
-import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * <p>
@@ -47,6 +47,10 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 
 	protected OrderVisitor<U> orderVisitor;
 	protected StrolchQueryOrdering ordering;
+
+	public OrderQuery() {
+		super();
+	}
 
 	public OrderQuery(Navigation navigation) {
 		super(navigation);

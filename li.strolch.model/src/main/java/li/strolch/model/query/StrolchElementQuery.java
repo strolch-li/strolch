@@ -25,12 +25,24 @@ public abstract class StrolchElementQuery<T extends QueryVisitor> implements Str
 	protected Navigation navigation;
 	protected Selection selection;
 
+	public StrolchElementQuery() {
+		// empty
+	}
+
 	public StrolchElementQuery(Navigation navigation) {
+		this.navigation = navigation;
+	}
+
+	public void setNavigation(Navigation navigation) {
 		this.navigation = navigation;
 	}
 
 	public boolean hasNavigation() {
 		return this.navigation != null;
+	}
+
+	public Navigation getNavigation() {
+		return this.navigation;
 	}
 
 	public boolean hasSelection() {

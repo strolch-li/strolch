@@ -32,6 +32,9 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
 
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+
 import li.strolch.model.Order;
 import li.strolch.model.Tags;
 import li.strolch.model.query.OrderQuery;
@@ -40,9 +43,6 @@ import li.strolch.model.xml.SimpleStrolchElementListener;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
-
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
 public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao {

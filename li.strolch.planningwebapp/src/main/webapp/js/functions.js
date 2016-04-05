@@ -283,22 +283,26 @@ strolch.fn.initDataTable = function (tableId, columns, url, queryData) {
         columns: columns,
         lengthMenu: [[5, 10, 20, -1], [5, 10, 20, 'All']],
         processing: true,
+        searching: false,
         serverSide: true,
         ajax: function (data, callback, settings) {
 
-            queryData.draw = data.draw;
-            queryData.pageSize = data.length;
-            queryData.page = data.start / data.length + 1;
-            queryData.query = data.search.value;
-            queryData.sortBy = data.columns[data.order[0].column].data;
-            queryData.ascending = data.order[0].dir == 'asc';
+            var payload = {
+                realmName: queryData.realmName,
+                draw: data.draw,
+                pageSize: data.length,
+                page: data.start / data.length + 1,
+                query: $('#' + queryData.queryFieldId).val(),
+                orderBy: data.columns[data.order[0].column].data,
+                ascending: data.order[0].dir == 'asc'
+            };
 
-            console.log('Searching for ' + queryData.query);
+            console.log('Searching for ' + payload.query);
 
             $.ajax({
                 dataType: 'json',
                 url: url,
-                data: queryData,
+                data: payload,
                 success: function (data) {
                     data.recordsTotal = data.dataSetSize;
                     data.recordsFiltered = data.nrOfElements;

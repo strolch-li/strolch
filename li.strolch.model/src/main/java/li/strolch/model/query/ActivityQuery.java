@@ -15,12 +15,12 @@
  */
 package li.strolch.model.query;
 
+import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
 import li.strolch.model.visitor.NoStrategyActivityVisitor;
-import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * <p>
@@ -47,6 +47,10 @@ public class ActivityQuery<U> extends StrolchElementQuery<ActivityQueryVisitor> 
 
 	protected ActivityVisitor<U> activityVisitor;
 	protected StrolchQueryOrdering ordering;
+
+	public ActivityQuery() {
+		super();
+	}
 
 	public ActivityQuery(Navigation navigation) {
 		super(navigation);
@@ -102,8 +106,8 @@ public class ActivityQuery<U> extends StrolchElementQuery<ActivityQueryVisitor> 
 	}
 
 	public static ActivityQuery<Activity> query(String type, StrolchQueryOrdering ordering) {
-		return new ActivityQuery<Activity>(new StrolchTypeNavigation(type)).setActivityVisitor(
-				new NoStrategyActivityVisitor()).setOrdering(ordering);
+		return new ActivityQuery<Activity>(new StrolchTypeNavigation(type))
+				.setActivityVisitor(new NoStrategyActivityVisitor()).setOrdering(ordering);
 	}
 
 	public static <U> ActivityQuery<U> query(String type, ActivityVisitor<U> activityVisitor) {
@@ -112,7 +116,7 @@ public class ActivityQuery<U> extends StrolchElementQuery<ActivityQueryVisitor> 
 
 	public static <U> ActivityQuery<U> query(String type, ActivityVisitor<U> activityVisitor,
 			StrolchQueryOrdering ordering) {
-		return new ActivityQuery<U>(new StrolchTypeNavigation(type)).setActivityVisitor(activityVisitor).setOrdering(
-				ordering);
+		return new ActivityQuery<U>(new StrolchTypeNavigation(type)).setActivityVisitor(activityVisitor)
+				.setOrdering(ordering);
 	}
 }

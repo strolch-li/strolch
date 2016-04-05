@@ -38,7 +38,6 @@ strolch.parts.model.hide = function () {
 strolch.parts.model.prepareResourceTable = function () {
 
     // query        => the search criteria
-    // queryBy      => the fields to use in searching, default is null/all
     // sortBy       => a single column to sort by
     // ascending    => true|false
     // pageSize     => integer, max number of elements to return per page,
@@ -50,10 +49,9 @@ strolch.parts.model.prepareResourceTable = function () {
         pageSize: 1,
         page: 0,
         query: '',
-        queryBy: 'Id, Name',
-        types: '',
         orderBy: '',
-        ascending: true
+        ascending: true,
+        queryFieldId: 'modelResourceTableSearch'
     };
 
     var url = strolch.fn.url(strolch.const.urls.resources);

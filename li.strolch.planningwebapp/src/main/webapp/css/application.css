@@ -5,7 +5,8 @@
 /*
  * Import different parts
  */
-@import url("utils.css");
-@import url("loader.css");
-@import url("parts/main.css");
-@import url("parts/nav.css");
+@import url('utils.css');
+@import url('loader.css');
+@import url('bootstrap-override.css');
+@import url('parts/main.css');
+@import url('parts/nav.css');
