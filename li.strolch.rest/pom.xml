@@ -97,6 +97,11 @@
 			<artifactId>jersey-media-moxy</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.github.petitparser</groupId>
+			<artifactId>java-petitparser</artifactId>
+		</dependency>
+
 		<!-- test dependencies -->
 		<dependency>
 			<groupId>li.strolch</groupId>
