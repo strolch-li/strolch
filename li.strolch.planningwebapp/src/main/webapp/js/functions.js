@@ -298,6 +298,7 @@ strolch.fn.initDataTable = function (queryData, columns) {
         lengthMenu: [[5, 10, 20, -1], [5, 10, 20, 'All']],
         processing: true,
         searching: false,
+        deferLoading: 0,
         serverSide: true,
         ajax: function (data, callback, settings) {
 

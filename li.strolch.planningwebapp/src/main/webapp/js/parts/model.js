@@ -22,12 +22,15 @@ strolch.parts.model.init = function (domParent) {
 
 strolch.parts.model.registerHandlers = function () {
 
+    $('#part-model').find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var tableSel = $(e.target).attr('href');
+        $(tableSel).find('table').DataTable().draw();
+    });
+
     console.log('Registered handlers');
 };
 
 strolch.parts.model.show = function () {
-
-
     $('#part-model').show();
 };
 
