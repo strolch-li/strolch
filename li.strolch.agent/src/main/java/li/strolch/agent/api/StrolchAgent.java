@@ -36,11 +36,16 @@ import li.strolch.runtime.configuration.StrolchConfiguration;
  */
 public class StrolchAgent {
 
-	private static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties"; //$NON-NLS-1$
+	public static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties"; //$NON-NLS-1$
 	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
 
 	private ComponentContainerImpl container;
 	private StrolchConfiguration strolchConfiguration;
+	private StrolchVersion appVersion;
+
+	public StrolchAgent(StrolchVersion appVersion) {
+		this.appVersion = appVersion;
+	}
 
 	public StrolchConfiguration getStrolchConfiguration() {
 		return this.strolchConfiguration;
@@ -138,6 +143,7 @@ public class StrolchAgent {
 		if (this.versionQueryResult == null) {
 
 			VersionQueryResult queryResult = new VersionQueryResult();
+			queryResult.setAppVersion(this.appVersion);
 
 			Properties properties = new Properties();
 

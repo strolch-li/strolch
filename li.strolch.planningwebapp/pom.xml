@@ -91,14 +91,14 @@
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 				<includes>
-					<include>**/componentVersion.properties</include>
+					<include>**/*.properties</include>
 				</includes>
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>false</filtering>
 				<excludes>
-					<exclude>**/componentVersion.properties</exclude>
+					<exclude>**/*.properties</exclude>
 				</excludes>
 			</resource>
 		</resources>

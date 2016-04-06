@@ -20,6 +20,9 @@ strolch.index.init = function () {
 
     strolch.fn.translateI18n();
 
+    // set version
+    $('#footer').find('.version').text('Version ' + strolch.fn.version());
+
     // logout if no session data
     if (strolch.fn.getAuthToken() == null || strolch.fn.getSessionData() == null) {
         console.log('AuthToken or session data unavailable, logging out...');
@@ -53,7 +56,8 @@ strolch.index.init = function () {
 
 strolch.index.start = function () {
 
-    strolch.index.loadParts();
+    strolch.fn.loadParts(strolch.const.partNames);
+    //strolch.index.loadParts();
     strolch.index.registerHandlers();
 };
 

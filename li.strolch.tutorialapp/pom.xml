@@ -30,14 +30,14 @@
 	</scm>
 
 	<dependencyManagement>
-	<dependencies>
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.bom</artifactId>
-			<type>pom</type>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+		<dependencies>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.bom</artifactId>
+				<type>pom</type>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
 	</dependencyManagement>
 
 	<dependencies>
@@ -63,14 +63,14 @@
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 				<includes>
-					<include>**/componentVersion.properties</include>
+					<include>**/*.properties</include>
 				</includes>
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory>
 				<filtering>false</filtering>
 				<excludes>
-					<exclude>**/componentVersion.properties</exclude>
+					<exclude>**/*.properties</exclude>
 				</excludes>
 			</resource>
 		</resources>

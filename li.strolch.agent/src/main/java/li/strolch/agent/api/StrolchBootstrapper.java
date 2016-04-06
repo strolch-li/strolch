@@ -1,8 +1,10 @@
 package li.strolch.agent.api;
 
 import java.io.File;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,8 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 public class StrolchBootstrapper extends DefaultHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(StrolchBootstrapper.class);
+
+	public static final String APP_VERSION_PROPERTIES = "/appVersion.properties"; //$NON-NLS-1$
 
 	private static final String SYS_PROP_USER_DIR = "user.dir";
 	private static final String STROLCH_BOOTSTRAP = "StrolchBootstrap";
@@ -59,6 +63,45 @@ public class StrolchBootstrapper extends DefaultHandler {
 	private File configPathF;
 	private File dataPathF;
 	private File tempPathF;
+
+	private StrolchVersion appVersion;
+
+	/**
+	 * <p>
+	 * Bootstrap Strolch using the given app {@link StrolchVersion}. This version is used for information on the code
+	 * base from which the agent is instantiated.
+	 * </p>
+	 * 
+	 * @param appVersion
+	 */
+	public StrolchBootstrapper(StrolchVersion appVersion) {
+		DBC.PRE.assertNotNull("appVersion must be set!", appVersion);
+		this.appVersion = appVersion;
+	}
+
+	/**
+	 * <p>
+	 * Bootstrap Strolch using the given {@link Class} from which to get the {@link #APP_VERSION_PROPERTIES} resource
+	 * stream. The version is used for information on the code base from which the agent is instantiated.
+	 * </p>
+	 * 
+	 * @param appClass
+	 *            the class where the {@link #APP_VERSION_PROPERTIES} resource resides
+	 */
+	public StrolchBootstrapper(Class<?> appClass) {
+		DBC.PRE.assertNotNull("appClass must be set!", appClass);
+
+		Properties env = new Properties();
+		try (InputStream in = appClass.getResourceAsStream(APP_VERSION_PROPERTIES)) {
+			env.load(in);
+		} catch (Exception e) {
+			throw new IllegalArgumentException(
+					"Could not find resource " + APP_VERSION_PROPERTIES + " on ClassLoader of class " + appClass);
+		}
+
+		StrolchVersion appVersion = new StrolchVersion(env);
+		this.appVersion = appVersion;
+	}
 
 	public void setEnvironmentOverride(String environmentOverride) {
 		this.environmentOverride = environmentOverride;
@@ -209,7 +252,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 			env = this.environmentOverride;
 		}
 
-		StrolchAgent agent = new StrolchAgent();
+		StrolchAgent agent = new StrolchAgent(this.appVersion);
 		agent.setup(env, this.configPathF, this.dataPathF, this.tempPathF);
 		return agent;
 	}

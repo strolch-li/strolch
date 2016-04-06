@@ -24,6 +24,7 @@ import java.io.File;
 import org.junit.Test;
 
 import ch.eitchnet.utils.helper.FileHelper;
+import li.strolch.RuntimeMock;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchBootstrapper;
 
@@ -38,7 +39,8 @@ public class ConfigurationParserTest {
 			throw new RuntimeException("Could not delete existing target " + rootDstPath);
 		}
 
-		StrolchAgent agent = new StrolchBootstrapper().setupByCopyingRoot(env, rootSrcPath, rootDstPath);
+		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion()).setupByCopyingRoot(env, rootSrcPath,
+				rootDstPath);
 		return agent.getStrolchConfiguration();
 	}
 

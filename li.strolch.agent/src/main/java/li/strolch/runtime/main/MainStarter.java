@@ -16,7 +16,9 @@
 package li.strolch.runtime.main;
 
 import java.io.File;
+import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.cli.CommandLine;
@@ -29,9 +31,11 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.eitchnet.utils.dbc.DBC;
 import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchBootstrapper;
+import li.strolch.agent.api.StrolchVersion;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -50,7 +54,41 @@ public class MainStarter {
 
 	private StrolchAgent agent;
 
-	public MainStarter() {
+	private StrolchVersion appVersion;
+
+	/**
+	 * @param appVersion
+	 *            See {@link StrolchBootstrapper#StrolchBootstrapper(StrolchVersion)}
+	 */
+	public MainStarter(StrolchVersion appVersion) {
+		DBC.PRE.assertNotNull("appVersion must be set!", appVersion);
+		this.appVersion = appVersion;
+
+		configureOptions();
+	}
+
+	/**
+	 * @param appClass
+	 *            See {@link StrolchBootstrapper#StrolchBootstrapper(Class)}
+	 */
+	public MainStarter(Class<?> appClass) {
+		DBC.PRE.assertNotNull("appClass must be set!", appClass);
+
+		Properties env = new Properties();
+		try (InputStream in = appClass.getResourceAsStream(StrolchBootstrapper.APP_VERSION_PROPERTIES)) {
+			env.load(in);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Could not find resource " + StrolchBootstrapper.APP_VERSION_PROPERTIES
+					+ " on ClassLoader of class " + appClass);
+		}
+
+		StrolchVersion appVersion = new StrolchVersion(env);
+		this.appVersion = appVersion;
+
+		configureOptions();
+	}
+
+	private void configureOptions() {
 
 		Options op = new Options();
 		Option rootPathOption = new Option("p", OPT_ROOT_PATH, true, "root path to strolch runtime");
@@ -112,7 +150,7 @@ public class MainStarter {
 	}
 
 	public void setup() {
-		this.agent = new StrolchBootstrapper().setupByRoot(this.env, this.pathF);
+		this.agent = new StrolchBootstrapper(this.appVersion).setupByRoot(this.env, this.pathF);
 	}
 
 	public void initialize() {

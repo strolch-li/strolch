@@ -78,13 +78,13 @@ strolch.fn.version = function () {
             }
         ).done(function (data) {
             if (data != null) {
-                var ver = data['artifactVersion'];
-                if (data['scmRevision'] == '${buildNumber}') {
+                var ver = data.appVersion.artifactVersion;
+                var rev = data.appVersion.scmRevision;
+                if (rev == '${buildNumber}') {
                     strolch.const.version = ver;
                 } else {
                     ver = ver ? ver.substr(0, 9) : '?';
-                    var rev = data['scmRevision'];
-                    var rev = rev ? rev.substr(0, 7) : '?';
+                    rev = rev ? rev.substr(0, 7) : '?';
                     strolch.const.version = ver + " - " + rev;
                 }
             }
@@ -93,22 +93,25 @@ strolch.fn.version = function () {
     return strolch.const.version;
 };
 
-strolch.const.revision = null;
+strolch.fn.revisionValue = null;
 strolch.fn.revision = function () {
 
-    if (strolch.const.revision == null) {
-        strolch.const.revision = Math.floor(Math.random() * 10000000);
+    if (strolch.fn.revisionValue == null) {
+        strolch.fn.revisionValue = Math.floor(Math.random() * 10000000);
         $.ajax({
                 async: false,
                 url: strolch.fn.url(strolch.const.urls.version)
             }
         ).done(function (data) {
-            if (data != null && data['scmRevision'] != '${buildNumber}') {
-                strolch.const.revision = data['scmRevision'];
+            if (data != null) {
+                var rev = data.appVersion.scmRevision;
+                if (rev != '${buildNumber}') {
+                    strolch.fn.revisionValue = rev;
+                }
             }
         });
     }
-    return strolch.const.revision;
+    return strolch.fn.revisionValue;
 };
 
 
@@ -362,74 +365,23 @@ strolch.fn.searchDataTable = function (queryData) {
 /*
  * Part loading
  */
-strolch.fn.loadPart = function (part, domParent) {
+strolch.fn.loadParts = function (parts, domParent) {
 
     var revision = '_=' + strolch.fn.revision();
 
-    var templatePath = localStorage['path_template'];
-    if (typeof templatePath == 'undefined' || templatePath == '') {
-        alertify.error('Template path configuration missing!');
-        return;
-    }
-    var templateUrl = templatePath + page + '.html?' + revision;
+    $.each(strolch.const.partNames, function (index, value) {
 
-    var scriptPath = localStorage['path_script'];
-    if (typeof scriptPath == 'undefined' || scriptPath == '') {
-        alertify.error('scriptPath path configuration missing!');
-        return;
-    }
-    var scriptUrl = scriptPath + 'templates/' + page + '.js?' + revision;
+        var partName = value;
+        var urlHtml = 'parts/' + partName + '.html?' + revision;
+        var urlCss = 'css/parts/' + partName + '.css?' + revision;
 
-    $('.content-loading, .loading-background').showLoading(true);
-    var container = $(this);
-    container.empty();
-    container.hide();
+        var urlJs = 'js/parts/' + partName + '.js?' + revision;
 
-    var css_url = 'css/templates/' + page + '.css?' + revision;
+        // $('.content-loading, .loading-background').showLoading(true);
 
-    this.load(templateUrl + ' ' + selection, function (response, status, xhr) {
-        if (status === 'success') {
-
-            if ($('head link[data-page=' + page + ']').length == 0)
-                $('head').append($('<link rel="stylesheet" type="text/css" />').attr('data-page', page).attr('href', css_url));
-
-            $.getScript(scriptUrl)
-                .done(function (script, textStatus) {
-                    initScript(page);
-                    i18n.translate_document();
-                    container.show();
-                    $('.content-loading, .loading-background').showLoading(false);
-                })
-                .fail(function (jqxhr, settings, exception) {
-
-                    var title;
-                    var msg;
-                    if (jqxhr.status == 404) {
-                        title = 'Missing script';
-                        msg = 'Server says script does not exist at URL ' + scriptUrl;
-                    } else {
-                        title = 'Get script failed!';
-                        msg = exception.message;
-                    }
-                    alertify.alert(title, msg);
-                    console.error(title + '\n:' + msg);
-                    if (exception.stack)
-                        console.error(exception.stack);
-                });
-
-        } else {
-
-            if (xhr.status == 404)
-                alertify.alert('Missing template', 'Server says template does not exist at URL ' + templateUrl);
-            else
-                alertify.alert('Failed to load template', 'Failed to load template at url ' + templateUrl);
-
-            container.show();
-            $('.content-loading, .loading-background').showLoading(false);
-
-            console.error('error: ' + status);
-            console.error(response);
-        }
+        console.log('urlHtml: ' + urlHtml);
+        console.log('urlCss: ' + urlCss);
+        console.log('urlJs: ' + urlJs);
     });
 };
 

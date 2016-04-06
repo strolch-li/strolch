@@ -19,7 +19,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchBootstrapper;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.agent.api.StrolchVersion;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
@@ -111,7 +114,8 @@ public class RuntimeMock implements AutoCloseable {
 				this.targetPathF.getAbsolutePath()));
 
 		// setup the container
-		this.agent = new StrolchBootstrapper().setupByCopyingRoot("dev", this.srcPathF, this.targetPathF);
+		this.agent = new StrolchBootstrapper(getAppVersion()).setupByCopyingRoot("dev", this.srcPathF,
+				this.targetPathF);
 
 		return this;
 	}
@@ -179,6 +183,17 @@ public class RuntimeMock implements AutoCloseable {
 
 			runnable.run(runtimeMock.getAgent());
 		}
+	}
+
+	public static StrolchVersion getAppVersion() {
+		Properties properties = new Properties();
+		try (InputStream in = RuntimeMock.class.getResourceAsStream(StrolchAgent.AGENT_VERSION_PROPERTIES)) {
+			properties.load(in);
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to read " + StrolchAgent.AGENT_VERSION_PROPERTIES, e);
+		}
+		StrolchVersion version = new StrolchVersion(properties);
+		return version;
 	}
 
 	public interface StrolchRunnable {

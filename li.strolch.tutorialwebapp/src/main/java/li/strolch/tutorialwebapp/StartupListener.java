@@ -43,7 +43,7 @@ public class StartupListener implements ServletContextListener {
 		File pathF = new File(realPath);
 		String environment = StrolchEnvironment.getEnvironmentFromEnvProperties(pathF);
 		logger.info("Starting Agent...");
-		this.agent = new StrolchBootstrapper().setupByRoot(environment, pathF);
+		this.agent = new StrolchBootstrapper(StartupListener.class).setupByRoot(environment, pathF);
 		this.agent.initialize();
 		this.agent.start();
 		logger.info("Agent started.");

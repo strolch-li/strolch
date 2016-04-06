@@ -26,7 +26,7 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MainStarter mainStarter = new MainStarter();
+		MainStarter mainStarter = new MainStarter(Main.class);
 		mainStarter.start(args);
 	}
 }

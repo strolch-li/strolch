@@ -30,6 +30,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "VersionQueryResult")
 public class VersionQueryResult {
 
+	@XmlElement(name = "appVersion", type = StrolchVersion.class)
+	private StrolchVersion appVersion;
 	@XmlElement(name = "agentVersion", type = AgentVersion.class)
 	private AgentVersion agentVersion;
 	@XmlElement(name = "componentVersions", type = ComponentVersion.class)
@@ -39,6 +41,21 @@ public class VersionQueryResult {
 
 	public VersionQueryResult() {
 		// no-arg constructor for JAXB
+	}
+
+	/**
+	 * @return the appVersion
+	 */
+	public StrolchVersion getAppVersion() {
+		return this.appVersion;
+	}
+
+	/**
+	 * @param appVersion
+	 *            the appVersion to set
+	 */
+	public void setAppVersion(StrolchVersion appVersion) {
+		this.appVersion = appVersion;
 	}
 
 	/**
