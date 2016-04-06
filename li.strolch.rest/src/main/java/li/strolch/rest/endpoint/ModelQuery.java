@@ -260,10 +260,10 @@ public class ModelQuery {
 			if (queryData.getOrderBy().equals(Tags.ID)) {
 				resources.sort((r1, r2) -> queryData.isAscending() ? r1.getId().compareTo(r2.getId())
 						: r2.getId().compareTo(r1.getId()));
-			} else if (queryData.getOrderBy().equals(Tags.ID)) {
+			} else if (queryData.getOrderBy().equals(Tags.NAME)) {
 				resources.sort((r1, r2) -> queryData.isAscending() ? r1.getName().compareTo(r2.getName())
 						: r2.getName().compareTo(r1.getName()));
-			} else if (queryData.getOrderBy().equals(Tags.ID)) {
+			} else if (queryData.getOrderBy().equals(Tags.TYPE)) {
 				resources.sort((r1, r2) -> queryData.isAscending() ? r1.getType().compareTo(r2.getType())
 						: r2.getType().compareTo(r1.getType()));
 			} else {
