@@ -6,7 +6,7 @@
  * Define the main namespace
  */
 if (typeof strolch == 'undefined') {
-	strolch = {};
+    strolch = {};
 }
 
 strolch.const = {
@@ -14,7 +14,8 @@ strolch.const = {
     urls: {
         auth: 'rest/strolch/authentication',
         version: 'rest/strolch/version',
-        resources: 'rest/strolch/model/resources'
+        resources: 'rest/strolch/model/resources',
+        orders: 'rest/strolch/model/orders'
     },
 
     auth_token: 'auth_token',

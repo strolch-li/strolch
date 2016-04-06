@@ -295,10 +295,12 @@ strolch.fn.initDataTable = function (queryData, columns) {
     // init table
     table.dataTable({
         columns: columns,
-        lengthMenu: [[5, 10, 20, -1], [5, 10, 20, 'All']],
+        //lengthMenu: [[5, 10, 20, -1], [5, 10, 20, 'All']],
+        lengthMenu: [[10, 50, 100, -1], [10, 50, 100, 'All']],
         processing: true,
         searching: false,
         deferLoading: 0,
+        dom: 't<"bottom"iflp><"clear">',
         serverSide: true,
         ajax: function (data, callback, settings) {
 
@@ -311,8 +313,6 @@ strolch.fn.initDataTable = function (queryData, columns) {
                 orderBy: data.columns[data.order[0].column].data,
                 ascending: data.order[0].dir == 'asc'
             };
-
-            console.log('Searching for ' + payload.query);
 
             $.ajax({
                 dataType: 'json',
@@ -354,7 +354,6 @@ strolch.fn.searchDataTable = function (queryData) {
         if (strolch.fn.searchTimeouts[queryData.searchFieldId] != null)
             clearTimeout(strolch.fn.searchTimeouts[queryData.searchFieldId]);
         strolch.fn.searchTimeouts[queryData.searchFieldId] = setTimeout(function () {
-            console.log('Searching for ' + queryData.query);
             $('#' + queryData.tableId).DataTable().draw();
         }, 300);
     }
