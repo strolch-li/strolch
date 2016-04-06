@@ -37,26 +37,15 @@ strolch.parts.model.hide = function () {
 
 strolch.parts.model.prepareResourceTable = function () {
 
-    // query        => the search criteria
-    // sortBy       => a single column to sort by
-    // ascending    => true|false
-    // pageSize     => integer, max number of elements to return per page,
-
     // prepare query data
-    var data = {
-        realmName: '',
-        draw: 1,
-        pageSize: 1,
-        page: 0,
-        query: '',
-        orderBy: '',
-        ascending: true,
-        queryFieldId: 'modelResourceTableSearch'
-    };
+    var data = strolch.fn.dataTableDefaults();
+    data.realmName = '';
+    data.url = strolch.fn.url(strolch.const.urls.resources);
+    data.tableId = 'modelResourceTable';
+    data.searchFieldId = 'modelResourceTableSearch';
 
-    var url = strolch.fn.url(strolch.const.urls.resources);
     var columns = strolch.parts.model.prepareColumns();
-    strolch.fn.initDataTable('modelResourceTable', columns, url, data);
+    strolch.fn.initDataTable(data, columns);
 };
 
 strolch.parts.model.prepareColumns = function () {

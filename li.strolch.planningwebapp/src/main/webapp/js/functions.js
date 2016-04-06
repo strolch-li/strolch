@@ -270,9 +270,23 @@ strolch.fn.toggleSubmitBtn = function (formId) {
 /*
  * DataTable helpers
  */
-strolch.fn.initDataTable = function (tableId, columns, url, queryData) {
+strolch.fn.dataTableDefaults = function () {
+    return {
+        realmName: '',
+        draw: 1,
+        pageSize: 1,
+        page: 0,
+        query: '',
+        orderBy: '',
+        ascending: true,
+        url: null,
+        tableId: null,
+        searchFieldId: null
+    };
+};
+strolch.fn.initDataTable = function (queryData, columns) {
 
-    var table = $('#' + tableId);
+    var table = $('#' + queryData.tableId);
     if ($.fn.dataTable.isDataTable(table)) {
         table.DataTable().destroy();
         table.empty();
@@ -292,7 +306,7 @@ strolch.fn.initDataTable = function (tableId, columns, url, queryData) {
                 draw: data.draw,
                 pageSize: data.length,
                 page: data.start / data.length + 1,
-                query: $('#' + queryData.queryFieldId).val(),
+                query: queryData.query,
                 orderBy: data.columns[data.order[0].column].data,
                 ascending: data.order[0].dir == 'asc'
             };
@@ -301,7 +315,7 @@ strolch.fn.initDataTable = function (tableId, columns, url, queryData) {
 
             $.ajax({
                 dataType: 'json',
-                url: url,
+                url: queryData.url,
                 data: payload,
                 success: function (data) {
                     data.recordsTotal = data.dataSetSize;
@@ -311,6 +325,38 @@ strolch.fn.initDataTable = function (tableId, columns, url, queryData) {
             });
         }
     });
+
+    strolch.fn.initSearch(queryData);
+};
+
+// this is for a search field belonging to a single table:
+strolch.fn.initSearch = function (queryData) {
+
+    var oldSearchValue = [null];
+
+    $('#' + queryData.searchFieldId).keyup(function (e) {
+        if (e.which !== 0) {
+            var searchValue = $(this).val();
+            if (oldSearchValue[0] == null || oldSearchValue[0] != searchValue) {
+                oldSearchValue[0] = searchValue;
+                queryData.query = searchValue;
+                strolch.fn.searchDataTable(queryData);
+            }
+        }
+    });
+};
+// this is the actual searching, which is set in a timeout, so we don't search too often and can cancel previous calls
+strolch.fn.searchTimeouts = {};
+strolch.fn.searchDataTable = function (queryData) {
+    var minLength = 3;
+    if (queryData.query.length == 0 || queryData.query.length >= minLength) {
+        if (strolch.fn.searchTimeouts[queryData.searchFieldId] != null)
+            clearTimeout(strolch.fn.searchTimeouts[queryData.searchFieldId]);
+        strolch.fn.searchTimeouts[queryData.searchFieldId] = setTimeout(function () {
+            console.log('Searching for ' + queryData.query);
+            $('#' + queryData.tableId).DataTable().draw();
+        }, 300);
+    }
 };
 
 /*

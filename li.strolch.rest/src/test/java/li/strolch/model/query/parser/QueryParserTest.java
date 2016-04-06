@@ -19,8 +19,43 @@ import li.strolch.model.query.StrolchTypeNavigation;
 public class QueryParserTest {
 
 	@Test
+	public void shouldIgnoreGibberish() {
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("sdf dfg3 !sdf", false);
+		assertFalse(query.hasNavigation());
+		assertFalse(query.hasSelection());
+	}
+
+	@Test
 	public void shouldParseEmpty() {
 		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("", false);
+		assertFalse(query.hasNavigation());
+		assertFalse(query.hasSelection());
+	}
+
+	@Test
+	public void shouldParseEmptyId() {
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("id:", false);
+		assertFalse(query.hasNavigation());
+		assertFalse(query.hasSelection());
+	}
+
+	@Test
+	public void shouldParseEmptyName() {
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("name:", false);
+		assertFalse(query.hasNavigation());
+		assertFalse(query.hasSelection());
+	}
+
+	@Test
+	public void shouldParseEmptyType() {
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("type:", false);
+		assertFalse(query.hasNavigation());
+		assertFalse(query.hasSelection());
+	}
+
+	@Test
+	public void shouldParseEmptyIdNameType() {
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("id: name: type:", false);
 		assertFalse(query.hasNavigation());
 		assertFalse(query.hasSelection());
 	}
@@ -86,6 +121,15 @@ public class QueryParserTest {
 		assertTrue(query.hasNavigation());
 		StrolchTypeNavigation navigation = (StrolchTypeNavigation) query.getNavigation();
 		assertEquals("asd", navigation.getType());
+	}
+
+	@Test
+	public void shouldReplaceMultipleType() {
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("type:asd type:fff", false);
+		assertFalse(query.hasSelection());
+		assertTrue(query.hasNavigation());
+		StrolchTypeNavigation navigation = (StrolchTypeNavigation) query.getNavigation();
+		assertEquals("fff", navigation.getType());
 	}
 
 	@Test

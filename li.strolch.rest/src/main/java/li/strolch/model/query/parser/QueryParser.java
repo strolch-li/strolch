@@ -64,20 +64,29 @@ public class QueryParser extends CompositeParser {
 		def("start", ref("query"));
 
 		action("id", (String s) -> {
+			String trimmed = s.trim();
+			if (trimmed.isEmpty())
+				return null;
+
 			if (this.idSelection == null) {
-				this.idSelection = new IdSelection(s.trim(), StringMatchMode.ci());
+				this.idSelection = new IdSelection(trimmed, StringMatchMode.ci());
 				or().with(this.idSelection);
 			} else {
-				this.idSelection.with(s.trim());
+				this.idSelection.with(trimmed);
 			}
+
 			return null;
 		});
 		action("name", (String s) -> {
-			or().with(new NameSelection(s.trim(), StringMatchMode.ci()));
+			String trimmed = s.trim();
+			if (!trimmed.isEmpty())
+				or().with(new NameSelection(trimmed, StringMatchMode.ci()));
 			return null;
 		});
 		action("type", (String s) -> {
-			this.query.setNavigation(new StrolchTypeNavigation(s.trim()));
+			String trimmed = s.trim();
+			if (!trimmed.isEmpty())
+				this.query.setNavigation(new StrolchTypeNavigation(trimmed));
 			return null;
 		});
 
