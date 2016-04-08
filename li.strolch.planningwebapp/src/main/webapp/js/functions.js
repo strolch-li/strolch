@@ -119,10 +119,11 @@ strolch.fn.revision = function () {
  * Session management
  */
 strolch.fn.showReAuthForm = function () {
-    $('#reauthFormModal').on('shown.bs.modal', function () {
+    var reauthForm = $('#reauthFormModal');
+    reauthForm.on('shown.bs.modal', function () {
         $('#auth-password').focus();
     });
-    $('#reauthFormModal').modal('show');
+    reauthForm.modal('show');
 };
 strolch.fn.reAuth = function () {
 
@@ -382,6 +383,10 @@ strolch.fn.loadParts = function (parts, domParent) {
         console.log('urlHtml: ' + urlHtml);
         console.log('urlCss: ' + urlCss);
         console.log('urlJs: ' + urlJs);
+
+        var script = document.createElement('script');
+        script.setAttribute('src', urlJs);
+        document.head.appendChild(script);
     });
 };
 
