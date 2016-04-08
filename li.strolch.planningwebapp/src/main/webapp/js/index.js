@@ -105,7 +105,6 @@ strolch.index.loadParts = function () {
         var partName = value;
 
         var urlHtml = "parts/" + partName + ".html";
-        var urlCss = "css/parts/" + partName + ".css";
         var urlJs = "js/parts/" + partName + ".js";
 
         $("#page-content").load(urlHtml, function (responseText, textStatus, req) {
@@ -119,44 +118,31 @@ strolch.index.loadParts = function () {
 
             } else {
 
-                $("#page-content").load(urlCss, function (responseText, textStatus, req) {
+                console.log("Loaded CSS for " + partName);
+
+                $.getScript(urlJs, function (responseText, textStatus, req) {
+                    console.log("Loaded JS for " + partName);
 
                     if (req.status != 200) {
-
-                        console.error("Failed to load CSS for " + partName + " due to status " + req.status);
-                        partsFailed.push(partName + " (missing: " + urlCss + ")");
-                        partsLoaded.push(partName);
-                        handleLoadDone();
-
+                        console.error("Failed to load JS for " + partName + " due to status " + req.status);
+                        partsFailed.push(partName + " (missing: " + urlJs + ")");
                     } else {
 
-                        console.log("Loaded CSS for " + partName);
+                        var part = strolch.parts[partName];
+                        if (part === 'undefined' || part.init === 'undefined' || part.show === 'undefined') {
+                            partsFailed.push(partName + " (missing part, init() or show())");
+                        }
 
-                        $.getScript(urlJs, function (responseText, textStatus, req) {
-                            console.log("Loaded JS for " + partName);
-
-                            if (req.status != 200) {
-                                console.error("Failed to load JS for " + partName + " due to status " + req.status);
-                                partsFailed.push(partName + " (missing: " + urlJs + ")");
-                            } else {
-
-                                var part = strolch.parts[partName];
-                                if (part === 'undefined' || part.init === 'undefined' || part.show === 'undefined') {
-                                    partsFailed.push(partName + " (missing part, init() or show())");
-                                }
-
-                                try {
-                                    part.init();
-                                } catch (e) {
-                                    strolch.fn.logException(e);
-                                    partsFailed.push(partName + " (init failed!)");
-                                }
-                            }
-
-                            partsLoaded.push(partName);
-                            handleLoadDone();
-                        });
+                        try {
+                            part.init();
+                        } catch (e) {
+                            strolch.fn.logException(e);
+                            partsFailed.push(partName + " (init failed!)");
+                        }
                     }
+
+                    partsLoaded.push(partName);
+                    handleLoadDone();
                 });
             }
         });
