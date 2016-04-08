@@ -1,5 +1,7 @@
 package li.strolch.model.json;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 
 import com.google.gson.JsonArray;
@@ -12,6 +14,9 @@ import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
@@ -55,6 +60,69 @@ public class StrolchElementToJsonVisitor {
 		return rootJ;
 	}
 
+	public JsonObject toJson(Activity element) {
+		JsonObject rootJ = new JsonObject();
+		return toJson(element, rootJ);
+	}
+
+	public JsonObject toJson(Action element) {
+		JsonObject rootJ = new JsonObject();
+		return toJson(element, rootJ);
+	}
+
+	protected JsonObject toJson(Activity element, JsonObject rootJ) {
+
+		rootJ.addProperty(Tags.OBJECT_TYPE, Tags.ACTIVITY);
+
+		toJson((AbstractStrolchElement) element, rootJ);
+
+		addParameterBags(element, rootJ);
+
+		if (element.hasPolicyDefs())
+			addPolicies(element.getPolicyDefs(), rootJ);
+
+		Iterator<Entry<String, IActivityElement>> iter = element.elementIterator();
+		if (iter.hasNext()) {
+
+			JsonArray elementsJ = new JsonArray();
+			rootJ.add(Tags.ELEMENTS, elementsJ);
+
+			while (iter.hasNext()) {
+				IActivityElement activityElement = iter.next().getValue();
+
+				JsonObject elementJ = new JsonObject();
+				elementsJ.add(elementJ);
+
+				if (activityElement instanceof Activity) {
+					toJson((Activity) activityElement, elementJ);
+				} else if (activityElement instanceof Action) {
+					toJson((Action) activityElement, elementJ);
+				} else {
+					throw new IllegalArgumentException("Unhandled element " + activityElement.getClass());
+				}
+			}
+		}
+
+		return rootJ;
+	}
+
+	protected JsonObject toJson(Action element, JsonObject rootJ) {
+
+		rootJ.addProperty(Tags.OBJECT_TYPE, Tags.ACTION);
+
+		toJson((AbstractStrolchElement) element, rootJ);
+		rootJ.addProperty(Tags.RESOURCE_ID, element.getResourceId());
+		rootJ.addProperty(Tags.RESOURCE_TYPE, element.getResourceType());
+		rootJ.addProperty(Tags.STATE, element.getState().name());
+
+		addParameterBags(element, rootJ);
+
+		if (element.hasPolicyDefs())
+			addPolicies(element.getPolicyDefs(), rootJ);
+
+		return rootJ;
+	}
+
 	protected void addPolicies(PolicyDefs policyDefs, JsonObject rootJ) {
 		if (!policyDefs.hasPolicyDefs())
 			return;
@@ -68,7 +136,7 @@ public class StrolchElementToJsonVisitor {
 		}
 	}
 
-	public JsonObject toJson(AbstractStrolchElement element, JsonObject rootJ) {
+	protected JsonObject toJson(AbstractStrolchElement element, JsonObject rootJ) {
 
 		rootJ.addProperty(Tags.ID, element.getId());
 		rootJ.addProperty(Tags.NAME, element.getName());
