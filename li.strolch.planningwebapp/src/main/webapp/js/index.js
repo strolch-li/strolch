@@ -30,9 +30,6 @@ strolch.index.init = function () {
         return;
     }
 
-    // multiple Modal hack
-    strolch.fn.multipleModalsHack();
-
     // re-auth modal form handler
     strolch.fn.onModalShow('#reauthFormModal', strolch.fn.logout);
     strolch.fn.onModalFormSubmit('#reauthFormModal', '#reauthForm', function () {
@@ -57,6 +54,12 @@ strolch.index.start = function () {
 
     strolch.index.loadParts();
     strolch.index.registerHandlers();
+
+    strolch.fn.translateI18n();
+
+    // multiple Modal hack
+    strolch.fn.multipleModalsHack();
+
 };
 
 strolch.index.registerHandlers = function () {

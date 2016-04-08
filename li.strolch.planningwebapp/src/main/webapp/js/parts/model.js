@@ -60,8 +60,18 @@ strolch.parts.model.prepareResourceTable = function () {
     columns.push({title: 'Id', width: 50, data: 'Id'});
     columns.push({title: 'Name', data: 'Name'});
     columns.push({title: 'Type', data: 'Type'});
+    columns.push({title: '', data: null, orderable: false});
 
-    strolch.fn.initDataTable(data, columns);
+    var columnDefs = [
+        {
+            render: function (data, type, row) {
+                return '<span class="fa fa-th-list row-action" data-function="action" data-type="details" />';
+            },
+            targets: columns.length - 1
+        }
+    ];
+
+    strolch.fn.initDataTable(data, columns, columnDefs);
 };
 
 strolch.parts.model.prepareOrderTable = function () {
@@ -79,8 +89,18 @@ strolch.parts.model.prepareOrderTable = function () {
     columns.push({title: 'State', data: 'State'});
     columns.push({title: 'Date', data: 'Date'});
     columns.push({title: 'Type', data: 'Type'});
+    columns.push({title: '', data: null, orderable: false});
 
-    strolch.fn.initDataTable(data, columns);
+    var columnDefs = [
+        {
+            render: function (data, type, row) {
+                return '<span class="fa fa-th-list row-action" data-function="action" data-type="details" />';
+            },
+            targets: columns.length - 1
+        }
+    ];
+
+    strolch.fn.initDataTable(data, columns, columnDefs);
 };
 
 strolch.parts.model.prepareActivityTable = function () {
@@ -96,6 +116,16 @@ strolch.parts.model.prepareActivityTable = function () {
     columns.push({title: 'Id', width: 50, data: 'Id'});
     columns.push({title: 'Name', data: 'Name'});
     columns.push({title: 'Type', data: 'Type'});
+    columns.push({title: '', data: null, orderable: false});
 
-    strolch.fn.initDataTable(data, columns);
+    var columnDefs = [
+        {
+            render: function (data, type, row) {
+                return '<span class="fa fa-th-list row-action" data-function="action" data-type="details" />';
+            },
+            targets: columns.length - 1
+        }
+    ];
+
+    strolch.fn.initDataTable(data, columns, columnDefs);
 };

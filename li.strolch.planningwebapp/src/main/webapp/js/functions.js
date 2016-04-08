@@ -288,7 +288,7 @@ strolch.fn.dataTableDefaults = function () {
         searchFieldId: null
     };
 };
-strolch.fn.initDataTable = function (queryData, columns) {
+strolch.fn.initDataTable = function (queryData, columns, columnDefs) {
 
     var table = $('#' + queryData.tableId);
     if ($.fn.dataTable.isDataTable(table)) {
@@ -299,6 +299,7 @@ strolch.fn.initDataTable = function (queryData, columns) {
     // init table
     table.dataTable({
         columns: columns,
+        columnDefs: columnDefs,
         //lengthMenu: [[5, 10, 20, -1], [5, 10, 20, 'All']],
         lengthMenu: [[10, 50, 100, -1], [10, 50, 100, 'All']],
         processing: true,
@@ -329,6 +330,19 @@ strolch.fn.initDataTable = function (queryData, columns) {
                 }
             });
         }
+    });
+
+    table.find('tbody').on('click', 'tr', function () {
+        var data = table.DataTable().row(this).data();
+        $(this).toggleClass('selected').toggleClass('table-active');
+        console.log('Selected ' + data['Id']);
+    });
+    table.find('tbody').on('click', 'tr span.row-action', function () {
+        var rowE = $(this).closest('tr');
+        var row = table.DataTable().row(rowE);
+        var data = row.data();
+        $('#jsonData').text(JSON.stringify(data, null, 2));
+        $('#modelElementDetailsModal').modal('show');
     });
 
     strolch.fn.initSearch(queryData);
@@ -362,34 +376,6 @@ strolch.fn.searchDataTable = function (queryData) {
         }, 300);
     }
 };
-
-/*
- * Part loading
- */
-strolch.fn.loadParts = function (parts, domParent) {
-
-    var revision = '_=' + strolch.fn.revision();
-
-    $.each(strolch.const.partNames, function (index, value) {
-
-        var partName = value;
-        var urlHtml = 'parts/' + partName + '.html?' + revision;
-        var urlCss = 'css/parts/' + partName + '.css?' + revision;
-
-        var urlJs = 'js/parts/' + partName + '.js?' + revision;
-
-        // $('.content-loading, .loading-background').showLoading(true);
-
-        console.log('urlHtml: ' + urlHtml);
-        console.log('urlCss: ' + urlCss);
-        console.log('urlJs: ' + urlJs);
-
-        var script = document.createElement('script');
-        script.setAttribute('src', urlJs);
-        document.head.appendChild(script);
-    });
-};
-
 
 /*
  * Utils
@@ -444,6 +430,28 @@ strolch.fn.equalsArray = function (a, b) {
 
 strolch.fn.logException = function (e) {
     (console.error || console.log).call(console, e, e.stack || e);
+};
+
+strolch.fn.syntaxHighlightJson = function (json) {
+    if (typeof json != 'string') {
+        json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
 };
 
 /*
