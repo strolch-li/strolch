@@ -1,3 +1,5 @@
+//# sourceURL=model.js
+
 /**
  * Created by eitch on 2016-03-27
  */
@@ -8,11 +10,13 @@
 if (typeof strolch.parts == 'undefined') {
     strolch.parts = {};
 }
+
+// define the namespace:
 strolch.parts.model = {
-    name: 'model',
-    loadedResources: false
+    name: 'model'
 };
 
+// Required function init() - called to initialize when loaded
 strolch.parts.model.init = function (domParent) {
 
     strolch.parts.model.prepareResourceTable();
@@ -21,6 +25,7 @@ strolch.parts.model.init = function (domParent) {
     strolch.parts.model.registerHandlers();
 };
 
+// delegate function to register handlers (called from init)
 strolch.parts.model.registerHandlers = function () {
 
     $('#part-model').find('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -31,10 +36,12 @@ strolch.parts.model.registerHandlers = function () {
     console.log('Registered handlers');
 };
 
+// Required function show() - called when navigated to this method
 strolch.parts.model.show = function () {
     $('#part-model').show();
 };
 
+// Required function hide() - called when navigated away
 strolch.parts.model.hide = function () {
     $('#part-model').hide();
 };

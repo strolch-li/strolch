@@ -1,3 +1,5 @@
+//# sourceURL=TEMPLATE.js
+
 // THIS IS A TEMPLATE - EXTEND FOR OWN PART
 
 /*
@@ -9,7 +11,7 @@ if (typeof strolch.parts == 'undefined') {
 
 // define the namespace:
 strolch.parts.TEMPLATE_NAME = {
-    name: TEMPLATE
+    name: 'TEMPLATE'
 };
 
 // Required function init() - called to initialize when loaded
@@ -25,5 +27,10 @@ strolch.parts.TEMPLATE_NAME.registerHandlers = function () {
 
 // Required function show() - called when navigated to this method
 strolch.parts.TEMPLATE_NAME.show = function () {
+
+};
+
+// Required function hide() - called when navigated away
+strolch.parts.TEMPLATE_NAME.hide = function () {
 
 };

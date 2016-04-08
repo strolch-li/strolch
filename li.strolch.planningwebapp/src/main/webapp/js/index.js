@@ -53,20 +53,16 @@ strolch.index.init = function () {
     });
 };
 
-
 strolch.index.start = function () {
 
-    strolch.fn.loadParts(strolch.const.partNames);
-    //strolch.index.loadParts();
+    strolch.index.loadParts();
     strolch.index.registerHandlers();
 };
-
 
 strolch.index.registerHandlers = function () {
 
     strolch.index.registerNavigationHandlers();
 };
-
 
 strolch.index.registerNavigationHandlers = function () {
 
@@ -108,42 +104,59 @@ strolch.index.loadParts = function () {
 
         var partName = value;
 
-        $("#page-content").load("parts/" + partName + ".html", function (responseText, textStatus, req) {
+        var urlHtml = "parts/" + partName + ".html";
+        var urlCss = "css/parts/" + partName + ".css";
+        var urlJs = "js/parts/" + partName + ".js";
+
+        $("#page-content").load(urlHtml, function (responseText, textStatus, req) {
 
             if (req.status != 200) {
 
                 console.error("Failed to load HTML for " + partName + " due to status " + req.status);
-                partsFailed.push(partName);
+                partsFailed.push(partName + " (missing: " + urlHtml + ")");
                 partsLoaded.push(partName);
                 handleLoadDone();
 
             } else {
 
-                console.log("Loaded HTML for " + partName);
-
-                $.getScript("js/parts/" + partName + ".js", function (responseText, textStatus, req) {
-                    console.log("Loaded JS for " + partName);
+                $("#page-content").load(urlCss, function (responseText, textStatus, req) {
 
                     if (req.status != 200) {
-                        console.error("Failed to load JS for " + partName + " due to status " + req.status);
-                        partsFailed.push(partName);
+
+                        console.error("Failed to load CSS for " + partName + " due to status " + req.status);
+                        partsFailed.push(partName + " (missing: " + urlCss + ")");
+                        partsLoaded.push(partName);
+                        handleLoadDone();
+
                     } else {
 
-                        var part = strolch.parts[partName];
-                        if (part === 'undefined' || part.init === 'undefined' || part.show === 'undefined') {
-                            partsFailed.push(partName + "(missing part, init() or show())");
-                        }
+                        console.log("Loaded CSS for " + partName);
 
-                        try {
-                            part.init();
-                        } catch (e) {
-                            strolch.fn.logException(e);
-                            partsFailed.push(partName + "(init failed!)");
-                        }
+                        $.getScript(urlJs, function (responseText, textStatus, req) {
+                            console.log("Loaded JS for " + partName);
+
+                            if (req.status != 200) {
+                                console.error("Failed to load JS for " + partName + " due to status " + req.status);
+                                partsFailed.push(partName + " (missing: " + urlJs + ")");
+                            } else {
+
+                                var part = strolch.parts[partName];
+                                if (part === 'undefined' || part.init === 'undefined' || part.show === 'undefined') {
+                                    partsFailed.push(partName + " (missing part, init() or show())");
+                                }
+
+                                try {
+                                    part.init();
+                                } catch (e) {
+                                    strolch.fn.logException(e);
+                                    partsFailed.push(partName + " (init failed!)");
+                                }
+                            }
+
+                            partsLoaded.push(partName);
+                            handleLoadDone();
+                        });
                     }
-
-                    partsLoaded.push(partName);
-                    handleLoadDone();
                 });
             }
         });
