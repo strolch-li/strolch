@@ -15,7 +15,8 @@ strolch.const = {
         auth: 'rest/strolch/authentication',
         version: 'rest/strolch/version',
         resources: 'rest/strolch/model/resources',
-        orders: 'rest/strolch/model/orders'
+        orders: 'rest/strolch/model/orders',
+        activities: 'rest/strolch/model/activities'
     },
 
     auth_token: 'auth_token',

@@ -24,14 +24,18 @@ import com.google.gson.JsonObject;
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.collections.Paging;
 import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.json.ActivityToJsonVisitor;
 import li.strolch.model.json.OrderToJsonVisitor;
 import li.strolch.model.json.ResourceToJsonVisitor;
+import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StrolchTypeNavigation;
@@ -164,64 +168,64 @@ public class ModelQuery {
 		return Response.ok(entity).build();
 	}
 
-//	/**
-//	 * Query {@link Activity Activities} by parsing the query string in {@link QueryData#getQuery()} using
-//	 * {@link QueryParser}
-//	 * 
-//	 * @param queryData
-//	 *            the data from the client
-//	 * @param request
-//	 *            the {@link HttpServletRequest} on which to get the {@link Certificate}
-//	 * 
-//	 * @return {@link Response} containing the JSONified {@link Activity Activities} queried
-//	 */
-//	@GET
-//	@Produces(MediaType.APPLICATION_JSON)
-//	@Path("orders")
-//	public Response queryActivities(@BeanParam QueryData queryData, @Context HttpServletRequest request) {
-//		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-//
-//		// see if a special realm was requested
-//		String realmName = getRealmName(queryData);
-//
-//		List<Activity> activities = new ArrayList<>();
-//
-//		// parse the query string
-//		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true);
-//
-//		// query the data
-//		long dataSetSize = 0L;
-//		try (StrolchTransaction tx = openTx(cert, realmName)) {
-//			ActivityMap activityMap = tx.getActivityMap();
-//
-//			if (query.hasNavigation()) {
-//				String type = ((StrolchTypeNavigation) query.getNavigation()).getType();
-//				dataSetSize = activityMap.querySize(tx, type);
-//				activities.addAll(tx.doQuery(query));
-//			} else {
-//				Set<String> types = activityMap.getTypes(tx);
-//				dataSetSize = activityMap.querySize(tx);
-//				for (String type : types) {
-//					query.setNavigation(new StrolchTypeNavigation(type));
-//					activities.addAll(tx.doQuery(query));
-//				}
-//			}
-//
-//			tx.doNothingOnClose();
-//		}
-//
-//		// do ordering
-//		doOrdering(queryData, activities);
-//
-//		// build JSON response
-//		ActivityToJsonVisitor toJsonVisitor = new ActivityToJsonVisitor();
-//		JsonObject root = marshall(queryData, dataSetSize, activities, toJsonVisitor);
-//
-//		// marshall result
-//		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//		String entity = gson.toJson(root);
-//		return Response.ok(entity).build();
-//	}
+	/**
+	 * Query {@link Activity Activities} by parsing the query string in {@link QueryData#getQuery()} using
+	 * {@link QueryParser}
+	 * 
+	 * @param queryData
+	 *            the data from the client
+	 * @param request
+	 *            the {@link HttpServletRequest} on which to get the {@link Certificate}
+	 * 
+	 * @return {@link Response} containing the JSONified {@link Activity Activities} queried
+	 */
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("activities")
+	public Response queryActivities(@BeanParam QueryData queryData, @Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		// see if a special realm was requested
+		String realmName = getRealmName(queryData);
+
+		List<Activity> activities = new ArrayList<>();
+
+		// parse the query string
+		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true);
+
+		// query the data
+		long dataSetSize = 0L;
+		try (StrolchTransaction tx = openTx(cert, realmName)) {
+			ActivityMap activityMap = tx.getActivityMap();
+
+			if (query.hasNavigation()) {
+				String type = ((StrolchTypeNavigation) query.getNavigation()).getType();
+				dataSetSize = activityMap.querySize(tx, type);
+				activities.addAll(tx.doQuery(query));
+			} else {
+				Set<String> types = activityMap.getTypes(tx);
+				dataSetSize = activityMap.querySize(tx);
+				for (String type : types) {
+					query.setNavigation(new StrolchTypeNavigation(type));
+					activities.addAll(tx.doQuery(query));
+				}
+			}
+
+			tx.doNothingOnClose();
+		}
+
+		// do ordering
+		doOrdering(queryData, activities);
+
+		// build JSON response
+		ActivityToJsonVisitor toJsonVisitor = new ActivityToJsonVisitor();
+		JsonObject root = marshall(queryData, dataSetSize, activities, toJsonVisitor);
+
+		// marshall result
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		String entity = gson.toJson(root);
+		return Response.ok(entity).build();
+	}
 
 	private <T extends StrolchRootElement> JsonObject marshall(QueryData queryData, long dataSetSize, List<T> elements,
 			StrolchElementVisitor<T, JsonObject> toJsonVisitor) {

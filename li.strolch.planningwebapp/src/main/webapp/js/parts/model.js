@@ -21,6 +21,7 @@ strolch.parts.model.init = function (domParent) {
 
     strolch.parts.model.prepareResourceTable();
     strolch.parts.model.prepareOrderTable();
+    strolch.parts.model.prepareActivityTable();
 
     strolch.parts.model.registerHandlers();
 };
@@ -77,6 +78,23 @@ strolch.parts.model.prepareOrderTable = function () {
     columns.push({title: 'Name', data: 'Name'});
     columns.push({title: 'State', data: 'State'});
     columns.push({title: 'Date', data: 'Date'});
+    columns.push({title: 'Type', data: 'Type'});
+
+    strolch.fn.initDataTable(data, columns);
+};
+
+strolch.parts.model.prepareActivityTable = function () {
+
+    // prepare query data
+    var data = strolch.fn.dataTableDefaults();
+    data.realmName = '';
+    data.url = strolch.fn.url(strolch.const.urls.activities);
+    data.tableId = 'modelActivityTable';
+    data.searchFieldId = 'modelActivityTableSearch';
+
+    var columns = [];
+    columns.push({title: 'Id', width: 50, data: 'Id'});
+    columns.push({title: 'Name', data: 'Name'});
     columns.push({title: 'Type', data: 'Type'});
 
     strolch.fn.initDataTable(data, columns);

@@ -11,6 +11,8 @@ import org.petitparser.tools.CompositeParser;
 import ch.eitchnet.utils.StringMatchMode;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
 import li.strolch.model.query.OrSelection;
@@ -18,6 +20,7 @@ import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StrolchElementQuery;
 import li.strolch.model.query.StrolchTypeNavigation;
+import li.strolch.model.visitor.NoStrategyActivityVisitor;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
 
@@ -111,6 +114,19 @@ public class QueryParser extends CompositeParser {
 		Result result = parser.parse(queryString);
 		OrderQuery<Order> query = result.get();
 		query.setOrderVisitor(new NoStrategyOrderVisitor());
+
+		if (!query.hasSelection() && withAny) {
+			query.withAny();
+		}
+
+		return query;
+	}
+
+	public static ActivityQuery<Activity> parseToActivityQuery(String queryString, boolean withAny) {
+		QueryParser parser = new QueryParser(new ActivityQuery<>());
+		Result result = parser.parse(queryString);
+		ActivityQuery<Activity> query = result.get();
+		query.setActivityVisitor(new NoStrategyActivityVisitor());
 
 		if (!query.hasSelection() && withAny) {
 			query.withAny();
