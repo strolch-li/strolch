@@ -23,6 +23,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import ch.eitchnet.utils.StringMatchMode;
+import ch.eitchnet.utils.dbc.DBC;
+import ch.eitchnet.utils.helper.StringHelper;
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.model.query.AndSelection;
 import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
@@ -30,6 +34,7 @@ import li.strolch.model.query.NotSelection;
 import li.strolch.model.query.OrSelection;
 import li.strolch.model.query.ParameterBagSelection;
 import li.strolch.model.query.ParameterBagSelection.NullParameterBagSelection;
+import li.strolch.model.query.ParameterSelection.AnyTypeParameterSelection;
 import li.strolch.model.query.ParameterSelection.BooleanParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateParameterSelection;
 import li.strolch.model.query.ParameterSelection.DateRangeParameterSelection;
@@ -51,16 +56,12 @@ import li.strolch.model.query.ordering.OrderById;
 import li.strolch.model.query.ordering.OrderByName;
 import li.strolch.model.query.ordering.OrderByParameter;
 import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
-import ch.eitchnet.utils.StringMatchMode;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelectionVisitor, ParameterSelectionVisitor,
-		StrolchQueryOrderingVisitor {
+public abstract class PostgreSqlQueryVisitor
+		implements StrolchRootElementSelectionVisitor, ParameterSelectionVisitor, StrolchQueryOrderingVisitor {
 
 	protected StringBuilder sql;
 	protected StringBuilder sb;
@@ -249,14 +250,11 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 		this.sb.append(xpath);
 	}
 
-	@Override
-	public void visit(StringParameterSelection selection) {
-		String value = selection.getValue();
-
+	private void xpath(String bagKey, String paramKey, String value, StringMatchMode matchMode) {
 		String xpath = "XPATH('//${className}/ParameterBag[@Id=\"${bagKey}\"]/Parameter[@Id=\"${paramKey}\"]/@Value', asxml))::TEXT AS content";
 		xpath = xpath.replace("${className}", getClassName());
-		xpath = xpath.replace("${bagKey}", selection.getBagKey());
-		xpath = xpath.replace("${paramKey}", selection.getParamKey());
+		xpath = xpath.replace("${bagKey}", bagKey);
+		xpath = xpath.replace("${paramKey}", paramKey);
 
 		this.sb.append(this.indent);
 		this.sb.append("id IN (\n");
@@ -277,15 +275,15 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 		this.sb.append(this.indent);
 		this.sb.append("WHERE ");
 
-		if (selection.getMatchMode().isEquals()) {
-			if (selection.getMatchMode().isCaseSensitve()) {
+		if (matchMode.isEquals()) {
+			if (matchMode.isCaseSensitve()) {
 				this.sb.append("content = ?\n");
 			} else {
 				this.sb.append("content ILIKE ?\n");
 			}
 		} else {
 			value = "%" + value + "%";
-			if (selection.getMatchMode().isCaseSensitve()) {
+			if (matchMode.isCaseSensitve()) {
 				this.sb.append("content LIKE ?\n");
 			} else {
 				this.sb.append("content ILIKE ?\n");
@@ -296,6 +294,11 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 		this.sb.append(")\n");
 
 		this.values.add(value);
+	}
+
+	@Override
+	public void visit(StringParameterSelection sel) {
+		xpath(sel.getBagKey(), sel.getParamKey(), sel.getValue(), sel.getMatchMode());
 	}
 
 	@Override
@@ -406,6 +409,11 @@ public abstract class PostgreSqlQueryVisitor implements StrolchRootElementSelect
 	@Override
 	public PostgreSqlQueryVisitor visit(OrderByParameter ordering) {
 		throw new UnsupportedOperationException("Not yet supported!");
+	}
+
+	@Override
+	public void visit(AnyTypeParameterSelection sel) {
+		xpath(sel.getBagKey(), sel.getParamKey(), sel.getValue(), sel.getMatchMode());
 	}
 
 	/**

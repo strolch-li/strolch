@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.eitchnet.privilege.model.Certificate;
 import ch.eitchnet.utils.StringMatchMode;
+import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
@@ -413,6 +414,19 @@ public class QueryTest {
 				ParameterSelection.stringSelection("@bag01", "@param5", "Strolch",
 						StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performResourceQuery(query, expected);
+	}
+
+	@Test
+	public void shouldQueryResourceByAnyTypeParam() throws SQLException {
+
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
+		query.and().with(ParameterSelection.anyTypeSelection("@bag01", "@param6",
+				ISO8601FormatFactory.getInstance().formatDate(new Date(1354295525628L)), StringMatchMode.ci()));
+		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
+
+		query = ResourceQuery.query("MyType1", new OrderById());
+		query.and().with(ParameterSelection.anyTypeSelection("@bag01", "@param8", "P1D", StringMatchMode.ci()));
+		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
 	@Test
