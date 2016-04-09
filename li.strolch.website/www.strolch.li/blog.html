@@ -61,6 +61,76 @@
 
             <!-- blog post -->
             <div class="blog-post">
+                <h2 class="blog-post-title">Strolch Update</h2>
+
+                <p class="blog-post-meta">April 9, 2016 by <a href="#">Robert</a></p>
+
+                <p>Long due update on Strolch development.</p>
+                <hr>
+                <p>Although we have been rather quiet in the last couple of months, anyone viewing Strolch's commit log,
+                    will see that we certainly didn't halt Strolch development.</p>
+                <p>We have been hard at work, using Strolch in projects, which required many new features and fixes. The
+                    commit log shows as of today over 180 commits since the release tag 1.0.0.</p>
+                <p>Some of the most exciting changes are:</p>
+                <ul>
+                    <li>REST API to query model, incl. privilege management.</li>
+                    <li>JSON marshalling of all elements.</li>
+                    <li>Added <code>Policies</code></li>
+                    <li>Added persisting of user sessions.</li>
+                    <li>New JavaScript based UI to view Strolch's model. This is an initial version and more UI elements
+                        and functions will follow.
+                    </li>
+                    <li>Basic planning engine functionality.</li>
+                </ul>
+
+                <p>Further new features and changes are:</p>
+                <ul>
+                    <li>Implemented a REST API to the privilege management - Now users can be added, changed, etc. via
+                        call to the appropriate URL under <code>../strolch/privilege/*</code>.
+                    </li>
+                    <li>Implemented a REST API to query the user sessions. Incl. invalidating sessions to forcefully
+                        logout users.
+                    </li>
+                    <li>Implemented a REST API to query <code>Audits</code>.</li>
+                    <li>Implemented REST API to query <code>Orders</code>, <code>Resources</code> and
+                        <code>Activities</code>/<code>Actions</code></li>
+                    <li>Implemented REST API to update <code>Resources</code> and <code>Orders</code> from XML</li>
+                    <li>REST API to authenticate now adds a cookie, so authorization is much simpler.</li>
+                    <li>Added convenience methods in <code>Service</code> and <code>Command</code> to easily perform
+                        system user actions.
+                    </li>
+                    <li>Added audits for login/logout of users.</li>
+                    <li>Added audits for changes to privilege management.</li>
+                    <li>PostgreSQL persistence layer now uses <a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>
+                        for connection pooling.
+                    </li>
+                    <li>Implemented a performance test project</li>
+                    <li>Added new Parameters of type <code>IntegerList</code>, <code>FloatList</code> and
+                        <code>LongList</code>.
+                    </li>
+                    <li>Added feature to ignore a realm on DB init.</li>
+                    <li>Implemented core planning functionality.</li>
+                    <li>Added <code>strolch_minimal</code> and <code>strolch_minimal_rest</code> projects to easily get
+                        started.
+                    </li>
+                    <li>Query API now has built in ordering.</li>
+                    <li>Added <code>Policy</code> to all root elements.</li>
+                    <li>Added new planning web app project. This is a test application for demoing the planning engine
+                        functionality of Strolch.
+                    </li>
+                    <li>Adding the persisting and reloading of user sessions, so that a new start of Strolch does not
+                        logout users.
+                    </li>
+                    <li>Implemented to JSON visitors for all root elements.</li>
+                </ul>
+
+                <p>So, although we've been rather quiet on the blog and on social media, we have not been quiet in
+                    Strolch's development. We are planning to release version 1.1.0 soon, so stay tuned!</p>
+
+            </div>
+            <!-- /.blog-post -->
+            <!-- blog post -->
+            <div class="blog-post">
                 <h2 class="blog-post-title">Activities: Beginning of the planning engine</h2>
 
                 <p class="blog-post-meta">July 8, 2015 by <a href="#">Robert</a></p>
@@ -72,23 +142,23 @@
                     <code>Resource</code> objects representing machines, human resources, etc., and
                     <code>Activity</code>/<code>Action</code> hierarchies defining a workflow.</p>
 
-                <p>With the latest couple of commits to Strolch we have now added <code>Activities</code> and a basic
-                    planning of <code>Actions</code> onto <code>Resources</code>. <code>Activities</code> have an
+                <p>With the latest couple of commits to Strolch we have now added Activities and a basic
+                    planning of Actions onto Resources. Activities have an
                     ordered list of <code>IActivityElement</code> which allows creating an arbitrary deep tree structure
-                    of <code>Activity</code> and <code>Action</code> elements.</p>
+                    of Activity and Action elements.</p>
 
-                <p><code>Action</code> objects have a list of <code>IValueChange</code> objects which define the start,
-                    end and further value changes over time on a referenced <code>Resource</code>. Thus planning an
-                    <code>Activity</code> is done by iterating the <code>Activity</code> hierarchy and for every <code>Action</code>
-                    selecting a relevant <code>Resource</code> and then then applying the changes of the
-                    <code>Action</code> on to the referenced <code>TimeState</code> on the <code>Resource</code>.</p>
+                <p>Action objects have a list of <code>IValueChange</code> objects which define the start,
+                    end and further value changes over time on a referenced Resource. Thus planning an
+                    Activity is done by iterating the Activity hierarchy and for every Action
+                    selecting a relevant Resource and then then applying the changes of the
+                    Action on to the referenced <code>TimeState</code> on the Resource.</p>
 
                 <p>This implementation is currently very simple as it ignores all constraints which a
-                    <code>Resource</code> might have. In further development we shall implement a <code>Violation</code>
-                    model so that UIs can be built to visualize the over-use of <code>Resources</code>.</p>
+                    Resource might have. In further development we shall implement a <code>Violation</code>
+                    model so that UIs can be built to visualize the over-use of Resources.</p>
 
                 <p>In even further steps we would then start implementing algorithms to not just apply the changes onto
-                    a <code>Resource</code>, but to actually search the <code>Resource</code> for time slots when the
+                    a Resource, but to actually search the Resource for time slots when the
                     value changes would not violate any constraints applied to the resource.</p>
 
                 <p>We are very much looking forward to these new features. Stay tuned for your updates - even though
@@ -161,7 +231,7 @@
                     <li>And many more...</li>
                 </ul>
 
-                <p>Strolch 1.1.0 is already in development and can also be downloaded from the download page Here you
+                <p>Strolch 1.1.0 is already in development and can also be downloaded from the download page. Here you
                     can see the current change list on <a
                             href="https://github.com/eitchnet/strolch/compare/1.0.0...develop">GitHub</a>. For instance
                     heavy work has been done to implement privilege management by adding a REST API. Looking forward to
