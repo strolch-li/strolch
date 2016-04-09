@@ -23,7 +23,7 @@
 
 	<repositories>
 
-		<repository>
+		<!-- repository>
 			<id>archive.eitchnet.ch.internal</id>
 			<name>Internal</name>
 			<url>https://archive.eitchnet.ch/repository/internal/</url>
@@ -45,7 +45,7 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-		</repository>
+		</repository -->
 
 		<repository>
 			<id>jitpack.io</id>
@@ -61,7 +61,7 @@
 
 	</repositories>
 
-	<pluginRepositories>
+	<!-- pluginRepositories>
 
 		<pluginRepository>
 			<id>archive.eitchnet.ch.plugins</id>
@@ -87,7 +87,7 @@
 			</snapshots>
 		</pluginRepository>
 
-	</pluginRepositories>
+	</pluginRepositories -->
 
 	<distributionManagement>
 		<repository>
