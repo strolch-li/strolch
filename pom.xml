@@ -22,11 +22,72 @@
 	</properties>
 
 	<repositories>
+
+		<repository>
+			<id>archive.eitchnet.ch.internal</id>
+			<name>Internal</name>
+			<url>https://archive.eitchnet.ch/repository/internal/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>archive.eitchnet.ch.snapshots</id>
+			<name>snapshots</name>
+			<url>https://archive.eitchnet.ch/repository/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+
 		<repository>
 			<id>jitpack.io</id>
+			<name>snapshots</name>
 			<url>https://jitpack.io</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
+
 	</repositories>
+
+	<pluginRepositories>
+
+		<pluginRepository>
+			<id>archive.eitchnet.ch.plugins</id>
+			<name>Internal</name>
+			<url>https://archive.eitchnet.ch/repository/internal/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+
+		<pluginRepository>
+			<id>archive.eitchnet.ch.plugins.snapshots</id>
+			<name>snapshots</name>
+			<url>https://archive.eitchnet.ch/repository/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+
+	</pluginRepositories>
 
 	<distributionManagement>
 		<repository>

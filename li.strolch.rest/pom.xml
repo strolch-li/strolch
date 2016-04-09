@@ -86,7 +86,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.github.petitparser</groupId>
+			<groupId>com.github.petitparser.java-petitparser</groupId>
 			<artifactId>petitparser-core</artifactId>
 		</dependency>
 
