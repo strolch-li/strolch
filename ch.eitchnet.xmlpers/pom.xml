@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>ch.eitchnet</groupId>
+		<artifactId>ch.eitchnet.parent</artifactId>
+		<version>1.1.0-SNAPSHOT</version>
+		<relativePath>../ch.eitchnet.parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>ch.eitchnet.xmlpers</artifactId>
+	<packaging>jar</packaging>
+	<name>ch.eitchnet.xmlpers</name>
+	<url>https://github.com/eitchnet/ch.eitchnet.xmlpers</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<eitchnet.utils.version>1.1.0-SNAPSHOT</eitchnet.utils.version>
+	</properties>
+
+	<!-- POM Reference: http://maven.apache.org/pom.html#Licenses -->
+
+	<inceptionYear>2011</inceptionYear>
+
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/eitchnet/ch.eitchnet.xmlpers/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:https://github.com/eitchnet/ch.eitchnet.xmlpers.git</connection>
+		<developerConnection>scm:git:git@github.com:eitchnet/ch.eitchnet.xmlpers.git</developerConnection>
+		<url>https://github.com/eitchnet/ch.eitchnet.xmlpers</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<dependencies>
+		<dependency>
+			<groupId>ch.eitchnet</groupId>
+			<artifactId>ch.eitchnet.utils</artifactId>
+			<version>${eitchnet.utils.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+			</plugin>
+
+		</plugins>
+	</build>
+</project>
