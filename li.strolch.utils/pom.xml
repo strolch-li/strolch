@@ -10,9 +10,9 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>ch.eitchnet.utils</artifactId>
+	<artifactId>li.strolch.utils</artifactId>
 	<packaging>jar</packaging>
-	<name>ch.eitchnet.utils</name>
+	<name>li.strolch.utils</name>
 	<description>These utils contain project independent helper classes and utilities for reuse</description>
 	<inceptionYear>2011</inceptionYear>
 

@@ -10,16 +10,16 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<groupId>ch.eitchnet</groupId>
-	<artifactId>ch.eitchnet.privilege</artifactId>
+	<groupId>li.strolch</groupId>
+	<artifactId>li.strolch.privilege</artifactId>
 	<packaging>jar</packaging>
-	<name>ch.eitchnet.privilege</name>
+	<name>li.strolch.privilege</name>
 	<inceptionYear>2011</inceptionYear>
 
 	<dependencies>
 		<dependency>
-			<groupId>ch.eitchnet</groupId>
-			<artifactId>ch.eitchnet.utils</artifactId>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.utils</artifactId>
 		</dependency>
 	</dependencies>
 

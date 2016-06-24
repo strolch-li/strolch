@@ -10,15 +10,15 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>ch.eitchnet.xmlpers</artifactId>
+	<artifactId>li.strolch.xmlpers</artifactId>
 	<packaging>jar</packaging>
-	<name>ch.eitchnet.xmlpers</name>
+	<name>li.strolch.xmlpers</name>
 	<inceptionYear>2011</inceptionYear>
 
 	<dependencies>
 		<dependency>
-			<groupId>ch.eitchnet</groupId>
-			<artifactId>ch.eitchnet.utils</artifactId>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.utils</artifactId>
 		</dependency>
 	</dependencies>
 
