@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Users>
+
+	<User userId="1" username="userA" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
+		<Firstname>System User</Firstname>
+		<Lastname>Administrator</Lastname>
+		<State>ENABLED</State>
+		<Locale>en_GB</Locale>
+		<Roles>
+			<Role>RoleA1</Role>
+			<Role>RoleA2</Role>
+		</Roles>
+	</User>
+
+	<User userId="2" username="userB" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
+		<Firstname>System User</Firstname>
+		<Lastname>Administrator</Lastname>
+		<State>ENABLED</State>
+		<Locale>en_GB</Locale>
+		<Roles>
+			<Role>RoleB1</Role>
+			<Role>RoleB2</Role>
+		</Roles>
+	</User>
+
+</Users>
