@@ -16,6 +16,13 @@
 	<description>These utils contain project independent helper classes and utilities for reuse</description>
 	<inceptionYear>2011</inceptionYear>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

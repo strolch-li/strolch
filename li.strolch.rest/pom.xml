@@ -15,6 +15,18 @@
 	<description>Restful Web Service API for Strolch</description>
 	<inceptionYear>2011</inceptionYear>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.glassfish.jersey</groupId>
+				<artifactId>jersey-bom</artifactId>
+				<version>${jersey.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<!-- main -->
 		<dependency>
@@ -36,10 +48,6 @@
 		</dependency>
 
 		<!-- Web -->
-		<dependency>
-			<groupId>org.glassfish.jersey</groupId>
-			<artifactId>jersey-bom</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
