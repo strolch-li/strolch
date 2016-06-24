@@ -68,12 +68,12 @@
 
 		<!-- eitchnet -->
 		<dependency>
-			<groupId>ch.eitchnet</groupId>
-			<artifactId>ch.eitchnet.utils</artifactId>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.utils</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>ch.eitchnet</groupId>
-			<artifactId>ch.eitchnet.privilege</artifactId>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.privilege</artifactId>
 		</dependency>
 
 		<!-- strolch -->

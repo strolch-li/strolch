@@ -26,8 +26,8 @@
 			<artifactId>li.strolch.agent</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>ch.eitchnet</groupId>
-			<artifactId>ch.eitchnet.xmlpers</artifactId>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.xmlpers</artifactId>
 		</dependency>
 
 		<!-- test -->

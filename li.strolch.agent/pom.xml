@@ -22,8 +22,8 @@
 			<artifactId>li.strolch.model</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>ch.eitchnet</groupId>
-			<artifactId>ch.eitchnet.privilege</artifactId>
+			<groupId>li.strolch</groupId>
+			<artifactId>li.strolch.privilege</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-cli</groupId>

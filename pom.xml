@@ -53,10 +53,6 @@
 	</developers>
 
 	<properties>
-		<eitchnet.utils.version>1.1.0-SNAPSHOT</eitchnet.utils.version>
-		<eitchnet.xmlpers.version>1.1.0-SNAPSHOT</eitchnet.xmlpers.version>
-		<eitchnet.privilege.version>1.1.0-SNAPSHOT</eitchnet.privilege.version>
-		<strolch.version>1.1.0-SNAPSHOT</strolch.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<buildTimestamp>${maven.build.timestamp}</buildTimestamp>
@@ -69,7 +65,6 @@
 		<module>li.strolch.privilege</module>
 		<module>li.strolch.utils</module>
 		<module>li.strolch.xmlpers</module>
-		<module>li.strolch.parent</module>
 		<module>li.strolch.dev</module>
 		<module>li.strolch.bom</module>
 		<module>li.strolch.model</module>
@@ -119,6 +114,21 @@
 				<artifactId>li.strolch.rest</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.utils</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.xmlpers</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>li.strolch</groupId>
+				<artifactId>li.strolch.privilege</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
 			<!-- test -->
 			<dependency>
@@ -126,23 +136,6 @@
 				<artifactId>li.strolch.testbase</artifactId>
 				<version>${project.version}</version>
 				<scope>test</scope>
-			</dependency>
-
-			<!-- eitchnet -->
-			<dependency>
-				<groupId>ch.eitchnet</groupId>
-				<artifactId>ch.eitchnet.utils</artifactId>
-				<version>${eitchnet.utils.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.eitchnet</groupId>
-				<artifactId>ch.eitchnet.xmlpers</artifactId>
-				<version>${eitchnet.xmlpers.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>ch.eitchnet</groupId>
-				<artifactId>ch.eitchnet.privilege</artifactId>
-				<version>${eitchnet.privilege.version}</version>
 			</dependency>
 
 			<!-- Miscellaneous -->
