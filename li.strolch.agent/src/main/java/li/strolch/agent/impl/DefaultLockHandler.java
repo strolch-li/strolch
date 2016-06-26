@@ -25,11 +25,10 @@ import li.strolch.agent.api.LockHandler;
 import li.strolch.agent.api.StrolchLockException;
 import li.strolch.model.Locator;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.utils.dbc.DBC;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

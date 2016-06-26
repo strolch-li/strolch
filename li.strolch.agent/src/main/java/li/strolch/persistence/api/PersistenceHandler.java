@@ -24,7 +24,7 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.Audit;
-import ch.eitchnet.privilege.model.Certificate;
+import li.strolch.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -23,7 +23,7 @@ import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.ActivityQueryVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.persistence.api.ActivityDao;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

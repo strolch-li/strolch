@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import ch.eitchnet.utils.xml.XmlKeyValue;
+import li.strolch.utils.xml.XmlKeyValue;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

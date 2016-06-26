@@ -26,9 +26,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.helper.SystemHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ComponentState;
 import li.strolch.agent.api.RealmHandler;
@@ -36,11 +33,14 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.helper.SystemHelper;
 
 public class ComponentContainerImpl implements ComponentContainer {
 

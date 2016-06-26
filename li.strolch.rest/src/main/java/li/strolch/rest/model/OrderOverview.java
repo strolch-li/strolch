@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import li.strolch.model.Order;
 import li.strolch.model.State;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

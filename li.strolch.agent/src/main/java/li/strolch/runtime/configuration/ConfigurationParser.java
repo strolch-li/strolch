@@ -18,9 +18,9 @@ package li.strolch.runtime.configuration;
 import java.io.File;
 import java.text.MessageFormat;
 
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.XmlHelper;
 import li.strolch.runtime.configuration.ConfigurationSaxParser.ConfigurationBuilder;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.XmlHelper;
 
 public class ConfigurationParser {
 

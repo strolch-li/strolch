@@ -2,7 +2,7 @@
 <Roles>
 
 	<Role name="agent">
-		<Privilege name="ch.eitchnet.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
+		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
 			<Allow>li.strolch.agent.impl.StartRealms</Allow>
 		</Privilege>
 		<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">

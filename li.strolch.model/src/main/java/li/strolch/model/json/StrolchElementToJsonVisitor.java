@@ -7,7 +7,6 @@ import java.util.SortedSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Order;
@@ -23,6 +22,7 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public class StrolchElementToJsonVisitor {
 

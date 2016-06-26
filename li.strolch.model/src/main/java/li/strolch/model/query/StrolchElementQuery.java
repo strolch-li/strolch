@@ -15,7 +15,7 @@
  */
 package li.strolch.model.query;
 
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -98,7 +98,7 @@ public abstract class StrolchElementQuery<T extends QueryVisitor> implements Str
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeName()
+	 * @see li.strolch.privilege.model.Restrictable#getPrivilegeName()
 	 */
 	@Override
 	public String getPrivilegeName() {
@@ -106,7 +106,7 @@ public abstract class StrolchElementQuery<T extends QueryVisitor> implements Str
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeValue()
+	 * @see li.strolch.privilege.model.Restrictable#getPrivilegeValue()
 	 */
 	@Override
 	public Object getPrivilegeValue() {

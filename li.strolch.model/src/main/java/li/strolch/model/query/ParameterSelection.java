@@ -18,10 +18,10 @@ package li.strolch.model.query;
 import java.util.Date;
 import java.util.List;
 
-import ch.eitchnet.utils.StringMatchMode;
-import ch.eitchnet.utils.collections.DateRange;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.StringMatchMode;
+import li.strolch.utils.collections.DateRange;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

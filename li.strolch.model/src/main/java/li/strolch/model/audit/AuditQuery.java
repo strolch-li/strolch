@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import li.strolch.model.query.StrolchQuery;
-import ch.eitchnet.utils.collections.DateRange;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.collections.DateRange;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * 
@@ -103,7 +103,7 @@ public class AuditQuery<U> implements StrolchQuery {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeName()
+	 * @see li.strolch.privilege.model.Restrictable#getPrivilegeName()
 	 */
 	@Override
 	public String getPrivilegeName() {
@@ -111,7 +111,7 @@ public class AuditQuery<U> implements StrolchQuery {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeValue()
+	 * @see li.strolch.privilege.model.Restrictable#getPrivilegeValue()
 	 */
 	@Override
 	public Object getPrivilegeValue() {

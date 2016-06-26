@@ -8,13 +8,13 @@
 			<Parameter name="autoPersistOnPasswordChange" value="true" />
 		</Parameters>
 
-		<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
+		<EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
 			<Parameters>
 				<Parameter name="hashAlgorithm" value="SHA-256" />
 			</Parameters>
 		</EncryptionHandler>
 
-		<PersistenceHandler class="ch.eitchnet.privilege.handler.XmlPersistenceHandler">
+		<PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
 			<Parameters>
 				<Parameter name="basePath" value="config/" />
 				<Parameter name="modelXmlFile" value="PrivilegeModel.xml" />
@@ -24,7 +24,7 @@
 	</Container>
 
 	<Policies>
-		<Policy name="DefaultPrivilege" class="ch.eitchnet.privilege.policy.DefaultPrivilege" />
+		<Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
 	</Policies>
 
 </Privilege>

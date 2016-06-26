@@ -29,16 +29,15 @@ import li.strolch.command.RemoveOrderCommand;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.testbase.runtime.RuntimeMock;
+import li.strolch.utils.Version;
+import li.strolch.utils.collections.MapOfLists;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.Version;
-import ch.eitchnet.utils.collections.MapOfLists;
 
 public class MigrationsTest {
 

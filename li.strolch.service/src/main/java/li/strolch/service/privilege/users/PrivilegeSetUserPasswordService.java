@@ -18,10 +18,10 @@ package li.strolch.service.privilege.users;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
-import ch.eitchnet.privilege.handler.PrivilegeHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

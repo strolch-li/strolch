@@ -27,7 +27,7 @@ import li.strolch.model.audit.AuditQueryVisitor;
 import li.strolch.model.audit.ElementSelection;
 import li.strolch.model.audit.IdentitySelection;
 import li.strolch.model.query.StringSelection;
-import ch.eitchnet.utils.StringMatchMode;
+import li.strolch.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -1,7 +1,7 @@
-ch.eitchnet.privilege
+li.strolch.privilege
 ==================
 
-[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=ch.eitchnet.privilege)](http://jenkins.eitchnet.ch/view/ch.eitchnet/job/ch.eitchnet.privilege/)
+[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=li.strolch.privilege)](http://jenkins.eitchnet.ch/view/li.strolch/job/li.strolch.privilege/)
 
 Overview
 =======================================================================
@@ -19,7 +19,7 @@ a LDAP repository with only the Privilege JAR.
 Privilege is distributed under the GNU Lesser General Public License on 
 Github.com and can be downloaded at 
 
-   https://github.com/eitchnet/ch.eitchnet.privilege
+   https://github.com/eitchnet/li.strolch.privilege
 
 The main developer is Robert von Burg <eitch@eitchnet.ch> who also maintains the
 Github repository. He is available for all questions regarding Privilege
@@ -82,7 +82,7 @@ $ mvn compile
 Using
 =======================================================================
 
-To use Privilege see the ch.eitchnet.privilege.test.PrivilegeTest.java class
+To use Privilege see the li.strolch.privilege.test.PrivilegeTest.java class
 which contains a few test cases including showing how to load Privilege.
 
 This documentation is still in need of more work, but for any questions please

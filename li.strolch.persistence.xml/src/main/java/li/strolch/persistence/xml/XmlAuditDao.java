@@ -24,13 +24,13 @@ import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchTransaction;
-import ch.eitchnet.utils.collections.DateRange;
-import ch.eitchnet.xmlpers.api.PersistenceContext;
-import ch.eitchnet.xmlpers.api.PersistenceTransaction;
-import ch.eitchnet.xmlpers.objref.IdOfSubTypeRef;
-import ch.eitchnet.xmlpers.objref.ObjectRef;
-import ch.eitchnet.xmlpers.objref.SubTypeRef;
-import ch.eitchnet.xmlpers.objref.TypeRef;
+import li.strolch.utils.collections.DateRange;
+import li.strolch.xmlpers.api.PersistenceContext;
+import li.strolch.xmlpers.api.PersistenceTransaction;
+import li.strolch.xmlpers.objref.IdOfSubTypeRef;
+import li.strolch.xmlpers.objref.ObjectRef;
+import li.strolch.xmlpers.objref.SubTypeRef;
+import li.strolch.xmlpers.objref.TypeRef;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

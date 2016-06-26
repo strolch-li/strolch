@@ -15,9 +15,9 @@
  */
 package li.strolch.service.privilege.users;
 
+import li.strolch.privilege.model.UserRep;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
-import ch.eitchnet.privilege.model.UserRep;
 
 public class PrivilegeUserResult extends ServiceResult {
 	private static final long serialVersionUID = 1L;

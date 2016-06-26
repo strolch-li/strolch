@@ -18,7 +18,7 @@ package li.strolch.agent.api;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
-import ch.eitchnet.privilege.model.Certificate;
+import li.strolch.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

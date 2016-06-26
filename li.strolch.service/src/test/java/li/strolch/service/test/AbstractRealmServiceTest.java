@@ -27,12 +27,11 @@ import org.postgresql.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.db.DbSchemaVersionCheck;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.Version;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.service.XmlImportModelArgument;
 import li.strolch.service.XmlImportModelResult;
 import li.strolch.service.XmlImportModelService;
@@ -42,6 +41,7 @@ import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.testbase.runtime.RuntimeMock;
+import li.strolch.utils.Version;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

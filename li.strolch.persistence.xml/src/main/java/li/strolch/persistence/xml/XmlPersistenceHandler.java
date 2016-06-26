@@ -18,12 +18,6 @@ package li.strolch.persistence.xml;
 import java.io.File;
 import java.util.Properties;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.xmlpers.api.IoMode;
-import ch.eitchnet.xmlpers.api.PersistenceConstants;
-import ch.eitchnet.xmlpers.api.PersistenceManager;
-import ch.eitchnet.xmlpers.api.PersistenceManagerLoader;
-import ch.eitchnet.xmlpers.api.PersistenceTransaction;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
@@ -40,8 +34,14 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.xml.model.AuditContextFactory;
 import li.strolch.persistence.xml.model.OrderContextFactory;
 import li.strolch.persistence.xml.model.ResourceContextFactory;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+import li.strolch.xmlpers.api.IoMode;
+import li.strolch.xmlpers.api.PersistenceConstants;
+import li.strolch.xmlpers.api.PersistenceManager;
+import li.strolch.xmlpers.api.PersistenceManagerLoader;
+import li.strolch.xmlpers.api.PersistenceTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

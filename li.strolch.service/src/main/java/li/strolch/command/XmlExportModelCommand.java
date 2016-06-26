@@ -15,7 +15,7 @@
  */
 package li.strolch.command;
 
-import static ch.eitchnet.utils.helper.StringHelper.UNDERLINE;
+import static li.strolch.utils.helper.StringHelper.UNDERLINE;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,7 +53,7 @@ import li.strolch.model.xml.ResourceToSaxWriterVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -19,11 +19,10 @@ import javax.xml.parsers.DocumentBuilder;
 
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
+import li.strolch.utils.helper.DomUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import ch.eitchnet.utils.helper.DomUtil;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

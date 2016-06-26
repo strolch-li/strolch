@@ -28,11 +28,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import ch.eitchnet.privilege.handler.PrivilegeHandler;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.xml.XmlKeyValue;
+import li.strolch.utils.xml.XmlKeyValue;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

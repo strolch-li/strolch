@@ -17,13 +17,13 @@ package li.strolch.service.test;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
+
+import li.strolch.privilege.model.Certificate;
 import li.strolch.service.test.model.GreetingResult;
 import li.strolch.service.test.model.GreetingService;
 import li.strolch.service.test.model.GreetingService.GreetingArgument;
 
 import org.junit.Test;
-
-import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

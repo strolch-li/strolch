@@ -23,10 +23,10 @@ import java.io.File;
 
 import org.junit.Test;
 
-import ch.eitchnet.utils.helper.FileHelper;
 import li.strolch.RuntimeMock;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchBootstrapper;
+import li.strolch.utils.helper.FileHelper;
 
 @SuppressWarnings("nls")
 public class ConfigurationParserTest {

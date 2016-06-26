@@ -21,8 +21,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import ch.eitchnet.utils.collections.MapOfMaps;
-import ch.eitchnet.utils.helper.XmlHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchPolicyException;
@@ -34,6 +32,8 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.StrolchPolicyFileParser.PolicyModel;
 import li.strolch.policy.StrolchPolicyFileParser.PolicyType;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.utils.collections.MapOfMaps;
+import li.strolch.utils.helper.XmlHelper;
 
 /**
  * <p>

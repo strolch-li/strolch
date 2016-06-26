@@ -27,7 +27,7 @@ import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * Command to plan an {@link Activity} to a {@link Resource}. This

@@ -9,13 +9,13 @@
 			<Parameter name="privilegeConflictResolution" value="MERGE" />
 		</Parameters>
 
-		<EncryptionHandler class="ch.eitchnet.privilege.handler.DefaultEncryptionHandler">
+		<EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
 			<Parameters>
 				<Parameter name="hashAlgorithm" value="SHA-256" />
 			</Parameters>
 		</EncryptionHandler>
 
-		<PersistenceHandler class="ch.eitchnet.privilege.handler.XmlPersistenceHandler">
+		<PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
 			<Parameters>
 				<Parameter name="basePath" value="./target/${target}" />
 				<Parameter name="usersXmlFile" value="PrivilegeUsersMerge.xml" />
@@ -26,9 +26,9 @@
 	</Container>
 
 	<Policies>
-		<Policy name="DefaultPrivilege" class="ch.eitchnet.privilege.policy.DefaultPrivilege" />
-		<Policy name="RoleAccessPrivilege" class="ch.eitchnet.privilege.policy.RoleAccessPrivilege" />
-		<Policy name="UserAccessPrivilege" class="ch.eitchnet.privilege.policy.UserAccessPrivilege" />
+		<Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
+		<Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege" />
+		<Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege" />
 	</Policies>
 
 </Privilege>

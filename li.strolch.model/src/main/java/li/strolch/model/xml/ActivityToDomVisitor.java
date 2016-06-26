@@ -20,10 +20,10 @@ import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import ch.eitchnet.utils.helper.DomUtil;
 import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.utils.helper.DomUtil;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

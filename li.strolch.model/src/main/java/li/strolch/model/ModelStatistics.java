@@ -15,7 +15,7 @@
  */
 package li.strolch.model;
 
-import static ch.eitchnet.utils.helper.StringHelper.NULL;
+import static li.strolch.utils.helper.StringHelper.NULL;
 
 import java.util.Date;
 
@@ -26,8 +26,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import li.strolch.model.xml.Iso8601DateAdapter;
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -18,10 +18,9 @@ package li.strolch.persistence.xml.model;
 import li.strolch.model.Order;
 import li.strolch.model.xml.OrderFromDomVisitor;
 import li.strolch.model.xml.OrderToDomVisitor;
+import li.strolch.xmlpers.api.DomParser;
 
 import org.w3c.dom.Document;
-
-import ch.eitchnet.xmlpers.api.DomParser;
 
 public class OrderDomParser implements DomParser<Order> {
 

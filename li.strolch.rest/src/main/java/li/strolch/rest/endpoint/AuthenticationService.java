@@ -42,14 +42,13 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import ch.eitchnet.privilege.base.AccessDeniedException;
-import ch.eitchnet.privilege.base.InvalidCredentialsException;
-import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.IPrivilege;
-import ch.eitchnet.privilege.model.PrivilegeContext;
-import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.exception.StrolchException;
+import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.InvalidCredentialsException;
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.IPrivilege;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
@@ -57,6 +56,7 @@ import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
 import li.strolch.rest.model.LogoutResult;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

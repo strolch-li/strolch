@@ -26,8 +26,8 @@ import li.strolch.model.audit.AuditQuery;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.runtime.query.inmemory.InMemoryAuditQuery;
 import li.strolch.runtime.query.inmemory.InMemoryAuditQueryVisitor;
-import ch.eitchnet.utils.collections.DateRange;
-import ch.eitchnet.utils.collections.MapOfMaps;
+import li.strolch.utils.collections.DateRange;
+import li.strolch.utils.collections.MapOfMaps;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

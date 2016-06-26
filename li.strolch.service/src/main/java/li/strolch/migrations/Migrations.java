@@ -27,14 +27,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.utils.Version;
+import li.strolch.utils.collections.MapOfLists;
+import li.strolch.utils.dbc.DBC;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.Version;
-import ch.eitchnet.utils.collections.MapOfLists;
-import ch.eitchnet.utils.dbc.DBC;
 
 public class Migrations {
 

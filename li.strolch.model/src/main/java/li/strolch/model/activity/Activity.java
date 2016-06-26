@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
@@ -34,6 +33,7 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * Parameterized object grouping a collection of {@link Activity} and {@link Action} objects defining the process to be

@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.query.AndSelection;
 import li.strolch.model.query.BooleanSelection;
@@ -54,6 +53,7 @@ import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.runtime.query.inmemory.ParameterBagSelector.NullParameterBagSelector;
 import li.strolch.runtime.query.inmemory.ParameterSelector.StringParameterSelector;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

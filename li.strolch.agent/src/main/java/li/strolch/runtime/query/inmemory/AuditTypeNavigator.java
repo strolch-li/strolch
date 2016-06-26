@@ -19,8 +19,8 @@ import java.util.List;
 
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.AuditDao;
-import ch.eitchnet.utils.collections.DateRange;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.collections.DateRange;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

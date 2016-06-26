@@ -21,16 +21,16 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.helper.ExceptionHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.helper.ExceptionHelper;
 
 /**
  * The {@link ServiceExecutionHandler} is used to perform long running services so that no singletons etc. are required.

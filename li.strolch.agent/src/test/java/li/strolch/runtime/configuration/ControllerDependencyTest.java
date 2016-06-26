@@ -30,13 +30,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import ch.eitchnet.utils.dbc.DBC.DbcException;
 import li.strolch.agent.api.ComponentState;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.agent.impl.ComponentContainerStateHandler;
 import li.strolch.agent.impl.ComponentController;
 import li.strolch.agent.impl.ComponentDependencyAnalyzer;
+import li.strolch.utils.dbc.DBC.DbcException;
 
 @SuppressWarnings("nls")
 public class ControllerDependencyTest {

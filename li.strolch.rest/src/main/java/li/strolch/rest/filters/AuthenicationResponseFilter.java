@@ -25,7 +25,7 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
 
-import ch.eitchnet.privilege.model.Certificate;
+import li.strolch.privilege.model.Certificate;
 
 /**
  * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>

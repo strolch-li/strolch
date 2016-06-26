@@ -17,7 +17,7 @@ package li.strolch.runtime.query.enums;
 
 import java.util.Locale;
 
-import ch.eitchnet.privilege.model.Certificate;
+import li.strolch.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

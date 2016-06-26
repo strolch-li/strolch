@@ -17,7 +17,7 @@ package li.strolch.persistence.api;
 
 import java.util.Date;
 
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.helper.StringHelper;
 
 public class TransactionResult {
 

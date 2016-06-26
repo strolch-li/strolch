@@ -19,8 +19,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.eitchnet.utils.StringMatchMode;
-import ch.eitchnet.utils.collections.DateRange;
+import li.strolch.utils.StringMatchMode;
+import li.strolch.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

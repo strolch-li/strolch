@@ -17,7 +17,7 @@ package li.strolch.model.query;
 
 import java.util.Date;
 
-import ch.eitchnet.utils.collections.DateRange;
+import li.strolch.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

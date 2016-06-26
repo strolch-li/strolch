@@ -15,12 +15,12 @@
  */
 package li.strolch.runtime;
 
-import static ch.eitchnet.utils.helper.StringHelper.DOT;
+import static li.strolch.utils.helper.StringHelper.DOT;
 
-import ch.eitchnet.privilege.handler.PrivilegeHandler;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.privilege.handler.PrivilegeHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

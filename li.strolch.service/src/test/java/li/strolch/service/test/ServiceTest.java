@@ -27,10 +27,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import ch.eitchnet.privilege.base.AccessDeniedException;
-import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.UserState;
+import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.UserState;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.model.GreetingResult;
 import li.strolch.service.test.model.GreetingService;

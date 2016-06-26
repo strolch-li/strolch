@@ -16,7 +16,7 @@
 package li.strolch.runtime.query.inmemory;
 
 import li.strolch.model.StrolchElement;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

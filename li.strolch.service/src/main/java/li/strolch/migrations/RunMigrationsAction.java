@@ -17,8 +17,8 @@ package li.strolch.migrations;
 
 import java.util.Map;
 
-import ch.eitchnet.privilege.handler.SystemUserAction;
-import ch.eitchnet.privilege.model.PrivilegeContext;
+import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.model.PrivilegeContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

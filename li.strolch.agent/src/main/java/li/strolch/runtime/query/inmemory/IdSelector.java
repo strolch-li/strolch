@@ -17,8 +17,8 @@ package li.strolch.runtime.query.inmemory;
 
 import java.util.List;
 
-import ch.eitchnet.utils.StringMatchMode;
 import li.strolch.model.StrolchElement;
+import li.strolch.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

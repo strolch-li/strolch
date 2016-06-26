@@ -24,10 +24,9 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.xml.ActivityToSaxWriterVisitor;
 import li.strolch.model.xml.StrolchElementListener;
 import li.strolch.model.xml.XmlModelSaxReader;
+import li.strolch.xmlpers.api.SaxParser;
 
 import org.xml.sax.helpers.DefaultHandler;
-
-import ch.eitchnet.xmlpers.api.SaxParser;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -33,6 +33,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeRep;
+import li.strolch.privilege.model.RoleRep;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.model.Result;
@@ -47,12 +53,6 @@ import li.strolch.service.privilege.roles.PrivilegeRoleArgument;
 import li.strolch.service.privilege.roles.PrivilegeRoleNameArgument;
 import li.strolch.service.privilege.roles.PrivilegeRoleResult;
 import li.strolch.service.privilege.roles.PrivilegeUpdateRoleService;
-import ch.eitchnet.privilege.base.AccessDeniedException;
-import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.handler.PrivilegeHandler;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeRep;
-import ch.eitchnet.privilege.model.RoleRep;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

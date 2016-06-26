@@ -18,10 +18,9 @@ package li.strolch.persistence.xml.model;
 import li.strolch.model.Resource;
 import li.strolch.model.xml.ResourceFromDomVisitor;
 import li.strolch.model.xml.ResourceToDomVisitor;
+import li.strolch.xmlpers.api.DomParser;
 
 import org.w3c.dom.Document;
-
-import ch.eitchnet.xmlpers.api.DomParser;
 
 public class ResourceDomParser implements DomParser<Resource> {
 

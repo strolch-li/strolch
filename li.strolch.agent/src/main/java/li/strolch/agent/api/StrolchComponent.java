@@ -23,8 +23,8 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.handler.SystemUserAction;
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.handler.SystemUserAction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.RunRunnable;

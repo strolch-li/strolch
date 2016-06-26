@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.XmlExportModelArgument;
 import li.strolch.service.XmlExportModelService;
@@ -33,8 +34,6 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -34,12 +34,11 @@ import li.strolch.model.audit.AuditQuery;
 import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.persistence.inmemory.InMemoryAuditDao;
+import li.strolch.utils.StringMatchMode;
+import li.strolch.utils.collections.DateRange;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import ch.eitchnet.utils.StringMatchMode;
-import ch.eitchnet.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

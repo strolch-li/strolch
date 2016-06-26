@@ -36,8 +36,8 @@ import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import ch.eitchnet.privilege.model.Certificate;
 
 @SuppressWarnings("nls")
 public class ResourceModelTestRunner {

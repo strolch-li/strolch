@@ -31,8 +31,8 @@ import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
-import ch.eitchnet.utils.collections.DateRange;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.collections.DateRange;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

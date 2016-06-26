@@ -25,10 +25,9 @@ import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
+import li.strolch.utils.dbc.DBC;
 
 import org.junit.Test;
-
-import ch.eitchnet.utils.dbc.DBC;
 
 public class FlushTxTest extends AbstractRealmServiceTest {
 

@@ -18,8 +18,8 @@ package li.strolch.rest;
 import java.util.List;
 import java.util.Locale;
 
+import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.model.UserSession;
-import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -26,12 +26,12 @@ import org.postgresql.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.db.DbSchemaVersionCheck;
-import ch.eitchnet.utils.Version;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.testbase.runtime.AbstractModelTest;
 import li.strolch.testbase.runtime.RuntimeMock;
+import li.strolch.utils.Version;
+import li.strolch.utils.helper.StringHelper;
 
 public class CachedDaoTest extends AbstractModelTest {
 

@@ -1,7 +1,7 @@
 package li.strolch.runtime.privilege;
 
-import ch.eitchnet.privilege.handler.SystemUserAction;
-import ch.eitchnet.privilege.model.PrivilegeContext;
+import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.model.PrivilegeContext;
 
 /**
  * {@link SystemUserAction} to run {@link Runnable} as a system user

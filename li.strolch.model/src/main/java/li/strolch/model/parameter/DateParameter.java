@@ -19,8 +19,8 @@ import java.util.Date;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -26,8 +26,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.StringMatchMode;
 import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
@@ -40,7 +38,9 @@ import li.strolch.model.query.ParameterSelection;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.Selection;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
+import li.strolch.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

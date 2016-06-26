@@ -17,11 +17,11 @@ package li.strolch.persistence.xml.model;
 
 import li.strolch.model.Tags;
 import li.strolch.model.audit.Audit;
-import ch.eitchnet.xmlpers.api.PersistenceContext;
-import ch.eitchnet.xmlpers.api.PersistenceContextFactory;
-import ch.eitchnet.xmlpers.objref.IdOfSubTypeRef;
-import ch.eitchnet.xmlpers.objref.ObjectRef;
-import ch.eitchnet.xmlpers.objref.ObjectReferenceCache;
+import li.strolch.xmlpers.api.PersistenceContext;
+import li.strolch.xmlpers.api.PersistenceContextFactory;
+import li.strolch.xmlpers.objref.IdOfSubTypeRef;
+import li.strolch.xmlpers.objref.ObjectRef;
+import li.strolch.xmlpers.objref.ObjectReferenceCache;
 
 public class AuditContextFactory implements PersistenceContextFactory<Audit> {
 

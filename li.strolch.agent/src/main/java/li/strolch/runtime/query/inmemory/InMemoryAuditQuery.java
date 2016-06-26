@@ -21,7 +21,7 @@ import java.util.List;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditVisitor;
 import li.strolch.persistence.inmemory.InMemoryAuditDao;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

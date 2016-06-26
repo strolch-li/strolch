@@ -22,7 +22,7 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
 import li.strolch.persistence.api.StrolchTransaction;
-import ch.eitchnet.utils.collections.DateRange;
+import li.strolch.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

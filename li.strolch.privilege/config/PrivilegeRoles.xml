@@ -53,7 +53,7 @@
 	</Role>
 
 	<Role name="AppUser">
-		<Privilege name="ch.eitchnet.privilege.test.model.TestRestrictable" policy="DefaultPrivilege">
+		<Privilege name="li.strolch.privilege.test.model.TestRestrictable" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
 	</Role>
@@ -71,17 +71,17 @@
 	</Role>
 
 	<Role name="system_admin_privileges">
-		<Privilege name="ch.eitchnet.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
-			<Allow>ch.eitchnet.privilege.test.model.TestSystemUserAction</Allow>
-			<Deny>ch.eitchnet.privilege.test.model.TestSystemUserActionDeny</Deny>
+		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
+			<Allow>li.strolch.privilege.test.model.TestSystemUserAction</Allow>
+			<Deny>li.strolch.privilege.test.model.TestSystemUserActionDeny</Deny>
 		</Privilege>
-		<Privilege name="ch.eitchnet.privilege.test.model.TestSystemRestrictable" policy="DefaultPrivilege">
+		<Privilege name="li.strolch.privilege.test.model.TestSystemRestrictable" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
 	</Role>
 
 	<Role name="restrictedRole">
-		<Privilege name="ch.eitchnet.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
+		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
 			<Allow>hello</Allow>
 			<Deny>goodbye</Deny>
 		</Privilege>

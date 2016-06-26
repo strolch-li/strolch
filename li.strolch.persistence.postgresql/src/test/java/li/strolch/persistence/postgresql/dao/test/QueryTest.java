@@ -42,9 +42,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.StringMatchMode;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
@@ -67,8 +64,11 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.postgresql.PostgreSqlOrderQueryVisitor;
 import li.strolch.persistence.postgresql.PostgreSqlQueryVisitor;
 import li.strolch.persistence.postgresql.PostgreSqlResourceQueryVisitor;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.testbase.runtime.RuntimeMock;
+import li.strolch.utils.StringMatchMode;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

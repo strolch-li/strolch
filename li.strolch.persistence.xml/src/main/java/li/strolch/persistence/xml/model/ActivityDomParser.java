@@ -18,10 +18,9 @@ package li.strolch.persistence.xml.model;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.xml.ActivityFromDomVisitor;
 import li.strolch.model.xml.ActivityToDomVisitor;
+import li.strolch.xmlpers.api.DomParser;
 
 import org.w3c.dom.Document;
-
-import ch.eitchnet.xmlpers.api.DomParser;
 
 public class ActivityDomParser implements DomParser<Activity> {
 

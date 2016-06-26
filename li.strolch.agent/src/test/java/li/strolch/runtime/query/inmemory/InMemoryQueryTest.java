@@ -15,8 +15,6 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import static ch.eitchnet.utils.StringMatchMode.ci;
-import static ch.eitchnet.utils.StringMatchMode.es;
 import static li.strolch.model.query.ParameterSelection.booleanSelection;
 import static li.strolch.model.query.ParameterSelection.floatListSelection;
 import static li.strolch.model.query.ParameterSelection.floatSelection;
@@ -24,6 +22,8 @@ import static li.strolch.model.query.ParameterSelection.integerListSelection;
 import static li.strolch.model.query.ParameterSelection.longListSelection;
 import static li.strolch.model.query.ParameterSelection.stringListSelection;
 import static li.strolch.model.query.ParameterSelection.stringSelection;
+import static li.strolch.utils.StringMatchMode.ci;
+import static li.strolch.utils.StringMatchMode.es;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;

@@ -23,10 +23,10 @@ import java.util.Locale;
 
 import org.junit.Test;
 
-import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

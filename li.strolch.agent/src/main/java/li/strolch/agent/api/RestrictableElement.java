@@ -15,7 +15,7 @@
  */
 package li.strolch.agent.api;
 
-import ch.eitchnet.privilege.model.Restrictable;
+import li.strolch.privilege.model.Restrictable;
 
 /**
  * A simple implementation for the {@link Restrictable} interface

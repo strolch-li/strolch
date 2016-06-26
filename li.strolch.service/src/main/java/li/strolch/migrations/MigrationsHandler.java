@@ -24,12 +24,12 @@ import java.util.concurrent.TimeUnit;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.Version;
-import ch.eitchnet.utils.collections.MapOfLists;
+import li.strolch.utils.Version;
+import li.strolch.utils.collections.MapOfLists;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

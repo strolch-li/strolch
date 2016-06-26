@@ -15,7 +15,7 @@
  */
 package li.strolch.model.query;
 
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

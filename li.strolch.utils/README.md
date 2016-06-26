@@ -1,7 +1,7 @@
-ch.eitchnet.utils
+li.strolch.utils
 ======================
 
-[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=ch.eitchnet.utils)](http://jenkins.eitchnet.ch/view/ch.eitchnet/job/ch.eitchnet.utils/)
+[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=li.strolch.utils)](http://jenkins.eitchnet.ch/view/li.strolch/job/li.strolch.utils/)
 
 Java Utilites which ease daily work when programming in the Java language
 

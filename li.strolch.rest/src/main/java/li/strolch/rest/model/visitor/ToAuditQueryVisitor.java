@@ -23,8 +23,8 @@ import li.strolch.rest.model.ActionSelection;
 import li.strolch.rest.model.AuditQuery;
 import li.strolch.rest.model.DateRange;
 import li.strolch.rest.model.IdentitySelection;
-import ch.eitchnet.utils.StringMatchMode;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.StringMatchMode;
+import li.strolch.utils.helper.StringHelper;
 
 public class ToAuditQueryVisitor {
 
@@ -41,7 +41,7 @@ public class ToAuditQueryVisitor {
 		if (dateRange == null || dateRange.getFromDate() == null || dateRange.getToDate() == null) {
 			throw new IllegalArgumentException("DateRange on AuditQuery is not valid or is missing!");
 		}
-		ch.eitchnet.utils.collections.DateRange dr = new ch.eitchnet.utils.collections.DateRange().from(
+		li.strolch.utils.collections.DateRange dr = new li.strolch.utils.collections.DateRange().from(
 				dateRange.getFromDate(), dateRange.isFromInclusive()).to(dateRange.getToDate(),
 				dateRange.isToInclusive());
 

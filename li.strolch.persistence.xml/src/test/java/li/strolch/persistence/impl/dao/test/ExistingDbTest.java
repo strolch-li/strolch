@@ -23,15 +23,15 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.helper.FileHelper;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.xml.XmlPersistenceHandler;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
+import li.strolch.utils.helper.FileHelper;
 
 public class ExistingDbTest {
 

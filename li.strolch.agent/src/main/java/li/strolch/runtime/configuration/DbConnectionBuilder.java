@@ -15,10 +15,10 @@
  */
 package li.strolch.runtime.configuration;
 
-import static ch.eitchnet.db.DbConstants.PROP_DB_IGNORE_REALM;
-import static ch.eitchnet.db.DbConstants.PROP_DB_PASSWORD;
-import static ch.eitchnet.db.DbConstants.PROP_DB_URL;
-import static ch.eitchnet.db.DbConstants.PROP_DB_USERNAME;
+import static li.strolch.db.DbConstants.PROP_DB_IGNORE_REALM;
+import static li.strolch.db.DbConstants.PROP_DB_PASSWORD;
+import static li.strolch.db.DbConstants.PROP_DB_URL;
+import static li.strolch.db.DbConstants.PROP_DB_USERNAME;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 
 import java.sql.Connection;

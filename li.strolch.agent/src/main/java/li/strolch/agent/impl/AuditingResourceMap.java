@@ -24,7 +24,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.api.StrolchTransaction;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * This is the {@link AuditTrail} for {@link Resource Resources}

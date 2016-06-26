@@ -24,11 +24,10 @@ import javax.xml.parsers.SAXParserFactory;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
+import li.strolch.utils.helper.StringHelper;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

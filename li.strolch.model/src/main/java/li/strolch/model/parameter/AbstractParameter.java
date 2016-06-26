@@ -27,7 +27,7 @@ import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.visitor.ParameterVisitor;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

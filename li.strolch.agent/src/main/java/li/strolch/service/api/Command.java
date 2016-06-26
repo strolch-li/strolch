@@ -18,9 +18,6 @@ package li.strolch.service.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.handler.SystemUserAction;
-import ch.eitchnet.privilege.model.Restrictable;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.model.PolicyContainer;
@@ -29,6 +26,9 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.policy.StrolchPolicy;
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.model.Restrictable;
 
 /**
  * <p>
@@ -131,7 +131,7 @@ public abstract class Command implements Restrictable {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeName()
+	 * @see li.strolch.privilege.model.Restrictable#getPrivilegeName()
 	 */
 	@Override
 	public String getPrivilegeName() {
@@ -139,7 +139,7 @@ public abstract class Command implements Restrictable {
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeValue()
+	 * @see li.strolch.privilege.model.Restrictable#getPrivilegeValue()
 	 */
 	@Override
 	public Object getPrivilegeValue() {
