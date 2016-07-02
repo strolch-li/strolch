@@ -26,4 +26,4 @@ Find more to Strolch at our website: http://strolch.li
 
 Build status
 ===================
-[![Build Status](http://jenkins.eitchnet.ch/view/ch.eitchnet/job/strolch/badge/icon)](http://jenkins.eitchnet.ch/view/strolch/) strolch
+[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=li.strolch)](http://jenkins.eitchnet.ch/job/li.strolch/)
