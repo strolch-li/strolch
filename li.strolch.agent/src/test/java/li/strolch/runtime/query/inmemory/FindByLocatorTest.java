@@ -19,7 +19,6 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
@@ -32,6 +31,7 @@ import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.timedstate.IntegerTimedState;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 
 /**

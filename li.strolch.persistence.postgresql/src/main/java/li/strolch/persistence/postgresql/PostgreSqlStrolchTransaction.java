@@ -25,12 +25,11 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.TransactionResult;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.privilege.model.Certificate;
 
 public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 

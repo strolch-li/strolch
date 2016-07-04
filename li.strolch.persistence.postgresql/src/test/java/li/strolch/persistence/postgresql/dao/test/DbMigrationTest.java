@@ -25,15 +25,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 
+import li.strolch.db.DbException;
+import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.runtime.StrolchConstants;
+import li.strolch.utils.Version;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import ch.eitchnet.db.DbException;
-import ch.eitchnet.db.DbSchemaVersionCheck;
-import ch.eitchnet.utils.Version;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -16,9 +16,9 @@
 package li.strolch.persistence.xml.model;
 
 import li.strolch.model.audit.Audit;
-import ch.eitchnet.xmlpers.api.DomParser;
-import ch.eitchnet.xmlpers.api.ParserFactory;
-import ch.eitchnet.xmlpers.api.SaxParser;
+import li.strolch.xmlpers.api.DomParser;
+import li.strolch.xmlpers.api.ParserFactory;
+import li.strolch.xmlpers.api.SaxParser;
 
 public class AuditParserFactory implements ParserFactory<Audit> {
 

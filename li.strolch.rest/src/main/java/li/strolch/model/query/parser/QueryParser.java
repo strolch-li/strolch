@@ -8,7 +8,6 @@ import org.petitparser.context.Result;
 import org.petitparser.parser.Parser;
 import org.petitparser.tools.CompositeParser;
 
-import ch.eitchnet.utils.StringMatchMode;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
@@ -23,6 +22,7 @@ import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.model.visitor.NoStrategyActivityVisitor;
 import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
+import li.strolch.utils.StringMatchMode;
 
 public class QueryParser extends CompositeParser {
 

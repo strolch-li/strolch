@@ -6,11 +6,12 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.runtime.configuration.StrolchEnvironment;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.StrolchBootstrapper;
+import li.strolch.runtime.configuration.StrolchEnvironment;
 
 @WebListener
 public class StartupListener implements ServletContextListener {
@@ -28,8 +29,7 @@ public class StartupListener implements ServletContextListener {
 		String environment = StrolchEnvironment.getEnvironmentFromEnvProperties(pathF);
 		logger.info("Starting Strolch Minimal Rest...");
 		try {
-			this.agent = new StrolchAgent();
-			this.agent.setup(environment, pathF);
+			this.agent = new StrolchBootstrapper(StartupListener.class).setupByRoot(environment, pathF);
 			this.agent.initialize();
 			this.agent.start();
 		} catch (Exception e) {

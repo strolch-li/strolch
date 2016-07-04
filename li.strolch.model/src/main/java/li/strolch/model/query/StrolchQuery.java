@@ -15,7 +15,7 @@
  */
 package li.strolch.model.query;
 
-import ch.eitchnet.privilege.model.Restrictable;
+import li.strolch.privilege.model.Restrictable;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

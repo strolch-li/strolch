@@ -18,9 +18,9 @@ package li.strolch.agent.api;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

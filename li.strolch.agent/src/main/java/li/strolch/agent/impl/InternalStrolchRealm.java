@@ -27,14 +27,13 @@ import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.utils.dbc.DBC;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.privilege.model.PrivilegeContext;
-import ch.eitchnet.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

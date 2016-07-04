@@ -17,7 +17,7 @@ package li.strolch.service.api;
 
 import java.io.Serializable;
 
-import ch.eitchnet.privilege.model.Restrictable;
+import li.strolch.privilege.model.Restrictable;
 
 /**
  * Interface for Strolch service's. Service's are the main object in which business logic is implemented in a Strolch

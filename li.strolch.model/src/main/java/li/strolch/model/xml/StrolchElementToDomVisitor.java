@@ -22,7 +22,6 @@ import java.util.SortedSet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Order;
@@ -41,6 +40,7 @@ import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

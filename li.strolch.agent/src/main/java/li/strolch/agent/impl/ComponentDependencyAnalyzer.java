@@ -23,12 +23,11 @@ import java.util.Set;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
 
 public class ComponentDependencyAnalyzer {
 

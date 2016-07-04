@@ -18,10 +18,6 @@ package li.strolch.agent.impl;
 import java.io.File;
 import java.text.MessageFormat;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
@@ -32,9 +28,13 @@ import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.inmemory.InMemoryPersistence;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

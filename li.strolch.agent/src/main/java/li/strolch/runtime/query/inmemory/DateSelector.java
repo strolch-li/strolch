@@ -16,7 +16,7 @@
 package li.strolch.runtime.query.inmemory;
 
 import li.strolch.model.Order;
-import ch.eitchnet.utils.collections.DateRange;
+import li.strolch.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -43,10 +43,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 public class ConfigurationSaxParser extends DefaultHandler {
 

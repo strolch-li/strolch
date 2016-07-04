@@ -20,19 +20,19 @@ import java.text.MessageFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.handler.SystemUserAction;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
-import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -314,7 +314,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	protected abstract U internalDoService(T arg) throws Exception;
 
 	/**
-	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeName()
+	 * @see li.strolch.privilege.model.Restrictable#getPrivilegeName()
 	 */
 	@Override
 	public String getPrivilegeName() {
@@ -322,7 +322,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
-	 * @see ch.eitchnet.privilege.model.Restrictable#getPrivilegeValue()
+	 * @see li.strolch.privilege.model.Restrictable#getPrivilegeValue()
 	 */
 	@Override
 	public Object getPrivilegeValue() {

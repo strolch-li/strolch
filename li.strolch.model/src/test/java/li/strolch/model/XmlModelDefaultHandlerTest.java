@@ -24,12 +24,11 @@ import java.util.Map;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.xml.StrolchElementListener;
 import li.strolch.model.xml.XmlModelSaxFileReader;
+import li.strolch.utils.helper.StringHelper;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

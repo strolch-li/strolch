@@ -19,10 +19,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * The {@link PolicyDefs} contains the policy configuration of any {@link StrolchRootElement} which requires policies

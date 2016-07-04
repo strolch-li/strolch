@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Roles>
+
+	<Role name="PrivilegeAdmin">
+		<Privilege name="PrivilegeAction" policy="DefaultPrivilege">
+			<Allow>Persist</Allow>
+			<Allow>Reload</Allow>
+			<Allow>GetPolicies</Allow>
+		</Privilege>
+
+		<Privilege name="PrivilegeGetRole" policy="RoleAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeAddRole" policy="RoleAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeRemoveRole" policy="RoleAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeModifyRole" policy="RoleAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+
+		<Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeAddUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeRemoveUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeModifyUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeAddRoleToUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeRemoveRoleFromUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeSetUserLocale" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeSetUserState" policy="UserAccessPrivilege">
+			<Allow>ENABLED</Allow>
+			<Allow>DISABLED</Allow>
+			<Deny>SYSTEM</Deny>
+		</Privilege>
+		<Privilege name="PrivilegeSetUserPassword" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+	</Role>
+
+	<Role name="AppUser">
+		<Privilege name="li.strolch.privilege.test.model.TestRestrictable" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+	</Role>
+
+	<Role name="MyRole">
+		<Privilege name="Foo" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+	</Role>
+
+	<Role name="MyRole2">
+		<Privilege name="Foo" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+	</Role>
+
+	<Role name="system_admin_privileges">
+		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
+			<Allow>li.strolch.privilege.test.model.TestSystemUserAction</Allow>
+			<Deny>li.strolch.privilege.test.model.TestSystemUserActionDeny</Deny>
+		</Privilege>
+		<Privilege name="li.strolch.privilege.test.model.TestSystemRestrictable" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+	</Role>
+
+	<Role name="restrictedRole">
+		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
+			<Allow>hello</Allow>
+			<Deny>goodbye</Deny>
+		</Privilege>
+	</Role>
+
+</Roles>

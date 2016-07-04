@@ -29,9 +29,9 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.Version;
+import li.strolch.utils.Version;
 
 public class CurrentMigrationVersionQuery {
 

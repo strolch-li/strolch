@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
@@ -55,6 +53,8 @@ import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.StringSetValue;
 import li.strolch.model.timevalue.impl.ValueChange;
+import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * Class which can be used to generate objects which implement {@link StrolchElement}. These generated classes can then

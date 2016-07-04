@@ -15,8 +15,8 @@
  */
 package li.strolch.exception;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.Restrictable;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.Restrictable;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

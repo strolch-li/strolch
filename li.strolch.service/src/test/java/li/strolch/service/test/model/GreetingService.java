@@ -20,7 +20,7 @@ import java.text.MessageFormat;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.test.model.GreetingService.GreetingArgument;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -20,10 +20,10 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.StrolchRestfulConstants;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

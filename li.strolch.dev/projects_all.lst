@@ -1,9 +1,7 @@
-ch.eitchnet.parent:develop
-ch.eitchnet.privilege:develop
-ch.eitchnet.utils:develop
-ch.eitchnet.xmlpers:develop
+li.strolch.utils:develop
+li.strolch.privilege:develop
+li.strolch.xmlpers:develop
 li.strolch.dev:develop
-li.strolch.parent:develop
 li.strolch.bom:develop
 li.strolch.model:develop
 li.strolch.testbase:develop

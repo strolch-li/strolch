@@ -22,7 +22,7 @@ import li.strolch.model.State;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>

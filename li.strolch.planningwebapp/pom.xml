@@ -1,60 +1,30 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>li.strolch</groupId>
-		<artifactId>li.strolch.parent</artifactId>
-		<version>1.1.0-SNAPSHOT</version>
-		<relativePath>../li.strolch.parent/pom.xml</relativePath>
+		<artifactId>li.strolch</artifactId>
+		<version>1.2.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
+	<artifactId>li.strolch.planningwebapp</artifactId>
+	<name>li.strolch.planningwebapp</name>
+	<description>Tutorial webapp to show case using Strolch in a servlet container</description>
+	<packaging>war</packaging>
+	<inceptionYear>2011</inceptionYear>
+
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<warFinalName>planningwebapp</warFinalName>
 		<tomcat7ServerId>tomcat7.eitchnet.ch</tomcat7ServerId>
 		<tomcat7Url>http://tomcat.eitchnet.ch:8080/manager/text</tomcat7Url>
 		<m2eclipse.wtp.contextRoot>${warFinalName}</m2eclipse.wtp.contextRoot>
 	</properties>
 
-	<artifactId>li.strolch.planningwebapp</artifactId>
-	<name>li.strolch.planningwebapp</name>
-	<description>Tutorial webapp to show case using Strolch in a servlet container</description>
-	<packaging>war</packaging>
-
-	<url>https://github.com/eitchnet/li.strolch</url>
-
-	<inceptionYear>2011</inceptionYear>
-
-	<issueManagement>
-		<system>Github Issues</system>
-		<url>https://github.com/eitchnet/li.strolch/issues</url>
-	</issueManagement>
-
-	<scm>
-		<connection>scm:git:https://github.com/eitchnet/strolch.git</connection>
-		<developerConnection>scm:git:git@github.com:eitch/strolch.git</developerConnection>
-		<url>https://github.com/eitchnet/strolch</url>
-	</scm>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>li.strolch</groupId>
-				<artifactId>li.strolch.bom</artifactId>
-				<type>pom</type>
-				<version>${project.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<dependencies>
 		<!-- main -->
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.bom</artifactId>
-			<type>pom</type>
-		</dependency>
 		<dependency>
 			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.rest</artifactId>

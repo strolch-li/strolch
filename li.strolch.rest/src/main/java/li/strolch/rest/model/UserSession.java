@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import ch.eitchnet.privilege.model.Certificate;
+import li.strolch.privilege.model.Certificate;
 
 @XmlRootElement(name = "UserSession")
 @XmlAccessorType(XmlAccessType.NONE)

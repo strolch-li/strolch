@@ -15,43 +15,43 @@
  */
 package li.strolch.runtime.privilege;
 
-import static ch.eitchnet.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS;
-import static ch.eitchnet.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
+import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS;
+import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.handler.DefaultPrivilegeHandler;
-import ch.eitchnet.privilege.handler.EncryptionHandler;
-import ch.eitchnet.privilege.handler.PersistenceHandler;
-import ch.eitchnet.privilege.handler.SystemUserAction;
-import ch.eitchnet.privilege.handler.XmlPersistenceHandler;
-import ch.eitchnet.privilege.helper.PrivilegeInitializationHelper;
-import ch.eitchnet.privilege.helper.XmlConstants;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
-import ch.eitchnet.privilege.model.internal.PrivilegeContainerModel;
-import ch.eitchnet.privilege.xml.PrivilegeConfigSaxReader;
-import ch.eitchnet.utils.helper.XmlHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.handler.DefaultPrivilegeHandler;
+import li.strolch.privilege.handler.EncryptionHandler;
+import li.strolch.privilege.handler.PersistenceHandler;
+import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.handler.XmlPersistenceHandler;
+import li.strolch.privilege.helper.PrivilegeInitializationHelper;
+import li.strolch.privilege.helper.XmlConstants;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.privilege.model.internal.PrivilegeContainerModel;
+import li.strolch.privilege.xml.PrivilegeConfigSaxReader;
 import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
+import li.strolch.utils.helper.XmlHelper;
 
 public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements PrivilegeHandler {
 
 	public static final String PROP_PRIVILEGE_CONFIG_FILE = "privilegeConfigFile"; //$NON-NLS-1$
 	public static final String PRIVILEGE_CONFIG_XML = "PrivilegeConfig.xml"; //$NON-NLS-1$
 
-	private ch.eitchnet.privilege.handler.PrivilegeHandler privilegeHandler;
+	private li.strolch.privilege.handler.PrivilegeHandler privilegeHandler;
 
 	public DefaultStrolchPrivilegeHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -65,7 +65,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
 		File privilegeConfigFile = configuration.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML,
 				runtimeConfiguration);
-		ch.eitchnet.privilege.handler.PrivilegeHandler privilegeHandler = initializeFromXml(configuration,
+		li.strolch.privilege.handler.PrivilegeHandler privilegeHandler = initializeFromXml(configuration,
 				privilegeConfigFile);
 		this.privilegeHandler = privilegeHandler;
 	}
@@ -79,7 +79,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
 	 *         {@link PersistenceHandler} are set and initialized as well
 	 */
-	private ch.eitchnet.privilege.handler.PrivilegeHandler initializeFromXml(ComponentConfiguration configuration,
+	private li.strolch.privilege.handler.PrivilegeHandler initializeFromXml(ComponentConfiguration configuration,
 			File privilegeXmlFile) {
 
 		// make sure file exists
@@ -189,7 +189,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public ch.eitchnet.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
+	public li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
 			throws PrivilegeException {
 		return this.privilegeHandler;
 	}

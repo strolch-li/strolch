@@ -29,7 +29,7 @@ import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.TimedStateVisitor;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * Wrapper for a {@link IntegerTimedState}

@@ -23,7 +23,7 @@ import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.ResourceQueryVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.persistence.api.ResourceDao;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

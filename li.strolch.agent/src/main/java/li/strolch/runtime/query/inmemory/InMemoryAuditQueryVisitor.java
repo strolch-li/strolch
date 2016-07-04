@@ -24,8 +24,8 @@ import li.strolch.model.audit.AuditQueryVisitor;
 import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.audit.ElementSelection;
 import li.strolch.model.audit.IdentitySelection;
-import ch.eitchnet.utils.collections.DateRange;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.collections.DateRange;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

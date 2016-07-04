@@ -21,9 +21,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.collections.Paging;
-import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
@@ -42,9 +39,12 @@ import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.model.query.parser.QueryParser;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.runtime.StrolchConstants;
+import li.strolch.utils.collections.Paging;
+import li.strolch.utils.helper.StringHelper;
 
 @Path("strolch/model")
 public class ModelQuery {

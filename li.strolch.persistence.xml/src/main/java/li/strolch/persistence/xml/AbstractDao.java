@@ -23,10 +23,10 @@ import java.util.Set;
 import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchTransaction;
-import ch.eitchnet.xmlpers.api.PersistenceTransaction;
-import ch.eitchnet.xmlpers.objref.IdOfSubTypeRef;
-import ch.eitchnet.xmlpers.objref.SubTypeRef;
-import ch.eitchnet.xmlpers.objref.TypeRef;
+import li.strolch.xmlpers.api.PersistenceTransaction;
+import li.strolch.xmlpers.objref.IdOfSubTypeRef;
+import li.strolch.xmlpers.objref.SubTypeRef;
+import li.strolch.xmlpers.objref.TypeRef;
 
 public abstract class AbstractDao<T extends StrolchElement> implements StrolchDao<T> {
 

@@ -27,8 +27,8 @@ import li.strolch.model.ModelStatistics;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.Version;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.utils.Version;
 
 public class DataMigration extends Migration {
 

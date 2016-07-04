@@ -24,7 +24,7 @@ import java.util.List;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.persistence.api.StrolchDao;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

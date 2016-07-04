@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

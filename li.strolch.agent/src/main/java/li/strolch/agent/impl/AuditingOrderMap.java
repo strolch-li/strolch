@@ -24,7 +24,7 @@ import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.persistence.api.StrolchTransaction;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * This is the {@link AuditTrail} for {@link Order Orders}

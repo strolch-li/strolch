@@ -21,8 +21,8 @@ import java.text.MessageFormat;
 import java.util.Properties;
 
 import li.strolch.runtime.StrolchConstants;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -27,10 +27,10 @@ import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.privilege.model.Restrictable;
-import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.exception.StrolchAccessDeniedException;
+import li.strolch.privilege.model.Restrictable;
 import li.strolch.rest.model.Result;
+import li.strolch.utils.helper.StringHelper;
 
 @Provider
 public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception> {

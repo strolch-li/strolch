@@ -20,8 +20,8 @@ import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.TransactionResult;
 import li.strolch.persistence.api.TransactionState;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import ch.eitchnet.privilege.model.Certificate;
 
 public class InMemoryTransaction extends AbstractTransaction {
 

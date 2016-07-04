@@ -24,8 +24,8 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import ch.eitchnet.privilege.model.Certificate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

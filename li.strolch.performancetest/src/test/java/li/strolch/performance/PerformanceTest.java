@@ -2,7 +2,7 @@ package li.strolch.performance;
 
 import org.junit.Test;
 
-import ch.eitchnet.privilege.model.Certificate;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 

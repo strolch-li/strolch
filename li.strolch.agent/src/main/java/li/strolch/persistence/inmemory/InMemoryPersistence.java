@@ -25,8 +25,8 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import ch.eitchnet.privilege.model.Certificate;
 
 public class InMemoryPersistence implements PersistenceHandler {
 

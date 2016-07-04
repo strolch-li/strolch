@@ -21,12 +21,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * {@link IValue} implementation to work with String valued {@link ITimeValue} objects. Since a java.util.String object

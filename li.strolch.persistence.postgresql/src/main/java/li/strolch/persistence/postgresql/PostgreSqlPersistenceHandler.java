@@ -15,11 +15,11 @@
  */
 package li.strolch.persistence.postgresql;
 
-import static ch.eitchnet.db.DbConstants.PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE;
-import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_CREATION;
-import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_DROP;
-import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_MIGRATION;
 import static li.strolch.agent.api.RealmHandler.SYSTEM_USER_DB_INITIALIZER;
+import static li.strolch.db.DbConstants.PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE;
+import static li.strolch.db.DbConstants.PROP_ALLOW_SCHEMA_CREATION;
+import static li.strolch.db.DbConstants.PROP_ALLOW_SCHEMA_DROP;
+import static li.strolch.db.DbConstants.PROP_ALLOW_SCHEMA_MIGRATION;
 
 import java.sql.Connection;
 import java.text.MessageFormat;
@@ -30,14 +30,13 @@ import javax.sql.DataSource;
 
 import org.postgresql.Driver;
 
-import ch.eitchnet.db.DbMigrationState;
-import ch.eitchnet.db.DbSchemaVersionCheck;
-import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.db.DbMigrationState;
+import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
@@ -46,6 +45,7 @@ import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.postgresql.PostgreSqlDbConnectionBuilder.StrolchPostgreDataSource;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.DbConnectionBuilder;
 import li.strolch.runtime.configuration.StrolchConfiguration;

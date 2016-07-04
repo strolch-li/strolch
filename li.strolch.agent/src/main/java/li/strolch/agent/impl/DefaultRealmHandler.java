@@ -29,7 +29,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

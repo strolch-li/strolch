@@ -32,13 +32,13 @@ import javax.ws.rs.core.Response;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.model.AuditQuery;
 import li.strolch.rest.model.AuditQueryResult;
 import li.strolch.rest.model.StringListResult;
 import li.strolch.rest.model.visitor.ToAuditQueryVisitor;
-import ch.eitchnet.privilege.model.Certificate;
 
 @Path("strolch/audits")
 public class AuditsService {

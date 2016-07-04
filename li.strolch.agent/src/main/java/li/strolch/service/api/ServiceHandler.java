@@ -15,7 +15,7 @@
  */
 package li.strolch.service.api;
 
-import ch.eitchnet.privilege.model.Certificate;
+import li.strolch.privilege.model.Certificate;
 
 public interface ServiceHandler {
 

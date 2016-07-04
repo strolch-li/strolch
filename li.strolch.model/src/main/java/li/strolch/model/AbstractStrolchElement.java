@@ -19,7 +19,7 @@ import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator.LocatorBuilder;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

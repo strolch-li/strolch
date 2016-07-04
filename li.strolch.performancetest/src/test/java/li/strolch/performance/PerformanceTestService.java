@@ -17,7 +17,6 @@ package li.strolch.performance;
 
 import java.util.concurrent.TimeUnit;
 
-import ch.eitchnet.utils.helper.SystemHelper;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.command.AddResourceCommand;
 import li.strolch.command.RemoveResourceCommand;
@@ -26,6 +25,7 @@ import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.helper.SystemHelper;
 
 public class PerformanceTestService extends AbstractService<PerformanceTestArgument, ServiceResult> {
 

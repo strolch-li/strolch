@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ch.eitchnet.utils.StringMatchMode;
+import li.strolch.utils.StringMatchMode;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

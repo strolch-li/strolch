@@ -23,10 +23,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import ch.eitchnet.utils.StringMatchMode;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.model.query.AndSelection;
 import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
@@ -56,6 +52,10 @@ import li.strolch.model.query.ordering.OrderById;
 import li.strolch.model.query.ordering.OrderByName;
 import li.strolch.model.query.ordering.OrderByParameter;
 import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
+import li.strolch.utils.StringMatchMode;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -3,9 +3,9 @@
  */
 package li.strolch.persistence.postgresql;
 
-import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_CREATION;
-import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_DROP;
-import static ch.eitchnet.db.DbConstants.PROP_ALLOW_SCHEMA_MIGRATION;
+import static li.strolch.db.DbConstants.PROP_ALLOW_SCHEMA_CREATION;
+import static li.strolch.db.DbConstants.PROP_ALLOW_SCHEMA_DROP;
+import static li.strolch.db.DbConstants.PROP_ALLOW_SCHEMA_MIGRATION;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,16 +14,16 @@ import javax.sql.DataSource;
 
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.db.DbConnectionCheck;
+import li.strolch.db.DbException;
+import li.strolch.db.DbMigrationState;
+import li.strolch.db.DbSchemaVersionCheck;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
-import ch.eitchnet.db.DbConnectionCheck;
-import ch.eitchnet.db.DbException;
-import ch.eitchnet.db.DbMigrationState;
-import ch.eitchnet.db.DbSchemaVersionCheck;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
 
 public class PostgreSqlDbInitializer extends PostgreSqlInitializer {
 

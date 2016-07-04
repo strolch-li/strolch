@@ -33,9 +33,9 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.collections.DateRange;
+import li.strolch.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

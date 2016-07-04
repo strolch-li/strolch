@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import li.strolch.agent.api.StrolchAgent;
-import ch.eitchnet.db.DbMigrationState;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
+import li.strolch.db.DbMigrationState;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

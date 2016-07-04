@@ -1,0 +1,11 @@
+A list of TODOs for Privilege
+============================================
+
+- Write up a proper explanation on the idea on how Privilege, PrivilegePolicy,
+  Restrictable and Roles fit together to grant privileges to Users
+
+- i18n for any messages and exceptions!
+
+- Finish the JavaDoc
+
+- Set up a website =)

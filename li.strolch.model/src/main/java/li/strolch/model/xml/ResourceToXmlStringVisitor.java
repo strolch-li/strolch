@@ -20,11 +20,11 @@ import java.io.StringWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
-import ch.eitchnet.utils.dbc.DBC;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.model.Resource;
 import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchModelConstants;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

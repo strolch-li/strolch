@@ -22,10 +22,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

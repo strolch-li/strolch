@@ -3,7 +3,7 @@
  */
 package li.strolch.migrations;
 
-import ch.eitchnet.utils.Version;
+import li.strolch.utils.Version;
 
 /**
  * Migration versions for data and code migrations

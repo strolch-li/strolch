@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.privilege.model.Certificate;
 import li.strolch.RuntimeMock;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
@@ -35,6 +34,7 @@ import li.strolch.model.Resource;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTest;
 import li.strolch.runtime.configuration.model.ServiceHandlerTest;

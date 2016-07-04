@@ -15,7 +15,7 @@
  */
 package li.strolch.runtime.query.enums;
 
-import static ch.eitchnet.utils.helper.StringHelper.UNDERLINE;
+import static li.strolch.utils.helper.StringHelper.UNDERLINE;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -31,10 +31,10 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

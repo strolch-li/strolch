@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Privilege>
+
+	<Container>
+
+		<Parameters>
+			<!-- parameters for the container itself -->
+			<Parameter name="secretKey" value="5185F447-6317-4856-B40E-573919BA0A16" />
+			<Parameter name="secretSalt" value="00F6E88C-A64F-410A-8FCF-9CD340E340F7" />
+			<Parameter name="persistSessions" value="true" />
+			<Parameter name="persistSessionsPath" value="./target/${target}/sessions.dat" />
+			<Parameter name="autoPersistOnUserChangesData" value="true" />
+			<Parameter name="privilegeConflictResolution" value="STRICT" />
+		</Parameters>
+
+		<EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
+			<Parameters>
+				<Parameter name="hashAlgorithm" value="SHA-256" />
+			</Parameters>
+		</EncryptionHandler>
+
+		<PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
+			<Parameters>
+				<Parameter name="basePath" value="./target/${target}" />
+				<Parameter name="usersXmlFile" value="PrivilegeUsers.xml" />
+				<Parameter name="rolesXmlFile" value="PrivilegeRoles.xml" />
+			</Parameters>
+		</PersistenceHandler>
+
+	</Container>
+
+	<Policies>
+		<Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
+		<Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege" />
+		<Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege" />
+	</Policies>
+
+</Privilege>

@@ -19,7 +19,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * Command to assign an {@link Action} to a new {@link Resource}.

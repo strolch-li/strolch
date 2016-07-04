@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamWriter;
 import li.strolch.model.Order;
 import li.strolch.model.OrderVisitor;
 import li.strolch.model.StrolchModelConstants;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

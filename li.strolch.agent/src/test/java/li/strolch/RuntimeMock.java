@@ -26,8 +26,6 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.utils.helper.FileHelper;
-import ch.eitchnet.utils.helper.StringHelper;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchBootstrapper;
@@ -37,6 +35,8 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+import li.strolch.utils.helper.FileHelper;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * Basically you should use the RuntimeMock class in the testbase project, but to mitigate circular dependencies, in

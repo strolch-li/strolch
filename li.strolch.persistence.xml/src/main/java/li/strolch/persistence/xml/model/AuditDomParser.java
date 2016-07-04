@@ -18,11 +18,10 @@ package li.strolch.persistence.xml.model;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditFromDomReader;
 import li.strolch.model.audit.AuditToDomVisitor;
+import li.strolch.xmlpers.api.DomParser;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import ch.eitchnet.xmlpers.api.DomParser;
 
 public class AuditDomParser implements DomParser<Audit> {
 

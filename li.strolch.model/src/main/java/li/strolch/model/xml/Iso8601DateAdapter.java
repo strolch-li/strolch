@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.helper.StringHelper;
 
 public class Iso8601DateAdapter extends XmlAdapter<String, Date> {
 

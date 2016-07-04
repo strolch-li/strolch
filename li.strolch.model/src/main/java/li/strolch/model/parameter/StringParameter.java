@@ -17,7 +17,7 @@ package li.strolch.model.parameter;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

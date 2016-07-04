@@ -17,7 +17,7 @@ package li.strolch.model.timevalue.impl;
 
 import java.io.Serializable;
 
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * Wrapper for java.util.String object defining a inverse to support algebraic operations.

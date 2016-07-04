@@ -31,6 +31,7 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
@@ -39,8 +40,6 @@ import li.strolch.rest.model.UserSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.privilege.model.Certificate;
 
 @Path("strolch/sessions")
 public class UserSessionsService {

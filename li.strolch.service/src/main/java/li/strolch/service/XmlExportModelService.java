@@ -18,12 +18,12 @@ package li.strolch.service;
 import java.io.File;
 import java.text.MessageFormat;
 
-import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.command.XmlExportModelCommand;
 import li.strolch.model.ModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

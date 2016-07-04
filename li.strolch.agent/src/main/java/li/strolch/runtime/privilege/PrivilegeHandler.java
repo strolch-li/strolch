@@ -15,10 +15,10 @@
  */
 package li.strolch.runtime.privilege;
 
-import ch.eitchnet.privilege.base.PrivilegeException;
-import ch.eitchnet.privilege.handler.SystemUserAction;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.privilege.model.PrivilegeContext;
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -30,28 +30,28 @@ public interface PrivilegeHandler {
 	 * @param password
 	 * @return
 	 * 
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#authenticate(String, byte[])
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, byte[])
 	 */
 	public abstract Certificate authenticate(String username, byte[] password);
 
 	/**
 	 * @param certificate
 	 * @throws PrivilegeException
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#isCertificateValid(Certificate)
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#isCertificateValid(Certificate)
 	 */
 	public abstract void isCertificateValid(Certificate certificate) throws PrivilegeException;
 
 	/**
 	 * @param certificate
 	 * @return
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#invalidateSession(ch.eitchnet.privilege.model.Certificate)
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#invalidateSession(li.strolch.privilege.model.Certificate)
 	 */
 	public abstract boolean invalidateSession(Certificate certificate);
 
 	/**
 	 * @param certificate
 	 * @return
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#invalidateSession(ch.eitchnet.privilege.model.Certificate)
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#invalidateSession(li.strolch.privilege.model.Certificate)
 	 */
 	public abstract boolean sessionTimeout(Certificate certificate);
 
@@ -59,7 +59,7 @@ public interface PrivilegeHandler {
 	 * @param certificate
 	 * @return
 	 * @throws PrivilegeException
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#getPrivilegeContext(ch.eitchnet.privilege.model.Certificate)
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#getPrivilegeContext(li.strolch.privilege.model.Certificate)
 	 */
 	public abstract PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException;
 
@@ -67,8 +67,8 @@ public interface PrivilegeHandler {
 	 * @param systemUsername
 	 * @param action
 	 * @throws PrivilegeException
-	 * @see ch.eitchnet.privilege.handler.PrivilegeHandler#runAsSystem(java.lang.String,
-	 *      ch.eitchnet.privilege.handler.SystemUserAction)
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#runAsSystem(java.lang.String,
+	 *      li.strolch.privilege.handler.SystemUserAction)
 	 */
 	public abstract <T extends SystemUserAction> T runAsSystem(String systemUsername, T action)
 			throws PrivilegeException;
@@ -78,14 +78,14 @@ public interface PrivilegeHandler {
 	 * @return
 	 * @throws PrivilegeException
 	 */
-	public abstract ch.eitchnet.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
+	public abstract li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
 			throws PrivilegeException;
 
 	/**
 	 * @param certificate
 	 * @param password
 	 * @throws PrivilegeException
-	 * @see {@link ch.eitchnet.privilege.handler.PrivilegeHandler#checkPassword(Certificate, byte[])}
+	 * @see {@link li.strolch.privilege.handler.PrivilegeHandler#checkPassword(Certificate, byte[])}
 	 */
 	public void checkPassword(Certificate certificate, byte[] password) throws PrivilegeException;
 }

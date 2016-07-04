@@ -22,8 +22,8 @@ import java.util.List;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.ParameterVisitor;
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

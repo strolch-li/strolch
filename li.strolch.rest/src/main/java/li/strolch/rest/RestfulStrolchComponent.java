@@ -19,7 +19,6 @@ import java.text.MessageFormat;
 
 import org.glassfish.jersey.server.ServerProperties;
 
-import ch.eitchnet.utils.dbc.DBC;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
@@ -27,6 +26,7 @@ import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.HttpCacheResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.service.api.ServiceHandler;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

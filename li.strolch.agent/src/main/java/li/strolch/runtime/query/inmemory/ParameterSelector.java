@@ -18,8 +18,6 @@ package li.strolch.runtime.query.inmemory;
 import java.util.Date;
 import java.util.List;
 
-import ch.eitchnet.utils.StringMatchMode;
-import ch.eitchnet.utils.collections.DateRange;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.parameter.BooleanParameter;
@@ -31,6 +29,8 @@ import li.strolch.model.parameter.ListParameter;
 import li.strolch.model.parameter.LongParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.utils.StringMatchMode;
+import li.strolch.utils.collections.DateRange;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

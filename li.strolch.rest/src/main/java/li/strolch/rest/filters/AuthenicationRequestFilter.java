@@ -31,11 +31,11 @@ import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>

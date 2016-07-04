@@ -18,13 +18,12 @@ package li.strolch.model.audit;
 import java.text.MessageFormat;
 
 import li.strolch.model.Tags;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

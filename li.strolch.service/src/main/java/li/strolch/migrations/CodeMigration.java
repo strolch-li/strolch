@@ -21,8 +21,8 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.parameter.SetParameterCommand;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.StringParameter;
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.Version;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.utils.Version;
 
 public class CodeMigration extends Migration {
 

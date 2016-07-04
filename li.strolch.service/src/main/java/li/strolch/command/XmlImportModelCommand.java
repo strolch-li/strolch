@@ -24,7 +24,7 @@ import li.strolch.model.ModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-import ch.eitchnet.utils.dbc.DBC;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

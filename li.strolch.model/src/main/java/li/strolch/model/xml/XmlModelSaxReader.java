@@ -26,8 +26,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.iso8601.ISO8601FormatFactory;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
@@ -46,6 +44,8 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.impl.ValueChange;
+import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

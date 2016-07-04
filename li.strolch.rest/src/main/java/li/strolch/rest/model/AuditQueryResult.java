@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import li.strolch.model.audit.Audit;
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.helper.StringHelper;
 
 @XmlRootElement(name = "AuditQueryResult")
 @XmlAccessorType(XmlAccessType.NONE)

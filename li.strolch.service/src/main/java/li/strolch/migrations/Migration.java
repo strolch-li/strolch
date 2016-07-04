@@ -24,12 +24,11 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.utils.Version;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.eitchnet.privilege.model.Certificate;
-import ch.eitchnet.utils.Version;
 
 public abstract class Migration {
 

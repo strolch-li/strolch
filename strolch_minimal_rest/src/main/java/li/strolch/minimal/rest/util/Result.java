@@ -15,7 +15,7 @@
  */
 package li.strolch.minimal.rest.util;
 
-import ch.eitchnet.utils.helper.StringHelper;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

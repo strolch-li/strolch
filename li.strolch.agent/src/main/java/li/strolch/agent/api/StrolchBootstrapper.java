@@ -12,12 +12,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import ch.eitchnet.utils.dbc.DBC;
-import ch.eitchnet.utils.helper.FileHelper;
-import ch.eitchnet.utils.helper.StringHelper;
-import ch.eitchnet.utils.helper.XmlHelper;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.FileHelper;
+import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.helper.XmlHelper;
 
 public class StrolchBootstrapper extends DefaultHandler {
 
