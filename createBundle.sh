@@ -1,18 +1,18 @@
 #!/bin/bash
 
+projectName=strolch_bundle
+DIST_STROLCH="/var/www/eitch/strolch.li/dist/snapshot"
+DEPLOY_SERVER="hosting.eitchnet.ch"
+ROOT="$(cd ${0%/*} ; pwd)"
+workDir="${ROOT}/target/${bundle_name}"
+
 projectVersion=$(grep -m 1 "<version>" pom.xml | tr '<>' '|' | cut -d '|' -f 3)
 if [ $? != 0 ] ; then
   echo "ERROR: Failed to parse version!"
 fi
-
-echo "INFO: Project version is ${projectVersion}"
-
-projectName=strolch_bundle
 bundle_name="${projectName}-${projectVersion}"
-DIST_STROLCH="/var/www/eitch/strolch.li/dist/snapshot"
-DEPLOY_SERVER="hosting.eitchnet.ch"
-ROOT="${PWD}"
-workDir="${ROOT}/target/${bundle_name}"
+
+echo "INFO: Creating bundle ${bundle_name}"
 
 # Create all needed packages
 #echo "INFO: Building projects..."
