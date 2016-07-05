@@ -5,7 +5,7 @@
 
 	<groupId>li.strolch</groupId>
 	<artifactId>li.strolch</artifactId>
-	<version>1.2.2</version>
+	<version>1.2.3</version>
 
 	<name>li.strolch</name>
 	<description>Module build for strolch</description>
