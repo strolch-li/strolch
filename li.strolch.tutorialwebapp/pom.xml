@@ -86,7 +86,6 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<warName>${warFinalName}</warName>
 					<webResources>
 						<resource>
 							<directory>src/main/non-packaged-resources</directory>
