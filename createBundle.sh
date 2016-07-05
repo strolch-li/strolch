@@ -75,6 +75,10 @@ fi
 
 if [ "$(hostname -f)" == "${DEPLOY_SERVER}" ] ; then
   echo "INFO: Publishing..."
+  if ! mkdir ${DIST_STROLCH} ; then
+    echo "ERROR: Failed to create dist ${DIST_STROLCH}"
+    exit 1
+  fi
   if ! cp ${workDir}/* "${DIST_STROLCH}" ; then
     echo "ERROR: Failed to publish packages."
     exit 1
