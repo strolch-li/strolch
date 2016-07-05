@@ -1,12 +1,13 @@
 #!/bin/bash
 
-if [ $# != 1 ] ; then
-  echo "Usage: ${0} <version>"
-  exit 1
+projectVersion=$(grep -m 1 "<version>" pom.xml | tr '<>' '|' | cut -d '|' -f 3)
+if [ $? != 0 ] ; then
+  echo "ERROR: Failed to parse version!"
 fi
 
+echo "INFO: Project version is ${projectVersion}"
+
 projectName=strolch_bundle
-projectVersion=${1}
 bundle_name="${projectName}-${projectVersion}"
 DIST_STROLCH="/var/www/eitch/strolch.li/dist/snapshot"
 DEPLOY_SERVER="hosting.eitchnet.ch"
