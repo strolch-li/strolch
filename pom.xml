@@ -65,7 +65,6 @@
 		<module>li.strolch.privilege</module>
 		<module>li.strolch.utils</module>
 		<module>li.strolch.xmlpers</module>
-		<module>li.strolch.dev</module>
 		<module>li.strolch.bom</module>
 		<module>li.strolch.model</module>
 		<module>li.strolch.testbase</module>
@@ -78,6 +77,7 @@
 		<module>li.strolch.tutorialapp</module>
 		<module>li.strolch.tutorialwebapp</module>
 		<module>li.strolch.planningwebapp</module>
+		<module>li.strolch.website</module>
 		<module>strolch_minimal</module>
 		<module>strolch_minimal_rest</module>
 	</modules>
