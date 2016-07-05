@@ -15,11 +15,11 @@ bundle_name="${projectName}-${projectVersion}"
 echo "INFO: Creating bundle ${bundle_name}"
 
 # Create all needed packages
-#echo "INFO: Building projects..."
-#if ! mvn -DskipTests clean package ; then
-#  echo "ERROR: Failed to build packages!"
-#  exit 1
-#fi
+echo "INFO: Building projects..."
+if ! mvn -DskipTests clean package ; then
+  echo "ERROR: Failed to build packages!"
+  exit 1
+fi
 
 # Make sure the work directory exists
 if [ -d "${workDir}" ] ; then
