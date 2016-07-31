@@ -11,7 +11,9 @@ import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
+import li.strolch.model.PolicyContainer;
 import li.strolch.model.Resource;
+import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -22,6 +24,7 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.model.timevalue.IValueChange;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public class StrolchElementToJsonVisitor {
@@ -34,11 +37,8 @@ public class StrolchElementToJsonVisitor {
 		toJson(element, rootJ);
 
 		addParameterBags(element, rootJ);
-
 		addTimedStates(element, rootJ);
-
-		if (element.hasPolicyDefs())
-			addPolicies(element.getPolicyDefs(), rootJ);
+		addPolicies(element, rootJ);
 
 		return rootJ;
 	}
@@ -53,9 +53,7 @@ public class StrolchElementToJsonVisitor {
 		rootJ.addProperty(Tags.STATE, element.getState().name());
 
 		addParameterBags(element, rootJ);
-
-		if (element.hasPolicyDefs())
-			addPolicies(element.getPolicyDefs(), rootJ);
+		addPolicies(element, rootJ);
 
 		return rootJ;
 	}
@@ -77,9 +75,7 @@ public class StrolchElementToJsonVisitor {
 		toJson((AbstractStrolchElement) element, rootJ);
 
 		addParameterBags(element, rootJ);
-
-		if (element.hasPolicyDefs())
-			addPolicies(element.getPolicyDefs(), rootJ);
+		addPolicies(element, rootJ);
 
 		Iterator<Entry<String, IActivityElement>> iter = element.elementIterator();
 		if (iter.hasNext()) {
@@ -110,29 +106,51 @@ public class StrolchElementToJsonVisitor {
 
 		rootJ.addProperty(Tags.OBJECT_TYPE, Tags.ACTION);
 
+		// attributes
 		toJson((AbstractStrolchElement) element, rootJ);
 		rootJ.addProperty(Tags.RESOURCE_ID, element.getResourceId());
 		rootJ.addProperty(Tags.RESOURCE_TYPE, element.getResourceType());
 		rootJ.addProperty(Tags.STATE, element.getState().name());
 
 		addParameterBags(element, rootJ);
+		addPolicies(element, rootJ);
 
-		if (element.hasPolicyDefs())
-			addPolicies(element.getPolicyDefs(), rootJ);
+		// value changes
+		Iterator<IValueChange<? extends IValue<?>>> iter = element.getChanges().iterator();
+		if (iter.hasNext()) {
+
+			JsonArray changesJ = new JsonArray();
+			rootJ.add(Tags.VALUE_CHANGES, changesJ);
+
+			while (iter.hasNext()) {
+				IValueChange<? extends IValue<?>> valueChange = iter.next();
+
+				JsonObject changeJ = new JsonObject();
+
+				changeJ.addProperty(Tags.STATE_ID, valueChange.getStateId());
+				changeJ.addProperty(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(valueChange.getTime()));
+				changeJ.addProperty(Tags.VALUE, valueChange.getValue().getValueAsString());
+				changeJ.addProperty(Tags.TYPE, valueChange.getValue().getType());
+
+				changesJ.add(changeJ);
+			}
+		}
 
 		return rootJ;
 	}
 
-	protected void addPolicies(PolicyDefs policyDefs, JsonObject rootJ) {
-		if (!policyDefs.hasPolicyDefs())
+	protected void addPolicies(PolicyContainer policyContainer, JsonObject rootJ) {
+		if (!policyContainer.hasPolicyDefs() || !policyContainer.getPolicyDefs().hasPolicyDefs())
 			return;
+
+		PolicyDefs policyDefs = policyContainer.getPolicyDefs();
 
 		JsonObject policyDefsJ = new JsonObject();
 		rootJ.add(Tags.POLICIES, policyDefsJ);
 
 		for (String type : policyDefs.getPolicyTypes()) {
 			PolicyDef policyDef = policyDefs.getPolicyDef(type);
-			policyDefsJ.addProperty(policyDef.getType(), policyDef.getValue());
+			policyDefsJ.addProperty(policyDef.getType(), policyDef.getValueForXml());
 		}
 	}
 
@@ -161,27 +179,34 @@ public class StrolchElementToJsonVisitor {
 
 			toJson(bag, bagJ);
 
-			addParameters(bag, bagJ);
-		}
-	}
+			if (!bag.hasParameters())
+				continue;
 
-	protected void addParameters(ParameterBag bag, JsonObject bagJ) {
+			JsonObject paramsJ = new JsonObject();
+			bagJ.add(Tags.PARAMETERS, paramsJ);
 
-		if (!bag.hasParameters())
-			return;
+			for (String paramKey : bag.getParameterKeySet()) {
+				Parameter<?> param = bag.getParameter(paramKey);
 
-		JsonObject paramsJ = new JsonObject();
-		bagJ.add(Tags.PARAMETERS, paramsJ);
+				JsonObject paramJ = new JsonObject();
+				paramsJ.add(paramKey, paramJ);
 
-		for (String paramKey : bag.getParameterKeySet()) {
-			Parameter<?> param = bag.getParameter(paramKey);
+				toJson((AbstractStrolchElement) param, paramJ);
 
-			JsonObject paramJ = new JsonObject();
-			paramsJ.add(paramKey, paramJ);
+				if (!StrolchModelConstants.INTERPRETATION_NONE.equals(param.getInterpretation()))
+					paramJ.addProperty(Tags.INTERPRETATION, param.getInterpretation());
 
-			toJson((AbstractStrolchElement) param, paramJ);
+				if (param.isHidden())
+					paramJ.addProperty(Tags.HIDDEN, param.isHidden());
 
-			paramJ.addProperty(Tags.VALUE, param.getValueAsString());
+				if (!StrolchModelConstants.UOM_NONE.equals(param.getUom()))
+					paramJ.addProperty(Tags.UOM, param.getUom());
+
+				if (param.getIndex() != 0)
+					paramJ.addProperty(Tags.INDEX, param.getIndex());
+
+				paramJ.addProperty(Tags.VALUE, param.getValueAsString());
+			}
 		}
 	}
 

@@ -8,12 +8,16 @@ import li.strolch.model.ResourceVisitor;
 
 public class ResourceToJsonVisitor extends StrolchElementToJsonVisitor implements ResourceVisitor<JsonObject> {
 
+	private JsonObject jsonObject;
+
+	public JsonObject getJsonObject() {
+		return this.jsonObject;
+	}
+
 	@Override
 	public JsonObject visit(Resource element) {
-
-		JsonObject rootJ = toJson(element);
-
-		return rootJ;
+		this.jsonObject = toJson(element);
+		return this.jsonObject;
 	}
 
 	public static String toJsonString(Resource element) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright 2016 Robert von Burg <eitch@eitchnet.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,39 +18,36 @@ package li.strolch.model;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.w3c.dom.Document;
+
+import com.google.gson.JsonObject;
 
 import li.strolch.model.activity.Activity;
+import li.strolch.model.json.ActivityFromJsonVisitor;
+import li.strolch.model.json.ActivityToJsonVisitor;
+import li.strolch.model.json.OrderFromJsonVisitor;
+import li.strolch.model.json.OrderToJsonVisitor;
+import li.strolch.model.json.ResourceFromJsonVisitor;
+import li.strolch.model.json.ResourceToJsonVisitor;
 import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
-import li.strolch.model.xml.ActivityFromDomVisitor;
-import li.strolch.model.xml.ActivityToDomVisitor;
-import li.strolch.model.xml.OrderFromDomVisitor;
-import li.strolch.model.xml.OrderToDomVisitor;
-import li.strolch.model.xml.ResourceFromDomVisitor;
-import li.strolch.model.xml.ResourceToDomVisitor;
 
-/**
- * @author Robert von Burg <eitch@eitchnet.ch>
- */
-@SuppressWarnings("nls")
-public class XmlToDomTest extends ModelTest {
+public class ModelToJsonTest {
 
 	@Test
 	public void shouldFormatAndParseOrder() {
 
 		Order order = ModelGenerator.createOrder("@1", "My Order 1", "MyOrder");
 
-		OrderToDomVisitor domVisitor = new OrderToDomVisitor();
-		domVisitor.visit(order);
-		Document document = domVisitor.getDocument();
+		OrderToJsonVisitor jsonVisitor = new OrderToJsonVisitor();
+		jsonVisitor.visit(order);
+		JsonObject jsonObject = jsonVisitor.getJsonObject();
 
-		Order parsedOrder = new OrderFromDomVisitor().visit(document);
+		Order parsedOrder = new OrderFromJsonVisitor().visit(jsonObject);
 
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
 		visitor.visit(parsedOrder);
-		assertTrue("To DOM and back should equal same Order:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
+		assertTrue("To JSON and back should equal same Order:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
 	}
 
 	@Test
@@ -58,15 +55,15 @@ public class XmlToDomTest extends ModelTest {
 
 		Resource resource = ModelGenerator.createResource("@1", "My Resource 1", "MyResource");
 
-		ResourceToDomVisitor domVisitor = new ResourceToDomVisitor();
-		domVisitor.visit(resource);
-		Document document = domVisitor.getDocument();
+		ResourceToJsonVisitor jsonVisitor = new ResourceToJsonVisitor();
+		jsonVisitor.visit(resource);
+		JsonObject jsonObject = jsonVisitor.getJsonObject();
 
-		Resource parsedResource = new ResourceFromDomVisitor().visit(document);
+		Resource parsedResource = new ResourceFromJsonVisitor().visit(jsonObject);
 
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(resource);
 		visitor.visit(parsedResource);
-		assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(),
+		assertTrue("To JSON and back should equal same Resource:\n" + visitor.getMismatchedLocators(),
 				visitor.isEqual());
 	}
 
@@ -75,15 +72,15 @@ public class XmlToDomTest extends ModelTest {
 
 		Activity activity = ModelGenerator.createActivity("@1", "My Activity 1", "Transport");
 
-		ActivityToDomVisitor domVisitor = new ActivityToDomVisitor();
-		domVisitor.visit(activity);
-		Document document = domVisitor.getDocument();
+		ActivityToJsonVisitor jsonVisitor = new ActivityToJsonVisitor();
+		jsonVisitor.visit(activity);
+		JsonObject jsonObject = jsonVisitor.getJsonObject();
 
-		Activity parsedActivity = new ActivityFromDomVisitor().visit(document);
+		Activity parsedActivity = new ActivityFromJsonVisitor().visit(jsonObject);
 
 		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(activity);
 		visitor.visit(parsedActivity);
-		assertTrue("To DOM and back should equal same Activity:\n" + visitor.getMismatchedLocators(),
+		assertTrue("To JSON and back should equal same Activity:\n" + visitor.getMismatchedLocators(),
 				visitor.isEqual());
 	}
 }

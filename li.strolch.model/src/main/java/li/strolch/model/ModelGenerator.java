@@ -315,7 +315,7 @@ public class ModelGenerator {
 	 */
 	public static PolicyDefs createPolicyDefs() {
 		PolicyDefs policyDefs = new PolicyDefs();
-		PolicyDef policyDef = new JavaPolicyDef("ObjectPolicy", "java.lang.Object");
+		PolicyDef policyDef = new JavaPolicyDef("ObjectPolicy", Object.class.getName());
 		policyDefs.addOrUpdate(policyDef);
 		return policyDefs;
 	}

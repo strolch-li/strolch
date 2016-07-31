@@ -119,9 +119,8 @@ public abstract class PolicyDef {
 
 			try {
 				Class.forName(value);
-
 			} catch (ClassNotFoundException e) {
-				throw new StrolchPolicyException("Invalid policy configuration. Policy does not exist: " + value);
+				throw new StrolchPolicyException("Invalid policy configuration. Policy does not exist: " + value, e);
 			}
 
 			return new JavaPolicyDef(type, value);

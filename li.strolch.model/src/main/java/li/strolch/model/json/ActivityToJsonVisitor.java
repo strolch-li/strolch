@@ -8,12 +8,16 @@ import li.strolch.model.activity.Activity;
 
 public class ActivityToJsonVisitor extends StrolchElementToJsonVisitor implements ActivityVisitor<JsonObject> {
 
+	private JsonObject jsonObject;
+
+	public JsonObject getJsonObject() {
+		return this.jsonObject;
+	}
+
 	@Override
 	public JsonObject visit(Activity element) {
-
-		JsonObject rootJ = toJson(element);
-
-		return rootJ;
+		this.jsonObject = toJson(element);
+		return this.jsonObject;
 	}
 
 	public static String toJsonString(Activity element) {

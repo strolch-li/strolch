@@ -8,12 +8,16 @@ import li.strolch.model.OrderVisitor;
 
 public class OrderToJsonVisitor extends StrolchElementToJsonVisitor implements OrderVisitor<JsonObject> {
 
+	private JsonObject jsonObject;
+
+	public JsonObject getJsonObject() {
+		return this.jsonObject;
+	}
+
 	@Override
 	public JsonObject visit(Order element) {
-
-		JsonObject rootJ = toJson(element);
-
-		return rootJ;
+		this.jsonObject = toJson(element);
+		return this.jsonObject;
 	}
 
 	public static String toJsonString(Order element) {

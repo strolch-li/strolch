@@ -44,7 +44,7 @@ import org.junit.Test;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
-public class XmlToSaxTest extends ModelTest {
+public class ModelToSaxTest extends ModelTest {
 
 	@Test
 	public void shouldFormatAndParseOrder() {

@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
-public class XmlModelDefaultHandlerTest {
+public class XmlModelSaxFileReaderTest {
 
-	private static final Logger logger = LoggerFactory.getLogger(XmlModelDefaultHandlerTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlModelSaxFileReaderTest.class);
 
 	@Test
 	public void shouldParseXmlModelFile() {

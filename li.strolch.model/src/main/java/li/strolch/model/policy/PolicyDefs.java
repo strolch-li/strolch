@@ -20,8 +20,10 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.exception.StrolchPolicyException;
+import li.strolch.model.Locator;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -98,5 +100,11 @@ public class PolicyDefs {
 			clone.addOrUpdate(policyDef.getClone());
 		}
 		return clone;
+	}
+
+	public Locator getLocator() {
+		if (this.parent == null)
+			return Locator.valueOf(Tags.POLICIES);
+		return this.parent.getLocator().append(Tags.POLICIES);
 	}
 }

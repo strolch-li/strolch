@@ -27,6 +27,7 @@ import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.Tags;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -63,20 +64,20 @@ public class StrolchElementDeepEqualsVisitor {
 	protected void deepEquals(StrolchElement srcElement, StrolchElement dstElement) {
 		DBC.PRE.assertEquals("Both elements should have the same ID", srcElement.getId(), dstElement.getId());
 		if (!srcElement.getName().equals(dstElement.getName())) {
-			this.mismatchedLocators.add(dstElement.getLocator());
+			this.mismatchedLocators.add(dstElement.getLocator().append(Tags.NAME));
 		}
 		if (!srcElement.getType().equals(dstElement.getType())) {
-			this.mismatchedLocators.add(dstElement.getLocator());
+			this.mismatchedLocators.add(dstElement.getLocator().append(Tags.TYPE));
 		}
 	}
 
 	protected void deepEquals(Order srcOrder, Order dstOrder) {
 		deepEquals((StrolchElement) srcOrder, (StrolchElement) dstOrder);
 		if (!srcOrder.getState().equals(dstOrder.getState())) {
-			this.mismatchedLocators.add(dstOrder.getLocator());
+			this.mismatchedLocators.add(dstOrder.getLocator().append(Tags.STATE));
 		}
 		if (!srcOrder.getDate().equals(dstOrder.getDate())) {
-			this.mismatchedLocators.add(dstOrder.getLocator());
+			this.mismatchedLocators.add(dstOrder.getLocator().append(Tags.DATE));
 		}
 
 		deepEquals((GroupedParameterizedElement) srcOrder, (GroupedParameterizedElement) dstOrder);
@@ -84,7 +85,7 @@ public class StrolchElementDeepEqualsVisitor {
 		if (srcOrder.hasPolicyDefs() && dstOrder.hasPolicyDefs())
 			deepEquals(srcOrder.getPolicyDefs(), dstOrder.getPolicyDefs());
 		else if (srcOrder.hasPolicyDefs() != dstOrder.hasPolicyDefs())
-			this.mismatchedLocators.add(srcOrder.getLocator());
+			this.mismatchedLocators.add(srcOrder.getPolicyDefs().getLocator());
 	}
 
 	private void deepEquals(PolicyDefs srcPolicyDefs, PolicyDefs dstPolicyDefs) {
@@ -94,22 +95,22 @@ public class StrolchElementDeepEqualsVisitor {
 			PolicyDef srcPolicyDef = srcPolicyDefs.getPolicyDef(srcType);
 
 			if (!dstPolicyDefs.hasPolicyDef(srcType)) {
-				this.mismatchedLocators.add(dstPolicyDefs.getParent().getLocator());
+				this.mismatchedLocators.add(dstPolicyDefs.getLocator().append(srcType));
 				continue;
 			}
 
 			PolicyDef dstPolicyDef = dstPolicyDefs.getPolicyDef(srcType);
 
 			if (srcPolicyDef.getClass() != dstPolicyDef.getClass())
-				this.mismatchedLocators.add(dstPolicyDefs.getParent().getLocator());
+				this.mismatchedLocators.add(dstPolicyDefs.getLocator().append(srcType));
 			if (!srcPolicyDef.getValue().equals(dstPolicyDef.getValue()))
-				this.mismatchedLocators.add(dstPolicyDefs.getParent().getLocator());
+				this.mismatchedLocators.add(dstPolicyDefs.getLocator().append(srcType));
 		}
 
 		Set<String> dstTypes = dstPolicyDefs.getPolicyTypes();
 		for (String dstType : dstTypes) {
 			if (!srcPolicyDefs.hasPolicyDef(dstType)) {
-				this.mismatchedLocators.add(srcPolicyDefs.getParent().getLocator());
+				this.mismatchedLocators.add(srcPolicyDefs.getLocator().append(dstType));
 			}
 		}
 	}
@@ -121,7 +122,7 @@ public class StrolchElementDeepEqualsVisitor {
 		if (srcRes.hasPolicyDefs() && dstRes.hasPolicyDefs())
 			deepEquals(srcRes.getPolicyDefs(), dstRes.getPolicyDefs());
 		else if (srcRes.hasPolicyDefs() != dstRes.hasPolicyDefs())
-			this.mismatchedLocators.add(srcRes.getLocator());
+			this.mismatchedLocators.add(srcRes.getPolicyDefs().getLocator());
 
 		Set<String> srcTimedStateKeySet = srcRes.getTimedStateKeySet();
 		for (String timedStateKey : srcTimedStateKeySet) {
@@ -152,7 +153,7 @@ public class StrolchElementDeepEqualsVisitor {
 		if (srcActivity.hasPolicyDefs() && dstActivity.hasPolicyDefs())
 			deepEquals(srcActivity.getPolicyDefs(), dstActivity.getPolicyDefs());
 		else if (srcActivity.hasPolicyDefs() != dstActivity.hasPolicyDefs())
-			this.mismatchedLocators.add(srcActivity.getLocator());
+			this.mismatchedLocators.add(srcActivity.getPolicyDefs().getLocator());
 
 		Iterator<Entry<String, IActivityElement>> iter = srcActivity.elementIterator();
 		while (iter.hasNext()) {
@@ -193,13 +194,13 @@ public class StrolchElementDeepEqualsVisitor {
 		deepEquals((GroupedParameterizedElement) srcAction, (GroupedParameterizedElement) dstAction);
 
 		if (!srcAction.getResourceId().equals(dstAction.getResourceId())) {
-			this.mismatchedLocators.add(dstAction.getLocator());
+			this.mismatchedLocators.add(dstAction.getLocator().append(Tags.RESOURCE_ID));
 		}
 		if (!srcAction.getResourceType().equals(dstAction.getResourceType())) {
-			this.mismatchedLocators.add(dstAction.getLocator());
+			this.mismatchedLocators.add(dstAction.getLocator().append(Tags.RESOURCE_TYPE));
 		}
 		if (!srcAction.getState().equals(dstAction.getState())) {
-			this.mismatchedLocators.add(dstAction.getLocator());
+			this.mismatchedLocators.add(dstAction.getLocator().append(Tags.STATE));
 		}
 
 		if ((srcAction.getParent() == null && srcAction.getParent() != null)
@@ -212,10 +213,15 @@ public class StrolchElementDeepEqualsVisitor {
 		}
 
 		if (srcAction.hasChanges() != dstAction.hasChanges()) {
-			this.mismatchedLocators.add(dstAction.getLocator());
+			this.mismatchedLocators.add(dstAction.getLocator().append(Tags.VALUE_CHANGES));
 		} else if (!srcAction.getChanges().equals(dstAction.getChanges())) {
-			this.mismatchedLocators.add(dstAction.getLocator());
+			this.mismatchedLocators.add(dstAction.getLocator().append(Tags.VALUE_CHANGES));
 		}
+
+		if (srcAction.hasPolicyDefs() && dstAction.hasPolicyDefs())
+			deepEquals(srcAction.getPolicyDefs(), dstAction.getPolicyDefs());
+		else if (srcAction.hasPolicyDefs() != dstAction.hasPolicyDefs())
+			this.mismatchedLocators.add(dstAction.getPolicyDefs().getLocator());
 	}
 
 	protected void deepEquals(GroupedParameterizedElement srcElement, GroupedParameterizedElement dstElement) {
@@ -291,7 +297,7 @@ public class StrolchElementDeepEqualsVisitor {
 		final ITimeVariable<?> dstTimeEvolution = dstState.getTimeEvolution();
 
 		if (!srcTimeEvolution.getValues().equals(dstTimeEvolution.getValues())) {
-			this.mismatchedLocators.add(dstState.getLocator());
+			this.mismatchedLocators.add(dstState.getLocator().append(Tags.VALUES));
 		}
 	}
 
