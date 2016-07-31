@@ -21,7 +21,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.utils.dbc.DBC;
@@ -29,7 +29,7 @@ import li.strolch.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InMemoryQuery<T extends StrolchElement, U> {
+public class InMemoryQuery<T extends StrolchRootElement, U> {
 
 	private Navigator<T> navigator;
 	private Selector<T> selector;

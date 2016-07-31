@@ -18,8 +18,8 @@ package li.strolch.runtime.query.inmemory;
 import java.util.Date;
 import java.util.List;
 
-import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.ParameterBag;
+import li.strolch.model.ParameterBagContainer;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.DurationParameter;
@@ -35,7 +35,7 @@ import li.strolch.utils.collections.DateRange;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class ParameterSelector<T extends GroupedParameterizedElement> implements Selector<T> {
+public abstract class ParameterSelector<T extends ParameterBagContainer> implements Selector<T> {
 
 	protected String bagKey;
 	protected String paramKey;
@@ -46,79 +46,79 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 	}
 
 	@Override
-	public abstract boolean select(GroupedParameterizedElement element);
+	public abstract boolean select(ParameterBagContainer element);
 
-	public static <T extends GroupedParameterizedElement> StringParameterSelector<T> stringSelector(String bagKey,
+	public static <T extends ParameterBagContainer> StringParameterSelector<T> stringSelector(String bagKey,
 			String paramKey, String value, StringMatchMode matchMode) {
 		return new StringParameterSelector<>(bagKey, paramKey, value, matchMode);
 	}
 
-	public static <T extends GroupedParameterizedElement> IntegerParameterSelector<T> integerSelector(String bagKey,
+	public static <T extends ParameterBagContainer> IntegerParameterSelector<T> integerSelector(String bagKey,
 			String paramKey, int value) {
 		return new IntegerParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> BooleanParameterSelector<T> booleanSelector(String bagKey,
+	public static <T extends ParameterBagContainer> BooleanParameterSelector<T> booleanSelector(String bagKey,
 			String paramKey, boolean value) {
 		return new BooleanParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> FloatParameterSelector<T> floatSelector(String bagKey,
+	public static <T extends ParameterBagContainer> FloatParameterSelector<T> floatSelector(String bagKey,
 			String paramKey, double value) {
 		return new FloatParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> LongParameterSelector<T> longSelector(String bagKey,
+	public static <T extends ParameterBagContainer> LongParameterSelector<T> longSelector(String bagKey,
 			String paramKey, long value) {
 		return new LongParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> DateParameterSelector<T> dateSelector(String bagKey,
+	public static <T extends ParameterBagContainer> DateParameterSelector<T> dateSelector(String bagKey,
 			String paramKey, Date value) {
 		return new DateParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> DurationParameterSelector<T> durationSelector(String bagKey,
+	public static <T extends ParameterBagContainer> DurationParameterSelector<T> durationSelector(String bagKey,
 			String paramKey, Long value) {
 		return new DurationParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> DateRangeParameterSelector<T> dateRangeSelector(String bagKey,
+	public static <T extends ParameterBagContainer> DateRangeParameterSelector<T> dateRangeSelector(String bagKey,
 			String paramKey, DateRange dateRange) {
 		return new DateRangeParameterSelector<>(bagKey, paramKey, dateRange);
 	}
 
-	public static <T extends GroupedParameterizedElement> StringListParameterSelector<T> stringListSelector(
-			String bagKey, String paramKey, List<String> value) {
+	public static <T extends ParameterBagContainer> StringListParameterSelector<T> stringListSelector(String bagKey,
+			String paramKey, List<String> value) {
 		return new StringListParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> IntegerListParameterSelector<T> integerListSelector(
-			String bagKey, String paramKey, List<Integer> value) {
+	public static <T extends ParameterBagContainer> IntegerListParameterSelector<T> integerListSelector(String bagKey,
+			String paramKey, List<Integer> value) {
 		return new IntegerListParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> FloatListParameterSelector<T> floatListSelector(String bagKey,
+	public static <T extends ParameterBagContainer> FloatListParameterSelector<T> floatListSelector(String bagKey,
 			String paramKey, List<Double> value) {
 		return new FloatListParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> LongListParameterSelector<T> longListSelector(String bagKey,
+	public static <T extends ParameterBagContainer> LongListParameterSelector<T> longListSelector(String bagKey,
 			String paramKey, List<Long> value) {
 		return new LongListParameterSelector<>(bagKey, paramKey, value);
 	}
 
-	public static <T extends GroupedParameterizedElement> NullParameterSelector<T> nullSelector(String bagKey,
+	public static <T extends ParameterBagContainer> NullParameterSelector<T> nullSelector(String bagKey,
 			String paramKey) {
 		return new NullParameterSelector<>(bagKey, paramKey);
 	}
 
-	public static <T extends GroupedParameterizedElement> AnyTypeParameterSelector<T> anyTypeSelection(String bagKey,
+	public static <T extends ParameterBagContainer> AnyTypeParameterSelector<T> anyTypeSelection(String bagKey,
 			String paramKey, String value, StringMatchMode matchMode) {
 		return new AnyTypeParameterSelector<>(bagKey, paramKey, value, matchMode);
 	}
 
-	public static class AnyTypeParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class AnyTypeParameterSelector<T extends ParameterBagContainer> extends ParameterSelector<T> {
 
 		private StringMatchMode matchMode;
 		private String value;
@@ -130,7 +130,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 
 			ParameterBag bag = element.getParameterBag(this.bagKey);
 			if (bag == null) {
@@ -146,14 +146,14 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class NullParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class NullParameterSelector<T extends ParameterBagContainer> extends ParameterSelector<T> {
 
 		public NullParameterSelector(String bagKey, String key) {
 			super(bagKey, key);
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 
 			ParameterBag bag = element.getParameterBag(this.bagKey);
 			if (bag == null) {
@@ -164,7 +164,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class StringParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class StringParameterSelector<T extends ParameterBagContainer> extends ParameterSelector<T> {
 
 		private StringMatchMode matchMode;
 		private String value;
@@ -180,7 +180,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 
 			if (!element.hasParameterBag(this.bagKey))
 				return false;
@@ -196,7 +196,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class IntegerParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class IntegerParameterSelector<T extends ParameterBagContainer> extends ParameterSelector<T> {
 
 		private Integer value;
 
@@ -206,7 +206,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 			if (!element.hasParameterBag(this.bagKey))
 				return false;
 
@@ -219,7 +219,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class BooleanParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class BooleanParameterSelector<T extends ParameterBagContainer> extends ParameterSelector<T> {
 
 		private Boolean value;
 
@@ -229,7 +229,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 			if (!element.hasParameterBag(this.bagKey))
 				return false;
 
@@ -242,7 +242,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class FloatParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class FloatParameterSelector<T extends ParameterBagContainer> extends ParameterSelector<T> {
 
 		private Double value;
 
@@ -252,7 +252,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 			if (!element.hasParameterBag(this.bagKey))
 				return false;
 
@@ -265,7 +265,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class LongParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class LongParameterSelector<T extends ParameterBagContainer> extends ParameterSelector<T> {
 
 		private Long value;
 
@@ -275,7 +275,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 			if (!element.hasParameterBag(this.bagKey))
 				return false;
 
@@ -288,7 +288,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class DateParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class DateParameterSelector<T extends ParameterBagContainer> extends ParameterSelector<T> {
 
 		private Date value;
 
@@ -298,7 +298,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 			if (!element.hasParameterBag(this.bagKey))
 				return false;
 
@@ -311,7 +311,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class DateRangeParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class DateRangeParameterSelector<T extends ParameterBagContainer> extends ParameterSelector<T> {
 
 		private DateRange dateRange;
 
@@ -321,7 +321,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 			if (!element.hasParameterBag(this.bagKey))
 				return false;
 
@@ -336,7 +336,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class DurationParameterSelector<T extends GroupedParameterizedElement> extends ParameterSelector<T> {
+	public static class DurationParameterSelector<T extends ParameterBagContainer> extends ParameterSelector<T> {
 
 		private Long value;
 
@@ -346,7 +346,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 			if (!element.hasParameterBag(this.bagKey))
 				return false;
 
@@ -359,7 +359,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static abstract class AbstractListParameterSelector<U, T extends GroupedParameterizedElement>
+	public static abstract class AbstractListParameterSelector<U, T extends ParameterBagContainer>
 			extends ParameterSelector<T> {
 
 		private List<U> value;
@@ -370,7 +370,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 
 		@Override
-		public boolean select(GroupedParameterizedElement element) {
+		public boolean select(ParameterBagContainer element) {
 			if (!element.hasParameterBag(this.bagKey))
 				return false;
 
@@ -383,7 +383,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class StringListParameterSelector<T extends GroupedParameterizedElement>
+	public static class StringListParameterSelector<T extends ParameterBagContainer>
 			extends AbstractListParameterSelector<String, T> {
 
 		public StringListParameterSelector(String bagKey, String paramKey, List<String> value) {
@@ -391,7 +391,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class IntegerListParameterSelector<T extends GroupedParameterizedElement>
+	public static class IntegerListParameterSelector<T extends ParameterBagContainer>
 			extends AbstractListParameterSelector<Integer, T> {
 
 		public IntegerListParameterSelector(String bagKey, String paramKey, List<Integer> value) {
@@ -399,7 +399,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class FloatListParameterSelector<T extends GroupedParameterizedElement>
+	public static class FloatListParameterSelector<T extends ParameterBagContainer>
 			extends AbstractListParameterSelector<Double, T> {
 
 		public FloatListParameterSelector(String bagKey, String paramKey, List<Double> value) {
@@ -407,7 +407,7 @@ public abstract class ParameterSelector<T extends GroupedParameterizedElement> i
 		}
 	}
 
-	public static class LongListParameterSelector<T extends GroupedParameterizedElement>
+	public static class LongListParameterSelector<T extends ParameterBagContainer>
 			extends AbstractListParameterSelector<Long, T> {
 
 		public LongListParameterSelector(String bagKey, String paramKey, List<Long> value) {

@@ -17,13 +17,13 @@ package li.strolch.runtime.query.inmemory;
 
 import java.util.List;
 
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchDao;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class StrolchTypeNavigator<T extends StrolchElement> implements Navigator<T> {
+public abstract class StrolchTypeNavigator<T extends StrolchRootElement> implements Navigator<T> {
 
 	private String type;
 

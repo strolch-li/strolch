@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 
-public class InMemoryDao<T extends StrolchElement> implements StrolchDao<T> {
+public class InMemoryDao<T extends StrolchRootElement> implements StrolchDao<T> {
 
 	private Map<String, Map<String, T>> elementMap;
 

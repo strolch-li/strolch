@@ -24,20 +24,19 @@ import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.OrderQueryVisitor;
 import li.strolch.model.query.StateSelection;
 import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.persistence.api.OrderDao;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order, OrderDao> implements OrderQueryVisitor {
+public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order> implements OrderQueryVisitor {
 
 	public InMemoryOrderQueryVisitor() {
 		super();
 	}
 
 	@Override
-	protected InMemoryQueryVisitor<Order, OrderDao> newInstance() {
+	protected InMemoryQueryVisitor<Order> newInstance() {
 		return new InMemoryOrderQueryVisitor();
 	}
 

@@ -19,11 +19,46 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 
 /**
  * Root element for all top level {@link StrolchElement}. These are elements which have no parent, e.g. {@link Resource
- * Resources} and {@link Order Orders}
+ * Resources} and {@link Order Orders}. Every root element has a version, so that versions can be kept of an object
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchRootElement extends StrolchElement {
+public interface StrolchRootElement extends StrolchElement, PolicyContainer, ParameterBagContainer {
 
+	/**
+	 * Returns the current version of this object, or null if no version is set
+	 * 
+	 * @return the current version of this object, or null if no version is set
+	 */
+	public Version getVersion();
+
+	/**
+	 * <p>
+	 * Sets the version of this object.
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Note:</b> If the version is set, then the new version must have the {@link Version#getVersion()} be an
+	 * increment to the current version!
+	 * </p>
+	 * 
+	 * @param version
+	 *            the version to set
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the given version's locator is not equal to the current version's locator
+	 * @throws IllegalStateException
+	 *             if the given version is not the next version (an increment)
+	 */
+	public void setVersion(Version version) throws IllegalArgumentException, IllegalStateException;
+
+	/**
+	 * Visitor pattern accept method. Takes a {@link StrolchRootElementVisitor} to visit this element
+	 * 
+	 * @param visitor
+	 *            the visitor
+	 * 
+	 * @return the result of the visitation
+	 */
 	public <T> T accept(StrolchRootElementVisitor<T> visitor);
 }

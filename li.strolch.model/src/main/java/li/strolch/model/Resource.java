@@ -33,11 +33,11 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class Resource extends GroupedParameterizedElement
-		implements StrolchRootElement, Comparable<Resource>, PolicyContainer {
+public class Resource extends GroupedParameterizedElement implements StrolchRootElement, Comparable<Resource> {
 
 	private static final long serialVersionUID = 0L;
 
+	protected Version version;
 	protected Map<String, StrolchTimedState<IValue<?>>> timedStateMap;
 	protected PolicyDefs policyDefs;
 
@@ -57,6 +57,18 @@ public class Resource extends GroupedParameterizedElement
 	 */
 	public Resource(String id, String name, String type) {
 		super(id, name, type);
+	}
+
+	@Override
+	public Version getVersion() {
+		return this.version;
+	}
+
+	@Override
+	public void setVersion(Version version) throws IllegalArgumentException, IllegalStateException {
+		if (this.version != null)
+			this.version.validateIsNext(version);
+		this.version = version;
 	}
 
 	@SuppressWarnings("unchecked")

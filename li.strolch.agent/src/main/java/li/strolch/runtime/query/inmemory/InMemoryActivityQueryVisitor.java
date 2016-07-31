@@ -22,21 +22,19 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.ActivityQueryVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.persistence.api.ActivityDao;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InMemoryActivityQueryVisitor extends InMemoryQueryVisitor<Activity, ActivityDao> implements
-		ActivityQueryVisitor {
+public class InMemoryActivityQueryVisitor extends InMemoryQueryVisitor<Activity> implements ActivityQueryVisitor {
 
 	public InMemoryActivityQueryVisitor() {
 		super();
 	}
 
 	@Override
-	protected InMemoryQueryVisitor<Activity, ActivityDao> newInstance() {
+	protected InMemoryQueryVisitor<Activity> newInstance() {
 		return new InMemoryActivityQueryVisitor();
 	}
 

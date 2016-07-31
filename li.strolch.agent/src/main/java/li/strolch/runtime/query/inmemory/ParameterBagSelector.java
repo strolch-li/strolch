@@ -15,12 +15,12 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import li.strolch.model.GroupedParameterizedElement;
+import li.strolch.model.StrolchRootElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ParameterBagSelector<T extends GroupedParameterizedElement> implements Selector<T> {
+public class ParameterBagSelector<T extends StrolchRootElement> implements Selector<T> {
 
 	protected String bagKey;
 
@@ -33,7 +33,7 @@ public class ParameterBagSelector<T extends GroupedParameterizedElement> impleme
 		return element.hasParameterBag(this.bagKey);
 	}
 
-	public static class NullParameterBagSelector<T extends GroupedParameterizedElement> extends ParameterBagSelector<T> {
+	public static class NullParameterBagSelector<T extends StrolchRootElement> extends ParameterBagSelector<T> {
 
 		public NullParameterBagSelector(String bagKey) {
 			super(bagKey);

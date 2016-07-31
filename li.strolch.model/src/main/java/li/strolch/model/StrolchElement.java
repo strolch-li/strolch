@@ -30,7 +30,7 @@ public interface StrolchElement extends Serializable {
 	public Locator getLocator();
 
 	/**
-	 * Set the semi unique id of this {@link StrolchElement}. This value should be unique under all concrete
+	 * Set the semi unique id of this {@link StrolchElement}. This value should be unique for all concrete
 	 * implementations of this interface
 	 *
 	 * @param id
@@ -38,7 +38,7 @@ public interface StrolchElement extends Serializable {
 	public void setId(String id);
 
 	/**
-	 * Returns the semi unique id of this {@link StrolchElement}. This value should be unique under all concrete
+	 * Returns the semi unique id of this {@link StrolchElement}. This value should be unique for all concrete
 	 * implementations of this interface
 	 *
 	 * @return

@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.xmlpers.api.PersistenceTransaction;
@@ -28,12 +28,13 @@ import li.strolch.xmlpers.objref.IdOfSubTypeRef;
 import li.strolch.xmlpers.objref.SubTypeRef;
 import li.strolch.xmlpers.objref.TypeRef;
 
-public abstract class AbstractDao<T extends StrolchElement> implements StrolchDao<T> {
+public abstract class AbstractDao<T extends StrolchRootElement> implements StrolchDao<T> {
 
+	private XmlStrolchTransaction strolchTx;
 	protected PersistenceTransaction tx;
 
 	protected AbstractDao(StrolchTransaction tx) {
-		XmlStrolchTransaction strolchTx = (XmlStrolchTransaction) tx;
+		this.strolchTx = (XmlStrolchTransaction) tx;
 		this.tx = strolchTx.getTx();
 	}
 

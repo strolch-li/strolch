@@ -26,11 +26,11 @@ import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.PolicyContainer;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.Version;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.dbc.DBC;
@@ -42,10 +42,11 @@ import li.strolch.utils.dbc.DBC;
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class Activity extends GroupedParameterizedElement
-		implements IActivityElement, StrolchRootElement, Comparable<Activity>, PolicyContainer {
+		implements IActivityElement, StrolchRootElement, Comparable<Activity> {
 
 	private static final long serialVersionUID = 1L;
 
+	private Version version;
 	protected Activity parent;
 	protected Map<String, IActivityElement> elements;
 	protected PolicyDefs policyDefs;
@@ -57,8 +58,29 @@ public class Activity extends GroupedParameterizedElement
 		super();
 	}
 
+	/**
+	 * Default constructor
+	 *
+	 * @param id
+	 * @param name
+	 * @param type
+	 */
 	public Activity(String id, String name, String type) {
 		super(id, name, type);
+	}
+
+	@Override
+	public Version getVersion() {
+		return this.version;
+	}
+
+	@Override
+	public void setVersion(Version version) throws IllegalArgumentException, IllegalStateException {
+		if (!this.isRootElement())
+			throw new IllegalStateException("Can't set the version on non root of " + getLocator());
+		if (this.version != null)
+			this.version.validateIsNext(version);
+		this.version = version;
 	}
 
 	private void initElements() {

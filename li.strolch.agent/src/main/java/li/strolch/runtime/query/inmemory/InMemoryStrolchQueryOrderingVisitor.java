@@ -17,7 +17,7 @@ package li.strolch.runtime.query.inmemory;
 
 import java.util.Comparator;
 
-import li.strolch.model.GroupedParameterizedElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.query.ordering.ByIdComparator;
 import li.strolch.model.query.ordering.ByNameComparator;
 import li.strolch.model.query.ordering.ByParamComparator;
@@ -29,8 +29,7 @@ import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InMemoryStrolchQueryOrderingVisitor<T extends GroupedParameterizedElement> implements
-		StrolchQueryOrderingVisitor {
+public class InMemoryStrolchQueryOrderingVisitor<T extends StrolchRootElement> implements StrolchQueryOrderingVisitor {
 
 	private Comparator<T> comparator;
 

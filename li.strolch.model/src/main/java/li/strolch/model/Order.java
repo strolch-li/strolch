@@ -33,11 +33,11 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class Order extends GroupedParameterizedElement
-		implements StrolchRootElement, Comparable<Order>, PolicyContainer {
+public class Order extends GroupedParameterizedElement implements StrolchRootElement, Comparable<Order> {
 
 	private static final long serialVersionUID = 0L;
 
+	protected Version version;
 	protected Date date;
 	protected State state;
 	protected PolicyDefs policyDefs;
@@ -79,6 +79,18 @@ public class Order extends GroupedParameterizedElement
 		setDate(date);
 	}
 
+	@Override
+	public Version getVersion() {
+		return this.version;
+	}
+
+	@Override
+	public void setVersion(Version version) throws IllegalArgumentException, IllegalStateException {
+		if (this.version != null)
+			this.version.validateIsNext(version);
+		this.version = version;
+	}
+
 	public Date getDate() {
 		return this.date;
 	}
@@ -96,7 +108,7 @@ public class Order extends GroupedParameterizedElement
 	}
 
 	@Override
-	public PolicyDefs getPolicyDefs() {
+	public PolicyDefs getPolicyDefs() throws StrolchPolicyException {
 		if (this.policyDefs == null)
 			throw new StrolchPolicyException(getLocator() + " has no Policies defined!");
 		return this.policyDefs;

@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import li.strolch.model.GroupedParameterizedElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.query.AndSelection;
 import li.strolch.model.query.BooleanSelection;
 import li.strolch.model.query.IdSelection;
@@ -50,7 +50,6 @@ import li.strolch.model.query.ordering.OrderById;
 import li.strolch.model.query.ordering.OrderByName;
 import li.strolch.model.query.ordering.OrderByParameter;
 import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
-import li.strolch.persistence.api.StrolchDao;
 import li.strolch.runtime.query.inmemory.ParameterBagSelector.NullParameterBagSelector;
 import li.strolch.runtime.query.inmemory.ParameterSelector.StringParameterSelector;
 import li.strolch.utils.dbc.DBC;
@@ -58,11 +57,11 @@ import li.strolch.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement, S extends StrolchDao<?>>
+public abstract class InMemoryQueryVisitor<T extends StrolchRootElement>
 		implements StrolchRootElementSelectionVisitor, ParameterSelectionVisitor, StrolchQueryOrderingVisitor {
 
-	private Comparator<T> comparator;
 	private Navigator<T> navigator;
+	private Comparator<T> comparator;
 	private List<Selector<T>> selectors;
 	private boolean any;
 
@@ -94,7 +93,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	 * 
 	 * @return a new instance of this concrete type
 	 */
-	protected abstract InMemoryQueryVisitor<T, S> newInstance();
+	protected abstract InMemoryQueryVisitor<T> newInstance();
 
 	private void assertNotAny() {
 		DBC.INTERIM.assertFalse("Not allowed to use further Selections with Any!", this.any); //$NON-NLS-1$
@@ -115,7 +114,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	@Override
 	public void visitAnd(AndSelection andSelection) {
 		assertNotAny();
-		InMemoryQueryVisitor<T, S> query = newInstance();
+		InMemoryQueryVisitor<T> query = newInstance();
 		List<Selection> selections = andSelection.getSelections();
 		for (Selection selection : selections) {
 			selection.accept(query);
@@ -127,7 +126,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	@Override
 	public void visitOr(OrSelection orSelection) {
 		assertNotAny();
-		InMemoryQueryVisitor<T, S> query = newInstance();
+		InMemoryQueryVisitor<T> query = newInstance();
 		List<Selection> selections = orSelection.getSelections();
 		for (Selection selection : selections) {
 			selection.accept(query);
@@ -139,7 +138,7 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	@Override
 	public void visitNot(NotSelection notSelection) {
 		assertNotAny();
-		InMemoryQueryVisitor<T, S> query = newInstance();
+		InMemoryQueryVisitor<T> query = newInstance();
 		List<Selection> selections = notSelection.getSelections();
 		for (Selection selection : selections) {
 			selection.accept(query);
@@ -261,19 +260,19 @@ public abstract class InMemoryQueryVisitor<T extends GroupedParameterizedElement
 	}
 
 	@Override
-	public InMemoryQueryVisitor<T, S> visit(OrderById ordering) {
+	public InMemoryQueryVisitor<T> visit(OrderById ordering) {
 		this.comparator = new InMemoryStrolchQueryOrderingVisitor<T>().visit(ordering).getComparator();
 		return this;
 	}
 
 	@Override
-	public InMemoryQueryVisitor<T, S> visit(OrderByName ordering) {
+	public InMemoryQueryVisitor<T> visit(OrderByName ordering) {
 		this.comparator = new InMemoryStrolchQueryOrderingVisitor<T>().visit(ordering).getComparator();
 		return this;
 	}
 
 	@Override
-	public InMemoryQueryVisitor<T, S> visit(OrderByParameter ordering) {
+	public InMemoryQueryVisitor<T> visit(OrderByParameter ordering) {
 		this.comparator = new InMemoryStrolchQueryOrderingVisitor<T>().visit(ordering).getComparator();
 		return this;
 	}

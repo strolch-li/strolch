@@ -22,21 +22,20 @@ import li.strolch.model.ResourceVisitor;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.ResourceQueryVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.persistence.api.ResourceDao;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource, ResourceDao> implements
-		ResourceQueryVisitor {
+public class InMemoryResourceQueryVisitor extends InMemoryQueryVisitor<Resource>
+		implements ResourceQueryVisitor {
 
 	public InMemoryResourceQueryVisitor() {
 		super();
 	}
 
 	@Override
-	protected InMemoryQueryVisitor<Resource, ResourceDao> newInstance() {
+	protected InMemoryQueryVisitor<Resource> newInstance() {
 		return new InMemoryResourceQueryVisitor();
 	}
 

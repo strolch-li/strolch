@@ -5,12 +5,12 @@ package li.strolch.model.query.ordering;
 
 import java.util.Comparator;
 
-import li.strolch.model.GroupedParameterizedElement;
+import li.strolch.model.StrolchRootElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ByIdComparator<T extends GroupedParameterizedElement> implements Comparator<T> {
+public class ByIdComparator<T extends StrolchRootElement> implements Comparator<T> {
 
 	private boolean ascending;
 

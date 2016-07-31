@@ -45,7 +45,7 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 
 @SuppressWarnings("nls")
-public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao {
+public class PostgreSqlOrderDao extends PostgresqlXmlDao<Order> implements OrderDao {
 
 	public static final String ORDERS = "orders";
 
@@ -70,16 +70,16 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 			parser.parse(binaryStream, new XmlModelSaxReader(listener));
 		} catch (SQLException | IOException | SAXException | ParserConfigurationException e) {
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"Failed to extract Order from sqlxml value for {0} / {1}", id, type), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to extract Order from sqlxml value for {0} / {1}", id, type), e);
 		}
 
 		if (listener.getOrders().size() == 0)
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"No Orders parsed from sqlxml value for {0} / {1}", id, type));
+			throw new StrolchPersistenceException(
+					MessageFormat.format("No Orders parsed from sqlxml value for {0} / {1}", id, type));
 		if (listener.getOrders().size() > 1)
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"Multiple Orders parsed from sqlxml value for {0} / {1}", id, type));
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Multiple Orders parsed from sqlxml value for {0} / {1}", id, type));
 
 		return listener.getOrders().get(0);
 	}

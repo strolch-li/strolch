@@ -30,7 +30,7 @@ import li.strolch.utils.helper.StringHelper;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class GroupedParameterizedElement extends AbstractStrolchElement {
+public abstract class GroupedParameterizedElement extends AbstractStrolchElement implements ParameterBagContainer {
 
 	private static final long serialVersionUID = 0L;
 

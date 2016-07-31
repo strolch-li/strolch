@@ -49,6 +49,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.Version;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
@@ -85,6 +86,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private boolean suppressUpdates;
 	private boolean suppressAudits;
 	private boolean suppressDoNothingLogging;
+	private boolean versioningEnabled;
 	private TransactionResult txResult;
 
 	private List<Command> commands;
@@ -207,6 +209,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public boolean isSuppressAudits() {
 		return this.suppressAudits;
+	}
+
+	@Override
+	public void setVersioningEnabled(boolean versioningEnabled) {
+		this.versioningEnabled = versioningEnabled;
+	}
+
+	@Override
+	public boolean isVersioningEnabled() {
+		return this.versioningEnabled;
 	}
 
 	@Override
@@ -902,6 +914,15 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		audit.setAccessType(accessType);
 
 		return audit;
+	}
+
+	@Override
+	public void updateVersionFor(StrolchRootElement element, boolean deleted) {
+		if (this.versioningEnabled) {
+			int v = element.getVersion() == null ? 0 : element.getVersion().getVersion() + 1;
+			Version version = new Version(element.getLocator(), v, this.certificate.getUsername(), deleted);
+			element.setVersion(version);
+		}
 	}
 
 	/**

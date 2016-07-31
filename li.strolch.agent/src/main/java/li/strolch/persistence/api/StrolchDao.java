@@ -18,12 +18,12 @@ package li.strolch.persistence.api;
 import java.util.List;
 import java.util.Set;
 
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchDao<T extends StrolchElement> {
+public interface StrolchDao<T extends StrolchRootElement> {
 
 	public Set<String> queryKeySet();
 

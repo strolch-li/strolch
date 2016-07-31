@@ -25,13 +25,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionResult;
 
 @SuppressWarnings("nls")
-public abstract class PostgresqlDao<T extends StrolchElement> implements StrolchDao<T> {
+public abstract class PostgresqlDao<T extends StrolchRootElement> implements StrolchDao<T> {
 
 	protected PostgreSqlStrolchTransaction tx;
 	protected List<DaoCommand> commands;
