@@ -29,6 +29,7 @@ import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 import li.strolch.utils.Version;
+import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
 
 /**
@@ -74,7 +75,6 @@ public class PerformancePostgreSqlTest extends PerformanceTest {
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
-		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
 		runtimeMock.startContainer();
 	}
 
@@ -82,5 +82,10 @@ public class PerformancePostgreSqlTest extends PerformanceTest {
 	public static void afterClass() {
 		if (runtimeMock != null)
 			runtimeMock.destroyRuntime();
+
+		File rootPath = new File(RUNTIME_PATH);
+		if (rootPath.exists()) {
+			FileHelper.deleteFile(rootPath, false);
+		}
 	}
 }

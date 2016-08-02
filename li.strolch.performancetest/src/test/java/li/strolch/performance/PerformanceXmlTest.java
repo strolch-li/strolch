@@ -21,6 +21,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import li.strolch.testbase.runtime.RuntimeMock;
+import li.strolch.utils.helper.FileHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -53,5 +54,10 @@ public class PerformanceXmlTest extends PerformanceTest {
 	public static void afterClass() {
 		if (runtimeMock != null)
 			runtimeMock.destroyRuntime();
+
+		File rootPath = new File(RUNTIME_PATH);
+		if (rootPath.exists()) {
+			FileHelper.deleteFile(rootPath, false);
+		}
 	}
 }
