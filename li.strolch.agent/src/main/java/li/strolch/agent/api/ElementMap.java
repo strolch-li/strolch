@@ -23,32 +23,105 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.persistence.api.StrolchDao;
+import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 
 /**
+ * <p>
+ * The {@link ElementMap} is the entry point to the Strolch model. Any access to Strolch objects is done using the
+ * {@link ElementMap}. A concrete {@link ElementMap} instance uses the given {@link StrolchTransaction} to access the a
+ * {@link StrolchDao} and perform the relevant operation.
+ * </p>
+ * 
+ * <p>
+ * <b>Note:</b>
+ * </p>
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
+ *
+ * @param <T>
+ *            the object instance being managed
  */
 public interface ElementMap<T extends StrolchRootElement> {
 
+	/**
+	 * Returns true if the underlying persistence layer has elements with the given type
+	 * 
+	 * @param tx
+	 *            the open {@link StrolchTransaction}
+	 * @param type
+	 *            the type of element to check for
+	 * 
+	 * @return true if the underlying persistence layer has elements with the given type
+	 */
 	public boolean hasType(StrolchTransaction tx, String type);
 
+	/**
+	 * Returns true if the underlying persistence layer has an element with the given type and ID
+	 * 
+	 * @param tx
+	 *            the open {@link StrolchTransaction}
+	 * @param type
+	 *            the type of element to check for
+	 * @param id
+	 *            the ID of the element to check for
+	 * 
+	 * @return true if the underlying persistence layer has an element with the given type and ID
+	 */
 	public boolean hasElement(StrolchTransaction tx, String type, String id);
 
+	/**
+	 * Returns the number of elements regardless of type in the underlying persistence layer
+	 * 
+	 * @param tx
+	 *            the open {@link StrolchTransaction}
+	 * 
+	 * @return the number of elements regardless of type in the underlying persistence layer
+	 */
 	public long querySize(StrolchTransaction tx);
 
+	/**
+	 * Returns the number of elements of the given type in the underlying persistence layer
+	 * 
+	 * @param tx
+	 *            the open {@link StrolchTransaction}
+	 * @param type
+	 *            the type of element for which the number of elements is to be queried
+	 * 
+	 * @return the number of elements of the given type in the underlying persistence layer
+	 */
 	public long querySize(StrolchTransaction tx, String type);
 
 	/**
-	 * Returns the element with the type "Template" and the id = type
+	 * Returns a copy of the element with the type "Template" and the id = type
 	 * 
 	 * @param tx
 	 *            the open {@link StrolchTransaction}
 	 * @param type
 	 *            The template id to return
+	 * 
 	 * @return the template, or null if it does not exist
 	 */
 	public T getTemplate(StrolchTransaction tx, String type);
+
+	/**
+	 * Returns a copy of the element with the type "Template" and the id = type
+	 * 
+	 * @param tx
+	 *            the open {@link StrolchTransaction}
+	 * @param type
+	 *            The template id to return
+	 * @param assertExists
+	 *            if true, and element does not exist, then a {@link StrolchException} is thrown
+	 * 
+	 * @return the template, or null if it does not exist
+	 * 
+	 * @throws StrolchException
+	 *             if the template does not exist
+	 */
+	public T getTemplate(StrolchTransaction tx, String type, boolean assertExists) throws StrolchException;
 
 	/**
 	 * Retrieves the element with the given type and id, or null if it does not exist
@@ -63,6 +136,63 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @return the element with the type and id, or null if it does not exist
 	 */
 	public T getBy(StrolchTransaction tx, String type, String id);
+
+	/**
+	 * Retrieves the element with the given type and id, or null if it does not exist
+	 * 
+	 * @param tx
+	 *            the open transaction
+	 * @param type
+	 *            the type of the element to retrieve
+	 * @param id
+	 *            the id of the element to retrieve
+	 * @param assertExists
+	 *            if true, and element does not exist, then a {@link StrolchException} is thrown
+	 * 
+	 * @return the element with the type and id, or null if it does not exist
+	 * 
+	 * @throws StrolchException
+	 *             if the element does not exist
+	 */
+	public T getBy(StrolchTransaction tx, String type, String id, boolean assertExists) throws StrolchException;
+
+	/**
+	 * Retrieves the specific version of the element with the given type and id, or null if it does not exist
+	 * 
+	 * @param tx
+	 *            the open transaction
+	 * @param type
+	 *            the type of the element to retrieve
+	 * @param id
+	 *            the id of the element to retrieve
+	 * @param version
+	 *            the version to get
+	 * 
+	 * @return the element with the type and id, or null if it does not exist
+	 */
+	public T getBy(StrolchTransaction tx, String type, String id, int version);
+
+	/**
+	 * Retrieves the specific version of the element with the given type and id, or null if it does not exist
+	 * 
+	 * @param tx
+	 *            the open transaction
+	 * @param type
+	 *            the type of the element to retrieve
+	 * @param id
+	 *            the id of the element to retrieve
+	 * @param version
+	 *            the version to get
+	 * @param assertExists
+	 *            if true, and element does not exist, then a {@link StrolchException} is thrown
+	 * 
+	 * @return the element with the type and id, or null if it does not exist
+	 * 
+	 * @throws StrolchException
+	 *             if the element does not exist
+	 */
+	public T getBy(StrolchTransaction tx, String type, String id, int version, boolean assertExists)
+			throws StrolchException;
 
 	/**
 	 * Returns the element which is referenced by the given {@link StringParameter}. A reference {@link Parameter} must
@@ -105,29 +235,264 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 */
 	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists) throws StrolchException;
 
+	/**
+	 * Queries and returns all the versions of the element with the given type and ID
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param type
+	 *            the type of the element to be queried
+	 * @param id
+	 *            the id of the element to be queried
+	 * 
+	 * @return all the versions of the element with the given type and ID
+	 */
+	public List<T> getVersionsFor(StrolchTransaction tx, String type, String id);
+
+	/**
+	 * Returns all elements in the underlying persistence layer regardless of type
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * 
+	 * @return all elements in the underlying persistence layer regardless of type
+	 */
 	public List<T> getAllElements(StrolchTransaction tx);
 
+	/**
+	 * Returns all elements in the underlying persistence layer of the given type
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * 
+	 * @param type
+	 *            the type of the elements to retrieve
+	 * 
+	 * @return all elements in the underlying persistence layer of the given type
+	 */
 	public List<T> getElementsBy(StrolchTransaction tx, String type);
 
+	/**
+	 * Returns all the types known in the underlying persistence layer
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * 
+	 * @return all the types known in the underlying persistence layer
+	 */
 	public Set<String> getTypes(StrolchTransaction tx);
 
+	/**
+	 * Returns all keys/IDs of all elements in the underlying persistence layer, regardless of type
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * 
+	 * @return all keys/IDs of all elements in the underlying persistence layer, regardless of type
+	 */
 	public Set<String> getAllKeys(StrolchTransaction tx);
 
+	/**
+	 * Returns all keys/IDs of all elements in the underlying persistence layer, of the given type
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param type
+	 *            the type of the element to retrieve the keys for
+	 * 
+	 * @return all keys/IDs of all elements in the underlying persistence layer, of the given type
+	 */
 	public Set<String> getKeysBy(StrolchTransaction tx, String type);
 
-	public void add(StrolchTransaction tx, T element);
+	/**
+	 * Adds the given element to the underlying persistence layer. The element may not already exist
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param element
+	 *            the element to add
+	 * 
+	 * @throws StrolchPersistenceException
+	 *             if an element already exists with the same ID
+	 */
+	public void add(StrolchTransaction tx, T element) throws StrolchPersistenceException;
 
-	public void addAll(StrolchTransaction tx, List<T> elements);
+	/**
+	 * Adds the given elements to the underlying persistence layer. None of the elements may already exist
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param elements
+	 *            the elements to add
+	 * 
+	 * @throws StrolchPersistenceException
+	 *             if an element already exists with the same ID
+	 */
+	public void addAll(StrolchTransaction tx, List<T> elements) throws StrolchPersistenceException;
 
-	public T update(StrolchTransaction tx, T element);
+	/**
+	 * Updates the existing element
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param element
+	 *            the element to update
+	 * 
+	 * @return the replaced element
+	 * 
+	 * @throws StrolchPersistenceException
+	 *             if the element does not exist
+	 */
+	public void update(StrolchTransaction tx, T element) throws StrolchPersistenceException;
 
-	public List<T> updateAll(StrolchTransaction tx, List<T> elements);
+	/**
+	 * Updates all the existing elements
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param elements
+	 *            the elements to update
+	 * 
+	 * @return the replaced elements
+	 * 
+	 * @throws StrolchPersistenceException
+	 *             if any of the elements don't yet exist
+	 */
+	public void updateAll(StrolchTransaction tx, List<T> elements) throws StrolchPersistenceException;
 
-	public void remove(StrolchTransaction tx, T element);
+	/**
+	 * Removes the given element
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param element
+	 *            the element to be removed
+	 * 
+	 * @throws StrolchPersistenceException
+	 *             if the element does not exist
+	 */
+	public void remove(StrolchTransaction tx, T element) throws StrolchPersistenceException;
 
-	public void removeAll(StrolchTransaction tx, List<T> elements);
+	/**
+	 * Removes the given elements
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param elements
+	 *            the elements to be removed
+	 * 
+	 * @throws StrolchPersistenceException
+	 *             if any of the elements don't yet exist
+	 */
+	public void removeAll(StrolchTransaction tx, List<T> elements) throws StrolchPersistenceException;
 
+	/**
+	 * <p>
+	 * Removes all elements regardless of the type
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Note:</b> This method ignores versioning. Do NOT call this method unless you want to clear the model!
+	 * </p>
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * 
+	 * @return the number of elements removed
+	 */
 	public long removeAll(StrolchTransaction tx);
 
+	/**
+	 * <p>
+	 * Removes all elements of the given type
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Note:</b> This method ignores versioning. Do NOT call this method unless you want to clear the model!
+	 * </p>
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param type
+	 *            the type of elements to remove
+	 * 
+	 * @return the number of elements removed
+	 */
 	public long removeAllBy(StrolchTransaction tx, String type);
+
+	/**
+	 * <p>
+	 * Undoes the given version by reverting to the previous version of the element given. If the element given is the
+	 * first version, then the element is removed. If the previous version exists, then it is reverted to it. If the
+	 * given element does not exist, nor it's previous version, then a {@link StrolchPersistenceException} is thrown
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Note:</b> This method should only be used in the same transaction where the element was created to undo a
+	 * change in the same transaction. If there is a requirement to revert to a previous version, then the
+	 * {@link #revertToVersion(StrolchTransaction, StrolchRootElement)} method.
+	 * </p>
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param element
+	 *            the element which is to be reverted to a previous version
+	 * 
+	 * @throws StrolchException
+	 *             if the version does not exist, if this version is not the latest version, if the previous version is
+	 *             missing or other problems arise
+	 */
+	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException;
+
+	/**
+	 * <p>
+	 * Reverts to the given version of the specified element. This method will retrieve the given version of the
+	 * specified element, then set a new version on that element which is an increment of the current latest version and
+	 * store this new version. The new element is then returned for convenience.
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Note:</b> This is the method which should be called when a change should be reverted. This method gurantees
+	 * that the history is not changed and that a new version is saved but with the version of the element specified.
+	 * </p>
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param element
+	 *            the version of the element to revert to
+	 * 
+	 * @return the new version of the element
+	 * 
+	 * @throws StrolchException
+	 *             if the version does not exist
+	 */
+	public T revertToVersion(StrolchTransaction tx, T element) throws StrolchException;
+
+	/**
+	 * <p>
+	 * Reverts to the given version of the specified element. This method will retrieve the given version of the
+	 * specified element, then set a new version on that element which is an increment of the current latest version and
+	 * store this new version. The new element is then returned for convenience.
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Note:</b> This is the method which should be called when a change should be reverted. This method gurantees
+	 * that the history is not changed and that a new version is saved but with the version of the element specified.
+	 * </p>
+	 * 
+	 * @param tx
+	 *            the {@link StrolchTransaction} instance
+	 * @param type
+	 *            the type of the element to revert to
+	 * @param id
+	 *            the id of the element to revert to
+	 * @param version
+	 *            the version of the specified element to revert to
+	 * 
+	 * @return the new version of the element
+	 * 
+	 * @throws StrolchException
+	 *             if the version does not exist
+	 */
+	public T revertToVersion(StrolchTransaction tx, String type, String id, int version) throws StrolchException;
 }

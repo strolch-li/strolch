@@ -15,14 +15,14 @@
  */
 package li.strolch.testbase.runtime;
 
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractModelTest {
 
@@ -98,8 +98,42 @@ public abstract class AbstractModelTest {
 	}
 
 	@Test
+	public void shouldCreateActivities() {
+
+		ActivityModelTestRunner testRunner = new ActivityModelTestRunner(getRuntimeMock(), this.realmName);
+		testRunner.runCreateActivityTest();
+	}
+
+	@Test
+	public void shouldQueryActivitySizes() {
+
+		ActivityModelTestRunner testRunner = new ActivityModelTestRunner(getRuntimeMock(), this.realmName);
+		testRunner.runQuerySizeTest();
+	}
+
+	@Test
+	public void shouldActivityCrud() {
+
+		ActivityModelTestRunner testRunner = new ActivityModelTestRunner(getRuntimeMock(), this.realmName);
+		testRunner.runCrudTests();
+	}
+
+	@Test
+	public void shouldActivityPerformBulkOperations() {
+
+		ActivityModelTestRunner testRunner = new ActivityModelTestRunner(getRuntimeMock(), this.realmName);
+		testRunner.runBulkOperationTests();
+	}
+
+	@Test
 	public void shouldTestAudits() {
 		AuditModelTestRunner testRunner = new AuditModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runTestForAudits();
+	}
+
+	@Test
+	public void shouldTestVersioning() {
+		VersioningTestRunner testRunner = new VersioningTestRunner(getRuntimeMock());
+		testRunner.runTestsForVersioning();
 	}
 }

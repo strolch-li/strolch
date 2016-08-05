@@ -16,6 +16,7 @@
 package li.strolch.command;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -32,7 +33,8 @@ import li.strolch.utils.dbc.DBC;
 public class UpdateOrderCollectionCommand extends Command {
 
 	private List<Order> orders;
-	private List<Order> replacedElements;
+	private List<Order> replaced;
+	private boolean updated;
 
 	/**
 	 * @param tx
@@ -62,22 +64,32 @@ public class UpdateOrderCollectionCommand extends Command {
 		}
 
 		OrderMap orderMap = tx().getOrderMap();
+		this.replaced = new ArrayList<>();
 		for (Order order : this.orders) {
-			if (!orderMap.hasElement(tx(), order.getType(), order.getId())) {
+			Order o = orderMap.getBy(tx(), order.getType(), order.getId());
+			if (o == null) {
 				String msg = "The Order {0} can not be updated as it does not exist!";
 				msg = MessageFormat.format(msg, order.getLocator());
 				throw new StrolchException(msg);
 			}
+
+			this.replaced.add(o);
 		}
 
-		this.replacedElements = orderMap.updateAll(tx(), this.orders);
+		orderMap.updateAll(tx(), this.orders);
+		this.updated = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.replacedElements != null && tx().isRollingBack()) {
-			OrderMap orderMap = tx().getOrderMap();
-			orderMap.updateAll(tx(), this.replacedElements);
+		if (this.updated && tx().isRollingBack()) {
+			if (tx().isVersioningEnabled()) {
+				for (Order order : this.orders) {
+					tx().getOrderMap().undoVersion(tx(), order);
+				}
+			} else {
+				tx().getOrderMap().updateAll(tx(), this.replaced);
+			}
 		}
 	}
 }

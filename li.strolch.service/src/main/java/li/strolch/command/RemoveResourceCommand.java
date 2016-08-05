@@ -31,6 +31,7 @@ import li.strolch.utils.dbc.DBC;
 public class RemoveResourceCommand extends Command {
 
 	private Resource resource;
+	private boolean removed;
 
 	/**
 	 * @param tx
@@ -65,14 +66,16 @@ public class RemoveResourceCommand extends Command {
 		}
 
 		resourceMap.remove(tx(), this.resource);
+		this.removed = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.resource != null && tx().isRollingBack()) {
-			ResourceMap resourceMap = tx().getResourceMap();
-			if (!resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId()))
-				resourceMap.add(tx(), this.resource);
+		if (this.resource != null && tx().isRollingBack() && this.removed) {
+			if (tx().isVersioningEnabled())
+				tx().getResourceMap().undoVersion(tx(), this.resource);
+			else
+				tx().getResourceMap().add(tx(), this.resource);
 		}
 	}
 }

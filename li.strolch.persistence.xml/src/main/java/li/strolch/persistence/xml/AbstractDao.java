@@ -22,6 +22,7 @@ import java.util.Set;
 
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchDao;
+import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.objref.IdOfSubTypeRef;
@@ -105,6 +106,18 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 	}
 
 	@Override
+	public T queryBy(String type, String id, int version) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<T> queryVersionsFor(String type, String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public List<T> queryAll() {
 		List<T> objects = new ArrayList<>();
 		Set<String> types = queryTypes();
@@ -162,5 +175,11 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 	public long removeAllBy(String type) {
 		SubTypeRef typeRef = getTypeRef(type);
 		return this.tx.getObjectDao().removeAllBy(typeRef);
+	}
+
+	@Override
+	public void removeVersion(T element) throws StrolchPersistenceException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("not yet implemented!");
 	}
 }

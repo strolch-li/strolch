@@ -15,6 +15,7 @@
  */
 package li.strolch.model.activity;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -78,8 +79,12 @@ public class Activity extends GroupedParameterizedElement
 	public void setVersion(Version version) throws IllegalArgumentException, IllegalStateException {
 		if (!this.isRootElement())
 			throw new IllegalStateException("Can't set the version on non root of " + getLocator());
-		if (this.version != null)
-			this.version.validateIsNext(version);
+
+		if (version != null && !getLocator().equals(version.getLocator())) {
+			String msg = "Illegal version as locator is not same: Element: {0} Version: {1}";
+			throw new IllegalArgumentException(MessageFormat.format(msg, getLocator(), version));
+		}
+
 		this.version = version;
 	}
 
@@ -260,6 +265,7 @@ public class Activity extends GroupedParameterizedElement
 	@Override
 	public Activity getClone() {
 		Activity clone = new Activity();
+
 		super.fillClone(clone);
 
 		if (this.elements == null)

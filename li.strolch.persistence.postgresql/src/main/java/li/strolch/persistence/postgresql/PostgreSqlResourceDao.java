@@ -21,14 +21,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLXML;
+import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
+
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
@@ -38,9 +43,6 @@ import li.strolch.model.xml.SimpleStrolchElementListener;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
-
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
 public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements ResourceDao {
@@ -68,16 +70,16 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 			parser.parse(binaryStream, new XmlModelSaxReader(listener));
 		} catch (SQLException | IOException | SAXException | ParserConfigurationException e) {
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"Failed to extract Resource from sqlxml value for {0} / {1}", id, type), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to extract Resource from sqlxml value for {0} / {1}", id, type), e);
 		}
 
 		if (listener.getResources().size() == 0)
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"No Resource parsed from sqlxml value for {0} / {1}", id, type));
+			throw new StrolchPersistenceException(
+					MessageFormat.format("No Resource parsed from sqlxml value for {0} / {1}", id, type));
 		if (listener.getResources().size() > 1)
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"Multiple Resources parsed from sqlxml value for {0} / {1}", id, type));
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Multiple Resources parsed from sqlxml value for {0} / {1}", id, type));
 
 		return listener.getResources().get(0);
 	}
@@ -94,14 +96,26 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 	@Override
 	protected void internalSave(final Resource res) {
-		String sql = "insert into " + getTableName() + " (id, name, type, asxml) values (?, ?, ?, ?)";
+		String sql = "insert into " + getTableName()
+				+ " (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, true, ?, ?, ?)";
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+
+			// id
 			preparedStatement.setString(1, res.getId());
-			preparedStatement.setString(2, res.getName());
-			preparedStatement.setString(3, res.getType());
+
+			// version
+			preparedStatement.setInt(2, res.getVersion().getVersion());
+			preparedStatement.setString(3, res.getVersion().getCreatedBy());
+			preparedStatement.setTimestamp(4, new Timestamp(res.getVersion().getCreatedAt().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(5, res.getVersion().isDeleted());
+
+			// attributes
+			preparedStatement.setString(6, res.getName());
+			preparedStatement.setString(7, res.getType());
 
 			SQLXML sqlxml = createSqlXml(res, preparedStatement);
-			preparedStatement.setSQLXML(4, sqlxml);
+			preparedStatement.setSQLXML(8, sqlxml);
 			try {
 				int modCount = preparedStatement.executeUpdate();
 				if (modCount != 1) {
@@ -117,24 +131,82 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			throw new StrolchPersistenceException(MessageFormat.format("Failed to insert Resource {0} due to {1}",
 					res.getLocator(), e.getLocalizedMessage()), e);
 		}
+
+		if (res.getVersion().isFirstVersion()) {
+			return;
+		}
+
+		// and set the previous version to not be latest anymore
+		sql = "update " + getTableName() + " SET latest = false WHERE id = ? AND version = ?";
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+
+			// primary key
+			preparedStatement.setString(1, res.getId());
+			preparedStatement.setInt(2, res.getVersion().getPreviousVersion());
+
+			int modCount = preparedStatement.executeUpdate();
+			if (modCount != 1) {
+				String msg = "Expected to update 1 previous element with id {0} and version {1} but SQL statement modified {2} elements!";
+				msg = MessageFormat.format(msg, res.getId(), res.getVersion().getPreviousVersion(), modCount);
+				throw new StrolchPersistenceException(msg);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to insert Resource {0} due to {1}",
+					res.getLocator(), e.getLocalizedMessage()), e);
+		}
 	}
 
 	@Override
 	protected void internalUpdate(final Resource resource) {
-		String sql = "update " + getTableName() + " set name = ?, type = ?, asxml = ? where id = ? ";
+
+		// with versioning we save a new object
+		if (tx().getRealm().isVersioningEnabled()) {
+			internalSave(resource);
+			return;
+		}
+
+		// make sure is first version when versioning is not enabled
+		if (!resource.getVersion().isFirstVersion()) {
+			throw new StrolchPersistenceException(MessageFormat.format(
+					"Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
+					resource.getVersion()));
+		}
+
+		// and also not marked as deleted!
+		if (resource.getVersion().isDeleted()) {
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Versioning is not enabled, so version can not be marked as deleted for {0}",
+							resource.getVersion()));
+		}
+
+		// now we update the existing object
+		String sql = "update " + getTableName()
+				+ " set created_by = ?, created_at = ?, deleted = ?, latest = true, name = ?, type = ?, asxml = ? where id = ? and version = ?";
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
-			preparedStatement.setString(1, resource.getName());
-			preparedStatement.setString(2, resource.getType());
-			preparedStatement.setString(4, resource.getId());
+			// version
+			preparedStatement.setString(1, resource.getVersion().getCreatedBy());
+			preparedStatement.setTimestamp(2, new Timestamp(resource.getVersion().getCreatedAt().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(3, resource.getVersion().isDeleted());
+
+			// attributes
+			preparedStatement.setString(4, resource.getName());
+			preparedStatement.setString(5, resource.getType());
 
 			SQLXML sqlxml = createSqlXml(resource, preparedStatement);
-			preparedStatement.setSQLXML(3, sqlxml);
+			preparedStatement.setSQLXML(6, sqlxml);
+
+			// primary key
+			preparedStatement.setString(7, resource.getId());
+			preparedStatement.setInt(8, resource.getVersion().getVersion());
+
 			try {
 				int modCount = preparedStatement.executeUpdate();
 				if (modCount != 1) {
-					String msg = "Expected to update 1 element with id {0} but SQL statement modified {1} elements!";
-					msg = MessageFormat.format(msg, resource.getId(), modCount);
+					String msg = "Expected to update 1 element with id {0} and version {1} but SQL statement modified {2} elements!";
+					msg = MessageFormat.format(msg, resource.getId(), resource.getVersion().getVersion(), modCount);
 					throw new StrolchPersistenceException(msg);
 				}
 			} finally {

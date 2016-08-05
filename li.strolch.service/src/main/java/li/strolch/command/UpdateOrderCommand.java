@@ -31,7 +31,8 @@ import li.strolch.utils.dbc.DBC;
 public class UpdateOrderCommand extends Command {
 
 	private Order order;
-	private Order replacedElement;
+	private Order replaced;
+	private boolean updated;
 
 	/**
 	 * @param tx
@@ -59,19 +60,24 @@ public class UpdateOrderCommand extends Command {
 		tx().lock(this.order);
 
 		OrderMap orderMap = tx().getOrderMap();
-		if (!orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
-			String msg = "The Order {0} can not be updated as it does not exist!";
+		this.replaced = orderMap.getBy(tx(), this.order.getType(), this.order.getId());
+		if (this.replaced == null) {
+			String msg = "The Order {0} can not be updated as it does not exist!!";
 			msg = MessageFormat.format(msg, this.order.getLocator());
 			throw new StrolchException(msg);
 		}
 
-		this.replacedElement = orderMap.update(tx(), this.order);
+		orderMap.update(tx(), this.order);
+		this.updated = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.replacedElement != null && tx().isRollingBack()) {
-			tx().getOrderMap().update(tx(), this.replacedElement);
+		if (this.updated && tx().isRollingBack()) {
+			if (tx().isVersioningEnabled())
+				tx().getOrderMap().undoVersion(tx(), this.order);
+			else
+				tx().getOrderMap().update(tx(), this.replaced);
 		}
 	}
 }

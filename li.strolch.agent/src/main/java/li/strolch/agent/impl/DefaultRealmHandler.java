@@ -39,6 +39,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	public static final String PROP_ENABLE_AUDIT_TRAIL = "enableAuditTrail"; //$NON-NLS-1$
 	public static final String PROP_ENABLE_AUDIT_TRAIL_FOR_READ = "enableAuditTrailForRead"; //$NON-NLS-1$
 	public static final String PROP_ENABLE_OBSERVER_UPDATES = "enableObserverUpdates"; //$NON-NLS-1$
+	public static final String PROP_ENABLE_VERSIONING = "enableVersioning"; //$NON-NLS-1$
 	public static final String PREFIX_DATA_STORE_MODE = "dataStoreMode"; //$NON-NLS-1$
 	public static final String PREFIX_DATA_STORE_FILE = "dataStoreFile"; //$NON-NLS-1$
 	public static final String PROP_REALMS = "realms"; //$NON-NLS-1$
@@ -76,9 +77,11 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 		this.realms = new HashMap<>();
 		String[] realms = configuration.getStringArray(PROP_REALMS, StrolchConstants.DEFAULT_REALM);
 		for (String realmName : realms) {
+
 			String dataStoreModeKey = StrolchConstants.makeRealmKey(realmName, PREFIX_DATA_STORE_MODE);
 			String realmMode = configuration.getString(dataStoreModeKey, null);
 			DataStoreMode dataStoreMode = DataStoreMode.parseDataStoreMode(realmMode);
+
 			InternalStrolchRealm realm = dataStoreMode.createRealm(realmName);
 			this.realms.put(realmName, realm);
 		}

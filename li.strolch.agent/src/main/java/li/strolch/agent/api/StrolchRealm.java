@@ -45,5 +45,7 @@ public interface StrolchRealm {
 
 	public boolean isUpdateObservers();
 
+	public boolean isVersioningEnabled();
+
 	public ObserverHandler getObserverHandler();
 }

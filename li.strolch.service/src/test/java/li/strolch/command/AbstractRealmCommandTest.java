@@ -22,8 +22,15 @@ import static li.strolch.service.test.AbstractRealmServiceTest.REALM_TRANSIENT;
 import static li.strolch.service.test.AbstractRealmServiceTest.RUNTIME_PATH;
 import static li.strolch.service.test.AbstractRealmServiceTest.dropSchema;
 import static li.strolch.service.test.AbstractRealmServiceTest.importFromXml;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
@@ -33,12 +40,6 @@ import li.strolch.service.api.Command;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -47,9 +48,6 @@ public abstract class AbstractRealmCommandTest {
 	protected static RuntimeMock runtimeMock;
 
 	protected static Certificate certificate;
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
@@ -80,17 +78,27 @@ public abstract class AbstractRealmCommandTest {
 
 	protected abstract Command getCommandInstance(ComponentContainer container, StrolchTransaction tx);
 
-	protected void doCommandAsFail(String realmName) {
-		this.expectedException.expect(RuntimeException.class);
-		this.expectedException.expectMessage("Fail on purpose after do command!");
+	protected abstract void validateAfterCommand(ComponentContainer container, StrolchTransaction tx);
 
+	protected abstract void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx);
+
+	protected void doCommandAsFail(String realmName) {
 		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
+		boolean caught = false;
 		try (StrolchTransaction tx = realm.openTx(certificate, "test")) {
 			Command command = getCommandInstance(runtimeMock.getContainer(), tx);
 			FailCommandFacade commandFacade = new FailCommandFacade(runtimeMock.getContainer(), tx, command);
 
 			tx.addCommand(commandFacade);
 			tx.commitOnClose();
+		} catch (RuntimeException e) {
+			assertThat(e.getMessage(), containsString("Fail on purpose after do command!"));
+			caught = true;
+		}
+		assertTrue(caught);
+
+		try (StrolchTransaction tx = realm.openTx(certificate, "test")) {
+			validateAfterCommandFailed(runtimeMock.getContainer(), tx);
 		}
 	}
 
@@ -101,21 +109,28 @@ public abstract class AbstractRealmCommandTest {
 			tx.addCommand(command);
 			tx.commitOnClose();
 		}
+
+		try (StrolchTransaction tx = realm.openTx(certificate, "test")) {
+			validateAfterCommand(runtimeMock.getContainer(), tx);
+		}
 	}
 
 	@Test
-	public void shouldFailCommandTransient() {
+	public void shouldDoCommandTransient() {
 		doCommandAsFail(REALM_TRANSIENT);
+		doCommand(REALM_TRANSIENT);
 	}
 
 	@Test
-	public void shouldFailCommandCached() {
+	public void shouldDoCommandCached() {
 		doCommandAsFail(REALM_CACHED);
+		doCommand(REALM_CACHED);
 	}
 
 	@Test
-	public void shouldFailCommandTransactional() {
+	public void shouldDoCommandTransactional() {
 		doCommandAsFail(REALM_TRANSACTIONAL);
+		doCommand(REALM_TRANSACTIONAL);
 	}
 
 	private class FailCommandFacade extends Command {

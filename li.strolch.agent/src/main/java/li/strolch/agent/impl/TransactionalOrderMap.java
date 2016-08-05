@@ -20,6 +20,7 @@ import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ORDER_REF;
 import java.util.List;
 
 import li.strolch.agent.api.OrderMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.OrderQuery;
@@ -27,6 +28,10 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
 public class TransactionalOrderMap extends TransactionalElementMap<Order> implements OrderMap {
+
+	public TransactionalOrderMap(StrolchRealm realm) {
+		super(realm);
+	}
 
 	@Override
 	protected void assertIsRefParam(Parameter<?> refP) {

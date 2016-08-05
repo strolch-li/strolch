@@ -49,7 +49,6 @@ import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
-import li.strolch.model.Version;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
@@ -67,7 +66,6 @@ import li.strolch.model.visitor.ElementTypeVisitor;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
@@ -86,7 +84,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private boolean suppressUpdates;
 	private boolean suppressAudits;
 	private boolean suppressDoNothingLogging;
-	private boolean versioningEnabled;
 	private TransactionResult txResult;
 
 	private List<Command> commands;
@@ -147,7 +144,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return this.realm.getRealm();
 	}
 
-	protected StrolchRealm getRealm() {
+	public StrolchRealm getRealm() {
 		return this.realm;
 	}
 
@@ -212,16 +209,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void setVersioningEnabled(boolean versioningEnabled) {
-		this.versioningEnabled = versioningEnabled;
-	}
-
-	@Override
-	public boolean isVersioningEnabled() {
-		return this.versioningEnabled;
-	}
-
-	@Override
 	public boolean isSuppressDoNothingLogging() {
 		return suppressDoNothingLogging;
 	}
@@ -229,6 +216,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void setSuppressDoNothingLogging(boolean quietDoNothing) {
 		this.suppressDoNothingLogging = quietDoNothing;
+	}
+
+	@Override
+	public boolean isVersioningEnabled() {
+		return this.realm.isVersioningEnabled();
 	}
 
 	@Override
@@ -407,22 +399,22 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Resource getResourceTemplate(String type) {
-		return getResourceBy(StrolchConstants.TEMPLATE, type);
+		return getResourceMap().getTemplate(this, type);
 	}
 
 	@Override
 	public Resource getResourceTemplate(String type, boolean assertExists) throws StrolchException {
-		return getResourceBy(StrolchConstants.TEMPLATE, type, assertExists);
+		return getResourceMap().getTemplate(this, type, assertExists);
 	}
 
 	@Override
 	public Order getOrderTemplate(String type) {
-		return getOrderBy(StrolchConstants.TEMPLATE, type);
+		return getOrderMap().getTemplate(this, type);
 	}
 
 	@Override
 	public Order getOrderTemplate(String type, boolean assertExists) throws StrolchException {
-		return getOrderBy(StrolchConstants.TEMPLATE, type, assertExists);
+		return getOrderMap().getTemplate(this, type, assertExists);
 	}
 
 	@Override
@@ -432,12 +424,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Order getOrderBy(String type, String id, boolean assertExists) throws StrolchException {
-		Order order = getOrderMap().getBy(this, type, id);
-		if (assertExists && order == null) {
-			String msg = "No Order exists with the id {0} with type {1}";
-			throw new StrolchException(MessageFormat.format(msg, id, type));
-		}
-		return order;
+		return getOrderMap().getBy(this, type, id, assertExists);
 	}
 
 	@Override
@@ -580,21 +567,25 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		} catch (Exception e) {
 			this.txResult.setState(TransactionState.ROLLING_BACK);
+
 			try {
 				undoCommands();
-			} catch (Exception e2) {
+			} catch (Exception ex) {
+				logger.error("Failed to commit transaction and then undo commands due to " + ex.getMessage(), ex);
 				try {
 					rollback(this.txResult);
 					handleRollback(start);
-				} catch (Exception e1) {
-					logger.error("Failed to roll back after failing to undo commands: " + e1.getMessage(), e1); //$NON-NLS-1$
+				} catch (Exception exc) {
+					logger.error("Failed to roll back after failing to undo commands: " + exc.getMessage(), exc); //$NON-NLS-1$
 				}
-				handleFailure(start, e);
+				handleFailure(start, ex);
 			}
+
 			try {
 				rollback(this.txResult);
 				handleRollback(start);
-			} catch (Exception e1) {
+			} catch (Exception ex) {
+				logger.error("Failed to commit transaction and then rollback due to " + ex.getMessage(), ex);
 				handleFailure(start, e);
 			}
 
@@ -843,6 +834,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		List<Audit> audits = new ArrayList<>();
 
+		// this is bad... doesn't account for a created and deleted in same TX...
+
 		if (this.orderMap != null) {
 			if (this.realm.isAuditTrailEnabledForRead())
 				auditsFor(audits, AccessType.READ, Tags.ORDER, this.orderMap.getRead());
@@ -916,15 +909,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return audit;
 	}
 
-	@Override
-	public void updateVersionFor(StrolchRootElement element, boolean deleted) {
-		if (this.versioningEnabled) {
-			int v = element.getVersion() == null ? 0 : element.getVersion().getVersion() + 1;
-			Version version = new Version(element.getLocator(), v, this.certificate.getUsername(), deleted);
-			element.setVersion(version);
-		}
-	}
-
 	/**
 	 * Calls {@link Command#validate()} on all registered command. This is done before we perform any commands and thus
 	 * no rollback needs be done due to invalid input for a command
@@ -943,8 +927,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		ListIterator<Command> iter = this.commands.listIterator();
 		while (iter.hasNext()) {
 			Command command = iter.next();
-			command.doCommand();
 			this.flushedCommands.add(command);
+			command.doCommand();
 			iter.remove();
 		}
 	}

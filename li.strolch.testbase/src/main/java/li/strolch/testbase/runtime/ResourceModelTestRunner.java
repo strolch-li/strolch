@@ -226,6 +226,8 @@ public class ResourceModelTestRunner {
 			}
 		}
 
+		resources.forEach(t -> t.setVersion(null));
+
 		// now add all again
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.getResourceMap().addAll(tx, resources);

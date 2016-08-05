@@ -15,16 +15,18 @@
  */
 package li.strolch.command;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Before;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-
-import org.junit.Before;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -47,5 +49,21 @@ public class UpdateResourceCollectionCommandTest extends AbstractRealmCommandTes
 		UpdateResourceCollectionCommand command = new UpdateResourceCollectionCommand(container, tx);
 		command.setResources(this.resources);
 		return command;
+	}
+
+	@Override
+	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+		for (Resource resource : this.resources) {
+			Resource r = tx.getResourceBy(resource.getType(), resource.getId());
+			assertEquals("Modified Enumeration", r.getName());
+		}
+	}
+
+	@Override
+	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+		for (Resource resource : this.resources) {
+			Resource r = tx.getResourceBy(resource.getType(), resource.getId());
+			assertEquals(r.getId(), r.getName().toLowerCase());
+		}
 	}
 }

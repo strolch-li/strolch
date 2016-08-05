@@ -226,6 +226,9 @@ public class OrderModelTestRunner {
 			}
 		}
 
+		// remove the version
+		orders.forEach(t -> t.setVersion(null));
+
 		// now add all again
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.getOrderMap().addAll(tx, orders);

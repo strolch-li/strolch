@@ -31,6 +31,7 @@ import li.strolch.utils.dbc.DBC;
 public class RemoveOrderCommand extends Command {
 
 	private Order order;
+	private boolean removed;
 
 	/**
 	 * @param tx
@@ -65,14 +66,16 @@ public class RemoveOrderCommand extends Command {
 		}
 
 		orderMap.remove(tx(), this.order);
+		this.removed = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.order != null && tx().isRollingBack()) {
-			OrderMap orderMap = tx().getOrderMap();
-			if (!orderMap.hasElement(tx(), this.order.getType(), this.order.getId()))
-				orderMap.add(tx(), this.order);
+		if (this.order != null && tx().isRollingBack() && this.removed) {
+			if (tx().isVersioningEnabled())
+				tx().getOrderMap().undoVersion(tx(), this.order);
+			else
+				tx().getOrderMap().add(tx(), this.order);
 		}
 	}
 }

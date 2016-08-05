@@ -25,6 +25,10 @@ import li.strolch.runtime.query.inmemory.InMemoryQuery;
 
 public class InMemoryActivityDao extends InMemoryDao<Activity> implements ActivityDao {
 
+	public InMemoryActivityDao(boolean versioningEnabled) {
+		super(versioningEnabled);
+	}
+
 	@Override
 	public <U> List<U> doQuery(ActivityQuery<U> activityQuery) {
 		InMemoryActivityQueryVisitor visitor = new InMemoryActivityQueryVisitor();

@@ -20,6 +20,7 @@ import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ORDER_REF;
 import java.util.List;
 
 import li.strolch.agent.api.OrderMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.OrderQuery;
@@ -31,9 +32,10 @@ public class CachedOrderMap extends CachedElementMap<Order> implements OrderMap 
 
 	private OrderDao cachedDao;
 
-	public CachedOrderMap() {
-		super();
-		this.cachedDao = new InMemoryOrderDao();
+	public CachedOrderMap(StrolchRealm realm) {
+		super(realm);
+		// the cached DAO should not have versioning enabled
+		this.cachedDao = new InMemoryOrderDao(false);
 	}
 
 	@Override

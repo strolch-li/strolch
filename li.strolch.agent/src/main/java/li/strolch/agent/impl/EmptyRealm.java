@@ -27,7 +27,6 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.inmemory.InMemoryPersistence;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.dbc.DBC;
 
@@ -86,18 +85,15 @@ public class EmptyRealm extends InternalStrolchRealm {
 	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		super.initialize(container, configuration);
-		this.persistenceHandler = new InMemoryPersistence(container.getPrivilegeHandler());
-		this.resourceMap = new TransactionalResourceMap();
-		this.orderMap = new TransactionalOrderMap();
+		this.persistenceHandler = new InMemoryPersistence(container.getPrivilegeHandler(), isVersioningEnabled());
+		this.resourceMap = new TransactionalResourceMap(this);
+		this.orderMap = new TransactionalOrderMap(this);
+		this.activityMap = new TransactionalActivityMap(this);
 
-		String enableAuditKey = StrolchConstants.makeRealmKey(getRealm(), DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL);
-		if (configuration.getBoolean(enableAuditKey, Boolean.FALSE)) {
+		if (isAuditTrailEnabled())
 			this.auditTrail = new TransactionalAuditTrail();
-			logger.info("Enabling AuditTrail for realm " + getRealm()); //$NON-NLS-1$
-		} else {
+		else
 			this.auditTrail = new NoStrategyAuditTrail();
-			logger.info("AuditTrail is disabled for realm " + getRealm()); //$NON-NLS-1$
-		}
 	}
 
 	@Override

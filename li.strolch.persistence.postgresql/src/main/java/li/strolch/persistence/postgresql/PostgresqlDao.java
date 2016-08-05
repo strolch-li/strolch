@@ -33,7 +33,7 @@ import li.strolch.persistence.api.TransactionResult;
 @SuppressWarnings("nls")
 public abstract class PostgresqlDao<T extends StrolchRootElement> implements StrolchDao<T> {
 
-	protected PostgreSqlStrolchTransaction tx;
+	private PostgreSqlStrolchTransaction tx;
 	protected List<DaoCommand> commands;
 
 	public PostgresqlDao(PostgreSqlStrolchTransaction tx) {
@@ -180,6 +180,18 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	@Override
+	public T queryBy(String type, String id, int version) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<T> queryVersionsFor(String type, String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public List<T> queryAll() {
 
 		List<T> list = new ArrayList<>();
@@ -225,73 +237,55 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	@Override
 	public void save(final T res) {
-		this.commands.add(new DaoCommand() {
-			@Override
-			public void doComand(TransactionResult txResult) {
-				internalSave(res);
-				txResult.incCreated(1);
-			}
+		this.commands.add(txResult -> {
+			internalSave(res);
+			txResult.incCreated(1);
 		});
 	}
 
 	@Override
 	public void saveAll(final List<T> elements) {
-		this.commands.add(new DaoCommand() {
-			@Override
-			public void doComand(TransactionResult txResult) {
-				for (T element : elements) {
-					internalSave(element);
-				}
-				txResult.incCreated(elements.size());
+		this.commands.add(txResult -> {
+			for (T element : elements) {
+				internalSave(element);
 			}
+			txResult.incCreated(elements.size());
 		});
 	}
 
 	@Override
 	public void update(final T element) {
-		this.commands.add(new DaoCommand() {
-			@Override
-			public void doComand(TransactionResult txResult) {
-				internalUpdate(element);
-				txResult.incUpdated(1);
-			}
+		this.commands.add(txResult -> {
+			internalUpdate(element);
+			txResult.incUpdated(1);
 		});
 	}
 
 	@Override
 	public void updateAll(final List<T> elements) {
-		this.commands.add(new DaoCommand() {
-			@Override
-			public void doComand(TransactionResult txResult) {
-				for (T element : elements) {
-					internalUpdate(element);
-				}
-				txResult.incUpdated(elements.size());
+		this.commands.add(txResult -> {
+			for (T element : elements) {
+				internalUpdate(element);
 			}
+			txResult.incUpdated(elements.size());
 		});
 	}
 
 	@Override
 	public void remove(final T element) {
-		this.commands.add(new DaoCommand() {
-			@Override
-			public void doComand(TransactionResult txResult) {
-				internalRemove(element);
-				txResult.incDeleted(1);
-			}
+		this.commands.add(txResult -> {
+			internalRemove(element);
+			txResult.incDeleted(1);
 		});
 	}
 
 	@Override
 	public void removeAll(final List<T> elements) {
-		this.commands.add(new DaoCommand() {
-			@Override
-			public void doComand(TransactionResult txResult) {
-				for (T element : elements) {
-					internalRemove(element);
-				}
-				txResult.incDeleted(elements.size());
+		this.commands.add(txResult -> {
+			for (T element : elements) {
+				internalRemove(element);
 			}
+			txResult.incDeleted(elements.size());
 		});
 	}
 
@@ -300,12 +294,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		final long toRemove = querySize();
 
-		this.commands.add(new DaoCommand() {
-			@Override
-			public void doComand(TransactionResult txResult) {
-				internalRemoveAll(toRemove);
-				txResult.incDeleted(toRemove);
-			}
+		this.commands.add(txResult -> {
+			internalRemoveAll(toRemove);
+			txResult.incDeleted(toRemove);
 		});
 
 		return toRemove;
@@ -316,15 +307,18 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		final long toRemove = querySize(type);
 
-		this.commands.add(new DaoCommand() {
-			@Override
-			public void doComand(TransactionResult txResult) {
-				internalRemoveAllBy(toRemove, type);
-				txResult.incDeleted(toRemove);
-			}
+		this.commands.add(txResult -> {
+			internalRemoveAllBy(toRemove, type);
+			txResult.incDeleted(toRemove);
 		});
 
 		return toRemove;
+	}
+
+	@Override
+	public void removeVersion(T element) throws StrolchPersistenceException {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -366,8 +360,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove all elements due to {0}",
-					e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to remove all elements due to {0}", e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -383,8 +377,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"Failed to remove all elements of type {0} due to {1}", type, e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(MessageFormat
+					.format("Failed to remove all elements of type {0} due to {1}", type, e.getLocalizedMessage()), e);
 		}
 	}
 

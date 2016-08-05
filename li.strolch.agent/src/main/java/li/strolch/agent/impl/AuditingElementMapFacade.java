@@ -137,7 +137,15 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	@Override
 	public T getTemplate(StrolchTransaction tx, String type) {
 		T template = this.elementMap.getTemplate(tx, type);
-		if (this.observeAccessReads)
+		if (this.observeAccessReads && template != null)
+			this.read.add(template);
+		return template;
+	}
+
+	@Override
+	public T getTemplate(StrolchTransaction tx, String type, boolean assertExists) throws StrolchException {
+		T template = this.elementMap.getTemplate(tx, type, assertExists);
+		if (this.observeAccessReads && template != null)
 			this.read.add(template);
 		return template;
 	}
@@ -145,7 +153,32 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	@Override
 	public T getBy(StrolchTransaction tx, String type, String id) {
 		T element = this.elementMap.getBy(tx, type, id);
-		if (this.observeAccessReads)
+		if (this.observeAccessReads && element != null)
+			this.read.add(element);
+		return element;
+	}
+
+	@Override
+	public T getBy(StrolchTransaction tx, String type, String id, boolean assertExists) throws StrolchException {
+		T element = this.elementMap.getBy(tx, type, id, assertExists);
+		if (this.observeAccessReads && element != null)
+			this.read.add(element);
+		return element;
+	}
+
+	@Override
+	public T getBy(StrolchTransaction tx, String type, String id, int version) {
+		T element = this.elementMap.getBy(tx, type, id, version);
+		if (this.observeAccessReads && element != null)
+			this.read.add(element);
+		return element;
+	}
+
+	@Override
+	public T getBy(StrolchTransaction tx, String type, String id, int version, boolean assertExists)
+			throws StrolchException {
+		T element = this.elementMap.getBy(tx, type, id, version, assertExists);
+		if (this.observeAccessReads && element != null)
 			this.read.add(element);
 		return element;
 	}
@@ -153,23 +186,32 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	@Override
 	public T getBy(StrolchTransaction tx, StringParameter refP, boolean assertExists) throws StrolchException {
 		T element = this.elementMap.getBy(tx, refP, assertExists);
-		if (this.observeAccessReads)
+		if (this.observeAccessReads && element != null)
 			this.read.add(element);
 		return element;
 	}
 
 	@Override
-	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists) throws StrolchException {
+	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists)
+			throws StrolchException {
 		List<T> elements = this.elementMap.getBy(tx, refP, assertExists);
-		if (this.observeAccessReads)
+		if (this.observeAccessReads && !elements.isEmpty())
 			this.read.addAll(elements);
 		return elements;
 	}
 
 	@Override
+	public List<T> getVersionsFor(StrolchTransaction tx, String type, String id) {
+		List<T> versions = this.elementMap.getVersionsFor(tx, type, id);
+		if (this.observeAccessReads && !versions.isEmpty())
+			this.read.add(versions.get(versions.size() - 1));
+		return versions;
+	}
+
+	@Override
 	public List<T> getAllElements(StrolchTransaction tx) {
 		List<T> elements = this.elementMap.getAllElements(tx);
-		if (this.observeAccessReads)
+		if (this.observeAccessReads && !elements.isEmpty())
 			this.read.addAll(elements);
 		return elements;
 	}
@@ -177,7 +219,7 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	@Override
 	public List<T> getElementsBy(StrolchTransaction tx, String type) {
 		List<T> elements = this.elementMap.getElementsBy(tx, type);
-		if (this.observeAccessReads)
+		if (this.observeAccessReads && !elements.isEmpty())
 			this.read.addAll(elements);
 		return elements;
 	}
@@ -210,18 +252,15 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	}
 
 	@Override
-	public T update(StrolchTransaction tx, T element) {
-		T replaced = this.elementMap.update(tx, element);
+	public void update(StrolchTransaction tx, T element) {
+		this.elementMap.update(tx, element);
 		this.updated.add(element);
-		return replaced;
-
 	}
 
 	@Override
-	public List<T> updateAll(StrolchTransaction tx, List<T> elements) {
-		List<T> replaced = this.elementMap.updateAll(tx, elements);
+	public void updateAll(StrolchTransaction tx, List<T> elements) {
+		this.elementMap.updateAll(tx, elements);
 		this.updated.addAll(elements);
-		return replaced;
 	}
 
 	@Override
@@ -254,5 +293,28 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 		this.deletedAllByType.put(type, byType);
 
 		return removed;
+	}
+
+	@Override
+	public T revertToVersion(StrolchTransaction tx, String type, String id, int version) throws StrolchException {
+		T element = this.elementMap.revertToVersion(tx, type, id, version);
+		this.updated.add(element);
+		return element;
+	}
+
+	@Override
+	public T revertToVersion(StrolchTransaction tx, T element) throws StrolchException {
+		T revertedElement = this.elementMap.revertToVersion(tx, element);
+		this.updated.add(revertedElement);
+		return revertedElement;
+	}
+
+	@Override
+	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException {
+		this.elementMap.undoVersion(tx, element);
+		if (element.getVersion().isFirstVersion())
+			this.deleted.add(element);
+		else
+			this.updated.add(element);
 	}
 }

@@ -85,16 +85,14 @@ public class TransactionalRealm extends InternalStrolchRealm {
 	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		super.initialize(container, configuration);
-		this.resourceMap = new TransactionalResourceMap();
-		this.orderMap = new TransactionalOrderMap();
-		this.activityMap = new TransactionalActivityMap();
+		this.resourceMap = new TransactionalResourceMap(this);
+		this.orderMap = new TransactionalOrderMap(this);
+		this.activityMap = new TransactionalActivityMap(this);
 
 		if (isAuditTrailEnabled()) {
 			this.auditTrail = new TransactionalAuditTrail();
-			logger.info("Enabling AuditTrail for realm " + getRealm()); //$NON-NLS-1$
 		} else {
 			this.auditTrail = new NoStrategyAuditTrail();
-			logger.info("AuditTrail is disabled for realm " + getRealm()); //$NON-NLS-1$
 		}
 
 		this.persistenceHandler = container.getComponent(PersistenceHandler.class);
@@ -122,8 +120,8 @@ public class TransactionalRealm extends InternalStrolchRealm {
 
 		long duration = System.nanoTime() - start;
 		String durationS = StringHelper.formatNanoDuration(duration);
-		logger.info(MessageFormat.format(
-				"Initialized Transactional Maps for realm {0} took {1}.", getRealm(), durationS)); //$NON-NLS-1$
+		logger.info(
+				MessageFormat.format("Initialized Transactional Maps for realm {0} took {1}.", getRealm(), durationS)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("There are {0} Orders", nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("There are {0} Resources", nrOfResources)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("There are {0} Activities", nrOfActivities)); //$NON-NLS-1$

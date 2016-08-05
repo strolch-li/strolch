@@ -44,7 +44,7 @@
 		<Component>
 			<name>PersistenceHandler</name>
 			<api>li.strolch.persistence.api.PersistenceHandler</api>
-			<impl>li.strolch.persistence.inmemory.InMemoryPersistenceHandler</impl>
+			<impl>li.strolch.runtime.query.inmemory.InMemoryPersistenceHandler</impl>
 		</Component>
 	</env>
 </StrolchConfiguration>

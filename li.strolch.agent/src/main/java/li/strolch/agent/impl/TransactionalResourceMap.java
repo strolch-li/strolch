@@ -20,6 +20,7 @@ import static li.strolch.model.StrolchModelConstants.INTERPRETATION_RESOURCE_REF
 import java.util.List;
 
 import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ResourceQuery;
@@ -27,6 +28,10 @@ import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
 public class TransactionalResourceMap extends TransactionalElementMap<Resource> implements ResourceMap {
+
+	public TransactionalResourceMap(StrolchRealm realm) {
+		super(realm);
+	}
 
 	@Override
 	protected void assertIsRefParam(Parameter<?> refP) {

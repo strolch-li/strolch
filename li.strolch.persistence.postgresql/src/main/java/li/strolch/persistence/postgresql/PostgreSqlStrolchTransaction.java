@@ -17,6 +17,9 @@ package li.strolch.persistence.postgresql;
 
 import java.sql.Connection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.ActivityDao;
@@ -27,9 +30,6 @@ import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.TransactionResult;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 
@@ -56,6 +56,8 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 			this.orderDao.commit(txResult);
 		if (this.resourceDao != null)
 			this.resourceDao.commit(txResult);
+		if (this.activityDao != null)
+			this.activityDao.commit(txResult);
 
 		// don't commit the connection, this is done in postCommit when we close the connection
 	}

@@ -50,6 +50,7 @@ public class ComponentContainerTest {
 	public static final String PATH_CACHED_CONTAINER = "src/test/resources/cachedtest";
 	public static final String PATH_EMPTY_CONTAINER = "src/test/resources/emptytest";
 	public static final String PATH_MINIMAL_CONTAINER = "src/test/resources/minimaltest";
+	public static final String PATH_VERSIONING_CONTAINER = "src/test/resources/versioningtest";
 
 	public static final String PATH_REALM_RUNTIME = "target/realmtest/";
 	public static final String PATH_TRANSIENT_RUNTIME = "target/transienttest/";

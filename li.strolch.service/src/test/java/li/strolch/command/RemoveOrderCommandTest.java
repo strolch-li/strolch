@@ -15,14 +15,17 @@
  */
 package li.strolch.command;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-
-import org.junit.Before;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -44,5 +47,15 @@ public class RemoveOrderCommandTest extends AbstractRealmCommandTest {
 		RemoveOrderCommand command = new RemoveOrderCommand(container, tx);
 		command.setOrder(order);
 		return command;
+	}
+
+	@Override
+	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+		assertFalse(tx.getOrderMap().hasElement(tx, "TestType", "@3"));
+	}
+
+	@Override
+	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+		assertTrue(tx.getOrderMap().hasElement(tx, "TestType", "@3"));
 	}
 }

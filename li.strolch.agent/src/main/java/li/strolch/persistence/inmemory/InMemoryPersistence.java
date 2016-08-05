@@ -30,11 +30,13 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 
 public class InMemoryPersistence implements PersistenceHandler {
 
+	private boolean versioningEnabled;
 	private Map<String, DaoCache> daoCache;
 	private PrivilegeHandler privilegeHandler;
 
-	public InMemoryPersistence(PrivilegeHandler privilegeHandler) {
+	public InMemoryPersistence(PrivilegeHandler privilegeHandler, boolean versioningEnabled) {
 		this.privilegeHandler = privilegeHandler;
+		this.versioningEnabled = versioningEnabled;
 		this.daoCache = new HashMap<>();
 	}
 
@@ -75,7 +77,8 @@ public class InMemoryPersistence implements PersistenceHandler {
 	private synchronized DaoCache getDaoCache(StrolchTransaction tx) {
 		DaoCache daoCache = this.daoCache.get(tx.getRealmName());
 		if (daoCache == null) {
-			daoCache = new DaoCache(new InMemoryOrderDao(), new InMemoryResourceDao(), new InMemoryActivityDao(),
+			daoCache = new DaoCache(new InMemoryOrderDao(this.versioningEnabled),
+					new InMemoryResourceDao(this.versioningEnabled), new InMemoryActivityDao(this.versioningEnabled),
 					new InMemoryAuditDao());
 			this.daoCache.put(tx.getRealmName(), daoCache);
 		}

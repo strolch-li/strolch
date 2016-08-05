@@ -15,6 +15,7 @@
  */
 package li.strolch.model;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,8 +67,11 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 
 	@Override
 	public void setVersion(Version version) throws IllegalArgumentException, IllegalStateException {
-		if (this.version != null)
-			this.version.validateIsNext(version);
+		if (version != null && !getLocator().equals(version.getLocator())) {
+			String msg = "Illegal version as locator is not same: Element: {0} Version: {1}";
+			throw new IllegalArgumentException(MessageFormat.format(msg, getLocator(), version));
+		}
+
 		this.version = version;
 	}
 
@@ -140,6 +144,7 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 	@Override
 	public Resource getClone() {
 		Resource clone = new Resource();
+
 		super.fillClone(clone);
 
 		if (this.timedStateMap != null) {

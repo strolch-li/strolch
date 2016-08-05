@@ -17,6 +17,7 @@ package li.strolch.model.visitor;
 
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.activity.Activity;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -26,4 +27,6 @@ public interface StrolchRootElementVisitor<T> extends StrolchVisitor {
 	public T visitOrder(Order order);
 
 	public T visitResource(Resource resource);
+
+	public T visitActivity(Activity activity);
 }

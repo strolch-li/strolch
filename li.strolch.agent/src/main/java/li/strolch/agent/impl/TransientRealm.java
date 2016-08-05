@@ -103,18 +103,15 @@ public class TransientRealm extends InternalStrolchRealm {
 
 		this.modelFile = configuration.getDataFile(key, null, configuration.getRuntimeConfiguration(), true);
 
-		this.persistenceHandler = new InMemoryPersistence(container.getPrivilegeHandler());
-		this.resourceMap = new TransactionalResourceMap();
-		this.orderMap = new TransactionalOrderMap();
-		this.activityMap = new TransactionalActivityMap();
+		this.persistenceHandler = new InMemoryPersistence(container.getPrivilegeHandler(), isVersioningEnabled());
+		this.resourceMap = new TransactionalResourceMap(this);
+		this.orderMap = new TransactionalOrderMap(this);
+		this.activityMap = new TransactionalActivityMap(this);
 
-		if (isAuditTrailEnabled()) {
+		if (isAuditTrailEnabled())
 			this.auditTrail = new TransactionalAuditTrail();
-			logger.info("Enabling AuditTrail for realm " + getRealm()); //$NON-NLS-1$
-		} else {
+		else
 			this.auditTrail = new NoStrategyAuditTrail();
-			logger.info("AuditTrail is disabled for realm " + getRealm()); //$NON-NLS-1$
-		}
 	}
 
 	@Override

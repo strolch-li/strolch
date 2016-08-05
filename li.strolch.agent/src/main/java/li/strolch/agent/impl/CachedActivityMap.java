@@ -20,6 +20,7 @@ import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ACTIVITY_REF
 import java.util.List;
 
 import li.strolch.agent.api.ActivityMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ActivityQuery;
@@ -31,9 +32,10 @@ public class CachedActivityMap extends CachedElementMap<Activity> implements Act
 
 	private ActivityDao cachedDao;
 
-	public CachedActivityMap() {
-		super();
-		this.cachedDao = new InMemoryActivityDao();
+	public CachedActivityMap(StrolchRealm realm) {
+		super(realm);
+		// the cached DAO should not have versioning enabled
+		this.cachedDao = new InMemoryActivityDao(false);
 	}
 
 	@Override

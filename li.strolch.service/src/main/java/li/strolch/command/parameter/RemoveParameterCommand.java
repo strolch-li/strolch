@@ -18,6 +18,7 @@ package li.strolch.command.parameter;
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.command.visitor.UndoUpdateElementVisitor;
 import li.strolch.command.visitor.UpdateElementVisitor;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.StrolchRootElement;
@@ -36,7 +37,6 @@ public class RemoveParameterCommand extends Command {
 	private String parameterId;
 
 	private Parameter<?> removedParameter;
-	private StrolchRootElement replacedElement;
 
 	/**
 	 * @param container
@@ -81,17 +81,14 @@ public class RemoveParameterCommand extends Command {
 		tx().lock(rootElement);
 
 		this.removedParameter = this.element.removeParameter(this.parameterId);
-		this.replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
+		new UpdateElementVisitor(tx()).update(rootElement);
 	}
 
 	@Override
 	public void undo() {
 		if (this.removedParameter != null) {
 			this.element.addParameter(this.removedParameter);
-		}
-
-		if (this.replacedElement != null && this.element != this.replacedElement) {
-			new UpdateElementVisitor(tx()).update(this.replacedElement);
+			new UndoUpdateElementVisitor(tx()).undo(this.removedParameter.getRootElement());
 		}
 	}
 }

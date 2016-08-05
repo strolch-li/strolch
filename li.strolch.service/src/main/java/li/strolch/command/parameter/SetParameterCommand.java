@@ -16,6 +16,7 @@
 package li.strolch.command.parameter;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.command.visitor.UndoUpdateElementVisitor;
 import li.strolch.command.visitor.UpdateElementVisitor;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
@@ -46,7 +47,7 @@ public class SetParameterCommand extends Command {
 	private Integer oldIndex;
 	private String oldValueAsString;
 
-	private StrolchRootElement replacedElement;
+	private boolean updated;
 
 	/**
 	 * @param container
@@ -151,7 +152,8 @@ public class SetParameterCommand extends Command {
 		}
 
 		if (hasChanges()) {
-			this.replacedElement = new UpdateElementVisitor(tx()).update(rootElement);
+			new UpdateElementVisitor(tx()).update(rootElement);
+			this.updated = true;
 		}
 	}
 
@@ -185,8 +187,9 @@ public class SetParameterCommand extends Command {
 				visitor.setValue(this.parameter, this.oldValueAsString);
 			}
 
-			if (hasChanges() && this.replacedElement != null && this.replacedElement != this.parameter.getRootElement()) {
-				new UpdateElementVisitor(tx()).update(this.replacedElement);
+			if (hasChanges() && this.updated) {
+				StrolchRootElement rootElement = this.parameter.getRootElement();
+				new UndoUpdateElementVisitor(tx()).undo(rootElement);
 			}
 		}
 	}

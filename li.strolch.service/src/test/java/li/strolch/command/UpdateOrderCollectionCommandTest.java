@@ -15,16 +15,18 @@
  */
 package li.strolch.command;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Before;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-
-import org.junit.Before;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -36,6 +38,7 @@ public class UpdateOrderCollectionCommandTest extends AbstractRealmCommandTest {
 	@Before
 	public void before() {
 		this.orders = new ArrayList<>();
+		// we create elements with the same id as already exists!
 		this.orders.add(ModelGenerator.createOrder("@1", "Modified Test Order", "TestType"));
 		this.orders.add(ModelGenerator.createOrder("@2", "Modified Test Order", "TestType"));
 		this.orders.add(ModelGenerator.createOrder("@3", "Modified Test Order", "TestType"));
@@ -47,5 +50,21 @@ public class UpdateOrderCollectionCommandTest extends AbstractRealmCommandTest {
 		UpdateOrderCollectionCommand command = new UpdateOrderCollectionCommand(container, tx);
 		command.setOrders(this.orders);
 		return command;
+	}
+
+	@Override
+	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+		for (Order order : orders) {
+			Order o = tx.getOrderBy(order.getType(), order.getId());
+			assertEquals("Modified Test Order", o.getName());
+		}
+	}
+
+	@Override
+	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+		for (Order order : orders) {
+			Order o = tx.getOrderBy(order.getType(), order.getId());
+			assertEquals("Test Name", o.getName());
+		}
 	}
 }

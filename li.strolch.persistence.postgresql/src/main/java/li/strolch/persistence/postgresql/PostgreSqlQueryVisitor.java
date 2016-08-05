@@ -100,7 +100,7 @@ public abstract class PostgreSqlQueryVisitor
 			return this.sqlAsString;
 		}
 
-		this.sql.append("type = ? AND\n");
+		this.sql.append("type = ? AND latest = true AND\n");
 		this.sql.append(this.sb.toString());
 
 		appendOrdering();

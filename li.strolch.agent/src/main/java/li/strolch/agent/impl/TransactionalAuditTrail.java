@@ -63,7 +63,7 @@ public class TransactionalAuditTrail implements AuditTrail {
 	public Audit getBy(StrolchTransaction tx, String type, Long id) {
 		return getDao(tx).queryBy(type, id);
 	}
-
+	
 	@Override
 	public List<Audit> getAllElements(StrolchTransaction tx, String type, DateRange dateRange) {
 		return getDao(tx).queryAll(type, dateRange);

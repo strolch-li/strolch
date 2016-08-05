@@ -21,14 +21,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLXML;
+import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
+
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
@@ -38,9 +43,6 @@ import li.strolch.model.xml.SimpleStrolchElementListener;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
-
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
 public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements ActivityDao {
@@ -68,22 +70,22 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 			parser.parse(binaryStream, new XmlModelSaxReader(listener));
 		} catch (SQLException | IOException | SAXException | ParserConfigurationException e) {
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"Failed to extract Activity from sqlxml value for {0} / {1}", id, type), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to extract Activity from sqlxml value for {0} / {1}", id, type), e);
 		}
 
 		if (listener.getActivities().size() == 0)
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"No Activity parsed from sqlxml value for {0} / {1}", id, type));
+			throw new StrolchPersistenceException(
+					MessageFormat.format("No Activity parsed from sqlxml value for {0} / {1}", id, type));
 		if (listener.getActivities().size() > 1)
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"Multiple Activities parsed from sqlxml value for {0} / {1}", id, type));
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Multiple Activities parsed from sqlxml value for {0} / {1}", id, type));
 
 		return listener.getActivities().get(0);
 	}
 
-	protected SQLXML createSqlXml(Activity activity, PreparedStatement preparedStatement) throws SQLException,
-			SAXException {
+	protected SQLXML createSqlXml(Activity activity, PreparedStatement preparedStatement)
+			throws SQLException, SAXException {
 		SQLXML sqlxml = tx().getConnection().createSQLXML();
 		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
 		ContentHandler contentHandler = saxResult.getHandler();
@@ -95,14 +97,29 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 
 	@Override
 	protected void internalSave(final Activity activity) {
-		String sql = "insert into " + getTableName() + " (id, name, type, asxml) values (?, ?, ?, ?)";
+
+		String sql = "insert into " + getTableName()
+				+ " (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, true, ?, ?, ?)";
+
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+
+			// id
 			preparedStatement.setString(1, activity.getId());
-			preparedStatement.setString(2, activity.getName());
-			preparedStatement.setString(3, activity.getType());
+
+			// version
+			preparedStatement.setInt(2, activity.getVersion().getVersion());
+			preparedStatement.setString(3, activity.getVersion().getCreatedBy());
+			preparedStatement.setTimestamp(4, new Timestamp(activity.getVersion().getCreatedAt().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(5, activity.getVersion().isDeleted());
+
+			// attributes
+			preparedStatement.setString(6, activity.getName());
+			preparedStatement.setString(7, activity.getType());
 
 			SQLXML sqlxml = createSqlXml(activity, preparedStatement);
-			preparedStatement.setSQLXML(4, sqlxml);
+			preparedStatement.setSQLXML(8, sqlxml);
+
 			try {
 				int modCount = preparedStatement.executeUpdate();
 				if (modCount != 1) {
@@ -118,19 +135,79 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 			throw new StrolchPersistenceException(MessageFormat.format("Failed to insert Activity {0} due to {1}",
 					activity.getLocator(), e.getLocalizedMessage()), e);
 		}
+
+		if (activity.getVersion().isFirstVersion()) {
+			return;
+		}
+
+		// and set the previous version to not be latest anymore
+		sql = "update " + getTableName() + " SET latest = false WHERE id = ? AND version = ?";
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+
+			// primary key
+			preparedStatement.setString(1, activity.getId());
+			preparedStatement.setInt(2, activity.getVersion().getPreviousVersion());
+
+			int modCount = preparedStatement.executeUpdate();
+			if (modCount != 1) {
+				String msg = "Expected to update 1 previous element with id {0} and version {1} but SQL statement modified {2} elements!";
+				msg = MessageFormat.format(msg, activity.getId(), activity.getVersion().getPreviousVersion(), modCount);
+				throw new StrolchPersistenceException(msg);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update previous version of Activity {0} due to {1}",
+							activity.getVersion(), e.getLocalizedMessage()),
+					e);
+		}
 	}
 
 	@Override
 	protected void internalUpdate(final Activity activity) {
-		String sql = "update " + getTableName() + " set name = ?, type = ?, asxml = ? where id = ? ";
+
+		// with versioning we save a new object
+		if (tx().getRealm().isVersioningEnabled()) {
+			internalSave(activity);
+			return;
+		}
+
+		// make sure is first version when versioning is not enabled
+		if (!activity.getVersion().isFirstVersion()) {
+			throw new StrolchPersistenceException(MessageFormat.format(
+					"Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
+					activity.getVersion()));
+		}
+
+		// and also not marked as deleted!
+		if (activity.getVersion().isDeleted()) {
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Versioning is not enabled, so version can not be marked as deleted for {0}",
+							activity.getVersion()));
+		}
+
+		String sql = "update " + getTableName()
+				+ " set created_by = ?, created_at = ?, deleted = ?, latest = true, name = ?, type = ?, asxml = ? where id = ? and version = ?";
+
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
-			preparedStatement.setString(1, activity.getName());
-			preparedStatement.setString(2, activity.getType());
-			preparedStatement.setString(4, activity.getId());
+			// version
+			preparedStatement.setString(1, activity.getVersion().getCreatedBy());
+			preparedStatement.setTimestamp(2, new Timestamp(activity.getVersion().getCreatedAt().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(3, activity.getVersion().isDeleted());
+
+			// attributes
+			preparedStatement.setString(4, activity.getName());
+			preparedStatement.setString(5, activity.getType());
 
 			SQLXML sqlxml = createSqlXml(activity, preparedStatement);
-			preparedStatement.setSQLXML(3, sqlxml);
+			preparedStatement.setSQLXML(6, sqlxml);
+
+			// primary key
+			preparedStatement.setString(7, activity.getId());
+			preparedStatement.setInt(8, activity.getVersion().getVersion());
+
 			try {
 				int modCount = preparedStatement.executeUpdate();
 				if (modCount != 1) {

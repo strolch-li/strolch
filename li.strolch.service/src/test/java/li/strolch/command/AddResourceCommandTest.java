@@ -15,13 +15,16 @@
  */
 package li.strolch.command;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-
-import org.junit.Before;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -41,5 +44,15 @@ public class AddResourceCommandTest extends AbstractRealmCommandTest {
 		AddResourceCommand command = new AddResourceCommand(container, tx);
 		command.setResource(this.resource);
 		return command;
+	}
+
+	@Override
+	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+		assertTrue(tx.getResourceMap().hasElement(tx, this.resource.getType(), this.resource.getId()));
+	}
+
+	@Override
+	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+		assertFalse(tx.getResourceMap().hasElement(tx, this.resource.getType(), this.resource.getId()));
 	}
 }

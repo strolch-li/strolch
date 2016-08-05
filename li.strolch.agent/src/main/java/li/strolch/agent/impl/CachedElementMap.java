@@ -16,22 +16,26 @@
 package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ElementMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Version;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchDao;
+import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -39,6 +43,16 @@ import org.slf4j.LoggerFactory;
 public abstract class CachedElementMap<T extends StrolchRootElement> implements ElementMap<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(CachedElementMap.class);
+
+	private StrolchRealm realm;
+
+	public CachedElementMap(StrolchRealm realm) {
+		this.realm = realm;
+	}
+
+	protected StrolchRealm getRealm() {
+		return this.realm;
+	}
 
 	protected abstract StrolchDao<T> getCachedDao();
 
@@ -66,62 +80,110 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 
 	@Override
 	public synchronized T getTemplate(StrolchTransaction tx, String type) {
-		return getBy(tx, StrolchConstants.TEMPLATE, type);
+		return getTemplate(tx, type, false);
+	}
+
+	@Override
+	public T getTemplate(StrolchTransaction tx, String type, boolean assertExists) {
+		T t = getCachedDao().queryBy(StrolchConstants.TEMPLATE, type);
+		if (assertExists && t == null) {
+			String msg = "The template for type {0} does not exist!"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, type));
+		}
+
+		if (t == null)
+			return null;
+
+		@SuppressWarnings("unchecked")
+		T clone = (T) t.getClone();
+		clone.setVersion(t.getVersion());
+		return clone;
 	}
 
 	@Override
 	public synchronized T getBy(StrolchTransaction tx, String type, String id) {
-		return getCachedDao().queryBy(type, id);
+		return getBy(tx, type, id, false);
 	}
 
-	protected abstract void assertIsRefParam(Parameter<?> refP);
+	@Override
+	public T getBy(StrolchTransaction tx, String type, String id, boolean assertExists) throws StrolchException {
+		T t = getCachedDao().queryBy(type, id);
+		if (assertExists && t == null) {
+			String msg = "The element for type {0} and id {1} does not exist!"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, type, id));
+		}
+
+		if (t == null)
+			return null;
+
+		@SuppressWarnings("unchecked")
+		T clone = (T) t.getClone();
+		clone.setVersion(t.getVersion());
+		return clone;
+	}
+
+	@Override
+	public T getBy(StrolchTransaction tx, String type, String id, int version) {
+		return getBy(tx, type, id, version, false);
+	}
+
+	@Override
+	public T getBy(StrolchTransaction tx, String type, String id, int version, boolean assertExists)
+			throws StrolchException {
+		T t = getDbDao(tx).queryBy(type, id, version);
+		if (assertExists && t == null) {
+			String msg = "The element for type {0} and id {1} and version {2} does not exist!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, type, id, version);
+			throw new StrolchException(msg);
+		}
+		return t;
+	}
 
 	@Override
 	public T getBy(StrolchTransaction tx, StringParameter refP, boolean assertExists) throws StrolchException {
 		assertIsRefParam(refP);
 		String type = refP.getUom();
 		String id = refP.getValue();
-		T element = getBy(tx, type, id);
-		if (assertExists && element == null) {
-			String msg = "The element for refP {0} with id {1} does not exist!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, refP.getLocator(), id);
-			throw new StrolchException(msg);
-		}
-		return element;
+		return getBy(tx, type, id, assertExists);
 	}
 
 	@Override
-	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists) throws StrolchException {
+	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists)
+			throws StrolchException {
 		assertIsRefParam(refP);
 
-		List<T> elements = new ArrayList<>();
 		String type = refP.getUom();
 		List<String> ids = refP.getValue();
 
-		for (String id : ids) {
-			T element = getBy(tx, type, id);
-			if (element != null) {
-				elements.add(element);
-			} else if (assertExists) {
-				if (assertExists && element == null) {
-					String msg = "The element for refP {0} with id {1} does not exist!"; //$NON-NLS-1$
-					msg = MessageFormat.format(msg, refP.getLocator(), id);
-					throw new StrolchException(msg);
-				}
-			}
-		}
+		return ids.stream().map(id -> getBy(tx, type, id, assertExists)).filter(Objects::nonNull)
+				.collect(Collectors.toList());
+	}
 
-		return elements;
+	@Override
+	public List<T> getVersionsFor(StrolchTransaction tx, String type, String id) {
+		return getDbDao(tx).queryVersionsFor(type, id);
 	}
 
 	@Override
 	public synchronized List<T> getAllElements(StrolchTransaction tx) {
-		return getCachedDao().queryAll();
+		List<T> all = getCachedDao().queryAll();
+		return all.stream().map(t -> {
+			@SuppressWarnings("unchecked")
+			T clone = (T) t.getClone();
+			clone.setVersion(t.getVersion());
+			return clone;
+		}).collect(Collectors.toList());
 	}
 
 	@Override
 	public synchronized List<T> getElementsBy(StrolchTransaction tx, String type) {
-		return getCachedDao().queryAll(type);
+		List<T> all = getCachedDao().queryAll(type);
+		return all.stream().map(t -> {
+			@SuppressWarnings("unchecked")
+			T clone = (T) t.getClone();
+			clone.setVersion(t.getVersion());
+			return clone;
+		}).collect(Collectors.toList());
 	}
 
 	@Override
@@ -139,14 +201,6 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		return getCachedDao().queryKeySet(type);
 	}
 
-	@Override
-	public synchronized void add(StrolchTransaction tx, T element) {
-		// first perform cached change
-		getCachedDao().save(element);
-		// last is to perform DB changes
-		getDbDao(tx).save(element);
-	}
-
 	/**
 	 * Special method used when starting the container to cache the values. Not to be used anywhere else but from the
 	 * {@link CachedRealm}
@@ -158,27 +212,28 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		getCachedDao().save(element);
 	}
 
-	// TODO for update we should return the updated elements, or remove the return value
-
 	@Override
-	public synchronized T update(StrolchTransaction tx, T element) {
+	public synchronized void add(StrolchTransaction tx, T element) {
+		if (realm.isVersioningEnabled())
+			Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
+		else
+			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+
 		// first perform cached change
-		getCachedDao().update(element);
+		getCachedDao().save(element);
 		// last is to perform DB changes
-		getDbDao(tx).update(element);
-
-		return element;
-	}
-
-	@Override
-	public synchronized void remove(StrolchTransaction tx, T element) {
-		// first perform cached change
-		getCachedDao().remove(element);
-		getDbDao(tx).remove(element);
+		getDbDao(tx).save(element);
 	}
 
 	@Override
 	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
+		for (T element : elements) {
+			if (realm.isVersioningEnabled())
+				Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
+			else
+				Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+		}
+
 		// first perform cached change
 		getCachedDao().saveAll(elements);
 		// last is to perform DB changes
@@ -186,21 +241,79 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
-	public synchronized List<T> updateAll(StrolchTransaction tx, List<T> elements) {
+	public synchronized void update(StrolchTransaction tx, T element) {
+		if (realm.isVersioningEnabled())
+			Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
+		else
+			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+
+		// first perform cached change
+		getCachedDao().update(element);
+		// last is to perform DB changes
+		getDbDao(tx).update(element);
+	}
+
+	@Override
+	public synchronized void updateAll(StrolchTransaction tx, List<T> elements) {
+		for (T t : elements) {
+			if (realm.isVersioningEnabled())
+				Version.updateVersionFor(t, tx.getCertificate().getUsername(), false);
+			else
+				Version.setInitialVersionFor(t, tx.getCertificate().getUsername());
+		}
+
 		// first perform cached change
 		getCachedDao().updateAll(elements);
 		// last is to perform DB changes
 		getDbDao(tx).updateAll(elements);
+	}
 
-		return elements;
+	@Override
+	public synchronized void remove(StrolchTransaction tx, T element) {
+		if (realm.isVersioningEnabled())
+			Version.updateVersionFor(element, tx.getCertificate().getUsername(), true);
+		else
+			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+
+		if (this.realm.isVersioningEnabled()) {
+
+			// first perform cached change
+			getCachedDao().update(element);
+			// last is to perform DB changes
+			getDbDao(tx).update(element);
+
+		} else {
+
+			// first perform cached change
+			getCachedDao().remove(element);
+			// last is to perform DB changes
+			getDbDao(tx).remove(element);
+		}
 	}
 
 	@Override
 	public synchronized void removeAll(StrolchTransaction tx, List<T> elements) {
-		// first perform cached change
-		getCachedDao().removeAll(elements);
-		// last is to perform DB changes
-		getDbDao(tx).removeAll(elements);
+		for (T t : elements) {
+			if (realm.isVersioningEnabled())
+				Version.updateVersionFor(t, tx.getCertificate().getUsername(), true);
+			else
+				Version.setInitialVersionFor(t, tx.getCertificate().getUsername());
+		}
+
+		if (this.realm.isVersioningEnabled()) {
+
+			// first perform cached change
+			getCachedDao().updateAll(elements);
+			// last is to perform DB changes
+			getDbDao(tx).updateAll(elements);
+
+		} else {
+
+			// first perform cached change
+			getCachedDao().removeAll(elements);
+			// last is to perform DB changes
+			getDbDao(tx).removeAll(elements);
+		}
 	}
 
 	@Override
@@ -232,4 +345,63 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 
 		return removed;
 	}
+
+	@Override
+	public T revertToVersion(StrolchTransaction tx, T element) throws StrolchException {
+		return revertToVersion(tx, element.getType(), element.getId(), element.getVersion().getVersion());
+	}
+
+	@Override
+	public T revertToVersion(StrolchTransaction tx, String type, String id, int version) throws StrolchException {
+		if (!this.realm.isVersioningEnabled()) {
+			throw new StrolchPersistenceException("Can not und a version if versioning is not enabled!");
+		}
+
+		// get the current and specified version
+		T current = getBy(tx, type, id, true);
+		T versionT = getBy(tx, type, id, version, true);
+
+		// create the new version
+		@SuppressWarnings("unchecked")
+		T clone = (T) versionT.getClone();
+		clone.setVersion(current.getVersion().next(tx.getCertificate().getUsername(), false));
+
+		// save the new version
+		getCachedDao().update(clone);
+		getDbDao(tx).update(clone);
+
+		// and return new version
+		return clone;
+	}
+
+	@Override
+	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException {
+		if (!this.realm.isVersioningEnabled()) {
+			throw new StrolchPersistenceException("Can not und a version if versioning is not enabled!");
+		}
+
+		String type = element.getType();
+		String id = element.getId();
+
+		Version elementVersion = element.getVersion();
+
+		// make sure the given element is the latest version
+		T current = getBy(tx, type, id, true);
+		if (!current.getVersion().equals(elementVersion)) {
+			String msg = "Can not undo the version {0} as it is not the latest!"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, elementVersion);
+			throw new StrolchException(msg);
+		}
+
+		if (elementVersion.isFirstVersion()) {
+			getCachedDao().remove(element);
+			getDbDao(tx).remove(element);
+		} else {
+			T previous = getBy(tx, type, id, elementVersion.getPreviousVersion(), false);
+			getCachedDao().update(previous);
+			getDbDao(tx).removeVersion(current);
+		}
+	}
+
+	protected abstract void assertIsRefParam(Parameter<?> refP);
 }

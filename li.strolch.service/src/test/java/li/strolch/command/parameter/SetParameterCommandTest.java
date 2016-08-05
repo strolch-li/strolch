@@ -15,14 +15,16 @@
  */
 package li.strolch.command.parameter;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.AbstractRealmCommandTest;
 import li.strolch.model.Locator;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-
-import org.junit.Before;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -31,6 +33,7 @@ public class SetParameterCommandTest extends AbstractRealmCommandTest {
 
 	private Locator locator;
 	private String valueAsString;
+	private String originalValue;
 
 	@Before
 	public void before() {
@@ -42,10 +45,23 @@ public class SetParameterCommandTest extends AbstractRealmCommandTest {
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
 		Parameter<?> parameter = tx.findElement(this.locator);
+		this.originalValue = parameter.getValueAsString();
 
 		SetParameterCommand command = new SetParameterCommand(container, tx);
 		command.setValueAsString(this.valueAsString);
 		command.setParameter(parameter);
 		return command;
+	}
+
+	@Override
+	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+		Parameter<?> parameter = tx.findElement(this.locator);
+		assertEquals(this.valueAsString, parameter.getValueAsString());
+	}
+
+	@Override
+	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+		Parameter<?> parameter = tx.findElement(this.locator);
+		assertEquals(this.originalValue, parameter.getValueAsString());
 	}
 }

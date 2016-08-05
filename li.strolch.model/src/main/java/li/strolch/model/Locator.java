@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 
 /**
@@ -126,6 +127,11 @@ public class Locator {
 		this.pathElements = Collections.unmodifiableList(fullPath);
 	}
 
+	public String get(int part) {
+		DBC.PRE.assertTrue("Part outside of locator range: " + part, part < this.pathElements.size());
+		return this.pathElements.get(part);
+	}
+
 	/**
 	 * Returns the immutable list of path elements making up this locator
 	 *
@@ -155,7 +161,7 @@ public class Locator {
 	public Locator append(List<String> subPathElements) {
 		return new Locator(this.pathElements, subPathElements);
 	}
-	
+
 	/**
 	 * Returns a new {@link Locator} where the given sub path is appended to the locator
 	 *

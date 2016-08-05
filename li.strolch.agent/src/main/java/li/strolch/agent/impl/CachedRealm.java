@@ -95,17 +95,14 @@ public class CachedRealm extends InternalStrolchRealm {
 		super.initialize(container, configuration);
 
 		this.persistenceHandler = container.getComponent(PersistenceHandler.class);
-		this.resourceMap = new CachedResourceMap();
-		this.orderMap = new CachedOrderMap();
-		this.activityMap = new CachedActivityMap();
+		this.resourceMap = new CachedResourceMap(this);
+		this.orderMap = new CachedOrderMap(this);
+		this.activityMap = new CachedActivityMap(this);
 
-		if (isAuditTrailEnabled()) {
+		if (isAuditTrailEnabled())
 			this.auditTrail = new CachedAuditTrail();
-			logger.info("Enabling AuditTrail for realm " + getRealm()); //$NON-NLS-1$
-		} else {
+		else
 			this.auditTrail = new NoStrategyAuditTrail();
-			logger.info("AuditTrail is disabled for realm " + getRealm()); //$NON-NLS-1$
-		}
 	}
 
 	@Override

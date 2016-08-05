@@ -15,6 +15,11 @@
  */
 package li.strolch.command.parameter;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.AbstractRealmCommandTest;
 import li.strolch.model.Locator;
@@ -23,8 +28,6 @@ import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-
-import org.junit.Before;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -49,5 +52,17 @@ public class AddParameterCommandTest extends AbstractRealmCommandTest {
 		command.setElement(element);
 		command.setParameter(this.parameter);
 		return command;
+	}
+
+	@Override
+	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+		ParameterizedElement element = tx.findElement(this.locator);
+		assertTrue(element.hasParameter(this.parameter.getId()));
+	}
+
+	@Override
+	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+		ParameterizedElement element = tx.findElement(this.locator);
+		assertFalse(element.hasParameter(this.parameter.getId()));
 	}
 }

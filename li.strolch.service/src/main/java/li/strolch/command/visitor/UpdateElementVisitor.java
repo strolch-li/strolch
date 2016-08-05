@@ -18,13 +18,14 @@ package li.strolch.command.visitor;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateElementVisitor implements StrolchRootElementVisitor<StrolchRootElement> {
+public class UpdateElementVisitor implements StrolchRootElementVisitor<Void> {
 
 	private StrolchTransaction tx;
 
@@ -32,17 +33,25 @@ public class UpdateElementVisitor implements StrolchRootElementVisitor<StrolchRo
 		this.tx = tx;
 	}
 
-	public StrolchRootElement update(StrolchRootElement rootElement) {
+	public Void update(StrolchRootElement rootElement) {
 		return rootElement.accept(this);
 	}
 
 	@Override
-	public StrolchRootElement visitOrder(Order order) {
-		return this.tx.getOrderMap().update(this.tx, order);
+	public Void visitOrder(Order order) {
+		this.tx.getOrderMap().update(this.tx, order);
+		return null;
 	}
 
 	@Override
-	public StrolchRootElement visitResource(Resource resource) {
-		return this.tx.getResourceMap().update(this.tx, resource);
+	public Void visitResource(Resource resource) {
+		this.tx.getResourceMap().update(this.tx, resource);
+		return null;
+	}
+
+	@Override
+	public Void visitActivity(Activity activity) {
+		this.tx.getActivityMap().update(this.tx, activity);
+		return null;
 	}
 }

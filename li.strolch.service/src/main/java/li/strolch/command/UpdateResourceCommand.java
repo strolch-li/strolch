@@ -31,7 +31,8 @@ import li.strolch.utils.dbc.DBC;
 public class UpdateResourceCommand extends Command {
 
 	private Resource resource;
-	private Resource replacedElement;
+	private Resource replaced;
+	private boolean updated;
 
 	/**
 	 * @param tx
@@ -59,19 +60,24 @@ public class UpdateResourceCommand extends Command {
 		tx().lock(this.resource);
 
 		ResourceMap resourceMap = tx().getResourceMap();
-		if (!resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {
+		this.replaced = resourceMap.getBy(tx(), this.resource.getType(), this.resource.getId());
+		if (this.replaced == null) {
 			String msg = "The Resource {0} can not be updated as it does not exist!!";
 			msg = MessageFormat.format(msg, this.resource.getLocator());
 			throw new StrolchException(msg);
 		}
 
-		this.replacedElement = resourceMap.update(tx(), this.resource);
+		resourceMap.update(tx(), this.resource);
+		this.updated = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.replacedElement != null && tx().isRollingBack()) {
-			tx().getResourceMap().update(tx(), this.replacedElement);
+		if (this.updated && tx().isRollingBack()) {
+			if (tx().isVersioningEnabled())
+				tx().getResourceMap().undoVersion(tx(), this.resource);
+			else
+				tx().getResourceMap().update(tx(), this.replaced);
 		}
 	}
 }

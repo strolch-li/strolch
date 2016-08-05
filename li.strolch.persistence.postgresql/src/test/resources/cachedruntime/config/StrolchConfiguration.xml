@@ -22,7 +22,7 @@
 			<depends>PrivilegeHandler</depends>
 			<depends>PersistenceHandler</depends>
 			<Properties>
-				<dataStoreMode>TRANSACTIONAL</dataStoreMode>
+				<dataStoreMode>CACHED</dataStoreMode>
 				<enableAuditTrail>true</enableAuditTrail>
 				<enableObserverUpdates>true</enableObserverUpdates>
 			</Properties>

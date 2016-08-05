@@ -25,6 +25,10 @@ import li.strolch.runtime.query.inmemory.InMemoryResourceQueryVisitor;
 
 public class InMemoryResourceDao extends InMemoryDao<Resource> implements ResourceDao {
 
+	public InMemoryResourceDao(boolean versioningEnabled) {
+		super(versioningEnabled);
+	}
+
 	@Override
 	public <U> List<U> doQuery(ResourceQuery<U> resourceQuery) {
 		InMemoryResourceQueryVisitor visitor = new InMemoryResourceQueryVisitor();

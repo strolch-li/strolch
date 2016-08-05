@@ -15,6 +15,7 @@
  */
 package li.strolch.model;
 
+import java.text.MessageFormat;
 import java.util.Date;
 
 import li.strolch.exception.StrolchPolicyException;
@@ -86,8 +87,11 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 
 	@Override
 	public void setVersion(Version version) throws IllegalArgumentException, IllegalStateException {
-		if (this.version != null)
-			this.version.validateIsNext(version);
+		if (version != null && !getLocator().equals(version.getLocator())) {
+			String msg = "Illegal version as locator is not same: Element: {0} Version: {1}";
+			throw new IllegalArgumentException(MessageFormat.format(msg, getLocator(), version));
+		}
+
 		this.version = version;
 	}
 

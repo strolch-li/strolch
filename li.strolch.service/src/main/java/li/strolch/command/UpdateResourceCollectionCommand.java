@@ -16,6 +16,7 @@
 package li.strolch.command;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -32,7 +33,8 @@ import li.strolch.utils.dbc.DBC;
 public class UpdateResourceCollectionCommand extends Command {
 
 	private List<Resource> resources;
-	private List<Resource> replacedElements;
+	private List<Resource> replaced;
+	private boolean updated;
 
 	/**
 	 * @param tx
@@ -62,22 +64,32 @@ public class UpdateResourceCollectionCommand extends Command {
 		}
 
 		ResourceMap resourceMap = tx().getResourceMap();
+		this.replaced = new ArrayList<>();
 		for (Resource resource : this.resources) {
-			if (!resourceMap.hasElement(tx(), resource.getType(), resource.getId())) {
+			Resource r = resourceMap.getBy(tx(), resource.getType(), resource.getId());
+			if (r == null) {
 				String msg = "The Resource {0} can not be updated as it does not exist!";
 				msg = MessageFormat.format(msg, resource.getLocator());
 				throw new StrolchException(msg);
 			}
+
+			this.replaced.add(r);
 		}
 
-		this.replacedElements = resourceMap.updateAll(tx(), this.resources);
+		resourceMap.updateAll(tx(), this.resources);
+		this.updated = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.replacedElements != null && tx().isRollingBack()) {
-			ResourceMap resourceMap = tx().getResourceMap();
-			resourceMap.updateAll(tx(), this.replacedElements);
+		if (this.updated && tx().isRollingBack()) {
+			if (tx().isVersioningEnabled()) {
+				for (Resource resource : this.resources) {
+					tx().getResourceMap().undoVersion(tx(), resource);
+				}
+			} else {
+				tx().getResourceMap().updateAll(tx(), this.replaced);
+			}
 		}
 	}
 }

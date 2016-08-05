@@ -18,6 +18,7 @@ package li.strolch.model.visitor;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Activity;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -32,5 +33,10 @@ public class ElementTypeVisitor implements StrolchRootElementVisitor<String> {
 	@Override
 	public String visitResource(Resource resource) {
 		return Tags.RESOURCE;
+	}
+
+	@Override
+	public String visitActivity(Activity activity) {
+		return Tags.ACTIVITY;
 	}
 }

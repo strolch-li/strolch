@@ -280,19 +280,6 @@ public interface StrolchTransaction extends AutoCloseable {
 	public boolean isSuppressAudits();
 
 	/**
-	 * 
-	 * @param versioningEnabled
-	 */
-	public void setVersioningEnabled(boolean versioningEnabled);
-
-	/**
-	 * Returns true if versioning of objects is enabled
-	 * 
-	 * @return true if versioning of objects is enabled
-	 */
-	public boolean isVersioningEnabled();
-
-	/**
 	 * If the given argument is true, then logging of a {@link TransactionCloseStrategy#DO_NOTHING} will be suppressed
 	 * 
 	 * @param SuppressDoNothingLogging
@@ -306,6 +293,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return true if logging of a {@link TransactionCloseStrategy#DO_NOTHING} should be suppressed
 	 */
 	boolean isSuppressDoNothingLogging();
+
+	/**
+	 * Returns true if versioning is enabled on the {@link StrolchRealm} for which this transaction has been opened
+	 * 
+	 * @return true if versioning is enabled
+	 */
+	boolean isVersioningEnabled();
 
 	/**
 	 * Locks the given element and registers it on the transaction so the lock is released when the transaction is
@@ -375,21 +369,6 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the new audit
 	 */
 	public Audit auditFrom(AccessType accessType, StrolchRootElement element);
-
-	/**
-	 * Creates a new version for the given element. If the element has no version yet, then the result will be version
-	 * 0, otherwise the version will be an increment to the current version
-	 * 
-	 * @param element
-	 *            the element for which to create a new version
-	 * @param deleted
-	 *            if true, then the version will be marked as deleted, i.e. this object was removed from the element
-	 *            maps
-	 * 
-	 * @return the new version, which is either an increment of the existing version on the element, or it will be
-	 *         version 0
-	 */
-	public void updateVersionFor(StrolchRootElement element, boolean deleted);
 
 	/**
 	 * <p>

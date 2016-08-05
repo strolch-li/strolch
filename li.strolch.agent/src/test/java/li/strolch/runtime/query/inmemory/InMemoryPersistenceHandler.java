@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.persistence.inmemory;
+package li.strolch.runtime.query.inmemory;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -24,6 +24,7 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.inmemory.InMemoryPersistence;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 
@@ -44,7 +45,7 @@ public class InMemoryPersistenceHandler extends StrolchComponent implements Pers
 
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
-		this.persistence = new InMemoryPersistence(getContainer().getPrivilegeHandler());
+		this.persistence = new InMemoryPersistence(getContainer().getPrivilegeHandler(), false);
 		super.initialize(configuration);
 	}
 

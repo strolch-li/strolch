@@ -20,6 +20,7 @@ import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ACTIVITY_REF
 import java.util.List;
 
 import li.strolch.agent.api.ActivityMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ActivityQuery;
@@ -27,6 +28,10 @@ import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
 public class TransactionalActivityMap extends TransactionalElementMap<Activity> implements ActivityMap {
+
+	public TransactionalActivityMap(StrolchRealm realm) {
+		super(realm);
+	}
 
 	@Override
 	protected void assertIsRefParam(Parameter<?> refP) {

@@ -20,6 +20,7 @@ import static li.strolch.model.StrolchModelConstants.INTERPRETATION_RESOURCE_REF
 import java.util.List;
 
 import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ResourceQuery;
@@ -31,9 +32,10 @@ public class CachedResourceMap extends CachedElementMap<Resource> implements Res
 
 	private ResourceDao cachedDao;
 
-	public CachedResourceMap() {
-		super();
-		this.cachedDao = new InMemoryResourceDao();
+	public CachedResourceMap(StrolchRealm realm) {
+		super(realm);
+		// the cached DAO should not have versioning enabled
+		this.cachedDao = new InMemoryResourceDao(false);
 	}
 
 	@Override

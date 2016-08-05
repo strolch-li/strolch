@@ -15,8 +15,13 @@
  */
 package li.strolch.command;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Before;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Locator;
@@ -24,8 +29,6 @@ import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-
-import org.junit.Before;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -53,5 +56,19 @@ public class RemoveResourceCollectionCommandTest extends AbstractRealmCommandTes
 		RemoveResourceCollectionCommand command = new RemoveResourceCollectionCommand(container, tx);
 		command.setResources(resources);
 		return command;
+	}
+
+	@Override
+	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+		for (Locator locator : locators) {
+			assertFalse(tx.getResourceMap().hasElement(tx, locator.get(1), locator.get(2)));
+		}
+	}
+
+	@Override
+	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+		for (Locator locator : locators) {
+			assertTrue(tx.getResourceMap().hasElement(tx, locator.get(1), locator.get(2)));
+		}
 	}
 }

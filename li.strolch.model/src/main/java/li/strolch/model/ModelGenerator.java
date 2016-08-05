@@ -346,6 +346,33 @@ public class ModelGenerator {
 		return orders;
 	}
 
+	/**
+	 * Creates a list of {@link Activity Activities} with the given values and adds a {@link ParameterBag} by calling
+	 * {@link #createParameterBag(String, String, String)}
+	 *
+	 * @param idStart
+	 *            id range start
+	 * @param count
+	 *            the number of elements to create
+	 * @param idPrefix
+	 *            the prefix to generate IDs for the {@link Activity Activities}
+	 * @param name
+	 *            the name of the {@link Activity}
+	 * @param type
+	 *            the type of the {@link Activity}
+	 *
+	 * @return the list of newly created {@link Activity Activities}
+	 */
+
+	public static List<Activity> createActivities(int idStart, int count, String idPrefix, String name, String type) {
+		List<Activity> activities = new ArrayList<>();
+		for (int i = 0; i < count; i++) {
+			String id = StringHelper.normalizeLength(String.valueOf((i + idStart)), 8, true, '0');
+			activities.add(createActivity(idPrefix + id, name + " " + i, type));
+		}
+		return activities;
+	}
+
 	public static Activity createActivity(String id, String name, String type) {
 
 		Activity rootActivity = new Activity(id, name, type);

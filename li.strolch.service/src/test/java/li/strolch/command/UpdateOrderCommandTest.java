@@ -42,4 +42,16 @@ public class UpdateOrderCommandTest extends AbstractRealmCommandTest {
 		command.setOrder(this.order);
 		return command;
 	}
+
+	@Override
+	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+		// TODO Auto-generated method stub
+		
+	}
 }

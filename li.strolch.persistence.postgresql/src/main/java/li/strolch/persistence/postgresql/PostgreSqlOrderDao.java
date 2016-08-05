@@ -45,7 +45,7 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 
 @SuppressWarnings("nls")
-public class PostgreSqlOrderDao extends PostgresqlXmlDao<Order> implements OrderDao {
+public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao {
 
 	public static final String ORDERS = "orders";
 
@@ -96,17 +96,31 @@ public class PostgreSqlOrderDao extends PostgresqlXmlDao<Order> implements Order
 
 	@Override
 	protected void internalSave(final Order order) {
+
 		String sql = "insert into " + getTableName()
-				+ " (id, name, type, state, date, asxml) values (?, ?, ?, ?::order_state, ?, ?)";
+				+ " (id, version, created_by, created_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, true, ?, ?, ?::order_state, ?, ?)";
+
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+
+			// id
 			preparedStatement.setString(1, order.getId());
-			preparedStatement.setString(2, order.getName());
-			preparedStatement.setString(3, order.getType());
-			preparedStatement.setString(4, order.getState().name());
-			preparedStatement.setTimestamp(5, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
+
+			// version
+			preparedStatement.setInt(2, order.getVersion().getVersion());
+			preparedStatement.setString(3, order.getVersion().getCreatedBy());
+			preparedStatement.setTimestamp(4, new Timestamp(order.getVersion().getCreatedAt().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(5, order.getVersion().isDeleted());
+
+			// attributes
+			preparedStatement.setString(6, order.getName());
+			preparedStatement.setString(7, order.getType());
+			preparedStatement.setString(8, order.getState().name());
+			preparedStatement.setTimestamp(9, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 
 			SQLXML sqlxml = createSqlXml(order, preparedStatement);
-			preparedStatement.setSQLXML(6, sqlxml);
+			preparedStatement.setSQLXML(10, sqlxml);
+
 			try {
 				int modCount = preparedStatement.executeUpdate();
 				if (modCount != 1) {
@@ -120,29 +134,87 @@ public class PostgreSqlOrderDao extends PostgresqlXmlDao<Order> implements Order
 
 		} catch (SQLException | SAXException e) {
 			throw new StrolchPersistenceException(MessageFormat.format("Failed to insert Order {0} due to {1}",
-					order.getLocator(), e.getLocalizedMessage()), e);
+					order.getVersion(), e.getLocalizedMessage()), e);
+		}
+
+		if (order.getVersion().isFirstVersion()) {
+			return;
+		}
+
+		// and set the previous version to not be latest anymore
+		sql = "update " + getTableName() + " SET latest = false WHERE id = ? AND version = ?";
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+
+			// primary key
+			preparedStatement.setString(1, order.getId());
+			preparedStatement.setInt(2, order.getVersion().getPreviousVersion());
+
+			int modCount = preparedStatement.executeUpdate();
+			if (modCount != 1) {
+				String msg = "Expected to update 1 previous element with id {0} and version {1} but SQL statement modified {2} elements!";
+				msg = MessageFormat.format(msg, order.getId(), order.getVersion().getPreviousVersion(), modCount);
+				throw new StrolchPersistenceException(msg);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update previous version of Order {0} due to {1}",
+							order.getVersion(), e.getLocalizedMessage()),
+					e);
 		}
 	}
 
 	@Override
 	protected void internalUpdate(final Order order) {
+
+		// with versioning we save a new object
+		if (tx().getRealm().isVersioningEnabled()) {
+			internalSave(order);
+			return;
+		}
+
+		// make sure is first version when versioning is not enabled
+		if (!order.getVersion().isFirstVersion()) {
+			throw new StrolchPersistenceException(MessageFormat.format(
+					"Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
+					order.getVersion()));
+		}
+
+		// and also not marked as deleted!
+		if (order.getVersion().isDeleted()) {
+			throw new StrolchPersistenceException(MessageFormat.format(
+					"Versioning is not enabled, so version can not be marked as deleted for {0}", order.getVersion()));
+		}
+
+		// now we update the existing object
 		String sql = "update " + getTableName()
-				+ " set name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? ";
+				+ " set created_by = ?, created_at = ?, deleted = ?, latest = true, name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? and version = ?";
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
-			preparedStatement.setString(1, order.getName());
-			preparedStatement.setString(2, order.getType());
-			preparedStatement.setString(3, order.getState().name());
-			preparedStatement.setTimestamp(4, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
-			preparedStatement.setString(6, order.getId());
+			// version
+			preparedStatement.setString(1, order.getVersion().getCreatedBy());
+			preparedStatement.setTimestamp(2, new Timestamp(order.getVersion().getCreatedAt().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(3, order.getVersion().isDeleted());
+
+			// attributes
+			preparedStatement.setString(4, order.getName());
+			preparedStatement.setString(5, order.getType());
+			preparedStatement.setString(6, order.getState().name());
+			preparedStatement.setTimestamp(7, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 
 			SQLXML sqlxml = createSqlXml(order, preparedStatement);
-			preparedStatement.setSQLXML(5, sqlxml);
+			preparedStatement.setSQLXML(8, sqlxml);
+
+			// primary key
+			preparedStatement.setString(9, order.getId());
+			preparedStatement.setInt(10, order.getVersion().getVersion());
+
 			try {
 				int modCount = preparedStatement.executeUpdate();
 				if (modCount != 1) {
-					String msg = "Expected to update 1 element with id {0} but SQL statement modified {1} elements!";
-					msg = MessageFormat.format(msg, order.getId(), modCount);
+					String msg = "Expected to update 1 element with id {0} and version {1} but SQL statement modified {2} elements!";
+					msg = MessageFormat.format(msg, order.getId(), order.getVersion().getVersion(), modCount);
 					throw new StrolchPersistenceException(msg);
 				}
 			} finally {
