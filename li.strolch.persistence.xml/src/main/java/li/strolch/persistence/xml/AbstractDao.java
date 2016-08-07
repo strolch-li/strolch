@@ -118,6 +118,12 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 	}
 
 	@Override
+	public long queryVersionsSizeFor(String type, String id) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
 	public List<T> queryAll() {
 		List<T> objects = new ArrayList<>();
 		Set<String> types = queryTypes();
