@@ -10,7 +10,6 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<groupId>li.strolch</groupId>
 	<artifactId>li.strolch.privilege</artifactId>
 	<packaging>jar</packaging>
 	<name>li.strolch.privilege</name>
