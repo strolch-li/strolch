@@ -75,6 +75,10 @@ public class OrderModelTestRunner {
 			tx.getOrderMap().removeAll(tx, tx.getOrderMap().getAllElements(tx));
 			tx.commitOnClose();
 		}
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+			long size = tx.getOrderMap().querySize(tx);
+			assertEquals("Should have 0 objects", 0, size);
+		}
 
 		// create three orders
 		Order order1 = createOrder("myTestOrder1", "Test Name", "QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
@@ -164,18 +168,16 @@ public class OrderModelTestRunner {
 		orders.addAll(createOrders(orders.size(), 5, "@", "Further Order", "MyType3"));
 
 		// sort them so we know which order our objects are
-		Comparator<Order> comparator = new Comparator<Order>() {
-			@Override
-			public int compare(Order o1, Order o2) {
-				return o1.getId().compareTo(o2.getId());
-			}
-		};
+		Comparator<Order> comparator = (o1, o2) -> o1.getId().compareTo(o2.getId());
 		Collections.sort(orders, comparator);
 
 		// first clear the map, so that we have a clean state
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			OrderMap orderMap = tx.getOrderMap();
-			orderMap.removeAll(tx, orderMap.getAllElements(tx));
+			List<Order> allElements = orderMap.getAllElements(tx);
+			long removed = orderMap.removeAll(tx);
+			assertEquals(allElements.size(), removed);
+			assertEquals(0, orderMap.querySize(tx));
 			tx.commitOnClose();
 		}
 

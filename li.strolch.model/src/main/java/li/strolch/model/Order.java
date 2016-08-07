@@ -192,6 +192,8 @@ public class Order extends GroupedParameterizedElement implements StrolchRootEle
 		builder.append(this.state);
 		builder.append(", date=");
 		builder.append(ISO8601FormatFactory.getInstance().formatDate(this.date));
+		builder.append(", version=");
+		builder.append(this.version);
 		builder.append("]");
 
 		return builder.toString();

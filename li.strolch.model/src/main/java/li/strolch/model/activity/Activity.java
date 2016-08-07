@@ -296,6 +296,10 @@ public class Activity extends GroupedParameterizedElement
 		builder.append(this.getStart());
 		builder.append(", end=");
 		builder.append(this.getEnd());
+		if (isRootElement()) {
+			builder.append(", version=");
+			builder.append(this.version);
+		}
 		builder.append("]");
 		return builder.toString();
 	}

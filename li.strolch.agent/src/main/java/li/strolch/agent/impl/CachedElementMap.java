@@ -278,7 +278,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		if (this.realm.isVersioningEnabled()) {
 
 			// first perform cached change
-			getCachedDao().update(element);
+			getCachedDao().remove(element);
 			// last is to perform DB changes
 			getDbDao(tx).update(element);
 
@@ -303,7 +303,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		if (this.realm.isVersioningEnabled()) {
 
 			// first perform cached change
-			getCachedDao().updateAll(elements);
+			getCachedDao().removeAll(elements);
 			// last is to perform DB changes
 			getDbDao(tx).updateAll(elements);
 
@@ -397,7 +397,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 			getCachedDao().remove(element);
 			getDbDao(tx).remove(element);
 		} else {
-			T previous = getBy(tx, type, id, elementVersion.getPreviousVersion(), false);
+			T previous = getBy(tx, type, id, elementVersion.getPreviousVersion(), true);
 			getCachedDao().update(previous);
 			getDbDao(tx).removeVersion(current);
 		}

@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.Date;
 
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * <p>
@@ -159,7 +160,7 @@ public class Version {
 		builder.append(", createdBy=");
 		builder.append(this.createdBy);
 		builder.append(", createdAt=");
-		builder.append(this.createdAt);
+		builder.append(ISO8601FormatFactory.getInstance().formatDate(this.createdAt));
 		builder.append(", deleted=");
 		builder.append(this.deleted);
 		builder.append("]");

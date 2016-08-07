@@ -53,10 +53,11 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	@Override
 	public boolean hasElement(String type, String id) {
-		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ?";
+		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ? and latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
 			statement.setString(2, id);
+
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
 				long numberOfElements = result.getLong(1);
@@ -68,6 +69,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 				String msg = MessageFormat.format("Non unique number of elements with type {0} and id {1}", type, id);
 				throw new StrolchPersistenceException(msg);
 			}
+
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
 		}
@@ -75,12 +77,14 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	@Override
 	public long querySize() {
-		String sql = "select count(*) from " + getTableName();
+		String sql = "select count(*) from " + getTableName() + " where latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
 				return result.getLong(1);
 			}
+
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
 		}
@@ -88,13 +92,15 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	@Override
 	public long querySize(String type) {
-		String sql = "select count(*) from " + getTableName() + " where type = ?";
+		String sql = "select count(*) from " + getTableName() + " where type = ? and latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
+
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
 				return result.getLong(1);
 			}
+
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
 		}
@@ -105,13 +111,15 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		Set<String> keySet = new HashSet<>();
 
-		String sql = "select id from " + getTableName();
+		String sql = "select id from " + getTableName() + " where latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					keySet.add(result.getString("id"));
 				}
 			}
+
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException("Failed to query key set due to: " + e.getMessage(), e);
 		}
@@ -123,14 +131,16 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	public Set<String> queryKeySet(String type) {
 		Set<String> keySet = new HashSet<>();
 
-		String sql = "select id from " + getTableName() + " where type = ?";
+		String sql = "select id from " + getTableName() + " where type = ? and latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
+
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					keySet.add(result.getString("id"));
 				}
 			}
+
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException("Failed to query key set due to: " + e.getMessage(), e);
 		}
@@ -142,13 +152,15 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	public Set<String> queryTypes() {
 		Set<String> keySet = new HashSet<>();
 
-		String sql = "select distinct type from " + getTableName();
+		String sql = "select distinct type from " + getTableName() + " where latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					keySet.add(result.getString("type"));
 				}
 			}
+
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
 		}
@@ -159,10 +171,12 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	@Override
 	public T queryBy(String type, String id) {
 
-		String sql = "select id, name, type, asxml from " + getTableName() + " where id = ? and type = ?";
+		String sql = "select id, name, type, asxml from " + getTableName()
+				+ " where type = ? and id = ? and latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
-			statement.setString(1, id);
-			statement.setString(2, type);
+			statement.setString(1, type);
+			statement.setString(2, id);
+
 			try (ResultSet result = statement.executeQuery()) {
 				if (!result.next()) {
 					return null;
@@ -174,6 +188,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					throw new StrolchPersistenceException("Non unique result for query: " + sql);
 				return t;
 			}
+
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
 		}
@@ -181,22 +196,88 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	@Override
 	public T queryBy(String type, String id, int version) {
-		// TODO Auto-generated method stub
-		return null;
+
+		String sql = "select id, name, type, asxml from " + getTableName()
+				+ " where type = ? and id = ? and version = ?";
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+			statement.setString(1, type);
+			statement.setString(2, id);
+			statement.setInt(3, version);
+
+			try (ResultSet result = statement.executeQuery()) {
+				if (!result.next()) {
+					return null;
+				}
+
+				SQLXML sqlxml = result.getSQLXML("asxml");
+				T t = parseFromXml(id, type, sqlxml);
+				if (result.next())
+					throw new StrolchPersistenceException("Non unique result for query: " + sql);
+				return t;
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
+		}
 	}
 
 	@Override
 	public List<T> queryVersionsFor(String type, String id) {
-		// TODO Auto-generated method stub
-		return null;
+
+		String sql = "select id, name, type, asxml from " + getTableName()
+				+ " where type = ? and id = ? order by version";
+
+		List<T> list = new ArrayList<>(1);
+
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+			statement.setString(1, type);
+			statement.setString(2, id);
+
+			try (ResultSet result = statement.executeQuery()) {
+
+				while (result.next()) {
+					SQLXML sqlxml = result.getSQLXML("asxml");
+					T t = parseFromXml(id, type, sqlxml);
+					if (result.next())
+						throw new StrolchPersistenceException("Non unique result for query: " + sql);
+					list.add(t);
+				}
+
+				return list;
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public long queryVersionsSizeFor(String type, String id) {
+
+		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ?";
+
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+			statement.setString(1, type);
+			statement.setString(2, id);
+
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				return result.getLong(1);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
+		}
 	}
 
 	@Override
 	public List<T> queryAll() {
 
 		List<T> list = new ArrayList<>();
-		String sql = "select id, name, type, asxml from " + getTableName();
+
+		String sql = "select id, name, type, asxml from " + getTableName() + " where latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					String id = result.getString("id");
@@ -205,21 +286,24 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					T t = parseFromXml(id, type, sqlxml);
 					list.add(t);
 				}
+
+				return list;
 			}
+
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
 		}
-
-		return list;
 	}
 
 	@Override
 	public List<T> queryAll(String type) {
 
 		List<T> list = new ArrayList<>();
-		String sql = "select id, name, type, asxml from " + getTableName() + " where type = ?";
+
+		String sql = "select id, name, type, asxml from " + getTableName() + " where type = ? and latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
+
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					String id = result.getString("id");
@@ -227,16 +311,17 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					T t = parseFromXml(id, type, sqlxml);
 					list.add(t);
 				}
+
+				return list;
 			}
+
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
 		}
-
-		return list;
 	}
 
 	@Override
-	public void save(final T res) {
+	public void save(T res) {
 		this.commands.add(txResult -> {
 			internalSave(res);
 			txResult.incCreated(1);
@@ -244,7 +329,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	@Override
-	public void saveAll(final List<T> elements) {
+	public void saveAll(List<T> elements) {
 		this.commands.add(txResult -> {
 			for (T element : elements) {
 				internalSave(element);
@@ -254,7 +339,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	@Override
-	public void update(final T element) {
+	public void update(T element) {
 		this.commands.add(txResult -> {
 			internalUpdate(element);
 			txResult.incUpdated(1);
@@ -262,7 +347,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	@Override
-	public void updateAll(final List<T> elements) {
+	public void updateAll(List<T> elements) {
 		this.commands.add(txResult -> {
 			for (T element : elements) {
 				internalUpdate(element);
@@ -272,7 +357,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	@Override
-	public void remove(final T element) {
+	public void remove(T element) {
 		this.commands.add(txResult -> {
 			internalRemove(element);
 			txResult.incDeleted(1);
@@ -280,7 +365,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	@Override
-	public void removeAll(final List<T> elements) {
+	public void removeAll(List<T> elements) {
 		this.commands.add(txResult -> {
 			for (T element : elements) {
 				internalRemove(element);
@@ -295,7 +380,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		final long toRemove = querySize();
 
 		this.commands.add(txResult -> {
-			internalRemoveAll(toRemove);
+			internalRemoveAll();
 			txResult.incDeleted(toRemove);
 		});
 
@@ -303,12 +388,12 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	@Override
-	public long removeAllBy(final String type) {
+	public long removeAllBy(String type) {
 
-		final long toRemove = querySize(type);
+		long toRemove = querySize(type);
 
 		this.commands.add(txResult -> {
-			internalRemoveAllBy(toRemove, type);
+			internalRemoveAllBy(type);
 			txResult.incDeleted(toRemove);
 		});
 
@@ -317,8 +402,10 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	@Override
 	public void removeVersion(T element) throws StrolchPersistenceException {
-		// TODO Auto-generated method stub
-
+		this.commands.add(txResult -> {
+			internalRemoveVersion(element);
+			txResult.incDeleted(1);
+		});
 	}
 
 	/**
@@ -331,33 +418,89 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	 */
 	protected abstract void internalUpdate(T element);
 
-	protected void internalRemove(final T element) {
-		String sql = "delete from " + getTableName() + " where id = ?";
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+	protected void internalRemove(T element) {
 
+		// first find out how many there are
+		long count = 0;
+		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ?";
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+			statement.setString(1, element.getType());
+			statement.setString(2, element.getId());
+
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				count = result.getLong(1);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {1}",
+					element.getLocator(), e.getLocalizedMessage()), e);
+		}
+
+		if (count == 0) {
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to remove {0} as it does not exiset!", element.getLocator()));
+		}
+
+		sql = "delete from " + getTableName() + " where id = ?";
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 			preparedStatement.setString(1, element.getId());
+
 			int modCount = preparedStatement.executeUpdate();
-			if (modCount != 1) {
-				String msg = "Expected to delete 1 element with id {0} but SQL statement modified {1} elements!";
-				msg = MessageFormat.format(msg, element.getId(), modCount);
+			if (modCount != count) {
+				String msg = "Expected to delete {0} element with id {1} but SQL statement deleted {2} elements!";
+				msg = MessageFormat.format(msg, count, element.getId(), modCount);
 				throw new StrolchPersistenceException(msg);
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {2}",
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {1}",
 					element.getLocator(), e.getLocalizedMessage()), e);
 		}
 	}
 
-	protected void internalRemoveAll(final long toRemove) {
-		String sql = "delete from " + getTableName();
+	private void internalRemoveVersion(T element) {
+		String sql = "delete from " + getTableName() + " where type = ? and id = ? and version = ? and latest = true";
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+			preparedStatement.setString(1, element.getType());
+			preparedStatement.setString(2, element.getId());
+			preparedStatement.setInt(3, element.getVersion().getVersion());
+
 			int modCount = preparedStatement.executeUpdate();
-			if (modCount != toRemove) {
-				String msg = "Expected to delete {0} elements but SQL statement removed {1} elements!";
-				msg = MessageFormat.format(msg, toRemove, modCount);
+			if (modCount != 1) {
+				String msg = "Expected to delete 1 element with id {0} but SQL statement modified {1} elements! Verify that element {2} is the latest version!";
+				msg = MessageFormat.format(msg, element.getId(), modCount, element.getVersion());
 				throw new StrolchPersistenceException(msg);
 			}
+
+			//
+			sql = "update " + getTableName() + " set latest = true where type = ? and id = ? and version = ?";
+			try (PreparedStatement updateStmt = tx().getConnection().prepareStatement(sql)) {
+				int previousVersion = element.getVersion().getPreviousVersion();
+				updateStmt.setString(1, element.getType());
+				updateStmt.setString(2, element.getId());
+				updateStmt.setInt(3, previousVersion);
+
+				modCount = updateStmt.executeUpdate();
+				if (modCount != 1) {
+					String msg = "Expected to update 1 element with id {0} but SQL statement modified {1} elements! Verify that element {2} with version {3} exists!";
+					msg = MessageFormat.format(msg, element.getId(), modCount, element.getLocator(), previousVersion);
+					throw new StrolchPersistenceException(msg);
+				}
+
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove version {0} due to {1}",
+					element.getLocator(), e.getLocalizedMessage()), e);
+		}
+	}
+
+	protected void internalRemoveAll() {
+		String sql = "delete from " + getTableName();
+		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+
+			preparedStatement.executeUpdate();
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
@@ -365,16 +508,12 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		}
 	}
 
-	protected void internalRemoveAllBy(final long toRemove, String type) {
+	protected void internalRemoveAllBy(String type) {
 		String sql = "delete from " + getTableName() + " where type = ?";
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 			preparedStatement.setString(1, type);
-			int modCount = preparedStatement.executeUpdate();
-			if (modCount != toRemove) {
-				String msg = "Expected to delete {0} elements of type {1} but SQL statement removed {2} elements!";
-				msg = MessageFormat.format(msg, toRemove, type, modCount);
-				throw new StrolchPersistenceException(msg);
-			}
+
+			preparedStatement.executeUpdate();
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(MessageFormat

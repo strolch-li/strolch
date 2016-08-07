@@ -164,18 +164,16 @@ public class ResourceModelTestRunner {
 		resources.addAll(createResources(resources.size(), 5, "@", "Further Resource", "MyType3"));
 
 		// sort them so we know which order our objects are
-		Comparator<Resource> comparator = new Comparator<Resource>() {
-			@Override
-			public int compare(Resource o1, Resource o2) {
-				return o1.getId().compareTo(o2.getId());
-			}
-		};
+		Comparator<Resource> comparator = (o1, o2) -> o1.getId().compareTo(o2.getId());
 		Collections.sort(resources, comparator);
 
 		// first clear the map, so that we have a clean state
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			ResourceMap resourceMap = tx.getResourceMap();
-			resourceMap.removeAll(tx, resourceMap.getAllElements(tx));
+			List<Resource> allElements = resourceMap.getAllElements(tx);
+			long removed = resourceMap.removeAll(tx);
+			assertEquals(allElements.size(), removed);
+			assertEquals(0, resourceMap.querySize(tx));
 			tx.commitOnClose();
 		}
 
@@ -201,7 +199,8 @@ public class ResourceModelTestRunner {
 
 			// now use the remove all by type
 			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-				tx.getResourceMap().removeAllBy(tx, "MyType3");
+				long removed = tx.getResourceMap().removeAllBy(tx, "MyType3");
+				assertEquals(5, removed);
 				tx.commitOnClose();
 			}
 

@@ -264,7 +264,7 @@ public class InMemoryResourceQueryTest {
 
 	private Resource getBallResource() {
 		Resource res1 = new Resource("childrensBall", "Ball 1", "Ball");
-		res1.setVersion(new Version(res1.getLocator(), 0, "ModelGenerator", false));
+		Version.setInitialVersionFor(res1, "test");
 		ParameterBag bag = new ParameterBag("parameters", "Ball Details", "Parameters");
 		bag.addParameter(new StringParameter("color", "Color", "red"));
 		bag.addParameter(new BooleanParameter("forChildren", "Color", true));
@@ -293,11 +293,11 @@ public class InMemoryResourceQueryTest {
 		resources.add(res4);
 		resources.add(res5);
 		resources.add(res6);
-		
+
 		for (Resource resource : resources) {
-			resource.setVersion(new Version(resource.getLocator(), 0, "Test", false));
+			Version.setInitialVersionFor(resource, "test");
 		}
-		
+
 		return resources;
 	}
 }

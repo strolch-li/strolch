@@ -164,18 +164,16 @@ public class ActivityModelTestRunner {
 		activities.addAll(createActivities(activities.size(), 5, "@", "Further Activity", "MyType3"));
 
 		// sort them so we know which activity our objects are
-		Comparator<Activity> comparator = new Comparator<Activity>() {
-			@Override
-			public int compare(Activity o1, Activity o2) {
-				return o1.getId().compareTo(o2.getId());
-			}
-		};
+		Comparator<Activity> comparator = (o1, o2) -> o1.getId().compareTo(o2.getId());
 		Collections.sort(activities, comparator);
 
 		// first clear the map, so that we have a clean state
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			ActivityMap activityMap = tx.getActivityMap();
-			activityMap.removeAll(tx, activityMap.getAllElements(tx));
+			List<Activity> allElements = activityMap.getAllElements(tx);
+			long removed = activityMap.removeAll(tx);
+			assertEquals(allElements.size(), removed);
+			assertEquals(0, activityMap.querySize(tx));
 			tx.commitOnClose();
 		}
 

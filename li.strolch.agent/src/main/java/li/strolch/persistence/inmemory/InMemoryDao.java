@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchDao;
@@ -53,12 +55,11 @@ public class InMemoryDao<T extends StrolchRootElement> implements StrolchDao<T> 
 
 	@Override
 	public synchronized long querySize() {
-		long size = 0;
-		for (String type : this.elementMap.keySet()) {
-			Map<String, ArrayDeque<T>> byType = this.elementMap.get(type);
-			size += byType.size();
-		}
-		return size;
+		return this.elementMap.entrySet().stream().map(e -> {
+			return e.getValue().entrySet().stream().filter(f -> {
+				return !f.getValue().getLast().getVersion().isDeleted();
+			}).count();
+		}).mapToInt(e -> e.intValue()).sum();
 	}
 
 	@Override
@@ -66,19 +67,19 @@ public class InMemoryDao<T extends StrolchRootElement> implements StrolchDao<T> 
 		Map<String, ArrayDeque<T>> byType = this.elementMap.get(type);
 		if (byType == null)
 			return 0;
-		return byType.size();
+		return byType.entrySet().stream().filter(e -> !e.getValue().getLast().getVersion().isDeleted()).count();
 	}
 
 	@Override
 	public synchronized Set<String> queryKeySet() {
-		Set<String> keySet = new HashSet<>();
-		for (String type : this.elementMap.keySet()) {
-			Map<String, ArrayDeque<T>> byType = this.elementMap.get(type);
-			for (String id : byType.keySet()) {
-				keySet.add(id);
-			}
-		}
-		return keySet;
+		return this.elementMap.entrySet().stream() //
+				.map(e -> {
+					return e.getValue().entrySet().stream() //
+							.filter(f -> !f.getValue().getLast().getVersion().isDeleted()) //
+							.map(f -> f.getKey());
+				}) //
+				.flatMap(Function.identity()) //
+				.collect(Collectors.toSet());
 	}
 
 	@Override
@@ -86,7 +87,11 @@ public class InMemoryDao<T extends StrolchRootElement> implements StrolchDao<T> 
 		Map<String, ArrayDeque<T>> byType = this.elementMap.get(type);
 		if (byType == null)
 			return new HashSet<>(0);
-		return new HashSet<>(byType.keySet());
+
+		return byType.entrySet().stream() //
+				.filter(e -> !e.getValue().getLast().getVersion().isDeleted()) //
+				.map(e -> e.getKey()) //
+				.collect(Collectors.toSet());
 	}
 
 	@Override
@@ -139,19 +144,26 @@ public class InMemoryDao<T extends StrolchRootElement> implements StrolchDao<T> 
 	}
 
 	@Override
-	public synchronized List<T> queryAll() {
-		List<T> elements = new ArrayList<>();
-		for (String type : this.elementMap.keySet()) {
-			Map<String, ArrayDeque<T>> byType = this.elementMap.get(type);
-			for (String id : byType.keySet()) {
-				ArrayDeque<T> list = byType.get(id);
-				T last = list.getLast();
-				if (last.getVersion() == null || !last.getVersion().isDeleted())
-					elements.add(last);
-			}
-		}
+	public long queryVersionsSizeFor(String type, String id) {
+		Map<String, ArrayDeque<T>> byType = this.elementMap.get(type);
+		if (byType == null)
+			return 0L;
+		ArrayDeque<T> list = byType.get(id);
+		if (list == null)
+			return 0L;
+		return list.size();
+	}
 
-		return elements;
+	@Override
+	public synchronized List<T> queryAll() {
+		return this.elementMap.entrySet().stream() //
+				.map(e -> {
+					return e.getValue().entrySet().stream() //
+							.filter(f -> !f.getValue().getLast().getVersion().isDeleted()) //
+							.map(f -> f.getValue().getLast());
+				}) //
+				.flatMap(Function.identity()) //
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -160,14 +172,10 @@ public class InMemoryDao<T extends StrolchRootElement> implements StrolchDao<T> 
 		if (byType == null)
 			return new ArrayList<>(0);
 
-		List<T> elements = new ArrayList<>();
-		for (ArrayDeque<T> list : byType.values()) {
-			T last = list.getLast();
-			if (last.getVersion() == null || !last.getVersion().isDeleted())
-				elements.add(last);
-		}
-
-		return elements;
+		return byType.entrySet().stream() //
+				.filter(e -> !e.getValue().getLast().getVersion().isDeleted()) //
+				.map(e -> e.getValue().getLast()) //
+				.collect(Collectors.toList());
 	}
 
 	@Override

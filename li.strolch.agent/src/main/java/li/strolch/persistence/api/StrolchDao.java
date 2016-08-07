@@ -131,6 +131,18 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	public List<T> queryVersionsFor(String type, String id);
 
 	/**
+	 * Queries and returns the number of versions for the element with the given type and ID
+	 * 
+	 * @param type
+	 *            the type of the element to be queried
+	 * @param id
+	 *            the id of the element to be queried
+	 * 
+	 * @return the number of versions for the element with the given type and ID
+	 */
+	public long queryVersionsSizeFor(String type, String id);
+
+	/**
 	 * Queries and returns all elements regardless of type
 	 * 
 	 * @return all elements regardless of type

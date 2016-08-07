@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 
 public class VersioningTestRunner {
@@ -28,6 +30,7 @@ public class VersioningTestRunner {
 	}
 
 	public void runTestsForVersioning() {
+		assumeTrue(runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).isVersioningEnabled());
 
 		ComponentContainer container = runtimeMock.getContainer();
 

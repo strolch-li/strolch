@@ -43,84 +43,72 @@ public abstract class AbstractModelTest {
 
 	@Test
 	public void shouldCreateOrders() {
-
 		OrderModelTestRunner testRunner = new OrderModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runCreateOrderTest();
 	}
 
 	@Test
 	public void shouldQueryOrderSizes() {
-
 		OrderModelTestRunner testRunner = new OrderModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runQuerySizeTest();
 	}
 
 	@Test
 	public void shouldOrderCrud() {
-
 		OrderModelTestRunner testRunner = new OrderModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runCrudTests();
 	}
 
 	@Test
 	public void shouldOrderPerformBulkOperations() {
-
 		OrderModelTestRunner testRunner = new OrderModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runBulkOperationTests();
 	}
 
 	@Test
 	public void shouldCreateResources() {
-
 		ResourceModelTestRunner testRunner = new ResourceModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runCreateResourceTest();
 	}
 
 	@Test
 	public void shouldQueryResourceSizes() {
-
 		ResourceModelTestRunner testRunner = new ResourceModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runQuerySizeTest();
 	}
 
 	@Test
 	public void shouldResourceCrud() {
-
 		ResourceModelTestRunner testRunner = new ResourceModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runCrudTests();
 	}
 
 	@Test
 	public void shouldResourcePerformBulkOperations() {
-
 		ResourceModelTestRunner testRunner = new ResourceModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runBulkOperationTests();
 	}
 
 	@Test
 	public void shouldCreateActivities() {
-
 		ActivityModelTestRunner testRunner = new ActivityModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runCreateActivityTest();
 	}
 
 	@Test
 	public void shouldQueryActivitySizes() {
-
 		ActivityModelTestRunner testRunner = new ActivityModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runQuerySizeTest();
 	}
 
 	@Test
 	public void shouldActivityCrud() {
-
 		ActivityModelTestRunner testRunner = new ActivityModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runCrudTests();
 	}
 
 	@Test
 	public void shouldActivityPerformBulkOperations() {
-
 		ActivityModelTestRunner testRunner = new ActivityModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runBulkOperationTests();
 	}

@@ -203,7 +203,8 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 		builder.append(this.name);
 		builder.append(", type=");
 		builder.append(this.type);
-		builder.append("]");
+		builder.append(", version=");
+		builder.append(this.version);
 
 		return builder.toString();
 	}

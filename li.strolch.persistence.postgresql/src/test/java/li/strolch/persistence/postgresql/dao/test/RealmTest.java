@@ -40,9 +40,9 @@ public class RealmTest extends AbstractModelTest {
 
 	private static final String TESTUSER2 = "testuser2"; //$NON-NLS-1$
 	private static final String TESTUSER1 = "testuser1"; //$NON-NLS-1$
-	private static final String SECOND = "second"; //$NON-NLS-1$
 	private static final String TEST = "test"; //$NON-NLS-1$
 	private static final String FIRST = "first"; //$NON-NLS-1$
+	private static final String SECOND = "second"; //$NON-NLS-1$
 
 	public static final String RUNTIME_PATH = "target/realmtest/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
