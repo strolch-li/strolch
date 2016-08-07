@@ -33,7 +33,9 @@ import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -57,82 +59,10 @@ public abstract class StrolchElementToSaxVisitor {
 		this.contentHandler = contentHandler;
 	}
 
-	protected AttributesImpl attributesFor(StrolchElement element) {
-		AttributesImpl attributes = new AttributesImpl();
-		attributes.addAttribute(null, null, Tags.ID, Tags.CDATA, element.getId());
-		attributes.addAttribute(null, null, Tags.NAME, Tags.CDATA, element.getName());
-		attributes.addAttribute(null, null, Tags.TYPE, Tags.CDATA, element.getType());
-		return attributes;
-	}
-
-	protected AttributesImpl attributesFor(Parameter<?> parameter) {
-		AttributesImpl attributes = attributesFor((StrolchElement) parameter);
-		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, parameter.getValueAsString());
-
-		if (!UOM_NONE.equals(parameter.getUom())) {
-			attributes.addAttribute(null, null, Tags.UOM, Tags.CDATA, parameter.getUom());
-		}
-		if (!INTERPRETATION_NONE.equals(parameter.getInterpretation())) {
-			attributes.addAttribute(null, null, Tags.INTERPRETATION, Tags.CDATA, parameter.getInterpretation());
-		}
-		if (parameter.isHidden()) {
-			attributes.addAttribute(null, null, Tags.HIDDEN, Tags.CDATA, Boolean.toString(parameter.isHidden()));
-		}
-		if (parameter.getIndex() != 0) {
-			attributes.addAttribute(null, null, Tags.INDEX, Tags.CDATA, Integer.toString(parameter.getIndex()));
-		}
-
-		return attributes;
-	}
-
-	protected Attributes attributesFor(StrolchTimedState<IValue<?>> state) {
-		AttributesImpl attributes = attributesFor((StrolchElement) state);
-
-		if (!UOM_NONE.equals(state.getUom())) {
-			attributes.addAttribute(null, null, Tags.UOM, Tags.CDATA, state.getUom());
-		}
-		if (!INTERPRETATION_NONE.equals(state.getInterpretation())) {
-			attributes.addAttribute(null, null, Tags.INTERPRETATION, Tags.CDATA, state.getInterpretation());
-		}
-		if (state.isHidden()) {
-			attributes.addAttribute(null, null, Tags.HIDDEN, Tags.CDATA, Boolean.toString(state.isHidden()));
-		}
-		if (state.getIndex() != 0) {
-			attributes.addAttribute(null, null, Tags.INDEX, Tags.CDATA, Integer.toString(state.getIndex()));
-		}
-
-		return attributes;
-	}
-
-	protected Attributes attributesFor(ITimeValue<IValue<?>> value) {
-		AttributesImpl attributes = new AttributesImpl();
-		ISO8601FormatFactory df = ISO8601FormatFactory.getInstance();
-		attributes.addAttribute(null, null, Tags.TIME, Tags.CDATA, df.formatDate(value.getTime()));
-		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, value.getValue().getValueAsString());
-		return attributes;
-	}
-
-	protected void toSax(GroupedParameterizedElement parameterizedElement) throws SAXException {
-		Set<String> bagKeySet = parameterizedElement.getParameterBagKeySet();
-		for (String bagKey : bagKeySet) {
-			ParameterBag parameterBag = parameterizedElement.getParameterBag(bagKey);
-			this.contentHandler.startElement(null, null, Tags.PARAMETER_BAG, attributesFor(parameterBag));
-
-			Set<String> parameterKeySet = parameterBag.getParameterKeySet();
-			for (String paramKey : parameterKeySet) {
-				Parameter<?> parameter = parameterBag.getParameter(paramKey);
-				this.contentHandler.startElement(null, null, Tags.PARAMETER, attributesFor(parameter));
-				this.contentHandler.endElement(null, null, Tags.PARAMETER);
-			}
-
-			this.contentHandler.endElement(null, null, Tags.PARAMETER_BAG);
-		}
-	}
-
 	protected void toSax(Resource resource) throws SAXException {
 		this.contentHandler.startElement(null, null, Tags.RESOURCE, attributesFor(resource));
 
-		toSax((GroupedParameterizedElement) resource);
+		toSax((StrolchRootElement) resource);
 
 		Set<String> stateKeySet = resource.getTimedStateKeySet();
 		for (String stateKey : stateKeySet) {
@@ -147,37 +77,21 @@ public abstract class StrolchElementToSaxVisitor {
 			this.contentHandler.endElement(null, null, Tags.TIMED_STATE);
 		}
 
-		if (resource.hasPolicyDefs())
-			toSax(resource.getPolicyDefs());
-
 		this.contentHandler.endElement(null, null, Tags.RESOURCE);
-	}
-
-	protected AttributesImpl attributesFor(Order order) {
-		AttributesImpl attributes = attributesFor((StrolchElement) order);
-		attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, order.getState().name());
-		attributes.addAttribute(null, null, Tags.DATE, Tags.CDATA,
-				ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
-		return attributes;
 	}
 
 	protected void toSax(Order order) throws SAXException {
 		this.contentHandler.startElement(null, null, Tags.ORDER, attributesFor(order));
 
-		toSax((GroupedParameterizedElement) order);
-
-		if (order.hasPolicyDefs())
-			toSax(order.getPolicyDefs());
+		toSax((StrolchRootElement) order);
 
 		this.contentHandler.endElement(null, null, Tags.ORDER);
 	}
 
 	protected void toSax(Activity activity) throws SAXException {
 		this.contentHandler.startElement(null, null, Tags.ACTIVITY, attributesFor(activity));
-		toSax((GroupedParameterizedElement) activity);
 
-		if (activity.hasPolicyDefs())
-			toSax(activity.getPolicyDefs());
+		toSax((StrolchRootElement) activity);
 
 		Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
 		while (iter.hasNext()) {
@@ -197,6 +111,7 @@ public abstract class StrolchElementToSaxVisitor {
 
 	protected void toSax(Action action) throws SAXException {
 		this.contentHandler.startElement(null, null, Tags.ACTION, attributesFor(action));
+
 		toSax((GroupedParameterizedElement) action);
 
 		if (action.hasPolicyDefs())
@@ -223,6 +138,113 @@ public abstract class StrolchElementToSaxVisitor {
 			this.contentHandler.endElement(null, null, Tags.POLICY);
 		}
 		this.contentHandler.endElement(null, null, Tags.POLICIES);
+	}
+
+	protected void toSax(StrolchRootElement rootElement) throws SAXException {
+
+		if (rootElement.hasPolicyDefs())
+			toSax(rootElement.getPolicyDefs());
+
+		if (rootElement.hasVersion())
+			toSax(rootElement.getVersion());
+
+		toSax((GroupedParameterizedElement) rootElement);
+	}
+
+	private void toSax(Version version) throws SAXException {
+		this.contentHandler.startElement(null, null, Tags.VERSION, attributesFor(version));
+		this.contentHandler.endElement(null, null, Tags.VERSION);
+	}
+
+	protected void toSax(GroupedParameterizedElement parameterizedElement) throws SAXException {
+
+		Set<String> bagKeySet = parameterizedElement.getParameterBagKeySet();
+		for (String bagKey : bagKeySet) {
+			ParameterBag parameterBag = parameterizedElement.getParameterBag(bagKey);
+			this.contentHandler.startElement(null, null, Tags.PARAMETER_BAG, attributesFor(parameterBag));
+
+			Set<String> parameterKeySet = parameterBag.getParameterKeySet();
+			for (String paramKey : parameterKeySet) {
+				Parameter<?> parameter = parameterBag.getParameter(paramKey);
+				this.contentHandler.startElement(null, null, Tags.PARAMETER, attributesFor(parameter));
+				this.contentHandler.endElement(null, null, Tags.PARAMETER);
+			}
+
+			this.contentHandler.endElement(null, null, Tags.PARAMETER_BAG);
+		}
+	}
+
+	protected Attributes attributesFor(StrolchTimedState<IValue<?>> state) {
+		AttributesImpl attributes = attributesFor((StrolchElement) state);
+
+		if (!UOM_NONE.equals(state.getUom())) {
+			attributes.addAttribute(null, null, Tags.UOM, Tags.CDATA, state.getUom());
+		}
+		if (!INTERPRETATION_NONE.equals(state.getInterpretation())) {
+			attributes.addAttribute(null, null, Tags.INTERPRETATION, Tags.CDATA, state.getInterpretation());
+		}
+		if (state.isHidden()) {
+			attributes.addAttribute(null, null, Tags.HIDDEN, Tags.CDATA, Boolean.toString(state.isHidden()));
+		}
+		if (state.getIndex() != 0) {
+			attributes.addAttribute(null, null, Tags.INDEX, Tags.CDATA, Integer.toString(state.getIndex()));
+		}
+
+		return attributes;
+	}
+
+	protected AttributesImpl attributesFor(StrolchElement element) {
+		AttributesImpl attributes = new AttributesImpl();
+		attributes.addAttribute(null, null, Tags.ID, Tags.CDATA, element.getId());
+		attributes.addAttribute(null, null, Tags.NAME, Tags.CDATA, element.getName());
+		attributes.addAttribute(null, null, Tags.TYPE, Tags.CDATA, element.getType());
+		return attributes;
+	}
+
+	protected AttributesImpl attributesFor(Order order) {
+		AttributesImpl attributes = attributesFor((StrolchElement) order);
+		attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, order.getState().name());
+		attributes.addAttribute(null, null, Tags.DATE, Tags.CDATA,
+				ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
+		return attributes;
+	}
+
+	private Attributes attributesFor(Version version) {
+		AttributesImpl attributes = new AttributesImpl();
+		attributes.addAttribute(null, null, Tags.VERSION, Tags.CDATA, Integer.toString(version.getVersion()));
+		attributes.addAttribute(null, null, Tags.CREATED_BY, Tags.CDATA, version.getCreatedBy());
+		attributes.addAttribute(null, null, Tags.CREATED_AT, Tags.CDATA,
+				ISO8601FormatFactory.getInstance().formatDate(version.getCreatedAt()));
+		attributes.addAttribute(null, null, Tags.DELETED, Tags.CDATA, Boolean.toString(version.isDeleted()));
+		return attributes;
+	}
+
+	protected AttributesImpl attributesFor(Parameter<?> parameter) {
+		AttributesImpl attributes = attributesFor((StrolchElement) parameter);
+		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, parameter.getValueAsString());
+
+		if (!UOM_NONE.equals(parameter.getUom())) {
+			attributes.addAttribute(null, null, Tags.UOM, Tags.CDATA, parameter.getUom());
+		}
+		if (!INTERPRETATION_NONE.equals(parameter.getInterpretation())) {
+			attributes.addAttribute(null, null, Tags.INTERPRETATION, Tags.CDATA, parameter.getInterpretation());
+		}
+		if (parameter.isHidden()) {
+			attributes.addAttribute(null, null, Tags.HIDDEN, Tags.CDATA, Boolean.toString(parameter.isHidden()));
+		}
+		if (parameter.getIndex() != 0) {
+			attributes.addAttribute(null, null, Tags.INDEX, Tags.CDATA, Integer.toString(parameter.getIndex()));
+		}
+
+		return attributes;
+	}
+
+	protected Attributes attributesFor(ITimeValue<IValue<?>> value) {
+		AttributesImpl attributes = new AttributesImpl();
+		ISO8601FormatFactory df = ISO8601FormatFactory.getInstance();
+		attributes.addAttribute(null, null, Tags.TIME, Tags.CDATA, df.formatDate(value.getTime()));
+		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, value.getValue().getValueAsString());
+		return attributes;
 	}
 
 	protected AttributesImpl attributesFor(PolicyDef policyDef) {

@@ -22,7 +22,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
+import li.strolch.model.visitor.OrderVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

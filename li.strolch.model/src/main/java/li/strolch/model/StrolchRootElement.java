@@ -26,6 +26,13 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 public interface StrolchRootElement extends StrolchElement, PolicyContainer, ParameterBagContainer {
 
 	/**
+	 * Returns true if this {@link StrolchRootElement} has a version set
+	 * 
+	 * @return true if this {@link StrolchRootElement} has a version set
+	 */
+	public boolean hasVersion();
+
+	/**
 	 * Returns the current version of this object, or null if no version is set
 	 * 
 	 * @return the current version of this object, or null if no version is set

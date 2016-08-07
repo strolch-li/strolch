@@ -49,6 +49,10 @@ public class Tags {
 	public static final String POLICIES = "Policies";
 	public static final String POLICY = "Policy";
 	public static final String ELEMENTS = "Elements";
+	public static final String VERSION = "Version";
+	public static final String CREATED_AT = "CreatedAt";
+	public static final String CREATED_BY = "CreatedBy";
+	public static final String DELETED = "Deleted";
 
 	public static final String ACTIVITY = "Activity";
 	public static final String ACTION = "Action";

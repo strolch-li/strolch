@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model;
+package li.strolch.model.visitor;
 
-import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.model.activity.Activity;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
+ * @param <U>
  */
-public interface OrderVisitor<U> extends StrolchElementVisitor<Order, U> {
+public interface ActivityVisitor<U> extends StrolchElementVisitor<Activity, U> {
 
 	@Override
-	public U visit(Order element);
+	public U visit(Activity element);
 }

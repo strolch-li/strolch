@@ -25,13 +25,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.model.timevalue.impl.AString;
 import li.strolch.model.timevalue.impl.StringSetValue;
 import li.strolch.model.timevalue.impl.TimeVariable;
 import li.strolch.model.timevalue.impl.ValueChange;
-
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Basic tests for a {@link TimeVariable} with {@link StringValue}.
@@ -39,6 +41,8 @@ import org.junit.Test;
  * @author Martin Smock <smock.martin@gmail.com>
  */
 public class StringTimeVariableTest {
+
+	private static final Logger logger = LoggerFactory.getLogger(StringTimeVariableTest.class);
 
 	private static final Long MAX = 100L;
 	private static final Long STEP = 10L;
@@ -105,11 +109,10 @@ public class StringTimeVariableTest {
 		// check the future values
 		Collection<ITimeValue<IValue<Set<AString>>>> futureValues = this.timeVariable.getFutureValues(0L);
 		for (ITimeValue<IValue<Set<AString>>> iTimeValue : futureValues) {
-			System.out.println("++ " + iTimeValue); //$NON-NLS-1$
+			logger.info("++ " + iTimeValue); //$NON-NLS-1$
 		}
 
 		assertEquals(1, futureValues.size()); // a empty one is left
-
 	}
 
 	@Test
@@ -131,7 +134,5 @@ public class StringTimeVariableTest {
 
 		SortedSet<ITimeValue<IValue<Set<AString>>>> valuesCompacted = this.timeVariable.getFutureValues(0L);
 		assertEquals(1, valuesCompacted.size());
-
 	}
-
 }

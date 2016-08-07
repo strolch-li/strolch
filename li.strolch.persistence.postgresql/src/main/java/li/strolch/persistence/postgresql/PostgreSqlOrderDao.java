@@ -98,7 +98,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	protected void internalSave(final Order order) {
 
 		String sql = "insert into " + getTableName()
-				+ " (id, version, created_by, created_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, true, ?, ?, ?::order_state, ?, ?)";
+				+ " (id, version, created_by, created_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
 
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
@@ -112,14 +112,16 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 					Calendar.getInstance());
 			preparedStatement.setBoolean(5, order.getVersion().isDeleted());
 
+			preparedStatement.setBoolean(6, !order.getVersion().isDeleted());
+
 			// attributes
-			preparedStatement.setString(6, order.getName());
-			preparedStatement.setString(7, order.getType());
-			preparedStatement.setString(8, order.getState().name());
-			preparedStatement.setTimestamp(9, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
+			preparedStatement.setString(7, order.getName());
+			preparedStatement.setString(8, order.getType());
+			preparedStatement.setString(9, order.getState().name());
+			preparedStatement.setTimestamp(10, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 
 			SQLXML sqlxml = createSqlXml(order, preparedStatement);
-			preparedStatement.setSQLXML(10, sqlxml);
+			preparedStatement.setSQLXML(11, sqlxml);
 
 			try {
 				int modCount = preparedStatement.executeUpdate();
@@ -188,7 +190,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 		// now we update the existing object
 		String sql = "update " + getTableName()
-				+ " set created_by = ?, created_at = ?, deleted = ?, latest = true, name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? and version = ?";
+				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? and version = ?";
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
 			// version
@@ -197,18 +199,20 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 					Calendar.getInstance());
 			preparedStatement.setBoolean(3, order.getVersion().isDeleted());
 
+			preparedStatement.setBoolean(4, !order.getVersion().isDeleted());
+
 			// attributes
-			preparedStatement.setString(4, order.getName());
-			preparedStatement.setString(5, order.getType());
-			preparedStatement.setString(6, order.getState().name());
-			preparedStatement.setTimestamp(7, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
+			preparedStatement.setString(5, order.getName());
+			preparedStatement.setString(6, order.getType());
+			preparedStatement.setString(7, order.getState().name());
+			preparedStatement.setTimestamp(8, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 
 			SQLXML sqlxml = createSqlXml(order, preparedStatement);
-			preparedStatement.setSQLXML(8, sqlxml);
+			preparedStatement.setSQLXML(9, sqlxml);
 
 			// primary key
-			preparedStatement.setString(9, order.getId());
-			preparedStatement.setInt(10, order.getVersion().getVersion());
+			preparedStatement.setString(10, order.getId());
+			preparedStatement.setInt(11, order.getVersion().getVersion());
 
 			try {
 				int modCount = preparedStatement.executeUpdate();

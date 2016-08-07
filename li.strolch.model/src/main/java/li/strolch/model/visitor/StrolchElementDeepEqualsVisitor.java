@@ -27,7 +27,9 @@ import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -39,8 +41,11 @@ import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.utils.dbc.DBC;
 
 /**
+ * Visitor of {@link StrolchRootElement} to check if they are equal. This implementations stores a list of
+ * {@link Locator} for every element of an object which is not equal, thus making it easy to find the inconsistencies in
+ * objects.
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
 public class StrolchElementDeepEqualsVisitor {
 
@@ -57,79 +62,49 @@ public class StrolchElementDeepEqualsVisitor {
 		return this.mismatchedLocators;
 	}
 
+	/**
+	 * Returns true if the objects are equal, i.e. no locators for mismatches are stored
+	 * 
+	 * @return true if the objects are equal, i.e. no locators for mismatches are stored
+	 */
 	public boolean isEqual() {
 		return this.mismatchedLocators.isEmpty();
 	}
 
-	protected void deepEquals(StrolchElement srcElement, StrolchElement dstElement) {
-		DBC.PRE.assertEquals("Both elements should have the same ID", srcElement.getId(), dstElement.getId());
-		if (!srcElement.getName().equals(dstElement.getName())) {
-			this.mismatchedLocators.add(dstElement.getLocator().append(Tags.NAME));
-		}
-		if (!srcElement.getType().equals(dstElement.getType())) {
-			this.mismatchedLocators.add(dstElement.getLocator().append(Tags.TYPE));
-		}
+	/**
+	 * Checks the given orders for deep equality
+	 * 
+	 * @param srcOrder
+	 *            source order
+	 * @param dstOrder
+	 *            destination order
+	 */
+	public void deepEquals(Order srcOrder, Order dstOrder) {
+		deepEquals((StrolchRootElement) srcOrder, (StrolchRootElement) dstOrder);
+
+		if (!srcOrder.getState().equals(dstOrder.getState()))
+			addLocator(dstOrder.getLocator().append(Tags.STATE));
+		if (!srcOrder.getDate().equals(dstOrder.getDate()))
+			addLocator(dstOrder.getLocator().append(Tags.DATE));
 	}
 
-	protected void deepEquals(Order srcOrder, Order dstOrder) {
-		deepEquals((StrolchElement) srcOrder, (StrolchElement) dstOrder);
-		if (!srcOrder.getState().equals(dstOrder.getState())) {
-			this.mismatchedLocators.add(dstOrder.getLocator().append(Tags.STATE));
-		}
-		if (!srcOrder.getDate().equals(dstOrder.getDate())) {
-			this.mismatchedLocators.add(dstOrder.getLocator().append(Tags.DATE));
-		}
-
-		deepEquals((GroupedParameterizedElement) srcOrder, (GroupedParameterizedElement) dstOrder);
-
-		if (srcOrder.hasPolicyDefs() && dstOrder.hasPolicyDefs())
-			deepEquals(srcOrder.getPolicyDefs(), dstOrder.getPolicyDefs());
-		else if (srcOrder.hasPolicyDefs() != dstOrder.hasPolicyDefs())
-			this.mismatchedLocators.add(srcOrder.getPolicyDefs().getLocator());
-	}
-
-	private void deepEquals(PolicyDefs srcPolicyDefs, PolicyDefs dstPolicyDefs) {
-
-		Set<String> srcTypes = srcPolicyDefs.getPolicyTypes();
-		for (String srcType : srcTypes) {
-			PolicyDef srcPolicyDef = srcPolicyDefs.getPolicyDef(srcType);
-
-			if (!dstPolicyDefs.hasPolicyDef(srcType)) {
-				this.mismatchedLocators.add(dstPolicyDefs.getLocator().append(srcType));
-				continue;
-			}
-
-			PolicyDef dstPolicyDef = dstPolicyDefs.getPolicyDef(srcType);
-
-			if (srcPolicyDef.getClass() != dstPolicyDef.getClass())
-				this.mismatchedLocators.add(dstPolicyDefs.getLocator().append(srcType));
-			if (!srcPolicyDef.getValue().equals(dstPolicyDef.getValue()))
-				this.mismatchedLocators.add(dstPolicyDefs.getLocator().append(srcType));
-		}
-
-		Set<String> dstTypes = dstPolicyDefs.getPolicyTypes();
-		for (String dstType : dstTypes) {
-			if (!srcPolicyDefs.hasPolicyDef(dstType)) {
-				this.mismatchedLocators.add(srcPolicyDefs.getLocator().append(dstType));
-			}
-		}
-	}
-
-	protected void deepEquals(Resource srcRes, Resource dstRes) {
-		deepEquals((StrolchElement) srcRes, (StrolchElement) dstRes);
-		deepEquals((GroupedParameterizedElement) srcRes, (GroupedParameterizedElement) dstRes);
-
-		if (srcRes.hasPolicyDefs() && dstRes.hasPolicyDefs())
-			deepEquals(srcRes.getPolicyDefs(), dstRes.getPolicyDefs());
-		else if (srcRes.hasPolicyDefs() != dstRes.hasPolicyDefs())
-			this.mismatchedLocators.add(srcRes.getPolicyDefs().getLocator());
+	/**
+	 * Checks the given resources for deep equality
+	 * 
+	 * @param srcRes
+	 *            source resource
+	 * @param dstRes
+	 *            destination resource
+	 */
+	public void deepEquals(Resource srcRes, Resource dstRes) {
+		deepEquals((StrolchRootElement) srcRes, (StrolchRootElement) dstRes);
 
 		Set<String> srcTimedStateKeySet = srcRes.getTimedStateKeySet();
 		for (String timedStateKey : srcTimedStateKeySet) {
 			StrolchTimedState<?> srcTimedState = srcRes.getTimedState(timedStateKey);
 
 			if (!dstRes.hasTimedState(timedStateKey)) {
-				this.mismatchedLocators.add(srcTimedState.getLocator());
+				addLocator(srcTimedState.getLocator());
 				continue;
 			}
 
@@ -141,96 +116,153 @@ public class StrolchElementDeepEqualsVisitor {
 		for (String timedStateKey : dstTimedStateKeySet) {
 			if (!srcRes.hasTimedState(timedStateKey)) {
 				StrolchTimedState<?> dstTimedState = dstRes.getTimedState(timedStateKey);
-				this.mismatchedLocators.add(dstTimedState.getLocator());
+				addLocator(dstTimedState.getLocator());
 			}
 		}
 	}
 
-	protected void deepEquals(Activity srcActivity, Activity dstActivity) {
-		deepEquals((StrolchElement) srcActivity, (StrolchElement) dstActivity);
-		deepEquals((GroupedParameterizedElement) srcActivity, (GroupedParameterizedElement) dstActivity);
-
-		if (srcActivity.hasPolicyDefs() && dstActivity.hasPolicyDefs())
-			deepEquals(srcActivity.getPolicyDefs(), dstActivity.getPolicyDefs());
-		else if (srcActivity.hasPolicyDefs() != dstActivity.hasPolicyDefs())
-			this.mismatchedLocators.add(srcActivity.getPolicyDefs().getLocator());
+	/**
+	 * Checks the given activities for deep equality
+	 * 
+	 * @param srcActivity
+	 *            source activity
+	 * @param dstActivity
+	 *            destination activity
+	 */
+	public void deepEquals(Activity srcActivity, Activity dstActivity) {
+		deepEquals((StrolchRootElement) srcActivity, (StrolchRootElement) dstActivity);
 
 		Iterator<Entry<String, IActivityElement>> iter = srcActivity.elementIterator();
 		while (iter.hasNext()) {
 			IActivityElement srcActivityElement = iter.next().getValue();
 
 			if (!dstActivity.hasElement(srcActivityElement.getId())) {
-				this.mismatchedLocators.add(srcActivityElement.getLocator());
+				addLocator(srcActivityElement.getLocator());
 				continue;
 			}
 
 			IActivityElement dstActivityElement = dstActivity.getElement(srcActivityElement.getId());
 
 			if (!srcActivityElement.getClass().equals(dstActivityElement.getClass())) {
-				this.mismatchedLocators.add(srcActivityElement.getLocator());
+				addLocator(srcActivityElement.getLocator());
 				continue;
 			}
 
-			if (srcActivityElement instanceof Activity) {
+			if (srcActivityElement instanceof Activity)
 				deepEquals((Activity) srcActivityElement, (Activity) dstActivityElement);
-			} else if (srcActivityElement instanceof Action) {
+			else if (srcActivityElement instanceof Action)
 				deepEquals((Action) srcActivityElement, (Action) dstActivityElement);
-			} else {
+			else
 				throw new UnsupportedOperationException("Unhandled instance type " + srcActivityElement.getClass());
-			}
 		}
 
 		iter = dstActivity.elementIterator();
 		while (iter.hasNext()) {
 			IActivityElement activityElement = iter.next().getValue();
-			if (!srcActivity.hasElement(activityElement.getId())) {
-				this.mismatchedLocators.add(activityElement.getLocator());
-			}
+			if (!srcActivity.hasElement(activityElement.getId()))
+				addLocator(activityElement.getLocator());
 		}
 	}
 
-	protected void deepEquals(Action srcAction, Action dstAction) {
+	private void deepEquals(StrolchRootElement srcElement, StrolchRootElement dstElement) {
+		deepEquals((StrolchElement) srcElement, (StrolchElement) dstElement);
+		deepEquals((GroupedParameterizedElement) srcElement, (GroupedParameterizedElement) dstElement);
+
+		if (srcElement.hasVersion() && dstElement.hasVersion())
+			deepEquals(srcElement.getVersion(), dstElement.getVersion());
+		else if (!srcElement.hasVersion() && dstElement.hasVersion())
+			addLocator(dstElement.getLocator().append(Tags.VERSION));
+		else if (srcElement.hasVersion() && !dstElement.hasVersion())
+			addLocator(srcElement.getLocator().append(Tags.VERSION));
+
+		if (srcElement.hasPolicyDefs() && dstElement.hasPolicyDefs())
+			deepEquals(srcElement.getPolicyDefs(), dstElement.getPolicyDefs());
+		else if (srcElement.hasPolicyDefs() != dstElement.hasPolicyDefs())
+			addLocator(srcElement.getPolicyDefs().getLocator());
+	}
+
+	private void deepEquals(StrolchElement srcElement, StrolchElement dstElement) {
+		DBC.PRE.assertEquals("Both elements should have the same ID", srcElement.getId(), dstElement.getId());
+		if (!srcElement.getName().equals(dstElement.getName()))
+			addLocator(dstElement.getLocator().append(Tags.NAME));
+		if (!srcElement.getType().equals(dstElement.getType()))
+			addLocator(dstElement.getLocator().append(Tags.TYPE));
+	}
+
+	private void deepEquals(Version srcVersion, Version dstVersion) {
+		if (srcVersion.getVersion() != dstVersion.getVersion())
+			addLocator(srcVersion.getLocator().append(Tags.VERSION));
+		if (!srcVersion.getCreatedBy().equals(dstVersion.getCreatedBy()))
+			addLocator(srcVersion.getLocator().append(Tags.VERSION));
+		if (!srcVersion.getCreatedAt().equals(dstVersion.getCreatedAt()))
+			addLocator(srcVersion.getLocator().append(Tags.VERSION));
+		if (srcVersion.isDeleted() != dstVersion.isDeleted())
+			addLocator(srcVersion.getLocator().append(Tags.VERSION));
+	}
+
+	private void deepEquals(PolicyDefs srcPolicyDefs, PolicyDefs dstPolicyDefs) {
+
+		Set<String> srcTypes = srcPolicyDefs.getPolicyTypes();
+		for (String srcType : srcTypes) {
+			PolicyDef srcPolicyDef = srcPolicyDefs.getPolicyDef(srcType);
+
+			if (!dstPolicyDefs.hasPolicyDef(srcType)) {
+				addLocator(dstPolicyDefs.getLocator().append(srcType));
+				continue;
+			}
+
+			PolicyDef dstPolicyDef = dstPolicyDefs.getPolicyDef(srcType);
+
+			if (srcPolicyDef.getClass() != dstPolicyDef.getClass())
+				addLocator(dstPolicyDefs.getLocator().append(srcType));
+			if (!srcPolicyDef.getValue().equals(dstPolicyDef.getValue()))
+				addLocator(dstPolicyDefs.getLocator().append(srcType));
+		}
+
+		Set<String> dstTypes = dstPolicyDefs.getPolicyTypes();
+		for (String dstType : dstTypes) {
+			if (!srcPolicyDefs.hasPolicyDef(dstType))
+				addLocator(srcPolicyDefs.getLocator().append(dstType));
+		}
+	}
+
+	private void deepEquals(Action srcAction, Action dstAction) {
 		deepEquals((StrolchElement) srcAction, (StrolchElement) dstAction);
 		deepEquals((GroupedParameterizedElement) srcAction, (GroupedParameterizedElement) dstAction);
 
-		if (!srcAction.getResourceId().equals(dstAction.getResourceId())) {
-			this.mismatchedLocators.add(dstAction.getLocator().append(Tags.RESOURCE_ID));
-		}
-		if (!srcAction.getResourceType().equals(dstAction.getResourceType())) {
-			this.mismatchedLocators.add(dstAction.getLocator().append(Tags.RESOURCE_TYPE));
-		}
-		if (!srcAction.getState().equals(dstAction.getState())) {
-			this.mismatchedLocators.add(dstAction.getLocator().append(Tags.STATE));
-		}
+		if (!srcAction.getResourceId().equals(dstAction.getResourceId()))
+			addLocator(dstAction.getLocator().append(Tags.RESOURCE_ID));
+		if (!srcAction.getResourceType().equals(dstAction.getResourceType()))
+			addLocator(dstAction.getLocator().append(Tags.RESOURCE_TYPE));
+		if (!srcAction.getState().equals(dstAction.getState()))
+			addLocator(dstAction.getLocator().append(Tags.STATE));
 
 		if ((srcAction.getParent() == null && srcAction.getParent() != null)
-				|| (srcAction.getParent() != null && srcAction.getParent() == null)) {
-			this.mismatchedLocators.add(dstAction.getLocator());
-		} else if (!srcAction.getParent().getId().equals(dstAction.getParent().getId())) {
-			this.mismatchedLocators.add(dstAction.getLocator());
-		} else if (!srcAction.getParent().getType().equals(dstAction.getParent().getType())) {
-			this.mismatchedLocators.add(dstAction.getLocator());
-		}
+				|| (srcAction.getParent() != null && srcAction.getParent() == null))
+			addLocator(dstAction.getLocator());
+		else if (!srcAction.getParent().getId().equals(dstAction.getParent().getId()))
+			addLocator(dstAction.getLocator());
+		else if (!srcAction.getParent().getType().equals(dstAction.getParent().getType()))
+			addLocator(dstAction.getLocator());
 
-		if (srcAction.hasChanges() != dstAction.hasChanges()) {
-			this.mismatchedLocators.add(dstAction.getLocator().append(Tags.VALUE_CHANGES));
-		} else if (!srcAction.getChanges().equals(dstAction.getChanges())) {
-			this.mismatchedLocators.add(dstAction.getLocator().append(Tags.VALUE_CHANGES));
-		}
+		if (srcAction.hasChanges() != dstAction.hasChanges())
+			addLocator(dstAction.getLocator().append(Tags.VALUE_CHANGES));
+		else if (!srcAction.getChanges().equals(dstAction.getChanges()))
+			addLocator(dstAction.getLocator().append(Tags.VALUE_CHANGES));
 
 		if (srcAction.hasPolicyDefs() && dstAction.hasPolicyDefs())
 			deepEquals(srcAction.getPolicyDefs(), dstAction.getPolicyDefs());
 		else if (srcAction.hasPolicyDefs() != dstAction.hasPolicyDefs())
-			this.mismatchedLocators.add(dstAction.getPolicyDefs().getLocator());
+			addLocator(dstAction.getPolicyDefs().getLocator());
 	}
 
-	protected void deepEquals(GroupedParameterizedElement srcElement, GroupedParameterizedElement dstElement) {
+	private void deepEquals(GroupedParameterizedElement srcElement, GroupedParameterizedElement dstElement) {
 		Set<String> srcBagKeySet = srcElement.getParameterBagKeySet();
 		for (String bagKey : srcBagKeySet) {
 			ParameterBag srcBag = srcElement.getParameterBag(bagKey);
 
 			if (!dstElement.hasParameterBag(bagKey)) {
-				this.mismatchedLocators.add(srcBag.getLocator());
+				addLocator(srcBag.getLocator());
 				continue;
 			}
 
@@ -242,19 +274,19 @@ public class StrolchElementDeepEqualsVisitor {
 		for (String bagKey : dstBagKeySet) {
 			if (!srcElement.hasParameterBag(bagKey)) {
 				ParameterBag dstBag = dstElement.getParameterBag(bagKey);
-				this.mismatchedLocators.add(dstBag.getLocator());
+				addLocator(dstBag.getLocator());
 			}
 		}
 	}
 
-	protected void deepEquals(ParameterBag srcBag, ParameterBag dstBag) {
+	private void deepEquals(ParameterBag srcBag, ParameterBag dstBag) {
 		deepEquals((StrolchElement) srcBag, (StrolchElement) dstBag);
 
 		Set<String> srcParamKeySet = srcBag.getParameterKeySet();
 		for (String paramKey : srcParamKeySet) {
 			Parameter<?> srcParam = srcBag.getParameter(paramKey);
 			if (!dstBag.hasParameter(paramKey)) {
-				this.mismatchedLocators.add(srcParam.getLocator());
+				addLocator(srcParam.getLocator());
 				continue;
 			}
 
@@ -266,39 +298,37 @@ public class StrolchElementDeepEqualsVisitor {
 		for (String paramKey : dstParamKeySet) {
 			if (!srcBag.hasParameter(paramKey)) {
 				Parameter<?> dstParam = dstBag.getParameter(paramKey);
-				this.mismatchedLocators.add(dstParam.getLocator());
+				addLocator(dstParam.getLocator());
 			}
 		}
 	}
 
-	protected void deepEquals(Parameter<?> srcParam, Parameter<?> dstParam) {
+	private void deepEquals(Parameter<?> srcParam, Parameter<?> dstParam) {
 		deepEquals((StrolchElement) srcParam, (StrolchElement) dstParam);
-		if (!srcParam.getUom().equals(dstParam.getUom())) {
-			this.mismatchedLocators.add(dstParam.getLocator());
-		}
-		if (!srcParam.getInterpretation().equals(dstParam.getInterpretation())) {
-			this.mismatchedLocators.add(dstParam.getLocator());
-		}
-		if (srcParam.isHidden() != dstParam.isHidden()) {
-			this.mismatchedLocators.add(dstParam.getLocator());
-		}
-		if (srcParam.getIndex() != dstParam.getIndex()) {
-			this.mismatchedLocators.add(dstParam.getLocator());
-		}
+		if (!srcParam.getUom().equals(dstParam.getUom()))
+			addLocator(dstParam.getLocator());
+		if (!srcParam.getInterpretation().equals(dstParam.getInterpretation()))
+			addLocator(dstParam.getLocator());
+		if (srcParam.isHidden() != dstParam.isHidden())
+			addLocator(dstParam.getLocator());
+		if (srcParam.getIndex() != dstParam.getIndex())
+			addLocator(dstParam.getLocator());
 
-		if (!srcParam.getValue().equals(dstParam.getValue())) {
-			this.mismatchedLocators.add(dstParam.getLocator());
-		}
+		if (!srcParam.getValue().equals(dstParam.getValue()))
+			addLocator(dstParam.getLocator());
 	}
 
-	protected void deepEquals(StrolchTimedState<?> srcState, StrolchTimedState<?> dstState) {
+	private void deepEquals(StrolchTimedState<?> srcState, StrolchTimedState<?> dstState) {
 		deepEquals((StrolchElement) srcState, (StrolchElement) dstState);
 		final ITimeVariable<?> srcTimeEvolution = srcState.getTimeEvolution();
 		final ITimeVariable<?> dstTimeEvolution = dstState.getTimeEvolution();
 
-		if (!srcTimeEvolution.getValues().equals(dstTimeEvolution.getValues())) {
-			this.mismatchedLocators.add(dstState.getLocator().append(Tags.VALUES));
-		}
+		if (!srcTimeEvolution.getValues().equals(dstTimeEvolution.getValues()))
+			addLocator(dstState.getLocator().append(Tags.VALUES));
+	}
+
+	private void addLocator(Locator locator) {
+		this.mismatchedLocators.add(locator);
 	}
 
 	public static boolean isEqual(Order srcOrder, Order dstOrder) {
@@ -310,6 +340,12 @@ public class StrolchElementDeepEqualsVisitor {
 	public static boolean isEqual(Resource srcRes, Resource dstRes) {
 		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
 		visitor.visit(dstRes);
+		return visitor.isEqual();
+	}
+
+	public static boolean isEqual(Activity srcAct, Activity dstAct) {
+		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcAct);
+		visitor.visit(dstAct);
 		return visitor.isEqual();
 	}
 }

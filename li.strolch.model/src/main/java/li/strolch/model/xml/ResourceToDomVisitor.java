@@ -18,7 +18,7 @@ package li.strolch.model.xml;
 import javax.xml.parsers.DocumentBuilder;
 
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
+import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.utils.helper.DomUtil;
 
 import org.w3c.dom.Document;

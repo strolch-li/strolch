@@ -238,8 +238,6 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 				while (result.next()) {
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					T t = parseFromXml(id, type, sqlxml);
-					if (result.next())
-						throw new StrolchPersistenceException("Non unique result for query: " + sql);
 					list.add(t);
 				}
 

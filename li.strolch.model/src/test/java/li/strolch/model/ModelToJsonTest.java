@@ -17,8 +17,6 @@ package li.strolch.model;
 
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
-
 import com.google.gson.JsonObject;
 
 import li.strolch.model.activity.Activity;
@@ -32,13 +30,10 @@ import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
 
-public class ModelToJsonTest {
+public class ModelToJsonTest extends ModelMarshallingTest {
 
-	@Test
-	public void shouldFormatAndParseOrder() {
-
-		Order order = ModelGenerator.createOrder("@1", "My Order 1", "MyOrder");
-
+	@Override
+	protected Order formatAndParseOrder(Order order) {
 		OrderToJsonVisitor jsonVisitor = new OrderToJsonVisitor();
 		jsonVisitor.visit(order);
 		JsonObject jsonObject = jsonVisitor.getJsonObject();
@@ -48,12 +43,12 @@ public class ModelToJsonTest {
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
 		visitor.visit(parsedOrder);
 		assertTrue("To JSON and back should equal same Order:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
+
+		return parsedOrder;
 	}
 
-	@Test
-	public void shouldFormatAndParseResource() {
-
-		Resource resource = ModelGenerator.createResource("@1", "My Resource 1", "MyResource");
+	@Override
+	protected Resource formatAndParseResource(Resource resource) {
 
 		ResourceToJsonVisitor jsonVisitor = new ResourceToJsonVisitor();
 		jsonVisitor.visit(resource);
@@ -65,12 +60,12 @@ public class ModelToJsonTest {
 		visitor.visit(parsedResource);
 		assertTrue("To JSON and back should equal same Resource:\n" + visitor.getMismatchedLocators(),
 				visitor.isEqual());
+
+		return parsedResource;
 	}
 
-	@Test
-	public void shouldFormatAndParseActivity() {
-
-		Activity activity = ModelGenerator.createActivity("@1", "My Activity 1", "Transport");
+	@Override
+	protected Activity formatAndParseActivity(Activity activity) {
 
 		ActivityToJsonVisitor jsonVisitor = new ActivityToJsonVisitor();
 		jsonVisitor.visit(activity);
@@ -82,5 +77,7 @@ public class ModelToJsonTest {
 		visitor.visit(parsedActivity);
 		assertTrue("To JSON and back should equal same Activity:\n" + visitor.getMismatchedLocators(),
 				visitor.isEqual());
+
+		return parsedActivity;
 	}
 }

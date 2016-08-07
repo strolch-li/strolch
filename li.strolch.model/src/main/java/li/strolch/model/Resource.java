@@ -61,6 +61,11 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 	}
 
 	@Override
+	public boolean hasVersion() {
+		return this.version != null;
+	}
+
+	@Override
 	public Version getVersion() {
 		return this.version;
 	}

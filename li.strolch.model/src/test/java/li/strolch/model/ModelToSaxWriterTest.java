@@ -18,32 +18,45 @@ package li.strolch.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Collections;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.model.activity.Activity;
 import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
-import li.strolch.model.xml.ActivityToSaxVisitor;
-import li.strolch.model.xml.OrderToSaxVisitor;
-import li.strolch.model.xml.ResourceToSaxVisitor;
+import li.strolch.model.xml.ActivityToSaxWriterVisitor;
+import li.strolch.model.xml.OrderToSaxWriterVisitor;
+import li.strolch.model.xml.ResourceToSaxWriterVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
-import li.strolch.model.xml.XmlModelSaxReader;
+import li.strolch.model.xml.XmlModelSaxStreamReader;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
-public class ModelToSaxTest extends ModelMarshallingTest {
+public class ModelToSaxWriterTest extends ModelMarshallingTest {
 
 	@Override
-	protected Order formatAndParseOrder(Order order) {
+	protected Order formatAndParseOrder(Order order) throws Exception {
+
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		XMLStreamWriter writer = factory.createXMLStreamWriter(out, "UTF-8");
+		writer.writeStartDocument();
+		writer.writeStartElement(Tags.STROLCH_MODEL);
+		OrderToSaxWriterVisitor toSax = new OrderToSaxWriterVisitor(writer);
+		toSax.visit(order);
+		writer.writeEndDocument();
 
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
-		XmlModelSaxReader saxReader = new XmlModelSaxReader(listener);
-
-		OrderToSaxVisitor domVisitor = new OrderToSaxVisitor(saxReader);
-		domVisitor.visit(order);
+		XmlModelSaxStreamReader saxStreamReader = new XmlModelSaxStreamReader(listener,
+				new ByteArrayInputStream(out.toByteArray()));
+		saxStreamReader.parseStream();
 
 		assertEquals(1, listener.getOrders().size());
 		assertEquals(Collections.emptyList(), listener.getResources());
@@ -58,13 +71,21 @@ public class ModelToSaxTest extends ModelMarshallingTest {
 	}
 
 	@Override
-	protected Resource formatAndParseResource(Resource resource) {
+	protected Resource formatAndParseResource(Resource resource) throws Exception {
+
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		XMLStreamWriter writer = factory.createXMLStreamWriter(out, "UTF-8");
+		writer.writeStartDocument();
+		writer.writeStartElement(Tags.STROLCH_MODEL);
+		ResourceToSaxWriterVisitor toSax = new ResourceToSaxWriterVisitor(writer);
+		toSax.visit(resource);
+		writer.writeEndDocument();
 
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
-		XmlModelSaxReader saxReader = new XmlModelSaxReader(listener);
-
-		ResourceToSaxVisitor domVisitor = new ResourceToSaxVisitor(saxReader);
-		domVisitor.visit(resource);
+		XmlModelSaxStreamReader saxStreamReader = new XmlModelSaxStreamReader(listener,
+				new ByteArrayInputStream(out.toByteArray()));
+		saxStreamReader.parseStream();
 
 		assertEquals(1, listener.getResources().size());
 		assertEquals(Collections.emptyList(), listener.getActivities());
@@ -78,15 +99,26 @@ public class ModelToSaxTest extends ModelMarshallingTest {
 
 		return parsedResource;
 	}
+	
 
 	@Override
-	protected Activity formatAndParseActivity(Activity activity) {
+	protected Activity formatAndParseActivity(Activity activity) throws Exception {
+
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		XMLStreamWriter writer = factory.createXMLStreamWriter(out, "UTF-8");
+		writer.writeStartDocument();
+		writer.writeStartElement(Tags.STROLCH_MODEL);
+		ActivityToSaxWriterVisitor toSax = new ActivityToSaxWriterVisitor(writer);
+		toSax.visit(activity);
+		writer.writeEndDocument();
+		
+		System.out.println(out.toString());
 
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
-		XmlModelSaxReader saxReader = new XmlModelSaxReader(listener);
-
-		ActivityToSaxVisitor domVisitor = new ActivityToSaxVisitor(saxReader);
-		domVisitor.visit(activity);
+		XmlModelSaxStreamReader saxStreamReader = new XmlModelSaxStreamReader(listener,
+				new ByteArrayInputStream(out.toByteArray()));
+		saxStreamReader.parseStream();
 
 		assertEquals(1, listener.getActivities().size());
 		assertEquals(Collections.emptyList(), listener.getResources());

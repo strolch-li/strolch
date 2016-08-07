@@ -97,7 +97,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	@Override
 	protected void internalSave(final Resource res) {
 		String sql = "insert into " + getTableName()
-				+ " (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, true, ?, ?, ?)";
+				+ " (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
 			// id
@@ -110,12 +110,14 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 					Calendar.getInstance());
 			preparedStatement.setBoolean(5, res.getVersion().isDeleted());
 
+			preparedStatement.setBoolean(6, !res.getVersion().isDeleted());
+
 			// attributes
-			preparedStatement.setString(6, res.getName());
-			preparedStatement.setString(7, res.getType());
+			preparedStatement.setString(7, res.getName());
+			preparedStatement.setString(8, res.getType());
 
 			SQLXML sqlxml = createSqlXml(res, preparedStatement);
-			preparedStatement.setSQLXML(8, sqlxml);
+			preparedStatement.setSQLXML(9, sqlxml);
 			try {
 				int modCount = preparedStatement.executeUpdate();
 				if (modCount != 1) {
@@ -182,7 +184,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 		// now we update the existing object
 		String sql = "update " + getTableName()
-				+ " set created_by = ?, created_at = ?, deleted = ?, latest = true, name = ?, type = ?, asxml = ? where id = ? and version = ?";
+				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asxml = ? where id = ? and version = ?";
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
 			// version
@@ -191,16 +193,18 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 					Calendar.getInstance());
 			preparedStatement.setBoolean(3, resource.getVersion().isDeleted());
 
+			preparedStatement.setBoolean(4, !resource.getVersion().isDeleted());
+
 			// attributes
-			preparedStatement.setString(4, resource.getName());
-			preparedStatement.setString(5, resource.getType());
+			preparedStatement.setString(5, resource.getName());
+			preparedStatement.setString(6, resource.getType());
 
 			SQLXML sqlxml = createSqlXml(resource, preparedStatement);
-			preparedStatement.setSQLXML(6, sqlxml);
+			preparedStatement.setSQLXML(7, sqlxml);
 
 			// primary key
-			preparedStatement.setString(7, resource.getId());
-			preparedStatement.setInt(8, resource.getVersion().getVersion());
+			preparedStatement.setString(8, resource.getId());
+			preparedStatement.setInt(9, resource.getVersion().getVersion());
 
 			try {
 				int modCount = preparedStatement.executeUpdate();

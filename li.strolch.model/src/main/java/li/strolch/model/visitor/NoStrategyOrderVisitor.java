@@ -16,7 +16,6 @@
 package li.strolch.model.visitor;
 
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

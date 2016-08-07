@@ -34,8 +34,10 @@ import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.Tags;
+import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
@@ -92,6 +94,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String resName = attributes.getValue(Tags.NAME);
 			String resType = attributes.getValue(Tags.TYPE);
 			Resource resource = new Resource(resId, resName, resType);
+
 			this.parameterizedElement = resource;
 
 			break;
@@ -102,7 +105,9 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String activityName = attributes.getValue(Tags.NAME);
 			String activityType = attributes.getValue(Tags.TYPE);
 			Activity activity = new Activity(activityId, activityName, activityType);
+
 			this.parameterizedElement = activity;
+
 			this.activityStack.push(activity);
 
 			break;
@@ -153,6 +158,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 			}
 			if (StringHelper.isNotEmpty(orderStateS))
 				order.setState(State.valueOf(orderStateS));
+
 			this.parameterizedElement = order;
 
 			break;
@@ -242,6 +248,27 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 			break;
 
+		case Tags.VERSION:
+
+			try {
+				String versionS = attributes.getValue(Tags.VERSION);
+				int v = Integer.parseInt(versionS);
+				String createdBy = attributes.getValue(Tags.CREATED_BY);
+				String createdAtS = attributes.getValue(Tags.CREATED_AT);
+				Date createdAt = ISO8601FormatFactory.getInstance().parseDate(createdAtS);
+				String deletedS = attributes.getValue(Tags.DELETED);
+				boolean deleted = StringHelper.parseBoolean(deletedS);
+
+				Version version = new Version(this.parameterizedElement.getLocator(), v, createdBy, createdAt, deleted);
+				((StrolchRootElement) this.parameterizedElement).setVersion(version);
+
+			} catch (Exception e) {
+				throw new StrolchException(
+						"Failed to Version for for bag " + this.parameterizedElement + " due to " + e.getMessage(), e);
+			}
+
+			break;
+
 		default:
 			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
 		}
@@ -264,10 +291,11 @@ public class XmlModelSaxReader extends DefaultHandler {
 			if (this.activityStack.isEmpty()) {
 				this.listener.notifyActivity(activity);
 				this.statistics.nrOfActivities++;
+				this.parameterizedElement = null;
 			} else {
 				this.activityStack.peek().addElement(activity);
+				this.parameterizedElement = this.activityStack.peek();
 			}
-			this.parameterizedElement = null;
 
 			break;
 
@@ -282,7 +310,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 		case Tags.ACTION:
 
 			this.activityStack.peek().addElement((Action) parameterizedElement);
-			this.parameterizedElement = null;
+			this.parameterizedElement = this.activityStack.peek();
 
 			break;
 
@@ -310,13 +338,13 @@ public class XmlModelSaxReader extends DefaultHandler {
 			} else if (this.parameterizedElement instanceof Action) {
 				((Action) this.parameterizedElement).setPolicyDefs(this.policies);
 			} else {
-				throw new StrolchPolicyException(
-						"Policies are currently not allowed on " + this.parameterizedElement.getClass());
+				throw new StrolchPolicyException("Policies are not allowed on " + this.parameterizedElement.getClass());
 			}
 
 			this.policies = null;
 
 		case Tags.POLICY:
+		case Tags.VERSION:
 		case Tags.PARAMETER:
 		case Tags.INCLUDE_FILE:
 		case Tags.VALUE:

@@ -14,7 +14,9 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.PolicyContainer;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchModelConstants;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -36,6 +38,7 @@ public class StrolchElementToJsonVisitor {
 
 		toJson(element, rootJ);
 
+		addVersion(element, rootJ);
 		addParameterBags(element, rootJ);
 		addTimedStates(element, rootJ);
 		addPolicies(element, rootJ);
@@ -52,6 +55,7 @@ public class StrolchElementToJsonVisitor {
 		rootJ.addProperty(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(element.getDate()));
 		rootJ.addProperty(Tags.STATE, element.getState().name());
 
+		addVersion(element, rootJ);
 		addParameterBags(element, rootJ);
 		addPolicies(element, rootJ);
 
@@ -60,6 +64,7 @@ public class StrolchElementToJsonVisitor {
 
 	public JsonObject toJson(Activity element) {
 		JsonObject rootJ = new JsonObject();
+		addVersion(element, rootJ);
 		return toJson(element, rootJ);
 	}
 
@@ -242,5 +247,19 @@ public class StrolchElementToJsonVisitor {
 				valueJ.addProperty(Tags.VALUE, valueS);
 			}
 		}
+	}
+
+	private void addVersion(StrolchRootElement element, JsonObject rootJ) {
+		if (!element.hasVersion())
+			return;
+
+		Version version = element.getVersion();
+
+		JsonObject versionJ = new JsonObject();
+		versionJ.addProperty(Tags.VERSION, version.getVersion());
+		versionJ.addProperty(Tags.CREATED_BY, version.getCreatedBy());
+		versionJ.addProperty(Tags.CREATED_AT, ISO8601FormatFactory.getInstance().formatDate(version.getCreatedAt()));
+		versionJ.addProperty(Tags.DELETED, version.isDeleted());
+		rootJ.add(Tags.VERSION, versionJ);
 	}
 }

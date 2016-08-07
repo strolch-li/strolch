@@ -71,6 +71,11 @@ public class Activity extends GroupedParameterizedElement
 	}
 
 	@Override
+	public boolean hasVersion() {
+		return this.version != null;
+	}
+
+	@Override
 	public Version getVersion() {
 		return this.version;
 	}

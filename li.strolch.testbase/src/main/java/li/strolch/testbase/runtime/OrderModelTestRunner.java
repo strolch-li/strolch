@@ -155,7 +155,7 @@ public class OrderModelTestRunner {
 		// fail to re-read
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
 			Order order = tx.getOrderMap().getBy(tx, TYPE, ID);
-			assertNull("Should no read Order with id " + ID, order);
+			assertNull("Should not read Order with id " + ID, order);
 		}
 	}
 

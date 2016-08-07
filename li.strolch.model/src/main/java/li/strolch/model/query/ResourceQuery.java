@@ -16,10 +16,10 @@
 package li.strolch.model.query;
 
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
 import li.strolch.model.visitor.NoStrategyResourceVisitor;
+import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**

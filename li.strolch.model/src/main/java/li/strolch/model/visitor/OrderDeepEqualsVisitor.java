@@ -19,7 +19,6 @@ import java.util.List;
 
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

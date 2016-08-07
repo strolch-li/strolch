@@ -15,10 +15,10 @@
  */
 package li.strolch.model.query;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
+import li.strolch.model.visitor.ActivityVisitor;
 import li.strolch.model.visitor.NoStrategyActivityVisitor;
 import li.strolch.utils.dbc.DBC;
 

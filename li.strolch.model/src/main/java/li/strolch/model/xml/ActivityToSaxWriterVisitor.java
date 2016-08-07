@@ -21,8 +21,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.visitor.ActivityVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

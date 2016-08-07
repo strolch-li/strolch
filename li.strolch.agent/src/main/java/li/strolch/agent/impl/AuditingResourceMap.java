@@ -21,8 +21,8 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
 import li.strolch.model.query.ResourceQuery;
+import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 

@@ -22,7 +22,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
+import li.strolch.model.visitor.ResourceVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

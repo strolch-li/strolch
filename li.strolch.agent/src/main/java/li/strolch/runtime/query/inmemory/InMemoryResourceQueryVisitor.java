@@ -18,10 +18,10 @@ package li.strolch.runtime.query.inmemory;
 import java.util.List;
 
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.ResourceQueryVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
+import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**

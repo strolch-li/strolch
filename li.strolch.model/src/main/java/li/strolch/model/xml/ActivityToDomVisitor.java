@@ -20,9 +20,9 @@ import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.visitor.ActivityVisitor;
 import li.strolch.utils.helper.DomUtil;
 
 /**

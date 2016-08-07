@@ -157,8 +157,8 @@ public class ModelTest {
 		ParameterBag bag = activity.getParameterBag(BAG_ID);
 		validateBag(bag);
 
-		Action action = activity.getElement("act_" + actId);
-		assertEquals("act_" + actId, action.getId());
+		Action action = activity.getElement("action_" + actId);
+		assertEquals("action_" + actId, action.getId());
 		assertEquals("Action " + actName, action.getName());
 		assertEquals("Use", action.getType());
 		assertEquals(ACTION_RES_ID, action.getResourceId());
@@ -172,8 +172,8 @@ public class ModelTest {
 		bag = activity.getParameterBag(BAG_ID);
 		validateBag(bag);
 
-		action = activity.getElement("act_" + actId);
-		assertEquals("act_" + actId, action.getId());
+		action = activity.getElement("action_" + actId);
+		assertEquals("action_" + actId, action.getId());
 		assertEquals("Action " + actName, action.getName());
 		assertEquals("Use", action.getType());
 		assertEquals(ACTION_RES_ID, action.getResourceId());
@@ -187,8 +187,8 @@ public class ModelTest {
 		bag = activity.getParameterBag(BAG_ID);
 		validateBag(bag);
 
-		action = activity.getElement("act_" + actId);
-		assertEquals("act_" + actId, action.getId());
+		action = activity.getElement("action_" + actId);
+		assertEquals("action_" + actId, action.getId());
 		assertEquals("Action " + actName, action.getName());
 		assertEquals("Use", action.getType());
 		assertEquals(ACTION_RES_ID, action.getResourceId());
@@ -256,7 +256,7 @@ public class ModelTest {
 		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType");
 		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType");
 
-		Action action = dstActivity.getElement("act_" + "@act01");
+		Action action = dstActivity.getElement("action_" + "@act01");
 		action.setResourceId("Bla");
 		action.setResourceType("Bla");
 		action.setType("Bla");
@@ -266,13 +266,13 @@ public class ModelTest {
 		Activity activity = dstActivity.getElement("sub_" + "@act01");
 		activity.addElement(new Action("bla", "Bla", "Bla"));
 
-		action = activity.getElement("act_" + "@act01");
+		action = activity.getElement("action_" + "@act01");
 		action.addChange(new ValueChange<>(1234567890L, new IntegerValue(12345), STATE_INTEGER_ID));
 
 		activity = activity.getElement("subSub_" + "@act01");
 		activity.addElement(new Action("bla", "Bla", "Bla"));
 
-		action = activity.getElement("act_" + "@act01");
+		action = activity.getElement("action_" + "@act01");
 		action.addChange(new ValueChange<>(1234567890L, new IntegerValue(12345), STATE_INTEGER_ID));
 
 		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);

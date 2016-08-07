@@ -17,8 +17,8 @@ package li.strolch.model.xml;
 
 import java.text.MessageFormat;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.visitor.ActivityVisitor;
 
 import org.xml.sax.ContentHandler;
 

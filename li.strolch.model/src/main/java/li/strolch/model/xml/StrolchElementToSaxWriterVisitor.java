@@ -36,7 +36,9 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -66,6 +68,9 @@ public abstract class StrolchElementToSaxWriterVisitor {
 
 		writeStartStrolchElement(Tags.RESOURCE, empty, resource);
 
+		if (resource.hasVersion())
+			writeVersion(resource);
+
 		if (resource.hasParameterBags())
 			writeParameterBags(resource);
 
@@ -86,9 +91,11 @@ public abstract class StrolchElementToSaxWriterVisitor {
 		this.writer.writeAttribute(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
 		this.writer.writeAttribute(Tags.STATE, order.getState().name());
 
-		if (order.hasParameterBags()) {
+		if (order.hasVersion())
+			writeVersion(order);
+
+		if (order.hasParameterBags())
 			writeParameterBags(order);
-		}
 
 		if (order.hasPolicyDefs())
 			writePolicyDefs(order.getPolicyDefs());
@@ -98,13 +105,16 @@ public abstract class StrolchElementToSaxWriterVisitor {
 	}
 
 	protected void writeElement(Activity activity) throws XMLStreamException {
-		boolean empty = !activity.hasParameterBags() && !activity.hasElements() && !activity.hasPolicyDefs();
+		boolean empty = activity.hasVersion() && !activity.hasParameterBags() && !activity.hasElements()
+				&& !activity.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.ACTIVITY, empty, activity);
 
-		if (activity.hasParameterBags()) {
+		if (activity.hasVersion())
+			writeVersion(activity);
+
+		if (activity.hasParameterBags())
 			writeParameterBags(activity);
-		}
 
 		if (activity.hasElements()) {
 			Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
@@ -126,6 +136,16 @@ public abstract class StrolchElementToSaxWriterVisitor {
 			this.writer.writeEndElement();
 	}
 
+	private void writeVersion(StrolchRootElement rootElement) throws XMLStreamException {
+		this.writer.writeEmptyElement(Tags.VERSION);
+		Version version = rootElement.getVersion();
+		this.writer.writeAttribute(Tags.VERSION, Integer.toString(version.getVersion()));
+		this.writer.writeAttribute(Tags.CREATED_BY, version.getCreatedBy());
+		this.writer.writeAttribute(Tags.CREATED_AT,
+				ISO8601FormatFactory.getInstance().formatDate(version.getCreatedAt()));
+		this.writer.writeAttribute(Tags.DELETED, Boolean.toString(version.isDeleted()));
+	}
+
 	protected <T> void writeElement(Action action) throws XMLStreamException {
 		boolean empty = !action.hasParameterBags() && !action.hasChanges() && !action.hasPolicyDefs();
 
@@ -134,9 +154,8 @@ public abstract class StrolchElementToSaxWriterVisitor {
 		this.writer.writeAttribute(Tags.RESOURCE_ID, action.getResourceId());
 		this.writer.writeAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
 
-		if (action.hasParameterBags()) {
+		if (action.hasParameterBags())
 			writeParameterBags(action);
-		}
 
 		if (action.hasChanges()) {
 			for (IValueChange<? extends IValue<?>> change : action.getChanges()) {
@@ -144,7 +163,7 @@ public abstract class StrolchElementToSaxWriterVisitor {
 				this.writer.writeAttribute(Tags.STATE_ID, change.getStateId());
 				this.writer.writeAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(change.getTime()));
 				this.writer.writeAttribute(Tags.VALUE, change.getValue().getValueAsString());
-				this.writer.writeAttribute(Tags.TYPE, change.getValue().getClass().getName());
+				this.writer.writeAttribute(Tags.TYPE, change.getValue().getType());
 			}
 		}
 
@@ -193,11 +212,10 @@ public abstract class StrolchElementToSaxWriterVisitor {
 
 	protected void writeStartStrolchElement(String tag, boolean empty, StrolchElement element)
 			throws XMLStreamException {
-		if (empty) {
+		if (empty)
 			this.writer.writeEmptyElement(tag);
-		} else {
+		else
 			this.writer.writeStartElement(tag);
-		}
 
 		this.writer.writeAttribute(Tags.ID, element.getId());
 		this.writer.writeAttribute(Tags.NAME, element.getName());
@@ -224,18 +242,14 @@ public abstract class StrolchElementToSaxWriterVisitor {
 		for (Parameter<?> parameter : parameters) {
 			writeStartStrolchElement(Tags.PARAMETER, true, parameter);
 
-			if (!INTERPRETATION_NONE.equals(parameter.getInterpretation())) {
+			if (!INTERPRETATION_NONE.equals(parameter.getInterpretation()))
 				this.writer.writeAttribute(Tags.INTERPRETATION, parameter.getInterpretation());
-			}
-			if (!UOM_NONE.equals(parameter.getUom())) {
+			if (!UOM_NONE.equals(parameter.getUom()))
 				this.writer.writeAttribute(Tags.UOM, parameter.getUom());
-			}
-			if (parameter.isHidden()) {
+			if (parameter.isHidden())
 				this.writer.writeAttribute(Tags.HIDDEN, Boolean.toString(parameter.isHidden()));
-			}
-			if (parameter.getIndex() != 0) {
+			if (parameter.getIndex() != 0)
 				this.writer.writeAttribute(Tags.INDEX, Integer.toString(parameter.getIndex()));
-			}
 
 			this.writer.writeAttribute(Tags.VALUE, parameter.getValueAsString());
 		}

@@ -19,7 +19,6 @@ import java.util.List;
 
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

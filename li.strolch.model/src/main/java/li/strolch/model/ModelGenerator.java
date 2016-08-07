@@ -379,7 +379,7 @@ public class ModelGenerator {
 		ParameterBag bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
 		rootActivity.addParameterBag(bag);
 
-		Action action = createAction("act_" + rootActivity.getId(), "Action " + rootActivity.getName(), "Use");
+		Action action = createAction("action_" + rootActivity.getId(), "Action " + rootActivity.getName(), "Use");
 		rootActivity.addElement(action);
 
 		Activity subActivity = new Activity("sub_" + id, "sub_" + name, type);
@@ -387,7 +387,7 @@ public class ModelGenerator {
 		subActivity.addParameterBag(bag);
 		rootActivity.addElement(subActivity);
 
-		action = createAction("act_" + id, "Action " + name, "Use");
+		action = createAction("action_" + id, "Action " + name, "Use");
 		subActivity.addElement(action);
 
 		Activity subSubActivity = new Activity("subSub_" + id, "subSub_" + name, type);
@@ -395,7 +395,7 @@ public class ModelGenerator {
 		subSubActivity.addParameterBag(bag);
 		subActivity.addElement(subSubActivity);
 
-		action = createAction("act_" + id, "Action " + name, "Use");
+		action = createAction("action_" + id, "Action " + name, "Use");
 		subSubActivity.addElement(action);
 
 		rootActivity.setPolicyDefs(createPolicyDefs());

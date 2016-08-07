@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
+import li.strolch.model.visitor.OrderVisitor;
 
 public class OrderToJsonVisitor extends StrolchElementToJsonVisitor implements OrderVisitor<JsonObject> {
 

@@ -44,13 +44,28 @@ public class Version {
 	 *            the username of the creator of this object
 	 */
 	public Version(Locator locator, int version, String createdBy, boolean deleted) {
+		this(locator, version, createdBy, new Date(), deleted);
+	}
+
+	/**
+	 * Creates a new version instance with the given values.
+	 * 
+	 * @param version
+	 *            the integer version which must be >= 0 and should be incremented for each new version of an object
+	 * @param createdBy
+	 *            the username of the creator of this object
+	 * @param createdAt
+	 *            date when the version was created
+	 */
+	public Version(Locator locator, int version, String createdBy, Date createdAt, boolean deleted) {
 		DBC.PRE.assertTrue("Version must by >= 0", version >= 0);
 		DBC.PRE.assertNotNull("locator must be set!", locator);
 		DBC.PRE.assertNotNull("createdBy must be set!", createdBy);
+		DBC.PRE.assertNotNull("createdAt must be set!", createdAt);
 		this.locator = locator;
 		this.version = version;
 		this.createdBy = createdBy;
-		this.createdAt = new Date();
+		this.createdAt = createdAt;
 		this.deleted = deleted;
 	}
 
@@ -207,7 +222,7 @@ public class Version {
 	 *            maps
 	 */
 	public static void updateVersionFor(StrolchRootElement element, String username, boolean deleted) {
-		int v = element.getVersion() == null ? 0 : element.getVersion().getVersion() + 1;
+		int v = !element.hasVersion() ? 0 : element.getVersion().getVersion() + 1;
 		Version version = new Version(element.getLocator(), v, username, deleted);
 		element.setVersion(version);
 	}

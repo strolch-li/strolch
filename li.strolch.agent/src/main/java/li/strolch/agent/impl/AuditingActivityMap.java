@@ -20,9 +20,9 @@ import java.util.List;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
+import li.strolch.model.visitor.ActivityVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model;
+package li.strolch.model.visitor;
 
-import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.model.Resource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

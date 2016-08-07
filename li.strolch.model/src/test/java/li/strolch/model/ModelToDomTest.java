@@ -17,7 +17,6 @@ package li.strolch.model;
 
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
 import org.w3c.dom.Document;
 
 import li.strolch.model.activity.Activity;
@@ -35,28 +34,9 @@ import li.strolch.model.xml.ResourceToDomVisitor;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
-public class ModelToDomTest extends ModelTest {
+public class ModelToDomTest extends ModelMarshallingTest {
 
-	@Test
-	public void shouldFormatAndParseOrder() {
-
-		Order order = ModelGenerator.createOrder("@1", "My Order 1", "MyOrder");
-
-		OrderToDomVisitor domVisitor = new OrderToDomVisitor();
-		domVisitor.visit(order);
-		Document document = domVisitor.getDocument();
-
-		Order parsedOrder = new OrderFromDomVisitor().visit(document);
-
-		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
-		visitor.visit(parsedOrder);
-		assertTrue("To DOM and back should equal same Order:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
-	}
-
-	@Test
-	public void shouldFormatAndParseResource() {
-
-		Resource resource = ModelGenerator.createResource("@1", "My Resource 1", "MyResource");
+	protected Resource formatAndParseResource(Resource resource) {
 
 		ResourceToDomVisitor domVisitor = new ResourceToDomVisitor();
 		domVisitor.visit(resource);
@@ -68,12 +48,25 @@ public class ModelToDomTest extends ModelTest {
 		visitor.visit(parsedResource);
 		assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(),
 				visitor.isEqual());
+
+		return parsedResource;
 	}
 
-	@Test
-	public void shouldFormatAndParseActivity() {
+	protected Order formatAndParseOrder(Order order) {
+		OrderToDomVisitor domVisitor = new OrderToDomVisitor();
+		domVisitor.visit(order);
+		Document document = domVisitor.getDocument();
 
-		Activity activity = ModelGenerator.createActivity("@1", "My Activity 1", "Transport");
+		Order parsedOrder = new OrderFromDomVisitor().visit(document);
+
+		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
+		visitor.visit(parsedOrder);
+		assertTrue("To DOM and back should equal same Order:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
+
+		return parsedOrder;
+	}
+
+	protected Activity formatAndParseActivity(Activity activity) {
 
 		ActivityToDomVisitor domVisitor = new ActivityToDomVisitor();
 		domVisitor.visit(activity);
@@ -85,5 +78,7 @@ public class ModelToDomTest extends ModelTest {
 		visitor.visit(parsedActivity);
 		assertTrue("To DOM and back should equal same Activity:\n" + visitor.getMismatchedLocators(),
 				visitor.isEqual());
+
+		return parsedActivity;
 	}
 }

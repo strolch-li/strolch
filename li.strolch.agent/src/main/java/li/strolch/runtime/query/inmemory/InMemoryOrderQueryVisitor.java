@@ -18,12 +18,12 @@ package li.strolch.runtime.query.inmemory;
 import java.util.List;
 
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
 import li.strolch.model.query.DateSelection;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.OrderQueryVisitor;
 import li.strolch.model.query.StateSelection;
 import li.strolch.model.query.StrolchTypeNavigation;
+import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**

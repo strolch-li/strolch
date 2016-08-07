@@ -29,7 +29,9 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchModelConstants;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -59,10 +61,7 @@ public class StrolchElementToDomVisitor {
 		asDom.setAttribute(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
 		asDom.setAttribute(Tags.STATE, order.getState().name());
 
-		fillElement(asDom, order);
-
-		if (order.hasPolicyDefs())
-			fillElement(asDom, order.getPolicyDefs());
+		fillElement(asDom, (StrolchRootElement) order);
 
 		return asDom;
 	}
@@ -70,7 +69,7 @@ public class StrolchElementToDomVisitor {
 	protected Element toDom(Resource resource) {
 
 		Element asDom = document.createElement(Tags.RESOURCE);
-		fillElement(asDom, resource);
+		fillElement(asDom, (StrolchRootElement) resource);
 
 		if (resource.hasTimedStates()) {
 			for (String stateKey : resource.getTimedStateKeySet()) {
@@ -80,18 +79,12 @@ public class StrolchElementToDomVisitor {
 			}
 		}
 
-		if (resource.hasPolicyDefs())
-			fillElement(asDom, resource.getPolicyDefs());
-
 		return asDom;
 	}
 
 	protected Element toDom(Activity activity) {
 		Element element = document.createElement(Tags.ACTIVITY);
-		fillElement(element, activity);
-
-		if (activity.hasPolicyDefs())
-			fillElement(element, activity.getPolicyDefs());
+		fillElement(element, (StrolchRootElement) activity);
 
 		if (activity.hasElements()) {
 			Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
@@ -204,18 +197,37 @@ public class StrolchElementToDomVisitor {
 		return element;
 	}
 
+	protected Element toDom(Version version) {
+		Element element = document.createElement(Tags.VERSION);
+		element.setAttribute(Tags.VERSION, Integer.toString(version.getVersion()));
+		element.setAttribute(Tags.CREATED_BY, version.getCreatedBy());
+		element.setAttribute(Tags.CREATED_AT, ISO8601FormatFactory.getInstance().formatDate(version.getCreatedAt()));
+		element.setAttribute(Tags.DELETED, Boolean.toString(version.isDeleted()));
+		return element;
+	}
+
 	protected void fillElement(Element element, AbstractStrolchElement strolchElement) {
 		element.setAttribute(Tags.ID, strolchElement.getId());
 		element.setAttribute(Tags.NAME, strolchElement.getName());
 		element.setAttribute(Tags.TYPE, strolchElement.getType());
 	}
 
-	protected void fillElement(Element element, GroupedParameterizedElement groupedParameterizedElement) {
-		fillElement(element, (AbstractStrolchElement) groupedParameterizedElement);
+	protected void fillElement(Element element, StrolchRootElement rootElement) {
+		fillElement(element, (GroupedParameterizedElement) rootElement);
 
-		if (groupedParameterizedElement.hasParameterBags()) {
-			for (String bagKey : groupedParameterizedElement.getParameterBagKeySet()) {
-				ParameterBag bag = groupedParameterizedElement.getParameterBag(bagKey);
+		if (rootElement.hasVersion())
+			element.appendChild(toDom(rootElement.getVersion()));
+
+		if (rootElement.hasPolicyDefs())
+			fillElement(element, rootElement.getPolicyDefs());
+	}
+
+	protected void fillElement(Element element, GroupedParameterizedElement rootElement) {
+		fillElement(element, (AbstractStrolchElement) rootElement);
+
+		if (rootElement.hasParameterBags()) {
+			for (String bagKey : rootElement.getParameterBagKeySet()) {
+				ParameterBag bag = rootElement.getParameterBag(bagKey);
 				Element bagElement = toDom(bag);
 				element.appendChild(bagElement);
 			}

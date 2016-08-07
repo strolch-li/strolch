@@ -16,6 +16,7 @@
 package li.strolch.model.json;
 
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -31,8 +32,10 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.Tags;
+import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
@@ -51,6 +54,8 @@ public class StrolchElementFromJsonVisitor {
 
 	public void fillElement(JsonObject jsonObject, Order order) {
 		fillElement(jsonObject, (GroupedParameterizedElement) order);
+
+		parseVersion(order, jsonObject);
 
 		// policies
 		PolicyDefs defs = parsePolicies(jsonObject);
@@ -74,6 +79,8 @@ public class StrolchElementFromJsonVisitor {
 
 	public void fillElement(JsonObject jsonObject, Resource resource) {
 		fillElement(jsonObject, (GroupedParameterizedElement) resource);
+
+		parseVersion(resource, jsonObject);
 
 		// policies
 		PolicyDefs defs = parsePolicies(jsonObject);
@@ -138,6 +145,8 @@ public class StrolchElementFromJsonVisitor {
 
 	public void fillElement(JsonObject jsonObject, Activity activity) {
 		fillElement(jsonObject, (GroupedParameterizedElement) activity);
+
+		parseVersion(activity, jsonObject);
 
 		// policies
 		PolicyDefs defs = parsePolicies(jsonObject);
@@ -348,5 +357,22 @@ public class StrolchElementFromJsonVisitor {
 		}
 
 		return policyDefs;
+	}
+
+	protected void parseVersion(StrolchRootElement rootElement, JsonObject jsonObject) {
+
+		if (!jsonObject.has(Tags.VERSION))
+			return;
+
+		JsonObject versionJ = jsonObject.getAsJsonObject(Tags.VERSION);
+
+		int v = versionJ.get(Tags.VERSION).getAsInt();
+		String createdBy = versionJ.get(Tags.CREATED_BY).getAsString();
+		String createdAtS = versionJ.get(Tags.CREATED_AT).getAsString();
+		Date createdAt = ISO8601FormatFactory.getInstance().parseDate(createdAtS);
+		boolean deleted = versionJ.get(Tags.DELETED).getAsBoolean();
+
+		Version version = new Version(rootElement.getLocator(), v, createdBy, createdAt, deleted);
+		rootElement.setVersion(version);
 	}
 }

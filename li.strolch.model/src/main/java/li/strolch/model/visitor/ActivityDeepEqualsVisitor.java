@@ -17,7 +17,6 @@ package li.strolch.model.visitor;
 
 import java.util.List;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.Locator;
 import li.strolch.model.activity.Activity;
 

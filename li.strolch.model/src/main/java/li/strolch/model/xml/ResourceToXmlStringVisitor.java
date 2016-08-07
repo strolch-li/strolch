@@ -22,8 +22,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
 import li.strolch.model.StrolchModelConstants;
+import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**

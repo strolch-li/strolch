@@ -23,8 +23,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
 import li.strolch.model.StrolchModelConstants;
+import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**

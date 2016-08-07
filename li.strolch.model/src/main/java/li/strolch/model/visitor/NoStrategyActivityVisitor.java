@@ -15,7 +15,6 @@
  */
 package li.strolch.model.visitor;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Activity;
 
 /**

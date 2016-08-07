@@ -18,7 +18,7 @@ package li.strolch.model.xml;
 import javax.xml.parsers.DocumentBuilder;
 
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
+import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.utils.helper.DomUtil;
 
 import org.w3c.dom.Document;

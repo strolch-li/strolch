@@ -18,7 +18,7 @@ package li.strolch.model.xml;
 import java.text.MessageFormat;
 
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
+import li.strolch.model.visitor.ResourceVisitor;
 
 import org.xml.sax.ContentHandler;
 

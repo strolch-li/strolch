@@ -30,8 +30,10 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.Tags;
+import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
@@ -50,11 +52,7 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 public class StrolchElementFromDomVisitor {
 
 	public void fillElement(Element element, Order order) {
-		fillElement(element, (GroupedParameterizedElement) order);
-
-		PolicyDefs defs = parsePolicies(element);
-		if (defs.hasPolicyDefs())
-			order.setPolicyDefs(defs);
+		fillElement(element, (StrolchRootElement) order);
 
 		String date = element.getAttribute(Tags.DATE);
 		String state = element.getAttribute(Tags.STATE);
@@ -73,11 +71,7 @@ public class StrolchElementFromDomVisitor {
 	}
 
 	public void fillElement(Element resourceElement, Resource resource) {
-		fillElement(resourceElement, (GroupedParameterizedElement) resource);
-
-		PolicyDefs defs = parsePolicies(resourceElement);
-		if (defs.hasPolicyDefs())
-			resource.setPolicyDefs(defs);
+		fillElement(resourceElement, (StrolchRootElement) resource);
 
 		NodeList childNodes = resourceElement.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
@@ -147,6 +141,38 @@ public class StrolchElementFromDomVisitor {
 		}
 	}
 
+	public void fillElement(Element activityElement, Activity activity) {
+		fillElement(activityElement, (StrolchRootElement) activity);
+
+		NodeList childNodes = activityElement.getChildNodes();
+		for (int i = 0; i < childNodes.getLength(); i++) {
+			Node item = childNodes.item(i);
+			if (!(item instanceof Element))
+				continue;
+
+			Element childElem = (Element) item;
+
+			switch (childElem.getNodeName()) {
+			case Tags.ACTIVITY:
+				Activity childActivity = new Activity();
+				fillElement(childElem, childActivity);
+				activity.addElement(childActivity);
+				break;
+			case Tags.ACTION:
+				Action childAction = new Action();
+				fillElement(childElem, childAction);
+				activity.addElement(childAction);
+				break;
+			case Tags.PARAMETER_BAG:
+			case Tags.POLICIES:
+			case Tags.VERSION:
+				break;
+			default:
+				throw new IllegalArgumentException("Unexpected element tag " + childElem.getNodeName());
+			}
+		}
+	}
+
 	protected void fillElement(Element element, AbstractStrolchElement strolchElement) {
 		String id = element.getAttribute(Tags.ID);
 		String name = element.getAttribute(Tags.NAME);
@@ -181,6 +207,16 @@ public class StrolchElementFromDomVisitor {
 			fillElement(bagElement, bag);
 			groupedParameterizedElement.addParameterBag(bag);
 		}
+	}
+
+	protected void fillElement(Element element, StrolchRootElement strolchRootElement) {
+		fillElement(element, (GroupedParameterizedElement) strolchRootElement);
+
+		parseVersion(strolchRootElement, element);
+
+		PolicyDefs defs = parsePolicies(element);
+		if (defs.hasPolicyDefs())
+			strolchRootElement.setPolicyDefs(defs);
 	}
 
 	protected void fillElement(Element element, ParameterizedElement parameterizedElement) {
@@ -241,41 +277,6 @@ public class StrolchElementFromDomVisitor {
 				String msg = "Boolean string must be either {0} or {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, Boolean.TRUE.toString(), Boolean.FALSE.toString());
 				throw new StrolchException(msg);
-			}
-		}
-	}
-
-	public void fillElement(Element activityElement, Activity activity) {
-		fillElement(activityElement, (GroupedParameterizedElement) activity);
-
-		PolicyDefs defs = parsePolicies(activityElement);
-		if (defs.hasPolicyDefs())
-			activity.setPolicyDefs(defs);
-
-		NodeList childNodes = activityElement.getChildNodes();
-		for (int i = 0; i < childNodes.getLength(); i++) {
-			Node item = childNodes.item(i);
-			if (!(item instanceof Element))
-				continue;
-
-			Element childElem = (Element) item;
-
-			switch (childElem.getNodeName()) {
-			case Tags.ACTIVITY:
-				Activity childActivity = new Activity();
-				fillElement(childElem, childActivity);
-				activity.addElement(childActivity);
-				break;
-			case Tags.ACTION:
-				Action childAction = new Action();
-				fillElement(childElem, childAction);
-				activity.addElement(childAction);
-				break;
-			case Tags.PARAMETER_BAG:
-			case Tags.POLICIES:
-				break;
-			default:
-				throw new IllegalArgumentException("Unexpected element tag " + childElem.getNodeName());
 			}
 		}
 	}
@@ -352,5 +353,28 @@ public class StrolchElementFromDomVisitor {
 		}
 
 		return policyDefs;
+	}
+
+	protected void parseVersion(StrolchRootElement rootElement, Element element) {
+
+		NodeList childNodes = element.getChildNodes();
+		for (int i = 0; i < childNodes.getLength(); i++) {
+			Node resourceChildItem = childNodes.item(i);
+			if (!(resourceChildItem instanceof Element))
+				continue;
+
+			Element versionElem = (Element) resourceChildItem;
+			if (!versionElem.getNodeName().equals(Tags.VERSION))
+				continue;
+
+			int v = Integer.parseInt(versionElem.getAttribute(Tags.VERSION));
+			String createdBy = versionElem.getAttribute(Tags.CREATED_BY);
+			String createdAtS = versionElem.getAttribute(Tags.CREATED_AT);
+			Date createdAt = ISO8601FormatFactory.getInstance().parseDate(createdAtS);
+			boolean deleted = StringHelper.parseBoolean(versionElem.getAttribute(Tags.DELETED));
+			Version version = new Version(rootElement.getLocator(), v, createdBy, createdAt, deleted);
+
+			rootElement.setVersion(version);
+		}
 	}
 }

@@ -18,7 +18,7 @@ package li.strolch.model.xml;
 import java.text.MessageFormat;
 
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
+import li.strolch.model.visitor.OrderVisitor;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;

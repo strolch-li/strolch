@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
+import li.strolch.model.visitor.ResourceVisitor;
 
 public class ResourceToJsonVisitor extends StrolchElementToJsonVisitor implements ResourceVisitor<JsonObject> {
 

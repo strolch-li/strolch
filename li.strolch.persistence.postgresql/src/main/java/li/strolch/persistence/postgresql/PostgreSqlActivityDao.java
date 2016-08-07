@@ -99,7 +99,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 	protected void internalSave(final Activity activity) {
 
 		String sql = "insert into " + getTableName()
-				+ " (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, true, ?, ?, ?)";
+				+ " (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
@@ -113,12 +113,14 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 					Calendar.getInstance());
 			preparedStatement.setBoolean(5, activity.getVersion().isDeleted());
 
+			preparedStatement.setBoolean(6, !activity.getVersion().isDeleted());
+
 			// attributes
-			preparedStatement.setString(6, activity.getName());
-			preparedStatement.setString(7, activity.getType());
+			preparedStatement.setString(7, activity.getName());
+			preparedStatement.setString(8, activity.getType());
 
 			SQLXML sqlxml = createSqlXml(activity, preparedStatement);
-			preparedStatement.setSQLXML(8, sqlxml);
+			preparedStatement.setSQLXML(9, sqlxml);
 
 			try {
 				int modCount = preparedStatement.executeUpdate();
@@ -187,7 +189,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 		}
 
 		String sql = "update " + getTableName()
-				+ " set created_by = ?, created_at = ?, deleted = ?, latest = true, name = ?, type = ?, asxml = ? where id = ? and version = ?";
+				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asxml = ? where id = ? and version = ?";
 
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
@@ -197,16 +199,18 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 					Calendar.getInstance());
 			preparedStatement.setBoolean(3, activity.getVersion().isDeleted());
 
+			preparedStatement.setBoolean(4, !activity.getVersion().isDeleted());
+
 			// attributes
-			preparedStatement.setString(4, activity.getName());
-			preparedStatement.setString(5, activity.getType());
+			preparedStatement.setString(5, activity.getName());
+			preparedStatement.setString(6, activity.getType());
 
 			SQLXML sqlxml = createSqlXml(activity, preparedStatement);
-			preparedStatement.setSQLXML(6, sqlxml);
+			preparedStatement.setSQLXML(7, sqlxml);
 
 			// primary key
-			preparedStatement.setString(7, activity.getId());
-			preparedStatement.setInt(8, activity.getVersion().getVersion());
+			preparedStatement.setString(8, activity.getId());
+			preparedStatement.setInt(9, activity.getVersion().getVersion());
 
 			try {
 				int modCount = preparedStatement.executeUpdate();

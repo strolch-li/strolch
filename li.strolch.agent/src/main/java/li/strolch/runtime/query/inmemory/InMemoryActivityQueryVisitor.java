@@ -17,11 +17,11 @@ package li.strolch.runtime.query.inmemory;
 
 import java.util.List;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.ActivityQueryVisitor;
 import li.strolch.model.query.StrolchTypeNavigation;
+import li.strolch.model.visitor.ActivityVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**

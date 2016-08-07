@@ -3,8 +3,8 @@ package li.strolch.model.json;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import li.strolch.model.ActivityVisitor;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.visitor.ActivityVisitor;
 
 public class ActivityToJsonVisitor extends StrolchElementToJsonVisitor implements ActivityVisitor<JsonObject> {
 

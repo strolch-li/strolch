@@ -16,7 +16,6 @@
 package li.strolch.model.visitor;
 
 import li.strolch.model.Resource;
-import li.strolch.model.ResourceVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

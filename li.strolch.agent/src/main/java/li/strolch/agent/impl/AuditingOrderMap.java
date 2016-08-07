@@ -21,8 +21,8 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.model.Order;
-import li.strolch.model.OrderVisitor;
 import li.strolch.model.query.OrderQuery;
+import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 
