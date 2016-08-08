@@ -312,4 +312,9 @@ public class InMemoryDao<T extends StrolchRootElement> implements StrolchDao<T> 
 			byType.remove(element.getId());
 		}
 	}
+
+	@Override
+	public void flush() {
+		// nothing to do
+	}
 }

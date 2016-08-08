@@ -292,4 +292,8 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 */
 	public void removeVersion(T element) throws StrolchPersistenceException;
 
+	/**
+	 * Causes the DAO to flush any actions which have not yet been sent to the underlying persistence layer
+	 */
+	public void flush();
 }

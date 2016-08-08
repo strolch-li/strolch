@@ -18,7 +18,6 @@ package li.strolch.persistence.inmemory;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.PersistenceHandler;
-import li.strolch.persistence.api.TransactionResult;
 import li.strolch.persistence.api.TransactionState;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
@@ -34,13 +33,13 @@ public class InMemoryTransaction extends AbstractTransaction {
 	}
 
 	@Override
-	protected void writeChanges(TransactionResult txResult) throws Exception {
-		txResult.setState(TransactionState.COMMITTED);
+	protected void writeChanges() throws Exception {
+		getTxResult().setState(TransactionState.COMMITTED);
 	}
 
 	@Override
-	protected void rollback(TransactionResult txResult) throws Exception {
-		txResult.setState(TransactionState.ROLLED_BACK);
+	protected void rollback() throws Exception {
+		getTxResult().setState(TransactionState.ROLLED_BACK);
 	}
 
 	@Override

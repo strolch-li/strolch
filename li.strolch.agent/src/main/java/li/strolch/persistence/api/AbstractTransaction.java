@@ -119,6 +119,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setState(TransactionState.OPEN);
 	}
 
+	public TransactionResult getTxResult() {
+		return this.txResult;
+	}
+
 	@Override
 	public TransactionState getState() {
 		return this.txResult.getState();
@@ -534,7 +538,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		try {
 			validateCommands();
 			doCommands();
-			writeChanges(this.txResult);
+			writeChanges();
 		} catch (Exception e) {
 			this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
 
@@ -553,7 +557,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			validateCommands();
 			doCommands();
-			writeChanges(this.txResult);
+			writeChanges();
 
 			long auditTrailDuration = writeAuditTrail();
 			long updateObserversDuration = updateObservers();
@@ -573,7 +577,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			} catch (Exception ex) {
 				logger.error("Failed to commit transaction and then undo commands due to " + ex.getMessage(), ex);
 				try {
-					rollback(this.txResult);
+					rollback();
 					handleRollback(start);
 				} catch (Exception exc) {
 					logger.error("Failed to roll back after failing to undo commands: " + exc.getMessage(), exc); //$NON-NLS-1$
@@ -582,7 +586,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			}
 
 			try {
-				rollback(this.txResult);
+				rollback();
 				handleRollback(start);
 			} catch (Exception ex) {
 				logger.error("Failed to commit transaction and then rollback due to " + ex.getMessage(), ex);
@@ -607,7 +611,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		try {
 			this.txResult.setState(TransactionState.ROLLING_BACK);
 			undoCommands();
-			rollback(this.txResult);
+			rollback();
 			handleRollback(start);
 			this.txResult.setState(TransactionState.ROLLED_BACK);
 		} catch (Exception e) {
@@ -635,7 +639,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			long auditTrailDuration = writeAuditTrail();
 
 			// rollback and release any resources
-			rollback(this.txResult);
+			rollback();
 
 			handleDoNothing(start, auditTrailDuration);
 			this.txResult.setState(TransactionState.CLOSED);
@@ -647,9 +651,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		}
 	}
 
-	protected abstract void writeChanges(TransactionResult txResult) throws Exception;
+	protected abstract void writeChanges() throws Exception;
 
-	protected abstract void rollback(TransactionResult txResult) throws Exception;
+	protected abstract void rollback() throws Exception;
 
 	protected abstract void commit() throws Exception;
 

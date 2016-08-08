@@ -27,7 +27,6 @@ import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
-import li.strolch.persistence.api.TransactionResult;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 
@@ -49,21 +48,21 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	}
 
 	@Override
-	protected void writeChanges(TransactionResult txResult) throws Exception {
+	protected void writeChanges() throws Exception {
 
 		// first perform DAOs
 		if (this.orderDao != null)
-			this.orderDao.commit(txResult);
+			this.orderDao.flush();
 		if (this.resourceDao != null)
-			this.resourceDao.commit(txResult);
+			this.resourceDao.flush();
 		if (this.activityDao != null)
-			this.activityDao.commit(txResult);
+			this.activityDao.flush();
 
 		// don't commit the connection, this is done in postCommit when we close the connection
 	}
 
 	@Override
-	protected void rollback(TransactionResult txResult) throws Exception {
+	protected void rollback() throws Exception {
 		if (this.connection != null) {
 			try {
 				this.connection.rollback();

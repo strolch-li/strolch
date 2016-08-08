@@ -188,4 +188,10 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("not yet implemented!");
 	}
+
+	@Override
+	public void flush() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("not yet implemented!");
+	}
 }

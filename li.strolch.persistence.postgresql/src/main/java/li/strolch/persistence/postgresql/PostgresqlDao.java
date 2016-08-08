@@ -28,7 +28,6 @@ import java.util.Set;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
-import li.strolch.persistence.api.TransactionResult;
 
 @SuppressWarnings("nls")
 public abstract class PostgresqlDao<T extends StrolchRootElement> implements StrolchDao<T> {
@@ -471,21 +470,23 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 				throw new StrolchPersistenceException(msg);
 			}
 
-			//
-			sql = "update " + getTableName() + " set latest = true where type = ? and id = ? and version = ?";
-			try (PreparedStatement updateStmt = tx().getConnection().prepareStatement(sql)) {
-				int previousVersion = element.getVersion().getPreviousVersion();
-				updateStmt.setString(1, element.getType());
-				updateStmt.setString(2, element.getId());
-				updateStmt.setInt(3, previousVersion);
+			if (!element.getVersion().isFirstVersion()) {
+				sql = "update " + getTableName() + " set latest = true where type = ? and id = ? and version = ?";
+				try (PreparedStatement updateStmt = tx().getConnection().prepareStatement(sql)) {
+					int previousVersion = element.getVersion().getPreviousVersion();
+					updateStmt.setString(1, element.getType());
+					updateStmt.setString(2, element.getId());
+					updateStmt.setInt(3, previousVersion);
 
-				modCount = updateStmt.executeUpdate();
-				if (modCount != 1) {
-					String msg = "Expected to update 1 element with id {0} but SQL statement modified {1} elements! Verify that element {2} with version {3} exists!";
-					msg = MessageFormat.format(msg, element.getId(), modCount, element.getLocator(), previousVersion);
-					throw new StrolchPersistenceException(msg);
+					modCount = updateStmt.executeUpdate();
+					if (modCount != 1) {
+						String msg = "Expected to update 1 element with id {0} but SQL statement modified {1} elements! Verify that element {2} with version {3} exists!";
+						msg = MessageFormat.format(msg, element.getId(), modCount, element.getLocator(),
+								previousVersion);
+						throw new StrolchPersistenceException(msg);
+					}
+
 				}
-
 			}
 
 		} catch (SQLException e) {
@@ -519,15 +520,12 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		}
 	}
 
-	void commit(TransactionResult txResult) {
+	@Override
+	public void flush() {
 		// even though we support rollback we can clear the commands here even if we performed them because the DB transaction will be rolled back
 		for (DaoCommand command : this.commands) {
-			command.doComand(txResult);
+			command.doComand(tx().getTxResult());
 		}
-		this.commands.clear();
-	}
-
-	void rollback() {
 		this.commands.clear();
 	}
 }

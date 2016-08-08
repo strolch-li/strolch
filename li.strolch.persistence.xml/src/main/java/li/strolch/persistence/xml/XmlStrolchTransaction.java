@@ -43,21 +43,21 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 	}
 
 	@Override
-	protected void writeChanges(li.strolch.persistence.api.TransactionResult txResult) throws Exception {
+	protected void writeChanges() throws Exception {
 		TransactionResult result = new TransactionResult();
 		this.tx.setTransactionResult(result);
 		this.tx.autoCloseableCommit();
 		Set<String> keys = result.getKeys();
 		for (String key : keys) {
 			ModificationResult modificationResult = result.getModificationResult(key);
-			txResult.incCreated(modificationResult.getCreated().size());
-			txResult.incUpdated(modificationResult.getUpdated().size());
-			txResult.incDeleted(modificationResult.getDeleted().size());
+			getTxResult().incCreated(modificationResult.getCreated().size());
+			getTxResult().incUpdated(modificationResult.getUpdated().size());
+			getTxResult().incDeleted(modificationResult.getDeleted().size());
 		}
 	}
 
 	@Override
-	protected void rollback(li.strolch.persistence.api.TransactionResult txResult) throws Exception {
+	protected void rollback() throws Exception {
 		this.tx.autoCloseableRollback();
 	}
 

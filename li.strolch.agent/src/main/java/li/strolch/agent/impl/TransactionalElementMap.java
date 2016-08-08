@@ -254,6 +254,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
 
 		getDao(tx).save(element);
+		getDao(tx).flush();
 	}
 
 	@Override
@@ -266,6 +267,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 		}
 
 		getDao(tx).saveAll(elements);
+		getDao(tx).flush();
 	}
 
 	@Override
@@ -276,6 +278,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
 
 		getDao(tx).update(element);
+		getDao(tx).flush();
 	}
 
 	@Override
@@ -288,6 +291,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 		}
 
 		getDao(tx).updateAll(elements);
+		getDao(tx).flush();
 	}
 
 	@Override
@@ -299,6 +303,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
 			getDao(tx).remove(element);
 		}
+		getDao(tx).flush();
 	}
 
 	@Override
@@ -315,16 +320,21 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 		} else {
 			getDao(tx).removeAll(elements);
 		}
+		getDao(tx).flush();
 	}
 
 	@Override
 	public long removeAll(StrolchTransaction tx) {
-		return getDao(tx).removeAll();
+		long removed = getDao(tx).removeAll();
+		getDao(tx).flush();
+		return removed;
 	}
 
 	@Override
 	public long removeAllBy(StrolchTransaction tx, String type) {
-		return getDao(tx).removeAllBy(type);
+		long removed = getDao(tx).removeAllBy(type);
+		getDao(tx).flush();
+		return removed;
 	}
 
 	@Override
@@ -349,6 +359,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 
 		// save the new version
 		getDao(tx).update(clone);
+		getDao(tx).flush();
 
 		// and return new version
 		return clone;
@@ -369,6 +380,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 		}
 
 		getDao(tx).removeVersion(current);
+		getDao(tx).flush();
 	}
 
 	protected abstract void assertIsRefParam(Parameter<?> refP);
