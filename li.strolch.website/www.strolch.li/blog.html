@@ -58,6 +58,33 @@
 
             <!-- blog post -->
             <div class="blog-post">
+                <h2 class="blog-post-title">Versioning of objects</h2>
+
+                <p class="blog-post-meta">8. August, 2016 by <a href="#">Robert</a></p>
+
+                <p>Opt-In versioning of objects</p>
+                <hr>
+                <p>A major new feature has landed in Strolch. Now, using opt-in, it is possible to have all changes to
+                    the object model be versioned. This means that any change to <code>Order</code>,
+                    <code>Resource</code> or <code>Activity</code> is automatically versioned and one can then revert to
+                    this version later on.</p>
+
+                <p>This will make it far easier to implement undo operations in applications since it is an inherent
+                    part of the lifecycle of objects in Strolch.</p>
+
+                <p>Since Strolch is supposed to be used also in small footprint hardware, this option is opt-in.</p>
+
+                <p>A side affect of this new feature is that we have for the time being not ported the XML persistence
+                    layer. If this is required, then someone drop us a note and we'll check on it.</p>
+
+                <p>So now go ahead and add <code>&lt;enableVersioning&gt;true&lt;/enableVersioning&gt;</code> to your
+                    Realm so that versioning is enabled.</p>
+
+            </div>
+            <!-- /.blog-post -->
+
+            <!-- blog post -->
+            <div class="blog-post">
                 <h2 class="blog-post-title">Release 1.2.0</h2>
 
                 <p class="blog-post-meta">4. July, 2016 by <a href="#">Robert</a></p>
