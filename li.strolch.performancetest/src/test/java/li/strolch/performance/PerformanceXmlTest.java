@@ -19,6 +19,7 @@ import java.io.File;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 import li.strolch.testbase.runtime.RuntimeMock;
 import li.strolch.utils.helper.FileHelper;
@@ -26,6 +27,7 @@ import li.strolch.utils.helper.FileHelper;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
+@Ignore("We currently aren't building XML Persistence")
 public class PerformanceXmlTest extends PerformanceTest {
 
 	public static final String RUNTIME_PATH = "target/runtime_xml_test/"; //$NON-NLS-1$

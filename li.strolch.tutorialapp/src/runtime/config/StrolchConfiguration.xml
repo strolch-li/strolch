@@ -47,9 +47,21 @@
 		<Component>
 			<name>PersistenceHandler</name>
 			<api>li.strolch.persistence.api.PersistenceHandler</api>
-			<impl>li.strolch.persistence.xml.XmlPersistenceHandler</impl>
+			<impl>li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler</impl>
 			<Properties>
-				<verbose>true</verbose>
+				<allowSchemaCreation>true</allowSchemaCreation>
+				<allowSchemaDrop>true</allowSchemaDrop>
+				<db.url>jdbc:postgresql://localhost/tutorialapp</db.url>
+				<db.username>tutorialapp</db.username>
+				<db.password>tutorialapp</db.password>
+				<db.pool.maximumPoolSize>1</db.pool.maximumPoolSize>
+				<!--
+					To create the DB user:
+					create user testUser with password 'tutorialapp';
+					create database tutorialapp;
+					GRANT ALL PRIVILEGES ON DATABASE tutorialapp to tutorialapp;
+					GRANT CONNECT ON DATABASE tutorialapp TO tutorialapp ;
+				-->
 			</Properties>
 		</Component>
 		<Component>
