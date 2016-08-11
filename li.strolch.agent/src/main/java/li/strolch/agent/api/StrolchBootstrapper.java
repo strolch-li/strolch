@@ -14,6 +14,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+import li.strolch.runtime.configuration.StrolchEnvironment;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
@@ -189,7 +190,73 @@ public class StrolchBootstrapper extends DefaultHandler {
 		return setup();
 	}
 
+	/**
+	 * Set up Strolch by evaluating the environment from {@link StrolchEnvironment#getEnvironmentFromResourceEnv(Class)}
+	 * and then delegating to {@link #setupByBoostrapFile(String, File)}
+	 * 
+	 * @param clazz
+	 *            the class from which to load the resource as stream
+	 * @param bootstrapFile
+	 *            the bootstrap file to load
+	 * 
+	 * @return the Agent which is setup
+	 */
+	public StrolchAgent setupByBoostrapFile(Class<?> clazz, File bootstrapFile) {
+		DBC.PRE.assertNotNull("clazz must be set!", clazz);
+		DBC.PRE.assertNotNull("bootstrapFile must be set!", bootstrapFile);
+		this.environment = StrolchEnvironment.getEnvironmentFromResourceEnv(clazz);
+		parseBoostrapFile(bootstrapFile);
+		return setup();
+	}
+
+	/**
+	 * Set up Strolch by evaluating the environment from {@link StrolchEnvironment#getEnvironmentFromResourceEnv(Class)}
+	 * and then delegating to {@link #setupByBoostrapFile(String, File)}
+	 * 
+	 * @param clazz
+	 *            the class from which to load the resource as stream
+	 * @param bootstrapFile
+	 *            the input stream to the bootstrap file to load
+	 * 
+	 * @return the Agent which is setup
+	 */
+	public StrolchAgent setupByBoostrapFile(Class<?> clazz, InputStream bootstrapFile) {
+		DBC.PRE.assertNotNull("clazz must be set!", clazz);
+		DBC.PRE.assertNotNull("bootstrapFile must be set!", bootstrapFile);
+		this.environment = StrolchEnvironment.getEnvironmentFromResourceEnv(clazz);
+		parseBoostrapFile(bootstrapFile);
+		return setup();
+	}
+
+	/**
+	 * Set up Strolch by loading the given bootstrap file for configuration
+	 * 
+	 * @param environment
+	 *            the environment to load from the boostrap file
+	 * @param bootstrapFile
+	 *            the bootstrap file to load
+	 * 
+	 * @return the Agent which is setup
+	 */
 	public StrolchAgent setupByBoostrapFile(String environment, File bootstrapFile) {
+		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
+		DBC.PRE.assertNotNull("bootstrapFile must be set!", bootstrapFile);
+		this.environment = environment;
+		parseBoostrapFile(bootstrapFile);
+		return setup();
+	}
+
+	/**
+	 * Set up Strolch by loading the given bootstrap file for configuration
+	 * 
+	 * @param environment
+	 *            the environment to load from the boostrap file
+	 * @param bootstrapFile
+	 *            the input stream to the bootstrap file to load
+	 * 
+	 * @return the Agent which is setup
+	 */
+	public StrolchAgent setupByBoostrapFile(String environment, InputStream bootstrapFile) {
 		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
 		DBC.PRE.assertNotNull("bootstrapFile must be set!", bootstrapFile);
 		this.environment = environment;
@@ -266,6 +333,24 @@ public class StrolchBootstrapper extends DefaultHandler {
 			throw new StrolchConfigurationException("Environment " + this.environment
 					+ " not configured in bootstrap configuration " + bootstrapFile.getAbsolutePath());
 		}
+
+		evaluatePaths();
+	}
+
+	private void parseBoostrapFile(InputStream bootstrapStream) {
+
+		// parse the document using ourselves as the DefaultHandler
+		XmlHelper.parseDocument(bootstrapStream, this);
+
+		if (!this.envFound) {
+			throw new StrolchConfigurationException("Environment " + this.environment
+					+ " not configured in bootstrap configuration from given stream!");
+		}
+
+		evaluatePaths();
+	}
+
+	private void evaluatePaths() {
 
 		// validate the parsed data
 		if (!this.defaultAllowed) {

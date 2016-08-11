@@ -17,8 +17,13 @@ package li.strolch.runtime.configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.utils.dbc.DBC;
@@ -30,6 +35,8 @@ import li.strolch.utils.helper.StringHelper;
 public class StrolchEnvironment {
 
 	public static final String ENV_PROPERTIES_FILE = "ENV.properties"; //$NON-NLS-1$
+
+	private static final Logger logger = LoggerFactory.getLogger(StrolchEnvironment.class);
 
 	public static String getEnvironmentFromSystemProperties() {
 		String environment = System.getProperties().getProperty(StrolchConstants.ENV_STROLCH);
@@ -50,14 +57,42 @@ public class StrolchEnvironment {
 		try (FileInputStream fin = new FileInputStream(envF)) {
 			envP.load(fin);
 		} catch (Exception e) {
-			throw new StrolchConfigurationException(MessageFormat.format(
-					"Failed to load {0} in {1}", ENV_PROPERTIES_FILE, rootPath), e); //$NON-NLS-1$
+			throw new StrolchConfigurationException(
+					MessageFormat.format("Failed to load {0} in {1}", ENV_PROPERTIES_FILE, rootPath), e); //$NON-NLS-1$
 		}
 
 		String environment = envP.getProperty(StrolchConstants.ENV_STROLCH);
 		if (StringHelper.isEmpty(environment)) {
 			String msg = "The property {0} does not exist in {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, StrolchConstants.ENV_STROLCH, envF.getAbsolutePath());
+			throw new StrolchConfigurationException(msg);
+		}
+
+		return environment;
+	}
+
+	public static String getEnvironmentFromResourceEnv(Class<?> clazz) {
+		InputStream stream = clazz.getResourceAsStream("/" + ENV_PROPERTIES_FILE);
+		DBC.PRE.assertNotNull(
+				MessageFormat.format("{0} does not exist as root resource for class {1}", ENV_PROPERTIES_FILE, clazz),
+				stream);
+		Properties envP = new Properties();
+		try {
+			envP.load(stream);
+		} catch (Exception e) {
+			throw new StrolchConfigurationException(MessageFormat.format("Failed to load {0}", ENV_PROPERTIES_FILE), e); //$NON-NLS-1$
+		} finally {
+			try {
+				stream.close();
+			} catch (IOException e) {
+				logger.error("Failed to close InputStream!", e);
+			}
+		}
+
+		String environment = envP.getProperty(StrolchConstants.ENV_STROLCH);
+		if (StringHelper.isEmpty(environment)) {
+			String msg = "The property {0} does not exist in {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, StrolchConstants.ENV_STROLCH, ENV_PROPERTIES_FILE);
 			throw new StrolchConfigurationException(msg);
 		}
 
