@@ -1,131 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="StrolchModel" type="StrolchModelType"/>
-  <xs:complexType name="PolicyType">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="Type" use="optional"/>
-        <xs:attribute type="xs:string" name="Value" use="optional"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  <xs:complexType name="ParameterType">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="Id" use="optional"/>
-        <xs:attribute type="xs:string" name="Name" use="optional"/>
-        <xs:attribute type="xs:string" name="Type" use="optional"/>
-        <xs:attribute type="xs:string" name="Value" use="optional"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  <xs:complexType name="ActionType" mixed="true">
-    <xs:sequence>
-      <xs:element type="ParameterBagType" name="ParameterBag" minOccurs="0"/>
-      <xs:element type="PoliciesType" name="Policies" minOccurs="0"/>
-      <xs:element type="ValueChangeType" name="ValueChange" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-    <xs:attribute type="xs:string" name="Id" use="optional"/>
-    <xs:attribute type="xs:string" name="Name" use="optional"/>
-    <xs:attribute type="xs:string" name="ResourceId" use="optional"/>
-    <xs:attribute type="xs:string" name="ResourceType" use="optional"/>
-    <xs:attribute type="xs:string" name="State" use="optional"/>
-    <xs:attribute type="xs:string" name="Type" use="optional"/>
-  </xs:complexType>
-  <xs:complexType name="TimedStateType">
-    <xs:sequence>
-      <xs:element type="ValueType" name="Value" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-    <xs:attribute type="xs:string" name="Id" use="optional"/>
-    <xs:attribute type="xs:string" name="Name" use="optional"/>
-    <xs:attribute type="xs:string" name="Type" use="optional"/>
-  </xs:complexType>
-  <xs:complexType name="ValueType">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:dateTime" name="Time" use="optional"/>
-        <xs:attribute type="xs:string" name="Value" use="optional"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  <xs:complexType name="ActivityType">
-    <xs:sequence>
-      <xs:element type="VersionType" name="Version" minOccurs="0"/>
-      <xs:element type="ParameterBagType" name="ParameterBag"/>
-      <xs:element type="PoliciesType" name="Policies"/>
-      <xs:element type="ActionType" name="Action" maxOccurs="unbounded" minOccurs="0"/>
-      <xs:element type="ActivityType" name="Activity" minOccurs="0"/>
-    </xs:sequence>
-    <xs:attribute type="xs:string" name="Id" use="optional"/>
-    <xs:attribute type="xs:string" name="Name" use="optional"/>
-    <xs:attribute type="xs:string" name="Type" use="optional"/>
-  </xs:complexType>
-  <xs:complexType name="ResourceType">
-    <xs:sequence>
-      <xs:element type="VersionType" name="Version"/>
-      <xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0"/>
-      <xs:element type="TimedStateType" name="TimedState" maxOccurs="unbounded" minOccurs="0"/>
-      <xs:element type="PoliciesType" name="Policies"/>
-    </xs:sequence>
-    <xs:attribute type="xs:string" name="Id"/>
-    <xs:attribute type="xs:string" name="Name"/>
-    <xs:attribute type="xs:string" name="Type"/>
-  </xs:complexType>
-  <xs:complexType name="IncludeFileType">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="file" use="optional"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  <xs:complexType name="ValueChangeType">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="StateId" use="optional"/>
-        <xs:attribute type="xs:dateTime" name="Time" use="optional"/>
-        <xs:attribute type="xs:byte" name="Value" use="optional"/>
-        <xs:attribute type="xs:string" name="Type" use="optional"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  <xs:complexType name="StrolchModelType">
-    <xs:sequence>
-      <xs:element type="OrderType" name="Order"/>
-      <xs:element type="ResourceType" name="Resource"/>
-      <xs:element type="ActivityType" name="Activity"/>
-      <xs:element type="IncludeFileType" name="IncludeFile" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="VersionType">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:byte" name="Version" use="optional"/>
-        <xs:attribute type="xs:string" name="CreatedBy" use="optional"/>
-        <xs:attribute type="xs:dateTime" name="CreatedAt" use="optional"/>
-        <xs:attribute type="xs:string" name="Deleted" use="optional"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  <xs:complexType name="OrderType">
-    <xs:sequence>
-      <xs:element type="VersionType" name="Version"/>
-      <xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-    <xs:attribute type="xs:string" name="Id"/>
-    <xs:attribute type="xs:string" name="Name"/>
-    <xs:attribute type="xs:string" name="Type"/>
-  </xs:complexType>
-  <xs:complexType name="ParameterBagType">
-    <xs:sequence>
-      <xs:element type="ParameterType" name="Parameter" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-    <xs:attribute type="xs:string" name="Id" use="optional"/>
-    <xs:attribute type="xs:string" name="Name" use="optional"/>
-    <xs:attribute type="xs:string" name="Type" use="optional"/>
-  </xs:complexType>
-  <xs:complexType name="PoliciesType">
-    <xs:sequence>
-      <xs:element type="PolicyType" name="Policy" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="StrolchModel" type="StrolchModelType" />
+
+	<xs:complexType name="StrolchModelType">
+		<xs:sequence>
+			<xs:element type="IncludeFileType" name="IncludeFile" maxOccurs="unbounded" minOccurs="0" />
+			<xs:element type="OrderType" name="Order" maxOccurs="unbounded" minOccurs="0" />
+			<xs:element type="ResourceType" name="Resource" maxOccurs="unbounded" minOccurs="0" />
+			<xs:element type="ActivityType" name="Activity" maxOccurs="unbounded" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="IncludeFileType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="file" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="VersionType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:int" name="Version" />
+				<xs:attribute type="xs:string" name="CreatedBy" />
+				<xs:attribute type="xs:dateTime" name="CreatedAt" />
+				<xs:attribute type="xs:string" name="Deleted" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="OrderType">
+		<xs:sequence>
+			<xs:element type="VersionType" name="Version" maxOccurs="1" minOccurs="0" />
+			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" />
+		<xs:attribute type="xs:string" name="Name" />
+		<xs:attribute type="xs:string" name="Type" />
+	</xs:complexType>
+
+	<xs:complexType name="ResourceType">
+		<xs:sequence>
+			<xs:element type="VersionType" name="Version" maxOccurs="1" minOccurs="0" />
+			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0" />
+			<xs:element type="TimedStateType" name="TimedState" maxOccurs="unbounded" minOccurs="0" />
+			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" />
+		<xs:attribute type="xs:string" name="Name" />
+		<xs:attribute type="xs:string" name="Type" />
+	</xs:complexType>
+
+	<xs:complexType name="ActivityType">
+		<xs:sequence>
+			<xs:element type="VersionType" name="Version" maxOccurs="1" minOccurs="0" />
+			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0" />
+			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0" />
+			<xs:element type="ActionType" name="Action" maxOccurs="unbounded" minOccurs="0" />
+			<xs:element type="ActivityType" name="Activity" maxOccurs="unbounded" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" />
+		<xs:attribute type="xs:string" name="Name" />
+		<xs:attribute type="xs:string" name="Type" />
+	</xs:complexType>
+
+	<xs:complexType name="ActionType" mixed="true">
+		<xs:sequence>
+			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0" />
+			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0" />
+			<xs:element type="ValueChangeType" name="ValueChange" maxOccurs="unbounded" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" />
+		<xs:attribute type="xs:string" name="Name" />
+		<xs:attribute type="xs:string" name="ResourceId" />
+		<xs:attribute type="xs:string" name="ResourceType" />
+		<xs:attribute type="xs:string" name="State" />
+		<xs:attribute type="xs:string" name="Type" />
+	</xs:complexType>
+
+	<xs:complexType name="ParameterBagType">
+		<xs:sequence>
+			<xs:element type="ParameterType" name="Parameter" maxOccurs="unbounded" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" />
+		<xs:attribute type="xs:string" name="Name" />
+		<xs:attribute type="xs:string" name="Type" />
+	</xs:complexType>
+
+	<xs:complexType name="ParameterType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="Id" />
+				<xs:attribute type="xs:string" name="Name" />
+				<xs:attribute type="xs:string" name="Type" />
+				<xs:attribute type="xs:string" name="Value" />
+				<xs:attribute type="xs:string" name="Uom" use="optional" />
+				<xs:attribute type="xs:string" name="Interpretation" use="optional" />
+				<xs:attribute type="xs:string" name="Hidden" use="optional" />
+				<xs:attribute type="xs:string" name="Index" use="optional" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="PoliciesType">
+		<xs:sequence>
+			<xs:element type="PolicyType" name="Policy" maxOccurs="unbounded" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PolicyType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="Type" />
+				<xs:attribute type="xs:string" name="Value" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="TimedStateType">
+		<xs:sequence>
+			<xs:element type="ValueType" name="Value" maxOccurs="unbounded" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" />
+		<xs:attribute type="xs:string" name="Name" />
+		<xs:attribute type="xs:string" name="Type" />
+	</xs:complexType>
+
+	<xs:complexType name="ValueType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:dateTime" name="Time" />
+				<xs:attribute type="xs:string" name="Value" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="ValueChangeType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="StateId" />
+				<xs:attribute type="xs:dateTime" name="Time" />
+				<xs:attribute type="xs:byte" name="Value" />
+				<xs:attribute type="xs:string" name="Type" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
 </xs:schema>

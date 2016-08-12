@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<StrolchModel>
+<StrolchModel xsi:noNamespaceSchemaLocation="StrolchModel.xsd">
 
 	<Order Id="@test1" Name="Test Order" Type="Order">
 		<Version Version="0" CreatedBy="test" CreatedAt="2012-11-30T18:12:05.628+01:00" Deleted="false" />
