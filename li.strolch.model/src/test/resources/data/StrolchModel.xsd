@@ -4,11 +4,13 @@
 	<xs:element name="StrolchModel" type="StrolchModelType" />
 
 	<xs:complexType name="StrolchModelType">
-		<xs:sequence>
-			<xs:element type="IncludeFileType" name="IncludeFile" maxOccurs="unbounded" minOccurs="0" />
-			<xs:element type="OrderType" name="Order" maxOccurs="unbounded" minOccurs="0" />
-			<xs:element type="ResourceType" name="Resource" maxOccurs="unbounded" minOccurs="0" />
-			<xs:element type="ActivityType" name="Activity" maxOccurs="unbounded" minOccurs="0" />
+		<xs:sequence maxOccurs="unbounded" minOccurs="0">
+			<xs:choice>
+				<xs:element type="IncludeFileType" name="IncludeFile" maxOccurs="unbounded" minOccurs="0" />
+				<xs:element type="OrderType" name="Order" maxOccurs="unbounded" minOccurs="0" />
+				<xs:element type="ResourceType" name="Resource" maxOccurs="unbounded" minOccurs="0" />
+				<xs:element type="ActivityType" name="Activity" maxOccurs="unbounded" minOccurs="0" />
+			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -58,8 +60,12 @@
 			<xs:element type="VersionType" name="Version" maxOccurs="1" minOccurs="0" />
 			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0" />
 			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0" />
-			<xs:element type="ActionType" name="Action" maxOccurs="unbounded" minOccurs="0" />
-			<xs:element type="ActivityType" name="Activity" maxOccurs="unbounded" minOccurs="0" />
+			<xs:sequence maxOccurs="unbounded" minOccurs="0">
+				<xs:choice>
+					<xs:element type="ActionType" name="Action" maxOccurs="unbounded" minOccurs="0" />
+					<xs:element type="ActivityType" name="Activity" maxOccurs="unbounded" minOccurs="0" />
+				</xs:choice>
+			</xs:sequence>
 		</xs:sequence>
 		<xs:attribute type="xs:string" name="Id" />
 		<xs:attribute type="xs:string" name="Name" />
