@@ -92,7 +92,6 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 
 		@SuppressWarnings("unchecked")
 		T clone = (T) t.getClone();
-		clone.setVersion(t.getVersion());
 		return clone;
 	}
 

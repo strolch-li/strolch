@@ -17,6 +17,7 @@ package li.strolch.agent.impl;
 
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.Version;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.xml.StrolchElementListener;
 import li.strolch.persistence.api.ActivityDao;
@@ -40,16 +41,22 @@ public class StoreToDaoElementListener implements StrolchElementListener {
 
 	@Override
 	public void notifyResource(Resource resource) {
+		if (tx.isVersioningEnabled() && resource.getVersion() == null)
+			Version.setInitialVersionFor(resource, tx.getCertificate().getUsername());
 		this.resourceDao.save(resource);
 	}
 
 	@Override
 	public void notifyOrder(Order order) {
+		if (tx.isVersioningEnabled() && order.getVersion() == null)
+			Version.setInitialVersionFor(order, tx.getCertificate().getUsername());
 		this.orderDao.save(order);
 	}
 
 	@Override
 	public void notifyActivity(Activity activity) {
+		if (tx.isVersioningEnabled() && activity.getVersion() == null)
+			Version.setInitialVersionFor(activity, tx.getCertificate().getUsername());
 		this.activityDao.save(activity);
 	}
 }

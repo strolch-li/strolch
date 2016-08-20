@@ -96,7 +96,6 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 
 		@SuppressWarnings("unchecked")
 		T clone = (T) t.getClone();
-		clone.setVersion(t.getVersion());
 		return clone;
 	}
 
