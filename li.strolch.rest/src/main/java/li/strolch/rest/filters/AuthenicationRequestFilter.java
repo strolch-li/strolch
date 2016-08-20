@@ -18,6 +18,7 @@ package li.strolch.rest.filters;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -46,13 +47,17 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthenicationRequestFilter.class);
 
+	protected List<String> getUnsecuredPaths() {
+		return Arrays.asList("strolch/authentication");
+	}
+
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
 
 		List<String> matchedURIs = requestContext.getUriInfo().getMatchedURIs();
 
 		// we allow unauthorized access to the authentication service
-		if (matchedURIs.contains("strolch/authentication")) {
+		if (matchedURIs.stream().anyMatch(s -> getUnsecuredPaths().contains(s))) {
 			return;
 		}
 
