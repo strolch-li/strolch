@@ -457,7 +457,7 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
-	 * Returns the {@link Resource} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or null if it
+	 * Returns a copy of the {@link Resource} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or null if it
 	 * does not exist
 	 * </p>
 	 * 
@@ -478,7 +478,7 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
-	 * Returns the {@link Resource} of Type {@link StrolchConstants#TEMPLATE} with the given type as id. If
+	 * Returns a copy of the {@link Resource} of Type {@link StrolchConstants#TEMPLATE} with the given type as id. If
 	 * <code>assertExists</code> is true, then an exception is thrown if the template does not exist does not exist
 	 * </p>
 	 * 
@@ -502,7 +502,7 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
-	 * Returns the {@link Order} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or null if it does
+	 * Returns a copy of the {@link Order} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or null if it does
 	 * not exist
 	 * </p>
 	 * 
@@ -523,7 +523,7 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
-	 * Returns the {@link Order} of Type {@link StrolchConstants#TEMPLATE} with the given type as id. If
+	 * Returns a copy of the {@link Order} of Type {@link StrolchConstants#TEMPLATE} with the given type as id. If
 	 * <code>assertExists</code> is true, then an exception is thrown if the template does not exist does not exist
 	 * </p>
 	 * 
