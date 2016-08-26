@@ -22,6 +22,8 @@ import org.glassfish.jersey.server.ServerProperties;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.HttpCacheResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -203,5 +205,21 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	public ServiceHandler getServiceHandler() {
 		return getContainer().getComponent(ServiceHandler.class);
+	}
+
+	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz) {
+		return getContainer().getRealm(certificate).openTx(certificate, clazz);
+	}
+
+	public StrolchTransaction openTx(Certificate certificate, String name) {
+		return getContainer().getRealm(certificate).openTx(certificate, name);
+	}
+
+	public StrolchTransaction openTx(Certificate certificate, String realm, Class<?> clazz) {
+		return getContainer().getRealm(realm).openTx(certificate, clazz);
+	}
+
+	public StrolchTransaction openTx(Certificate certificate, String realm, String name) {
+		return getContainer().getRealm(realm).openTx(certificate, name);
 	}
 }
