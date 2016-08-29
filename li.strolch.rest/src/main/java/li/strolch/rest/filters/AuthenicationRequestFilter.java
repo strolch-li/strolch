@@ -18,7 +18,7 @@ package li.strolch.rest.filters;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -48,7 +48,9 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 	private static final Logger logger = LoggerFactory.getLogger(AuthenicationRequestFilter.class);
 
 	protected List<String> getUnsecuredPaths() {
-		return Arrays.asList("strolch/authentication");
+		List<String> list = new ArrayList<>();
+		list.add("strolch/authentication");
+		return list;
 	}
 
 	@Override

@@ -1,7 +1,13 @@
 package li.strolch.rest.visitor;
 
+import static li.strolch.model.Tags.ID;
+import static li.strolch.model.Tags.NAME;
+import static li.strolch.model.Tags.OBJECT_TYPE;
+import static li.strolch.model.Tags.TYPE;
+
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import com.google.gson.JsonObject;
 
@@ -25,9 +31,10 @@ import li.strolch.utils.collections.MapOfSets;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ToFlatJsonVisitor {
+public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 
 	private MapOfSets<String, String> ignoredKeys;
+	private BiConsumer<T, JsonObject> hook;
 
 	public ToFlatJsonVisitor() {
 		this.ignoredKeys = new MapOfSets<>();
@@ -35,6 +42,10 @@ public class ToFlatJsonVisitor {
 
 	public ToFlatJsonVisitor(MapOfSets<String, String> ignoredParams) {
 		this.ignoredKeys = new MapOfSets<>();
+	}
+
+	public void setHook(BiConsumer<T, JsonObject> hook) {
+		this.hook = hook;
 	}
 
 	public void ignoreBag(String bagId) {
@@ -45,9 +56,14 @@ public class ToFlatJsonVisitor {
 		this.ignoredKeys.addElement(bagId, paramId);
 	}
 
-	public JsonObject toJson(StrolchRootElement element) {
+	public JsonObject toJson(T element) {
 
 		JsonObject jsonObject = new JsonObject();
+
+		jsonObject.addProperty(ID, element.getId());
+		jsonObject.addProperty(NAME, element.getName());
+		jsonObject.addProperty(TYPE, element.getType());
+		jsonObject.addProperty(OBJECT_TYPE, element.getClass().getSimpleName());
 
 		Set<String> bagKeySet = element.getParameterBagKeySet();
 		for (String bagId : bagKeySet) {
@@ -82,6 +98,9 @@ public class ToFlatJsonVisitor {
 				}
 			}
 		}
+
+		if (hook != null)
+			this.hook.accept(element, jsonObject);
 
 		return jsonObject;
 	}
