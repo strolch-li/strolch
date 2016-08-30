@@ -74,7 +74,7 @@ public class ModelQuery {
 		List<Resource> resources = new ArrayList<>();
 
 		// parse the query string
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(queryData.getQuery(), true);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(queryData.getQuery(), true, true);
 
 		// query the data
 		long dataSetSize = 0L;
@@ -132,7 +132,7 @@ public class ModelQuery {
 		List<Order> orders = new ArrayList<>();
 
 		// parse the query string
-		OrderQuery<Order> query = QueryParser.parseToOrderQuery(queryData.getQuery(), true);
+		OrderQuery<Order> query = QueryParser.parseToOrderQuery(queryData.getQuery(), true, true);
 
 		// query the data
 		long dataSetSize = 0L;
@@ -191,7 +191,7 @@ public class ModelQuery {
 		List<Activity> activities = new ArrayList<>();
 
 		// parse the query string
-		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true);
+		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true, true);
 
 		// query the data
 		long dataSetSize = 0L;
