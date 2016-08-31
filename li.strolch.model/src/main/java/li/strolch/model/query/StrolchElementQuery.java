@@ -22,15 +22,22 @@ import li.strolch.utils.dbc.DBC;
  */
 public abstract class StrolchElementQuery<T extends QueryVisitor> implements StrolchQuery {
 
+	private String privilegeValue;
+
 	protected Navigation navigation;
 	protected Selection selection;
 
 	public StrolchElementQuery() {
-		// empty
+		this.privilegeValue = getClass().getName();
 	}
 
 	public StrolchElementQuery(Navigation navigation) {
+		this();
 		this.navigation = navigation;
+	}
+
+	public void setPrivilegeValue(String privilegeValue) {
+		this.privilegeValue = privilegeValue;
 	}
 
 	public void setNavigation(Navigation navigation) {
@@ -110,6 +117,6 @@ public abstract class StrolchElementQuery<T extends QueryVisitor> implements Str
 	 */
 	@Override
 	public Object getPrivilegeValue() {
-		return getClass().getName();
+		return this.privilegeValue;
 	}
 }

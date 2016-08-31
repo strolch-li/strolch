@@ -100,5 +100,7 @@ public class StrolchConstants {
 
 		public static final String PRIVILEGE_INVALIDATE_SESSION = "InvalidateSession";
 		public static final String PRIVILEGE_GET_SESSION = "GetSession";
+
+		public static final String INTERNAL = "internal";
 	}
 }
