@@ -121,23 +121,11 @@ public abstract class QueryParser extends CompositeParser {
 			}
 
 			action("id", (String s) -> {
-				String trimmed = s.trim();
-				if (trimmed.isEmpty())
-					return null;
-
-				if (this.idSelection == null) {
-					this.idSelection = new IdSelection(trimmed, StringMatchMode.ci());
-					or().with(this.idSelection);
-				} else {
-					this.idSelection.with(trimmed);
-				}
-
+				doIdAction(s);
 				return null;
 			});
 			action("name", (String s) -> {
-				String trimmed = s.trim();
-				if (!trimmed.isEmpty())
-					or().with(new NameSelection(trimmed, StringMatchMode.ci()));
+				doNameAction(s);
 				return null;
 			});
 			action("type", (String s) -> {
@@ -150,23 +138,44 @@ public abstract class QueryParser extends CompositeParser {
 		} else {
 
 			action("other", (String s) -> {
-
-				for (String bagId : getBagParamSet().keySet()) {
-					Set<String> set = getBagParamSet().getSet(bagId);
-					for (String paramId : set) {
-						String trimmed = s.trim();
-						if (!trimmed.isEmpty())
-							or().with(
-									ParameterSelection.anyTypeSelection(bagId, paramId, trimmed, StringMatchMode.ci()));
-					}
-				}
-
+				doIdAction(s);
+				doNameAction(s);
+				doParamAction(s);
 				return null;
-
 			});
 		}
 
 		action("start", o -> this.query);
+	}
+
+	private void doIdAction(String s) {
+		String trimmed = s.trim();
+		if (trimmed.isEmpty())
+			return;
+
+		if (this.idSelection == null) {
+			this.idSelection = new IdSelection(trimmed, StringMatchMode.ci());
+			or().with(this.idSelection);
+		} else {
+			this.idSelection.with(trimmed);
+		}
+	}
+
+	private void doNameAction(String s) {
+		String trimmed = s.trim();
+		if (!trimmed.isEmpty())
+			or().with(new NameSelection(trimmed, StringMatchMode.ci()));
+	}
+
+	private void doParamAction(String s) {
+		for (String bagId : getBagParamSet().keySet()) {
+			Set<String> set = getBagParamSet().getSet(bagId);
+			for (String paramId : set) {
+				String trimmed = s.trim();
+				if (!trimmed.isEmpty())
+					or().with(ParameterSelection.anyTypeSelection(bagId, paramId, trimmed, StringMatchMode.ci()));
+			}
+		}
 	}
 
 	@Override
