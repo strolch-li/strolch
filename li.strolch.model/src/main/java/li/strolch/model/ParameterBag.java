@@ -51,7 +51,8 @@ public class ParameterBag extends ParameterizedElement {
 
 	@Override
 	public void fillLocator(LocatorBuilder lb) {
-		this.parent.fillLocator(lb);
+		if (this.parent != null)
+			this.parent.fillLocator(lb);
 		lb.append(Tags.BAG);
 		lb.append(this.id);
 	}
