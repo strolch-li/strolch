@@ -18,6 +18,9 @@ package li.strolch.utils;
 import li.strolch.utils.dbc.DBC;
 
 /**
+ * The {@link StringMatchMode} is used to match String in different scenarios. The strings can be matched case sensitive
+ * or case insensitive as well as using contains or equals.
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public enum StringMatchMode {
@@ -29,25 +32,42 @@ public enum StringMatchMode {
 	private final boolean equals;
 	private final boolean caseSensitve;
 
+	/**
+	 * @param equals
+	 *            true if should be matched for entire string
+	 * @param caseSensitive
+	 *            true if should be a case insensitive match
+	 */
 	private StringMatchMode(boolean equals, boolean caseSensitive) {
 		this.equals = equals;
 		this.caseSensitve = caseSensitive;
 	}
 
 	/**
-	 * @return the caseSensitve
+	 * @return true if should be a case insensitive match
 	 */
 	public boolean isCaseSensitve() {
 		return this.caseSensitve;
 	}
 
 	/**
-	 * @return the equals
+	 * @return true if should be matched for entire string
 	 */
 	public boolean isEquals() {
 		return this.equals;
 	}
 
+	/**
+	 * Returns true if <code>value2</code> matches <code>value1</code>. I.e. for contains <code>value2</code> must be
+	 * contained in <code>value1</code>
+	 * 
+	 * @param value1
+	 *            the value to be matched against
+	 * @param value2
+	 *            the value to match with the first value
+	 * 
+	 * @return if <code>value2</code> matches <code>value1</code> according to the current settings
+	 */
 	public boolean matches(String value1, String value2) {
 		DBC.PRE.assertNotNull("value1 must be set!", value1); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("value2 must be set!", value2); //$NON-NLS-1$
