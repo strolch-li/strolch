@@ -88,8 +88,8 @@ public class ObjectFilter {
 	 * Default constructor initializing the filter
 	 */
 	public ObjectFilter() {
-		this.cache = new HashMap<>();
-		this.keySet = new HashSet<>();
+		this.cache = new HashMap<>(1);
+		this.keySet = new HashSet<>(1);
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class ObjectFilter {
 			default:
 				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
-		}// else of object not in cache
+		} // else of object not in cache
 
 		// register the key
 		this.keySet.add(key);
@@ -179,7 +179,8 @@ public class ObjectFilter {
 	}
 
 	/**
-	 * Register, under the given key, the update of the given object. * </p>
+	 * Register, under the given key, the update of the given object. *
+	 * </p>
 	 * <table border="1">
 	 * <tr>
 	 * <td>Action \ State in Cache</td>
@@ -241,14 +242,15 @@ public class ObjectFilter {
 			default:
 				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
-		}// else of object not in cache
+		} // else of object not in cache
 
 		// register the key
 		this.keySet.add(key);
 	}
 
 	/**
-	 * Register, under the given key, the removal of the given object. * </p>
+	 * Register, under the given key, the removal of the given object. *
+	 * </p>
 	 * <table border="1">
 	 * <tr>
 	 * <td>Action \ State in Cache</td>
@@ -677,6 +679,13 @@ public class ObjectFilter {
 	 */
 	public int sizeCache() {
 		return this.cache.size();
+	}
+
+	/**
+	 * @return true if the cache is empty, false otherwise
+	 */
+	public boolean isEmpty() {
+		return this.cache.size() == 0;
 	}
 
 	/**
