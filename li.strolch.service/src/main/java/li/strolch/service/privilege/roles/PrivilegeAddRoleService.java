@@ -39,7 +39,7 @@ public class PrivilegeAddRoleService extends AbstractService<PrivilegeRoleArgume
 	protected PrivilegeRoleResult internalDoService(PrivilegeRoleArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
-		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler(getCertificate());
+		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		RoleRep role = privilegeHandler.addRole(getCertificate(), arg.role);
 

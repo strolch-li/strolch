@@ -26,8 +26,8 @@ import li.strolch.service.api.AbstractService;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeAddOrReplacePrivilegeOnRoleService extends
-		AbstractService<PrivilegeAddOrReplacePrivilegeOnRoleArgument, PrivilegeRoleResult> {
+public class PrivilegeAddOrReplacePrivilegeOnRoleService
+		extends AbstractService<PrivilegeAddOrReplacePrivilegeOnRoleArgument, PrivilegeRoleResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,7 +40,7 @@ public class PrivilegeAddOrReplacePrivilegeOnRoleService extends
 	protected PrivilegeRoleResult internalDoService(PrivilegeAddOrReplacePrivilegeOnRoleArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
-		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler(getCertificate());
+		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		RoleRep role = privilegeHandler.addOrReplacePrivilegeOnRole(getCertificate(), arg.roleName, arg.privilegeRep);
 

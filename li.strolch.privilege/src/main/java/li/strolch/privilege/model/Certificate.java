@@ -38,6 +38,7 @@ public final class Certificate implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private final Usage usage;
 	private final String sessionId;
 	private final String username;
 	private final String firstname;
@@ -60,6 +61,8 @@ public final class Certificate implements Serializable {
 	 * by the {@link PrivilegeHandler}
 	 * </p>
 	 * 
+	 * @param usage
+	 *            the usage allowed for this certificate
 	 * @param sessionId
 	 *            the users session id
 	 * @param username
@@ -78,8 +81,9 @@ public final class Certificate implements Serializable {
 	 *            a {@link Map} containing string value pairs of properties for the logged in user. These properties can
 	 *            be edited and can be used for the user to change settings of this session
 	 */
-	public Certificate(String sessionId, String username, String firstname, String lastname, UserState userState,
-			String authToken, Date loginTime, Locale locale, Set<String> userRoles, Map<String, String> propertyMap) {
+	public Certificate(Usage usage, String sessionId, String username, String firstname, String lastname,
+			UserState userState, String authToken, Date loginTime, Locale locale, Set<String> userRoles,
+			Map<String, String> propertyMap) {
 
 		// validate arguments are not null
 		if (StringHelper.isEmpty(sessionId)) {
@@ -94,7 +98,11 @@ public final class Certificate implements Serializable {
 		if (userState == null) {
 			throw new PrivilegeException("userState is null!"); //$NON-NLS-1$
 		}
+		if (usage == null) {
+			throw new PrivilegeException("usage is null!"); //$NON-NLS-1$
+		}
 
+		this.usage = usage;
 		this.sessionId = sessionId;
 		this.username = username;
 		this.firstname = firstname;
@@ -115,6 +123,15 @@ public final class Certificate implements Serializable {
 			this.propertyMap = Collections.unmodifiableMap(propertyMap);
 
 		this.userRoles = Collections.unmodifiableSet(userRoles);
+	}
+
+	/**
+	 * Returns the {@link Usage}
+	 * 
+	 * @return the {@link Usage}
+	 */
+	public Usage getUsage() {
+		return this.usage;
 	}
 
 	/**

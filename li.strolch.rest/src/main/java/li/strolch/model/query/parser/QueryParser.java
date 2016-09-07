@@ -37,9 +37,15 @@ public abstract class QueryParser extends CompositeParser {
 	private OrSelection or;
 
 	private IdSelection idSelection;
+	private boolean allowType;
 
 	public QueryParser(StrolchElementQuery<?> query) {
+		this(query, false);
+	}
+
+	public QueryParser(StrolchElementQuery<?> query, boolean allowType) {
 		this.query = query;
+		this.allowType = allowType;
 	}
 
 	protected OrSelection or() {
@@ -69,7 +75,8 @@ public abstract class QueryParser extends CompositeParser {
 		if (withPrefix()) {
 			def("id", key("id"));
 			def("name", key("name"));
-			def("type", key("type"));
+			if (this.allowType)
+				def("type", key("type"));
 
 			for (String bagId : getBagParamSet().keySet()) {
 				Set<String> set = getBagParamSet().getSet(bagId);
@@ -86,9 +93,12 @@ public abstract class QueryParser extends CompositeParser {
 			}
 
 			if (parsers == null)
-				parsers = ref("id").or(ref("name")).or(ref("type"));
+				parsers = ref("id").or(ref("name"));
 			else
-				parsers = parsers.or(ref("id")).or(ref("name")).or(ref("type"));
+				parsers = parsers.or(ref("id")).or(ref("name"));
+
+			if (this.allowType)
+				parsers = parsers.or(ref("type"));
 
 		} else {
 			def("other", letter().or(digit()).seq(word().or(charParsers()).star().flatten()).flatten());
@@ -128,12 +138,15 @@ public abstract class QueryParser extends CompositeParser {
 				doNameAction(s);
 				return null;
 			});
-			action("type", (String s) -> {
-				String trimmed = s.trim();
-				if (!trimmed.isEmpty())
-					this.query.setNavigation(new StrolchTypeNavigation(trimmed));
-				return null;
-			});
+
+			if (this.allowType) {
+				action("type", (String s) -> {
+					String trimmed = s.trim();
+					if (!trimmed.isEmpty())
+						this.query.setNavigation(new StrolchTypeNavigation(trimmed));
+					return null;
+				});
+			}
 
 		} else {
 

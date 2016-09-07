@@ -55,6 +55,9 @@ public class CertificateStubsDomWriter {
 			// sessionId;
 			certElement.setAttribute(XmlConstants.XML_ATTR_SESSION_ID, cert.getSessionId());
 
+			// usage;
+			certElement.setAttribute(XmlConstants.XML_ATTR_USAGE, cert.getUsage().name());
+
 			// username;
 			certElement.setAttribute(XmlConstants.XML_ATTR_USERNAME, cert.getUsername());
 

@@ -39,7 +39,7 @@ public class PrivilegeRemoveRoleService extends AbstractService<PrivilegeRoleNam
 	protected PrivilegeRoleResult internalDoService(PrivilegeRoleNameArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
-		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler(getCertificate());
+		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		RoleRep role = privilegeHandler.removeRole(getCertificate(), arg.roleName);
 

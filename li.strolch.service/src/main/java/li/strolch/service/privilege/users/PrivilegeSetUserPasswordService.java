@@ -39,7 +39,7 @@ public class PrivilegeSetUserPasswordService extends AbstractService<PrivilegeSe
 	protected ServiceResult internalDoService(PrivilegeSetUserPasswordArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
-		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler(getCertificate());
+		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		privilegeHandler.setUserPassword(getCertificate(), arg.username, arg.password);
 

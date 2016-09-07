@@ -45,11 +45,14 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeRep;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.model.RoleRep;
+import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
+import li.strolch.privilege.model.internal.UserChallenge;
 import li.strolch.privilege.test.model.TestRestrictable;
 import li.strolch.privilege.test.model.TestSystemUserAction;
 import li.strolch.privilege.test.model.TestSystemUserActionDeny;
+import li.strolch.privilege.test.model.TestUserChallengeHandler;
 import li.strolch.utils.helper.ArraysHelper;
 
 /**
@@ -140,8 +143,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			RoleRep roleRep = new RoleRep(ROLE_TEMP, new ArrayList<>());
 
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addRole(certificate, roleRep);
-			privilegeHandler.persist(certificate);
+			this.privilegeHandler.addRole(certificate, roleRep);
+			this.privilegeHandler.persist(certificate);
 		} finally {
 			logout();
 		}
@@ -169,7 +172,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 		// create the action to be performed as a system user and then perform the action
 		TestSystemUserAction action = new TestSystemUserAction();
-		privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN, action);
+		this.privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN, action);
 	}
 
 	/**
@@ -185,7 +188,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
 
 			// and then perform the action
-			privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN, action);
+			this.privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN, action);
 		} finally {
 			logout();
 		}
@@ -204,7 +207,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
 
 			// and then perform the action
-			privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN2, action);
+			this.privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN2, action);
 		} finally {
 			logout();
 		}
@@ -243,15 +246,15 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			Certificate certificate = this.ctx.getCertificate();
 
 			// validate name is not yet set
-			UserRep user = privilegeHandler.getUser(certificate, ADMIN);
+			UserRep user = this.privilegeHandler.getUser(certificate, ADMIN);
 			assertNotEquals("The", user.getFirstname());
 			assertNotEquals("Admin", user.getLastname());
 
 			// let's add a new user bob
 			UserRep userRep = new UserRep(null, ADMIN, "The", "Admin", null, null, null, null);
-			privilegeHandler.updateUser(certificate, userRep);
+			this.privilegeHandler.updateUser(certificate, userRep);
 
-			user = privilegeHandler.getUser(certificate, ADMIN);
+			user = this.privilegeHandler.getUser(certificate, ADMIN);
 			assertEquals("The", user.getFirstname());
 			assertEquals("Admin", user.getLastname());
 
@@ -262,8 +265,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void shouldFailUpdateInexistantUser() {
-		exception.expect(PrivilegeException.class);
-		exception.expectMessage("User bob does not exist");
+		this.exception.expect(PrivilegeException.class);
+		this.exception.expectMessage("User bob does not exist");
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
@@ -271,7 +274,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			// let's add a new user bob
 			UserRep userRep = new UserRep(null, BOB, null, null, null, null, null, null);
-			privilegeHandler.updateUser(certificate, userRep);
+			this.privilegeHandler.updateUser(certificate, userRep);
 		} finally {
 			logout();
 		}
@@ -279,8 +282,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void shouldFailUpdateAdminNoChanges() {
-		exception.expect(PrivilegeException.class);
-		exception.expectMessage("All updateable fields are empty for update of user admin");
+		this.exception.expect(PrivilegeException.class);
+		this.exception.expectMessage("All updateable fields are empty for update of user admin");
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
@@ -288,7 +291,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			// let's add a new user bob
 			UserRep userRep = new UserRep(null, ADMIN, null, null, null, null, null, null);
-			privilegeHandler.updateUser(certificate, userRep);
+			this.privilegeHandler.updateUser(certificate, userRep);
 		} finally {
 			logout();
 		}
@@ -302,7 +305,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			Certificate certificate = this.ctx.getCertificate();
 
 			UserRep selectorRep = new UserRep(null, ADMIN, null, null, null, null, null, null);
-			List<UserRep> users = privilegeHandler.queryUsers(certificate, selectorRep);
+			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(1, users.size());
 			assertEquals(ADMIN, users.get(0).getUsername());
 
@@ -320,7 +323,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			UserRep selectorRep = new UserRep(null, null, null, null, null,
 					new HashSet<>(Arrays.asList("PrivilegeAdmin")), null, null);
-			List<UserRep> users = privilegeHandler.queryUsers(certificate, selectorRep);
+			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(1, users.size());
 			assertEquals(ADMIN, users.get(0).getUsername());
 
@@ -338,7 +341,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			UserRep selectorRep = new UserRep(null, null, null, null, null, new HashSet<>(Arrays.asList(ROLE_TEMP)),
 					null, null);
-			List<UserRep> users = privilegeHandler.queryUsers(certificate, selectorRep);
+			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(0, users.size());
 
 		} finally {
@@ -348,14 +351,14 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void shouldDetectPrivilegeConflict1() {
-		exception.expect(PrivilegeException.class);
-		exception.expectMessage("User admin has conflicts for privilege ");
+		this.exception.expect(PrivilegeException.class);
+		this.exception.expectMessage("User admin has conflicts for privilege ");
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Certificate certificate = this.ctx.getCertificate();
 			PrivilegeRep privilegeRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_ACTION, "DefaultPrivilege", true,
 					Collections.emptySet(), Collections.emptySet());
-			privilegeHandler.addOrReplacePrivilegeOnRole(certificate, ROLE_APP_USER, privilegeRep);
+			this.privilegeHandler.addOrReplacePrivilegeOnRole(certificate, ROLE_APP_USER, privilegeRep);
 		} finally {
 			logout();
 		}
@@ -363,16 +366,37 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void shouldDetectPrivilegeConflict2() {
-		exception.expect(PrivilegeException.class);
-		exception.expectMessage("User admin has conflicts for privilege ");
+		this.exception.expect(PrivilegeException.class);
+		this.exception.expectMessage("User admin has conflicts for privilege ");
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addRoleToUser(certificate, ADMIN, ROLE_MY);
-			privilegeHandler.addRoleToUser(certificate, ADMIN, ROLE_MY2);
+			this.privilegeHandler.addRoleToUser(certificate, ADMIN, ROLE_MY);
+			this.privilegeHandler.addRoleToUser(certificate, ADMIN, ROLE_MY2);
 		} finally {
 			logout();
 		}
+	}
+
+	@Test
+	public void shouldSetPasswordWithChallenge() {
+		this.privilegeHandler.initiateChallengeFor(Usage.SET_PASSWORD, ADMIN);
+		UserChallenge userChallenge = TestUserChallengeHandler.getInstance().getChallenges().values().stream()
+				.filter(u -> u.getUser().getUsername().equals(ADMIN)).findFirst().get();
+		Certificate certificate = this.privilegeHandler.validateChallenge(ADMIN, userChallenge.getChallenge());
+		this.privilegeHandler.setUserPassword(certificate, ADMIN, ArraysHelper.copyOf(PASS_TED));
+
+		try {
+			this.privilegeHandler.isCertificateValid(certificate);
+			fail("Certificate should not be valid anymore!");
+		} catch (PrivilegeException e) {
+			// expected
+		}
+
+		// change password back
+		certificate = this.privilegeHandler.authenticate(ADMIN, PASS_TED);
+		this.privilegeHandler.setUserPassword(certificate, ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+		this.privilegeHandler.invalidateSession(certificate);
 	}
 
 	/**
@@ -428,7 +452,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			Certificate certificate = this.ctx.getCertificate();
 
 			try {
-				privilegeHandler.setUserState(certificate, TED, UserState.SYSTEM);
+				this.privilegeHandler.setUserState(certificate, TED, UserState.SYSTEM);
 				fail("Should not be able to set user state to SYSTEM");
 			} catch (AccessDeniedException e) {
 				// ok
@@ -446,21 +470,21 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			Certificate certificate = this.ctx.getCertificate();
 
 			try {
-				privilegeHandler.setUserPassword(certificate, BOB, ArraysHelper.copyOf(PASS_TED));
+				this.privilegeHandler.setUserPassword(certificate, BOB, ArraysHelper.copyOf(PASS_TED));
 				fail("Should not be able to set password of other user, as missing privilege");
 			} catch (AccessDeniedException e) {
 				// ok
 			}
 
 			try {
-				privilegeHandler.setUserLocale(certificate, BOB, Locale.FRENCH);
+				this.privilegeHandler.setUserLocale(certificate, BOB, Locale.FRENCH);
 				fail("Should not be able to set locale of other user, as missing privilege");
 			} catch (AccessDeniedException e) {
 				// ok
 			}
 
 			try {
-				privilegeHandler.setUserState(certificate, BOB, UserState.DISABLED);
+				this.privilegeHandler.setUserState(certificate, BOB, UserState.DISABLED);
 				fail("Should not be able to set state of other user, as missing privilege");
 			} catch (AccessDeniedException e) {
 				// ok
@@ -478,21 +502,21 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			Certificate certificate = this.ctx.getCertificate();
 
 			try {
-				privilegeHandler.setUserPassword(certificate, TED, ArraysHelper.copyOf(PASS_TED));
+				this.privilegeHandler.setUserPassword(certificate, TED, ArraysHelper.copyOf(PASS_TED));
 				fail("Should not be able to set password, as missing privilege");
 			} catch (AccessDeniedException e) {
 				// ok
 			}
 
 			try {
-				privilegeHandler.setUserLocale(certificate, TED, Locale.FRENCH);
+				this.privilegeHandler.setUserLocale(certificate, TED, Locale.FRENCH);
 				fail("Should not be able to set locale, as missing privilege");
 			} catch (AccessDeniedException e) {
 				// ok
 			}
 
 			try {
-				privilegeHandler.setUserState(certificate, TED, UserState.ENABLED);
+				this.privilegeHandler.setUserState(certificate, TED, UserState.ENABLED);
 				fail("Should not be able to set state, as missing privilege");
 			} catch (AccessDeniedException e) {
 				// ok
@@ -516,10 +540,10 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			RoleRep roleRep = new RoleRep(ROLE_CHANGE_PW, Arrays.asList(passwordRep, localeRep));
 
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addRole(certificate, roleRep);
-			privilegeHandler.addRoleToUser(certificate, TED, ROLE_CHANGE_PW);
+			this.privilegeHandler.addRole(certificate, roleRep);
+			this.privilegeHandler.addRoleToUser(certificate, TED, ROLE_CHANGE_PW);
 			logger.info("Added " + ROLE_CHANGE_PW + " to " + TED);
-			privilegeHandler.persist(certificate);
+			this.privilegeHandler.persist(certificate);
 		} finally {
 			logout();
 		}
@@ -543,9 +567,9 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// testAddAppRoleToBob
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addRoleToUser(certificate, BOB, ROLE_APP_USER);
+			this.privilegeHandler.addRoleToUser(certificate, BOB, ROLE_APP_USER);
 			logger.info("Added " + ROLE_APP_USER + " to " + BOB);
-			privilegeHandler.persist(certificate);
+			this.privilegeHandler.persist(certificate);
 		} finally {
 			logout();
 		}
@@ -583,8 +607,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// testTedChangesOwnPwd
 			login(TED, ArraysHelper.copyOf(PASS_DEF));
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.setUserPassword(certificate, TED, ArraysHelper.copyOf(PASS_TED));
-			privilegeHandler.setUserLocale(certificate, TED, Locale.FRENCH);
+			this.privilegeHandler.setUserPassword(certificate, TED, ArraysHelper.copyOf(PASS_TED));
+			this.privilegeHandler.setUserLocale(certificate, TED, Locale.FRENCH);
 		} finally {
 			logout();
 		}
@@ -596,8 +620,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			login(BOB, ArraysHelper.copyOf(PASS_BOB));
 			// set ted's password to default
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.setUserPassword(certificate, TED, ArraysHelper.copyOf(PASS_DEF));
-			privilegeHandler.persist(certificate);
+			this.privilegeHandler.setUserPassword(certificate, TED, ArraysHelper.copyOf(PASS_DEF));
+			this.privilegeHandler.persist(certificate);
 		} finally {
 			logout();
 		}
@@ -628,9 +652,9 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			userRep = new UserRep(null, TED, "Ted", "Newman", UserState.ENABLED, roles, null,
 					new HashMap<String, String>());
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addUser(certificate, userRep, null);
+			this.privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + TED);
-			privilegeHandler.persist(certificate);
+			this.privilegeHandler.persist(certificate);
 		} finally {
 			logout();
 		}
@@ -641,9 +665,9 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// testAddAdminRoleToBob
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addRoleToUser(certificate, BOB, ROLE_PRIVILEGE_ADMIN);
+			this.privilegeHandler.addRoleToUser(certificate, BOB, ROLE_PRIVILEGE_ADMIN);
 			logger.info("Added " + ROLE_PRIVILEGE_ADMIN + " to " + ADMIN);
-			privilegeHandler.persist(certificate);
+			this.privilegeHandler.persist(certificate);
 		} finally {
 			logout();
 		}
@@ -661,7 +685,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<String>(), null,
 					new HashMap<String, String>());
 			certificate = this.ctx.getCertificate();
-			privilegeHandler.addUser(certificate, userRep, null);
+			this.privilegeHandler.addUser(certificate, userRep, null);
 			fail("User bob may not add a user as bob does not have admin rights!");
 		} catch (PrivilegeException e) {
 			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"), //$NON-NLS-1$
@@ -686,8 +710,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// testAddRoleUserToBob
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addRoleToUser(certificate, BOB, ROLE_USER);
-			privilegeHandler.persist(certificate);
+			this.privilegeHandler.addRoleToUser(certificate, BOB, ROLE_USER);
+			this.privilegeHandler.persist(certificate);
 			logout();
 		} finally {
 			logout();
@@ -700,8 +724,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			RoleRep roleRep = new RoleRep(ROLE_USER, new ArrayList<>());
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addRole(certificate, roleRep);
-			privilegeHandler.persist(certificate);
+			this.privilegeHandler.addRole(certificate, roleRep);
+			this.privilegeHandler.persist(certificate);
 		} finally {
 			logout();
 		}
@@ -712,8 +736,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// testEnableUserBob
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.setUserState(certificate, BOB, UserState.ENABLED);
-			privilegeHandler.persist(certificate);
+			this.privilegeHandler.setUserState(certificate, BOB, UserState.ENABLED);
+			this.privilegeHandler.persist(certificate);
 		} finally {
 			logout();
 		}
@@ -723,7 +747,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 		try {
 			// testFailAuthAsBob
 			// Will fail because user bob is not yet enabled
-			privilegeHandler.authenticate(BOB, ArraysHelper.copyOf(PASS_BOB));
+			this.privilegeHandler.authenticate(BOB, ArraysHelper.copyOf(PASS_BOB));
 			fail("User Bob may not authenticate because the user is not yet enabled!");
 		} catch (PrivilegeException e) {
 			String msg = "User bob does not have state ENABLED and can not login!";
@@ -741,13 +765,13 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			UserRep userRep = new UserRep(null, BOB, "Bob", "Newman", UserState.NEW,
 					new HashSet<>(Arrays.asList(ROLE_MY)), null, new HashMap<String, String>());
 			Certificate certificate = this.ctx.getCertificate();
-			privilegeHandler.addUser(certificate, userRep, null);
+			this.privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + BOB);
 
 			// set bob's password
-			privilegeHandler.setUserPassword(certificate, BOB, ArraysHelper.copyOf(PASS_BOB));
+			this.privilegeHandler.setUserPassword(certificate, BOB, ArraysHelper.copyOf(PASS_BOB));
 			logger.info("Set Bob's password");
-			privilegeHandler.persist(certificate);
+			this.privilegeHandler.persist(certificate);
 		} finally {
 			logout();
 		}

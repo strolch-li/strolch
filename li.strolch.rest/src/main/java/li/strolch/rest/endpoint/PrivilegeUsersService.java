@@ -70,16 +70,16 @@ import li.strolch.service.privilege.users.PrivilegeUserResult;
 @Path("strolch/privilege/users")
 public class PrivilegeUsersService {
 
-	private PrivilegeHandler getPrivilegeHandler(Certificate cert) {
+	private PrivilegeHandler getPrivilegeHandler() {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
-		return container.getPrivilegeHandler().getPrivilegeHandler(cert);
+		return container.getPrivilegeHandler().getPrivilegeHandler();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUsers(@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		List<UserRep> users = privilegeHandler.getUsers(cert);
 		GenericEntity<List<UserRep>> entity = new GenericEntity<List<UserRep>>(users) {
@@ -92,7 +92,7 @@ public class PrivilegeUsersService {
 	@Path("{username}")
 	public Response getUser(@PathParam("username") String username, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		UserRep user = privilegeHandler.getUser(cert, username);
 		return Response.ok(user, MediaType.APPLICATION_JSON).build();
@@ -104,7 +104,7 @@ public class PrivilegeUsersService {
 	@Path("query")
 	public Response queryUsers(UserRep query, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		List<UserRep> users = privilegeHandler.queryUsers(cert, query);
 		GenericEntity<List<UserRep>> entity = new GenericEntity<List<UserRep>>(users) {
@@ -287,6 +287,7 @@ public class PrivilegeUsersService {
 			// TODO invalidate any other sessions for this user
 
 			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+
 		} else if (svcResult.getThrowable() != null) {
 			Throwable t = svcResult.getThrowable();
 			if (t instanceof AccessDeniedException) {

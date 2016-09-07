@@ -144,12 +144,6 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public void checkPassword(Certificate certificate, byte[] password) throws PrivilegeException {
-		assertContainerStarted();
-		this.privilegeHandler.checkPassword(certificate, password);
-	}
-
-	@Override
 	public boolean invalidateSession(Certificate certificate) {
 		boolean invalidateSession = this.privilegeHandler.invalidateSession(certificate);
 		StrolchRealm realm = getContainer().getRealm(certificate);
@@ -189,8 +183,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
-			throws PrivilegeException {
+	public li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler() throws PrivilegeException {
 		return this.privilegeHandler;
 	}
 }

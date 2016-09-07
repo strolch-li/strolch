@@ -60,16 +60,16 @@ import li.strolch.service.privilege.roles.PrivilegeUpdateRoleService;
 @Path("strolch/privilege/roles")
 public class PrivilegeRolesService {
 
-	private PrivilegeHandler getPrivilegeHandler(Certificate cert) {
+	private PrivilegeHandler getPrivilegeHandler() {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
-		return container.getPrivilegeHandler().getPrivilegeHandler(cert);
+		return container.getPrivilegeHandler().getPrivilegeHandler();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRoles(@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		List<RoleRep> roles = privilegeHandler.getRoles(cert);
 		GenericEntity<List<RoleRep>> entity = new GenericEntity<List<RoleRep>>(roles) {
@@ -82,7 +82,7 @@ public class PrivilegeRolesService {
 	@Path("{rolename}")
 	public Response getRole(@PathParam("rolename") String rolename, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		RoleRep role = privilegeHandler.getRole(cert, rolename);
 		return Response.ok(role, MediaType.APPLICATION_JSON).build();

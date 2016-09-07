@@ -26,6 +26,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.privilege.base.AccessDeniedException;
@@ -49,12 +51,14 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.IPrivilege;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.privilege.model.Usage;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.model.Login;
 import li.strolch.rest.model.LoginResult;
 import li.strolch.rest.model.LogoutResult;
+import li.strolch.rest.model.Result;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.helper.StringHelper;
 
@@ -69,7 +73,7 @@ public class AuthenticationService {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response login(Login login, @Context HttpServletRequest request, @Context HttpHeaders headers) {
+	public Response authenticate(Login login, @Context HttpServletRequest request, @Context HttpHeaders headers) {
 
 		LoginResult loginResult = new LoginResult();
 
@@ -90,11 +94,11 @@ public class AuthenticationService {
 				return Response.status(Status.BAD_REQUEST).entity(loginResult).build();
 			}
 
-			RestfulStrolchComponent restfulStrolchComponent = RestfulStrolchComponent.getInstance();
-			StrolchSessionHandler sessionHandler = restfulStrolchComponent.getComponent(StrolchSessionHandler.class);
+			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			Certificate certificate = sessionHandler.authenticate(login.getUsername(), login.getPassword());
 
-			PrivilegeHandler privilegeHandler = restfulStrolchComponent.getContainer().getPrivilegeHandler();
+			PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getContainer()
+					.getPrivilegeHandler();
 			PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
 			loginResult.setSessionId(certificate.getSessionId());
 			loginResult.setAuthToken(certificate.getAuthToken());
@@ -116,7 +120,7 @@ public class AuthenticationService {
 			}
 			loginResult.setPrivileges(privileges);
 
-			boolean secureCookie = restfulStrolchComponent.isSecureCookie();
+			boolean secureCookie = RestfulStrolchComponent.getInstance().isSecureCookie();
 			if (secureCookie && !request.getScheme().equals("https")) {
 				logger.warn(
 						"Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!");
@@ -151,16 +155,15 @@ public class AuthenticationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
-	public Response logout(@PathParam("authToken") String authToken) {
+	public Response invalidateSession(@PathParam("authToken") String authToken) {
 
 		LogoutResult logoutResult = new LogoutResult();
 
 		try {
 
-			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance()
-					.getComponent(StrolchSessionHandler.class);
-			Certificate certificate = sessionHandlerHandler.validate(authToken);
-			sessionHandlerHandler.invalidate(certificate);
+			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+			Certificate certificate = sessionHandler.validate(authToken);
+			sessionHandler.invalidate(certificate);
 
 			logoutResult.setUsername(certificate.getUsername());
 			logoutResult.setAuthToken(authToken);
@@ -187,9 +190,8 @@ public class AuthenticationService {
 
 		try {
 
-			StrolchSessionHandler sessionHandlerHandler = RestfulStrolchComponent.getInstance()
-					.getComponent(StrolchSessionHandler.class);
-			sessionHandlerHandler.validate(authToken);
+			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+			sessionHandler.validate(authToken);
 
 			return Response.ok().build();
 
@@ -207,5 +209,45 @@ public class AuthenticationService {
 			String json = new Gson().toJson(root);
 			return Response.serverError().entity(json).build();
 		}
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("challenge")
+	public Response initiateChallenge(String data) {
+		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		String username = jsonObject.get("username").getAsString();
+		String usage = jsonObject.get("usage").getAsString();
+
+		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+		sessionHandler.initiateChallengeFor(Usage.byValue(usage), username);
+
+		return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+	}
+
+	@PUT
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("challenge")
+	public Response validateChallenge(@Context HttpServletRequest request, String data) {
+		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		String username = jsonObject.get("username").getAsString();
+		String challenge = jsonObject.get("challenge").getAsString();
+
+		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+		Certificate certificate = sessionHandler.validateChallenge(username, challenge);
+
+		jsonObject = new JsonObject();
+		jsonObject.addProperty("authToken", certificate.getAuthToken());
+
+		boolean secureCookie = RestfulStrolchComponent.getInstance().isSecureCookie();
+		if (secureCookie && !request.getScheme().equals("https")) {
+			String msg = "Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!";
+			logger.warn(msg);
+		}
+		NewCookie cookie = new NewCookie(StrolchRestfulConstants.STROLCH_AUTHORIZATION, certificate.getAuthToken(), "/",
+				null, "Authorization header", (int) TimeUnit.DAYS.toSeconds(1), secureCookie);
+
+		return Response.ok().entity(jsonObject.toString())//
+				.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken()).cookie(cookie).build();
 	}
 }

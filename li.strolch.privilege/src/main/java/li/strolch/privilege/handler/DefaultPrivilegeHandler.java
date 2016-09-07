@@ -21,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,11 +53,13 @@ import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.PrivilegeRep;
 import li.strolch.privilege.model.RoleRep;
 import li.strolch.privilege.model.SimpleRestrictable;
+import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.PrivilegeImpl;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
+import li.strolch.privilege.model.internal.UserChallenge;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.privilege.xml.CertificateStubsDomWriter;
 import li.strolch.privilege.xml.CertificateStubsSaxReader;
@@ -84,9 +88,6 @@ import li.strolch.utils.helper.StringHelper;
  */
 public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
-	/**
-	 * slf4j logger
-	 */
 	protected static final Logger logger = LoggerFactory.getLogger(DefaultPrivilegeHandler.class);
 
 	/**
@@ -108,6 +109,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * The encryption handler is used for generating hashes and tokens
 	 */
 	private EncryptionHandler encryptionHandler;
+
+	/**
+	 * The {@link UserChallengeHandler} is used to challenge a user which tries to authenticate and/or change their
+	 * password
+	 */
+	private UserChallengeHandler userChallengeHandler;
 
 	/**
 	 * flag to define if already initialized
@@ -752,10 +759,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(),
 					existingUser.getRoles(), existingUser.getLocale(), existingUser.getProperties());
 
-			// if the user is not setting their own password, then make sure this user may set this user's password
 			if (!certificate.getUsername().equals(username)) {
-				prvCtx.validateAction(
-						new SimpleRestrictable(PRIVILEGE_SET_USER_PASSWORD, new Tuple(existingUser, newUser)));
+				// check that the user may change their own password
+				Tuple value = new Tuple(existingUser, newUser);
+				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_PASSWORD, value));
 			}
 
 			// delegate user replacement to persistence handler
@@ -764,6 +771,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// perform automatic persisting, if enabled
 			if (this.autoPersistOnUserChangesData) {
 				this.persistenceHandler.persist();
+			}
+
+			if (certificate.getUsage() == Usage.SET_PASSWORD) {
+				invalidateSession(certificate);
 			}
 
 		} finally {
@@ -993,6 +1004,49 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
+	public void initiateChallengeFor(Usage usage, String username) {
+
+		// get User
+		User user = this.persistenceHandler.getUser(username);
+		if (user == null) {
+			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
+		}
+
+		// initiate the challenge
+		this.userChallengeHandler.initiateChallengeFor(usage, user);
+
+		logger.info(MessageFormat.format("Initiated Challenge for {0} with usage {1}", username, usage));
+	}
+
+	@Override
+	public Certificate validateChallenge(String username, String challenge) throws PrivilegeException {
+
+		// get User
+		User user = this.persistenceHandler.getUser(username);
+		if (user == null) {
+			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
+		}
+
+		// validate the response
+		UserChallenge userChallenge = this.userChallengeHandler.validateResponse(user, challenge);
+		String authToken = this.encryptionHandler.convertToHash(this.encryptionHandler.nextToken());
+		String sessionId = UUID.randomUUID().toString();
+
+		// create a new certificate, with details of the user
+		Usage usage = userChallenge.getUsage();
+		Certificate certificate = buildCertificate(usage, user, authToken, sessionId);
+		certificate.setLastAccess(new Date());
+
+		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
+		this.privilegeContextMap.put(sessionId, privilegeContext);
+
+		persistSessions();
+
+		logger.info(MessageFormat.format("Challenge validated for user {0} with usage {1}", username, usage));
+		return certificate;
+	}
+
+	@Override
 	public Certificate authenticate(String username, byte[] password) {
 
 		try {
@@ -1019,9 +1073,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String sessionId = UUID.randomUUID().toString();
 
 			// create a new certificate, with details of the user
-			Certificate certificate = new Certificate(sessionId, username, user.getFirstname(), user.getLastname(),
-					user.getUserState(), authToken, new Date(), user.getLocale(), userRoles,
-					new HashMap<>(user.getProperties()));
+			Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId);
 			certificate.setLastAccess(new Date());
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
@@ -1044,6 +1096,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		} finally {
 			clearPassword(password);
 		}
+	}
+
+	private Certificate buildCertificate(Usage usage, User user, String authToken, String sessionId) {
+		Set<String> userRoles = user.getRoles();
+		Certificate certificate = new Certificate(usage, sessionId, user.getUsername(), user.getFirstname(),
+				user.getLastname(), user.getUserState(), authToken, new Date(), user.getLocale(), userRoles,
+				new HashMap<>(user.getProperties()));
+		return certificate;
 	}
 
 	private boolean persistSessions() {
@@ -1101,6 +1161,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		for (CertificateStub certificateStub : certificateStubs) {
+			Usage usage = certificateStub.getUsage();
 			String username = certificateStub.getUsername();
 			String sessionId = certificateStub.getSessionId();
 			String authToken = certificateStub.getAuthToken();
@@ -1117,9 +1178,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			// create a new certificate, with details of the user
-			Certificate certificate = new Certificate(sessionId, username, user.getFirstname(), user.getLastname(),
-					user.getUserState(), authToken, certificateStub.getLoginTime(), certificateStub.getLocale(),
-					userRoles, new HashMap<>(user.getProperties()));
+			Certificate certificate = buildCertificate(usage, user, authToken, sessionId);
 			certificate.setLastAccess(certificateStub.getLastAccess());
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
@@ -1267,9 +1326,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	@Override
 	public boolean invalidateSession(Certificate certificate) {
 
-		// first validate certificate
-		isCertificateValid(certificate);
-
 		// remove registration
 		PrivilegeContext privilegeContext = this.privilegeContextMap.remove(certificate.getSessionId());
 
@@ -1279,10 +1335,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// return true if object was really removed
 		boolean loggedOut = privilegeContext != null;
 		if (loggedOut)
-			DefaultPrivilegeHandler.logger
-					.info(MessageFormat.format("User {0} logged out.", certificate.getUsername())); //$NON-NLS-1$
+			logger.info(MessageFormat.format("User {0} logged out.", certificate.getUsername())); //$NON-NLS-1$
 		else
-			DefaultPrivilegeHandler.logger.warn("User already logged out!"); //$NON-NLS-1$
+			logger.warn("User already logged out!"); //$NON-NLS-1$
+
 		return loggedOut;
 	}
 
@@ -1308,6 +1364,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException(msg);
 		}
 
+		// validate that challenge certificate is not expired (1 hour only) 
+		if (sessionCertificate.getUsage() != Usage.ANY) {
+			LocalDateTime dateTime = LocalDateTime.ofInstant(sessionCertificate.getLoginTime().toInstant(),
+					ZoneId.systemDefault());
+			if (dateTime.plusHours(1).isBefore(LocalDateTime.now())) {
+				invalidateSession(sessionCertificate);
+				throw new PrivilegeException("Certificate has already expired!"); //$NON-NLS-1$
+			}
+		}
+
 		// get user object
 		User user = this.persistenceHandler.getUser(privilegeContext.getUsername());
 
@@ -1318,16 +1384,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// everything is ok
-	}
-
-	@Override
-	public void checkPassword(Certificate certificate, byte[] password) throws PrivilegeException {
-		try {
-			isCertificateValid(certificate);
-			checkCredentialsAndUserState(certificate.getUsername(), password);
-		} finally {
-			clearPassword(password);
-		}
 	}
 
 	@Override
@@ -1397,6 +1453,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 *            the {@link EncryptionHandler} instance for this {@link PrivilegeHandler}
 	 * @param persistenceHandler
 	 *            the {@link PersistenceHandler} instance for this {@link PrivilegeHandler}
+	 * @param userChallengeHandler
+	 *            the handler to challenge a user's actions e.g. password change or authentication
 	 * @param policyMap
 	 *            map of {@link PrivilegePolicy} classes
 	 * 
@@ -1404,7 +1462,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 *             if the this method is called multiple times or an initialization exception occurs
 	 */
 	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
-			PersistenceHandler persistenceHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
+			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
+			Map<String, Class<PrivilegePolicy>> policyMap) {
 
 		if (this.initialized)
 			throw new PrivilegeException("Already initialized!"); //$NON-NLS-1$
@@ -1412,6 +1471,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.policyMap = policyMap;
 		this.encryptionHandler = encryptionHandler;
 		this.persistenceHandler = persistenceHandler;
+		this.userChallengeHandler = userChallengeHandler;
 
 		handleAutoPersistOnUserDataChange(parameterMap);
 		handlePersistSessionsParam(parameterMap);
@@ -1715,9 +1775,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String sessionId = UUID.randomUUID().toString();
 
 		// create a new certificate, with details of the user
-		Certificate systemUserCertificate = new Certificate(sessionId, systemUsername, user.getFirstname(),
-				user.getLastname(), user.getUserState(), authToken, new Date(), user.getLocale(), user.getRoles(),
-				new HashMap<>(user.getProperties()));
+		Certificate systemUserCertificate = buildCertificate(Usage.ANY, user, authToken, sessionId);
 		systemUserCertificate.setLastAccess(new Date());
 
 		// create and save a new privilege context

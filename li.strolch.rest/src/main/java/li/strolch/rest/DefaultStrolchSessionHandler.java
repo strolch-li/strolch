@@ -46,6 +46,7 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.SimpleRestrictable;
+import li.strolch.privilege.model.Usage;
 import li.strolch.rest.model.UserSession;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
@@ -85,7 +86,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		if (this.reloadSessions) {
 			List<Certificate> certificates = runPrivilegedRunnable(ctx -> {
 				Certificate cert = ctx.getCertificate();
-				return this.privilegeHandler.getPrivilegeHandler(cert).getCertificates(cert).stream()
+				return this.privilegeHandler.getPrivilegeHandler().getCertificates(cert).stream()
 						.filter(c -> !c.getUserState().isSystem()).collect(Collectors.toList());
 			});
 			for (Certificate certificate : certificates) {
@@ -109,7 +110,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	public void stop() throws Exception {
 		if (this.reloadSessions) {
 
-			runPrivilegedRunnable(ctx -> getContainer().getPrivilegeHandler().getPrivilegeHandler(ctx.getCertificate())
+			runPrivilegedRunnable(ctx -> getContainer().getPrivilegeHandler().getPrivilegeHandler()
 					.persistSessions(ctx.getCertificate()));
 
 		} else if (this.certificateMap != null) {
@@ -138,28 +139,23 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public Certificate authenticate(String username, byte[] password) {
-		DBC.PRE.assertNotEmpty("Origin must be set!", username); //$NON-NLS-1$
 		DBC.PRE.assertNotEmpty("Username must be set!", username); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Passwort must be set", password); //$NON-NLS-1$
 
-		synchronized (this.certificateMap) {
-			Certificate certificate = this.privilegeHandler.authenticate(username, password);
-			certificate.setLastAccess(new Date());
-			this.certificateMap.put(certificate.getAuthToken(), certificate);
+		Certificate certificate = this.privilegeHandler.authenticate(username, password);
+		certificate.setLastAccess(new Date());
 
-			logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
-			return certificate;
-		}
+		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
+
+		return certificate;
 	}
 
 	@Override
 	public Certificate validate(String authToken) {
-		DBC.PRE.assertNotEmpty("SessionId must be set!", authToken); //$NON-NLS-1$
+		DBC.PRE.assertNotEmpty("authToken must be set!", authToken); //$NON-NLS-1$
 
-		Certificate certificate;
-		synchronized (this.certificateMap) {
-			certificate = this.certificateMap.get(authToken);
-		}
+		Certificate certificate = this.certificateMap.get(authToken);
 
 		if (certificate == null)
 			throw new StrolchException(MessageFormat.format("No certificate exists for sessionId {0}", authToken)); //$NON-NLS-1$
@@ -178,24 +174,36 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	public void invalidate(Certificate certificate) {
 		DBC.PRE.assertNotNull("Certificate must be given!", certificate); //$NON-NLS-1$
 
-		Certificate removedCert;
-		synchronized (this.certificateMap) {
-			removedCert = this.certificateMap.remove(certificate.getAuthToken());
-		}
+		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
 			logger.error(MessageFormat.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
 
 		this.privilegeHandler.invalidateSession(certificate);
 	}
 
+	@Override
+	public void initiateChallengeFor(Usage usage, String username) {
+		this.privilegeHandler.getPrivilegeHandler().initiateChallengeFor(usage, username);
+	}
+
+	@Override
+	public Certificate validateChallenge(String username, String challenge) throws PrivilegeException {
+		DBC.PRE.assertNotEmpty("username must be set!", username); //$NON-NLS-1$
+		DBC.PRE.assertNotEmpty("challenge must be set", challenge); //$NON-NLS-1$
+
+		Certificate certificate = this.privilegeHandler.getPrivilegeHandler().validateChallenge(username, challenge);
+		certificate.setLastAccess(new Date());
+
+		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
+
+		return certificate;
+	}
+
 	protected void sessionTimeout(Certificate certificate) {
 		DBC.PRE.assertNotNull("Certificate must be given!", certificate); //$NON-NLS-1$
 
-		Certificate removedCert;
-		synchronized (this.certificateMap) {
-			removedCert = this.certificateMap.remove(certificate.getAuthToken());
-		}
-
+		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
 			logger.error(MessageFormat.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
 

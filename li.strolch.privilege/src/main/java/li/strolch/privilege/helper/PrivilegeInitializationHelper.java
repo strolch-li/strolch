@@ -26,6 +26,7 @@ import li.strolch.privilege.handler.DefaultPrivilegeHandler;
 import li.strolch.privilege.handler.EncryptionHandler;
 import li.strolch.privilege.handler.PersistenceHandler;
 import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.handler.UserChallengeHandler;
 import li.strolch.privilege.model.internal.PrivilegeContainerModel;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.privilege.xml.PrivilegeConfigSaxReader;
@@ -123,12 +124,26 @@ public class PrivilegeInitializationHelper {
 			throw new PrivilegeException(msg, e);
 		}
 
+		// initialize challenge handler
+		UserChallengeHandler challengeHandler;
+		String challengeHandlerClassName = containerModel.getUserChallengeHandlerClassName();
+		challengeHandler = ClassHelper.instantiateClass(challengeHandlerClassName);
+		parameterMap = containerModel.getUserChallengeHandlerParameterMap();
+		try {
+			challengeHandler.initialize(parameterMap);
+		} catch (Exception e) {
+			String msg = "UserChallengeHandler {0} could not be initialized"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, persistenceHandlerClassName);
+			throw new PrivilegeException(msg, e);
+		}
+
 		// initialize privilege handler
 		DefaultPrivilegeHandler privilegeHandler = new DefaultPrivilegeHandler();
 		parameterMap = containerModel.getParameterMap();
 		Map<String, Class<PrivilegePolicy>> policyMap = containerModel.getPolicies();
 		try {
-			privilegeHandler.initialize(parameterMap, encryptionHandler, persistenceHandler, policyMap);
+			privilegeHandler.initialize(parameterMap, encryptionHandler, persistenceHandler, challengeHandler,
+					policyMap);
 		} catch (Exception e) {
 			String msg = "PrivilegeHandler {0} could not be initialized"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, privilegeHandler.getClass().getName());

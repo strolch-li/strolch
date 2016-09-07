@@ -27,6 +27,7 @@ import li.strolch.privilege.model.IPrivilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.PrivilegeRep;
 import li.strolch.privilege.model.RoleRep;
+import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.Role;
@@ -541,6 +542,32 @@ public interface PrivilegeHandler {
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
+	 * Initiate a password reset challenge for the given username
+	 * 
+	 * @param usage
+	 *            the usage for which the challenge is requested
+	 * @param username
+	 *            the username of the user to initiate the challenge for
+	 */
+	public void initiateChallengeFor(Usage usage, String username);
+
+	/**
+	 * Validate the response of a challenge for the given username
+	 * 
+	 * @param username
+	 *            the username of the user for which the challenge is to be validated
+	 * @param challenge
+	 *            the challenge from the user
+	 * 
+	 * @return certificate with which the user can access the system with the {@link Usage} set to the value from the
+	 *         initiated challenge
+	 * 
+	 * @throws PrivilegeException
+	 *             if anything goes wrong
+	 */
+	public Certificate validateChallenge(String username, String challenge) throws PrivilegeException;
+
+	/**
 	 * Authenticates a user by validating that a {@link User} for the given username and password exist and then returns
 	 * a {@link Certificate} with which this user may then perform actions
 	 * 
@@ -578,20 +605,6 @@ public interface PrivilegeHandler {
 	 *             if there is anything wrong with this certificate
 	 */
 	public void isCertificateValid(Certificate certificate) throws PrivilegeException;
-
-	/**
-	 * Checks that the given password belongs to the given {@link Certificate}. If it doesn't, then a
-	 * {@link PrivilegeException} is thrown
-	 * 
-	 * @param certificate
-	 *            the certificate for which to check the password
-	 * @param password
-	 *            the password to check against the user from the certificate
-	 * 
-	 * @throws PrivilegeException
-	 *             if the certificate is invalid or the password does not match
-	 */
-	public void checkPassword(Certificate certificate, byte[] password) throws PrivilegeException;
 
 	/**
 	 * Returns the {@link PrivilegeContext} for the given {@link Certificate}. The {@link PrivilegeContext} is an
@@ -686,4 +699,5 @@ public interface PrivilegeHandler {
 	 * @return the {@link EncryptionHandler} instance
 	 */
 	public EncryptionHandler getEncryptionHandler() throws PrivilegeException;
+
 }

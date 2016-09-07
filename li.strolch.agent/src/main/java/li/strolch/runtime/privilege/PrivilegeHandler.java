@@ -78,14 +78,6 @@ public interface PrivilegeHandler {
 	 * @return
 	 * @throws PrivilegeException
 	 */
-	public abstract li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler(Certificate certificate)
-			throws PrivilegeException;
+	public abstract li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler() throws PrivilegeException;
 
-	/**
-	 * @param certificate
-	 * @param password
-	 * @throws PrivilegeException
-	 * @see {@link li.strolch.privilege.handler.PrivilegeHandler#checkPassword(Certificate, byte[])}
-	 */
-	public void checkPassword(Certificate certificate, byte[] password) throws PrivilegeException;
 }

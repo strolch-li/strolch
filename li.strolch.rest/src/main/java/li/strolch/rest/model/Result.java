@@ -17,6 +17,7 @@ package li.strolch.rest.model;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -76,6 +77,11 @@ public class Result {
 
 	public void setExceptionMsg(String exceptionMsg) {
 		this.exceptionMsg = exceptionMsg;
+	}
+
+	public static Response toResponse(String msg) {
+		Result result = new Result(msg);
+		return Response.status(Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON).entity(result).build();
 	}
 
 	public static Response toResponse(ServiceResult svcResult) {

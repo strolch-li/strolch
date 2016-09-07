@@ -30,6 +30,7 @@ import org.junit.rules.ExpectedException;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.UserState;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.model.GreetingResult;
@@ -56,15 +57,15 @@ public class ServiceTest extends AbstractServiceTest {
 	public void shouldFailInvalidCertificate1() {
 		this.thrown.expect(PrivilegeException.class);
 		TestService testService = new TestService();
-		getServiceHandler().doService(
-				new Certificate(null, null, null, null, null, null, new Date(), null, new HashSet<String>(), null),
-				testService);
+		getServiceHandler().doService(new Certificate(null, null, null, null, null, null, null, new Date(), null,
+				new HashSet<String>(), null), testService);
 	}
 
 	@Test
 	public void shouldFailInvalidCertificate2() {
 		TestService testService = new TestService();
-		Certificate badCert = new Certificate("1", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf", new Date(), null, //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf", //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+				new Date(), null,
 				new HashSet<String>(), null);
 		ServiceResult svcResult = getServiceHandler().doService(badCert, testService);
 		assertThat(svcResult.getThrowable(), instanceOf(AccessDeniedException.class));

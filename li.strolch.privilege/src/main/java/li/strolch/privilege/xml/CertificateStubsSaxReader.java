@@ -27,6 +27,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
+import li.strolch.privilege.model.Usage;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
@@ -58,6 +59,7 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 		case XmlConstants.XML_CERTIFICATE:
 
 			CertificateStub stub = new CertificateStub();
+			stub.usage = Usage.valueOf(attributes.getValue(XmlConstants.XML_ATTR_USAGE));
 			stub.sessionId = attributes.getValue(XmlConstants.XML_ATTR_SESSION_ID);
 			stub.username = attributes.getValue(XmlConstants.XML_ATTR_USERNAME);
 			stub.authToken = attributes.getValue(XmlConstants.XML_ATTR_AUTH_TOKEN);
@@ -80,12 +82,17 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 	}
 
 	public class CertificateStub {
+		private Usage usage;
 		private String sessionId;
 		private String username;
 		private String authToken;
 		private Locale locale;
 		private Date loginTime;
 		private Date lastAccess;
+
+		public Usage getUsage() {
+			return this.usage;
+		}
 
 		public String getSessionId() {
 			return sessionId;

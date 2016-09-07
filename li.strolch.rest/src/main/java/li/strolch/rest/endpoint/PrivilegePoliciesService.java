@@ -42,16 +42,16 @@ public class PrivilegePoliciesService {
 
 	// private static final Logger logger = LoggerFactory.getLogger(PrivilegePoliciesService.class);
 
-	private PrivilegeHandler getPrivilegeHandler(Certificate cert) {
+	private PrivilegeHandler getPrivilegeHandler() {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
-		return container.getPrivilegeHandler().getPrivilegeHandler(cert);
+		return container.getPrivilegeHandler().getPrivilegeHandler();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRoles(@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler(cert);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		Map<String, String> policyDefs = privilegeHandler.getPolicyDefs(cert);
 		List<XmlKeyValue> values = XmlKeyValue.valueOf(policyDefs);

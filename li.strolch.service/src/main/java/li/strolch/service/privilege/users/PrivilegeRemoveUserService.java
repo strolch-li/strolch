@@ -39,7 +39,7 @@ public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNam
 	protected PrivilegeUserResult internalDoService(PrivilegeUserNameArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
-		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler(getCertificate());
+		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		UserRep user = privilegeHandler.removeUser(getCertificate(), arg.username);
 

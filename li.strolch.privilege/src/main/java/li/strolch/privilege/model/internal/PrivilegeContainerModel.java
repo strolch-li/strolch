@@ -36,98 +36,80 @@ import li.strolch.privilege.policy.PrivilegePolicy;
 public class PrivilegeContainerModel {
 
 	private String encryptionHandlerClassName;
-	private Map<String, String> encryptionHandlerParameterMap;
 	private String persistenceHandlerClassName;
+	private String userChallengeHandlerClassName;
+
+	private Map<String, String> encryptionHandlerParameterMap;
 	private Map<String, String> persistenceHandlerParameterMap;
+	private Map<String, String> challengeHandlerParameterMap;
+
 	private Map<String, String> parameterMap;
+
 	private Map<String, Class<PrivilegePolicy>> policies;
 
-	/**
-	 * Default constructor
-	 */
 	public PrivilegeContainerModel() {
 		this.policies = new HashMap<>();
+		this.encryptionHandlerParameterMap = new HashMap<>();
+		this.persistenceHandlerParameterMap = new HashMap<>();
+		this.challengeHandlerParameterMap = new HashMap<>();
 	}
 
-	/**
-	 * @return the parameterMap
-	 */
 	public Map<String, String> getParameterMap() {
 		return this.parameterMap;
 	}
 
-	/**
-	 * @param parameterMap
-	 *            the parameterMap to set
-	 */
 	public void setParameterMap(Map<String, String> parameterMap) {
 		this.parameterMap = parameterMap;
 	}
 
-	/**
-	 * @return the encryptionHandlerClassName
-	 */
 	public String getEncryptionHandlerClassName() {
 		return this.encryptionHandlerClassName;
 	}
 
-	/**
-	 * @param encryptionHandlerClassName
-	 *            the encryptionHandlerClassName to set
-	 */
 	public void setEncryptionHandlerClassName(String encryptionHandlerClassName) {
 		this.encryptionHandlerClassName = encryptionHandlerClassName;
 	}
 
-	/**
-	 * @return the encryptionHandlerParameterMap
-	 */
 	public Map<String, String> getEncryptionHandlerParameterMap() {
 		return this.encryptionHandlerParameterMap;
 	}
 
-	/**
-	 * @param encryptionHandlerParameterMap
-	 *            the encryptionHandlerParameterMap to set
-	 */
 	public void setEncryptionHandlerParameterMap(Map<String, String> encryptionHandlerParameterMap) {
 		this.encryptionHandlerParameterMap = encryptionHandlerParameterMap;
 	}
 
-	/**
-	 * @return the persistenceHandlerClassName
-	 */
 	public String getPersistenceHandlerClassName() {
 		return this.persistenceHandlerClassName;
 	}
 
-	/**
-	 * @param persistenceHandlerClassName
-	 *            the persistenceHandlerClassName to set
-	 */
 	public void setPersistenceHandlerClassName(String persistenceHandlerClassName) {
 		this.persistenceHandlerClassName = persistenceHandlerClassName;
 	}
 
-	/**
-	 * @return the persistenceHandlerParameterMap
-	 */
 	public Map<String, String> getPersistenceHandlerParameterMap() {
 		return this.persistenceHandlerParameterMap;
 	}
 
-	/**
-	 * @param persistenceHandlerParameterMap
-	 *            the persistenceHandlerParameterMap to set
-	 */
 	public void setPersistenceHandlerParameterMap(Map<String, String> persistenceHandlerParameterMap) {
 		this.persistenceHandlerParameterMap = persistenceHandlerParameterMap;
 	}
 
-	/**
-	 * @param privilegeName
-	 * @param policyClassName
-	 */
+	public String getUserChallengeHandlerClassName() {
+		return this.userChallengeHandlerClassName;
+	}
+
+	public void setUserChallengeHandlerClassName(String userChallengeHandlerClassName) {
+		this.userChallengeHandlerClassName = userChallengeHandlerClassName;
+	}
+
+	public Map<String, String> getUserChallengeHandlerParameterMap() {
+		return this.challengeHandlerParameterMap;
+	}
+
+	public void setUserChallengeHandlerParameterMap(Map<String, String> challengeHandlerParameterMap) {
+		this.challengeHandlerParameterMap = challengeHandlerParameterMap;
+	}
+
 	public void addPolicy(String privilegeName, String policyClassName) {
 
 		try {
@@ -154,18 +136,10 @@ public class PrivilegeContainerModel {
 		}
 	}
 
-	/**
-	 * @return the policies
-	 */
 	public Map<String, Class<PrivilegePolicy>> getPolicies() {
 		return this.policies;
 	}
 
-	/**
-	 * Returns a string representation of this object displaying its concrete type and its values
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
@@ -178,6 +152,8 @@ public class PrivilegeContainerModel {
 		builder.append(this.persistenceHandlerClassName);
 		builder.append(", persistenceHandlerParameterMap=");
 		builder.append(this.persistenceHandlerParameterMap.size());
+		builder.append(", challengeHandlerParameterMap=");
+		builder.append(this.challengeHandlerParameterMap.size());
 		builder.append(", parameterMap=");
 		builder.append(this.parameterMap.size());
 		builder.append(", policies=");

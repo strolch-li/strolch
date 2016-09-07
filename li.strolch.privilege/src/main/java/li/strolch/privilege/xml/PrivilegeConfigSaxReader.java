@@ -86,24 +86,6 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 	public class ContainerParser extends ElementParserAdapter {
 
-//		  <Container>
-//		    <Parameters>
-//		      <!-- parameters for the container itself -->
-//		      <Parameter name="autoPersistOnPasswordChange" value="true" />
-//		    </Parameters>
-//		    <EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
-//		      <Parameters>
-//		        <Parameter name="hashAlgorithm" value="SHA-256" />
-//		      </Parameters>
-//		    </EncryptionHandler>
-//		    <PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
-//		      <Parameters>
-//		        <Parameter name="basePath" value="./target/test" />
-//		        <Parameter name="modelXmlFile" value="PrivilegeModel.xml" />
-//		      </Parameters>
-//		    </PersistenceHandler>
-//		  </Container>
-
 		private String currentElement;
 
 		@Override
@@ -119,6 +101,10 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 				this.currentElement = qName;
 				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
 				getContainerModel().setPersistenceHandlerClassName(className);
+			} else if (qName.equals(XmlConstants.XML_HANDLER_USER_CHALLENGE)) {
+				this.currentElement = qName;
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				getContainerModel().setUserChallengeHandlerClassName(className);
 			}
 		}
 
@@ -135,6 +121,8 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 				getContainerModel().setEncryptionHandlerParameterMap(parametersChild.getParameterMap());
 			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_PERSISTENCE)) {
 				getContainerModel().setPersistenceHandlerParameterMap(parametersChild.getParameterMap());
+			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_USER_CHALLENGE)) {
+				getContainerModel().setUserChallengeHandlerParameterMap(parametersChild.getParameterMap());
 			}
 		}
 	}

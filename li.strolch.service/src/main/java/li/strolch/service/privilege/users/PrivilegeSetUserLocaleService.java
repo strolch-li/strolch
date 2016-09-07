@@ -26,7 +26,8 @@ import li.strolch.service.api.AbstractService;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeSetUserLocaleService extends AbstractService<PrivilegeSetUserLocaleArgument, PrivilegeUserResult> {
+public class PrivilegeSetUserLocaleService
+		extends AbstractService<PrivilegeSetUserLocaleArgument, PrivilegeUserResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,7 +40,7 @@ public class PrivilegeSetUserLocaleService extends AbstractService<PrivilegeSetU
 	protected PrivilegeUserResult internalDoService(PrivilegeSetUserLocaleArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
-		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler(getCertificate());
+		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		UserRep user = privilegeHandler.setUserLocale(getCertificate(), arg.username, arg.locale);
 

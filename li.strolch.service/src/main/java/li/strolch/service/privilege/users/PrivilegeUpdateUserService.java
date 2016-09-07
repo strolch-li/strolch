@@ -39,7 +39,7 @@ public class PrivilegeUpdateUserService extends AbstractService<PrivilegeUserArg
 	protected PrivilegeUserResult internalDoService(PrivilegeUserArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
-		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler(getCertificate());
+		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		UserRep user = privilegeHandler.updateUser(getCertificate(), arg.user);
 

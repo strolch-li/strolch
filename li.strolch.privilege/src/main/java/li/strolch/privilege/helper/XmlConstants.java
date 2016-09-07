@@ -54,6 +54,11 @@ public class XmlConstants {
 	public static final String XML_ROOT_CERTIFICATES = "Certificates";
 
 	/**
+	 * XML_HANDLER_USER_CHALLENGE = "UserChallengeHandler" :
+	 */
+	public static final String XML_HANDLER_USER_CHALLENGE = "UserChallengeHandler";
+
+	/**
 	 * XML_HANDLER_PERSISTENCE = "PersistenceHandler" :
 	 */
 	public static final String XML_HANDLER_PERSISTENCE = "PersistenceHandler";
@@ -202,6 +207,11 @@ public class XmlConstants {
 	 * XML_ATTR_SESSION_ID = "sessionId" :
 	 */
 	public static final String XML_ATTR_SESSION_ID = "sessionId";
+
+	/**
+	 * XML_ATTR_SESSION_ID = "usage" :
+	 */
+	public static final String XML_ATTR_USAGE = "usage";
 
 	/**
 	 * XML_ATTR_USERNAME = "username" :

@@ -39,7 +39,7 @@ public class PrivilegeSetUserStateService extends AbstractService<PrivilegeSetUs
 	protected PrivilegeUserResult internalDoService(PrivilegeSetUserStateArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
-		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler(getCertificate());
+		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		UserRep user = privilegeHandler.setUserState(getCertificate(), arg.username, arg.userState);
 

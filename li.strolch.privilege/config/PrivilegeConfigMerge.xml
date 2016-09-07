@@ -23,6 +23,9 @@
 			</Parameters>
 		</PersistenceHandler>
 
+		<UserChallengeHandler class="li.strolch.privilege.handler.ConsoleUserChallengeHandler">
+		</UserChallengeHandler>
+
 	</Container>
 
 	<Policies>
