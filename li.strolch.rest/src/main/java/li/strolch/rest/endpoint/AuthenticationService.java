@@ -16,8 +16,7 @@
 package li.strolch.rest.endpoint;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Base64;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -41,8 +40,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.privilege.base.AccessDeniedException;
@@ -55,12 +57,8 @@ import li.strolch.privilege.model.Usage;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
-import li.strolch.rest.model.Login;
-import li.strolch.rest.model.LoginResult;
-import li.strolch.rest.model.LogoutResult;
 import li.strolch.rest.model.Result;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -73,52 +71,90 @@ public class AuthenticationService {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response authenticate(Login login, @Context HttpServletRequest request, @Context HttpHeaders headers) {
+	public Response authenticate(@Context HttpServletRequest request, @Context HttpHeaders headers, String data) {
 
-		LoginResult loginResult = new LoginResult();
+		JsonObject login = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject loginResult = new JsonObject();
 
 		try {
 
 			StringBuilder sb = new StringBuilder();
-			if (StringHelper.isEmpty(login.getUsername()) || login.getUsername().length() < 2) {
+			JsonElement usernameE = login.get("username");
+			if (usernameE == null || usernameE.getAsString().length() < 2) {
 				sb.append("Username was not given or is too short!"); //$NON-NLS-1$
 			}
-			if (login.getPassword() == null || login.getPassword().length < 3) {
+
+			JsonElement passwordE = login.get("password");
+			if (passwordE == null) {
 				if (sb.length() > 0)
 					sb.append("\n");
-				sb.append("Password was not given or was too short!"); //$NON-NLS-1$
+				sb.append("Password was not given!"); //$NON-NLS-1$
+			}
+
+			byte[] password = passwordE == null ? new byte[] {} : Base64.getDecoder().decode(passwordE.getAsString());
+			if (password.length < 3) {
+				if (sb.length() > 0)
+					sb.append("\n");
+				sb.append("Password not given or too short!"); //$NON-NLS-1$
 			}
 
 			if (sb.length() != 0) {
-				loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", sb.toString())); //$NON-NLS-1$
+				loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", sb.toString())); //$NON-NLS-1$
 				return Response.status(Status.BAD_REQUEST).entity(loginResult).build();
 			}
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			Certificate certificate = sessionHandler.authenticate(login.getUsername(), login.getPassword());
+			Certificate certificate = sessionHandler.authenticate(usernameE.getAsString(), password);
 
 			PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getContainer()
 					.getPrivilegeHandler();
 			PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
-			loginResult.setSessionId(certificate.getSessionId());
-			loginResult.setAuthToken(certificate.getAuthToken());
-			loginResult.setUsername(certificate.getUsername());
-			loginResult.setFirstname(certificate.getFirstname());
-			loginResult.setLastname(certificate.getLastname());
-			loginResult.setLocale(certificate.getLocale());
-			loginResult.setParameters(certificate.getPropertyMap());
-			loginResult.setRoles(new ArrayList<>(certificate.getUserRoles()));
+			loginResult.addProperty("sessionId", certificate.getSessionId());
+			loginResult.addProperty("authToken", certificate.getAuthToken());
+			loginResult.addProperty("username", certificate.getUsername());
+			loginResult.addProperty("firstname", certificate.getFirstname());
+			loginResult.addProperty("lastname", certificate.getLastname());
+			loginResult.addProperty("locale", certificate.getLocale().toString());
 
-			List<LoginResult.Privilege> privileges = new ArrayList<>();
-			for (String name : privilegeContext.getPrivilegeNames()) {
-				IPrivilege privilege = privilegeContext.getPrivilege(name);
-				Set<String> allowSet = privilege.getAllowList();
-				ArrayList<String> allowList = null;
-				if (!allowSet.isEmpty())
-					allowList = new ArrayList<>(allowSet);
-				privileges.add(new LoginResult.Privilege(name, privilege.isAllAllowed(), allowList));
+			if (!certificate.getPropertyMap().isEmpty()) {
+				JsonObject propObj = new JsonObject();
+				loginResult.add("properties", propObj);
+				for (String propKey : certificate.getPropertyMap().keySet()) {
+					propObj.addProperty(propKey, certificate.getPropertyMap().get(propKey));
+				}
 			}
-			loginResult.setPrivileges(privileges);
+
+			if (!certificate.getUserRoles().isEmpty()) {
+				JsonArray rolesArr = new JsonArray();
+				loginResult.add("roles", rolesArr);
+				for (String role : certificate.getUserRoles()) {
+					rolesArr.add(new JsonPrimitive(role));
+				}
+			}
+
+			if (!privilegeContext.getPrivilegeNames().isEmpty()) {
+				JsonArray privArr = new JsonArray();
+				loginResult.add("privileges", privArr);
+
+				for (String name : privilegeContext.getPrivilegeNames()) {
+					IPrivilege privilege = privilegeContext.getPrivilege(name);
+
+					JsonObject privObj = new JsonObject();
+					privArr.add(privObj);
+
+					privObj.addProperty("name", name);
+					privObj.addProperty("allAllowed", privilege.isAllAllowed());
+
+					Set<String> allowSet = privilege.getAllowList();
+					if (!allowSet.isEmpty()) {
+						JsonArray allowArr = new JsonArray();
+						privObj.add("allowList", allowArr);
+						for (String allow : allowSet) {
+							allowArr.add(new JsonPrimitive(allow));
+						}
+					}
+				}
+			}
 
 			boolean secureCookie = RestfulStrolchComponent.getInstance().isSecureCookie();
 			if (secureCookie && !request.getScheme().equals("https")) {
@@ -128,25 +164,25 @@ public class AuthenticationService {
 			NewCookie cookie = new NewCookie(StrolchRestfulConstants.STROLCH_AUTHORIZATION, certificate.getAuthToken(),
 					"/", null, "Authorization header", (int) TimeUnit.DAYS.toSeconds(1), secureCookie);
 
-			return Response.ok().entity(loginResult)//
+			return Response.ok().entity(loginResult.toString())//
 					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken()).cookie(cookie).build();
 
 		} catch (InvalidCredentialsException e) {
 			logger.error(e.getMessage(), e);
-			loginResult.setMsg("Could not log in as the given credentials are invalid"); //$NON-NLS-1$
+			loginResult.addProperty("msg", "Could not log in as the given credentials are invalid"); //$NON-NLS-1$
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
-			loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
+			loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
 		} catch (StrolchException | PrivilegeException e) {
 			logger.error(e.getMessage(), e);
-			loginResult.setMsg(MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
+			loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
 			return Response.status(Status.FORBIDDEN).entity(loginResult).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
-			loginResult.setMsg(MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
+			loginResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
 			return Response.serverError().entity(loginResult).build();
 		}
 	}
@@ -157,7 +193,7 @@ public class AuthenticationService {
 	@Path("{authToken}")
 	public Response invalidateSession(@PathParam("authToken") String authToken) {
 
-		LogoutResult logoutResult = new LogoutResult();
+		JsonObject logoutResult = new JsonObject();
 
 		try {
 
@@ -165,19 +201,20 @@ public class AuthenticationService {
 			Certificate certificate = sessionHandler.validate(authToken);
 			sessionHandler.invalidate(certificate);
 
-			logoutResult.setUsername(certificate.getUsername());
-			logoutResult.setAuthToken(authToken);
-			logoutResult.setMsg(MessageFormat.format("{0} has been logged out.", certificate.getUsername())); //$NON-NLS-1$
-			return Response.ok().entity(logoutResult).build();
+			logoutResult.addProperty("username", certificate.getUsername());
+			logoutResult.addProperty("authToken", authToken);
+			logoutResult.addProperty("msg", //$NON-NLS-1$
+					MessageFormat.format("{0} has been logged out.", certificate.getUsername()));
+			return Response.ok().entity(logoutResult.toString()).build();
 
 		} catch (StrolchException | PrivilegeException e) {
 			logger.error(e.getMessage(), e);
-			logoutResult.setMsg(MessageFormat.format("Could not logout due to: {0}", e.getMessage())); //$NON-NLS-1$
+			logoutResult.addProperty("msg", MessageFormat.format("Could not logout due to: {0}", e.getMessage())); //$NON-NLS-1$
 			return Response.status(Status.UNAUTHORIZED).entity(logoutResult).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
-			logoutResult.setMsg(MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
+			logoutResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
 			return Response.serverError().entity(logoutResult).build();
 		}
 	}

@@ -15,31 +15,25 @@
  */
 package li.strolch.rest.inspector.test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.Locale;
+import java.util.Base64;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-import li.strolch.rest.model.Login;
-import li.strolch.rest.model.LoginResult;
-import li.strolch.rest.model.LogoutResult;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@Ignore
 @SuppressWarnings("nls")
 public class AuthenticationTest extends AbstractRestfulTest {
 
@@ -49,93 +43,61 @@ public class AuthenticationTest extends AbstractRestfulTest {
 	public void shouldAuthenticate() {
 
 		// login
-		Login login = new Login();
-		login.setUsername("jill");
-		login.setPassword("jill".getBytes());
-		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
-		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(loginEntity);
+		JsonObject login = new JsonObject();
+		login.addProperty("username", "jill");
+		login.addProperty("password", Base64.getEncoder().encodeToString("jill".getBytes()));
+		Entity<String> entity = Entity.entity(login.toString(), MediaType.APPLICATION_JSON);
+
+		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(entity);
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
-		LoginResult loginResult = result.readEntity(LoginResult.class);
+		JsonObject loginResult = new JsonParser().parse(result.readEntity(String.class)).getAsJsonObject();
 		assertNotNull(loginResult);
-		assertEquals("jill", loginResult.getUsername());
-		assertEquals(64, loginResult.getAuthToken().length());
-		assertNull(loginResult.getMsg());
+		assertEquals("jill", loginResult.get("username").getAsString());
+		assertEquals(64, loginResult.get("authToken").getAsString().length());
+		assertNull(loginResult.get("msg"));
 
 		// logout
-		result = target().path(ROOT_PATH + "/" + loginResult.getAuthToken()).request(MediaType.APPLICATION_JSON)
-				.delete();
+		result = target().path(ROOT_PATH + "/" + loginResult.get("authToken").getAsString())
+				.request(MediaType.APPLICATION_JSON).delete();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		assertNotNull(loginResult);
-		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
+		JsonObject logoutResult = new JsonParser().parse(result.readEntity(String.class)).getAsJsonObject();
 		assertNotNull(logoutResult);
-		assertNull(logoutResult.getMsg());
-	}
-
-	@Test
-	public void shouldUseRequestedLanguage() {
-
-		// login
-		Login login = new Login();
-		login.setUsername("jill");
-		login.setPassword("jill".getBytes());
-		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
-		Builder builder = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON);
-		builder = builder.acceptLanguage(Locale.ITALY);
-		Response result = builder.post(loginEntity);
-		assertEquals(Status.OK.getStatusCode(), result.getStatus());
-		LoginResult loginResult = result.readEntity(LoginResult.class);
-		assertNotNull(loginResult);
-		assertEquals("jill", loginResult.getUsername());
-		assertEquals(64, loginResult.getAuthToken().length());
-		assertEquals(Locale.ITALY.toString(), loginResult.getLocale());
-		assertNull(loginResult.getMsg());
-
-		// logout
-		result = target().path(ROOT_PATH + "/" + loginResult.getAuthToken()).request(MediaType.APPLICATION_JSON)
-				.delete();
-		assertEquals(Status.OK.getStatusCode(), result.getStatus());
-		assertNotNull(loginResult);
-		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
-		assertNotNull(logoutResult);
-		assertNull(logoutResult.getMsg());
+		assertEquals("jill has been logged out.", logoutResult.get("msg").getAsString());
 	}
 
 	@Test
 	public void shouldNotAuthenticate() {
 
 		// login
-		Login login = new Login();
-		login.setUsername("admin");
-		login.setPassword("blalba".getBytes());
-		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
-		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(loginEntity);
-		assertEquals(Status.FORBIDDEN.getStatusCode(), result.getStatus());
-		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
-		assertNotNull(logoutResult);
-		assertEquals("Could not log in due to: Authentication credentials are invalid", logoutResult.getMsg());
+		JsonObject login = new JsonObject();
+		login.addProperty("username", "jill");
+		login.addProperty("password", Base64.getEncoder().encodeToString("blabla".getBytes()));
+		Entity<String> entity = Entity.entity(login.toString(), MediaType.APPLICATION_JSON);
+
+		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(entity);
+		assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
 	}
 
 	@Test
 	public void shouldFailLogoutIllegalSession() {
 
 		// login
-		Login login = new Login();
-		login.setUsername("jill");
-		login.setPassword("jill".getBytes());
-		Entity<Login> loginEntity = Entity.entity(login, MediaType.APPLICATION_JSON);
-		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(loginEntity);
+		JsonObject login = new JsonObject();
+		login.addProperty("username", "jill");
+		login.addProperty("password", Base64.getEncoder().encodeToString("jill".getBytes()));
+		Entity<String> entity = Entity.entity(login.toString(), MediaType.APPLICATION_JSON);
+
+		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).post(entity);
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
-		LoginResult loginResult = result.readEntity(LoginResult.class);
+		JsonObject loginResult = new JsonParser().parse(result.readEntity(String.class)).getAsJsonObject();
 		assertNotNull(loginResult);
-		assertEquals("jill", loginResult.getUsername());
-		assertEquals(64, loginResult.getAuthToken().length());
-		assertNull(loginResult.getMsg());
+		assertEquals("jill", loginResult.get("username").getAsString());
+		assertEquals(64, loginResult.get("authToken").getAsString().length());
+		assertNull(loginResult.get("msg"));
 
 		// logout
 		result = target().path(ROOT_PATH + "/blabla").request(MediaType.APPLICATION_JSON).delete();
-		assertEquals(Status.FORBIDDEN.getStatusCode(), result.getStatus());
-		LogoutResult logoutResult = result.readEntity(LogoutResult.class);
-		assertNotNull(logoutResult);
-		assertThat(logoutResult.getMsg(), containsString("No certificate exists for sessionId blabla"));
+		assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
 	}
 }

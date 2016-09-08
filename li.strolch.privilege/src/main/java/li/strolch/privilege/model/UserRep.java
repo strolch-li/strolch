@@ -24,12 +24,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
@@ -43,34 +37,24 @@ import li.strolch.utils.xml.XmlKeyValue;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@XmlRootElement(name = "User")
-@XmlAccessorType(XmlAccessType.NONE)
 public class UserRep implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlAttribute(name = "userId")
 	private String userId;
 
-	@XmlAttribute(name = "username")
 	private String username;
 
-	@XmlAttribute(name = "firstname")
 	private String firstname;
 
-	@XmlAttribute(name = "lastname")
 	private String lastname;
 
-	@XmlAttribute(name = "userState")
 	private UserState userState;
 
-	@XmlAttribute(name = "locale")
 	private Locale locale;
 
-	@XmlElement(name = "roles")
 	private Set<String> roles;
 
-	@XmlElement(name = "properties")
 	private List<XmlKeyValue> properties;
 
 	/**
@@ -319,7 +303,6 @@ public class UserRep implements Serializable {
 	 * 
 	 * @return the string map properties of this user as a list of {@link XmlKeyValue} elements
 	 */
-	@XmlElement(name = "properties")
 	public List<XmlKeyValue> getProperties() {
 		return this.properties == null ? new ArrayList<>() : this.properties;
 	}

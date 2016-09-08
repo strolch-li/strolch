@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -196,39 +197,42 @@ public class QueryParserTest {
 		assertFalse(query.hasNavigation());
 		OrSelection or = (OrSelection) query.getSelection();
 		List<Selection> selections = or.getSelections();
-		assertEquals(6, selections.size());
-		for (Selection selection : selections) {
-			assertEquals(AnyTypeParameterSelection.class, selection.getClass());
-		}
+		assertEquals(10, selections.size());
 
 		AnyTypeParameterSelection sel;
 
-		sel = (AnyTypeParameterSelection) selections.get(0);
-		assertEquals("parameters", sel.getBagKey());
-		assertEquals("date", sel.getParamKey());
-		assertEquals("asd", sel.getValue());
+		IdSelection idSel = (IdSelection) selections.get(0);
+		assertEquals(Arrays.asList("asd", "bla@dsfdfg.ch", "1970-01-01T01:00:00.000+01:00"), idSel.getIds());
 
-		sel = (AnyTypeParameterSelection) selections.get(1);
-		assertEquals("parameters", sel.getBagKey());
-		assertEquals("email", sel.getParamKey());
-		assertEquals("asd", sel.getValue());
+		NameSelection nameSel = (NameSelection) selections.get(1);
+		assertEquals("asd", nameSel.getName());
 
 		sel = (AnyTypeParameterSelection) selections.get(2);
 		assertEquals("parameters", sel.getBagKey());
 		assertEquals("date", sel.getParamKey());
-		assertEquals("bla@dsfdfg.ch", sel.getValue());
+		assertEquals("asd", sel.getValue());
 
 		sel = (AnyTypeParameterSelection) selections.get(3);
 		assertEquals("parameters", sel.getBagKey());
 		assertEquals("email", sel.getParamKey());
+		assertEquals("asd", sel.getValue());
+
+		sel = (AnyTypeParameterSelection) selections.get(5);
+		assertEquals("parameters", sel.getBagKey());
+		assertEquals("date", sel.getParamKey());
 		assertEquals("bla@dsfdfg.ch", sel.getValue());
 
-		sel = (AnyTypeParameterSelection) selections.get(4);
+		sel = (AnyTypeParameterSelection) selections.get(6);
+		assertEquals("parameters", sel.getBagKey());
+		assertEquals("email", sel.getParamKey());
+		assertEquals("bla@dsfdfg.ch", sel.getValue());
+
+		sel = (AnyTypeParameterSelection) selections.get(8);
 		assertEquals("parameters", sel.getBagKey());
 		assertEquals("date", sel.getParamKey());
 		assertEquals("1970-01-01T01:00:00.000+01:00", sel.getValue());
 
-		sel = (AnyTypeParameterSelection) selections.get(5);
+		sel = (AnyTypeParameterSelection) selections.get(9);
 		assertEquals("parameters", sel.getBagKey());
 		assertEquals("email", sel.getParamKey());
 		assertEquals("1970-01-01T01:00:00.000+01:00", sel.getValue());

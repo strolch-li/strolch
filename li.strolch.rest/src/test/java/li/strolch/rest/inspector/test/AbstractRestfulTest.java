@@ -18,22 +18,23 @@ package li.strolch.rest.inspector.test;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;
 
-import li.strolch.rest.StrolchRestfulClasses;
-import li.strolch.testbase.runtime.RuntimeMock;
-
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.TracingConfig;
 import org.glassfish.jersey.servlet.ServletProperties;
 import org.glassfish.jersey.test.DeploymentContext;
 import org.glassfish.jersey.test.JerseyTest;
-import org.glassfish.jersey.test.ServletDeploymentContext;
 import org.glassfish.jersey.test.TestProperties;
-import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
+import org.glassfish.jersey.test.spi.TestContainer;
 import org.glassfish.jersey.test.spi.TestContainerException;
 import org.glassfish.jersey.test.spi.TestContainerFactory;
 import org.junit.AfterClass;
@@ -41,13 +42,16 @@ import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import li.strolch.rest.StrolchRestfulClasses;
+import li.strolch.rest.endpoint.Inspector;
+import li.strolch.testbase.runtime.RuntimeMock;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
 public abstract class AbstractRestfulTest extends JerseyTest {
 
-	private static final URI BASE_URI = URI.create("http://localhost:8888/base");
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractRestfulTest.class);
 	private static final String RUNTIME_PATH = "target/withPrivilegeRuntime/"; //$NON-NLS-1$
 	private static final String CONFIG_SRC = "src/test/resources/withPrivilegeRuntime"; //$NON-NLS-1$
@@ -63,24 +67,9 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 		runtimeMock.startContainer();
 	}
 
-	@Override
-	protected URI getBaseUri() {
-		return BASE_URI;
-	}
-
 	@AfterClass
 	public static void afterClass() {
 		runtimeMock.destroyRuntime();
-	}
-
-	@Override
-	protected TestContainerFactory getTestContainerFactory() throws TestContainerException {
-		return new GrizzlyWebTestContainerFactory();
-	}
-
-	@Override
-	protected DeploymentContext configureDeployment() {
-		return ServletDeploymentContext.builder(configure()).contextPath("rest").build();
 	}
 
 	@Override
@@ -108,5 +97,46 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 		resourceConfig.property(ServerProperties.TRACING, TracingConfig.ALL.name());
 		resourceConfig.property(ServletProperties.FILTER_FORWARD_ON_404, true);
 		return resourceConfig;
+	}
+
+	@Override
+	protected TestContainerFactory getTestContainerFactory() throws TestContainerException {
+
+		return new TestContainerFactory() {
+			@Override
+			public TestContainer create(URI baseUri, DeploymentContext deploymentContext) {
+				return new TestContainer() {
+					private HttpServer server;
+
+					@Override
+					public ClientConfig getClientConfig() {
+						return null;
+					}
+
+					@Override
+					public URI getBaseUri() {
+						return baseUri;
+					}
+
+					@Override
+					public void start() {
+						try {
+							this.server = GrizzlyWebContainerFactory.create(baseUri, Collections.singletonMap(
+									"jersey.config.server.provider.packages", Inspector.class.getPackage().getName()));
+						} catch (ProcessingException e) {
+							throw new TestContainerException(e);
+						} catch (IOException e) {
+							throw new TestContainerException(e);
+						}
+					}
+
+					@Override
+					public void stop() {
+						this.server.shutdownNow();
+					}
+				};
+
+			}
+		};
 	}
 }

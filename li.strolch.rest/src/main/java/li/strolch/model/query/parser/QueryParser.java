@@ -37,15 +37,9 @@ public abstract class QueryParser extends CompositeParser {
 	private OrSelection or;
 
 	private IdSelection idSelection;
-	private boolean allowType;
 
 	public QueryParser(StrolchElementQuery<?> query) {
-		this(query, false);
-	}
-
-	public QueryParser(StrolchElementQuery<?> query, boolean allowType) {
 		this.query = query;
-		this.allowType = allowType;
 	}
 
 	protected OrSelection or() {
@@ -66,6 +60,8 @@ public abstract class QueryParser extends CompositeParser {
 
 	public abstract boolean withPrefix();
 
+	public abstract boolean allowType();
+
 	protected void defs() {
 
 		// [id:<value>] [name:<value>] [type:<value>] [param:<bagId>:<paramId>] [value]
@@ -75,8 +71,7 @@ public abstract class QueryParser extends CompositeParser {
 		if (withPrefix()) {
 			def("id", key("id"));
 			def("name", key("name"));
-			if (this.allowType)
-				def("type", key("type"));
+			def("type", key("type"));
 
 			for (String bagId : getBagParamSet().keySet()) {
 				Set<String> set = getBagParamSet().getSet(bagId);
@@ -97,7 +92,7 @@ public abstract class QueryParser extends CompositeParser {
 			else
 				parsers = parsers.or(ref("id")).or(ref("name"));
 
-			if (this.allowType)
+			if (allowType())
 				parsers = parsers.or(ref("type"));
 
 		} else {
@@ -139,7 +134,7 @@ public abstract class QueryParser extends CompositeParser {
 				return null;
 			});
 
-			if (this.allowType) {
+			if (allowType()) {
 				action("type", (String s) -> {
 					String trimmed = s.trim();
 					if (!trimmed.isEmpty())
@@ -214,6 +209,11 @@ public abstract class QueryParser extends CompositeParser {
 			public boolean withPrefix() {
 				return withPrefix;
 			}
+
+			@Override
+			public boolean allowType() {
+				return true;
+			}
 		};
 		Result result = parser.parse(queryString);
 		ResourceQuery<Resource> query = result.get();
@@ -241,6 +241,11 @@ public abstract class QueryParser extends CompositeParser {
 			@Override
 			public boolean withPrefix() {
 				return withPrefix;
+			}
+
+			@Override
+			public boolean allowType() {
+				return true;
 			}
 		};
 		Result result = parser.parse(queryString);
@@ -270,6 +275,11 @@ public abstract class QueryParser extends CompositeParser {
 			@Override
 			public boolean withPrefix() {
 				return withPrefix;
+			}
+
+			@Override
+			public boolean allowType() {
+				return true;
 			}
 		};
 		Result result = parser.parse(queryString);
