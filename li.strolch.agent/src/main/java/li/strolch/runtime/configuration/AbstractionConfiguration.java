@@ -17,8 +17,10 @@ package li.strolch.runtime.configuration;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -40,6 +42,18 @@ public abstract class AbstractionConfiguration {
 
 	public String getName() {
 		return this.name;
+	}
+
+	public Properties getAsProperties() {
+		Properties props = new Properties();
+		for (String key : configurationValues.keySet()) {
+			props.setProperty(key, configurationValues.get(key));
+		}
+		return props;
+	}
+
+	public Map<String, String> getAsMap() {
+		return new HashMap<>(this.configurationValues);
 	}
 
 	public boolean hasProperty(String key) {
@@ -82,7 +96,7 @@ public abstract class AbstractionConfiguration {
 		return defValue;
 	}
 
-	public int getInt(String key, int defValue) {
+	public int getInt(String key, Integer defValue) {
 		String value = this.configurationValues.get(key);
 		if (StringHelper.isNotEmpty(value)) {
 
@@ -100,7 +114,7 @@ public abstract class AbstractionConfiguration {
 		return defValue;
 	}
 
-	public long getLong(String key, long defValue) {
+	public long getLong(String key, Long defValue) {
 		String value = this.configurationValues.get(key);
 		if (StringHelper.isNotEmpty(value)) {
 

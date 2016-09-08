@@ -104,7 +104,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		String propTryLockTimeUnit = StrolchConstants.makeRealmKey(this.realm, PROP_TRY_LOCK_TIME_UNIT);
 		String propTryLockTime = StrolchConstants.makeRealmKey(this.realm, PROP_TRY_LOCK_TIME);
 		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(propTryLockTimeUnit, TimeUnit.SECONDS.name()));
-		long time = configuration.getLong(propTryLockTime, 10);
+		long time = configuration.getLong(propTryLockTime, 10L);
 		this.lockHandler = new DefaultLockHandler(this.realm, timeUnit, time);
 
 		// versioning
