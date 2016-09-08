@@ -36,6 +36,17 @@ public class ResponseUtil {
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
+	public static Response toResponse(String prop1, String value1, String prop2, String value2) {
+		JsonObject response = new JsonObject();
+		response.addProperty(MSG, StringHelper.DASH);
+		response.addProperty(prop1, value1);
+		response.addProperty(prop2, value2);
+
+		String json = new Gson().toJson(response);
+
+		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
 	public static Response toResponse(String member, JsonElement jsonElement) {
 		JsonObject response = new JsonObject();
 		response.addProperty(MSG, StringHelper.DASH);
