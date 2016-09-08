@@ -135,12 +135,22 @@ public class SmtpMailer {
 				message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
 
 			message.setSubject(subject);
+
+			if (this.overrideRecipient != null)
+				text = "Override recipient. Original recipient " + recipient + ".\n\n" + text;
 			message.setText(text);
 
 			Transport.send(message);
 
-			logger.info(MessageFormat.format("Sent E-mail to {0}: {1}",
-					message.getRecipients(Message.RecipientType.TO)[0], message.getSubject()));
+			String msg;
+			if (this.overrideRecipient != null)
+				msg = MessageFormat.format("Sent E-mail to override recipient {0}: {1}",
+						message.getRecipients(Message.RecipientType.TO)[0], message.getSubject());
+			else {
+				msg = MessageFormat.format("Sent E-mail to {0}: {1}",
+						message.getRecipients(Message.RecipientType.TO)[0], message.getSubject());
+			}
+			logger.info(msg);
 
 		} catch (MessagingException e) {
 			throw new RuntimeException("Failed to send e-mail due to " + e.getMessage(), e);
