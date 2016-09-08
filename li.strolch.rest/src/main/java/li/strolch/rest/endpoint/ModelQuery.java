@@ -64,7 +64,7 @@ public class ModelQuery {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("resources")
+	@Path("resource")
 	public Response queryResources(@BeanParam QueryData queryData, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
@@ -122,7 +122,7 @@ public class ModelQuery {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("orders")
+	@Path("order")
 	public Response queryOrders(@BeanParam QueryData queryData, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
@@ -181,7 +181,7 @@ public class ModelQuery {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("activities")
+	@Path("activity")
 	public Response queryActivities(@BeanParam QueryData queryData, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
