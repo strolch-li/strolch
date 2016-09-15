@@ -29,6 +29,7 @@ import li.strolch.policy.StrolchPolicy;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.SystemUserAction;
 import li.strolch.privilege.model.Restrictable;
+import li.strolch.runtime.StrolchConstants;
 
 /**
  * <p>
@@ -119,6 +120,21 @@ public abstract class Command implements Restrictable {
 	 */
 	protected <V extends SystemUserAction> V runAs(String username, V action) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runAsSystem(username, action);
+	}
+
+	/**
+	 * Performs the given {@link SystemUserAction} as the privileged system user
+	 * {@link StrolchConstants#PRIVILEGED_SYSTEM_USER}. Returns the action for chaining calls
+	 * 
+	 * @param action
+	 *            the action to perform
+	 * 
+	 * @return the action performed for chaining calls
+	 * 
+	 * @throws PrivilegeException
+	 */
+	protected <V extends SystemUserAction> V runPrivileged(V action) throws PrivilegeException {
+		return this.container.getPrivilegeHandler().runAsSystem(StrolchConstants.PRIVILEGED_SYSTEM_USER, action);
 	}
 
 	/**
