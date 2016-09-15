@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="ico/favicon.ico">
 
-    <title>Strolch: Documentation</title>
+    <title>Strolch: Architecture</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -44,32 +44,69 @@
 <div class="container">
 
     <div class="page-header">
-        <h1 class="page-title">Documentation</h1>
+        <h1 class="page-title">Documentation: Architecture</h1>
 
-        <p class="lead page-description">This is the index page to the documentation of Strolch.</p>
+        <p class="lead page-description">This page discusses the architecture of a Strolch Agent</p>
     </div>
 
     <div class="content">
-        <p>Strolch's documentation has only just begun, but as more and more details of the implementation in Strolch
-            are fixed, more documentation can be created and will be available here.</p>
 
-        <p>Currently we have the following topics of discussion:</p>
+        <h2>Birds View</h2>
+
+        <p>A Strolch agent's architecture can be seen as a simple three-tier architecture. The presentation layer is
+            mostly a web frontend, where the communication with the agent is done via REST API calls.</p>
+
+        <p>The agent itself implements the business logic using Services, Commands, Queries etc.</p>
+
+        <p>The agent can communicate with other 3rd systems using any API, where it is preferred to use JSON over
+            REST.</p>
+
+        <p>The agent can use a standard RDBMS as a storage system, where currently DAOs have been implemented only for
+            PostgreSQL. Should it be required, then any JDBC cabable RDBMS can be used, as no PostgreSQL specific SQL
+            commands are used.</p>
+
+        <p>The following diagram helps visualize this:</p>
+
+        <img src="images/Strolch-Bird-View.svg" class="img-responsive center-block" alt="Strolch Agent Bird View">
+
+        <br/>
+
+        <h2>Squirrel View</h2>
+
+        <p>The following diagram shows a more detailed view of the architecture of a Strolch Agent.</p>
+
+        <img src="images/Strolch-Squirrel-View.svg" class="img-responsive center-block"
+             alt="Strolch Agent Squirrel View">
+
+        <p>A Strolch agent consists of the following main parts:</p>
         <ul>
-            <li><a href="documentation_architecture.html">Strolch Architecture</a></li>
-            <li><a href="documentation_do_and_dont.html">Strolch Do and Don’t</a></li>
-            <li><a href="documentation_runtime.html">Strolch Runtime Configuration</a></li>
-            <li><a href="documentation_realms.html">Strolch Realms</a></li>
-            <li><a href="documentation_components.html">Strolch Components</a></li>
-            <li><a href="documentation_services_and_commands.html">Strolch Services and Commands</a></li>
-            <li><a href="documentation_queries.html">Strolch Queries</a></li>
-            <!--
-            <li><a href="documentation_transactions.html">Strolch Transactions</a></li>
-            <li><a href="documentation_policies.html">Strolch Policies</a></li>
-            <li><a href="documentation_privileges.html">Strolch Privileges</a></li>
-            <li><a href="documentation_observers.html">Strolch Observers</a></li>
-            <li><a href="documentation_versioning.html">Strolch Versioning</a></li>
-            -->
+            <li>REST Endpoints &rarr; expose an API to access the Strolch agent outside of the Java VM</li>
+            <li>Services and Commands &rarr; implements business logic</li>
+            <li>Queries &rarr; implements specific queries against the Strolch model</li>
+            <li>Components &rarr; Implements additional logic, which is best implement as a component. E.g. active
+                components which have threads, etc.
+            </li>
+            <li>Realms &rarr; implements multi-tenant capabilities</li>
         </ul>
+
+        <p>In addition to the main parts, Strolch contains inherit capabilities, which gives Strolch unique features
+            when compared to other Java Frameworks:</p>
+        <ul>
+            <li>Privileges &rarr; Strolch is user agnostic and any action, i.e. Service, Query, etc. is authorized
+                against the authenticated user.
+            </li>
+            <li>Transactions &rarr; Transactions handle locking/unlocking of objects, updating the model and are the
+                central API for the developer.
+            </li>
+            <li>Observers &rarr; modifications to the model are propagated to listeners using the observer pattern.</li>
+            <li>Versioning &rarr; modifications to objects are versioned and thus can be rolled back at a later time.
+            </li>
+            <li>Policies &rarr; Policies allow injecting different algorithms. All root elements can store Policy
+                definitions, so that a service can delegate to a Policy and thus behave differently, depending on the
+                element being accessed.
+            </li>
+        </ul>
+
 
         <!-- content here -->
 
