@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="ico/favicon.ico">
 
-    <title>Strolch: Documentation</title>
+    <title>Strolch: Observers</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -44,33 +44,66 @@
 <div class="container">
 
     <div class="page-header">
-        <h1 class="page-title">Documentation</h1>
+        <h1 class="page-title">Documentation: Observers</h1>
 
-        <p class="lead page-description">This is the index page to the documentation of Strolch.</p>
+        <p class="lead page-description">This page discusses the Strolch Observers</p>
     </div>
 
     <div class="content">
-        <p>Strolch's documentation has only just begun, but as more and more details of the implementation in Strolch
-            are fixed, more documentation can be created and will be available here.</p>
 
-        <p>Currently we have the following topics of discussion:</p>
-        <ul>
-            <li><a href="documentation_architecture.html">Strolch Architecture</a></li>
-            <li><a href="documentation_do_and_dont.html">Strolch Do and Don’t</a></li>
-            <li><a href="documentation_runtime.html">Strolch Runtime Configuration</a></li>
-            <li><a href="documentation_realms.html">Strolch Realms</a></li>
-            <li><a href="documentation_components.html">Strolch Components</a></li>
-            <li><a href="documentation_services_and_commands.html">Strolch Services and Commands</a></li>
-            <li><a href="documentation_queries.html">Strolch Queries</a></li>
-            <li><a href="documentation_transactions.html">Strolch Transactions</a></li>
-            <li><a href="documentation_policies.html">Strolch Policies</a></li>
-            <li><a href="documentation_observers.html">Strolch Observers</a></li>
-            <li><a href="documentation_versioning.html">Strolch Versioning</a></li>
-            <!--
-            <li><a href="documentation_privileges.html">Strolch Privileges</a></li>
-            <li><a href="documentation_audits.html">Strolch Audits</a></li>
-            -->
-        </ul>
+        <p>All changes done in a Strolch transaction are recorded and then propagated to any registered observers.</p>
+
+        <p>The observer feature is opt-in and is configured for each realm. In the <code>StrolchConfiguration.xml</code>
+            file enable observers by adding the <code>enableObserverUpdates</code> propery per realm:</p>
+        <pre>
+&lt;StrolchConfiguration&gt;
+  &lt;env id="dev"&gt;
+    ...
+    &lt;Component&gt;
+      &lt;name&gt;RealmHandler&lt;/name&gt;
+      &lt;api&gt;li.strolch.agent.api.RealmHandler&lt;/api&gt;
+      &lt;impl&gt;li.strolch.agent.impl.DefaultRealmHandler&lt;/impl&gt;
+      &lt;depends&gt;PrivilegeHandler&lt;/depends&gt;
+      &lt;Properties&gt;
+        &lt;realms&gt;defaultRealm, otherRealm&lt;/realms&gt;
+        &lt;enableObserverUpdates&gt;true&lt;/enableObserverUpdates&gt;
+        &lt;dataStoreMode&gt;TRANSIENT&lt;/dataStoreMode&gt;
+        &lt;dataStoreFile&gt;StrolchModel.xml&lt;/dataStoreFile&gt;
+        &lt;enableObserverUpdates.otherRealm&gt;true&lt;/enableObserverUpdates.otherRealm&gt;
+        &lt;dataStoreMode.otherRealm&gt;TRANSIENT&lt;/dataStoreMode.otherRealm&gt;
+        &lt;dataStoreFile.otherRealm&gt;StrolchModel.xml&lt;/dataStoreFile.otherRealm&gt;
+      &lt;/Properties&gt;
+    &lt;/Component&gt;
+  &lt;/env&gt;
+  ...
+&lt;/StrolchConfiguration&gt;</pre>
+
+        <br />
+        <p>Registering for updates is done by registering an <code>Observer</code> on the <code>ObserverHandler</code>
+            of the realm itself:</p>
+        <pre>
+ObserverHandler observerHandler = container.getRealm(StrolchConstants.DEFAULT_REALM).getObserverHandler();
+observerHandler.registerObserver(Tags.RESOURCE, new Observer() {
+
+  @Override
+  public void update(String key, List&lt;StrolchRootElement&gt; elements) {
+    logger.info(elements.size() + " resources were updated!");
+  }
+
+  @Override
+  public void remove(String key, List&lt;StrolchRootElement&gt; elements) {
+    logger.info(elements.size() + " resources were removed!");
+  }
+
+  @Override
+  public void add(String key, List&lt;StrolchRootElement&gt; elements) {
+    logger.info(elements.size() + " resources were added!");
+  }
+});</pre>
+
+        <br/>
+        <p>Observer updates can be suppressed on the transaction by calling <code>tx.setSuppressUpdates()</code></p>
+
 
         <!-- content here -->
 

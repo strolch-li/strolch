@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="ico/favicon.ico">
 
-    <title>Strolch: Documentation</title>
+    <title>Strolch: Versioning</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -44,33 +44,63 @@
 <div class="container">
 
     <div class="page-header">
-        <h1 class="page-title">Documentation</h1>
+        <h1 class="page-title">Documentation: Versioning</h1>
 
-        <p class="lead page-description">This is the index page to the documentation of Strolch.</p>
+        <p class="lead page-description">This page discusses the Strolch Versioning</p>
     </div>
 
     <div class="content">
-        <p>Strolch's documentation has only just begun, but as more and more details of the implementation in Strolch
-            are fixed, more documentation can be created and will be available here.</p>
 
-        <p>Currently we have the following topics of discussion:</p>
-        <ul>
-            <li><a href="documentation_architecture.html">Strolch Architecture</a></li>
-            <li><a href="documentation_do_and_dont.html">Strolch Do and Don’t</a></li>
-            <li><a href="documentation_runtime.html">Strolch Runtime Configuration</a></li>
-            <li><a href="documentation_realms.html">Strolch Realms</a></li>
-            <li><a href="documentation_components.html">Strolch Components</a></li>
-            <li><a href="documentation_services_and_commands.html">Strolch Services and Commands</a></li>
-            <li><a href="documentation_queries.html">Strolch Queries</a></li>
-            <li><a href="documentation_transactions.html">Strolch Transactions</a></li>
-            <li><a href="documentation_policies.html">Strolch Policies</a></li>
-            <li><a href="documentation_observers.html">Strolch Observers</a></li>
-            <li><a href="documentation_versioning.html">Strolch Versioning</a></li>
-            <!--
-            <li><a href="documentation_privileges.html">Strolch Privileges</a></li>
-            <li><a href="documentation_audits.html">Strolch Audits</a></li>
-            -->
-        </ul>
+        <p>One of Strolch's features that sets it apart from other frameworks, is that versioning is baked into
+            Strolch's fabric. The feature is opt-in, as it is not required in all projects, but it only needs enabling,
+            for all modifications to objects to be versioned, so that rollbacks can be done when needed.</p>
+
+        <p>The feature is enabled for each realm. In the <code>StrolchConfiguration.xml</code> file enable it by adding
+            the <code>enableVersioning</code> propery per realm:</p>
+        <pre>
+&lt;StrolchConfiguration&gt;
+  &lt;env id="dev"&gt;
+    ...
+    &lt;Component&gt;
+      &lt;name&gt;RealmHandler&lt;/name&gt;
+      &lt;api&gt;li.strolch.agent.api.RealmHandler&lt;/api&gt;
+      &lt;impl&gt;li.strolch.agent.impl.DefaultRealmHandler&lt;/impl&gt;
+      &lt;depends&gt;PrivilegeHandler&lt;/depends&gt;
+      &lt;Properties&gt;
+        &lt;realms&gt;defaultRealm, otherRealm&lt;/realms&gt;
+        &lt;enableVersioning&gt;true&lt;/enableVersioning&gt;
+        &lt;dataStoreMode&gt;TRANSIENT&lt;/dataStoreMode&gt;
+        &lt;dataStoreFile&gt;StrolchModel.xml&lt;/dataStoreFile&gt;
+        &lt;enableVersioning.otherRealm&gt;true&lt;/enableVersioning.otherRealm&gt;
+        &lt;dataStoreMode.otherRealm&gt;TRANSIENT&lt;/dataStoreMode.otherRealm&gt;
+        &lt;dataStoreFile.otherRealm&gt;StrolchModel.xml&lt;/dataStoreFile.otherRealm&gt;
+      &lt;/Properties&gt;
+    &lt;/Component&gt;
+  &lt;/env&gt;
+  ...
+&lt;/StrolchConfiguration&gt;</pre>
+
+        <br/>
+        <p>Once versioning is enabled, versioning is handled automatically. The API for versioning is implemented on the
+            ElementMaps.</p>
+
+        <p>Example: Revert to previous version of a Resource:</p>
+        <pre>
+Resource res = tx.getResourceBy("TestType", "MyTestResource");
+ResourceMap resourceMap = tx.getResourceMap();
+Resource previousVersion = resourceMap.revertToVersion(tx, res);
+// or
+Resource previousVersion = resourceMap.revertToVersion(tx, "TestType", "MyTestResource", 1);</pre>
+
+        <p>Example: Retrieve all versions of a Resource:</p>
+        <pre>
+List&lt;Resource&gt; versions = resourceMap.getVersionsFor(tx, "TestType", "MyTestResource");</pre>
+
+        <br/>
+        <p><b>Note:</b> When reverting to a previous version, it is important to remember, that any references on an
+            element to other elements will also be restored. As long as the relationship is to the same element, then
+            this is not an issue, but should the relationship have changed, then it this must be handled and the user
+            performing a revert be allowed to decided which element to reference in the reverted version.</p>
 
         <!-- content here -->
 
