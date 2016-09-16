@@ -93,8 +93,6 @@ public class ModelQuery {
 					resources.addAll(tx.doQuery(query));
 				}
 			}
-
-			tx.doNothingOnClose();
 		}
 
 		// do ordering
@@ -151,8 +149,6 @@ public class ModelQuery {
 					orders.addAll(tx.doQuery(query));
 				}
 			}
-
-			tx.doNothingOnClose();
 		}
 
 		// do ordering
@@ -210,8 +206,6 @@ public class ModelQuery {
 					activities.addAll(tx.doQuery(query));
 				}
 			}
-
-			tx.doNothingOnClose();
 		}
 
 		// do ordering

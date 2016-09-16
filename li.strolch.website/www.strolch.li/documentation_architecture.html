@@ -94,19 +94,21 @@
         <p>In addition to the main parts, Strolch contains inherit capabilities, which gives Strolch unique features
             when compared to other Java Frameworks:</p>
         <ul>
-            <li>Privileges &rarr; Strolch is user agnostic and any action, i.e. Service, Query, etc. is authorized
-                against the authenticated user.
-            </li>
-            <li>Transactions &rarr; Transactions handle locking/unlocking of objects, updating the model and are the
-                central API for the developer.
-            </li>
-            <li>Observers &rarr; modifications to the model are propagated to listeners using the observer pattern.</li>
-            <li>Versioning &rarr; modifications to objects are versioned and thus can be rolled back at a later time.
-            </li>
             <li>Policies &rarr; Policies allow injecting different algorithms. All root elements can store Policy
                 definitions, so that a service can delegate to a Policy and thus behave differently, depending on the
                 element being accessed.
             </li>
+            <li>Transactions &rarr; Transactions handle locking/unlocking of objects, updating the model and are the
+                central API for the developer.
+            </li>
+            <li>Privileges &rarr; Strolch is user agnostic and any action, i.e. Service, Query, etc. is authorized
+                against the authenticated user.
+            </li>
+            <li>Observers &rarr; modifications to the model are propagated to listeners using the observer pattern.</li>
+            <li>Audits &rarr; Every access (read, modify) of the model are audited</li>
+            <li>Versioning &rarr; modifications to objects are versioned and thus can be rolled back at a later time.
+            </li>
+
         </ul>
 
 
