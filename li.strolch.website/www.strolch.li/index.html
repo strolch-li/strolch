@@ -62,9 +62,9 @@
             used to implement applications with multiple users/customers for instance in SaaS environments.</p>
 
         <p>The parameterized data model consists of three top level objects, Resources, Orders and Activities. These
-            objects can have any number of ParameterBags which in turn can have any number of Parameters on them.
-            This allows for a very dynamic modelling of data structures including modification at run time. Multiple
-            ready to use Parameter types are already implemented which handle the primitive types in Java including
+            objects can have any number of ParameterBags which in turn can have any number of Parameters on them. This
+            allows for a very dynamic modelling of data structures including modification at run time. Multiple ready to
+            use Parameter types are already implemented which handle the primitive types in Java including
             ListParameters for collections of these primitive types.</p>
 
         <p>One of the main features of the Strolch agent, is that persistence is handled transparently and the user must
@@ -137,20 +137,32 @@
 
         <p>Strolch strives to use as few external dependencies as possible, so that the Strolch runtime is not bloated
             unnecessarily. The following list of Strolch dependencies is a summary and was created using mvn
-            dependency:tree on the li.strolch.dev project on the 2014-09-18.</p>
+            dependency:tree on the strolch_minimal project on the 2016-09-16.</p>
 
         <h4>Basic runtime dependencies</h4>
         <ul>
-            <li>org.postgresql:postgresql:jar:9.3-1100-jdbc41:compile
-                <p>Implements the PostgreSQL Persistence layer used by li.strolch.persistence.postgresql</p></li>
             <li>commons-cli:commons-cli:jar:1.2:compile
                 <p>Implements the command line parameter parsing when starting from a main class</p></li>
-            <li>junit:junit:jar:4.11:compile
-                <p>Testing facilities</p></li>
-            <li>org.slf4j:slf4j-api:jar:1.7.2:compile
-                <p>Logging facilities API</p></li>
+
+            <li>org.postgresql:postgresql:jar:9.4.1208.jre7:compile
+                <p>Implements the PostgreSQL Persistence layer used by li.strolch.persistence.postgresql</p></li>
+            <li>com.zaxxer:HikariCP:jar:2.3.6:compile
+                <p>Implements connection pooling for JDBC access</p></li>
+
+            <li>com.google.code.gson:gson:jar:2.3.1:compile
+                <p>Used to transform to JSON</p></li>
+
+            <li>javax.activation:activation:jar:1.1:compile
+                <p>Used when sending e-mails</p></li>
+            <li>javax.mail:mail:jar:1.5.0-b01:compile
+                <p>Used when sending e-mails</p></li>
+
             <li>log4j:log4j:jar:1.2.17:runtime
-                <p>Logging facilities Implementation</p></li>
+                <p>Used for logging</p></li>
+            <li>org.slf4j:slf4j-api:jar:1.7.2:compile
+                <p>Used for logging</p></li>
+            <li>org.slf4j:slf4j-log4j12:jar:1.7.2:runtime
+                <p>Used for logging</p></li>
         </ul>
 
 
@@ -159,7 +171,7 @@
         <p>If you want to access Strolch using the RESTful API, then we got you covered - but sadly RESTful service
             development requires quite a few extra dependencies:</p>
         <ul>
-            <li>com.google.guava:guava:jar:14.0.1:compile</li>
+            <li>com.github.petitparser.java-petitparser:petitparser-core:jar:2.0.2:compile</li>
             <li>javax.annotation:javax.annotation-api:jar:1.2:compile</li>
             <li>javax.servlet:javax.servlet-api:jar:3.0.1:provided</li>
             <li>javax.validation:validation-api:jar:1.1.0.Final:compile</li>
@@ -168,20 +180,21 @@
             <li>org.eclipse.persistence:org.eclipse.persistence.asm:jar:2.5.0:compile</li>
             <li>org.eclipse.persistence:org.eclipse.persistence.core:jar:2.5.0:compile</li>
             <li>org.eclipse.persistence:org.eclipse.persistence.moxy:jar:2.5.0:compile</li>
-            <li>org.glassfish.hk2.external:asm-all-repackaged:jar:2.2.0-b21:compile</li>
-            <li>org.glassfish.hk2.external:cglib:jar:2.2.0-b21:compile</li>
-            <li>org.glassfish.hk2.external:javax.inject:jar:2.2.0-b21:compile</li>
-            <li>org.glassfish.hk2:hk2-api:jar:2.2.0-b21:compile</li>
-            <li>org.glassfish.hk2:hk2-locator:jar:2.2.0-b21:compile</li>
-            <li>org.glassfish.hk2:hk2-utils:jar:2.2.0-b21:compile</li>
+            <li>org.glassfish.hk2.external:aopalliance-repackaged:jar:2.3.0-b05:compile</li>
+            <li>org.glassfish.hk2.external:javax.inject:jar:2.3.0-b05:compile</li>
+            <li>org.glassfish.hk2:hk2-api:jar:2.3.0-b05:compile</li>
+            <li>org.glassfish.hk2:hk2-locator:jar:2.3.0-b05:compile</li>
+            <li>org.glassfish.hk2:hk2-utils:jar:2.3.0-b05:compile</li>
             <li>org.glassfish.hk2:osgi-resource-locator:jar:1.0.1:compile</li>
-            <li>org.glassfish.jersey.containers:jersey-container-servlet-core:jar:2.5.1:compile</li>
-            <li>org.glassfish.jersey.containers:jersey-container-servlet:jar:2.5.1:compile</li>
-            <li>org.glassfish.jersey.core:jersey-client:jar:2.5.1:compile</li>
-            <li>org.glassfish.jersey.core:jersey-common:jar:2.5.1:compile</li>
-            <li>org.glassfish.jersey.core:jersey-server:jar:2.5.1:compile</li>
-            <li>org.glassfish.jersey.ext:jersey-entity-filtering:jar:2.5.1:compile</li>
-            <li>org.glassfish.jersey.media:jersey-media-moxy:jar:2.5.1:compile</li>
+            <li>org.glassfish.jersey.bundles.repackaged:jersey-guava:jar:2.11:compile</li>
+            <li>org.glassfish.jersey.containers:jersey-container-servlet-core:jar:2.11:compile</li>
+            <li>org.glassfish.jersey.containers:jersey-container-servlet:jar:2.11:compile</li>
+            <li>org.glassfish.jersey.core:jersey-client:jar:2.11:compile</li>
+            <li>org.glassfish.jersey.core:jersey-common:jar:2.11:compile</li>
+            <li>org.glassfish.jersey.core:jersey-server:jar:2.11:compile</li>
+            <li>org.glassfish.jersey.ext:jersey-entity-filtering:jar:2.11:compile</li>
+            <li>org.glassfish.jersey.media:jersey-media-moxy:jar:2.11:compile</li>
+            <li>org.javassist:javassist:jar:3.18.1-GA:compile</li>
         </ul>
 
         <h4>API</h4>

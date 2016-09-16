@@ -53,22 +53,19 @@
 
         <p>As is custom for every framework, querying the model must be possible. Strolch queries are implemented using
             the <code>StrolchQuery</code> interface and one of its concrete implementations: <code>ResourceQuery</code>,
-            <code>OrderQuery</code>,
-            <code>ActivityQuery</code>.</p>
+            <code>OrderQuery</code>, <code>ActivityQuery</code>.</p>
 
         <p>A Strolch element always has two identifiers: <code>Type</code> and <code>Id</code>. The type is important as
-            it classifies an element.
-            So if a car and a house would be modelled in Strolch, then those would both be a <code>Resource</code>, but
-            one of type
-            <code>Car</code> and the other of type <code>House</code>. Both would have different parameters.</p>
+            it classifies an element. So if a car and a house would be modelled in Strolch, then those would both be a
+            <code>Resource</code>, but one of type <code>Car</code> and the other of type <code>House</code>. Both would
+            have different parameters.</p>
 
         <p>Thus one of the inputs for every query is it's type, which is defined as the navigation. It is said that we
             navigate to the Cars, or Houses. Thus when instantiating a ResourceQuery, pass the navigation to the type of
             Resource as well. Same applies for Orders and Activities.</p>
 
         <p>Further input for a StrolchQuery are the selections. These selections get translated into RDBMS
-            <code>WHERE</code>
-            clauses. Selections support boolean operations thus allowing for complex querying.</p>
+            <code>WHERE</code> clauses. Selections support boolean operations thus allowing for complex querying.</p>
 
         <p>StrolchQueries also support Ordering and object transformation. Following classes provide the most used
             scenarios:</p>

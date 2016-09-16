@@ -53,8 +53,8 @@
 
         <p>Strolch Transactions play a central role in a Strolch agent. A transaction is opened for a realm, and grants
             access to the model of the agent. Transactions are implemented as a Java <code>try-with-resources</code> by
-            implementing
-            the <code>AutoCloseable</code> interface. This makes it trivial to understand the scope of a transaction.
+            implementing the <code>AutoCloseable</code> interface. This makes it trivial to understand the scope of a
+            transaction.
         </p>
 
         <p>Transactions handle the following:</p>
@@ -69,8 +69,7 @@
 
         <p>When a transaction is opened, it is by default read-only, i.e. does not perform any commands when it is
             closed. Should the TX perform commands, then it is important to call <code>tx.commitOnClose()</code>, but
-            only at the end
-            of the work, so that exception handling can properly work if something goes wrong.</p>
+            only at the end of the work, so that exception handling can properly work if something goes wrong.</p>
 
         <p><code>StrolchTransaction</code> offers a myriad of methods:</p>
         <ul>

@@ -53,19 +53,16 @@
 
         <p><code>Services</code> are written to implement a specific use-case. <code>Commands</code> are written to
             implemente re-usable parts of a use-case. The use-case can be abstract e.g. <code>AddResourceService</code>
-            or very specific e.g.
-            <code>CreatePatientService</code>.</p>
+            or very specific e.g. <code>CreatePatientService</code>.</p>
 
         <p>Should the use-case be re-usable in different scenarios, then commands should implement the logic, and the
-            services should then execute the commands. E.g. The <code>CreatePatientService</code> would use a
-            <code>CreatePatientResourceCommand</code> and then use an <code>AddResourceCommand</code> in a single
-            transaction, so that the task of
-            creating the actual Patient Resource can be re-used somewhere else.</p>
+            services should then execute the commands. E.g. The <code>CreatePatientService</code> would use a <code>CreatePatientResourceCommand</code>
+            and then use an <code>AddResourceCommand</code> in a single transaction, so that the task of creating the
+            actual Patient Resource can be re-used somewhere else.</p>
 
-        <p>Services extend the abstract class <code>AbstractService</code> and then implement the method
-            <code>internalDoService(ServiceArgument)</code>. AbstractService defines generic template arguments with
-            which the
-            concrete service can define a specific input ServiceArgument class and output ServiceResult class.</p>
+        <p>Services extend the abstract class <code>AbstractService</code> and then implement the method <code>internalDoService(ServiceArgument)</code>.
+            AbstractService defines generic template arguments with which the concrete service can define a specific
+            input ServiceArgument class and output ServiceResult class.</p>
 
         <p>The AbstractService class has multiple helper methods:</p>
         <ul>
@@ -77,8 +74,7 @@
 
 
         <p>Commands extend the <code>Command</code> class and then implement the method <code>doCommand()</code>.
-            Commands have helper
-            methods:</p>
+            Commands have helper methods:</p>
         <ul>
             <li><code>tx()</code> - to get the current transaction</li>
             <li><code>getPolicy()</code> - to retrieve a policy instance</li>

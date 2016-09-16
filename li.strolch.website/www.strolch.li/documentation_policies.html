@@ -84,7 +84,7 @@
         <p><b>Note</b> how the PlanningPolicy has a value of <code>key:SimplePlanning</code> and the ExecutionPolicy
             defines a reference to an actual class.</p>
 
-        <br />
+        <br/>
         <p>To use the PolicyHandler, it must be configured in the StrolchConfiguration.xml as follows:</p>
         <pre>
 &lt;Component>
@@ -97,7 +97,7 @@
   &lt;/Properties&gt;
 &lt;/Component&gt;</pre>
 
-        <br />
+        <br/>
         <p>And this policy handler implementation requires a file where the lookups for the policies is defined,
             e.g.:</p>
         <pre>
@@ -113,7 +113,7 @@
 
 &lt;/StrolchPolicies&gt;</pre>
 
-        <br />
+        <br/>
         <p>Now at runtime we can access the policies:</p>
         <pre>
 PolicyHandler policyHandler = getComponent(PolicyHandler.class);

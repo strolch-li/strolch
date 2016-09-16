@@ -51,42 +51,35 @@
 
     <div class="content">
 
-        <p>Realms implement multi-tenant capabilities. A Strolch agent can have an arbitrary number of realms
-            configured and each realm has its own persistence configuration, allowing to separate mandates
-            completely.</p>
+        <p>Realms implement multi-tenant capabilities. A Strolch agent can have an arbitrary number of realms configured
+            and each realm has its own persistence configuration, allowing to separate mandates completely.</p>
 
         A realm can run in one of the following modes:
         <ul>
-            <li>EMPTY <br/>
-                This is a transient data store mode, where no model changes are persisted - they are only kept in
-                memory. When the Strolch agent is started, this realm is empty as no data is loaded.
+            <li>EMPTY <br/> This is a transient data store mode, where no model changes are persisted - they are only
+                kept in memory. When the Strolch agent is started, this realm is empty as no data is loaded.
             </li>
-            <li>TRANSIENT <br/>
-                This is the same as EMPTY, but with the difference that when the Strolch agent is started, a model file
-                is parsed and the in-memory realm is populated with the elements parsed from the model file.
+            <li>TRANSIENT <br/> This is the same as EMPTY, but with the difference that when the Strolch agent is
+                started, a model file is parsed and the in-memory realm is populated with the elements parsed from the
+                model file.
             </li>
-            <li>CACHED <br/>
-                In this mode, all data is stored in-memory, and any changes made are written back to the persistence
-                layer. This allows for fast in-memory qeuries, but makes sure no data is lost when the agent is
-                restarted.
+            <li>CACHED <br/> In this mode, all data is stored in-memory, and any changes made are written back to the
+                persistence layer. This allows for fast in-memory qeuries, but makes sure no data is lost when the agent
+                is restarted.
             </li>
-            <li>TRANSACTIONAL <br/>
-                In this mode no data is kept in-memory and every query, and element retrieval is passed to the
-                persistence layer to be retrieved from the underlying database. This is similar to typical Java
-                applications where JPA is used.
+            <li>TRANSACTIONAL <br/> In this mode no data is kept in-memory and every query, and element retrieval is
+                passed to the persistence layer to be retrieved from the underlying database. This is similar to typical
+                Java applications where JPA is used.
             </li>
         </ul>
 
         <p>Realms are mostly hidden from a developer as a <code>StrolchTransaction</code> exposes all important
-            operations needed to
-            access Strolch objects. A developer will however need to configure the realms for their specific project. If
-            the project only requires one realm, then the <code>defaultRealm</code> can be used, where the developer
-            only is
-            required to configure the mode and any relevant model file.</p>
+            operations needed to access Strolch objects. A developer will however need to configure the realms for their
+            specific project. If the project only requires one realm, then the <code>defaultRealm</code> can be used,
+            where the developer only is required to configure the mode and any relevant model file.</p>
 
         <p>If the mode is CACHED or TRANSACTIONAL, then the <code>PersistenceHandler</code> component is required to be
-            configured,
-            so that the DAOs know how to access the underlying database.</p>
+            configured, so that the DAOs know how to access the underlying database.</p>
 
         <p>The configuration in the <code>StrolchConfiguration.xml</code> file is as follows:</p>
 
@@ -112,10 +105,8 @@
 </pre>
 
         <p>A multi-realm configuration would be as follows. Note how the <code>defaultRealm</code> is still enabled, and
-            has its
-            configuration as before. Further the PostgreSQL <code>PersistenceHandler</code> is configured to show how
-            the realms are
-            connected to the persistence handler:</p>
+            has its configuration as before. Further the PostgreSQL <code>PersistenceHandler</code> is configured to
+            show how the realms are connected to the persistence handler:</p>
 
         <pre>
 &lt;StrolchConfiguration&gt;
@@ -161,8 +152,8 @@
 &lt;/StrolchConfiguration&gt;
         </pre>
 
-        <p>Accessing a realm is done in multiple ways. Important is to note, that a user should use the
-            <code>StrolchTransaction</code> object, instead of accessing the Realm directly.</p>
+        <p>Accessing a realm is done in multiple ways. Important is to note, that a user should use the <code>StrolchTransaction</code>
+            object, instead of accessing the Realm directly.</p>
 
         <p>Opening a transaction is done from a <code>Service</code> by calling one of the <code>openTx()</code>-methods.
             Nevertheless, the realm can be accessed as follows:</p>

@@ -184,24 +184,22 @@
                     <code>Resource</code> objects representing machines, human resources, etc., and
                     <code>Activity</code>/<code>Action</code> hierarchies defining a workflow.</p>
 
-                <p>With the latest couple of commits to Strolch we have now added Activities and a basic
-                    planning of Actions onto Resources. Activities have an
-                    ordered list of <code>IActivityElement</code> which allows creating an arbitrary deep tree structure
-                    of Activity and Action elements.</p>
+                <p>With the latest couple of commits to Strolch we have now added Activities and a basic planning of
+                    Actions onto Resources. Activities have an ordered list of <code>IActivityElement</code> which
+                    allows creating an arbitrary deep tree structure of Activity and Action elements.</p>
 
-                <p>Action objects have a list of <code>IValueChange</code> objects which define the start,
-                    end and further value changes over time on a referenced Resource. Thus planning an
-                    Activity is done by iterating the Activity hierarchy and for every Action
-                    selecting a relevant Resource and then then applying the changes of the
-                    Action on to the referenced <code>TimeState</code> on the Resource.</p>
+                <p>Action objects have a list of <code>IValueChange</code> objects which define the start, end and
+                    further value changes over time on a referenced Resource. Thus planning an Activity is done by
+                    iterating the Activity hierarchy and for every Action selecting a relevant Resource and then then
+                    applying the changes of the Action on to the referenced <code>TimeState</code> on the Resource.</p>
 
-                <p>This implementation is currently very simple as it ignores all constraints which a
-                    Resource might have. In further development we shall implement a <code>Violation</code>
-                    model so that UIs can be built to visualize the over-use of Resources.</p>
+                <p>This implementation is currently very simple as it ignores all constraints which a Resource might
+                    have. In further development we shall implement a <code>Violation</code> model so that UIs can be
+                    built to visualize the over-use of Resources.</p>
 
                 <p>In even further steps we would then start implementing algorithms to not just apply the changes onto
-                    a Resource, but to actually search the Resource for time slots when the
-                    value changes would not violate any constraints applied to the resource.</p>
+                    a Resource, but to actually search the Resource for time slots when the value changes would not
+                    violate any constraints applied to the resource.</p>
 
                 <p>We are very much looking forward to these new features. Stay tuned for your updates - even though
                     they do take their time to arrive =).</p>
