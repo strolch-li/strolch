@@ -69,8 +69,8 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 		for (String bagId : bagKeySet) {
 
 			// see if we have to ignore this bag i.e. empty set existing
-			Set<String> paramIds = this.ignoredKeys.getSet(bagId);
-			if (paramIds != null && paramIds.isEmpty())
+			Set<String> ignoredParamIds = this.ignoredKeys.getSet(bagId);
+			if (ignoredParamIds != null && ignoredParamIds.isEmpty())
 				continue;
 
 			ParameterBag parameterBag = element.getParameterBag(bagId);
@@ -79,7 +79,7 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 			for (String paramId : parameterKeySet) {
 
 				// see if this parameter must be ignored
-				if (paramIds != null && paramIds.contains(paramId))
+				if (ignoredParamIds != null && ignoredParamIds.contains(paramId))
 					continue;
 
 				if (jsonObject.has(paramId)) {

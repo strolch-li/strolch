@@ -23,6 +23,10 @@ import li.strolch.utils.collections.MapOfSets;
  * empty set with the bag id.
  * </p>
  * 
+ * <p>
+ * Optional values are handled similar, but only a parameter can be optional, not a whole bag
+ * </p>
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  *
  * @param <T>
@@ -30,13 +34,16 @@ import li.strolch.utils.collections.MapOfSets;
 public class FromFlatJsonVisitor<T extends StrolchRootElement> {
 
 	private MapOfSets<String, String> ignoredKeys;
+	private MapOfSets<String, String> optionalKeys;
 
 	public FromFlatJsonVisitor() {
 		this.ignoredKeys = new MapOfSets<>();
+		this.optionalKeys = new MapOfSets<>();
 	}
 
 	public FromFlatJsonVisitor(MapOfSets<String, String> ignoredParams) {
 		this.ignoredKeys = new MapOfSets<>();
+		this.optionalKeys = new MapOfSets<>();
 	}
 
 	public void ignoreBag(String bagId) {
@@ -47,14 +54,18 @@ public class FromFlatJsonVisitor<T extends StrolchRootElement> {
 		this.ignoredKeys.addElement(bagId, paramId);
 	}
 
+	public void optionalParameter(String bagId, String paramId) {
+		this.optionalKeys.addElement(bagId, paramId);
+	}
+
 	public void visit(T element, JsonObject jsonObject) {
 
 		Set<String> bagKeySet = element.getParameterBagKeySet();
 		for (String bagId : bagKeySet) {
 
 			// see if we have to ignore this bag i.e. empty set existing
-			Set<String> paramIds = this.ignoredKeys.getSet(bagId);
-			if (paramIds != null && paramIds.isEmpty())
+			Set<String> ignoredParamIds = this.ignoredKeys.getSet(bagId);
+			if (ignoredParamIds != null && ignoredParamIds.isEmpty())
 				continue;
 
 			ParameterBag parameterBag = element.getParameterBag(bagId);
@@ -63,12 +74,15 @@ public class FromFlatJsonVisitor<T extends StrolchRootElement> {
 			for (String paramId : parameterKeySet) {
 
 				// see if this parameter must be ignored
-				if (paramIds != null && paramIds.contains(paramId))
+				if (ignoredParamIds != null && ignoredParamIds.contains(paramId))
 					continue;
 
 				JsonElement jsonElement = jsonObject.get(paramId);
-				if (jsonElement == null)
+				if (jsonElement == null) {
+					if (this.optionalKeys.containsElement(bagId, paramId))
+						continue;
 					throw new StrolchModelException("JsonObject is missing member with ID " + paramId);
+				}
 
 				if (!jsonElement.isJsonPrimitive()) {
 					throw new StrolchModelException("JsonElement " + paramId + " is not a json primitive but a "
