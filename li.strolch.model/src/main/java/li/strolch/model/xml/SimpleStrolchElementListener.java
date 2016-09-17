@@ -17,69 +17,78 @@ package li.strolch.model.xml;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.activity.Activity;
 
 /**
+ * {@link StrolchElementListener} to store the {@link StrolchRootElement} in {@link Map} objects when parsing an object
+ * model from an external source
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class SimpleStrolchElementListener implements StrolchElementListener {
 
-	private List<Resource> resources;
-	private List<Order> orders;
-	private List<Activity> activities;
+	private Map<String, Resource> resources;
+	private Map<String, Order> orders;
+	private Map<String, Activity> activities;
 
 	@Override
 	public void notifyResource(Resource resource) {
 		if (this.resources == null) {
-			this.resources = new ArrayList<>();
+			this.resources = new HashMap<>();
 		}
-		this.resources.add(resource);
+		this.resources.put(resource.getId(), resource);
 	}
 
 	@Override
 	public void notifyOrder(Order order) {
 		if (this.orders == null) {
-			this.orders = new ArrayList<>();
+			this.orders = new HashMap<>();
 		}
-		this.orders.add(order);
+		this.orders.put(order.getId(), order);
 	}
 
 	@Override
 	public void notifyActivity(Activity activity) {
 		if (this.activities == null) {
-			this.activities = new ArrayList<>();
+			this.activities = new HashMap<>();
 		}
-		this.activities.add(activity);
+		this.activities.put(activity.getId(), activity);
 	}
 
-	/**
-	 * @return the resources
-	 */
+	public Resource getResource(String id) {
+		return this.resources.get(id);
+	}
+
+	public Order getOrder(String id) {
+		return this.orders.get(id);
+	}
+
+	public Activity getActivity(String id) {
+		return this.activities.get(id);
+	}
+
 	public List<Resource> getResources() {
 		if (this.resources == null)
 			return Collections.emptyList();
-		return this.resources;
+		return new ArrayList<>(this.resources.values());
 	}
 
-	/**
-	 * @return the orders
-	 */
 	public List<Order> getOrders() {
 		if (this.orders == null)
 			return Collections.emptyList();
-		return this.orders;
+		return new ArrayList<>(this.orders.values());
 	}
 
-	/**
-	 * @return the activities
-	 */
 	public List<Activity> getActivities() {
 		if (this.activities == null)
 			return Collections.emptyList();
-		return this.activities;
+		return new ArrayList<>(this.activities.values());
 	}
 }
