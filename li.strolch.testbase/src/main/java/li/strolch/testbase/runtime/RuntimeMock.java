@@ -75,6 +75,10 @@ public final class RuntimeMock {
 		return getPrivilegeHandler().authenticate("admin", "admin".getBytes());
 	}
 
+	public Certificate login(String username, String password) {
+		return getPrivilegeHandler().authenticate(username, password.getBytes());
+	}
+
 	public boolean logout(Certificate cert) {
 		return getPrivilegeHandler().invalidateSession(cert);
 	}
