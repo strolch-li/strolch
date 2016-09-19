@@ -16,7 +16,6 @@
 package li.strolch.command.plan;
 
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_NAME;
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_10;
@@ -62,23 +61,23 @@ public class PlanActionTest {
 	public void init() {
 
 		// add a resource with integer state variable
-		resource = ModelGenerator.createResource("@1", "Test With States", "Stated");
-		final IntegerTimedState timedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
+		this.resource = ModelGenerator.createResource("@1", "Test With States", "Stated");
+		IntegerTimedState timedState = this.resource.getTimedState(STATE_INTEGER_ID);
+		timedState.getTimeEvolution().clear();
 		timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
-		resource.addTimedState(timedState);
 
-		action = new Action("action", "Action", "Use");
+		this.action = new Action("action", "Action", "Use");
 
-		Assert.assertEquals(State.CREATED, action.getState());
+		Assert.assertEquals(State.CREATED, this.action.getState());
 
-		final IntegerParameter iP = new IntegerParameter("quantity", "Occupation", 1);
-		action.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
-		action.addParameter("objective", iP);
+		IntegerParameter iP = new IntegerParameter("quantity", "Occupation", 1);
+		this.action.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
+		this.action.addParameter("objective", iP);
 
-		createChanges(action);
+		createChanges(this.action);
 
-		action.setResourceId(resource.getId());
-		action.setResourceType(resource.getType());
+		this.action.setResourceId(this.resource.getId());
+		this.action.setResourceType(this.resource.getType());
 	}
 
 	@Test
@@ -86,22 +85,22 @@ public class PlanActionTest {
 
 		try (StrolchTransaction tx = mock(StrolchTransaction.class)) {
 
-			final Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
-			when(tx.findElement(eq(locator))).thenReturn(resource);
+			Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
+			when(tx.findElement(eq(locator))).thenReturn(this.resource);
 
-			final PlanActionCommand cmd = new PlanActionCommand(null, tx);
-			cmd.setAction(action);
+			PlanActionCommand cmd = new PlanActionCommand(null, tx);
+			cmd.setAction(this.action);
 			cmd.doCommand();
 
 			// check the state
-			Assert.assertEquals(State.PLANNED, action.getState());
+			Assert.assertEquals(State.PLANNED, this.action.getState());
 
 			// check the resource Id
-			Assert.assertEquals(resource.getId(), action.getResourceId());
+			Assert.assertEquals(this.resource.getId(), this.action.getResourceId());
 
 			// check if we get the expected result
-			final StrolchTimedState<IValue<Integer>> timedState = resource.getTimedState(STATE_INTEGER_ID);
-			final ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
+			StrolchTimedState<IValue<Integer>> timedState = this.resource.getTimedState(STATE_INTEGER_ID);
+			ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
 			SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
 
 			Assert.assertEquals(3, values.size());
@@ -118,7 +117,7 @@ public class PlanActionTest {
 			// call undo to clean up
 			cmd.undo();
 
-			Assert.assertEquals(State.CREATED, action.getState());
+			Assert.assertEquals(State.CREATED, this.action.getState());
 
 			// and check again
 			values = timeEvolution.getValues();
@@ -137,18 +136,17 @@ public class PlanActionTest {
 	 * 
 	 * @param action
 	 */
-	protected static void createChanges(final Action action) {
+	protected static void createChanges(Action action) {
 
-		final Parameter<Integer> parameter = action.getParameter("objective", "quantity");
-		final Integer quantity = parameter.getValue();
+		Parameter<Integer> parameter = action.getParameter("objective", "quantity");
+		Integer quantity = parameter.getValue();
 
-		final IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(quantity));
+		IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(quantity));
 		startChange.setStateId(STATE_INTEGER_ID);
 		action.addChange(startChange);
 
-		final IValueChange<IntegerValue> endChange = new ValueChange<>(STATE_TIME_20, new IntegerValue(-quantity));
+		IValueChange<IntegerValue> endChange = new ValueChange<>(STATE_TIME_20, new IntegerValue(-quantity));
 		endChange.setStateId(STATE_INTEGER_ID);
 		action.addChange(endChange);
 	}
-
 }

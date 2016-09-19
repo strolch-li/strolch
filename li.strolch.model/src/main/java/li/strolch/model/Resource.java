@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.policy.PolicyDefs;
@@ -86,6 +87,10 @@ public class Resource extends GroupedParameterizedElement implements StrolchRoot
 			this.timedStateMap = new HashMap<>();
 		}
 
+		if (this.timedStateMap.containsKey(strolchTimedState.getId())) {
+			String msg = "A TimedState already exists with id {0} on {1}";
+			throw new StrolchException(MessageFormat.format(msg, strolchTimedState.getId(), getLocator()));
+		}
 		this.timedStateMap.put(strolchTimedState.getId(), (StrolchTimedState<IValue<?>>) strolchTimedState);
 		strolchTimedState.setParent(this);
 	}

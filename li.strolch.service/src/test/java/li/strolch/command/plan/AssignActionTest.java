@@ -16,7 +16,6 @@
 package li.strolch.command.plan;
 
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_NAME;
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_10;
@@ -26,6 +25,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.SortedSet;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import li.strolch.model.Locator;
 import li.strolch.model.ModelGenerator;
@@ -46,59 +49,58 @@ import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class AssignActionTest {
 
-	Resource initialResource, targetResource;
-	Action action;
-	IntegerTimedState initialTimedState, targetTimedState;
-	StrolchTransaction tx;
+	private Resource initialResource;
+	private Resource targetResource;
+	private Action action;
+	private IntegerTimedState initialTimedState;
+	private IntegerTimedState targetTimedState;
+	private StrolchTransaction tx;
 
 	@Before
 	public void init() {
 
 		// add initial resource with integer state variable
-		initialResource = ModelGenerator.createResource("initial", "Test With States", "Stated");
-		initialTimedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
-		initialTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
-		initialResource.addTimedState(initialTimedState);
+		this.initialResource = ModelGenerator.createResource("initial", "Test With States", "Stated");
+		this.initialTimedState = this.initialResource.getTimedState(STATE_INTEGER_ID);
+		this.initialTimedState.getTimeEvolution().clear();
+		this.initialTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 
 		// add target resource with integer state variable
-		targetResource = ModelGenerator.createResource("target", "Test With States", "Stated");
-		targetTimedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
-		targetTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
-		targetResource.addTimedState(targetTimedState);
+		this.targetResource = ModelGenerator.createResource("target", "Test With States", "Stated");
+		this.targetTimedState = this.targetResource.getTimedState(STATE_INTEGER_ID);
+		this.targetTimedState.getTimeEvolution().clear();
+		this.targetTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 
-		action = new Action("action", "Action", "Use");
+		this.action = new Action("action", "Action", "Use");
 
-		Assert.assertEquals(State.CREATED, action.getState());
+		Assert.assertEquals(State.CREATED, this.action.getState());
 
-		final IntegerParameter iP = new IntegerParameter("quantity", "Occupation", 1);
-		action.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
-		action.addParameter("objective", iP);
+		IntegerParameter iP = new IntegerParameter("quantity", "Occupation", 1);
+		this.action.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
+		this.action.addParameter("objective", iP);
 
-		createChanges(action);
+		createChanges(this.action);
 
-		action.setResourceId(initialResource.getId());
-		action.setResourceType(initialResource.getType());
+		this.action.setResourceId(this.initialResource.getId());
+		this.action.setResourceType(this.initialResource.getType());
 
-		tx = mock(StrolchTransaction.class);
+		this.tx = mock(StrolchTransaction.class);
 
-		Locator locator = Locator.newBuilder(Tags.RESOURCE, initialResource.getType(), initialResource.getId()).build();
-		when(tx.findElement(eq(locator))).thenReturn(initialResource);
+		Locator locator = Locator
+				.newBuilder(Tags.RESOURCE, this.initialResource.getType(), this.initialResource.getId()).build();
+		when(this.tx.findElement(eq(locator))).thenReturn(this.initialResource);
 
-		locator = Locator.newBuilder(Tags.RESOURCE, targetResource.getType(), targetResource.getId()).build();
-		when(tx.findElement(eq(locator))).thenReturn(targetResource);
+		locator = Locator.newBuilder(Tags.RESOURCE, this.targetResource.getType(), this.targetResource.getId()).build();
+		when(this.tx.findElement(eq(locator))).thenReturn(this.targetResource);
 
 		// finally plan the action
-		final PlanActionCommand planCommand = new PlanActionCommand(null, tx);
-		planCommand.setAction(action);
+		PlanActionCommand planCommand = new PlanActionCommand(null, this.tx);
+		planCommand.setAction(this.action);
 		planCommand.doCommand();
 
 	}
@@ -106,26 +108,26 @@ public class AssignActionTest {
 	@Test
 	public void test() {
 
-		final AssignActionCommand cmd = new AssignActionCommand(null, tx);
-		cmd.setTargetResourceId(targetResource.getId());
-		cmd.setTargetResourceType(targetResource.getType());
-		cmd.setAction(action);
+		AssignActionCommand cmd = new AssignActionCommand(null, this.tx);
+		cmd.setTargetResourceId(this.targetResource.getId());
+		cmd.setTargetResourceType(this.targetResource.getType());
+		cmd.setAction(this.action);
 		cmd.doCommand();
 
 		// check the state
-		Assert.assertEquals(State.PLANNED, action.getState());
+		Assert.assertEquals(State.PLANNED, this.action.getState());
 
 		// check the resource Id
-		Assert.assertEquals(targetResource.getId(), action.getResourceId());
+		Assert.assertEquals(this.targetResource.getId(), this.action.getResourceId());
 
 		// check if we get the expected result
-		StrolchTimedState<IValue<Integer>> initialTimedState = initialResource.getTimedState(STATE_INTEGER_ID);
+		StrolchTimedState<IValue<Integer>> initialTimedState = this.initialResource.getTimedState(STATE_INTEGER_ID);
 		ITimeVariable<IValue<Integer>> initialTimeEvolution = initialTimedState.getTimeEvolution();
 		SortedSet<ITimeValue<IValue<Integer>>> initialValues = initialTimeEvolution.getValues();
 
 		Assert.assertEquals(1, initialValues.size());
 
-		StrolchTimedState<IValue<Integer>> targetTimedState = targetResource.getTimedState(STATE_INTEGER_ID);
+		StrolchTimedState<IValue<Integer>> targetTimedState = this.targetResource.getTimedState(STATE_INTEGER_ID);
 		ITimeVariable<IValue<Integer>> targetTimeEvolution = targetTimedState.getTimeEvolution();
 		SortedSet<ITimeValue<IValue<Integer>>> targetValues = targetTimeEvolution.getValues();
 
@@ -140,19 +142,19 @@ public class AssignActionTest {
 		cmd.undo();
 
 		// check the state
-		Assert.assertEquals(State.PLANNED, action.getState());
+		Assert.assertEquals(State.PLANNED, this.action.getState());
 
 		// check the resource Id
-		Assert.assertEquals(initialResource.getId(), action.getResourceId());
+		Assert.assertEquals(this.initialResource.getId(), this.action.getResourceId());
 
 		// check if we get the expected result
-		targetTimedState = targetResource.getTimedState(STATE_INTEGER_ID);
+		targetTimedState = this.targetResource.getTimedState(STATE_INTEGER_ID);
 		targetTimeEvolution = targetTimedState.getTimeEvolution();
 		targetValues = targetTimeEvolution.getValues();
 
 		Assert.assertEquals(1, targetValues.size());
 
-		initialTimedState = initialResource.getTimedState(STATE_INTEGER_ID);
+		initialTimedState = this.initialResource.getTimedState(STATE_INTEGER_ID);
 		initialTimeEvolution = initialTimedState.getTimeEvolution();
 		initialValues = initialTimeEvolution.getValues();
 
@@ -168,25 +170,23 @@ public class AssignActionTest {
 
 	/**
 	 * <p>
-	 * add changes to action start and end time with a value defined in the
-	 * action objective and set the stateId of the state variable to apply the
-	 * change to
+	 * add changes to action start and end time with a value defined in the action objective and set the stateId of the
+	 * state variable to apply the change to
 	 * </p>
 	 * 
 	 * @param action
 	 */
-	protected static void createChanges(final Action action) {
+	protected static void createChanges(Action action) {
 
-		final Parameter<Integer> parameter = action.getParameter("objective", "quantity");
-		final Integer quantity = parameter.getValue();
+		Parameter<Integer> parameter = action.getParameter("objective", "quantity");
+		Integer quantity = parameter.getValue();
 
-		final IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(quantity));
+		IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(quantity));
 		startChange.setStateId(STATE_INTEGER_ID);
 		action.addChange(startChange);
 
-		final IValueChange<IntegerValue> endChange = new ValueChange<>(STATE_TIME_20, new IntegerValue(-quantity));
+		IValueChange<IntegerValue> endChange = new ValueChange<>(STATE_TIME_20, new IntegerValue(-quantity));
 		endChange.setStateId(STATE_INTEGER_ID);
 		action.addChange(endChange);
 	}
-
 }

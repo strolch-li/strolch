@@ -16,7 +16,6 @@
 package li.strolch.command.plan;
 
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_NAME;
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_10;
@@ -27,6 +26,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.SortedSet;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import li.strolch.model.Locator;
 import li.strolch.model.ModelGenerator;
@@ -47,49 +50,45 @@ import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class ShiftActionTest {
 
-	Resource resource;
-	Action action;
-	IntegerTimedState timedState;
-	StrolchTransaction tx;
+	private Resource resource;
+	private Action action;
+	private IntegerTimedState timedState;
+	private StrolchTransaction tx;
 
 	@Before
 	public void init() {
 
 		// add a resource with integer state variable
-		resource = ModelGenerator.createResource("@1", "Test With States", "Stated");
-		timedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
-		timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
-		resource.addTimedState(timedState);
+		this.resource = ModelGenerator.createResource("@1", "Test With States", "Stated");
+		this.timedState = this.resource.getTimedState(STATE_INTEGER_ID);
+		this.timedState.getTimeEvolution().clear();
+		this.timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 
-		action = new Action("action", "Action", "Use");
+		this.action = new Action("action", "Action", "Use");
 
-		Assert.assertEquals(State.CREATED, action.getState());
+		Assert.assertEquals(State.CREATED, this.action.getState());
 
-		final IntegerParameter iP = new IntegerParameter("quantity", "Occupation", 1);
-		action.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
-		action.addParameter("objective", iP);
+		IntegerParameter iP = new IntegerParameter("quantity", "Occupation", 1);
+		this.action.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
+		this.action.addParameter("objective", iP);
 
-		createChanges(action);
+		createChanges(this.action);
 
-		action.setResourceId(resource.getId());
-		action.setResourceType(resource.getType());
+		this.action.setResourceId(this.resource.getId());
+		this.action.setResourceType(this.resource.getType());
 
-		tx = mock(StrolchTransaction.class);
+		this.tx = mock(StrolchTransaction.class);
 
-		final Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
-		when(tx.findElement(eq(locator))).thenReturn(resource);
+		Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
+		when(this.tx.findElement(eq(locator))).thenReturn(this.resource);
 
-		final PlanActionCommand cmd = new PlanActionCommand(null, tx);
-		cmd.setAction(action);
+		PlanActionCommand cmd = new PlanActionCommand(null, this.tx);
+		cmd.setAction(this.action);
 		cmd.doCommand();
 
 	}
@@ -97,21 +96,21 @@ public class ShiftActionTest {
 	@Test
 	public void test() {
 
-		final ShiftActionCommand cmd = new ShiftActionCommand(null, tx);
-		cmd.setAction(action);
+		ShiftActionCommand cmd = new ShiftActionCommand(null, this.tx);
+		cmd.setAction(this.action);
 		cmd.setShift(10L);
 		cmd.doCommand();
 
 		// check the state
-		Assert.assertEquals(State.PLANNED, action.getState());
+		Assert.assertEquals(State.PLANNED, this.action.getState());
 
 		// check the resource Id
-		Assert.assertEquals(resource.getId(), action.getResourceId());
+		Assert.assertEquals(this.resource.getId(), this.action.getResourceId());
 
 		// check if we get the expected result
-		final StrolchTimedState<IValue<Integer>> timedState = resource.getTimedState(STATE_INTEGER_ID);
-		final ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
-		final SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
+		StrolchTimedState<IValue<Integer>> timedState = this.resource.getTimedState(STATE_INTEGER_ID);
+		ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
+		SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
 
 		Assert.assertEquals(3, values.size());
 
@@ -143,25 +142,23 @@ public class ShiftActionTest {
 
 	/**
 	 * <p>
-	 * add changes to action start and end time with a value defined in the
-	 * action objective and set the stateId of the state variable to apply the
-	 * change to
+	 * add changes to action start and end time with a value defined in the action objective and set the stateId of the
+	 * state variable to apply the change to
 	 * </p>
 	 * 
 	 * @param action
 	 */
-	protected static void createChanges(final Action action) {
+	protected static void createChanges(Action action) {
 
-		final Parameter<Integer> parameter = action.getParameter("objective", "quantity");
-		final Integer quantity = parameter.getValue();
+		Parameter<Integer> parameter = action.getParameter("objective", "quantity");
+		Integer quantity = parameter.getValue();
 
-		final IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(quantity));
+		IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(quantity));
 		startChange.setStateId(STATE_INTEGER_ID);
 		action.addChange(startChange);
 
-		final IValueChange<IntegerValue> endChange = new ValueChange<>(STATE_TIME_20, new IntegerValue(-quantity));
+		IValueChange<IntegerValue> endChange = new ValueChange<>(STATE_TIME_20, new IntegerValue(-quantity));
 		endChange.setStateId(STATE_INTEGER_ID);
 		action.addChange(endChange);
 	}
-
 }

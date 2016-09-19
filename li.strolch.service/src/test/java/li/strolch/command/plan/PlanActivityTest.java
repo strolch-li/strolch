@@ -16,7 +16,6 @@
 package li.strolch.command.plan;
 
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_NAME;
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_10;
@@ -28,6 +27,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.SortedSet;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import li.strolch.model.Locator;
 import li.strolch.model.ModelGenerator;
@@ -49,22 +52,23 @@ import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 /**
- * 
  * @author Martin Smock <martin.smock@bluewin.ch>
- * 
  */
 public class PlanActivityTest {
 
-	Activity activity, childActivity;
-	Resource resource_1, resource_2, resource_3;
-	IntegerTimedState timedState_1, timedState_2, timedState_3;
-	Action action_1, action_2, action_3;
-	StrolchTransaction tx;
+	private Activity activity;
+	private Activity childActivity;
+	private Resource resource1;
+	private Resource resource2;
+	private Resource resource3;
+	private IntegerTimedState timedState1;
+	private IntegerTimedState timedState2;
+	private IntegerTimedState timedState3;
+	private Action action1;
+	private Action action2;
+	private Action action3;
+	private StrolchTransaction tx;
 
 	/**
 	 * initialize the resources with states and the activity with 2 actions.
@@ -73,85 +77,85 @@ public class PlanActivityTest {
 	public void init() {
 
 		// create resource with integer state
-		resource_1 = ModelGenerator.createResource("@1", "Test With States 1", "Stated");
-		timedState_1 = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
-		timedState_1.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
-		resource_1.addTimedState(timedState_1);
+		this.resource1 = ModelGenerator.createResource("@1", "Test With States 1", "Stated");
+		this.timedState1 = resource1.getTimedState(STATE_INTEGER_ID);
+		this.timedState1.getTimeEvolution().clear();
+		this.timedState1.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 
 		// create resource with integer state
-		resource_2 = ModelGenerator.createResource("@2", "Test With States 2", "Stated");
-		timedState_2 = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
-		timedState_2.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
-		resource_2.addTimedState(timedState_2);
+		this.resource2 = ModelGenerator.createResource("@2", "Test With States 2", "Stated");
+		this.timedState2 = resource2.getTimedState(STATE_INTEGER_ID);
+		this.timedState2.getTimeEvolution().clear();
+		this.timedState2.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 
 		// create resource with integer state
-		resource_3 = ModelGenerator.createResource("@3", "Test With States 3", "Stated");
-		timedState_3 = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
-		timedState_3.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
-		resource_3.addTimedState(timedState_3);
+		this.resource3 = ModelGenerator.createResource("@3", "Test With States 3", "Stated");
+		this.timedState3 = resource3.getTimedState(STATE_INTEGER_ID);
+		this.timedState3.getTimeEvolution().clear();
+		this.timedState3.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 
 		// create activity element
-		activity = new Activity("activity", "Activity", "testType");
+		this.activity = new Activity("activity", "Activity", "testType");
 
 		// create action 1
-		action_1 = new Action("action_1", "Action 1", "Use");
+		this.action1 = new Action("action_1", "Action 1", "Use");
 
-		final IntegerParameter iP1 = new IntegerParameter("quantity", "Occupation", 1);
-		action_1.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
-		action_1.addParameter("objective", iP1);
+		IntegerParameter iP1 = new IntegerParameter("quantity", "Occupation", 1);
+		this.action1.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
+		this.action1.addParameter("objective", iP1);
 
-		createChanges(action_1, STATE_TIME_10, STATE_TIME_20);
+		createChanges(this.action1, STATE_TIME_10, STATE_TIME_20);
 
-		action_1.setResourceId(resource_1.getId());
-		action_1.setResourceType(resource_1.getType());
+		this.action1.setResourceId(this.resource1.getId());
+		this.action1.setResourceType(this.resource1.getType());
 
-		activity.addElement(action_1);
+		this.activity.addElement(this.action1);
 
 		// create child activity
-		childActivity = new Activity("childActivity", "Child Activity", "childType");
+		this.childActivity = new Activity("childActivity", "Child Activity", "childType");
 
 		// create action 2
-		action_2 = new Action("action_2", "Action 2", "Use");
+		this.action2 = new Action("action_2", "Action 2", "Use");
 
-		final IntegerParameter iP2 = new IntegerParameter("quantity", "Occupation", 1);
-		action_2.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
-		action_2.addParameter("objective", iP2);
+		IntegerParameter iP2 = new IntegerParameter("quantity", "Occupation", 1);
+		this.action2.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
+		this.action2.addParameter("objective", iP2);
 
-		createChanges(action_2, STATE_TIME_20, STATE_TIME_30);
+		createChanges(this.action2, STATE_TIME_20, STATE_TIME_30);
 
-		action_2.setResourceId(resource_2.getId());
-		action_2.setResourceType(resource_2.getType());
+		this.action2.setResourceId(this.resource2.getId());
+		this.action2.setResourceType(this.resource2.getType());
 
-		childActivity.addElement(action_2);
+		this.childActivity.addElement(this.action2);
 
 		// create action 3
-		action_3 = new Action("action_3", "Action 3", "Use");
+		this.action3 = new Action("action_3", "Action 3", "Use");
 
-		final IntegerParameter iP3 = new IntegerParameter("quantity", "Occupation", 1);
-		action_3.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
-		action_3.addParameter("objective", iP3);
+		IntegerParameter iP3 = new IntegerParameter("quantity", "Occupation", 1);
+		this.action3.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
+		this.action3.addParameter("objective", iP3);
 
-		createChanges(action_3, STATE_TIME_20, STATE_TIME_40);
+		createChanges(this.action3, STATE_TIME_20, STATE_TIME_40);
 
-		action_3.setResourceId(resource_3.getId());
-		action_3.setResourceType(resource_3.getType());
+		this.action3.setResourceId(this.resource3.getId());
+		this.action3.setResourceType(this.resource3.getType());
 
-		childActivity.addElement(action_3);
+		this.childActivity.addElement(this.action3);
 
-		activity.addElement(childActivity);
+		this.activity.addElement(this.childActivity);
 
-		Assert.assertEquals(2, activity.getElements().size());
+		Assert.assertEquals(2, this.activity.getElements().size());
 
-		tx = mock(StrolchTransaction.class);
+		this.tx = mock(StrolchTransaction.class);
 
-		final Locator locator1 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
-		when(tx.findElement(eq(locator1))).thenReturn(resource_1);
+		Locator locator1 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
+		when(this.tx.findElement(eq(locator1))).thenReturn(this.resource1);
 
-		final Locator locator2 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@2").build();
-		when(tx.findElement(eq(locator2))).thenReturn(resource_2);
+		Locator locator2 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@2").build();
+		when(this.tx.findElement(eq(locator2))).thenReturn(this.resource2);
 
-		final Locator locator3 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@3").build();
-		when(tx.findElement(eq(locator3))).thenReturn(resource_3);
+		Locator locator3 = Locator.newBuilder(Tags.RESOURCE, "Stated", "@3").build();
+		when(this.tx.findElement(eq(locator3))).thenReturn(this.resource3);
 
 	}
 
@@ -161,17 +165,17 @@ public class PlanActivityTest {
 	@Test
 	public void test() {
 
-		final PlanActivityCommand planActivityCommand = new PlanActivityCommand(null, tx);
-		planActivityCommand.setActivity(activity);
+		PlanActivityCommand planActivityCommand = new PlanActivityCommand(null, this.tx);
+		planActivityCommand.setActivity(this.activity);
 		planActivityCommand.doCommand();
 
 		// check the states
-		Assert.assertEquals(State.PLANNED, action_1.getState());
-		Assert.assertEquals(State.PLANNED, action_2.getState());
+		Assert.assertEquals(State.PLANNED, this.action1.getState());
+		Assert.assertEquals(State.PLANNED, this.action2.getState());
 
 		// check the resource states
-		final StrolchTimedState<IValue<Integer>> timedState_1 = resource_1.getTimedState(STATE_INTEGER_ID);
-		final ITimeVariable<IValue<Integer>> timeEvolution_1 = timedState_1.getTimeEvolution();
+		StrolchTimedState<IValue<Integer>> timedState_1 = this.resource1.getTimedState(STATE_INTEGER_ID);
+		ITimeVariable<IValue<Integer>> timeEvolution_1 = timedState_1.getTimeEvolution();
 		SortedSet<ITimeValue<IValue<Integer>>> values_1 = timeEvolution_1.getValues();
 
 		Assert.assertEquals(3, values_1.size());
@@ -186,8 +190,8 @@ public class PlanActivityTest {
 		Assert.assertEquals(true, valueAt_1.getValue().equals(new IntegerValue(0)));
 
 		// the second resource
-		final StrolchTimedState<IValue<Integer>> timedState_2 = resource_2.getTimedState(STATE_INTEGER_ID);
-		final ITimeVariable<IValue<Integer>> timeEvolution_2 = timedState_2.getTimeEvolution();
+		StrolchTimedState<IValue<Integer>> timedState_2 = this.resource2.getTimedState(STATE_INTEGER_ID);
+		ITimeVariable<IValue<Integer>> timeEvolution_2 = timedState_2.getTimeEvolution();
 		SortedSet<ITimeValue<IValue<Integer>>> values_2 = timeEvolution_2.getValues();
 
 		Assert.assertEquals(3, values_2.size());
@@ -205,8 +209,8 @@ public class PlanActivityTest {
 		planActivityCommand.undo();
 
 		// check the states
-		Assert.assertEquals(State.CREATED, action_1.getState());
-		Assert.assertEquals(State.CREATED, action_2.getState());
+		Assert.assertEquals(State.CREATED, this.action1.getState());
+		Assert.assertEquals(State.CREATED, this.action2.getState());
 
 		// check the resource states
 		values_1 = timeEvolution_1.getValues();
@@ -218,23 +222,20 @@ public class PlanActivityTest {
 	}
 
 	/**
-	 * add changes to action start and end time with a value defined in the
-	 * action objective and set the stateId of the state variable to apply the
-	 * change to
+	 * add changes to action start and end time with a value defined in the action objective and set the stateId of the
+	 * state variable to apply the change to
 	 */
 	protected static void createChanges(Action action, Long start, Long end) {
 
-		final Parameter<Integer> parameter = action.getParameter("objective", "quantity");
-		final Integer quantity = parameter.getValue();
+		Parameter<Integer> parameter = action.getParameter("objective", "quantity");
+		Integer quantity = parameter.getValue();
 
-		final IValueChange<IntegerValue> startChange = new ValueChange<>(start, new IntegerValue(quantity));
+		IValueChange<IntegerValue> startChange = new ValueChange<>(start, new IntegerValue(quantity));
 		startChange.setStateId(STATE_INTEGER_ID);
 		action.addChange(startChange);
 
-		final IValueChange<IntegerValue> endChange = new ValueChange<>(end, new IntegerValue(-quantity));
+		IValueChange<IntegerValue> endChange = new ValueChange<>(end, new IntegerValue(-quantity));
 		endChange.setStateId(STATE_INTEGER_ID);
 		action.addChange(endChange);
-
 	}
-
 }
