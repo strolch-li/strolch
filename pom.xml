@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>li.strolch</groupId>
@@ -69,10 +68,7 @@
 		<module>li.strolch.model</module>
 		<module>li.strolch.testbase</module>
 
-		<!--
-			Deactivate XML Persistence and see later if we want to add it back
-			<module>li.strolch.persistence.xml</module>
-		-->
+		<!-- Deactivate XML Persistence and see later if we want to add it back <module>li.strolch.persistence.xml</module> -->
 
 		<module>li.strolch.persistence.postgresql</module>
 		<module>li.strolch.agent</module>
@@ -489,14 +485,12 @@
 
 	<distributionManagement>
 		<repository>
-			<id>archive.eitchnet.ch</id>
-			<name>Internal Releases</name>
-			<url>https://archive.eitchnet.ch/repository/internal/</url>
+			<id>oss.sonatype.org</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 		<snapshotRepository>
-			<id>archive.eitchnet.ch</id>
-			<name>Internal Snapshots</name>
-			<url>https://archive.eitchnet.ch/repository/snapshots/</url>
+			<id>oss.sonatype.org</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 
