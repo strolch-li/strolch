@@ -10,6 +10,10 @@ public class StrolchRootElementResult extends ServiceResult {
 
 	private StrolchRootElement rootElement;
 
+	public StrolchRootElementResult() {
+		//
+	}
+
 	public StrolchRootElementResult(StrolchRootElement rootElement) {
 		super(ServiceResultState.SUCCESS);
 		this.rootElement = rootElement;
