@@ -457,8 +457,8 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
-	 * Returns a copy of the {@link Resource} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or null if it
-	 * does not exist
+	 * Returns a copy of the {@link Resource} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or
+	 * null if it does not exist
 	 * </p>
 	 * 
 	 * <p>
@@ -472,7 +472,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @param type
 	 *            the id of the {@link Resource} template
 	 * 
-	 * @return the {@link Resource} template with the given id, or null if it does not exist
+	 * @return the copy of the {@link Resource} template with the given id, or null if it does not exist
 	 */
 	public Resource getResourceTemplate(String type);
 
@@ -493,8 +493,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @param type
 	 *            the id of the {@link Resource} template
 	 * 
-	 * @return the {@link Resource} template with the given id, or if <code>assertExists</code> is true, then an
-	 *         exception is thrown if the resource does not exist
+	 * @return the copy of the {@link Resource} template with the given id, or if <code>assertExists</code> is true,
+	 *         then an exception is thrown if the resource does not exist
 	 * 
 	 * @throws StrolchException
 	 */
@@ -502,8 +502,8 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
-	 * Returns a copy of the {@link Order} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or null if it does
-	 * not exist
+	 * Returns a copy of the {@link Order} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or null
+	 * if it does not exist
 	 * </p>
 	 * 
 	 * <p>
@@ -517,7 +517,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @param type
 	 *            the id of the {@link Order} template
 	 * 
-	 * @return the {@link Order} template with the given id, or null if it does not exist
+	 * @return the copy of the {@link Order} template with the given id, or null if it does not exist
 	 */
 	public Order getOrderTemplate(String type);
 
@@ -538,12 +538,57 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @param type
 	 *            the id of the {@link Order} template
 	 * 
-	 * @return the {@link Order} template with the given id, or if <code>assertExists</code> is true, then an exception
-	 *         is thrown if the order does not exist
+	 * @return the copy of the {@link Order} template with the given id, or if <code>assertExists</code> is true, then
+	 *         an exception is thrown if the order does not exist
 	 * 
 	 * @throws StrolchException
 	 */
 	public Order getOrderTemplate(String type, boolean assertExists) throws StrolchException;
+
+	/**
+	 * <p>
+	 * Returns a copy of the {@link Activity} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or
+	 * null if it does not exist
+	 * </p>
+	 * 
+	 * <p>
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
+	 * {@link StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance
+	 * when creating a {@link Activity} of type <code>ToStock</code> then having a template with the id
+	 * <code>ToStock</code> helps creating new ToStock activities; get the activity and then create a clone:
+	 * {@link Activity#getClone()}
+	 * </p>
+	 * 
+	 * @param type
+	 *            the id of the {@link Activity} template
+	 * 
+	 * @return the copy of the {@link Activity} template with the given id, or null if it does not exist
+	 */
+	public Activity getActivityTemplate(String type);
+
+	/**
+	 * <p>
+	 * Returns a copy of the {@link Activity} of Type {@link StrolchConstants#TEMPLATE} with the given type as id. If
+	 * <code>assertExists</code> is true, then an exception is thrown if the template does not exist does not exist
+	 * </p>
+	 * 
+	 * <p>
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
+	 * {@link StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance
+	 * when creating a {@link Activity} of type <code>ToStock</code> then having a template with the id
+	 * <code>ToStock</code> helps creating new ToStock activities; get the activity and then create a clone:
+	 * {@link Activity#getClone()}
+	 * </p>
+	 * 
+	 * @param type
+	 *            the id of the {@link Activity} template
+	 * 
+	 * @return the copy of the {@link Activity} template with the given id, or if <code>assertExists</code> is true,
+	 *         then an exception is thrown if the activity does not exist
+	 * 
+	 * @throws StrolchException
+	 */
+	public Activity getActivityTemplate(String type, boolean assertExists) throws StrolchException;
 
 	/**
 	 * Returns the {@link Resource} with the given type and id, or null if it does not exist

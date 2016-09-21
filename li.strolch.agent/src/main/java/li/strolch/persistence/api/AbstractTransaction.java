@@ -422,6 +422,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public Activity getActivityTemplate(String type) {
+		return getActivityMap().getTemplate(this, type);
+	}
+
+	@Override
+	public Activity getActivityTemplate(String type, boolean assertExists) throws StrolchException {
+		return getActivityMap().getTemplate(this, type, assertExists);
+	}
+
+	@Override
 	public Order getOrderBy(String type, String id) {
 		return getOrderBy(type, id, false);
 	}
