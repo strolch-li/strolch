@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ElementMap;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchRootElement;
@@ -96,6 +97,8 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 
 		@SuppressWarnings("unchecked")
 		T clone = (T) t.getClone();
+		clone.setId(StrolchAgent.getUniqueId());
+		clone.setType(type);
 		return clone;
 	}
 

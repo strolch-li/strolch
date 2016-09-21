@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import li.strolch.agent.api.ElementMap;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchRootElement;
@@ -92,6 +93,8 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 
 		@SuppressWarnings("unchecked")
 		T clone = (T) t.getClone();
+		clone.setId(StrolchAgent.getUniqueId());
+		clone.setType(type);
 		return clone;
 	}
 
