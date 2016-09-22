@@ -13,26 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.test.parameter;
-
-import org.junit.Test;
+package li.strolch.service.parameter;
 
 import li.strolch.model.Locator;
-import li.strolch.service.LocatorArgument;
-import li.strolch.service.parameter.RemoveParameterService;
+import li.strolch.service.parameter.SetParameterService;
+import li.strolch.service.parameter.SetParameterService.SetParameterArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
+
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RemoveParameterServiceTest extends AbstractRealmServiceTest {
+public class SetParameterServiceTest extends AbstractRealmServiceTest {
 
 	@Test
 	public void runTest() {
 
-		LocatorArgument arg = new LocatorArgument();
+		SetParameterArg arg = new SetParameterArg();
 		arg.locator = Locator.valueOf("Resource/Ball/yellow/Bag/parameters/owner");
+		arg.name = "The Owner";
+		arg.interpretation = "Changing The Interpretation";
+		arg.uom = "Owners";
+		arg.hidden = true;
+		arg.index = 99;
+		arg.valueAsString = "someotherdude";
 
-		runServiceInAllRealmTypes(RemoveParameterService.class, arg);
+		runServiceInAllRealmTypes(SetParameterService.class, arg);
 	}
 }
