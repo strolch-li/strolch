@@ -21,6 +21,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.service.api.ServiceResultState;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -31,7 +32,7 @@ public class AddResourceService extends AbstractService<AddResourceService.AddRe
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult();
+		return new ServiceResult(ServiceResultState.FAILED);
 	}
 
 	@Override

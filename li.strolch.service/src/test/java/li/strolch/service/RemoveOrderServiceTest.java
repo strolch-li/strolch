@@ -15,12 +15,11 @@
  */
 package li.strolch.service;
 
+import org.junit.Test;
+
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
-import li.strolch.service.RemoveOrderService.RemoveOrderArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
-
-import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -30,7 +29,7 @@ public class RemoveOrderServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		RemoveOrderArg arg = new RemoveOrderArg();
+		LocatorArgument arg = new LocatorArgument();
 		arg.locator = Locator.newBuilder(Tags.ORDER, "TestType", "@3").build();
 
 		runServiceInAllRealmTypes(RemoveOrderService.class, arg);

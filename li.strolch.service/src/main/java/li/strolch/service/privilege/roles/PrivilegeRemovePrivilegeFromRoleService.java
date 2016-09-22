@@ -22,6 +22,7 @@ import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.RoleRep;
 import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.service.api.AbstractService;
+import li.strolch.service.api.ServiceResultState;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -33,7 +34,7 @@ public class PrivilegeRemovePrivilegeFromRoleService
 
 	@Override
 	protected PrivilegeRoleResult getResultInstance() {
-		return new PrivilegeRoleResult();
+		return new PrivilegeRoleResult(ServiceResultState.FAILED);
 	}
 
 	@Override

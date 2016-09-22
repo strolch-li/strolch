@@ -32,6 +32,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import li.strolch.command.planning.PlanActivityCommand;
 import li.strolch.model.Locator;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.ParameterBag;

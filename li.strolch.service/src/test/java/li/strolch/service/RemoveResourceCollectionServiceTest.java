@@ -17,12 +17,11 @@ package li.strolch.service;
 
 import java.util.ArrayList;
 
+import org.junit.Test;
+
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
-import li.strolch.service.RemoveResourceCollectionService.RemoveResourceCollectionArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
-
-import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -32,7 +31,7 @@ public class RemoveResourceCollectionServiceTest extends AbstractRealmServiceTes
 	@Test
 	public void runTest() {
 
-		RemoveResourceCollectionArg arg = new RemoveResourceCollectionArg();
+		LocatorListArgument arg = new LocatorListArgument();
 
 		ArrayList<Locator> locators = new ArrayList<>();
 		locators.add(Locator.newBuilder(Tags.RESOURCE, "Enumeration", "salutations").build());

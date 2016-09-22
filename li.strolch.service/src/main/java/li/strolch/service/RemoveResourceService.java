@@ -16,27 +16,26 @@
 package li.strolch.service;
 
 import li.strolch.command.RemoveResourceCommand;
-import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.service.api.ServiceResultState;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RemoveResourceService extends AbstractService<RemoveResourceService.RemoveResourceArg, ServiceResult> {
+public class RemoveResourceService extends AbstractService<LocatorArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult();
+		return new ServiceResult(ServiceResultState.FAILED);
 	}
 
 	@Override
-	protected ServiceResult internalDoService(RemoveResourceArg arg) {
+	protected ServiceResult internalDoService(LocatorArgument arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 
@@ -50,10 +49,5 @@ public class RemoveResourceService extends AbstractService<RemoveResourceService
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class RemoveResourceArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public Locator locator;
 	}
 }

@@ -22,6 +22,7 @@ import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.service.api.ServiceResultState;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -32,7 +33,7 @@ public class PrivilegeSetUserPasswordService extends AbstractService<PrivilegeSe
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult();
+		return new ServiceResult(ServiceResultState.FAILED);
 	}
 
 	@Override

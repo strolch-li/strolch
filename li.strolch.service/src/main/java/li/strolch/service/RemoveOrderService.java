@@ -16,27 +16,26 @@
 package li.strolch.service;
 
 import li.strolch.command.RemoveOrderCommand;
-import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.service.api.ServiceResultState;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RemoveOrderService extends AbstractService<RemoveOrderService.RemoveOrderArg, ServiceResult> {
+public class RemoveOrderService extends AbstractService<LocatorArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult();
+		return new ServiceResult(ServiceResultState.FAILED);
 	}
 
 	@Override
-	protected ServiceResult internalDoService(RemoveOrderArg arg) {
+	protected ServiceResult internalDoService(LocatorArgument arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 
@@ -50,10 +49,5 @@ public class RemoveOrderService extends AbstractService<RemoveOrderService.Remov
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class RemoveOrderArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public Locator locator;
 	}
 }

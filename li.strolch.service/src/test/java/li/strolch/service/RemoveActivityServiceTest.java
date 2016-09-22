@@ -19,7 +19,6 @@ import org.junit.Test;
 
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
-import li.strolch.service.RemoveActivityService.RemoveActivityArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
 /**
@@ -30,7 +29,7 @@ public class RemoveActivityServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		RemoveActivityArg arg = new RemoveActivityArg();
+		LocatorArgument arg = new LocatorArgument();
 		arg.locator = Locator.newBuilder(Tags.ACTIVITY, "ActivityType", "activity_1").build();
 
 		runServiceInAllRealmTypes(RemoveActivityService.class, arg);

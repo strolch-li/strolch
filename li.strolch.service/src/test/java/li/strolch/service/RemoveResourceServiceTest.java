@@ -15,12 +15,11 @@
  */
 package li.strolch.service;
 
+import org.junit.Test;
+
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
-import li.strolch.service.RemoveResourceService.RemoveResourceArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
-
-import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -30,7 +29,7 @@ public class RemoveResourceServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		RemoveResourceArg arg = new RemoveResourceArg();
+		LocatorArgument arg = new LocatorArgument();
 		arg.locator = Locator.newBuilder(Tags.RESOURCE, "Enumeration", "sex").build();
 
 		runServiceInAllRealmTypes(RemoveResourceService.class, arg);

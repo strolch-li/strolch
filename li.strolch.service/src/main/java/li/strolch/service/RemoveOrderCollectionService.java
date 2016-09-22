@@ -23,14 +23,12 @@ import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RemoveOrderCollectionService extends
-		AbstractService<RemoveOrderCollectionService.RemoveOrderCollectionArg, ServiceResult> {
+public class RemoveOrderCollectionService extends AbstractService<LocatorListArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,7 +38,7 @@ public class RemoveOrderCollectionService extends
 	}
 
 	@Override
-	protected ServiceResult internalDoService(RemoveOrderCollectionArg arg) {
+	protected ServiceResult internalDoService(LocatorListArgument arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
 
@@ -58,10 +56,5 @@ public class RemoveOrderCollectionService extends
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class RemoveOrderCollectionArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public List<Locator> locators;
 	}
 }

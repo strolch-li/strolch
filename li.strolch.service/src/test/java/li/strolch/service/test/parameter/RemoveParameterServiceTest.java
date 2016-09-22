@@ -15,12 +15,12 @@
  */
 package li.strolch.service.test.parameter;
 
-import li.strolch.model.Locator;
-import li.strolch.service.parameter.RemoveParameterService;
-import li.strolch.service.parameter.RemoveParameterService.RemoveParameterArg;
-import li.strolch.service.test.AbstractRealmServiceTest;
-
 import org.junit.Test;
+
+import li.strolch.model.Locator;
+import li.strolch.service.LocatorArgument;
+import li.strolch.service.parameter.RemoveParameterService;
+import li.strolch.service.test.AbstractRealmServiceTest;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -30,7 +30,7 @@ public class RemoveParameterServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		RemoveParameterArg arg = new RemoveParameterArg();
+		LocatorArgument arg = new LocatorArgument();
 		arg.locator = Locator.valueOf("Resource/Ball/yellow/Bag/parameters/owner");
 
 		runServiceInAllRealmTypes(RemoveParameterService.class, arg);

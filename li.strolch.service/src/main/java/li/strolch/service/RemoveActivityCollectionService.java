@@ -15,42 +15,46 @@
  */
 package li.strolch.service;
 
-import li.strolch.command.UpdateActivityCommand;
+import java.util.ArrayList;
+import java.util.List;
+
+import li.strolch.command.RemoveActivityCollectionCommand;
+import li.strolch.model.Locator;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
-import li.strolch.service.api.ServiceResultState;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateActivityService extends AbstractService<UpdateActivityService.UpdateActivityArg, ServiceResult> {
+public class RemoveActivityCollectionService extends AbstractService<LocatorListArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult(ServiceResultState.FAILED);
+		return new ServiceResult();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(UpdateActivityArg arg) {
+	protected ServiceResult internalDoService(LocatorListArgument arg) {
 
 		try (StrolchTransaction tx = openTx(arg.realm)) {
-			UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx);
-			command.setActivity(arg.activity);
+
+			List<Activity> activities = new ArrayList<>(arg.locators.size());
+			for (Locator locator : arg.locators) {
+				Activity resource = tx.findElement(locator);
+				activities.add(resource);
+			}
+
+			RemoveActivityCollectionCommand command = new RemoveActivityCollectionCommand(getContainer(), tx);
+			command.setActivities(activities);
 
 			tx.addCommand(command);
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class UpdateActivityArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public Activity activity;
 	}
 }

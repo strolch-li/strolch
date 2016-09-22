@@ -35,7 +35,7 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 
 	@Override
 	protected XmlImportModelResult getResultInstance() {
-		return new XmlImportModelResult();
+		return new XmlImportModelResult(ServiceResultState.FAILED);
 	}
 
 	@Override

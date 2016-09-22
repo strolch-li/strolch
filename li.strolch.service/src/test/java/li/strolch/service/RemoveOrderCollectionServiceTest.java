@@ -17,12 +17,11 @@ package li.strolch.service;
 
 import java.util.ArrayList;
 
+import org.junit.Test;
+
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
-import li.strolch.service.RemoveOrderCollectionService.RemoveOrderCollectionArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
-
-import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -32,7 +31,7 @@ public class RemoveOrderCollectionServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		RemoveOrderCollectionArg arg = new RemoveOrderCollectionArg();
+		LocatorListArgument arg = new LocatorListArgument();
 
 		ArrayList<Locator> locators = new ArrayList<>();
 		locators.add(Locator.newBuilder(Tags.ORDER, "TestType", "@1").build());

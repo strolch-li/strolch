@@ -23,6 +23,7 @@ import li.strolch.model.ModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.service.api.ServiceResultState;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -34,7 +35,7 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult();
+		return new ServiceResult(ServiceResultState.FAILED);
 	}
 
 	@Override
