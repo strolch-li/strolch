@@ -199,10 +199,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<!-- version>3.3</version -->
 				<configuration>
-					<source>${java-verison}</source>
-					<target>${java-verison}</target>
+					<source>${java-version}</source>
+					<target>${java-version}</target>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 					<compilerArgument>-Xlint:all</compilerArgument>
@@ -212,7 +212,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>
+				<!-- version>2.4</version -->
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -226,7 +226,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.4</version>
+				<!-- version>2.10.4</version -->
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
