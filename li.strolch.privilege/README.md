@@ -1,7 +1,5 @@
 li.strolch.privilege
-==================
-
-[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=li.strolch.privilege)](http://jenkins.eitchnet.ch/view/li.strolch/job/li.strolch.privilege/)
+====================
 
 Overview
 =======================================================================
@@ -19,7 +17,7 @@ a LDAP repository with only the Privilege JAR.
 Privilege is distributed under the GNU Lesser General Public License on 
 Github.com and can be downloaded at 
 
-   https://github.com/eitchnet/li.strolch.privilege
+   https://github.com/4treesCH/strolch/li.strolch.privilege
 
 The main developer is Robert von Burg <eitch@eitchnet.ch> who also maintains the
 Github repository. He is available for all questions regarding Privilege
@@ -77,7 +75,7 @@ Compiling
 Privilege is a Maven3 project and can be built by simply performing the
 following command:
 
-$ mvn compile
+$ mvn package
 
 Using
 =======================================================================

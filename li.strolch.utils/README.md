@@ -1,14 +1,12 @@
 li.strolch.utils
 ======================
 
-[![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=li.strolch.utils)](http://jenkins.eitchnet.ch/view/li.strolch/job/li.strolch.utils/)
-
 Java Utilites which ease daily work when programming in the Java language
 
 Dependencies
 ----------------------
 This utility package is built by Maven3 and has very few external dependencies. The current dependencies are:
-* the Java Runtime Environment 7
+* the Java Runtime Environment 8
 * JUnit 4.11 (test scope)
 * slf4j 1.7.2
 * slf4j-log4j bindings (test scope)
@@ -40,7 +38,7 @@ Features
 Building
 -------------------------
 * Prerequisites:
-  * JDK 6 is installed and JAVA_HOME is properly set and ../bin is in path
+  * JDK 8 is installed and JAVA_HOME is properly set and ../bin is in path
   * Maven 3 is installed and MAVEN_HOME is properly set and ../bin is in path
 * Clone repository and change path to root
 * Run maven:

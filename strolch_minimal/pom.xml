@@ -14,6 +14,43 @@
 	<description>Strolch app with minimal runtime</description>
 	<inceptionYear>2014</inceptionYear>
 
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/4treesCH/strolch/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:https://github.com/4treesCH/strolch.git</connection>
+		<developerConnection>scm:git:https://github.com/4treesCH/strolch.git</developerConnection>
+		<url>https://github.com/4treesCH/strolch</url>
+	</scm>
+
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>Strolch</name>
+		<url>http://www.strolch.li</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>eitch</id>
+			<name>Robert von Burg</name>
+			<email>eitch@eitchnet.ch</email>
+			<url>http://www.eitchnet.ch</url>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
@@ -23,12 +60,6 @@
 
 		<finalName>strolch_minimal</finalName>
 	</properties>
-
-	<scm>
-		<connection>scm:git:https://github.com/eitchnet/strolch.git</connection>
-		<developerConnection>scm:git:git@github.com:eitch/strolch.git</developerConnection>
-		<url>https://github.com/eitchnet/strolch</url>
-	</scm>
 
 	<dependencyManagement>
 		<dependencies>
@@ -115,19 +146,38 @@
 					<compilerArgument>-Xlint:all</compilerArgument>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
-						<phase>package</phase>
 						<goals>
-							<goal>jar-no-fork</goal>
+							<goal>jar</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<additionalparam>-Xdoclint:none</additionalparam>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>

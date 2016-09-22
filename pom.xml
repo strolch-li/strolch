@@ -14,13 +14,13 @@
 
 	<issueManagement>
 		<system>Github Issues</system>
-		<url>https://github.com/eitchnet/strolch/issues</url>
+		<url>https://github.com/4treesCH/strolch/issues</url>
 	</issueManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/eitchnet/strolch.git</connection>
-		<developerConnection>scm:git:git@github.com:eitch/strolch.git</developerConnection>
-		<url>https://github.com/eitchnet/strolch</url>
+		<connection>scm:git:https://github.com/4treesCH/strolch.git</connection>
+		<developerConnection>scm:git:https://github.com/4treesCH/strolch.git</developerConnection>
+		<url>https://github.com/4treesCH/strolch</url>
 	</scm>
 
 	<licenses>
@@ -31,7 +31,7 @@
 	</licenses>
 
 	<organization>
-		<name>eitchnet.ch</name>
+		<name>Strolch</name>
 		<url>http://www.strolch.li</url>
 	</organization>
 
@@ -41,8 +41,26 @@
 			<name>Robert von Burg</name>
 			<email>eitch@eitchnet.ch</email>
 			<url>http://www.eitchnet.ch</url>
-			<organization>eitchnet.ch</organization>
-			<organizationUrl>http://www.eitchnet.ch</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>msmock</id>
+			<name>Martin Smock</name>
+			<email>martin.smock@bluewin.ch</email>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>retob</id>
+			<name>Reto Breitenmoser</name>
+			<email>reto.breitenmoser@4trees.ch</email>
 			<roles>
 				<role>architect</role>
 				<role>developer</role>
@@ -55,9 +73,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<buildTimestamp>${maven.build.timestamp}</buildTimestamp>
-
 		<jersey.version>2.11</jersey.version>
-
 	</properties>
 
 	<modules>
@@ -267,6 +283,9 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>versions-maven-plugin</artifactId>
 					<version>2.2</version>
+					<configuration>
+						<generateBackupPoms>false</generateBackupPoms>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -333,12 +352,28 @@
 					<executions>
 						<execution>
 							<id>attach-sources</id>
-							<phase>package</phase>
 							<goals>
-								<goal>jar-no-fork</goal>
+								<goal>jar</goal>
 							</goals>
 						</execution>
 					</executions>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.10.4</version>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<additionalparam>-Xdoclint:none</additionalparam>
+					</configuration>
 				</plugin>
 
 				<plugin>
@@ -379,40 +414,6 @@
 						<server>${tomcat7ServerId}</server>
 						<path>/${warFinalName}</path>
 					</configuration>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>2.10.3</version>
-					<executions>
-						<execution>
-							<id>attach-javadocs</id>
-							<phase>deploy</phase>
-							<goals>
-								<goal>jar</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<additionalparam>-Xdoclint:none</additionalparam>
-					</configuration>
-				</plugin>
-
-				<plugin>
-					<!-- explicitly define maven-deploy-plugin after other to force exec order -->
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<version>2.8.2</version>
-					<executions>
-						<execution>
-							<id>deploy</id>
-							<phase>deploy</phase>
-							<goals>
-								<goal>deploy</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 
 				<plugin>
@@ -463,8 +464,61 @@
 					<!-- </executions> -->
 				</plugin>
 
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-gpg-plugin</artifactId>
+					<version>1.6</version>
+					<executions>
+						<execution>
+							<id>sign-artifacts</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>sign</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.8.2</version>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.sonatype.plugins</groupId>
+					<artifactId>nexus-staging-maven-plugin</artifactId>
+					<version>1.6.7</version>
+					<extensions>true</extensions>
+					<configuration>
+						<serverId>oss.sonatype.org</serverId>
+						<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+						<description>${project.version}</description>
+					</configuration>
+					<executions>
+						<execution>
+							<id>deploy-to-sonatype</id>
+							<phase>deploy</phase>
+							<goals>
+								<goal>deploy</goal>
+								<goal>release</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
 			</plugins>
 		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+
 	</build>
 
 	<repositories>
@@ -493,5 +547,31 @@
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
+
+	<profiles>
+		<profile>
+			<id>deploy</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

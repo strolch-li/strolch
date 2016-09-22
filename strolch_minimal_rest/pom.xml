@@ -14,6 +14,43 @@
 	<name>strolch_minimal_rest</name>
 	<url>http://www.strolch.li</url>
 
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/4treesCH/strolch/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:https://github.com/4treesCH/strolch.git</connection>
+		<developerConnection>scm:git:https://github.com/4treesCH/strolch.git</developerConnection>
+		<url>https://github.com/4treesCH/strolch</url>
+	</scm>
+
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>Strolch</name>
+		<url>http://www.strolch.li</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>eitch</id>
+			<name>Robert von Burg</name>
+			<email>eitch@eitchnet.ch</email>
+			<url>http://www.eitchnet.ch</url>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
 	<properties>
 		<m2eclipse.wtp.contextRoot>strolch_minimal</m2eclipse.wtp.contextRoot>
 		<warFinalName>strolch_minimal</warFinalName>
@@ -114,8 +151,7 @@
 			<artifactId>jersey-container-grizzly2-http</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- uncomment this to get JSON support: <dependency> <groupId>org.glassfish.jersey.media</groupId> <artifactId>jersey-media-moxy</artifactId>
-			</dependency> -->
+		<!-- uncomment this to get JSON support: <dependency> <groupId>org.glassfish.jersey.media</groupId> <artifactId>jersey-media-moxy</artifactId> </dependency> -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -157,15 +193,53 @@
 				</excludes>
 			</resource>
 		</resources>
+
 		<plugins>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
 				<configuration>
-					<source>${java-version}</source>
-					<target>${java-version}</target>
+					<source>${java-verison}</source>
+					<target>${java-verison}</target>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
+					<compilerArgument>-Xlint:all</compilerArgument>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<additionalparam>-Xdoclint:none</additionalparam>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
@@ -194,7 +268,7 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<!-- Publish to Tomcat7: mvn tomcat7:redeploy -->
+				<!-- Publish to Tomcat: mvn tomcat7:redeploy -->
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<configuration>
