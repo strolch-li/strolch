@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.command.plan;
+package li.strolch.command.planning;
 
 import java.util.Iterator;
 import java.util.List;
