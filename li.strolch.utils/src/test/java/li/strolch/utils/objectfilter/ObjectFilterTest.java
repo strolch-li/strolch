@@ -26,7 +26,7 @@ import org.junit.Test;
 import li.strolch.utils.objectfilter.ObjectFilter;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 @SuppressWarnings("nls")
 public class ObjectFilterTest {

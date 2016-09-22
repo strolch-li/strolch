@@ -18,7 +18,7 @@ package li.strolch.fileserver;
 import java.io.Serializable;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class FilePart implements Serializable {
 

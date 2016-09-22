@@ -29,18 +29,13 @@ import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  * 
  */
 public class FileClientUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileClientUtil.class);
 
-	/**
-	 * @param rmiFileClient
-	 * @param origFilePart
-	 * @param dstFile
-	 */
 	public static void downloadFile(FileClient rmiFileClient, FilePart origFilePart, File dstFile) {
 
 		// here we don't overwrite, the caller must make sure the destination file does not exist
@@ -116,11 +111,6 @@ public class FileClientUtil {
 		}
 	}
 
-	/**
-	 * @param rmiFileClient
-	 * @param srcFile
-	 * @param fileType
-	 */
 	public static void uploadFile(FileClient rmiFileClient, File srcFile, String fileType) {
 
 		// make sure the source file exists
@@ -220,11 +210,6 @@ public class FileClientUtil {
 		}
 	}
 
-	/**
-	 * @param rmiFileClient
-	 * @param fileDeletion
-	 * @param dstFile
-	 */
 	public static void deleteFile(FileClient rmiFileClient, FileDeletion fileDeletion, File dstFile) {
 
 		try {

@@ -52,7 +52,7 @@ import li.strolch.utils.helper.StringHelper;
  * @see ServerSocketEndpoint#configure(CommunicationConnection, IoMessageVisitor) for details on configuring the end
  *      point
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ServerSocketEndpoint implements CommunicationEndpoint, Runnable {
 

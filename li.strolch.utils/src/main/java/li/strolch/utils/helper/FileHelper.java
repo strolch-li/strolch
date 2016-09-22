@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Helper class for dealing with files
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class FileHelper {
 
@@ -180,6 +180,8 @@ public class FileHelper {
 	 * @param file
 	 *            the file to delete
 	 * @param log
+	 *            true to enable logging
+	 * 
 	 * @return true if all went well, and false if it did not work. The log will contain the problems encountered
 	 */
 	public final static boolean deleteFile(File file, boolean log) {
@@ -192,6 +194,8 @@ public class FileHelper {
 	 * @param files
 	 *            the files to delete
 	 * @param log
+	 *            true to enable logging
+	 * 
 	 * @return true if all went well, and false if it did not work. The log will contain the problems encountered
 	 */
 	public final static boolean deleteFiles(File[] files, boolean log) {
@@ -298,8 +302,8 @@ public class FileHelper {
 				String fromFileMD5 = StringHelper.getHexString(FileHelper.hashFileMd5(fromFile));
 				String toFileMD5 = StringHelper.getHexString(FileHelper.hashFileMd5(toFile));
 				if (!fromFileMD5.equals(toFileMD5)) {
-					FileHelper.logger.error(MessageFormat.format(
-							"Copying failed, as MD5 sums are not equal: {0} / {1}", fromFileMD5, toFileMD5)); //$NON-NLS-1$
+					FileHelper.logger.error(MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}", //$NON-NLS-1$
+							fromFileMD5, toFileMD5));
 					toFile.delete();
 
 					return false;
@@ -571,7 +575,8 @@ public class FileHelper {
 			outputStream.flush();
 
 		} catch (IOException e) {
-			throw new RuntimeException("Could not create and append the bytes to the file " + dstFile.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException(
+					"Could not create and append the bytes to the file " + dstFile.getAbsolutePath()); //$NON-NLS-1$
 		}
 	}
 }

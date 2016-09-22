@@ -18,7 +18,7 @@ package li.strolch.fileserver;
 import java.rmi.RemoteException;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  * 
  */
 public interface FileClient {

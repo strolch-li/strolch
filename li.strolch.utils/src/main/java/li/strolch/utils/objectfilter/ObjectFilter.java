@@ -72,8 +72,8 @@ import org.slf4j.LoggerFactory;
  * </tr>
  * </table>
  * 
- * @author Michael Gatto <michael@gatto.ch> (initial version)
- * @author Robert von Burg <eitch@eitchnet.ch> (minor modifications, refactorings)
+ * @author Michael Gatto &lt;michael@gatto.ch&gt; (initial version)
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt; (minor modifications, refactorings)
  */
 public class ObjectFilter {
 
@@ -96,7 +96,7 @@ public class ObjectFilter {
 	 * Register, under the given key, the addition of the given object.
 	 * <p>
 	 * This is the single point where the updating logic is applied for the cache in case of addition. The logic is:
-	 * <table border="1" >
+	 * <table border="1" summary="Allowed operations">
 	 * <tr>
 	 * <td>Action\State in Cache</td>
 	 * <td>N/A</td>
@@ -181,7 +181,7 @@ public class ObjectFilter {
 	/**
 	 * Register, under the given key, the update of the given object. *
 	 * </p>
-	 * <table border="1">
+	 * <table border="1" summary="Allowed operations">
 	 * <tr>
 	 * <td>Action \ State in Cache</td>
 	 * <td>N/A</td>
@@ -251,7 +251,7 @@ public class ObjectFilter {
 	/**
 	 * Register, under the given key, the removal of the given object. *
 	 * </p>
-	 * <table border="1">
+	 * <table border="1" summary="allowed operations">
 	 * <tr>
 	 * <td>Action \ State in Cache</td>
 	 * <td>N/A</td>

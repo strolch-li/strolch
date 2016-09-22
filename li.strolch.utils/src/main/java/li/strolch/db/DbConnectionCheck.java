@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class DbConnectionCheck {
 
@@ -38,15 +38,17 @@ public class DbConnectionCheck {
 
 	/**
 	 * @param dsMap
+	 *            the data source map
 	 */
 	public DbConnectionCheck(Map<String, DataSource> dsMap) {
 		this.dsMap = dsMap;
 	}
 
 	/**
-	 * Checks the connectivity to each of the configured {@link DbConnectionInfo}
+	 * Checks the connectivity to each of the configured {@link DataSource}
 	 * 
 	 * @throws DbException
+	 *             if something goes wrong
 	 */
 	public void checkConnections() throws DbException {
 		Collection<DataSource> values = this.dsMap.values();

@@ -33,7 +33,7 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
  * This class also contains a {@link Map} to store transient meta data to the actual payload
  * </p>
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class IoMessage {
 
@@ -47,8 +47,11 @@ public class IoMessage {
 
 	/**
 	 * @param id
+	 *            the id
 	 * @param key
+	 *            the key
 	 * @param connectionId
+	 *            the connection
 	 */
 	public IoMessage(String id, CommandKey key, String connectionId) {
 		this.id = id;

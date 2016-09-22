@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A helper class to perform different actions on {@link String}s
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class StringHelper {
 
@@ -65,6 +65,7 @@ public class StringHelper {
 	 * @return the encoded string
 	 * 
 	 * @throws RuntimeException
+	 *             if {@link UnsupportedEncodingException} is thrown
 	 */
 	public static String getHexString(byte[] raw) throws RuntimeException {
 		try {
@@ -682,6 +683,7 @@ public class StringHelper {
 	 * If the value parameter is empty, then a {@link #DASH} is returned, otherwise the value is returned
 	 * 
 	 * @param value
+	 *            the value
 	 * 
 	 * @return the non-empty value, or a {@link #DASH}
 	 */

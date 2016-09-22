@@ -33,7 +33,7 @@ import li.strolch.communication.console.ConsoleEndpoint;
 import li.strolch.communication.console.ConsoleMessageVisitor;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ConsoleEndpointTest extends AbstractEndpointTest {
 

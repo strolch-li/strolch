@@ -18,7 +18,7 @@ package li.strolch.utils.iso8601;
 /**
  * interface for the worktime format
  * 
- * @author Martin Smock <smock.martin@gmail.com>
+ * @author Martin Smock &lt;smock.martin@gmail.com&gt;
  */
 public interface WorktimeFormat {
 
@@ -26,6 +26,8 @@ public interface WorktimeFormat {
 	 * format a long to string
 	 * 
 	 * @param l
+	 *            the work time
+	 * 
 	 * @return formatted string if the long argument
 	 */
 	public String format(long l);
@@ -34,6 +36,8 @@ public interface WorktimeFormat {
 	 * parse a string to long
 	 * 
 	 * @param s
+	 *            the string to parse
+	 * 
 	 * @return the long value parsed
 	 */
 	public long parse(String s);

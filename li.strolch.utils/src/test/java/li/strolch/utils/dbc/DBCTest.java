@@ -29,7 +29,7 @@ import li.strolch.utils.dbc.DBC.DbcException;
  * The class <code>DBCTest</code> contains tests for the class <code>{@link DBC}</code>.
  * 
  * @generatedBy CodePro at 2/2/14 8:13 PM
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  * @version $Revision: 1.0 $
  */
 @SuppressWarnings("nls")
@@ -42,6 +42,7 @@ public class DBCTest {
 	 * Run the void assertEquals(String,Object,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -60,6 +61,7 @@ public class DBCTest {
 	 * Run the void assertEquals(String,Object,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -83,6 +85,7 @@ public class DBCTest {
 	 * Run the void assertEquals(String,Object,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -105,6 +108,7 @@ public class DBCTest {
 	 * Run the void assertEquals(String,Object,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -127,6 +131,7 @@ public class DBCTest {
 	 * Run the void assertEquals(String,Object,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -148,6 +153,7 @@ public class DBCTest {
 	 * Run the void assertEquals(String,Object,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -170,6 +176,7 @@ public class DBCTest {
 	 * Run the void assertEquals(String,Object,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -186,6 +193,7 @@ public class DBCTest {
 	 * Run the void assertEquals(String,Object,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -202,6 +210,7 @@ public class DBCTest {
 	 * Run the void assertEquals(String,Object,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -218,6 +227,7 @@ public class DBCTest {
 	 * Run the void assertEquals(String,Object,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -240,6 +250,7 @@ public class DBCTest {
 	 * Run the void assertExists(String,File) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -255,6 +266,7 @@ public class DBCTest {
 	 * Run the void assertExists(String,File) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -278,6 +290,7 @@ public class DBCTest {
 	 * Run the void assertFalse(String,boolean) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -296,6 +309,7 @@ public class DBCTest {
 	 * Run the void assertFalse(String,boolean) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -313,6 +327,7 @@ public class DBCTest {
 	 * Run the void assertNotEmpty(String,String) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -331,6 +346,7 @@ public class DBCTest {
 	 * Run the void assertNotEmpty(String,String) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -346,6 +362,7 @@ public class DBCTest {
 	 * Run the void assertNotExists(String,File) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -363,6 +380,7 @@ public class DBCTest {
 	 * Run the void assertNotExists(String,File) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -383,6 +401,7 @@ public class DBCTest {
 	 * Run the void assertNotNull(String,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -404,6 +423,7 @@ public class DBCTest {
 	 * Run the void assertNotNull(String,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -421,6 +441,7 @@ public class DBCTest {
 	 * Run the void assertNull(String,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -440,6 +461,7 @@ public class DBCTest {
 	 * Run the void assertNull(String,Object) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -457,6 +479,7 @@ public class DBCTest {
 	 * Run the void assertTrue(String,boolean) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
@@ -480,6 +503,7 @@ public class DBCTest {
 	 * Run the void assertTrue(String,boolean) method test.
 	 * 
 	 * @throws Exception
+	 *             if something goes wrong
 	 * 
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */

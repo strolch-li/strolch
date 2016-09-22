@@ -19,7 +19,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ExceptionHelper {
 
@@ -34,7 +34,9 @@ public class ExceptionHelper {
 	 * </p>
 	 * 
 	 * @param t
-	 * @return
+	 *            the {@link Throwable}
+	 * 
+	 * @return the exception as string
 	 */
 	public static String getExceptionMessage(Throwable t) {
 		return StringHelper.isEmpty(t.getMessage()) ? t.getClass().getName() : t.getMessage();
@@ -51,7 +53,9 @@ public class ExceptionHelper {
 	 * </p>
 	 * 
 	 * @param t
-	 * @return
+	 *            the {@link Throwable}
+	 * 
+	 * @return the exception as string
 	 */
 	public static String getExceptionMessageWithCauses(Throwable t) {
 		if (t.getCause() == null)

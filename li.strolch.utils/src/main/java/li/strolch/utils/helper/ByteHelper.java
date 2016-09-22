@@ -16,7 +16,7 @@
 package li.strolch.utils.helper;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ByteHelper {
 

@@ -30,7 +30,7 @@ import java.io.IOException;
  * <li>SIMULATION - the same as ON, with the difference that the connection should silently drop any work</li>
  * </ul>
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public enum ConnectionMode {
 

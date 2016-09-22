@@ -27,7 +27,7 @@ import java.io.IOException;
  * on bigger files
  * </p>
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ProgressableFileInputStream extends FileInputStream {
 

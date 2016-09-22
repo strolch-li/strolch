@@ -25,16 +25,16 @@ import org.slf4j.LoggerFactory;
  * "deployed" in one go.
  * <p>
  * Thus, this class keeps:
+ * </p>
  * <ul>
- * <li>An ID of the object, such that it can be referenced externally.</li.>
+ * <li>An ID of the object, such that it can be referenced externally.</li>
  * <li>A key for an object, which keeps the object's type.</li>
  * <li>A reference to the current state of the object</li>
  * <li>An identifier of the operation that needs to be performed on this</li>
  * </ul>
- * </p>
  * 
- * @author Michael Gatto <michael@gatto.ch>
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Michael Gatto &lt;michael@gatto.ch&gt;
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ObjectCache {
 
@@ -65,12 +65,6 @@ public class ObjectCache {
 	 */
 	private Object object;
 
-	/**
-	 * @param id
-	 * @param key
-	 * @param object
-	 * @param operation
-	 */
 	@SuppressWarnings("nls")
 	public ObjectCache(long id, String key, Object object, Operation operation) {
 
@@ -97,6 +91,7 @@ public class ObjectCache {
 	 * Set the new object version of this cache.
 	 * 
 	 * @param object
+	 *            the object to set
 	 */
 	public void setObject(Object object) {
 		if (logger.isDebugEnabled()) {
@@ -109,6 +104,7 @@ public class ObjectCache {
 	 * Change the operation to execute for this object.
 	 * 
 	 * @param newOperation
+	 *            the operation to set
 	 */
 	public void setOperation(Operation newOperation) {
 		if (logger.isDebugEnabled()) {

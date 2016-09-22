@@ -21,7 +21,7 @@ import java.util.Date;
  * This interface defines methods for formatting values for UI representation and also defines factory methods for
  * formatters for parsing and formatting duration and date values
  * 
- * Martin Smock <smock.martin@gmail.com>
+ * @author Martin Smock &lt;smock.martin@gmail.com&gt;
  */
 public interface FormatFactory {
 

@@ -31,7 +31,7 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class CommunicationConnection implements Runnable {
 
@@ -244,7 +244,7 @@ public class CommunicationConnection implements Runnable {
 	/**
 	 * Called by the underlying endpoint when a new message has been received and parsed
 	 * 
-	 * @param message
+	 * @param message the message to handle
 	 */
 	public void handleNewMessage(IoMessage message) {
 		ConnectionMessages.assertConfigured(this, "Can not be notified of new message yet!"); //$NON-NLS-1$
@@ -335,7 +335,7 @@ public class CommunicationConnection implements Runnable {
 	 * Called when an outgoing message has been handled. This method logs the message state and then notifies all
 	 * observers
 	 * 
-	 * @param message
+	 * @param message the message which is done
 	 */
 	public void done(IoMessage message) {
 		ConnectionMessages.assertConfigured(this, "Can not notify observers yet!"); //$NON-NLS-1$
@@ -390,7 +390,7 @@ public class CommunicationConnection implements Runnable {
 	 * Send the message using the underlying endpoint. Do not change the state of the message, this will be done by the
 	 * caller
 	 * 
-	 * @param message
+	 * @param message the message to send
 	 */
 	public void send(IoMessage message) {
 		ConnectionMessages.assertConfigured(this, "Can not send yet"); //$NON-NLS-1$

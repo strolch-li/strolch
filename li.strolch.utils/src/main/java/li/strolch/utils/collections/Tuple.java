@@ -18,7 +18,7 @@ package li.strolch.utils.collections;
 /**
  * Simple wrapper for two elements
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class Tuple {
 

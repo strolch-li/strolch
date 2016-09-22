@@ -43,7 +43,7 @@ import li.strolch.communication.tcpip.SocketEndpointConstants;
 import li.strolch.communication.tcpip.SocketMessageVisitor;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class SocketEndpointTest extends AbstractEndpointTest {
 

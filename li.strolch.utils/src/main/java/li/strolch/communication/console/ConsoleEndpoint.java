@@ -26,7 +26,7 @@ import li.strolch.communication.IoMessage;
 import li.strolch.communication.IoMessageVisitor;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ConsoleEndpoint implements CommunicationEndpoint {
 

@@ -21,7 +21,7 @@ package li.strolch.utils.io;
  * jobs has a size which is a primitive long value e.g. the number of bytes parsed/ to be parsed in a file
  * </p>
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public interface FileProgressListener {
 

@@ -22,17 +22,13 @@ import org.slf4j.Logger;
 import li.strolch.utils.helper.FileHelper;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class LoggingFileProgressListener implements FileProgressListener {
 
 	private final Logger logger;
 	private final String name;
 
-	/**
-	 * @param logger
-	 * @param name
-	 */
 	public LoggingFileProgressListener(Logger logger, String name) {
 		this.logger = logger;
 		this.name = name;

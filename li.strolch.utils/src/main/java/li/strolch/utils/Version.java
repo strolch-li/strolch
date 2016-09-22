@@ -12,6 +12,7 @@ import li.strolch.utils.helper.StringHelper;
  * 
  * <p>
  * Version identifiers have four components.
+ * </p>
  * <ol>
  * <li>Major version. A non-negative integer.</li>
  * <li>Minor version. A non-negative integer.</li>
@@ -19,12 +20,15 @@ import li.strolch.utils.helper.StringHelper;
  * <li>Qualifier. A text string. See {@code Version(String)} for the format of the qualifier string.</li>
  * </ol>
  * 
+ * <p>
  * <b>Note:</b> The qualifier can be separated by two different styles: {@link #OSGI_QUALIFIER_SEPARATOR} or
  * {@link #MAVEN_QUALIFIER_SEPARATOR}. Thus the qualifier my also have two special values:
  * {@link #OSGI_SNAPSHOT_QUALIFIER} or {@value #MAVEN_SNAPSHOT_QUALIFIER}.
+ * </p>
  * 
  * <p>
  * The grammar for parsing version strings is as follows:
+ * </p>
  * 
  * <pre>
  * version ::= major('.'minor('.'micro('.'qualifier)?)?)?
@@ -36,6 +40,7 @@ import li.strolch.utils.helper.StringHelper;
  * alpha ::= [a..zA..Z]
  * </pre>
  * 
+ * <p>
  * <b>Note:</b> There must be no whitespace in version.
  * </p>
  * 

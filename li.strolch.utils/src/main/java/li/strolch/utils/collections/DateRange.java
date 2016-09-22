@@ -21,7 +21,7 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class DateRange {
 

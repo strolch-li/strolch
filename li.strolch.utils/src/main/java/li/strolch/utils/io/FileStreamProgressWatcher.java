@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * File stream progress monitoring thread
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class FileStreamProgressWatcher implements Runnable {
 
@@ -33,11 +33,6 @@ public class FileStreamProgressWatcher implements Runnable {
 	private FileProgressListener progressListener;
 	private long millis;
 
-	/**
-	 * @param millis
-	 * @param progressListener
-	 * @param inputStream
-	 */
 	public FileStreamProgressWatcher(long millis, FileProgressListener progressListener,
 			ProgressableFileInputStream inputStream) {
 		this.millis = millis;

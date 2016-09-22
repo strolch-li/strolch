@@ -16,7 +16,7 @@
 package li.strolch.db;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class DbException extends Exception {
 
@@ -24,6 +24,7 @@ public class DbException extends Exception {
 
 	/**
 	 * @param message
+	 *            the message
 	 */
 	public DbException(String message) {
 		super(message);
@@ -31,7 +32,9 @@ public class DbException extends Exception {
 
 	/**
 	 * @param message
+	 *            the message
 	 * @param cause
+	 *            the cause
 	 */
 	public DbException(String message, Throwable cause) {
 		super(message, cause);

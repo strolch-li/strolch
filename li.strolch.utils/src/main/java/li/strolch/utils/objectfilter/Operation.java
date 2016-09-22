@@ -18,7 +18,7 @@ package li.strolch.utils.objectfilter;
 /**
  * A discrete set of operations associated to some object / state
  * 
- * @author Michael Gatto <michael@gatto.ch>
+ * @author Michael Gatto &lt;michael@gatto.ch&gt;
  */
 public enum Operation {
 	/**

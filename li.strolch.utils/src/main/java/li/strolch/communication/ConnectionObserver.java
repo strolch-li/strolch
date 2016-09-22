@@ -16,7 +16,7 @@
 package li.strolch.communication;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public interface ConnectionObserver {
 

@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 /**
  * Generates code which should be easily readable as problematic letters e.g. 0, o, O, i, I, l are left out
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class CodeGenerator {
 

@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import li.strolch.utils.helper.StringHelper;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 @SuppressWarnings("nls")
 public class BaseEncodingTest {

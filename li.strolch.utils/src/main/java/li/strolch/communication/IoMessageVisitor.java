@@ -31,7 +31,7 @@ import li.strolch.communication.console.ConsoleMessageVisitor;
  * Concrete implementations must be thread safe!
  * </p>
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public abstract class IoMessageVisitor {
 

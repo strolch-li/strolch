@@ -29,7 +29,7 @@ import java.util.Set;
  * </p>
  * 
  * <pre>
- * Map&lt;String, Map&lgt;String, MyObject&gt;&gt; mapOfMaps = new HashMap&lt;&gt;;
+ * Map&lt;String, Map&lt;String, MyObject&gt;&gt; mapOfMaps = new HashMap&lt;&gt;;
  * </pre>
  * 
  * <p>
@@ -41,7 +41,7 @@ import java.util.Set;
  * </pre>
  * 
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  * 
  * @param <T>
  *            The key to a map with U as the key and V as the value

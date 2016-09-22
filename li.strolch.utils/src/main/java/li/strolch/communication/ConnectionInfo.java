@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 @XmlRootElement(name = "ConnectionInfo")
 @XmlAccessorType(XmlAccessType.FIELD)

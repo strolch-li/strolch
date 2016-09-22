@@ -18,7 +18,7 @@ package li.strolch.communication;
 import li.strolch.utils.helper.StringHelper;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class CommandKey {
 	private final String key1;
@@ -27,7 +27,9 @@ public class CommandKey {
 
 	/**
 	 * @param key1
+	 *            key1
 	 * @param key2
+	 *            key2
 	 */
 	public CommandKey(String key1, String key2) {
 		this.key1 = key1;

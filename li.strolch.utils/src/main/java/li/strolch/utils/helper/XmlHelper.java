@@ -49,7 +49,7 @@ import li.strolch.utils.exceptions.XmlException;
 /**
  * Helper class for performing XML based tasks
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class XmlHelper {
 
@@ -139,8 +139,6 @@ public class XmlHelper {
 	 *            the {@link Document} to write to the file system
 	 * @param file
 	 *            the {@link File} describing the path on the file system where the XML file should be written to
-	 * @param encoding
-	 *            encoding to use to write the file
 	 * 
 	 * @throws RuntimeException
 	 *             if something went wrong while creating the XML configuration, or writing the element
@@ -189,8 +187,6 @@ public class XmlHelper {
 	 * 
 	 * @param document
 	 *            the {@link Document} to write to the file system
-	 * @param outputStream
-	 *            stream to write document to
 	 * 
 	 * @throws RuntimeException
 	 *             if something went wrong while creating the XML configuration, or writing the element
@@ -210,8 +206,8 @@ public class XmlHelper {
 	 * 
 	 * @param document
 	 *            the {@link Document} to write to the file system
-	 * @param file
-	 *            the {@link File} describing the path on the file system where the XML file should be written to
+	 * @param streamResult
+	 *            the destination
 	 * @param encoding
 	 *            encoding to use to write the file
 	 * 

@@ -18,7 +18,7 @@ package li.strolch.utils.helper;
 /**
  * A helper class for {@link System} methods
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class SystemHelper {
 

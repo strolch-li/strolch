@@ -16,7 +16,7 @@
 package li.strolch.db;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public enum DbMigrationState {
 	NOTHING, CREATED, MIGRATED, DROPPED_CREATED;

@@ -20,7 +20,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public interface DbDataSourceBuilder {
 

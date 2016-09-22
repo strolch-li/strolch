@@ -23,7 +23,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class MapOfSets<T, U> {
 

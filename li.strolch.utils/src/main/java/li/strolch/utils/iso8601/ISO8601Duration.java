@@ -42,8 +42,8 @@ package li.strolch.utils.iso8601;
  * minutes and seconds
  * </p>
  * 
- * @author Martin Smock <smock.martin@gmail.com>
- * @author Michael Gatto <michael@gatto.ch> (reimplementation using enum)
+ * @author Martin Smock &lt;smock.martin@gmail.com&gt;
+ * @author Michael Gatto &lt;michael@gatto.ch&gt; (reimplementation using enum)
  */
 @SuppressWarnings("nls")
 public class ISO8601Duration implements DurationFormat {
@@ -234,6 +234,8 @@ public class ISO8601Duration implements DurationFormat {
 	 * Formats the given time duration to a pseudo ISO 8601 duration string
 	 * 
 	 * @param duration
+	 *            the duration
+	 * 
 	 * @return String the duration formatted as a ISO8601 duration string
 	 */
 	@Override

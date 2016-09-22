@@ -27,7 +27,7 @@ import li.strolch.utils.helper.StringHelper;
 /**
  * Helper class to thrown connection messages
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ConnectionMessages {
 
@@ -44,9 +44,11 @@ public class ConnectionMessages {
 	 * Convenience method to throw an exception when an illegal {@link ConnectionState} change occurs
 	 * 
 	 * @param current
+	 *            the current state
 	 * @param change
+	 *            the new state
 	 * 
-	 * @return
+	 * @return the exception
 	 */
 	public static ConnectionException throwIllegalConnectionState(ConnectionState current, ConnectionState change) {
 		String msg = "The connection with state {0} cannot be changed to {1}"; //$NON-NLS-1$
@@ -59,12 +61,16 @@ public class ConnectionMessages {
 	 * Convenience method to throw an exception when an invalid parameter is set in the configuration
 	 * 
 	 * @param clazz
+	 *            clazz type
 	 * @param parameterName
+	 *            the name of the parameter
 	 * @param parameterValue
+	 *            the value of the parameter
 	 * 
-	 * @return
+	 * @return the exception
 	 */
-	public static ConnectionException throwInvalidParameter(Class<?> clazz, String parameterName, String parameterValue) {
+	public static ConnectionException throwInvalidParameter(Class<?> clazz, String parameterName,
+			String parameterValue) {
 		String value;
 		if (parameterValue != null && !parameterValue.isEmpty())
 			value = parameterValue;
@@ -81,10 +87,13 @@ public class ConnectionMessages {
 	 * Convenience method to throw an exception when an two conflicting parameters are activated
 	 * 
 	 * @param clazz
+	 *            clazz type
 	 * @param parameter1
+	 *            parameter 1
 	 * @param parameter2
+	 *            parameter 2
 	 * 
-	 * @return
+	 * @return the exception
 	 */
 	public static ConnectionException throwConflictingParameters(Class<?> clazz, String parameter1, String parameter2) {
 		String msg = "{0} : The parameters {1} and {2} can not be both activated as they conflict"; //$NON-NLS-1$
@@ -97,8 +106,11 @@ public class ConnectionMessages {
 	 * Convenience method to log a warning when a parameter is not set in the configuration
 	 * 
 	 * @param clazz
+	 *            the clazz of the warning
 	 * @param parameterName
+	 *            the parameter name
 	 * @param defValue
+	 *            the default value to be used
 	 */
 	public static void warnUnsetParameter(Class<?> clazz, String parameterName, String defValue) {
 		if (logger.isDebugEnabled()) {
@@ -113,7 +125,9 @@ public class ConnectionMessages {
 	 * Convenience method to throw an exception when the connection is not yet configured
 	 * 
 	 * @param connection
+	 *            the connection
 	 * @param message
+	 *            the message
 	 */
 	public static void assertConfigured(CommunicationConnection connection, String message) {
 		if (connection.getState() == ConnectionState.CREATED) {
@@ -127,9 +141,11 @@ public class ConnectionMessages {
 	 * Convenience method to throw an exception when the connection is not connected
 	 * 
 	 * @param connection
+	 *            the connection
 	 * @param message
+	 *            the message
 	 * 
-	 * @return
+	 * @return the exception
 	 */
 	public static ConnectionException throwNotConnected(CommunicationConnection connection, String message) {
 		String msg = "{0} : Not connected: {1}"; //$NON-NLS-1$
@@ -142,9 +158,11 @@ public class ConnectionMessages {
 	 * Convenience method to throw an exception when the connection is not connected
 	 * 
 	 * @param connection
+	 *            the connection
 	 * @param message
+	 *            the message
 	 * 
-	 * @return
+	 * @return the exception
 	 */
 	public static ConnectionException throwNotConnected(CommunicationConnection connection, IoMessage message) {
 		String msg = "{0} : Not connected, can not send message with id {1}"; //$NON-NLS-1$
@@ -157,8 +175,8 @@ public class ConnectionMessages {
 			Class<? extends IoMessageVisitor> expectedVisitor, IoMessageVisitor actualVisitor) {
 		if (!(expectedVisitor.isAssignableFrom(actualVisitor.getClass()))) {
 			String msg = "{0} requires {1} but has received illegal type {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, endpoint.getName(), expectedVisitor.getName(), actualVisitor.getClass()
-					.getName());
+			msg = MessageFormat.format(msg, endpoint.getName(), expectedVisitor.getName(),
+					actualVisitor.getClass().getName());
 			throw new ConnectionException(msg);
 		}
 	}

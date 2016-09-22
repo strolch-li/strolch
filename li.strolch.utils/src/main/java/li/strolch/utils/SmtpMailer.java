@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * <li>port - the SMTP port</li>
  * </ul>
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class SmtpMailer {
 

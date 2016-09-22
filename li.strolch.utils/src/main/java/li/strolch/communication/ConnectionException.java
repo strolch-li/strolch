@@ -18,7 +18,7 @@ package li.strolch.communication;
 /**
  * Base Exception for exceptions thrown by the communication classes
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ConnectionException extends RuntimeException {
 	private static final long serialVersionUID = 1L;

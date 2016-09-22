@@ -25,7 +25,7 @@ import org.junit.Test;
 import li.strolch.utils.collections.Paging;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class PagingTest {
 

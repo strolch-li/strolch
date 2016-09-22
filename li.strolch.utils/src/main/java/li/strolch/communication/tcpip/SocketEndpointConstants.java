@@ -18,7 +18,7 @@ package li.strolch.communication.tcpip;
 /**
  * Constants used in the communication classes
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class SocketEndpointConstants {
 

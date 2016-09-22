@@ -31,7 +31,7 @@ import li.strolch.communication.IoMessageArchive;
 import li.strolch.communication.SimpleMessageArchive;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class SimpleMessageArchiveTest extends AbstractEndpointTest {
 

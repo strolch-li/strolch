@@ -34,7 +34,7 @@ package li.strolch.communication;
  * <li>DISCONNECTED - the connection has been disconnected</li>
  * </ul>
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public enum ConnectionState {
 

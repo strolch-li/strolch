@@ -27,7 +27,7 @@ import org.junit.Test;
 import li.strolch.utils.collections.DefaultedHashMap;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class DefaultedHashMapTest {
 

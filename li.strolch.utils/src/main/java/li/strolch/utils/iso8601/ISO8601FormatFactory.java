@@ -22,7 +22,7 @@ import li.strolch.utils.helper.MathHelper;
 /**
  * Default factory for date formats used for serialization.
  * 
- * @author Martin Smock <smock.martin@gmail.com>
+ * @author Martin Smock &lt;smock.martin@gmail.com&gt;
  */
 public class ISO8601FormatFactory implements FormatFactory {
 

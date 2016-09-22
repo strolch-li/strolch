@@ -43,7 +43,7 @@ import li.strolch.communication.file.FileEndpointMode;
 import li.strolch.utils.helper.FileHelper;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class FileEndpointTest extends AbstractEndpointTest {
 

@@ -18,7 +18,10 @@ package li.strolch.utils.collections;
 import java.util.List;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
+ *
+ * @param <T>
+ *            the type of element in the list
  */
 public class Paging<T> {
 
@@ -86,6 +89,9 @@ public class Paging<T> {
 	 *            the page to return - start index is 1
 	 * 
 	 * @return a {@link Paging} instance from which the selected page (list) can be retrieved
+	 * 
+	 * @param <T>
+	 *            the type of element in the list
 	 */
 	public static <T> Paging<T> asPage(List<T> list, int pageSize, int page) {
 

@@ -20,7 +20,7 @@ import java.util.Date;
 /**
  * Interface for date formatting
  * 
- * Martin Smock <smock.martin@gmail.com>
+ * @author Martin Smock &lt;smock.martin@gmail.com&gt;
  */
 public interface DateFormat {
 
@@ -28,6 +28,8 @@ public interface DateFormat {
 	 * format a long to string
 	 * 
 	 * @param timepoint
+	 *            the timepoint
+	 * 
 	 * @return the formatted string of the long value
 	 */
 	public String format(long timepoint);
@@ -36,6 +38,8 @@ public interface DateFormat {
 	 * format a Date to string
 	 * 
 	 * @param date
+	 *            the date
+	 * 
 	 * @return the formatted string of the long value
 	 */
 	public String format(Date date);
@@ -44,6 +48,8 @@ public interface DateFormat {
 	 * parse a string to long
 	 * 
 	 * @param s
+	 *            the string
+	 * 
 	 * @return the value parsed
 	 */
 	public long parseLong(String s);
@@ -52,6 +58,8 @@ public interface DateFormat {
 	 * parse a string to Date
 	 * 
 	 * @param s
+	 *            the string
+	 * 
 	 * @return the value parsed
 	 */
 	public Date parse(String s);

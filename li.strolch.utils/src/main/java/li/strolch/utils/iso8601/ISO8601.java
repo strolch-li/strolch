@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import li.strolch.utils.helper.StringHelper;
 
 /**
- * @author Martin Smock <smock.martin@gmail.com>
+ * @author Martin Smock &lt;smock.martin@gmail.com&gt;
  */
 @SuppressWarnings("nls")
 public class ISO8601 implements DateFormat {
@@ -40,8 +40,8 @@ public class ISO8601 implements DateFormat {
 	private DecimalFormat xxxxFormat = new DecimalFormat("0000");
 
 	/**
-     * 
-     */
+	 * 
+	 */
 	private Calendar parseToCalendar(String text) {
 
 		// check optional leading sign
@@ -175,8 +175,8 @@ public class ISO8601 implements DateFormat {
 	}
 
 	/**
-     * 
-     */
+	 * 
+	 */
 	private String format(Calendar cal) {
 
 		if (cal == null) {
@@ -236,6 +236,8 @@ public class ISO8601 implements DateFormat {
 	 * added by msmock convert a long to ISO8601
 	 * 
 	 * @param timePoint
+	 *            the timepoint
+	 * 
 	 * @return time point as ISO8601 String
 	 */
 	@Override
@@ -269,7 +271,9 @@ public class ISO8601 implements DateFormat {
 	 * @param s
 	 *            the string to parse
 	 * @return time point as long
-	 * @throws NumberFormatException
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the string can not be parsed
 	 */
 	@Override
 	public Date parse(String s) {

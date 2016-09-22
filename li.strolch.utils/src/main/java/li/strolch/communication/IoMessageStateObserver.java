@@ -18,7 +18,7 @@ package li.strolch.communication;
 import li.strolch.communication.IoMessage.State;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class IoMessageStateObserver implements ConnectionObserver {
 

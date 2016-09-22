@@ -21,7 +21,7 @@ import li.strolch.utils.dbc.DBC;
  * The {@link StringMatchMode} is used to match String in different scenarios. The strings can be matched case sensitive
  * or case insensitive as well as using contains or equals.
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public enum StringMatchMode {
 	EQUALS_CASE_SENSITIVE(true, true),

@@ -38,7 +38,7 @@ import li.strolch.utils.helper.StringHelper;
 /**
  * An {@link CommunicationEndpoint} which writes and/or reads from a designated file
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class FileEndpoint implements CommunicationEndpoint, Runnable {
 

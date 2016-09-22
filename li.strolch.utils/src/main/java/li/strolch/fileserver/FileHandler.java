@@ -31,7 +31,7 @@ import li.strolch.utils.helper.StringHelper;
  * This class handles remote requests of clients to upload or download a file. Uploading a file is done by calling
  * {@link #handleFilePart(FilePart)} and the downloading a file is done by calling {@link #requestFile(FilePart)}
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class FileHandler {
 

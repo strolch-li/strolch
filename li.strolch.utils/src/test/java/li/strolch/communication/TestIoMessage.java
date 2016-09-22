@@ -21,7 +21,7 @@ import li.strolch.communication.CommandKey;
 import li.strolch.communication.IoMessage;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class TestIoMessage extends IoMessage {
 

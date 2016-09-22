@@ -18,7 +18,7 @@ package li.strolch.utils.iso8601;
 /**
  * Interface for duration formatting
  * 
- * Martin Smock <smock.martin@gmail.com>
+ * @author Martin Smock &lt;smock.martin@gmail.com&gt;
  */
 public interface DurationFormat {
 
@@ -26,6 +26,8 @@ public interface DurationFormat {
 	 * format a long to string
 	 * 
 	 * @param l
+	 *            the long duration to format
+	 * 
 	 * @return formatted string if the long argument
 	 */
 	public String format(long l);
@@ -34,6 +36,8 @@ public interface DurationFormat {
 	 * parse a string to long
 	 * 
 	 * @param s
+	 *            the string to parse
+	 * 
 	 * @return the long value parsed
 	 */
 	public long parse(String s);

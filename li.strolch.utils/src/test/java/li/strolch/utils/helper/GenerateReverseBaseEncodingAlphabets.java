@@ -23,7 +23,7 @@ import li.strolch.utils.helper.BaseEncoding;
 /**
  * Simple helper class to generate the reverse alphabets for {@link BaseEncoding}
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 @SuppressWarnings("nls")
 public class GenerateReverseBaseEncodingAlphabets {

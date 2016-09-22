@@ -31,7 +31,7 @@ import li.strolch.utils.helper.PropertiesHelper;
 import li.strolch.utils.helper.StringHelper;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 @SuppressWarnings("nls")
 public class BaseDecodingTest {

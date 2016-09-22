@@ -18,7 +18,7 @@ package li.strolch.utils.helper;
 /**
  * ASCII constants
  * 
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class AsciiHelper {
 
@@ -230,6 +230,8 @@ public class AsciiHelper {
 	 * Returns the ASCII Text of a certain bye value
 	 * 
 	 * @param b
+	 *            the byte
+	 * 
 	 * @return String
 	 */
 	public static String getAsciiText(byte b) {
@@ -240,6 +242,8 @@ public class AsciiHelper {
 	 * Returns the ASCII Text of a certain char value
 	 * 
 	 * @param c
+	 *            the char
+	 * 
 	 * @return String
 	 */
 	@SuppressWarnings("nls")

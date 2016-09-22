@@ -16,22 +16,15 @@
 package li.strolch.utils.exceptions;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class XmlException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @param message
-	 */
 	public XmlException(String message) {
 		super(message);
 	}
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
 	public XmlException(String message, Throwable cause) {
 		super(message, cause);
 	}
