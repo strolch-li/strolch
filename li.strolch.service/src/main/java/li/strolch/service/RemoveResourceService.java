@@ -37,7 +37,7 @@ public class RemoveResourceService extends AbstractService<LocatorArgument, Serv
 	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			Resource resource = tx.findElement(arg.locator);
 

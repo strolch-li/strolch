@@ -38,7 +38,7 @@ public class UpdateOrderService extends AbstractService<UpdateOrderService.Updat
 	@Override
 	protected ServiceResult internalDoService(UpdateOrderArg arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			UpdateOrderCommand command = new UpdateOrderCommand(getContainer(), tx);
 			command.setOrder(arg.order);
 

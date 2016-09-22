@@ -44,7 +44,7 @@ public class PrivilegeUpdateRoleService extends AbstractService<PrivilegeRoleArg
 
 		RoleRep role = privilegeHandler.replaceRole(getCertificate(), arg.role);
 
-		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_MODIFY_ROLE)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_MODIFY_ROLE)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
 					StrolchPrivilegeConstants.ROLE, role.getName());

@@ -37,7 +37,7 @@ public class RemoveOrderService extends AbstractService<LocatorArgument, Service
 	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			Order order = tx.findElement(arg.locator);
 

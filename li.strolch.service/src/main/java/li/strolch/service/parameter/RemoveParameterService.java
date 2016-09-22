@@ -38,7 +38,7 @@ public class RemoveParameterService extends AbstractService<LocatorArgument, Ser
 	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			Parameter<?> parameter = tx.findElement(arg.locator);
 

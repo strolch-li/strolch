@@ -40,7 +40,7 @@ public class AddResourceCollectionService extends
 	@Override
 	protected ServiceResult internalDoService(AddResourceCollectionArg arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			AddResourceCollectionCommand command = new AddResourceCollectionCommand(getContainer(), tx);
 			command.setResources(arg.resources);
 			tx.addCommand(command);

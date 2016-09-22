@@ -45,7 +45,7 @@ public class PrivilegeAddOrReplacePrivilegeOnRoleService
 
 		RoleRep role = privilegeHandler.addOrReplacePrivilegeOnRole(getCertificate(), arg.roleName, arg.privilegeRep);
 
-		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_MODIFY_ROLE)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_MODIFY_ROLE)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
 					StrolchPrivilegeConstants.ROLE, role.getName());

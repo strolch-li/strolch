@@ -37,7 +37,7 @@ public class RemoveActivityService extends AbstractService<LocatorArgument, Serv
 	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			Activity activity = tx.findElement(arg.locator);
 

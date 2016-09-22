@@ -38,7 +38,7 @@ public class AddActivityService extends AbstractService<AddActivityService.AddAc
 	@Override
 	protected ServiceResult internalDoService(AddActivityArg arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			AddActivityCommand command = new AddActivityCommand(getContainer(), tx);
 			command.setActivity(arg.activity);
 			tx.addCommand(command);

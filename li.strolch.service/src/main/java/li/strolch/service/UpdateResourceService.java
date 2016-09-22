@@ -38,7 +38,7 @@ public class UpdateResourceService extends AbstractService<UpdateResourceService
 	@Override
 	protected ServiceResult internalDoService(UpdateResourceArg arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			UpdateResourceCommand command = new UpdateResourceCommand(getContainer(), tx);
 			command.setResource(arg.resource);
 

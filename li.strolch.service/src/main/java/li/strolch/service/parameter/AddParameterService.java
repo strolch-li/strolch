@@ -40,7 +40,7 @@ public class AddParameterService extends AbstractService<AddParameterService.Add
 	@Override
 	protected ServiceResult internalDoService(AddParameterArg arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			ParameterizedElement element = tx.findElement(arg.locator);
 

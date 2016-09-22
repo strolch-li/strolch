@@ -44,7 +44,7 @@ public class PrivilegeUpdateUserService extends AbstractService<PrivilegeUserArg
 
 		UserRep user = privilegeHandler.updateUser(getCertificate(), arg.user);
 
-		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_MODIFY_USER)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_MODIFY_USER)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
 					StrolchPrivilegeConstants.USER, user.getUsername());

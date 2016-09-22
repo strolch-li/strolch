@@ -44,7 +44,7 @@ public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNam
 
 		UserRep user = privilegeHandler.removeUser(getCertificate(), arg.username);
 
-		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_REMOVE_USER)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_REMOVE_USER)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE,
 					StrolchPrivilegeConstants.USER, user.getUsername());

@@ -38,7 +38,7 @@ public class AddOrderService extends AbstractService<AddOrderService.AddOrderArg
 	@Override
 	protected ServiceResult internalDoService(AddOrderArg arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			AddOrderCommand command = new AddOrderCommand(getContainer(), tx);
 			command.setOrder(arg.order);
 			tx.addCommand(command);

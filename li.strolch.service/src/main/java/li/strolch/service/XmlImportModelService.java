@@ -69,7 +69,7 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 		}
 
 		XmlImportModelCommand command;
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			command = new XmlImportModelCommand(getContainer(), tx);
 			command.setModelFile(modelFile);

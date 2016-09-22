@@ -76,7 +76,7 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 		logger.info("Exporting model to real path: " + modelFile.getAbsolutePath());
 
 		XmlExportModelCommand command;
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			command = new XmlExportModelCommand(getContainer(), tx);
 			command.setModelFile(modelFile);

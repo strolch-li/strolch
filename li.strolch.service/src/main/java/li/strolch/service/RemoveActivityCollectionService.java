@@ -40,7 +40,7 @@ public class RemoveActivityCollectionService extends AbstractService<LocatorList
 	@Override
 	protected ServiceResult internalDoService(LocatorListArgument arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			List<Activity> activities = new ArrayList<>(arg.locators.size());
 			for (Locator locator : arg.locators) {

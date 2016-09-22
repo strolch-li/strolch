@@ -44,7 +44,7 @@ public class PrivilegeSetUserPasswordService extends AbstractService<PrivilegeSe
 
 		privilegeHandler.setUserPassword(getCertificate(), arg.username, arg.password);
 
-		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
 					StrolchPrivilegeConstants.USER, arg.username);

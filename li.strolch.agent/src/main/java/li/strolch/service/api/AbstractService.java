@@ -33,6 +33,7 @@ import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -149,7 +150,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * @param realm
 	 *            the name of the realm to return
 	 * 
-	 * @return the realm with the given name
+	 * @return the open {@link StrolchTransaction}
 	 * 
 	 * @throws StrolchException
 	 *             if the {@link StrolchRealm} does not exist with the given name
@@ -159,15 +160,55 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
+	 * Opens a {@link StrolchTransaction} by evaluating if the given argument has a realm defined, if not, then the
+	 * realm from the user certificate is used. The action for the TX is this implementation's class name. This
+	 * transaction should be used in a try-with-resource clause so it is properly closed
+	 * 
+	 * @param arg
+	 *            the {@link ServiceArgument}
+	 * 
+	 * @return the open {@link StrolchTransaction}
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StrolchRealm} does not exist with the given name
+	 */
+	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg) throws StrolchException {
+		if (StringHelper.isEmpty(arg.realm))
+			return openUserTx();
+		return openTx(arg.realm);
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} by evaluating if the given argument has a realm defined, if not, then the
+	 * realm from the user certificate is used. The action for the TX is this implementation's class name. This
+	 * transaction should be used in a try-with-resource clause so it is properly closed
+	 * 
+	 * @param arg
+	 *            the {@link ServiceArgument}
+	 * @param action
+	 *            the action to use for the opened TX
+	 * 
+	 * @return the open {@link StrolchTransaction}
+	 * 
+	 * @throws StrolchException
+	 *             if the {@link StrolchRealm} does not exist with the given name
+	 */
+	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg, String action) throws StrolchException {
+		if (StringHelper.isEmpty(arg.realm))
+			return openUserTx();
+		return openTx(arg.realm, action);
+	}
+
+	/**
 	 * Opens a {@link StrolchTransaction} for the given realm. This transaction should be used in a try-with-resource
 	 * clause so it is properly closed
 	 * 
 	 * @param realm
-	 *            the name of the realm to return
+	 *            the name of the realm
 	 * @param action
 	 *            the action to use for the opened TX
 	 * 
-	 * @return the realm with the given name
+	 * @return the open {@link StrolchTransaction}
 	 * 
 	 * @throws StrolchException
 	 *             if the {@link StrolchRealm} does not exist with the given name
@@ -181,7 +222,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * {@link ComponentContainer#getRealm(Certificate)}, the action for the TX is this implementation's class name. This
 	 * transaction should be used in a try-with-resource clause so it is properly closed
 	 * 
-	 * @return the realm with the given name
+	 * @return the open {@link StrolchTransaction}
 	 * 
 	 * @throws StrolchException
 	 *             if the {@link StrolchRealm} does not exist with the given name
@@ -195,12 +236,10 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * {@link ComponentContainer#getRealm(Certificate)}. This transaction should be used in a try-with-resource clause
 	 * so it is properly closed
 	 * 
-	 * @param realm
-	 *            the name of the realm to return
 	 * @param action
 	 *            the action to use for the opened TX
 	 * 
-	 * @return the realm with the given name
+	 * @return the open {@link StrolchTransaction}
 	 * 
 	 * @throws StrolchException
 	 *             if the {@link StrolchRealm} does not exist with the given name

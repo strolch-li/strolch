@@ -45,7 +45,7 @@ public class PrivilegeAddRoleToUserService
 
 		UserRep user = privilegeHandler.addRoleToUser(getCertificate(), arg.username, arg.rolename);
 
-		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
 					StrolchPrivilegeConstants.USER, user.getUsername());

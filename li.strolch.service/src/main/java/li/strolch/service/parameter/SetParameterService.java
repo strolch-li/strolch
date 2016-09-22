@@ -39,7 +39,7 @@ public class SetParameterService extends AbstractService<SetParameterService.Set
 	@Override
 	protected ServiceResult internalDoService(SetParameterArg arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			Parameter<?> parameter = tx.findElement(arg.locator);
 

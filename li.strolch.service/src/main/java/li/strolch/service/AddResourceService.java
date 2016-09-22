@@ -38,7 +38,7 @@ public class AddResourceService extends AbstractService<AddResourceService.AddRe
 	@Override
 	protected ServiceResult internalDoService(AddResourceArg arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			AddResourceCommand command = new AddResourceCommand(getContainer(), tx);
 			command.setResource(arg.resource);
 			tx.addCommand(command);

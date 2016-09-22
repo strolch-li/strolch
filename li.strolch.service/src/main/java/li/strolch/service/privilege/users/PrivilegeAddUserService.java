@@ -44,7 +44,7 @@ public class PrivilegeAddUserService extends AbstractService<PrivilegeUserArgume
 
 		UserRep user = privilegeHandler.addUser(getCertificate(), arg.user, null);
 
-		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_ADD_USER)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_ADD_USER)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE,
 					StrolchPrivilegeConstants.USER, user.getUsername());

@@ -183,7 +183,12 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler() throws PrivilegeException {
+	public <V extends SystemUserAction> V runPrivileged(V action) throws PrivilegeException {
+		return super.runPrivileged(action);
+	}
+
+	@Override
+	public li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler() {
 		return this.privilegeHandler;
 	}
 }

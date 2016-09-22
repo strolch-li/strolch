@@ -44,7 +44,7 @@ public class PrivilegeRemoveRoleService extends AbstractService<PrivilegeRoleNam
 
 		RoleRep role = privilegeHandler.removeRole(getCertificate(), arg.roleName);
 
-		try (StrolchTransaction tx = openUserTx(PrivilegeHandler.PRIVILEGE_REMOVE_ROLE)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_REMOVE_ROLE)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE,
 					StrolchPrivilegeConstants.ROLE, role.getName());

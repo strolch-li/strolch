@@ -40,7 +40,7 @@ public class UpdateOrderCollectionService extends
 	@Override
 	protected ServiceResult internalDoService(UpdateOrderCollectionArg arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			UpdateOrderCollectionCommand command = new UpdateOrderCollectionCommand(getContainer(), tx);
 			command.setOrders(arg.orders);
 

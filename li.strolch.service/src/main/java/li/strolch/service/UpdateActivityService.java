@@ -38,7 +38,7 @@ public class UpdateActivityService extends AbstractService<UpdateActivityService
 	@Override
 	protected ServiceResult internalDoService(UpdateActivityArg arg) {
 
-		try (StrolchTransaction tx = openTx(arg.realm)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx);
 			command.setActivity(arg.activity);
 

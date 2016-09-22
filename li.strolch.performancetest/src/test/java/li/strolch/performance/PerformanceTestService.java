@@ -25,6 +25,7 @@ import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.service.api.ServiceResultState;
 import li.strolch.utils.helper.SystemHelper;
 
 public class PerformanceTestService extends AbstractService<PerformanceTestArgument, ServiceResult> {
@@ -35,7 +36,7 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult();
+		return new ServiceResult(ServiceResultState.FAILED);
 	}
 
 	@Override
