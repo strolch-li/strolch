@@ -203,9 +203,16 @@ public abstract class StrolchElementToSaxVisitor {
 
 	protected AttributesImpl attributesFor(Order order) {
 		AttributesImpl attributes = attributesFor((StrolchElement) order);
-		attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, order.getState().name());
+		attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, order.getState().getName());
 		attributes.addAttribute(null, null, Tags.DATE, Tags.CDATA,
 				ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
+		return attributes;
+	}
+
+	protected AttributesImpl attributesFor(Activity activity) {
+		AttributesImpl attributes = attributesFor((StrolchElement) activity);
+		attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, activity.getState().getName());
+		attributes.addAttribute(null, null, Tags.TIME_ORDERING, Tags.CDATA, activity.getTimeOrdering().getName());
 		return attributes;
 	}
 
@@ -258,7 +265,7 @@ public abstract class StrolchElementToSaxVisitor {
 		AttributesImpl attributes = attributesFor((StrolchElement) action);
 		attributes.addAttribute(null, null, Tags.RESOURCE_ID, Tags.CDATA, action.getResourceId());
 		attributes.addAttribute(null, null, Tags.RESOURCE_TYPE, Tags.CDATA, action.getResourceType());
-		attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, action.getState().name());
+		attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, action.getState().getName());
 		return attributes;
 	}
 

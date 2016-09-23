@@ -53,7 +53,7 @@ public class StrolchElementToJsonVisitor {
 
 		toJson(element, rootJ);
 		rootJ.addProperty(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(element.getDate()));
-		rootJ.addProperty(Tags.STATE, element.getState().name());
+		rootJ.addProperty(Tags.STATE, element.getState().getName());
 
 		addVersion(element, rootJ);
 		addParameterBags(element, rootJ);
@@ -76,6 +76,8 @@ public class StrolchElementToJsonVisitor {
 	protected JsonObject toJson(Activity element, JsonObject rootJ) {
 
 		rootJ.addProperty(Tags.OBJECT_TYPE, Tags.ACTIVITY);
+
+		rootJ.addProperty(Tags.TIME_ORDERING, element.getTimeOrdering().getName());
 
 		toJson((AbstractStrolchElement) element, rootJ);
 
@@ -110,6 +112,8 @@ public class StrolchElementToJsonVisitor {
 	protected JsonObject toJson(Action element, JsonObject rootJ) {
 
 		rootJ.addProperty(Tags.OBJECT_TYPE, Tags.ACTION);
+
+		rootJ.addProperty(Tags.STATE, element.getState().getName());
 
 		// attributes
 		toJson((AbstractStrolchElement) element, rootJ);

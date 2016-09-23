@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="ico/favicon.ico">
 
-    <title>Strolch: Versioning</title>
+    <title>Strolch: Transactions</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -44,63 +44,63 @@
 <div class="container">
 
     <div class="page-header">
-        <h1 class="page-title">Documentation: Versioning</h1>
+        <h1 class="page-title">Documentation: Transactions</h1>
 
-        <p class="lead page-description">This page discusses the Strolch Versioning</p>
+        <p class="lead page-description">This page discusses Strolch Transactions.</p>
     </div>
 
     <div class="content">
 
-        <p>One of Strolch's features that sets it apart from other frameworks, is that versioning is baked into
-            Strolch's fabric. The feature is opt-in, as it is not required in all projects, but it only needs enabling,
-            for all modifications to objects to be versioned, so that rollbacks can be done when needed.</p>
+        <p>Strolch Transactions play a central role in a Strolch agent. A transaction is opened for a realm, and grants
+            access to the model of the agent. Transactions are implemented as a Java <code>try-with-resources</code> by
+            implementing the <code>AutoCloseable</code> interface. This makes it trivial to understand the scope of a
+            transaction.
+        </p>
 
-        <p>The feature is enabled for each realm. In the <code>StrolchConfiguration.xml</code> file enable it by adding
-            the <code>enableVersioning</code> propery per realm:</p>
+        <p>Transactions handle the following:</p>
+        <ul>
+            <li>Opening and closing database connections</li>
+            <li>Releasing locks to strolch elements, if <code>tx.lock(StrolchRootElement)</code></li>
+            <li>Performing Commands correctly</li>
+            <li>exception handling</li>
+            <li>auditing</li>
+            <li>updating observers</li>
+        </ul>
+
+        <p>When a transaction is opened, it is by default read-only, i.e. does not perform any commands when it is
+            closed. Should the TX perform commands, then it is important to call <code>tx.commitOnClose()</code>, but
+            only at the end of the work, so that exception handling can properly work if something goes wrong.</p>
+
+        <p><code>StrolchTransaction</code> offers a myriad of methods:</p>
+        <ul>
+            <li>accessing the Resources, Orders and Activities</li>
+            <li>accessing the element maps</li>
+            <li>do queries</li>
+            <li>get copies of templates</li>
+            <li>add commands for execution</li>
+        </ul>
+
+        <p>Transactions are opened by accessing the realm, but there are convenience methods depending on the
+            use-case:</p>
+        <ul>
+            <li>In Services: by calling one of the <code>openTx()</code>-methods</li>
+            <li>In Commands: Transactions are already open, use method <code>tx()</code> to get instance</li>
+            <li>REST API: <code>RestfulStrolchComponent.openTx()</code></li>
+        </ul>
+
+        <p>Important is to always open the transaction as a try-with-resource block and to define if the TX should
+            commit, or not:</p>
         <pre>
-&lt;StrolchConfiguration&gt;
-  &lt;env id="dev"&gt;
-    ...
-    &lt;Component&gt;
-      &lt;name&gt;RealmHandler&lt;/name&gt;
-      &lt;api&gt;li.strolch.agent.api.RealmHandler&lt;/api&gt;
-      &lt;impl&gt;li.strolch.agent.impl.DefaultRealmHandler&lt;/impl&gt;
-      &lt;depends&gt;PrivilegeHandler&lt;/depends&gt;
-      &lt;Properties&gt;
-        &lt;realms&gt;defaultRealm, otherRealm&lt;/realms&gt;
-        &lt;enableVersioning&gt;true&lt;/enableVersioning&gt;
-        &lt;dataStoreMode&gt;TRANSIENT&lt;/dataStoreMode&gt;
-        &lt;dataStoreFile&gt;StrolchModel.xml&lt;/dataStoreFile&gt;
-        &lt;enableVersioning.otherRealm&gt;true&lt;/enableVersioning.otherRealm&gt;
-        &lt;dataStoreMode.otherRealm&gt;TRANSIENT&lt;/dataStoreMode.otherRealm&gt;
-        &lt;dataStoreFile.otherRealm&gt;StrolchModel.xml&lt;/dataStoreFile.otherRealm&gt;
-      &lt;/Properties&gt;
-    &lt;/Component&gt;
-  &lt;/env&gt;
-  ...
-&lt;/StrolchConfiguration&gt;</pre>
+try (StrolchTransaction tx = openTx(...)) {
 
-        <br/>
-        <p>Once versioning is enabled, versioning is handled automatically. The API for versioning is implemented on the
-            ElementMaps.</p>
+  // do work
 
-        <p>Example: Revert to previous version of a Resource:</p>
-        <pre>
-Resource res = tx.getResourceBy("TestType", "MyTestResource");
-ResourceMap resourceMap = tx.getResourceMap();
-Resource previousVersion = resourceMap.revertToVersion(tx, res);
-// or
-Resource previousVersion = resourceMap.revertToVersion(tx, "TestType", "MyTestResource", 1);</pre>
+  // either or:
+  tx.doNothingOnClose(); // can also be omitted, as default
+  tx.commitOnClose();
+}
+</pre>
 
-        <p>Example: Retrieve all versions of a Resource:</p>
-        <pre>
-List&lt;Resource&gt; versions = resourceMap.getVersionsFor(tx, "TestType", "MyTestResource");</pre>
-
-        <br/>
-        <p><b>Note:</b> When reverting to a previous version, it is important to remember, that any references on an
-            element to other elements will also be restored. As long as the relationship is to the same element, then
-            this is not an issue, but should the relationship have changed, then it this must be handled and the user
-            performing a revert be allowed to decided which element to reference in the reverted version.</p>
 
         <!-- content here -->
 
@@ -119,7 +119,7 @@ List&lt;Resource&gt; versions = resourceMap.getVersionsFor(tx, "TestType", "MyTe
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
+<!-- Include all compiled plugins (below), or include individual xsd as needed -->
 <script src="js/bootstrap.min.js"></script>
 
 <!-- Piwik -->

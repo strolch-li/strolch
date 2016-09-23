@@ -40,6 +40,7 @@ import li.strolch.model.Tags;
 import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
@@ -104,7 +105,11 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String activityId = attributes.getValue(Tags.ID);
 			String activityName = attributes.getValue(Tags.NAME);
 			String activityType = attributes.getValue(Tags.TYPE);
-			Activity activity = new Activity(activityId, activityName, activityType);
+			String timeOrderingS = attributes.getValue(Tags.TIME_ORDERING);
+			if (StringHelper.isEmpty(timeOrderingS))
+				throw new StrolchException("TimeOrdering is not set for Activity with ID " + activityId);
+			TimeOrdering timeOrdering = TimeOrdering.parse(timeOrderingS);
+			Activity activity = new Activity(activityId, activityName, activityType, timeOrdering);
 
 			this.parameterizedElement = activity;
 
@@ -124,7 +129,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 			action.setResourceId(actionResourceId);
 			action.setResourceType(actionResourceType);
 			if (StringHelper.isNotEmpty(actionState))
-				action.setState(State.valueOf(actionState));
+				action.setState(State.parse(actionState));
 
 			this.parameterizedElement = action;
 
@@ -157,7 +162,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 				order.setDate(orderDate);
 			}
 			if (StringHelper.isNotEmpty(orderStateS))
-				order.setState(State.valueOf(orderStateS));
+				order.setState(State.parse(orderStateS));
 
 			this.parameterizedElement = order;
 

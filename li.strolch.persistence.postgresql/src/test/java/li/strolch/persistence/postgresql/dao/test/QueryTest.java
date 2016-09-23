@@ -115,10 +115,10 @@ public class QueryTest {
 			OrderMap orderMap = tx.getOrderMap();
 
 			orderMap.add(tx, ModelGenerator.createOrder("@1", "Order 1", "MyType1", earlier, State.CREATED));
-			orderMap.add(tx, ModelGenerator.createOrder("@2", "Order 2", "MyType1", current, State.OPEN));
+			orderMap.add(tx, ModelGenerator.createOrder("@2", "Order 2", "MyType1", current, State.CLOSED));
 			orderMap.add(tx, ModelGenerator.createOrder("@3", "Order 3", "MyType1", later, State.CLOSED));
 			orderMap.add(tx, ModelGenerator.createOrder("@4", "Order 4", "MyType2", earlier, State.CREATED));
-			orderMap.add(tx, ModelGenerator.createOrder("@5", "Order 5", "MyType2", current, State.OPEN));
+			orderMap.add(tx, ModelGenerator.createOrder("@5", "Order 5", "MyType2", current, State.CLOSED));
 			orderMap.add(tx, ModelGenerator.createOrder("@6", "Order 6", "MyType2", later, State.CLOSED));
 
 			ResourceMap resourceMap = tx.getResourceMap();
@@ -216,7 +216,7 @@ public class QueryTest {
 		performOrderQuery(query, Arrays.asList("@1"));
 
 		query = OrderQuery.query("MyType1");
-		query.and().with(new StateSelection(State.OPEN));
+		query.and().with(new StateSelection(State.CLOSED));
 		performOrderQuery(query, Arrays.<String> asList("@2"));
 	}
 

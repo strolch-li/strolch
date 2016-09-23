@@ -38,6 +38,7 @@ import li.strolch.model.Tags;
 import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
@@ -71,7 +72,7 @@ public class StrolchElementFromJsonVisitor {
 		}
 
 		if (jsonObject.has(Tags.STATE)) {
-			order.setState(State.valueOf(jsonObject.get(Tags.STATE).getAsString()));
+			order.setState(State.parse(jsonObject.get(Tags.STATE).getAsString()));
 		} else {
 			order.setState(State.CREATED);
 		}
@@ -145,6 +146,12 @@ public class StrolchElementFromJsonVisitor {
 
 	public void fillElement(JsonObject jsonObject, Activity activity) {
 		fillElement(jsonObject, (GroupedParameterizedElement) activity);
+
+		if (!jsonObject.has(Tags.TIME_ORDERING))
+			throw new StrolchException("TimeOrdering not set on " + activity.getLocator());
+		String timeOrderingS = jsonObject.get(Tags.TIME_ORDERING).getAsString();
+		TimeOrdering timeOrdering = TimeOrdering.parse(timeOrderingS);
+		activity.setTimeOrdering(timeOrdering);
 
 		parseVersion(activity, jsonObject);
 
@@ -301,7 +308,7 @@ public class StrolchElementFromJsonVisitor {
 		if (jsonObject.has(Tags.RESOURCE_TYPE))
 			action.setResourceType(jsonObject.get(Tags.RESOURCE_TYPE).getAsString());
 		if (jsonObject.has(Tags.STATE))
-			action.setState(State.valueOf(jsonObject.get(Tags.STATE).getAsString()));
+			action.setState(State.parse(jsonObject.get(Tags.STATE).getAsString()));
 
 		// policies
 		PolicyDefs defs = parsePolicies(jsonObject);

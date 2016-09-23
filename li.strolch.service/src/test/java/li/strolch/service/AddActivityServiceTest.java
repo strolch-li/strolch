@@ -18,6 +18,7 @@ package li.strolch.service;
 import org.junit.Test;
 
 import li.strolch.model.ModelGenerator;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.service.AddActivityService.AddActivityArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
@@ -30,7 +31,7 @@ public class AddActivityServiceTest extends AbstractRealmServiceTest {
 	public void runTest() {
 
 		AddActivityArg arg = new AddActivityArg();
-		arg.activity = ModelGenerator.createActivity("firstActivity", "First Activity", "AdditionalActivitys");
+		arg.activity = ModelGenerator.createActivity("firstActivity", "First Activity", "AdditionalActivitys", TimeOrdering.SERIES);
 
 		runServiceInAllRealmTypes(AddActivityService.class, arg);
 	}

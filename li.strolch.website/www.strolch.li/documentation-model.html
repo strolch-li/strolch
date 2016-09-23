@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="ico/favicon.ico">
+
+    <title>Strolch: Model</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries --><!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script><![endif]-->
+</head>
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="index.html">Strolch</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="api.html">API</a></li>
+                <li class="active"><a href="documentation.html">Documentation</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+                <li><a href="development.html">Development</a></li>
+                <li><a href="blog.html">Blog</a></li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1 class="page-title">Documentation: Model</h1>
+
+        <p class="lead page-description">This page discusses Strolch's model</p>
+    </div>
+
+    <div class="content">
+
+        <p>There is a XML Schema which defines the model in XML: <a href="xsd/StrolchModel.xsd">StrolchModel.xsd</a>
+        </p>
+
+        Here is an example of all the possible elements in Strolch:
+        <pre>
+&lt;StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="https://www.strolch.li/xsd/StrolchModel.xsd"
+            xsi:schemaLocation="https://www.strolch.li/xsd/StrolchModel.xsd StrolchModel.xsd"&gt;
+
+  &lt;IncludeFile file="Include1.xml"/&gt;
+
+  &lt;Order Id="@test1" Name="Test Order" Type="Order"&gt;
+    &lt;Version Version="0" CreatedBy="test" CreatedAt="2012-11-30T18:12:05.628+01:00" Deleted="false"/&gt;
+    &lt;ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag"&gt;
+      &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/&gt;
+    &lt;/ParameterBag&gt;
+    &lt;ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag"&gt;
+      &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/&gt;
+    &lt;/ParameterBag&gt;
+    &lt;Policies&gt;
+      &lt;Policy Type="PlanningPolicy" Value="key:SimplePlanning"/&gt;
+      &lt;Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/&gt;
+    &lt;/Policies&gt;
+  &lt;/Order&gt;
+
+  &lt;Resource Id="MyTestResource" Name="Test Name" Type="TestType"&gt;
+    &lt;Version Version="0" CreatedBy="test" CreatedAt="2012-11-30T18:12:05.628+01:00" Deleted="false"/&gt;
+    &lt;ParameterBag Id="@bag01" Name="Test Bag 01" Type="TestBag"&gt;
+      &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/&gt;
+    &lt;/ParameterBag&gt;
+    &lt;ParameterBag Id="@bag02" Name="Test Bag 02" Type="TestBag"&gt;
+      &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/&gt;
+    &lt;/ParameterBag&gt;
+    &lt;TimedState Id="@booleanState" Name="Boolean State" Type="Boolean"&gt;
+      &lt;Value Time="1970-01-01T00:02:00.000+01:00" Value="false"/&gt;
+    &lt;/TimedState&gt;
+    &lt;Policies&gt;
+      &lt;Policy Type="PlanningPolicy" Value="key:SimplePlanning"/&gt;
+      &lt;Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/&gt;
+    &lt;/Policies&gt;
+  &lt;/Resource&gt;
+
+  &lt;Activity Id="activity_1" Name="Activity" Type="parentType"&gt;
+    &lt;Version Version="0" CreatedBy="test" CreatedAt="2012-11-30T18:12:05.628+01:00" Deleted="false"/&gt;
+    &lt;ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag"&gt;
+      &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/&gt;
+    &lt;/ParameterBag&gt;
+    &lt;Policies&gt;
+      &lt;Policy Type="PlanningPolicy" Value="key:SimplePlanning"/&gt;
+      &lt;Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/&gt;
+    &lt;/Policies&gt;
+    &lt;Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use"&gt;
+      &lt;ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag"&gt;
+        &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/&gt;
+      &lt;/ParameterBag&gt;
+      &lt;Policies&gt;
+        &lt;Policy Type="PlanningPolicy" Value="key:SimplePlanning"/&gt;
+        &lt;Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/&gt;
+      &lt;/Policies&gt;
+      &lt;ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer"/&gt;
+      &lt;ValueChange StateId="dummyId" Time="2012-11-30T18:12:06.628+01:00" Value="6" Type="Integer"/&gt;
+    &lt;/Action&gt;
+    &lt;Activity Id="child_activity" Name="Child Activity" Type="childType"&gt;
+      &lt;ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag"&gt;
+        &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/&gt;
+      &lt;/ParameterBag&gt;
+      &lt;Policies&gt;
+        &lt;Policy Type="PlanningPolicy" Value="key:SimplePlanning"/&gt;
+        &lt;Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/&gt;
+      &lt;/Policies&gt;
+      &lt;Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned"
+          Type="Use"&gt;
+        &lt;ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer"/&gt;
+        &lt;ValueChange StateId="dummyId" Time="2012-11-30T18:12:06.628+01:00" Value="6" Type="Integer"/&gt;
+      &lt;/Action&gt;
+      &lt;Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created"
+          Type="Use"/&gt;
+    &lt;/Activity&gt;
+  &lt;/Activity&gt;
+
+&lt;/StrolchModel&gt;</pre>
+
+        <!-- content here -->
+
+    </div>
+    <!-- /.content -->
+
+    <div id="footer">
+        <div class="container">
+            <p class="text-muted">&copy; Strolch / <a href="mailto:eitch@eitchnet.ch">Robert von Burg</a> / Hosting by
+                <a href="http://www.eitchnet.ch">eitchnet.ch</a></p>
+        </div>
+    </div>
+
+</div>
+<!-- /.container -->
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual xsd as needed -->
+<script src="js/bootstrap.min.js"></script>
+
+<!-- Piwik -->
+<script type="text/javascript">
+    var _paq = _paq || [];
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function () {
+        var u = (("https:" == document.location.protocol) ? "https" : "http") + "://piwik.eitchnet.ch/";
+        _paq.push(['setTrackerUrl', u + 'piwik.php']);
+        _paq.push(['setSiteId', 2]);
+        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript';
+        g.defer = true;
+        g.async = true;
+        g.src = u + 'piwik.js';
+        s.parentNode.insertBefore(g, s);
+    })();
+</script>
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt=""/></p></noscript>
+<!-- End Piwik Code -->
+
+</body>
+</html>

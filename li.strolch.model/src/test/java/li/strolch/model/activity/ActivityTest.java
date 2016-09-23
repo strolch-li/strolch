@@ -48,7 +48,7 @@ public class ActivityTest {
 	public void init() {
 
 		// create activity element
-		this.activity = new Activity("activity", "Activity", "parentType");
+		this.activity = new Activity("activity", "Activity", "parentType", TimeOrdering.SERIES);
 
 		// create action 1
 		this.action_1 = new Action("action_1", "Action 1", "Use");
@@ -58,7 +58,7 @@ public class ActivityTest {
 
 		this.activity.addElement(this.action_1);
 
-		this.childActivity = new Activity("child_activity", "Child Activity", "childType");
+		this.childActivity = new Activity("child_activity", "Child Activity", "childType", TimeOrdering.SERIES);
 
 		// create action 2
 		this.action_2 = new Action("action_2", "Action 2", "Use");

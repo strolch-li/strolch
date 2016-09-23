@@ -89,7 +89,7 @@ public abstract class StrolchElementToSaxWriterVisitor {
 
 		writeStartStrolchElement(Tags.ORDER, empty, order);
 		this.writer.writeAttribute(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
-		this.writer.writeAttribute(Tags.STATE, order.getState().name());
+		this.writer.writeAttribute(Tags.STATE, order.getState().getName());
 
 		if (order.hasVersion())
 			writeVersion(order);
@@ -109,7 +109,8 @@ public abstract class StrolchElementToSaxWriterVisitor {
 				&& !activity.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.ACTIVITY, empty, activity);
-
+		this.writer.writeAttribute(Tags.TIME_ORDERING, activity.getTimeOrdering().getName());
+		
 		if (activity.hasVersion())
 			writeVersion(activity);
 
@@ -150,7 +151,7 @@ public abstract class StrolchElementToSaxWriterVisitor {
 		boolean empty = !action.hasParameterBags() && !action.hasChanges() && !action.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.ACTION, empty, action);
-		this.writer.writeAttribute(Tags.STATE, action.getState().name());
+		this.writer.writeAttribute(Tags.STATE, action.getState().getName());
 		this.writer.writeAttribute(Tags.RESOURCE_ID, action.getResourceId());
 		this.writer.writeAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
 

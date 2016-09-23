@@ -59,7 +59,7 @@ public class StrolchElementToDomVisitor {
 
 		Element asDom = document.createElement(Tags.ORDER);
 		asDom.setAttribute(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
-		asDom.setAttribute(Tags.STATE, order.getState().name());
+		asDom.setAttribute(Tags.STATE, order.getState().getName());
 
 		fillElement(asDom, (StrolchRootElement) order);
 
@@ -84,6 +84,8 @@ public class StrolchElementToDomVisitor {
 
 	protected Element toDom(Activity activity) {
 		Element element = document.createElement(Tags.ACTIVITY);
+		element.setAttribute(Tags.TIME_ORDERING, activity.getTimeOrdering().getName());
+
 		fillElement(element, (StrolchRootElement) activity);
 
 		if (activity.hasElements()) {
@@ -109,7 +111,7 @@ public class StrolchElementToDomVisitor {
 
 		element.setAttribute(Tags.RESOURCE_ID, action.getResourceId());
 		element.setAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
-		element.setAttribute(Tags.STATE, action.getState().name());
+		element.setAttribute(Tags.STATE, action.getState().getName());
 
 		if (action.hasPolicyDefs())
 			fillElement(element, action.getPolicyDefs());

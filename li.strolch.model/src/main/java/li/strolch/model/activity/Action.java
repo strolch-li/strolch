@@ -29,10 +29,10 @@ import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.PolicyContainer;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
-import li.strolch.model.StrolchRootElement;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+import li.strolch.model.visitor.IActivityElementVisitor;
 
 /**
  * An {@link Action} represents a single step within an {@link Activity}, that is, one that is not further decomposed
@@ -163,7 +163,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
-	public StrolchRootElement getRootElement() {
+	public Activity getRootElement() {
 		return (this.parent == null) ? null : this.parent.getRootElement();
 	}
 
@@ -264,5 +264,10 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 			end = Math.max(end, change.getTime());
 		}
 		return end;
+	}
+
+	@Override
+	public void accept(IActivityElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

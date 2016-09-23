@@ -55,6 +55,7 @@ public class Tags {
 	public static final String DELETED = "Deleted";
 
 	public static final String ACTIVITY = "Activity";
+	public static final String TIME_ORDERING = "TimeOrdering";
 	public static final String ACTION = "Action";
 	public static final String START = "Start";
 	public static final String END = "End";

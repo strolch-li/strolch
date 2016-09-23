@@ -41,6 +41,7 @@ import li.strolch.model.State;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.timedstate.IntegerTimedState;
@@ -96,7 +97,7 @@ public class PlanActivityTest {
 		this.timedState3.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 
 		// create activity element
-		this.activity = new Activity("activity", "Activity", "testType");
+		this.activity = new Activity("activity", "Activity", "testType", TimeOrdering.SERIES);
 
 		// create action 1
 		this.action1 = new Action("action_1", "Action 1", "Use");
@@ -113,7 +114,7 @@ public class PlanActivityTest {
 		this.activity.addElement(this.action1);
 
 		// create child activity
-		this.childActivity = new Activity("childActivity", "Child Activity", "childType");
+		this.childActivity = new Activity("childActivity", "Child Activity", "childType", TimeOrdering.SERIES);
 
 		// create action 2
 		this.action2 = new Action("action_2", "Action 2", "Use");

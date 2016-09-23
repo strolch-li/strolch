@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 
 public abstract class ModelMarshallingTest {
 
@@ -38,13 +39,13 @@ public abstract class ModelMarshallingTest {
 
 	@Test
 	public void shouldFormatAndParseActivity() throws Exception {
-		Activity activity = ModelGenerator.createActivity("@1", "My Activity 1", "Transport");
+		Activity activity = ModelGenerator.createActivity("@1", "My Activity 1", "Transport", TimeOrdering.SERIES);
 		formatAndParseActivity(activity);
 	}
 
 	@Test
 	public void shouldFormatAndParseVersionedActivity() throws Exception {
-		Activity activity = ModelGenerator.createActivity("@1", "My Activity 1", "Transport");
+		Activity activity = ModelGenerator.createActivity("@1", "My Activity 1", "Transport", TimeOrdering.SERIES);
 		Version.setInitialVersionFor(activity, "test");
 		Activity parsed = formatAndParseActivity(activity);
 		assertEquals(activity.getVersion(), parsed.getVersion());

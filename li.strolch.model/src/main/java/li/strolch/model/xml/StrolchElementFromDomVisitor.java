@@ -36,6 +36,7 @@ import li.strolch.model.Tags;
 import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
@@ -66,7 +67,7 @@ public class StrolchElementFromDomVisitor {
 		if (state == null || state.isEmpty()) {
 			order.setState(State.CREATED);
 		} else {
-			order.setState(State.valueOf(state));
+			order.setState(State.parse(state));
 		}
 	}
 
@@ -143,6 +144,12 @@ public class StrolchElementFromDomVisitor {
 
 	public void fillElement(Element activityElement, Activity activity) {
 		fillElement(activityElement, (StrolchRootElement) activity);
+
+		String timeOrderingS = activityElement.getAttribute(Tags.TIME_ORDERING);
+		if (StringHelper.isEmpty(timeOrderingS))
+			throw new StrolchException("TimeOrdering is not set for " + activity.getLocator());
+		TimeOrdering timeOrdering = TimeOrdering.parse(timeOrderingS);
+		activity.setTimeOrdering(timeOrdering);
 
 		NodeList childNodes = activityElement.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
@@ -290,7 +297,7 @@ public class StrolchElementFromDomVisitor {
 
 		action.setResourceId(resourceId);
 		action.setResourceType(resourceType);
-		action.setState(State.valueOf(stateS));
+		action.setState(State.parse(stateS));
 
 		PolicyDefs defs = parsePolicies(element);
 		if (defs.hasPolicyDefs())

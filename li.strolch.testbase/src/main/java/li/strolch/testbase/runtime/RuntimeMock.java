@@ -31,6 +31,7 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchBootstrapper;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.api.StrolchVersion;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.Service;
@@ -41,7 +42,7 @@ import li.strolch.service.api.ServiceResultState;
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
 
-public final class RuntimeMock {
+public class RuntimeMock {
 
 	private static final Logger logger = LoggerFactory.getLogger(RuntimeMock.class);
 	private static final String TARGET = "target"; //$NON-NLS-1$
@@ -69,6 +70,10 @@ public final class RuntimeMock {
 
 	public StrolchRealm getRealm(String realm) {
 		return this.container.getRealm(realm);
+	}
+
+	public StrolchTransaction openUserTx(Certificate certificate) {
+		return this.container.getRealm(certificate).openTx(certificate, getClass());
 	}
 
 	public Certificate loginAdmin() {

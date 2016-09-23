@@ -21,6 +21,7 @@ import li.strolch.model.ModelGenerator;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Version;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.FloatListParameter;
 import li.strolch.model.parameter.FloatParameter;
@@ -263,7 +264,7 @@ public class InMemoryActivityQueryTest {
 	}
 
 	private Activity getBallActivity() {
-		Activity res1 = new Activity("childrensBall", "Ball 1", "Ball");
+		Activity res1 = new Activity("childrensBall", "Ball 1", "Ball", TimeOrdering.SERIES);
 		Version.setInitialVersionFor(res1, "test");
 		ParameterBag bag = new ParameterBag("parameters", "Ball Details", "Parameters");
 		bag.addParameter(new StringParameter("color", "Color", "red"));
@@ -280,12 +281,12 @@ public class InMemoryActivityQueryTest {
 	}
 
 	private List<Activity> getActivities() {
-		Activity res1 = ModelGenerator.createActivity("@1", "Activity 1", "MyType1");
-		Activity res2 = ModelGenerator.createActivity("@2", "Activity 2", "MyType1");
-		Activity res3 = ModelGenerator.createActivity("@3", "Activity 3", "MyType2");
-		Activity res4 = ModelGenerator.createActivity("@4", "Activity 4", "MyType2");
-		Activity res5 = ModelGenerator.createActivity("@5", "Activity 5", "MyType3");
-		Activity res6 = ModelGenerator.createActivity("@6", "Activity 6", "MyType3");
+		Activity res1 = ModelGenerator.createActivity("@1", "Activity 1", "MyType1", TimeOrdering.SERIES);
+		Activity res2 = ModelGenerator.createActivity("@2", "Activity 2", "MyType1", TimeOrdering.SERIES);
+		Activity res3 = ModelGenerator.createActivity("@3", "Activity 3", "MyType2", TimeOrdering.SERIES);
+		Activity res4 = ModelGenerator.createActivity("@4", "Activity 4", "MyType2", TimeOrdering.SERIES);
+		Activity res5 = ModelGenerator.createActivity("@5", "Activity 5", "MyType3", TimeOrdering.SERIES);
+		Activity res6 = ModelGenerator.createActivity("@6", "Activity 6", "MyType3", TimeOrdering.SERIES);
 		List<Activity> activitys = new ArrayList<>();
 		activitys.add(res1);
 		activitys.add(res2);

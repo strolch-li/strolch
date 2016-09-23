@@ -132,6 +132,9 @@ public class StrolchElementDeepEqualsVisitor {
 	public void deepEquals(Activity srcActivity, Activity dstActivity) {
 		deepEquals((StrolchRootElement) srcActivity, (StrolchRootElement) dstActivity);
 
+		if (!srcActivity.getTimeOrdering().equals(dstActivity.getTimeOrdering()))
+			addLocator(dstActivity.getLocator().append(Tags.TIME_ORDERING));
+
 		Iterator<Entry<String, IActivityElement>> iter = srcActivity.elementIterator();
 		while (iter.hasNext()) {
 			IActivityElement srcActivityElement = iter.next().getValue();

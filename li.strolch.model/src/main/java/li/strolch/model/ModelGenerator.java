@@ -25,6 +25,7 @@ import java.util.Set;
 
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.parameter.BooleanParameter;
@@ -363,26 +364,26 @@ public class ModelGenerator {
 	 *
 	 * @return the list of newly created {@link Activity Activities}
 	 */
-
-	public static List<Activity> createActivities(int idStart, int count, String idPrefix, String name, String type) {
+	public static List<Activity> createActivities(int idStart, int count, String idPrefix, String name, String type,
+			TimeOrdering timeOrdering) {
 		List<Activity> activities = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			String id = StringHelper.normalizeLength(String.valueOf((i + idStart)), 8, true, '0');
-			activities.add(createActivity(idPrefix + id, name + " " + i, type));
+			activities.add(createActivity(idPrefix + id, name + " " + i, type, timeOrdering));
 		}
 		return activities;
 	}
 
-	public static Activity createActivity(String id, String name, String type) {
+	public static Activity createActivity(String id, String name, String type, TimeOrdering timeOrdering) {
 
-		Activity rootActivity = new Activity(id, name, type);
+		Activity rootActivity = new Activity(id, name, type, timeOrdering);
 		ParameterBag bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
 		rootActivity.addParameterBag(bag);
 
 		Action action = createAction("action_" + rootActivity.getId(), "Action " + rootActivity.getName(), "Use");
 		rootActivity.addElement(action);
 
-		Activity subActivity = new Activity("sub_" + id, "sub_" + name, type);
+		Activity subActivity = new Activity("sub_" + id, "sub_" + name, type, timeOrdering);
 		bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
 		subActivity.addParameterBag(bag);
 		rootActivity.addElement(subActivity);
@@ -390,7 +391,7 @@ public class ModelGenerator {
 		action = createAction("action_" + id, "Action " + name, "Use");
 		subActivity.addElement(action);
 
-		Activity subSubActivity = new Activity("subSub_" + id, "subSub_" + name, type);
+		Activity subSubActivity = new Activity("subSub_" + id, "subSub_" + name, type, timeOrdering);
 		bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
 		subSubActivity.addParameterBag(bag);
 		subActivity.addElement(subSubActivity);

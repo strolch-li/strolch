@@ -199,7 +199,7 @@ public class LockingTest {
 		@Override
 		protected ServiceResult internalDoService(LockingArgumentTest arg) throws Exception {
 
-			try (StrolchTransaction tx = openTx(arg.realm)) {
+			try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 				if (!arg.longRunning)
 					Thread.sleep(200l);

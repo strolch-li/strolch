@@ -15,30 +15,39 @@
  */
 package li.strolch.model;
 
+import li.strolch.exception.StrolchException;
+import li.strolch.utils.dbc.DBC;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public enum State {
 
 	CREATED("Created"), //$NON-NLS-1$
-	OPEN("Open"), //$NON-NLS-1$
+	PLANNING("Planning"), //$NON-NLS-1$
+	PLANNED("Planned"), //$NON-NLS-1$
 	EXECUTION("Execution"), //$NON-NLS-1$
-	CLOSED("Closed"), //$NON-NLS-1$
-	PLANNED("Planned"); //$NON-NLS-1$
+	STOPPED("Stopped"), //$NON-NLS-1$
+	EXECUTED("Executed"), //$NON-NLS-1$
+	CLOSED("Closed"); //$NON-NLS-1$
 
 	private String state;
 
-	/**
-	 * @param state
-	 */
 	private State(String state) {
 		this.state = state;
 	}
 
-	/**
-	 * @return
-	 */
-	public String getStateName() {
+	public String getName() {
 		return this.state;
+	}
+
+	public static State parse(String s) {
+		DBC.PRE.assertNotEmpty("Value may not be null", s);
+		for (State state : values()) {
+			if (state.state.toLowerCase().equals(s.toLowerCase()))
+				return state;
+		}
+
+		throw new StrolchException("No State for " + s);
 	}
 }

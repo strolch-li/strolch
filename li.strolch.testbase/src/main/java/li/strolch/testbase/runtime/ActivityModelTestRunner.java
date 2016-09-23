@@ -34,6 +34,7 @@ import java.util.Set;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
@@ -61,7 +62,7 @@ public class ActivityModelTestRunner {
 	public void runCreateActivityTest() {
 
 		// create
-		Activity newActivity = createActivity("MyTestActivity", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Activity newActivity = createActivity("MyTestActivity", "Test Name", "TestType", TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
 			tx.getActivityMap().add(tx, newActivity);
 			tx.commitOnClose();
@@ -77,9 +78,9 @@ public class ActivityModelTestRunner {
 		}
 
 		// create three activities
-		Activity activity1 = createActivity("myTestActivity1", "Test Name", "QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		Activity activity2 = createActivity("myTestActivity2", "Test Name", "QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		Activity activity3 = createActivity("myTestActivity3", "Test Name", "QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Activity activity1 = createActivity("myTestActivity1", "Test Name", "QTestType1", TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Activity activity2 = createActivity("myTestActivity2", "Test Name", "QTestType2", TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Activity activity3 = createActivity("myTestActivity3", "Test Name", "QTestType3", TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
 			tx.getActivityMap().add(tx, activity1);
 			tx.getActivityMap().add(tx, activity2);
@@ -109,7 +110,7 @@ public class ActivityModelTestRunner {
 	public void runCrudTests() {
 
 		// create
-		Activity newActivity = createActivity(ID, NAME, TYPE);
+		Activity newActivity = createActivity(ID, NAME, TYPE, TimeOrdering.SERIES);
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
 			tx.getActivityMap().add(tx, newActivity);
 			tx.commitOnClose();
@@ -159,9 +160,11 @@ public class ActivityModelTestRunner {
 
 		// create 15 activities
 		List<Activity> activities = new ArrayList<>();
-		activities.addAll(createActivities(activities.size(), 5, "@", "My Activity", "MyType1"));
-		activities.addAll(createActivities(activities.size(), 5, "@", "Other Activity", "MyType2"));
-		activities.addAll(createActivities(activities.size(), 5, "@", "Further Activity", "MyType3"));
+		activities.addAll(createActivities(activities.size(), 5, "@", "My Activity", "MyType1", TimeOrdering.SERIES));
+		activities
+				.addAll(createActivities(activities.size(), 5, "@", "Other Activity", "MyType2", TimeOrdering.SERIES));
+		activities.addAll(
+				createActivities(activities.size(), 5, "@", "Further Activity", "MyType3", TimeOrdering.SERIES));
 
 		// sort them so we know which activity our objects are
 		Comparator<Activity> comparator = (o1, o2) -> o1.getId().compareTo(o2.getId());

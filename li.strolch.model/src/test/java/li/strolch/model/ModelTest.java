@@ -70,8 +70,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.FloatListParameter;
@@ -94,10 +99,6 @@ import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("nls")
 public class ModelTest {
@@ -122,12 +123,12 @@ public class ModelTest {
 	public void shouldCreateOrder() {
 
 		Date date = new Date();
-		Order order = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		Order order = createOrder("@ord01", "Test Order", "MyType", date, State.CLOSED);
 		assertEquals("@ord01", order.getId());
 		assertEquals("Test Order", order.getName());
 		assertEquals("MyType", order.getType());
 		assertEquals(date, order.getDate());
-		assertEquals(State.OPEN, order.getState());
+		assertEquals(State.CLOSED, order.getState());
 
 		ParameterBag bag = order.getParameterBag(BAG_ID);
 		validateBag(bag);
@@ -149,7 +150,7 @@ public class ModelTest {
 		changes.add(new ValueChange<>(50L, new IntegerValue(10), STATE_INTEGER_ID));
 		changes.add(new ValueChange<>(60L, new IntegerValue(0), STATE_INTEGER_ID));
 
-		Activity activity = createActivity(actId, actName, actType);
+		Activity activity = createActivity(actId, actName, actType, TimeOrdering.SERIES);
 		assertEquals(actId, activity.getId());
 		assertEquals(actName, activity.getName());
 		assertEquals(actType, activity.getType());
@@ -208,7 +209,7 @@ public class ModelTest {
 		FloatTimedState floatS = resource.getTimedState(STATE_FLOAT_ID);
 		assertEquals(Locator.valueOf(RESOURCE, "MyType", "@res01", STATE, STATE_FLOAT_ID), floatS.getLocator());
 
-		Order order = createOrder("@ord01", "Test Order", "MyType", new Date(), State.OPEN);
+		Order order = createOrder("@ord01", "Test Order", "MyType", new Date(), State.CLOSED);
 		assertEquals(Locator.valueOf(ORDER, "MyType", "@ord01"), order.getLocator());
 		bag = order.getParameterBag(BAG_ID);
 		assertEquals(Locator.valueOf(ORDER, "MyType", "@ord01", BAG, BAG_ID), bag.getLocator());
@@ -218,8 +219,8 @@ public class ModelTest {
 
 	@Test
 	public void shouldPerformDeepActivityEquals() {
-		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType");
-		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType");
+		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
+		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
 		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
 		visitor.visit(dstActivity);
 		assertTrue("Same Activity should be deep equal!", visitor.isEqual());
@@ -227,7 +228,7 @@ public class ModelTest {
 
 	@Test
 	public void shouldPerformActivityClone() {
-		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType");
+		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
 		Activity dstActivity = srcActivity.getClone();
 		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
 		visitor.visit(dstActivity);
@@ -236,8 +237,8 @@ public class ModelTest {
 
 	@Test
 	public void shouldFailDeepActivityEquals1() {
-		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType");
-		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType");
+		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
+		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
 		dstActivity.setName("Bla");
 		dstActivity.setType("BlaBla");
 		ParameterBag bag = dstActivity.getParameterBag(BAG_ID);
@@ -253,8 +254,8 @@ public class ModelTest {
 
 	@Test
 	public void shouldFailDeepActivityEquals2() {
-		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType");
-		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType");
+		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
+		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
 
 		Action action = dstActivity.getElement("action_" + "@act01");
 		action.setResourceId("Bla");
@@ -330,8 +331,8 @@ public class ModelTest {
 	@Test
 	public void shouldPerformDeepOrderEquals() {
 		Date date = new Date();
-		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
-		Order dstOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.CREATED);
+		Order dstOrder = createOrder("@ord01", "Test Order", "MyType", date, State.CREATED);
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
 		visitor.visit(dstOrder);
 		assertTrue("Same Order should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
@@ -340,7 +341,7 @@ public class ModelTest {
 	@Test
 	public void shouldPerformOrderClone() {
 		Date date = new Date();
-		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.CREATED);
 		Order dstOrder = srcOrder.getClone();
 		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
 		visitor.visit(dstOrder);
@@ -350,8 +351,8 @@ public class ModelTest {
 	@Test
 	public void shouldFailDeepOrderEquals1() {
 		Date date = new Date();
-		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
-		Order dstOrder = createOrder("@ord01", "Test Order", "MyType", date, State.OPEN);
+		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.CREATED);
+		Order dstOrder = createOrder("@ord01", "Test Order", "MyType", date, State.CREATED);
 		dstOrder.setDate(new Date(1L));
 		dstOrder.setState(State.CLOSED);
 		ParameterBag bag = dstOrder.getParameterBag(BAG_ID);

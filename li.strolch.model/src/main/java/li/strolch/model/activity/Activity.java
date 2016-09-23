@@ -33,6 +33,7 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.Version;
 import li.strolch.model.policy.PolicyDefs;
+import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.dbc.DBC;
 
@@ -48,7 +49,9 @@ public class Activity extends GroupedParameterizedElement
 	private static final long serialVersionUID = 1L;
 
 	private Version version;
+
 	protected Activity parent;
+	protected TimeOrdering timeOrdering;
 	protected Map<String, IActivityElement> elements;
 	protected PolicyDefs policyDefs;
 
@@ -62,12 +65,21 @@ public class Activity extends GroupedParameterizedElement
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * @param name
-	 * @param type
+	 * @param id the id
+	 * @param name the name
+	 * @param type the type
 	 */
-	public Activity(String id, String name, String type) {
+	public Activity(String id, String name, String type, TimeOrdering timeOrdering) {
 		super(id, name, type);
+		this.timeOrdering = timeOrdering;
+	}
+
+	public TimeOrdering getTimeOrdering() {
+		return this.timeOrdering;
+	}
+
+	public void setTimeOrdering(TimeOrdering timeOrdering) {
+		this.timeOrdering = timeOrdering;
 	}
 
 	@Override
@@ -82,7 +94,7 @@ public class Activity extends GroupedParameterizedElement
 
 	@Override
 	public void setVersion(Version version) throws IllegalArgumentException, IllegalStateException {
-		if (!this.isRootElement())
+		if (!isRootElement())
 			throw new IllegalStateException("Can't set the version on non root of " + getLocator());
 
 		if (version != null && !getLocator().equals(version.getLocator())) {
@@ -139,12 +151,12 @@ public class Activity extends GroupedParameterizedElement
 		String id = activityElement.getId();
 		if (id == null)
 			throw new StrolchException("Cannot add IActivityElement without id.");
-		else if (elements.containsKey(id))
+		else if (this.elements.containsKey(id))
 			throw new StrolchException(
 					"Activiy " + getLocator() + " already contains an activity element with id = " + id);
 		else {
 			activityElement.setParent(this);
-			return elements.put(activityElement.getId(), activityElement);
+			return this.elements.put(activityElement.getId(), activityElement);
 		}
 	}
 
@@ -159,7 +171,7 @@ public class Activity extends GroupedParameterizedElement
 	public <T extends IActivityElement> T getElement(String id) {
 		if (this.elements == null)
 			return null;
-		return (T) elements.get(id);
+		return (T) this.elements.get(id);
 	}
 
 	/**
@@ -168,7 +180,7 @@ public class Activity extends GroupedParameterizedElement
 	public Map<String, IActivityElement> getElements() {
 		if (this.elements == null)
 			return Collections.emptyMap();
-		return elements;
+		return this.elements;
 	}
 
 	/**
@@ -177,7 +189,7 @@ public class Activity extends GroupedParameterizedElement
 	public Iterator<Entry<String, IActivityElement>> elementIterator() {
 		if (this.elements == null)
 			return Collections.<String, IActivityElement> emptyMap().entrySet().iterator();
-		return elements.entrySet().iterator();
+		return this.elements.entrySet().iterator();
 	}
 
 	@Override
@@ -208,7 +220,7 @@ public class Activity extends GroupedParameterizedElement
 
 	@Override
 	public State getState() {
-		State state = State.PLANNED;
+		State state = State.CREATED;
 		if (this.elements == null)
 			return state;
 		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
@@ -254,22 +266,23 @@ public class Activity extends GroupedParameterizedElement
 
 	@Override
 	public StrolchElement getParent() {
-		return parent;
+		return this.parent;
 	}
 
 	@Override
-	public StrolchRootElement getRootElement() {
-		return (parent == null) ? this : parent.getRootElement();
+	public Activity getRootElement() {
+		return (this.parent == null) ? this : this.parent.getRootElement();
 	}
 
 	@Override
 	public boolean isRootElement() {
-		return (parent == null);
+		return (this.parent == null);
 	}
 
 	@Override
 	public Activity getClone() {
 		Activity clone = new Activity();
+		clone.timeOrdering = this.timeOrdering;
 
 		super.fillClone(clone);
 
@@ -296,11 +309,11 @@ public class Activity extends GroupedParameterizedElement
 		builder.append(", type=");
 		builder.append(this.type);
 		builder.append(", state=");
-		builder.append(this.getState());
+		builder.append(getState());
 		builder.append(", start=");
-		builder.append(this.getStart());
+		builder.append(getStart());
 		builder.append(", end=");
-		builder.append(this.getEnd());
+		builder.append(getEnd());
 		if (isRootElement()) {
 			builder.append(", version=");
 			builder.append(this.version);
@@ -316,7 +329,12 @@ public class Activity extends GroupedParameterizedElement
 
 	@Override
 	public <T> T accept(StrolchRootElementVisitor<T> visitor) {
-		throw new StrolchException("not implemented yet");
+		return visitor.visitActivity(this);
+	}
+
+	@Override
+	public void accept(IActivityElementVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override
