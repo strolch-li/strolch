@@ -80,6 +80,10 @@ public class RuntimeMock {
 		return getPrivilegeHandler().authenticate("admin", "admin".getBytes());
 	}
 
+	public Certificate loginTest() {
+		return getPrivilegeHandler().authenticate("test", "test".getBytes());
+	}
+
 	public Certificate login(String username, String password) {
 		return getPrivilegeHandler().authenticate(username, password.getBytes());
 	}
