@@ -1,5 +1,6 @@
-package li.strolch.service.execution;
+package li.strolch.execution.service;
 
+import li.strolch.execution.command.StopActionCommand;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.LocatorArgument;
@@ -7,7 +8,7 @@ import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 
-public class SetActionToExecutedService extends AbstractService<LocatorArgument, ServiceResult> {
+public class StopActionService extends AbstractService<LocatorArgument, ServiceResult> {
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -22,7 +23,7 @@ public class SetActionToExecutedService extends AbstractService<LocatorArgument,
 
 			Action action = tx.findElement(arg.locator);
 
-			SetActionToExecutedCommand command = new SetActionToExecutedCommand(getContainer(), tx);
+			StopActionCommand command = new StopActionCommand(getContainer(), tx);
 			command.setAction(action);
 			tx.addCommand(command);
 

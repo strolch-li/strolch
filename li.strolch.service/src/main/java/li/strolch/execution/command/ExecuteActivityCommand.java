@@ -1,4 +1,4 @@
-package li.strolch.service.execution;
+package li.strolch.execution.command;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.activity.Activity;

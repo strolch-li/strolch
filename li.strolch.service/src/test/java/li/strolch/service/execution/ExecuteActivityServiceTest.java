@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import li.strolch.execution.service.ExecuteActivityService;
 import li.strolch.model.Locator;
 import li.strolch.model.State;
 import li.strolch.model.Tags;

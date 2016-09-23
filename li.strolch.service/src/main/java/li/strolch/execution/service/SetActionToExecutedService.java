@@ -1,13 +1,14 @@
-package li.strolch.service.execution;
+package li.strolch.execution.service;
 
-import li.strolch.model.activity.Activity;
+import li.strolch.execution.command.SetActionToExecutedCommand;
+import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.LocatorArgument;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 
-public class ExecuteActivityService extends AbstractService<LocatorArgument, ServiceResult> {
+public class SetActionToExecutedService extends AbstractService<LocatorArgument, ServiceResult> {
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -20,10 +21,10 @@ public class ExecuteActivityService extends AbstractService<LocatorArgument, Ser
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
-			Activity activity = tx.findElement(arg.locator);
+			Action action = tx.findElement(arg.locator);
 
-			ExecuteActivityCommand command = new ExecuteActivityCommand(getContainer(), tx);
-			command.setActivity(activity);
+			SetActionToExecutedCommand command = new SetActionToExecutedCommand(getContainer(), tx);
+			command.setAction(action);
 			tx.addCommand(command);
 
 			tx.commitOnClose();

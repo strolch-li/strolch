@@ -1,19 +1,20 @@
-package li.strolch.service.execution;
+package li.strolch.execution.command;
 
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.exception.StrolchException;
+import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 
-public class SetActionToExecutedCommand extends ExecutionCommand {
+public class StopActionCommand extends ExecutionCommand {
 
 	private Action action;
 
-	public SetActionToExecutedCommand(ComponentContainer container, StrolchTransaction tx) {
+	public StopActionCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
@@ -25,7 +26,7 @@ public class SetActionToExecutedCommand extends ExecutionCommand {
 	public void validate() {
 		DBC.PRE.assertNotNull("action can not be null", this.action);
 
-		if (this.action.getState() != State.EXECUTION && this.action.getState() != State.STOPPED) {
+		if (this.action.getState() != State.EXECUTION) {
 			String msg = "State {0} and canot be changed to {1} for action {2}";
 			msg = MessageFormat.format(msg, this.action.getState(), State.EXECUTED, this.action.getLocator());
 			throw new StrolchException(msg);
@@ -34,8 +35,9 @@ public class SetActionToExecutedCommand extends ExecutionCommand {
 
 	@Override
 	public void doCommand() {
-		ExecutionPolicy executionPolicy = getExecutionPolicy(this.action);
-		executionPolicy.executed(this.action);
+
+		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
+		executionPolicy.stop(this.action);
 	}
 
 	@Override

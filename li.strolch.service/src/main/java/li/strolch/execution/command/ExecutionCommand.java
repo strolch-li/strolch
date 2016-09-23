@@ -1,4 +1,4 @@
-package li.strolch.service.execution;
+package li.strolch.execution.command;
 
 import static li.strolch.utils.helper.StringHelper.DASH;
 
@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.exception.StrolchException;
+import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
