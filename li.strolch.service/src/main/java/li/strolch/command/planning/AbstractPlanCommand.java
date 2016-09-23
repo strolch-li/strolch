@@ -43,7 +43,7 @@ public abstract class AbstractPlanCommand extends Command {
 	 * @param container
 	 * @param tx
 	 */
-	public AbstractPlanCommand(final ComponentContainer container, final StrolchTransaction tx) {
+	public AbstractPlanCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
@@ -54,11 +54,11 @@ public abstract class AbstractPlanCommand extends Command {
 	 * @param action
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected void plan(final Action action) {
+	protected void plan(Action action) {
 
-		final Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId())
+		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId())
 				.build();
-		final Resource resource = tx().findElement(locator);
+		Resource resource = tx().findElement(locator);
 
 		if (resource == null)
 			throw new StrolchException("Resource with " + locator + " referenced by " + action.getLocator()
@@ -66,9 +66,9 @@ public abstract class AbstractPlanCommand extends Command {
 
 		tx().lock(resource);
 
-		final List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
-		for (final IValueChange<?> change : changes) {
-			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
+		List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
+		for (IValueChange<?> change : changes) {
+			StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change);
 		}
 
@@ -79,14 +79,14 @@ public abstract class AbstractPlanCommand extends Command {
 	 * plan an {@link Activity} by navigating to the {#link Action} and delegating the planning depending on the
 	 * {@link IActivityElement} class.
 	 */
-	protected void plan(final Activity activity) {
+	protected void plan(Activity activity) {
 		
 		// TODO Martin: Use a visitor pattern so we don't start with instanceof again...
 
-		final Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
+		Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
 
 		while (elementIterator.hasNext()) {
-			final IActivityElement activityElement = elementIterator.next().getValue();
+			IActivityElement activityElement = elementIterator.next().getValue();
 			if (activityElement instanceof Activity)
 				plan((Activity) activityElement);
 			else if (activityElement instanceof Action)
@@ -95,27 +95,27 @@ public abstract class AbstractPlanCommand extends Command {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected void unplan(final Action action) {
+	protected void unplan(Action action) {
 
-		final Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId())
+		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId())
 				.build();
-		final Resource resource = tx().findElement(locator);
+		Resource resource = tx().findElement(locator);
 
-		final List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
-		for (final IValueChange<?> change : changes) {
-			final StrolchTimedState timedState = resource.getTimedState(change.getStateId());
+		List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
+		for (IValueChange<?> change : changes) {
+			StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			timedState.applyChange(change.getInverse());
 		}
 
 		action.setState(State.CREATED);
 	}
 
-	protected void unplan(final Activity activity) {
+	protected void unplan(Activity activity) {
 
-		final Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
+		Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
 		while (elementIterator.hasNext()) {
 
-			final IActivityElement activityElement = elementIterator.next().getValue();
+			IActivityElement activityElement = elementIterator.next().getValue();
 
 			if (activityElement instanceof Activity)
 				unplan((Activity) activityElement);

@@ -16,6 +16,7 @@
 package li.strolch.model.policy;
 
 import li.strolch.exception.StrolchPolicyException;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * <p>
@@ -116,6 +117,8 @@ public abstract class PolicyDef {
 		if (xmlValue.startsWith(JavaPolicyDef.XML_PREFIX)) {
 
 			String value = xmlValue.substring(JavaPolicyDef.XML_PREFIX.length());
+			if (StringHelper.isEmpty(value))
+				throw new StrolchPolicyException("Invalid policy configuration. Policy value is empty for " + type);
 
 			try {
 				Class.forName(value);

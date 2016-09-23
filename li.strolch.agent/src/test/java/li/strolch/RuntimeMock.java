@@ -160,6 +160,10 @@ public class RuntimeMock implements AutoCloseable {
 		return this;
 	}
 
+	public void run(StrolchRunnable runnable) {
+		runnable.run(getAgent());
+	}
+
 	@Override
 	public void close() throws RuntimeException {
 		destroyRuntime();
@@ -180,8 +184,7 @@ public class RuntimeMock implements AutoCloseable {
 		try (RuntimeMock runtimeMock = new RuntimeMock(targetPath, srcPath)) {
 			runtimeMock.mockRuntime();
 			runtimeMock.startContainer();
-
-			runnable.run(runtimeMock.getAgent());
+			runtimeMock.run(runnable);
 		}
 	}
 

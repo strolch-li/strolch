@@ -15,18 +15,20 @@
  */
 package li.strolch.runtime.query.inmemory;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
+import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.timedstate.IntegerTimedState;
@@ -42,53 +44,125 @@ public class FindByLocatorTest {
 
 	private static final String PATH_FIND_BY_LOCATOR_RUNTIME = "target/FindByLocatorTest/";
 
-	@Test
-	public void shouldFindByLocator() {
-		RuntimeMock.runInStrolch(PATH_FIND_BY_LOCATOR_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER,
-				agent -> doLocatorTest(agent));
+	private static RuntimeMock runtimeMock;
+	private static Certificate certificate;
+
+	@BeforeClass
+	public static void beforeClass() {
+		runtimeMock = new RuntimeMock(PATH_FIND_BY_LOCATOR_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER);
+		runtimeMock.mockRuntime();
+		runtimeMock.startContainer();
+		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+
 	}
 
-	private void doLocatorTest(StrolchAgent agent) {
-		ComponentContainer container = agent.getContainer();
+	@Test
+	public void shouldFindByResource() {
+		runtimeMock.run(agent -> {
+			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
+					.openTx(certificate, "test")) {
 
-		Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".getBytes());
+				// Resource
+				Locator locResource = Locator.valueOf("Resource/TestType/MyTestResource");
+				Resource resource = tx.findElement(locResource);
+				assertNotNull("Should have found a FloatParameter with the locator " + locResource, resource);
 
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+				// Bag on Resource
+				Locator locResBag = Locator.valueOf("Resource/TestType/MyTestResource/Bag/@bag01");
+				ParameterBag resBag = tx.findElement(locResBag);
+				assertNotNull("Should have found a ParameterBag with the locator " + locResBag, resBag);
 
-			// Resource
-			Locator locResource = Locator.valueOf("Resource/TestType/MyTestResource");
-			Resource resource = tx.findElement(locResource);
-			assertNotNull("Should have found a FloatParameter with the locator " + locResource, resource);
+				// Parameter on Resource
+				Locator locResStringParam = Locator.valueOf("Resource/TestType/MyTestResource/Bag/@bag01/@param5");
+				StringParameter resStringParam = tx.findElement(locResStringParam);
+				assertNotNull("Should have found a StringParameter with the locator " + locResStringParam,
+						resStringParam);
 
-			// Order
-			Locator locOrder = Locator.valueOf("Order/TestType/MyTestOrder");
-			Order order = tx.findElement(locOrder);
-			assertNotNull("Should have found an Order with the locator " + locOrder, order);
+				// TimedState on Resource
+				Locator locResIntegerState = Locator.valueOf("Resource/TestType/MyTestResource/State/@integerState");
+				IntegerTimedState integerS = tx.findElement(locResIntegerState);
+				assertNotNull("Should have found a IntegerTimedState with the locator " + locResIntegerState, integerS);
 
-			// Bag on Resource
-			Locator locResBag = Locator.valueOf("Resource/TestType/MyTestResource/Bag/@bag01");
-			ParameterBag resBag = tx.findElement(locResBag);
-			assertNotNull("Should have found a ParameterBag with the locator " + locResBag, resBag);
+			}
+		});
+	}
 
-			// Bag on Order
-			Locator locOrdBag = Locator.valueOf("Order/TestType/MyTestOrder/Bag/@bag01");
-			ParameterBag ordBag = tx.findElement(locOrdBag);
-			assertNotNull("Should have found a ParameterBag with the locator " + ordBag, locOrdBag);
+	@Test
+	public void shouldFindByOrder() {
+		runtimeMock.run(agent -> {
+			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
+					.openTx(certificate, "test")) {
 
-			// Parameter on Resource
-			Locator locResStringParam = Locator.valueOf("Resource/TestType/MyTestResource/Bag/@bag01/@param5");
-			StringParameter resStringParam = tx.findElement(locResStringParam);
-			assertNotNull("Should have found a StringParameter with the locator " + locResStringParam, resStringParam);
+				// Order
+				Locator locOrder = Locator.valueOf("Order/TestType/MyTestOrder");
+				Order order = tx.findElement(locOrder);
+				assertNotNull("Should have found an Order with the locator " + locOrder, order);
 
-			// Parameter on Order
-			Locator locOrderFloatParam = Locator.valueOf("Order/TestType/MyTestOrder/Bag/@bag01/@param2");
-			FloatParameter orderFloatP = tx.findElement(locOrderFloatParam);
-			assertNotNull("Should have found a FloatParameter with the locator " + locOrderFloatParam, orderFloatP);
+				// Bag on Order
+				Locator locOrdBag = Locator.valueOf("Order/TestType/MyTestOrder/Bag/@bag01");
+				ParameterBag ordBag = tx.findElement(locOrdBag);
+				assertNotNull("Should have found a ParameterBag with the locator " + ordBag, locOrdBag);
 
-			// TimedState on Resource
-			Locator locResIntegerState = Locator.valueOf("Resource/TestType/MyTestResource/State/@integerState");
-			IntegerTimedState integerS = tx.findElement(locResIntegerState);
-			assertNotNull("Should have found a IntegerTimedState with the locator " + locResIntegerState, integerS);
-		}
+				// Parameter on Order
+				Locator locOrderFloatParam = Locator.valueOf("Order/TestType/MyTestOrder/Bag/@bag01/@param2");
+				FloatParameter orderFloatP = tx.findElement(locOrderFloatParam);
+				assertNotNull("Should have found a FloatParameter with the locator " + locOrderFloatParam, orderFloatP);
+
+			}
+		});
+	}
+
+	@Test
+	public void shouldFindByActivity() {
+		runtimeMock.run(agent -> {
+			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
+					.openTx(certificate, "test")) {
+
+				// Activity
+				Locator locActivity = Locator.valueOf("Activity/ActivityType/activity_1");
+				Activity activity = tx.findElement(locActivity);
+				assertNotNull("Should have found Activity with id activity_1", activity);
+				assertEquals("activity_1", activity.getId());
+				assertEquals(locActivity.toString(), activity.getLocator().toString());
+
+				// sub activity
+				Locator locAction = Locator.valueOf("Activity/ActivityType/activity_1/child_activity");
+				activity = tx.findElement(locAction);
+				assertNotNull("Should have found sub Activity with id child_activity", activity);
+				assertEquals("child_activity", activity.getId());
+				assertEquals(locAction.toString(), activity.getLocator().toString());
+
+			}
+		});
+	}
+
+	@Test
+	public void shouldFindByAction() {
+		runtimeMock.run(agent -> {
+			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
+					.openTx(certificate, "test")) {
+
+				// sub action
+				Locator locAction = Locator.valueOf("Activity/ActivityType/activity_1/action_1");
+				Action action = tx.findElement(locAction);
+				assertNotNull("Should have found Action with id action_1 on Activity activity_1", action);
+				assertEquals("action_1", action.getId());
+				assertEquals(locAction.toString(), action.getLocator().toString());
+
+				// sub sub action
+				locAction = Locator.valueOf("Activity/ActivityType/activity_1/child_activity/action_2");
+				action = tx.findElement(locAction);
+				assertNotNull("Should have found sub Activity with id child_activity", action);
+				assertEquals("action_2", action.getId());
+				assertEquals(locAction.toString(), action.getLocator().toString());
+
+				// sub sub action
+				locAction = Locator.valueOf("Activity/ActivityType/activity_1/child_activity/action_3");
+				action = tx.findElement(locAction);
+				assertNotNull("Should have found sub Activity with id child_activity", action);
+				assertEquals("action_3", action.getId());
+				assertEquals(locAction.toString(), action.getLocator().toString());
+			}
+		});
 	}
 }

@@ -65,9 +65,12 @@ public class Activity extends GroupedParameterizedElement
 	/**
 	 * Default constructor
 	 *
-	 * @param id the id
-	 * @param name the name
-	 * @param type the type
+	 * @param id
+	 *            the id
+	 * @param name
+	 *            the name
+	 * @param type
+	 *            the type
 	 */
 	public Activity(String id, String name, String type, TimeOrdering timeOrdering) {
 		super(id, name, type);
@@ -261,7 +264,11 @@ public class Activity extends GroupedParameterizedElement
 
 	@Override
 	protected void fillLocator(LocatorBuilder locatorBuilder) {
-		locatorBuilder.append(Tags.ACTIVITY).append(getType()).append(getId());
+		if (this.parent != null)
+			this.parent.fillLocator(locatorBuilder);
+		else
+			locatorBuilder.append(Tags.ACTIVITY).append(getType());
+		locatorBuilder.append(getId());
 	}
 
 	@Override

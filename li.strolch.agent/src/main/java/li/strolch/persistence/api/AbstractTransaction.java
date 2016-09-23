@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -50,6 +51,7 @@ import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
@@ -368,8 +370,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			return (T) groupedParameterizedElement;
 
 		// state or bag
-		String stateOrBag = elements.get(3);
-		if (stateOrBag.equals(Tags.BAG)) {
+		String stateOrBagOrActivity = elements.get(3);
+		if (stateOrBagOrActivity.equals(Tags.BAG)) {
 
 			String parameterBagId = elements.get(4);
 			ParameterBag bag = groupedParameterizedElement.getParameterBag(parameterBagId);
@@ -386,7 +388,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			Parameter<?> parameter = bag.getParameter(parameterId);
 			return (T) parameter;
 
-		} else if (stateOrBag.equals(Tags.STATE)) {
+		} else if (stateOrBagOrActivity.equals(Tags.STATE)) {
 
 			if (elements.size() != 5) {
 				String msg = "Missing state Id on locator {0}"; //$NON-NLS-1$
@@ -398,10 +400,29 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			StrolchTimedState<IValue<?>> timedState = resource.getTimedState(stateId);
 			return (T) timedState;
+
+		} else if (groupedParameterizedElement instanceof Activity) {
+
+			Activity activity = (Activity) groupedParameterizedElement;
+
+			Iterator<String> iter = elements.subList(3, elements.size()).iterator();
+			IActivityElement element = activity;
+			while (iter.hasNext()) {
+				String next = iter.next();
+
+				if (!(element instanceof Activity)) {
+					String msg = "Invalid locator {0} with part {1} as not an Activity but deeper element specified"; //$NON-NLS-1$
+					throw new StrolchException(MessageFormat.format(msg, locator, next));
+				}
+
+				element = ((Activity) element).getElement(next);
+			}
+
+			return (T) element;
 		}
 
-		String msg = "Invalid locator {0} on with part {1}"; //$NON-NLS-1$
-		throw new StrolchException(MessageFormat.format(msg, locator, stateOrBag));
+		String msg = "Invalid locator {0} with part {1}"; //$NON-NLS-1$
+		throw new StrolchException(MessageFormat.format(msg, locator, stateOrBagOrActivity));
 	}
 
 	@Override
