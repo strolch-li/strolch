@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="https://www.strolch.li/xsd/StrolchModel.xsd" xmlns="https://www.strolch.li/xsd/StrolchModel.xsd"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="https://www.strolch.li/xsd/StrolchModel-1.4.xsd" xmlns="https://www.strolch.li/xsd/StrolchModel-1.4.xsd"
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	<xs:annotation>
-		<xs:documentation>This is Version 1.4.0-SNAPSHOT of the StrolchModel XSD.</xs:documentation>
+		<xs:documentation>This is Version 1.4.x of the StrolchModel XSD.</xs:documentation>
 	</xs:annotation>
 
 	<xs:element name="StrolchModel" type="StrolchModelType" />
