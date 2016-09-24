@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.command.plan;
+package li.strolch.planning;
 
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
@@ -30,8 +30,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import li.strolch.command.planning.AssignActionCommand;
-import li.strolch.command.planning.PlanActionCommand;
 import li.strolch.model.Locator;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.ParameterBag;
@@ -50,6 +48,8 @@ import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.planning.AssignActionCommand;
+import li.strolch.planning.PlanActionCommand;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>

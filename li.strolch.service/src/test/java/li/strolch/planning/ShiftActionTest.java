@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.command.plan;
+package li.strolch.planning;
 
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
 import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_0;
 import static li.strolch.model.ModelGenerator.STATE_TIME_10;
 import static li.strolch.model.ModelGenerator.STATE_TIME_20;
+import static li.strolch.model.ModelGenerator.STATE_TIME_30;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -30,7 +31,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import li.strolch.command.planning.PlanActionCommand;
 import li.strolch.model.Locator;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.ParameterBag;
@@ -49,23 +49,27 @@ import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.planning.PlanActionCommand;
+import li.strolch.planning.ShiftActionCommand;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public class PlanActionTest {
+public class ShiftActionTest {
 
 	private Resource resource;
 	private Action action;
+	private IntegerTimedState timedState;
+	private StrolchTransaction tx;
 
 	@Before
 	public void init() {
 
 		// add a resource with integer state variable
 		this.resource = ModelGenerator.createResource("@1", "Test With States", "Stated");
-		IntegerTimedState timedState = this.resource.getTimedState(STATE_INTEGER_ID);
-		timedState.getTimeEvolution().clear();
-		timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
+		this.timedState = this.resource.getTimedState(STATE_INTEGER_ID);
+		this.timedState.getTimeEvolution().clear();
+		this.timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
 
 		this.action = new Action("action", "Action", "Use");
 
@@ -79,54 +83,63 @@ public class PlanActionTest {
 
 		this.action.setResourceId(this.resource.getId());
 		this.action.setResourceType(this.resource.getType());
+
+		this.tx = mock(StrolchTransaction.class);
+
+		Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
+		when(this.tx.findElement(eq(locator))).thenReturn(this.resource);
+
+		PlanActionCommand cmd = new PlanActionCommand(null, this.tx);
+		cmd.setAction(this.action);
+		cmd.doCommand();
+
 	}
 
 	@Test
 	public void test() {
 
-		try (StrolchTransaction tx = mock(StrolchTransaction.class)) {
+		ShiftActionCommand cmd = new ShiftActionCommand(null, this.tx);
+		cmd.setAction(this.action);
+		cmd.setShift(10L);
+		cmd.doCommand();
 
-			Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
-			when(tx.findElement(eq(locator))).thenReturn(this.resource);
+		// check the state
+		Assert.assertEquals(State.PLANNED, this.action.getState());
 
-			PlanActionCommand cmd = new PlanActionCommand(null, tx);
-			cmd.setAction(this.action);
-			cmd.doCommand();
+		// check the resource Id
+		Assert.assertEquals(this.resource.getId(), this.action.getResourceId());
 
-			// check the state
-			Assert.assertEquals(State.PLANNED, this.action.getState());
+		// check if we get the expected result
+		StrolchTimedState<IValue<Integer>> timedState = this.resource.getTimedState(STATE_INTEGER_ID);
+		ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
+		SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
 
-			// check the resource Id
-			Assert.assertEquals(this.resource.getId(), this.action.getResourceId());
+		Assert.assertEquals(3, values.size());
 
-			// check if we get the expected result
-			StrolchTimedState<IValue<Integer>> timedState = this.resource.getTimedState(STATE_INTEGER_ID);
-			ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
-			SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
+		ITimeValue<IValue<Integer>> valueAt = timeEvolution.getValueAt(STATE_TIME_0);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
 
-			Assert.assertEquals(3, values.size());
+		valueAt = timeEvolution.getValueAt(STATE_TIME_10);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
 
-			ITimeValue<IValue<Integer>> valueAt = timeEvolution.getValueAt(STATE_TIME_0);
-			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
+		valueAt = timeEvolution.getValueAt(STATE_TIME_20);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(1)));
 
-			valueAt = timeEvolution.getValueAt(STATE_TIME_10);
-			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(1)));
+		valueAt = timeEvolution.getValueAt(STATE_TIME_30);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
 
-			valueAt = timeEvolution.getValueAt(STATE_TIME_20);
-			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
+		// check the undo functionality
+		cmd.undo();
 
-			// call undo to clean up
-			cmd.undo();
+		valueAt = timeEvolution.getValueAt(STATE_TIME_0);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
 
-			Assert.assertEquals(State.CREATED, this.action.getState());
+		valueAt = timeEvolution.getValueAt(STATE_TIME_10);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(1)));
 
-			// and check again
-			values = timeEvolution.getValues();
-			Assert.assertEquals(1, values.size());
+		valueAt = timeEvolution.getValueAt(STATE_TIME_20);
+		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
 
-			valueAt = timeEvolution.getValueAt(STATE_TIME_0);
-			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
-		}
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package li.strolch.service.execution;
+package li.strolch.execution;
 
 import static org.junit.Assert.assertEquals;
 

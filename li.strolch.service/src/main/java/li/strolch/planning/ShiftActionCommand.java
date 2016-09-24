@@ -13,32 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.command.planning;
+package li.strolch.planning;
+
+import java.util.List;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.model.Resource;
-import li.strolch.model.activity.Action;
+import li.strolch.model.State;
+import li.strolch.model.timevalue.IValue;
+import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 
 /**
- * Command to assign an {@link Action} to a new {@link Resource}.
- * 
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public class AssignActionCommand extends PlanActionCommand {
+public class ShiftActionCommand extends PlanActionCommand {
 
-	private String targetResourceType;
-	private String targetResourceId;
-
-	private String initialResourceType;
-	private String initialResourceId;
+	private Long shift;
 
 	/**
 	 * @param container
 	 * @param tx
 	 */
-	public AssignActionCommand(final ComponentContainer container, final StrolchTransaction tx) {
+	public ShiftActionCommand(final ComponentContainer container, final StrolchTransaction tx) {
 		super(container, tx);
 	}
 
@@ -47,8 +44,7 @@ public class AssignActionCommand extends PlanActionCommand {
 		DBC.PRE.assertNotNull("Action may not be null!", this.action);
 		DBC.PRE.assertNotNull("Action attribute resourceId may not be null!", action.getResourceId());
 		DBC.PRE.assertNotNull("Action attribute resourceType may not be null!", action.getResourceType());
-		DBC.PRE.assertNotNull("Target resourceId may not be null!", targetResourceId);
-		DBC.PRE.assertNotNull("Target resourceType may not be null!", targetResourceType);
+		DBC.PRE.assertNotNull("The time to shift the action may not be null!", shift);
 	}
 
 	@Override
@@ -56,43 +52,39 @@ public class AssignActionCommand extends PlanActionCommand {
 
 		validate();
 
-		// bookkeeping for undo
-		initialResourceId = action.getResourceId();
-		initialResourceType = action.getResourceType();
-
 		// unplan the action
-		unplan(action);
+		if (action.getState() == State.PLANNED)
+			unplan(action);
 
-		// set target resource
-		action.setResourceId(targetResourceId);
-		action.setResourceType(targetResourceType);
+		// iterate all changes and shift
+		final List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
+		for (final IValueChange<?> change : changes) {
+			change.setTime(change.getTime() + shift);
+		}
 
-		// finally plan the action to the assigned resource
+		// finally plan the action
 		plan(action);
+
 	}
 
 	@Override
 	public void undo() {
 
-		validate();
-
 		// unplan the action
-		unplan(action);
+		if (action.getState() == State.PLANNED)
+			unplan(action);
 
-		// set target resource
-		action.setResourceId(initialResourceId);
-		action.setResourceType(initialResourceType);
+		// iterate all changes and shift
+		final List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
+		for (final IValueChange<?> change : changes) {
+			change.setTime(change.getTime() - shift);
+		}
 
 		// finally plan the action
 		plan(action);
 	}
 
-	public void setTargetResourceType(String type) {
-		this.targetResourceType = type;
+	public void setShift(Long shift) {
+		this.shift = shift;
 	}
-
-	public void setTargetResourceId(String id) {
-		this.targetResourceId = id;
-	}
-
 }

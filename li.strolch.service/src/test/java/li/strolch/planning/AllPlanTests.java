@@ -1,4 +1,4 @@
-package li.strolch.command.plan;
+package li.strolch.planning;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
