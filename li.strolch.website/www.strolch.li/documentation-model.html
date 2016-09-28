@@ -94,7 +94,7 @@
     &lt;/Policies&gt;
   &lt;/Resource&gt;
 
-  &lt;Activity Id="activity_1" Name="Activity" Type="parentType"&gt;
+  &lt;Activity Id="activity_1" Name="Activity" Type="parentType" TimeOrdering="Series"&gt;
     &lt;Version Version="0" CreatedBy="test" CreatedAt="2012-11-30T18:12:05.628+01:00" Deleted="false"/&gt;
     &lt;ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag"&gt;
       &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/&gt;
@@ -114,7 +114,7 @@
       &lt;ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer"/&gt;
       &lt;ValueChange StateId="dummyId" Time="2012-11-30T18:12:06.628+01:00" Value="6" Type="Integer"/&gt;
     &lt;/Action&gt;
-    &lt;Activity Id="child_activity" Name="Child Activity" Type="childType"&gt;
+    &lt;Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series"&gt;
       &lt;ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag"&gt;
         &lt;Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/&gt;
       &lt;/ParameterBag&gt;
