@@ -24,10 +24,10 @@
 	</xs:complexType>
 
 	<xs:complexType name="VersionType">
-		<xs:attribute type="xs:int" name="Version" />
-		<xs:attribute type="xs:string" name="CreatedBy" />
-		<xs:attribute type="xs:dateTime" name="CreatedAt" />
-		<xs:attribute type="xs:string" name="Deleted" />
+		<xs:attribute type="xs:int" name="Version" use="required" />
+		<xs:attribute type="xs:string" name="CreatedBy" use="required" />
+		<xs:attribute type="xs:dateTime" name="CreatedAt" use="required" />
+		<xs:attribute type="xs:string" name="Deleted" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="OrderType">
@@ -36,10 +36,10 @@
 			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0" />
 			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0" />
 		</xs:sequence>
-		<xs:attribute type="xs:string" name="Id" />
-		<xs:attribute type="xs:string" name="Name" />
-		<xs:attribute type="xs:string" name="Type" />
-		<xs:attribute type="StateType" name="State" />
+		<xs:attribute type="xs:string" name="Id" use="required" />
+		<xs:attribute type="xs:string" name="Name" use="required" />
+		<xs:attribute type="xs:string" name="Type" use="required" />
+		<xs:attribute type="StateType" name="State" use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="ResourceType">
@@ -49,9 +49,9 @@
 			<xs:element type="TimedStateType" name="TimedState" maxOccurs="unbounded" minOccurs="0" />
 			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0" />
 		</xs:sequence>
-		<xs:attribute type="xs:string" name="Id" />
-		<xs:attribute type="xs:string" name="Name" />
-		<xs:attribute type="xs:string" name="Type" />
+		<xs:attribute type="xs:string" name="Id" use="required" />
+		<xs:attribute type="xs:string" name="Name" use="required" />
+		<xs:attribute type="xs:string" name="Type" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="ActivityType">
@@ -66,11 +66,10 @@
 				</xs:choice>
 			</xs:sequence>
 		</xs:sequence>
-		<xs:attribute type="xs:string" name="Id" />
-		<xs:attribute type="xs:string" name="Name" />
-		<xs:attribute type="xs:string" name="Type" />
-		<xs:attribute type="StateType" name="State" />
-		<xs:attribute type="TimeOrderingType" name="TimeOrdering" />
+		<xs:attribute type="xs:string" name="Id" use="required" />
+		<xs:attribute type="xs:string" name="Name" use="required" />
+		<xs:attribute type="xs:string" name="Type" use="required" />
+		<xs:attribute type="TimeOrderingType" name="TimeOrdering" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="ActionType">
@@ -79,28 +78,28 @@
 			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0" />
 			<xs:element type="ValueChangeType" name="ValueChange" maxOccurs="unbounded" minOccurs="0" />
 		</xs:sequence>
-		<xs:attribute type="xs:string" name="Id" />
-		<xs:attribute type="xs:string" name="Name" />
-		<xs:attribute type="xs:string" name="ResourceId" />
-		<xs:attribute type="xs:string" name="ResourceType" />
-		<xs:attribute type="StateType" name="State" />
-		<xs:attribute type="xs:string" name="Type" />
+		<xs:attribute type="xs:string" name="Id" use="required" />
+		<xs:attribute type="xs:string" name="Name" use="required" />
+		<xs:attribute type="xs:string" name="ResourceId" use="required" />
+		<xs:attribute type="xs:string" name="ResourceType" use="required" />
+		<xs:attribute type="StateType" name="State" use="optional" />
+		<xs:attribute type="xs:string" name="Type" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="ParameterBagType">
 		<xs:sequence>
 			<xs:element type="ParameterType" name="Parameter" maxOccurs="unbounded" minOccurs="0" />
 		</xs:sequence>
-		<xs:attribute type="xs:string" name="Id" />
-		<xs:attribute type="xs:string" name="Name" />
-		<xs:attribute type="xs:string" name="Type" />
+		<xs:attribute type="xs:string" name="Id" use="required" />
+		<xs:attribute type="xs:string" name="Name" use="required" />
+		<xs:attribute type="xs:string" name="Type" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="ParameterType">
-		<xs:attribute type="xs:string" name="Id" />
-		<xs:attribute type="xs:string" name="Name" />
-		<xs:attribute type="ParameterValueType" name="Type" />
-		<xs:attribute type="xs:string" name="Value" />
+		<xs:attribute type="xs:string" name="Id" use="required" />
+		<xs:attribute type="xs:string" name="Name" use="required" />
+		<xs:attribute type="ParameterValueType" name="Type" use="required" />
+		<xs:attribute type="xs:string" name="Value" use="required" />
 		<xs:attribute type="xs:string" name="Interpretation" use="optional" />
 		<xs:attribute type="xs:string" name="Uom" use="optional" />
 		<xs:attribute type="xs:boolean" name="Hidden" use="optional" />
@@ -114,29 +113,29 @@
 	</xs:complexType>
 
 	<xs:complexType name="PolicyType">
-		<xs:attribute type="xs:string" name="Type" />
-		<xs:attribute type="xs:string" name="Value" />
+		<xs:attribute type="xs:string" name="Type" use="required" />
+		<xs:attribute type="xs:string" name="Value" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="TimedStateType">
 		<xs:sequence>
 			<xs:element type="ValueType" name="Value" maxOccurs="unbounded" minOccurs="0" />
 		</xs:sequence>
-		<xs:attribute type="xs:string" name="Id" />
-		<xs:attribute type="xs:string" name="Name" />
-		<xs:attribute type="TimedStateTypeType" name="Type" />
+		<xs:attribute type="xs:string" name="Id" use="required" />
+		<xs:attribute type="xs:string" name="Name" use="required" />
+		<xs:attribute type="TimedStateTypeType" name="Type" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="ValueType">
-		<xs:attribute type="xs:dateTime" name="Time" />
-		<xs:attribute type="xs:string" name="Value" />
+		<xs:attribute type="xs:dateTime" name="Time" use="required" />
+		<xs:attribute type="xs:string" name="Value" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="ValueChangeType">
-		<xs:attribute type="xs:string" name="StateId" />
-		<xs:attribute type="xs:dateTime" name="Time" />
-		<xs:attribute type="xs:string" name="Value" />
-		<xs:attribute type="TimedStateTypeType" name="Type" />
+		<xs:attribute type="xs:string" name="StateId" use="required" />
+		<xs:attribute type="xs:dateTime" name="Time" use="required" />
+		<xs:attribute type="xs:string" name="Value" use="required" />
+		<xs:attribute type="TimedStateTypeType" name="Type" use="required" />
 	</xs:complexType>
 
 	<xs:simpleType name="StateType">
