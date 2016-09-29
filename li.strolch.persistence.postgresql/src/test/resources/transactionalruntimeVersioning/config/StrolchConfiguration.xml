@@ -24,7 +24,9 @@
 			<Properties>
 				<dataStoreMode>TRANSACTIONAL</dataStoreMode>
 				<enableAuditTrail>true</enableAuditTrail>
+				<enableObserverUpdates>true</enableObserverUpdates>
 				<enableVersioning>true</enableVersioning>
+				<dataStoreFile>StrolchModel.xml</dataStoreFile>
 			</Properties>
 		</Component>
 		<Component>
@@ -32,6 +34,7 @@
 			<api>li.strolch.persistence.api.PersistenceHandler</api>
 			<impl>li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler</impl>
 			<Properties>
+				<allowDataInitOnSchemaCreate>true</allowDataInitOnSchemaCreate>
 				<allowSchemaCreation>true</allowSchemaCreation>
 				<allowSchemaDrop>true</allowSchemaDrop>
 				<db.url>jdbc:postgresql://localhost/testdb</db.url>

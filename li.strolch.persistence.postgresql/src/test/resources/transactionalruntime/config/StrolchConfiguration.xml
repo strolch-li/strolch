@@ -24,6 +24,8 @@
 			<Properties>
 				<dataStoreMode>TRANSACTIONAL</dataStoreMode>
 				<enableAuditTrail>true</enableAuditTrail>
+				<enableObserverUpdates>true</enableObserverUpdates>
+				<dataStoreFile>StrolchModel.xml</dataStoreFile>
 			</Properties>
 		</Component>
 		<Component>

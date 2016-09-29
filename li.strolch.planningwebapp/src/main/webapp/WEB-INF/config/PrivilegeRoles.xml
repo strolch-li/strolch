@@ -5,6 +5,7 @@
 		<Privilege name="li.strolch.privilege.handler.SystemAction" policy="DefaultPrivilege">
 			<Allow>li.strolch.runtime.privilege.StrolchSystemAction</Allow>
 			<Allow>li.strolch.runtime.privilege.StrolchSystemActionWithResult</Allow>
+			<Allow>li.strolch.persistence.postgresql.PostgreSqlSchemaInitializer</Allow>
 		</Privilege>
 		<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
