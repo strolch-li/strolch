@@ -63,7 +63,7 @@ public class PrivilegePolicyHelper {
 		// first check values not allowed
 		if (privilege.isDenied(privilegeValue)) {
 			// then throw access denied
-			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
 					ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
 			throw new AccessDeniedException(msg);
 		}
@@ -73,7 +73,7 @@ public class PrivilegePolicyHelper {
 			return;
 
 		// default is not allowed
-		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
+		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
 				ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
 		throw new AccessDeniedException(msg);
 	}

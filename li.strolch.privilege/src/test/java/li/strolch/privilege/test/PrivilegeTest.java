@@ -201,7 +201,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	public void testPerformSystemRestrictableFailNoAdditionalPrivilege() throws Exception {
 		this.exception.expect(PrivilegeException.class);
 		this.exception.expectMessage(
-				"User system_admin2 does not have the privilege li.strolch.privilege.handler.SystemAction needed for Restrictable li.strolch.privilege.test.model.TestSystemUserActionDeny");
+				"User system_admin2 does not have the privilege li.strolch.privilege.handler.SystemAction with value li.strolch.privilege.test.model.TestSystemUserActionDeny needed for Restrictable li.strolch.privilege.test.model.TestSystemUserActionDeny");
 		try {
 			// create the action to be performed as a system user
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
