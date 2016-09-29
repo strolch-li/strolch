@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Roles>
 	<Role name="agent">
-		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
-			<Allow>li.strolch.agent.impl.StartRealms</Allow>
+		<Privilege name="li.strolch.privilege.handler.SystemAction" policy="DefaultPrivilege">
+			<Allow>li.strolch.runtime.privilege.StrolchSystemAction</Allow>
+			<Allow>li.strolch.runtime.privilege.StrolchSystemActionWithResult</Allow>
 		</Privilege>
 	</Role>
 	<Role name="AppUser">

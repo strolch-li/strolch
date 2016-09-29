@@ -22,7 +22,6 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -135,14 +134,10 @@ public class MigrationsHandler extends StrolchComponent {
 		if (this.runMigrationsOnStart && this.migrations != null) {
 
 			CurrentMigrationVersionQuery query = new CurrentMigrationVersionQuery(getContainer());
-			QueryCurrentVersionsAction queryAction = new QueryCurrentVersionsAction(query);
 			PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
-			privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, queryAction);
+			privilegeHandler.runAsAgent(ctx -> query.doQuery(ctx.getCertificate()));
 			Map<String, MigrationVersion> currentVersions = query.getCurrentVersions();
-
-			RunMigrationsAction action = new RunMigrationsAction(this.migrations, currentVersions);
-
-			privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, action);
+			privilegeHandler.runAsAgent(ctx -> migrations.runMigrations(ctx.getCertificate(), currentVersions));
 		}
 
 		super.start();
@@ -182,9 +177,8 @@ public class MigrationsHandler extends StrolchComponent {
 			migrations.parseMigrations(MigrationsHandler.this.migrationsPath);
 
 			CurrentMigrationVersionQuery query = new CurrentMigrationVersionQuery(getContainer());
-			QueryCurrentVersionsAction queryAction = new QueryCurrentVersionsAction(query);
 			PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
-			privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, queryAction);
+			privilegeHandler.runAsAgent(ctx -> query.doQuery(ctx.getCertificate()));
 			Map<String, MigrationVersion> currentVersions = query.getCurrentVersions();
 
 			MigrationsHandler.this.migrations = migrations;
@@ -192,9 +186,7 @@ public class MigrationsHandler extends StrolchComponent {
 				if (verbose)
 					logger.info("There are no migrations required at the moment!");
 			} else {
-				RunMigrationsAction runMigrationsAction = new RunMigrationsAction(MigrationsHandler.this.migrations,
-						currentVersions);
-				privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_AGENT, runMigrationsAction);
+				privilegeHandler.runAsAgent(ctx -> migrations.runMigrations(ctx.getCertificate(), currentVersions));
 			}
 		}
 	}

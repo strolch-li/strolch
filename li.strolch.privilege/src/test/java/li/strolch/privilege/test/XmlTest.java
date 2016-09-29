@@ -265,12 +265,12 @@ public class XmlTest {
 		assertEquals("system_admin_privileges", systemAdminPrivileges.getName());
 		assertEquals(2, systemAdminPrivileges.getPrivilegeNames().size());
 		assertThat(systemAdminPrivileges.getPrivilegeNames(),
-				containsInAnyOrder("li.strolch.privilege.handler.SystemUserAction",
+				containsInAnyOrder("li.strolch.privilege.handler.SystemAction",
 						"li.strolch.privilege.test.model.TestSystemRestrictable"));
 
 		IPrivilege testSystemUserAction = systemAdminPrivileges
-				.getPrivilege("li.strolch.privilege.handler.SystemUserAction");
-		assertEquals("li.strolch.privilege.handler.SystemUserAction", testSystemUserAction.getName());
+				.getPrivilege("li.strolch.privilege.handler.SystemAction");
+		assertEquals("li.strolch.privilege.handler.SystemAction", testSystemUserAction.getName());
 		assertEquals("DefaultPrivilege", testSystemUserAction.getPolicy());
 		assertFalse(testSystemUserAction.isAllAllowed());
 		assertEquals(1, testSystemUserAction.getAllowList().size());
@@ -289,11 +289,11 @@ public class XmlTest {
 		assertEquals("restrictedRole", restrictedRole.getName());
 		assertEquals(1, restrictedRole.getPrivilegeNames().size());
 		assertThat(restrictedRole.getPrivilegeNames(),
-				containsInAnyOrder("li.strolch.privilege.handler.SystemUserAction"));
+				containsInAnyOrder("li.strolch.privilege.handler.SystemAction"));
 
 		IPrivilege testSystemUserAction2 = restrictedRole
-				.getPrivilege("li.strolch.privilege.handler.SystemUserAction");
-		assertEquals("li.strolch.privilege.handler.SystemUserAction", testSystemUserAction2.getName());
+				.getPrivilege("li.strolch.privilege.handler.SystemAction");
+		assertEquals("li.strolch.privilege.handler.SystemAction", testSystemUserAction2.getName());
 		assertEquals("DefaultPrivilege", testSystemUserAction2.getPolicy());
 		assertFalse(testSystemUserAction2.isAllAllowed());
 		assertEquals(1, testSystemUserAction2.getAllowList().size());

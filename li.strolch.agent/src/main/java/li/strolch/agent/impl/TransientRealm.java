@@ -118,7 +118,7 @@ public class TransientRealm extends InternalStrolchRealm {
 	public void start(PrivilegeContext privilegeContext) {
 
 		ModelStatistics statistics;
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			InMemoryElementListener elementListener = new InMemoryElementListener(tx);
 
 			// explicitly deny updating, so that we can detect XML files with duplicates

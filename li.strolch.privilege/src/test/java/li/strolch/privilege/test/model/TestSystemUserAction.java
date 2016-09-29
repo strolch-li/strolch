@@ -15,14 +15,14 @@
  */
 package li.strolch.privilege.test.model;
 
-import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.handler.SystemAction;
 import li.strolch.privilege.model.PrivilegeContext;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class TestSystemUserAction extends SystemUserAction {
+public class TestSystemUserAction extends SystemAction {
 
 	@Override
 	public void execute(PrivilegeContext context) {

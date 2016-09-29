@@ -51,6 +51,7 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.IPrivilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.PrivilegeRep;
+import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.model.RoleRep;
 import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.privilege.model.Usage;
@@ -1695,38 +1696,58 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public <T extends SystemUserAction> T runAsSystem(String systemUsername, T action) throws PrivilegeException {
+	public void runAs(String username, SystemAction action) throws PrivilegeException {
 
-		if (systemUsername == null)
-			throw new PrivilegeException("systemUsername may not be null!"); //$NON-NLS-1$
-		if (action == null)
-			throw new PrivilegeException("action may not be null!"); //$NON-NLS-1$
-
-		// get the system user
-		User systemUser = this.persistenceHandler.getUser(systemUsername);
-		if (systemUser == null)
-			throw new PrivilegeException(MessageFormat.format("System user {0} does not exist!", systemUsername)); //$NON-NLS-1$
-
-		// validate this is a system user
-		if (systemUser.getUserState() != UserState.SYSTEM)
-			throw new PrivilegeException(MessageFormat.format("User {0} is not a System user!", systemUsername)); //$NON-NLS-1$
-
-		// get privilegeContext for this system user
-		PrivilegeContext systemUserPrivilegeContext = getSystemUserPrivilegeContext(systemUsername);
-
-		// validate this system user may perform the given action
-		systemUserPrivilegeContext.validateAction(action);
+		PrivilegeContext systemUserPrivilegeContext = initiateSystemPrivilege(username, action);
 
 		String sessionId = systemUserPrivilegeContext.getCertificate().getSessionId();
-		this.privilegeContextMap.put(sessionId, systemUserPrivilegeContext);
 		try {
 			// perform the action
 			action.execute(systemUserPrivilegeContext);
 		} finally {
 			this.privilegeContextMap.remove(sessionId);
 		}
+	}
 
-		return action;
+	@Override
+	public <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException {
+
+		PrivilegeContext systemUserPrivilegeContext = initiateSystemPrivilege(username, action);
+
+		String sessionId = systemUserPrivilegeContext.getCertificate().getSessionId();
+		try {
+			// perform the action
+			return action.execute(systemUserPrivilegeContext);
+		} finally {
+			this.privilegeContextMap.remove(sessionId);
+		}
+	}
+
+	private <T> PrivilegeContext initiateSystemPrivilege(String username, Restrictable restrictable) {
+		if (username == null)
+			throw new PrivilegeException("systemUsername may not be null!"); //$NON-NLS-1$
+		if (restrictable == null)
+			throw new PrivilegeException("action may not be null!"); //$NON-NLS-1$
+
+		// get the system user
+		User systemUser = this.persistenceHandler.getUser(username);
+		if (systemUser == null)
+			throw new PrivilegeException(MessageFormat.format("System user {0} does not exist!", username)); //$NON-NLS-1$
+
+		// validate this is a system user
+		if (systemUser.getUserState() != UserState.SYSTEM)
+			throw new PrivilegeException(MessageFormat.format("User {0} is not a System user!", username)); //$NON-NLS-1$
+
+		// get privilegeContext for this system user
+		PrivilegeContext systemUserPrivilegeContext = getSystemUserPrivilegeContext(username);
+
+		// validate this system user may perform the given action
+		systemUserPrivilegeContext.validateAction(restrictable);
+
+		String sessionId = systemUserPrivilegeContext.getCertificate().getSessionId();
+		this.privilegeContextMap.put(sessionId, systemUserPrivilegeContext);
+
+		return systemUserPrivilegeContext;
 	}
 
 	/**

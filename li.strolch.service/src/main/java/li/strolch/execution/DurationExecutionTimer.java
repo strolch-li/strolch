@@ -12,7 +12,6 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.execution.service.SetActionToExecutedService;
 import li.strolch.model.Locator;
 import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.privilege.RunAsAgent;
 import li.strolch.service.LocatorArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
@@ -66,10 +65,10 @@ public class DurationExecutionTimer {
 		arg.realm = realm;
 		arg.locator = locator;
 
-		ServiceHandler svcHandler = container.getComponent(ServiceHandler.class);
-		RunAsAgent<LocatorArgument, ServiceResult> runAsAgent = new RunAsAgent<>(svcHandler, svc, arg);
-
-		container.getPrivilegeHandler().runAsSystem(StrolchConstants.PRIVILEGED_SYSTEM_USER, runAsAgent);
+		container.getPrivilegeHandler().runAsAgent(ctx -> {
+			ServiceHandler svcHandler = container.getComponent(ServiceHandler.class);
+			ServiceResult result = svcHandler.doService(ctx.getCertificate(), svc, arg);
+		});
 	}
 
 	private class SimulationTask extends TimerTask {

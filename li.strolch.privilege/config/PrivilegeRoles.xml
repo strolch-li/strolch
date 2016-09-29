@@ -71,7 +71,7 @@
 	</Role>
 
 	<Role name="system_admin_privileges">
-		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
+		<Privilege name="li.strolch.privilege.handler.SystemAction" policy="DefaultPrivilege">
 			<Allow>li.strolch.privilege.test.model.TestSystemUserAction</Allow>
 			<Deny>li.strolch.privilege.test.model.TestSystemUserActionDeny</Deny>
 		</Privilege>
@@ -81,7 +81,7 @@
 	</Role>
 
 	<Role name="restrictedRole">
-		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
+		<Privilege name="li.strolch.privilege.handler.SystemAction" policy="DefaultPrivilege">
 			<Allow>hello</Allow>
 			<Deny>goodbye</Deny>
 		</Privilege>

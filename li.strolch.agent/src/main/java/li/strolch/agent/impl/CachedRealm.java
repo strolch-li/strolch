@@ -113,7 +113,7 @@ public class CachedRealm extends InternalStrolchRealm {
 		int nrOfResources = 0;
 		int nrOfActivities = 0;
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			ResourceDao resourceDao = tx.getPersistenceHandler().getResourceDao(tx);
 			Set<String> resourceTypes = resourceDao.queryTypes();
 			for (String type : resourceTypes) {
@@ -127,7 +127,7 @@ public class CachedRealm extends InternalStrolchRealm {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			OrderDao orderDao = tx.getPersistenceHandler().getOrderDao(tx);
 			Set<String> orderTypes = orderDao.queryTypes();
 			for (String type : orderTypes) {
@@ -141,7 +141,7 @@ public class CachedRealm extends InternalStrolchRealm {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			ActivityDao activityDao = tx.getPersistenceHandler().getActivityDao(tx);
 			Set<String> activityTypes = activityDao.queryTypes();
 			for (String type : activityTypes) {

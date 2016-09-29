@@ -107,7 +107,12 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	public void start() throws Exception {
 
 		PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
-		privilegeHandler.runAsSystem(SYSTEM_USER_AGENT, new StartRealms(this));
+		privilegeHandler.runAsAgent(ctx -> {
+			for (String realmName : getRealms().keySet()) {
+				InternalStrolchRealm realm = getRealms().get(realmName);
+				realm.start(ctx);
+			}
+		});
 
 		super.start();
 	}

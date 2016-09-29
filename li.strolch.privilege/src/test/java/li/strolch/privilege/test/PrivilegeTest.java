@@ -172,7 +172,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 		// create the action to be performed as a system user and then perform the action
 		TestSystemUserAction action = new TestSystemUserAction();
-		this.privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN, action);
+		this.privilegeHandler.runAs(SYSTEM_USER_ADMIN, action);
 	}
 
 	/**
@@ -182,13 +182,13 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	public void testPerformSystemRestrictableFailPrivilege() throws Exception {
 		this.exception.expect(PrivilegeException.class);
 		this.exception.expectMessage(
-				"User system_admin does not have the privilege li.strolch.privilege.handler.SystemUserAction");
+				"User system_admin does not have the privilege li.strolch.privilege.handler.SystemAction");
 		try {
 			// create the action to be performed as a system user
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
 
 			// and then perform the action
-			this.privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN, action);
+			this.privilegeHandler.runAs(SYSTEM_USER_ADMIN, action);
 		} finally {
 			logout();
 		}
@@ -201,13 +201,13 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	public void testPerformSystemRestrictableFailNoAdditionalPrivilege() throws Exception {
 		this.exception.expect(PrivilegeException.class);
 		this.exception.expectMessage(
-				"User system_admin2 does not have the privilege li.strolch.privilege.handler.SystemUserAction needed for Restrictable li.strolch.privilege.test.model.TestSystemUserActionDeny");
+				"User system_admin2 does not have the privilege li.strolch.privilege.handler.SystemAction needed for Restrictable li.strolch.privilege.test.model.TestSystemUserActionDeny");
 		try {
 			// create the action to be performed as a system user
 			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
 
 			// and then perform the action
-			this.privilegeHandler.runAsSystem(SYSTEM_USER_ADMIN2, action);
+			this.privilegeHandler.runAs(SYSTEM_USER_ADMIN2, action);
 		} finally {
 			logout();
 		}

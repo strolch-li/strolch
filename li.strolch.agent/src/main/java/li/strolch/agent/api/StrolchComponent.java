@@ -24,10 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.handler.SystemAction;
+import li.strolch.privilege.handler.SystemActionWithResult;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.privilege.RunRunnable;
+import li.strolch.runtime.privilege.PrivilegedRunnable;
+import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 
 /**
  * <p>
@@ -179,49 +181,121 @@ public class StrolchComponent {
 	}
 
 	/**
-	 * Performs the given {@link SystemUserAction} as a system user with the given username. Returns the action for
-	 * chaining calls
+	 * Performs the given {@link PrivilegedRunnable} as the given system user
 	 * 
 	 * @param username
 	 *            the name of the system user to perform the action as
 	 * @param action
 	 *            the action to perform
 	 * 
-	 * @return the action performed for chaining calls
-	 * 
 	 * @throws PrivilegeException
 	 */
-	protected <V extends SystemUserAction> V runAs(String username, V action) throws PrivilegeException {
-		return this.container.getPrivilegeHandler().runAsSystem(username, action);
+	protected void runAs(String username, SystemAction action) throws PrivilegeException {
+		this.container.getPrivilegeHandler().runAs(username, action);
 	}
 
 	/**
-	 * Performs the given {@link SystemUserAction} as the privileged system user
-	 * {@link StrolchConstants#PRIVILEGED_SYSTEM_USER}. Returns the action for chaining calls
+	 * Performs the given {@link PrivilegedRunnable} as the given system user
 	 * 
+	 * @param username
+	 *            the name of the system user to perform the action as
 	 * @param action
 	 *            the action to perform
 	 * 
-	 * @return the action performed for chaining calls
+	 * @return the result
 	 * 
 	 * @throws PrivilegeException
 	 */
-	protected <V extends SystemUserAction> V runPrivileged(V action) throws PrivilegeException {
-		return this.container.getPrivilegeHandler().runAsSystem(StrolchConstants.PRIVILEGED_SYSTEM_USER, action);
+	protected <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException {
+		return this.container.getPrivilegeHandler().runWithResult(username, action);
 	}
 
 	/**
-	 * Performs the given {@link SystemUserAction} as the privileged system user
-	 * {@link StrolchConstants#PRIVILEGED_SYSTEM_USER}. Returns the action for chaining calls
+	 * Performs the given {@link PrivilegedRunnable} as the given system user
 	 * 
+	 * @param username
+	 *            the name of the system user to perform the action as
+	 * @param runnable
+	 *            the runnable to perform
+	 * 
+	 * @throws PrivilegeException
+	 */
+	protected void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException {
+		this.container.getPrivilegeHandler().runAs(username, runnable);
+	}
+
+	/**
+	 * Performs the given {@link PrivilegedRunnable} as the given system user
+	 * 
+	 * @param username
+	 *            the name of the system user to perform the action as
+	 * @param runnable
+	 *            the runnable to perform
+	 * 
+	 * @return the result
+	 * 
+	 * @throws PrivilegeException
+	 */
+	protected <T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
+		return this.container.getPrivilegeHandler().runWithResult(username, runnable);
+	}
+
+	/**
+	 * Performs the given {@link PrivilegedRunnable} as the given system user
+	 * 
+	 * @param username
+	 *            the name of the system user to perform the action as
 	 * @param action
 	 *            the action to perform
 	 * 
 	 * @throws PrivilegeException
 	 */
-	protected <T> T runPrivilegedRunnable(RunRunnable.Runnable<T> action) throws PrivilegeException {
-		return this.container.getPrivilegeHandler()
-				.runAsSystem(StrolchConstants.PRIVILEGED_SYSTEM_USER, new RunRunnable<>(action)).getResult();
+	protected void runAsAgent(SystemAction action) throws PrivilegeException {
+		this.container.getPrivilegeHandler().runAsAgent(action);
+	}
+
+	/**
+	 * Performs the given {@link PrivilegedRunnable} as the given system user
+	 * 
+	 * @param username
+	 *            the name of the system user to perform the action as
+	 * @param action
+	 *            the action to perform
+	 * 
+	 * @return the result
+	 * 
+	 * @throws PrivilegeException
+	 */
+	protected <T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException {
+		return this.container.getPrivilegeHandler().runAsAgentWithResult(action);
+	}
+
+	/**
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
+	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
+	 * 
+	 * @param runnable
+	 *            the runnable to perform
+	 * 
+	 * @throws PrivilegeException
+	 */
+	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
+		this.container.getPrivilegeHandler().runAsAgent(runnable);
+	}
+
+	/**
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
+	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
+	 * 
+	 * @param runnable
+	 *            the runnable to perform
+	 * 
+	 * @return the result
+	 * 
+	 * @throws PrivilegeException
+	 */
+	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
+		return this.container.getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 
 	/**

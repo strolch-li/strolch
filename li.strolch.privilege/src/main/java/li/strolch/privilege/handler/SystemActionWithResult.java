@@ -22,15 +22,16 @@ import li.strolch.privilege.model.Restrictable;
 /**
  * With this interface system actions, which are to be performed in an automated fashion, i.e. by cron jobs, can be
  * implemented and then the authorized execution can be delegated to
- * {@link PrivilegeHandler#runAsSystem(String, SystemUserAction)}
+ * {@link PrivilegeHandler#runAsSystem(String, SystemActionWithResult)}
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class SystemUserAction implements Restrictable {
+public abstract class SystemActionWithResult<T> implements Restrictable {
 
 	@Override
 	public String getPrivilegeName() {
-		return SystemUserAction.class.getName();
+		// We want to use the same Privilege as SystemAction
+		return SystemAction.class.getName();
 	}
 
 	@Override
@@ -42,11 +43,10 @@ public abstract class SystemUserAction implements Restrictable {
 	 * This method will be called by the {@link PrivilegeHandler} when an authorized {@link Certificate} has been
 	 * generated to allow this action to properly validate its execution
 	 * 
-	 * TODO: I'm not really happy with this... we might want to pass the certificate and then force the action to
-	 * validate it to get the {@link PrivilegeContext} - we don't want the {@link PrivilegeContext} to live forever...
-	 * 
 	 * @param privilegeContext
 	 *            the {@link PrivilegeContext} which was generated for a valid system user
+	 * 
+	 * @return the result
 	 */
-	public abstract void execute(PrivilegeContext privilegeContext);
+	public abstract T execute(PrivilegeContext privilegeContext);
 }

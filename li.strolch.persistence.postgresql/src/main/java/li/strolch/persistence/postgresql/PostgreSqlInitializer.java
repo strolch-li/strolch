@@ -31,7 +31,7 @@ import li.strolch.db.DbMigrationState;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.handler.SystemAction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -40,7 +40,7 @@ import li.strolch.runtime.configuration.StrolchConfiguration;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class PostgreSqlInitializer extends SystemUserAction {
+public abstract class PostgreSqlInitializer extends SystemAction {
 
 	protected static final Logger logger = LoggerFactory.getLogger(PostgreSqlInitializer.class);
 	protected StrolchAgent agent;
@@ -75,7 +75,7 @@ public abstract class PostgreSqlInitializer extends SystemUserAction {
 
 		ModelStatistics statistics;
 		try (StrolchTransaction tx = this.persistenceHandler.openTx(this.agent.getContainer().getRealm(realmName),
-				getCertificate(), RealmHandler.SYSTEM_USER_DB_INITIALIZER)) {
+				getCertificate(), getClass().getSimpleName())) {
 			File dataStoreF = getDataStoreFile(this.runtimeConfig, this.realmConfig, realmName);
 
 			StoreToDaoElementListener listener = new StoreToDaoElementListener(tx);

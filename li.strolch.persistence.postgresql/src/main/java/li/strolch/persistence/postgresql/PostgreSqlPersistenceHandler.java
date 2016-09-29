@@ -15,7 +15,6 @@
  */
 package li.strolch.persistence.postgresql;
 
-import static li.strolch.agent.api.RealmHandler.SYSTEM_USER_DB_INITIALIZER;
 import static li.strolch.db.DbConstants.PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE;
 import static li.strolch.db.DbConstants.PROP_ALLOW_SCHEMA_CREATION;
 import static li.strolch.db.DbConstants.PROP_ALLOW_SCHEMA_DROP;
@@ -31,7 +30,6 @@ import javax.sql.DataSource;
 import org.postgresql.Driver;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
@@ -99,9 +97,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		schemaVersionCheck.checkSchemaVersion(this.dsMap);
 
 		// if allowed, perform DB initialization
-		if (!allowSchemaCreation || !allowDataInitOnSchemaCreate) {
-			logger.info(
-					"Data Initialization not enabled as either 'allowSchemaCreation or 'allowDataInitOnSchemaCreate' is false!, so not checking if needed."); //$NON-NLS-1$
+		if (!allowDataInitOnSchemaCreate) {
+			logger.info("Data Initialization not enabled as 'allowDataInitOnSchemaCreate' is false!"); //$NON-NLS-1$
 		} else {
 			Map<String, DbMigrationState> dbMigrationStates = schemaVersionCheck.getDbMigrationStates();
 			String msg = "Data Initialization is enabled, checking for {0} realms if DB initialization is required..."; //$NON-NLS-1$
@@ -110,7 +107,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 			StrolchAgent agent = getContainer().getAgent();
 			PostgreSqlSchemaInitializer schemaInitializer = new PostgreSqlSchemaInitializer(agent, this,
 					dbMigrationStates);
-			privilegeHandler.runAsSystem(SYSTEM_USER_DB_INITIALIZER, schemaInitializer);
+			privilegeHandler.runAsAgent(schemaInitializer);
 		}
 
 		super.start();
@@ -179,6 +176,6 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		StrolchConfiguration strolchConfiguration = getContainer().getAgent().getStrolchConfiguration();
 		PostgreSqlDbInitializer sqlDbInitializer = new PostgreSqlDbInitializer(agent, this,
 				strolchConfiguration.getComponentConfiguration(getName()));
-		privilegeHandler.runAsSystem(RealmHandler.SYSTEM_USER_DB_INITIALIZER, sqlDbInitializer);
+		privilegeHandler.runAsAgent(sqlDbInitializer);
 	}
 }

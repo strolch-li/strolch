@@ -33,7 +33,8 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.DefaultPrivilegeHandler;
 import li.strolch.privilege.handler.EncryptionHandler;
 import li.strolch.privilege.handler.PersistenceHandler;
-import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.handler.SystemAction;
+import li.strolch.privilege.handler.SystemActionWithResult;
 import li.strolch.privilege.handler.XmlPersistenceHandler;
 import li.strolch.privilege.helper.PrivilegeInitializationHelper;
 import li.strolch.privilege.helper.XmlConstants;
@@ -41,6 +42,7 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.internal.PrivilegeContainerModel;
 import li.strolch.privilege.xml.PrivilegeConfigSaxReader;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -173,18 +175,49 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
+	public void runAs(String username, SystemAction action) throws PrivilegeException {
+		this.privilegeHandler.runAs(username, action);
+	}
+
+	@Override
+	public <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException {
+		return this.privilegeHandler.runWithResult(username, action);
+	}
+
+	@Override
+	public void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException {
+		this.privilegeHandler.runAs(username, new StrolchSystemAction(runnable));
+	}
+
+	@Override
+	public <T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
+		return this.privilegeHandler.runWithResult(username, new StrolchSystemActionWithResult<>(runnable));
+	}
+
+	@Override
+	public void runAsAgent(SystemAction action) throws PrivilegeException {
+		this.privilegeHandler.runAs(StrolchConstants.SYSTEM_USER_AGENT, action);
+	}
+
+	@Override
+	public <T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException {
+		return this.privilegeHandler.runWithResult(StrolchConstants.SYSTEM_USER_AGENT, action);
+	}
+
+	@Override
+	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
+		this.privilegeHandler.runAs(StrolchConstants.SYSTEM_USER_AGENT, new StrolchSystemAction(runnable));
+	}
+
+	@Override
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
+		return this.privilegeHandler.runWithResult(StrolchConstants.SYSTEM_USER_AGENT,
+				new StrolchSystemActionWithResult<>(runnable));
+	}
+
+	@Override
 	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException {
 		return this.privilegeHandler.getPrivilegeContext(certificate);
-	}
-
-	@Override
-	public <T extends SystemUserAction> T runAsSystem(String systemUsername, T action) throws PrivilegeException {
-		return this.privilegeHandler.runAsSystem(systemUsername, action);
-	}
-
-	@Override
-	public <V extends SystemUserAction> V runPrivileged(V action) throws PrivilegeException {
-		return super.runPrivileged(action);
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
@@ -106,15 +107,15 @@ public class TransactionalRealm extends InternalStrolchRealm {
 		int nrOfResources = 0;
 		int nrOfActivities = 0;
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			nrOfOrders = this.orderMap.getAllKeys(tx).size();
 		}
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			nrOfResources = this.resourceMap.getAllKeys(tx).size();
 		}
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), DefaultRealmHandler.AGENT_BOOT)) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			nrOfActivities = this.activityMap.getAllKeys(tx).size();
 		}
 

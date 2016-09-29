@@ -33,7 +33,7 @@ public class StrolchConstants {
 	public static final String OBSERVER_HANDLER = ObserverHandler.class.getSimpleName();
 
 	public static final String PRIVILEGE_HANDLER = "PrivilegeHandler";
-	public static final String PRIVILEGED_SYSTEM_USER = "privileged";
+	public static final String SYSTEM_USER_AGENT = "agent";
 
 	public static final String PROP_REALM = "realm";
 	public static final String DEFAULT_REALM = "defaultRealm";

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Users>
-	<User userId="1" username="agent">
+	<User userId="0" username="agent">
 		<State>SYSTEM</State>
 		<Roles>
 			<Role>agent</Role>
 		</Roles>
 	</User>
-	<User userId="3" username="test" password="9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08">
+	<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
 		<Firstname>Application</Firstname>
 		<Lastname>Administrator</Lastname>
 		<State>ENABLED</State>
@@ -14,5 +14,9 @@
 		<Roles>
 			<Role>AppUser</Role>
 		</Roles>
+		<Properties>
+			<Property name="organization" value="eitchnet.ch" />
+			<Property name="organizationalUnit" value="Development" />
+		</Properties>
 	</User>
 </Users>

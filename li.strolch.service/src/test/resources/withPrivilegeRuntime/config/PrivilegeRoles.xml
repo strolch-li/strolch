@@ -2,8 +2,9 @@
 <Roles>
 
 	<Role name="agent">
-		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
-			<Allow>li.strolch.agent.impl.StartRealms</Allow>
+		<Privilege name="li.strolch.privilege.handler.SystemAction" policy="DefaultPrivilege">
+			<Allow>li.strolch.runtime.privilege.StrolchSystemAction</Allow>
+			<Allow>li.strolch.runtime.privilege.StrolchSystemActionWithResult</Allow>
 		</Privilege>
 		<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>

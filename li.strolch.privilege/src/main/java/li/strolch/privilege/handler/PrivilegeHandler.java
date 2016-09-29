@@ -679,7 +679,7 @@ public interface PrivilegeHandler {
 	/**
 	 * Special method to perform work as a System user, meaning the given systemUsername corresponds to an account which
 	 * has the state {@link UserState#SYSTEM} and this user must have privilege to perform the concrete implementation
-	 * of the given {@link SystemUserAction} instance
+	 * of the given {@link SystemAction} instance
 	 * 
 	 * 
 	 * @param systemUsername
@@ -691,7 +691,24 @@ public interface PrivilegeHandler {
 	 * 
 	 * @throws PrivilegeException
 	 */
-	public <T extends SystemUserAction> T runAsSystem(String systemUsername, T action) throws PrivilegeException;
+	public void runAs(String systemUsername, SystemAction action) throws PrivilegeException;
+
+	/**
+	 * Special method to perform work as a System user, meaning the given systemUsername corresponds to an account which
+	 * has the state {@link UserState#SYSTEM} and this user must have privilege to perform the concrete implementation
+	 * of the given {@link SystemAction} instance
+	 * 
+	 * 
+	 * @param systemUsername
+	 *            the username of the system user to perform the action as
+	 * @param action
+	 *            the action to be performed as the system user
+	 * 
+	 * @return the action
+	 * 
+	 * @throws PrivilegeException
+	 */
+	public <T> T runWithResult(String systemUsername, SystemActionWithResult<T> action) throws PrivilegeException;
 
 	/**
 	 * Returns the {@link EncryptionHandler} instance

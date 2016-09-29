@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Roles>
 	<Role name="agent">
-		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
-			<Allow>li.strolch.agent.impl.StartRealms</Allow>
-		</Privilege>
-	</Role>
-	<Role name="privileged">
-		<Privilege name="li.strolch.privilege.handler.SystemUserAction" policy="DefaultPrivilege">
-			<AllAllowed>true</AllAllowed>
+		<Privilege name="li.strolch.privilege.handler.SystemAction" policy="DefaultPrivilege">
+			<Allow>li.strolch.runtime.privilege.StrolchSystemAction</Allow>
+			<Allow>li.strolch.runtime.privilege.StrolchSystemActionWithResult</Allow>
 		</Privilege>
 		<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>

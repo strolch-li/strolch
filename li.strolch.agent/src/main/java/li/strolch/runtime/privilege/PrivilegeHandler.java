@@ -16,7 +16,8 @@
 package li.strolch.runtime.privilege;
 
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.handler.SystemUserAction;
+import li.strolch.privilege.handler.SystemAction;
+import li.strolch.privilege.handler.SystemActionWithResult;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
@@ -94,35 +95,106 @@ public interface PrivilegeHandler {
 	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException;
 
 	/**
-	 * Run the given {@link SystemUserAction} as the given system user
+	 * Run the given {@link SystemAction} as the given system user
 	 * 
-	 * @param systemUsername
+	 * @param username
 	 *            the system username
 	 * @param action
 	 *            the action to perform
 	 * 
-	 * @return the action after performing the action
-	 * 
 	 * @throws PrivilegeException
 	 *             if there is something wrong
-	 * 
-	 * @see li.strolch.privilege.handler.PrivilegeHandler#runAsSystem(java.lang.String,
-	 *      li.strolch.privilege.handler.SystemUserAction)
 	 */
-	public <T extends SystemUserAction> T runAsSystem(String systemUsername, T action) throws PrivilegeException;
+	public void runAs(String username, SystemAction action) throws PrivilegeException;
 
 	/**
-	 * Run the given {@link SystemUserAction} as the system user {@link StrolchConstants#PRIVILEGED_SYSTEM_USER}
+	 * Run the given {@link SystemActionWithResult} as the given system user
 	 * 
+	 * @param username
+	 *            the system username
 	 * @param action
 	 *            the action to perform
 	 * 
-	 * @return the action after performing the action
+	 * @return the result
 	 * 
 	 * @throws PrivilegeException
 	 *             if there is something wrong
 	 */
-	public <V extends SystemUserAction> V runPrivileged(V action) throws PrivilegeException;
+	public <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException;
+
+	/**
+	 * Run the given {@link PrivilegedRunnable} as the given system user
+	 * 
+	 * @param username
+	 *            the system username
+	 * @param runnable
+	 *            the runnable to perform
+	 * 
+	 * @throws PrivilegeException
+	 *             if there is something wrong
+	 */
+	public void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException;
+
+	/**
+	 * Run the given {@link PrivilegedRunnable} as the given system user
+	 * 
+	 * @param username
+	 *            the system username
+	 * @param runnable
+	 *            the runnable to perform
+	 * 
+	 * @return the result
+	 * 
+	 * @throws PrivilegeException
+	 *             if there is something wrong
+	 */
+	public <T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException;
+
+	/**
+	 * Run the given {@link SystemAction} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
+	 * 
+	 * @param runnable
+	 *            the runnable to perform
+	 * 
+	 * @throws PrivilegeException
+	 *             if there is something wrong
+	 */
+	public void runAsAgent(SystemAction action) throws PrivilegeException;
+
+	/**
+	 * Run the given {@link SystemActionWithResult} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
+	 * 
+	 * @param runnable
+	 *            the runnable to perform
+	 * 
+	 * @throws PrivilegeException
+	 *             if there is something wrong
+	 */
+	public <T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException;
+
+	/**
+	 * Run the given {@link PrivilegedRunnable} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
+	 * 
+	 * @param runnable
+	 *            the runnable to perform
+	 * 
+	 * @throws PrivilegeException
+	 *             if there is something wrong
+	 */
+	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException;
+
+	/**
+	 * Run the given {@link PrivilegedRunnableWithResult} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
+	 * 
+	 * @param runnable
+	 *            the runnable to perform
+	 * 
+	 * @return the result
+	 * 
+	 * @throws PrivilegeException
+	 *             if there is something wrong
+	 */
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException;
 
 	/**
 	 * Returns the {@link li.strolch.privilege.handler.PrivilegeHandler}
