@@ -243,7 +243,7 @@
 	<!--
 		Activities
 	-->
-	<Activity Id="purchaseAct001" Name="Purchase Gears" Type="ToStockGears">
+	<Activity Id="purchaseAct001" Name="Purchase Gears" Type="ToStockGears" TimeOrdering="Series">
 		<Action Id="toStock" Name="Gears to stock" ResourceId="gears" ResourceType="Article" Type="Produce" State="CREATED">
 			<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 				<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -252,9 +252,9 @@
 		</Action>
 	</Activity>
 
-	<Activity Id="productionAct001" Name="Bicycle Production" Type="ProductionBicycle">
+	<Activity Id="productionAct001" Name="Bicycle Production" Type="ProductionBicycle" TimeOrdering="Series">
 
-		<Activity Id="componentProduction" Name="Production of components" Type="Production">
+		<Activity Id="componentProduction" Name="Production of components" Type="Production" TimeOrdering="Series">
 
 			<Action Id="consumeGears" Name="Gears" ResourceId="gears" ResourceType="Article" Type="Consume" State="CREATED">
 				<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
@@ -263,7 +263,7 @@
 				</ParameterBag>
 			</Action>
 
-			<Activity Id="handlebarProduction" Name="Production handlebar" Type="Production">
+			<Activity Id="handlebarProduction" Name="Production handlebar" Type="Production" TimeOrdering="Series">
 				<Action Id="produce" Name="Production handlebars" ResourceId="handlebarProduction" ResourceType="Machine" Type="Use" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -278,7 +278,7 @@
 				</Action>
 			</Activity>
 
-			<Activity Id="frameProduction" Name="Production frame" Type="Production">
+			<Activity Id="frameProduction" Name="Production frame" Type="Production" TimeOrdering="Series">
 				<Action Id="produce" Name="Production frame" ResourceId="frameProduction" ResourceType="Machine" Type="Use" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -293,7 +293,7 @@
 				</Action>
 			</Activity>
 
-			<Activity Id="saddleProduction" Name="Production saddle" Type="Production">
+			<Activity Id="saddleProduction" Name="Production saddle" Type="Production" TimeOrdering="Series">
 				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -308,7 +308,7 @@
 				</Action>
 			</Activity>
 
-			<Activity Id="wheelProduction" Name="Production wheel" Type="Production">
+			<Activity Id="wheelProduction" Name="Production wheel" Type="Production" TimeOrdering="Series">
 				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -323,7 +323,7 @@
 				</Action>
 			</Activity>
 
-			<Activity Id="brakeProduction" Name="Herstellen Bremsen" Type="Production">
+			<Activity Id="brakeProduction" Name="Herstellen Bremsen" Type="Production" TimeOrdering="Series">
 				<Action Id="produce" Name="Production saddle" ResourceId="saddleProduction" ResourceType="Machine" Type="Use" State="CREATED">
 					<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 						<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />
@@ -355,7 +355,7 @@
 		</Action>
 	</Activity>
 
-	<Activity Id="saleAct001" Name="Sale of Bicycle" Type="FromStockBicycle">
+	<Activity Id="saleAct001" Name="Sale of Bicycle" Type="FromStockBicycle" TimeOrdering="Series">
 		<Action Id="consumeBicycle" Name="Consume Bicycle" ResourceId="bicycle" ResourceType="Product" Type="Consume" State="CREATED">
 			<ParameterBag Id="objectives" Name="Production goals" Type="Objectives">
 				<Parameter Id="quantity" Name="Quantity" Type="Float" Value="1" />

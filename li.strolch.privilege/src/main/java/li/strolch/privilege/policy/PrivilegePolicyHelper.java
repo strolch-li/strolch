@@ -45,9 +45,9 @@ public class PrivilegePolicyHelper {
 
 		// we want the privileges names to match
 		if (!privilege.getName().equals(privilegeName)) {
-			throw new PrivilegeException(MessageFormat.format(
-					PrivilegeMessages.getString("Privilege.illegalArgument.privilegeNameMismatch"), //$NON-NLS-1$
-					privilege.getName(), privilegeName));
+			throw new PrivilegeException(
+					MessageFormat.format(PrivilegeMessages.getString("Privilege.illegalArgument.privilegeNameMismatch"), //$NON-NLS-1$
+							privilege.getName(), privilegeName));
 		}
 
 		return privilegeName;
@@ -64,7 +64,7 @@ public class PrivilegePolicyHelper {
 		if (privilege.isDenied(privilegeValue)) {
 			// then throw access denied
 			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
-					ctx.getUsername(), privilege.getName(), restrictable.getClass().getName());
+					ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
 			throw new AccessDeniedException(msg);
 		}
 
@@ -74,7 +74,7 @@ public class PrivilegePolicyHelper {
 
 		// default is not allowed
 		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
-				ctx.getUsername(), privilege.getName(), restrictable.getClass().getName());
+				ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
 		throw new AccessDeniedException(msg);
 	}
 }

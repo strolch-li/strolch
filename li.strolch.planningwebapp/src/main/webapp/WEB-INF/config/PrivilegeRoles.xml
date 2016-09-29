@@ -10,6 +10,10 @@
 		<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
+		<Privilege name="PrivilegeAction" policy="DefaultPrivilege">
+			<Allow>PersistSessions</Allow>
+			<Allow>GetCertificates</Allow>
+		</Privilege>
 	</Role>
 
 	<Role name="AppUser">
