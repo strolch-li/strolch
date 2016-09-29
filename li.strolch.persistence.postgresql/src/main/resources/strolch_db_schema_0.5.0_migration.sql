@@ -23,19 +23,19 @@ UPDATE resources SET version = 0 where version IS NULL;
 UPDATE resources SET created_by = 'MIGRATION' where created_by IS NULL;
 UPDATE resources SET created_at = CURRENT_TIMESTAMP where created_at IS NULL;
 UPDATE resources SET deleted = false where deleted IS NULL;
-UPDATE resources SET latest = 0 where latest IS NULL;
+UPDATE resources SET latest = true where latest IS NULL;
 
 UPDATE orders SET version = 0 where version IS NULL;
 UPDATE orders SET created_by = 'MIGRATION' where created_by IS NULL;
 UPDATE orders SET created_at = CURRENT_TIMESTAMP where created_at IS NULL;
 UPDATE orders SET deleted = false where deleted IS NULL;
-UPDATE orders SET latest = 0 where latest IS NULL;
+UPDATE orders SET latest = true where latest IS NULL;
 
 UPDATE activities SET version = 0 where version IS NULL;
 UPDATE activities SET created_by = 'MIGRATION' where created_by IS NULL;
 UPDATE activities SET created_at = CURRENT_TIMESTAMP where created_at IS NULL;
 UPDATE activities SET deleted = false where deleted IS NULL;
-UPDATE activities SET latest = 0 where latest IS NULL;
+UPDATE activities SET latest = true where latest IS NULL;
 
 -- make columns not null
 ALTER TABLE resources ALTER COLUMN version SET NOT NULL;
