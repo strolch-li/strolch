@@ -11,9 +11,9 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 		super(container, tx);
 	}
 
-	public abstract void execute(Action action);
+	public abstract void toExecution(Action action);
 
-	public abstract void executed(Action action);
+	public abstract void toExecuted(Action action);
 
-	public abstract void stop(Action action);
+	public abstract void toStopped(Action action);
 }

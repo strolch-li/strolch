@@ -9,12 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.execution.service.SetActionToExecutedService;
 import li.strolch.model.Locator;
-import li.strolch.runtime.StrolchConstants;
-import li.strolch.service.LocatorArgument;
-import li.strolch.service.api.ServiceHandler;
-import li.strolch.service.api.ServiceResult;
 
 public class DurationExecutionTimer {
 
@@ -56,19 +51,12 @@ public class DurationExecutionTimer {
 		logger.info("Registered execution timer for " + locator);
 	}
 
-	private void executed(Locator locator, String realm, ComponentContainer container) {
+	private void executed(String realm, ComponentContainer container, Locator locator) {
 
 		logger.info("Completing execution for " + locator);
 
-		SetActionToExecutedService svc = new SetActionToExecutedService();
-		LocatorArgument arg = new LocatorArgument();
-		arg.realm = realm;
-		arg.locator = locator;
-
-		container.getPrivilegeHandler().runAsAgent(ctx -> {
-			ServiceHandler svcHandler = container.getComponent(ServiceHandler.class);
-			ServiceResult result = svcHandler.doService(ctx.getCertificate(), svc, arg);
-		});
+		ExecutionHandler executionHandler = container.getComponent(ExecutionHandler.class);
+		executionHandler.toExecuted(realm, locator);
 	}
 
 	private class SimulationTask extends TimerTask {
@@ -85,7 +73,7 @@ public class DurationExecutionTimer {
 
 		@Override
 		public void run() {
-			executed(locator, realm, container);
+			executed(realm, container, locator);
 		}
 	}
 }

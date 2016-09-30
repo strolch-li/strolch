@@ -10,9 +10,13 @@ public abstract class ExecutionHandler extends StrolchComponent {
 		super(container, componentName);
 	}
 
-	public abstract void execute(Locator locator);
+	public abstract void toExecution(String realm, Locator locator);
 
-	public abstract void executed(Locator locator);
+	public abstract void toExecuted(String realm, Locator locator);
 
-	public abstract void stop(Locator locator);
+	public abstract void toStopped(String realm, Locator locator);
+
+	public abstract void toWarning(String realm, Locator locator);
+
+	public abstract void toError(String realm, Locator locator);
 }

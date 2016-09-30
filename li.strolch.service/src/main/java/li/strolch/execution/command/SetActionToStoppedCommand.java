@@ -10,11 +10,11 @@ import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 
-public class StopActionCommand extends ExecutionCommand {
+public class SetActionToStoppedCommand extends ExecutionCommand {
 
 	private Action action;
 
-	public StopActionCommand(ComponentContainer container, StrolchTransaction tx) {
+	public SetActionToStoppedCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
@@ -35,9 +35,8 @@ public class StopActionCommand extends ExecutionCommand {
 
 	@Override
 	public void doCommand() {
-
-		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
-		executionPolicy.stop(this.action);
+		ExecutionPolicy executionPolicy = getExecutionPolicy(this.action);
+		executionPolicy.toStopped(this.action);
 	}
 
 	@Override

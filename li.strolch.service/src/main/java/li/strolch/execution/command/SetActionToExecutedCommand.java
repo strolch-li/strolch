@@ -36,7 +36,7 @@ public class SetActionToExecutedCommand extends ExecutionCommand {
 	@Override
 	public void doCommand() {
 		ExecutionPolicy executionPolicy = getExecutionPolicy(this.action);
-		executionPolicy.executed(this.action);
+		executionPolicy.toExecuted(this.action);
 	}
 
 	@Override

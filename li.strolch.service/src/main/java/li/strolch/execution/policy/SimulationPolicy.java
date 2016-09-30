@@ -17,7 +17,7 @@ public class SimulationPolicy extends ExecutionPolicy {
 	}
 
 	@Override
-	public void execute(Action action) {
+	public void toExecution(Action action) {
 
 		this.action = action;
 
@@ -35,7 +35,7 @@ public class SimulationPolicy extends ExecutionPolicy {
 	}
 
 	@Override
-	public void executed(Action action) {
+	public void toExecuted(Action action) {
 
 		action.setState(State.EXECUTED);
 
@@ -47,7 +47,7 @@ public class SimulationPolicy extends ExecutionPolicy {
 	}
 
 	@Override
-	public void stop(Action action) {
+	public void toStopped(Action action) {
 
 		DurationExecutionTimer.getInstance().stop(action.getLocator());
 
@@ -62,6 +62,6 @@ public class SimulationPolicy extends ExecutionPolicy {
 
 	@Override
 	public void undo() {
-		stop(this.action);
+		toStopped(this.action);
 	}
 }
