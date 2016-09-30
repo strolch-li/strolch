@@ -15,6 +15,7 @@
  */
 package li.strolch.persistence.postgresql;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Version;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 
@@ -170,7 +172,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	@Override
 	public T queryBy(String type, String id) {
 
-		String sql = "select id, name, type, asxml from " + getTableName()
+		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
 				+ " where type = ? and id = ? and latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
@@ -183,6 +185,14 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 				SQLXML sqlxml = result.getSQLXML("asxml");
 				T t = parseFromXml(id, type, sqlxml);
+
+				int v = result.getInt(4);
+				String createdBy = result.getString(5);
+				Date createdAt = result.getDate(6);
+				boolean deleted = result.getBoolean(7);
+				Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
+				t.setVersion(version);
+
 				if (result.next())
 					throw new StrolchPersistenceException("Non unique result for query: " + sql);
 				return t;
@@ -194,14 +204,14 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	@Override
-	public T queryBy(String type, String id, int version) {
+	public T queryBy(String type, String id, int versionNr) {
 
-		String sql = "select id, name, type, asxml from " + getTableName()
+		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
 				+ " where type = ? and id = ? and version = ?";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
 			statement.setString(2, id);
-			statement.setInt(3, version);
+			statement.setInt(3, versionNr);
 
 			try (ResultSet result = statement.executeQuery()) {
 				if (!result.next()) {
@@ -210,6 +220,17 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 				SQLXML sqlxml = result.getSQLXML("asxml");
 				T t = parseFromXml(id, type, sqlxml);
+
+				int v = result.getInt(4);
+				if (v != versionNr)
+					throw new StrolchPersistenceException(
+							"Requested version " + versionNr + " != " + v + " for " + t.getLocator());
+				String createdBy = result.getString(5);
+				Date createdAt = result.getDate(6);
+				boolean deleted = result.getBoolean(7);
+				Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
+				t.setVersion(version);
+
 				if (result.next())
 					throw new StrolchPersistenceException("Non unique result for query: " + sql);
 				return t;
@@ -223,7 +244,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	@Override
 	public List<T> queryVersionsFor(String type, String id) {
 
-		String sql = "select id, name, type, asxml from " + getTableName()
+		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
 				+ " where type = ? and id = ? order by version";
 
 		List<T> list = new ArrayList<>(1);
@@ -237,6 +258,14 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 				while (result.next()) {
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					T t = parseFromXml(id, type, sqlxml);
+
+					int v = result.getInt(4);
+					String createdBy = result.getString(5);
+					Date createdAt = result.getDate(6);
+					boolean deleted = result.getBoolean(7);
+					Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
+					t.setVersion(version);
+
 					list.add(t);
 				}
 
@@ -272,7 +301,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		List<T> list = new ArrayList<>();
 
-		String sql = "select id, name, type, asxml from " + getTableName() + " where latest = true";
+		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
+				+ " where latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 
 			try (ResultSet result = statement.executeQuery()) {
@@ -281,6 +311,14 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					String type = result.getString("type");
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					T t = parseFromXml(id, type, sqlxml);
+
+					int v = result.getInt(4);
+					String createdBy = result.getString(5);
+					Date createdAt = result.getDate(6);
+					boolean deleted = result.getBoolean(7);
+					Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
+					t.setVersion(version);
+
 					list.add(t);
 				}
 
@@ -297,7 +335,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		List<T> list = new ArrayList<>();
 
-		String sql = "select id, name, type, asxml from " + getTableName() + " where type = ? and latest = true";
+		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
+				+ " where type = ? and latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
 			statement.setString(1, type);
 
@@ -306,6 +345,14 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					String id = result.getString("id");
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					T t = parseFromXml(id, type, sqlxml);
+
+					int v = result.getInt(4);
+					String createdBy = result.getString(5);
+					Date createdAt = result.getDate(6);
+					boolean deleted = result.getBoolean(7);
+					Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
+					t.setVersion(version);
+
 					list.add(t);
 				}
 
