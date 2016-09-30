@@ -37,7 +37,7 @@ import li.strolch.utils.xml.XmlKeyValue;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@Path("strolch/privilege/policy")
+@Path("strolch/privilege/policies")
 public class PrivilegePoliciesService {
 
 	// private static final Logger logger = LoggerFactory.getLogger(PrivilegePoliciesService.class);

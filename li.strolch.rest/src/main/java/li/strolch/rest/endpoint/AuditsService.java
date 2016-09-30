@@ -40,7 +40,7 @@ import li.strolch.rest.model.AuditQueryResult;
 import li.strolch.rest.model.StringListResult;
 import li.strolch.rest.model.visitor.ToAuditQueryVisitor;
 
-@Path("strolch/audit")
+@Path("strolch/audits")
 public class AuditsService {
 
 	@GET

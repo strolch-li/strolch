@@ -41,7 +41,7 @@ import li.strolch.rest.model.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("strolch/session")
+@Path("strolch/sessions")
 public class UserSessionsService {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserSessionsService.class);

@@ -57,7 +57,7 @@ import li.strolch.service.privilege.roles.PrivilegeUpdateRoleService;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@Path("strolch/privilege/role")
+@Path("strolch/privilege/roles")
 public class PrivilegeRolesService {
 
 	private PrivilegeHandler getPrivilegeHandler() {
@@ -143,7 +143,7 @@ public class PrivilegeRolesService {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{rolename}/privilege")
+	@Path("{rolename}/privileges")
 	public Response addOrReplacePrivilegeOnRole(@PathParam("rolename") String rolename, PrivilegeRep privilegeRep,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -161,7 +161,7 @@ public class PrivilegeRolesService {
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{rolename}/privilege/{privilege}")
+	@Path("{rolename}/privileges/{privilege}")
 	public Response removePrivilegeFromRole(@PathParam("rolename") String rolename,
 			@PathParam("privilege") String privilege, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);

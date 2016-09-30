@@ -76,7 +76,7 @@ import li.strolch.service.privilege.users.PrivilegeUserResult;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@Path("strolch/privilege/user")
+@Path("strolch/privilege/users")
 public class PrivilegeUsersService {
 
 	private PrivilegeHandler getPrivilegeHandler() {
@@ -114,7 +114,7 @@ public class PrivilegeUsersService {
 			JsonObject propObj = new JsonObject();
 			propObj.addProperty("key", propKey);
 			propObj.addProperty("value", userRep.getProperty(propKey));
-			rolesArr.add(propObj);
+			propsArr.add(propObj);
 		}
 
 		return jsonObject;
@@ -248,7 +248,7 @@ public class PrivilegeUsersService {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/role/{rolename}")
+	@Path("{username}/roles/{rolename}")
 	public Response addRoleToUser(@PathParam("username") String username, @PathParam("rolename") String rolename,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -266,7 +266,7 @@ public class PrivilegeUsersService {
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/role/{rolename}")
+	@Path("{username}/roles/{rolename}")
 	public Response removeRoleFromUser(@PathParam("username") String username, @PathParam("rolename") String rolename,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);

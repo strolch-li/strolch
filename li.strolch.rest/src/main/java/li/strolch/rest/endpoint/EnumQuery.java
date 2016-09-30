@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@Path("strolch/enum")
+@Path("strolch/enums")
 public class EnumQuery {
 
 	private static final Logger logger = LoggerFactory.getLogger(EnumQuery.class);
