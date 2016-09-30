@@ -145,6 +145,8 @@
 			<xs:enumeration value="Planned" />
 			<xs:enumeration value="Execution" />
 			<xs:enumeration value="Stopped" />
+			<xs:enumeration value="Warning" />
+			<xs:enumeration value="Error" />
 			<xs:enumeration value="Executed" />
 			<xs:enumeration value="Closed" />
 		</xs:restriction>

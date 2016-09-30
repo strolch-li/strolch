@@ -28,7 +28,6 @@ import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.State;
-import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.Version;
@@ -223,18 +222,9 @@ public class Activity extends GroupedParameterizedElement
 
 	@Override
 	public State getState() {
-		State state = State.CREATED;
-		if (this.elements == null)
-			return state;
-		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
-		while (elementIterator.hasNext()) {
-			IActivityElement child = elementIterator.next().getValue();
-			State childState = child.getState();
-			if (childState.ordinal() < state.ordinal()) {
-				state = childState;
-			}
-		}
-		return state;
+		if (this.elements == null || this.elements.isEmpty())
+			return State.CREATED;
+		return State.getState(this);
 	}
 
 	@Override
@@ -272,7 +262,7 @@ public class Activity extends GroupedParameterizedElement
 	}
 
 	@Override
-	public StrolchElement getParent() {
+	public Activity getParent() {
 		return this.parent;
 	}
 

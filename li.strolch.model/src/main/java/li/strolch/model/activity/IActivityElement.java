@@ -33,9 +33,15 @@ public interface IActivityElement extends StrolchElement {
 	public State getState();
 
 	public void setParent(Activity activity);
-	
-	public void accept(IActivityElementVisitor visitor);
+
+	@Override
+	public Activity getParent();
+
+	@Override
+	public Activity getRootElement();
 
 	@Override
 	public IActivityElement getClone();
+
+	public void accept(IActivityElementVisitor visitor);
 }

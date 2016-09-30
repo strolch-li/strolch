@@ -15,7 +15,15 @@
  */
 package li.strolch.model;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.exception.StrolchException;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.IActivityElement;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -28,8 +36,12 @@ public enum State {
 	PLANNED("Planned"), //$NON-NLS-1$
 	EXECUTION("Execution"), //$NON-NLS-1$
 	STOPPED("Stopped"), //$NON-NLS-1$
+	WARNING("Warning"), //$NON-NLS-1$
+	ERROR("Error"), //$NON-NLS-1$
 	EXECUTED("Executed"), //$NON-NLS-1$
 	CLOSED("Closed"); //$NON-NLS-1$
+
+	private static final Logger logger = LoggerFactory.getLogger(State.class);
 
 	private String state;
 
@@ -41,6 +53,42 @@ public enum State {
 		return this.state;
 	}
 
+	/**
+	 * @return true if the state is {@link #CREATED}
+	 */
+	public boolean inCreatedPhase() {
+		return this == CREATED;
+	}
+
+	/**
+	 * @return true if the state is one of {@link #PLANNING} or {@link #PLANNED}
+	 */
+	public boolean inPlanningPhase() {
+		return this == PLANNING || this == PLANNED;
+	}
+
+	/**
+	 * @return true if the state is one of {@link #EXECUTION}, {@link #STOPPED}, {@link #WARNING}, {@link #ERROR} or
+	 *         {@link #EXECUTED}
+	 */
+	public boolean inExecutionPhase() {
+		return this == EXECUTION || this == STOPPED || this == WARNING || this == ERROR || this == EXECUTED;
+	}
+
+	/**
+	 * @return true if the state is one of {@link #STOPPED}, {@link #WARNING} or {@link #ERROR}
+	 */
+	public boolean inExecutionWarningPhase() {
+		return this == STOPPED || this == WARNING || this == ERROR;
+	}
+
+	/**
+	 * @return true if the state is {@link #CLOSED}
+	 */
+	public boolean inClosedPhase() {
+		return this == CLOSED;
+	}
+
 	public static State parse(String s) {
 		DBC.PRE.assertNotEmpty("Value may not be null", s);
 		for (State state : values()) {
@@ -49,5 +97,88 @@ public enum State {
 		}
 
 		throw new StrolchException("No State for " + s);
+	}
+
+	public static State max(State state1, State state2) {
+		return state1.ordinal() >= state2.ordinal() ? state1 : state2;
+	}
+
+	public static State min(State state1, State state2) {
+		return state1.ordinal() <= state2.ordinal() ? state1 : state2;
+	}
+
+	public static State getState(Activity activity) {
+
+		Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
+
+		IActivityElement first = elementIterator.next().getValue();
+		State state = first.getState();
+
+		while (elementIterator.hasNext()) {
+			IActivityElement child = elementIterator.next().getValue();
+			State childState = child.getState();
+
+			// error trumps all
+			if (childState == State.ERROR) {
+				state = State.ERROR;
+				break;
+			}
+
+			// then in execution warning
+			if (childState.inExecutionWarningPhase()) {
+				if (state.inExecutionWarningPhase())
+					state = State.max(state, childState);
+				else
+					state = childState;
+			}
+
+			// then execution
+			else if (childState.inExecutionPhase()) {
+				if (!state.inExecutionWarningPhase()) {
+					if (state.inExecutionPhase())
+						state = State.min(state, childState);
+					else
+						state = State.EXECUTION;
+				}
+			}
+
+			// then planning
+			else if (childState.inPlanningPhase()) {
+				if (state.inExecutionPhase()) {
+					if (!state.inExecutionWarningPhase())
+						state = State.EXECUTION;
+				} else {
+					if (state.inPlanningPhase())
+						state = State.min(state, childState);
+					else if ((state.inClosedPhase() || state.inCreatedPhase()) && childState.inPlanningPhase())
+						state = State.PLANNING;
+				}
+			}
+
+			// then created
+			else if (childState.inCreatedPhase()) {
+				if (state.inExecutionPhase()) {
+					if (!state.inExecutionWarningPhase())
+						state = State.EXECUTION;
+				} else {
+					if (state.inPlanningPhase()) {
+						state = State.PLANNING;
+					}
+				}
+			}
+
+			// then closed 
+			else if (childState.inClosedPhase()) {
+				state = State.min(state, childState);
+			}
+
+			// should never occur
+			else {
+				logger.warn("Else case for getState() child: " + child.getLocator() + " childState: " + childState
+						+ " state: " + state);
+			}
+		}
+
+		return state;
 	}
 }

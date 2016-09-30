@@ -94,7 +94,7 @@ public class ActivityTest {
 
 	@Test
 	public void testState() {
-		Assert.assertEquals(State.CREATED, this.activity.getState());
+		Assert.assertEquals(State.PLANNING, this.activity.getState());
 	}
 
 	@Test(expected = StrolchException.class)

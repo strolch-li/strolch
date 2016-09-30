@@ -396,7 +396,10 @@ public class ModelGenerator {
 		subSubActivity.addParameterBag(bag);
 		subActivity.addElement(subSubActivity);
 
-		action = createAction("action_" + id, "Action " + name, "Use");
+		action = createAction("action1_" + id, "Action " + name, "Use");
+		subSubActivity.addElement(action);
+
+		action = createAction("action2_" + id, "Action " + name, "Use");
 		subSubActivity.addElement(action);
 
 		rootActivity.setPolicyDefs(createPolicyDefs());
