@@ -22,22 +22,22 @@ public class StartupListener implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-
-		String realPath = sce.getServletContext().getRealPath("/WEB-INF");
-
-		File pathF = new File(realPath);
-		String environment = StrolchEnvironment.getEnvironmentFromEnvProperties(pathF);
-		logger.info("Starting Strolch Minimal Rest...");
 		try {
+			String realPath = sce.getServletContext().getRealPath("/WEB-INF");
+
+			File pathF = new File(realPath);
+			String environment = StrolchEnvironment.getEnvironmentFromEnvProperties(pathF);
+			logger.info("Starting Strolch Minimal Rest...");
 			this.agent = new StrolchBootstrapper(StartupListener.class).setupByRoot(environment, pathF);
 			this.agent.initialize();
 			this.agent.start();
+
+			logger.info("Started Strolch Minimal Rest.");
+
 		} catch (Exception e) {
-			logger.error("Failed to start Strolch due to: " + e.getMessage(), e);
+			logger.error("Server startup failed due to: " + e.getMessage(), e);
 			throw e;
 		}
-
-		logger.info("Started Strolch Minimal Rest.");
 	}
 
 	@Override
