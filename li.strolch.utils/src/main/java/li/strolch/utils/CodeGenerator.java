@@ -10,7 +10,7 @@ import java.security.SecureRandom;
 public class CodeGenerator {
 
 	private static final String ALPHA_NUMERIC_UPPER = "123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-	private static final String ALPHA_NUMERIC_LOWER_UPPER = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjklmnpqrstuvwxyz";
+	private static final String ALPHA_NUMERIC_LOWER_UPPER = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz";
 
 	public static String alphaNumericUpper(int len) {
 

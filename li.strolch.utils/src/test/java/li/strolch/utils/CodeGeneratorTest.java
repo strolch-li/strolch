@@ -10,8 +10,8 @@ public class CodeGeneratorTest {
 
 	@Test
 	public void shouldCreateGeneratorLowerUpper() {
-		String code = CodeGenerator.alphaNumericLowerUpper(12);
-		assertEquals(12, code.length());
+		String code = CodeGenerator.alphaNumericLowerUpper(500);
+		assertEquals(500, code.length());
 		assertFalse(code.contains("0"));
 		assertFalse(code.contains("i"));
 		assertFalse(code.contains("I"));

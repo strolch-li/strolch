@@ -188,8 +188,8 @@ public class ModelTest {
 		bag = activity.getParameterBag(BAG_ID);
 		validateBag(bag);
 
-		action = activity.getElement("action_" + actId);
-		assertEquals("action_" + actId, action.getId());
+		action = activity.getElement("action1_" + actId);
+		assertEquals("action1_" + actId, action.getId());
 		assertEquals("Action " + actName, action.getName());
 		assertEquals("Use", action.getType());
 		assertEquals(ACTION_RES_ID, action.getResourceId());
@@ -273,7 +273,7 @@ public class ModelTest {
 		activity = activity.getElement("subSub_" + "@act01");
 		activity.addElement(new Action("bla", "Bla", "Bla"));
 
-		action = activity.getElement("action_" + "@act01");
+		action = activity.getElement("action1_" + "@act01");
 		action.addChange(new ValueChange<>(1234567890L, new IntegerValue(12345), STATE_INTEGER_ID));
 
 		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
