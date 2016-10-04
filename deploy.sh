@@ -58,5 +58,6 @@ fi
 echo -e "\nINFO: Strolch release ${releaseVersion} deployed to Maven Central."
 echo -e "INFO: Remember, it can take up to 10minutes to be available, and 2 hours for all synching."
 
+echo -e "\nRepository is at: https://oss.sonatype.org/service/local/repositories/releases/content/li/strolch/"
 
 exit 0
