@@ -73,7 +73,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<buildTimestamp>${maven.build.timestamp}</buildTimestamp>
-		<jersey.version>2.11</jersey.version>
+		<jersey.version>2.23.2</jersey.version>
 	</properties>
 
 	<modules>
