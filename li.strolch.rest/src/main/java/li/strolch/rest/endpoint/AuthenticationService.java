@@ -170,20 +170,20 @@ public class AuthenticationService {
 		} catch (InvalidCredentialsException e) {
 			logger.error(e.getMessage(), e);
 			loginResult.addProperty("msg", "Could not log in as the given credentials are invalid"); //$NON-NLS-1$
-			return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
+			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
 		} catch (AccessDeniedException e) {
 			logger.error(e.getMessage(), e);
 			loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
-			return Response.status(Status.UNAUTHORIZED).entity(loginResult).build();
+			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
 		} catch (StrolchException | PrivilegeException e) {
 			logger.error(e.getMessage(), e);
 			loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
-			return Response.status(Status.FORBIDDEN).entity(loginResult).build();
+			return Response.status(Status.FORBIDDEN).entity(loginResult.toString()).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
 			loginResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
-			return Response.serverError().entity(loginResult).build();
+			return Response.serverError().entity(loginResult.toString()).build();
 		}
 	}
 
@@ -210,12 +210,12 @@ public class AuthenticationService {
 		} catch (StrolchException | PrivilegeException e) {
 			logger.error(e.getMessage(), e);
 			logoutResult.addProperty("msg", MessageFormat.format("Could not logout due to: {0}", e.getMessage())); //$NON-NLS-1$
-			return Response.status(Status.UNAUTHORIZED).entity(logoutResult).build();
+			return Response.status(Status.UNAUTHORIZED).entity(logoutResult.toString()).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
 			logoutResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
-			return Response.serverError().entity(logoutResult).build();
+			return Response.serverError().entity(logoutResult.toString()).build();
 		}
 	}
 
