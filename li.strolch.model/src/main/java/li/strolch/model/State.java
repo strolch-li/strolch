@@ -89,6 +89,34 @@ public enum State {
 		return this == CLOSED;
 	}
 
+	/**
+	 * @return true if {@link #inExecutionPhase()} but not executed and not already in warning
+	 */
+	public boolean canSetToWarning() {
+		return inExecutionPhase() && this != State.EXECUTED && this != State.WARNING;
+	}
+
+	/**
+	 * @return true if {@link #inExecutionPhase()} but not executed and not already stopped
+	 */
+	public boolean canSetToStopped() {
+		return inExecutionPhase() && this != State.EXECUTED && this != State.STOPPED;
+	}
+
+	/**
+	 * @return true if {@link #inExecutionPhase()} but not executed and not already in error
+	 */
+	public boolean canSetToError() {
+		return inExecutionPhase() && this != State.EXECUTED && this != State.ERROR;
+	}
+
+	/**
+	 * @return true if {@link #inExecutionPhase()} but not executed
+	 */
+	public boolean canSetToExecuted() {
+		return inExecutionPhase() && this != State.EXECUTED;
+	}
+
 	public static State parse(String s) {
 		DBC.PRE.assertNotEmpty("Value may not be null", s);
 		for (State state : values()) {

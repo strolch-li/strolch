@@ -2,8 +2,10 @@ package li.strolch.execution;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.execution.command.ExecuteActivityCommand;
+import li.strolch.execution.command.SetActionToErrorCommand;
 import li.strolch.execution.command.SetActionToExecutedCommand;
 import li.strolch.execution.command.SetActionToStoppedCommand;
+import li.strolch.execution.command.SetActionToWarningCommand;
 import li.strolch.model.Locator;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -53,16 +55,6 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		});
 	}
 
-	private void toWarning(String realm, Locator locator, PrivilegeContext ctx) {
-		// TODO Auto-generated method stub
-
-	}
-
-	private void toError(String realm, Locator locator, PrivilegeContext ctx) {
-		// TODO Auto-generated method stub
-
-	}
-
 	private void toExecution(String realm, Locator locator, PrivilegeContext ctx) {
 		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ExecuteActivityCommand.class)) {
 			IActivityElement activityElement = tx.findElement(locator);
@@ -92,6 +84,30 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		}
 
 		toExecution(realm, activityLoc, ctx);
+	}
+
+	private void toWarning(String realm, Locator locator, PrivilegeContext ctx) {
+		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class)) {
+			Action action = tx.findElement(locator);
+
+			SetActionToWarningCommand command = new SetActionToWarningCommand(getContainer(), tx);
+			command.setAction(action);
+			tx.addCommand(command);
+
+			tx.commitOnClose();
+		}
+	}
+
+	private void toError(String realm, Locator locator, PrivilegeContext ctx) {
+		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class)) {
+			Action action = tx.findElement(locator);
+
+			SetActionToErrorCommand command = new SetActionToErrorCommand(getContainer(), tx);
+			command.setAction(action);
+			tx.addCommand(command);
+
+			tx.commitOnClose();
+		}
 	}
 
 	private void toStopped(String realm, Locator locator, PrivilegeContext ctx) {

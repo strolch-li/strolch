@@ -16,12 +16,14 @@
 
 package li.strolch.model.activity;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
@@ -29,6 +31,8 @@ import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.PolicyContainer;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
+import li.strolch.model.Tags;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
@@ -267,7 +271,34 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
-	public void accept(IActivityElementVisitor visitor) {
-		visitor.visit(this);
+	public <T extends Parameter<?>> T findParameter(String bagKey, String paramKey) {
+
+		T parameter = getParameter(bagKey, paramKey);
+		if (parameter != null)
+			return parameter;
+
+		return this.parent.findParameter(bagKey, paramKey);
+	}
+
+	@Override
+	public <T extends Parameter<?>> T findParameter(String bagKey, String paramKey, boolean assertExists)
+			throws StrolchModelException {
+
+		T parameter = getParameter(bagKey, paramKey);
+		if (parameter != null)
+			return parameter;
+
+		parameter = this.parent == null ? null : this.parent.findParameter(bagKey, paramKey);
+		if (assertExists && parameter == null) {
+			String msg = "The Parameter {0} does not exist";
+			throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(Tags.BAG, bagKey, paramKey)));
+		}
+
+		return parameter;
+	}
+
+	@Override
+	public <T> T accept(IActivityElementVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 }

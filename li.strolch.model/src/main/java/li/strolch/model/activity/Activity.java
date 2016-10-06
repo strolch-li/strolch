@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
@@ -31,6 +32,7 @@ import li.strolch.model.State;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.Version;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
@@ -330,8 +332,38 @@ public class Activity extends GroupedParameterizedElement
 	}
 
 	@Override
-	public void accept(IActivityElementVisitor visitor) {
-		visitor.visit(this);
+	public <T> T accept(IActivityElementVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
+
+	@Override
+	public <T extends Parameter<?>> T findParameter(String bagKey, String paramKey) {
+
+		T parameter = getParameter(bagKey, paramKey);
+		if (parameter != null)
+			return parameter;
+
+		if (this.parent != null)
+			return this.parent.findParameter(bagKey, paramKey);
+
+		return null;
+	}
+
+	@Override
+	public <T extends Parameter<?>> T findParameter(String bagKey, String paramKey, boolean assertExists)
+			throws StrolchModelException {
+
+		T parameter = getParameter(bagKey, paramKey);
+		if (parameter != null)
+			return parameter;
+
+		parameter = this.parent == null ? null : this.parent.findParameter(bagKey, paramKey);
+		if (assertExists && parameter == null) {
+			String msg = "The Parameter {0} does not exist";
+			throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(Tags.BAG, bagKey, paramKey)));
+		}
+
+		return parameter;
 	}
 
 	@Override

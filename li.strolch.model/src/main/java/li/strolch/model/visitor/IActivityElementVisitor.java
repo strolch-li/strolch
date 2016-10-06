@@ -3,9 +3,9 @@ package li.strolch.model.visitor;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 
-public interface IActivityElementVisitor {
+public interface IActivityElementVisitor<T> {
 
-	public void visit(Activity activity);
+	public T visit(Activity activity);
 
-	public void visit(Action action);
+	public T visit(Action action);
 }

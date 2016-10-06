@@ -21,7 +21,7 @@ import li.strolch.policy.PolicyHandler;
 import li.strolch.service.api.Command;
 import li.strolch.utils.helper.StringHelper;
 
-public abstract class ExecutionCommand extends Command implements TimeOrderingVisitor, IActivityElementVisitor {
+public abstract class ExecutionCommand extends Command implements TimeOrderingVisitor, IActivityElementVisitor<Void> {
 
 	public ExecutionCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
@@ -48,14 +48,14 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	@Override
 	public void visitSeries(Activity activity) {
 
-		if (activity.getState() == State.EXECUTED)
+		if (activity.getState().compareTo(State.EXECUTED) >= 0)
 			return;
 
 		Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
 		while (iter.hasNext()) {
 			IActivityElement element = iter.next().getValue();
 
-			boolean canExecute = element.getState().compareTo(State.EXECUTION) < 0;
+			boolean canExecute = isExecutable(element);
 			if (canExecute) {
 				element.accept(this);
 				break;
@@ -66,28 +66,36 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	@Override
 	public void visitParallel(Activity activity) {
 
-		if (activity.getState() == State.EXECUTED)
+		if (activity.getState().compareTo(State.EXECUTED) >= 0)
 			return;
 
 		Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
 		while (iter.hasNext()) {
 			IActivityElement element = iter.next().getValue();
 
-			boolean canExecute = element.getState().compareTo(State.EXECUTION) < 0;
+			boolean canExecute = isExecutable(element);
 			if (canExecute) {
 				element.accept(this);
 			}
 		}
 	}
 
-	@Override
-	public void visit(Activity activity) {
-		activity.getTimeOrdering().accept(this, activity);
+	protected boolean isExecutable(IActivityElement element) {
+		if (element.getState() == State.EXECUTED)
+			return false;
+		return element instanceof Activity || element.getState().compareTo(State.EXECUTION) < 0;
 	}
 
 	@Override
-	public void visit(Action action) {
+	public Void visit(Activity activity) {
+		activity.getTimeOrdering().accept(this, activity);
+		return null;
+	}
+
+	@Override
+	public Void visit(Action action) {
 		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
 		executionPolicy.toExecution(action);
+		return null;
 	}
 }

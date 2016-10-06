@@ -104,8 +104,10 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *            if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
 	 * 
 	 * @return the found {@link Parameter} or null if it was not found
+	 * 
+	 * @throws StrolchModelException if the element does not exist and <code>assertExists</code> is true
 	 */
-	public <T extends Parameter<?>> T getParameter(String bagKey, String paramKey, boolean assertExists) {
+	public <T extends Parameter<?>> T getParameter(String bagKey, String paramKey, boolean assertExists) throws StrolchModelException {
 		if (this.parameterBagMap == null) {
 			if (assertExists) {
 				String msg = "The Parameter {0} does not exist";

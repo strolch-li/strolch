@@ -33,7 +33,7 @@ public class DurationExecutionTimer {
 		this.simulationPolicies = new HashMap<>();
 	}
 
-	public void stop(Locator locator) {
+	public void cancel(Locator locator) {
 		SimulationTask task = this.simulationPolicies.remove(locator);
 		if (task != null) {
 			task.cancel();

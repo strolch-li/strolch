@@ -24,7 +24,7 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 	@Before
 	public void before() {
 		mockRuntime(new File("target/" + StartActivityExecutionServiceTest.class.getName()),
-				new File("src/test/resources/svctest"));
+				new File("src/test/resources/executiontest"));
 		startContainer();
 	}
 
@@ -42,19 +42,19 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 
 		StartActivityExecutionService svc = new StartActivityExecutionService();
 		LocatorArgument arg = new LocatorArgument();
-		arg.realm = "svcTransient";
+		arg.realm = "execution";
 		arg.locator = activityLoc;
 
 		doService(cert, svc, arg);
 
-		try (StrolchTransaction tx = getRealm("svcTransient").openTx(cert, StartActivityExecutionServiceTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action = tx.findElement(activityLoc.append("produce"));
 			assertEquals(State.EXECUTION, action.getState());
 		}
 
-		Thread.sleep(3000L);
+		Thread.sleep(100L);
 
-		try (StrolchTransaction tx = getRealm("svcTransient").openTx(cert, StartActivityExecutionServiceTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action = tx.findElement(activityLoc.append("produce"));
 			assertEquals(State.EXECUTED, action.getState());
 		}
@@ -69,12 +69,12 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 
 		StartActivityExecutionService svc = new StartActivityExecutionService();
 		LocatorArgument arg = new LocatorArgument();
-		arg.realm = "svcTransient";
+		arg.realm = "execution";
 		arg.locator = activityLoc;
 
 		doService(cert, svc, arg);
 
-		try (StrolchTransaction tx = getRealm("svcTransient").openTx(cert, StartActivityExecutionServiceTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
 
 			action = tx.findElement(activityLoc.append("action_1"));
@@ -86,9 +86,9 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 			assertEquals(State.CREATED, action.getState());
 		}
 
-		Thread.sleep(3000L);
+		Thread.sleep(450L);
 
-		try (StrolchTransaction tx = getRealm("svcTransient").openTx(cert, StartActivityExecutionServiceTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
 
 			action = tx.findElement(activityLoc.append("action_1"));
@@ -101,9 +101,9 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 			assertEquals(State.CREATED, action.getState());
 		}
 
-		Thread.sleep(2000L);
+		Thread.sleep(300L);
 
-		try (StrolchTransaction tx = getRealm("svcTransient").openTx(cert, StartActivityExecutionServiceTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
 
 			action = tx.findElement(activityLoc.append("action_1"));
@@ -116,9 +116,9 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 			assertEquals(State.EXECUTION, action.getState());
 		}
 
-		Thread.sleep(2000L);
+		Thread.sleep(300L);
 
-		try (StrolchTransaction tx = getRealm("svcTransient").openTx(cert, StartActivityExecutionServiceTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
 
 			action = tx.findElement(activityLoc.append("action_1"));
@@ -145,12 +145,12 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 
 		StartActivityExecutionService svc = new StartActivityExecutionService();
 		LocatorArgument arg = new LocatorArgument();
-		arg.realm = "svcTransient";
+		arg.realm = "execution";
 		arg.locator = activityLoc;
 
 		doService(cert, svc, arg);
 
-		try (StrolchTransaction tx = getRealm("svcTransient").openTx(cert, StartActivityExecutionServiceTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
 
 			action = tx.findElement(activityLoc.append("action_1"));
@@ -161,9 +161,9 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 			assertEquals(State.EXECUTION, action.getState());
 		}
 
-		Thread.sleep(3000L);
+		Thread.sleep(100L);
 
-		try (StrolchTransaction tx = getRealm("svcTransient").openTx(cert, StartActivityExecutionServiceTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
 
 			action = tx.findElement(activityLoc.append("action_1"));
@@ -172,6 +172,28 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 			assertEquals(State.EXECUTED, action.getState());
 			action = tx.findElement(activityLoc.append("action_3"));
 			assertEquals(State.EXECUTED, action.getState());
+		}
+	}
+
+	@Test
+	public void shouldExecuteDeepActivity() throws InterruptedException {
+
+		Locator activityLoc = Locator.valueOf(Tags.ACTIVITY, "ToStock", "deep");
+
+		Certificate cert = loginTest();
+
+		StartActivityExecutionService svc = new StartActivityExecutionService();
+		LocatorArgument arg = new LocatorArgument();
+		arg.realm = "execution";
+		arg.locator = activityLoc;
+
+		doService(cert, svc, arg);
+
+		Thread.sleep(200L);
+
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
+			Activity activity = tx.findElement(activityLoc);
+			assertEquals(State.EXECUTED, activity.getState());
 		}
 	}
 }

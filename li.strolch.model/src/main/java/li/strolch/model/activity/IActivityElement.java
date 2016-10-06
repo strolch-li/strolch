@@ -15,8 +15,11 @@
  */
 package li.strolch.model.activity;
 
+import li.strolch.exception.StrolchModelException;
+import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.model.visitor.IActivityElementVisitor;
 
 /**
@@ -26,13 +29,56 @@ import li.strolch.model.visitor.IActivityElementVisitor;
  */
 public interface IActivityElement extends StrolchElement {
 
+	/**
+	 * @return the start time of this element
+	 */
 	public Long getStart();
 
+	/**
+	 * @return the end time of this element
+	 */
 	public Long getEnd();
 
+	/**
+	 * @return the {@link State} of this element
+	 */
 	public State getState();
 
+	/**
+	 * Set the parent
+	 * 
+	 * @param activity
+	 */
 	public void setParent(Activity activity);
+
+	/**
+	 * <p>
+	 * Checks if this element contains the {@link Parameter}, or otherwise queries its parent, until the root element is
+	 * reached.
+	 * </p>
+	 * 
+	 * <p>
+	 * If the parameter does not exist, null is returned
+	 * </p>
+	 * 
+	 * @see GroupedParameterizedElement#getParameter(String, String)
+	 */
+	public <T extends Parameter<?>> T findParameter(String bagKey, String paramKey);
+
+	/**
+	 * <p>
+	 * Checks if this element contains the {@link Parameter}, or otherwise queries its parent, until the root element is
+	 * reached.
+	 * </p>
+	 * 
+	 * <p>
+	 * If the parameter does not exist and <code>assertExists</code> is true, then an
+	 * </p>
+	 * 
+	 * @see GroupedParameterizedElement#getParameter(String, String, boolean)
+	 */
+	public <T extends Parameter<?>> T findParameter(String bagKey, String paramKey, boolean assertExists)
+			throws StrolchModelException;
 
 	@Override
 	public Activity getParent();
@@ -43,5 +89,13 @@ public interface IActivityElement extends StrolchElement {
 	@Override
 	public IActivityElement getClone();
 
-	public void accept(IActivityElementVisitor visitor);
+	/**
+	 * Implements the visitor pattern. Concrete implementation will call the proper method on the visitor
+	 * 
+	 * @param visitor
+	 *            the visitor to accept
+	 * 
+	 * @return the result of the visitor being accepted
+	 */
+	public <T> T accept(IActivityElementVisitor<T> visitor);
 }
