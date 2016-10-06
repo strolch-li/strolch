@@ -33,49 +33,49 @@
 	<Resource Id="bicycle" Name="Bicycle" Type="Product">
 		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
 		<Policies>
-			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.SimulationPolicy" />
+			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.DurationExecution" />
 		</Policies>
 	</Resource>
 
 	<Resource Id="article1" Name="Article 1" Type="Article">
 		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
 		<Policies>
-			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.SimulationPolicy" />
+			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.DurationExecution" />
 		</Policies>
 	</Resource>
 
 	<Resource Id="article2" Name="Article 2" Type="Article">
 		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
 		<Policies>
-			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.SimulationPolicy" />
+			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.DurationExecution" />
 		</Policies>
 	</Resource>
 
 	<Resource Id="article3" Name="Article 3" Type="Article">
 		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
 		<Policies>
-			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.SimulationPolicy" />
+			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.DurationExecution" />
 		</Policies>
 	</Resource>
 
 	<Resource Id="conveyor1" Name="Conveyor 1" Type="Conveyor">
 		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
 		<Policies>
-			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.SimulationPolicy" />
+			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.DurationExecution" />
 		</Policies>
 	</Resource>
 
 	<Resource Id="conveyor2" Name="Conveyor 2" Type="Conveyor">
 		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
 		<Policies>
-			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.SimulationPolicy" />
+			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.DurationExecution" />
 		</Policies>
 	</Resource>
 
 	<Resource Id="conveyor3" Name="Conveyor 3" Type="Conveyor">
 		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
 		<Policies>
-			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.SimulationPolicy" />
+			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.DurationExecution" />
 		</Policies>
 	</Resource>
 
