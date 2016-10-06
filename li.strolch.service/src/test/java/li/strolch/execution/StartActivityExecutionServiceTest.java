@@ -161,7 +161,7 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 			assertEquals(State.EXECUTION, action.getState());
 		}
 
-		Thread.sleep(100L);
+		Thread.sleep(150L);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
@@ -189,7 +189,7 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 
 		doService(cert, svc, arg);
 
-		Thread.sleep(200L);
+		Thread.sleep(1000L);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Activity activity = tx.findElement(activityLoc);

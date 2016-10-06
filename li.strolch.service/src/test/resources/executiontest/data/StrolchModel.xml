@@ -68,7 +68,7 @@
 
 	<Activity Id="parallel" Name="Activity" Type="ToStock" TimeOrdering="Parallel">
 		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
-			<Parameter Name="Duration" Id="duration" Value="PT0.01S" Type="Duration" />
+			<Parameter Name="Duration" Id="duration" Value="PT0.1S" Type="Duration" />
 		</ParameterBag>
 		<Action Id="action_1" Name="Action 1" ResourceId="article1" ResourceType="Article" Type="Use" />
 		<Action Id="action_2" Name="Action 2" ResourceId="article2" ResourceType="Article" Type="Use" />
@@ -77,7 +77,7 @@
 
 	<Activity Id="deep" Name="Activity" Type="ToStock" TimeOrdering="Series">
 		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
-			<Parameter Name="Duration" Id="duration" Value="PT0.01S" Type="Duration" />
+			<Parameter Name="Duration" Id="duration" Value="PT0.1S" Type="Duration" />
 		</ParameterBag>
 		<Activity Id="sub1" Name="Sub Activity 1" Type="Sub" TimeOrdering="Series">
 			<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />
