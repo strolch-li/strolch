@@ -18,6 +18,9 @@ package li.strolch.utils.collections;
 import java.util.List;
 
 /**
+ * Paging helper creating windows on result list of queries. The input is the original complete list, and with the help
+ * of an offset and a limit, a page/window can be fetched.
+ * 
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  *
  * @param <T>
@@ -25,108 +28,138 @@ import java.util.List;
  */
 public class Paging<T> {
 
-	private int pageSize;
-	private int pageToReturn;
-	private int nrOfPages;
-	private int nrOfElements;
+	private int limit;
+	private int offset;
+	private int size;
 
 	private List<T> input;
 	private List<T> page;
 
-	private Paging(int pageSize, int indexOfPageToReturn) {
-		this.pageSize = pageSize;
-		this.pageToReturn = indexOfPageToReturn;
+	private int nextOffset;
+	private int previousOffset;
+	private int firstOffset;
+	private int lastOffset;
+
+	private Paging() {
+		// empty constructor
 	}
 
-	public int getPageSize() {
-		return this.pageSize;
+	/**
+	 * @return the max number of elements to be returned in the page/window
+	 */
+	public int getLimit() {
+		return this.limit;
 	}
 
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
+	/**
+	 * @return the offset in the input list for the page/window
+	 */
+	public int getOffset() {
+		return this.offset;
 	}
 
-	public int getPageToReturn() {
-		return this.pageToReturn;
+	/**
+	 * @return the next offset, i.e. offset + limit
+	 */
+	public int getNextOffset() {
+		return this.nextOffset;
 	}
 
-	public void setPageToReturn(int pageToReturn) {
-		this.pageToReturn = pageToReturn;
+	/**
+	 * @return the previous offset, i.e. offset - limit
+	 */
+	public int getPreviousOffset() {
+		return this.previousOffset;
 	}
 
-	public int getNrOfPages() {
-		return this.nrOfPages;
+	/**
+	 * @return 0, as the first offset is the first element in the input list
+	 */
+	public int getFirstOffset() {
+		return this.firstOffset;
 	}
 
-	public void setNrOfPages(int nrOfPages) {
-		this.nrOfPages = nrOfPages;
+	/**
+	 * @return the last possible offset given the offset, limit and input size
+	 */
+	public int getLastOffset() {
+		return this.lastOffset;
 	}
 
-	public int getNrOfElements() {
-		return this.nrOfElements;
+	/**
+	 * @return the size of the input list
+	 */
+	public int getSize() {
+		return this.size;
 	}
 
-	public void setNrOfElements(int nrOfElements) {
-		this.nrOfElements = nrOfElements;
-	}
-
+	/**
+	 * @return the input
+	 */
 	public List<T> getInput() {
 		return this.input;
 	}
 
+	/**
+	 * @return the current page/window
+	 */
 	public List<T> getPage() {
 		return this.page;
 	}
 
 	/**
-	 * Creates a sub list of the given list by creating defining start and end from the requested page of the form
+	 * Creates a sub list of the input list with the given limit and offset
 	 * 
 	 * @param list
-	 *            the list to paginate
-	 * @param pageSize
-	 *            The number of items to return in each page
-	 * @param page
-	 *            the page to return - start index is 1
-	 * 
+	 *            the list to paginate / create a window for
+	 * @param offset
+	 *            where to start the sub list
+	 * @param limit
+	 *            The number of items to return in each page/window
 	 * @return a {@link Paging} instance from which the selected page (list) can be retrieved
 	 * 
 	 * @param <T>
 	 *            the type of element in the list
 	 */
-	public static <T> Paging<T> asPage(List<T> list, int pageSize, int page) {
+	public static <T> Paging<T> asPage(List<T> list, int offset, int limit) {
 
-		Paging<T> paging = new Paging<>(pageSize, page);
-		paging.nrOfElements = list.size();
+		Paging<T> paging = new Paging<>();
+		paging.firstOffset = 0;
+		paging.limit = limit;
+		paging.offset = offset;
 
-		if (paging.pageSize <= 0 || paging.pageToReturn <= 0) {
-			paging.nrOfPages = 0;
-			paging.pageSize = list.size();
-			paging.pageToReturn = 0;
-			paging.input = list;
+		paging.size = list.size();
+		paging.input = list;
+
+		paging.firstOffset = 0;
+
+		if (paging.limit <= 0 || paging.offset < 0) {
+			paging.offset = 0;
+			paging.limit = list.size();
+
 			paging.page = list;
+
+			paging.nextOffset = 0;
+			paging.lastOffset = 0;
+			paging.previousOffset = 0;
+
 			return paging;
 		}
 
-		int size = list.size();
+		paging.page = list.subList(offset, Math.min(paging.size, offset + limit));
 
-		// calculate maximum number of pages
-		paging.nrOfPages = size / paging.pageSize;
-		if (size % paging.pageSize != 0)
-			paging.nrOfPages++;
+		if (limit == 1) {
 
-		// and from this validate requested page
-		paging.pageToReturn = Math.min(paging.pageToReturn, paging.nrOfPages);
+			paging.nextOffset = Math.min(paging.size - 1, offset + 1);
+			paging.previousOffset = Math.max(0, offset - 1);
+			paging.lastOffset = paging.size - 1;
 
-		// now we can calculate the start and end of the page
-		int start = Math.max(0, paging.pageSize * paging.pageToReturn - paging.pageSize);
-		int end = Math.min(size, paging.pageSize * paging.pageToReturn);
+		} else {
 
-		// and return the list
-		paging.page = list.subList(start, end);
-
-		// fix page size
-		if (paging.page.size() < paging.pageSize)
-			paging.pageSize = paging.page.size();
+			paging.nextOffset = Math.min(paging.size - 1, limit + offset);
+			paging.previousOffset = Math.max(0, offset - limit);
+			paging.lastOffset = offset + ((paging.size - offset) - ((paging.size - offset) % limit));
+		}
 
 		return paging;
 	}

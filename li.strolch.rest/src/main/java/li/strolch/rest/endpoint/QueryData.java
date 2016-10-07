@@ -7,14 +7,11 @@ public class QueryData {
 	@QueryParam("realmName")
 	private String realmName;
 
-	@QueryParam("draw")
-	private int draw;
+	@QueryParam("offset")
+	private int offset;
 
-	@QueryParam("pageSize")
-	private int pageSize;
-
-	@QueryParam("page")
-	private int page;
+	@QueryParam("limit")
+	private int limit;
 
 	@QueryParam("query")
 	private String query;
@@ -33,14 +30,6 @@ public class QueryData {
 		this.realmName = realmName;
 	}
 
-	public int getDraw() {
-		return this.draw;
-	}
-
-	public void setDraw(int draw) {
-		this.draw = draw;
-	}
-
 	public String getOrderBy() {
 		return this.orderBy;
 	}
@@ -57,20 +46,20 @@ public class QueryData {
 		this.ascending = ascending;
 	}
 
-	public int getPageSize() {
-		return this.pageSize;
+	public int getOffset() {
+		return this.offset;
 	}
 
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
+	public void setOffset(int offset) {
+		this.offset = offset;
 	}
 
-	public int getPage() {
-		return this.page;
+	public int getLimit() {
+		return this.limit;
 	}
 
-	public void setPage(int page) {
-		this.page = page;
+	public void setLimit(int limit) {
+		this.limit = limit;
 	}
 
 	public String getQuery() {

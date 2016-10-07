@@ -225,23 +225,25 @@ public class ModelQuery {
 			StrolchElementVisitor<T, JsonObject> toJsonVisitor) {
 
 		// paging
-		Paging<T> paging = Paging.asPage(elements, queryData.getPageSize(), queryData.getPage());
+		Paging<T> paging = Paging.asPage(elements, queryData.getOffset(), queryData.getLimit());
 
 		// get page
 		List<T> page = paging.getPage();
 
 		JsonObject root = new JsonObject();
 		root.addProperty("msg", "-");
-		root.addProperty("draw", queryData.getDraw());
+		root.addProperty("limit", paging.getLimit());
+		root.addProperty("offset", paging.getOffset());
+		root.addProperty("size", paging.getSize());
+		root.addProperty("previousOffset", paging.getPreviousOffset());
+		root.addProperty("nextOffset", paging.getNextOffset());
+		root.addProperty("lastOffset", paging.getLastOffset());
+
 		root.addProperty("dataSetSize", dataSetSize);
-		root.addProperty("nrOfElements", paging.getNrOfElements());
 
 		if (StringHelper.isNotEmpty(queryData.getOrderBy()))
 			root.addProperty("sortBy", queryData.getOrderBy());
 		root.addProperty("ascending", queryData.isAscending());
-		root.addProperty("nrOfPages", paging.getNrOfPages());
-		root.addProperty("pageSize", paging.getPageSize());
-		root.addProperty("page", paging.getPageToReturn());
 
 		// add items
 		JsonArray data = new JsonArray();

@@ -22,4 +22,14 @@ public class StrolchRestfulConstants {
 
 	public static final String STROLCH_CERTIFICATE = "strolch.certificate"; //$NON-NLS-1$
 	public static final String STROLCH_AUTHORIZATION = "strolch.authorization"; //$NON-NLS-1$
+
+	public static final String MSG = "msg";
+	public static final String DATA = "data";
+	public static final String LAST_OFFSET = "lastOffset";
+	public static final String NEXT_OFFSET = "nextOffset";
+	public static final String PREVIOUS_OFFSET = "previousOffset";
+	public static final String SIZE = "size";
+	public static final String OFFSET = "offset";
+	public static final String LIMIT = "limit";
+
 }
