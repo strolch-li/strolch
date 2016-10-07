@@ -118,6 +118,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		if (t == null)
 			return null;
 
+		// TODO cloning has its issues, as queries don't return a clone!
 		@SuppressWarnings("unchecked")
 		T clone = (T) t.getClone();
 		clone.setVersion(t.getVersion());

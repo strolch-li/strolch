@@ -118,6 +118,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 		if (!this.realm.getMode().isTransient())
 			return t;
 
+		// TODO cloning has its issues, as queries don't return a clone!
 		@SuppressWarnings("unchecked")
 		T clone = (T) t.getClone();
 		clone.setVersion(t.getVersion());

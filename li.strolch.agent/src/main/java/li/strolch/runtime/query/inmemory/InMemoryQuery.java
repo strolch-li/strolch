@@ -92,6 +92,8 @@ public class InMemoryQuery<T extends StrolchRootElement, U> {
 			}
 		}
 
+		// TODO The ElementMaps return a clone, but here we don't...
+
 		return result;
 	}
 }
