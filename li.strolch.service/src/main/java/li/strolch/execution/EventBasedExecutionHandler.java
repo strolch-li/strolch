@@ -16,8 +16,29 @@ import li.strolch.privilege.model.PrivilegeContext;
 
 public class EventBasedExecutionHandler extends ExecutionHandler {
 
+	private DelayedExecutionTimer delayedExecutionTimer;
+
 	public EventBasedExecutionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
+	}
+
+	@Override
+	public void start() throws Exception {
+
+		this.delayedExecutionTimer = new SimpleDurationExecutionTimer();
+
+		super.start();
+	}
+
+	@Override
+	public void stop() throws Exception {
+
+		if (this.delayedExecutionTimer != null) {
+			this.delayedExecutionTimer.destroy();
+			this.delayedExecutionTimer = null;
+		}
+
+		super.stop();
 	}
 
 	@Override
@@ -124,5 +145,10 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	protected StrolchTransaction openTx(String realm, Certificate cert, Class<?> clazz) {
 		return getContainer().getRealm(realm).openTx(cert, clazz);
+	}
+
+	@Override
+	public DelayedExecutionTimer getDelayedExecutionTimer() {
+		return this.delayedExecutionTimer;
 	}
 }

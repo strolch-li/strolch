@@ -9,6 +9,8 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public ExecutionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
+	
+	public abstract DelayedExecutionTimer getDelayedExecutionTimer();
 
 	public abstract void toExecution(String realm, Locator locator);
 

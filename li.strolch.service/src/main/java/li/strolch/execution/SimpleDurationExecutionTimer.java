@@ -11,28 +11,26 @@ import org.slf4j.LoggerFactory;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Locator;
 
-public class DurationExecutionTimer {
+public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
-	private static final Logger logger = LoggerFactory.getLogger(DurationExecutionTimer.class);
-
-	private static final DurationExecutionTimer instance;
-
-	static {
-		instance = new DurationExecutionTimer();
-	}
-
-	public static DurationExecutionTimer getInstance() {
-		return instance;
-	}
+	private static final Logger logger = LoggerFactory.getLogger(SimpleDurationExecutionTimer.class);
 
 	private Timer timer;
 
 	private Map<Locator, SimulationTask> simulationPolicies;
 
-	public DurationExecutionTimer() {
+	public SimpleDurationExecutionTimer() {
 		this.simulationPolicies = new HashMap<>();
 	}
 
+	@Override
+	public void destroy() {
+		if (this.timer != null) {
+			this.timer.cancel();
+		}
+	}
+
+	@Override
 	public void cancel(Locator locator) {
 		SimulationTask task = this.simulationPolicies.remove(locator);
 		if (task != null) {
@@ -40,6 +38,7 @@ public class DurationExecutionTimer {
 		}
 	}
 
+	@Override
 	public void execute(String realm, ComponentContainer container, Locator locator, long duration) {
 		if (this.timer == null)
 			this.timer = new Timer("SimulationExecution", true);

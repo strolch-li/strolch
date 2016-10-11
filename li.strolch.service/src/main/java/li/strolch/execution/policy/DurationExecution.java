@@ -2,7 +2,6 @@ package li.strolch.execution.policy;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.UpdateActivityCommand;
-import li.strolch.execution.DurationExecutionTimer;
 import li.strolch.model.Locator;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
@@ -33,7 +32,7 @@ public class DurationExecution extends ExecutionPolicy {
 		String realmName = tx().getRealmName();
 		Locator locator = action.getLocator();
 		logger.warn("Executing action " + action.getLocator() + " has a duration of " + durationP.getValueAsString());
-		DurationExecutionTimer.getInstance().execute(realmName, getContainer(), locator, durationP.getValue());
+		getDelayedExecutionTimer().execute(realmName, getContainer(), locator, durationP.getValue());
 
 		action.setState(State.EXECUTION);
 
@@ -59,7 +58,7 @@ public class DurationExecution extends ExecutionPolicy {
 	@Override
 	public void toStopped(Action action) {
 
-		DurationExecutionTimer.getInstance().cancel(action.getLocator());
+		getDelayedExecutionTimer().cancel(action.getLocator());
 
 		action.setState(State.STOPPED);
 
@@ -73,7 +72,7 @@ public class DurationExecution extends ExecutionPolicy {
 	@Override
 	public void toError(Action action) {
 
-		DurationExecutionTimer.getInstance().cancel(action.getLocator());
+		getDelayedExecutionTimer().cancel(action.getLocator());
 
 		action.setState(State.ERROR);
 

@@ -2,6 +2,8 @@ package li.strolch.execution.policy;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.UpdateActivityCommand;
+import li.strolch.execution.DelayedExecutionTimer;
+import li.strolch.execution.ExecutionHandler;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -30,5 +32,9 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 		command.doCommand();
 
 		logger.warn("Action " + action.getLocator() + " is now in WARNING!");
+	}
+
+	protected DelayedExecutionTimer getDelayedExecutionTimer() {
+		return getComponent(ExecutionHandler.class).getDelayedExecutionTimer();
 	}
 }
