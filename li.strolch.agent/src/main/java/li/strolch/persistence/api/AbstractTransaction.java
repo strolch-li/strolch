@@ -616,6 +616,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				} catch (Exception exc) {
 					logger.error("Failed to roll back after failing to undo commands: " + exc.getMessage(), exc); //$NON-NLS-1$
 				}
+				logger.error("Transaction failed due to " + e.getMessage(), e);
 				handleFailure(start, ex);
 			}
 
@@ -623,6 +624,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				rollback();
 				handleRollback(start);
 			} catch (Exception ex) {
+				logger.error("Transaction failed due to " + e.getMessage(), e);
 				logger.error("Failed to commit transaction and then rollback due to " + ex.getMessage(), ex);
 				handleFailure(start, e);
 			}
