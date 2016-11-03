@@ -37,6 +37,7 @@ public class RemoveParameterCommand extends Command {
 	private String parameterId;
 
 	private Parameter<?> removedParameter;
+	private boolean removed;
 
 	/**
 	 * @param container
@@ -82,11 +83,12 @@ public class RemoveParameterCommand extends Command {
 
 		this.removedParameter = this.element.removeParameter(this.parameterId);
 		new UpdateElementVisitor(tx()).update(rootElement);
+		this.removed = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.removedParameter != null) {
+		if (this.removed && this.removedParameter != null) {
 			this.element.addParameter(this.removedParameter);
 			new UndoUpdateElementVisitor(tx()).undo(this.removedParameter.getRootElement());
 		}

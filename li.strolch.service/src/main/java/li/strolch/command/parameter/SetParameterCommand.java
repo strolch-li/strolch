@@ -165,7 +165,7 @@ public class SetParameterCommand extends Command {
 	@Override
 	public void undo() {
 
-		if (this.parameter != null) {
+		if (this.updated && this.parameter != null) {
 			if (this.oldName != null) {
 				this.parameter.setName(this.oldName);
 			}
@@ -187,7 +187,7 @@ public class SetParameterCommand extends Command {
 				visitor.setValue(this.parameter, this.oldValueAsString);
 			}
 
-			if (hasChanges() && this.updated) {
+			if (hasChanges()) {
 				StrolchRootElement rootElement = this.parameter.getRootElement();
 				new UndoUpdateElementVisitor(tx()).undo(rootElement);
 			}

@@ -31,6 +31,7 @@ import li.strolch.utils.dbc.DBC;
 public class AddActivityCommand extends Command {
 
 	private Activity activity;
+	private boolean added;
 
 	/**
 	 * @param tx
@@ -64,11 +65,12 @@ public class AddActivityCommand extends Command {
 		}
 
 		activityMap.add(tx(), this.activity);
+		this.added = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.activity != null && tx().isRollingBack()) {
+		if (this.added && this.activity != null && tx().isRollingBack()) {
 			ActivityMap activityMap = tx().getActivityMap();
 			if (activityMap.hasElement(tx(), this.activity.getType(), this.activity.getId()))
 				activityMap.remove(tx(), this.activity);

@@ -32,6 +32,7 @@ import li.strolch.utils.dbc.DBC;
 public class AddOrderCollectionCommand extends Command {
 
 	private List<Order> orders;
+	private boolean added;
 
 	/**
 	 * @param tx
@@ -69,11 +70,12 @@ public class AddOrderCollectionCommand extends Command {
 		}
 
 		orderMap.addAll(tx(), this.orders);
+		this.added = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.orders != null && !this.orders.isEmpty() && tx().isRollingBack()) {
+		if (this.added && this.orders != null && !this.orders.isEmpty() && tx().isRollingBack()) {
 			OrderMap orderMap = tx().getOrderMap();
 			for (Order order : this.orders) {
 				if (orderMap.hasElement(tx(), order.getType(), order.getId())) {

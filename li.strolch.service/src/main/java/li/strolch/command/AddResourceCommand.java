@@ -31,6 +31,7 @@ import li.strolch.utils.dbc.DBC;
 public class AddResourceCommand extends Command {
 
 	private Resource resource;
+	private boolean added;
 
 	/**
 	 * @param tx
@@ -64,11 +65,12 @@ public class AddResourceCommand extends Command {
 		}
 
 		resourceMap.add(tx(), this.resource);
+		this.added = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.resource != null && tx().isRollingBack()) {
+		if (this.added && this.resource != null && tx().isRollingBack()) {
 			ResourceMap resourceMap = tx().getResourceMap();
 			if (resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId()))
 				resourceMap.remove(tx(), this.resource);
