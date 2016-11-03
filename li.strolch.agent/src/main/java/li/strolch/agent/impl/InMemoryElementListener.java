@@ -155,6 +155,9 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 		if (this.resourceMap.hasElement(this.tx, resource.getType(), resource.getId())) {
 			if (this.updateResources) {
+				// we need to update the version, thus we set the current version
+				Resource current = this.resourceMap.getBy(tx, resource.getType(), resource.getId());
+				resource.setVersion(current.getVersion());
 				this.resourceMap.update(this.tx, resource);
 			} else if (this.failOnUpdate) {
 				throw new StrolchException(MessageFormat
@@ -173,6 +176,9 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 		if (this.orderMap.hasElement(this.tx, order.getType(), order.getId())) {
 			if (this.updateOrders) {
+				// we need to update the version, thus we set the current version
+				Order current = this.orderMap.getBy(tx, order.getType(), order.getId());
+				order.setVersion(current.getVersion());
 				this.orderMap.update(this.tx, order);
 			} else if (failOnUpdate) {
 				throw new StrolchException(MessageFormat.format("Order {0} already exists and updating is disallowed!",
@@ -191,6 +197,9 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 		if (this.activityMap.hasElement(this.tx, activity.getType(), activity.getId())) {
 			if (this.updateActivities) {
+				// we need to update the version, thus we set the current version
+				Activity current = this.activityMap.getBy(tx, activity.getType(), activity.getId());
+				activity.setVersion(current.getVersion());
 				this.activityMap.update(this.tx, activity);
 			} else if (failOnUpdate) {
 				throw new StrolchException(MessageFormat
