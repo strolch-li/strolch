@@ -32,6 +32,7 @@ import li.strolch.utils.dbc.DBC;
 public class RemoveOrderCollectionCommand extends Command {
 
 	private List<Order> orders;
+	private boolean removed;
 
 	/**
 	 * @param tx
@@ -70,11 +71,12 @@ public class RemoveOrderCollectionCommand extends Command {
 		}
 
 		orderMap.removeAll(tx(), this.orders);
+		this.removed = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.orders != null && !this.orders.isEmpty() && tx().isRollingBack()) {
+		if (this.removed && this.orders != null && !this.orders.isEmpty() && tx().isRollingBack()) {
 			OrderMap orderMap = tx().getOrderMap();
 			for (Order order : this.orders) {
 				if (!orderMap.hasElement(tx(), order.getType(), order.getId())) {

@@ -32,6 +32,7 @@ import li.strolch.utils.dbc.DBC;
 public class RemoveActivityCollectionCommand extends Command {
 
 	private List<Activity> activities;
+	private boolean removed;
 
 	/**
 	 * @param tx
@@ -70,11 +71,12 @@ public class RemoveActivityCollectionCommand extends Command {
 		}
 
 		activityMap.removeAll(tx(), this.activities);
+		this.removed = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.activities != null && !this.activities.isEmpty() && tx().isRollingBack()) {
+		if (this.removed && this.activities != null && !this.activities.isEmpty() && tx().isRollingBack()) {
 			ActivityMap activityMap = tx().getActivityMap();
 			for (Activity activity : this.activities) {
 				if (!activityMap.hasElement(tx(), activity.getType(), activity.getId())) {

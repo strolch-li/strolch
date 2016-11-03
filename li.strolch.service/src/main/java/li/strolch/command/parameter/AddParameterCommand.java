@@ -35,6 +35,7 @@ public class AddParameterCommand extends Command {
 
 	private ParameterizedElement element;
 	private Parameter<?> parameter;
+	private boolean added;
 
 	/**
 	 * @param container
@@ -80,11 +81,12 @@ public class AddParameterCommand extends Command {
 
 		this.element.addParameter(this.parameter);
 		new UpdateElementVisitor(tx()).update(rootElement);
+		this.added = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.parameter != null) {
+		if (this.added && this.parameter != null) {
 			if (this.element.hasParameter(this.parameter.getId())) {
 				this.element.removeParameter(this.parameter.getId());
 				new UndoUpdateElementVisitor(tx()).undo(this.element.getRootElement());
