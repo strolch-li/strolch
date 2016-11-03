@@ -24,11 +24,6 @@
 			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.agent</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.xmlpers</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>li.strolch</groupId>
 			<artifactId>li.strolch.privilege</artifactId>
