@@ -1,6 +1,9 @@
 Strolch
 ==================
-Jenkins Build status: [![Build Status](https://jenkins.eitchnet.ch/job/li.strolch/badge/icon)](https://jenkins.eitchnet.ch/job/li.strolch/)
+[![Build Status](https://jenkins.eitchnet.ch/job/li.strolch/badge/icon)](https://jenkins.eitchnet.ch/job/li.strolch/) <a href="https://scan.coverity.com/projects/4treesch-strolch">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/10741/badge.svg"/>
+</a>
 
 The main repository which contains all of Strolch.
 
