@@ -38,6 +38,7 @@ import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,7 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.testbase.runtime.RuntimeMock;
 import li.strolch.utils.StringMatchMode;
+import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -299,6 +301,15 @@ public class QueryTest {
 		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
+	@Ignore("Not yet implemented")
+	@Test
+	public void shouldQueryOrderByDateRange() throws SQLException {
+		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
+		query.and().with(ParameterSelection.dateRangeSelection("@bag01", "@param6",
+				new DateRange().from(new Date(1354295525627L), false).to(new Date(1354295525629L), false)));
+		performOrderQuery(query, Arrays.asList("@1", "@2", "@3"));
+	}
+
 	@Test
 	public void shouldQueryOrderByDurationParam() throws SQLException {
 		OrderQuery<Order> query = OrderQuery.query("MyType1", new OrderById());
@@ -409,10 +420,10 @@ public class QueryTest {
 		query.and()
 				.with(ParameterSelection.stringSelection("@bag01", "@param5", "olch",
 						StringMatchMode.CONTAINS_CASE_INSENSITIVE),
-				ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
-						StringMatchMode.CONTAINS_CASE_INSENSITIVE),
-				ParameterSelection.stringSelection("@bag01", "@param5", "Strolch",
-						StringMatchMode.EQUALS_CASE_SENSITIVE));
+						ParameterSelection.stringSelection("@bag01", "@param5", "strolch",
+								StringMatchMode.CONTAINS_CASE_INSENSITIVE),
+						ParameterSelection.stringSelection("@bag01", "@param5", "Strolch",
+								StringMatchMode.EQUALS_CASE_SENSITIVE));
 		performResourceQuery(query, expected);
 	}
 
@@ -433,6 +444,15 @@ public class QueryTest {
 	public void shouldQueryResourceByDateParam() throws SQLException {
 		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
 		query.and().with(ParameterSelection.dateSelection("@bag01", "@param6", new Date(1354295525628L)));
+		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
+	}
+
+	@Ignore("Not yet implemented")
+	@Test
+	public void shouldQueryResourceByDateRange() throws SQLException {
+		ResourceQuery<Resource> query = ResourceQuery.query("MyType1", new OrderById());
+		query.and().with(ParameterSelection.dateRangeSelection("@bag01", "@param6",
+				new DateRange().from(new Date(1354295525627L), false).to(new Date(1354295525629L), false)));
 		performResourceQuery(query, Arrays.asList("@1", "@2", "@3"));
 	}
 
