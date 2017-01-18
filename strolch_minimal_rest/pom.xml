@@ -236,6 +236,7 @@
 					</webResources>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<!-- Publish to Tomcat: mvn tomcat7:redeploy -->
 				<groupId>org.apache.tomcat.maven</groupId>
@@ -244,6 +245,14 @@
 					<url>${tomcat7Url}</url>
 					<server>${tomcat7ServerId}</server>
 					<path>/${warFinalName}</path>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<configuration>
+					<skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
 				</configuration>
 			</plugin>
 
