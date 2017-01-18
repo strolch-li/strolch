@@ -90,7 +90,6 @@
 		<module>li.strolch.agent</module>
 		<module>li.strolch.service</module>
 		<module>li.strolch.rest</module>
-		<module>li.strolch.performancetest</module>
 		
 		<!-- test and demo project -->
 		<module>li.strolch.tutorialapp</module>
@@ -99,8 +98,9 @@
 		<module>li.strolch.website</module>
 		<module>strolch_minimal</module>
 		<module>strolch_minimal_rest</module>
-		
-		<module>deploy-dummy</module>
+
+		<!-- keep a module as last which is deployable to central -->
+		<module>li.strolch.performancetest</module>
 	</modules>
 
 	<dependencies>
