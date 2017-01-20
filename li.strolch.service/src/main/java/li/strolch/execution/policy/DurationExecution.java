@@ -1,9 +1,7 @@
 package li.strolch.execution.policy;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.command.UpdateActivityCommand;
 import li.strolch.model.Locator;
-import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.parameter.DurationParameter;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -17,7 +15,7 @@ import li.strolch.runtime.StrolchConstants.PolicyConstants;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class DurationExecution extends ExecutionPolicy {
+public class DurationExecution extends SimpleExecution {
 
 	public DurationExecution(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
@@ -34,57 +32,6 @@ public class DurationExecution extends ExecutionPolicy {
 		logger.warn("Executing action " + action.getLocator() + " has a duration of " + durationP.getValueAsString());
 		getDelayedExecutionTimer().execute(realmName, getContainer(), locator, durationP.getValue());
 
-		action.setState(State.EXECUTION);
-
-		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
-		command.setActivity(action.getRootElement());
-		command.doCommand();
-
-		logger.info("Action " + action.getLocator() + " is now in EXECUTION!");
-	}
-
-	@Override
-	public void toExecuted(Action action) {
-
-		action.setState(State.EXECUTED);
-
-		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
-		command.setActivity(action.getRootElement());
-		command.doCommand();
-
-		logger.info("Action " + action.getLocator() + " is now EXECUTED!");
-	}
-
-	@Override
-	public void toStopped(Action action) {
-
-		getDelayedExecutionTimer().cancel(action.getLocator());
-
-		action.setState(State.STOPPED);
-
-		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
-		command.setActivity(action.getRootElement());
-		command.doCommand();
-
-		logger.warn("Action " + action.getLocator() + " is now STOPPED!");
-	}
-
-	@Override
-	public void toError(Action action) {
-
-		getDelayedExecutionTimer().cancel(action.getLocator());
-
-		action.setState(State.ERROR);
-
-		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
-		command.setActivity(action.getRootElement());
-		command.doCommand();
-
-		logger.error("Action " + action.getLocator() + " is now in ERROR!");
-	}
-
-	@Override
-	public void undo() {
-		logger.error("Can not undo an " + getClass());
+		super.toExecution(action);
 	}
 }
