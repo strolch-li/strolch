@@ -17,10 +17,10 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 	private Timer timer;
 
-	private Map<Locator, SimulationTask> simulationPolicies;
+	private Map<Locator, SimulationTask> simulationTasks;
 
 	public SimpleDurationExecutionTimer() {
-		this.simulationPolicies = new HashMap<>();
+		this.simulationTasks = new HashMap<>();
 	}
 
 	@Override
@@ -32,22 +32,22 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 	@Override
 	public void cancel(Locator locator) {
-		SimulationTask task = this.simulationPolicies.remove(locator);
+		SimulationTask task = this.simulationTasks.remove(locator);
 		if (task != null) {
 			task.cancel();
 		}
 	}
 
 	@Override
-	public void execute(String realm, ComponentContainer container, Locator locator, long duration) {
+	public void execute(String realm, ComponentContainer container, Locator actionLocator, long duration) {
 		if (this.timer == null)
 			this.timer = new Timer("SimulationExecution", true);
 
-		SimulationTask task = new SimulationTask(realm, container, locator);
-		this.simulationPolicies.put(locator, task);
+		SimulationTask task = new SimulationTask(realm, container, actionLocator);
+		this.simulationTasks.put(actionLocator, task);
 		this.timer.schedule(task, duration);
 
-		logger.info("Registered execution timer for " + locator);
+		logger.info("Registered execution timer for " + actionLocator);
 	}
 
 	private void executed(String realm, ComponentContainer container, Locator locator) {
