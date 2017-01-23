@@ -2,14 +2,13 @@
 
 # usage
 if [ $# != 2 ] ; then
-  echo -e "Usage: ${0} <release_version> <hotfix_version>"
+  echo -e "Usage: ${0} <release_branch> <hotfix_version>"
   exit 1
 fi
 
 
 # Confirm
-releaseVersion="${1}"
-releaseBranch="release/${1}"
+releaseBranch="${1}"
 hotfixVersion="${2}"
 echo -e "INFO: Do you want to make hotfix version ${hotfixVersion} from release branch ${releaseBranch}? y/n"
 read a
