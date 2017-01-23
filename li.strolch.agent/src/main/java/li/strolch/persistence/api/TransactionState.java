@@ -50,4 +50,25 @@ public enum TransactionState {
 	public boolean isClosing() {
 		return this == CLOSING;
 	}
+
+	/**
+	 * @return true if this is {@link #OPEN}
+	 */
+	public boolean isOpen() {
+		return this == OPEN;
+	}
+
+	/**
+	 * @return true if this is {@link #CLOSED}
+	 */
+	public boolean isClosed() {
+		return this == CLOSED;
+	}
+
+	/**
+	 * @return true if this is {@link #FAILED}
+	 */
+	public boolean isFailed() {
+		return this == FAILED;
+	}
 }

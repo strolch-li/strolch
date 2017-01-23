@@ -55,10 +55,6 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		super.initialize(configuration);
 	}
 
-	public <T> T getComponent(Class<T> clazz) {
-		return getContainer().getComponent(clazz);
-	}
-
 	public RuntimeConfiguration getRuntimeConfiguration() {
 		return this.runtimeConfiguration;
 	}

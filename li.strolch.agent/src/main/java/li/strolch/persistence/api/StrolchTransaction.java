@@ -235,6 +235,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	public TransactionState getState();
 
 	/**
+	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#OPEN}
+	 */
+	public boolean isOpen();
+
+	/**
 	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#ROLLING_BACK}
 	 */
 	public boolean isRollingBack();
@@ -248,6 +253,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#CLOSING}
 	 */
 	public boolean isClosing();
+
+	/**
+	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#CLOSED}
+	 */
+	public boolean isClosed();
+
+	/**
+	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#FAILED}
+	 */
+	public boolean isFailed();
 
 	/**
 	 * If the given argument is true, then no observer updates are performed

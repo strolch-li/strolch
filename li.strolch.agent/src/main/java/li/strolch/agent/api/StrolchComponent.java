@@ -181,6 +181,21 @@ public class StrolchComponent {
 	}
 
 	/**
+	 * Returns the reference to the {@link StrolchComponent} with the given name, if it exists. If it does not exist, an
+	 * {@link IllegalArgumentException} is thrown
+	 * 
+	 * @param clazz
+	 * 
+	 * @return the component with the given name
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the component does not exist
+	 */
+	protected <V> V getComponent(Class<V> clazz) {
+		return this.container.getComponent(clazz);
+	}
+
+	/**
 	 * Performs the given {@link PrivilegedRunnable} as the given system user
 	 * 
 	 * @param username

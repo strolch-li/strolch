@@ -131,6 +131,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public boolean isOpen() {
+		return this.txResult.getState().isOpen();
+	}
+
+	@Override
 	public boolean isRollingBack() {
 		return this.txResult.getState().isRollingBack();
 	}
@@ -143,6 +148,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public boolean isClosing() {
 		return this.txResult.getState().isClosing();
+	}
+
+	@Override
+	public boolean isClosed() {
+		return this.txResult.getState().isClosed();
+	}
+
+	@Override
+	public boolean isFailed() {
+		return this.txResult.getState().isFailed();
 	}
 
 	@Override
