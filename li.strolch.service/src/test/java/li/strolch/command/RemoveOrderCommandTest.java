@@ -35,7 +35,7 @@ public class RemoveOrderCommandTest extends AbstractRealmCommandTest {
 	private Locator locator;
 
 	@Before
-	public void before() {
+	public void before() throws Exception {
 		this.locator = Locator.newBuilder(Tags.ORDER, "TestType", "@3").build();
 	}
 

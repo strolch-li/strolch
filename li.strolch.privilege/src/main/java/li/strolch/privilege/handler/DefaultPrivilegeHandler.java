@@ -405,7 +405,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public UserRep addUser(Certificate certificate, UserRep userRep, byte[] password) {
+	public UserRep addUser(Certificate certificate, UserRep userRepParam, byte[] password) {
 		try {
 
 			// validate user actually has this type of privilege
@@ -413,10 +413,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			prvCtx.assertHasPrivilege(PRIVILEGE_ADD_USER);
 
 			// make sure userId is not set
-			if (StringHelper.isNotEmpty(userRep.getUserId())) {
+			if (StringHelper.isNotEmpty(userRepParam.getUserId())) {
 				String msg = "UserId can not be set when adding a new user!";
-				throw new PrivilegeException(MessageFormat.format(msg, userRep.getUsername()));
+				throw new PrivilegeException(MessageFormat.format(msg, userRepParam.getUsername()));
 			}
+			
+			UserRep userRep = userRepParam.clone();
 
 			// set userId
 			userRep.setUserId(StringHelper.getUniqueId());

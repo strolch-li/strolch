@@ -368,4 +368,17 @@ public class UserRep implements Serializable {
 			return false;
 		return true;
 	}
+
+	@Override
+	public UserRep clone() {
+
+		Set<String> roles = new HashSet<>(this.roles);
+		Map<String, String> propertyMap = new HashMap<>();
+		this.properties.forEach(e -> propertyMap.put(e.getKey(), e.getValue()));
+
+		UserRep clone = new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState, roles,
+				this.locale, propertyMap);
+
+		return clone;
+	}
 }

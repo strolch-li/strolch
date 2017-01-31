@@ -22,8 +22,6 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.io.IOException;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchRealm;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.service.test.AbstractRealmServiceTest;
@@ -40,13 +38,10 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest {
 	@Test
 	public void runTest() {
 
-		Runner before = new Runner() {
-			@Override
-			public void run(StrolchRealm strolchRealm, ComponentContainer container) {
-				File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
-				if (file.exists())
-					file.delete();
-			}
+		Runner before = (strolchRealm, container) -> {
+			File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
+			if (file.exists())
+				file.delete();
 		};
 
 		XmlExportModelArgument arg = new XmlExportModelArgument();

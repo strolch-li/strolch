@@ -15,13 +15,15 @@
  */
 package li.strolch.command;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-
-import org.junit.Before;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -31,7 +33,7 @@ public class UpdateResourceCommandTest extends AbstractRealmCommandTest {
 	private Resource resource;
 
 	@Before
-	public void before() {
+	public void before() throws Exception {
 		this.resource = ModelGenerator.createResource("yellow", "Modified Yellow Ball", "Ball");
 	}
 
@@ -45,13 +47,13 @@ public class UpdateResourceCommandTest extends AbstractRealmCommandTest {
 
 	@Override
 	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
-		// TODO Auto-generated method stub
-		
+		Resource r = tx.getResourceBy(resource.getType(), resource.getId());
+		assertEquals("Modified Yellow Ball", r.getName());
 	}
 
 	@Override
 	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
-		// TODO Auto-generated method stub
-		
+		Resource r = tx.getResourceBy(resource.getType(), resource.getId());
+		assertEquals("Yellow Ball", r.getName());
 	}
 }

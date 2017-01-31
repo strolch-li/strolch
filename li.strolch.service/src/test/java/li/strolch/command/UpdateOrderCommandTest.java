@@ -21,6 +21,8 @@ import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 
 /**
@@ -31,7 +33,7 @@ public class UpdateOrderCommandTest extends AbstractRealmCommandTest {
 	private Order order;
 
 	@Before
-	public void before() {
+	public void before() throws Exception {
 		this.order = ModelGenerator.createOrder("myCarOrder", "Modified Car Order", "ProductionOrder");
 	}
 
@@ -45,13 +47,13 @@ public class UpdateOrderCommandTest extends AbstractRealmCommandTest {
 
 	@Override
 	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
-		// TODO Auto-generated method stub
-		
+		Order o = tx.getOrderBy(order.getType(), order.getId());
+		assertEquals("Modified Car Order", o.getName());
 	}
 
 	@Override
 	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
-		// TODO Auto-generated method stub
-		
+		Order o = tx.getOrderBy(order.getType(), order.getId());
+		assertEquals("Car Production Order", o.getName());
 	}
 }

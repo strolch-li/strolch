@@ -28,8 +28,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -49,8 +49,12 @@ public abstract class AbstractRealmCommandTest {
 
 	protected static Certificate certificate;
 
-	@BeforeClass
-	public static void beforeClass() throws Exception {
+	protected String getUsername() {
+		return "test";
+	}
+
+	@Before
+	public void beforeClass() throws Exception {
 
 		dropSchema("jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
 		dropSchema("jdbc:postgresql://localhost/transactionaluserdb", "transactionaluser", "test");
@@ -61,13 +65,13 @@ public abstract class AbstractRealmCommandTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		certificate = runtimeMock.getPrivilegeHandler().authenticate(getUsername(), "test".getBytes());
 		importFromXml(REALM_CACHED, certificate, getServiceHandler());
 		importFromXml(REALM_TRANSACTIONAL, certificate, getServiceHandler());
 	}
 
-	@AfterClass
-	public static void afterClass() {
+	@After
+	public void afterClass() {
 		if (runtimeMock != null)
 			runtimeMock.destroyRuntime();
 	}

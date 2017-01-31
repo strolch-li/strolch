@@ -59,6 +59,10 @@ public abstract class AbstractRealmServiceTest {
 	protected static RuntimeMock runtimeMock;
 	protected Certificate certificate;
 
+	protected String getUsername() {
+		return "test";
+	}
+
 	@Before
 	public void before() throws Exception {
 
@@ -71,7 +75,7 @@ public abstract class AbstractRealmServiceTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		this.certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		this.certificate = runtimeMock.getPrivilegeHandler().authenticate(getUsername(), "test".getBytes());
 		importFromXml(REALM_CACHED, this.certificate, getServiceHandler());
 		importFromXml(REALM_TRANSACTIONAL, this.certificate, getServiceHandler());
 	}
@@ -152,29 +156,43 @@ public abstract class AbstractRealmServiceTest {
 			Class<? extends Service<T, U>> svcClass, Class<?> expectedServiceResultType, T arg, Runner before,
 			Runner validator, Runner after) {
 		try {
-			runTransient(expectedServiceResultType, svcClass.newInstance(), arg, before, validator, after);
-			runCached(expectedServiceResultType, svcClass.newInstance(), arg, before, validator, after);
-			runTransactional(expectedServiceResultType, svcClass.newInstance(), arg, before, validator, after);
+			runTransient(svcClass.newInstance(), expectedServiceResultType, arg, before, validator, after);
+			runCached(svcClass.newInstance(), expectedServiceResultType, arg, before, validator, after);
+			runTransactional(svcClass.newInstance(), expectedServiceResultType, arg, before, validator, after);
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException("Failed to instantiate class " + svcClass.getName() + ": " + e.getMessage(), e);
 		}
 	}
 
-	private <T extends ServiceArgument, U extends ServiceResult> void runTransactional(
-			Class<?> expectedServiceResultType, Service<T, U> svc, T arg, Runner before, Runner validator,
-			Runner after) {
+	protected <T extends ServiceArgument, U extends ServiceResult> void runTransactional(Service<T, U> svc,
+			Class<?> expectedServiceResultType, T arg) {
+		runTransactional(svc, expectedServiceResultType, arg, null, null, null);
+	}
+
+	protected <T extends ServiceArgument, U extends ServiceResult> void runTransactional(Service<T, U> svc,
+			Class<?> expectedServiceResultType, T arg, Runner before, Runner validator, Runner after) {
 		doService(REALM_TRANSACTIONAL, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before,
 				validator, after);
 	}
 
-	private <T extends ServiceArgument, U extends ServiceResult> void runCached(Class<?> expectedServiceResultType,
-			Service<T, U> svc, T arg, Runner before, Runner validator, Runner after) {
+	protected <T extends ServiceArgument, U extends ServiceResult> void runCached(Service<T, U> svc,
+			Class<?> expectedServiceResultType, T arg) {
+		runCached(svc, expectedServiceResultType, arg, null, null, null);
+	}
+
+	protected <T extends ServiceArgument, U extends ServiceResult> void runCached(Service<T, U> svc,
+			Class<?> expectedServiceResultType, T arg, Runner before, Runner validator, Runner after) {
 		doService(REALM_CACHED, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before, validator,
 				after);
 	}
 
-	private <T extends ServiceArgument, U extends ServiceResult> void runTransient(Class<?> expectedServiceResultType,
-			Service<T, U> svc, T arg, Runner before, Runner validator, Runner after) {
+	protected <T extends ServiceArgument, U extends ServiceResult> void runTransient(Service<T, U> svc,
+			Class<?> expectedServiceResultType, T arg) {
+		runTransient(svc, expectedServiceResultType, arg, null, null, null);
+	}
+
+	protected <T extends ServiceArgument, U extends ServiceResult> void runTransient(Service<T, U> svc,
+			Class<?> expectedServiceResultType, T arg, Runner before, Runner validator, Runner after) {
 		doService(REALM_TRANSIENT, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before, validator,
 				after);
 	}

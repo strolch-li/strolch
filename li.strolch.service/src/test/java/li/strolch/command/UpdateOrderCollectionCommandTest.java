@@ -36,7 +36,7 @@ public class UpdateOrderCollectionCommandTest extends AbstractRealmCommandTest {
 	private List<Order> orders;
 
 	@Before
-	public void before() {
+	public void before() throws Exception {
 		this.orders = new ArrayList<>();
 		// we create elements with the same id as already exists!
 		this.orders.add(ModelGenerator.createOrder("@1", "Modified Test Order", "TestType"));
