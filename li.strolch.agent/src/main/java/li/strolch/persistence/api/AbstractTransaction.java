@@ -85,6 +85,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private TransactionCloseStrategy closeStrategy;
 	private boolean suppressUpdates;
 	private boolean suppressAudits;
+	private boolean suppressAuditsForAudits;
 	private boolean suppressDoNothingLogging;
 	private TransactionResult txResult;
 
@@ -225,8 +226,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public void setSuppressAuditsForAudits(boolean suppressAuditsForAudits) {
+		this.suppressAuditsForAudits = suppressAuditsForAudits;
+	}
+
+	@Override
 	public boolean isSuppressAudits() {
 		return this.suppressAudits;
+	}
+
+	@Override
+	public boolean isSuppressAuditsForAudits() {
+		return this.suppressAuditsForAudits;
 	}
 
 	@Override
@@ -889,7 +900,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		List<Audit> audits = new ArrayList<>();
 
-		// this is bad... doesn't account for a created and deleted in same TX...
+		// TODO this is bad... doesn't account for a created and deleted in same TX...
 
 		if (this.orderMap != null) {
 			if (this.realm.isAuditTrailEnabledForRead())
@@ -907,7 +918,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			auditsFor(audits, AccessType.DELETE, Tags.RESOURCE, this.resourceMap.getDeleted());
 		}
 
-		if (this.auditTrail != null) {
+		if (this.auditTrail != null && !isSuppressAuditsForAudits()) {
 			if (this.realm.isAuditTrailEnabledForRead())
 				auditsForAudits(audits, AccessType.READ, Tags.AUDIT, this.auditTrail.getRead());
 			auditsForAudits(audits, AccessType.CREATE, Tags.AUDIT, this.auditTrail.getCreated());
@@ -915,7 +926,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			auditsForAudits(audits, AccessType.DELETE, Tags.AUDIT, this.auditTrail.getDeleted());
 		}
 
-		this.realm.getAuditTrail().addAll(this, audits);
+		if (!audits.isEmpty())
+			this.realm.getAuditTrail().addAll(this, audits);
+
 		long auditTrailDuration = System.nanoTime() - auditTrailStart;
 		return auditTrailDuration;
 	}

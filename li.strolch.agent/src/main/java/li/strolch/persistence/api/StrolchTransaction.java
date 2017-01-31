@@ -288,11 +288,28 @@ public interface StrolchTransaction extends AutoCloseable {
 	public void setSuppressAudits(boolean suppressAudits);
 
 	/**
+	 * If the given argument is true, then no {@link Audit Audits} for Audits are written. Since the {@link AuditTrail}
+	 * is also audited, {@link Audit Audits} for Audits are generated, this allows to suppress this should that be
+	 * required.
+	 * 
+	 * @param suppressAuditsForAudits
+	 *            true to suppress writing {@link Audit Audits}, false to enable them
+	 */
+	public void setSuppressAuditsForAudits(boolean suppressAuditsForAudits);
+
+	/**
 	 * Returns true if writing {@link Audit Audits} is currently suppressed
 	 * 
 	 * @return true if writing {@link Audit Audits} is currently suppressed
 	 */
 	public boolean isSuppressAudits();
+
+	/**
+	 * Returns true if writing {@link Audit Audits} for Audits is currently suppressed
+	 * 
+	 * @return true if writing {@link Audit Audits} for Audits is currently suppressed
+	 */
+	public boolean isSuppressAuditsForAudits();
 
 	/**
 	 * If the given argument is true, then logging of a {@link TransactionCloseStrategy#DO_NOTHING} will be suppressed
