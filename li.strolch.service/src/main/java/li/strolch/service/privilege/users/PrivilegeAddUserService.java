@@ -15,11 +15,8 @@
  */
 package li.strolch.service.privilege.users;
 
-import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
-import li.strolch.privilege.model.UserRep;
 import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResultState;
@@ -39,19 +36,15 @@ public class PrivilegeAddUserService extends AbstractService<PrivilegeUserArgume
 	@Override
 	protected PrivilegeUserResult internalDoService(PrivilegeUserArgument arg) throws Exception {
 
-		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
-		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
-
-		UserRep user = privilegeHandler.addUser(getCertificate(), arg.user, null);
-
+		PrivilegeAddUserCommand cmd;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_ADD_USER)) {
-			tx.setSuppressAudits(true);
-			Audit audit = tx.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE,
-					StrolchPrivilegeConstants.USER, user.getUsername());
-			tx.getAuditTrail().add(tx, audit);
+			cmd = new PrivilegeAddUserCommand(getContainer(), tx);
+			cmd.setUserIn(arg.user);
+			tx.addCommand(cmd);
+			tx.commitOnClose();
 		}
 
-		return new PrivilegeUserResult(user);
+		return new PrivilegeUserResult(cmd.getUserOut());
 	}
 
 	@Override
