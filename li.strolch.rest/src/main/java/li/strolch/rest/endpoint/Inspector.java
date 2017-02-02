@@ -50,8 +50,10 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.json.ActivityToJsonVisitor;
 import li.strolch.model.json.OrderToJsonVisitor;
 import li.strolch.model.json.ResourceToJsonVisitor;
+import li.strolch.model.xml.ActivityToXmlStringVisitor;
 import li.strolch.model.xml.OrderToXmlStringVisitor;
 import li.strolch.model.xml.ResourceToXmlStringVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
@@ -62,6 +64,8 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.model.Result;
+import li.strolch.service.UpdateActivityService;
+import li.strolch.service.UpdateActivityService.UpdateActivityArg;
 import li.strolch.service.UpdateOrderService;
 import li.strolch.service.UpdateOrderService.UpdateOrderArg;
 import li.strolch.service.UpdateResourceService;
@@ -351,9 +355,6 @@ public class Inspector {
 	 * 
 	 * @return an overview of the {@link Resource Resources} with the given type. This is a list of overviews of the
 	 *         resources
-	 * 
-	 * @see TypeDetail
-	 * @see StrolchElementOverview
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -400,9 +401,6 @@ public class Inspector {
 	 * @param type
 	 * 
 	 * @return an overview of the {@link Order Orders} with the given type. This is a list of overviews of the orders
-	 * 
-	 * @see TypeDetail
-	 * @see StrolchElementOverview
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -438,23 +436,6 @@ public class Inspector {
 		return Response.ok().entity(typeDetailJ.toString()).build();
 	}
 
-	/**
-	 * <p>
-	 * Order type inspector
-	 * </p>
-	 * <p>
-	 * Returns an overview of the {@link Order Orders} with the given type. This is a list of overviews of the orders
-	 * </p>
-	 * 
-	 * @param realm
-	 *            the realm for which the order type overview is to be returned
-	 * @param type
-	 * 
-	 * @return an overview of the {@link Order Orders} with the given type. This is a list of overviews of the orders
-	 * 
-	 * @see TypeDetail
-	 * @see StrolchElementOverview
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}")
@@ -489,26 +470,6 @@ public class Inspector {
 		return Response.ok().entity(typeDetailJ.toString()).build();
 	}
 
-	/**
-	 * <p>
-	 * Resource inspector
-	 * </p>
-	 * 
-	 * <p>
-	 * Returns the resource with the given id
-	 * </p>
-	 * 
-	 * @param realm
-	 *            the realm for which the resource is to be returned
-	 * @param type
-	 *            the type of the resource
-	 * @param id
-	 *            the id of the resource
-	 * 
-	 * @return the resource with the given id
-	 * 
-	 * @see ResourceDetail
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}/{id}")
@@ -667,6 +628,106 @@ public class Inspector {
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			String asXml = new OrderToXmlStringVisitor().visit(order);
+			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
+	/**
+	 * <p>
+	 * Activity inspector
+	 * </p>
+	 * 
+	 * <p>
+	 * Returns the activity with the given id
+	 * </p>
+	 * 
+	 * @param realm
+	 *            the realm for which the activity is to be returned
+	 * @param type
+	 *            the type of the activity
+	 * @param id
+	 *            the id of the activity
+	 * 
+	 * @return the activity with the given id
+	 */
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{realm}/activities/{type}/{id}")
+	public Response getActivityAsJson(@PathParam("realm") String realm, @PathParam("type") String type,
+			@PathParam("id") String id, @Context HttpServletRequest request) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Activity activity;
+		try (StrolchTransaction tx = openTx(cert, realm)) {
+			activity = tx.getActivityMap().getBy(tx, type, id);
+		}
+		if (activity == null) {
+			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
+		}
+
+		return Response.ok().entity(ActivityToJsonVisitor.toJsonString(activity)).build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/activities/{type}/{id}")
+	public Response getActivityAsXml(@PathParam("realm") String realm, @PathParam("type") String type,
+			@PathParam("id") String id, @Context HttpServletRequest request) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Activity activity;
+		try (StrolchTransaction tx = openTx(cert, realm)) {
+			activity = tx.getActivityMap().getBy(tx, type, id);
+		}
+		if (activity == null) {
+			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
+		}
+
+		String asXml = new ActivityToXmlStringVisitor().visit(activity);
+		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+	}
+
+	@PUT
+	@Produces(MediaType.APPLICATION_XML)
+	@Consumes(MediaType.APPLICATION_XML)
+	@Path("{realm}/activities/{type}/{id}")
+	public Response updateActivityAsXml(@PathParam("realm") String realm, @PathParam("type") String type,
+			@PathParam("id") String id, String data, @Context HttpServletRequest request) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Activity activity;
+		try {
+			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
+			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
+
+			if (listener.getActivities().size() == 0)
+				throw new StrolchPersistenceException(
+						MessageFormat.format("No Activities parsed from xml value for {0} / {1}", id, type));
+			if (listener.getActivities().size() > 1)
+				throw new StrolchPersistenceException(
+						MessageFormat.format("Multiple Activities parsed from xml value for {0} / {1}", id, type));
+
+			activity = listener.getActivities().get(0);
+
+		} catch (Exception e) {
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to extract Activities from xml value for {0} / {1}", id, type), e);
+		}
+
+		UpdateActivityService svc = new UpdateActivityService();
+		UpdateActivityArg arg = new UpdateActivityArg();
+		arg.activity = activity;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			String asXml = new ActivityToXmlStringVisitor().visit(activity);
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 

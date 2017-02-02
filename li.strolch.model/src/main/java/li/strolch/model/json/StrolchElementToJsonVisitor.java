@@ -78,6 +78,7 @@ public class StrolchElementToJsonVisitor {
 		rootJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ACTIVITY);
 
 		rootJ.addProperty(Tags.Json.TIME_ORDERING, element.getTimeOrdering().getName());
+		rootJ.addProperty(Tags.Json.STATE, element.getState().getName());
 
 		toJson((AbstractStrolchElement) element, rootJ);
 
@@ -113,13 +114,11 @@ public class StrolchElementToJsonVisitor {
 
 		rootJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ACTION);
 
-		rootJ.addProperty(Tags.Json.STATE, element.getState().getName());
-
 		// attributes
 		toJson((AbstractStrolchElement) element, rootJ);
 		rootJ.addProperty(Tags.Json.RESOURCE_ID, element.getResourceId());
 		rootJ.addProperty(Tags.Json.RESOURCE_TYPE, element.getResourceType());
-		rootJ.addProperty(Tags.Json.STATE, element.getState().name());
+		rootJ.addProperty(Tags.Json.STATE, element.getState().getName());
 
 		addParameterBags(element, rootJ);
 		addPolicies(element, rootJ);
@@ -137,7 +136,8 @@ public class StrolchElementToJsonVisitor {
 				JsonObject changeJ = new JsonObject();
 
 				changeJ.addProperty(Tags.Json.STATE_ID, valueChange.getStateId());
-				changeJ.addProperty(Tags.Json.TIME, ISO8601FormatFactory.getInstance().formatDate(valueChange.getTime()));
+				changeJ.addProperty(Tags.Json.TIME,
+						ISO8601FormatFactory.getInstance().formatDate(valueChange.getTime()));
 				changeJ.addProperty(Tags.Json.VALUE, valueChange.getValue().getValueAsString());
 				changeJ.addProperty(Tags.Json.TYPE, valueChange.getValue().getType());
 
@@ -262,7 +262,8 @@ public class StrolchElementToJsonVisitor {
 		JsonObject versionJ = new JsonObject();
 		versionJ.addProperty(Tags.Json.VERSION, version.getVersion());
 		versionJ.addProperty(Tags.Json.CREATED_BY, version.getCreatedBy());
-		versionJ.addProperty(Tags.Json.CREATED_AT, ISO8601FormatFactory.getInstance().formatDate(version.getCreatedAt()));
+		versionJ.addProperty(Tags.Json.CREATED_AT,
+				ISO8601FormatFactory.getInstance().formatDate(version.getCreatedAt()));
 		versionJ.addProperty(Tags.Json.DELETED, version.isDeleted());
 		rootJ.add(Tags.Json.VERSION, versionJ);
 	}
