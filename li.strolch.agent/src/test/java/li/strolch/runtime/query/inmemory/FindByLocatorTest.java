@@ -79,7 +79,7 @@ public class FindByLocatorTest {
 						resStringParam);
 
 				// TimedState on Resource
-				Locator locResIntegerState = Locator.valueOf("Resource/TestType/MyTestResource/State/@integerState");
+				Locator locResIntegerState = Locator.valueOf("Resource/TestType/MyTestResource/TimedState/@integerState");
 				IntegerTimedState integerS = tx.findElement(locResIntegerState);
 				assertNotNull("Should have found a IntegerTimedState with the locator " + locResIntegerState, integerS);
 

@@ -414,7 +414,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			Parameter<?> parameter = bag.getParameter(parameterId);
 			return (T) parameter;
 
-		} else if (stateOrBagOrActivity.equals(Tags.STATE)) {
+		} else if (stateOrBagOrActivity.equals(Tags.TIMED_STATE)) {
 
 			if (elements.size() != 5) {
 				String msg = "Missing state Id on locator {0}"; //$NON-NLS-1$
