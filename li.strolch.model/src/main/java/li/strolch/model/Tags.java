@@ -67,9 +67,9 @@ public class Tags {
 
 		// elements
 
-		public static final String RESOURCE = "resource";
-		public static final String ORDER = "order";
-		public static final String ACTIVITY = "activity";
+		public static final String RESOURCE = Tags.RESOURCE;
+		public static final String ORDER = Tags.ORDER;
+		public static final String ACTIVITY = Tags.ACTIVITY;
 
 		public static final String OBJECT_TYPE = "objectType";
 
