@@ -18,8 +18,11 @@ package li.strolch.model;
 @SuppressWarnings("nls")
 public class Tags {
 
+	public static final String RESOURCE = "Resource";
+	public static final String ORDER = "Order";
+	public static final String ACTIVITY = "Activity";
+
 	public static final String CDATA = "CDATA";
-	public static final String OBJECT_TYPE = "ObjectType";
 	public static final String ID = "Id";
 	public static final String NAME = "Name";
 	public static final String TYPE = "Type";
@@ -33,13 +36,9 @@ public class Tags {
 	public static final String HIDDEN = "Hidden";
 	public static final String INDEX = "Index";
 	public static final String PARAMETER = "Parameter";
-	public static final String PARAMETERS = "Parameters";
 	public static final String TIMED_STATE = "TimedState";
-	public static final String TIMED_STATES = "TimedStates";
 	public static final String PARAMETERIZED_ELEMENT = "ParameterizedElement";
-	public static final String RESOURCE = "Resource";
-	public static final String ORDER = "Order";
-	public static final String PARAMETER_BAGS = "ParameterBags";
+
 	public static final String PARAMETER_BAG = "ParameterBag";
 	public static final String STROLCH_MODEL = "StrolchModel";
 	public static final String INCLUDE_FILE = "IncludeFile";
@@ -48,13 +47,12 @@ public class Tags {
 	public static final String AUDIT = "Audit";
 	public static final String POLICIES = "Policies";
 	public static final String POLICY = "Policy";
-	public static final String ELEMENTS = "Elements";
+
 	public static final String VERSION = "Version";
 	public static final String CREATED_AT = "CreatedAt";
 	public static final String CREATED_BY = "CreatedBy";
 	public static final String DELETED = "Deleted";
 
-	public static final String ACTIVITY = "Activity";
 	public static final String TIME_ORDERING = "TimeOrdering";
 	public static final String ACTION = "Action";
 	public static final String START = "Start";
@@ -64,6 +62,58 @@ public class Tags {
 	public static final String RESOURCE_ID = "ResourceId";
 	public static final String RESOURCE_TYPE = "ResourceType";
 	public static final String STATE_ID = "StateId";
+
+	public static class Json {
+
+		// elements
+
+		public static final String RESOURCE = "resource";
+		public static final String ORDER = "order";
+		public static final String ACTIVITY = "activity";
+
+		public static final String OBJECT_TYPE = "objectType";
+
+		public static final String ID = "id";
+		public static final String TYPE = "type";
+		public static final String NAME = "name";
+		public static final String DATE = "date";
+		public static final String STATE = "state";
+		public static final String TIME_ORDERING = "timeOrdering";
+
+		public static final String PARAMETER_BAGS = "parameterBags";
+		public static final String PARAMETERS = "parameters";
+		public static final String INTERPRETATION = "interpretation";
+		public static final String UOM = "uom";
+		public static final String HIDDEN = "hidden";
+		public static final String INDEX = "index";
+
+		public static final String TIMED_STATES = "timedStates";
+		public static final String VALUES = "values";
+
+		public static final String ACTION = "action";
+		public static final String RESOURCE_ID = "resourceId";
+		public static final String RESOURCE_TYPE = "resourceType";
+		public static final String VALUE_CHANGES = "valueChanges";
+		public static final String STATE_ID = "stateId";
+		public static final String VALUE = "value";
+		public static final String TIME = "time";
+
+		public static final String POLICIES = "policies";
+
+		public static final String VERSION = "version";
+		public static final String CREATED_AT = "createdAt";
+		public static final String CREATED_BY = "createdBy";
+		public static final String DELETED = "deleted";
+
+		// miscellaneous
+
+		public static final String ELEMENTS = "elements";
+		public static final String NR_OF_ELEMENTS = "nrOfElements";
+		public static final String ELEMENT_MAPS = "elementMaps";
+		public static final String TYPES = "types";
+		public static final String REALMS = "realms";
+		public static final String SIZE = "size";
+	}
 
 	public static class Audit {
 		public static final String ID = Tags.ID;

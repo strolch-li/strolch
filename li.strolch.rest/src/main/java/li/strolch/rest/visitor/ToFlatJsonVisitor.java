@@ -1,9 +1,9 @@
 package li.strolch.rest.visitor;
 
-import static li.strolch.model.Tags.ID;
-import static li.strolch.model.Tags.NAME;
-import static li.strolch.model.Tags.OBJECT_TYPE;
-import static li.strolch.model.Tags.TYPE;
+import static li.strolch.model.Tags.Json.ID;
+import static li.strolch.model.Tags.Json.NAME;
+import static li.strolch.model.Tags.Json.OBJECT_TYPE;
+import static li.strolch.model.Tags.Json.TYPE;
 
 import java.util.Collections;
 import java.util.Set;

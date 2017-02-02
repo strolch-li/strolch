@@ -46,6 +46,7 @@ import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -64,15 +65,15 @@ public class StrolchElementFromJsonVisitor {
 			order.setPolicyDefs(defs);
 
 		// attributes
-		if (jsonObject.has(Tags.DATE)) {
-			String date = jsonObject.get(Tags.DATE).getAsString();
+		if (jsonObject.has(Tags.Json.DATE)) {
+			String date = jsonObject.get(Tags.Json.DATE).getAsString();
 			order.setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse(date));
 		} else {
-			order.setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse("-")); //$NON-NLS-1$
+			order.setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse(StringHelper.DASH)); //$NON-NLS-1$
 		}
 
-		if (jsonObject.has(Tags.STATE)) {
-			order.setState(State.parse(jsonObject.get(Tags.STATE).getAsString()));
+		if (jsonObject.has(Tags.Json.STATE)) {
+			order.setState(State.parse(jsonObject.get(Tags.Json.STATE).getAsString()));
 		} else {
 			order.setState(State.CREATED);
 		}
@@ -89,10 +90,10 @@ public class StrolchElementFromJsonVisitor {
 			resource.setPolicyDefs(defs);
 
 		// time states
-		if (!jsonObject.has(Tags.TIMED_STATES))
+		if (!jsonObject.has(Tags.Json.TIMED_STATES))
 			return;
 
-		JsonObject timedStatesJ = jsonObject.getAsJsonObject(Tags.TIMED_STATES);
+		JsonObject timedStatesJ = jsonObject.getAsJsonObject(Tags.Json.TIMED_STATES);
 		Set<Entry<String, JsonElement>> entrySet = timedStatesJ.entrySet();
 		for (Entry<String, JsonElement> entry : entrySet) {
 
@@ -100,7 +101,7 @@ public class StrolchElementFromJsonVisitor {
 			JsonObject timeStateJ = entry.getValue().getAsJsonObject();
 
 			// evaluate type of TimedState
-			String typeS = timeStateJ.get(Tags.TYPE).getAsString();
+			String typeS = timeStateJ.get(Tags.Json.TYPE).getAsString();
 			DBC.PRE.assertNotEmpty("Type must be set on TimedState for resource with id " + resource.getId(), typeS);
 			StrolchValueType valueType = StrolchValueType.parse(typeS);
 			StrolchTimedState<? extends IValue<?>> timedState = valueType.timedStateInstance();
@@ -116,29 +117,29 @@ public class StrolchElementFromJsonVisitor {
 			}
 
 			// further attributes
-			if (timeStateJ.has(Tags.INTERPRETATION))
-				timedState.setInterpretation(timeStateJ.get(Tags.INTERPRETATION).getAsString());
-			if (timeStateJ.has(Tags.UOM))
-				timedState.setUom(timeStateJ.get(Tags.UOM).getAsString());
-			if (timeStateJ.has(Tags.INDEX))
-				timedState.setIndex(timeStateJ.get(Tags.INDEX).getAsInt());
-			if (timeStateJ.has(Tags.HIDDEN))
-				timedState.setHidden(timeStateJ.get(Tags.HIDDEN).getAsBoolean());
+			if (timeStateJ.has(Tags.Json.INTERPRETATION))
+				timedState.setInterpretation(timeStateJ.get(Tags.Json.INTERPRETATION).getAsString());
+			if (timeStateJ.has(Tags.Json.UOM))
+				timedState.setUom(timeStateJ.get(Tags.Json.UOM).getAsString());
+			if (timeStateJ.has(Tags.Json.INDEX))
+				timedState.setIndex(timeStateJ.get(Tags.Json.INDEX).getAsInt());
+			if (timeStateJ.has(Tags.Json.HIDDEN))
+				timedState.setHidden(timeStateJ.get(Tags.Json.HIDDEN).getAsBoolean());
 
 			resource.addTimedState(timedState);
 
-			if (!timeStateJ.has(Tags.VALUES))
+			if (!timeStateJ.has(Tags.Json.VALUES))
 				continue;
 
-			JsonArray valuesJ = timeStateJ.getAsJsonArray(Tags.VALUES);
+			JsonArray valuesJ = timeStateJ.getAsJsonArray(Tags.Json.VALUES);
 			valuesJ.forEach(e -> {
 
 				JsonObject timeValueJ = e.getAsJsonObject();
 
-				String timeS = timeValueJ.get(Tags.TIME).getAsString();
+				String timeS = timeValueJ.get(Tags.Json.TIME).getAsString();
 				long time = ISO8601FormatFactory.getInstance().parseDate(timeS).getTime();
 
-				String valueS = timeValueJ.get(Tags.VALUE).getAsString();
+				String valueS = timeValueJ.get(Tags.Json.VALUE).getAsString();
 				timedState.setStateFromStringAt(time, valueS);
 			});
 		}
@@ -147,9 +148,9 @@ public class StrolchElementFromJsonVisitor {
 	public void fillElement(JsonObject jsonObject, Activity activity) {
 		fillElement(jsonObject, (GroupedParameterizedElement) activity);
 
-		if (!jsonObject.has(Tags.TIME_ORDERING))
+		if (!jsonObject.has(Tags.Json.TIME_ORDERING))
 			throw new StrolchException("TimeOrdering not set on " + activity.getLocator());
-		String timeOrderingS = jsonObject.get(Tags.TIME_ORDERING).getAsString();
+		String timeOrderingS = jsonObject.get(Tags.Json.TIME_ORDERING).getAsString();
 		TimeOrdering timeOrdering = TimeOrdering.parse(timeOrderingS);
 		activity.setTimeOrdering(timeOrdering);
 
@@ -160,23 +161,23 @@ public class StrolchElementFromJsonVisitor {
 		if (defs.hasPolicyDefs())
 			activity.setPolicyDefs(defs);
 
-		if (!jsonObject.has(Tags.ELEMENTS))
+		if (!jsonObject.has(Tags.Json.ELEMENTS))
 			return;
 
-		JsonArray elementsJsonArray = jsonObject.getAsJsonArray(Tags.ELEMENTS);
+		JsonArray elementsJsonArray = jsonObject.getAsJsonArray(Tags.Json.ELEMENTS);
 		elementsJsonArray.forEach(e -> {
 
 			JsonObject elementJsonObject = e.getAsJsonObject();
-			String objectType = elementJsonObject.get(Tags.OBJECT_TYPE).getAsString();
+			String objectType = elementJsonObject.get(Tags.Json.OBJECT_TYPE).getAsString();
 
 			switch (objectType) {
-			case Tags.ACTIVITY:
+			case Tags.Json.ACTIVITY:
 				Activity childActivity = new Activity();
 				fillElement(elementJsonObject, childActivity);
 				activity.addElement(childActivity);
 				break;
 
-			case Tags.ACTION:
+			case Tags.Json.ACTION:
 				Action childAction = new Action();
 				fillElement(elementJsonObject, childAction);
 				activity.addElement(childAction);
@@ -191,9 +192,9 @@ public class StrolchElementFromJsonVisitor {
 	}
 
 	protected void fillElement(JsonObject jsonObject, AbstractStrolchElement strolchElement) {
-		if (jsonObject.has(Tags.ID) && jsonObject.has(Tags.NAME)) {
-			strolchElement.setId(jsonObject.get(Tags.ID).getAsString());
-			strolchElement.setName(jsonObject.get(Tags.NAME).getAsString());
+		if (jsonObject.has(Tags.Json.ID) && jsonObject.has(Tags.Json.NAME)) {
+			strolchElement.setId(jsonObject.get(Tags.Json.ID).getAsString());
+			strolchElement.setName(jsonObject.get(Tags.Json.NAME).getAsString());
 		} else {
 			String msg = "Check the values of the jsonObject: {0} either id or name attribute is null!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, jsonObject);
@@ -204,8 +205,8 @@ public class StrolchElementFromJsonVisitor {
 	protected void fillElement(JsonObject jsonObject, GroupedParameterizedElement groupedParameterizedElement) {
 		fillElement(jsonObject, (AbstractStrolchElement) groupedParameterizedElement);
 
-		if (jsonObject.has(Tags.TYPE)) {
-			groupedParameterizedElement.setType(jsonObject.get(Tags.TYPE).getAsString());
+		if (jsonObject.has(Tags.Json.TYPE)) {
+			groupedParameterizedElement.setType(jsonObject.get(Tags.Json.TYPE).getAsString());
 		} else {
 			String msg = "Check the values of the jsonObject: {0} type attribute is null!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, jsonObject);
@@ -213,10 +214,10 @@ public class StrolchElementFromJsonVisitor {
 		}
 
 		// add all the parameter bags
-		if (!jsonObject.has(Tags.PARAMETER_BAGS))
+		if (!jsonObject.has(Tags.Json.PARAMETER_BAGS))
 			return;
 
-		JsonObject bagsJsonObject = jsonObject.getAsJsonObject(Tags.PARAMETER_BAGS);
+		JsonObject bagsJsonObject = jsonObject.getAsJsonObject(Tags.Json.PARAMETER_BAGS);
 
 		Set<Entry<String, JsonElement>> bags = bagsJsonObject.entrySet();
 		for (Entry<String, JsonElement> entry : bags) {
@@ -244,8 +245,8 @@ public class StrolchElementFromJsonVisitor {
 	protected void fillElement(JsonObject jsonObject, ParameterizedElement parameterizedElement) {
 		fillElement(jsonObject, (AbstractStrolchElement) parameterizedElement);
 
-		if (jsonObject.has(Tags.TYPE)) {
-			parameterizedElement.setType(jsonObject.get(Tags.TYPE).getAsString());
+		if (jsonObject.has(Tags.Json.TYPE)) {
+			parameterizedElement.setType(jsonObject.get(Tags.Json.TYPE).getAsString());
 		} else {
 			String msg = "Check the values of the jsonObject: {0} type attribute is null!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, jsonObject);
@@ -253,10 +254,10 @@ public class StrolchElementFromJsonVisitor {
 		}
 
 		// add all the parameters
-		if (!jsonObject.has(Tags.PARAMETERS))
+		if (!jsonObject.has(Tags.Json.PARAMETERS))
 			return;
 
-		JsonObject parametersJsonObject = jsonObject.getAsJsonObject(Tags.PARAMETERS);
+		JsonObject parametersJsonObject = jsonObject.getAsJsonObject(Tags.Json.PARAMETERS);
 		Set<Entry<String, JsonElement>> parameters = parametersJsonObject.entrySet();
 		for (Entry<String, JsonElement> entry : parameters) {
 			String paramId = entry.getKey();
@@ -268,7 +269,7 @@ public class StrolchElementFromJsonVisitor {
 			}
 
 			JsonObject paramJsonObject = jsonElement.getAsJsonObject();
-			String paramtype = paramJsonObject.get(Tags.TYPE).getAsString();
+			String paramtype = paramJsonObject.get(Tags.Json.TYPE).getAsString();
 
 			StrolchValueType paramValueType = StrolchValueType.parse(paramtype);
 			Parameter<?> parameter = paramValueType.parameterInstance();
@@ -286,16 +287,16 @@ public class StrolchElementFromJsonVisitor {
 	protected void fillElement(JsonObject jsonObject, Parameter<?> param) {
 		fillElement(jsonObject, (AbstractStrolchElement) param);
 
-		if (jsonObject.has(Tags.INTERPRETATION))
-			param.setInterpretation(jsonObject.get(Tags.INTERPRETATION).getAsString());
-		if (jsonObject.has(Tags.UOM))
-			param.setUom(jsonObject.get(Tags.UOM).getAsString());
-		if (jsonObject.has(Tags.INDEX))
-			param.setIndex(jsonObject.get(Tags.INDEX).getAsInt());
-		if (jsonObject.has(Tags.HIDDEN))
-			param.setHidden(jsonObject.get(Tags.HIDDEN).getAsBoolean());
+		if (jsonObject.has(Tags.Json.INTERPRETATION))
+			param.setInterpretation(jsonObject.get(Tags.Json.INTERPRETATION).getAsString());
+		if (jsonObject.has(Tags.Json.UOM))
+			param.setUom(jsonObject.get(Tags.Json.UOM).getAsString());
+		if (jsonObject.has(Tags.Json.INDEX))
+			param.setIndex(jsonObject.get(Tags.Json.INDEX).getAsInt());
+		if (jsonObject.has(Tags.Json.HIDDEN))
+			param.setHidden(jsonObject.get(Tags.Json.HIDDEN).getAsBoolean());
 
-		String value = jsonObject.get(Tags.VALUE).getAsString();
+		String value = jsonObject.get(Tags.Json.VALUE).getAsString();
 		param.setValueFromString(value);
 	}
 
@@ -303,12 +304,12 @@ public class StrolchElementFromJsonVisitor {
 		fillElement(jsonObject, (GroupedParameterizedElement) action);
 
 		// attributes
-		if (jsonObject.has(Tags.RESOURCE_ID))
-			action.setResourceId(jsonObject.get(Tags.RESOURCE_ID).getAsString());
-		if (jsonObject.has(Tags.RESOURCE_TYPE))
-			action.setResourceType(jsonObject.get(Tags.RESOURCE_TYPE).getAsString());
-		if (jsonObject.has(Tags.STATE))
-			action.setState(State.parse(jsonObject.get(Tags.STATE).getAsString()));
+		if (jsonObject.has(Tags.Json.RESOURCE_ID))
+			action.setResourceId(jsonObject.get(Tags.Json.RESOURCE_ID).getAsString());
+		if (jsonObject.has(Tags.Json.RESOURCE_TYPE))
+			action.setResourceType(jsonObject.get(Tags.Json.RESOURCE_TYPE).getAsString());
+		if (jsonObject.has(Tags.Json.STATE))
+			action.setState(State.parse(jsonObject.get(Tags.Json.STATE).getAsString()));
 
 		// policies
 		PolicyDefs defs = parsePolicies(jsonObject);
@@ -316,18 +317,18 @@ public class StrolchElementFromJsonVisitor {
 			action.setPolicyDefs(defs);
 
 		// value changes
-		if (!jsonObject.has(Tags.VALUE_CHANGES))
+		if (!jsonObject.has(Tags.Json.VALUE_CHANGES))
 			return;
 
-		JsonArray valueChangesJ = jsonObject.getAsJsonArray(Tags.VALUE_CHANGES);
+		JsonArray valueChangesJ = jsonObject.getAsJsonArray(Tags.Json.VALUE_CHANGES);
 		valueChangesJ.forEach(e -> {
 			try {
 				JsonObject valueChangeJ = e.getAsJsonObject();
 
-				String stateId = valueChangeJ.get(Tags.STATE_ID).getAsString();
-				String timeS = valueChangeJ.get(Tags.TIME).getAsString();
-				String valueS = valueChangeJ.get(Tags.VALUE).getAsString();
-				String typeS = valueChangeJ.get(Tags.TYPE).getAsString();
+				String stateId = valueChangeJ.get(Tags.Json.STATE_ID).getAsString();
+				String timeS = valueChangeJ.get(Tags.Json.TIME).getAsString();
+				String valueS = valueChangeJ.get(Tags.Json.VALUE).getAsString();
+				String typeS = valueChangeJ.get(Tags.Json.TYPE).getAsString();
 
 				StrolchValueType type = StrolchValueType.parse(typeS);
 				IValue<?> value = type.valueInstance(valueS);
@@ -349,10 +350,10 @@ public class StrolchElementFromJsonVisitor {
 
 		PolicyDefs policyDefs = new PolicyDefs();
 
-		if (!jsonObject.has(Tags.POLICIES))
+		if (!jsonObject.has(Tags.Json.POLICIES))
 			return policyDefs;
 
-		JsonObject policiesJsonObject = jsonObject.getAsJsonObject(Tags.POLICIES);
+		JsonObject policiesJsonObject = jsonObject.getAsJsonObject(Tags.Json.POLICIES);
 
 		Set<Entry<String, JsonElement>> entrySet = policiesJsonObject.entrySet();
 		for (Entry<String, JsonElement> entry : entrySet) {
@@ -368,16 +369,16 @@ public class StrolchElementFromJsonVisitor {
 
 	protected void parseVersion(StrolchRootElement rootElement, JsonObject jsonObject) {
 
-		if (!jsonObject.has(Tags.VERSION))
+		if (!jsonObject.has(Tags.Json.VERSION))
 			return;
 
-		JsonObject versionJ = jsonObject.getAsJsonObject(Tags.VERSION);
+		JsonObject versionJ = jsonObject.getAsJsonObject(Tags.Json.VERSION);
 
-		int v = versionJ.get(Tags.VERSION).getAsInt();
-		String createdBy = versionJ.get(Tags.CREATED_BY).getAsString();
-		String createdAtS = versionJ.get(Tags.CREATED_AT).getAsString();
+		int v = versionJ.get(Tags.Json.VERSION).getAsInt();
+		String createdBy = versionJ.get(Tags.Json.CREATED_BY).getAsString();
+		String createdAtS = versionJ.get(Tags.Json.CREATED_AT).getAsString();
 		Date createdAt = ISO8601FormatFactory.getInstance().parseDate(createdAtS);
-		boolean deleted = versionJ.get(Tags.DELETED).getAsBoolean();
+		boolean deleted = versionJ.get(Tags.Json.DELETED).getAsBoolean();
 
 		Version version = new Version(rootElement.getLocator(), v, createdBy, createdAt, deleted);
 		rootElement.setVersion(version);
