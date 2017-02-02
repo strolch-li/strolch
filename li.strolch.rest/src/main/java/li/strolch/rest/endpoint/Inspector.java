@@ -364,6 +364,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		JsonObject typeDetailJ = new JsonObject();
+		typeDetailJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.RESOURCE);
 		typeDetailJ.addProperty(Tags.Json.TYPE, type);
 
 		JsonArray elementsJ = new JsonArray();
@@ -412,6 +413,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		JsonObject typeDetailJ = new JsonObject();
+		typeDetailJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ORDER);
 		typeDetailJ.addProperty(Tags.Json.TYPE, type);
 
 		JsonArray elementsJ = new JsonArray();
@@ -462,6 +464,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		JsonObject typeDetailJ = new JsonObject();
+		typeDetailJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ACTIVITY);
 		typeDetailJ.addProperty(Tags.Json.TYPE, type);
 
 		JsonArray elementsJ = new JsonArray();
