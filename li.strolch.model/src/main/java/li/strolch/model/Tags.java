@@ -78,6 +78,8 @@ public class Tags {
 		public static final String NAME = "name";
 		public static final String DATE = "date";
 		public static final String STATE = "state";
+		public static final String START = "start";
+		public static final String END = "end";
 		public static final String TIME_ORDERING = "timeOrdering";
 
 		public static final String PARAMETER_BAGS = "parameterBags";
@@ -90,7 +92,7 @@ public class Tags {
 		public static final String TIMED_STATES = "timedStates";
 		public static final String VALUES = "values";
 
-		public static final String ACTION = "action";
+		public static final String ACTION = "Action";
 		public static final String RESOURCE_ID = "resourceId";
 		public static final String RESOURCE_TYPE = "resourceType";
 		public static final String VALUE_CHANGES = "valueChanges";

@@ -377,6 +377,7 @@ public class Inspector {
 			for (Resource resource : byType) {
 
 				JsonObject elementJ = new JsonObject();
+				elementJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.RESOURCE);
 				elementJ.addProperty(Tags.Json.ID, resource.getId());
 				elementJ.addProperty(Tags.Json.NAME, resource.getName());
 				elementJ.addProperty(Tags.Json.TYPE, resource.getType());
@@ -423,6 +424,7 @@ public class Inspector {
 			for (Order order : byType) {
 
 				JsonObject elementJ = new JsonObject();
+				elementJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.ORDER);
 				elementJ.addProperty(Tags.Json.ID, order.getId());
 				elementJ.addProperty(Tags.Json.NAME, order.getName());
 				elementJ.addProperty(Tags.Json.TYPE, order.getType());
@@ -457,6 +459,7 @@ public class Inspector {
 			for (Activity activity : byType) {
 
 				JsonObject elementJ = new JsonObject();
+				elementJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.ACTIVITY);
 				elementJ.addProperty(Tags.Json.ID, activity.getId());
 				elementJ.addProperty(Tags.Json.NAME, activity.getName());
 				elementJ.addProperty(Tags.Json.TYPE, activity.getType());
