@@ -90,14 +90,12 @@ public class PagingTest {
 		Paging<String> paging = Paging.asPage(list, 0, 2);
 		List<String> page = paging.getPage();
 		assertEquals(Arrays.asList("a", "b"), page);
-		assertEquals(0, paging.getFirstOffset());
 		assertEquals(2, paging.getNextOffset());
 		assertEquals(6, paging.getLastOffset());
 
 		paging = Paging.asPage(list, paging.getLastOffset(), 2);
 		page = paging.getPage();
 		assertEquals(Arrays.asList("g"), page);
-		assertEquals(0, paging.getFirstOffset());
 		assertEquals(6, paging.getNextOffset());
 		assertEquals(6, paging.getLastOffset());
 	}
@@ -113,7 +111,6 @@ public class PagingTest {
 		paging = Paging.asPage(list, paging.getLastOffset(), 1);
 		page = paging.getPage();
 		assertEquals(Arrays.asList("g"), page);
-		assertEquals(0, paging.getFirstOffset());
 		assertEquals(6, paging.getNextOffset());
 		assertEquals(6, paging.getLastOffset());
 	}
@@ -125,15 +122,26 @@ public class PagingTest {
 		Paging<String> paging = Paging.asPage(list, 0, 3);
 		List<String> page = paging.getPage();
 		assertEquals(Arrays.asList("a", "b", "c"), page);
-		assertEquals(0, paging.getFirstOffset());
+		assertEquals(0, paging.getOffset());
+		assertEquals(0, paging.getPreviousOffset());
 		assertEquals(3, paging.getNextOffset());
 		assertEquals(6, paging.getLastOffset());
 
-		page = Paging.asPage(list, paging.getNextOffset(), paging.getLimit()).getPage();
+		paging = Paging.asPage(list, paging.getNextOffset(), paging.getLimit());
+		page = paging.getPage();
 		assertEquals(Arrays.asList("d", "e", "f"), page);
+		assertEquals(3, paging.getOffset());
+		assertEquals(0, paging.getPreviousOffset());
+		assertEquals(6, paging.getNextOffset());
+		assertEquals(6, paging.getLastOffset());
 
-		page = Paging.asPage(list, paging.getLastOffset(), paging.getLimit()).getPage();
+		paging = Paging.asPage(list, paging.getLastOffset(), paging.getLimit());
+		page = paging.getPage();
 		assertEquals(Arrays.asList("g"), page);
+		assertEquals(6, paging.getOffset());
+		assertEquals(3, paging.getPreviousOffset());
+		assertEquals(6, paging.getNextOffset());
+		assertEquals(6, paging.getLastOffset());
 	}
 
 	@Test
@@ -144,13 +152,20 @@ public class PagingTest {
 		List<String> page = paging.getPage();
 		assertEquals(Arrays.asList("b"), page);
 
-		page = Paging.asPage(list, paging.getPreviousOffset(), paging.getLimit()).getPage();
+		paging = Paging.asPage(list, paging.getPreviousOffset(), paging.getLimit());
+		page = paging.getPage();
 		assertEquals(Arrays.asList("a"), page);
 
-		page = Paging.asPage(list, paging.getNextOffset(), paging.getLimit()).getPage();
+		paging = Paging.asPage(list, paging.getNextOffset(), paging.getLimit());
+		page = paging.getPage();
+		assertEquals(Arrays.asList("b"), page);
+
+		paging = Paging.asPage(list, paging.getNextOffset(), paging.getLimit());
+		page = paging.getPage();
 		assertEquals(Arrays.asList("c"), page);
 
-		page = Paging.asPage(list, paging.getLastOffset(), paging.getLimit()).getPage();
+		paging = Paging.asPage(list, paging.getLastOffset(), paging.getLimit());
+		page = paging.getPage();
 		assertEquals(Arrays.asList("g"), page);
 	}
 
@@ -162,13 +177,45 @@ public class PagingTest {
 		List<String> page = paging.getPage();
 		assertEquals(Arrays.asList("c", "d"), page);
 
-		page = Paging.asPage(list, paging.getPreviousOffset(), paging.getLimit()).getPage();
+		paging = Paging.asPage(list, paging.getPreviousOffset(), paging.getLimit());
+		page = paging.getPage();
 		assertEquals(Arrays.asList("a", "b"), page);
 
-		page = Paging.asPage(list, paging.getNextOffset(), paging.getLimit()).getPage();
-		assertEquals(Arrays.asList("e", "f"), page);
+		paging = Paging.asPage(list, paging.getNextOffset(), paging.getLimit());
+		page = paging.getPage();
+		assertEquals(Arrays.asList("c", "d"), page);
 
-		page = Paging.asPage(list, paging.getLastOffset(), paging.getLimit()).getPage();
-		assertEquals(Arrays.asList("g"), page);
+		paging = Paging.asPage(list, paging.getNextOffset(), paging.getLimit());
+		page = paging.getPage();
+		assertEquals(Arrays.asList("e", "f"), page);
+	}
+
+	@Test
+	public void shouldReturnLastPage8() {
+		List<String> list = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11");
+
+		Paging<String> paging = Paging.asPage(list, 0, 5);
+		List<String> page = paging.getPage();
+		assertEquals(Arrays.asList("0", "1", "2", "3", "4"), page);
+		assertEquals(0, paging.getOffset());
+		assertEquals(0, paging.getPreviousOffset());
+		assertEquals(5, paging.getNextOffset());
+		assertEquals(10, paging.getLastOffset());
+
+		paging = Paging.asPage(list, paging.getNextOffset(), paging.getLimit());
+		page = paging.getPage();
+		assertEquals(Arrays.asList("5", "6", "7", "8", "9"), page);
+		assertEquals(5, paging.getOffset());
+		assertEquals(0, paging.getPreviousOffset());
+		assertEquals(10, paging.getNextOffset());
+		assertEquals(10, paging.getLastOffset());
+
+		paging = Paging.asPage(list, paging.getNextOffset(), paging.getLimit());
+		page = paging.getPage();
+		assertEquals(Arrays.asList("10", "11"), page);
+		assertEquals(10, paging.getOffset());
+		assertEquals(5, paging.getPreviousOffset());
+		assertEquals(10, paging.getNextOffset());
+		assertEquals(10, paging.getLastOffset());
 	}
 }

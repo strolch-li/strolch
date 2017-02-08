@@ -37,7 +37,6 @@ public class Paging<T> {
 
 	private int nextOffset;
 	private int previousOffset;
-	private int firstOffset;
 	private int lastOffset;
 
 	private Paging() {
@@ -70,13 +69,6 @@ public class Paging<T> {
 	 */
 	public int getPreviousOffset() {
 		return this.previousOffset;
-	}
-
-	/**
-	 * @return 0, as the first offset is the first element in the input list
-	 */
-	public int getFirstOffset() {
-		return this.firstOffset;
 	}
 
 	/**
@@ -124,14 +116,11 @@ public class Paging<T> {
 	public static <T> Paging<T> asPage(List<T> list, int offset, int limit) {
 
 		Paging<T> paging = new Paging<>();
-		paging.firstOffset = 0;
 		paging.limit = limit;
 		paging.offset = offset;
 
 		paging.size = list.size();
 		paging.input = list;
-
-		paging.firstOffset = 0;
 
 		if (paging.limit <= 0 || paging.offset < 0) {
 			paging.offset = 0;
@@ -156,9 +145,9 @@ public class Paging<T> {
 
 		} else {
 
-			paging.nextOffset = Math.min(paging.size - 1, limit + offset);
+			paging.lastOffset = paging.size % limit == 0 ? paging.size - limit : ((int) paging.size / limit) * limit;
+			paging.nextOffset = Math.min(paging.lastOffset, limit + offset);
 			paging.previousOffset = Math.max(0, offset - limit);
-			paging.lastOffset = offset + ((paging.size - offset) - ((paging.size - offset) % limit));
 		}
 
 		return paging;

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -37,6 +38,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.InputSource;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -53,6 +56,11 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.json.ActivityToJsonVisitor;
 import li.strolch.model.json.OrderToJsonVisitor;
 import li.strolch.model.json.ResourceToJsonVisitor;
+import li.strolch.model.query.ActivityQuery;
+import li.strolch.model.query.OrderQuery;
+import li.strolch.model.query.ResourceQuery;
+import li.strolch.model.query.StrolchTypeNavigation;
+import li.strolch.model.query.parser.QueryParser;
 import li.strolch.model.xml.ActivityToXmlStringVisitor;
 import li.strolch.model.xml.OrderToXmlStringVisitor;
 import li.strolch.model.xml.ResourceToXmlStringVisitor;
@@ -63,6 +71,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
+import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.Result;
 import li.strolch.service.UpdateActivityService;
 import li.strolch.service.UpdateActivityService.UpdateActivityArg;
@@ -71,7 +80,6 @@ import li.strolch.service.UpdateOrderService.UpdateOrderArg;
 import li.strolch.service.UpdateResourceService;
 import li.strolch.service.UpdateResourceService.UpdateResourceArg;
 import li.strolch.service.api.ServiceResult;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -352,41 +360,46 @@ public class Inspector {
 	 * @param realm
 	 *            the realm for which the resource type overview is to be returned
 	 * @param type
-	 * 
+	 *            marshall
 	 * @return an overview of the {@link Resource Resources} with the given type. This is a list of overviews of the
 	 *         resources
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}")
-	public Response getResourceTypeDetails(@PathParam("realm") String realm, @PathParam("type") String type,
-			@Context HttpServletRequest request) {
+	public Response queryResourcesByType(@BeanParam QueryData queryData, @PathParam("realm") String realm,
+			@PathParam("type") String type, @Context HttpServletRequest request) {
 
+		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		JsonObject typeDetailJ = new JsonObject();
-		typeDetailJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.RESOURCE);
-		typeDetailJ.addProperty(Tags.Json.TYPE, type);
+		List<Resource> resources = new ArrayList<>();
 
-		JsonArray elementsJ = new JsonArray();
-		typeDetailJ.add(Tags.Json.ELEMENTS, elementsJ);
+		// parse the query string
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(queryData.getQuery(), true, true);
 
+		// set navigation to requested type
+		query.setNavigation(new StrolchTypeNavigation(type));
+
+		// query the data
+		long dataSetSize = 0L;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-
-			List<Resource> byType = tx.getResourceMap().getElementsBy(tx, type);
-			for (Resource resource : byType) {
-
-				JsonObject elementJ = new JsonObject();
-				elementJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.RESOURCE);
-				elementJ.addProperty(Tags.Json.ID, resource.getId());
-				elementJ.addProperty(Tags.Json.NAME, resource.getName());
-				elementJ.addProperty(Tags.Json.TYPE, resource.getType());
-
-				elementsJ.add(elementJ);
-			}
+			ResourceMap resourceMap = tx.getResourceMap();
+			dataSetSize = resourceMap.querySize(tx);
+			resources.addAll(tx.doQuery(query));
 		}
 
-		return Response.ok().entity(typeDetailJ.toString()).build();
+		// do ordering
+		RestfulHelper.doOrdering(queryData, resources);
+
+		// build JSON response
+		ResourceToJsonVisitor toJsonVisitor = new ResourceToJsonVisitor();
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, resources, toJsonVisitor);
+
+		// marshall result
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		String entity = gson.toJson(root);
+		return Response.ok(entity).build();
 	}
 
 	/**
@@ -406,71 +419,73 @@ public class Inspector {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders/{type}")
-	public Response getOrderTypeDetails(@PathParam("realm") String realm, @PathParam("type") String type,
-			@Context HttpServletRequest request) {
+	public Response queryOrdersByType(@BeanParam QueryData queryData, @PathParam("realm") String realm,
+			@PathParam("type") String type, @Context HttpServletRequest request) {
 
+		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		JsonObject typeDetailJ = new JsonObject();
-		typeDetailJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ORDER);
-		typeDetailJ.addProperty(Tags.Json.TYPE, type);
+		List<Order> orders = new ArrayList<>();
 
-		JsonArray elementsJ = new JsonArray();
-		typeDetailJ.add(Tags.Json.ELEMENTS, elementsJ);
+		// parse the query string
+		OrderQuery<Order> query = QueryParser.parseToOrderQuery(queryData.getQuery(), true, true);
+		query.setNavigation(new StrolchTypeNavigation(type));
 
-		try (StrolchTransaction tx = openTx(cert, realm)) {
-
-			List<Order> byType = tx.getOrderMap().getElementsBy(tx, type);
-			for (Order order : byType) {
-
-				JsonObject elementJ = new JsonObject();
-				elementJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.ORDER);
-				elementJ.addProperty(Tags.Json.ID, order.getId());
-				elementJ.addProperty(Tags.Json.NAME, order.getName());
-				elementJ.addProperty(Tags.Json.TYPE, order.getType());
-				elementJ.addProperty(Tags.Json.STATE, order.getState().getName());
-				elementJ.addProperty(Tags.Json.DATE, ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
-
-				elementsJ.add(elementJ);
-			}
+		// query the data
+		long dataSetSize = 0L;
+		try (StrolchTransaction tx = openTx(cert, queryData.getRealmName())) {
+			OrderMap orderMap = tx.getOrderMap();
+			dataSetSize = orderMap.querySize(tx);
+			orders.addAll(tx.doQuery(query));
 		}
 
-		return Response.ok().entity(typeDetailJ.toString()).build();
+		// do ordering
+		RestfulHelper.doOrdering(queryData, orders);
+
+		// build JSON response
+		OrderToJsonVisitor toJsonVisitor = new OrderToJsonVisitor();
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, orders, toJsonVisitor);
+
+		// marshall result
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		String entity = gson.toJson(root);
+		return Response.ok(entity).build();
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}")
-	public Response getActivities(@PathParam("realm") String realm, @PathParam("type") String type,
-			@Context HttpServletRequest request) {
+	public Response queryActivitiesByType(@BeanParam QueryData queryData, @PathParam("realm") String realm,
+			@PathParam("type") String type, @Context HttpServletRequest request) {
 
+		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		JsonObject typeDetailJ = new JsonObject();
-		typeDetailJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ACTIVITY);
-		typeDetailJ.addProperty(Tags.Json.TYPE, type);
+		List<Activity> activities = new ArrayList<>();
 
-		JsonArray elementsJ = new JsonArray();
-		typeDetailJ.add(Tags.Json.ELEMENTS, elementsJ);
+		// parse the query string
+		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true, true);
+		query.setNavigation(new StrolchTypeNavigation(type));
 
-		try (StrolchTransaction tx = openTx(cert, realm)) {
-
-			List<Activity> byType = tx.getActivityMap().getElementsBy(tx, type);
-			for (Activity activity : byType) {
-
-				JsonObject elementJ = new JsonObject();
-				elementJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.ACTIVITY);
-				elementJ.addProperty(Tags.Json.ID, activity.getId());
-				elementJ.addProperty(Tags.Json.NAME, activity.getName());
-				elementJ.addProperty(Tags.Json.TYPE, activity.getType());
-				elementJ.addProperty(Tags.Json.STATE, activity.getState().getName());
-				elementJ.addProperty(Tags.Json.TIME_ORDERING, activity.getTimeOrdering().getName());
-
-				elementsJ.add(elementJ);
-			}
+		// query the data
+		long dataSetSize = 0L;
+		try (StrolchTransaction tx = openTx(cert, queryData.getRealmName())) {
+			ActivityMap activityMap = tx.getActivityMap();
+			dataSetSize = activityMap.querySize(tx);
+			activities.addAll(tx.doQuery(query));
 		}
 
-		return Response.ok().entity(typeDetailJ.toString()).build();
+		// do ordering
+		RestfulHelper.doOrdering(queryData, activities);
+
+		// build JSON response
+		ActivityToJsonVisitor toJsonVisitor = new ActivityToJsonVisitor();
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, activities, toJsonVisitor);
+
+		// marshall result
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		String entity = gson.toJson(root);
+		return Response.ok(entity).build();
 	}
 
 	@GET

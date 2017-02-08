@@ -2,6 +2,8 @@ package li.strolch.rest.endpoint;
 
 import javax.ws.rs.QueryParam;
 
+import li.strolch.runtime.StrolchConstants;
+
 public class QueryData {
 
 	@QueryParam("realmName")
@@ -19,8 +21,17 @@ public class QueryData {
 	@QueryParam("orderBy")
 	private String orderBy;
 
-	@QueryParam("ascending")
-	private boolean ascending;
+	@QueryParam("descending")
+	private boolean descending;
+
+	public void initializeUnsetFields() {
+		if (this.realmName == null)
+			this.realmName = StrolchConstants.DEFAULT_REALM;
+		if (this.limit == 0)
+			this.limit = 50;
+		if (this.query == null)
+			this.query = "";
+	}
 
 	public String getRealmName() {
 		return this.realmName;
@@ -38,12 +49,12 @@ public class QueryData {
 		this.orderBy = orderBy;
 	}
 
-	public boolean isAscending() {
-		return this.ascending;
+	public boolean isDescending() {
+		return this.descending;
 	}
 
-	public void setAscending(boolean ascending) {
-		this.ascending = ascending;
+	public void setDescending(boolean descending) {
+		this.descending = descending;
 	}
 
 	public int getOffset() {

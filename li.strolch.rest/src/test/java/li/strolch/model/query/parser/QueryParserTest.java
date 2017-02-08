@@ -29,7 +29,14 @@ public class QueryParserTest {
 	}
 
 	@Test
-	public void shouldParseEmpty() {
+	public void shouldParseEmpty1() {
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("", false, false);
+		assertFalse(query.hasNavigation());
+		assertFalse(query.hasSelection());
+	}
+	
+	@Test
+	public void shouldParseEmpty2() {
 		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("", true, false);
 		assertFalse(query.hasNavigation());
 		assertFalse(query.hasSelection());
