@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.rest.model.Result;
-import li.strolch.utils.helper.StringHelper;
 
 @Provider
 public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception> {
@@ -53,7 +52,9 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 			sb.append(" does not have access to ");
 			Restrictable restrictable = e.getRestrictable();
 			if (restrictable == null) {
-				sb.append(StringHelper.NULL);
+				// sb.append(StringHelper.NULL);
+				// use the message
+				sb.append(e.getMessage());
 			} else {
 				sb.append(restrictable.getPrivilegeName());
 				sb.append(" - ");
