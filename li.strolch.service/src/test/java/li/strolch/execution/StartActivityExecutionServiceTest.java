@@ -45,7 +45,7 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 		arg.realm = "execution";
 		arg.locator = activityLoc;
 
-		doService(cert, svc, arg);
+		doServiceAssertResult(cert, svc, arg);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action = tx.findElement(activityLoc.append("produce"));
@@ -72,7 +72,7 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 		arg.realm = "execution";
 		arg.locator = activityLoc;
 
-		doService(cert, svc, arg);
+		doServiceAssertResult(cert, svc, arg);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
@@ -148,7 +148,7 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 		arg.realm = "execution";
 		arg.locator = activityLoc;
 
-		doService(cert, svc, arg);
+		doServiceAssertResult(cert, svc, arg);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
@@ -187,7 +187,7 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 		arg.realm = "execution";
 		arg.locator = activityLoc;
 
-		doService(cert, svc, arg);
+		doServiceAssertResult(cert, svc, arg);
 
 		Thread.sleep(1000L);
 
