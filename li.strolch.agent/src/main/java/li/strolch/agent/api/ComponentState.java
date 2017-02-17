@@ -21,7 +21,7 @@ public enum ComponentState {
 
 	UNDEFINED, SETUP, INITIALIZED, STARTED, STOPPED, DESTROYED;
 
-	public ComponentState validateStateChange(ComponentState newState) {
+	public ComponentState validateStateChange(ComponentState newState, String componentName) {
 
 		if (this == newState)
 			return this;
@@ -29,35 +29,35 @@ public enum ComponentState {
 		switch (this) {
 		case UNDEFINED:
 			if (newState != ComponentState.SETUP && newState != STOPPED)
-				throw getIllegalStateEx(newState);
+				throw getIllegalStateEx(newState, componentName);
 			break;
 		case SETUP:
 			if (newState != ComponentState.INITIALIZED && newState != STOPPED && newState != DESTROYED)
-				throw getIllegalStateEx(newState);
+				throw getIllegalStateEx(newState, componentName);
 			break;
 		case INITIALIZED:
 			if (newState != ComponentState.STARTED && newState != STOPPED && newState != DESTROYED)
-				throw getIllegalStateEx(newState);
+				throw getIllegalStateEx(newState, componentName);
 			break;
 		case STARTED:
 			if (newState != ComponentState.STOPPED)
-				throw getIllegalStateEx(newState);
+				throw getIllegalStateEx(newState, componentName);
 			break;
 		case STOPPED:
 			if (newState != ComponentState.STARTED && newState != ComponentState.DESTROYED)
-				throw getIllegalStateEx(newState);
+				throw getIllegalStateEx(newState, componentName);
 			break;
 		case DESTROYED:
-			throw getIllegalStateEx(newState);
+			throw getIllegalStateEx(newState, componentName);
 		default:
-			throw getIllegalStateEx(newState);
+			throw getIllegalStateEx(newState, componentName);
 		}
 
 		return newState;
 	}
 
-	private IllegalStateException getIllegalStateEx(ComponentState newState) {
-		String msg = "Moving from state {0} to state {1} is not allowed!"; //$NON-NLS-1$
+	private IllegalStateException getIllegalStateEx(ComponentState newState, String componentName) {
+		String msg = "Moving from state {0} to state {1} is not allowed for component " + componentName; //$NON-NLS-1$
 		msg = MessageFormat.format(msg, this, newState);
 		throw new IllegalStateException(msg);
 	}
