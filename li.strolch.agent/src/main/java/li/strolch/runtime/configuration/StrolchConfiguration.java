@@ -38,6 +38,10 @@ public class StrolchConfiguration {
 		return this.configurationByComponent.keySet();
 	}
 
+	public ComponentConfiguration getComponentConfiguration(Class<?> componentClass) {
+		return getComponentConfiguration(componentClass.getSimpleName());
+	}
+
 	public ComponentConfiguration getComponentConfiguration(String componentName) {
 		ComponentConfiguration componentConfiguration = this.configurationByComponent.get(componentName);
 		if (componentConfiguration == null) {
