@@ -21,14 +21,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchRootElement;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
+ * A simple {@link ObserverHandler} which keeps a reference to all registered {@link Observer} and notifies them when
+ * one of the notify methods are called
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DefaultObserverHandler implements ObserverHandler {
@@ -43,6 +46,9 @@ public class DefaultObserverHandler implements ObserverHandler {
 
 	@Override
 	public void add(String key, List<StrolchRootElement> elements) {
+		if (elements == null || elements.isEmpty())
+			return;
+
 		List<Observer> observerList = this.observerMap.get(key);
 		if (observerList != null && !observerList.isEmpty()) {
 			for (Observer observer : observerList) {
@@ -59,6 +65,9 @@ public class DefaultObserverHandler implements ObserverHandler {
 
 	@Override
 	public void update(String key, List<StrolchRootElement> elements) {
+		if (elements == null || elements.isEmpty())
+			return;
+
 		List<Observer> observerList = this.observerMap.get(key);
 		if (observerList != null && !observerList.isEmpty()) {
 			for (Observer observer : observerList) {
@@ -75,6 +84,9 @@ public class DefaultObserverHandler implements ObserverHandler {
 
 	@Override
 	public void remove(String key, List<StrolchRootElement> elements) {
+		if (elements == null || elements.isEmpty())
+			return;
+
 		List<Observer> observerList = this.observerMap.get(key);
 		if (observerList != null && !observerList.isEmpty()) {
 			for (Observer observer : observerList) {
