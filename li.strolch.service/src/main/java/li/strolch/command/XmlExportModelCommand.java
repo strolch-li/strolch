@@ -100,7 +100,7 @@ public class XmlExportModelCommand extends Command {
 		File[] existingFiles = parentFile.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.startsWith(exportName);
+				return name.startsWith(exportName) && name.endsWith(".xml");
 			}
 		});
 
@@ -119,7 +119,10 @@ public class XmlExportModelCommand extends Command {
 		this.statistics.startTime = new Date();
 
 		String exportName = fileName.substring(0, fileName.indexOf(XML_FILE_SUFFIX));
-		cleanUpExisting(exportName);
+
+		// only delete existing files if doing multi-file
+		if (this.multiFile)
+			cleanUpExisting(exportName);
 
 		Set<File> createdFiles = new HashSet<>();
 
@@ -184,8 +187,8 @@ public class XmlExportModelCommand extends Command {
 
 						File typeXmlFileF = new File(this.modelFile.getParentFile(), typeXmlFile);
 						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
-						logger.info("Writing " + resourceMap.querySize(tx(), type) + " " + type
-								+ " Resources to path: " + typeXmlFileF.getAbsolutePath() + "...");
+						logger.info("Writing " + resourceMap.querySize(tx(), type) + " " + type + " Resources to path: "
+								+ typeXmlFileF.getAbsolutePath() + "...");
 						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = openXmlStreamWriter(typeOut);
@@ -320,8 +323,8 @@ public class XmlExportModelCommand extends Command {
 		}
 	}
 
-	private XMLStreamWriter openXmlStreamWriter(FileOutputStream out) throws FactoryConfigurationError,
-			XMLStreamException {
+	private XMLStreamWriter openXmlStreamWriter(FileOutputStream out)
+			throws FactoryConfigurationError, XMLStreamException {
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		XMLStreamWriter writer = factory.createXMLStreamWriter(out, StrolchConstants.DEFAULT_ENCODING);
 		writer = new IndentingXMLStreamWriter(writer);
