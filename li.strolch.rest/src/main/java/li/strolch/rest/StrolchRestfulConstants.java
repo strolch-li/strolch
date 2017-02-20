@@ -24,6 +24,7 @@ public class StrolchRestfulConstants {
 	public static final String STROLCH_AUTHORIZATION = "strolch.authorization"; //$NON-NLS-1$
 
 	public static final String MSG = "msg";
+	public static final String EXCEPTION_MSG = "exceptionMsg";
 	public static final String DATA = "data";
 	public static final String LAST_OFFSET = "lastOffset";
 	public static final String NEXT_OFFSET = "nextOffset";

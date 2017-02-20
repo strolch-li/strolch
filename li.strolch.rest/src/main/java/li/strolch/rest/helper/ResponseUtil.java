@@ -1,6 +1,7 @@
 package li.strolch.rest.helper;
 
 import static li.strolch.rest.StrolchRestfulConstants.DATA;
+import static li.strolch.rest.StrolchRestfulConstants.EXCEPTION_MSG;
 import static li.strolch.rest.StrolchRestfulConstants.LAST_OFFSET;
 import static li.strolch.rest.StrolchRestfulConstants.LIMIT;
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
@@ -19,6 +20,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.helper.StringHelper;
@@ -66,6 +68,42 @@ public class ResponseUtil {
 		String json = new Gson().toJson(response);
 
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
+	public static Response toResponse(String member, List<JsonObject> jsonObjects) {
+		JsonObject response = new JsonObject();
+		response.addProperty(MSG, StringHelper.DASH);
+
+		JsonArray arrayJ = new JsonArray();
+		for (JsonElement obj : jsonObjects) {
+			arrayJ.add(obj);
+		}
+		response.add(member, arrayJ);
+
+		String json = new Gson().toJson(response);
+
+		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
+	public static Response toResponse(ServiceResult svcResult) {
+
+		String msg = StringHelper.DASH;
+		String exceptionMsg = StringHelper.DASH;
+
+		if (!svcResult.isOk()) {
+			msg = svcResult.getMessage();
+			Throwable t = svcResult.getThrowable();
+			if (t != null)
+				exceptionMsg = StringHelper.formatExceptionMessage(t);
+		}
+
+		JsonObject response = new JsonObject();
+		response.addProperty(MSG, msg);
+		if (!exceptionMsg.equals(StringHelper.DASH))
+			response.addProperty(EXCEPTION_MSG, exceptionMsg);
+
+		String json = new Gson().toJson(response);
+		return Response.serverError().entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
 	public static Response toResponse(Throwable t) {

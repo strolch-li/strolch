@@ -871,15 +871,30 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		ObserverHandler observerHandler = this.realm.getObserverHandler();
 
 		if (this.orderMap != null) {
-			observerHandler.add(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getCreated()));
-			observerHandler.update(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getUpdated()));
-			observerHandler.remove(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getDeleted()));
+			if (!this.orderMap.getCreated().isEmpty())
+				observerHandler.add(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getCreated()));
+			if (!this.orderMap.getUpdated().isEmpty())
+				observerHandler.update(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getUpdated()));
+			if (!this.orderMap.getDeleted().isEmpty())
+				observerHandler.remove(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getDeleted()));
 		}
 
 		if (this.resourceMap != null) {
-			observerHandler.add(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getCreated()));
-			observerHandler.update(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getUpdated()));
-			observerHandler.remove(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getDeleted()));
+			if (!this.resourceMap.getCreated().isEmpty())
+				observerHandler.add(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getCreated()));
+			if (!this.resourceMap.getUpdated().isEmpty())
+				observerHandler.update(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getUpdated()));
+			if (!this.resourceMap.getDeleted().isEmpty())
+				observerHandler.remove(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getDeleted()));
+		}
+
+		if (this.activityMap != null) {
+			if (!this.activityMap.getCreated().isEmpty())
+				observerHandler.add(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getCreated()));
+			if (!this.activityMap.getUpdated().isEmpty())
+				observerHandler.update(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getUpdated()));
+			if (!this.activityMap.getDeleted().isEmpty())
+				observerHandler.remove(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getDeleted()));
 		}
 
 		long observerUpdateDuration = System.nanoTime() - observerUpdateStart;
@@ -916,6 +931,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			auditsFor(audits, AccessType.CREATE, Tags.RESOURCE, this.resourceMap.getCreated());
 			auditsFor(audits, AccessType.UPDATE, Tags.RESOURCE, this.resourceMap.getUpdated());
 			auditsFor(audits, AccessType.DELETE, Tags.RESOURCE, this.resourceMap.getDeleted());
+		}
+
+		if (this.activityMap != null) {
+			if (this.realm.isAuditTrailEnabledForRead())
+				auditsFor(audits, AccessType.READ, Tags.ACTIVITY, this.activityMap.getRead());
+			auditsFor(audits, AccessType.CREATE, Tags.ACTIVITY, this.activityMap.getCreated());
+			auditsFor(audits, AccessType.UPDATE, Tags.ACTIVITY, this.activityMap.getUpdated());
+			auditsFor(audits, AccessType.DELETE, Tags.ACTIVITY, this.activityMap.getDeleted());
 		}
 
 		if (this.auditTrail != null && !isSuppressAuditsForAudits()) {

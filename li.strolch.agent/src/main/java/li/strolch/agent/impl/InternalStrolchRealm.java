@@ -152,7 +152,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	}
 
 	@Override
-	public ObserverHandler getObserverHandler() {
+	public ObserverHandler getObserverHandler() throws IllegalArgumentException{
 		if (!this.updateObservers)
 			throw new IllegalArgumentException("ObserverUpdates are not enabled!"); //$NON-NLS-1$
 		return this.observerHandler;

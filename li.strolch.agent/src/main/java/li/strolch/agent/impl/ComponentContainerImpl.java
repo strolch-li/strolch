@@ -178,7 +178,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	public void setup(StrolchConfiguration strolchConfiguration) {
-		this.state.validateStateChange(ComponentState.SETUP);
+		this.state.validateStateChange(ComponentState.SETUP, "agent");
 
 		// set the application locale
 		Locale.setDefault(strolchConfiguration.getRuntimeConfiguration().getLocale());
@@ -220,7 +220,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	public void initialize(StrolchConfiguration strolchConfiguration) {
-		this.state.validateStateChange(ComponentState.INITIALIZED);
+		this.state.validateStateChange(ComponentState.INITIALIZED, "agent");
 
 		// now we can initialize the components
 		String msg = "{0}:{1} Initializing {2} Strolch Components..."; //$NON-NLS-1$
@@ -238,7 +238,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	public void start() {
-		this.state.validateStateChange(ComponentState.STARTED);
+		this.state.validateStateChange(ComponentState.STARTED, "agent");
 
 		String msg = "{0}:{1} Starting {2} Strolch Components..."; //$NON-NLS-1$
 		String environment = getEnvironment();
@@ -257,7 +257,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	public void stop() {
-		this.state.validateStateChange(ComponentState.STOPPED);
+		this.state.validateStateChange(ComponentState.STOPPED, "agent");
 
 		String msg = "{0}:{1} Stopping {2} Strolch Components..."; //$NON-NLS-1$
 		String environment = getEnvironment();
@@ -278,7 +278,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	public void destroy() {
-		this.state.validateStateChange(ComponentState.DESTROYED);
+		this.state.validateStateChange(ComponentState.DESTROYED, "agent");
 
 		String msg = "{0}:{1} Destroying {2} Strolch Components..."; //$NON-NLS-1$
 		String environment = getEnvironment();

@@ -136,7 +136,7 @@ public class StrolchComponent {
 	 * @param configuration
 	 */
 	public void setup(ComponentConfiguration configuration) {
-		this.state = this.state.validateStateChange(ComponentState.SETUP);
+		this.state = this.state.validateStateChange(ComponentState.SETUP, getName());
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class StrolchComponent {
 	 */
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 		this.configuration = configuration;
-		this.state = this.state.validateStateChange(ComponentState.INITIALIZED);
+		this.state = this.state.validateStateChange(ComponentState.INITIALIZED, getName());
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class StrolchComponent {
 	 * @throws Exception
 	 */
 	public void start() throws Exception {
-		this.state = this.state.validateStateChange(ComponentState.STARTED);
+		this.state = this.state.validateStateChange(ComponentState.STARTED, getName());
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class StrolchComponent {
 	 * @throws Exception
 	 */
 	public void stop() throws Exception {
-		this.state = this.state.validateStateChange(ComponentState.STOPPED);
+		this.state = this.state.validateStateChange(ComponentState.STOPPED, getName());
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class StrolchComponent {
 	 * @throws Exception
 	 */
 	public void destroy() throws Exception {
-		this.state = this.state.validateStateChange(ComponentState.DESTROYED);
+		this.state = this.state.validateStateChange(ComponentState.DESTROYED, getName());
 	}
 
 	/**
