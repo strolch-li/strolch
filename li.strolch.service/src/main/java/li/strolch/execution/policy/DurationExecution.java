@@ -29,7 +29,7 @@ public class DurationExecution extends SimpleExecution {
 
 		String realmName = tx().getRealmName();
 		Locator locator = action.getLocator();
-		logger.warn("Executing action " + action.getLocator() + " has a duration of " + durationP.getValueAsString());
+		logger.info("Executing action " + action.getLocator() + " has a duration of " + durationP.getValueAsString());
 		getDelayedExecutionTimer().execute(realmName, getContainer(), locator, durationP.getValue());
 
 		super.toExecution(action);

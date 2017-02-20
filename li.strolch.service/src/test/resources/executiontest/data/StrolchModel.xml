@@ -43,12 +43,40 @@
 		</Policies>
 	</Resource>
 
+	<Resource Id="machine1" Name="Machine" Type="Machine">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="reserved" Name="Reservation" Type="Boolean" Value="false" />
+		</ParameterBag>
+		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
+		<Policies>
+			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.ReservationExection" />
+		</Policies>
+	</Resource>
+
 	<Resource Id="conveyor3" Name="Conveyor 3" Type="Conveyor">
 		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
 		<Policies>
 			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.DurationExecution" />
 		</Policies>
 	</Resource>
+
+	<Activity Id="produceMachine1" Name="Activity" Type="ToStock" TimeOrdering="Series">
+		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
+			<Parameter Name="Duration" Id="duration" Value="PT0.3S" Type="Duration" />
+		</ParameterBag>
+		<Action Id="reserve" Name="Reserve" ResourceId="machine1" ResourceType="Machine" Type="Reserve" />
+		<Action Id="produce" Name="Produce" ResourceId="machine1" ResourceType="Machine" Type="Produce" />
+		<Action Id="release" Name="Release" ResourceId="machine1" ResourceType="Machine" Type="Release" />
+	</Activity>
+
+	<Activity Id="produceMachine2" Name="Activity" Type="ToStock" TimeOrdering="Series">
+		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
+			<Parameter Name="Duration" Id="duration" Value="PT0.1S" Type="Duration" />
+		</ParameterBag>
+		<Action Id="reserve" Name="Reserve" ResourceId="machine1" ResourceType="Machine" Type="Reserve" />
+		<Action Id="produce" Name="Produce" ResourceId="machine1" ResourceType="Machine" Type="Produce" />
+		<Action Id="release" Name="Release" ResourceId="machine1" ResourceType="Machine" Type="Release" />
+	</Activity>
 
 	<Activity Id="produceBicycle" Name="Activity" Type="ToStock" TimeOrdering="Series">
 		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">

@@ -469,7 +469,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 
 	 * <p>
 	 * This method can also be used to find a deeper element, e.g. a specific {@link Parameter} on an
-	 * {@link ParameterBag} on an {@link Order}. This would be done as follows: <i>Order/MyType/@1/myParam</i>
+	 * {@link ParameterBag} on an {@link Order}. This would be done as follows: <i>Order/MyType/Bag/@1/myParam</i>
 	 * </p>
 	 * 
 	 * @param locator

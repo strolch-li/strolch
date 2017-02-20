@@ -21,54 +21,42 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	@Override
 	public void toExecution(Action action) {
-
-		action.setState(State.EXECUTION);
-
-		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
-		command.setActivity(action.getRootElement());
-		command.doCommand();
-
-		logger.info("Action " + action.getLocator() + " is now in EXECUTION!");
+		setActionState(action, State.EXECUTION);
 	}
 
 	@Override
 	public void toExecuted(Action action) {
-
-		action.setState(State.EXECUTED);
-
-		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
-		command.setActivity(action.getRootElement());
-		command.doCommand();
-
-		logger.info("Action " + action.getLocator() + " is now EXECUTED!");
+		setActionState(action, State.EXECUTED);
 	}
 
 	@Override
 	public void toStopped(Action action) {
-
 		getDelayedExecutionTimer().cancel(action.getLocator());
-
-		action.setState(State.STOPPED);
-
-		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
-		command.setActivity(action.getRootElement());
-		command.doCommand();
-
-		logger.warn("Action " + action.getLocator() + " is now STOPPED!");
+		setActionState(action, State.STOPPED);
 	}
 
 	@Override
 	public void toError(Action action) {
-
 		getDelayedExecutionTimer().cancel(action.getLocator());
+		setActionState(action, State.ERROR);
+	}
 
-		action.setState(State.ERROR);
+	protected void setActionState(Action action, State state) {
+		tx().lock(action.getRootElement());
+
+		action.setState(state);
 
 		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
 		command.setActivity(action.getRootElement());
 		command.doCommand();
 
-		logger.error("Action " + action.getLocator() + " is now in ERROR!");
+		String msg = "Action " + action.getLocator() + " is now in state " + state;
+		if (state == State.ERROR)
+			logger.error(msg);
+		else if (state == State.STOPPED)
+			logger.warn(msg);
+		else
+			logger.info(msg);
 	}
 
 	@Override

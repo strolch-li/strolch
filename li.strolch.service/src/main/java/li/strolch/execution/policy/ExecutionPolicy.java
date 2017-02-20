@@ -56,6 +56,27 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
+	 * <p>
+	 * Evaluates if the given {@link Action} is executable i.e. any state has the expected values so that the given
+	 * {@link Action} can have its execution be started.
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Note:</b> The default implementation is to always allow execution. Subclasses can override this method and
+	 * define a required state which is to be met for execution of the given {@link Action}.
+	 * </p>
+	 * 
+	 * @param action
+	 *            the {@link Action} to check if it can be executed
+	 * 
+	 * @return true if the action can be executed, false if not, i.e. the current state disallows the action to be
+	 *         executed
+	 */
+	public boolean isExecutable(Action action) {
+		return true;
+	}
+
+	/**
 	 * Starts the execution of the given {@link Action}, i.e. sets the state to {@link State#EXECUTION}
 	 * 
 	 * @param action

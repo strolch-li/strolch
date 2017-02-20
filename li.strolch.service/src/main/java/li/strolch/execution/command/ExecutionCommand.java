@@ -95,7 +95,10 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	@Override
 	public Void visit(Action action) {
 		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
-		executionPolicy.toExecution(action);
+
+		if (executionPolicy.isExecutable(action))
+			executionPolicy.toExecution(action);
+
 		return null;
 	}
 }

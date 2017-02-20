@@ -412,6 +412,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			String parameterId = elements.get(5);
 			Parameter<?> parameter = bag.getParameter(parameterId);
+			if (parameter == null) {
+				String msg = "Could not find Parameter for locator {0} on element {1}"; //$NON-NLS-1$
+				throw new StrolchException(MessageFormat.format(msg, locator, bag.getLocator()));
+			}
 			return (T) parameter;
 
 		} else if (stateOrBagOrActivity.equals(Tags.TIMED_STATE)) {

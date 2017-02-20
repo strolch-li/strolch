@@ -41,7 +41,7 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 	@Override
 	public void execute(String realm, ComponentContainer container, Locator actionLocator, long duration) {
 		if (this.timer == null)
-			this.timer = new Timer("SimulationExecution", true);
+			this.timer = new Timer("DurationExecution", true);
 
 		SimulationTask task = new SimulationTask(realm, container, actionLocator);
 		this.simulationTasks.put(actionLocator, task);
