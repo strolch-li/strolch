@@ -10,8 +10,12 @@ public class StrolchRootElementResult extends ServiceResult {
 
 	private StrolchRootElement rootElement;
 
-	public StrolchRootElementResult() {
-		//
+	public StrolchRootElementResult(ServiceResultState state) {
+		super(state);
+	}
+
+	public StrolchRootElementResult(ServiceResultState state, String msg) {
+		super(state, msg);
 	}
 
 	public StrolchRootElementResult(StrolchRootElement rootElement) {
