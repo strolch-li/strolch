@@ -24,6 +24,7 @@ public class ExecuteActivityCommand extends ExecutionCommand {
 
 	@Override
 	public void doCommand() {
+		tx().lock(this.activity.getRootElement());
 		this.activity.accept(this);
 	}
 

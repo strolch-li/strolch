@@ -8,7 +8,8 @@ import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * <p>
- * Simple Execution Policy which sets the state of the action depending on the method called.
+ * Simple Execution Policy which sets the state of the action depending on the
+ * method called.
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -42,7 +43,6 @@ public class SimpleExecution extends ExecutionPolicy {
 	}
 
 	protected void setActionState(Action action, State state) {
-		tx().lock(action.getRootElement());
 
 		action.setState(state);
 
