@@ -179,7 +179,10 @@ public class Activity extends GroupedParameterizedElement
 	 * @return the removed element, or null if it does not exist
 	 */
 	public IActivityElement remove(String id) {
-		return this.elements.remove(id);
+		IActivityElement element = this.elements.remove(id);
+		if (element != null)
+			element.setParent(null);
+		return element;
 	}
 
 	/**
