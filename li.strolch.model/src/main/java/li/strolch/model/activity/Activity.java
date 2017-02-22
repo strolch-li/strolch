@@ -39,8 +39,8 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**
- * Parameterized object grouping a collection of {@link Activity} and {@link Action} objects defining the process to be
- * scheduled
+ * Parameterized object grouping a collection of {@link Activity} and
+ * {@link Action} objects defining the process to be scheduled
  * 
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
@@ -111,36 +111,42 @@ public class Activity extends GroupedParameterizedElement
 
 	private void initElements() {
 		if (this.elements == null) {
-			// use a LinkedHashMap since we will iterate elements in the order added and lookup elements by ID
+			// use a LinkedHashMap since we will iterate elements in the order
+			// added and lookup elements by ID
 			this.elements = new LinkedHashMap<>();
 		}
 	}
 
 	/**
-	 * Returns true if this {@link Activity} contains any children i.e. any of {@link Action} or {@link Activity}
+	 * Returns true if this {@link Activity} contains any children i.e. any of
+	 * {@link Action} or {@link Activity}
 	 * 
-	 * @return true if this {@link Activity} contains any children i.e. any of {@link Action} or {@link Activity}
+	 * @return true if this {@link Activity} contains any children i.e. any of
+	 *         {@link Action} or {@link Activity}
 	 */
 	public boolean hasElements() {
 		return this.elements != null && !this.elements.isEmpty();
 	}
 
 	/**
-	 * Returns true if this {@link Activity} contains a child with the given id. The element instance type is ignored,
-	 * i.e. {@link Action} or {@link Activity}
+	 * Returns true if this {@link Activity} contains a child with the given id.
+	 * The element instance type is ignored, i.e. {@link Action} or
+	 * {@link Activity}
 	 * 
 	 * @param id
 	 *            the id of the element to check for
 	 * 
-	 * @return true if this {@link Activity} contains a child with the given id. The element instance type is ignored,
-	 *         i.e. {@link Action} or {@link Activity}
+	 * @return true if this {@link Activity} contains a child with the given id.
+	 *         The element instance type is ignored, i.e. {@link Action} or
+	 *         {@link Activity}
 	 */
 	public boolean hasElement(String id) {
 		return this.elements != null && this.elements.containsKey(id);
 	}
 
 	/**
-	 * add an activity element to the <code>LinkedHashMap</code> of <code>IActivityElements</code>
+	 * add an activity element to the <code>LinkedHashMap</code> of
+	 * <code>IActivityElements</code>
 	 * 
 	 * @param activityElement
 	 * @return the element added
@@ -165,6 +171,18 @@ public class Activity extends GroupedParameterizedElement
 	}
 
 	/**
+	 * Removes the element with the given id and returns it, if it exists
+	 * 
+	 * @param id
+	 *            the id of the element to remove
+	 * 
+	 * @return the removed element, or null if it does not exist
+	 */
+	public IActivityElement remove(String id) {
+		return this.elements.remove(id);
+	}
+
+	/**
 	 * get <code>IActivityElement</code> by id
 	 * 
 	 * @param id
@@ -179,7 +197,8 @@ public class Activity extends GroupedParameterizedElement
 	}
 
 	/**
-	 * @return get the <code>LinkedHashMap</code> of <code>IActivityElements</code>
+	 * @return get the <code>LinkedHashMap</code> of
+	 *         <code>IActivityElements</code>
 	 */
 	public Map<String, IActivityElement> getElements() {
 		if (this.elements == null)
@@ -188,11 +207,12 @@ public class Activity extends GroupedParameterizedElement
 	}
 
 	/**
-	 * @return the iterator for entries, which include the id as key and the {@link IActivityElement} as value
+	 * @return the iterator for entries, which include the id as key and the
+	 *         {@link IActivityElement} as value
 	 */
 	public Iterator<Entry<String, IActivityElement>> elementIterator() {
 		if (this.elements == null)
-			return Collections.<String, IActivityElement> emptyMap().entrySet().iterator();
+			return Collections.<String, IActivityElement>emptyMap().entrySet().iterator();
 		return this.elements.entrySet().iterator();
 	}
 
