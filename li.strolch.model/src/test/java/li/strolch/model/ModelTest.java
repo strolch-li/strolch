@@ -159,6 +159,7 @@ public class ModelTest {
 		validateBag(bag);
 
 		Action action = activity.getElement("action_" + actId);
+		action.setState(State.ERROR);
 		assertEquals("action_" + actId, action.getId());
 		assertEquals("Action " + actName, action.getName());
 		assertEquals("Use", action.getType());
@@ -174,6 +175,7 @@ public class ModelTest {
 		validateBag(bag);
 
 		action = activity.getElement("action_" + actId);
+		action.setState(State.ERROR);
 		assertEquals("action_" + actId, action.getId());
 		assertEquals("Action " + actName, action.getName());
 		assertEquals("Use", action.getType());
@@ -189,12 +191,22 @@ public class ModelTest {
 		validateBag(bag);
 
 		action = activity.getElement("action1_" + actId);
+		action.setState(State.EXECUTION);
 		assertEquals("action1_" + actId, action.getId());
 		assertEquals("Action " + actName, action.getName());
 		assertEquals("Use", action.getType());
 		assertEquals(ACTION_RES_ID, action.getResourceId());
 		assertEquals(ACTION_RES_TYPE, action.getResourceType());
 		assertEquals(changes, action.getChanges());
+
+		List<Action> actions = activity.getRootElement().getActionsWithState(State.ERROR);
+		assertEquals(2, actions.size());
+
+		actions = activity.getRootElement().getActionsWithState(State.EXECUTION);
+		assertEquals(1, actions.size());
+
+		actions = activity.getRootElement().getActionsWithState(State.CREATED);
+		assertEquals(1, actions.size());
 	}
 
 	@Test
