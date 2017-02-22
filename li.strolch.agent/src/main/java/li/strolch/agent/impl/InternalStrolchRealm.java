@@ -34,7 +34,7 @@ import li.strolch.agent.api.ObserverHandler;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Locator;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -67,19 +67,19 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	}
 
 	@Override
-	public void lock(StrolchRootElement element) {
-		DBC.PRE.assertNotNull("Can not lock a null pointer =)", element); //$NON-NLS-1$
-		this.lockHandler.lock(element);
+	public void lock(Locator locator) {
+		DBC.PRE.assertNotNull("Can not lock a null pointer =)", locator); //$NON-NLS-1$
+		this.lockHandler.lock(locator);
 	}
 
 	@Override
-	public void unlock(StrolchRootElement lockedElement) {
-		this.lockHandler.unlock(lockedElement);
+	public void unlock(Locator locator) {
+		this.lockHandler.unlock(locator);
 	}
 
 	@Override
-	public void releaseLock(StrolchRootElement lockedElement) {
-		this.lockHandler.releaseLock(lockedElement);
+	public void releaseLock(Locator locator) {
+		this.lockHandler.releaseLock(locator);
 	}
 
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
@@ -152,7 +152,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	}
 
 	@Override
-	public ObserverHandler getObserverHandler() throws IllegalArgumentException{
+	public ObserverHandler getObserverHandler() throws IllegalArgumentException {
 		if (!this.updateObservers)
 			throw new IllegalArgumentException("ObserverUpdates are not enabled!"); //$NON-NLS-1$
 		return this.observerHandler;

@@ -16,7 +16,7 @@
 package li.strolch.agent.api;
 
 import li.strolch.agent.impl.DataStoreMode;
-import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Locator;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 
@@ -51,34 +51,34 @@ public interface StrolchRealm {
 	public String getRealm();
 
 	/**
-	 * Locks the given element
+	 * Locks the element with the given {@link Locator}
 	 * 
 	 * @param element
-	 *            the element to lock
+	 *            the locator of the element to lock
 	 * 
-	 * @see LockHandler#lock(StrolchRootElement)
+	 * @see LockHandler#lock(Locator)
 	 */
-	public void lock(StrolchRootElement element);
+	public void lock(Locator locator);
 
 	/**
-	 * Unlocks the given element (lock might still be held, if lock counter is used)
+	 * Unlocks the element with the given {@link Locator} (lock might still be held, if lock counter is used)
 	 * 
-	 * @param lockedElement
-	 *            the element to unlock
+	 * @param locator
+	 *            the locator of the element to unlock
 	 * 
-	 * @see LockHandler#unlock(StrolchRootElement)
+	 * @see LockHandler#unlock(Locator)
 	 */
-	public void unlock(StrolchRootElement lockedElement);
+	public void unlock(Locator locator);
 
 	/**
 	 * Releases the lock for the given element
 	 * 
-	 * @param lockedElement
-	 *            the element for which to release the lock
+	 * @param locator
+	 *            the locator of the element for which to release the lock
 	 * 
-	 * @see LockHandler#releaseLock(StrolchRootElement)
+	 * @see LockHandler#releaseLock(Locator)
 	 */
-	public void releaseLock(StrolchRootElement lockedElement);
+	public void releaseLock(Locator locator);
 
 	/**
 	 * Returns the {@link DataStoreMode}

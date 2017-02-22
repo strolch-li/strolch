@@ -45,43 +45,45 @@ import li.strolch.model.StrolchRootElement;
 public interface LockHandler {
 
 	/**
-	 * Locks the given element by using the element's {@link Locator} and creating a lock on it. Calling lock multiple
-	 * times from the same thread will not lock, it is up to the concrete implementation to define if a lock counter is
-	 * used
+	 * Locks the element with the given {@link Locator} and creating a lock on it. Calling lock multiple times from the
+	 * same thread will not lock, it is up to the concrete implementation to define if a lock counter is used
 	 * 
-	 * @param element
-	 *            the element for which a {@link Lock} on its {@link Locator} is to be created and/or locked
+	 * @param locator
+	 *            the {@link Locator} of the element for which a {@link Lock} is to be created and/or locked
 	 * 
 	 * @throws StrolchLockException
+	 *             if the lock could not be acquired
 	 */
-	public void lock(StrolchRootElement element) throws StrolchLockException;
+	public void lock(Locator locator) throws StrolchLockException;
 
 	/**
 	 * <p>
-	 * Unlocks the given element by finding the element's lock by its {@link Locator}. It is up to the concrete
-	 * implementation to define if unlocking an unlocked element will fail or not. This method might not completely
-	 * unlock the element if a lock counter is used and the object was locked multiple times.
+	 * Unlocks the element with the given locator. It is up to the concrete implementation to define if unlocking an
+	 * unlocked element will fail or not. This method might not completely unlock the element if a lock counter is used
+	 * and the object was locked multiple times.
 	 * </p>
 	 * 
 	 * <p>
-	 * If the lock must be completely released, then use {@link #releaseLock(StrolchRootElement)}
+	 * If the lock must be completely released, then use {@link #releaseLock(Locator)}
 	 * </p>
 	 * 
-	 * @param element
-	 *            the element for which the current/last {@link Lock} is to be unlocked
+	 * @param locator
+	 *            the {@link Locator} of the element for which the current/last {@link Lock} is to be unlocked
 	 * 
 	 * @throws StrolchLockException
+	 *             if the unlock failed
 	 */
-	public void unlock(StrolchRootElement element) throws StrolchLockException;
+	public void unlock(Locator locator) throws StrolchLockException;
 
 	/**
-	 * Releases the lock on the given element, by unlocking all locks, i.e. after this method is called, no lock will be
-	 * held anymore by the current thread
+	 * Releases the lock on the element with the given {@link Locator}, by unlocking all locks, i.e. after this method
+	 * is called, no lock will be held anymore by the current thread
 	 * 
-	 * @param element
-	 *            the element for which the {@link Lock} on the {@link Locator} is to be released
+	 * @param locator
+	 *            the {@link Locator} of the element for which the {@link Lock} is to be released
 	 * 
 	 * @throws StrolchLockException
+	 *             if the lock could not be released
 	 */
-	public void releaseLock(StrolchRootElement element) throws StrolchLockException;
+	public void releaseLock(Locator locator) throws StrolchLockException;
 }

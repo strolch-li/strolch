@@ -30,13 +30,11 @@ import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
 /**
- * Command to plan an {@link Activity} to a {@link Resource}. This
- * {@link Command} assumes that the {@link IValueChange} objects of the action
- * are already constructed and {@link Action#resourceId} is set.
+ * Command to plan an {@link Activity} to a {@link Resource}. This {@link Command} assumes that the {@link IValueChange}
+ * objects of the action are already constructed and {@link Action#resourceId} is set.
  * <p/>
- * It iterates the {@link IValueChange} operators and registers the resulting
- * changes on the {@link StrolchTimedState} objects assigned to the
- * {@link Resource}.
+ * It iterates the {@link IValueChange} operators and registers the resulting changes on the {@link StrolchTimedState}
+ * objects assigned to the {@link Resource}.
  * 
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
@@ -76,14 +74,13 @@ public class PlanActivityCommand extends AbstractPlanCommand {
 
 	@Override
 	public void doCommand() {
-		validate();
 		tx().lock(activity);
+		validate();
 		plan(activity);
 	}
 
 	@Override
 	public void undo() {
-		tx().lock(activity);
 		unplan(activity);
 	}
 

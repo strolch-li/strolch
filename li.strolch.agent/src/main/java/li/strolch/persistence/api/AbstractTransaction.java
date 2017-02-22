@@ -91,7 +91,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private List<Command> commands;
 	private List<Command> flushedCommands;
-	private Set<StrolchRootElement> lockedElements;
+	private Set<Locator> lockedElements;
 
 	private AuditingOrderMap orderMap;
 	private AuditingResourceMap resourceMap;
@@ -256,20 +256,34 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public <T extends StrolchRootElement> void lock(Locator locator) throws StrolchLockException {
+		this.realm.lock(locator);
+		this.lockedElements.add(locator);
+	}
+
+	@Override
 	public <T extends StrolchRootElement> void lock(T element) throws StrolchLockException {
-		this.realm.lock(element);
-		this.lockedElements.add(element);
+		Locator locator = element.getLocator();
+		this.realm.lock(locator);
+		this.lockedElements.add(locator);
 	}
 
 	@Override
 	public <T extends StrolchRootElement> void releaseLock(T element) throws StrolchLockException {
-		this.realm.releaseLock(element);
-		this.lockedElements.remove(element);
+		Locator locator = element.getLocator();
+		this.realm.releaseLock(locator);
+		this.lockedElements.remove(locator);
+	}
+
+	@Override
+	public <T extends StrolchRootElement> void releaseLock(Locator locator) throws StrolchLockException {
+		this.realm.releaseLock(locator);
+		this.lockedElements.remove(locator);
 	}
 
 	private void releaseElementLocks() {
-		for (StrolchRootElement lockedElement : this.lockedElements) {
-			this.realm.releaseLock(lockedElement);
+		for (Locator locator : this.lockedElements) {
+			this.realm.releaseLock(locator);
 		}
 	}
 

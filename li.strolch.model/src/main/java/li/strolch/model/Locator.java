@@ -186,6 +186,12 @@ public class Locator {
 		return new Locator(this.pathElements, element);
 	}
 
+	public Locator trim(int size) {
+		if (this.pathElements.size() == size)
+			return this;
+		return new Locator(this.pathElements.subList(0, size));
+	}
+
 	/**
 	 * Returns the string representation of this {@link Locator} by using the {@link #PATH_SEPARATOR} to separate the
 	 * values

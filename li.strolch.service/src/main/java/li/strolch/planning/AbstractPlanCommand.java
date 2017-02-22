@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
@@ -56,15 +55,11 @@ public abstract class AbstractPlanCommand extends Command {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void plan(Action action) {
 
-		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId())
-				.build();
+		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId()).build();
+
+		tx().lock(locator);
+
 		Resource resource = tx().findElement(locator);
-
-		if (resource == null)
-			throw new StrolchException("Resource with " + locator + " referenced by " + action.getLocator()
-					+ " cannot be null!");
-
-		tx().lock(resource);
 
 		List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
 		for (IValueChange<?> change : changes) {
@@ -80,7 +75,7 @@ public abstract class AbstractPlanCommand extends Command {
 	 * {@link IActivityElement} class.
 	 */
 	protected void plan(Activity activity) {
-		
+
 		// TODO Martin: Use a visitor pattern so we don't start with instanceof again...
 
 		Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
@@ -97,8 +92,7 @@ public abstract class AbstractPlanCommand extends Command {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void unplan(Action action) {
 
-		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId())
-				.build();
+		Locator locator = Locator.newBuilder(Tags.RESOURCE, action.getResourceType(), action.getResourceId()).build();
 		Resource resource = tx().findElement(locator);
 
 		List<IValueChange<? extends IValue<?>>> changes = action.getChanges();

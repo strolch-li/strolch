@@ -6,6 +6,7 @@ import li.strolch.execution.command.SetActionToErrorCommand;
 import li.strolch.execution.command.SetActionToExecutedCommand;
 import li.strolch.execution.command.SetActionToStoppedCommand;
 import li.strolch.execution.command.SetActionToWarningCommand;
+import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.model.Locator;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -13,7 +14,14 @@ import li.strolch.model.activity.IActivityElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.utils.dbc.DBC;
 
+/**
+ * The event based execution handler waits for events in that the {@link ExecutionPolicy} implementations must call the
+ * relevant methods when the work is complete. Afterwards the next {@link Action} in the procedure is executed
+ * 
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
 public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	private DelayedExecutionTimer delayedExecutionTimer;
@@ -76,29 +84,34 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		});
 	}
 
-	private void toExecution(String realm, Locator locator, PrivilegeContext ctx) {
+	private void toExecution(String realm, Locator activityLoc, PrivilegeContext ctx) {
 		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ExecuteActivityCommand.class)) {
-			IActivityElement activityElement = tx.findElement(locator);
-			Activity activity = activityElement.getRootElement();
+			Locator rootElemLoc = activityLoc.trim(3);
+			tx.lock(rootElemLoc);
+
+			IActivityElement elem = tx.findElement(rootElemLoc);
+			DBC.INTERIM.assertEquals("toExecution only for Activity!", Activity.class, elem.getClass());
 
 			ExecuteActivityCommand command = new ExecuteActivityCommand(getContainer(), tx);
-			command.setActivity(activity);
+			command.setActivity((Activity) elem);
 			tx.addCommand(command);
 
 			tx.commitOnClose();
 		}
 	}
 
-	private void toExecuted(String realm, Locator locator, PrivilegeContext ctx) {
+	private void toExecuted(String realm, Locator actionLoc, PrivilegeContext ctx) {
 
-		Locator activityLoc;
+		Locator activityLoc = actionLoc.trim(3);
 
 		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class)) {
-			Action action = tx.findElement(locator);
-			activityLoc = action.getRootElement().getLocator();
+			tx.lock(activityLoc);
+
+			IActivityElement elem = tx.findElement(actionLoc);
+			DBC.INTERIM.assertEquals("toExecuted only for Action!", Action.class, elem.getClass());
 
 			SetActionToExecutedCommand command = new SetActionToExecutedCommand(getContainer(), tx);
-			command.setAction(action);
+			command.setAction((Action) elem);
 			tx.addCommand(command);
 
 			tx.commitOnClose();
@@ -107,36 +120,48 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		toExecution(realm, activityLoc, ctx);
 	}
 
-	private void toWarning(String realm, Locator locator, PrivilegeContext ctx) {
+	private void toWarning(String realm, Locator actionLoc, PrivilegeContext ctx) {
 		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class)) {
-			Action action = tx.findElement(locator);
+			Locator rootElemLoc = actionLoc.trim(3);
+			tx.lock(rootElemLoc);
+
+			IActivityElement elem = tx.findElement(actionLoc);
+			DBC.INTERIM.assertEquals("toWarning only for Action!", Action.class, elem.getClass());
 
 			SetActionToWarningCommand command = new SetActionToWarningCommand(getContainer(), tx);
-			command.setAction(action);
+			command.setAction((Action) elem);
 			tx.addCommand(command);
 
 			tx.commitOnClose();
 		}
 	}
 
-	private void toError(String realm, Locator locator, PrivilegeContext ctx) {
+	private void toError(String realm, Locator actionLoc, PrivilegeContext ctx) {
 		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class)) {
-			Action action = tx.findElement(locator);
+			Locator rootElemLoc = actionLoc.trim(3);
+			tx.lock(rootElemLoc);
+
+			IActivityElement elem = tx.findElement(actionLoc);
+			DBC.INTERIM.assertEquals("toError only for Action!", Action.class, elem.getClass());
 
 			SetActionToErrorCommand command = new SetActionToErrorCommand(getContainer(), tx);
-			command.setAction(action);
+			command.setAction((Action) elem);
 			tx.addCommand(command);
 
 			tx.commitOnClose();
 		}
 	}
 
-	private void toStopped(String realm, Locator locator, PrivilegeContext ctx) {
+	private void toStopped(String realm, Locator actionLoc, PrivilegeContext ctx) {
 		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToStoppedCommand.class)) {
-			Action action = tx.findElement(locator);
+			Locator rootElemLoc = actionLoc.trim(3);
+			tx.lock(rootElemLoc);
+
+			IActivityElement elem = tx.findElement(actionLoc);
+			DBC.INTERIM.assertEquals("toStopped only for Action!", Action.class, elem.getClass());
 
 			SetActionToStoppedCommand command = new SetActionToStoppedCommand(getContainer(), tx);
-			command.setAction(action);
+			command.setAction((Action) elem);
 			tx.addCommand(command);
 
 			tx.commitOnClose();

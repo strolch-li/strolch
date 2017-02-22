@@ -79,7 +79,7 @@ import li.strolch.service.api.Command;
  * </p>
  * <ul>
  * <li>Opening and closing database connections</li>
- * <li>Releasing locks to strolch elements, if {@link #lock(StrolchRootElement)} is used</li>
+ * <li>Releasing locks to strolch elements, if {@link #lock(StrolchRootElement)} or {@link #lock(Locator)} is used</li>
  * <li>Performing Commands correctly</li>
  * <li>exception handling</li>
  * <li>auditing</li>
@@ -334,6 +334,17 @@ public interface StrolchTransaction extends AutoCloseable {
 	boolean isVersioningEnabled();
 
 	/**
+	 * Locks the element with the given locator and registers it on the transaction so the lock is released when the
+	 * transaction is closed
+	 * 
+	 * @param locator
+	 *            the {@link Locator} of the element to lock
+	 * 
+	 * @throws StrolchLockException
+	 */
+	public <T extends StrolchRootElement> void lock(Locator locator) throws StrolchLockException;
+
+	/**
 	 * Locks the given element and registers it on the transaction so the lock is released when the transaction is
 	 * closed
 	 * 
@@ -345,8 +356,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	public <T extends StrolchRootElement> void lock(T element) throws StrolchLockException;
 
 	/**
-	 * Releases the lock of the given element so that even though the transaction is still open, another
-	 * thread/transaction can lock the element
+	 * Releases the lock of the element so that even though the transaction is still open, another thread/transaction
+	 * can lock the element
 	 * 
 	 * @param element
 	 *            the element for which the lock is to be released
@@ -354,6 +365,17 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchLockException
 	 */
 	public <T extends StrolchRootElement> void releaseLock(T element) throws StrolchLockException;
+
+	/**
+	 * Releases the lock of the element with the given {@link Locator} so that even though the transaction is still
+	 * open, another thread/transaction can lock the element
+	 * 
+	 * @param locator
+	 *            the {@link Locator} of the element for which the lock is to be released
+	 * 
+	 * @throws StrolchLockException
+	 */
+	public <T extends StrolchRootElement> void releaseLock(Locator locator) throws StrolchLockException;
 
 	/**
 	 * Adds the given {@link Command} to the transaction. Using this method guarantees that a {@link Command} is

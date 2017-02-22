@@ -52,9 +52,6 @@ public class ReservationExection extends DurationExecution {
 			throw new StrolchModelException("Parameter " + PARAM_RESERVED + " on bag " + BAG_PARAMETERS + " missing on "
 					+ resource.getLocator());
 
-		// immediately lock, so that when toExecution is called, we don't have a race condition
-		tx().lock(resource);
-
 		BooleanParameter reservedP = resource.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
 		if (action.getType().equals(TYPE_RESERVE))
 			return !reservedP.getValue();
