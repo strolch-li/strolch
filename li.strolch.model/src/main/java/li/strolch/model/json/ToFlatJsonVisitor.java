@@ -21,13 +21,23 @@ import li.strolch.utils.collections.MapOfSets;
 /**
  * <p>
  * Maps a given {@link StrolchRootElement} to a {@link JsonObject}. All {@link Parameter Parameters} are mapped to a
- * member of the {@link JsonObject}.
+ * member of the {@link JsonObject}, {@link ParameterBag ParameterBags} are thus removed
  * </p>
  * 
  * <p>
- * To not map a {@link Parameter} add it to the {@link MapOfSets}, to ignore a whole {@link ParameterBag} then add an
- * empty set with the bag id.
+ * To ignore {@link Parameter Parameters} or {@link ParameterBag ParameterBags} use the
+ * {@link #ignoreParameter(String, String)} and {@link #ignoreBag(String)} methods
  * </p>
+ * 
+ * <p>
+ * The mapping can be extended by setting hook:
+ * </p>
+ * 
+ * <pre>
+ * visitor.setHook((element, jsonObject) -> {
+ * 	// do work
+ * });
+ * </pre>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */

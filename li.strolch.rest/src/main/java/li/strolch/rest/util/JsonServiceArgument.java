@@ -13,7 +13,14 @@ import li.strolch.service.api.ServiceArgument;
  */
 public class JsonServiceArgument extends ServiceArgument {
 	private static final long serialVersionUID = 1L;
-	public String baseUrl;
+	
+	/**
+	 * the objectId - its context is defined by the service 
+	 */
 	public String objectId;
+	
+	/**
+	 * The input object
+	 */
 	public JsonElement jsonElement;
 }

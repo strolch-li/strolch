@@ -15,23 +15,23 @@ import li.strolch.utils.collections.MapOfSets;
 /**
  * <p>
  * Maps a given {@link JsonObject} to a {@link StrolchRootElement}. All {@link Parameter Parameters} on the element are
- * iterated expected to be found as a member on the {@link JsonObject}.
+ * iterated and expected to be found as a member on the {@link JsonObject}.
  * </p>
  * 
  * <p>
- * To not map a {@link Parameter} add it to the {@link MapOfSets}, to ignore a whole {@link ParameterBag} then add an
- * empty set with the bag id.
+ * To ignore {@link Parameter Parameters} or {@link ParameterBag ParameterBags} use the
+ * {@link #ignoreParameter(String, String)} and {@link #ignoreBag(String)} methods
  * </p>
  * 
  * <p>
- * Optional values are handled similar, but only a parameter can be optional, not a whole bag
+ * {@link Parameter} can be made optional by using the {@link #optionalParameter(String, String)} method
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  *
  * @param <T>
  */
-public class FromFlatJsonVisitor<T extends StrolchRootElement> {
+public class FromFlatJsonVisitor {
 
 	private MapOfSets<String, String> ignoredKeys;
 	private MapOfSets<String, String> optionalKeys;
@@ -58,7 +58,7 @@ public class FromFlatJsonVisitor<T extends StrolchRootElement> {
 		this.optionalKeys.addElement(bagId, paramId);
 	}
 
-	public void visit(T element, JsonObject jsonObject) {
+	public void visit(StrolchRootElement element, JsonObject jsonObject) {
 
 		Set<String> bagKeySet = element.getParameterBagKeySet();
 		for (String bagId : bagKeySet) {
