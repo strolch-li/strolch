@@ -1,4 +1,4 @@
-package li.strolch.rest.visitor;
+package li.strolch.model.json;
 
 import static li.strolch.model.Tags.Json.ID;
 import static li.strolch.model.Tags.Json.NAME;

@@ -1,4 +1,4 @@
-package li.strolch.rest.visitor;
+package li.strolch.model.json;
 
 import java.util.Collections;
 import java.util.Set;

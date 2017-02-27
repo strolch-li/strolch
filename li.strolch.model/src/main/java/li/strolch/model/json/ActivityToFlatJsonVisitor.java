@@ -1,4 +1,4 @@
-package li.strolch.rest.visitor;
+package li.strolch.model.json;
 
 import com.google.gson.JsonObject;
 
