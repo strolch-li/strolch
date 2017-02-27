@@ -45,6 +45,7 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 
 	private MapOfSets<String, String> ignoredKeys;
 	private BiConsumer<T, JsonObject> hook;
+	private boolean withoutElementName;
 
 	public ToFlatJsonVisitor() {
 		this.ignoredKeys = new MapOfSets<>();
@@ -54,16 +55,24 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 		this.ignoredKeys = new MapOfSets<>();
 	}
 
-	public void setHook(BiConsumer<T, JsonObject> hook) {
+	public ToFlatJsonVisitor<T> withoutElementName() {
+		this.withoutElementName = true;
+		return this;
+	}
+
+	public ToFlatJsonVisitor<T> setHook(BiConsumer<T, JsonObject> hook) {
 		this.hook = hook;
+		return this;
 	}
 
-	public void ignoreBag(String bagId) {
+	public ToFlatJsonVisitor<T> ignoreBag(String bagId) {
 		this.ignoredKeys.addSet(bagId, Collections.emptySet());
+		return this;
 	}
 
-	public void ignoreParameter(String bagId, String paramId) {
+	public ToFlatJsonVisitor<T> ignoreParameter(String bagId, String paramId) {
 		this.ignoredKeys.addElement(bagId, paramId);
+		return this;
 	}
 
 	public JsonObject toJson(T element) {
@@ -71,7 +80,8 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 		JsonObject jsonObject = new JsonObject();
 
 		jsonObject.addProperty(ID, element.getId());
-		jsonObject.addProperty(NAME, element.getName());
+		if (!this.withoutElementName)
+			jsonObject.addProperty(NAME, element.getName());
 		jsonObject.addProperty(TYPE, element.getType());
 		jsonObject.addProperty(OBJECT_TYPE, element.getClass().getSimpleName());
 
@@ -93,7 +103,8 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 					continue;
 
 				if (jsonObject.has(paramId)) {
-					throw new StrolchModelException("JsonObject already has a member with ID " + paramId);
+					throw new StrolchModelException(
+							"JsonObject already has a member with ID " + paramId + ": " + parameterBag.getLocator());
 				}
 
 				Parameter<?> param = parameterBag.getParameter(paramId);
