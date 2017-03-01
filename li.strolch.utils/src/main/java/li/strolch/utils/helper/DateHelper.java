@@ -5,8 +5,12 @@ import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * Helper class to format dates and periods to Strings
@@ -94,5 +98,21 @@ public class DateHelper {
 		}
 
 		return labelString;
+	}
+
+	public static long truncateTimeFromTimestamp(String strTimeStamp) {
+
+		Date dateToCut = ISO8601FormatFactory.getInstance().parseDate(strTimeStamp);
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dateToCut);
+		cal.clear(Calendar.HOUR);
+		cal.clear(Calendar.HOUR_OF_DAY);
+		cal.clear(Calendar.MINUTE);
+		cal.clear(Calendar.SECOND);
+		cal.clear(Calendar.MILLISECOND);
+		cal.clear(Calendar.AM_PM);
+
+		return cal.getTimeInMillis();
 	}
 }
