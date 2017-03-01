@@ -60,6 +60,12 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 		return this.resourceVisitor;
 	}
 
+	@Override
+	public ResourceQuery<U> internal() {
+		super.internal();
+		return this;
+	}
+
 	public ResourceQuery<U> setResourceVisitor(ResourceVisitor<U> resourceVisitor) {
 		DBC.PRE.assertNotNull("resourceVisitor", resourceVisitor);
 		this.resourceVisitor = resourceVisitor;

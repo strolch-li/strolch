@@ -55,4 +55,6 @@ public class StrolchModelConstants {
 	 * This uom value indicates that the {@link Parameter} has no defined uom
 	 */
 	public static final String UOM_NONE = "None"; //$NON-NLS-1$
+	
+	public static final String INTERNAL = "internal";
 }

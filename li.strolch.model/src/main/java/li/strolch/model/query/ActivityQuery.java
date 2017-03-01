@@ -59,6 +59,12 @@ public class ActivityQuery<U> extends StrolchElementQuery<ActivityQueryVisitor> 
 	public ActivityVisitor<U> getActivityVisitor() {
 		return this.activityVisitor;
 	}
+	
+	@Override
+	public ActivityQuery<U> internal() {
+		super.internal();
+		return this;
+	}
 
 	public ActivityQuery<U> setActivityVisitor(ActivityVisitor<U> activityVisitor) {
 		DBC.PRE.assertNotNull("activityVisitor", activityVisitor);

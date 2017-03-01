@@ -59,6 +59,12 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 	public OrderVisitor<U> getOrderVisitor() {
 		return this.orderVisitor;
 	}
+	
+	@Override
+	public OrderQuery<U> internal() {
+		super.internal();
+		return this;
+	}
 
 	public OrderQuery<U> setOrderVisitor(OrderVisitor<U> orderVisitor) {
 		DBC.PRE.assertNotNull("orderVisitor", orderVisitor);

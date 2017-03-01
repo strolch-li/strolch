@@ -15,6 +15,7 @@
  */
 package li.strolch.model.query;
 
+import li.strolch.model.StrolchModelConstants;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -34,6 +35,17 @@ public abstract class StrolchElementQuery<T extends QueryVisitor> implements Str
 	public StrolchElementQuery(Navigation navigation) {
 		this();
 		this.navigation = navigation;
+	}
+
+	/**
+	 * Marks this query as an internal query, thus allowing it to be performed without the authenticated user to need
+	 * the required privilege
+	 * 
+	 * @return this object for chaining
+	 */
+	public StrolchElementQuery<T> internal() {
+		this.privilegeValue = StrolchModelConstants.INTERNAL;
+		return this;
 	}
 
 	public void setPrivilegeValue(String privilegeValue) {
