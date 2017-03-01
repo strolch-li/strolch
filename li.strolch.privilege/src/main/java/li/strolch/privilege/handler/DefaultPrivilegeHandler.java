@@ -417,7 +417,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				String msg = "UserId can not be set when adding a new user!";
 				throw new PrivilegeException(MessageFormat.format(msg, userRepParam.getUsername()));
 			}
-			
+
 			UserRep userRep = userRepParam.clone();
 
 			// set userId
@@ -455,6 +455,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// delegate to persistence handler
 			this.persistenceHandler.addUser(newUser);
+
+			logger.info("Created new user " + newUser.getUsername());
 
 			return newUser.asUserRep();
 
@@ -510,6 +512,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// delegate to persistence handler
 			this.persistenceHandler.replaceUser(newUser);
+
+			logger.info("Replaced user " + newUser.getUsername());
 
 			return newUser.asUserRep();
 
@@ -590,6 +594,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// delegate to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
 
+		logger.info("Updated user " + newUser.getUsername());
+
 		return newUser.asUserRep();
 	}
 
@@ -612,6 +618,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user removal to persistence handler
 		this.persistenceHandler.removeUser(username);
+
+		logger.info("Removed user " + username);
 
 		return existingUser.asUserRep();
 	}
@@ -659,6 +667,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
 
+		logger.info("Added role " + roleName + " to " + newUser.getUsername());
+
 		return newUser.asUserRep();
 	}
 
@@ -696,6 +706,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
 
+		logger.info("Removed role " + roleName + " from " + newUser.getUsername());
+
 		return newUser.asUserRep();
 	}
 
@@ -729,6 +741,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (this.autoPersistOnUserChangesData) {
 			this.persistenceHandler.persist();
 		}
+
+		logger.info("Set locale to " + locale + " for " + newUser.getUsername());
 
 		return newUser.asUserRep();
 	}
@@ -780,6 +794,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				invalidateSession(certificate);
 			}
 
+			logger.info("Updated password for " + newUser.getUsername());
+
 		} finally {
 			clearPassword(password);
 		}
@@ -808,6 +824,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+
+		logger.info("Set state of user " + newUser.getUsername() + " to " + state);
 
 		return newUser.asUserRep();
 	}
@@ -839,6 +857,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate to persistence handler
 		this.persistenceHandler.addRole(newRole);
+
+		logger.info("Added new role " + newRole.getName());
 
 		return newRole.asRoleRep();
 	}
@@ -875,6 +895,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// delegate to persistence handler
 		this.persistenceHandler.replaceRole(newRole);
 
+		logger.info("Replaced role " + newRole.getName());
+
 		return newRole.asRoleRep();
 	}
 
@@ -908,6 +930,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate role removal to persistence handler
 		this.persistenceHandler.removeRole(roleName);
+
+		logger.info("Removed role " + roleName);
 
 		return existingRole.asRoleRep();
 	}
@@ -963,6 +987,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// delegate role replacement to persistence handler
 		this.persistenceHandler.replaceRole(newRole);
 
+		logger.info("Added/replaced privilege " + privilegeRep.getName() + " to " + roleName);
+
 		return newRole.asRoleRep();
 	}
 
@@ -1002,6 +1028,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceRole(newRole);
+
+		logger.info("Removed privilege " + privilegeName + " from " + roleName);
 
 		return newRole.asRoleRep();
 	}
@@ -1085,8 +1113,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			persistSessions();
 
 			// log
-			DefaultPrivilegeHandler.logger
-					.info(MessageFormat.format("User {0} authenticated: {1}", username, certificate)); //$NON-NLS-1$
+			logger.info(MessageFormat.format("User {0} authenticated: {1}", username, certificate)); //$NON-NLS-1$
 
 			// return the certificate
 			return certificate;
@@ -1094,7 +1121,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		} catch (RuntimeException e) {
 			String msg = "User {0} Failed to authenticate: {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, username, e.getMessage());
-			DefaultPrivilegeHandler.logger.error(msg);
+			logger.error(msg);
 			throw e;
 		} finally {
 			clearPassword(password);
@@ -1807,7 +1834,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// log
 		String msg = "The system user ''{0}'' is logged in with session {1}"; //$NON-NLS-1$
 		msg = MessageFormat.format(msg, systemUsername, systemUserCertificate.getSessionId());
-		DefaultPrivilegeHandler.logger.info(msg);
+		logger.info(msg);
 
 		return privilegeContext;
 	}
