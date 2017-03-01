@@ -20,6 +20,14 @@ public class JsonServiceResult extends ServiceResult {
 		// do nothing
 	}
 
+	public JsonServiceResult(ServiceResultState state) {
+		super(state);
+	}
+
+	public JsonServiceResult(ServiceResultState state, String message) {
+		super(state, message);
+	}
+
 	public JsonServiceResult(JsonElement result) {
 		super(ServiceResultState.SUCCESS);
 		this.result = result;
