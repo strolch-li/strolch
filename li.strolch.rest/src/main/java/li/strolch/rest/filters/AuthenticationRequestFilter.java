@@ -18,8 +18,9 @@ package li.strolch.rest.filters;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -43,12 +44,14 @@ import li.strolch.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Provider
-public class AuthenicationRequestFilter implements ContainerRequestFilter {
+public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
-	private static final Logger logger = LoggerFactory.getLogger(AuthenicationRequestFilter.class);
+	private static final Logger logger = LoggerFactory.getLogger(AuthenticationRequestFilter.class);
 
-	protected List<String> getUnsecuredPaths() {
-		List<String> list = new ArrayList<>();
+	private Set<String> unsecuredPaths;
+
+	protected Set<String> getUnsecuredPaths() {
+		Set<String> list = new HashSet<>();
 		list.add("strolch/authentication");
 		return list;
 	}
@@ -59,7 +62,14 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 		List<String> matchedURIs = requestContext.getUriInfo().getMatchedURIs();
 
 		// we allow unauthorized access to the authentication service
-		if (matchedURIs.stream().anyMatch(s -> getUnsecuredPaths().contains(s))) {
+		if (this.unsecuredPaths == null)
+			this.unsecuredPaths = getUnsecuredPaths();
+		if (matchedURIs.stream().anyMatch(s -> this.unsecuredPaths.contains(s))) {
+			return;
+		}
+
+		// we have to allow OPTIONS for CORS
+		if (requestContext.getMethod().equals("OPTIONS")) {
 			return;
 		}
 
@@ -93,7 +103,7 @@ public class AuthenicationRequestFilter implements ContainerRequestFilter {
 			Certificate certificate = sessionHandler.validate(sessionId);
 			requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			logger.error(e.getMessage());
 			requestContext.abortWith(
 					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
 							.entity("User cannot access the resource.").build()); //$NON-NLS-1$

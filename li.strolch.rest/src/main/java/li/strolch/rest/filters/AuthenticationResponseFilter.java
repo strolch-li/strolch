@@ -32,7 +32,7 @@ import li.strolch.privilege.model.Certificate;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Provider
-public class AuthenicationResponseFilter implements ContainerResponseFilter {
+public class AuthenticationResponseFilter implements ContainerResponseFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)

@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 @Priority(Priorities.HEADER_DECORATOR)
 public class AccessControlResponseFilter implements ContainerResponseFilter {
 
+	private static final String ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
 	private static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods"; //$NON-NLS-1$
 	private static final String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers"; //$NON-NLS-1$
 	private static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers"; //$NON-NLS-1$
@@ -79,7 +80,8 @@ public class AccessControlResponseFilter implements ContainerResponseFilter {
 
 		// and set the allowed HTTP headers and methods
 		headers.add(ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Origin, X-Requested-With, Content-Type"); //$NON-NLS-1$
-		headers.add(ACCESS_CONTROL_EXPOSE_HEADERS, "Location, Content-Disposition"); //$NON-NLS-1$
+		headers.add(ACCESS_CONTROL_EXPOSE_HEADERS, "Authorization, Location, Content-Disposition"); //$NON-NLS-1$
 		headers.add(ACCESS_CONTROL_ALLOW_METHODS, "POST, PUT, GET, DELETE, HEAD, OPTIONS"); //$NON-NLS-1$
+		headers.add(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true"); //$NON-NLS-1$
 	}
 }
