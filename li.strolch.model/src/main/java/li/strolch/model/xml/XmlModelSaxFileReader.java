@@ -22,12 +22,12 @@ import java.util.Date;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.StringHelper;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -62,8 +62,8 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
 			String includeFileS = attributes.getValue(Tags.FILE);
 			if (StringHelper.isEmpty(includeFileS)) {
-				throw new IllegalArgumentException(MessageFormat.format(
-						"The attribute {0} is missing for IncludeFile!", Tags.FILE)); //$NON-NLS-1$
+				throw new IllegalArgumentException(
+						MessageFormat.format("The attribute {0} is missing for IncludeFile!", Tags.FILE)); //$NON-NLS-1$
 			}
 
 			File includeFile = new File(this.modelFile.getParentFile(), includeFileS);
