@@ -10,6 +10,9 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
@@ -19,6 +22,8 @@ import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 
 public class StrolchXmlHelper {
+
+	private static final Logger logger = LoggerFactory.getLogger(StrolchXmlHelper.class);
 
 	public static Resource parseAndReturnResource(File file, String id) {
 		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
@@ -51,6 +56,8 @@ public class StrolchXmlHelper {
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to write elements to " + file, e);
 		}
+
+		logger.info("Wrote " + elements.size() + " to file " + file);
 	}
 
 	public static XMLStreamWriter openXmlStreamWriter(OutputStream out)
