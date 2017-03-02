@@ -67,7 +67,8 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 			sb.append(iter.next());
 
 			if (iter.hasNext()) {
-				sb.append(VALUE_SEPARATOR);
+				sb.append(VALUE_SEPARATOR2);
+				sb.append(" ");
 			}
 		}
 
@@ -140,7 +141,12 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 			return Collections.emptyList();
 		}
 
-		String[] valueArr = value.split(VALUE_SEPARATOR);
+		String[] valueArr;
+		if (value.contains(VALUE_SEPARATOR1))
+			valueArr = value.split(VALUE_SEPARATOR1);
+		else
+			valueArr = value.split(VALUE_SEPARATOR2);
+
 		List<String> values = new ArrayList<>();
 		for (String val : valueArr) {
 			values.add(val.trim());

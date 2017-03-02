@@ -18,12 +18,14 @@ package li.strolch.model.parameter;
 import java.util.List;
 
 /**
+ * A {@link Parameter} which supports a list of elements.
+ * 
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
 public interface ListParameter<E> extends Parameter<List<E>> {
 
-	public static final String VALUE_SEPARATOR = ";"; //$NON-NLS-1$
+	public static final String VALUE_SEPARATOR1 = ";"; //$NON-NLS-1$
+	public static final String VALUE_SEPARATOR2 = ","; //$NON-NLS-1$
 
 	/**
 	 * Adds a single value to the {@link List} of values
@@ -44,7 +46,7 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	public boolean removeValue(E value);
 
 	/**
-	 * Clears the list of values
+	 * Clears the list of values, i.e the list of values is empty after this call
 	 */
 	public void clearValue();
 

@@ -71,6 +71,16 @@ public class DateParameter extends AbstractParameter<Date> {
 		setValue(parseFromString(valueAsString));
 	}
 
+	/**
+	 * Sets the value to 1970-01-01 (unix time 0)
+	 * 
+	 * @see Parameter#clearValue()
+	 */
+	@Override
+	public void clearValue() {
+		this.value = ISO8601FormatFactory.getInstance().getDateFormat().parse("-");
+	}
+
 	@Override
 	public String getType() {
 		return StrolchValueType.DATE.getType();
@@ -95,7 +105,7 @@ public class DateParameter extends AbstractParameter<Date> {
 	public static Date parseFromString(String valueS) {
 		return ISO8601FormatFactory.getInstance().getDateFormat().parse(valueS);
 	}
-	
+
 	@Override
 	public int compareTo(Parameter<?> o) {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());

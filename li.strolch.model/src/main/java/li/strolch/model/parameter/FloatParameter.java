@@ -65,6 +65,16 @@ public class FloatParameter extends AbstractParameter<Double> {
 		this.value = value;
 	}
 
+	/**
+	 * Sets the value to 0
+	 * 
+	 * @see Parameter#clearValue()
+	 */
+	@Override
+	public void clearValue() {
+		this.value = 0.0D;
+	}
+
 	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));

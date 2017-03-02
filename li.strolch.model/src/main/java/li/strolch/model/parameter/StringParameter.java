@@ -25,10 +25,9 @@ import li.strolch.utils.dbc.DBC;
  */
 public class StringParameter extends AbstractParameter<String> {
 
-	public static final String UNDEFINED_VALUE = "-"; //$NON-NLS-1$
 	private static final long serialVersionUID = 0L;
 
-	private String value = UNDEFINED_VALUE;
+	private String value = "";
 
 	/**
 	 * Empty constructor
@@ -69,6 +68,16 @@ public class StringParameter extends AbstractParameter<String> {
 	public void setValue(String value) {
 		validateValue(value);
 		this.value = value;
+	}
+
+	/**
+	 * Sets the value to the empty string
+	 * 
+	 * @see Parameter#clearValue()
+	 */
+	@Override
+	public void clearValue() {
+		this.value = "";
 	}
 
 	@Override

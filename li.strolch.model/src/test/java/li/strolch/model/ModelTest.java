@@ -421,6 +421,15 @@ public class ModelTest {
 		stringList.add("Hello");
 		stringList.add("World");
 		assertEquals(stringList, stringListP.getValue());
+		assertEquals("Hello, World", stringListP.getValueAsString());
+		stringListP.setValueFromString("a;b");
+		assertEquals("a, b", stringListP.getValueAsString());
+		stringListP.setValueFromString("a,b");
+		assertEquals("a, b", stringListP.getValueAsString());
+		stringListP.clearValue();
+		assertEquals("", stringListP.getValueAsString());
+		stringListP.addValue("a");
+		assertEquals("a", stringListP.getValueAsString());
 
 		IntegerListParameter intListP = bag.getParameter(PARAM_LIST_INTEGER_ID);
 		assertNotNull("IntegerList Param missing with id " + PARAM_LIST_INTEGER_ID, intListP);
@@ -429,6 +438,15 @@ public class ModelTest {
 		intList.add(10);
 		intList.add(15);
 		assertEquals(intList, intListP.getValue());
+		assertEquals("5, 10, 15", intListP.getValueAsString());
+		intListP.setValueFromString("4;45");
+		assertEquals("4, 45", intListP.getValueAsString());
+		intListP.setValueFromString("4,45");
+		assertEquals("4, 45", intListP.getValueAsString());
+		intListP.clearValue();
+		assertEquals("", intListP.getValueAsString());
+		intListP.addValue(55);
+		assertEquals("55", intListP.getValueAsString());
 
 		FloatListParameter floatListP = bag.getParameter(PARAM_LIST_FLOAT_ID);
 		assertNotNull("FloatList Param missing with id " + PARAM_LIST_FLOAT_ID, floatListP);
@@ -437,6 +455,15 @@ public class ModelTest {
 		floatList.add(11.0);
 		floatList.add(16.0);
 		assertEquals(floatList, floatListP.getValue());
+		assertEquals("6.0, 11.0, 16.0", floatListP.getValueAsString());
+		floatListP.setValueFromString("4.2;4.1");
+		assertEquals("4.2, 4.1", floatListP.getValueAsString());
+		floatListP.setValueFromString("4.2,4.1");
+		assertEquals("4.2, 4.1", floatListP.getValueAsString());
+		floatListP.clearValue();
+		assertEquals("", floatListP.getValueAsString());
+		floatListP.addValue(55.5);
+		assertEquals("55.5", floatListP.getValueAsString());
 
 		LongListParameter longListP = bag.getParameter(PARAM_LIST_LONG_ID);
 		assertNotNull("LongList Param missing with id " + PARAM_LIST_LONG_ID, longListP);
@@ -445,6 +472,15 @@ public class ModelTest {
 		longList.add(12L);
 		longList.add(17L);
 		assertEquals(longList, longListP.getValue());
+		assertEquals("7, 12, 17", longListP.getValueAsString());
+		longListP.setValueFromString("4;4");
+		assertEquals("4, 4", longListP.getValueAsString());
+		longListP.setValueFromString("4,4");
+		assertEquals("4, 4", longListP.getValueAsString());
+		longListP.clearValue();
+		assertEquals("", longListP.getValueAsString());
+		longListP.addValue(55L);
+		assertEquals("55", longListP.getValueAsString());
 	}
 
 	/**

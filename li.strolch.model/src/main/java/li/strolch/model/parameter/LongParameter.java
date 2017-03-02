@@ -64,6 +64,16 @@ public class LongParameter extends AbstractParameter<Long> {
 		this.value = value;
 	}
 
+	/**
+	 * Sets the value to 0
+	 * 
+	 * @see Parameter#clearValue()
+	 */
+	@Override
+	public void clearValue() {
+		this.value = 0L;
+	}
+
 	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));
@@ -93,7 +103,7 @@ public class LongParameter extends AbstractParameter<Long> {
 	public static Long parseFromString(String valueS) {
 		return Long.valueOf(valueS);
 	}
-	
+
 	@Override
 	public int compareTo(Parameter<?> o) {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());

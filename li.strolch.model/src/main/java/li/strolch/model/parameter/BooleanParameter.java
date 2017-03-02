@@ -69,6 +69,16 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 		setValue(parseFromString(valueAsString));
 	}
 
+	/**
+	 * Sets the value to false
+	 * 
+	 * @see Parameter#clearValue()
+	 */
+	@Override
+	public void clearValue() {
+		this.value = false;
+	}
+
 	@Override
 	public String getType() {
 		return StrolchValueType.BOOLEAN.getType();

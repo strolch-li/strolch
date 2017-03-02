@@ -67,7 +67,8 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 			sb.append(iter.next());
 
 			if (iter.hasNext()) {
-				sb.append(VALUE_SEPARATOR);
+				sb.append(VALUE_SEPARATOR2);
+				sb.append(" ");
 			}
 		}
 
@@ -140,7 +141,12 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 			return Collections.emptyList();
 		}
 
-		String[] valueArr = value.split(VALUE_SEPARATOR);
+		String[] valueArr;
+		if (value.contains(VALUE_SEPARATOR1))
+			valueArr = value.split(VALUE_SEPARATOR1);
+		else
+			valueArr = value.split(VALUE_SEPARATOR2);
+
 		List<Integer> values = new ArrayList<>();
 		for (String val : valueArr) {
 			values.add(Integer.valueOf(val.trim()));

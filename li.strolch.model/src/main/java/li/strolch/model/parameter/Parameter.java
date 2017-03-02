@@ -55,6 +55,11 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	public void setValue(T value);
 
 	/**
+	 * Clears the value, dependent on the concrete class
+	 */
+	public void clearValue();
+
+	/**
 	 * get the hidden attribute
 	 * 
 	 * @return
@@ -141,12 +146,12 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 
 	@Override
 	public boolean equals(Object obj);
-	
+
 	@Override
 	public int compareTo(Parameter<?> o);
 
 	@Override
 	public Parameter<T> getClone();
 
-	public <U> U accept(ParameterVisitor visitor);	
+	public <U> U accept(ParameterVisitor visitor);
 }

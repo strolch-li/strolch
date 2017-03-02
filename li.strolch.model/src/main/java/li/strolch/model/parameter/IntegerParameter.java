@@ -69,6 +69,16 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		this.value = value;
 	}
 
+	/**
+	 * Sets the value to 0
+	 * 
+	 * @see Parameter#clearValue()
+	 */
+	@Override
+	public void clearValue() {
+		this.value = 0;
+	}
+
 	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));

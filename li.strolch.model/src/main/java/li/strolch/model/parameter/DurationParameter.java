@@ -64,6 +64,16 @@ public class DurationParameter extends AbstractParameter<Long> {
 		this.value = value;
 	}
 
+	/**
+	 * Sets the value to 0
+	 * 
+	 * @see Parameter#clearValue()
+	 */
+	@Override
+	public void clearValue() {
+		this.value = 0L;
+	}
+
 	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));
