@@ -91,4 +91,12 @@ public class SimpleStrolchElementListener implements StrolchElementListener {
 			return Collections.emptyList();
 		return new ArrayList<>(this.activities.values());
 	}
+
+	public List<StrolchRootElement> getElements() {
+		List<StrolchRootElement> elements = new ArrayList<>();
+		elements.addAll(getResources());
+		elements.addAll(getOrders());
+		elements.addAll(getActivities());
+		return elements;
+	}
 }

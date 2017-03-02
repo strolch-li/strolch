@@ -3,6 +3,7 @@ package li.strolch.model.xml;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -43,7 +44,13 @@ public class StrolchXmlHelper {
 		return elementListener.getActivity(id);
 	}
 
-	public static void writeToFile(File file, List<StrolchRootElement> elements) {
+	public static List<StrolchRootElement> parseFile(File file) {
+		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
+		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
+		return elementListener.getElements();
+	}
+
+	public static void writeToFile(File file, Collection<StrolchRootElement> elements) {
 
 		try (FileOutputStream out = new FileOutputStream(file)) {
 
@@ -52,6 +59,8 @@ public class StrolchXmlHelper {
 			for (StrolchRootElement element : elements) {
 				element.accept(new StrolchElementToSaxWriterVisitor(writer));
 			}
+
+			writer.writeEndDocument();
 
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to write elements to " + file, e);
