@@ -22,17 +22,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.model.activity.Activity;
 import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
-import li.strolch.model.xml.ActivityToSaxWriterVisitor;
-import li.strolch.model.xml.OrderToSaxWriterVisitor;
-import li.strolch.model.xml.ResourceToSaxWriterVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
+import li.strolch.model.xml.StrolchElementToSaxWriterVisitor;
+import li.strolch.model.xml.StrolchXmlHelper;
 import li.strolch.model.xml.XmlModelSaxStreamReader;
 
 /**
@@ -44,13 +42,9 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 	@Override
 	protected Order formatAndParseOrder(Order order) throws Exception {
 
-		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		XMLStreamWriter writer = factory.createXMLStreamWriter(out, "UTF-8");
-		writer.writeStartDocument();
-		writer.writeStartElement(Tags.STROLCH_MODEL);
-		OrderToSaxWriterVisitor toSax = new OrderToSaxWriterVisitor(writer);
-		toSax.visit(order);
+		XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(out);
+		order.accept(new StrolchElementToSaxWriterVisitor(writer));
 		writer.writeEndDocument();
 
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
@@ -73,13 +67,9 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 	@Override
 	protected Resource formatAndParseResource(Resource resource) throws Exception {
 
-		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		XMLStreamWriter writer = factory.createXMLStreamWriter(out, "UTF-8");
-		writer.writeStartDocument();
-		writer.writeStartElement(Tags.STROLCH_MODEL);
-		ResourceToSaxWriterVisitor toSax = new ResourceToSaxWriterVisitor(writer);
-		toSax.visit(resource);
+		XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(out);
+		resource.accept(new StrolchElementToSaxWriterVisitor(writer));
 		writer.writeEndDocument();
 
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
@@ -99,20 +89,15 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 
 		return parsedResource;
 	}
-	
 
 	@Override
 	protected Activity formatAndParseActivity(Activity activity) throws Exception {
 
-		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		XMLStreamWriter writer = factory.createXMLStreamWriter(out, "UTF-8");
-		writer.writeStartDocument();
-		writer.writeStartElement(Tags.STROLCH_MODEL);
-		ActivityToSaxWriterVisitor toSax = new ActivityToSaxWriterVisitor(writer);
-		toSax.visit(activity);
+		XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(out);
+		activity.accept(new StrolchElementToSaxWriterVisitor(writer));
 		writer.writeEndDocument();
-		
+
 		System.out.println(out.toString());
 
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();

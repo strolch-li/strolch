@@ -27,11 +27,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
-import javanet.staxutils.IndentingXMLStreamWriter;
-
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.agent.api.ActivityMap;
@@ -44,14 +39,9 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.visitor.ActivityVisitor;
-import li.strolch.model.visitor.OrderVisitor;
-import li.strolch.model.visitor.ResourceVisitor;
-import li.strolch.model.xml.ActivityToSaxWriterVisitor;
-import li.strolch.model.xml.OrderToSaxWriterVisitor;
-import li.strolch.model.xml.ResourceToSaxWriterVisitor;
+import li.strolch.model.xml.StrolchElementToSaxWriterVisitor;
+import li.strolch.model.xml.StrolchXmlHelper;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
@@ -167,7 +157,7 @@ public class XmlExportModelCommand extends Command {
 		try (FileOutputStream out = new FileOutputStream(this.modelFile)) {
 			createdFiles.add(this.modelFile);
 
-			XMLStreamWriter writer = openXmlStreamWriter(out);
+			XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(out);
 
 			if (this.doResources) {
 				ResourceMap resourceMap = tx().getResourceMap();
@@ -191,7 +181,7 @@ public class XmlExportModelCommand extends Command {
 								+ typeXmlFileF.getAbsolutePath() + "...");
 						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
 							createdFiles.add(typeXmlFileF);
-							XMLStreamWriter typeWriter = openXmlStreamWriter(typeOut);
+							XMLStreamWriter typeWriter = StrolchXmlHelper.openXmlStreamWriter(typeOut);
 							writeResourcesByType(typeWriter, resourceMap, type);
 							typeWriter.writeEndDocument();
 						}
@@ -220,7 +210,7 @@ public class XmlExportModelCommand extends Command {
 								+ typeXmlFileF.getAbsolutePath() + "...");
 						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
 							createdFiles.add(typeXmlFileF);
-							XMLStreamWriter typeWriter = openXmlStreamWriter(typeOut);
+							XMLStreamWriter typeWriter = StrolchXmlHelper.openXmlStreamWriter(typeOut);
 							writeOrdersByType(typeWriter, orderMap, type);
 							typeWriter.writeEndDocument();
 						}
@@ -250,7 +240,7 @@ public class XmlExportModelCommand extends Command {
 								+ " Activities to path: " + typeXmlFileF.getAbsolutePath() + "...");
 						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
 							createdFiles.add(typeXmlFileF);
-							XMLStreamWriter typeWriter = openXmlStreamWriter(typeOut);
+							XMLStreamWriter typeWriter = StrolchXmlHelper.openXmlStreamWriter(typeOut);
 							writeActivitiesByType(typeWriter, activityMap, type);
 							typeWriter.writeEndDocument();
 						}
@@ -284,11 +274,11 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	private void writeOrdersByType(XMLStreamWriter writer, OrderMap orderMap, String type) {
-		OrderVisitor<?> visitor = new OrderToSaxWriterVisitor(writer);
+		StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 		Set<String> keysByType = new TreeSet<>(orderMap.getKeysBy(tx(), type));
 		for (String id : keysByType) {
 			Order order = orderMap.getBy(tx(), type, id);
-			visitor.visit(order);
+			order.accept(visitor);
 			this.statistics.nrOfOrders++;
 			logElementsWritten();
 		}
@@ -302,37 +292,25 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	private void writeResourcesByType(XMLStreamWriter writer, ResourceMap resourceMap, String type) {
-		ResourceVisitor<?> visitor = new ResourceToSaxWriterVisitor(writer);
+		StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 		Set<String> keysByType = new TreeSet<>(resourceMap.getKeysBy(tx(), type));
 		for (String id : keysByType) {
 			Resource resource = resourceMap.getBy(tx(), type, id);
-			visitor.visit(resource);
+			resource.accept(visitor);
 			this.statistics.nrOfResources++;
 			logElementsWritten();
 		}
 	}
 
 	private void writeActivitiesByType(XMLStreamWriter writer, ActivityMap activityMap, String type) {
-		ActivityVisitor<?> visitor = new ActivityToSaxWriterVisitor(writer);
+		StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 		Set<String> keysByType = new TreeSet<>(activityMap.getKeysBy(tx(), type));
 		for (String id : keysByType) {
 			Activity activity = activityMap.getBy(tx(), type, id);
-			visitor.visit(activity);
+			activity.accept(visitor);
 			this.statistics.nrOfActivities++;
 			logElementsWritten();
 		}
-	}
-
-	private XMLStreamWriter openXmlStreamWriter(FileOutputStream out)
-			throws FactoryConfigurationError, XMLStreamException {
-		XMLOutputFactory factory = XMLOutputFactory.newInstance();
-		XMLStreamWriter writer = factory.createXMLStreamWriter(out, StrolchConstants.DEFAULT_ENCODING);
-		writer = new IndentingXMLStreamWriter(writer);
-
-		// start document
-		writer.writeStartDocument(StrolchConstants.DEFAULT_ENCODING, StrolchConstants.DEFAULT_XML_VERSION);
-		writer.writeStartElement(Tags.STROLCH_MODEL);
-		return writer;
 	}
 
 	/**

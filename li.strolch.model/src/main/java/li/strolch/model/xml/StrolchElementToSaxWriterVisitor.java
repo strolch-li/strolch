@@ -18,6 +18,7 @@ package li.strolch.model.xml;
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import java.util.TreeSet;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import li.strolch.exception.StrolchException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
@@ -50,17 +52,63 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class StrolchElementToSaxWriterVisitor {
+public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisitor<Void> {
 
 	protected XMLStreamWriter writer;
 
 	public StrolchElementToSaxWriterVisitor(XMLStreamWriter writer) {
 		this.writer = writer;
+	}
+
+	@Override
+	public Void visitActivity(Activity activity) {
+
+		try {
+			writeElement(activity);
+			this.writer.flush();
+		} catch (XMLStreamException e) {
+			String msg = "Failed to write Activity {0} due to {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, activity.getLocator(), e.getMessage());
+			throw new StrolchException(msg, e);
+		}
+
+		return null;
+	}
+
+	@Override
+	public Void visitOrder(Order order) {
+
+		try {
+			writeElement(order);
+			this.writer.flush();
+		} catch (XMLStreamException e) {
+			String msg = "Failed to write Order {0} due to {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, order.getLocator(), e.getMessage());
+			throw new StrolchException(msg, e);
+		}
+
+		return null;
+	}
+
+	@Override
+	public Void visitResource(Resource resource) {
+
+		try {
+			writeElement(resource);
+			this.writer.flush();
+		} catch (XMLStreamException e) {
+			String msg = "Failed to write Resource {0} due to {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, resource.getLocator(), e.getMessage());
+			throw new StrolchException(msg, e);
+		}
+
+		return null;
 	}
 
 	protected void writeElement(Resource resource) throws XMLStreamException {
@@ -110,7 +158,7 @@ public abstract class StrolchElementToSaxWriterVisitor {
 
 		writeStartStrolchElement(Tags.ACTIVITY, empty, activity);
 		this.writer.writeAttribute(Tags.TIME_ORDERING, activity.getTimeOrdering().getName());
-		
+
 		if (activity.hasVersion())
 			writeVersion(activity);
 

@@ -18,6 +18,7 @@ package li.strolch.model.xml;
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
+import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -46,17 +47,63 @@ import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class StrolchElementToSaxVisitor {
+public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Void> {
 
 	protected ContentHandler contentHandler;
 
-	protected StrolchElementToSaxVisitor(ContentHandler contentHandler) {
+	public StrolchElementToSaxVisitor(ContentHandler contentHandler) {
 		this.contentHandler = contentHandler;
+	}
+
+	@Override
+	public Void visitActivity(Activity activity) {
+		try {
+
+			toSax(activity);
+
+		} catch (Exception e) {
+			String msg = "Failed to transform Activity {0} to XML due to {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, activity.getLocator(), e.getMessage());
+			throw new RuntimeException(msg, e);
+		}
+
+		return null;
+	}
+
+	@Override
+	public Void visitOrder(Order order) {
+		try {
+
+			toSax(order);
+
+		} catch (SAXException e) {
+			String msg = "Failed to transform Order {0} to XML due to {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, order.getLocator(), e.getMessage());
+			throw new RuntimeException(msg, e);
+		}
+
+		return null;
+	}
+
+	@Override
+	public Void visitResource(Resource resource) {
+		try {
+
+			toSax(resource);
+
+		} catch (Exception e) {
+			String msg = "Failed to transform Resource {0} to XML due to {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, resource.getLocator(), e.getMessage());
+			throw new RuntimeException(msg, e);
+		}
+
+		return null;
 	}
 
 	protected void toSax(Resource resource) throws SAXException {

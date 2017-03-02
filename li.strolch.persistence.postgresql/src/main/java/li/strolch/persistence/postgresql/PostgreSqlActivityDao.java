@@ -38,8 +38,8 @@ import org.xml.sax.SAXException;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
-import li.strolch.model.xml.ActivityToSaxVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
+import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
@@ -90,7 +90,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
 		ContentHandler contentHandler = saxResult.getHandler();
 		contentHandler.startDocument();
-		new ActivityToSaxVisitor(contentHandler).visit(activity);
+		activity.accept(new StrolchElementToSaxVisitor(contentHandler));
 		contentHandler.endDocument();
 		return sqlxml;
 	}

@@ -38,8 +38,8 @@ import org.xml.sax.SAXException;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.model.query.ResourceQuery;
-import li.strolch.model.xml.ResourceToSaxVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
+import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
@@ -89,7 +89,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
 		ContentHandler contentHandler = saxResult.getHandler();
 		contentHandler.startDocument();
-		new ResourceToSaxVisitor(contentHandler).visit(res);
+		res.accept(new StrolchElementToSaxVisitor(contentHandler));
 		contentHandler.endDocument();
 		return sqlxml;
 	}

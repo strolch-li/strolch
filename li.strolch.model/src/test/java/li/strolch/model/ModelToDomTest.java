@@ -24,11 +24,9 @@ import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
 import li.strolch.model.xml.ActivityFromDomVisitor;
-import li.strolch.model.xml.ActivityToDomVisitor;
 import li.strolch.model.xml.OrderFromDomVisitor;
-import li.strolch.model.xml.OrderToDomVisitor;
 import li.strolch.model.xml.ResourceFromDomVisitor;
-import li.strolch.model.xml.ResourceToDomVisitor;
+import li.strolch.model.xml.StrolchElementToDomVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -38,9 +36,7 @@ public class ModelToDomTest extends ModelMarshallingTest {
 
 	protected Resource formatAndParseResource(Resource resource) {
 
-		ResourceToDomVisitor domVisitor = new ResourceToDomVisitor();
-		domVisitor.visit(resource);
-		Document document = domVisitor.getDocument();
+		Document document = resource.accept(new StrolchElementToDomVisitor());
 
 		Resource parsedResource = new ResourceFromDomVisitor().visit(document);
 
@@ -53,9 +49,8 @@ public class ModelToDomTest extends ModelMarshallingTest {
 	}
 
 	protected Order formatAndParseOrder(Order order) {
-		OrderToDomVisitor domVisitor = new OrderToDomVisitor();
-		domVisitor.visit(order);
-		Document document = domVisitor.getDocument();
+
+		Document document = order.accept(new StrolchElementToDomVisitor());
 
 		Order parsedOrder = new OrderFromDomVisitor().visit(document);
 
@@ -68,9 +63,7 @@ public class ModelToDomTest extends ModelMarshallingTest {
 
 	protected Activity formatAndParseActivity(Activity activity) {
 
-		ActivityToDomVisitor domVisitor = new ActivityToDomVisitor();
-		domVisitor.visit(activity);
-		Document document = domVisitor.getDocument();
+		Document document = activity.accept(new StrolchElementToDomVisitor());
 
 		Activity parsedActivity = new ActivityFromDomVisitor().visit(document);
 

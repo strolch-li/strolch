@@ -24,10 +24,8 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
 import li.strolch.model.visitor.OrderDeepEqualsVisitor;
 import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
-import li.strolch.model.xml.ActivityToSaxVisitor;
-import li.strolch.model.xml.OrderToSaxVisitor;
-import li.strolch.model.xml.ResourceToSaxVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
+import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 
 /**
@@ -42,8 +40,7 @@ public class ModelToSaxTest extends ModelMarshallingTest {
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
 		XmlModelSaxReader saxReader = new XmlModelSaxReader(listener);
 
-		OrderToSaxVisitor domVisitor = new OrderToSaxVisitor(saxReader);
-		domVisitor.visit(order);
+		order.accept(new StrolchElementToSaxVisitor(saxReader));
 
 		assertEquals(1, listener.getOrders().size());
 		assertEquals(Collections.emptyList(), listener.getResources());
@@ -63,8 +60,7 @@ public class ModelToSaxTest extends ModelMarshallingTest {
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
 		XmlModelSaxReader saxReader = new XmlModelSaxReader(listener);
 
-		ResourceToSaxVisitor domVisitor = new ResourceToSaxVisitor(saxReader);
-		domVisitor.visit(resource);
+		resource.accept(new StrolchElementToSaxVisitor(saxReader));
 
 		assertEquals(1, listener.getResources().size());
 		assertEquals(Collections.emptyList(), listener.getActivities());
@@ -85,8 +81,7 @@ public class ModelToSaxTest extends ModelMarshallingTest {
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
 		XmlModelSaxReader saxReader = new XmlModelSaxReader(listener);
 
-		ActivityToSaxVisitor domVisitor = new ActivityToSaxVisitor(saxReader);
-		domVisitor.visit(activity);
+		activity.accept(new StrolchElementToSaxVisitor(saxReader));
 
 		assertEquals(1, listener.getActivities().size());
 		assertEquals(Collections.emptyList(), listener.getResources());

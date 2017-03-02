@@ -19,6 +19,8 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 
+import javax.xml.parsers.DocumentBuilder;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -42,12 +44,14 @@ import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+import li.strolch.model.visitor.StrolchRootElementVisitor;
+import li.strolch.utils.helper.DomUtil;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class StrolchElementToDomVisitor {
+public class StrolchElementToDomVisitor implements StrolchRootElementVisitor<Document> {
 
 	protected Document document;
 
@@ -55,7 +59,37 @@ public class StrolchElementToDomVisitor {
 		return this.document;
 	}
 
-	protected Element toDom(Order order) {
+	@Override
+	public Document visitActivity(Activity activity) {
+		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
+		this.document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
+
+		Element asDom = toDom(activity);
+		document.appendChild(asDom);
+		return this.document;
+	}
+
+	@Override
+	public Document visitOrder(Order order) {
+		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
+		this.document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
+
+		Element asDom = toDom(order);
+		document.appendChild(asDom);
+		return this.document;
+	}
+
+	@Override
+	public Document visitResource(Resource resource) {
+		DocumentBuilder documentBuilder = DomUtil.createDocumentBuilder();
+		this.document = documentBuilder.getDOMImplementation().createDocument(null, null, null);
+
+		Element asDom = toDom(resource);
+		document.appendChild(asDom);
+		return this.document;
+	}
+
+	public Element toDom(Order order) {
 
 		Element asDom = document.createElement(Tags.ORDER);
 		asDom.setAttribute(Tags.DATE, ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
@@ -66,7 +100,7 @@ public class StrolchElementToDomVisitor {
 		return asDom;
 	}
 
-	protected Element toDom(Resource resource) {
+	public Element toDom(Resource resource) {
 
 		Element asDom = document.createElement(Tags.RESOURCE);
 		fillElement(asDom, (StrolchRootElement) resource);
@@ -82,7 +116,7 @@ public class StrolchElementToDomVisitor {
 		return asDom;
 	}
 
-	protected Element toDom(Activity activity) {
+	public Element toDom(Activity activity) {
 		Element element = document.createElement(Tags.ACTIVITY);
 		element.setAttribute(Tags.TIME_ORDERING, activity.getTimeOrdering().getName());
 
@@ -105,7 +139,7 @@ public class StrolchElementToDomVisitor {
 		return element;
 	}
 
-	protected Element toDom(Action action) {
+	public Element toDom(Action action) {
 		Element element = document.createElement(Tags.ACTION);
 		fillElement(element, action);
 

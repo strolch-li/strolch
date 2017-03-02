@@ -61,10 +61,8 @@ import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.model.query.parser.QueryParser;
-import li.strolch.model.xml.ActivityToXmlStringVisitor;
-import li.strolch.model.xml.OrderToXmlStringVisitor;
-import li.strolch.model.xml.ResourceToXmlStringVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
+import li.strolch.model.xml.StrolchElementToXmlStringVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -523,7 +521,7 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		String asXml = new ResourceToXmlStringVisitor().visit(resource);
+		String asXml = resource.accept(new StrolchElementToXmlStringVisitor());
 		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
@@ -563,7 +561,7 @@ public class Inspector {
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			String asXml = new ResourceToXmlStringVisitor().visit(resource);
+			String asXml = resource.accept(new StrolchElementToXmlStringVisitor());
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
@@ -605,7 +603,7 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		String asXml = new OrderToXmlStringVisitor().visit(order);
+		String asXml = order.accept(new StrolchElementToXmlStringVisitor());
 		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
@@ -645,7 +643,7 @@ public class Inspector {
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			String asXml = new OrderToXmlStringVisitor().visit(order);
+			String asXml = order.accept(new StrolchElementToXmlStringVisitor());
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
@@ -705,7 +703,7 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		String asXml = new ActivityToXmlStringVisitor().visit(activity);
+		String asXml = activity.accept(new StrolchElementToXmlStringVisitor());
 		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
@@ -745,7 +743,7 @@ public class Inspector {
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			String asXml = new ActivityToXmlStringVisitor().visit(activity);
+			String asXml = activity.accept(new StrolchElementToXmlStringVisitor());
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 

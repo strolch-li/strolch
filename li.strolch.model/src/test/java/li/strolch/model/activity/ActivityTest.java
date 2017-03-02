@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.State;
-import li.strolch.model.xml.ActivityToDomVisitor;
+import li.strolch.model.xml.StrolchElementToDomVisitor;
 
 public class ActivityTest {
 
@@ -144,7 +144,7 @@ public class ActivityTest {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		Document document = db.newDocument();
-		Element dom = new ActivityToDomVisitor().toDom(this.activity);
+		Element dom = new StrolchElementToDomVisitor().toDom(this.activity);
 		document.appendChild(dom);
 
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();

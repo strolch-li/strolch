@@ -38,8 +38,8 @@ import org.xml.sax.SAXException;
 import li.strolch.model.Order;
 import li.strolch.model.Tags;
 import li.strolch.model.query.OrderQuery;
-import li.strolch.model.xml.OrderToSaxVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
+import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
@@ -89,7 +89,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
 		ContentHandler contentHandler = saxResult.getHandler();
 		contentHandler.startDocument();
-		new OrderToSaxVisitor(contentHandler).visit(order);
+		order.accept(new StrolchElementToSaxVisitor(contentHandler));
 		contentHandler.endDocument();
 		return sqlxml;
 	}

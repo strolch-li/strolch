@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
-import li.strolch.model.xml.ActivityToDomVisitor;
+import li.strolch.model.xml.StrolchElementToDomVisitor;
 
 public class ActionTest {
 
@@ -77,7 +77,7 @@ public class ActionTest {
 
 		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document document = db.newDocument();
-		Element dom = new ActivityToDomVisitor().toDom(this.action);
+		Element dom = new StrolchElementToDomVisitor().toDom(this.action);
 		document.appendChild(dom);
 
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
