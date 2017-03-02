@@ -100,9 +100,17 @@ public class DateHelper {
 		return labelString;
 	}
 
-	public static long truncateTimeFromTimestamp(String strTimeStamp) {
+	/**
+	 * Parses the given ISO8601 time stamp and truncates the time from it, returning the time in long
+	 * 
+	 * @param iso8601Timestamp
+	 *            the ISO 8601 date to parse
+	 * 
+	 * @return the truncated time in milliseconds
+	 */
+	public static long truncateTimeFromTimestamp(String iso8601Timestamp) {
 
-		Date dateToCut = ISO8601FormatFactory.getInstance().parseDate(strTimeStamp);
+		Date dateToCut = ISO8601FormatFactory.getInstance().parseDate(iso8601Timestamp);
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(dateToCut);
