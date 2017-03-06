@@ -46,16 +46,19 @@ public class FromFlatJsonVisitor {
 		this.optionalKeys = new MapOfSets<>();
 	}
 
-	public void ignoreBag(String bagId) {
+	public FromFlatJsonVisitor ignoreBag(String bagId) {
 		this.ignoredKeys.addSet(bagId, Collections.emptySet());
+		return this;
 	}
 
-	public void ignoreParameter(String bagId, String paramId) {
+	public FromFlatJsonVisitor ignoreParameter(String bagId, String paramId) {
 		this.ignoredKeys.addElement(bagId, paramId);
+		return this;
 	}
 
-	public void optionalParameter(String bagId, String paramId) {
+	public FromFlatJsonVisitor optionalParameter(String bagId, String paramId) {
 		this.optionalKeys.addElement(bagId, paramId);
+		return this;
 	}
 
 	public void visit(StrolchRootElement element, JsonObject jsonObject) {
