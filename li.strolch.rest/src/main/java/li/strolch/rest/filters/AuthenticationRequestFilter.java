@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Cookie;
@@ -44,6 +46,7 @@ import li.strolch.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Provider
+@Priority(Priorities.AUTHENTICATION) 
 public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthenticationRequestFilter.class);
