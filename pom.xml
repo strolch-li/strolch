@@ -90,7 +90,7 @@
 		<module>li.strolch.agent</module>
 		<module>li.strolch.service</module>
 		<module>li.strolch.rest</module>
-		
+
 		<!-- test and demo project -->
 		<module>li.strolch.tutorialapp</module>
 		<module>li.strolch.tutorialwebapp</module>
@@ -200,7 +200,7 @@
 			<dependency>
 				<groupId>com.github.petitparser.java-petitparser</groupId>
 				<artifactId>petitparser-core</artifactId>
-				<version>2.0.2</version>
+				<version>2.0.3</version>
 			</dependency>
 
 			<!-- Database -->
