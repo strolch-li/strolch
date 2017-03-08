@@ -233,7 +233,7 @@ public class AuthenticationService {
 			return Response.ok().build();
 
 		} catch (StrolchException | PrivilegeException e) {
-			logger.error(e.getMessage(), e);
+			logger.error("Session validation failed: " + e.getMessage());
 			JsonObject root = new JsonObject();
 			root.addProperty("msg", MessageFormat.format("Session invalid: {0}", e.getMessage()));
 			String json = new Gson().toJson(root);
