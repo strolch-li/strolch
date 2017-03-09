@@ -15,8 +15,10 @@
  */
 package li.strolch.privilege.test;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.text.MessageFormat;
@@ -635,7 +637,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			fail("User Ted may not authenticate because the user has no password!");
 		} catch (PrivilegeException e) {
 			String msg = "User ted has no password and may not login!";
-			assertEquals(msg, e.getMessage());
+			assertThat(e.getMessage(), containsString(msg));
 		} finally {
 			logout();
 		}
@@ -751,7 +753,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			fail("User Bob may not authenticate because the user is not yet enabled!");
 		} catch (PrivilegeException e) {
 			String msg = "User bob does not have state ENABLED and can not login!";
-			assertEquals(msg, e.getMessage());
+			assertThat(e.getMessage(), containsString(msg));
 		} finally {
 			logout();
 		}
