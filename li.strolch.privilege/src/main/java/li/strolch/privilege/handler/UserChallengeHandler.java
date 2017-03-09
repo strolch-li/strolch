@@ -1,6 +1,5 @@
 package li.strolch.privilege.handler;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,24 +26,7 @@ public abstract class UserChallengeHandler {
 	 *            a map containing configuration properties
 	 */
 	public void initialize(Map<String, String> parameterMap) {
-		this.challenges = Collections.synchronizedMap(new HashMap<>());
-	}
-
-	/**
-	 * Initiate a password reset challenge for the given user
-	 * 
-	 * @param usage
-	 *            the {@link Usage} for this certificate
-	 * @param user
-	 *            the user for which to initiate the challenge for
-	 */
-	public void initiateChallengeFor(Usage usage, User user) {
-
-		String challenge = generateChallenge();
-		UserChallenge userChallenge = new UserChallenge(usage, user, challenge);
-		this.challenges.put(user, userChallenge);
-
-		sendChallengeToUser(user, challenge);
+		this.challenges = new HashMap<>();
 	}
 
 	/**
@@ -55,6 +37,23 @@ public abstract class UserChallengeHandler {
 	protected String generateChallenge() {
 		String challenge = CodeGenerator.alphaNumericUpper(12);
 		return challenge;
+	}
+
+	/**
+	 * Initiate a password reset challenge for the given user
+	 * 
+	 * @param usage
+	 *            the {@link Usage} for this certificate
+	 * @param user
+	 *            the user for which to initiate the challenge for
+	 */
+	public synchronized void initiateChallengeFor(Usage usage, User user) {
+
+		String challenge = generateChallenge();
+		UserChallenge userChallenge = new UserChallenge(usage, user, challenge);
+		this.challenges.put(user, userChallenge);
+
+		sendChallengeToUser(user, challenge);
 	}
 
 	/**
@@ -70,18 +69,25 @@ public abstract class UserChallengeHandler {
 	 * 
 	 * @return the challenge
 	 */
-	public UserChallenge validateResponse(User user, String challenge) throws PrivilegeException {
+	public synchronized UserChallenge validateResponse(User user, String challenge) throws PrivilegeException {
 
-		UserChallenge userChallenge = this.challenges.remove(user);
+		// get the challenge
+		UserChallenge userChallenge = this.challenges.get(user);
 		if (userChallenge == null)
 			throw new PrivilegeException("No challenge exists for user " + user.getUsername());
+
+		// validate the challenge
 		if (!userChallenge.getUser().equals(user))
 			throw new PrivilegeException("UserChallenge invalid: Wrong user!");
-
 		if (!userChallenge.getChallenge().equals(challenge))
 			throw new PrivilegeException("Challenge is invalid!");
 
+		// then remove it
+		this.challenges.remove(user);
+
+		// it's full filled
 		userChallenge.fulfilled();
+
 		return userChallenge;
 	}
 

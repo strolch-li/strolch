@@ -1119,10 +1119,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			return certificate;
 
 		} catch (RuntimeException e) {
-			String msg = "User {0} Failed to authenticate: {1}"; //$NON-NLS-1$
+			String msg = "User {0} failed to authenticate: {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, username, e.getMessage());
-			logger.error(msg);
-			throw e;
+			throw new InvalidCredentialsException(msg, e);
 		} finally {
 			clearPassword(password);
 		}

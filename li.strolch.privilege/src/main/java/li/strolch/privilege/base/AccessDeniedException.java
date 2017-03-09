@@ -31,4 +31,14 @@ public class AccessDeniedException extends PrivilegeException {
 	public AccessDeniedException(String msg) {
 		super(msg);
 	}
+
+	/**
+	 * @param msg
+	 *            detail on why and where access was denied
+	 * @param e
+	 *            root exception
+	 */
+	public AccessDeniedException(String msg, Exception e) {
+		super(msg, e);
+	}
 }

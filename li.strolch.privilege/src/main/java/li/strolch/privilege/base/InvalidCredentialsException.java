@@ -16,4 +16,14 @@ public class InvalidCredentialsException extends AccessDeniedException {
 	public InvalidCredentialsException(String msg) {
 		super(msg);
 	}
+
+	/**
+	 * @param msg
+	 *            detail on why and where access was denied
+	 * @param e
+	 *            root exception
+	 */
+	public InvalidCredentialsException(String msg, Exception e) {
+		super(msg, e);
+	}
 }

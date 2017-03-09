@@ -59,6 +59,7 @@ import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.model.Result;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.utils.helper.ExceptionHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -168,11 +169,11 @@ public class AuthenticationService {
 					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken()).cookie(cookie).build();
 
 		} catch (InvalidCredentialsException e) {
-			logger.error(e.getMessage(), e);
+			logger.error("Authentication failed due to: " + e.getMessage());
 			loginResult.addProperty("msg", "Could not log in as the given credentials are invalid"); //$NON-NLS-1$
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
 		} catch (AccessDeniedException e) {
-			logger.error(e.getMessage(), e);
+			logger.error("Authentication failed due to: " + e.getMessage());
 			loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-1$
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
 		} catch (StrolchException | PrivilegeException e) {
@@ -208,7 +209,7 @@ public class AuthenticationService {
 			return Response.ok().entity(logoutResult.toString()).build();
 
 		} catch (StrolchException | PrivilegeException e) {
-			logger.error(e.getMessage(), e);
+			logger.error("Failed to invalidate session due to: " + e.getMessage());
 			logoutResult.addProperty("msg", MessageFormat.format("Could not logout due to: {0}", e.getMessage())); //$NON-NLS-1$
 			return Response.status(Status.UNAUTHORIZED).entity(logoutResult.toString()).build();
 		} catch (Exception e) {
@@ -252,39 +253,61 @@ public class AuthenticationService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("challenge")
 	public Response initiateChallenge(String data) {
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
-		String username = jsonObject.get("username").getAsString();
-		String usage = jsonObject.get("usage").getAsString();
 
-		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-		sessionHandler.initiateChallengeFor(Usage.byValue(usage), username);
+		try {
+			JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+			String username = jsonObject.get("username").getAsString();
+			String usage = jsonObject.get("usage").getAsString();
 
-		return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+			sessionHandler.initiateChallengeFor(Usage.byValue(usage), username);
+
+			return Response.ok(new Result(), MediaType.APPLICATION_JSON).build();
+
+		} catch (PrivilegeException e) {
+			logger.error("Challenge initialization failed: " + e.getMessage());
+			JsonObject root = new JsonObject();
+			root.addProperty("msg", ExceptionHelper.getExceptionMessage(e));
+			String json = new Gson().toJson(root);
+			return Response.status(Status.UNAUTHORIZED).entity(json).build();
+		}
 	}
 
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("challenge")
 	public Response validateChallenge(@Context HttpServletRequest request, String data) {
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
-		String username = jsonObject.get("username").getAsString();
-		String challenge = jsonObject.get("challenge").getAsString();
 
-		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-		Certificate certificate = sessionHandler.validateChallenge(username, challenge);
+		try {
 
-		jsonObject = new JsonObject();
-		jsonObject.addProperty("authToken", certificate.getAuthToken());
+			JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+			String username = jsonObject.get("username").getAsString();
+			String challenge = jsonObject.get("challenge").getAsString();
 
-		boolean secureCookie = RestfulStrolchComponent.getInstance().isSecureCookie();
-		if (secureCookie && !request.getScheme().equals("https")) {
-			String msg = "Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!";
-			logger.warn(msg);
+			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+			Certificate certificate = sessionHandler.validateChallenge(username, challenge);
+
+			jsonObject = new JsonObject();
+			jsonObject.addProperty("authToken", certificate.getAuthToken());
+
+			boolean secureCookie = RestfulStrolchComponent.getInstance().isSecureCookie();
+			if (secureCookie && !request.getScheme().equals("https")) {
+				String msg = "Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!";
+				logger.warn(msg);
+			}
+			
+			NewCookie cookie = new NewCookie(StrolchRestfulConstants.STROLCH_AUTHORIZATION, certificate.getAuthToken(),
+					"/", null, "Authorization header", (int) TimeUnit.DAYS.toSeconds(1), secureCookie);
+
+			return Response.ok().entity(jsonObject.toString())//
+					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken()).cookie(cookie).build();
+
+		} catch (PrivilegeException e) {
+			logger.error("Challenge validation failed: " + e.getMessage());
+			JsonObject root = new JsonObject();
+			root.addProperty("msg", ExceptionHelper.getExceptionMessage(e));
+			String json = new Gson().toJson(root);
+			return Response.status(Status.UNAUTHORIZED).entity(json).build();
 		}
-		NewCookie cookie = new NewCookie(StrolchRestfulConstants.STROLCH_AUTHORIZATION, certificate.getAuthToken(), "/",
-				null, "Authorization header", (int) TimeUnit.DAYS.toSeconds(1), secureCookie);
-
-		return Response.ok().entity(jsonObject.toString())//
-				.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken()).cookie(cookie).build();
 	}
 }
