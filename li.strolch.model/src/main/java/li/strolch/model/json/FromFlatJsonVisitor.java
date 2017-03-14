@@ -93,7 +93,11 @@ public class FromFlatJsonVisitor {
 				}
 
 				Parameter<?> parameter = parameterBag.getParameter(paramId);
-				parameter.setValueFromString(jsonElement.getAsString());
+				try {
+					parameter.setValueFromString(jsonElement.getAsString());
+				} catch (Exception e) {
+					throw new IllegalStateException("Failed to set parameter " + parameter.getLocator(), e);
+				}
 			}
 		}
 	}
