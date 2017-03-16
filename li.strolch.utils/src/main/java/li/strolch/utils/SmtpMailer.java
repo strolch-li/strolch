@@ -97,11 +97,11 @@ public class SmtpMailer {
 		String fromName = properties.getProperty("fromName", null);
 		this.from = new InternetAddress(fromAddr, fromName);
 
-		if (properties.containsKey("overrideRecipients")) {
+		if (!properties.containsKey("overrideRecipients")) {
+			this.overrideRecipients = null;
+		} else {
 			String addr = properties.getProperty("overrideRecipients", null);
 			this.overrideRecipients = InternetAddress.parse(addr);
-		} else {
-			this.overrideRecipients = null;
 		}
 
 		if (!properties.containsKey("recipientWhitelist")) {
@@ -179,8 +179,11 @@ public class SmtpMailer {
 				}
 
 				if (!allowList.isEmpty()) {
-					send(subject, text, parseAddress(recipients));
-					logger.info(MessageFormat.format("Sent E-mail to {0}: {1}", recipients, subject));
+					InternetAddress[] arr = new InternetAddress[allowList.size()];
+					allowList.toArray(arr);
+					send(subject, text, arr);
+					logger.info(
+							MessageFormat.format("Sent E-mail to white list recipient {0}: {1}", recipients, subject));
 				}
 
 				if (needsOverrides) {
