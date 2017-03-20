@@ -92,6 +92,12 @@ public class RuntimeMock {
 		return getPrivilegeHandler().invalidateSession(cert);
 	}
 
+	public RuntimeMock mockRuntime(String targetPath, String srcPath) {
+		File targetPathF = new File(targetPath);
+		File srcPathF = new File(srcPath);
+		return mockRuntime(targetPathF, srcPathF);
+	}
+
 	public RuntimeMock mockRuntime(File targetPathF, File srcPathF) {
 
 		this.targetPathF = targetPathF;
