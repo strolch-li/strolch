@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.4.xsd">
+
+	<Resource Id="stockReport" Name="Stock Report" Type="Report">
+
+		<ParameterBag Id="parameters" Name="parameters" Type="Parameters">
+			<Parameter Id="objectType" Name="Object Type" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Slot" />
+		</ParameterBag>
+
+		<ParameterBag Id="columns" Name="Display Columns" Type="Display">
+			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="$name" />
+			<Parameter Id="storage" Name="Storage" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="$name" />
+			<Parameter Id="section" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="$name" />
+			<Parameter Id="slot" Name="Slot" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="$name" />
+			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="$name" />
+			<Parameter Id="quantity" Name="Quantity" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/quantity" />
+			<Parameter Id="maxQuantity" Name="Quantity" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/maxQuantity" />
+		</ParameterBag>
+
+		<ParameterBag Id="joins" Name="Joins" Type="Joins">
+			<Parameter Id="Product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="Slot" />
+			<Parameter Id="Section" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="Slot" />
+			<Parameter Id="Storage" Name="Storage" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="Section" />
+			<Parameter Id="Location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="Storage" />
+		</ParameterBag>
+
+	</Resource>
+
+	<Resource Id="product01" Name="Product 01" Type="Product">
+	</Resource>
+	<Resource Id="product02" Name="Product 02" Type="Product">
+	</Resource>
+
+	<Resource Id="location01" Name="Location 01" Type="Location">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="description" Name="Description" Type="String" Value="Just a location" />
+		</ParameterBag>
+	</Resource>
+	<Resource Id="location02" Name="Location 02" Type="Location">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="description" Name="Description" Type="String" Value="Just a location" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="storage01" Name="Storage 01" Type="Storage">
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="location01" />
+		</ParameterBag>
+	</Resource>
+	<Resource Id="storage02" Name="Storage 02" Type="Storage">
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="location02" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="section001" Name="Section 001" Type="Section">
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="parentStorage" Name="Storage" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="storage01" />
+		</ParameterBag>
+	</Resource>
+	<Resource Id="section002" Name="Section 002" Type="Section">
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="parentStorage" Name="Storage" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="storage02" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="slot001" Name="Slot 1" Type="Slot">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="quantity" Name="Quantity" Type="Float" Value="20.0" />
+			<Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="40.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section001" />
+			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="product01" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="slot002" Name="Slot 2" Type="Slot">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="quantity" Name="Quantity" Type="Float" Value="18.0" />
+			<Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section001" />
+			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="product02" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="slot003" Name="Slot 3" Type="Slot">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="quantity" Name="Quantity" Type="Float" Value="11.0" />
+			<Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="40.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section002" />
+			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="product01" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="slot004" Name="Slot 4" Type="Slot">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="quantity" Name="Quantity" Type="Float" Value="16.0" />
+			<Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section002" />
+			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="product02" />
+		</ParameterBag>
+	</Resource>
+
+</StrolchModel>
