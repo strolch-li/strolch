@@ -1,5 +1,7 @@
 package li.strolch.report;
 
+import static li.strolch.utils.helper.StringHelper.DASH;
+
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +20,7 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
-import static li.strolch.utils.helper.StringHelper.*;
+import li.strolch.utils.collections.MapOfSets;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
@@ -33,9 +35,11 @@ public class GenericReport {
 	private static final String COL_NAME = "$name";
 	private static final String BAG_COLUMNS = "columns";
 	private static final String TYPE_REPORT = "Report";
+
 	// input
 	private StrolchTransaction tx;
 	private String reportId;
+	private MapOfSets<String, String> filtersByType;
 
 	// intermediate
 	private Resource report;
@@ -44,6 +48,21 @@ public class GenericReport {
 	public GenericReport(StrolchTransaction tx, String reportId) {
 		this.tx = tx;
 		this.reportId = reportId;
+		this.filtersByType = new MapOfSets<>();
+	}
+
+	public GenericReport filter(String type, String... ids) {
+		for (String id : ids) {
+			this.filtersByType.addElement(type, id);
+		}
+		return this;
+	}
+
+	public GenericReport filter(String type, List<String> ids) {
+		for (String id : ids) {
+			this.filtersByType.addElement(type, id);
+		}
+		return this;
 	}
 
 	private Stream<Map<String, StrolchRootElement>> doReport() {
@@ -54,7 +73,26 @@ public class GenericReport {
 		this.columnsBag = this.report.getParameterBag(BAG_COLUMNS);
 
 		// query the main objects and return a stream
-		return queryRows().map(e -> evaluateRow(e));
+		Stream<Map<String, StrolchRootElement>> stream = queryRows().map(e -> evaluateRow(e));
+
+		if (!this.filtersByType.isEmpty())
+			stream = stream.filter(e -> filter(e));
+
+		return stream;
+	}
+
+	private boolean filter(Map<String, StrolchRootElement> row) {
+
+		for (String type : this.filtersByType.keySet()) {
+			StrolchRootElement element = row.get(type);
+			if (element == null)
+				return false;
+
+			if (!this.filtersByType.getSet(type).contains(element.getId()))
+				return false;
+		}
+
+		return true;
 	}
 
 	public Stream<JsonObject> doReportAsJson() {
@@ -134,7 +172,7 @@ public class GenericReport {
 		}
 	}
 
-	private HashMap<String, StrolchRootElement> evaluateRow(StrolchRootElement resource) {
+	private Map<String, StrolchRootElement> evaluateRow(StrolchRootElement resource) {
 
 		// interpretation -> Resource-Ref, etc.
 		// uom -> object type
@@ -154,7 +192,7 @@ public class GenericReport {
 		return refs;
 	}
 
-	private StrolchRootElement addColumnJoin(HashMap<String, StrolchRootElement> refs, ParameterBag joinBag,
+	private StrolchRootElement addColumnJoin(Map<String, StrolchRootElement> refs, ParameterBag joinBag,
 			StringParameter joinP, boolean optional) {
 
 		String elementType = joinP.getInterpretation().substring(0, joinP.getInterpretation().indexOf(SUFFIX_REF));

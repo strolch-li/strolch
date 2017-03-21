@@ -1,6 +1,7 @@
 package li.strolch.report;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -32,7 +33,7 @@ public class GenericReportTest {
 	}
 
 	@Test
-	public void test() {
+	public void shouldGenerateJsonReport() {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
 
@@ -74,6 +75,50 @@ public class GenericReportTest {
 					assertEquals("Section 002", e.get("section").getAsString());
 					assertEquals("Storage 02", e.get("storage").getAsString());
 					assertEquals("Location 02", e.get("location").getAsString());
+				} else {
+
+					fail("Unhandled result element: \n" + e.toString());
+				}
+			});
+		}
+	}
+
+	@Test
+	public void shouldFilterReport1() {
+
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+
+			GenericReport report = new GenericReport(tx, "stockReport");
+			report.filter("Product", "product01").doReportAsJson().forEach(e -> {
+
+				String slotName = e.get("slot").getAsString();
+				switch (slotName) {
+				case "Slot 1":
+				case "Slot 3":
+					break;
+				default:
+					fail("Unexpected slot name " + slotName + ", should have been filtered!");
+					break;
+				}
+			});
+		}
+	}
+
+	@Test
+	public void shouldFilterReport2() {
+
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+
+			GenericReport report = new GenericReport(tx, "stockReport");
+			report.filter("Product", "product01").filter("Location", "location02").doReportAsJson().forEach(e -> {
+
+				String slotName = e.get("slot").getAsString();
+				switch (slotName) {
+				case "Slot 3":
+					break;
+				default:
+					fail("Unexpected slot name " + slotName + ", should have been filtered!");
+					break;
 				}
 			});
 		}
