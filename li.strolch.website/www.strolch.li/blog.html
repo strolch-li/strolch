@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8"/>
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -58,6 +58,79 @@
 
             <!-- blog post -->
             <div class="blog-post">
+                <h2 class="blog-post-title">Wow, the many changes!</h2>
+
+                <p class="blog-post-meta">21. March, 2017 by <a href="#">Robert</a></p>
+
+                <p>So many changes, and so long no update - not good!</p>
+                <hr>
+                <p>Oh boy, have we forgotten to update you all on the latest awesome features in Strolch! There are over
+                    <a href="https://github.com/4treesCH/strolch/compare/1.3.0...develop">123 commits</a> since the last
+                   tag 1.3.0, so that alone merits a new blog post.</p>
+                <p>Currently the latest tag is 1.5.5, but this version is actually already quite old, as it was created
+                   on 31. January 2017 and there are 53 new commits ahead of the tag.</p>
+
+                <p>Enough of all the commits, lets get to the new features:</p>
+                <ul>
+                    <li>Added new generic report creator</li>
+                    <li>Added Activity.TimeOrdering and updated Model XSD</li>
+                    <li>Implemented State Model on Activity/Actions</li>
+                    <li>Implemented execution of Activities</li>
+                    <li>Implemented EventBasedExecutionHandler</li>
+                    <li>Added StrolchXmlParser to quickly parse from a file</li>
+                    <li>Add Activity.remove(String) to remove an element</li>
+                    <li>Refactored LockHandler to use Locator</li>
+                    <li>Added Activity.getActionsWithState(State)</li>
+                    <li>Moved *ToFlat and *FromFlat Json Visitors to strolch model</li>
+                    <li>Added StrolchElementQuery.internal()</li>
+                    <li>Added Parameter.clearValue() and list parameters use , as sep</li>
+                    <li>Json Tags are now in Tags.Json and are drinking camel-case</li>
+                    <li>Moved PrivilegeAddUserService to command, added tests</li>
+                    <li>Lots of JavaDoc updates</li>
+                    <li>Refactored code for REST Inspector to use gson</li>
+                    <li>Added inspector REST api for activities</li>
+                    <li>Inspector now has offset/limit for queries</li>
+                    <li>Added new StringMapArgument for StrolchServices</li>
+                    <li>Added missing activity observer calls in AbstractTransaction</li>
+                    <li>Added StringMapResult to use as a ServiceResult</li>
+                    <li>Removed many visitors and implemented proper visitor pattern...</li>
+                    <li>Don't log stack trace if certificate does not exist</li>
+                    <li>SmtpMailer now understands whitelists for override</li>
+                    <li>Fixed locator finding for Activity and Action</li>
+                    <li>Fixed undo logic for general commands</li>
+                </ul>
+
+                <p>To summarize, <b>execution</b> and <b>reporting</b> are the two new features that make Strolch really
+                   awesome! We use execution to perform a number of actions on a remote device connected to a Strolch
+                   agent through WebSockets. This allows serial and parallel execution of actions and of course locking
+                   of concurrently used resources.</p>
+
+                <p>In an enterprise world reports can never be missed, so we needed an API to create reports. Of course
+                   that API was created in a way that all things are done in Strolch: generically. Thus a report is
+                   created as a Resource, defining the report object, columns and any relevant joins.</p>
+
+                <p>And one of the really cool things is that we have started with a UI for Strolch. There is now an <a
+                        href="https://github.com/4treesCH/strolch-wc-inspector">Inspector</a> with which the entire data
+                   model of a running agent can be seen. This inspector is built using Polymer and WebComponents and
+                   thus can be easily embedded in your application.</p>
+                <p>To facilitate the authentication of a user for the inspector, an
+                    <a href="https://github.com/4treesCH/strolch-wc-auth">authentication component</a> was created as
+                   well. And of course i18n can't be forgotten, so there is a component for
+                    <a href="https://github.com/4treesCH/strolch-wc-localize-behavior">that</a> too.</p>
+                <p>To simplify tasks in a web project, there is also a <a href="https://github.com/4treesCH/strolchjs">StrolchJs</a>
+                   repository where certain Strolch specific things are handled e.g. querying the authenticated user's
+                   roles etc.</p>
+
+                <p>The release of the next Strolch version isn't defined yet, as we are internally building a project on
+                   all these changes and with the release 1.0.0 of that project (which will be soon), we shall perform
+                   the next release of Strolch.</p>
+
+                <p>Until then, happy coding!</p>
+            </div>
+            <!-- /.blog-post -->
+
+            <!-- blog post -->
+            <div class="blog-post">
                 <h2 class="blog-post-title">Strolch now on Maven Central</h2>
 
                 <p class="blog-post-meta">22. September, 2016 by <a href="#">Robert</a></p>
@@ -65,10 +138,10 @@
                 <p>Release Version 1.3.0 released and deployed to Maven Central</p>
                 <hr>
                 <p>We have released a new version of Strolch so that you can now go and use the the latest features in
-                    Strolch.</p>
+                   Strolch.</p>
                 <p>Further we have now deployed Strolch to Maven Central, so it is easier than ever to use Strolch in
-                    your projects. No need to download first or use a special repository - just define the dependencies
-                    as you would any other dependency.</p>
+                   your projects. No need to download first or use a special repository - just define the dependencies
+                   as you would any other dependency.</p>
 
                 <p>Some of the new features:</p>
                 <ul>
@@ -81,14 +154,14 @@
                     <li>Further additional bugfixes</li>
                 </ul>
 
-                <p>Strolch has also been moved to another <a target="_blank"
-                                                             href="https://github.com/4treesCH/strolch">organisation</a>
-                    on GitHub, so if you're compiling Strolch from source, please update your GIT remote configurations.
+                <p>Strolch has also been moved to another <a target="_blank" href="https://github.com/4treesCH/strolch">organisation</a>
+                   on GitHub, so if you're compiling Strolch from source, please update your GIT remote configurations.
                 </p>
 
                 <p>Have fun using the latest and greatest version of Strolch!</p>
             </div>
             <!-- /.blog-post -->
+
             <!-- blog post -->
             <div class="blog-post">
                 <h2 class="blog-post-title">Versioning of objects</h2>
@@ -98,20 +171,20 @@
                 <p>Opt-In versioning of objects</p>
                 <hr>
                 <p>A major new feature has landed in Strolch. Now, using opt-in, it is possible to have all changes to
-                    the object model be versioned. This means that any change to <code>Order</code>,
+                   the object model be versioned. This means that any change to <code>Order</code>,
                     <code>Resource</code> or <code>Activity</code> is automatically versioned and one can then revert to
-                    this version later on.</p>
+                   this version later on.</p>
 
                 <p>This will make it far easier to implement undo operations in applications since it is an inherent
-                    part of the lifecycle of objects in Strolch.</p>
+                   part of the lifecycle of objects in Strolch.</p>
 
                 <p>Since Strolch is supposed to be used also in small footprint hardware, this option is opt-in.</p>
 
                 <p>A side affect of this new feature is that we have for the time being not ported the XML persistence
-                    layer. If this is required, then someone drop us a note and we'll check on it.</p>
+                   layer. If this is required, then someone drop us a note and we'll check on it.</p>
 
                 <p>So now go ahead and add <code>&lt;enableVersioning&gt;true&lt;/enableVersioning&gt;</code> to your
-                    Realm so that versioning is enabled.</p>
+                   Realm so that versioning is enabled.</p>
 
             </div>
             <!-- /.blog-post -->
@@ -125,11 +198,11 @@
                 <p>Release of Strolch 1.2.0</p>
                 <hr>
                 <p>A few months ago we informed of the soon to be released version 1.1.0. Well, we decided to jump to
-                    1.2.0 because we did some refactorings. All the eitchnet projects have been melted into Strolch and
-                    thus now it's all one nice package. This will result in simpler development and less constraints on
-                    APIs between the two projects.</p>
+                   1.2.0 because we did some refactorings. All the eitchnet projects have been melted into Strolch and
+                   thus now it's all one nice package. This will result in simpler development and less constraints on
+                   APIs between the two projects.</p>
                 <p>Other than that, not much changed, but we are continually working on Strolch, so go grab your latest
-                    copy and have fun coding!</p>
+                   copy and have fun coding!</p>
 
             </div>
             <!-- /.blog-post -->
@@ -143,9 +216,9 @@
                 <p>Long due update on Strolch development.</p>
                 <hr>
                 <p>Although we have been rather quiet in the last couple of months, anyone viewing Strolch's commit log,
-                    will see that we certainly didn't halt Strolch development.</p>
+                   will see that we certainly didn't halt Strolch development.</p>
                 <p>We have been hard at work, using Strolch in projects, which required many new features and fixes. The
-                    commit log shows as of today over 180 commits since the release tag 1.0.0.</p>
+                   commit log shows as of today over 180 commits since the release tag 1.0.0.</p>
                 <p>Some of the most exciting changes are:</p>
                 <ul>
                     <li>REST API to query model, incl. privilege management.</li>
@@ -200,7 +273,7 @@
                 </ul>
 
                 <p>So, although we've been rather quiet on the blog and on social media, we have not been quiet in
-                    Strolch's development. We are planning to release version 1.1.0 soon, so stay tuned!</p>
+                   Strolch's development. We are planning to release version 1.1.0 soon, so stay tuned!</p>
 
             </div>
             <!-- /.blog-post -->
@@ -213,29 +286,29 @@
                 <p>The ground work of the Strolch planning engine has been laid.</p>
                 <hr>
                 <p>One of the core ideas in building Strolch was to create a planning engine. The planning engine would
-                    work in combination of <code>Order</code> objects representing customer orders,
-                    <code>Resource</code> objects representing machines, human resources, etc., and
-                    <code>Activity</code>/<code>Action</code> hierarchies defining a workflow.</p>
+                   work in combination of <code>Order</code> objects representing customer orders, <code>Resource</code>
+                   objects representing machines, human resources, etc., and <code>Activity</code>/<code>Action</code>
+                   hierarchies defining a workflow.</p>
 
                 <p>With the latest couple of commits to Strolch we have now added Activities and a basic planning of
-                    Actions onto Resources. Activities have an ordered list of <code>IActivityElement</code> which
-                    allows creating an arbitrary deep tree structure of Activity and Action elements.</p>
+                   Actions onto Resources. Activities have an ordered list of <code>IActivityElement</code> which allows
+                   creating an arbitrary deep tree structure of Activity and Action elements.</p>
 
                 <p>Action objects have a list of <code>IValueChange</code> objects which define the start, end and
-                    further value changes over time on a referenced Resource. Thus planning an Activity is done by
-                    iterating the Activity hierarchy and for every Action selecting a relevant Resource and then then
-                    applying the changes of the Action on to the referenced <code>TimeState</code> on the Resource.</p>
+                   further value changes over time on a referenced Resource. Thus planning an Activity is done by
+                   iterating the Activity hierarchy and for every Action selecting a relevant Resource and then then
+                   applying the changes of the Action on to the referenced <code>TimeState</code> on the Resource.</p>
 
                 <p>This implementation is currently very simple as it ignores all constraints which a Resource might
-                    have. In further development we shall implement a <code>Violation</code> model so that UIs can be
-                    built to visualize the over-use of Resources.</p>
+                   have. In further development we shall implement a <code>Violation</code> model so that UIs can be
+                   built to visualize the over-use of Resources.</p>
 
                 <p>In even further steps we would then start implementing algorithms to not just apply the changes onto
-                    a Resource, but to actually search the Resource for time slots when the value changes would not
-                    violate any constraints applied to the resource.</p>
+                   a Resource, but to actually search the Resource for time slots when the value changes would not
+                   violate any constraints applied to the resource.</p>
 
                 <p>We are very much looking forward to these new features. Stay tuned for your updates - even though
-                    they do take their time to arrive =).</p>
+                   they do take their time to arrive =).</p>
 
             </div>
             <!-- /.blog-post -->
@@ -247,17 +320,17 @@
                 <p class="blog-post-meta">April 6, 2015 by <a href="#">Robert</a></p>
 
                 <p>Any good software has some decent documentation explaining concepts, best practices and gives
-                    examples.</p>
+                   examples.</p>
                 <hr>
                 <p>So this post is to announce that there is now a new page on Strolch's website with a bit of
-                    documentation. This first documentation explains the Strolch runtime and some of the do and don't in
-                    Strolch code.</p>
+                   documentation. This first documentation explains the Strolch runtime and some of the do and don't in
+                   Strolch code.</p>
 
                 <p>Bear with us, writing documentation takes time and can be outdated quickly, so we will make an effort
-                    to keep everything up to date and add more documentation, but this is a start.</p>
+                   to keep everything up to date and add more documentation, but this is a start.</p>
 
                 <p>So go ahead and read the <a href="documentation.html">documentation</a> , and if you haven't already,
-                    also read the rest of the website which should give some more insight into the <a href="index.html">what</a>,
+                   also read the rest of the website which should give some more insight into the <a href="index.html">what</a>,
                     <a href="index.html">why</a> and <a href="api.html">how</a> of Strolch.</p>
 
             </div>
@@ -270,11 +343,11 @@
                 <p class="blog-post-meta">March 31, 2015 by <a href="#">Robert</a></p>
 
                 <p>Finally Version 1.0.0 of Strolch has been released and can be <a href="downloads.html">downloaded</a>
-                    immediately.</p>
+                   immediately.</p>
                 <hr>
                 <p>Before 1.0.0 could be released, some major changes were decided, all driven by the first big project
-                    using Strolch as its underlying stack. Those changes were minor, and really major, but should make
-                    Strolch better and was important for the first release.</p>
+                   using Strolch as its underlying stack. Those changes were minor, and really major, but should make
+                   Strolch better and was important for the first release.</p>
 
                 <p>Here is a list of the most interesting changes:</p>
                 <ul>
@@ -295,9 +368,9 @@
                         queries, instead of staying in-memory.
                     </li>
                     <li><code>ParameterSelection.stringListSelection()</code> uses a <code>StringMatchMode</code>
-                        instead of just <code>equals()</code></li>
+                                                                              instead of just <code>equals()</code></li>
                     <li><code>ParameterSelection.dateRangeSelection()</code> uses a <code>DateRange</code> instead of
-                        just <code>equals()</code></li>
+                                                                             just <code>equals()</code></li>
                     <li>Added the <code>MigrationsHandler</code> to use to perform code migrations of production data
                         bases where data shouldn't go lost.
                     </li>
@@ -305,10 +378,10 @@
                 </ul>
 
                 <p>Strolch 1.1.0 is already in development and can also be downloaded from the download page. Here you
-                    can see the current change list on <a
-                            href="https://github.com/4treesCH/strolch/compare/1.0.0...develop">GitHub</a>. For instance
-                    heavy work has been done to implement privilege management by adding a REST API. Looking forward to
-                    a wonderful next Strolch release.</p>
+                   can see the current change list on
+                    <a href="https://github.com/4treesCH/strolch/compare/1.0.0...develop">GitHub</a>. For instance heavy
+                   work has been done to implement privilege management by adding a REST API. Looking forward to a
+                   wonderful next Strolch release.</p>
 
             </div>
             <!-- /.blog-post -->
@@ -320,14 +393,14 @@
                 <p class="blog-post-meta">October 9, 2014 by <a href="#">Robert</a></p>
 
                 <p>New <code>DurationParameter</code> and additional minor changes: Release of 1.0.0-RC4 which can be
-                    downloaded on the <a href="downloads.html">download</a> page.</p>
+                   downloaded on the <a href="downloads.html">download</a> page.</p>
                 <hr>
                 <p>While implementing a use case in a Strolch based application it was detected that an essential
-                    parameter type was missing, the <code>DurationParameter</code>. This parameter currently stores the
-                    value as a long in memory and serializes to <a
-                            href="http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO8601</a>. As soon as we move
-                    Strolch to Java8, we will change this to use the <code>Period</code> class in the new Java8 date and
-                    time API.</p>
+                   parameter type was missing, the <code>DurationParameter</code>. This parameter currently stores the
+                   value as a long in memory and serializes to
+                    <a href="http://en.wikipedia.org/wiki/ISO_8601#Durations">ISO8601</a>. As soon as we move Strolch to
+                   Java8, we will change this to use the <code>Period</code> class in the new Java8 date and time API.
+                </p>
 
                 <p>In addition to the new parameter, a couple of other changes were made:</p>
                 <ul>
@@ -353,30 +426,30 @@
                 <p class="blog-post-meta">August 24, 2014 by <a href="#">Robert</a></p>
 
                 <p>Important feature <i>Database Initialization</i> added: Release of 1.0.0-RC3 which can be downloaded
-                    on the <a href="downloads.html">download</a> page.</p>
+                   on the <a href="downloads.html">download</a> page.</p>
                 <hr>
                 <p>When living <i>continuous integration</i> and <i>continuous delivery</i>, it is vital that things
-                    like database migrations and initialization are performed in a controlled, but automatic way.</p>
+                   like database migrations and initialization are performed in a controlled, but automatic way.</p>
 
                 <p>A Strolch-based application is using the PostgreSQL persistence layer. The implementation understands
-                    the concepts of migration, and validating the database schema, but currently a mechanism to
-                    automatically initialize the database with a minimal set of data was missing.</p>
+                   the concepts of migration, and validating the database schema, but currently a mechanism to
+                   automatically initialize the database with a minimal set of data was missing.</p>
 
                 <p>Migrating a database for Strolch is mostly a one time thing. The object model in Strolch is quite
-                    static, so there is seldom a need to migrate the database. Domain specific changes, i.e. new
-                    Resources, or adding Parameters to Resources, is not a schema change. Thus, instead of going the way
-                    other frameworks go, e.g. Ruby on Rails, we built the data initialization right into the <code>PersistenceHandler</code>.
+                   static, so there is seldom a need to migrate the database. Domain specific changes, i.e. new
+                   Resources, or adding Parameters to Resources, is not a schema change. Thus, instead of going the way
+                   other frameworks go, e.g. Ruby on Rails, we built the data initialization right into the <code>PersistenceHandler</code>.
                 </p>
 
                 <p>Now if the PostgreSQL <code>PersistenceHandler</code> creates the schema, then it might also
-                    initialize the minimal set of data. For this to work, the <code>PersistenceHandler</code> checks if
-                    the flags <code>allowSchemaCreation</code>, <code>allowSchemaDrop</code> and <code>allowDbInitOnSchemaCreate</code>.
-                    If those flags are enabled, and the schema was created during initialization, then the database is
-                    also initialized with the contents of the XML file configured under key <code>dataStoreFile</code>
-                    of the relevant <code>Realm</code>.</p>
+                   initialize the minimal set of data. For this to work, the <code>PersistenceHandler</code> checks if
+                   the flags <code>allowSchemaCreation</code>, <code>allowSchemaDrop</code> and <code>allowDbInitOnSchemaCreate</code>.
+                   If those flags are enabled, and the schema was created during initialization, then the database is
+                   also initialized with the contents of the XML file configured under key <code>dataStoreFile</code> of
+                   the relevant <code>Realm</code>.</p>
 
                 <p>The database initialization is done as a system user action which must have the name <code>db_initializer</code>.
-                    This is another fail-safe, so that on a production system, this user can simply be deleted.</p>
+                   This is another fail-safe, so that on a production system, this user can simply be deleted.</p>
 
                 <p>So, Strolch 1.0.0-RC3 is out the door, go ahead and <a href="downloads.html">try it out</a>.</p>
 
@@ -389,11 +462,11 @@
 
                 <p class="blog-post-meta">August 22, 2014 by <a href="#">Robert</a></p>
 
-                <p>Scratch that RC1, here is the brand new 1.0.0-RC2 which can be downloaded on the <a
-                        href="downloads.html">download</a> page.</p>
+                <p>Scratch that RC1, here is the brand new 1.0.0-RC2 which can be downloaded on the
+                    <a href="downloads.html">download</a> page.</p>
                 <hr>
                 <p>So, as expected there were a few bugs, for instance the Strolch tutorial apps didn't start, so now i
-                    fixed those and released an RC2. Go <a href="downloads.html">get it</a> and give it a try!</p>
+                   fixed those and released an RC2. Go <a href="downloads.html">get it</a> and give it a try!</p>
 
             </div>
             <!-- /.blog-post -->
@@ -405,99 +478,99 @@
                 <p class="blog-post-meta">August 20, 2014 by <a href="#">Robert</a></p>
 
                 <p>With the Go-Live of a Strolch-based application around the corner, it is time to release Version
-                    1.0.0 of Strolch. To this affect we have now released version 1.0.0-RC1 which can be downloaded on
-                    the <a href="downloads.html">download</a> page.</p>
+                   1.0.0 of Strolch. To this affect we have now released version 1.0.0-RC1 which can be downloaded on
+                   the <a href="downloads.html">download</a> page.</p>
                 <hr>
                 <h3>Story</h3>
 
                 <p>Strolch as a component based software agent has been two years in the making. The concepts in Strolch
-                    have been taken from a proprietary planning, scheduling and controlling software agent, which was,
-                    and is been, used in industrial automation, logistics and production. Strolch was created to bring
-                    the concepts, which were working well for small teams to go-live with large projects in short to
-                    medium time-frames to the open source world.</p>
+                   have been taken from a proprietary planning, scheduling and controlling software agent, which was,
+                   and is been, used in industrial automation, logistics and production. Strolch was created to bring
+                   the concepts, which were working well for small teams to go-live with large projects in short to
+                   medium time-frames to the open source world.</p>
 
                 <p>Strolch was completely rewritten using the key concepts of a parameterized object model and a
-                    component based agent but remembering which clutches the original implementation had, thus trying to
-                    eradicate those without bringing in new ones. It might not be perfect in version 1.0.0, but it is a
-                    starting point form which to carry on from.</p>
+                   component based agent but remembering which clutches the original implementation had, thus trying to
+                   eradicate those without bringing in new ones. It might not be perfect in version 1.0.0, but it is a
+                   starting point form which to carry on from.</p>
 
                 <h3>Features</h3>
 
                 <p>Strolch isn't feature complete by a long shot, but it sure has got many features which make it
-                    useable in a concrete project, thus making sure it is not vaporware =)</p>
+                   useable in a concrete project, thus making sure it is not vaporware =)</p>
 
                 <p>The following is a list of key features, many of which were driven by concrete project
-                    requirements:</p>
+                   requirements:</p>
                 <ul>
                     <li>Separate containers for models (mandates)</li>
-                    <li>Parameterized model with full <a
-                            href="http://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUD</a> for Resource
-                        and Order objects
+                    <li>Parameterized model with full
+                        <a href="http://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUD</a> for Resource and
+                        Order objects
                     </li>
                     <li>Timed values on Resources to map values by time</li>
                     <li>Built-in versioning of model - configurable by Realm</li>
                     <li>Transparent runtime modes: TRANSIENT, CACHED, TRANSACTIONAL<sup>*</sup></li>
                     <li>Service and Command pattern for reusing functionality</li>
                     <li><a href="https://github.com/4treesCH/ch.eitchnet.xmlpers">XML File based persistence
-                        layer</a><sup>*</sup></li>
+                                                                                  layer</a><sup>*</sup></li>
                     <li><a href="http://www.postgresql.org/">PostgreSQL</a> persistence layer<sup>*</sup></li>
                     <li>Querying using a <a href="http://en.wikipedia.org/wiki/Fluent_API">fluent API</a></li>
                     <li>Services to import and export a model to XML</li>
-                    <li>Integrated authentication and authorization to validate user privileges using <a
-                            href="https://github.com/4treesCH/ch.eitchnet.privilege">Privilege</a></li>
+                    <li>Integrated authentication and authorization to validate user privileges using
+                        <a href="https://github.com/4treesCH/ch.eitchnet.privilege">Privilege</a></li>
                     <li>Ready to use <a href="http://en.wikipedia.org/wiki/Observer_pattern">Observer</a> pattern</li>
                     <li>(currently) Read-only <a href="http://en.wikipedia.org/wiki/Restful">REST</a> API to access the
                         agent model remotely
                     </li>
                     <li>Configurable environments</li>
                     <li>Opt-in audit trail (including read access, and the audits themselves)</li>
-                    <li>Basic components required to <a
-                            href="https://github.com/4treesCH/ch.eitchnet.utils/tree/master/src/main/java/ch/eitchnet/communication">communicate</a>
+                    <li>Basic components required to
+                        <a href="https://github.com/4treesCH/ch.eitchnet.utils/tree/master/src/main/java/ch/eitchnet/communication">communicate</a>
                         with external devices using TCP/IP
                     </li>
                 </ul>
                 <p>With the light weight implementation, where there are basically no third party libraries required for
-                    the normal runtime, Strolch has a minimal foot print which allows it to run on small devices for
-                    instance a <a href="http://beagleboard.org/Products/BeagleBone+Black">BeagleBone Black</a>. Using
-                    the in-memory mode, it is an easy feat to set up test environments with little to no further
-                    requirements than the JVM.</p>
+                   the normal runtime, Strolch has a minimal foot print which allows it to run on small devices for
+                   instance a <a href="http://beagleboard.org/Products/BeagleBone+Black">BeagleBone Black</a>. Using the
+                   in-memory mode, it is an easy feat to set up test environments with little to no further requirements
+                   than the JVM.</p>
 
                 <h3>Future</h3>
 
                 <p>So what is planned for the future? Although Strolch has quite a few interesting features, it is by no
-                    way feature complete. The greatest wish is for Strolch to become a community driven platform, so
-                    many new features will arise in the future, but at least one major future feature which will be
-                    tackled in the near future and will certainly drive the next major release is a planning and
-                    scheduling engine using a <a href="http://en.wikipedia.org/wiki/Gantt_chart">Gantt</a> chart to
-                    visualize the schedule.</p>
+                   way feature complete. The greatest wish is for Strolch to become a community driven platform, so many
+                   new features will arise in the future, but at least one major future feature which will be tackled in
+                   the near future and will certainly drive the next major release is a planning and scheduling engine
+                   using a <a href="http://en.wikipedia.org/wiki/Gantt_chart">Gantt</a> chart to visualize the schedule.
+                </p>
 
                 <p>The planning engine will use the timed values on Resources extensively to create a planning engine on
-                    which Workflows can be placed and allowing to detect violations and bottlenecks.</p>
+                   which Workflows can be placed and allowing to detect violations and bottlenecks.</p>
 
                 <p>An extension of the planning of the scheduling engine will allow more than just placing Workflows on
-                    Resources, but actually searching groups of Resources for a time slot of when to place tasks. This
-                    will allow to use capacity constraints to plan and schedule workflows using different algorithms,
-                    and respecting calendars etc.</p>
+                   Resources, but actually searching groups of Resources for a time slot of when to place tasks. This
+                   will allow to use capacity constraints to plan and schedule workflows using different algorithms, and
+                   respecting calendars etc.</p>
 
-                <p>Further time will be spent on giving Strolch it's own UI. Currently the idea is to use <a
-                        href="http://www.polymer-project.org/">Google's Polymer</a> to implement the UI, thus creating
-                    reusable widgets that can be used in projects.</p>
+                <p>Further time will be spent on giving Strolch it's own UI. Currently the idea is to use
+                    <a href="http://www.polymer-project.org/">Google's Polymer</a> to implement the UI, thus creating
+                   reusable widgets that can be used in projects.</p>
 
                 <h3>Take it for a spin</h3>
 
                 <p>So, now the important part is for new users to start using Strolch for their own projects. Go ahead,
-                    check out the <a href="downloads.html">Downloads</a> page for the latest release and then checkout
-                    the two tutorial applications to get yourself up to speed!</p>
+                   check out the <a href="downloads.html">Downloads</a> page for the latest release and then checkout
+                   the two tutorial applications to get yourself up to speed!</p>
 
                 <p>Don't hesitate to send us feedback or questions, we will be delighted to help you get your
-                    Strolch-based application up and running, or provide feedback to your concerns!</p>
+                   Strolch-based application up and running, or provide feedback to your concerns!</p>
 
                 <h3>Developers</h3>
 
-                <p>Robert von Burg<br/> Reto Breitenmoser<br/> Dr. Martin Smock<br/></p>
+                <p>Robert von Burg<br /> Reto Breitenmoser<br /> Dr. Martin Smock<br /></p>
 
                 <p><sup>*</sup> Currently Transactional mode is missing concrete implementation for querying for the XML
-                    persistence</p>
+                                persistence</p>
 
             </div>
             <!-- /.blog-post -->
@@ -512,19 +585,19 @@
         <!-- /.blog-main -->
 
         <!-- sidebar -->
-        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+        <div-- class="col-sm-3 col-sm-offset-1 blog-sidebar">
             <div class="sidebar-module sidebar-module-inset">
                 <h4>About</h4>
 
                 <p>Strolch is an open source component based software agent written in Java and can be compared, in a
-                    light sense, with the Java EE stack: Strolch takes care of persistence, implements Services for use
-                    cases, Commands as re-usable algorithms and has a parameterized data model.</p>
+                   light sense, with the Java EE stack: Strolch takes care of persistence, implements Services for use
+                   cases, Commands as re-usable algorithms and has a parameterized data model.</p>
             </div>
-            <div class="sidebar-module">
+            <!--div class="sidebar-module">
                 <h4>Archives</h4>
                 <ol class="list-unstyled">
                     <li><a href="#">August 2014</a></li>
-                    <!--
+                    < ! - -
                     <li><a href="#">February 2014</a></li>
                     <li><a href="#">January 2014</a></li>
                     <li><a href="#">December 2013</a></li>
@@ -536,9 +609,9 @@
                     <li><a href="#">June 2013</a></li>
                     <li><a href="#">May 2013</a></li>
                     <li><a href="#">April 2013</a></li>
-                    -->
+                    - - >
                 </ol>
-            </div>
+            </div-->
             <div class="sidebar-module">
                 <h4>Elsewhere</h4>
                 <ol class="list-unstyled">
@@ -586,7 +659,7 @@
         s.parentNode.insertBefore(g, s);
     })();
 </script>
-<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt=""/></p></noscript>
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
 <!-- End Piwik Code -->
 
 </body>
