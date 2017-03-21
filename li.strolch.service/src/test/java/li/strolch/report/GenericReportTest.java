@@ -3,15 +3,25 @@ package li.strolch.report;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.gson.JsonObject;
+
+import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.testbase.runtime.RuntimeMock;
+import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
 
 public class GenericReportTest {
@@ -128,34 +138,123 @@ public class GenericReportTest {
 	}
 
 	@Test
+	public void shouldFilterReportByDateRange1() {
+
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+
+			Date from = new Date(LocalDate.of(2016, 1, 1).toEpochDay() * 86400000);
+			Date to = new Date(LocalDate.of(2017, 1, 1).toEpochDay() * 86400000);
+			DateRange dateRange = new DateRange().from(from, true).to(to, false);
+
+			// expect no slots as all not in date range
+			GenericReport report = new GenericReport(tx, "stockReport");
+			List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
+					.collect(Collectors.toList());
+			assertTrue(result.isEmpty());
+
+			// expect 2 slots, as in date range
+			to = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
+			dateRange = new DateRange().from(from, true).to(to, false);
+			report = new GenericReport(tx, "stockReport");
+			result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
+					.collect(Collectors.toList());
+			assertEquals(2, result.size());
+		}
+	}
+
+	@Test
+	public void shouldFilterReportByDateRange2() {
+
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+
+			Date from = new Date(LocalDate.of(2016, 1, 1).toEpochDay() * 86400000);
+			Date to = new Date(LocalDate.of(2017, 1, 1).toEpochDay() * 86400000);
+			DateRange dateRange = new DateRange().from(from, true).to(to, false);
+
+			// expect no orders as all not in date range
+			GenericReport report = new GenericReport(tx, "fromStockReport");
+			List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
+					.collect(Collectors.toList());
+			assertTrue(result.isEmpty());
+
+			// expect 2 orders, as in date range
+			to = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
+			dateRange = new DateRange().from(from, true).to(to, false);
+			report = new GenericReport(tx, "fromStockReport");
+			result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
+					.collect(Collectors.toList());
+			assertEquals(2, result.size());
+
+			// expect 4 orders, as all in date range
+			to = new Date(LocalDate.of(2017, 3, 2).toEpochDay() * 86400000);
+			dateRange = new DateRange().from(from, true).to(to, false);
+			report = new GenericReport(tx, "fromStockReport");
+			result = report.filter("Product", "product01", "product02").dateRange(dateRange).doReportAsJson()
+					.collect(Collectors.toList());
+			assertEquals(4, result.size());
+		}
+	}
+
+	@Test
 	public void shouldCreateFilterCriteria() {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
 
 			GenericReport report = new GenericReport(tx, "stockReport");
-			MapOfSets<String, String> filterCriteria = report.generateFilterCriteria();
+			MapOfSets<String, StrolchRootElement> filterCriteria = report.generateFilterCriteria();
 
-			assertThat(filterCriteria.getSet("Product"), containsInAnyOrder("product01", "product02"));
-			assertThat(filterCriteria.getSet("Location"), containsInAnyOrder("location01", "location02"));
-			assertThat(filterCriteria.getSet("Storage"), containsInAnyOrder("storage01", "storage02"));
-			assertThat(filterCriteria.getSet("Section"), containsInAnyOrder("section001", "section002"));
-			assertThat(filterCriteria.getSet("Slot"), containsInAnyOrder("slot001", "slot002", "slot003", "slot004"));
+			assertThat(filterCriteria.getSet("Product").stream().map(e -> e.getId()).collect(Collectors.toSet()),
+					containsInAnyOrder("product01", "product02"));
+			assertThat(filterCriteria.getSet("Location").stream().map(e -> e.getId()).collect(Collectors.toSet()),
+					containsInAnyOrder("location01", "location02"));
+			assertThat(filterCriteria.getSet("Storage").stream().map(e -> e.getId()).collect(Collectors.toSet()),
+					containsInAnyOrder("storage01", "storage02"));
+			assertThat(filterCriteria.getSet("Section").stream().map(e -> e.getId()).collect(Collectors.toSet()),
+					containsInAnyOrder("section001", "section002"));
+			assertThat(filterCriteria.getSet("Slot").stream().map(e -> e.getId()).collect(Collectors.toSet()),
+					containsInAnyOrder("slot001", "slot002", "slot003", "slot004"));
 		}
 	}
 
 	@Test
-	public void shouldCreateFilterCriteriaFiltered() {
+	public void shouldCreateFilterCriteriaFiltered1() {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
 
 			GenericReport report = new GenericReport(tx, "stockReport");
-			MapOfSets<String, String> filterCriteria = report.filter("Product", "product01").generateFilterCriteria();
+			MapOfSets<String, StrolchRootElement> filterCriteria = report //
+					.filter("Product", "product01") //
+					.generateFilterCriteria();
 
-			assertThat(filterCriteria.getSet("Product"), containsInAnyOrder("product01"));
-			assertThat(filterCriteria.getSet("Location"), containsInAnyOrder("location01", "location02"));
-			assertThat(filterCriteria.getSet("Storage"), containsInAnyOrder("storage01", "storage02"));
-			assertThat(filterCriteria.getSet("Section"), containsInAnyOrder("section001", "section002"));
-			assertThat(filterCriteria.getSet("Slot"), containsInAnyOrder("slot001", "slot003"));
+			assertThat(filterCriteria.getSet("Product").stream().map(e -> e.getId()).collect(Collectors.toSet()),
+					containsInAnyOrder("product01"));
+			assertThat(filterCriteria.getSet("Location").stream().map(e -> e.getId()).collect(Collectors.toSet()),
+					containsInAnyOrder("location01", "location02"));
+			assertThat(filterCriteria.getSet("Storage").stream().map(e -> e.getId()).collect(Collectors.toSet()),
+					containsInAnyOrder("storage01", "storage02"));
+			assertThat(filterCriteria.getSet("Section").stream().map(e -> e.getId()).collect(Collectors.toSet()),
+					containsInAnyOrder("section001", "section002"));
+			assertThat(filterCriteria.getSet("Slot").stream().map(e -> e.getId()).collect(Collectors.toSet()),
+					containsInAnyOrder("slot001", "slot003"));
+		}
+	}
+
+	@Test
+	public void shouldCreateFilterCriteriaFiltered2() {
+
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+
+			Date from = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
+			Date to = new Date(LocalDate.of(2017, 3, 5).toEpochDay() * 86400000);
+			DateRange dateRange = new DateRange().from(from, true).to(to, false);
+
+			GenericReport report = new GenericReport(tx, "stockReport");
+			MapOfSets<String, StrolchRootElement> filterCriteria = report //
+					.dateRange(dateRange) //
+					.filter("Product", "product01") //
+					.generateFilterCriteria();
+
+			assertTrue(filterCriteria.isEmpty());
 		}
 	}
 }

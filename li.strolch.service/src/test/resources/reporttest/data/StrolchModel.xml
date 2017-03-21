@@ -5,6 +5,7 @@
 
 		<ParameterBag Id="parameters" Name="parameters" Type="Parameters">
 			<Parameter Id="objectType" Name="Object Type" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Slot" />
+			<Parameter Id="dateRangeSel" Name="Date Range Selector" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="Bags/parameters/expirationDate" />
 		</ParameterBag>
 
 		<ParameterBag Id="columns" Name="Display Columns" Type="Display">
@@ -26,10 +27,76 @@
 
 	</Resource>
 
+	<Resource Id="fromStockReport" Name="FromStock Report" Type="Report">
+
+		<ParameterBag Id="parameters" Name="parameters" Type="Parameters">
+			<Parameter Id="objectType" Name="Object Type" Type="String" Interpretation="Order-Ref" Uom="FromStock" Value="FromStock" />
+			<Parameter Id="dateRangeSel" Name="Date Range Selector" Type="String" Interpretation="Order-Ref" Uom="FromStock" Value="$date" />
+		</ParameterBag>
+
+		<ParameterBag Id="columns" Name="Display Columns" Type="Display">
+			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="$name" />
+			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="$name" />
+			<Parameter Id="quantity" Name="Quantity" Type="String" Interpretation="Order-Ref" Uom="FromStock" Value="Bags/parameters/quantity" />
+			<Parameter Id="date" Name="Date" Type="String" Interpretation="Order-Ref" Uom="FromStock" Value="$date" />
+			<Parameter Id="state" Name="State" Type="String" Interpretation="Order-Ref" Uom="FromStock" Value="$state" />
+			<Parameter Id="id" Name="Id" Type="String" Interpretation="Order-Ref" Uom="FromStock" Value="$id" />
+		</ParameterBag>
+
+		<ParameterBag Id="joins" Name="Joins" Type="Joins">
+			<Parameter Id="Product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="FromStock" />
+			<Parameter Id="Location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="FromStock" />
+		</ParameterBag>
+
+	</Resource>
+
 	<Resource Id="product01" Name="Product 01" Type="Product">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="expirationDate" Name="Expiration Date" Type="Date" Value="2017-02-01T10:00:00.000+01:00" />
+		</ParameterBag>
 	</Resource>
 	<Resource Id="product02" Name="Product 02" Type="Product">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="expirationDate" Name="Expiration Date" Type="Date" Value="2017-03-01T10:00:00.000+01:00" />
+		</ParameterBag>
 	</Resource>
+
+	<Order Id="fromStock01" Name="From Stock" Type="FromStock" Date="2017-02-01T10:00:00.000+01:00" State="EXECUTED">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="quantity" Name="quantity" Type="Float" Value="4.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="location01" />
+			<Parameter Id="product" Name="Product" Type="String" Value="product01" Interpretation="Resource-Ref" Uom="Product" />
+		</ParameterBag>
+	</Order>
+	<Order Id="fromStock02" Name="From Stock" Type="FromStock" Date="2017-02-01T10:00:00.000+01:00" State="EXECUTED">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="quantity" Name="quantity" Type="Float" Value="6.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="location01" />
+			<Parameter Id="product" Name="Product" Type="String" Value="product01" Interpretation="Resource-Ref" Uom="Product" />
+		</ParameterBag>
+	</Order>
+	<Order Id="fromStock03" Name="From Stock" Type="FromStock" Date="2017-03-01T10:00:00.000+01:00" State="CREATED">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="quantity" Name="quantity" Type="Float" Value="8.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="location02" />
+			<Parameter Id="product" Name="Product" Type="String" Value="product02" Interpretation="Resource-Ref" Uom="Product" />
+		</ParameterBag>
+	</Order>
+	<Order Id="fromStock04" Name="From Stock" Type="FromStock" Date="2017-03-01T10:00:00.000+01:00" State="CREATED">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="quantity" Name="quantity" Type="Float" Value="12.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="location02" />
+			<Parameter Id="product" Name="Product" Type="String" Value="product02" Interpretation="Resource-Ref" Uom="Product" />
+		</ParameterBag>
+	</Order>
 
 	<Resource Id="location01" Name="Location 01" Type="Location">
 		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">

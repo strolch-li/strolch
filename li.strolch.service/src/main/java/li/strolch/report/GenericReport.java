@@ -3,6 +3,7 @@ package li.strolch.report;
 import static li.strolch.utils.helper.StringHelper.DASH;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,42 +18,65 @@ import li.strolch.model.Locator;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.StrolchValueType;
+import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.visitor.ElementDateVisitor;
+import li.strolch.model.visitor.ElementStateVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
+import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class GenericReport {
 
-	private static final String BAG_RELATIONS = "relations";
-	private static final String SUFFIX_REF = "-Ref";
-	private static final String BAG_JOINS = "joins";
-	private static final String PARAM_OBJECT_TYPE = "objectType";
-	private static final String BAG_PARAMETERS = "parameters";
-	private static final String COL_NAME = "$name";
-	private static final String BAG_COLUMNS = "columns";
 	private static final String TYPE_REPORT = "Report";
+
+	private static final String BAG_RELATIONS = "relations";
+	private static final String BAG_JOINS = "joins";
+	private static final String BAG_PARAMETERS = "parameters";
+	private static final String BAG_COLUMNS = "columns";
+
+	private static final String PARAM_OBJECT_TYPE = "objectType";
+	private static final String PARAM_DATE_RANGE_SEL = "dateRangeSel";
+
+	private static final String COL_ID = "$id";
+	private static final String COL_NAME = "$name";
+	private static final String COL_TYPE = "$type";
+	private static final String COL_STATE = "$state";
+	private static final String COL_DATE = "$date";
+
+	private static final String SUFFIX_REF = "-Ref";
 
 	// input
 	private StrolchTransaction tx;
 	private String reportId;
-	private MapOfSets<String, String> filtersByType;
 
-	// intermediate
 	private Resource report;
 	private ParameterBag columnsBag;
+	private StringParameter dateRangeSelP;
+
+	private DateRange dateRange;
+	private MapOfSets<String, String> filtersByType;
 
 	public GenericReport(StrolchTransaction tx, String reportId) {
 		this.tx = tx;
 		this.reportId = reportId;
-		this.filtersByType = new MapOfSets<>();
+	}
+
+	public GenericReport dateRange(DateRange dateRange) {
+		this.dateRange = dateRange;
+		return this;
 	}
 
 	public GenericReport filter(String type, String... ids) {
+		if (this.filtersByType == null)
+			this.filtersByType = new MapOfSets<>();
 		for (String id : ids) {
 			this.filtersByType.addElement(type, id);
 		}
@@ -60,6 +84,8 @@ public class GenericReport {
 	}
 
 	public GenericReport filter(String type, List<String> ids) {
+		if (this.filtersByType == null)
+			this.filtersByType = new MapOfSets<>();
 		for (String id : ids) {
 			this.filtersByType.addElement(type, id);
 		}
@@ -70,40 +96,69 @@ public class GenericReport {
 
 		// get the report
 		this.report = this.tx.getResourceBy(TYPE_REPORT, this.reportId);
-
 		this.columnsBag = this.report.getParameterBag(BAG_COLUMNS);
+		this.dateRangeSelP = this.report.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
 
 		// query the main objects and return a stream
-		Stream<Map<String, StrolchRootElement>> stream = queryRows().map(e -> evaluateRow(e));
-
-		if (!this.filtersByType.isEmpty())
-			stream = stream.filter(e -> filter(e));
-
-		return stream;
+		return queryRows().map(e -> evaluateRow(e)).filter(e -> filter(e));
 	}
 
-	public MapOfSets<String, String> generateFilterCriteria() {
+	public MapOfSets<String, StrolchRootElement> generateFilterCriteria() {
 		return buildStream() //
 				.flatMap(e -> e.values().stream()) //
 				.collect( //
 						Collector.of( //
-								() -> new MapOfSets<String, String>(), //
-								(m, e) -> m.addElement(e.getType(), e.getId()), //
+								() -> new MapOfSets<String, StrolchRootElement>(), //
+								(m, e) -> m.addElement(e.getType(), e), //
 								(m1, m2) -> m1, //
 								m -> m));
 	}
 
 	private boolean filter(Map<String, StrolchRootElement> row) {
 
-		for (String type : this.filtersByType.keySet()) {
+		// first we do a date range selection, if required
+		if (this.dateRange != null) {
+			if (this.dateRangeSelP == null)
+				throw new IllegalStateException(
+						"DateRange defined, but report does not defined a date range selector!");
+
+			String type = this.dateRangeSelP.getUom();
 			StrolchRootElement element = row.get(type);
 			if (element == null)
 				return false;
 
-			if (!this.filtersByType.getSet(type).contains(element.getId()))
+			String dateRangeSel = this.dateRangeSelP.getValue();
+
+			Date date;
+			if (dateRangeSel.equals(COL_DATE)) {
+				date = element.accept(new ElementDateVisitor());
+			} else {
+				Parameter<?> param = findParameter(this.dateRangeSelP, element);
+				if (StrolchValueType.parse(param.getType()) != StrolchValueType.DATE)
+					throw new IllegalStateException(
+							"Date Range selector is invalid, as referenced parameter is not a Date but a "
+									+ param.getType());
+
+				date = ((DateParameter) param).getValue();
+			}
+
+			if (!this.dateRange.contains(date))
 				return false;
 		}
 
+		// then we do a filter by criteria
+		if (this.filtersByType != null && !this.filtersByType.isEmpty()) {
+			for (String type : this.filtersByType.keySet()) {
+				StrolchRootElement element = row.get(type);
+				if (element == null)
+					return false;
+
+				if (!this.filtersByType.getSet(type).contains(element.getId()))
+					return false;
+			}
+		}
+
+		// otherwise we want to keep this row
 		return true;
 	}
 
@@ -144,23 +199,42 @@ public class GenericReport {
 			String columnValue;
 			if (column == null) {
 				columnValue = DASH;
+			} else if (columnDef.equals(COL_ID)) {
+				columnValue = column.getId();
 			} else if (columnDef.equals(COL_NAME)) {
 				columnValue = column.getName();
+			} else if (columnDef.equals(COL_TYPE)) {
+				columnValue = column.getType();
+			} else if (columnDef.equals(COL_STATE)) {
+				columnValue = column.accept(new ElementStateVisitor()).name();
+			} else if (columnDef.equals(COL_DATE)) {
+				columnValue = ISO8601FormatFactory.getInstance().formatDate(column.accept(new ElementDateVisitor()));
 			} else {
-				String[] locatorParts = columnDef.split(Locator.PATH_SEPARATOR);
-				if (locatorParts.length != 3)
-					throw new IllegalStateException(
-							"Column definition is invalid as column must either be $name, or a three part parameter locator ");
-
-				String bagKey = locatorParts[1];
-				String paramKey = locatorParts[2];
-
-				Parameter<?> param = column.getParameter(bagKey, paramKey);
+				Parameter<?> param = findParameter(columnDefP, column);
 				columnValue = param.getValueAsString();
 			}
 
 			return new SimpleImmutableEntry<>(columnId, columnValue);
 		});
+	}
+
+	private Parameter<?> findParameter(StringParameter paramRefP, StrolchRootElement column) {
+		String paramRef = paramRefP.getValue();
+
+		String[] locatorParts = paramRef.split(Locator.PATH_SEPARATOR);
+		if (locatorParts.length != 3)
+			throw new IllegalStateException("Parameter reference (" + paramRef
+					+ ") is invalid as it does not have 3 parts for " + paramRefP.getLocator());
+
+		String bagKey = locatorParts[1];
+		String paramKey = locatorParts[2];
+
+		Parameter<?> param = column.getParameter(bagKey, paramKey);
+		if (param == null)
+			throw new IllegalStateException("Parameter reference (" + paramRef + ") for " + paramRefP.getLocator()
+					+ " not found on " + column.getLocator());
+
+		return param;
 	}
 
 	private Stream<StrolchRootElement> queryRows() {
@@ -222,6 +296,10 @@ public class GenericReport {
 		}
 
 		ParameterBag relationsBag = dependency.getParameterBag(BAG_RELATIONS);
+		if (relationsBag == null)
+			throw new IllegalStateException("Invalid join definition value: " + joinP.getValue() + " on: "
+					+ joinP.getLocator() + " as " + dependency.getLocator() + " has no ParameterBag " + BAG_RELATIONS);
+
 		List<Parameter<?>> relationParams = relationsBag.getParameters().stream()
 				.filter(p -> p.getUom().equals(joinType)).collect(Collectors.toList());
 		if (relationParams.isEmpty()) {
