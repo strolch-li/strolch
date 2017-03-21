@@ -6,6 +6,7 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -65,7 +66,7 @@ public class GenericReport {
 		return this;
 	}
 
-	private Stream<Map<String, StrolchRootElement>> doReport() {
+	public Stream<Map<String, StrolchRootElement>> buildStream() {
 
 		// get the report
 		this.report = this.tx.getResourceBy(TYPE_REPORT, this.reportId);
@@ -79,6 +80,17 @@ public class GenericReport {
 			stream = stream.filter(e -> filter(e));
 
 		return stream;
+	}
+
+	public MapOfSets<String, String> generateFilterCriteria() {
+		return buildStream() //
+				.flatMap(e -> e.values().stream()) //
+				.collect( //
+						Collector.of( //
+								() -> new MapOfSets<String, String>(), //
+								(m, e) -> m.addElement(e.getType(), e.getId()), //
+								(m1, m2) -> m1, //
+								m -> m));
 	}
 
 	private boolean filter(Map<String, StrolchRootElement> row) {
@@ -98,7 +110,7 @@ public class GenericReport {
 	public Stream<JsonObject> doReportAsJson() {
 
 		// generate the stream and map to JsonObject
-		return doReport().map(row -> {
+		return buildStream().map(row -> {
 
 			// new json object
 			JsonObject jsonObject = new JsonObject();

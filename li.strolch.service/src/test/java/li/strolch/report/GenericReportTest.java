@@ -1,6 +1,8 @@
 package li.strolch.report;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.junit.AfterClass;
@@ -10,6 +12,7 @@ import org.junit.Test;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.testbase.runtime.RuntimeMock;
+import li.strolch.utils.collections.MapOfSets;
 
 public class GenericReportTest {
 
@@ -121,6 +124,38 @@ public class GenericReportTest {
 					break;
 				}
 			});
+		}
+	}
+
+	@Test
+	public void shouldCreateFilterCriteria() {
+
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+
+			GenericReport report = new GenericReport(tx, "stockReport");
+			MapOfSets<String, String> filterCriteria = report.generateFilterCriteria();
+
+			assertThat(filterCriteria.getSet("Product"), containsInAnyOrder("product01", "product02"));
+			assertThat(filterCriteria.getSet("Location"), containsInAnyOrder("location01", "location02"));
+			assertThat(filterCriteria.getSet("Storage"), containsInAnyOrder("storage01", "storage02"));
+			assertThat(filterCriteria.getSet("Section"), containsInAnyOrder("section001", "section002"));
+			assertThat(filterCriteria.getSet("Slot"), containsInAnyOrder("slot001", "slot002", "slot003", "slot004"));
+		}
+	}
+
+	@Test
+	public void shouldCreateFilterCriteriaFiltered() {
+
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+
+			GenericReport report = new GenericReport(tx, "stockReport");
+			MapOfSets<String, String> filterCriteria = report.filter("Product", "product01").generateFilterCriteria();
+
+			assertThat(filterCriteria.getSet("Product"), containsInAnyOrder("product01"));
+			assertThat(filterCriteria.getSet("Location"), containsInAnyOrder("location01", "location02"));
+			assertThat(filterCriteria.getSet("Storage"), containsInAnyOrder("storage01", "storage02"));
+			assertThat(filterCriteria.getSet("Section"), containsInAnyOrder("section001", "section002"));
+			assertThat(filterCriteria.getSet("Slot"), containsInAnyOrder("slot001", "slot003"));
 		}
 	}
 }
