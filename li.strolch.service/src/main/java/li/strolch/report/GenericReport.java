@@ -50,6 +50,9 @@ public class GenericReport {
 	private static final String COL_TYPE = "$type";
 	private static final String COL_STATE = "$state";
 	private static final String COL_DATE = "$date";
+	private static final String COL_SEARCH = "$search";
+
+	private static final String SEARCH_SEPARATOR = ":";
 
 	private static final String SUFFIX_REF = "-Ref";
 
@@ -133,7 +136,7 @@ public class GenericReport {
 			if (dateRangeSel.equals(COL_DATE)) {
 				date = element.accept(new ElementDateVisitor());
 			} else {
-				Parameter<?> param = findParameter(this.dateRangeSelP, element);
+				Parameter<?> param = lookupParameter(this.dateRangeSelP, element);
 				if (StrolchValueType.parse(param.getType()) != StrolchValueType.DATE)
 					throw new IllegalStateException(
 							"Date Range selector is invalid, as referenced parameter is not a Date but a "
@@ -209,16 +212,62 @@ public class GenericReport {
 				columnValue = column.accept(new ElementStateVisitor()).name();
 			} else if (columnDef.equals(COL_DATE)) {
 				columnValue = ISO8601FormatFactory.getInstance().formatDate(column.accept(new ElementDateVisitor()));
+			} else if (columnDef.startsWith(COL_SEARCH)) {
+				Parameter<?> parameter = findParameter(columnDefP, column);
+				if (parameter == null)
+					columnValue = DASH;
+				else
+					columnValue = parameter.getValueAsString();
 			} else {
-				Parameter<?> param = findParameter(columnDefP, column);
-				columnValue = param.getValueAsString();
+				columnValue = lookupParameter(columnDefP, column).getValueAsString();
 			}
 
 			return new SimpleImmutableEntry<>(columnId, columnValue);
 		});
 	}
 
-	private Parameter<?> findParameter(StringParameter paramRefP, StrolchRootElement column) {
+	private Parameter<?> findParameter(StringParameter columnDefP, StrolchRootElement column) {
+
+		String columnDef = columnDefP.getValue();
+
+		String[] searchParts = columnDef.split(SEARCH_SEPARATOR);
+		if (searchParts.length != 3)
+			throw new IllegalStateException("Parameter search reference (" + columnDef
+					+ ") is invalid as it does not have 3 parts for " + columnDefP.getLocator());
+
+		String parentParamId = searchParts[1];
+		String paramRef = searchParts[2];
+
+		String[] locatorParts = paramRef.split(Locator.PATH_SEPARATOR);
+		if (locatorParts.length != 3)
+			throw new IllegalStateException("Parameter search reference (" + paramRef
+					+ ") is invalid as it does not have 3 parts for " + columnDefP.getLocator());
+
+		String bagKey = locatorParts[1];
+		String paramKey = locatorParts[2];
+
+		return findParameter(column, parentParamId, bagKey, paramKey);
+	}
+
+	private Parameter<?> findParameter(StrolchRootElement element, String parentParamId, String bagKey,
+			String paramKey) {
+
+		Parameter<?> parameter = element.getParameter(bagKey, paramKey);
+		if (parameter != null)
+			return parameter;
+
+		StringParameter parentRefP = element.getParameter(BAG_RELATIONS, parentParamId);
+		if (parentRefP == null)
+			return null;
+
+		Resource parent = this.tx.getResourceBy(parentRefP);
+		if (parent == null)
+			return null;
+
+		return findParameter(parent, parentParamId, bagKey, paramKey);
+	}
+
+	private Parameter<?> lookupParameter(StringParameter paramRefP, StrolchRootElement column) {
 		String paramRef = paramRefP.getValue();
 
 		String[] locatorParts = paramRef.split(Locator.PATH_SEPARATOR);

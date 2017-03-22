@@ -58,6 +58,7 @@ public class GenericReportTest {
 					assertEquals("Product 01", e.get("product").getAsString());
 					assertEquals("20.0", e.get("quantity").getAsString());
 					assertEquals("40.0", e.get("maxQuantity").getAsString());
+					assertEquals("4.0", e.get("minQuantity").getAsString());
 					assertEquals("Section 001", e.get("section").getAsString());
 					assertEquals("Storage 01", e.get("storage").getAsString());
 					assertEquals("Location 01", e.get("location").getAsString());
@@ -67,6 +68,7 @@ public class GenericReportTest {
 					assertEquals("Product 02", e.get("product").getAsString());
 					assertEquals("18.0", e.get("quantity").getAsString());
 					assertEquals("20.0", e.get("maxQuantity").getAsString());
+					assertEquals("4.0", e.get("minQuantity").getAsString());
 					assertEquals("Section 001", e.get("section").getAsString());
 					assertEquals("Storage 01", e.get("storage").getAsString());
 					assertEquals("Location 01", e.get("location").getAsString());
@@ -76,6 +78,7 @@ public class GenericReportTest {
 					assertEquals("Product 01", e.get("product").getAsString());
 					assertEquals("11.0", e.get("quantity").getAsString());
 					assertEquals("40.0", e.get("maxQuantity").getAsString());
+					assertEquals("6.0", e.get("minQuantity").getAsString());
 					assertEquals("Section 002", e.get("section").getAsString());
 					assertEquals("Storage 02", e.get("storage").getAsString());
 					assertEquals("Location 02", e.get("location").getAsString());
@@ -85,6 +88,7 @@ public class GenericReportTest {
 					assertEquals("Product 02", e.get("product").getAsString());
 					assertEquals("16.0", e.get("quantity").getAsString());
 					assertEquals("20.0", e.get("maxQuantity").getAsString());
+					assertEquals("6.0", e.get("minQuantity").getAsString());
 					assertEquals("Section 002", e.get("section").getAsString());
 					assertEquals("Storage 02", e.get("storage").getAsString());
 					assertEquals("Location 02", e.get("location").getAsString());

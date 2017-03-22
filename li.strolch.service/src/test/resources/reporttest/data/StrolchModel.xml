@@ -15,7 +15,8 @@
 			<Parameter Id="slot" Name="Slot" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="$name" />
 			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="$name" />
 			<Parameter Id="quantity" Name="Quantity" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/quantity" />
-			<Parameter Id="maxQuantity" Name="Quantity" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/maxQuantity" />
+			<Parameter Id="maxQuantity" Name="Max Quantity" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/maxQuantity" />
+			<Parameter Id="minQuantity" Name="Min Quantity" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="$search:parent:Bags/parameters/minQuantity" />
 		</ParameterBag>
 
 		<ParameterBag Id="joins" Name="Joins" Type="Joins">
@@ -109,13 +110,26 @@
 		</ParameterBag>
 	</Resource>
 
+	<Resource Id="storage00" Name="Storage 00" Type="Storage">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="minQuantity" Name="Min Quantity" Type="Float" Value="4.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="location00" />
+		</ParameterBag>
+	</Resource>
 	<Resource Id="storage01" Name="Storage 01" Type="Storage">
 		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="parent" Name="Parent" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="storage00" />
 			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="location01" />
 		</ParameterBag>
 	</Resource>
 	<Resource Id="storage02" Name="Storage 02" Type="Storage">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="minQuantity" Name="Min Quantity" Type="Float" Value="6.0" />
+		</ParameterBag>
 		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="parent" Name="Parent" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="storage00" />
 			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="location02" />
 		</ParameterBag>
 	</Resource>
