@@ -313,7 +313,6 @@ public class GenericReport {
 
 		StringParameter relationP = (StringParameter) relationParams.get(0);
 		if (relationP.getValue().isEmpty() && optional) {
-			refs.put(joinType, null);
 			return null;
 		}
 
