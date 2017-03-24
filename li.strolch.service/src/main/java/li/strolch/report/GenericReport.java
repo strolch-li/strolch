@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -87,6 +88,15 @@ public class GenericReport {
 	}
 
 	public GenericReport filter(String type, List<String> ids) {
+		if (this.filtersByType == null)
+			this.filtersByType = new MapOfSets<>();
+		for (String id : ids) {
+			this.filtersByType.addElement(type, id);
+		}
+		return this;
+	}
+
+	public GenericReport filter(String type, Set<String> ids) {
 		if (this.filtersByType == null)
 			this.filtersByType = new MapOfSets<>();
 		for (String id : ids) {
