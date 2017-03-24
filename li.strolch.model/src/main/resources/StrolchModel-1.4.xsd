@@ -124,6 +124,10 @@
 		<xs:attribute type="xs:string" name="Id" use="required" />
 		<xs:attribute type="xs:string" name="Name" use="required" />
 		<xs:attribute type="TimedStateTypeType" name="Type" use="required" />
+		<xs:attribute type="xs:string" name="Interpretation" use="optional" />
+		<xs:attribute type="xs:string" name="Uom" use="optional" />
+		<xs:attribute type="xs:boolean" name="Hidden" use="optional" />
+		<xs:attribute type="xs:int" name="Index" use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="ValueType">
