@@ -180,12 +180,14 @@ public class XmlModelSaxReader extends DefaultHandler {
 		case Tags.PARAMETER:
 
 			String paramId = attributes.getValue(Tags.ID);
-			String paramName = attributes.getValue(Tags.NAME);
-			String paramType = attributes.getValue(Tags.TYPE);
-			String paramValue = attributes.getValue(Tags.VALUE);
-			String paramHiddenS = attributes.getValue(Tags.HIDDEN);
-			String paramIndexS = attributes.getValue(Tags.INDEX);
 			try {
+
+				String paramName = attributes.getValue(Tags.NAME);
+				String paramType = attributes.getValue(Tags.TYPE);
+				String paramValue = attributes.getValue(Tags.VALUE);
+				String paramHiddenS = attributes.getValue(Tags.HIDDEN);
+				String paramIndexS = attributes.getValue(Tags.INDEX);
+
 				int index = StringHelper.isEmpty(paramIndexS) ? 0 : Integer.valueOf(paramIndexS);
 				boolean paramHidden = StringHelper.isEmpty(paramHiddenS) ? false
 						: StringHelper.parseBoolean(paramHiddenS);
@@ -216,13 +218,30 @@ public class XmlModelSaxReader extends DefaultHandler {
 		case Tags.TIMED_STATE:
 
 			String stateId = attributes.getValue(Tags.ID);
-			String stateName = attributes.getValue(Tags.NAME);
-			String stateType = attributes.getValue(Tags.TYPE);
+			try {
+				String stateName = attributes.getValue(Tags.NAME);
+				String stateType = attributes.getValue(Tags.TYPE);
+				String stateHiddenS = attributes.getValue(Tags.HIDDEN);
+				String stateIndexS = attributes.getValue(Tags.INDEX);
+				String stateUom = attributes.getValue(Tags.UOM);
+				String stateInterpretation = attributes.getValue(Tags.INTERPRETATION);
+				int stateIndex = StringHelper.isEmpty(stateIndexS) ? 0 : Integer.valueOf(stateIndexS);
+				boolean stateHidden = StringHelper.isEmpty(stateHiddenS) ? false
+						: StringHelper.parseBoolean(stateHiddenS);
 
-			this.stateType = StrolchValueType.parse(stateType);
-			this.state = this.stateType.timedStateInstance();
-			this.state.setId(stateId);
-			this.state.setName(stateName);
+				this.stateType = StrolchValueType.parse(stateType);
+				this.state = this.stateType.timedStateInstance();
+				this.state.setId(stateId);
+				this.state.setName(stateName);
+				this.state.setIndex(stateIndex);
+				this.state.setHidden(stateHidden);
+				this.state.setInterpretation(stateInterpretation);
+				this.state.setUom(stateUom);
+
+			} catch (Exception e) {
+				throw new StrolchException("Failed to instantiate TimedState " + stateId + " for resource "
+						+ this.parameterizedElement.getLocator() + " due to " + e.getMessage(), e);
+			}
 
 			break;
 
