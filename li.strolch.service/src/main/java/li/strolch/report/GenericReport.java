@@ -2,7 +2,6 @@ package li.strolch.report;
 
 import static li.strolch.utils.helper.StringHelper.DASH;
 
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import com.google.gson.JsonObject;
 
@@ -63,6 +61,7 @@ public class GenericReport {
 
 	private Resource report;
 	private ParameterBag columnsBag;
+	private Set<String> columnIds;
 	private StringParameter dateRangeSelP;
 
 	private DateRange dateRange;
@@ -76,6 +75,10 @@ public class GenericReport {
 	public GenericReport dateRange(DateRange dateRange) {
 		this.dateRange = dateRange;
 		return this;
+	}
+
+	public Set<String> getColumnKeys() {
+		return this.columnIds;
 	}
 
 	public GenericReport filter(String type, String... ids) {
@@ -110,10 +113,19 @@ public class GenericReport {
 		// get the report
 		this.report = this.tx.getResourceBy(TYPE_REPORT, this.reportId);
 		this.columnsBag = this.report.getParameterBag(BAG_COLUMNS);
+		this.columnIds = this.columnsBag.getParameterKeySet();
 		this.dateRangeSelP = this.report.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
 
 		// query the main objects and return a stream
 		return queryRows().map(e -> evaluateRow(e)).filter(e -> filter(e));
+	}
+
+	public Stream<ReportElement> doReport() {
+
+		return buildStream().map(e -> new ReportElement(getColumnKeys(), columnId -> {
+			StringParameter columnDefP = (StringParameter) this.columnsBag.getParameter(columnId);
+			return evaluateColumnValue(columnDefP, e);
+		}));
 	}
 
 	public MapOfSets<String, StrolchRootElement> generateFilterCriteria() {
@@ -123,7 +135,7 @@ public class GenericReport {
 						Collector.of( //
 								() -> new MapOfSets<String, StrolchRootElement>(), //
 								(m, e) -> m.addElement(e.getType(), e), //
-								(m1, m2) -> m1, //
+								(m1, m2) -> m1.addAll(m2), //
 								m -> m));
 	}
 
@@ -177,63 +189,46 @@ public class GenericReport {
 
 	public Stream<JsonObject> doReportAsJson() {
 
-		// generate the stream and map to JsonObject
-		return buildStream().map(row -> {
-
-			// new json object
-			JsonObject jsonObject = new JsonObject();
-
-			// add columns
-			evaluateColumns(row).forEach(e -> jsonObject.addProperty(e.getKey(), e.getValue()));
-
-			return jsonObject;
+		return doReport().map(e -> {
+			JsonObject o = new JsonObject();
+			e.stream().forEach(elem -> o.addProperty(elem.getKey(), elem.getValue()));
+			return o;
 		});
 	}
 
-	private Stream<SimpleImmutableEntry<String, String>> evaluateColumns(Map<String, StrolchRootElement> row) {
+	private String evaluateColumnValue(StringParameter columnDefP, Map<String, StrolchRootElement> row) {
 
-		// get iterator to columns
-		Iterable<Parameter<?>> iterable = () -> this.columnsBag.getParameters().iterator();
+		String columnDef = columnDefP.getValue();
+		String refType = columnDefP.getUom();
 
-		// generate a stream
-		return StreamSupport.stream(iterable.spliterator(), false).map(p -> {
+		// get the referenced object
+		StrolchRootElement column = row.get(refType);
 
-			// create the column id/value pair
+		String columnValue;
 
-			StringParameter columnDefP = (StringParameter) p;
-
-			String columnId = columnDefP.getId();
-			String refType = columnDefP.getUom();
-			String columnDef = columnDefP.getValue();
-
-			// get the referenced object
-			StrolchRootElement column = row.get(refType);
-
-			String columnValue;
-			if (column == null) {
+		if (column == null)
+			columnValue = DASH;
+		else if (columnDef.equals(COL_ID)) {
+			columnValue = column.getId();
+		} else if (columnDef.equals(COL_NAME)) {
+			columnValue = column.getName();
+		} else if (columnDef.equals(COL_TYPE)) {
+			columnValue = column.getType();
+		} else if (columnDef.equals(COL_STATE)) {
+			columnValue = column.accept(new ElementStateVisitor()).name();
+		} else if (columnDef.equals(COL_DATE)) {
+			columnValue = ISO8601FormatFactory.getInstance().formatDate(column.accept(new ElementDateVisitor()));
+		} else if (columnDef.startsWith(COL_SEARCH)) {
+			Parameter<?> parameter = findParameter(columnDefP, column);
+			if (parameter == null)
 				columnValue = DASH;
-			} else if (columnDef.equals(COL_ID)) {
-				columnValue = column.getId();
-			} else if (columnDef.equals(COL_NAME)) {
-				columnValue = column.getName();
-			} else if (columnDef.equals(COL_TYPE)) {
-				columnValue = column.getType();
-			} else if (columnDef.equals(COL_STATE)) {
-				columnValue = column.accept(new ElementStateVisitor()).name();
-			} else if (columnDef.equals(COL_DATE)) {
-				columnValue = ISO8601FormatFactory.getInstance().formatDate(column.accept(new ElementDateVisitor()));
-			} else if (columnDef.startsWith(COL_SEARCH)) {
-				Parameter<?> parameter = findParameter(columnDefP, column);
-				if (parameter == null)
-					columnValue = DASH;
-				else
-					columnValue = parameter.getValueAsString();
-			} else {
-				columnValue = lookupParameter(columnDefP, column).getValueAsString();
-			}
+			else
+				columnValue = parameter.getValueAsString();
+		} else {
+			columnValue = lookupParameter(columnDefP, column).getValueAsString();
+		}
 
-			return new SimpleImmutableEntry<>(columnId, columnValue);
-		});
+		return columnValue;
 	}
 
 	private Parameter<?> findParameter(StringParameter columnDefP, StrolchRootElement column) {
