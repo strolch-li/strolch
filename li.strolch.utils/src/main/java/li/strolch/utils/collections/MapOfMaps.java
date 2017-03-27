@@ -169,4 +169,11 @@ public class MapOfMaps<T, U, V> {
 	public boolean isEmpty() {
 		return this.mapOfMaps.isEmpty();
 	}
+
+	public MapOfMaps<T, U, V> putAll(MapOfMaps<T, U, V> other) {
+		for (T key : other.keySet()) {
+			addMap(key, other.getMap(key));
+		}
+		return this;
+	}
 }

@@ -121,4 +121,11 @@ public class MapOfLists<T, U> {
 	public boolean isEmpty() {
 		return this.mapOfLists.isEmpty();
 	}
+
+	public MapOfLists<T, U> addAll(MapOfLists<T, U> other) {
+		for (T key : other.keySet()) {
+			addList(key, other.getList(key));
+		}
+		return this;
+	}
 }

@@ -120,4 +120,11 @@ public class MapOfSets<T, U> {
 	public boolean isEmpty() {
 		return this.mapOfSets.isEmpty();
 	}
+
+	public MapOfSets<T, U> addAll(MapOfSets<T, U> other) {
+		for (T key : other.keySet()) {
+			addSet(key, other.getSet(key));
+		}
+		return this;
+	}
 }
