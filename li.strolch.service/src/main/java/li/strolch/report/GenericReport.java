@@ -77,8 +77,11 @@ public class GenericReport {
 		return this;
 	}
 
-	public Set<String> getColumnKeys() {
-		return this.columnIds;
+	public List<String> getOrderedColumnKeys() {
+		return this.columnsBag.getParameters().stream() //
+				.sorted((p1, p2) -> Integer.compare(p1.getIndex(), p2.getIndex())) //
+				.map(p -> p.getId()) //
+				.collect(Collectors.toList());
 	}
 
 	public GenericReport filter(String type, String... ids) {
@@ -122,7 +125,7 @@ public class GenericReport {
 
 	public Stream<ReportElement> doReport() {
 
-		return buildStream().map(e -> new ReportElement(getColumnKeys(), columnId -> {
+		return buildStream().map(e -> new ReportElement(this.columnIds, columnId -> {
 			StringParameter columnDefP = (StringParameter) this.columnsBag.getParameter(columnId);
 			return evaluateColumnValue(columnDefP, e);
 		}));
@@ -191,7 +194,7 @@ public class GenericReport {
 
 		return doReport().map(e -> {
 			JsonObject o = new JsonObject();
-			e.stream().forEach(elem -> o.addProperty(elem.getKey(), elem.getValue()));
+			e.keyValueStream().forEach(elem -> o.addProperty(elem.getKey(), elem.getValue()));
 			return o;
 		});
 	}

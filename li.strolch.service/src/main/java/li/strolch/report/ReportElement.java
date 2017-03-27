@@ -24,7 +24,11 @@ public class ReportElement {
 		return this.columnGetter.apply(key);
 	}
 
-	public Stream<SimpleEntry<String, String>> stream() {
+	public Stream<SimpleEntry<String, String>> keyValueStream() {
 		return this.columnKeys.stream().map(k -> new SimpleEntry<>(k, this.columnGetter.apply(k)));
+	}
+
+	public Stream<String> valueStream() {
+		return this.columnKeys.stream().map(k -> this.columnGetter.apply(k));
 	}
 }
