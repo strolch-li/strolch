@@ -70,6 +70,12 @@ public class GenericReport {
 	public GenericReport(StrolchTransaction tx, String reportId) {
 		this.tx = tx;
 		this.reportId = reportId;
+
+		// get the report
+		this.report = this.tx.getResourceBy(TYPE_REPORT, this.reportId, true);
+		this.columnsBag = this.report.getParameterBag(BAG_COLUMNS, true);
+		this.columnIds = this.columnsBag.getParameterKeySet();
+		this.dateRangeSelP = this.report.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
 	}
 
 	public GenericReport dateRange(DateRange dateRange) {
@@ -113,12 +119,6 @@ public class GenericReport {
 
 	public Stream<Map<String, StrolchRootElement>> buildStream() {
 
-		// get the report
-		this.report = this.tx.getResourceBy(TYPE_REPORT, this.reportId);
-		this.columnsBag = this.report.getParameterBag(BAG_COLUMNS);
-		this.columnIds = this.columnsBag.getParameterKeySet();
-		this.dateRangeSelP = this.report.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
-
 		// query the main objects and return a stream
 		return queryRows().map(e -> evaluateRow(e)).filter(e -> filter(e));
 	}
@@ -126,7 +126,7 @@ public class GenericReport {
 	public Stream<ReportElement> doReport() {
 
 		return buildStream().map(e -> new ReportElement(this.columnIds, columnId -> {
-			StringParameter columnDefP = (StringParameter) this.columnsBag.getParameter(columnId);
+			StringParameter columnDefP = (StringParameter) this.columnsBag.getParameter(columnId, true);
 			return evaluateColumnValue(columnDefP, e);
 		}));
 	}
