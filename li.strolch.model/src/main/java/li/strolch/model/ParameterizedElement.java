@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.utils.helper.StringHelper;
@@ -89,12 +90,39 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 
 	 * @return the {@link Parameter} with the given id, or null if it does not exist
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> T getParameter(String key) {
+		return getParameter(key, false);
+	}
+
+	/**
+	 * Returns the {@link Parameter} with the given id, or null if it does not exist
+	 * 
+	 * @param key
+	 *            the id of the parameter to return
+	 * @param assertExists
+	 *            if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
+	 * 
+	 * @return the {@link Parameter} with the given id, or null if it does not exist
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T getParameter(String key, boolean assertExists) {
 		if (this.parameterMap == null) {
+
+			if (assertExists) {
+				String msg = "The Parameter {0} does not exist";
+				throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(key)));
+			}
+
 			return null;
 		}
-		return (T) this.parameterMap.get(key);
+
+		Parameter<?> parameter = this.parameterMap.get(key);
+		if (assertExists && parameter == null) {
+			String msg = "The Parameter {0} does not exist";
+			throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(key)));
+		}
+
+		return (T) parameter;
 	}
 
 	/**

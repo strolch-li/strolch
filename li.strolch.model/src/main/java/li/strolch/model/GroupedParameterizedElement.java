@@ -105,9 +105,11 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * 
 	 * @return the found {@link Parameter} or null if it was not found
 	 * 
-	 * @throws StrolchModelException if the element does not exist and <code>assertExists</code> is true
+	 * @throws StrolchModelException
+	 *             if the element does not exist and <code>assertExists</code> is true
 	 */
-	public <T extends Parameter<?>> T getParameter(String bagKey, String paramKey, boolean assertExists) throws StrolchModelException {
+	public <T extends Parameter<?>> T getParameter(String bagKey, String paramKey, boolean assertExists)
+			throws StrolchModelException {
 		if (this.parameterBagMap == null) {
 			if (assertExists) {
 				String msg = "The Parameter {0} does not exist";
@@ -192,10 +194,35 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
 	 */
 	public ParameterBag getParameterBag(String key) {
+		return getParameterBag(key, false);
+	}
+
+	/**
+	 * Returns the {@link ParameterBag} with the given key, or null if it does not exist
+	 * 
+	 * @param key
+	 *            the key of the {@link ParameterBag} to return
+	 * @param assertExists
+	 *            if set to true, and the parameter bag does not exist, a {@link StrolchModelException} is thrown
+	 * 
+	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
+	 */
+	public ParameterBag getParameterBag(String key, boolean assertExists) {
 		if (this.parameterBagMap == null) {
+			if (assertExists) {
+				String msg = "The ParameterBag {0} does not exist";
+				throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(Tags.BAG, key)));
+			}
 			return null;
 		}
-		return this.parameterBagMap.get(key);
+
+		ParameterBag parameterBag = this.parameterBagMap.get(key);
+		if (assertExists && parameterBag == null) {
+			String msg = "The ParameterBag {0} does not exist";
+			throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(Tags.BAG, key)));
+		}
+
+		return parameterBag;
 	}
 
 	/**
