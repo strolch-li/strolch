@@ -49,6 +49,8 @@ public class AddOrUpdateResourceService extends AbstractService<AddOrUpdateResou
 				addCmd.setResource(arg.resource);
 				tx.addCommand(addCmd);
 			}
+			
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
