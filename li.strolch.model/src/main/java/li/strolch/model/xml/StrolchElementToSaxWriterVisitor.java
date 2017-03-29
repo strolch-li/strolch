@@ -247,6 +247,15 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 
 			writeStartStrolchElement(Tags.TIMED_STATE, values.isEmpty(), timedState);
 
+			if (!INTERPRETATION_NONE.equals(timedState.getInterpretation()))
+				this.writer.writeAttribute(Tags.INTERPRETATION, timedState.getInterpretation());
+			if (!UOM_NONE.equals(timedState.getUom()))
+				this.writer.writeAttribute(Tags.UOM, timedState.getUom());
+			if (timedState.isHidden())
+				this.writer.writeAttribute(Tags.HIDDEN, Boolean.toString(timedState.isHidden()));
+			if (timedState.getIndex() != 0)
+				this.writer.writeAttribute(Tags.INDEX, Integer.toString(timedState.getIndex()));
+
 			for (ITimeValue<IValue<?>> timeValue : values) {
 				this.writer.writeEmptyElement(Tags.VALUE);
 				this.writer.writeAttribute(Tags.TIME,
