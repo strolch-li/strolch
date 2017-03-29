@@ -34,7 +34,7 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class Order extends GroupedParameterizedElement implements StrolchRootElement, Comparable<Order> {
+public class Order extends AbstractStrolchRootElement implements StrolchRootElement, Comparable<Order> {
 
 	private static final long serialVersionUID = 0L;
 

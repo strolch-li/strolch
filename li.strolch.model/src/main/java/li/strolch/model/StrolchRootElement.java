@@ -69,4 +69,26 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * @return the result of the visitation
 	 */
 	public <T> T accept(StrolchRootElementVisitor<T> visitor);
+
+	/**
+	 * Formats this {@link StrolchRootElement} as an XML string
+	 * 
+	 * @return the formatted XML string
+	 */
+	public String toXmlString();
+
+	/**
+	 * Formats this element as a JSON string
+	 * 
+	 * @return the formatted JSON string
+	 */
+	public String toJsonString();
+
+	/**
+	 * Formats this element as a flat JSON string, i.e. all parameter bags are removed and parameters are on the root
+	 * element of the JSON object
+	 * 
+	 * @return the formatted JSON string
+	 */
+	public String toFlatJsonString();
 }

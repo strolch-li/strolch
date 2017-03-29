@@ -35,7 +35,7 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class Resource extends GroupedParameterizedElement implements StrolchRootElement, Comparable<Resource> {
+public class Resource extends AbstractStrolchRootElement implements StrolchRootElement, Comparable<Resource> {
 
 	private static final long serialVersionUID = 0L;
 

@@ -28,9 +28,25 @@ import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
-public class StrolchElementToJsonVisitor {
+public class StrolchElementToJsonVisitor implements StrolchRootElementVisitor<JsonObject> {
+
+	@Override
+	public JsonObject visitResource(Resource resource) {
+		return toJson(resource);
+	}
+
+	@Override
+	public JsonObject visitOrder(Order order) {
+		return toJson(order);
+	}
+
+	@Override
+	public JsonObject visitActivity(Activity activity) {
+		return toJson(activity);
+	}
 
 	public JsonObject toJson(Resource element) {
 

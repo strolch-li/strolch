@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
-import li.strolch.model.GroupedParameterizedElement;
+import li.strolch.model.AbstractStrolchRootElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.State;
@@ -46,7 +46,7 @@ import li.strolch.utils.dbc.DBC;
  * 
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public class Activity extends GroupedParameterizedElement
+public class Activity extends AbstractStrolchRootElement
 		implements IActivityElement, StrolchRootElement, Comparable<Activity> {
 
 	private static final long serialVersionUID = 1L;
