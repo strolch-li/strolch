@@ -23,9 +23,11 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.SystemAction;
 import li.strolch.privilege.handler.SystemActionWithResult;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
@@ -311,6 +313,48 @@ public class StrolchComponent {
 	 */
 	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runAsAgentWithResult(runnable);
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} for the default realm and certificate
+	 * 
+	 * @param cert
+	 *            the certificate authorizing the transaction
+	 * 
+	 * @return the newly created transaction
+	 */
+	protected StrolchTransaction openTx(Certificate cert) {
+		return getContainer().getRealm(cert).openTx(cert, this.getClass());
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} for the given realm and certificate
+	 * 
+	 * @param realm
+	 *            the name of the realm in which to open the transaction
+	 * @param cert
+	 *            the certificate authorizing the transaction
+	 * 
+	 * @return the newly created transaction
+	 */
+	protected StrolchTransaction openTx(String realm, Certificate cert) {
+		return getContainer().getRealm(realm).openTx(cert, this.getClass());
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} for the given realm and certificate
+	 * 
+	 * @param realm
+	 *            the name of the realm in which to open the transaction
+	 * @param cert
+	 *            the certificate authorizing the transaction
+	 * @param clazz
+	 *            the clazz describing the transaction context
+	 * 
+	 * @return the newly created transaction
+	 */
+	protected StrolchTransaction openTx(String realm, Certificate cert, Class<?> clazz) {
+		return getContainer().getRealm(realm).openTx(cert, clazz);
 	}
 
 	/**
