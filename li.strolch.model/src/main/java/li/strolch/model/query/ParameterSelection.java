@@ -15,6 +15,7 @@
  */
 package li.strolch.model.query;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -112,8 +113,16 @@ public abstract class ParameterSelection implements Selection {
 		return new DateRangeParameterSelection(bagKey, paramKey, dateRange);
 	}
 
+	public static StringListParameterSelection stringListSelection(String bagKey, String paramKey, String value) {
+		return new StringListParameterSelection(bagKey, paramKey, Arrays.asList(value));
+	}
+
 	public static StringListParameterSelection stringListSelection(String bagKey, String paramKey, List<String> value) {
 		return new StringListParameterSelection(bagKey, paramKey, value);
+	}
+
+	public static IntegerListParameterSelection integerListSelection(String bagKey, String paramKey, Integer value) {
+		return new IntegerListParameterSelection(bagKey, paramKey, Arrays.asList(value));
 	}
 
 	public static IntegerListParameterSelection integerListSelection(String bagKey, String paramKey,
@@ -121,8 +130,16 @@ public abstract class ParameterSelection implements Selection {
 		return new IntegerListParameterSelection(bagKey, paramKey, value);
 	}
 
+	public static FloatListParameterSelection floatListSelection(String bagKey, String paramKey, Double value) {
+		return new FloatListParameterSelection(bagKey, paramKey, Arrays.asList(value));
+	}
+
 	public static FloatListParameterSelection floatListSelection(String bagKey, String paramKey, List<Double> value) {
 		return new FloatListParameterSelection(bagKey, paramKey, value);
+	}
+
+	public static LongListParameterSelection longListSelection(String bagKey, String paramKey, Long value) {
+		return new LongListParameterSelection(bagKey, paramKey, Arrays.asList(value));
 	}
 
 	public static LongListParameterSelection longListSelection(String bagKey, String paramKey, List<Long> value) {
