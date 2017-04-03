@@ -22,7 +22,6 @@ public class ChatMessageVisitor extends SocketMessageVisitor {
 	@Override
 	public IoMessage visit(DataInputStream inputStream, DataOutputStream outputStream) throws Exception {
 
-		@SuppressWarnings("resource")
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 		String line = bufferedReader.readLine();
 		if (line == null) {
