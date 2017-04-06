@@ -84,7 +84,7 @@ public class FromFlatJsonVisitor {
 				if (jsonElement == null) {
 					if (this.optionalKeys.containsElement(bagId, paramId))
 						continue;
-					throw new StrolchModelException("JsonObject is missing member with ID " + paramId);
+					throw new StrolchModelException("JsonObject is missing member " + paramId);
 				}
 
 				if (!jsonElement.isJsonPrimitive()) {

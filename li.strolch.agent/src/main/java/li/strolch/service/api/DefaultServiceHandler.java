@@ -141,7 +141,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			logger.info(msg);
 		} else if (serviceResult.getState() == ServiceResultState.WARNING) {
 
-			msg = ServiceResultState.WARNING + " " + msg;
+			msg = ServiceResultState.WARNING + ": " + msg;
 			logger.warn(msg);
 
 			if (StringHelper.isNotEmpty(serviceResult.getMessage()) && serviceResult.getThrowable() != null) {
@@ -152,9 +152,10 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				logger.warn("Reason: " + serviceResult.getThrowable().getMessage(), serviceResult.getThrowable());
 			}
 
-		} else if (serviceResult.getState() == ServiceResultState.FAILED) {
+		} else if (serviceResult.getState() == ServiceResultState.FAILED
+				|| serviceResult.getState() == ServiceResultState.ACCESS_DENIED) {
 
-			msg = ServiceResultState.FAILED + " " + msg;
+			msg = serviceResult.getState() + ": " + msg;
 			logger.error(msg);
 
 			if (StringHelper.isNotEmpty(serviceResult.getMessage()) && serviceResult.getThrowable() != null) {
@@ -165,11 +166,11 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				logger.error("Reason: " + serviceResult.getThrowable().getMessage(), serviceResult.getThrowable());
 			}
 		} else if (serviceResult.getState() == null) {
-			logger.warn("Service " + service.getClass().getName() + " returned a null ServiceResultState!");
-			logger.warn(msg);
+			logger.error("Service " + service.getClass().getName() + " returned a null ServiceResultState!");
+			logger.error(msg);
 		} else {
-			logger.warn("UNHANDLED SERVICE RESULT STATE: " + serviceResult.getState());
-			logger.warn(msg);
+			logger.error("UNHANDLED SERVICE RESULT STATE: " + serviceResult.getState());
+			logger.error(msg);
 		}
 	}
 }
