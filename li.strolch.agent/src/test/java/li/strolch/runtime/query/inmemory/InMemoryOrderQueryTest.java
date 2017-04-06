@@ -48,6 +48,7 @@ import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
 import li.strolch.model.query.OrderQuery;
+import li.strolch.model.query.OrderStateSelection;
 import li.strolch.model.query.ParameterSelection;
 import li.strolch.persistence.inmemory.InMemoryOrderDao;
 
@@ -283,6 +284,25 @@ public class InMemoryOrderQueryTest {
 		assertEquals(1, result.size());
 	}
 
+	@Test
+	public void shouldQueryByState() {
+
+		List<Order> orders = getOrders();
+		InMemoryOrderDao dao = daoInstance();
+		dao.saveAll(orders);
+
+		OrderQuery<Order> ballQuery = OrderQuery.query("MyType1");
+		ballQuery.with(new OrderStateSelection(State.STOPPED));
+
+		List<Order> result = dao.doQuery(ballQuery);
+		assertEquals(2, result.size());
+
+		ballQuery = OrderQuery.query("MyType2");
+		ballQuery.with(new OrderStateSelection(State.STOPPED));
+		result = dao.doQuery(ballQuery);
+		assertEquals(1, result.size());
+	}
+
 	private Order getBallOrder() {
 		Order o1 = new Order("childrensBall", "Ball 1", "Ball");
 		Version.setInitialVersionFor(o1, "test");
@@ -301,12 +321,12 @@ public class InMemoryOrderQueryTest {
 	}
 
 	private List<Order> getOrders() {
-		Order res1 = ModelGenerator.createOrder("@1", "Order 1", "MyType1", new Date(), State.CREATED);
-		Order res2 = ModelGenerator.createOrder("@2", "Order 2", "MyType1", new Date(), State.CREATED);
-		Order res3 = ModelGenerator.createOrder("@3", "Order 3", "MyType2", new Date(), State.CREATED);
-		Order res4 = ModelGenerator.createOrder("@4", "Order 4", "MyType2", new Date(), State.CREATED);
-		Order res5 = ModelGenerator.createOrder("@5", "Order 5", "MyType3", new Date(), State.CREATED);
-		Order res6 = ModelGenerator.createOrder("@6", "Order 6", "MyType3", new Date(), State.CREATED);
+		Order res1 = ModelGenerator.createOrder("@1", "Order 1", "MyType1", new Date(), State.STOPPED);
+		Order res2 = ModelGenerator.createOrder("@2", "Order 2", "MyType1", new Date(), State.STOPPED);
+		Order res3 = ModelGenerator.createOrder("@3", "Order 3", "MyType2", new Date(), State.STOPPED);
+		Order res4 = ModelGenerator.createOrder("@4", "Order 4", "MyType2", new Date(), State.PLANNING);
+		Order res5 = ModelGenerator.createOrder("@5", "Order 5", "MyType3", new Date(), State.ERROR);
+		Order res6 = ModelGenerator.createOrder("@6", "Order 6", "MyType3", new Date(), State.CLOSED);
 		List<Order> orders = new ArrayList<>();
 		orders.add(res1);
 		orders.add(res2);

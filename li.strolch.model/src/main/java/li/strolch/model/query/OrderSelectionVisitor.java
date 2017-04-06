@@ -17,11 +17,10 @@ package li.strolch.model.query;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
 public interface OrderSelectionVisitor extends StrolchRootElementSelectionVisitor {
 
 	public void visit(DateSelection selection);
 
-	public void visit(StateSelection selection);
+	public void visit(OrderStateSelection selection);
 }

@@ -18,7 +18,7 @@ package li.strolch.persistence.postgresql;
 import li.strolch.model.Tags;
 import li.strolch.model.query.DateSelection;
 import li.strolch.model.query.OrderQueryVisitor;
-import li.strolch.model.query.StateSelection;
+import li.strolch.model.query.OrderStateSelection;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -48,7 +48,7 @@ public class PostgreSqlOrderQueryVisitor extends PostgreSqlQueryVisitor implemen
 	}
 
 	@Override
-	public void visit(StateSelection selection) {
+	public void visit(OrderStateSelection selection) {
 		this.sb.append(this.indent);
 		this.sb.append("state = ?::order_state\n");
 		this.values.add(selection.getState().name());

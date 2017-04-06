@@ -17,6 +17,7 @@ package li.strolch.persistence.postgresql;
 
 import li.strolch.model.Tags;
 import li.strolch.model.query.ActivityQueryVisitor;
+import li.strolch.model.query.ActivityStateSelection;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -38,5 +39,12 @@ public class PostgreSqlActivityQueryVisitor extends PostgreSqlQueryVisitor imple
 	@Override
 	protected String getTableName() {
 		return PostgreSqlActivityDao.ACTIVITIES;
+	}
+
+	@Override
+	public void visit(ActivityStateSelection selection) {
+		this.sb.append(this.indent);
+		this.sb.append("state = ?::order_state\n");
+		this.values.add(selection.getState().name());
 	}
 }

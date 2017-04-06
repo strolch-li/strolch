@@ -20,6 +20,7 @@ import java.util.List;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.ActivityQueryVisitor;
+import li.strolch.model.query.ActivityStateSelection;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.model.visitor.ActivityVisitor;
 import li.strolch.utils.dbc.DBC;
@@ -61,5 +62,10 @@ public class InMemoryActivityQueryVisitor extends InMemoryQueryVisitor<Activity>
 	@Override
 	public void visit(StrolchTypeNavigation navigation) {
 		setNavigator(new ActivityTypeNavigator(navigation.getType()));
+	}
+
+	@Override
+	public void visit(ActivityStateSelection selection) {
+		addSelector(new ActivityStateSelector(selection.getState()));
 	}
 }

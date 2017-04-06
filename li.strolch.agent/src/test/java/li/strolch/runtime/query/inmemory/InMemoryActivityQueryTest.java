@@ -19,7 +19,9 @@ import org.junit.Test;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.ParameterBag;
+import li.strolch.model.State;
 import li.strolch.model.Version;
+import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.BooleanParameter;
@@ -30,6 +32,7 @@ import li.strolch.model.parameter.LongListParameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.ActivityQuery;
+import li.strolch.model.query.ActivityStateSelection;
 import li.strolch.model.query.IdSelection;
 import li.strolch.model.query.NameSelection;
 import li.strolch.model.query.ParameterSelection;
@@ -251,15 +254,34 @@ public class InMemoryActivityQueryTest {
 	@Test
 	public void shouldQueryByName() {
 
-		List<Activity> activitys = getActivities();
-		activitys.add(getBallActivity());
+		List<Activity> activities = getActivities();
+		activities.add(getBallActivity());
 		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activitys);
+		dao.saveAll(activities);
 
 		ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
 		ballQuery.with(new NameSelection("ball ", ci()));
 
 		List<Activity> result = dao.doQuery(ballQuery);
+		assertEquals(1, result.size());
+	}
+
+	@Test
+	public void shouldQueryByState() {
+
+		List<Activity> activities = getActivities();
+		InMemoryActivityDao dao = daoInstance();
+		dao.saveAll(activities);
+
+		ActivityQuery<Activity> ballQuery = ActivityQuery.query("MyType1");
+		ballQuery.with(new ActivityStateSelection(State.STOPPED));
+
+		List<Activity> result = dao.doQuery(ballQuery);
+		assertEquals(2, result.size());
+
+		ballQuery = ActivityQuery.query("MyType2");
+		ballQuery.with(new ActivityStateSelection(State.STOPPED));
+		result = dao.doQuery(ballQuery);
 		assertEquals(1, result.size());
 	}
 
@@ -281,19 +303,32 @@ public class InMemoryActivityQueryTest {
 	}
 
 	private List<Activity> getActivities() {
-		Activity res1 = ModelGenerator.createActivity("@1", "Activity 1", "MyType1", TimeOrdering.SERIES);
-		Activity res2 = ModelGenerator.createActivity("@2", "Activity 2", "MyType1", TimeOrdering.SERIES);
-		Activity res3 = ModelGenerator.createActivity("@3", "Activity 3", "MyType2", TimeOrdering.SERIES);
-		Activity res4 = ModelGenerator.createActivity("@4", "Activity 4", "MyType2", TimeOrdering.SERIES);
-		Activity res5 = ModelGenerator.createActivity("@5", "Activity 5", "MyType3", TimeOrdering.SERIES);
-		Activity res6 = ModelGenerator.createActivity("@6", "Activity 6", "MyType3", TimeOrdering.SERIES);
+
+		Activity activity1 = ModelGenerator.createActivity("@1", "Activity 1", "MyType1", TimeOrdering.SERIES);
+		((Action) activity1.getElement("action_" + activity1.getId())).setState(State.STOPPED);
+
+		Activity activity2 = ModelGenerator.createActivity("@2", "Activity 2", "MyType1", TimeOrdering.SERIES);
+		((Action) activity2.getElement("action_" + activity2.getId())).setState(State.STOPPED);
+
+		Activity activity3 = ModelGenerator.createActivity("@3", "Activity 3", "MyType2", TimeOrdering.SERIES);
+		((Action) activity3.getElement("action_" + activity3.getId())).setState(State.STOPPED);
+
+		Activity activity4 = ModelGenerator.createActivity("@4", "Activity 4", "MyType2", TimeOrdering.SERIES);
+		((Action) activity4.getElement("action_" + activity4.getId())).setState(State.PLANNING);
+
+		Activity activity5 = ModelGenerator.createActivity("@5", "Activity 5", "MyType3", TimeOrdering.SERIES);
+		((Action) activity5.getElement("action_" + activity5.getId())).setState(State.ERROR);
+
+		Activity activity6 = ModelGenerator.createActivity("@6", "Activity 6", "MyType3", TimeOrdering.SERIES);
+		((Action) activity6.getElement("action_" + activity6.getId())).setState(State.CLOSED);
+
 		List<Activity> activitys = new ArrayList<>();
-		activitys.add(res1);
-		activitys.add(res2);
-		activitys.add(res3);
-		activitys.add(res4);
-		activitys.add(res5);
-		activitys.add(res6);
+		activitys.add(activity1);
+		activitys.add(activity2);
+		activitys.add(activity3);
+		activitys.add(activity4);
+		activitys.add(activity5);
+		activitys.add(activity6);
 
 		for (Activity activity : activitys) {
 			Version.setInitialVersionFor(activity, "test");

@@ -99,7 +99,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 	protected void internalSave(final Activity activity) {
 
 		String sql = "insert into " + getTableName()
-				+ " (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				+ " (id, version, created_by, created_at, deleted, latest, name, type, state, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
 
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
@@ -118,9 +118,10 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 			// attributes
 			preparedStatement.setString(7, activity.getName());
 			preparedStatement.setString(8, activity.getType());
+			preparedStatement.setString(9, activity.getState().name());
 
 			SQLXML sqlxml = createSqlXml(activity, preparedStatement);
-			preparedStatement.setSQLXML(9, sqlxml);
+			preparedStatement.setSQLXML(10, sqlxml);
 
 			try {
 				int modCount = preparedStatement.executeUpdate();
@@ -189,7 +190,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 		}
 
 		String sql = "update " + getTableName()
-				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asxml = ? where id = ? and version = ?";
+				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?, asxml = ? where id = ? and version = ?";
 
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 
@@ -204,13 +205,14 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 			// attributes
 			preparedStatement.setString(5, activity.getName());
 			preparedStatement.setString(6, activity.getType());
+			preparedStatement.setString(7, activity.getState().name());
 
 			SQLXML sqlxml = createSqlXml(activity, preparedStatement);
-			preparedStatement.setSQLXML(7, sqlxml);
+			preparedStatement.setSQLXML(8, sqlxml);
 
 			// primary key
-			preparedStatement.setString(8, activity.getId());
-			preparedStatement.setInt(9, activity.getVersion().getVersion());
+			preparedStatement.setString(9, activity.getId());
+			preparedStatement.setInt(10, activity.getVersion().getVersion());
 
 			try {
 				int modCount = preparedStatement.executeUpdate();

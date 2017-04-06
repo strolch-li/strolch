@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,25 @@
  */
 package li.strolch.model.query;
 
-import li.strolch.model.query.ordering.StrolchQueryOrderingVisitor;
+import li.strolch.model.State;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface ActivityQueryVisitor
-		extends ActivitySelectionVisitor, ParameterSelectionVisitor, StrolchQueryOrderingVisitor {
+public class ActivityStateSelection extends ActivitySelection {
 
-	// marker interface
+	private State state;
+
+	public ActivityStateSelection(State state) {
+		this.state = state;
+	}
+
+	public State getState() {
+		return this.state;
+	}
+
+	@Override
+	public void accept(ActivitySelectionVisitor visitor) {
+		visitor.visit(this);
+	}
 }

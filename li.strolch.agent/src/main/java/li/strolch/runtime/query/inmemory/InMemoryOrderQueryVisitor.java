@@ -21,7 +21,7 @@ import li.strolch.model.Order;
 import li.strolch.model.query.DateSelection;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.OrderQueryVisitor;
-import li.strolch.model.query.StateSelection;
+import li.strolch.model.query.OrderStateSelection;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.utils.dbc.DBC;
@@ -71,7 +71,7 @@ public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order> imple
 	}
 
 	@Override
-	public void visit(StateSelection selection) {
-		addSelector(new StateSelector(selection.getState()));
+	public void visit(OrderStateSelection selection) {
+		addSelector(new OrderStateSelector(selection.getState()));
 	}
 }

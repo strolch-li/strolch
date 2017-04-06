@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model.query;
+package li.strolch.runtime.query.inmemory;
 
+import li.strolch.model.Order;
 import li.strolch.model.State;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class StateSelection extends OrderSelection {
+public class OrderStateSelector implements Selector<Order> {
 
 	private State state;
 
-	public StateSelection(State state) {
+	/**
+	 * @param state
+	 */
+	public OrderStateSelector(State state) {
 		this.state = state;
 	}
 
-	public State getState() {
-		return this.state;
-	}
-
 	@Override
-	public void accept(OrderSelectionVisitor visitor) {
-		visitor.visit(this);
+	public boolean select(Order element) {
+		return this.state.equals(element.getState());
 	}
 }
