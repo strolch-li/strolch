@@ -1,10 +1,10 @@
 package li.strolch.utils.helper;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.AlgorithmParameters;
 import java.security.spec.KeySpec;
 
@@ -103,8 +103,8 @@ public class AesCryptoHelper {
 
 	public static void encrypt(char[] password, byte[] salt, String clearTextFileS, String encryptedFileS) {
 
-		try (FileInputStream inFile = new FileInputStream(clearTextFileS);
-				FileOutputStream outFile = new FileOutputStream(encryptedFileS)) {
+		try (InputStream inFile = Files.newInputStream(Paths.get(clearTextFileS));
+				OutputStream outFile = Files.newOutputStream(Paths.get(encryptedFileS))) {
 
 			encrypt(password, salt, inFile, outFile);
 
@@ -117,8 +117,8 @@ public class AesCryptoHelper {
 
 	public static void encrypt(SecretKey secret, String clearTextFileS, String encryptedFileS) {
 
-		try (FileInputStream inFile = new FileInputStream(clearTextFileS);
-				FileOutputStream outFile = new FileOutputStream(encryptedFileS)) {
+		try (InputStream inFile = Files.newInputStream(Paths.get(clearTextFileS));
+				OutputStream outFile = Files.newOutputStream(Paths.get(encryptedFileS))) {
 
 			encrypt(secret, inFile, outFile);
 
@@ -179,8 +179,8 @@ public class AesCryptoHelper {
 
 	public static void decrypt(char[] password, byte[] salt, String encryptedFileS, String decryptedFileS) {
 
-		try (FileInputStream fis = new FileInputStream(encryptedFileS);
-				FileOutputStream fos = new FileOutputStream(decryptedFileS)) {
+		try (InputStream fis = Files.newInputStream(Paths.get(encryptedFileS));
+				OutputStream fos = Files.newOutputStream(Paths.get(decryptedFileS))) {
 
 			decrypt(password, salt, fis, fos);
 
@@ -194,8 +194,8 @@ public class AesCryptoHelper {
 
 	public static void decrypt(SecretKey secret, String encryptedFileS, String decryptedFileS) {
 
-		try (FileInputStream fis = new FileInputStream(encryptedFileS);
-				FileOutputStream fos = new FileOutputStream(decryptedFileS)) {
+		try (InputStream fis = Files.newInputStream(Paths.get(encryptedFileS));
+				OutputStream fos = Files.newOutputStream(Paths.get(decryptedFileS))) {
 
 			decrypt(secret, fis, fos);
 

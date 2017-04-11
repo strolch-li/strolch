@@ -1,8 +1,8 @@
 package li.strolch.model.xml;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class StrolchXmlHelper {
 
 	public static void writeToFile(File file, Collection<StrolchRootElement> elements) {
 
-		try (FileOutputStream out = new FileOutputStream(file)) {
+		try (OutputStream out = Files.newOutputStream(file.toPath())) {
 
 			XMLStreamWriter writer = openXmlStreamWriter(out);
 

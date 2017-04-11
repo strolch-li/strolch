@@ -20,14 +20,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ComponentDependencyAnalyzer {
 

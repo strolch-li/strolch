@@ -20,14 +20,15 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class FileHelper {
 		byte[] data = new byte[(int) file.length()];
 		int pos = 0;
 
-		try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));) {
+		try (BufferedInputStream in = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
 			byte[] bytes = new byte[8192];
 			int read;
 			while ((read = in.read(bytes)) != -1) {
@@ -146,7 +147,7 @@ public class FileHelper {
 	 */
 	public static final void writeToFile(byte[] bytes, File dstFile) {
 
-		try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dstFile));) {
+		try (BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(dstFile.toPath()))) {
 			out.write(bytes);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath()); //$NON-NLS-1$
@@ -287,8 +288,8 @@ public class FileHelper {
 	 */
 	public final static boolean copy(File fromFile, File toFile, boolean checksum) {
 
-		try (BufferedInputStream inBuffer = new BufferedInputStream(new FileInputStream(fromFile));
-				BufferedOutputStream outBuffer = new BufferedOutputStream(new FileOutputStream(toFile));) {
+		try (BufferedInputStream inBuffer = new BufferedInputStream(Files.newInputStream(fromFile.toPath()));
+				BufferedOutputStream outBuffer = new BufferedOutputStream(Files.newOutputStream(toFile.toPath()))) {
 
 			int theByte = 0;
 
@@ -540,7 +541,7 @@ public class FileHelper {
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFile(File file, String algorithm) {
-		try (InputStream fis = new FileInputStream(file);) {
+		try (InputStream fis = Files.newInputStream(file.toPath())) {
 
 			byte[] buffer = new byte[1024];
 			MessageDigest complete = MessageDigest.getInstance(algorithm);
@@ -569,7 +570,7 @@ public class FileHelper {
 	 */
 	public static void appendFilePart(File dstFile, byte[] bytes) {
 
-		try (FileOutputStream outputStream = new FileOutputStream(dstFile, true);) {
+		try (OutputStream outputStream = Files.newOutputStream(dstFile.toPath(), StandardOpenOption.APPEND)) {
 
 			outputStream.write(bytes);
 			outputStream.flush();

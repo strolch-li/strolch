@@ -17,8 +17,8 @@ package li.strolch.fileserver;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.text.MessageFormat;
 
@@ -119,7 +119,7 @@ public class FileClientUtil {
 			throw new RuntimeException(msg);
 		}
 
-		try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(srcFile));) {
+		try (BufferedInputStream inputStream = new BufferedInputStream(Files.newInputStream(srcFile.toPath()))) {
 
 			// get the size of the file
 			long fileLength = srcFile.length();

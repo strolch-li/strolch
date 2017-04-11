@@ -18,8 +18,9 @@ package li.strolch.command;
 import static li.strolch.utils.helper.StringHelper.UNDERLINE;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -154,7 +155,7 @@ public class XmlExportModelCommand extends Command {
 		logger.info("Exporting " + this.nrOfOrdersToExport + " Orders...");
 		logger.info("Exporting " + this.nrOfActivitiesToExport + " Activities...");
 
-		try (FileOutputStream out = new FileOutputStream(this.modelFile)) {
+		try (OutputStream out = Files.newOutputStream(this.modelFile.toPath())) {
 			createdFiles.add(this.modelFile);
 
 			XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(out);
@@ -179,7 +180,7 @@ public class XmlExportModelCommand extends Command {
 						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
 						logger.info("Writing " + resourceMap.querySize(tx(), type) + " " + type + " Resources to path: "
 								+ typeXmlFileF.getAbsolutePath() + "...");
-						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
+						try (OutputStream typeOut = Files.newOutputStream(typeXmlFileF.toPath())) {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = StrolchXmlHelper.openXmlStreamWriter(typeOut);
 							writeResourcesByType(typeWriter, resourceMap, type);
@@ -208,7 +209,7 @@ public class XmlExportModelCommand extends Command {
 						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
 						logger.info("Writing " + orderMap.querySize(tx(), type) + " " + type + " Orders to path: "
 								+ typeXmlFileF.getAbsolutePath() + "...");
-						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
+						try (OutputStream typeOut = Files.newOutputStream(typeXmlFileF.toPath())) {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = StrolchXmlHelper.openXmlStreamWriter(typeOut);
 							writeOrdersByType(typeWriter, orderMap, type);
@@ -238,7 +239,7 @@ public class XmlExportModelCommand extends Command {
 						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
 						logger.info("Writing " + activityMap.querySize(tx(), type) + " " + type
 								+ " Activities to path: " + typeXmlFileF.getAbsolutePath() + "...");
-						try (FileOutputStream typeOut = new FileOutputStream(typeXmlFileF)) {
+						try (OutputStream typeOut = Files.newOutputStream(typeXmlFileF.toPath())) {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = StrolchXmlHelper.openXmlStreamWriter(typeOut);
 							writeActivitiesByType(typeWriter, activityMap, type);

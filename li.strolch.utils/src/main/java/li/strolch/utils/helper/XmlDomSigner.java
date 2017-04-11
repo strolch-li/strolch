@@ -3,11 +3,10 @@ package li.strolch.utils.helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStore.TrustedCertificateEntry;
@@ -70,7 +69,7 @@ public class XmlDomSigner {
 		try {
 
 			KeyStore keyStore = KeyStore.getInstance("JKS");
-			keyStore.load(new FileInputStream(keyStorePath), password);
+			keyStore.load(Files.newInputStream(keyStorePath.toPath()), password);
 			this.keyStore = keyStore;
 			this.privateKeyAlias = privateKeyAlias;
 			this.trustAlias = trustAlias;
@@ -220,8 +219,8 @@ public class XmlDomSigner {
 
 	public static void writeTo(Document doc, File file) {
 		try {
-			writeTo(doc, new FileOutputStream(file));
-		} catch (FileNotFoundException e) {
+			writeTo(doc, Files.newOutputStream(file.toPath()));
+		} catch (IOException e) {
 			throw new RuntimeException("Failed to write document to " + file.getAbsolutePath(), e);
 		}
 	}
@@ -242,7 +241,7 @@ public class XmlDomSigner {
 
 	public static Document parse(File signedXmlFile) {
 		try {
-			return parse(new FileInputStream(signedXmlFile));
+			return parse(Files.newInputStream(signedXmlFile.toPath()));
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to parse signed file at " + signedXmlFile.getAbsolutePath(), e);
 		}

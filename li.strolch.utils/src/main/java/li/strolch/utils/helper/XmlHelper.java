@@ -17,11 +17,11 @@ package li.strolch.utils.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -78,7 +78,7 @@ public class XmlHelper {
 	 */
 	public static void parseDocument(File xmlFile, DefaultHandler xmlHandler) {
 
-		try (FileInputStream xmlFileInputStream = new FileInputStream(xmlFile);) {
+		try (InputStream xmlFileInputStream = Files.newInputStream(xmlFile.toPath())) {
 
 			parseDocument(xmlFileInputStream, xmlHandler);
 			String msg = "SAX parsed file {0}"; //$NON-NLS-1$

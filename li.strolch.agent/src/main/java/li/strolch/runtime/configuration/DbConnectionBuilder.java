@@ -30,13 +30,13 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.runtime.StrolchConstants;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

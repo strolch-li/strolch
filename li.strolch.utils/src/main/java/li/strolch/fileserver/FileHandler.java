@@ -16,9 +16,10 @@
 package li.strolch.fileserver;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 
 import org.slf4j.Logger;
@@ -148,7 +149,7 @@ public class FileHandler {
 		}
 
 		// now read the part of the file and set it as bytes for the file part
-		try (FileInputStream fin = new FileInputStream(file);) {
+		try (InputStream fin = Files.newInputStream(file.toPath())) {
 
 			// position the stream
 			long skip = fin.skip(requestOffset);

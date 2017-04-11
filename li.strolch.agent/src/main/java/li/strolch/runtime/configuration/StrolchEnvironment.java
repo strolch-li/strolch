@@ -16,9 +16,9 @@
 package li.strolch.runtime.configuration;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Properties;
 
@@ -54,7 +54,7 @@ public class StrolchEnvironment {
 				MessageFormat.format("{0} does not exist in {1}", ENV_PROPERTIES_FILE, rootPath.getAbsolutePath()), //$NON-NLS-1$
 				envF);
 		Properties envP = new Properties();
-		try (FileInputStream fin = new FileInputStream(envF)) {
+		try (InputStream fin = Files.newInputStream(envF.toPath())) {
 			envP.load(fin);
 		} catch (Exception e) {
 			throw new StrolchConfigurationException(

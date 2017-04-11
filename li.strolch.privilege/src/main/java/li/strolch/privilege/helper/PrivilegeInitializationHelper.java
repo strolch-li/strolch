@@ -16,8 +16,8 @@
 package li.strolch.privilege.helper;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -60,7 +60,7 @@ public class PrivilegeInitializationHelper {
 		}
 
 		// delegate using input stream
-		try (FileInputStream fin = new FileInputStream(privilegeXmlFile)) {
+		try (InputStream fin = Files.newInputStream(privilegeXmlFile.toPath())) {
 			return initializeFromXml(fin);
 		} catch (Exception e) {
 			String msg = "Failed to load configuration from {0}"; //$NON-NLS-1$

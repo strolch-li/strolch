@@ -16,10 +16,9 @@
 package li.strolch.privilege.handler;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -1142,7 +1141,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		List<Certificate> sessions = this.privilegeContextMap.values().stream().map(p -> p.getCertificate())
 				.filter(c -> !c.getUserState().isSystem()).collect(Collectors.toList());
 
-		try (FileOutputStream fout = new FileOutputStream(this.persistSessionsPath);
+		try (OutputStream fout = Files.newOutputStream(this.persistSessionsPath.toPath());
 				OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, fout)) {
 
 			CertificateStubsDomWriter writer = new CertificateStubsDomWriter(sessions, outputStream);
@@ -1172,7 +1171,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					"Sessions data file is not a file but exists at " + this.persistSessionsPath.getAbsolutePath());
 
 		List<CertificateStub> certificateStubs;
-		try (FileInputStream fin = new FileInputStream(this.persistSessionsPath);
+		try (InputStream fin = Files.newInputStream(this.persistSessionsPath.toPath());
 				InputStream inputStream = AesCryptoHelper.wrapDecrypt(this.secretKey, fin)) {
 
 			CertificateStubsSaxReader reader = new CertificateStubsSaxReader(inputStream);

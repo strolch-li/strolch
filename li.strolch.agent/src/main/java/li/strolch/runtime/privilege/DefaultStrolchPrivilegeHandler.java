@@ -19,7 +19,8 @@ import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIO
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -91,7 +92,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			throw new PrivilegeException(msg);
 		}
 
-		try (FileInputStream inputStream = new FileInputStream(privilegeXmlFile)) {
+		try (InputStream inputStream = Files.newInputStream(privilegeXmlFile.toPath())) {
 
 			// parse configuration file
 			PrivilegeContainerModel containerModel = new PrivilegeContainerModel();

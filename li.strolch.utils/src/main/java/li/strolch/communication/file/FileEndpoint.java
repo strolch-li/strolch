@@ -16,9 +16,10 @@
 package li.strolch.communication.file;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -163,7 +164,7 @@ public class FileEndpoint implements CommunicationEndpoint, Runnable {
 		this.connection.notifyStateChange(ConnectionState.WORKING, ConnectionState.WORKING.toString());
 
 		// open the stream
-		try (FileOutputStream outputStream = new FileOutputStream(this.outboundFilename, false)) {
+		try (OutputStream outputStream = Files.newOutputStream(Paths.get(this.outboundFilename))) {
 
 			// write the message using the visitor
 			this.messageVisitor.visit(outputStream, message);
@@ -237,7 +238,7 @@ public class FileEndpoint implements CommunicationEndpoint, Runnable {
 	 */
 	protected void handleFile(File file) throws Exception {
 
-		try (InputStream inputStream = new FileInputStream(file)) {
+		try (InputStream inputStream = Files.newInputStream(file.toPath())) {
 
 			// convert the object to an integration message
 			IoMessage message = this.messageVisitor.visit(inputStream);

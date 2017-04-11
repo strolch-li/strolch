@@ -19,6 +19,9 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditQuery;
@@ -26,9 +29,6 @@ import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.inmemory.InMemoryAuditDao;
 import li.strolch.utils.collections.DateRange;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

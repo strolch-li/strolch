@@ -1,7 +1,6 @@
 package li.strolch.utils.helper;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
@@ -40,7 +39,7 @@ public class TexHelper {
 		this.templateName = templateName;
 		this.bundle = ResourceBundle.getBundle(bundleName, locale, new UTF8Control());
 	}
-	
+
 	public ResourceBundle getBundle() {
 		return this.bundle;
 	}
@@ -94,7 +93,7 @@ public class TexHelper {
 			// then write TEX file
 			String texFileName = fileName + ".tex";
 			File texFileS = new File(tmpPathF, texFileName);
-			try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(texFileS), "UTF-8")) {
+			try (OutputStreamWriter out = new OutputStreamWriter(Files.newOutputStream(texFileS.toPath()), "UTF-8")) {
 				out.write(data);
 			}
 
