@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS resources (
 );
 
 -- ORDERS
-CREATE TYPE order_state AS ENUM ('CREATED', 'OPEN', 'EXECUTION', 'CLOSED');
+CREATE TYPE order_state AS ENUM ('CREATED', 'PLANNING', 'PLANNED', 'EXECUTION', 'STOPPED', 'WARNING', 'ERROR', 'EXECUTED', 'CLOSED');
+
 
 CREATE TABLE IF NOT EXISTS orders (
   id varchar(255) not null,
@@ -136,6 +137,6 @@ INSERT INTO db_version
 values(
   '0.5.1',
   'strolch',
-  'Added state column to activity',
+  'Added state column to activity, and added new states',
   CURRENT_TIMESTAMP
 );

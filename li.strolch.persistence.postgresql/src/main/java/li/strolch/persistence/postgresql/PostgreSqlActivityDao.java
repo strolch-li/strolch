@@ -190,7 +190,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 		}
 
 		String sql = "update " + getTableName()
-				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?, asxml = ? where id = ? and version = ?";
+				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, asxml = ? where id = ? and version = ?";
 
 		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
 

@@ -20,10 +20,17 @@ import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_URL;
 import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_USERNAME;
 import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.Arrays;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import li.strolch.db.DbException;
 import li.strolch.db.DbSchemaVersionCheck;
@@ -31,40 +38,78 @@ import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.utils.Version;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DbMigrationTest {
 
-	@BeforeClass
-	public static void beforeClass() throws Exception {
+	private static final Logger logger = LoggerFactory.getLogger(DbMigrationTest.class);
+
+	@Before
+	public void before() throws Exception {
 		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
+	}
+
+	@Test
+	public void shouldCreate() throws Exception {
+
+		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
+				PostgreSqlPersistenceHandler.class, true, true, true);
+
+		try (Connection con = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+
+			// CREATE 0.1.0
+			dbCheck.createSchema(con, StrolchConstants.DEFAULT_REALM, Version.valueOf("0.1.0"));
+
+			File scriptsD = new File("src/main/resources");
+			File[] scriptFiles = scriptsD.listFiles(f -> f.getName().endsWith("_initial.sql"));
+			Arrays.sort(scriptFiles, (f1, f2) -> f1.getName().compareTo(f2.getName()));
+			for (File scriptFile : scriptFiles) {
+
+				String name = scriptFile.getName();
+				String versionS = name.substring("strolch_db_schema_".length(),
+						name.length() - "_initial.sql".length());
+				Version version = Version.valueOf(versionS);
+				logger.info("Creating Version " + version);
+
+				dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
+
+				// CREATE
+				dbCheck.createSchema(con, StrolchConstants.DEFAULT_REALM, version);
+			}
+
+		} catch (SQLException e) {
+			String msg = "Failed to open DB connection to URL {0} due to: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, DB_URL, e.getMessage());
+			throw new DbException(msg, e);
+		}
 	}
 
 	@Test
 	public void shouldMigrate() throws Exception {
 
-		String scriptPrefix = PostgreSqlPersistenceHandler.SCRIPT_PREFIX;
-		Class<?> ctxClass = PostgreSqlPersistenceHandler.class;
-		boolean allowSchemaCreation = true;
-		boolean allowSchemaMigration = true;
-		boolean allowSchemaDrop = true;
-		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(scriptPrefix, ctxClass, allowSchemaCreation,
-				allowSchemaMigration, allowSchemaDrop);
+		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
+				PostgreSqlPersistenceHandler.class, true, true, true);
 
 		try (Connection con = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
 
-			// DROP 0.2.1
-			dbCheck.dropSchema(con, StrolchConstants.DEFAULT_REALM, Version.valueOf("0.2.1"));
+			// CREATE 0.1.0
+			dbCheck.createSchema(con, StrolchConstants.DEFAULT_REALM, Version.valueOf("0.1.0"));
 
-			// CREATE 0.2.0
-			dbCheck.createSchema(con, StrolchConstants.DEFAULT_REALM, Version.valueOf("0.2.0"));
+			File scriptsD = new File("src/main/resources");
+			File[] scriptFiles = scriptsD.listFiles(f -> f.getName().endsWith("_migration.sql"));
+			Arrays.sort(scriptFiles, (f1, f2) -> f1.getName().compareTo(f2.getName()));
+			for (File scriptFile : scriptFiles) {
 
-			// MIGRATE 0.2.1
-			dbCheck.migrateSchema(con, StrolchConstants.DEFAULT_REALM, Version.valueOf("0.2.1"));
+				String name = scriptFile.getName();
+				String versionS = name.substring("strolch_db_schema_".length(),
+						name.length() - "_migration.sql".length());
+				Version version = Version.valueOf(versionS);
+				logger.info("Migrating Version " + version);
+
+				// MIGRATE
+				dbCheck.migrateSchema(con, StrolchConstants.DEFAULT_REALM, version);
+			}
 
 		} catch (SQLException e) {
 			String msg = "Failed to open DB connection to URL {0} due to: {1}"; //$NON-NLS-1$
