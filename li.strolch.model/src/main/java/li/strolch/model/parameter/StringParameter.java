@@ -54,6 +54,7 @@ public class StringParameter extends AbstractParameter<String> {
 		return StrolchValueType.STRING.getType();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public String getValue() {
 		return this.value;

@@ -53,6 +53,7 @@ public class DurationParameter extends AbstractParameter<Long> {
 		return ISO8601FormatFactory.getInstance().formatDuration(this.value);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Long getValue() {
 		return this.value;

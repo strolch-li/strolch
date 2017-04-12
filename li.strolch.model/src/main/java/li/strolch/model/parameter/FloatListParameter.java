@@ -75,6 +75,7 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 		return sb.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Double> getValue() {
 		return new ArrayList<>(this.value);

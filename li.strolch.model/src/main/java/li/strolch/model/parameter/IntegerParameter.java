@@ -58,6 +58,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		return Integer.toString(this.value);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Integer getValue() {
 		return this.value;

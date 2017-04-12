@@ -53,6 +53,7 @@ public class LongParameter extends AbstractParameter<Long> {
 		return this.value.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Long getValue() {
 		return this.value;

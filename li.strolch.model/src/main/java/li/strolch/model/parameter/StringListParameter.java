@@ -75,6 +75,7 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 		return sb.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<String> getValue() {
 		return new ArrayList<>(this.value);

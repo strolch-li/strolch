@@ -54,6 +54,7 @@ public class FloatParameter extends AbstractParameter<Double> {
 		return Double.toString(this.value);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Double getValue() {
 		return this.value;

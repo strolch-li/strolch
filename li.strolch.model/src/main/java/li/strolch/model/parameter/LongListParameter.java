@@ -75,6 +75,7 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 		return sb.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Long> getValue() {
 		return new ArrayList<>(this.value);

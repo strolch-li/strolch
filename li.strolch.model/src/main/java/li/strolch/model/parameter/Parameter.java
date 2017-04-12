@@ -45,7 +45,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * 
 	 * @return
 	 */
-	public T getValue();
+	public <U extends T>  U getValue();
 
 	/**
 	 * the value of the parameter

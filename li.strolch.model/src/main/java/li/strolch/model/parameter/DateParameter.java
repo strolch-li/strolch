@@ -55,6 +55,7 @@ public class DateParameter extends AbstractParameter<Date> {
 		return ISO8601FormatFactory.getInstance().formatDate(this.value);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Date getValue() {
 		return this.value;

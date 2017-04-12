@@ -53,6 +53,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 		return this.value.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Boolean getValue() {
 		return this.value;

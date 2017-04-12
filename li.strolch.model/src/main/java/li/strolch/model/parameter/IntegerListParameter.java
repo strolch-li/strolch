@@ -75,6 +75,7 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 		return sb.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Integer> getValue() {
 		return new ArrayList<>(this.value);
