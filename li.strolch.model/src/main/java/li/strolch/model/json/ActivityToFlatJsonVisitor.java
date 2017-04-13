@@ -9,6 +9,14 @@ import li.strolch.model.visitor.ActivityVisitor;
 
 public class ActivityToFlatJsonVisitor extends ToFlatJsonVisitor<Activity> implements ActivityVisitor<JsonObject> {
 
+	public ActivityToFlatJsonVisitor() {
+		super();
+	}
+
+	public ActivityToFlatJsonVisitor(boolean withVersion) {
+		super(withVersion);
+	}
+
 	@Override
 	public JsonObject visit(Activity element) {
 		return toJson(element);

@@ -9,6 +9,14 @@ import li.strolch.model.visitor.ResourceVisitor;
 
 public class ResourceToFlatJsonVisitor extends ToFlatJsonVisitor<Resource> implements ResourceVisitor<JsonObject> {
 
+	public ResourceToFlatJsonVisitor() {
+		super();
+	}
+
+	public ResourceToFlatJsonVisitor(boolean withVersion) {
+		super(withVersion);
+	}
+
 	@Override
 	public JsonObject visit(Resource element) {
 		return toJson(element);

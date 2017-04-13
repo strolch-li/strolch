@@ -168,14 +168,6 @@ public class StrolchElementToJsonVisitor implements StrolchRootElementVisitor<Js
 		return rootJ;
 	}
 
-	private String formatDate(Date date) {
-		return ISO8601FormatFactory.getInstance().formatDate(date);
-	}
-
-	private String formatDate(Long timestamp) {
-		return ISO8601FormatFactory.getInstance().formatDate(timestamp);
-	}
-
 	protected void addPolicies(PolicyContainer policyContainer, JsonObject rootJ) {
 		if (!policyContainer.hasPolicyDefs() || !policyContainer.getPolicyDefs().hasPolicyDefs())
 			return;
@@ -281,7 +273,7 @@ public class StrolchElementToJsonVisitor implements StrolchRootElementVisitor<Js
 		}
 	}
 
-	private void addVersion(StrolchRootElement element, JsonObject rootJ) {
+	public static void addVersion(StrolchRootElement element, JsonObject rootJ) {
 		if (!element.hasVersion())
 			return;
 
@@ -293,5 +285,14 @@ public class StrolchElementToJsonVisitor implements StrolchRootElementVisitor<Js
 		versionJ.addProperty(Tags.Json.CREATED_AT, formatDate(version.getCreatedAt()));
 		versionJ.addProperty(Tags.Json.DELETED, version.isDeleted());
 		rootJ.add(Tags.Json.VERSION, versionJ);
+	}
+	
+
+	private static String formatDate(Date date) {
+		return ISO8601FormatFactory.getInstance().formatDate(date);
+	}
+
+	private static String formatDate(Long timestamp) {
+		return ISO8601FormatFactory.getInstance().formatDate(timestamp);
 	}
 }

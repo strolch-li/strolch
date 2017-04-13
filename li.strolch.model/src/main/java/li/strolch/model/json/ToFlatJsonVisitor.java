@@ -4,6 +4,7 @@ import static li.strolch.model.Tags.Json.ID;
 import static li.strolch.model.Tags.Json.NAME;
 import static li.strolch.model.Tags.Json.OBJECT_TYPE;
 import static li.strolch.model.Tags.Json.TYPE;
+import static li.strolch.model.json.StrolchElementToJsonVisitor.addVersion;
 
 import java.util.Collections;
 import java.util.Set;
@@ -46,12 +47,14 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 	private MapOfSets<String, String> ignoredKeys;
 	private BiConsumer<T, JsonObject> hook;
 	private boolean withoutElementName;
+	private boolean withVersion;
 
 	public ToFlatJsonVisitor() {
-		this.ignoredKeys = new MapOfSets<>();
+		this(false);
 	}
 
-	public ToFlatJsonVisitor(MapOfSets<String, String> ignoredParams) {
+	public ToFlatJsonVisitor(boolean withVersion) {
+		this.withVersion = withVersion;
 		this.ignoredKeys = new MapOfSets<>();
 	}
 
@@ -120,8 +123,11 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 			}
 		}
 
-		if (hook != null)
+		if (this.hook != null)
 			this.hook.accept(element, jsonObject);
+
+		if (this.withVersion)
+			addVersion(element, jsonObject);
 
 		return jsonObject;
 	}

@@ -9,6 +9,14 @@ import li.strolch.model.visitor.OrderVisitor;
 
 public class OrderToFlatJsonVisitor extends ToFlatJsonVisitor<Order> implements OrderVisitor<JsonObject> {
 
+	public OrderToFlatJsonVisitor() {
+		super();
+	}
+
+	public OrderToFlatJsonVisitor(boolean withVersion) {
+		super(withVersion);
+	}
+
 	@Override
 	public JsonObject visit(Order element) {
 		return toJson(element);
