@@ -78,6 +78,10 @@ public class GenericReport {
 		this.dateRangeSelP = this.report.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
 	}
 
+	public boolean hasDateRangeSelector() {
+		return this.dateRangeSelP != null;
+	}
+
 	public GenericReport dateRange(DateRange dateRange) {
 		this.dateRange = dateRange;
 		return this;
