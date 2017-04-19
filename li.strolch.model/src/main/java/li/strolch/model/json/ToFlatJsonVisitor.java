@@ -50,12 +50,20 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 	private boolean withVersion;
 
 	public ToFlatJsonVisitor() {
-		this(false);
+		this.ignoredKeys = new MapOfSets<>();
+	}
+	
+	public boolean isWithVersion() {
+		return this.withVersion;
+	}
+	
+	public boolean isWithoutElementName() {
+		return this.withoutElementName;
 	}
 
-	public ToFlatJsonVisitor(boolean withVersion) {
-		this.withVersion = withVersion;
-		this.ignoredKeys = new MapOfSets<>();
+	public ToFlatJsonVisitor<T> withVersion() {
+		this.withVersion = true;
+		return this;
 	}
 
 	public ToFlatJsonVisitor<T> withoutElementName() {
@@ -63,7 +71,7 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 		return this;
 	}
 
-	public ToFlatJsonVisitor<T> setHook(BiConsumer<T, JsonObject> hook) {
+	public ToFlatJsonVisitor<T> hook(BiConsumer<T, JsonObject> hook) {
 		this.hook = hook;
 		return this;
 	}

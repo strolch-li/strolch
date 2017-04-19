@@ -4,6 +4,7 @@ import java.util.function.BiConsumer;
 
 import com.google.gson.JsonObject;
 
+import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.visitor.ActivityVisitor;
 
@@ -13,13 +14,10 @@ public class ActivityToFlatJsonVisitor extends ToFlatJsonVisitor<Activity> imple
 		super();
 	}
 
-	public ActivityToFlatJsonVisitor(boolean withVersion) {
-		super(withVersion);
-	}
-
 	@Override
-	public JsonObject visit(Activity element) {
-		return toJson(element);
+	public ActivityToFlatJsonVisitor withVersion() {
+		super.withVersion();
+		return this;
 	}
 
 	@Override
@@ -29,8 +27,8 @@ public class ActivityToFlatJsonVisitor extends ToFlatJsonVisitor<Activity> imple
 	}
 
 	@Override
-	public ActivityToFlatJsonVisitor setHook(BiConsumer<Activity, JsonObject> hook) {
-		super.setHook(hook);
+	public ActivityToFlatJsonVisitor hook(BiConsumer<Activity, JsonObject> hook) {
+		super.hook(hook);
 		return this;
 	}
 
@@ -44,5 +42,12 @@ public class ActivityToFlatJsonVisitor extends ToFlatJsonVisitor<Activity> imple
 	public ActivityToFlatJsonVisitor ignoreParameter(String bagId, String paramId) {
 		super.ignoreParameter(bagId, paramId);
 		return this;
+	}
+
+	@Override
+	public JsonObject visit(Activity element) {
+		JsonObject jsonObject = toJson(element);
+		jsonObject.addProperty(Tags.Json.STATE, element.getState().getName());
+		return jsonObject;
 	}
 }
