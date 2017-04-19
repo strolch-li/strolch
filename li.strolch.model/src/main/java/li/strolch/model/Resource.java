@@ -96,7 +96,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	public <T extends StrolchTimedState<?>> T getTimedState(String id) {
+	public <T extends StrolchTimedState<? extends IValue<?>>> T getTimedState(String id) {
 		if (this.timedStateMap == null) {
 			return null;
 		}
