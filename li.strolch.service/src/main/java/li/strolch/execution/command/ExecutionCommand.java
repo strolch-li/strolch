@@ -55,6 +55,10 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 		while (iter.hasNext()) {
 			IActivityElement element = iter.next().getValue();
 
+			// in series we can never have two Actions in execution, so if we found the action in execution, we stop
+			if (element instanceof Action && element.getState() == State.EXECUTION)
+				break;
+
 			boolean canExecute = isExecutable(element);
 			if (canExecute) {
 				element.accept(this);

@@ -98,6 +98,16 @@
 		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
 			<Parameter Name="Duration" Id="duration" Value="PT0.1S" Type="Duration" />
 		</ParameterBag>
+		<Activity Id="sub1" Name="Sub Activity 1" Type="Sub" TimeOrdering="Parallel">
+			<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />
+			<Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use" />
+			<Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use" />
+		</Activity>
+		<Activity Id="sub2" Name="Sub Activity 2" Type="Sub" TimeOrdering="Series">
+			<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />
+			<Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use" />
+			<Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use" />
+		</Activity>
 		<Action Id="action_1" Name="Action 1" ResourceId="article1" ResourceType="Article" Type="Use" />
 		<Action Id="action_2" Name="Action 2" ResourceId="article2" ResourceType="Article" Type="Use" />
 		<Action Id="action_3" Name="Action 3" ResourceId="article3" ResourceType="Article" Type="Use" />

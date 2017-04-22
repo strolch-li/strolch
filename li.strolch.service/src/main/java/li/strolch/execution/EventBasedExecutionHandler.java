@@ -1,5 +1,9 @@
 package li.strolch.execution;
 
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.execution.command.ExecuteActivityCommand;
 import li.strolch.execution.command.SetActionToErrorCommand;
@@ -8,12 +12,16 @@ import li.strolch.execution.command.SetActionToStoppedCommand;
 import li.strolch.execution.command.SetActionToWarningCommand;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.model.Locator;
+import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.runtime.ThreadPoolFactory;
+import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -24,6 +32,10 @@ import li.strolch.utils.dbc.DBC;
  */
 public class EventBasedExecutionHandler extends ExecutionHandler {
 
+	private ExecutorService executorService;
+
+	private MapOfSets<String, Locator> registeredActivities;
+
 	private DelayedExecutionTimer delayedExecutionTimer;
 
 	public EventBasedExecutionHandler(ComponentContainer container, String componentName) {
@@ -31,8 +43,17 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void initialize(ComponentConfiguration configuration) throws Exception {
+
+		this.registeredActivities = new MapOfSets<>();
+
+		super.initialize(configuration);
+	}
+
+	@Override
 	public void start() throws Exception {
 
+		this.executorService = Executors.newCachedThreadPool(new ThreadPoolFactory("ExecutionHandler"));
 		this.delayedExecutionTimer = new SimpleDurationExecutionTimer();
 
 		super.start();
@@ -40,6 +61,15 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void stop() throws Exception {
+
+		if (this.executorService != null) {
+			this.executorService.shutdown();
+			while (!this.executorService.isTerminated()) {
+				logger.info("Waiting for executor service to terminate...");
+				Thread.sleep(50L);
+			}
+			this.executorService = null;
+		}
 
 		if (this.delayedExecutionTimer != null) {
 			this.delayedExecutionTimer.destroy();
@@ -50,37 +80,64 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void addForExecution(String realm, Locator activityLoc) {
+		Locator rootElemLoc = activityLoc.trim(3);
+		synchronized (this.registeredActivities) {
+			this.registeredActivities.addElement(realm, rootElemLoc);
+		}
+		toExecution(realm, activityLoc);
+	}
+
+	@Override
+	public void removeFromExecution(String realm, Locator activityLoc) {
+		Locator rootElemLoc = activityLoc.trim(3);
+		synchronized (this.registeredActivities) {
+			this.registeredActivities.removeElement(realm, rootElemLoc);
+		}
+	}
+
+	@Override
 	public void toExecution(String realm, Locator locator) {
-		runAsAgent(ctx -> {
-			toExecution(realm, locator, ctx);
+		this.executorService.execute(() -> {
+			runAsAgent(ctx -> {
+				toExecution(realm, locator, ctx);
+			});
 		});
 	}
 
 	@Override
 	public void toExecuted(String realm, Locator locator) {
-		runAsAgent(ctx -> {
-			toExecuted(realm, locator, ctx);
+		this.executorService.execute(() -> {
+			runAsAgent(ctx -> {
+				toExecuted(realm, locator, ctx);
+			});
 		});
 	}
 
 	@Override
 	public void toStopped(String realm, Locator locator) {
-		runAsAgent(ctx -> {
-			toStopped(realm, locator, ctx);
+		this.executorService.execute(() -> {
+			runAsAgent(ctx -> {
+				toStopped(realm, locator, ctx);
+			});
 		});
 	}
 
 	@Override
 	public void toError(String realm, Locator locator) {
-		runAsAgent(ctx -> {
-			toError(realm, locator, ctx);
+		this.executorService.execute(() -> {
+			runAsAgent(ctx -> {
+				toError(realm, locator, ctx);
+			});
 		});
 	}
 
 	@Override
 	public void toWarning(String realm, Locator locator) {
-		runAsAgent(ctx -> {
-			toWarning(realm, locator, ctx);
+		this.executorService.execute(() -> {
+			runAsAgent(ctx -> {
+				toWarning(realm, locator, ctx);
+			});
 		});
 	}
 
@@ -90,6 +147,14 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			tx.lock(rootElemLoc);
 
 			IActivityElement elem = tx.findElement(rootElemLoc);
+			if (elem == null) {
+				logger.error("Element for locator " + activityLoc + " does not exist!");
+				synchronized (this.registeredActivities) {
+					this.registeredActivities.removeElement(realm, rootElemLoc);
+				}
+				return;
+			}
+
 			DBC.INTERIM.assertEquals("toExecution only for Activity!", Activity.class, elem.getClass());
 
 			ExecuteActivityCommand command = new ExecuteActivityCommand(getContainer(), tx);
@@ -114,10 +179,39 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			command.setAction((Action) elem);
 			tx.addCommand(command);
 
+			tx.flush();
+
+			if (elem.getRootElement().getState() == State.EXECUTED) {
+				synchronized (this.registeredActivities) {
+					this.registeredActivities.removeElement(realm, activityLoc);
+				}
+			}
+
 			tx.commitOnClose();
 		}
 
+		// execute any next Action
 		toExecution(realm, activityLoc, ctx);
+
+		// now trigger a further execution of any other activities needed execution in this realm
+		triggerExecution(realm);
+	}
+
+	/**
+	 * Triggers a to execution for all registered activities in the given realm
+	 * 
+	 * @param realm
+	 */
+	private void triggerExecution(String realm) {
+		synchronized (this.registeredActivities) {
+			Set<Locator> locators = this.registeredActivities.getSet(realm);
+			if (locators != null) {
+				for (Locator locator : locators) {
+					// execute async
+					toExecution(realm, locator);
+				}
+			}
+		}
 	}
 
 	private void toWarning(String realm, Locator actionLoc, PrivilegeContext ctx) {
@@ -166,6 +260,9 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			tx.commitOnClose();
 		}
+
+		// now trigger a further execution of any other activities needed execution in this realm
+		triggerExecution(realm);
 	}
 
 	protected StrolchTransaction openTx(String realm, Certificate cert, Class<?> clazz) {

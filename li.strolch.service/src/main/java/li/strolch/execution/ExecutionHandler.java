@@ -8,6 +8,7 @@ import li.strolch.model.Locator;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 
 /**
  * <p>
@@ -15,8 +16,14 @@ import li.strolch.model.activity.Activity;
  * </p>
  * 
  * <p>
- * To start the execution of an {@link Activity} pass it to the {@link #toExecution(String, Locator)} method, and
- * together with the {@link ExecutionPolicy} to execution of the element will be handled
+ * To start the execution of an {@link Activity} add it to the {@link ExecutionHandler} by calling
+ * {@link #addForExecution(String, Locator)}. Actual execution is asynchronously performed and the
+ * {@link ExecutionPolicy} of the resources of the {@link Action Actions} will perform the actual execution.
+ * </p>
+ * 
+ * <p>
+ * Execution of Actions is done either in series or in parallel, depending on the {@link TimeOrdering} on the relevant
+ * {@link Activity}
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -26,6 +33,27 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public ExecutionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
+
+	/**
+	 * Registers the given {@link Locator} of an {@link Activity} for execution, and submits it for execution
+	 * immediately in an asynchronous manner
+	 * 
+	 * @param realm
+	 *            the realm where the {@link Activity} resides
+	 * @param activityLoc
+	 *            the {@link Locator} of the {@link Activity}
+	 */
+	public abstract void addForExecution(String realm, Locator activityLoc);
+
+	/**
+	 * Removes the given {@link Locator} for an {@link Activity} from execution, so it is not executed further
+	 * 
+	 * @param realm
+	 *            the realm where the {@link Activity} resides
+	 * @param activityLoc
+	 *            the {@link Locator} of the {@link Activity}
+	 */
+	public abstract void removeFromExecution(String realm, Locator activityLoc);
 
 	/**
 	 * <p>

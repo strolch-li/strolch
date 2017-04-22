@@ -47,6 +47,9 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 
 		doServiceAssertResult(cert, svc, arg);
 
+		// allow execution handler to do work
+		Thread.sleep(10);
+
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action = tx.findElement(activityLoc.append("produce"));
 			assertEquals(State.EXECUTION, action.getState());
@@ -73,6 +76,9 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 		arg.locator = activityLoc;
 
 		doServiceAssertResult(cert, svc, arg);
+
+		// allow execution handler to do work
+		Thread.sleep(10);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
@@ -150,9 +156,29 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 
 		doServiceAssertResult(cert, svc, arg);
 
+		// allow execution handler to do work
+		Thread.sleep(10);
+
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
 
+			// sub1 also parallel
+			action = tx.findElement(activityLoc.append("sub1", "action_1"));
+			assertEquals(State.EXECUTION, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_2"));
+			assertEquals(State.EXECUTION, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_3"));
+			assertEquals(State.EXECUTION, action.getState());
+
+			// sub2 in series
+			action = tx.findElement(activityLoc.append("sub2", "action_1"));
+			assertEquals(State.EXECUTION, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_2"));
+			assertEquals(State.CREATED, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_3"));
+			assertEquals(State.CREATED, action.getState());
+
+			// actions
 			action = tx.findElement(activityLoc.append("action_1"));
 			assertEquals(State.EXECUTION, action.getState());
 			action = tx.findElement(activityLoc.append("action_2"));
@@ -166,12 +192,73 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
 
+			// sub1 also parallel
+			action = tx.findElement(activityLoc.append("sub1", "action_1"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_2"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_3"));
+			assertEquals(State.EXECUTED, action.getState());
+
+			// sub2 in series
+			action = tx.findElement(activityLoc.append("sub2", "action_1"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_2"));
+			assertEquals(State.EXECUTION, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_3"));
+			assertEquals(State.CREATED, action.getState());
+
+			// actions
 			action = tx.findElement(activityLoc.append("action_1"));
 			assertEquals(State.EXECUTED, action.getState());
 			action = tx.findElement(activityLoc.append("action_2"));
 			assertEquals(State.EXECUTED, action.getState());
 			action = tx.findElement(activityLoc.append("action_3"));
 			assertEquals(State.EXECUTED, action.getState());
+
+			Activity activity = tx.findElement(activityLoc);
+			assertEquals(State.EXECUTION, activity.getState());
+		}
+
+		Thread.sleep(150L);
+
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
+			Action action;
+
+			// sub1 also parallel
+			action = tx.findElement(activityLoc.append("sub1", "action_1"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_2"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_3"));
+			assertEquals(State.EXECUTED, action.getState());
+
+			// sub2 in series
+			action = tx.findElement(activityLoc.append("sub2", "action_1"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_2"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_3"));
+			assertEquals(State.EXECUTION, action.getState());
+
+			// actions
+			action = tx.findElement(activityLoc.append("action_1"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("action_2"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("action_3"));
+			assertEquals(State.EXECUTED, action.getState());
+
+			Activity activity = tx.findElement(activityLoc);
+			assertEquals(State.EXECUTION, activity.getState());
+		}
+
+		Thread.sleep(150L);
+
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
+
+			Activity activity = tx.findElement(activityLoc);
+			assertEquals(State.EXECUTED, activity.getState());
 		}
 	}
 
@@ -188,6 +275,73 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 		arg.locator = activityLoc;
 
 		doServiceAssertResult(cert, svc, arg);
+
+		// allow execution handler to do work
+		Thread.sleep(10);
+
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
+			Action action;
+
+			// sub1 in series
+			action = tx.findElement(activityLoc.append("sub1", "action_1"));
+			assertEquals(State.EXECUTION, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_2"));
+			assertEquals(State.CREATED, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_3"));
+			assertEquals(State.CREATED, action.getState());
+
+			// sub2 in series
+			action = tx.findElement(activityLoc.append("sub2", "action_1"));
+			assertEquals(State.CREATED, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_2"));
+			assertEquals(State.CREATED, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_3"));
+			assertEquals(State.CREATED, action.getState());
+
+			// actions
+			action = tx.findElement(activityLoc.append("action_1"));
+			assertEquals(State.CREATED, action.getState());
+			action = tx.findElement(activityLoc.append("action_2"));
+			assertEquals(State.CREATED, action.getState());
+			action = tx.findElement(activityLoc.append("action_3"));
+			assertEquals(State.CREATED, action.getState());
+
+			Activity activity = tx.findElement(activityLoc);
+			assertEquals(State.EXECUTION, activity.getState());
+		}
+
+		Thread.sleep(150L);
+
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
+			Action action;
+
+			// sub1 in series
+			action = tx.findElement(activityLoc.append("sub1", "action_1"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_2"));
+			assertEquals(State.EXECUTION, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_3"));
+			assertEquals(State.CREATED, action.getState());
+
+			// sub2 in series
+			action = tx.findElement(activityLoc.append("sub2", "action_1"));
+			assertEquals(State.CREATED, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_2"));
+			assertEquals(State.CREATED, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_3"));
+			assertEquals(State.CREATED, action.getState());
+
+			// actions
+			action = tx.findElement(activityLoc.append("action_1"));
+			assertEquals(State.CREATED, action.getState());
+			action = tx.findElement(activityLoc.append("action_2"));
+			assertEquals(State.CREATED, action.getState());
+			action = tx.findElement(activityLoc.append("action_3"));
+			assertEquals(State.CREATED, action.getState());
+
+			Activity activity = tx.findElement(activityLoc);
+			assertEquals(State.EXECUTION, activity.getState());
+		}
 
 		Thread.sleep(1000L);
 

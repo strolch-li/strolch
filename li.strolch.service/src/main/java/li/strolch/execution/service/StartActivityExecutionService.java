@@ -22,7 +22,7 @@ public class StartActivityExecutionService extends AbstractService<LocatorArgume
 		String realm = StringHelper.isEmpty(arg.realm) ? StrolchConstants.DEFAULT_REALM : arg.realm;
 
 		ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
-		executionHandler.toExecution(realm, arg.locator);
+		executionHandler.addForExecution(realm, arg.locator);
 
 		return ServiceResult.success();
 	}
