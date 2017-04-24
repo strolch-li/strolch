@@ -214,6 +214,18 @@ public class UserRep implements Serializable {
 	}
 
 	/**
+	 * Returns true if this user has the given role
+	 * 
+	 * @param role
+	 *            the role to check for
+	 * 
+	 * @return returns true if this user has the given role
+	 */
+	public boolean hasRole(String role) {
+		return this.roles.contains(role);
+	}
+
+	/**
 	 * @return the locale
 	 */
 	public Locale getLocale() {
