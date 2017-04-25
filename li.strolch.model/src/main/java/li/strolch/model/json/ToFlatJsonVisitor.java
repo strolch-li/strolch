@@ -86,7 +86,7 @@ public class ToFlatJsonVisitor<T extends StrolchRootElement> {
 		return this;
 	}
 
-	public JsonObject toJson(T element) {
+	protected JsonObject toJson(T element) {
 
 		JsonObject jsonObject = new JsonObject();
 

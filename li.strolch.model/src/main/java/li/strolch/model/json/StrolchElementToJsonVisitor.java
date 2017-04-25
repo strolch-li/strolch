@@ -48,7 +48,7 @@ public class StrolchElementToJsonVisitor implements StrolchRootElementVisitor<Js
 		return toJson(activity);
 	}
 
-	public JsonObject toJson(Resource element) {
+	protected JsonObject toJson(Resource element) {
 
 		JsonObject rootJ = new JsonObject();
 		rootJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.RESOURCE);
@@ -63,7 +63,7 @@ public class StrolchElementToJsonVisitor implements StrolchRootElementVisitor<Js
 		return rootJ;
 	}
 
-	public JsonObject toJson(Order element) {
+	protected JsonObject toJson(Order element) {
 
 		JsonObject rootJ = new JsonObject();
 		rootJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ORDER);
@@ -79,13 +79,13 @@ public class StrolchElementToJsonVisitor implements StrolchRootElementVisitor<Js
 		return rootJ;
 	}
 
-	public JsonObject toJson(Activity element) {
+	protected JsonObject toJson(Activity element) {
 		JsonObject rootJ = new JsonObject();
 		addVersion(element, rootJ);
 		return toJson(element, rootJ);
 	}
 
-	public JsonObject toJson(Action element) {
+	protected JsonObject toJson(Action element) {
 		JsonObject rootJ = new JsonObject();
 		return toJson(element, rootJ);
 	}
