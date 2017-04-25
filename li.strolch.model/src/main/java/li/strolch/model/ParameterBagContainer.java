@@ -25,7 +25,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * 
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	public <T extends Parameter<?>> T getParameter(String bagKey, String paramKey);
+	public <U, T extends Parameter<U>> T getParameter(String bagKey, String paramKey);
 
 	/**
 	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the given bagKey, or null if
@@ -40,7 +40,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * 
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	public <T extends Parameter<?>> T getParameter(String bagKey, String paramKey, boolean assertExists);
+	public <U, T extends Parameter<U>> T getParameter(String bagKey, String paramKey, boolean assertExists);
 
 	/**
 	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key

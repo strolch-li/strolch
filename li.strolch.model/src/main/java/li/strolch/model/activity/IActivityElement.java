@@ -63,7 +63,7 @@ public interface IActivityElement extends StrolchElement {
 	 * 
 	 * @see GroupedParameterizedElement#getParameter(String, String)
 	 */
-	public <T extends Parameter<?>> T findParameter(String bagKey, String paramKey);
+	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey);
 
 	/**
 	 * <p>
@@ -77,7 +77,7 @@ public interface IActivityElement extends StrolchElement {
 	 * 
 	 * @see GroupedParameterizedElement#getParameter(String, String, boolean)
 	 */
-	public <T extends Parameter<?>> T findParameter(String bagKey, String paramKey, boolean assertExists)
+	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey, boolean assertExists)
 			throws StrolchModelException;
 
 	@Override

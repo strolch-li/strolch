@@ -370,7 +370,7 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
-	public <T extends Parameter<?>> T findParameter(String bagKey, String paramKey) {
+	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey) {
 
 		T parameter = getParameter(bagKey, paramKey);
 		if (parameter != null)
@@ -383,7 +383,7 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
-	public <T extends Parameter<?>> T findParameter(String bagKey, String paramKey, boolean assertExists)
+	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey, boolean assertExists)
 			throws StrolchModelException {
 
 		T parameter = getParameter(bagKey, paramKey);

@@ -113,6 +113,8 @@ public class ModelTest {
 		assertEquals("Test resource", resource.getName());
 		assertEquals("MyType", resource.getType());
 
+		assertParams(resource);
+
 		ParameterBag bag = resource.getParameterBag(BAG_ID);
 		validateBag(bag);
 
@@ -130,6 +132,7 @@ public class ModelTest {
 		assertEquals(date, order.getDate());
 		assertEquals(State.CLOSED, order.getState());
 
+		assertParams(order);
 		ParameterBag bag = order.getParameterBag(BAG_ID);
 		validateBag(bag);
 	}
@@ -155,6 +158,8 @@ public class ModelTest {
 		assertEquals(actName, activity.getName());
 		assertEquals(actType, activity.getType());
 
+		assertParams(activity);
+
 		ParameterBag bag = activity.getParameterBag(BAG_ID);
 		validateBag(bag);
 
@@ -166,6 +171,10 @@ public class ModelTest {
 		assertEquals(ACTION_RES_ID, action.getResourceId());
 		assertEquals(ACTION_RES_TYPE, action.getResourceType());
 		assertEquals(changes, action.getChanges());
+
+		assertParams(action);
+		bag = action.getParameterBag(BAG_ID);
+		validateBag(bag);
 
 		activity = activity.getElement("sub_" + actId);
 		assertEquals("sub_" + actId, activity.getId());
@@ -387,6 +396,53 @@ public class ModelTest {
 		assertEquals(BAG_TYPE, bag.getType());
 
 		validateParams(bag);
+	}
+
+	private void assertParams(ParameterBagContainer bagContainer) {
+		Boolean bool = bagContainer.getParameter(BAG_ID, PARAM_BOOLEAN_ID).getValue();
+		assertEquals(true, bool.booleanValue());
+
+		String string = bagContainer.getParameter(BAG_ID, PARAM_STRING_ID).getValue();
+		assertEquals("Strolch", string);
+
+		Integer integer = bagContainer.getParameter(BAG_ID, PARAM_INTEGER_ID).getValue();
+		assertEquals(77, integer.intValue());
+
+		Date date = bagContainer.getParameter(BAG_ID, PARAM_DATE_ID).getValue();
+		assertEquals(1354295525628L, date.getTime());
+
+		Double doubl = bagContainer.getParameter(BAG_ID, PARAM_FLOAT_ID).getValue();
+		assertEquals(44.3, doubl.doubleValue(), 0.0001);
+
+		Long lon = bagContainer.getParameter(BAG_ID, PARAM_LONG_ID).getValue();
+		assertEquals(4453234566L, lon.longValue());
+
+		List<Double> doubles = bagContainer.getParameter(BAG_ID, PARAM_LIST_FLOAT_ID).getValue();
+		ArrayList<Double> floatList = new ArrayList<>();
+		floatList.add(6.0);
+		floatList.add(11.0);
+		floatList.add(16.0);
+		assertEquals(floatList, doubles);
+
+		List<Integer> integers = bagContainer.getParameter(BAG_ID, PARAM_LIST_INTEGER_ID).getValue();
+		ArrayList<Integer> intList = new ArrayList<>();
+		intList.add(5);
+		intList.add(10);
+		intList.add(15);
+		assertEquals(intList, integers);
+
+		List<Long> longs = bagContainer.getParameter(BAG_ID, PARAM_LIST_LONG_ID).getValue();
+		ArrayList<Long> longList = new ArrayList<>();
+		longList.add(7L);
+		longList.add(12L);
+		longList.add(17L);
+		assertEquals(longList, longs);
+
+		List<String> strings = bagContainer.getParameter(BAG_ID, PARAM_LIST_STRING_ID).getValue();
+		ArrayList<String> stringList = new ArrayList<>();
+		stringList.add("Hello");
+		stringList.add("World");
+		assertEquals(stringList, strings);
 	}
 
 	public static void validateParams(ParameterBag bag) {
