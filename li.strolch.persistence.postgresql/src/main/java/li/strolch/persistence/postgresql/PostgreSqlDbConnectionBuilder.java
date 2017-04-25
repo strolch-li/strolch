@@ -53,7 +53,6 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		ds.validate();
 	}
 
-	@SuppressWarnings("resource")
 	@Override
 	public DataSource build(String realm, String url, String username, String password, Properties props) {
 
@@ -188,7 +187,7 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		 * @see com.zaxxer.hikari.HikariDataSource#shutdown()
 		 */
 		public void shutdown() {
-			this.ds.shutdown();
+			this.ds.close();
 		}
 
 		/**
