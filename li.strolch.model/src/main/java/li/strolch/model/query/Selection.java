@@ -23,4 +23,8 @@ public interface Selection {
 	public void accept(QueryVisitor visitor);
 
 	public boolean hasSelection();
+
+	public default Selection not() {
+		return new NotSelection(this);
+	}
 }
