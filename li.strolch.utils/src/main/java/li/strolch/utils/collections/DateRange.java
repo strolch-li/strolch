@@ -127,7 +127,12 @@ public class DateRange {
 	@Override
 	public String toString() {
 		ISO8601FormatFactory df = ISO8601FormatFactory.getInstance();
-		return df.formatDate(this.fromDate) + (this.fromInclusive ? " (inc)" : " (exc)") + " - "
-				+ df.formatDate(this.toDate) + (this.toInclusive ? " (inc)" : " (exc)");
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.fromDate == null ? "-" : df.formatDate(this.fromDate));
+		sb.append((this.fromInclusive ? " (inc)" : " (exc)"));
+		sb.append(" - ");
+		sb.append(this.toDate == null ? "-" : df.formatDate(this.toDate));
+		sb.append((this.toInclusive ? " (inc)" : " (exc)"));
+		return sb.toString();
 	}
 }
