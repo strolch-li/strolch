@@ -116,6 +116,7 @@ public class TransientRealm extends InternalStrolchRealm {
 
 	@Override
 	public void start(PrivilegeContext privilegeContext) {
+		super.start(privilegeContext);
 
 		ModelStatistics statistics;
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
@@ -139,11 +140,6 @@ public class TransientRealm extends InternalStrolchRealm {
 		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$
-	}
-
-	@Override
-	public void stop() {
-		// 
 	}
 
 	@Override

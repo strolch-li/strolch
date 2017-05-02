@@ -158,9 +158,19 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		return this.observerHandler;
 	}
 
-	public abstract void start(PrivilegeContext privilegeContext);
+	public void start(PrivilegeContext privilegeContext) {
 
-	public abstract void stop();
+		if (this.observerHandler != null) {
+			this.observerHandler.start();
+		}
+	}
+
+	public void stop() {
+
+		if (this.observerHandler != null) {
+			this.observerHandler.stop();
+		}
+	}
 
 	public abstract void destroy();
 
@@ -171,5 +181,4 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	public abstract ActivityMap getActivityMap();
 
 	public abstract AuditTrail getAuditTrail();
-
 }

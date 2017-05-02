@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
+import li.strolch.agent.api.ObserverEvent;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
@@ -886,34 +887,37 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		long observerUpdateStart = System.nanoTime();
 
-		ObserverHandler observerHandler = this.realm.getObserverHandler();
-
-		if (this.orderMap != null) {
-			if (!this.orderMap.getCreated().isEmpty())
-				observerHandler.add(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getCreated()));
-			if (!this.orderMap.getUpdated().isEmpty())
-				observerHandler.update(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getUpdated()));
-			if (!this.orderMap.getDeleted().isEmpty())
-				observerHandler.remove(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getDeleted()));
-		}
+		ObserverEvent event = new ObserverEvent();
 
 		if (this.resourceMap != null) {
 			if (!this.resourceMap.getCreated().isEmpty())
-				observerHandler.add(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getCreated()));
+				event.added.addList(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getCreated()));
 			if (!this.resourceMap.getUpdated().isEmpty())
-				observerHandler.update(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getUpdated()));
+				event.updated.addList(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getUpdated()));
 			if (!this.resourceMap.getDeleted().isEmpty())
-				observerHandler.remove(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getDeleted()));
+				event.removed.addList(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getDeleted()));
+		}
+
+		if (this.orderMap != null) {
+			if (!this.orderMap.getCreated().isEmpty())
+				event.added.addList(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getCreated()));
+			if (!this.orderMap.getUpdated().isEmpty())
+				event.updated.addList(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getUpdated()));
+			if (!this.orderMap.getDeleted().isEmpty())
+				event.removed.addList(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getDeleted()));
 		}
 
 		if (this.activityMap != null) {
 			if (!this.activityMap.getCreated().isEmpty())
-				observerHandler.add(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getCreated()));
+				event.added.addList(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getCreated()));
 			if (!this.activityMap.getUpdated().isEmpty())
-				observerHandler.update(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getUpdated()));
+				event.updated.addList(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getUpdated()));
 			if (!this.activityMap.getDeleted().isEmpty())
-				observerHandler.remove(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getDeleted()));
+				event.removed.addList(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getDeleted()));
 		}
+
+		ObserverHandler observerHandler = this.realm.getObserverHandler();
+		observerHandler.notify(event);
 
 		long observerUpdateDuration = System.nanoTime() - observerUpdateStart;
 		return observerUpdateDuration;

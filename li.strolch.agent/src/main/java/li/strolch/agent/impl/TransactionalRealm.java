@@ -100,6 +100,7 @@ public class TransactionalRealm extends InternalStrolchRealm {
 
 	@Override
 	public void start(PrivilegeContext privilegeContext) {
+		super.start(privilegeContext);
 
 		long start = System.nanoTime();
 		int nrOfOrders = 0;
@@ -125,11 +126,6 @@ public class TransactionalRealm extends InternalStrolchRealm {
 		logger.info(MessageFormat.format("There are {0} Orders", nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("There are {0} Resources", nrOfResources)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("There are {0} Activities", nrOfActivities)); //$NON-NLS-1$
-	}
-
-	@Override
-	public void stop() {
-		// 
 	}
 
 	@Override

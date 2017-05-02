@@ -98,12 +98,8 @@ public class EmptyRealm extends InternalStrolchRealm {
 
 	@Override
 	public void start(PrivilegeContext privilegeContext) {
+		super.start(privilegeContext);
 		logger.info(MessageFormat.format("Initialized EMPTY Realm {0}", getRealm())); //$NON-NLS-1$
-	}
-
-	@Override
-	public void stop() {
-		// 
 	}
 
 	@Override

@@ -15,8 +15,6 @@
  */
 package li.strolch.agent.api;
 
-import java.util.List;
-
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 
@@ -45,36 +43,12 @@ import li.strolch.model.Tags;
 public interface ObserverHandler {
 
 	/**
-	 * Notifies any registered {@link Observer} that the given elements under the given key have been added i.e. created
+	 * Update observers with the given event
 	 * 
-	 * @param key
-	 *            the key for which to notify observers
-	 * @param elements
-	 *            the elements to notify observers with
+	 * @param observerEvent
+	 *            containing the updates
 	 */
-	public void add(String key, List<StrolchRootElement> elements);
-
-	/**
-	 * Notifies any registered {@link Observer} that the given elements under the given key have been updated i.e.
-	 * modified
-	 * 
-	 * @param key
-	 *            the key for which to notify observers
-	 * @param elements
-	 *            the elements to notify observers with
-	 */
-	public void update(String key, List<StrolchRootElement> elements);
-
-	/**
-	 * Notifies any registered {@link Observer} that the given elements under the given key have been removed i.e.
-	 * deleted
-	 * 
-	 * @param key
-	 *            the key for which to notify observers
-	 * @param elements
-	 *            the elements to notify observers with
-	 */
-	public void remove(String key, List<StrolchRootElement> elements);
+	public void notify(ObserverEvent observerEvent);
 
 	/**
 	 * Registers the {@link Observer} for notification of objects under the given key
@@ -95,4 +69,14 @@ public interface ObserverHandler {
 	 *            the observer unregister
 	 */
 	public void unregisterObserver(String key, Observer observer);
+
+	/**
+	 * Start the update thread
+	 */
+	public void start();
+
+	/**
+	 * Stop the update thread
+	 */
+	public void stop();
 }
