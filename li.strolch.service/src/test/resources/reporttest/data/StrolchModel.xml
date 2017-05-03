@@ -8,6 +8,15 @@
 			<Parameter Id="dateRangeSel" Name="Date Range Selector" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="Bags/parameters/expirationDate" />
 		</ParameterBag>
 
+		<ParameterBag Id="quantityFilter" Name="Filter" Type="Filter">
+			<Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:GreaterThan" Value="0.0" />
+			<Parameter Id="fieldRef" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/quantity" />
+		</ParameterBag>
+		<ParameterBag Id="noProductFilter" Name="Filter" Type="Filter">
+			<Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:Equals" Value="!-" />
+			<Parameter Id="fieldRef" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="$id" />
+		</ParameterBag>
+
 		<ParameterBag Id="columns" Name="Display Columns" Type="Display">
 			<Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="$name" />
 			<Parameter Id="storage" Name="Storage" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="$name" />
@@ -186,6 +195,28 @@
 		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
 			<Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section002" />
 			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="product02" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="slot005" Name="Slot 4" Type="Slot">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="quantity" Name="Quantity" Type="Float" Value="0.0" />
+			<Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section002" />
+			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="product02" />
+		</ParameterBag>
+	</Resource>
+
+	<Resource Id="slot006" Name="Slot 4" Type="Slot">
+		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+			<Parameter Id="quantity" Name="Quantity" Type="Float" Value="22.0" />
+			<Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0" />
+		</ParameterBag>
+		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
+			<Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section002" />
+			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="-" />
 		</ParameterBag>
 	</Resource>
 

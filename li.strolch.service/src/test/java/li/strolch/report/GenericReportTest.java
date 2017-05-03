@@ -50,7 +50,7 @@ public class GenericReportTest {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
 
-			GenericReport report = new GenericReport(tx, "stockReport");
+			GenericReport report = new GenericReport(runtimeMock.getContainer(), tx, "stockReport");
 			report.doReportAsJson().forEach(e -> {
 
 				if (e.get("slot").getAsString().equals("Slot 1")) {
@@ -105,7 +105,7 @@ public class GenericReportTest {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
 
-			GenericReport report = new GenericReport(tx, "stockReport");
+			GenericReport report = new GenericReport(runtimeMock.getContainer(), tx, "stockReport");
 			report.filter("Product", "product01").doReportAsJson().forEach(e -> {
 
 				String slotName = e.get("slot").getAsString();
@@ -126,7 +126,7 @@ public class GenericReportTest {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
 
-			GenericReport report = new GenericReport(tx, "stockReport");
+			GenericReport report = new GenericReport(runtimeMock.getContainer(), tx, "stockReport");
 			report.filter("Product", "product01").filter("Location", "location02").doReportAsJson().forEach(e -> {
 
 				String slotName = e.get("slot").getAsString();
@@ -151,7 +151,7 @@ public class GenericReportTest {
 			DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
 			// expect no slots as all not in date range
-			GenericReport report = new GenericReport(tx, "stockReport");
+			GenericReport report = new GenericReport(runtimeMock.getContainer(), tx, "stockReport");
 			List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
 					.collect(Collectors.toList());
 			assertTrue(result.isEmpty());
@@ -159,7 +159,7 @@ public class GenericReportTest {
 			// expect 2 slots, as in date range
 			to = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
 			dateRange = new DateRange().from(from, true).to(to, false);
-			report = new GenericReport(tx, "stockReport");
+			report = new GenericReport(runtimeMock.getContainer(), tx, "stockReport");
 			result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
 					.collect(Collectors.toList());
 			assertEquals(2, result.size());
@@ -176,7 +176,7 @@ public class GenericReportTest {
 			DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
 			// expect no orders as all not in date range
-			GenericReport report = new GenericReport(tx, "fromStockReport");
+			GenericReport report = new GenericReport(runtimeMock.getContainer(), tx, "fromStockReport");
 			List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
 					.collect(Collectors.toList());
 			assertTrue(result.isEmpty());
@@ -184,7 +184,7 @@ public class GenericReportTest {
 			// expect 2 orders, as in date range
 			to = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
 			dateRange = new DateRange().from(from, true).to(to, false);
-			report = new GenericReport(tx, "fromStockReport");
+			report = new GenericReport(runtimeMock.getContainer(), tx, "fromStockReport");
 			result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
 					.collect(Collectors.toList());
 			assertEquals(2, result.size());
@@ -192,7 +192,7 @@ public class GenericReportTest {
 			// expect 4 orders, as all in date range
 			to = new Date(LocalDate.of(2017, 3, 2).toEpochDay() * 86400000);
 			dateRange = new DateRange().from(from, true).to(to, false);
-			report = new GenericReport(tx, "fromStockReport");
+			report = new GenericReport(runtimeMock.getContainer(), tx, "fromStockReport");
 			result = report.filter("Product", "product01", "product02").dateRange(dateRange).doReportAsJson()
 					.collect(Collectors.toList());
 			assertEquals(4, result.size());
@@ -204,7 +204,7 @@ public class GenericReportTest {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
 
-			GenericReport report = new GenericReport(tx, "stockReport");
+			GenericReport report = new GenericReport(runtimeMock.getContainer(), tx, "stockReport");
 			MapOfSets<String, StrolchRootElement> filterCriteria = report.generateFilterCriteria();
 
 			assertThat(filterCriteria.getSet("Product").stream().map(e -> e.getId()).collect(Collectors.toSet()),
@@ -225,7 +225,7 @@ public class GenericReportTest {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
 
-			GenericReport report = new GenericReport(tx, "stockReport");
+			GenericReport report = new GenericReport(runtimeMock.getContainer(), tx, "stockReport");
 			MapOfSets<String, StrolchRootElement> filterCriteria = report //
 					.filter("Product", "product01") //
 					.generateFilterCriteria();
@@ -252,7 +252,7 @@ public class GenericReportTest {
 			Date to = new Date(LocalDate.of(2017, 3, 5).toEpochDay() * 86400000);
 			DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
-			GenericReport report = new GenericReport(tx, "stockReport");
+			GenericReport report = new GenericReport(runtimeMock.getContainer(), tx, "stockReport");
 			MapOfSets<String, StrolchRootElement> filterCriteria = report //
 					.dateRange(dateRange) //
 					.filter("Product", "product01") //

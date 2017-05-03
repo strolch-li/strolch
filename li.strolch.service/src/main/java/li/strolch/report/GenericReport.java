@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Locator;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
@@ -21,9 +22,12 @@ import li.strolch.model.StrolchValueType;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.ElementDateVisitor;
 import li.strolch.model.visitor.ElementStateVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.policy.PolicyHandler;
+import li.strolch.report.policy.ReportFilterPolicy;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
@@ -35,6 +39,7 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 public class GenericReport {
 
 	private static final String TYPE_REPORT = "Report";
+	private static final String TYPE_FILTER = "Filter";
 
 	private static final String BAG_RELATIONS = "relations";
 	private static final String BAG_JOINS = "joins";
@@ -43,6 +48,8 @@ public class GenericReport {
 
 	private static final String PARAM_OBJECT_TYPE = "objectType";
 	private static final String PARAM_DATE_RANGE_SEL = "dateRangeSel";
+	private static final String PARAM_FIELD_REF = "fieldRef";
+	private static final String PARAM_POLICY = "policy";
 
 	private static final String COL_ID = "$id";
 	private static final String COL_NAME = "$name";
@@ -65,17 +72,36 @@ public class GenericReport {
 	private StringParameter dateRangeSelP;
 
 	private DateRange dateRange;
-	private MapOfSets<String, String> filtersByType;
+	private Map<ReportFilterPolicy, StringParameter> filtersByPolicy;
+	private MapOfSets<String, String> filtersById;
 
-	public GenericReport(StrolchTransaction tx, String reportId) {
+	public GenericReport(ComponentContainer container, StrolchTransaction tx, String reportId) {
 		this.tx = tx;
 		this.reportId = reportId;
 
 		// get the report
 		this.report = this.tx.getResourceBy(TYPE_REPORT, this.reportId, true);
+
+		// prepare
 		this.columnsBag = this.report.getParameterBag(BAG_COLUMNS, true);
 		this.columnIds = this.columnsBag.getParameterKeySet();
 		this.dateRangeSelP = this.report.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
+
+		// evaluate filters
+		this.filtersByPolicy = new HashMap<>();
+		List<ParameterBag> filterBags = this.report.getParameterBagsByType(TYPE_FILTER);
+		for (ParameterBag filterBag : filterBags) {
+
+			// prepare filter function policy
+			StringParameter functionP = filterBag.getParameter(PARAM_POLICY);
+			PolicyHandler policyHandler = container.getComponent(PolicyHandler.class);
+			PolicyDef policyDef = PolicyDef.valueOf(functionP.getInterpretation(), functionP.getUom());
+			ReportFilterPolicy filterFunction = policyHandler.getPolicy(policyDef, tx);
+			filterFunction.init(functionP.getValue());
+
+			StringParameter fieldRefP = filterBag.getParameter(PARAM_FIELD_REF);
+			this.filtersByPolicy.put(filterFunction, fieldRefP);
+		}
 	}
 
 	public boolean hasDateRangeSelector() {
@@ -95,28 +121,28 @@ public class GenericReport {
 	}
 
 	public GenericReport filter(String type, String... ids) {
-		if (this.filtersByType == null)
-			this.filtersByType = new MapOfSets<>();
+		if (this.filtersById == null)
+			this.filtersById = new MapOfSets<>();
 		for (String id : ids) {
-			this.filtersByType.addElement(type, id);
+			this.filtersById.addElement(type, id);
 		}
 		return this;
 	}
 
 	public GenericReport filter(String type, List<String> ids) {
-		if (this.filtersByType == null)
-			this.filtersByType = new MapOfSets<>();
+		if (this.filtersById == null)
+			this.filtersById = new MapOfSets<>();
 		for (String id : ids) {
-			this.filtersByType.addElement(type, id);
+			this.filtersById.addElement(type, id);
 		}
 		return this;
 	}
 
 	public GenericReport filter(String type, Set<String> ids) {
-		if (this.filtersByType == null)
-			this.filtersByType = new MapOfSets<>();
+		if (this.filtersById == null)
+			this.filtersById = new MapOfSets<>();
 		for (String id : ids) {
-			this.filtersByType.addElement(type, id);
+			this.filtersById.addElement(type, id);
 		}
 		return this;
 	}
@@ -148,7 +174,26 @@ public class GenericReport {
 
 	private boolean filter(Map<String, StrolchRootElement> row) {
 
-		// first we do a date range selection, if required
+		// do filtering by policies
+		for (ReportFilterPolicy filterPolicy : this.filtersByPolicy.keySet()) {
+			StringParameter fieldRefP = this.filtersByPolicy.get(filterPolicy);
+
+			String type = fieldRefP.getUom();
+
+			StrolchRootElement column = row.get(type);
+
+			if (fieldRefP.getValue().startsWith("$")) {
+				String columnValue = evaluateColumnValue(fieldRefP, row);
+				if (!filterPolicy.filter(columnValue))
+					return false;
+			} else {
+				Parameter<?> param = lookupParameter(fieldRefP, column);
+				if (!filterPolicy.filter(param))
+					return false;
+			}
+		}
+
+		// do a date range selection, if required
 		if (this.dateRange != null) {
 			if (this.dateRangeSelP == null)
 				throw new IllegalStateException(
@@ -179,13 +224,13 @@ public class GenericReport {
 		}
 
 		// then we do a filter by criteria
-		if (this.filtersByType != null && !this.filtersByType.isEmpty()) {
-			for (String type : this.filtersByType.keySet()) {
+		if (this.filtersById != null && !this.filtersById.isEmpty()) {
+			for (String type : this.filtersById.keySet()) {
 				StrolchRootElement element = row.get(type);
 				if (element == null)
 					return false;
 
-				if (!this.filtersByType.getSet(type).contains(element.getId()))
+				if (!this.filtersById.getSet(type).contains(element.getId()))
 					return false;
 			}
 		}
@@ -354,6 +399,8 @@ public class GenericReport {
 			// recursively find the dependency
 			StringParameter dependencyP = joinBag.getParameter(dependencyType);
 			dependency = addColumnJoin(refs, joinBag, dependencyP, false);
+			if (dependency == null)
+				return null;
 		}
 
 		ParameterBag relationsBag = dependency.getParameterBag(BAG_RELATIONS);
@@ -378,13 +425,9 @@ public class GenericReport {
 		}
 
 		Locator locator = Locator.valueOf(elementType, joinType, relationP.getValue());
-		StrolchRootElement joinElem;
-		try {
-			joinElem = this.tx.findElement(locator);
-		} catch (Exception e) {
-			throw new IllegalStateException("Failed to find join element " + joinType + " for dependency "
-					+ dependency.getLocator() + " with locator " + locator);
-		}
+		StrolchRootElement joinElem = this.tx.findElement(locator, true);
+		if (joinElem == null)
+			return null;
 
 		refs.put(joinType, joinElem);
 		return joinElem;

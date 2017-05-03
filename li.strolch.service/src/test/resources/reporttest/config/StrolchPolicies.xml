@@ -1,3 +1,8 @@
 <StrolchPolicies>
 
+	<PolicyType Type="ReportFilterPolicy" Api="li.strolch.report.policy.ReportFilterPolicy">
+		<Policy Key="GreaterThan" Class="li.strolch.report.policy.GreaterThanReportFilter" />
+		<Policy Key="Equals" Class="li.strolch.report.policy.EqualsReportFilter" />
+	</PolicyType>
+
 </StrolchPolicies>
