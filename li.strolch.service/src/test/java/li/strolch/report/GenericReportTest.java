@@ -2,6 +2,7 @@ package li.strolch.report;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -215,8 +216,7 @@ public class GenericReportTest {
 					containsInAnyOrder("storage01", "storage02"));
 			assertThat(filterCriteria.getSet("Section").stream().map(e -> e.getId()).collect(Collectors.toSet()),
 					containsInAnyOrder("section001", "section002"));
-			assertThat(filterCriteria.getSet("Slot").stream().map(e -> e.getId()).collect(Collectors.toSet()),
-					containsInAnyOrder("slot001", "slot002", "slot003", "slot004"));
+			assertFalse(filterCriteria.containsSet("Slot"));
 		}
 	}
 
@@ -238,8 +238,7 @@ public class GenericReportTest {
 					containsInAnyOrder("storage01", "storage02"));
 			assertThat(filterCriteria.getSet("Section").stream().map(e -> e.getId()).collect(Collectors.toSet()),
 					containsInAnyOrder("section001", "section002"));
-			assertThat(filterCriteria.getSet("Slot").stream().map(e -> e.getId()).collect(Collectors.toSet()),
-					containsInAnyOrder("slot001", "slot003"));
+			assertFalse(filterCriteria.containsSet("Slot"));
 		}
 	}
 

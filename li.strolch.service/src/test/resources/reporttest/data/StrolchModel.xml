@@ -5,6 +5,7 @@
 
 		<ParameterBag Id="parameters" Name="parameters" Type="Parameters">
 			<Parameter Id="objectType" Name="Object Type" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Slot" />
+			<Parameter Id="hideObjectTypeFromFilterCriteria" Name="Hide objectType from filter criteria" Type="Boolean" Value="true" />
 			<Parameter Id="dateRangeSel" Name="Date Range Selector" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="Bags/parameters/expirationDate" />
 		</ParameterBag>
 
@@ -13,8 +14,8 @@
 			<Parameter Id="fieldRef" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/quantity" />
 		</ParameterBag>
 		<ParameterBag Id="noProductFilter" Name="Filter" Type="Filter">
-			<Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:Equals" Value="!-" />
-			<Parameter Id="fieldRef" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="$id" />
+			<Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:Equals" Value="!" />
+			<Parameter Id="fieldRef" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/relations/product" />
 		</ParameterBag>
 
 		<ParameterBag Id="columns" Name="Display Columns" Type="Display">
@@ -216,7 +217,7 @@
 		</ParameterBag>
 		<ParameterBag Id="relations" Name="Relations" Type="Parameters">
 			<Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section002" />
-			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="-" />
+			<Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="" />
 		</ParameterBag>
 	</Resource>
 

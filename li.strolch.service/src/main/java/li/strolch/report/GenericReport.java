@@ -19,6 +19,7 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.StrolchValueType;
+import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
@@ -47,6 +48,7 @@ public class GenericReport {
 	private static final String BAG_COLUMNS = "columns";
 
 	private static final String PARAM_OBJECT_TYPE = "objectType";
+	private static final String PARAM_HIDE_OBJECT_TYPE_FROM_FILTER_CRITERIA = "hideObjectTypeFromFilterCriteria";
 	private static final String PARAM_DATE_RANGE_SEL = "dateRangeSel";
 	private static final String PARAM_FIELD_REF = "fieldRef";
 	private static final String PARAM_POLICY = "policy";
@@ -67,6 +69,8 @@ public class GenericReport {
 	private String reportId;
 
 	private Resource report;
+	private StringParameter objectTypeP;
+	private boolean hideObjectTypeFromFilterCriteria;
 	private ParameterBag columnsBag;
 	private Set<String> columnIds;
 	private StringParameter dateRangeSelP;
@@ -83,6 +87,12 @@ public class GenericReport {
 		this.report = this.tx.getResourceBy(TYPE_REPORT, this.reportId, true);
 
 		// prepare
+		this.objectTypeP = this.report.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
+
+		BooleanParameter hideObjectTypeFromFilterCriteriaP = this.report.getParameter(BAG_PARAMETERS,
+				PARAM_HIDE_OBJECT_TYPE_FROM_FILTER_CRITERIA);
+		this.hideObjectTypeFromFilterCriteria = hideObjectTypeFromFilterCriteriaP != null
+				&& hideObjectTypeFromFilterCriteriaP.getValue();
 		this.columnsBag = this.report.getParameterBag(BAG_COLUMNS, true);
 		this.columnIds = this.columnsBag.getParameterKeySet();
 		this.dateRangeSelP = this.report.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
@@ -163,7 +173,13 @@ public class GenericReport {
 
 	public MapOfSets<String, StrolchRootElement> generateFilterCriteria() {
 		return buildStream() //
-				.flatMap(e -> e.values().stream()) //
+				.flatMap(e -> {
+					Stream<StrolchRootElement> stream = e.values().stream();
+					if (this.hideObjectTypeFromFilterCriteria) {
+						stream = stream.filter(element -> !element.getType().equals(this.objectTypeP.getValue()));
+					}
+					return stream;
+				}) //
 				.collect( //
 						Collector.of( //
 								() -> new MapOfSets<String, StrolchRootElement>(), //
@@ -346,8 +362,6 @@ public class GenericReport {
 	private Stream<StrolchRootElement> queryRows() {
 
 		// find the type of object for which the report is created
-		StringParameter objectTypeP = this.report.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
-
 		if (objectTypeP.getInterpretation().equals(StrolchConstants.INTERPRETATION_RESOURCE_REF)) {
 
 			return this.tx.getResourceMap().getElementsBy(this.tx, objectTypeP.getUom()).stream()
@@ -369,13 +383,16 @@ public class GenericReport {
 		// interpretation -> Resource-Ref, etc.
 		// uom -> object type
 		// value -> element type where relation is defined for this join
-		ParameterBag joinBag = this.report.getParameterBag(BAG_JOINS);
 
 		// create the refs element
 		HashMap<String, StrolchRootElement> refs = new HashMap<>();
 		// and add the starting point
 		refs.put(resource.getType(), resource);
 
+		if (!this.report.hasParameterBag(BAG_JOINS))
+			return refs;
+
+		ParameterBag joinBag = this.report.getParameterBag(BAG_JOINS);
 		for (String paramId : joinBag.getParameterKeySet()) {
 			StringParameter joinP = joinBag.getParameter(paramId);
 			addColumnJoin(refs, joinBag, joinP, true);
