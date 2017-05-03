@@ -19,8 +19,10 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -223,6 +225,21 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		}
 
 		return parameterBag;
+	}
+
+	/**
+	 * Returns the {@link ParameterBag ParameterBags} of the given type
+	 * 
+	 * @param type
+	 *            the type of {@link ParameterBag} to return
+	 * 
+	 * @return the {@link ParameterBag ParameterBags} of the given type
+	 */
+	public List<ParameterBag> getParameterBagsByType(String type) {
+		return this.parameterBagMap.values() //
+				.stream() //
+				.filter(map -> map.getType().equals(type)) //
+				.collect(Collectors.toList());
 	}
 
 	/**
