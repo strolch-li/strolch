@@ -96,7 +96,7 @@
 
 	<Activity Id="parallel" Name="Activity" Type="ToStock" TimeOrdering="Parallel">
 		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
-			<Parameter Name="Duration" Id="duration" Value="PT0.1S" Type="Duration" />
+			<Parameter Name="Duration" Id="duration" Value="PT0.2S" Type="Duration" />
 		</ParameterBag>
 		<Activity Id="sub1" Name="Sub Activity 1" Type="Sub" TimeOrdering="Parallel">
 			<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />

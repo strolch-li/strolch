@@ -157,7 +157,7 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 		doServiceAssertResult(cert, svc, arg);
 
 		// allow execution handler to do work
-		Thread.sleep(50);
+		Thread.sleep(100);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
@@ -187,7 +187,7 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 			assertEquals(State.EXECUTION, action.getState());
 		}
 
-		Thread.sleep(150L);
+		Thread.sleep(200L);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action;
@@ -207,39 +207,6 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 			assertEquals(State.EXECUTION, action.getState());
 			action = tx.findElement(activityLoc.append("sub2", "action_3"));
 			assertEquals(State.CREATED, action.getState());
-
-			// actions
-			action = tx.findElement(activityLoc.append("action_1"));
-			assertEquals(State.EXECUTED, action.getState());
-			action = tx.findElement(activityLoc.append("action_2"));
-			assertEquals(State.EXECUTED, action.getState());
-			action = tx.findElement(activityLoc.append("action_3"));
-			assertEquals(State.EXECUTED, action.getState());
-
-			Activity activity = tx.findElement(activityLoc);
-			assertEquals(State.EXECUTION, activity.getState());
-		}
-
-		Thread.sleep(100L);
-
-		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
-			Action action;
-
-			// sub1 also parallel
-			action = tx.findElement(activityLoc.append("sub1", "action_1"));
-			assertEquals(State.EXECUTED, action.getState());
-			action = tx.findElement(activityLoc.append("sub1", "action_2"));
-			assertEquals(State.EXECUTED, action.getState());
-			action = tx.findElement(activityLoc.append("sub1", "action_3"));
-			assertEquals(State.EXECUTED, action.getState());
-
-			// sub2 in series
-			action = tx.findElement(activityLoc.append("sub2", "action_1"));
-			assertEquals(State.EXECUTED, action.getState());
-			action = tx.findElement(activityLoc.append("sub2", "action_2"));
-			assertEquals(State.EXECUTED, action.getState());
-			action = tx.findElement(activityLoc.append("sub2", "action_3"));
-			assertEquals(State.EXECUTION, action.getState());
 
 			// actions
 			action = tx.findElement(activityLoc.append("action_1"));
@@ -253,7 +220,40 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 			assertEquals(State.EXECUTION, activity.getState());
 		}
 
-		Thread.sleep(150L);
+		Thread.sleep(200L);
+
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
+			Action action;
+
+			// sub1 also parallel
+			action = tx.findElement(activityLoc.append("sub1", "action_1"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_2"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub1", "action_3"));
+			assertEquals(State.EXECUTED, action.getState());
+
+			// sub2 in series
+			action = tx.findElement(activityLoc.append("sub2", "action_1"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_2"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("sub2", "action_3"));
+			assertEquals(State.EXECUTION, action.getState());
+
+			// actions
+			action = tx.findElement(activityLoc.append("action_1"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("action_2"));
+			assertEquals(State.EXECUTED, action.getState());
+			action = tx.findElement(activityLoc.append("action_3"));
+			assertEquals(State.EXECUTED, action.getState());
+
+			Activity activity = tx.findElement(activityLoc);
+			assertEquals(State.EXECUTION, activity.getState());
+		}
+
+		Thread.sleep(200L);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 
