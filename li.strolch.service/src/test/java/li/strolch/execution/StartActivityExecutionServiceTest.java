@@ -48,14 +48,14 @@ public class StartActivityExecutionServiceTest extends RuntimeMock {
 		doServiceAssertResult(cert, svc, arg);
 
 		// allow execution handler to do work
-		Thread.sleep(10);
+		Thread.sleep(100);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action = tx.findElement(activityLoc.append("produce"));
 			assertEquals(State.EXECUTION, action.getState());
 		}
 
-		Thread.sleep(100L);
+		Thread.sleep(200L);
 
 		try (StrolchTransaction tx = getRealm("execution").openTx(cert, StartActivityExecutionServiceTest.class)) {
 			Action action = tx.findElement(activityLoc.append("produce"));

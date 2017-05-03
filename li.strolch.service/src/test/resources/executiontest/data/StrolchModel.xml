@@ -80,7 +80,7 @@
 
 	<Activity Id="produceBicycle" Name="Activity" Type="ToStock" TimeOrdering="Series">
 		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
-			<Parameter Name="Duration" Id="duration" Value="PT0.01S" Type="Duration" />
+			<Parameter Name="Duration" Id="duration" Value="PT0.2S" Type="Duration" />
 		</ParameterBag>
 		<Action Id="produce" Name="Produce" ResourceId="bicycle" ResourceType="Product" Type="Produce" />
 	</Activity>
