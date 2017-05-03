@@ -365,9 +365,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return getAuditTrail().doQuery(this, query);
 	}
 
+	@Override
+	public <T extends StrolchElement> T findElement(Locator locator) throws StrolchException, ClassCastException {
+		return findElement(locator, false);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends StrolchElement> T findElement(Locator locator) {
+	public <T extends StrolchElement> T findElement(Locator locator, boolean allowNull) {
 
 		// Resource/<type>/<id>
 		// Resource/<type>/<id>/Bag/<id>
@@ -403,6 +408,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		}
 
 		if (groupedParameterizedElement == null) {
+			if (allowNull)
+				return null;
 			String msg = "No top level object could be found with locator {0}"; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, locator));
 		}
@@ -417,6 +424,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			String parameterBagId = elements.get(4);
 			ParameterBag bag = groupedParameterizedElement.getParameterBag(parameterBagId);
 			if (bag == null) {
+				if (allowNull)
+					return null;
 				String msg = "Could not find ParameterBag for locator {0} on element {1}"; //$NON-NLS-1$
 				throw new StrolchException(
 						MessageFormat.format(msg, locator, groupedParameterizedElement.getLocator()));
@@ -428,6 +437,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			String parameterId = elements.get(5);
 			Parameter<?> parameter = bag.getParameter(parameterId);
 			if (parameter == null) {
+				if (allowNull)
+					return null;
 				String msg = "Could not find Parameter for locator {0} on element {1}"; //$NON-NLS-1$
 				throw new StrolchException(MessageFormat.format(msg, locator, bag.getLocator()));
 			}
@@ -465,6 +476,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			return (T) element;
 		}
+
+		if (allowNull)
+			return null;
 
 		String msg = "Invalid locator {0} with part {1}"; //$NON-NLS-1$
 		throw new StrolchException(MessageFormat.format(msg, locator, stateOrBagOrActivity));

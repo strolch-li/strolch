@@ -480,6 +480,18 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
+	 * Used to find a {@link StrolchElement} by a {@link Locator}, throwing exception if the element is not found
+	 * </p>
+	 * 
+	 * @throws StrolchException
+	 *             if the element could not be found
+	 * 
+	 * @see #findElement(Locator, boolean)
+	 */
+	public <T extends StrolchElement> T findElement(Locator locator) throws StrolchException, ClassCastException;
+
+	/**
+	 * <p>
 	 * Used to find a {@link StrolchElement} by a {@link Locator}.
 	 * </p>
 	 * 
@@ -496,18 +508,21 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 
 	 * @param locator
 	 *            the locator defining the path to the element which is to be found
+	 * @param allowNull
+	 *            if element not found, null is returned - presuming Locator has a valid form
 	 * 
 	 * @return the element described by the locator. If {@link Locator} references an element which does not exist, i.e.
 	 *         an inexistant {@link Resource} or an inexistand {@link Parameter} on a Resource, then a
 	 *         {@link StrolchException} is thrown
 	 * 
 	 * @throws StrolchException
-	 *             if the element could not be found
+	 *             if the element could not be found and <code>allowNull</code> is false
 	 * @throws ClassCastException
 	 *             if the querying code is not asking for the correct instance. Do not query a {@link Parameter} if the
 	 *             variable to which the result is to be is stored is a {@link Resource}, etc.
 	 */
-	public <T extends StrolchElement> T findElement(Locator locator) throws StrolchException, ClassCastException;
+	public <T extends StrolchElement> T findElement(Locator locator, boolean allowNull)
+			throws StrolchException, ClassCastException;
 
 	/**
 	 * <p>
