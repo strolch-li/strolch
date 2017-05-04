@@ -148,7 +148,8 @@ public class Activity extends AbstractStrolchRootElement
 	 * @param activityElement
 	 * @return the element added
 	 */
-	public IActivityElement addElement(IActivityElement activityElement) {
+	@SuppressWarnings("unchecked")
+	public <T extends IActivityElement> T addElement(IActivityElement activityElement) {
 		DBC.PRE.assertNotEquals("Can't add element to itself!", this, activityElement);
 		DBC.PRE.assertNull("Parent can't already be set!", activityElement.getParent());
 
@@ -163,7 +164,7 @@ public class Activity extends AbstractStrolchRootElement
 					"Activiy " + getLocator() + " already contains an activity element with id = " + id);
 		else {
 			activityElement.setParent(this);
-			return this.elements.put(activityElement.getId(), activityElement);
+			return (T) this.elements.put(activityElement.getId(), activityElement);
 		}
 	}
 
@@ -175,11 +176,12 @@ public class Activity extends AbstractStrolchRootElement
 	 * 
 	 * @return the removed element, or null if it does not exist
 	 */
-	public IActivityElement remove(String id) {
+	@SuppressWarnings("unchecked")
+	public <T extends IActivityElement> T remove(String id) {
 		IActivityElement element = this.elements.remove(id);
 		if (element != null)
 			element.setParent(null);
-		return element;
+		return (T) element;
 	}
 
 	/**
