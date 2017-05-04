@@ -90,7 +90,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 
 	 * @return the {@link Parameter} with the given id, or null if it does not exist
 	 */
-	public <T> T getParameter(String key) {
+	public <U, T extends Parameter<U>> T getParameter(String key) {
 		return getParameter(key, false);
 	}
 
@@ -105,7 +105,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * @return the {@link Parameter} with the given id, or null if it does not exist
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T getParameter(String key, boolean assertExists) {
+	public <U, T extends Parameter<U>> T getParameter(String key, boolean assertExists) {
 		if (this.parameterMap == null) {
 
 			if (assertExists) {
@@ -153,11 +153,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * @return the removed {@link Parameter}, or null if it does not exist
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> Parameter<T> removeParameter(String key) {
+	public <U, T extends Parameter<U>> T removeParameter(String key) {
 		if (this.parameterMap == null) {
 			return null;
 		}
-		return (Parameter<T>) this.parameterMap.remove(key);
+		return (T) this.parameterMap.remove(key);
 	}
 
 	/**

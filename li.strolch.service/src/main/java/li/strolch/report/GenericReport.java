@@ -166,7 +166,7 @@ public class GenericReport {
 	public Stream<ReportElement> doReport() {
 
 		return buildStream().map(e -> new ReportElement(this.columnIds, columnId -> {
-			StringParameter columnDefP = (StringParameter) this.columnsBag.getParameter(columnId, true);
+			StringParameter columnDefP = this.columnsBag.getParameter(columnId, true);
 			return evaluateColumnValue(columnDefP, e);
 		}));
 	}
