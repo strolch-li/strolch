@@ -99,45 +99,65 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	@Override
 	public void toExecution(String realm, Locator locator) {
 		this.executorService.execute(() -> {
-			runAsAgent(ctx -> {
-				toExecution(realm, locator, ctx);
-			});
+			try {
+				runAsAgent(ctx -> {
+					toExecution(realm, locator, ctx);
+				});
+			} catch (Exception e) {
+				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+			}
 		});
 	}
 
 	@Override
 	public void toExecuted(String realm, Locator locator) {
 		this.executorService.execute(() -> {
-			runAsAgent(ctx -> {
-				toExecuted(realm, locator, ctx);
-			});
+			try {
+				runAsAgent(ctx -> {
+					toExecuted(realm, locator, ctx);
+				});
+			} catch (Exception e) {
+				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+			}
 		});
 	}
 
 	@Override
 	public void toStopped(String realm, Locator locator) {
 		this.executorService.execute(() -> {
-			runAsAgent(ctx -> {
-				toStopped(realm, locator, ctx);
-			});
+			try {
+				runAsAgent(ctx -> {
+					toStopped(realm, locator, ctx);
+				});
+			} catch (Exception e) {
+				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+			}
 		});
 	}
 
 	@Override
 	public void toError(String realm, Locator locator) {
 		this.executorService.execute(() -> {
-			runAsAgent(ctx -> {
-				toError(realm, locator, ctx);
-			});
+			try {
+				runAsAgent(ctx -> {
+					toError(realm, locator, ctx);
+				});
+			} catch (Exception e) {
+				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+			}
 		});
 	}
 
 	@Override
 	public void toWarning(String realm, Locator locator) {
 		this.executorService.execute(() -> {
-			runAsAgent(ctx -> {
-				toWarning(realm, locator, ctx);
-			});
+			try {
+				runAsAgent(ctx -> {
+					toWarning(realm, locator, ctx);
+				});
+			} catch (Exception e) {
+				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+			}
 		});
 	}
 
