@@ -25,9 +25,6 @@ import li.strolch.model.query.ParameterSelection;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StrolchElementQuery;
 import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.model.visitor.NoStrategyActivityVisitor;
-import li.strolch.model.visitor.NoStrategyOrderVisitor;
-import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.utils.StringMatchMode;
 import li.strolch.utils.collections.MapOfSets;
 
@@ -217,7 +214,6 @@ public abstract class QueryParser extends CompositeParser {
 		};
 		Result result = parser.parse(queryString);
 		ResourceQuery<Resource> query = result.get();
-		query.setResourceVisitor(new NoStrategyResourceVisitor());
 
 		if (!query.hasSelection() && withAny) {
 			query.withAny();
@@ -250,7 +246,6 @@ public abstract class QueryParser extends CompositeParser {
 		};
 		Result result = parser.parse(queryString);
 		OrderQuery<Order> query = result.get();
-		query.setOrderVisitor(new NoStrategyOrderVisitor());
 
 		if (!query.hasSelection() && withAny) {
 			query.withAny();
@@ -284,7 +279,6 @@ public abstract class QueryParser extends CompositeParser {
 		};
 		Result result = parser.parse(queryString);
 		ActivityQuery<Activity> query = result.get();
-		query.setActivityVisitor(new NoStrategyActivityVisitor());
 
 		if (!query.hasSelection() && withAny) {
 			query.withAny();

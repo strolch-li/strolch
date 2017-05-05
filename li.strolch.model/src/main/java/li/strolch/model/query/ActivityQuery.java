@@ -19,7 +19,6 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
 import li.strolch.model.visitor.ActivityVisitor;
-import li.strolch.model.visitor.NoStrategyActivityVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -50,16 +49,24 @@ public class ActivityQuery<U> extends StrolchElementQuery<ActivityQueryVisitor> 
 
 	public ActivityQuery() {
 		super();
+		setIdentityVisitor();
 	}
 
 	public ActivityQuery(Navigation navigation) {
 		super(navigation);
+		setIdentityVisitor();
+	}
+
+	private void setIdentityVisitor() {
+		@SuppressWarnings("unchecked")
+		ActivityVisitor<U> identityVisitor = t -> (U) t;
+		this.activityVisitor = identityVisitor;
 	}
 
 	public ActivityVisitor<U> getActivityVisitor() {
 		return this.activityVisitor;
 	}
-	
+
 	@Override
 	public ActivityQuery<U> internal() {
 		super.internal();
@@ -107,13 +114,11 @@ public class ActivityQuery<U> extends StrolchElementQuery<ActivityQueryVisitor> 
 	}
 
 	public static ActivityQuery<Activity> query(String type) {
-		return new ActivityQuery<Activity>(new StrolchTypeNavigation(type))
-				.setActivityVisitor(new NoStrategyActivityVisitor());
+		return new ActivityQuery<Activity>(new StrolchTypeNavigation(type));
 	}
 
 	public static ActivityQuery<Activity> query(String type, StrolchQueryOrdering ordering) {
-		return new ActivityQuery<Activity>(new StrolchTypeNavigation(type))
-				.setActivityVisitor(new NoStrategyActivityVisitor()).setOrdering(ordering);
+		return new ActivityQuery<Activity>(new StrolchTypeNavigation(type)).setOrdering(ordering);
 	}
 
 	public static <U> ActivityQuery<U> query(String type, ActivityVisitor<U> activityVisitor) {

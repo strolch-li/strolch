@@ -18,7 +18,6 @@ package li.strolch.model.query;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
-import li.strolch.model.visitor.NoStrategyResourceVisitor;
 import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.utils.dbc.DBC;
 
@@ -50,10 +49,18 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 
 	public ResourceQuery() {
 		super();
+		setIdentityVisitor();
 	}
 
 	public ResourceQuery(Navigation navigation) {
 		super(navigation);
+		setIdentityVisitor();
+	}
+
+	private void setIdentityVisitor() {
+		@SuppressWarnings("unchecked")
+		ResourceVisitor<U> identityVisitor = t -> (U) t;
+		this.resourceVisitor = identityVisitor;
 	}
 
 	public ResourceVisitor<U> getResourceVisitor() {
@@ -108,13 +115,11 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 	}
 
 	public static ResourceQuery<Resource> query(String type) {
-		return new ResourceQuery<Resource>(new StrolchTypeNavigation(type))
-				.setResourceVisitor(new NoStrategyResourceVisitor());
+		return new ResourceQuery<Resource>(new StrolchTypeNavigation(type));
 	}
 
 	public static ResourceQuery<Resource> query(String type, StrolchQueryOrdering ordering) {
-		return new ResourceQuery<Resource>(new StrolchTypeNavigation(type))
-				.setResourceVisitor(new NoStrategyResourceVisitor()).setOrdering(ordering);
+		return new ResourceQuery<Resource>(new StrolchTypeNavigation(type)).setOrdering(ordering);
 	}
 
 	public static <U> ResourceQuery<U> query(String type, ResourceVisitor<U> resourceVisitor) {

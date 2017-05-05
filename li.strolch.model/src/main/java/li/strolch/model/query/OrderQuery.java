@@ -18,7 +18,6 @@ package li.strolch.model.query;
 import li.strolch.model.Order;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
-import li.strolch.model.visitor.NoStrategyOrderVisitor;
 import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.utils.dbc.DBC;
 
@@ -50,16 +49,24 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 
 	public OrderQuery() {
 		super();
+		setIdentityVisitor();
 	}
 
 	public OrderQuery(Navigation navigation) {
 		super(navigation);
+		setIdentityVisitor();
+	}
+
+	private void setIdentityVisitor() {
+		@SuppressWarnings("unchecked")
+		OrderVisitor<U> identityVisitor = t -> (U) t;
+		this.orderVisitor = identityVisitor;
 	}
 
 	public OrderVisitor<U> getOrderVisitor() {
 		return this.orderVisitor;
 	}
-	
+
 	@Override
 	public OrderQuery<U> internal() {
 		super.internal();
@@ -108,12 +115,11 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 	}
 
 	public static OrderQuery<Order> query(String type) {
-		return new OrderQuery<Order>(new StrolchTypeNavigation(type)).setOrderVisitor(new NoStrategyOrderVisitor());
+		return new OrderQuery<Order>(new StrolchTypeNavigation(type));
 	}
 
 	public static OrderQuery<Order> query(String type, StrolchQueryOrdering ordering) {
-		return new OrderQuery<Order>(new StrolchTypeNavigation(type)).setOrderVisitor(new NoStrategyOrderVisitor())
-				.setOrdering(ordering);
+		return new OrderQuery<Order>(new StrolchTypeNavigation(type)).setOrdering(ordering);
 	}
 
 	public static <U> OrderQuery<U> query(String type, OrderVisitor<U> orderVisitor) {
@@ -121,6 +127,6 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 	}
 
 	public static <U> OrderQuery<U> query(String type, OrderVisitor<U> orderVisitor, StrolchQueryOrdering ordering) {
-		return new OrderQuery<U>(new StrolchTypeNavigation(type)).setOrdering(ordering).setOrderVisitor(orderVisitor);
+		return new OrderQuery<U>(new StrolchTypeNavigation(type)).setOrdering(ordering);
 	}
 }
