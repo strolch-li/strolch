@@ -32,8 +32,8 @@ class ElementMapHelpers {
 		String interpretation = refP.getInterpretation();
 		if (!interpretation.equals(expectedInterpretation)) {
 			String msg = "{0} is not an expected element reference as its interpretation is {1} instead of {2}"; //$NON-NLS-1$
-			throw new StrolchException(MessageFormat.format(msg, refP.getLocator(), expectedInterpretation,
-					interpretation));
+			throw new StrolchException(
+					MessageFormat.format(msg, refP.getLocator(), interpretation, expectedInterpretation));
 		}
 
 		if (refP.getUom().equals(UOM_NONE)) {
