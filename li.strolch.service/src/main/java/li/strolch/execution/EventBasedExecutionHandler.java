@@ -12,7 +12,6 @@ import li.strolch.execution.command.SetActionToStoppedCommand;
 import li.strolch.execution.command.SetActionToWarningCommand;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.model.Locator;
-import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -161,24 +160,23 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		});
 	}
 
-	private void toExecution(String realm, Locator activityLoc, PrivilegeContext ctx) {
+	private void toExecution(String realm, Locator elementLoc, PrivilegeContext ctx) {
 		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ExecuteActivityCommand.class)) {
-			Locator rootElemLoc = activityLoc.trim(3);
-			tx.lock(rootElemLoc);
 
-			IActivityElement elem = tx.findElement(rootElemLoc);
-			if (elem == null) {
-				logger.error("Element for locator " + activityLoc + " does not exist!");
+			Locator activityLoc = elementLoc.trim(3);
+			tx.lock(activityLoc);
+
+			Activity activity = tx.findElement(activityLoc);
+			if (activity == null) {
+				logger.error("Element for locator " + elementLoc + " does not exist!");
 				synchronized (this.registeredActivities) {
-					this.registeredActivities.removeElement(realm, rootElemLoc);
+					this.registeredActivities.removeElement(realm, activityLoc);
 				}
 				return;
 			}
 
-			DBC.INTERIM.assertEquals("toExecution only for Activity!", Activity.class, elem.getClass());
-
 			ExecuteActivityCommand command = new ExecuteActivityCommand(getContainer(), tx);
-			command.setActivity((Activity) elem);
+			command.setActivity(activity);
 			tx.addCommand(command);
 
 			tx.commitOnClose();
@@ -190,28 +188,43 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		Locator activityLoc = actionLoc.trim(3);
 
 		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class)) {
+
 			tx.lock(activityLoc);
 
-			IActivityElement elem = tx.findElement(actionLoc);
-			DBC.INTERIM.assertEquals("toExecuted only for Action!", Action.class, elem.getClass());
+			Action action = tx.findElement(actionLoc);
 
+			// set this action to executed
 			SetActionToExecutedCommand command = new SetActionToExecutedCommand(getContainer(), tx);
-			command.setAction((Action) elem);
+			command.setAction(action);
 			tx.addCommand(command);
 
+			// flush so we can see that changes performed
 			tx.flush();
 
-			if (elem.getRootElement().getState() == State.EXECUTED) {
+			// if the activity is now executed, remove it from the registered activities
+			if (action.getRootElement().getState().isExecuted()) {
+
 				synchronized (this.registeredActivities) {
 					this.registeredActivities.removeElement(realm, activityLoc);
 				}
+				logger.info("Activity " + activityLoc + " is in state " + action.getRootElement().getState());
+
+			} else {
+
+				// otherwise execute any next action(s) for this action's activity
+
+				Activity activity = tx.findElement(activityLoc);
+
+				ExecuteActivityCommand execCommand = new ExecuteActivityCommand(getContainer(), tx);
+				execCommand.setActivity(activity);
+				tx.addCommand(execCommand);
+
+				// flush so we can see that changes performed
+				tx.flush();
 			}
 
 			tx.commitOnClose();
 		}
-
-		// execute any next Action
-		toExecution(realm, activityLoc, ctx);
 
 		// now trigger a further execution of any other activities needed execution in this realm
 		triggerExecution(realm);

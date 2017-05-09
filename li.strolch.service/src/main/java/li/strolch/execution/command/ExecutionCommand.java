@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.command.UpdateActivityCommand;
 import li.strolch.exception.StrolchException;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.model.Resource;
@@ -100,8 +101,21 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	public Void visit(Action action) {
 		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
 
-		if (executionPolicy.isExecutable(action))
-			executionPolicy.toExecution(action);
+		if (executionPolicy.isExecutable(action)) {
+
+			// we catch all exceptions because we can't undo, thus need to set the state to ERROR in this case
+			// this is only required because we execute actions in same TX as we set to executed any previous actions
+			try {
+				executionPolicy.toExecution(action);
+			} catch (Exception e) {
+				logger.error("Failed to set " + action.getLocator() + " to execution due to " + e.getMessage(), e);
+				action.setState(State.ERROR);
+
+				UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
+				command.setActivity(action.getRootElement());
+				command.doCommand();
+			}
+		}
 
 		return null;
 	}
