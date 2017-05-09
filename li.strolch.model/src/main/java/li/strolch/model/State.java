@@ -90,6 +90,20 @@ public enum State {
 	}
 
 	/**
+	 * @return true if the state is {@link #CLOSED}
+	 */
+	public boolean isClosed() {
+		return this == CLOSED;
+	}
+
+	/**
+	 * @return true if the state is {@link #CLOSED}
+	 */
+	public boolean isExecuted() {
+		return this == EXECUTED;
+	}
+
+	/**
 	 * @return true if {@link #inExecutionPhase()} but not executed and not already in warning
 	 */
 	public boolean canSetToWarning() {
