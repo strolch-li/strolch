@@ -34,7 +34,7 @@ public class InMemoryTransaction extends AbstractTransaction {
 
 	@Override
 	protected void writeChanges() throws Exception {
-		getTxResult().setState(TransactionState.COMMITTED);
+		// do nothing
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class InMemoryTransaction extends AbstractTransaction {
 
 	@Override
 	protected void commit() throws Exception {
-		// no-op
+		getTxResult().setState(TransactionState.COMMITTED);
 	}
 
 	@Override
