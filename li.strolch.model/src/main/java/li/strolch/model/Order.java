@@ -208,4 +208,8 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	public int compareTo(Order o) {
 		return getId().compareTo(o.getId());
 	}
+
+	public static Locator locatorFor(String type, String id) {
+		return Locator.valueOf(Tags.ORDER, type, id);
+	}
 }

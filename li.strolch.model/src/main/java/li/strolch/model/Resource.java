@@ -223,4 +223,8 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	public int compareTo(Resource o) {
 		return getId().compareTo(o.getId());
 	}
+
+	public static Locator locatorFor(String type, String id) {
+		return Locator.valueOf(Tags.RESOURCE, type, id);
+	}
 }

@@ -405,4 +405,8 @@ public class Activity extends AbstractStrolchRootElement
 	public void setParent(Activity activity) {
 		this.parent = activity;
 	}
+
+	public static Locator locatorFor(String type, String id) {
+		return Locator.valueOf(Tags.ACTIVITY, type, id);
+	}
 }
