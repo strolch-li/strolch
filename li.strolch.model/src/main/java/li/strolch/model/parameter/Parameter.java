@@ -45,7 +45,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * 
 	 * @return
 	 */
-	public <U extends T>  U getValue();
+	public <U extends T> U getValue();
 
 	/**
 	 * the value of the parameter
@@ -57,7 +57,13 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * Clears the value, dependent on the concrete class
 	 */
-	public void clearValue();
+	public void clear();
+
+	/**
+	 * @return true if the value is empty, i.e. if the value is the same as the value which would be set if
+	 *         {@link #clear()} was called
+	 */
+	public boolean isEmpty();
 
 	/**
 	 * get the hidden attribute

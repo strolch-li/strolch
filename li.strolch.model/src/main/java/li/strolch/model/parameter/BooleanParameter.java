@@ -73,11 +73,16 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	/**
 	 * Sets the value to false
 	 * 
-	 * @see Parameter#clearValue()
+	 * @see Parameter#clear()
 	 */
 	@Override
-	public void clearValue() {
+	public void clear() {
 		this.value = false;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return !this.value;
 	}
 
 	@Override

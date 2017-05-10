@@ -48,12 +48,12 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	/**
 	 * Clears the list of values, i.e the list of values is empty after this call
 	 */
-	public void clearValue();
+	public void clear();
 
 	/**
 	 * Returns true if the list of values is empty, false if not
 	 * 
 	 * @returns true if the list of values is empty, false if not
 	 */
-	public boolean isValueEmpty();
+	public boolean isEmpty();
 }

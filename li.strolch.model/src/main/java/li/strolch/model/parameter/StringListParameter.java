@@ -107,12 +107,12 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
-	public void clearValue() {
+	public void clear() {
 		this.value.clear();
 	}
 
 	@Override
-	public boolean isValueEmpty() {
+	public boolean isEmpty() {
 		return this.value.isEmpty();
 	}
 

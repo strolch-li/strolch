@@ -482,7 +482,7 @@ public class ModelTest {
 		assertEquals("a, b", stringListP.getValueAsString());
 		stringListP.setValueFromString("a,b");
 		assertEquals("a, b", stringListP.getValueAsString());
-		stringListP.clearValue();
+		stringListP.clear();
 		assertEquals("", stringListP.getValueAsString());
 		stringListP.addValue("a");
 		assertEquals("a", stringListP.getValueAsString());
@@ -499,7 +499,7 @@ public class ModelTest {
 		assertEquals("4, 45", intListP.getValueAsString());
 		intListP.setValueFromString("4,45");
 		assertEquals("4, 45", intListP.getValueAsString());
-		intListP.clearValue();
+		intListP.clear();
 		assertEquals("", intListP.getValueAsString());
 		intListP.addValue(55);
 		assertEquals("55", intListP.getValueAsString());
@@ -516,7 +516,7 @@ public class ModelTest {
 		assertEquals("4.2, 4.1", floatListP.getValueAsString());
 		floatListP.setValueFromString("4.2,4.1");
 		assertEquals("4.2, 4.1", floatListP.getValueAsString());
-		floatListP.clearValue();
+		floatListP.clear();
 		assertEquals("", floatListP.getValueAsString());
 		floatListP.addValue(55.5);
 		assertEquals("55.5", floatListP.getValueAsString());
@@ -533,7 +533,7 @@ public class ModelTest {
 		assertEquals("4, 4", longListP.getValueAsString());
 		longListP.setValueFromString("4,4");
 		assertEquals("4, 4", longListP.getValueAsString());
-		longListP.clearValue();
+		longListP.clear();
 		assertEquals("", longListP.getValueAsString());
 		longListP.addValue(55L);
 		assertEquals("55", longListP.getValueAsString());

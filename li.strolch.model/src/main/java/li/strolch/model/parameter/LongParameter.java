@@ -68,11 +68,16 @@ public class LongParameter extends AbstractParameter<Long> {
 	/**
 	 * Sets the value to 0
 	 * 
-	 * @see Parameter#clearValue()
+	 * @see Parameter#clear()
 	 */
 	@Override
-	public void clearValue() {
+	public void clear() {
 		this.value = 0L;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return this.value == 0L;
 	}
 
 	@Override

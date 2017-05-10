@@ -73,11 +73,16 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	/**
 	 * Sets the value to 0
 	 * 
-	 * @see Parameter#clearValue()
+	 * @see Parameter#clear()
 	 */
 	@Override
-	public void clearValue() {
+	public void clear() {
 		this.value = 0;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return this.value == 0;
 	}
 
 	@Override

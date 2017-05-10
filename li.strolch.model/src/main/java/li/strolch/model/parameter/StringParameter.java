@@ -74,10 +74,10 @@ public class StringParameter extends AbstractParameter<String> {
 	/**
 	 * Sets the value to the empty string
 	 * 
-	 * @see Parameter#clearValue()
+	 * @see Parameter#clear()
 	 */
 	@Override
-	public void clearValue() {
+	public void clear() {
 		this.value = "";
 	}
 
