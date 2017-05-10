@@ -81,6 +81,13 @@ public class StringParameter extends AbstractParameter<String> {
 		this.value = "";
 	}
 
+	/**
+	 * @return true if the string is empty
+	 */
+	public boolean isEmpty() {
+		return this.value.isEmpty();
+	}
+
 	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(valueAsString);
@@ -107,4 +114,5 @@ public class StringParameter extends AbstractParameter<String> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareToIgnoreCase(((StringParameter) o).getValue());
 	}
+
 }
