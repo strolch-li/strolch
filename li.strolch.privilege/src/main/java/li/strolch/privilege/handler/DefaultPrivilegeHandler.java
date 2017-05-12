@@ -1138,8 +1138,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (!this.persistSessions)
 			return false;
 
-		List<Certificate> sessions = this.privilegeContextMap.values().stream().map(p -> p.getCertificate())
-				.filter(c -> !c.getUserState().isSystem()).collect(Collectors.toList());
+		List<Certificate> sessions = new ArrayList<>(this.privilegeContextMap.values()).stream()
+				.map(p -> p.getCertificate()).filter(c -> !c.getUserState().isSystem()).collect(Collectors.toList());
 
 		try (OutputStream fout = Files.newOutputStream(this.persistSessionsPath.toPath());
 				OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, fout)) {
