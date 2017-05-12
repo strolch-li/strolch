@@ -117,6 +117,11 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
+	public boolean contains(Double value) {
+		return this.value.contains(value);
+	}
+
+	@Override
 	public String getType() {
 		return StrolchValueType.FLOAT_LIST.getType();
 	}

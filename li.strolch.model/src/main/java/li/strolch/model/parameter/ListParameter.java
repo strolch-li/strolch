@@ -56,4 +56,14 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 * @returns true if the list of values is empty, false if not
 	 */
 	public boolean isEmpty();
+
+	/**
+	 * Returns true if the list of values contains the given element, false if not
+	 * 
+	 * @param value
+	 *            the value to check if it is contained in the list of values
+	 * 
+	 * @return true if the list of values contains the given element, false if not
+	 */
+	public boolean contains(E value);
 }

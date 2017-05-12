@@ -117,6 +117,11 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
+	public boolean contains(String value) {
+		return this.value.contains(value);
+	}
+
+	@Override
 	public String getType() {
 		return StrolchValueType.STRING_LIST.getType();
 	}

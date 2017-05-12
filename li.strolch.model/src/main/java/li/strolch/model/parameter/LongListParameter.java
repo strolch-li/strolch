@@ -117,6 +117,11 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	}
 
 	@Override
+	public boolean contains(Long value) {
+		return this.value.contains(value);
+	}
+
+	@Override
 	public String getType() {
 		return StrolchValueType.LONG_LIST.getType();
 	}

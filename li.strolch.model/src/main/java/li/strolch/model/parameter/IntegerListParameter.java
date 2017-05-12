@@ -117,6 +117,11 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	}
 
 	@Override
+	public boolean contains(Integer value) {
+		return this.value.contains(value);
+	}
+
+	@Override
 	public String getType() {
 		return StrolchValueType.INTEGER_LIST.getType();
 	}
