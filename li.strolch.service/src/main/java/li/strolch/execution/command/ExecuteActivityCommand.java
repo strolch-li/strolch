@@ -1,6 +1,7 @@
 package li.strolch.execution.command;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.model.State;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
@@ -24,8 +25,13 @@ public class ExecuteActivityCommand extends ExecutionCommand {
 
 	@Override
 	public void doCommand() {
-		tx().lock(this.activity.getRootElement());
+		Activity rootElement = this.activity.getRootElement();
+		tx().lock(rootElement);
+
+		State currentState = rootElement.getState();
 		this.activity.accept(this);
+
+		updateOrderState(rootElement, currentState, rootElement.getState());
 	}
 
 	@Override

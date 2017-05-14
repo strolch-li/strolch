@@ -7,9 +7,11 @@ import java.util.Map.Entry;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.UpdateActivityCommand;
+import li.strolch.command.UpdateOrderCommand;
 import li.strolch.exception.StrolchException;
 import li.strolch.execution.policy.ConfirmationPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
+import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
@@ -39,6 +41,24 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 
 		Resource resource = tx.getResourceBy(resourceType, resourceId, true);
 		return resource;
+	}
+
+	protected void updateOrderState(Activity rootElement, State currentState, State newState) {
+		if (currentState == newState)
+			return;
+
+		String type = rootElement.getType();
+		String id = rootElement.getId();
+
+		Order order = tx().getOrderBy(type, id);
+		if (order == null)
+			return;
+
+		order.setState(rootElement.getState());
+
+		UpdateOrderCommand cmd = new UpdateOrderCommand(getContainer(), tx());
+		cmd.setOrder(order);
+		cmd.doCommand();
 	}
 
 	protected ExecutionPolicy getExecutionPolicy(Action action) {

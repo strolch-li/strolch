@@ -90,17 +90,45 @@ public enum State {
 	}
 
 	/**
-	 * @return true if the state is {@link #CLOSED}
+	 * @return true if the state is {@link #CREATED}
 	 */
-	public boolean isClosed() {
-		return this == CLOSED;
+	public boolean isCreated() {
+		return this == State.CREATED;
+	}
+
+	/**
+	 * @return true if the state is {@link #PLANNING}
+	 */
+	public boolean isInPlanning() {
+		return this == State.PLANNING;
+	}
+
+	/**
+	 * @return true if the state is {@link #PLANNED}
+	 */
+	public boolean isInPlanned() {
+		return this == State.PLANNED;
+	}
+
+	/**
+	 * @return true if the state is {@link #EXECUTION}
+	 */
+	public boolean isInExecution() {
+		return this == State.EXECUTION;
+	}
+
+	/**
+	 * @return true if the state is {@link #EXECUTED}
+	 */
+	public boolean isExecuted() {
+		return this == EXECUTED;
 	}
 
 	/**
 	 * @return true if the state is {@link #CLOSED}
 	 */
-	public boolean isExecuted() {
-		return this == EXECUTED;
+	public boolean isClosed() {
+		return this == CLOSED;
 	}
 
 	/**
