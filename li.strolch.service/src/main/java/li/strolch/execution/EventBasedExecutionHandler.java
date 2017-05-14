@@ -10,12 +10,15 @@ import li.strolch.execution.command.SetActionToErrorCommand;
 import li.strolch.execution.command.SetActionToExecutedCommand;
 import li.strolch.execution.command.SetActionToStoppedCommand;
 import li.strolch.execution.command.SetActionToWarningCommand;
+import li.strolch.execution.policy.ActivityArchivalPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.model.Locator;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.policy.PolicyHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.ThreadPoolFactory;
@@ -30,6 +33,8 @@ import li.strolch.utils.dbc.DBC;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class EventBasedExecutionHandler extends ExecutionHandler {
+
+	private static final String KEY_DEFAULT_ACTIVITY_ARCHIVAL = "key:DefaultActivityArchival";
 
 	private ExecutorService executorService;
 
@@ -202,18 +207,20 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			tx.flush();
 
 			// if the activity is now executed, remove it from the registered activities
-			if (action.getRootElement().getState().isExecuted()) {
+			Activity activity = action.getRootElement();
+			if (activity.getState().isExecuted()) {
 
 				synchronized (this.registeredActivities) {
 					this.registeredActivities.removeElement(realm, activityLoc);
 				}
-				logger.info("Activity " + activityLoc + " is in state " + action.getRootElement().getState());
+
+				archiveActivity(tx, activity);
+
+				logger.info("Activity " + activityLoc + " is in state " + activity.getState());
 
 			} else {
 
 				// otherwise execute any next action(s) for this action's activity
-
-				Activity activity = tx.findElement(activityLoc);
 
 				ExecuteActivityCommand execCommand = new ExecuteActivityCommand(getContainer(), tx);
 				execCommand.setActivity(activity);
@@ -228,6 +235,15 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		// now trigger a further execution of any other activities needed execution in this realm
 		triggerExecution(realm);
+	}
+
+	private void archiveActivity(StrolchTransaction tx, Activity activity) {
+
+		PolicyDef policyDef = PolicyDef.valueOf(ActivityArchivalPolicy.class.getSimpleName(),
+				KEY_DEFAULT_ACTIVITY_ARCHIVAL);
+
+		ActivityArchivalPolicy archivalPolicy = getComponent(PolicyHandler.class).getPolicy(policyDef, tx);
+		archivalPolicy.archive(activity);
 	}
 
 	/**

@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.UpdateActivityCommand;
 import li.strolch.exception.StrolchException;
+import li.strolch.execution.policy.ConfirmationPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
@@ -43,6 +44,12 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	protected ExecutionPolicy getExecutionPolicy(Action action) {
 		Resource resource = getResource(tx(), action);
 		PolicyDef executionPolicyDef = resource.getPolicyDefs().getPolicyDef(ExecutionPolicy.class.getSimpleName());
+		return getComponent(PolicyHandler.class).getPolicy(executionPolicyDef, tx());
+	}
+
+	protected ConfirmationPolicy getConfirmationPolicy(Action action) {
+		Resource resource = getResource(tx(), action);
+		PolicyDef executionPolicyDef = resource.getPolicyDefs().getPolicyDef(ConfirmationPolicy.class.getSimpleName());
 		return getComponent(PolicyHandler.class).getPolicy(executionPolicyDef, tx());
 	}
 
@@ -107,6 +114,7 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 			// this is only required because we execute actions in same TX as we set to executed any previous actions
 			try {
 				executionPolicy.toExecution(action);
+				getConfirmationPolicy(action).toExecution(action);
 			} catch (Exception e) {
 				logger.error("Failed to set " + action.getLocator() + " to execution due to " + e.getMessage(), e);
 				action.setState(State.ERROR);
@@ -114,6 +122,8 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 				UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
 				command.setActivity(action.getRootElement());
 				command.doCommand();
+
+				getConfirmationPolicy(action).toError(action);
 			}
 		}
 

@@ -1,3 +1,15 @@
 <StrolchPolicies>
 
+	<PolicyType Type="ExecutionPolicy" Api="li.strolch.execution.policy.ExecutionPolicy">
+		<Policy Key="DurationExecution" Class="li.strolch.execution.policy.DurationExecution" />
+	</PolicyType>
+
+	<PolicyType Type="ConfirmationPolicy" Api="li.strolch.execution.policy.ConfirmationPolicy">
+		<Policy Key="DefaultConfirmation" Class="li.strolch.execution.policy.ConfirmationPolicy" />
+	</PolicyType>
+
+	<PolicyType Type="ActivityArchivalPolicy" Api="li.strolch.execution.policy.ActivityArchivalPolicy">
+		<Policy Key="DefaultActivityArchival" Class="li.strolch.execution.policy.ActivityArchivalPolicy" />
+	</PolicyType>
+
 </StrolchPolicies>

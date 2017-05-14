@@ -4,7 +4,6 @@ import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.exception.StrolchException;
-import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -36,8 +35,9 @@ public class SetActionToStoppedCommand extends ExecutionCommand {
 	@Override
 	public void doCommand() {
 		tx().lock(this.action.getRootElement());
-		ExecutionPolicy executionPolicy = getExecutionPolicy(this.action);
-		executionPolicy.toStopped(this.action);
+
+		getExecutionPolicy(this.action).toStopped(this.action);
+		getConfirmationPolicy(this.action).toStopped(this.action);
 	}
 
 	@Override
