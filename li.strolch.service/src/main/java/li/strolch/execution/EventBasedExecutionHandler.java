@@ -165,13 +165,44 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		});
 	}
 
+	private void archiveActivity(String realm, Locator activityLoc) {
+		this.executorService.execute(() -> {
+			try {
+				runAsAgent(ctx -> {
+					try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ActivityArchivalPolicy.class)) {
+						tx.lock(activityLoc);
+
+						Activity activity = tx.findElement(activityLoc);
+
+						logger.info("Activity " + activity.getLocator() + " is in state " + activity.getState());
+
+						PolicyDef policyDef;
+						if (activity.hasPolicyDef(ActivityArchivalPolicy.class.getSimpleName())) {
+							policyDef = activity.getPolicyDef(ActivityArchivalPolicy.class.getSimpleName());
+						} else {
+							policyDef = PolicyDef.valueOf(ActivityArchivalPolicy.class.getSimpleName(),
+									KEY_DEFAULT_ACTIVITY_ARCHIVAL);
+						}
+
+						ActivityArchivalPolicy archivalPolicy = getComponent(PolicyHandler.class).getPolicy(policyDef,
+								tx);
+						archivalPolicy.archive(activity);
+
+					}
+				});
+			} catch (Exception e) {
+				logger.error("Failed to archive " + activityLoc + " due to " + e.getMessage(), e);
+			}
+		});
+	}
+
 	private void toExecution(String realm, Locator elementLoc, PrivilegeContext ctx) {
 		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ExecuteActivityCommand.class)) {
 
 			Locator activityLoc = elementLoc.trim(3);
 			tx.lock(activityLoc);
 
-			Activity activity = tx.findElement(activityLoc);
+			Activity activity = tx.findElement(activityLoc, true);
 			if (activity == null) {
 				logger.error("Element for locator " + elementLoc + " does not exist!");
 				synchronized (this.registeredActivities) {
@@ -211,12 +242,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			if (activity.getState().isExecuted()) {
 
 				synchronized (this.registeredActivities) {
-					this.registeredActivities.removeElement(realm, activityLoc);
+					if (!this.registeredActivities.removeElement(realm, activityLoc))
+						logger.warn("Activity " + actionLoc + " already removed from registered activities!");
 				}
 
-				archiveActivity(tx, activity);
-
-				logger.info("Activity " + activityLoc + " is in state " + activity.getState());
+				archiveActivity(realm, activity.getLocator());
 
 			} else {
 
@@ -235,15 +265,6 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		// now trigger a further execution of any other activities needed execution in this realm
 		triggerExecution(realm);
-	}
-
-	private void archiveActivity(StrolchTransaction tx, Activity activity) {
-
-		PolicyDef policyDef = PolicyDef.valueOf(ActivityArchivalPolicy.class.getSimpleName(),
-				KEY_DEFAULT_ACTIVITY_ARCHIVAL);
-
-		ActivityArchivalPolicy archivalPolicy = getComponent(PolicyHandler.class).getPolicy(policyDef, tx);
-		archivalPolicy.archive(activity);
 	}
 
 	/**
