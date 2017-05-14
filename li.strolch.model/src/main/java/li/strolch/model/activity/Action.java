@@ -33,6 +33,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
@@ -202,8 +203,18 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
+	public PolicyDef getPolicyDef(String type) {
+		return getPolicyDefs().getPolicyDef(type);
+	}
+
+	@Override
 	public boolean hasPolicyDefs() {
 		return this.policyDefs != null;
+	}
+
+	@Override
+	public boolean hasPolicyDef(String type) {
+		return this.policyDefs != null && policyDefs.hasPolicyDef(type);
 	}
 
 	@Override

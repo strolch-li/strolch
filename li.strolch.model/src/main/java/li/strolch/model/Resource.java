@@ -27,6 +27,7 @@ import java.util.Set;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
@@ -141,8 +142,18 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	}
 
 	@Override
+	public PolicyDef getPolicyDef(String type) {
+		return getPolicyDefs().getPolicyDef(type);
+	}
+
+	@Override
 	public boolean hasPolicyDefs() {
 		return this.policyDefs != null;
+	}
+
+	@Override
+	public boolean hasPolicyDef(String type) {
+		return this.policyDefs != null && policyDefs.hasPolicyDef(type);
 	}
 
 	@Override

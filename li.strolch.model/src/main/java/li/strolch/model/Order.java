@@ -20,6 +20,7 @@ import java.util.Date;
 
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
@@ -124,8 +125,18 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	@Override
+	public PolicyDef getPolicyDef(String type) {
+		return getPolicyDefs().getPolicyDef(type);
+	}
+
+	@Override
 	public boolean hasPolicyDefs() {
 		return this.policyDefs != null;
+	}
+
+	@Override
+	public boolean hasPolicyDef(String type) {
+		return this.policyDefs != null && policyDefs.hasPolicyDef(type);
 	}
 
 	@Override

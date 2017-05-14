@@ -1,6 +1,7 @@
 package li.strolch.model;
 
 import li.strolch.exception.StrolchPolicyException;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 
 /**
@@ -25,6 +26,26 @@ public interface PolicyContainer {
 	 * @return true if this container has {@link PolicyDefs}, false if not
 	 */
 	public boolean hasPolicyDefs();
+
+	/**
+	 * Returns true if this container has the {@link PolicyDef} with the given type, false if not
+	 * 
+	 * @param type
+	 *            the type of policy def to return
+	 * 
+	 * @return true if this container has the {@link PolicyDef} with the given type, false if not
+	 */
+	public boolean hasPolicyDef(String type);
+
+	/**
+	 * Returns the {@link PolicyDef} for the given type
+	 * 
+	 * @param type
+	 *            the type of policy def to return
+	 * 
+	 * @return the policy def of the given type
+	 */
+	public PolicyDef getPolicyDef(String type);
 
 	/**
 	 * Set the reference to the {@link PolicyDefs}

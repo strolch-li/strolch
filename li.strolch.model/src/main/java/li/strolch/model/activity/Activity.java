@@ -35,6 +35,7 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.Version;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
@@ -272,8 +273,18 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public PolicyDef getPolicyDef(String type) {
+		return getPolicyDefs().getPolicyDef(type);
+	}
+
+	@Override
 	public boolean hasPolicyDefs() {
 		return this.policyDefs != null;
+	}
+
+	@Override
+	public boolean hasPolicyDef(String type) {
+		return this.policyDefs != null && policyDefs.hasPolicyDef(type);
 	}
 
 	@Override
