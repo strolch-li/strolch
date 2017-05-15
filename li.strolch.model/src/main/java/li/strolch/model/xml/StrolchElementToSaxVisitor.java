@@ -48,6 +48,7 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
+import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -224,105 +225,134 @@ public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Voi
 	protected Attributes attributesFor(StrolchTimedState<IValue<?>> state) {
 		AttributesImpl attributes = attributesFor((StrolchElement) state);
 
-		if (!UOM_NONE.equals(state.getUom())) {
+		if (!UOM_NONE.equals(state.getUom()))
 			attributes.addAttribute(null, null, Tags.UOM, Tags.CDATA, state.getUom());
-		}
-		if (!INTERPRETATION_NONE.equals(state.getInterpretation())) {
+
+		if (!INTERPRETATION_NONE.equals(state.getInterpretation()))
 			attributes.addAttribute(null, null, Tags.INTERPRETATION, Tags.CDATA, state.getInterpretation());
-		}
-		if (state.isHidden()) {
+
+		if (state.isHidden())
 			attributes.addAttribute(null, null, Tags.HIDDEN, Tags.CDATA, Boolean.toString(state.isHidden()));
-		}
-		if (state.getIndex() != 0) {
+
+		if (state.getIndex() != 0)
 			attributes.addAttribute(null, null, Tags.INDEX, Tags.CDATA, Integer.toString(state.getIndex()));
-		}
 
 		return attributes;
 	}
 
 	protected AttributesImpl attributesFor(StrolchElement element) {
 		AttributesImpl attributes = new AttributesImpl();
+
 		attributes.addAttribute(null, null, Tags.ID, Tags.CDATA, element.getId());
 		attributes.addAttribute(null, null, Tags.NAME, Tags.CDATA, element.getName());
 		attributes.addAttribute(null, null, Tags.TYPE, Tags.CDATA, element.getType());
+
 		return attributes;
 	}
 
 	protected AttributesImpl attributesFor(Order order) {
 		AttributesImpl attributes = attributesFor((StrolchElement) order);
-		attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, order.getState().getName());
+
+		if (!order.getState().isCreated())
+			attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, order.getState().getName());
+
 		attributes.addAttribute(null, null, Tags.DATE, Tags.CDATA,
 				ISO8601FormatFactory.getInstance().formatDate(order.getDate()));
+
 		return attributes;
 	}
 
 	protected AttributesImpl attributesFor(Activity activity) {
 		AttributesImpl attributes = attributesFor((StrolchElement) activity);
-		attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, activity.getState().getName());
+
+		if (!activity.getState().isCreated())
+			attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, activity.getState().getName());
+
 		attributes.addAttribute(null, null, Tags.TIME_ORDERING, Tags.CDATA, activity.getTimeOrdering().getName());
+
 		return attributes;
 	}
 
 	private Attributes attributesFor(Version version) {
 		AttributesImpl attributes = new AttributesImpl();
+
 		attributes.addAttribute(null, null, Tags.VERSION, Tags.CDATA, Integer.toString(version.getVersion()));
 		attributes.addAttribute(null, null, Tags.CREATED_BY, Tags.CDATA, version.getCreatedBy());
 		attributes.addAttribute(null, null, Tags.CREATED_AT, Tags.CDATA,
 				ISO8601FormatFactory.getInstance().formatDate(version.getCreatedAt()));
 		attributes.addAttribute(null, null, Tags.DELETED, Tags.CDATA, Boolean.toString(version.isDeleted()));
+
 		return attributes;
 	}
 
 	protected AttributesImpl attributesFor(Parameter<?> parameter) {
 		AttributesImpl attributes = attributesFor((StrolchElement) parameter);
+
 		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, parameter.getValueAsString());
 
-		if (!UOM_NONE.equals(parameter.getUom())) {
+		if (!UOM_NONE.equals(parameter.getUom()))
 			attributes.addAttribute(null, null, Tags.UOM, Tags.CDATA, parameter.getUom());
-		}
-		if (!INTERPRETATION_NONE.equals(parameter.getInterpretation())) {
+
+		if (!INTERPRETATION_NONE.equals(parameter.getInterpretation()))
 			attributes.addAttribute(null, null, Tags.INTERPRETATION, Tags.CDATA, parameter.getInterpretation());
-		}
-		if (parameter.isHidden()) {
+
+		if (parameter.isHidden())
 			attributes.addAttribute(null, null, Tags.HIDDEN, Tags.CDATA, Boolean.toString(parameter.isHidden()));
-		}
-		if (parameter.getIndex() != 0) {
+
+		if (parameter.getIndex() != 0)
 			attributes.addAttribute(null, null, Tags.INDEX, Tags.CDATA, Integer.toString(parameter.getIndex()));
-		}
 
 		return attributes;
 	}
 
 	protected Attributes attributesFor(ITimeValue<IValue<?>> value) {
 		AttributesImpl attributes = new AttributesImpl();
+
 		ISO8601FormatFactory df = ISO8601FormatFactory.getInstance();
 		attributes.addAttribute(null, null, Tags.TIME, Tags.CDATA, df.formatDate(value.getTime()));
+
 		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, value.getValue().getValueAsString());
+
 		return attributes;
 	}
 
 	protected AttributesImpl attributesFor(PolicyDef policyDef) {
 		AttributesImpl attributes = new AttributesImpl();
+
 		attributes.addAttribute(null, null, Tags.TYPE, Tags.CDATA, policyDef.getType());
 		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, policyDef.getValueForXml());
+
 		return attributes;
 	}
 
 	protected AttributesImpl attributesFor(Action action) {
 		AttributesImpl attributes = attributesFor((StrolchElement) action);
-		attributes.addAttribute(null, null, Tags.RESOURCE_ID, Tags.CDATA, action.getResourceId());
-		attributes.addAttribute(null, null, Tags.RESOURCE_TYPE, Tags.CDATA, action.getResourceType());
-		attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, action.getState().getName());
+
+		if (StringHelper.isNotEmpty(action.getResourceId()))
+			attributes.addAttribute(null, null, Tags.RESOURCE_ID, Tags.CDATA, action.getResourceId());
+
+		if (StringHelper.isNotEmpty(action.getResourceType()))
+			attributes.addAttribute(null, null, Tags.RESOURCE_TYPE, Tags.CDATA, action.getResourceType());
+
+		if (!action.getState().isCreated())
+			attributes.addAttribute(null, null, Tags.STATE, Tags.CDATA, action.getState().getName());
+
 		return attributes;
 	}
 
 	protected AttributesImpl attributesFor(IValueChange<? extends IValue<?>> valueChange) {
 		AttributesImpl attributes = new AttributesImpl();
-		attributes.addAttribute(null, null, Tags.STATE_ID, Tags.CDATA, valueChange.getStateId());
+
+		if (StringHelper.isNotEmpty(valueChange.getStateId()))
+			attributes.addAttribute(null, null, Tags.STATE_ID, Tags.CDATA, valueChange.getStateId());
+
 		attributes.addAttribute(null, null, Tags.TIME, Tags.CDATA,
 				ISO8601FormatFactory.getInstance().formatDate(valueChange.getTime()));
+
 		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, valueChange.getValue().getValueAsString());
+
 		attributes.addAttribute(null, null, Tags.TYPE, Tags.CDATA, valueChange.getValue().getType());
+
 		return attributes;
 	}
 }
