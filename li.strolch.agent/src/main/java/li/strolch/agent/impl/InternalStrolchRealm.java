@@ -15,10 +15,12 @@
  */
 package li.strolch.agent.impl;
 
+import static li.strolch.agent.impl.DefaultRealmHandler.PROP_ENABLED_DELAYED_OBSERVER_UPDATES;
 import static li.strolch.agent.impl.DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL;
 import static li.strolch.agent.impl.DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL_FOR_READ;
 import static li.strolch.agent.impl.DefaultRealmHandler.PROP_ENABLE_OBSERVER_UPDATES;
 import static li.strolch.agent.impl.DefaultRealmHandler.PROP_ENABLE_VERSIONING;
+import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 
 import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +38,6 @@ import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Locator;
 import li.strolch.privilege.model.PrivilegeContext;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.dbc.DBC;
 
@@ -87,28 +88,35 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		logger.info("Initializing Realm " + getRealm() + "...");
 
 		// audits
-		String enableAuditKey = StrolchConstants.makeRealmKey(getRealm(), PROP_ENABLE_AUDIT_TRAIL);
+		String enableAuditKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDIT_TRAIL);
 		this.auditTrailEnabled = configuration.getBoolean(enableAuditKey, Boolean.FALSE);
 
 		// audits for read
-		String enableAuditForReadKey = StrolchConstants.makeRealmKey(getRealm(), PROP_ENABLE_AUDIT_TRAIL_FOR_READ);
+		String enableAuditForReadKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDIT_TRAIL_FOR_READ);
 		this.auditTrailEnabledForRead = configuration.getBoolean(enableAuditForReadKey, Boolean.FALSE);
 
 		// observer updates
-		String updateObserversKey = StrolchConstants.makeRealmKey(getRealm(), PROP_ENABLE_OBSERVER_UPDATES);
+		String updateObserversKey = makeRealmKey(getRealm(), PROP_ENABLE_OBSERVER_UPDATES);
 		this.updateObservers = configuration.getBoolean(updateObserversKey, Boolean.FALSE);
-		if (this.updateObservers)
-			this.observerHandler = new DefaultObserverHandler();
+		if (this.updateObservers) {
+			String delayedObserversKey = makeRealmKey(getRealm(), PROP_ENABLED_DELAYED_OBSERVER_UPDATES);
+			if (configuration.getBoolean(delayedObserversKey, Boolean.FALSE)) {
+				this.observerHandler = new DefaultObserverHandler();
+			} else {
+				this.observerHandler = new EventCollectingObserverHandler();
+				logger.info("Enabled Delayed Observer Updates.");
+			}
+		}
 
 		// lock timeout
-		String propTryLockTimeUnit = StrolchConstants.makeRealmKey(this.realm, PROP_TRY_LOCK_TIME_UNIT);
-		String propTryLockTime = StrolchConstants.makeRealmKey(this.realm, PROP_TRY_LOCK_TIME);
+		String propTryLockTimeUnit = makeRealmKey(this.realm, PROP_TRY_LOCK_TIME_UNIT);
+		String propTryLockTime = makeRealmKey(this.realm, PROP_TRY_LOCK_TIME);
 		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(propTryLockTimeUnit, TimeUnit.SECONDS.name()));
 		long time = configuration.getLong(propTryLockTime, 10L);
 		this.lockHandler = new DefaultLockHandler(this.realm, timeUnit, time);
 
 		// versioning
-		String enableVersioningKey = StrolchConstants.makeRealmKey(getRealm(), PROP_ENABLE_VERSIONING);
+		String enableVersioningKey = makeRealmKey(getRealm(), PROP_ENABLE_VERSIONING);
 		this.versioningEnabled = configuration.getBoolean(enableVersioningKey, Boolean.FALSE);
 
 		if (this.auditTrailEnabled)

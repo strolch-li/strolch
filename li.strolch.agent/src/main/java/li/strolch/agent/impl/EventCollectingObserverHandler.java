@@ -17,8 +17,10 @@ package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,25 +38,34 @@ import li.strolch.utils.collections.MapOfLists;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class DefaultObserverHandler implements ObserverHandler {
+public class EventCollectingObserverHandler implements ObserverHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultObserverHandler.class);
 
 	private MapOfLists<String, Observer> observerMap;
 
-	private ExecutorService executorService;
+	private ScheduledExecutorService executorService;
+	private ObserverEvent observerEvent;
 
-	public DefaultObserverHandler() {
+	private ScheduledFuture<?> future;
+
+	public EventCollectingObserverHandler() {
 		this.observerMap = new MapOfLists<>();
 	}
 
 	@Override
 	public void start() {
-		this.executorService = Executors.newSingleThreadExecutor(new ThreadPoolFactory("ObserverHandler"));
+		this.executorService = Executors.newScheduledThreadPool(1, new ThreadPoolFactory("ObserverHandler"));
 	}
 
 	@Override
 	public void stop() {
+
+		if (this.future != null) {
+			this.future.cancel(false);
+			this.future = null;
+		}
+
 		if (this.executorService != null) {
 			this.executorService.shutdown();
 			while (!this.executorService.isTerminated()) {
@@ -71,17 +82,36 @@ public class DefaultObserverHandler implements ObserverHandler {
 	}
 
 	@Override
-	public void notify(ObserverEvent event) {
-
+	public synchronized void notify(ObserverEvent event) {
 		if (event.added.isEmpty() && event.updated.isEmpty() && event.removed.isEmpty())
 			return;
 
-		this.executorService.execute(() -> {
-			doUpdates(event);
-		});
+		synchronized (this) {
+			if (this.observerEvent == null) {
+				this.observerEvent = event;
+			} else {
+				this.observerEvent.added.addAll(event.added);
+				this.observerEvent.updated.addAll(event.updated);
+				this.observerEvent.removed.addAll(event.removed);
+			}
+		}
+
+		if (this.future == null || this.future.isDone()) {
+			this.future = this.executorService.scheduleAtFixedRate(() -> doUpdates(), 100, 100, TimeUnit.MILLISECONDS);
+		}
 	}
 
-	protected void doUpdates(ObserverEvent event) {
+	protected void doUpdates() {
+
+		ObserverEvent event;
+		synchronized (this) {
+			if (this.observerEvent == null)
+				return;
+
+			event = this.observerEvent;
+			this.observerEvent = null;
+		}
+
 		synchronized (this.observerMap) {
 			for (String key : event.added.keySet()) {
 				add(key, event.added.getList(key));
@@ -91,6 +121,13 @@ public class DefaultObserverHandler implements ObserverHandler {
 			}
 			for (String key : event.removed.keySet()) {
 				remove(key, event.removed.getList(key));
+			}
+		}
+
+		synchronized (this) {
+			if (this.observerEvent != null) {
+				this.future = this.executorService.scheduleAtFixedRate(() -> doUpdates(), 100, 100,
+						TimeUnit.MILLISECONDS);
 			}
 		}
 	}
