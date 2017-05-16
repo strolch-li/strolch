@@ -38,7 +38,7 @@ public class PolicyDefs {
 	private Map<String, PolicyDef> policyDefMap;
 
 	public PolicyDefs() {
-		this.policyDefMap = new HashMap<>(0);
+		this.policyDefMap = new HashMap<>(1, 1.0F);
 	}
 
 	public void setParent(StrolchElement parent) {

@@ -133,7 +133,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 */
 	public void addParameter(Parameter<?> parameter) {
 		if (this.parameterMap == null) {
-			this.parameterMap = new HashMap<>();
+			this.parameterMap = new HashMap<>(1, 1.0F);
 		}
 
 		if (this.parameterMap.containsKey(parameter.getId())) {

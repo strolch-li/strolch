@@ -85,7 +85,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	@SuppressWarnings("unchecked")
 	public void addTimedState(StrolchTimedState<?> strolchTimedState) {
 		if (this.timedStateMap == null) {
-			this.timedStateMap = new HashMap<>();
+			this.timedStateMap = new HashMap<>(1, 1.0F);
 		}
 
 		if (this.timedStateMap.containsKey(strolchTimedState.getId())) {

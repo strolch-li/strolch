@@ -114,7 +114,7 @@ public class SystemHelper {
 		sb.append(SystemHelper.getMaxMemory());
 		sb.append(" / Used: "); //$NON-NLS-1$
 		sb.append(SystemHelper.getUsedMemory());
-		sb.append(" / Free:"); //$NON-NLS-1$
+		sb.append(" / Free: "); //$NON-NLS-1$
 		sb.append(SystemHelper.getFreeMemory());
 		return sb.toString();
 	}
