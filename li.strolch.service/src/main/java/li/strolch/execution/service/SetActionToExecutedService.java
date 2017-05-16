@@ -17,6 +17,11 @@ public class SetActionToExecutedService extends AbstractService<LocatorArgument,
 	}
 
 	@Override
+	public LocatorArgument getArgumentInstance() {
+		return new LocatorArgument();
+	}
+
+	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {

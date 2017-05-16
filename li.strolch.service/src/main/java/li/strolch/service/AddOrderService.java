@@ -18,6 +18,7 @@ package li.strolch.service;
 import li.strolch.command.AddOrderCommand;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.service.AddOrderService.AddOrderArg;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -26,13 +27,18 @@ import li.strolch.service.api.ServiceResultState;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrderService extends AbstractService<AddOrderService.AddOrderArg, ServiceResult> {
+public class AddOrderService extends AbstractService<AddOrderArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult(ServiceResultState.FAILED);
+	}
+
+	@Override
+	public AddOrderArg getArgumentInstance() {
+		return new AddOrderArg();
 	}
 
 	@Override

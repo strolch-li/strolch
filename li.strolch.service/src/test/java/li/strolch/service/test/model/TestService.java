@@ -21,7 +21,6 @@ import li.strolch.service.api.ServiceResult;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class TestService extends AbstractService<ServiceArgument, ServiceResult> {
 	private static final long serialVersionUID = 1L;
@@ -29,6 +28,11 @@ public class TestService extends AbstractService<ServiceArgument, ServiceResult>
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult();
+	}
+
+	@Override
+	public ServiceArgument getArgumentInstance() {
+		return new ServiceArgument();
 	}
 
 	@Override

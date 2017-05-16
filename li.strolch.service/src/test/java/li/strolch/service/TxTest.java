@@ -17,6 +17,10 @@ package li.strolch.service;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
 import li.strolch.command.AddResourceCommand;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
@@ -27,9 +31,6 @@ import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import li.strolch.utils.dbc.DBC;
-
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class TxTest extends AbstractRealmServiceTest {
 
@@ -64,6 +65,11 @@ public class TxTest extends AbstractRealmServiceTest {
 		@Override
 		protected ServiceResult getResultInstance() {
 			return new ServiceResult();
+		}
+
+		@Override
+		public ServiceArgument getArgumentInstance() {
+			return new ServiceArgument();
 		}
 
 		@Override
@@ -107,6 +113,11 @@ public class TxTest extends AbstractRealmServiceTest {
 		}
 
 		@Override
+		public ServiceArgument getArgumentInstance() {
+			return new ServiceArgument();
+		}
+
+		@Override
 		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
 
 			String id = "flushSuccessfully";
@@ -147,6 +158,11 @@ public class TxTest extends AbstractRealmServiceTest {
 		}
 
 		@Override
+		public ServiceArgument getArgumentInstance() {
+			return new ServiceArgument();
+		}
+
+		@Override
 		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
 
 			try (StrolchTransaction tx = openTx(arg.realm)) {
@@ -167,6 +183,11 @@ public class TxTest extends AbstractRealmServiceTest {
 		@Override
 		protected ServiceResult getResultInstance() {
 			return new ServiceResult();
+		}
+
+		@Override
+		public ServiceArgument getArgumentInstance() {
+			return new ServiceArgument();
 		}
 
 		@Override

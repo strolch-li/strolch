@@ -19,6 +19,7 @@ import li.strolch.command.AddResourceCommand;
 import li.strolch.command.UpdateResourceCommand;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.service.AddOrUpdateResourceService.AddOrUpdateResourceArg;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -27,13 +28,18 @@ import li.strolch.service.api.ServiceResultState;
 /**
  * @author Reto Breitenmoser <reto.breitenmoser@gmail.com>
  */
-public class AddOrUpdateResourceService extends AbstractService<AddOrUpdateResourceService.AddOrUpdateResourceArg, ServiceResult> {
+public class AddOrUpdateResourceService extends AbstractService<AddOrUpdateResourceArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult(ServiceResultState.FAILED);
+	}
+
+	@Override
+	public AddOrUpdateResourceArg getArgumentInstance() {
+		return new AddOrUpdateResourceArg();
 	}
 
 	@Override
@@ -49,7 +55,7 @@ public class AddOrUpdateResourceService extends AbstractService<AddOrUpdateResou
 				addCmd.setResource(arg.resource);
 				tx.addCommand(addCmd);
 			}
-			
+
 			tx.commitOnClose();
 		}
 

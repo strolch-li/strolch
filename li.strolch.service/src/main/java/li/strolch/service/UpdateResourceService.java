@@ -18,6 +18,7 @@ package li.strolch.service;
 import li.strolch.command.UpdateResourceCommand;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.service.UpdateResourceService.UpdateResourceArg;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -26,13 +27,18 @@ import li.strolch.service.api.ServiceResultState;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateResourceService extends AbstractService<UpdateResourceService.UpdateResourceArg, ServiceResult> {
+public class UpdateResourceService extends AbstractService<UpdateResourceArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult(ServiceResultState.FAILED);
+	}
+
+	@Override
+	public UpdateResourceArg getArgumentInstance() {
+		return new UpdateResourceArg();
 	}
 
 	@Override

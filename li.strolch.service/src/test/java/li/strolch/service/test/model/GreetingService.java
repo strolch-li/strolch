@@ -46,6 +46,11 @@ public class GreetingService extends AbstractService<GreetingArgument, GreetingR
 		return new GreetingResult();
 	}
 
+	@Override
+	public GreetingArgument getArgumentInstance() {
+		return new GreetingArgument();
+	}
+
 	public static class GreetingArgument extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
 		public String name;

@@ -17,6 +17,11 @@ public class SetActionToStoppedService extends AbstractService<LocatorArgument, 
 	}
 
 	@Override
+	public LocatorArgument getArgumentInstance() {
+		return new LocatorArgument();
+	}
+
+	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
 
 		String realm = StringHelper.isEmpty(arg.realm) ? StrolchConstants.DEFAULT_REALM : arg.realm;

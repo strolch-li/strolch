@@ -20,6 +20,7 @@ import java.util.List;
 import li.strolch.command.UpdateResourceCollectionCommand;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.service.UpdateResourceCollectionService.UpdateResourceCollectionArg;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -27,14 +28,18 @@ import li.strolch.service.api.ServiceResult;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateResourceCollectionService extends
-		AbstractService<UpdateResourceCollectionService.UpdateResourceCollectionArg, ServiceResult> {
+public class UpdateResourceCollectionService extends AbstractService<UpdateResourceCollectionArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult();
+	}
+
+	@Override
+	public UpdateResourceCollectionArg getArgumentInstance() {
+		return new UpdateResourceCollectionArg();
 	}
 
 	@Override

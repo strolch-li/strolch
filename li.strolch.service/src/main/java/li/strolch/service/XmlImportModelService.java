@@ -39,6 +39,11 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 	}
 
 	@Override
+	public XmlImportModelArgument getArgumentInstance() {
+		return new XmlImportModelArgument();
+	}
+
+	@Override
 	protected XmlImportModelResult internalDoService(XmlImportModelArgument arg) {
 
 		File modelFile;
@@ -90,8 +95,8 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 
 		ModelStatistics statistics = command.getStatistics();
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info(MessageFormat.format(
-				"Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(), arg.realm, durationS)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(), //$NON-NLS-1$
+				arg.realm, durationS));
 		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$

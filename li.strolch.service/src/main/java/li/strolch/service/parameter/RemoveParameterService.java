@@ -36,6 +36,11 @@ public class RemoveParameterService extends AbstractService<LocatorArgument, Ser
 	}
 
 	@Override
+	public LocatorArgument getArgumentInstance() {
+		return new LocatorArgument();
+	}
+
+	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {

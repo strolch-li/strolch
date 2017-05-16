@@ -15,6 +15,8 @@
  */
 package li.strolch.service;
 
+import org.junit.Test;
+
 import li.strolch.command.AddResourceCommand;
 import li.strolch.command.RemoveResourceCommand;
 import li.strolch.command.UpdateResourceCommand;
@@ -26,8 +28,6 @@ import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import li.strolch.utils.dbc.DBC;
-
-import org.junit.Test;
 
 public class FlushTxTest extends AbstractRealmServiceTest {
 
@@ -55,6 +55,11 @@ public class FlushTxTest extends AbstractRealmServiceTest {
 		@Override
 		protected ServiceResult getResultInstance() {
 			return new ServiceResult();
+		}
+
+		@Override
+		public ServiceArgument getArgumentInstance() {
+			return new ServiceArgument();
 		}
 
 		@Override
@@ -104,6 +109,11 @@ public class FlushTxTest extends AbstractRealmServiceTest {
 		}
 
 		@Override
+		public ServiceArgument getArgumentInstance() {
+			return new ServiceArgument();
+		}
+
+		@Override
 		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
 
 			String id = "flushSuccessfully";
@@ -147,6 +157,11 @@ public class FlushTxTest extends AbstractRealmServiceTest {
 		@Override
 		protected ServiceResult getResultInstance() {
 			return new ServiceResult();
+		}
+
+		@Override
+		public ServiceArgument getArgumentInstance() {
+			return new ServiceArgument();
 		}
 
 		@Override

@@ -18,6 +18,7 @@ package li.strolch.service;
 import li.strolch.command.UpdateActivityCommand;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.service.UpdateActivityService.UpdateActivityArg;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -26,13 +27,18 @@ import li.strolch.service.api.ServiceResultState;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateActivityService extends AbstractService<UpdateActivityService.UpdateActivityArg, ServiceResult> {
+public class UpdateActivityService extends AbstractService<UpdateActivityArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult(ServiceResultState.FAILED);
+	}
+
+	@Override
+	public UpdateActivityArg getArgumentInstance() {
+		return new UpdateActivityArg();
 	}
 
 	@Override

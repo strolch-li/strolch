@@ -38,6 +38,11 @@ public class PrivilegeAddOrReplacePrivilegeOnRoleService
 	}
 
 	@Override
+	public PrivilegeAddOrReplacePrivilegeOnRoleArgument getArgumentInstance() {
+		return new PrivilegeAddOrReplacePrivilegeOnRoleArgument();
+	}
+
+	@Override
 	protected PrivilegeRoleResult internalDoService(PrivilegeAddOrReplacePrivilegeOnRoleArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();

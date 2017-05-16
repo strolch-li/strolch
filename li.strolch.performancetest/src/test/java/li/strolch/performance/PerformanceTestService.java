@@ -40,6 +40,11 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 	}
 
 	@Override
+	public PerformanceTestArgument getArgumentInstance() {
+		return new PerformanceTestArgument();
+	}
+
+	@Override
 	protected boolean isArgumentRequired() {
 		return true;
 	}

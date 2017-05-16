@@ -20,6 +20,7 @@ import java.util.List;
 import li.strolch.command.AddOrderCollectionCommand;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.service.AddOrderCollectionService.AddOrderCollectionArg;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -27,14 +28,18 @@ import li.strolch.service.api.ServiceResult;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrderCollectionService extends
-		AbstractService<AddOrderCollectionService.AddOrderCollectionArg, ServiceResult> {
+public class AddOrderCollectionService extends AbstractService<AddOrderCollectionArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult();
+	}
+
+	@Override
+	public AddOrderCollectionArg getArgumentInstance() {
+		return new AddOrderCollectionArg();
 	}
 
 	@Override

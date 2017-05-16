@@ -197,6 +197,11 @@ public class LockingTest {
 		}
 
 		@Override
+		public LockingArgumentTest getArgumentInstance() {
+			return new LockingArgumentTest();
+		}
+
+		@Override
 		protected ServiceResult internalDoService(LockingArgumentTest arg) throws Exception {
 
 			try (StrolchTransaction tx = openArgOrUserTx(arg)) {

@@ -428,6 +428,13 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	protected abstract U getResultInstance();
 
 	/**
+	 * Method to easily instantiate an instance of the {@link ServiceArgument} for this concrete service implementation
+	 * 
+	 * @return an instance of the {@link ServiceArgument} returned by this implementation
+	 */
+	public abstract T getArgumentInstance();
+
+	/**
 	 * Internal method to perform the {@link Service}. The implementor does not need to handle exceptions as this is
 	 * done in the {@link #doService(ServiceArgument)} which calls this method
 	 * 

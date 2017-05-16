@@ -39,6 +39,11 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 	}
 
 	@Override
+	public XmlExportModelArgument getArgumentInstance() {
+		return new XmlExportModelArgument();
+	}
+
+	@Override
 	protected ServiceResult internalDoService(XmlExportModelArgument arg) {
 
 		DBC.PRE.assertNotEmpty("Modelfile must be set!", arg.modelFileName);

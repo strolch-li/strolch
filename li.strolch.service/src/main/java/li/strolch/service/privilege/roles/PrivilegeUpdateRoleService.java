@@ -37,6 +37,11 @@ public class PrivilegeUpdateRoleService extends AbstractService<PrivilegeRoleArg
 	}
 
 	@Override
+	public PrivilegeRoleArgument getArgumentInstance() {
+		return new PrivilegeRoleArgument();
+	}
+
+	@Override
 	protected PrivilegeRoleResult internalDoService(PrivilegeRoleArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();

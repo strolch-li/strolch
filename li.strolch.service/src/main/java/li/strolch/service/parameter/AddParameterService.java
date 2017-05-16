@@ -24,17 +24,23 @@ import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+import li.strolch.service.parameter.AddParameterService.AddParameterArg;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddParameterService extends AbstractService<AddParameterService.AddParameterArg, ServiceResult> {
+public class AddParameterService extends AbstractService<AddParameterArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult(ServiceResultState.FAILED);
+	}
+
+	@Override
+	public AddParameterArg getArgumentInstance() {
+		return new AddParameterArg();
 	}
 
 	@Override

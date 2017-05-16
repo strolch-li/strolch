@@ -38,6 +38,11 @@ public class ClearModelService extends AbstractService<ClearModelArgument, Servi
 	}
 
 	@Override
+	public ClearModelArgument getArgumentInstance() {
+		return new ClearModelArgument();
+	}
+
+	@Override
 	protected ServiceResult internalDoService(ClearModelArgument arg) {
 
 		ClearModelCommand command;

@@ -35,6 +35,11 @@ public class RemoveActivityService extends AbstractService<LocatorArgument, Serv
 	}
 
 	@Override
+	public LocatorArgument getArgumentInstance() {
+		return new LocatorArgument();
+	}
+
+	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {

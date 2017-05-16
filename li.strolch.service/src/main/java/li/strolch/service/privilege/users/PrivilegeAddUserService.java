@@ -34,6 +34,11 @@ public class PrivilegeAddUserService extends AbstractService<PrivilegeUserArgume
 	}
 
 	@Override
+	public PrivilegeUserArgument getArgumentInstance() {
+		return new PrivilegeUserArgument();
+	}
+
+	@Override
 	protected PrivilegeUserResult internalDoService(PrivilegeUserArgument arg) throws Exception {
 
 		PrivilegeAddUserCommand cmd;

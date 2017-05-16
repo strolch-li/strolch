@@ -37,6 +37,11 @@ public class PrivilegeRemoveRoleFromUserService
 	}
 
 	@Override
+	public PrivilegeRoleUserNamesArgument getArgumentInstance() {
+		return new PrivilegeRoleUserNamesArgument();
+	}
+
+	@Override
 	protected PrivilegeUserResult internalDoService(PrivilegeRoleUserNamesArgument arg) throws Exception {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
