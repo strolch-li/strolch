@@ -29,6 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
@@ -42,10 +46,6 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -111,7 +111,7 @@ public class ObserverUpdateTest {
 	}
 
 	@Test
-	public void shouldReceiveUpdates() {
+	public void shouldReceiveUpdates() throws InterruptedException {
 
 		// register an observer for orders and resources
 		ElementAddedObserver observer = new ElementAddedObserver();
@@ -135,6 +135,9 @@ public class ObserverUpdateTest {
 			tx.getResourceMap().add(tx, newResource);
 			tx.commitOnClose();
 		}
+
+		// observer updates are async...
+		Thread.sleep(100L);
 
 		assertEquals(2, observer.results.size());
 		assertEquals(1, observer.results.get(Tags.ORDER).getCreated().size());
