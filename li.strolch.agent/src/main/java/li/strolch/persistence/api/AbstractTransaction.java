@@ -723,12 +723,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		try {
 			this.txResult.setState(TransactionState.CLOSING);
 
-			// TODO re-think this.
 			if (!this.commands.isEmpty()) {
-				logger.error(
-						"There are commands registered on a read-only transaction. Changing to rollback! Probably due to an exception!");
 				autoCloseableRollback();
-				return;
+				String msg = "There are commands registered on a read-only transaction. Changing to rollback! Probably due to an exception!";
+				throw new IllegalStateException(msg);
 			}
 
 			long auditTrailDuration = writeAuditTrail();
