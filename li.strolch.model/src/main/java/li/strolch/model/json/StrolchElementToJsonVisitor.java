@@ -55,6 +55,7 @@ public class StrolchElementToJsonVisitor
 	private boolean withoutElementName;
 	private boolean withVersion;
 	private boolean withoutPolicies;
+	private int activityDepth = Integer.MAX_VALUE;
 
 	public StrolchElementToJsonVisitor() {
 		this.ignoredKeys = new MapOfSets<>();
@@ -89,6 +90,11 @@ public class StrolchElementToJsonVisitor
 
 	public StrolchElementToJsonVisitor withoutPolicies() {
 		this.withoutPolicies = true;
+		return this;
+	}
+
+	public StrolchElementToJsonVisitor activityDepth(int depth) {
+		this.activityDepth = depth;
 		return this;
 	}
 
@@ -186,7 +192,7 @@ public class StrolchElementToJsonVisitor
 
 	protected JsonObject toJson(Activity element) {
 		JsonObject rootJ = new JsonObject();
-		return toJson(element, rootJ);
+		return toJson(element, rootJ, 0);
 	}
 
 	protected JsonObject toJson(Action element) {
@@ -194,7 +200,7 @@ public class StrolchElementToJsonVisitor
 		return toJson(element, rootJ);
 	}
 
-	protected JsonObject toJson(Activity element, JsonObject rootJ) {
+	protected JsonObject toJson(Activity element, JsonObject rootJ, int currentDepth) {
 
 		rootJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ACTIVITY);
 
@@ -212,6 +218,9 @@ public class StrolchElementToJsonVisitor
 		if (this.activityHook != null)
 			this.activityHook.accept(element, rootJ);
 
+		if (currentDepth >= this.activityDepth)
+			return rootJ;
+
 		Iterator<Entry<String, IActivityElement>> iter = element.elementIterator();
 		if (iter.hasNext()) {
 
@@ -225,7 +234,7 @@ public class StrolchElementToJsonVisitor
 				elementsJ.add(elementJ);
 
 				if (activityElement instanceof Activity) {
-					toJson((Activity) activityElement, elementJ);
+					toJson((Activity) activityElement, elementJ, currentDepth + 1);
 				} else if (activityElement instanceof Action) {
 					toJson((Action) activityElement, elementJ);
 				} else {
