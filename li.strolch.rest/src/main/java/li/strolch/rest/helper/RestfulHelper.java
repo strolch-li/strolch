@@ -57,7 +57,7 @@ public class RestfulHelper {
 	}
 
 	public static <T extends StrolchRootElement> JsonObject toJson(QueryData queryData, long dataSetSize,
-			List<T> elements, StrolchElementVisitor<T, JsonObject> toJsonVisitor) {
+			List<T> elements, StrolchElementVisitor<JsonObject> toJsonVisitor) {
 
 		// paging
 		Paging<T> paging = Paging.asPage(elements, queryData.getOffset(), queryData.getLimit());
@@ -83,7 +83,7 @@ public class RestfulHelper {
 		// add items
 		JsonArray data = new JsonArray();
 		for (T t : page) {
-			JsonObject element = toJsonVisitor.visit(t);
+			JsonObject element = t.accept(toJsonVisitor);
 			data.add(element);
 		}
 		root.add("data", data);

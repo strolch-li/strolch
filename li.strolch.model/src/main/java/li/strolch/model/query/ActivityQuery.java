@@ -19,6 +19,7 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
 import li.strolch.model.visitor.ActivityVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -70,6 +71,12 @@ public class ActivityQuery<U> extends StrolchElementQuery<ActivityQueryVisitor> 
 	@Override
 	public ActivityQuery<U> internal() {
 		super.internal();
+		return this;
+	}
+
+	public ActivityQuery<U> setVisitor(StrolchElementVisitor<U> visitor) {
+		DBC.PRE.assertNotNull("visitor", visitor);
+		this.activityVisitor = visitor.asActivityVisitor();
 		return this;
 	}
 

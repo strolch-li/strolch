@@ -17,32 +17,29 @@ package li.strolch.model;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
 import com.google.gson.JsonObject;
 
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.ActivityFromJsonVisitor;
-import li.strolch.model.json.ActivityToJsonVisitor;
 import li.strolch.model.json.OrderFromJsonVisitor;
-import li.strolch.model.json.OrderToJsonVisitor;
 import li.strolch.model.json.ResourceFromJsonVisitor;
-import li.strolch.model.json.ResourceToJsonVisitor;
-import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
-import li.strolch.model.visitor.OrderDeepEqualsVisitor;
-import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
+import li.strolch.model.json.StrolchElementToJsonVisitor;
+import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
 
 public class ModelToJsonTest extends ModelMarshallingTest {
 
 	@Override
 	protected Order formatAndParseOrder(Order order) {
-		OrderToJsonVisitor jsonVisitor = new OrderToJsonVisitor();
-		jsonVisitor.visit(order);
-		JsonObject jsonObject = jsonVisitor.getJsonObject();
+		StrolchElementToJsonVisitor jsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+		JsonObject jsonObject = order.accept(jsonVisitor);
 
 		Order parsedOrder = new OrderFromJsonVisitor().visit(jsonObject);
 
-		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
-		visitor.visit(parsedOrder);
-		assertTrue("To JSON and back should equal same Order:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(order);
+		List<Locator> mismatches = parsedOrder.accept(visitor);
+		assertTrue("To JSON and back should equal same Order:\n" + mismatches, mismatches.isEmpty());
 
 		return parsedOrder;
 	}
@@ -50,16 +47,14 @@ public class ModelToJsonTest extends ModelMarshallingTest {
 	@Override
 	protected Resource formatAndParseResource(Resource resource) {
 
-		ResourceToJsonVisitor jsonVisitor = new ResourceToJsonVisitor();
-		jsonVisitor.visit(resource);
-		JsonObject jsonObject = jsonVisitor.getJsonObject();
+		StrolchElementToJsonVisitor jsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+		JsonObject jsonObject = resource.accept(jsonVisitor);
 
 		Resource parsedResource = new ResourceFromJsonVisitor().visit(jsonObject);
 
-		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(resource);
-		visitor.visit(parsedResource);
-		assertTrue("To JSON and back should equal same Resource:\n" + visitor.getMismatchedLocators(),
-				visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(resource);
+		List<Locator> mismatches = parsedResource.accept(visitor);
+		assertTrue("To JSON and back should equal same Resource:\n" + mismatches, mismatches.isEmpty());
 
 		return parsedResource;
 	}
@@ -67,16 +62,14 @@ public class ModelToJsonTest extends ModelMarshallingTest {
 	@Override
 	protected Activity formatAndParseActivity(Activity activity) {
 
-		ActivityToJsonVisitor jsonVisitor = new ActivityToJsonVisitor();
-		jsonVisitor.visit(activity);
-		JsonObject jsonObject = jsonVisitor.getJsonObject();
+		StrolchElementToJsonVisitor jsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+		JsonObject jsonObject = activity.accept(jsonVisitor);
 
 		Activity parsedActivity = new ActivityFromJsonVisitor().visit(jsonObject);
 
-		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(activity);
-		visitor.visit(parsedActivity);
-		assertTrue("To JSON and back should equal same Activity:\n" + visitor.getMismatchedLocators(),
-				visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(activity);
+		List<Locator> mismatches = parsedActivity.accept(visitor);
+		assertTrue("To JSON and back should equal same Activity:\n" + mismatches, mismatches.isEmpty());
 
 		return parsedActivity;
 	}

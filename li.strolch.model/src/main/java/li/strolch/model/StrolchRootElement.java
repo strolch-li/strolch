@@ -15,6 +15,7 @@
  */
 package li.strolch.model;
 
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 
 /**
@@ -68,7 +69,7 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * 
 	 * @return the result of the visitation
 	 */
-	public <T> T accept(StrolchRootElementVisitor<T> visitor);
+	public <T> T accept(StrolchElementVisitor<T> visitor);
 
 	/**
 	 * Formats this {@link StrolchRootElement} as an XML string

@@ -19,6 +19,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
 import li.strolch.model.visitor.ResourceVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -70,6 +71,12 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 	@Override
 	public ResourceQuery<U> internal() {
 		super.internal();
+		return this;
+	}
+
+	public ResourceQuery<U> setVisitor(StrolchElementVisitor<U> visitor) {
+		DBC.PRE.assertNotNull("visitor", visitor);
+		this.resourceVisitor = visitor.asResourceVisitor();
 		return this;
 	}
 

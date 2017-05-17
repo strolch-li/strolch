@@ -249,7 +249,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 					String id = result.getString("id");
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					Activity t = parseFromXml(id, queryVisitor.getType(), sqlxml);
-					list.add(query.getActivityVisitor().visit(t));
+					list.add(t.accept(query.getActivityVisitor()));
 				}
 			}
 		} catch (SQLException e) {

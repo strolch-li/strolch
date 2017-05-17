@@ -1,11 +1,17 @@
 package li.strolch.model.visitor;
 
-import li.strolch.model.activity.Action;
-import li.strolch.model.activity.Activity;
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
 
-public interface IActivityElementVisitor<T> {
+public interface IActivityElementVisitor<T> extends StrolchElementVisitor<T> {
 
-	public T visit(Activity activity);
+	@Override
+	public default T visitOrder(Order order) {
+		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + order.getClass());
+	}
 
-	public T visit(Action action);
+	@Override
+	public default T visitResource(Resource resource) {
+		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + resource.getClass());
+	}
 }

@@ -241,7 +241,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 					String id = result.getString("id");
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					Resource t = parseFromXml(id, queryVisitor.getType(), sqlxml);
-					list.add(query.getResourceVisitor().visit(t));
+					list.add(t.accept(query.getResourceVisitor()));
 				}
 			}
 		} catch (SQLException e) {

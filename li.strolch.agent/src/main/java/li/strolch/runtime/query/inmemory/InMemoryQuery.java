@@ -33,14 +33,14 @@ public class InMemoryQuery<T extends StrolchRootElement, U> {
 
 	private Navigator<T> navigator;
 	private Selector<T> selector;
-	private StrolchElementVisitor<T, U> elementVisitor;
+	private StrolchElementVisitor<U> elementVisitor;
 	private Comparator<T> comparator;
 
 	public InMemoryQuery() {
 		// empty constructor
 	}
 
-	public InMemoryQuery(Navigator<T> navigator, Selector<T> selector, StrolchElementVisitor<T, U> elementVisitor,
+	public InMemoryQuery(Navigator<T> navigator, Selector<T> selector, StrolchElementVisitor<U> elementVisitor,
 			Comparator<T> comparator) {
 		this.navigator = navigator;
 		this.selector = selector;
@@ -68,7 +68,7 @@ public class InMemoryQuery<T extends StrolchRootElement, U> {
 	 * @param elementVisitor
 	 *            the elementVisitor to set
 	 */
-	public void setElementVisitor(StrolchElementVisitor<T, U> elementVisitor) {
+	public void setElementVisitor(StrolchElementVisitor<U> elementVisitor) {
 		this.elementVisitor = elementVisitor;
 	}
 
@@ -86,7 +86,7 @@ public class InMemoryQuery<T extends StrolchRootElement, U> {
 		while (iter.hasNext()) {
 			T element = iter.next();
 			if (this.selector.select(element)) {
-				U returnValue = this.elementVisitor.visit(element);
+				U returnValue = element.accept(this.elementVisitor);
 				DBC.INTERIM.assertNotNull("Visitor may not return null in query!", returnValue); //$NON-NLS-1$
 				result.add(returnValue);
 			}

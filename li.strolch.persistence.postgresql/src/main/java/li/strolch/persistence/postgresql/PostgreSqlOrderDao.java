@@ -249,7 +249,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 					String id = result.getString("id");
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					Order t = parseFromXml(id, queryVisitor.getType(), sqlxml);
-					list.add(query.getOrderVisitor().visit(t));
+					list.add(t.accept(query.getOrderVisitor()));
 				}
 			}
 		} catch (SQLException e) {

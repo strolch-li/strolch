@@ -15,14 +15,28 @@
  */
 package li.strolch.model.visitor;
 
-import li.strolch.model.activity.Activity;
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
+import li.strolch.model.activity.Action;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  * @param <U>
  */
-public interface ActivityVisitor<U> extends StrolchElementVisitor<Activity, U> {
+public interface ActivityVisitor<U> extends StrolchElementVisitor<U> {
 
 	@Override
-	public U visit(Activity element);
+	public default U visitAction(Action action) {
+		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + action.getClass());
+	}
+
+	@Override
+	public default U visitOrder(Order order) {
+		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + order.getClass());
+	}
+
+	@Override
+	public default U visitResource(Resource resource) {
+		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + resource.getClass());
+	}
 }

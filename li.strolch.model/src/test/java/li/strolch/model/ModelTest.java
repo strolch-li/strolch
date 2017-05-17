@@ -96,9 +96,7 @@ import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.BooleanValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
-import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
-import li.strolch.model.visitor.OrderDeepEqualsVisitor;
-import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
+import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
 
 @SuppressWarnings("nls")
 public class ModelTest {
@@ -242,18 +240,18 @@ public class ModelTest {
 	public void shouldPerformDeepActivityEquals() {
 		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
 		Activity dstActivity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
-		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
-		visitor.visit(dstActivity);
-		assertTrue("Same Activity should be deep equal!", visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcActivity);
+		List<Locator> mismatches = dstActivity.accept(visitor);
+		assertTrue("Same Activity should be deep equal!", mismatches.isEmpty());
 	}
 
 	@Test
 	public void shouldPerformActivityClone() {
 		Activity srcActivity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
 		Activity dstActivity = srcActivity.getClone();
-		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
-		visitor.visit(dstActivity);
-		assertTrue("Cloned Activity should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcActivity);
+		List<Locator> mismatches = dstActivity.accept(visitor);
+		assertTrue("Cloned Activity should be deep equal: " + mismatches, mismatches.isEmpty());
 	}
 
 	@Test
@@ -267,10 +265,10 @@ public class ModelTest {
 		FloatParameter fParam = bag.getParameter(PARAM_FLOAT_ID);
 		fParam.setValue(23434234.234);
 		fParam.setName("Ohla");
-		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
-		visitor.visit(dstActivity);
-		assertFalse("Activity should not be same if something has been changed", visitor.isEqual());
-		assertEquals("Multiple changes should be registered", 6, visitor.getMismatchedLocators().size());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcActivity);
+		List<Locator> mismatches = dstActivity.accept(visitor);
+		assertFalse("Activity should not be same if something has been changed", mismatches.isEmpty());
+		assertEquals("Multiple changes should be registered", 6, mismatches.size());
 	}
 
 	@Test
@@ -297,28 +295,28 @@ public class ModelTest {
 		action = activity.getElement("action1_" + "@act01");
 		action.addChange(new ValueChange<>(1234567890L, new IntegerValue(12345), STATE_INTEGER_ID));
 
-		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcActivity);
-		visitor.visit(dstActivity);
-		assertFalse("Activity should not be same if something has been changed", visitor.isEqual());
-		assertEquals("Multiple changes should be registered", 9, visitor.getMismatchedLocators().size());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcActivity);
+		List<Locator> mismatches = dstActivity.accept(visitor);
+		assertFalse("Activity should not be same if something has been changed", mismatches.isEmpty());
+		assertEquals("Multiple changes should be registered", 9, mismatches.size());
 	}
 
 	@Test
 	public void shouldPerformDeepResourceEquals() {
 		Resource srcRes = createResource("@res01", "Test resource", "MyType");
 		Resource dstRes = createResource("@res01", "Test resource", "MyType");
-		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
-		visitor.visit(dstRes);
-		assertTrue("Same Resource should be deep equal!", visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcRes);
+		List<Locator> mismatches = dstRes.accept(visitor);
+		assertTrue("Same Resource should be deep equal!", mismatches.isEmpty());
 	}
 
 	@Test
 	public void shouldPerformResourceClone() {
 		Resource srcRes = createResource("@res01", "Test resource", "MyType");
 		Resource dstRes = srcRes.getClone();
-		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
-		visitor.visit(dstRes);
-		assertTrue("Cloned Resource should be deep equal!", visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcRes);
+		List<Locator> mismatches = dstRes.accept(visitor);
+		assertTrue("Cloned Resource should be deep equal!", mismatches.isEmpty());
 	}
 
 	@Test
@@ -330,10 +328,10 @@ public class ModelTest {
 		FloatParameter fParam = bag.getParameter(PARAM_FLOAT_ID);
 		fParam.setValue(23434234.234);
 		fParam.setName("Ohla");
-		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
-		visitor.visit(dstRes);
-		assertFalse("Resource should not be same if param is changed!", visitor.isEqual());
-		assertEquals("Multiple changes should be registered", 3, visitor.getMismatchedLocators().size());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcRes);
+		List<Locator> mismatches = dstRes.accept(visitor);
+		assertFalse("Resource should not be same if param is changed!", mismatches.isEmpty());
+		assertEquals("Multiple changes should be registered", 3, mismatches.size());
 	}
 
 	@Test
@@ -343,10 +341,10 @@ public class ModelTest {
 		BooleanTimedState timedState = dstRes.getTimedState(STATE_BOOLEAN_ID);
 		timedState.applyChange(new ValueChange<>(System.currentTimeMillis(), new BooleanValue(Boolean.FALSE)));
 		timedState.setName("Ohla");
-		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
-		visitor.visit(dstRes);
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcRes);
+		List<Locator> mismatches = dstRes.accept(visitor);
 		assertFalse("Resource should not be same if param is changed!", visitor.isEqual());
-		assertEquals("Multiple change should be registered!", 2, visitor.getMismatchedLocators().size());
+		assertEquals("Multiple change should be registered!", 2, mismatches.size());
 	}
 
 	@Test
@@ -354,9 +352,9 @@ public class ModelTest {
 		Date date = new Date();
 		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.CREATED);
 		Order dstOrder = createOrder("@ord01", "Test Order", "MyType", date, State.CREATED);
-		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
-		visitor.visit(dstOrder);
-		assertTrue("Same Order should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcOrder);
+		List<Locator> mismatches = dstOrder.accept(visitor);
+		assertTrue("Same Order should be deep equal: " + mismatches, visitor.isEqual());
 	}
 
 	@Test
@@ -364,9 +362,9 @@ public class ModelTest {
 		Date date = new Date();
 		Order srcOrder = createOrder("@ord01", "Test Order", "MyType", date, State.CREATED);
 		Order dstOrder = srcOrder.getClone();
-		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
-		visitor.visit(dstOrder);
-		assertTrue("Cloned Order should be deep equal: " + visitor.getMismatchedLocators(), visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcOrder);
+		List<Locator> mismatches = dstOrder.accept(visitor);
+		assertTrue("Cloned Order should be deep equal: " + mismatches, visitor.isEqual());
 	}
 
 	@Test
@@ -381,10 +379,10 @@ public class ModelTest {
 		FloatParameter fParam = bag.getParameter(PARAM_FLOAT_ID);
 		fParam.setValue(23434234.234);
 		fParam.setName("Ohla");
-		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
-		visitor.visit(dstOrder);
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcOrder);
+		List<Locator> mismatches = dstOrder.accept(visitor);
 		assertFalse("Order should not be same if something has been changed", visitor.isEqual());
-		assertEquals("Multiple changes should be registered", 5, visitor.getMismatchedLocators().size());
+		assertEquals("Multiple changes should be registered", 5, mismatches.size());
 	}
 
 	public static void validateBag(ParameterBag bag) {

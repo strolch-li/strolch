@@ -53,7 +53,7 @@ public class AuditingOrderMap extends AuditingElementMapFacade<Order> implements
 		DBC.PRE.assertNotNull("orderVisitor on query", orderVisitor);
 		query.setOrderVisitor(order -> {
 			this.read.add(order);
-			return orderVisitor.visit(order);
+			return order.accept(orderVisitor);
 		});
 
 		return getElementMap().doQuery(tx, query);

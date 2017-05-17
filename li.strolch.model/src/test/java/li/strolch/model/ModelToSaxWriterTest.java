@@ -21,13 +21,12 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.model.activity.Activity;
-import li.strolch.model.visitor.ActivityDeepEqualsVisitor;
-import li.strolch.model.visitor.OrderDeepEqualsVisitor;
-import li.strolch.model.visitor.ResourceDeepEqualsVisitor;
+import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
 import li.strolch.model.xml.StrolchElementToSaxWriterVisitor;
 import li.strolch.model.xml.StrolchXmlHelper;
@@ -57,9 +56,9 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 		assertEquals(Collections.emptyList(), listener.getActivities());
 		Order parsedOrder = listener.getOrders().get(0);
 
-		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(order);
-		visitor.visit(parsedOrder);
-		assertTrue("To DOM and back should equal same Order:\n" + visitor.getMismatchedLocators(), visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(order);
+		List<Locator> mismatches = parsedOrder.accept(visitor);
+		assertTrue("To DOM and back should equal same Order:\n" + mismatches, mismatches.isEmpty());
 
 		return parsedOrder;
 	}
@@ -82,10 +81,9 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 		assertEquals(Collections.emptyList(), listener.getOrders());
 		Resource parsedResource = listener.getResources().get(0);
 
-		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(resource);
-		visitor.visit(parsedResource);
-		assertTrue("To DOM and back should equal same Resource:\n" + visitor.getMismatchedLocators(),
-				visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(resource);
+		List<Locator> mismatches = parsedResource.accept(visitor);
+		assertTrue("To DOM and back should equal same Resource:\n" + mismatches, mismatches.isEmpty());
 
 		return parsedResource;
 	}
@@ -110,10 +108,9 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 		assertEquals(Collections.emptyList(), listener.getOrders());
 		Activity parsedActivity = listener.getActivities().get(0);
 
-		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(activity);
-		visitor.visit(parsedActivity);
-		assertTrue("To DOM and back should equal same Activity:\n" + visitor.getMismatchedLocators(),
-				visitor.isEqual());
+		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(activity);
+		List<Locator> mismatches = parsedActivity.accept(visitor);
+		assertTrue("To DOM and back should equal same Activity:\n" + mismatches, mismatches.isEmpty());
 
 		return parsedActivity;
 	}

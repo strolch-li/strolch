@@ -119,13 +119,13 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	}
 
 	@Override
-	public Void visit(Activity activity) {
+	public Void visitActivity(Activity activity) {
 		activity.getTimeOrdering().accept(this, activity);
 		return null;
 	}
 
 	@Override
-	public Void visit(Action action) {
+	public Void visitAction(Action action) {
 		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
 
 		if (executionPolicy.isExecutable(action)) {

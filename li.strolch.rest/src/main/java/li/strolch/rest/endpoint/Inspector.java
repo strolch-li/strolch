@@ -53,9 +53,7 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.json.ActivityToJsonVisitor;
-import li.strolch.model.json.OrderToJsonVisitor;
-import li.strolch.model.json.ResourceToJsonVisitor;
+import li.strolch.model.json.StrolchElementToJsonVisitor;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
@@ -391,7 +389,7 @@ public class Inspector {
 		RestfulHelper.doOrdering(queryData, resources);
 
 		// build JSON response
-		ResourceToJsonVisitor toJsonVisitor = new ResourceToJsonVisitor();
+		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor();
 		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, resources, toJsonVisitor);
 
 		// marshall result
@@ -441,7 +439,7 @@ public class Inspector {
 		RestfulHelper.doOrdering(queryData, orders);
 
 		// build JSON response
-		OrderToJsonVisitor toJsonVisitor = new OrderToJsonVisitor();
+		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor();
 		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, orders, toJsonVisitor);
 
 		// marshall result
@@ -477,7 +475,7 @@ public class Inspector {
 		RestfulHelper.doOrdering(queryData, activities);
 
 		// build JSON response
-		ActivityToJsonVisitor toJsonVisitor = new ActivityToJsonVisitor();
+		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor();
 		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, activities, toJsonVisitor);
 
 		// marshall result
@@ -502,7 +500,8 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		return Response.ok().entity(ResourceToJsonVisitor.toJsonString(resource)).build();
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+		return Response.ok().entity(resource.accept(visitor)).build();
 	}
 
 	@GET
@@ -584,7 +583,8 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		return Response.ok().entity(OrderToJsonVisitor.toJsonString(order)).build();
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+		return Response.ok().entity(order.accept(visitor)).build();
 	}
 
 	@GET
@@ -684,7 +684,8 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		return Response.ok().entity(ActivityToJsonVisitor.toJsonString(activity)).build();
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+		return Response.ok().entity(activity.accept(visitor)).build();
 	}
 
 	@GET

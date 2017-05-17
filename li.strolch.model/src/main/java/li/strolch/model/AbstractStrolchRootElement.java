@@ -3,7 +3,6 @@ package li.strolch.model;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import li.strolch.model.json.StrolchElementToFlatJsonVisitor;
 import li.strolch.model.json.StrolchElementToJsonVisitor;
 import li.strolch.model.xml.StrolchElementToXmlStringVisitor;
 
@@ -21,7 +20,7 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 
 	@Override
 	public String toXmlString() {
-		return this.accept(new StrolchElementToXmlStringVisitor());
+		return accept(new StrolchElementToXmlStringVisitor());
 	}
 
 	@Override
@@ -33,6 +32,6 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 	@Override
 	public String toFlatJsonString() {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.toJson(this.accept(new StrolchElementToFlatJsonVisitor()));
+		return gson.toJson(this.accept(new StrolchElementToJsonVisitor().flat()));
 	}
 }

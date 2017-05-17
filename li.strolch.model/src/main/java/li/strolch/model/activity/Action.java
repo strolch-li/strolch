@@ -310,6 +310,6 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public <T> T accept(IActivityElementVisitor<T> visitor) {
-		return visitor.visit(this);
+		return visitor.visitAction(this);
 	}
 }

@@ -47,11 +47,13 @@ import li.strolch.utils.dbc.DBC;
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class StrolchElementDeepEqualsVisitor {
+public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<List<Locator>> {
 
 	private List<Locator> mismatchedLocators;
+	private StrolchElement srcElement;
 
-	public StrolchElementDeepEqualsVisitor() {
+	public StrolchElementDeepEqualsVisitor(StrolchElement srcElement) {
+		this.srcElement = srcElement;
 		this.mismatchedLocators = new ArrayList<>();
 	}
 
@@ -335,20 +337,42 @@ public class StrolchElementDeepEqualsVisitor {
 	}
 
 	public static boolean isEqual(Order srcOrder, Order dstOrder) {
-		OrderDeepEqualsVisitor visitor = new OrderDeepEqualsVisitor(srcOrder);
-		visitor.visit(dstOrder);
-		return visitor.isEqual();
+		return srcOrder.accept(new StrolchElementDeepEqualsVisitor(dstOrder)).isEmpty();
 	}
 
 	public static boolean isEqual(Resource srcRes, Resource dstRes) {
-		ResourceDeepEqualsVisitor visitor = new ResourceDeepEqualsVisitor(srcRes);
-		visitor.visit(dstRes);
-		return visitor.isEqual();
+		return srcRes.accept(new StrolchElementDeepEqualsVisitor(dstRes)).isEmpty();
 	}
 
 	public static boolean isEqual(Activity srcAct, Activity dstAct) {
-		ActivityDeepEqualsVisitor visitor = new ActivityDeepEqualsVisitor(srcAct);
-		visitor.visit(dstAct);
-		return visitor.isEqual();
+		return srcAct.accept(new StrolchElementDeepEqualsVisitor(dstAct)).isEmpty();
+	}
+
+	@Override
+	public List<Locator> visitOrder(Order order) {
+		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), order.getClass());
+		deepEquals((Order) this.srcElement, order);
+		return getMismatchedLocators();
+	}
+
+	@Override
+	public List<Locator> visitResource(Resource resource) {
+		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), resource.getClass());
+		deepEquals((Resource) this.srcElement, resource);
+		return getMismatchedLocators();
+	}
+
+	@Override
+	public List<Locator> visitActivity(Activity activity) {
+		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), activity.getClass());
+		deepEquals((Activity) this.srcElement, activity);
+		return getMismatchedLocators();
+	}
+
+	@Override
+	public List<Locator> visitAction(Action action) {
+		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), action.getClass());
+		deepEquals((Action) this.srcElement, action);
+		return getMismatchedLocators();
 	}
 }

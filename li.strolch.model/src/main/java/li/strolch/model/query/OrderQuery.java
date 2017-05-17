@@ -19,6 +19,7 @@ import li.strolch.model.Order;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
 import li.strolch.model.visitor.OrderVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -70,6 +71,12 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 	@Override
 	public OrderQuery<U> internal() {
 		super.internal();
+		return this;
+	}
+
+	public OrderQuery<U> setVisitor(StrolchElementVisitor<U> visitor) {
+		DBC.PRE.assertNotNull("visitor", visitor);
+		this.orderVisitor = visitor.asOrderVisitor();
 		return this;
 	}
 

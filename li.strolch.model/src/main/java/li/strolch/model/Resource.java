@@ -31,7 +31,7 @@ import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
-import li.strolch.model.visitor.StrolchRootElementVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -208,7 +208,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	}
 
 	@Override
-	public <T> T accept(StrolchRootElementVisitor<T> visitor) {
+	public <T> T accept(StrolchElementVisitor<T> visitor) {
 		return visitor.visitResource(this);
 	}
 

@@ -23,9 +23,7 @@ import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.json.ActivityToJsonVisitor;
-import li.strolch.model.json.OrderToJsonVisitor;
-import li.strolch.model.json.ResourceToJsonVisitor;
+import li.strolch.model.json.StrolchElementToJsonVisitor;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
@@ -87,8 +85,8 @@ public class ModelQuery {
 		RestfulHelper.doOrdering(queryData, resources);
 
 		// build JSON response
-		ResourceToJsonVisitor toJsonVisitor = new ResourceToJsonVisitor();
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, resources, toJsonVisitor);
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, resources, visitor);
 
 		// marshall result
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -142,8 +140,8 @@ public class ModelQuery {
 		RestfulHelper.doOrdering(queryData, orders);
 
 		// build JSON response
-		OrderToJsonVisitor toJsonVisitor = new OrderToJsonVisitor();
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, orders, toJsonVisitor);
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, orders, visitor);
 
 		// marshall result
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -198,8 +196,8 @@ public class ModelQuery {
 		RestfulHelper.doOrdering(queryData, activities);
 
 		// build JSON response
-		ActivityToJsonVisitor toJsonVisitor = new ActivityToJsonVisitor();
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, activities, toJsonVisitor);
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, activities, visitor);
 
 		// marshall result
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();

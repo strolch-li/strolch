@@ -53,7 +53,7 @@ public class AuditingActivityMap extends AuditingElementMapFacade<Activity> impl
 		DBC.PRE.assertNotNull("activityVisitor on query", activityVisitor);
 		query.setActivityVisitor(activity -> {
 			this.read.add(activity);
-			return activityVisitor.visit(activity);
+			return activity.accept(activityVisitor);
 		});
 
 		return getElementMap().doQuery(tx, query);
