@@ -243,7 +243,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				synchronized (this.registeredActivities) {
 					if (!this.registeredActivities.removeElement(realm, activityLoc))
-						logger.warn("Activity " + actionLoc + " already removed from registered activities!");
+						logger.warn("Activity " + activityLoc + " already removed from registered activities!");
 				}
 
 				archiveActivity(realm, activity.getLocator());

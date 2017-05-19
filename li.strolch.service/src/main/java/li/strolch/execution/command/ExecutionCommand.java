@@ -82,9 +82,12 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 		Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
 		while (iter.hasNext()) {
 			IActivityElement element = iter.next().getValue();
+			State state = element.getState();
+			if (element.getState().compareTo(State.EXECUTED) >= 0)
+				continue;
 
 			// in series we can never have two Actions in execution, so if we found the action in execution, we stop
-			if (element instanceof Action && element.getState() == State.EXECUTION)
+			if (element instanceof Action && state == State.EXECUTION)
 				break;
 
 			boolean canExecute = isExecutable(element);
@@ -104,6 +107,8 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 		Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
 		while (iter.hasNext()) {
 			IActivityElement element = iter.next().getValue();
+			if (element.getState().isExecuted())
+				continue;
 
 			boolean canExecute = isExecutable(element);
 			if (canExecute) {
@@ -113,7 +118,7 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	}
 
 	protected boolean isExecutable(IActivityElement element) {
-		if (element.getState() == State.EXECUTED)
+		if (element.getState().compareTo(State.EXECUTED) >= 0)
 			return false;
 		return element instanceof Activity || element.getState().compareTo(State.EXECUTION) < 0;
 	}

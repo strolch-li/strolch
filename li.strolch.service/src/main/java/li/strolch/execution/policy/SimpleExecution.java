@@ -8,8 +8,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * <p>
- * Simple Execution Policy which sets the state of the action depending on the
- * method called.
+ * Simple Execution Policy which sets the state of the action depending on the method called.
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
