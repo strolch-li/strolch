@@ -15,7 +15,13 @@
  */
 package li.strolch.model.activity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.StringWriter;
+import java.util.List;
+import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,6 +39,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.ModelGenerator;
 import li.strolch.model.State;
 import li.strolch.model.xml.StrolchElementToDomVisitor;
 
@@ -105,6 +112,131 @@ public class ActivityTest {
 	@Test(expected = StrolchException.class)
 	public void testIdAlreadyExists() {
 		this.activity.addElement(new Action("action_1", "Action 1", "Use"));
+	}
+
+	@Test
+	public void testPreviousNext() {
+
+		Activity a = ModelGenerator.createActivity("bla", "Bla", "Bla", TimeOrdering.SERIES);
+
+		IActivityElement element = a.getElement("action_bla");
+		assertNotNull(element);
+		Optional<IActivityElement> previousElement = a.getPreviousElement(element);
+		Optional<IActivityElement> nextElement = a.getNextElement(element);
+		assertFalse(previousElement.isPresent());
+		assertEquals("sub_bla", nextElement.get().getId());
+
+		element = a.getElement("sub_bla");
+		assertNotNull(element);
+		previousElement = a.getPreviousElement(element);
+		nextElement = a.getNextElement(element);
+		assertEquals("action_bla", previousElement.get().getId());
+		assertFalse(nextElement.isPresent());
+	}
+
+	@Test
+	public void testPreviousNext1() {
+
+		Activity a = new Activity("bla", "Bla", "Bla", TimeOrdering.SERIES);
+
+		Action a1 = new Action("a1", "A1", "Consume");
+		a.addElement(a1);
+		Action a2 = new Action("a2", "A2", "Consume");
+		a.addElement(a2);
+		Action a3 = new Action("a3", "A3", "Consume");
+		a.addElement(a3);
+		Action a4 = new Action("a4", "A4", "Consume");
+		a.addElement(a4);
+
+		Optional<IActivityElement> previousElement = a.getPreviousElement(a1);
+		Optional<IActivityElement> nextElement = a.getNextElement(a1);
+		assertFalse(previousElement.isPresent());
+		assertEquals("a2", nextElement.get().getId());
+
+		previousElement = a.getPreviousElement(a2);
+		nextElement = a.getNextElement(a2);
+		assertEquals("a1", previousElement.get().getId());
+		assertEquals("a3", nextElement.get().getId());
+
+		previousElement = a.getPreviousElement(a3);
+		nextElement = a.getNextElement(a3);
+		assertEquals("a2", previousElement.get().getId());
+		assertEquals("a4", nextElement.get().getId());
+
+		previousElement = a.getPreviousElement(a4);
+		nextElement = a.getNextElement(a4);
+		assertEquals("a3", previousElement.get().getId());
+		assertFalse(nextElement.isPresent());
+	}
+
+	@Test
+	public void testPreviousNextByType() {
+
+		Activity a = new Activity("bla", "Bla", "Bla", TimeOrdering.SERIES);
+
+		Action a0 = new Action("a0", "A0", "Wait");
+		a.addElement(a0);
+		Action a1 = new Action("a1", "A1", "Consume");
+		a.addElement(a1);
+		Action a2 = new Action("a2", "A2", "Consume");
+		a.addElement(a2);
+		Action a3 = new Action("a3", "A3", "Produce");
+		a.addElement(a3);
+		Action a4 = new Action("a4", "A4", "Produce");
+		a.addElement(a4);
+		Action a5 = new Action("a5", "A5", "Use");
+		a.addElement(a5);
+
+		// a1
+		Optional<IActivityElement> previousElement = a.getPreviousElementByType(a1, "Consume");
+		assertFalse(previousElement.isPresent());
+		Optional<IActivityElement> nextElement = a.getNextElementByType(a1, "Consume");
+		assertEquals("a2", nextElement.get().getId());
+		nextElement = a.getNextElementByType(a1, "Produce");
+		assertEquals("a3", nextElement.get().getId());
+
+		// a2
+		previousElement = a.getPreviousElementByType(a2, "Wait");
+		assertEquals("a0", previousElement.get().getId());
+		previousElement = a.getPreviousElementByType(a2, "Consume");
+		assertEquals("a1", previousElement.get().getId());
+		nextElement = a.getNextElementByType(a2, "Consume");
+		assertFalse(nextElement.isPresent());
+		nextElement = a.getNextElementByType(a2, "Produce");
+		assertEquals("a3", nextElement.get().getId());
+		nextElement = a.getNextElementByType(a2, "Use");
+		assertEquals("a5", nextElement.get().getId());
+
+		// a3
+		previousElement = a.getPreviousElementByType(a3, "Consume");
+		assertEquals("a2", previousElement.get().getId());
+		nextElement = a.getNextElementByType(a3, "Produce");
+		assertEquals("a4", nextElement.get().getId());
+
+		// a4
+		previousElement = a.getPreviousElementByType(a4, "Produce");
+		assertEquals("a3", previousElement.get().getId());
+		nextElement = a.getNextElementByType(a4, "Produce");
+		assertFalse(nextElement.isPresent());
+		nextElement = a.getNextElementByType(a4, "Use");
+		assertEquals("a5", nextElement.get().getId());
+	}
+
+	@Test
+	public void testActionsWithState() {
+
+		Activity a = ModelGenerator.createActivity("bla", "Bla", "Bla", TimeOrdering.SERIES);
+
+		List<Action> actionsWithState = a.getActionsWithState(State.CREATED);
+		assertEquals(4, actionsWithState.size());
+
+		Action action = a.getElement("action_bla");
+		action.setState(State.EXECUTED);
+		actionsWithState = a.getActionsWithState(State.CREATED);
+		assertEquals(3, actionsWithState.size());
+		actionsWithState = a.getActionsWithState(State.EXECUTED);
+		assertEquals(1, actionsWithState.size());
+		assertEquals("action_bla", actionsWithState.get(0).getId());
 	}
 
 	@Test

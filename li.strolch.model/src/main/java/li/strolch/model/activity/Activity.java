@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -197,6 +198,97 @@ public class Activity extends AbstractStrolchRootElement
 		if (this.elements == null)
 			return null;
 		return (T) this.elements.get(id);
+	}
+
+	public Optional<IActivityElement> getPreviousElement(IActivityElement element) {
+		if (!hasElements())
+			return Optional.empty();
+
+		IActivityElement previous = null;
+
+		Iterator<Entry<String, IActivityElement>> iter = elementIterator();
+		while (iter.hasNext()) {
+			IActivityElement elem = iter.next().getValue();
+			if (elem == element)
+				return Optional.ofNullable(previous);
+			else
+				previous = elem;
+		}
+
+		return Optional.empty();
+	}
+
+	public Optional<IActivityElement> getPreviousElementByType(IActivityElement element, String type) {
+		if (!hasElements())
+			return Optional.empty();
+
+		List<IActivityElement> reversed = new ArrayList<>(this.elements.values());
+		Collections.reverse(reversed);
+
+		boolean foundElem = false;
+		Iterator<IActivityElement> iter = reversed.iterator();
+		IActivityElement elem = iter.next();
+		while (iter.hasNext()) {
+			elem = iter.next();
+
+			if (foundElem && elem.getType().equals(type))
+				return Optional.of(elem);
+			else if (elem == element) {
+				foundElem = true;
+			}
+		}
+
+		return Optional.empty();
+	}
+
+	public Optional<IActivityElement> getNextElement(IActivityElement element) {
+		if (!hasElements())
+			return Optional.empty();
+
+		Iterator<Entry<String, IActivityElement>> iter = elementIterator();
+		IActivityElement previous = iter.next().getValue();
+
+		while (iter.hasNext()) {
+			IActivityElement elem = iter.next().getValue();
+			if (previous == element)
+				return Optional.ofNullable(elem);
+			else
+				previous = elem;
+		}
+
+		return Optional.empty();
+	}
+
+	public Optional<IActivityElement> getNextElementByType(IActivityElement element, String type) {
+		if (!hasElements())
+			return Optional.empty();
+
+		Iterator<Entry<String, IActivityElement>> iter = elementIterator();
+
+		boolean foundElem = false;
+		IActivityElement elem = iter.next().getValue();
+		while (iter.hasNext()) {
+			elem = iter.next().getValue();
+
+			if (foundElem && elem.getType().equals(type))
+				return Optional.of(elem);
+			else if (elem == element) {
+				foundElem = true;
+			}
+		}
+
+		return Optional.empty();
+	}
+
+	public List<IActivityElement> getElementsByType(String type) {
+		List<IActivityElement> elements = new ArrayList<>();
+		Iterator<Entry<String, IActivityElement>> iter = elementIterator();
+		while (iter.hasNext()) {
+			IActivityElement element = iter.next().getValue();
+			if (element.getType().equals(type))
+				elements.add(element);
+		}
+		return elements;
 	}
 
 	/**
