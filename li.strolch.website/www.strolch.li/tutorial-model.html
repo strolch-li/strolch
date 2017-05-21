@@ -51,16 +51,19 @@
     </div>
 
     <div class="content">
-        <a href="tutorial-configuration.html" class="pull-left">Previous: Configuration</a><a href="tutorial-.html"
-                                                                                              class="pull-right">Next: </a>
+        <a href="tutorial-configuration.html" class="pull-left">Previous:
+                                                                Configuration</a><a href="tutorial-crud-book.html"
+                                                                                    class="pull-right">Next: CRUD
+                                                                                                       Books</a>
         <br><br>
 
-        <p>Looking back at our functionality, we can list the following entities that need to be modelled:</p>
+        <p>Looking back at our functionality, we can list the following entities that need to be modelled (We'll go into
+           detail further down):</p>
         <ul>
             <li>Book &rightarrow; books can be orderd</li>
             <li>UserCart &rightarrow; we want to store the cart of the user</li>
             <li>Account &rightarrow; we need to know where to send the orders</li>
-            <li>Order &rightarrow; we need to know what was ordered and keep track of its state</li>
+            <li>PurchaseOrder &rightarrow; we need to know what was ordered and keep track of its state</li>
             <li>FromStock &rightarrow; we want to use activities to implement the process of an order</li>
         </ul>
 
@@ -70,85 +73,162 @@
         <b>Book</b>
         <pre class="pre-scrollable">
 &lt;Resource Id="Book" Name="Book Template" Type="Template"&gt;
-&lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
-  &lt;Parameter Id="description" Name="Description" Type="String" Value="" /&gt;
-  &lt;Parameter Id="quantity" Name="Quantity in Stock" Type="Integer" Value="0" /&gt;
-&lt;/ParameterBag&gt;
-&lt;/Resource&gt;
-</pre>
-
-        <b>UserCart</b>
-        <pre class="pre-scrollable">
-&lt;Resource Id="UserCart" Name="UserCart Template" Type="Template"&gt;
-&lt;ParameterBag Id="books" Name="Books" Type="Book"&gt;
-  &lt;!-- Parameter Id="bookId" Name="Book reference" Type="Float" Value="0" / --&gt;
-&lt;/ParameterBag&gt;
-&lt;ParameterBag Id="relations" Name="Relations" Type="Parameters"&gt;
-  &lt;Parameter Id="account" Name="Account" Type="String" Interpretation="Resource-Ref" Uom="Account" Value="" /&gt;
-&lt;/ParameterBag&gt;
+  &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
+    &lt;Parameter Id="description" Name="Description" Type="String" Value="" /&gt;
+    &lt;Parameter Id="quantity" Name="Quantity in Stock" Type="Integer" Value="0" /&gt;
+  &lt;/ParameterBag&gt;
 &lt;/Resource&gt;
 </pre>
 
         <b>Account</b>
         <pre class="pre-scrollable">
 &lt;Resource Id="Account" Name="Account Template" Type="Template"&gt;
-&lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
-  &lt;Parameter Id="user" Name="User" Type="String" Value="" /&gt;
-  &lt;Parameter Id="firstName" Name="First Name" Type="String" Value="" /&gt;
-  &lt;Parameter Id="lastName" Name="Last Name" Type="String" Value="" /&gt;
-  &lt;Parameter Id="email" Name="E-Mail" Type="String" Value="" /&gt;
-&lt;/ParameterBag&gt;
-&lt;ParameterBag Name="Address" Id="address" Type="Address"&gt;
-  &lt;Parameter Id="phone" Name="Telephone Number" Type="String" Value="" /&gt;
-  &lt;Parameter Id="street" Name="Street" Type="String" Value="" /&gt;
-  &lt;Parameter Id="city" Name="City" Type="String" Value="" /&gt;
-  &lt;Parameter Id="zip" Name="Postal Code" Type="String" Value="" /&gt;
-  &lt;Parameter Id="country" Name="Country" Type="String" Value="" /&gt;
-&lt;/ParameterBag&gt;
+  &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
+    &lt;Parameter Id="user" Name="User" Type="String" Value="" /&gt;
+    &lt;Parameter Id="firstName" Name="First Name" Type="String" Value="" /&gt;
+    &lt;Parameter Id="lastName" Name="Last Name" Type="String" Value="" /&gt;
+    &lt;Parameter Id="email" Name="E-Mail" Type="String" Value="" /&gt;
+  &lt;/ParameterBag&gt;
+  &lt;ParameterBag Name="Address" Id="address" Type="Address"&gt;
+    &lt;Parameter Id="phone" Name="Telephone Number" Type="String" Value="" /&gt;
+    &lt;Parameter Id="street" Name="Street" Type="String" Value="" /&gt;
+    &lt;Parameter Id="city" Name="City" Type="String" Value="" /&gt;
+    &lt;Parameter Id="zip" Name="Postal Code" Type="String" Value="" /&gt;
+    &lt;Parameter Id="country" Name="Country" Type="String" Value="" /&gt;
+  &lt;/ParameterBag&gt;
 &lt;/Resource&gt;
 </pre>
 
-        <b>Order</b>
+        <b>UserCart</b>
         <pre class="pre-scrollable">
-&lt;Order Id="Order" Name="Order Template" Type="Template" State="Created"&gt;
-&lt;ParameterBag Id="books" Name="Books" Type="Book"&gt;
-  &lt;!-- Parameter Id="bookId" Name="Book reference" Type="Float" Value="0" / --&gt;
-&lt;/ParameterBag&gt;
-&lt;ParameterBag Id="relations" Name="Relations" Type="Parameters"&gt;
-  &lt;Parameter Id="account" Name="Account" Type="String" Interpretation="Resource-Ref" Uom="Account" Value="" /&gt;
-&lt;/ParameterBag&gt;
+&lt;Resource Id="UserCart" Name="UserCart Template" Type="Template"&gt;
+  &lt;ParameterBag Id="books" Name="Books" Type="Book"&gt;
+    &lt;!-- Parameter Id="bookId" Name="Book reference" Type="Float" Value="0" / --&gt;
+  &lt;/ParameterBag&gt;
+  &lt;ParameterBag Id="relations" Name="Relations" Type="Parameters"&gt;
+    &lt;Parameter Id="account" Name="Account" Type="String" Interpretation="Resource-Ref" Uom="Account" Value="" /&gt;
+  &lt;/ParameterBag&gt;
+&lt;/Resource&gt;
+</pre>
+
+        <b>PurchaseOrder</b>
+        <pre class="pre-scrollable">
+&lt;Order Id="PurchaseOrder" Name="PurchaseOrder Template" Type="Template" State="Created"&gt;
+  &lt;ParameterBag Id="books" Name="Books" Type="Book"&gt;
+    &lt;!-- Parameter Id="bookId" Name="Book reference" Type="Float" Value="0" / --&gt;
+  &lt;/ParameterBag&gt;
+  &lt;ParameterBag Id="relations" Name="Relations" Type="Parameters"&gt;
+    &lt;Parameter Id="account" Name="Account" Type="String" Interpretation="Resource-Ref" Uom="Account" Value="" /&gt;
+  &lt;/ParameterBag&gt;
 &lt;/Order&gt;
 </pre>
 
         <b>FromStock</b>
         <pre class="pre-scrollable">
 &lt;Activity Id="FromStock" Name="From Stock Template" Type="FromStock" TimeOrdering="Series"&gt;
-&lt;ParameterBag Name="objectives" Id="Objectives" Type="Objectives"&gt;
-  &lt;Parameter Name="Duration" Id="duration" Value="PT1MS" Type="Duration" /&gt;
-&lt;/ParameterBag&gt;
-
-&lt;Action Id="Validate" Name="Validation of order" Type="Use" ResourceType="Validation" ResourceId="validation" /&gt;
-
-&lt;!-- for each book we do a consume, i.e. reduce the stock quantity --&gt;
-&lt;Action Id="Consume" Name="Consume Template for book" Type="Template"&gt;
-  &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
-    &lt;Parameter Id="quantity" Name="Quantity" Type="Float" Value="0" /&gt;
+  &lt;ParameterBag Name="objectives" Id="Objectives" Type="Objectives"&gt;
+    &lt;Parameter Name="Duration" Id="duration" Value="PT1MS" Type="Duration" /&gt;
   &lt;/ParameterBag&gt;
-&lt;/Action&gt;
 
-&lt;Action Id="Package" Name="Packaging of Order" Type="Use" ResourceType="Packaging" ResourceId="packaging" /&gt;
-&lt;Action Id="Send" Name="Sending of package" Type="Use" ResourceType="Sending" ResourceId="sending" /&gt;
+  &lt;Action Id="validate" Name="Validation of order" Type="Use" ResourceType="Validation" ResourceId="validation" /&gt;
+
+  &lt;!-- for each book we do a consume, i.e. reduce the stock quantity --&gt;
+  &lt;Action Id="Consume" Name="Consume Template for book" Type="Template"&gt;
+    &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
+      &lt;Parameter Id="quantity" Name="Quantity" Type="Float" Value="0" /&gt;
+    &lt;/ParameterBag&gt;
+  &lt;/Action&gt;
+
+  &lt;Action Id="package" Name="Packaging of PurchaseOrder" Type="Use" ResourceType="Packaging" ResourceId="packaging" /&gt;
+  &lt;Action Id="send" Name="Sending of package" Type="Use" ResourceType="Sending" ResourceId="sending" /&gt;
 
 &lt;/Activity&gt;
 </pre>
 
         <p>Let's explain a few things:</p>
         <ul>
-            <li></li>
+            <li>The <code>Book</code> entity is a <code>Resource</code> object and only contains the description and the
+                current quantity in stock.
+            </li>
+            <li>The <code>Account</code> entity is a Resource and contains the address and further details of the user,
+                and with the <code>user</code> parameter the username is defined, thus referencing the real user.
+            </li>
+            <li>The <code>UserCart</code> entity is a Resource and has a reference to the account Resource. Note how the
+                reference is done using a StringParameter, where Interpretation, UOM and the value is set in a specific
+                manner.
+            </li>
+            <li>The <code>UserCart</code> entity is a Resource and references books using a special
+                <code>ParameterBag</code> with the type set to <code>Book</code>, the actual type of the book entity.
+                Each Parameter is of type <code>Float</code> and the ID of the parameter is the ID of the book, and the
+                value is the quantity that the user would like to purchase. There will only be one cart per
+                user/account.
+            </li>
+            <li>The <code>PurchaseOrder</code> entity is an <code>Order</code> object, and is basically a copy of the
+                UserCart entity. This is the confirmed purchase order for the contents of a cart, and can then be used
+                for reports on how much of which book was sold.
+            </li>
+            <li>The <code>FromStock</code> entity is an <code>Activity</code> object and defines the process we will go
+                through when delivering a purchase to a user. Note how the activity has a ParameterBag
+                <code>objectives</code> with a <code>duration</code> parameter. This defines globally for this activity
+                how long each <code>Action</code> should execute. This can be overridden in each Action and can help to
+                plan how much effort goes into the delivering of each PurchaseOrder.
+            </li>
+            <li>Further note how the activity has three special actions (<code>validate</code>, <code>package</code> and
+                <code>send</code>) on which a <code>ResourceType</code> and <code>ResourceId</code> are defined. Actions
+                are always performed on a Resource, as the referenced Resource defines the behaviour of the action
+                through defined <code>Policy</code> objects.
+            </li>
+            <li>For each book which will be purchased, an Action will be created of type <code>Consume</code>. In the
+                template this is defined by a template Action with the id <code>Consume</code> and will later be changed
+                accordingly.
+            </li>
         </ul>
 
-        <a href="tutorial-configuration.html" class="pull-left">Previous: Configuration</a><a href="tutorial-.html"
-                                                                                              class="pull-right">Next: </a>
+        <p>Since we are referencing resources from actions in the activity, we need to add these as well, but not as
+           templates. They can be added to the <code>defaultModel.xml</code> file:</p>
+        <pre>
+&lt;Resource Id="validation" Name="Validation Resource" Type="Validation"&gt;
+  &lt;Policies&gt;
+    &lt;Policy Type="ExecutionPolicy" Value="key:ValidationExecution" /&gt;
+    &lt;Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" /&gt;
+  &lt;/Policies&gt;
+&lt;/Resource&gt;
+
+&lt;Resource Id="packaging" Name="Packaging Resource" Type="Packaging"&gt;
+  &lt;Policies&gt;
+    &lt;Policy Type="ExecutionPolicy" Value="key:PackagingExecution" /&gt;
+    &lt;Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" /&gt;
+  &lt;/Policies&gt;
+&lt;/Resource&gt;
+
+&lt;Resource Id="sending" Name="Sending Resource" Type="Sending"&gt;
+  &lt;Policies&gt;
+    &lt;Policy Type="ExecutionPolicy" Value="key:SendingExecution" /&gt;
+    &lt;Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" /&gt;
+  &lt;/Policies&gt;
+&lt;/Resource&gt;
+</pre>
+
+        <p>What should now be noted by these three new Resources is that they have Policy definitions:</p>
+        <ul>
+            <li><code>ExecutionPolicy</code> &rightarrow; defines how an action on this resource is executed by
+                                             referencing an ExecutionPolicy implementation.
+            </li>
+            <li><code>ConfirmationPolicy</code> &rightarrow; defines behaviour to be performed on every state change of
+                                                an action being performed on this resource by referencing an
+                                                ConfirmationPolicy implementation.
+            </li>
+        </ul>
+        <p>Currently these resources reference policies which don't exist. We will resolve this issue later, when we
+           implement the execution of the activity.</p>
+
+        <p>This concludes the model definition. In the next step we'll start creating services and commands for our
+           model.</p>
+
+        <a href="tutorial-configuration.html" class="pull-left">Previous:
+                                                                Configuration</a><a href="tutorial-crud-book.html"
+                                                                                    class="pull-right">Next: CRUD
+                                                                                                       Books</a>
         <!-- content here -->
 
         <a href="tutorial-model.html"></a>
