@@ -3,13 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8"/>
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="shortcut icon" href="ico/favicon.ico">
 
-    <title>Strolch: Observers</title>
+    <title>Strolch: Tutorial</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -31,8 +31,8 @@
             <ul class="nav navbar-nav">
                 <li><a href="index.html">Overview</a></li>
                 <li><a href="api.html">API</a></li>
-                <li class="active"><a href="documentation.html">Documentation</a></li>
-                <li><a href="tutorial.html">Tutorial</a></li>
+                <li><a href="documentation.html">Documentation</a></li>
+                <li class="active"><a href="tutorial.html">Tutorial</a></li>
                 <li><a href="downloads.html">Downloads</a></li>
                 <li><a href="development.html">Development</a></li>
                 <li><a href="blog.html">Blog</a></li>
@@ -45,68 +45,36 @@
 <div class="container">
 
     <div class="page-header">
-        <h1 class="page-title">Documentation: Observers</h1>
+        <h1 class="page-title">Tutorial</h1>
 
-        <p class="lead page-description">This page discusses the Strolch Observers</p>
+        <p class="lead page-description">Let's build a bookshop!</p>
     </div>
 
     <div class="content">
+        <p>In this tutorial we will build a book store using Strolch. This book store will be without a UI, but we will
+           do everything using REST APIs, which should make it easy to add a UI later using whatever framework suits one
+           most.</p>
 
-        <p>All changes done in a Strolch transaction are recorded and then propagated to any registered observers.</p>
+        <p>The book store will have the following features:</p>
+        <ul>
+            <li>The store owner can add, update and remove books</li>
+            <li>The store owner can edit the stock quantity</li>
+            <li>Users can view a list of books</li>
+            <li>Users can add books to a virtual cart</li>
+            <li>Users can create and verify an account using an e-mail address</li>
+            <li>Users can submit an order for the books in their cart</li>
+            <li>The store owner can see the orders by state (pending, preparing, sent)</li>
+            <li>The store owner can update the state of an order (preparing, sent)</li>
+            <li>Notify the user when the order is sent</li>
+        </ul>
 
-        <p>The observer feature is opt-in and is configured for each realm. In the <code>StrolchConfiguration.xml</code>
-            file enable observers by adding the <code>enableObserverUpdates</code> propery per realm:</p>
-        <pre>
-&lt;StrolchConfiguration&gt;
-  &lt;env id="dev"&gt;
-    ...
-    &lt;Component&gt;
-      &lt;name&gt;RealmHandler&lt;/name&gt;
-      &lt;api&gt;li.strolch.agent.api.RealmHandler&lt;/api&gt;
-      &lt;impl&gt;li.strolch.agent.impl.DefaultRealmHandler&lt;/impl&gt;
-      &lt;depends&gt;PrivilegeHandler&lt;/depends&gt;
-      &lt;Properties&gt;
-        &lt;realms&gt;defaultRealm, otherRealm&lt;/realms&gt;
-        &lt;enableObserverUpdates&gt;true&lt;/enableObserverUpdates&gt;
-        &lt;dataStoreMode&gt;TRANSIENT&lt;/dataStoreMode&gt;
-        &lt;dataStoreFile&gt;StrolchModel.xml&lt;/dataStoreFile&gt;
-        &lt;enableObserverUpdates.otherRealm&gt;true&lt;/enableObserverUpdates.otherRealm&gt;
-        &lt;dataStoreMode.otherRealm&gt;TRANSIENT&lt;/dataStoreMode.otherRealm&gt;
-        &lt;dataStoreFile.otherRealm&gt;StrolchModel.xml&lt;/dataStoreFile.otherRealm&gt;
-      &lt;/Properties&gt;
-    &lt;/Component&gt;
-  &lt;/env&gt;
-  ...
-&lt;/StrolchConfiguration&gt;</pre>
+      <p>Navigation:</p>
+      <ul>
+        <li><a href="tutorial-configuration.html">Configuration</a></li>
+        <li><a href="tutorial-model.html">Model</a></li>
+      </ul>
 
-        <br />
-        <p>Registering for updates is done by registering an <code>Observer</code> on the <code>ObserverHandler</code>
-            of the realm itself:</p>
-        <pre>
-ObserverHandler observerHandler = container.getRealm(StrolchConstants.DEFAULT_REALM).getObserverHandler();
-observerHandler.registerObserver(Tags.RESOURCE, new Observer() {
-
-  @Override
-  public void update(String key, List&lt;StrolchRootElement&gt; elements) {
-    logger.info(elements.size() + " resources were updated!");
-  }
-
-  @Override
-  public void remove(String key, List&lt;StrolchRootElement&gt; elements) {
-    logger.info(elements.size() + " resources were removed!");
-  }
-
-  @Override
-  public void add(String key, List&lt;StrolchRootElement&gt; elements) {
-    logger.info(elements.size() + " resources were added!");
-  }
-});</pre>
-
-        <br/>
-        <p>Observer updates can be suppressed on the transaction by calling <code>tx.setSuppressUpdates()</code></p>
-
-
-        <!-- content here -->
+      <a href="tutorial-configuration.html" class="pull-right">Next: Configuration</a>
 
     </div>
     <!-- /.content -->
@@ -143,7 +111,7 @@ observerHandler.registerObserver(Tags.RESOURCE, new Observer() {
         s.parentNode.insertBefore(g, s);
     })();
 </script>
-<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt=""/></p></noscript>
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
 <!-- End Piwik Code -->
 
 </body>
