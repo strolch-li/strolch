@@ -1286,10 +1286,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// we only work with hashed passwords
 		byte[] passwordHash = this.encryptionHandler.hashPassword(password, salt);
 
-		logger.info("New hash: " + StringHelper.getHexString(passwordHash));
-		logger.info("User hash: " + StringHelper.getHexString(pwHash));
-		logger.info("User salt: " + StringHelper.getHexString(salt));
-
 		// validate password
 		if (!Arrays.equals(passwordHash, pwHash))
 			throw new InvalidCredentialsException(MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$

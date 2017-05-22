@@ -75,7 +75,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 
 	@Override
 	public String nextToken() {
-		byte[] bytes = new byte[16];
+		byte[] bytes = new byte[32];
 		this.secureRandom.nextBytes(bytes);
 		return StringHelper.getHexString(bytes);
 	}
