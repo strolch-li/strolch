@@ -10,7 +10,13 @@
 
 		<EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
 			<Parameters>
-				<Parameter name="hashAlgorithm" value="SHA-256" />
+				<!-- WARNING: If you change iterations or keyLength, then all passwords are invalid -->
+				<!-- default algorithm is: PBKDF2WithHmacSHA512 -->
+				<Parameter name="hashAlgorithm" value="PBKDF2WithHmacSHA512" />
+				<!-- default iterations: 200000 -->
+				<Parameter name="hashIterations" value="10000" />
+				<!-- default key length: 256 -->
+				<Parameter name="hashKeyLength" value="256" />
 			</Parameters>
 		</EncryptionHandler>
 

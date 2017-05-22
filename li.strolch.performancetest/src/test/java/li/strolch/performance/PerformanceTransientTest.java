@@ -50,7 +50,7 @@ public class PerformanceTransientTest {
 	@Test
 	public void runPerformanceTest() {
 
-		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("transient", "test".getBytes());
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("transient", "test".toCharArray());
 
 		ServiceHandler svcHandler = runtimeMock.getServiceHandler();
 		svcHandler.doService(certificate, new PerformanceTestService(), new PerformanceTestArgument());

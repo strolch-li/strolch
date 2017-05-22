@@ -74,7 +74,7 @@ public class ServiceTest extends AbstractServiceTest {
 	@Test
 	public void shouldFailWithNoAccess() {
 
-		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".toCharArray()); //$NON-NLS-1$//$NON-NLS-2$
 		try {
 			TestService testService = new TestService();
 			ServiceResult svcResult = getServiceHandler().doService(certificate, testService);
@@ -88,7 +88,7 @@ public class ServiceTest extends AbstractServiceTest {
 
 	@Test
 	public void shouldNotFailWithAccess() {
-		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".toCharArray()); //$NON-NLS-1$//$NON-NLS-2$
 		try {
 			GreetingService service = new GreetingService();
 			GreetingArgument argument = new GreetingArgument();
@@ -103,7 +103,7 @@ public class ServiceTest extends AbstractServiceTest {
 	@Test
 	public void shouldNotFailWithLogin1() {
 
-		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("bob", "bob".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("bob", "bob".toCharArray()); //$NON-NLS-1$//$NON-NLS-2$
 		try {
 			TestService testService = new TestService();
 			getServiceHandler().doService(certificate, testService);
@@ -114,7 +114,7 @@ public class ServiceTest extends AbstractServiceTest {
 
 	@Test
 	public void shouldNotFailWithLogin2() {
-		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("bob", "bob".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("bob", "bob".toCharArray()); //$NON-NLS-1$//$NON-NLS-2$
 		try {
 			GreetingService service = new GreetingService();
 			GreetingArgument argument = new GreetingArgument();

@@ -55,7 +55,7 @@ public class ResourceDaoTest extends QueryTest {
 		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
 		runtimeMock.startContainer();
 
-		Certificate cert = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		Certificate cert = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 		StrolchRealm realm = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM);
 		try (StrolchTransaction tx = realm.openTx(cert, "test")) {
 

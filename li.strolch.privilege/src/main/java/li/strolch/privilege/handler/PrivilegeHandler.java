@@ -331,7 +331,7 @@ public interface PrivilegeHandler {
 	 * 
 	 * <p>
 	 * If the password given is null, then the user is created, but can not not login! Otherwise the password must meet
-	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(byte[])}
+	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(char[])}
 	 * </p>
 	 * 
 	 * @param certificate
@@ -341,14 +341,14 @@ public interface PrivilegeHandler {
 	 * @param password
 	 *            the password of the new user. If the password is null, then this is accepted but the user can not
 	 *            login, otherwise the password must be validated against
-	 *            {@link PrivilegeHandler#validatePassword(byte[])}
+	 *            {@link PrivilegeHandler#validatePassword(char[])}
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or the user already exists
 	 */
-	public UserRep addUser(Certificate certificate, UserRep userRep, byte[] password)
+	public UserRep addUser(Certificate certificate, UserRep userRep, char[] password)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
@@ -390,7 +390,7 @@ public interface PrivilegeHandler {
 	 * 
 	 * <p>
 	 * If the password given is null, then the user is created, but can not not login! Otherwise the password must meet
-	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(byte[])}
+	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(char[])}
 	 * </p>
 	 * 
 	 * @param certificate
@@ -400,14 +400,14 @@ public interface PrivilegeHandler {
 	 * @param password
 	 *            the password of the new user. If the password is null, then this is accepted but the user can not
 	 *            login, otherwise the password must be validated against
-	 *            {@link PrivilegeHandler#validatePassword(byte[])}
+	 *            {@link PrivilegeHandler#validatePassword(char[])}
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate or if the user does not exist
 	 */
-	public UserRep replaceUser(Certificate certificate, UserRep userRep, byte[] password)
+	public UserRep replaceUser(Certificate certificate, UserRep userRep, char[] password)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
@@ -481,7 +481,7 @@ public interface PrivilegeHandler {
 	 * <p>
 	 * Changes the password for the {@link User} with the given username. If the password is null, then the {@link User}
 	 * can not login anymore. Otherwise the password must meet the requirements of the implementation under
-	 * {@link PrivilegeHandler#validatePassword(byte[])}
+	 * {@link PrivilegeHandler#validatePassword(char[])}
 	 * </p>
 	 * 
 	 * <p>
@@ -495,14 +495,14 @@ public interface PrivilegeHandler {
 	 * @param password
 	 *            the new password for this user. If the password is null, then the {@link User} can not login anymore.
 	 *            Otherwise the password must meet the requirements of the implementation under
-	 *            {@link PrivilegeHandler#validatePassword(byte[])}
+	 *            {@link PrivilegeHandler#validatePassword(char[])}
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user for this certificate may not perform the action
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
 	 */
-	public void setUserPassword(Certificate certificate, String username, byte[] password)
+	public void setUserPassword(Certificate certificate, String username, char[] password)
 			throws AccessDeniedException, PrivilegeException;
 
 	/**
@@ -575,14 +575,14 @@ public interface PrivilegeHandler {
 	 *            the username of the {@link User} which is registered in the {@link PersistenceHandler}
 	 * @param password
 	 *            the password with which this user is to be authenticated. Null passwords are not accepted and they
-	 *            must meet the requirements of the {@link #validatePassword(byte[])}-method
+	 *            must meet the requirements of the {@link #validatePassword(char[])}-method
 	 * 
 	 * @return a {@link Certificate} with which this user may then perform actions
 	 * 
 	 * @throws AccessDeniedException
 	 *             if the user credentials are not valid
 	 */
-	public Certificate authenticate(String username, byte[] password) throws AccessDeniedException;
+	public Certificate authenticate(String username, char[] password) throws AccessDeniedException;
 
 	/**
 	 * Invalidates the session for the given {@link Certificate}, effectively logging out the user who was authenticated
@@ -630,7 +630,7 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException
 	 *             if the password does not implement the requirement of the concrete implementation
 	 */
-	public void validatePassword(byte[] password) throws PrivilegeException;
+	public void validatePassword(char[] password) throws PrivilegeException;
 
 	/**
 	 * <p>

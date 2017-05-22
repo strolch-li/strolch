@@ -18,7 +18,7 @@ public abstract class PerformanceTest {
 	@Test
 	public void runPerformanceTestCached() {
 
-		Certificate certificate = runtime().getPrivilegeHandler().authenticate("cached", "test".getBytes());
+		Certificate certificate = runtime().getPrivilegeHandler().authenticate("cached", "test".toCharArray());
 
 		ServiceHandler svcHandler = runtime().getServiceHandler();
 		svcHandler.doService(certificate, new PerformanceTestService(), argInstance());
@@ -27,7 +27,7 @@ public abstract class PerformanceTest {
 	@Test
 	public void runPerformanceTestTransactional() {
 
-		Certificate certificate = runtime().getPrivilegeHandler().authenticate("transactional", "test".getBytes());
+		Certificate certificate = runtime().getPrivilegeHandler().authenticate("transactional", "test".toCharArray());
 
 		ServiceHandler svcHandler = runtime().getServiceHandler();
 		svcHandler.doService(certificate, new PerformanceTestService(), argInstance());

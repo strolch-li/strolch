@@ -26,7 +26,7 @@ public class VersioningTestRunner {
 		this.runtimeMock = runtimeMock;
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getContainer().getPrivilegeHandler();
-		this.certificate = privilegeHandler.authenticate("test", "test".getBytes());
+		this.certificate = privilegeHandler.authenticate("test", "test".toCharArray());
 	}
 
 	public void runTestsForVersioning() {

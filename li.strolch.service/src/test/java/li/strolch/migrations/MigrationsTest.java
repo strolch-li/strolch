@@ -56,7 +56,7 @@ public class MigrationsTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 	}
 
 	@AfterClass

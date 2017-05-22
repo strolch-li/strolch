@@ -17,17 +17,17 @@ package li.strolch.privilege.helper;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.security.MessageDigest;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.crypto.SecretKeyFactory;
+
+import li.strolch.privilege.handler.DefaultEncryptionHandler;
 import li.strolch.utils.helper.StringHelper;
 
 /**
  * <p>
  * Simple main class which can be used to create a hash from a password which the user must type in at the command line
- * </p>
- * 
- * <p>
- * TODO: Note: currently the password input is echoed which is a security risk
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -47,26 +47,82 @@ public class PasswordCreator {
 
 		String hashAlgorithm = null;
 		while (hashAlgorithm == null) {
-			System.out.print("Hash Algorithm [SHA-256]: ");
+			System.out.print("Hash Algorithm [PBKDF2WithHmacSHA512]: ");
 			String readLine = r.readLine().trim();
 
 			if (readLine.isEmpty()) {
-				hashAlgorithm = "SHA-256";
+				hashAlgorithm = "PBKDF2WithHmacSHA512";
 			} else {
 
 				try {
-					MessageDigest.getInstance(readLine);
+					SecretKeyFactory.getInstance(readLine);
 					hashAlgorithm = readLine;
 				} catch (Exception e) {
-					System.out.println(e.getLocalizedMessage());
+					System.err.println(e.getLocalizedMessage());
 					hashAlgorithm = null;
 				}
 			}
 		}
 
-		System.out.print("Password: ");
-		String password = r.readLine().trim();
-		System.out.print("Hash is: " + StringHelper.hashAsHex(hashAlgorithm, password));
-	}
+		int iterations = -1;
+		while (iterations == -1) {
+			System.out.print("Hash iterations [200000]: ");
+			String readLine = r.readLine().trim();
 
+			if (readLine.isEmpty()) {
+				iterations = 200000;
+			} else {
+
+				try {
+					iterations = Integer.parseInt(readLine);
+				} catch (Exception e) {
+					System.err.println(e.getLocalizedMessage());
+					iterations = -1;
+				}
+			}
+		}
+
+		int keyLength = -1;
+		while (keyLength == -1) {
+			System.out.print("Hash keyLength [256]: ");
+			String readLine = r.readLine().trim();
+
+			if (readLine.isEmpty()) {
+				keyLength = 256;
+			} else {
+
+				try {
+					keyLength = Integer.parseInt(readLine);
+					if (keyLength <= 0)
+						throw new IllegalArgumentException("KeyLength must be > 0");
+				} catch (Exception e) {
+					System.err.println(e.getLocalizedMessage());
+					keyLength = -1;
+				}
+			}
+		}
+
+		System.out.print("Password: ");
+		char[] password = r.readLine().trim().toCharArray();
+		System.out.print("Salt: ");
+		String saltS = StringHelper.getHexString(r.readLine().trim().getBytes());
+		byte[] salt = StringHelper.fromHexString(saltS);
+
+		Map<String, String> parameterMap = new HashMap<>();
+		parameterMap.put(XmlConstants.XML_PARAM_HASH_ALGORITHM, hashAlgorithm);
+		parameterMap.put(XmlConstants.XML_PARAM_HASH_ITERATIONS, "" + iterations);
+		parameterMap.put(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, "" + keyLength);
+
+		DefaultEncryptionHandler encryptionHandler = new DefaultEncryptionHandler();
+		encryptionHandler.initialize(parameterMap);
+
+		byte[] passwordHash = encryptionHandler.hashPassword(password, salt);
+		String passwordHashS = StringHelper.getHexString(passwordHash);
+		System.out.println("Hash is: " + passwordHashS);
+		System.out.println("Salt is: " + saltS);
+		System.out.println();
+
+		System.out.println(XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordHashS + "\" " + XmlConstants.XML_ATTR_SALT
+				+ "=\"" + saltS + "\"");
+	}
 }

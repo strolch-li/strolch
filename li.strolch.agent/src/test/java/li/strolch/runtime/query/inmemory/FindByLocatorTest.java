@@ -52,7 +52,7 @@ public class FindByLocatorTest {
 		runtimeMock = new RuntimeMock(PATH_FIND_BY_LOCATOR_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER);
 		runtimeMock.mockRuntime();
 		runtimeMock.startContainer();
-		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 
 	}
 

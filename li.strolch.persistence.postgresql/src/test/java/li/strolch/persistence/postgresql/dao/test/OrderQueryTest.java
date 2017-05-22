@@ -78,7 +78,7 @@ public class OrderQueryTest extends QueryTest {
 		cal.set(2000, 11, 1);
 		future = cal.getTime();
 
-		Certificate cert = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		Certificate cert = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 		StrolchRealm realm = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM);
 		try (StrolchTransaction tx = realm.openTx(cert, "test")) {
 			OrderMap orderMap = tx.getOrderMap();

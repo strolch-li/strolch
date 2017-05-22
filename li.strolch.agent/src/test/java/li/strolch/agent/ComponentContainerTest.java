@@ -168,7 +168,7 @@ public class ComponentContainerTest {
 
 	private static Certificate login(StrolchAgent agent) {
 		PrivilegeHandler privilegeHandler = agent.getContainer().getPrivilegeHandler();
-		return privilegeHandler.authenticate("test", "test".getBytes());
+		return privilegeHandler.authenticate("test", "test".toCharArray());
 	}
 
 	public static void testPersistenceContainer(StrolchAgent agent) {

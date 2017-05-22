@@ -15,12 +15,16 @@
  */
 package li.strolch.privilege.handler;
 
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.text.MessageFormat;
 import java.util.Map;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +41,7 @@ import li.strolch.utils.helper.StringHelper;
  * 
  * Required parameters:
  * <ul>
- * <li> {@link XmlConstants#XML_PARAM_HASH_ALGORITHM}</li>
+ * <li>{@link XmlConstants#XML_PARAM_HASH_ALGORITHM}</li>
  * </ul>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -55,40 +59,47 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	private SecureRandom secureRandom;
 
 	/**
-	 * The configured hash algorithm for this instance
+	 * The configured algorithm for this instance
 	 */
-	private String hashAlgorithm;
+	private String algorithm;
 
-	@Override
-	public String convertToHash(String string) {
-		return convertToHash(string.getBytes());
-	}
+	/**
+	 * The number of iterations to perform the hashing with
+	 */
+	private int iterations;
 
-	@Override
-	public String convertToHash(byte[] bytes) {
-		try {
-
-			return StringHelper.hashAsHex(this.hashAlgorithm, bytes);
-
-		} catch (RuntimeException e) {
-			if (e.getCause() == null)
-				throw e;
-			if (e.getCause().getClass().equals(NoSuchAlgorithmException.class))
-				throw new PrivilegeException(
-						MessageFormat.format("Algorithm {0} was not found!", this.hashAlgorithm), e.getCause()); //$NON-NLS-1$
-			if (e.getCause().getClass().equals(UnsupportedEncodingException.class))
-				throw new PrivilegeException("Charset ASCII is not supported!", e.getCause()); //$NON-NLS-1$
-
-			throw e;
-		}
-	}
+	/**
+	 * The length of the secure key for the hashing
+	 */
+	private int keyLength;
 
 	@Override
 	public String nextToken() {
 		byte[] bytes = new byte[16];
 		this.secureRandom.nextBytes(bytes);
-		String randomString = new String(bytes);
-		return randomString;
+		return StringHelper.getHexString(bytes);
+	}
+
+	@Override
+	public byte[] nextSalt() {
+		byte[] bytes = new byte[32];
+		this.secureRandom.nextBytes(bytes);
+		return bytes;
+	}
+
+	@Override
+	public byte[] hashPassword(char[] password, byte[] salt) {
+
+		try {
+			SecretKeyFactory skf = SecretKeyFactory.getInstance(this.algorithm);
+			PBEKeySpec spec = new PBEKeySpec(password, salt, this.iterations, this.keyLength);
+			SecretKey key = skf.generateSecret(spec);
+			byte[] res = key.getEncoded();
+			return res;
+
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	@Override
@@ -97,18 +108,14 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		this.secureRandom = new SecureRandom();
 
 		// get hash algorithm parameters
-		this.hashAlgorithm = parameterMap.get(XmlConstants.XML_PARAM_HASH_ALGORITHM);
-		if (this.hashAlgorithm == null || this.hashAlgorithm.isEmpty()) {
-			String msg = "[{0}] Defined parameter {1} is invalid"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), XmlConstants.XML_PARAM_HASH_ALGORITHM);
-			throw new PrivilegeException(msg);
-		}
+		this.algorithm = parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_ALGORITHM, "PBKDF2WithHmacSHA512");
+		this.iterations = Integer.parseInt(parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_ITERATIONS, "200000"));
+		this.keyLength = Integer.parseInt(parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, "256"));
 
 		// test hash algorithm
 		try {
-			convertToHash("test"); //$NON-NLS-1$
-			DefaultEncryptionHandler.logger.info(MessageFormat
-					.format("Using hashing algorithm {0}", this.hashAlgorithm)); //$NON-NLS-1$
+			hashPassword("test".toCharArray(), "test".getBytes()); //$NON-NLS-1$
+			DefaultEncryptionHandler.logger.info(MessageFormat.format("Using hashing algorithm {0}", this.algorithm)); //$NON-NLS-1$
 		} catch (Exception e) {
 			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), XmlConstants.XML_PARAM_HASH_ALGORITHM,

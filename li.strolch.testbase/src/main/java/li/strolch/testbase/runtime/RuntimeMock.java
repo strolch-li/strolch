@@ -77,15 +77,15 @@ public class RuntimeMock {
 	}
 
 	public Certificate loginAdmin() {
-		return getPrivilegeHandler().authenticate("admin", "admin".getBytes());
+		return getPrivilegeHandler().authenticate("admin", "admin".toCharArray());
 	}
 
 	public Certificate loginTest() {
-		return getPrivilegeHandler().authenticate("test", "test".getBytes());
+		return getPrivilegeHandler().authenticate("test", "test".toCharArray());
 	}
 
 	public Certificate login(String username, String password) {
-		return getPrivilegeHandler().authenticate(username, password.getBytes());
+		return getPrivilegeHandler().authenticate(username, password.toCharArray());
 	}
 
 	public boolean logout(Certificate cert) {

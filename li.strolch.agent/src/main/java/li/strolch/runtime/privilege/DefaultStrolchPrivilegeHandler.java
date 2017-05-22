@@ -126,7 +126,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public Certificate authenticate(String username, byte[] password) {
+	public Certificate authenticate(String username, char[] password) {
 		assertContainerStarted();
 		Certificate certificate = this.privilegeHandler.authenticate(username, password);
 		StrolchRealm realm = getContainer().getRealm(certificate);

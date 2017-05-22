@@ -59,8 +59,10 @@ public class PrivilegeUsersDomWriter {
 
 			userElement.setAttribute(XmlConstants.XML_ATTR_USER_ID, user.getUserId());
 			userElement.setAttribute(XmlConstants.XML_ATTR_USERNAME, user.getUsername());
-			if (StringHelper.isNotEmpty(user.getPassword()))
-				userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, user.getPassword());
+			if (user.getPassword() != null)
+				userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, StringHelper.getHexString(user.getPassword()));
+			if (user.getSalt() != null)
+				userElement.setAttribute(XmlConstants.XML_ATTR_SALT, StringHelper.getHexString(user.getSalt()));
 
 			// add first name element
 			if (StringHelper.isNotEmpty(user.getFirstname())) {

@@ -72,7 +72,7 @@ public class LockingTest {
 	}
 
 	public static Certificate login() {
-		return runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		return runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 	}
 
 	@Test

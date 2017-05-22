@@ -26,29 +26,30 @@ import java.util.Map;
 public interface EncryptionHandler {
 
 	/**
-	 * Calculates or generates a token which can be used to identify certificates and so forth
+	 * Generates a token which can be used to identify certificates and so forth
 	 * 
-	 * @return the secure token
+	 * @return a new token
 	 */
 	public String nextToken();
 
 	/**
-	 * Converts a given string, e.g. a password to a hash which is defined by the concrete implementation
+	 * Generates a token which can be used to identify certificates and so forth
 	 * 
-	 * @param string
-	 *            the string to convert
-	 * @return the hash of the string after converting
+	 * @return a new token
 	 */
-	public String convertToHash(String string);
+	public byte[] nextSalt();
 
 	/**
-	 * Converts a given byte array, e.g. a password to a hash which is defined by the concrete implementation
+	 * Hashes the given password with the given salt with the configured algorithm
 	 * 
-	 * @param bytes
-	 *            the bytes to convert
-	 * @return the hash of the string after converting
+	 * @param password
+	 *            the password
+	 * @param salt
+	 *            the salt
+	 * 
+	 * @return the hashed password
 	 */
-	public String convertToHash(byte[] bytes);
+	public byte[] hashPassword(final char[] password, final byte[] salt);
 
 	/**
 	 * Initialize the concrete {@link EncryptionHandler}. The passed parameter map contains any configuration the

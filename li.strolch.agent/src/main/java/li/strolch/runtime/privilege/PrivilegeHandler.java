@@ -41,7 +41,7 @@ public interface PrivilegeHandler {
 	 * 
 	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, byte[])
 	 */
-	public Certificate authenticate(String username, byte[] password);
+	public Certificate authenticate(String username, char[] password);
 
 	/**
 	 * Validate that the certificate is still valid

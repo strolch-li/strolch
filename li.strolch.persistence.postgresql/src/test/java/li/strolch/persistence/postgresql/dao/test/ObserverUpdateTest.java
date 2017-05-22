@@ -120,7 +120,7 @@ public class ObserverUpdateTest {
 		realm.getObserverHandler().registerObserver(Tags.RESOURCE, observer);
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
-		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
+		Certificate certificate = privilegeHandler.authenticate("test", "test".toCharArray()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$

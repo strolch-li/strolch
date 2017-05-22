@@ -43,7 +43,7 @@ public class EnumHandlerTest {
 
 			ComponentContainer container = agent.getContainer();
 
-			Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".getBytes());
+			Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 
 			EnumHandler enumHandler = container.getComponent(EnumHandler.class);
 			StrolchEnum sexEnum = enumHandler.getEnum(certificate, "sex", Locale.ENGLISH);

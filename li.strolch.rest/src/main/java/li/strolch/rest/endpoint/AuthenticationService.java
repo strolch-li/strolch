@@ -92,7 +92,8 @@ public class AuthenticationService {
 				sb.append("Password was not given!"); //$NON-NLS-1$
 			}
 
-			byte[] password = passwordE == null ? new byte[] {} : Base64.getDecoder().decode(passwordE.getAsString());
+			char[] password = passwordE == null ? new char[] {}
+					: new String(Base64.getDecoder().decode(passwordE.getAsString())).toCharArray();
 			if (password.length < 3) {
 				if (sb.length() > 0)
 					sb.append("\n");
@@ -295,7 +296,7 @@ public class AuthenticationService {
 				String msg = "Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!";
 				logger.warn(msg);
 			}
-			
+
 			NewCookie cookie = new NewCookie(StrolchRestfulConstants.STROLCH_AUTHORIZATION, certificate.getAuthToken(),
 					"/", null, "Authorization header", (int) TimeUnit.DAYS.toSeconds(1), secureCookie);
 

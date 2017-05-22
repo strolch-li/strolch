@@ -22,7 +22,7 @@ public class AbstractPrivilegeTest {
 	protected PrivilegeHandler privilegeHandler;
 	protected PrivilegeContext ctx;
 
-	protected void login(String username, byte[] password) {
+	protected void login(String username, char[] password) {
 		Certificate certificate = privilegeHandler.authenticate(username, password);
 		assertTrue("Certificate is null!", certificate != null);
 		PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);

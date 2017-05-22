@@ -35,6 +35,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.User;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -114,7 +115,8 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 		String userId;
 		String username;
-		String password;
+		byte[] password;
+		byte[] salt;
 		String firstName;
 		String lastname;
 		UserState userState;
@@ -135,7 +137,12 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			if (qName.equals(XmlConstants.XML_USER)) {
 				this.userId = attributes.getValue(XmlConstants.XML_ATTR_USER_ID);
 				this.username = attributes.getValue(XmlConstants.XML_ATTR_USERNAME);
-				this.password = attributes.getValue(XmlConstants.XML_ATTR_PASSWORD);
+				String passwordS = attributes.getValue(XmlConstants.XML_ATTR_PASSWORD);
+				if (!StringHelper.isEmpty(passwordS))
+					this.password = StringHelper.fromHexString(passwordS);
+				String saltS = attributes.getValue(XmlConstants.XML_ATTR_SALT);
+				if (!StringHelper.isEmpty(saltS))
+					this.salt = StringHelper.fromHexString(saltS);
 			}
 		}
 
@@ -165,8 +172,8 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 				// NO-OP
 			} else if (qName.equals(XmlConstants.XML_USER)) {
 
-				User user = new User(this.userId, this.username, this.password, this.firstName, this.lastname,
-						this.userState, this.userRoles, this.locale, this.parameters);
+				User user = new User(this.userId, this.username, this.password, this.salt, this.firstName,
+						this.lastname, this.userState, this.userRoles, this.locale, this.parameters);
 				logger.info(MessageFormat.format("New User: {0}", user)); //$NON-NLS-1$
 				getUsers().add(user);
 			} else {

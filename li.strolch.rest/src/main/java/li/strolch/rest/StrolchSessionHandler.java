@@ -28,7 +28,7 @@ import li.strolch.rest.model.UserSession;
  */
 public interface StrolchSessionHandler {
 
-	public Certificate authenticate(String username, byte[] password);
+	public Certificate authenticate(String username, char[] password);
 
 	public Certificate validate(String authToken);
 

@@ -65,7 +65,7 @@ public abstract class AbstractRealmCommandTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		certificate = runtimeMock.getPrivilegeHandler().authenticate(getUsername(), "test".getBytes());
+		certificate = runtimeMock.getPrivilegeHandler().authenticate(getUsername(), getUsername().toCharArray());
 		importFromXml(REALM_CACHED, certificate, getServiceHandler());
 		importFromXml(REALM_TRANSACTIONAL, certificate, getServiceHandler());
 	}

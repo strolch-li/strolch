@@ -44,7 +44,7 @@ public class PolicyHandlerTest {
 			PolicyHandler policyHandler = agent.getContainer().getComponent(PolicyHandler.class);
 
 			ComponentContainer container = agent.getContainer();
-			Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".getBytes());
+			Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate,
 					"test")) {
 

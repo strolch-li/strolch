@@ -52,7 +52,7 @@ public class QueryTest {
 	public static final String PATH_EMPTY_RUNTIME = "target/QueryTest/"; //$NON-NLS-1$
 
 	private Certificate login(ComponentContainer container) {
-		return container.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		return container.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 	}
 
 	@Test

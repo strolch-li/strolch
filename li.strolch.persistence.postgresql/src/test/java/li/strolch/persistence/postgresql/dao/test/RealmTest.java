@@ -82,7 +82,7 @@ public class RealmTest extends AbstractModelTest {
 		String type = "Bla"; //$NON-NLS-1$
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
-		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.getBytes());
+		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.toCharArray());
 
 		{
 			StrolchRealm firstRealm = runtimeMock.getRealm(FIRST);

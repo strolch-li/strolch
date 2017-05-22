@@ -37,7 +37,7 @@ public class GreetingServiceTest extends AbstractServiceTest {
 		GreetingArgument greetingArgument = new GreetingArgument();
 		greetingArgument.name = "Robert"; //$NON-NLS-1$
 
-		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".getBytes()); //$NON-NLS-1$//$NON-NLS-2$
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".toCharArray()); //$NON-NLS-1$//$NON-NLS-2$
 		try {
 			GreetingResult greetingResult = getServiceHandler().doService(certificate, greetingService,
 					greetingArgument);

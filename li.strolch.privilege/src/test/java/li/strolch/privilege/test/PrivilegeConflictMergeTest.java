@@ -51,7 +51,7 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 	@Test
 	public void shouldMergePrivileges1() {
 		try {
-			login("userA", "admin".getBytes());
+			login("userA", "admin".toCharArray());
 			IPrivilege privilege = this.ctx.getPrivilege("Foo");
 			assertTrue(privilege.isAllAllowed());
 			assertTrue(privilege.getAllowList().isEmpty());
@@ -65,7 +65,7 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 	@Test
 	public void shouldMergePrivileges2() {
 		try {
-			login("userB", "admin".getBytes());
+			login("userB", "admin".toCharArray());
 			IPrivilege privilege = this.ctx.getPrivilege("Bar");
 			assertFalse(privilege.isAllAllowed());
 			assertEquals(2, privilege.getAllowList().size());

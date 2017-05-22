@@ -404,7 +404,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public UserRep addUser(Certificate certificate, UserRep userRepParam, byte[] password) {
+	public UserRep addUser(Certificate certificate, UserRep userRepParam, char[] password) {
 		try {
 
 			// validate user actually has this type of privilege
@@ -433,18 +433,22 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new PrivilegeException(MessageFormat.format(msg, userRep.getUsername()));
 			}
 
-			String passwordHash = null;
+			byte[] passwordHash = null;
+			byte[] salt = null;
 			if (password != null) {
 
 				// validate password meets basic requirements
 				validatePassword(password);
 
+				// get new salt for user
+				salt = this.encryptionHandler.nextSalt();
+
 				// hash password
-				passwordHash = this.encryptionHandler.convertToHash(password);
+				passwordHash = this.encryptionHandler.hashPassword(password, salt);
 			}
 
 			// create new user
-			User newUser = createUser(userRep, passwordHash);
+			User newUser = createUser(userRep, passwordHash, salt);
 
 			// detect privilege conflicts
 			assertNoPrivilegeConflict(newUser);
@@ -465,7 +469,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public UserRep replaceUser(Certificate certificate, UserRep userRep, byte[] password) {
+	public UserRep replaceUser(Certificate certificate, UserRep userRep, char[] password) {
 		try {
 
 			// validate user actually has this type of privilege
@@ -491,17 +495,21 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new PrivilegeException(MessageFormat.format(msg, userRep.getUsername()));
 			}
 
-			String passwordHash = null;
+			byte[] passwordHash = null;
+			byte[] salt = null;
 			if (password != null) {
 
 				// validate password meets basic requirements
 				validatePassword(password);
 
+				// get new salt for user
+				salt = this.encryptionHandler.nextSalt();
+
 				// hash password
-				passwordHash = this.encryptionHandler.convertToHash(password);
+				passwordHash = this.encryptionHandler.hashPassword(password, salt);
 			}
 
-			User newUser = createUser(userRep, passwordHash);
+			User newUser = createUser(userRep, passwordHash, salt);
 
 			// detect privilege conflicts
 			assertNoPrivilegeConflict(newUser);
@@ -532,8 +540,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	private User createUser(UserRep userRep, String passwordHash) {
-		User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, userRep.getFirstname(),
+	private User createUser(UserRep userRep, byte[] passwordHash, byte[] salt) {
+		User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, salt, userRep.getFirstname(),
 				userRep.getLastname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
 				userRep.getPropertyMap());
 		return user;
@@ -563,7 +571,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		String userId = existingUser.getUserId();
 		String username = existingUser.getUsername();
-		String password = existingUser.getPassword();
+		byte[] password = existingUser.getPassword();
+		byte[] salt = existingUser.getSalt();
 		String firstname = existingUser.getFirstname();
 		String lastname = existingUser.getLastname();
 		UserState userState = existingUser.getUserState();
@@ -582,7 +591,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			propertyMap = userRep.getPropertyMap();
 
 		// create new user
-		User newUser = new User(userId, username, password, firstname, lastname, userState, roles, locale, propertyMap);
+		User newUser = new User(userId, username, password, salt, firstname, lastname, userState, roles, locale,
+				propertyMap);
 
 		// detect privilege conflicts
 		assertNoPrivilegeConflict(newUser);
@@ -657,8 +667,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		newRoles.add(roleName);
 
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
-				existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(), newRoles,
-				existingUser.getLocale(), existingUser.getProperties());
+				existingUser.getSalt(), existingUser.getFirstname(), existingUser.getLastname(),
+				existingUser.getUserState(), newRoles, existingUser.getLocale(), existingUser.getProperties());
 
 		// detect privilege conflicts
 		assertNoPrivilegeConflict(newUser);
@@ -699,8 +709,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Set<String> newRoles = new HashSet<>(currentRoles);
 		newRoles.remove(roleName);
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
-				existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(), newRoles,
-				existingUser.getLocale(), existingUser.getProperties());
+				existingUser.getSalt(), existingUser.getFirstname(), existingUser.getLastname(),
+				existingUser.getUserState(), newRoles, existingUser.getLocale(), existingUser.getProperties());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
@@ -725,8 +735,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
-				existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(),
-				existingUser.getRoles(), locale, existingUser.getProperties());
+				existingUser.getSalt(), existingUser.getFirstname(), existingUser.getLastname(),
+				existingUser.getUserState(), existingUser.getRoles(), locale, existingUser.getProperties());
 
 		// if the user is not setting their own locale, then make sure this user may set this user's locale
 		if (!certificate.getUsername().equals(username)) {
@@ -747,7 +757,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public void setUserPassword(Certificate certificate, String username, byte[] password) {
+	public void setUserPassword(Certificate certificate, String username, char[] password) {
 		try {
 
 			// validate user actually has this type of privilege
@@ -760,18 +770,22 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
 			}
 
-			String passwordHash = null;
+			byte[] passwordHash = null;
+			byte[] salt = null;
 			if (password != null) {
 
 				// validate password meets basic requirements
 				validatePassword(password);
 
+				// get new salt for user
+				salt = this.encryptionHandler.nextSalt();
+
 				// hash password
-				passwordHash = this.encryptionHandler.convertToHash(password);
+				passwordHash = this.encryptionHandler.hashPassword(password, salt);
 			}
 
 			// create new user
-			User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), passwordHash,
+			User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), passwordHash, salt,
 					existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(),
 					existingUser.getRoles(), existingUser.getLocale(), existingUser.getProperties());
 
@@ -815,8 +829,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
-				existingUser.getFirstname(), existingUser.getLastname(), state, existingUser.getRoles(),
-				existingUser.getLocale(), existingUser.getProperties());
+				existingUser.getSalt(), existingUser.getFirstname(), existingUser.getLastname(), state,
+				existingUser.getRoles(), existingUser.getLocale(), existingUser.getProperties());
 
 		// validate that this user may modify this user's state
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_STATE, new Tuple(existingUser, newUser)));
@@ -1059,7 +1073,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate the response
 		UserChallenge userChallenge = this.userChallengeHandler.validateResponse(user, challenge);
-		String authToken = this.encryptionHandler.convertToHash(this.encryptionHandler.nextToken());
+		String authToken = this.encryptionHandler.nextToken();
 		String sessionId = UUID.randomUUID().toString();
 
 		// create a new certificate, with details of the user
@@ -1077,7 +1091,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public Certificate authenticate(String username, byte[] password) {
+	public Certificate authenticate(String username, char[] password) {
 
 		try {
 			// username must be at least 2 characters in length
@@ -1097,7 +1111,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			// get 2 auth tokens
-			String authToken = this.encryptionHandler.convertToHash(this.encryptionHandler.nextToken());
+			String authToken = this.encryptionHandler.nextToken();
 
 			// get next session id
 			String sessionId = UUID.randomUUID().toString();
@@ -1232,14 +1246,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @throws InvalidCredentialsException
 	 *             if the given credentials are invalid, the user does not exist, or has no password set
 	 */
-	private User checkCredentialsAndUserState(String username, byte[] password)
+	private User checkCredentialsAndUserState(String username, char[] password)
 			throws InvalidCredentialsException, AccessDeniedException {
 
 		// and validate the password
 		validatePassword(password);
-
-		// we only work with hashed passwords
-		String passwordHash = this.encryptionHandler.convertToHash(password);
 
 		// get user object
 		User user = this.persistenceHandler.getUser(username);
@@ -1256,14 +1267,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new InvalidCredentialsException(msg);
 		}
 
-		// validate password
-		String pwHash = user.getPassword();
-		if (pwHash == null)
-			throw new AccessDeniedException(
-					MessageFormat.format("User {0} has no password and may not login!", username)); //$NON-NLS-1$
-		if (!pwHash.equals(passwordHash))
-			throw new InvalidCredentialsException(MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
-
 		// validate if user is allowed to login
 		// this also capture the trying to login of SYSTEM user
 		if (user.getUserState() != UserState.ENABLED) {
@@ -1271,6 +1274,25 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			msg = MessageFormat.format(msg, username, UserState.ENABLED);
 			throw new AccessDeniedException(msg);
 		}
+
+		byte[] pwHash = user.getPassword();
+		if (pwHash == null)
+			throw new AccessDeniedException(
+					MessageFormat.format("User {0} has no password and may not login!", username)); //$NON-NLS-1$
+		byte[] salt = user.getSalt();
+		if (salt == null)
+			throw new AccessDeniedException(MessageFormat.format("User {0} has no salt and may not login!", salt)); //$NON-NLS-1$
+
+		// we only work with hashed passwords
+		byte[] passwordHash = this.encryptionHandler.hashPassword(password, salt);
+
+		logger.info("New hash: " + StringHelper.getHexString(passwordHash));
+		logger.info("User hash: " + StringHelper.getHexString(pwHash));
+		logger.info("User salt: " + StringHelper.getHexString(salt));
+
+		// validate password
+		if (!Arrays.equals(passwordHash, pwHash))
+			throw new InvalidCredentialsException(MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
 
 		return user;
 	}
@@ -1426,10 +1448,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * This simple implementation validates that the password is not null, and that the password string is not empty
 	 * 
-	 * @see li.strolch.privilege.handler.PrivilegeHandler#validatePassword(byte[])
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#validatePassword(char[])
 	 */
 	@Override
-	public void validatePassword(byte[] password) throws PrivilegeException {
+	public void validatePassword(char[] password) throws PrivilegeException {
 
 		if (password == null || password.length == 0) {
 			throw new PrivilegeException("A password may not be empty!"); //$NON-NLS-1$
@@ -1708,13 +1730,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * Passwords should not be kept as strings, as string are immutable, this method thus clears the byte array so that
+	 * Passwords should not be kept as strings, as string are immutable, this method thus clears the char array so that
 	 * the password is not in memory anymore
 	 * 
 	 * @param password
-	 *            the byte array containing the passwort which is to be set to zeroes
+	 *            the char array containing the passwort which is to be set to zeroes
 	 */
-	private void clearPassword(byte[] password) {
+	private void clearPassword(char[] password) {
 		if (password != null) {
 			for (int i = 0; i < password.length; i++) {
 				password[i] = 0;
@@ -1797,7 +1819,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// validate password
-		String pwHash = user.getPassword();
+		byte[] pwHash = user.getPassword();
 		if (pwHash != null) {
 			String msg = MessageFormat.format("System users must not have a password: {0}", systemUsername); //$NON-NLS-1$
 			throw new AccessDeniedException(msg);

@@ -51,4 +51,16 @@ public class ArraysHelper {
 	public static byte[] copyOf(byte[] bytes) {
 		return Arrays.copyOf(bytes, bytes.length);
 	}
+
+	/**
+	 * Creates a simple copy of the given array
+	 * 
+	 * @param bytes
+	 *            the array to copy
+	 * 
+	 * @return the copy
+	 */
+	public static char[] copyOf(char[] chars) {
+		return Arrays.copyOf(chars, chars.length);
+	}
 }

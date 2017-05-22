@@ -138,7 +138,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public Certificate authenticate(String username, byte[] password) {
+	public Certificate authenticate(String username, char[] password) {
 		DBC.PRE.assertNotEmpty("Username must be set!", username); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Passwort must be set", password); //$NON-NLS-1$
 

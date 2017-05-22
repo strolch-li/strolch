@@ -35,7 +35,7 @@ public abstract class AbstractModelTest {
 	@Test
 	public void shouldStartContainer() {
 		PrivilegeHandler privilegeHandler = getRuntimeMock().getContainer().getPrivilegeHandler();
-		Certificate certificate = privilegeHandler.authenticate("test", "test".getBytes());
+		Certificate certificate = privilegeHandler.authenticate("test", "test".toCharArray());
 		try (StrolchTransaction tx = getRuntimeMock().getRealm(this.realmName).openTx(certificate, "test")) {
 			tx.getOrderMap().getAllKeys(tx);
 		}

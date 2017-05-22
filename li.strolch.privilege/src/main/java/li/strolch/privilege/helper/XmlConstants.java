@@ -234,9 +234,24 @@ public class XmlConstants {
 	public static final String XML_ATTR_PASSWORD = "password";
 
 	/**
+	 * XML_ATTR_SALT = "salt" :
+	 */
+	public static final String XML_ATTR_SALT = "salt";
+
+	/**
 	 * XML_PARAM_HASH_ALGORITHM = "hashAlgorithm" :
 	 */
 	public static final String XML_PARAM_HASH_ALGORITHM = "hashAlgorithm";
+
+	/**
+	 * XML_PARAM_HASH_ALGORITHM = "hashAlgorithm" :
+	 */
+	public static final String XML_PARAM_HASH_ITERATIONS = "hashIterations";
+
+	/**
+	 * XML_PARAM_HASH_ALGORITHM = "hashAlgorithm" :
+	 */
+	public static final String XML_PARAM_HASH_KEY_LENGTH = "hashKeyLength";
 
 	/**
 	 * XML_PARAM_USERS_FILE = "usersXmlFile" :

@@ -129,7 +129,7 @@ public class XmlTest {
 
 		assertEquals(6, containerModel.getParameterMap().size());
 		assertEquals(3, containerModel.getPolicies().size());
-		assertEquals(1, containerModel.getEncryptionHandlerParameterMap().size());
+		assertEquals(3, containerModel.getEncryptionHandlerParameterMap().size());
 		assertEquals(3, containerModel.getPersistenceHandlerParameterMap().size());
 
 		// TODO extend assertions to actual model
@@ -184,7 +184,9 @@ public class XmlTest {
 		User admin = findUser("admin", users);
 		assertEquals("1", admin.getUserId());
 		assertEquals("admin", admin.getUsername());
-		assertEquals("8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", admin.getPassword());
+		assertEquals("cb69962946617da006a2f95776d78b49e5ec7941d2bdb2d25cdb05f957f64344",
+				StringHelper.getHexString(admin.getPassword()));
+		assertEquals("61646d696e", StringHelper.getHexString(admin.getSalt()));
 		assertEquals("Application", admin.getFirstname());
 		assertEquals("Administrator", admin.getLastname());
 		assertEquals(UserState.ENABLED, admin.getUserState());
@@ -200,6 +202,7 @@ public class XmlTest {
 		assertEquals("2", systemAdmin.getUserId());
 		assertEquals("system_admin", systemAdmin.getUsername());
 		assertEquals(null, systemAdmin.getPassword());
+		assertEquals(null, systemAdmin.getSalt());
 		assertEquals("System User", systemAdmin.getFirstname());
 		assertEquals("Administrator", systemAdmin.getLastname());
 		assertEquals(UserState.SYSTEM, systemAdmin.getUserState());
@@ -264,9 +267,8 @@ public class XmlTest {
 		Role systemAdminPrivileges = findRole("system_admin_privileges", roles);
 		assertEquals("system_admin_privileges", systemAdminPrivileges.getName());
 		assertEquals(2, systemAdminPrivileges.getPrivilegeNames().size());
-		assertThat(systemAdminPrivileges.getPrivilegeNames(),
-				containsInAnyOrder("li.strolch.privilege.handler.SystemAction",
-						"li.strolch.privilege.test.model.TestSystemRestrictable"));
+		assertThat(systemAdminPrivileges.getPrivilegeNames(), containsInAnyOrder(
+				"li.strolch.privilege.handler.SystemAction", "li.strolch.privilege.test.model.TestSystemRestrictable"));
 
 		IPrivilege testSystemUserAction = systemAdminPrivileges
 				.getPrivilege("li.strolch.privilege.handler.SystemAction");
@@ -288,11 +290,9 @@ public class XmlTest {
 		Role restrictedRole = findRole("restrictedRole", roles);
 		assertEquals("restrictedRole", restrictedRole.getName());
 		assertEquals(1, restrictedRole.getPrivilegeNames().size());
-		assertThat(restrictedRole.getPrivilegeNames(),
-				containsInAnyOrder("li.strolch.privilege.handler.SystemAction"));
+		assertThat(restrictedRole.getPrivilegeNames(), containsInAnyOrder("li.strolch.privilege.handler.SystemAction"));
 
-		IPrivilege testSystemUserAction2 = restrictedRole
-				.getPrivilege("li.strolch.privilege.handler.SystemAction");
+		IPrivilege testSystemUserAction2 = restrictedRole.getPrivilege("li.strolch.privilege.handler.SystemAction");
 		assertEquals("li.strolch.privilege.handler.SystemAction", testSystemUserAction2.getName());
 		assertEquals("DefaultPrivilege", testSystemUserAction2.getPolicy());
 		assertFalse(testSystemUserAction2.isAllAllowed());
@@ -341,16 +341,16 @@ public class XmlTest {
 		propertyMap.put("prop1", "value1");
 		userRoles = new HashSet<>();
 		userRoles.add("role1");
-		User user1 = new User("1", "user1", "blabla", "Bob", "White", UserState.DISABLED, userRoles, Locale.ENGLISH,
-				propertyMap);
+		User user1 = new User("1", "user1", "blabla".getBytes(), "blabla".getBytes(), "Bob", "White",
+				UserState.DISABLED, userRoles, Locale.ENGLISH, propertyMap);
 		users.add(user1);
 
 		propertyMap = new HashMap<>();
 		propertyMap.put("prop2", "value2");
 		userRoles = new HashSet<>();
 		userRoles.add("role2");
-		User user2 = new User("2", "user2", "haha", "Leonard", "Sheldon", UserState.ENABLED, userRoles, Locale.ENGLISH,
-				propertyMap);
+		User user2 = new User("2", "user2", "haha".getBytes(), "haha".getBytes(), "Leonard", "Sheldon",
+				UserState.ENABLED, userRoles, Locale.ENGLISH, propertyMap);
 		users.add(user2);
 
 		File modelFile = new File("./target/test/PrivilegeUsersTest.xml");
@@ -370,7 +370,8 @@ public class XmlTest {
 		assertEquals(user1.getFirstname(), parsedUser1.getFirstname());
 		assertEquals(user1.getLastname(), parsedUser1.getLastname());
 		assertEquals(user1.getLocale(), parsedUser1.getLocale());
-		assertEquals(user1.getPassword(), parsedUser1.getPassword());
+		assertTrue(Arrays.equals(user1.getPassword(), parsedUser1.getPassword()));
+		assertTrue(Arrays.equals(user1.getSalt(), parsedUser1.getSalt()));
 		assertEquals(user1.getProperties(), parsedUser1.getProperties());
 		assertEquals(user1.getUserId(), parsedUser1.getUserId());
 		assertEquals(user1.getUserState(), parsedUser1.getUserState());
@@ -379,7 +380,8 @@ public class XmlTest {
 		assertEquals(user2.getFirstname(), parsedUser2.getFirstname());
 		assertEquals(user2.getLastname(), parsedUser2.getLastname());
 		assertEquals(user2.getLocale(), parsedUser2.getLocale());
-		assertEquals(user2.getPassword(), parsedUser2.getPassword());
+		assertTrue(Arrays.equals(user2.getPassword(), parsedUser2.getPassword()));
+		assertTrue(Arrays.equals(user2.getSalt(), parsedUser2.getSalt()));
 		assertEquals(user2.getProperties(), parsedUser2.getProperties());
 		assertEquals(user2.getUserId(), parsedUser2.getUserId());
 		assertEquals(user2.getUserState(), parsedUser2.getUserState());

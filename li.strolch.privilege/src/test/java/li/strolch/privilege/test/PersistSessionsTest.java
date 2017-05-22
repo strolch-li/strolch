@@ -37,7 +37,7 @@ public class PersistSessionsTest extends AbstractPrivilegeTest {
 		assertFalse("Sessions File should no yet exist", sessionsFile.exists());
 
 		// login and assert sessions file was written
-		login("admin", "admin".getBytes());
+		login("admin", "admin".toCharArray());
 		this.privilegeHandler.isCertificateValid(ctx.getCertificate());
 		assertTrue("Sessions File should have been created!", sessionsFile.isFile());
 

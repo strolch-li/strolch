@@ -100,7 +100,7 @@ public class AuditQueryTest {
 		cal.set(2000, 11, 1);
 		future = cal.getTime();
 
-		Certificate cert = runtimeMock.getPrivilegeHandler().authenticate("test", "test".getBytes());
+		Certificate cert = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 		StrolchRealm realm = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM);
 		int i = 0;
 		try (StrolchTransaction tx = realm.openTx(cert, "test")) {

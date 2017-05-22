@@ -43,7 +43,8 @@ public final class User {
 	private final String userId;
 
 	private final String username;
-	private final String password;
+	private final byte[] password;
+	private final byte[] salt;
 
 	private final String firstname;
 	private final String lastname;
@@ -78,7 +79,7 @@ public final class User {
 	 * @param propertyMap
 	 *            a {@link Map} containing string value pairs of properties for this user
 	 */
-	public User(String userId, String username, String password, String firstname, String lastname,
+	public User(String userId, String username, byte[] password, byte[] salt, String firstname, String lastname,
 			UserState userState, Set<String> roles, Locale locale, Map<String, String> propertyMap) {
 
 		if (StringHelper.isEmpty(userId)) {
@@ -107,7 +108,8 @@ public final class User {
 		this.userId = userId;
 
 		this.username = username;
-		this.password = StringHelper.isEmpty(password) ? null : password;
+		this.password = password;
+		this.salt = salt;
 		this.userState = userState;
 
 		this.firstname = firstname;
@@ -148,8 +150,17 @@ public final class User {
 	 * 
 	 * @return the hashed password for this {@link User}
 	 */
-	public String getPassword() {
+	public byte[] getPassword() {
 		return this.password;
+	}
+
+	/**
+	 * Return the salt for this {@link User}
+	 * 
+	 * @return the salt for this {@link User}
+	 */
+	public byte[] getSalt() {
+		return this.salt;
 	}
 
 	/**

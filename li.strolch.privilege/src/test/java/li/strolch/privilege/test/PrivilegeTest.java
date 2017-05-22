@@ -70,21 +70,21 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	private static final String ROLE_PRIVILEGE_ADMIN = "PrivilegeAdmin";
 	private static final String PRIVILEGE_USER_ACCESS = "UserAccessPrivilege";
 	private static final String ADMIN = "admin";
-	private static final byte[] PASS_ADMIN = "admin".getBytes();
+	private static final char[] PASS_ADMIN = "admin".toCharArray();
 	private static final String BOB = "bob";
 	private static final String TED = "ted";
 	private static final String SYSTEM_USER_ADMIN = "system_admin";
 	private static final String SYSTEM_USER_ADMIN2 = "system_admin2";
-	private static final byte[] PASS_BOB = "admin1".getBytes();
+	private static final char[] PASS_BOB = "admin1".toCharArray();
 	private static final String ROLE_APP_USER = "AppUser";
 	private static final String ROLE_MY = "MyRole";
 	private static final String ROLE_MY2 = "MyRole2";
 	private static final String ROLE_CHANGE_PW = "changePw";
 	private static final String ROLE_TEMP = "temp";
 	private static final String ROLE_USER = "user";
-	private static final byte[] PASS_DEF = "def".getBytes();
-	private static final byte[] PASS_BAD = "123".getBytes();
-	private static final byte[] PASS_TED = "12345".getBytes();
+	private static final char[] PASS_DEF = "def".toCharArray();
+	private static final char[] PASS_BAD = "123".toCharArray();
+	private static final char[] PASS_TED = "12345".toCharArray();
 
 	private static final Logger logger = LoggerFactory.getLogger(PrivilegeTest.class);
 
@@ -223,7 +223,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 		this.exception.expect(AccessDeniedException.class);
 		this.exception.expectMessage("User system_admin is a system user and may not login!");
 		try {
-			login(SYSTEM_USER_ADMIN, SYSTEM_USER_ADMIN.getBytes());
+			login(SYSTEM_USER_ADMIN, SYSTEM_USER_ADMIN.toCharArray());
 		} finally {
 			logout();
 		}

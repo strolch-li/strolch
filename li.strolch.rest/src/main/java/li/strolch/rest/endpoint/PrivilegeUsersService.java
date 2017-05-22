@@ -360,7 +360,7 @@ public class PrivilegeUsersService {
 		PrivilegeSetUserPasswordService svc = new PrivilegeSetUserPasswordService();
 		PrivilegeSetUserPasswordArgument arg = new PrivilegeSetUserPasswordArgument();
 		arg.username = username;
-		arg.password = Base64.getDecoder().decode(password);
+		arg.password = new String(Base64.getDecoder().decode(password)).toCharArray();
 
 		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
 		if (svcResult.isOk()) {
