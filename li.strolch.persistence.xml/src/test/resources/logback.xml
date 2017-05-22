@@ -9,8 +9,6 @@
 		</encoder>
 	</appender>
 
-	<logger name="li.strolch.persistence.api" level="warn" />
-
 	<root level="info">
 		<appender-ref ref="STDOUT" />
 	</root>
