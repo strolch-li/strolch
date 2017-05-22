@@ -102,12 +102,6 @@ public class PasswordCreator {
 			}
 		}
 
-		System.out.print("Password: ");
-		char[] password = r.readLine().trim().toCharArray();
-		System.out.print("Salt: ");
-		String saltS = StringHelper.getHexString(r.readLine().trim().getBytes());
-		byte[] salt = StringHelper.fromHexString(saltS);
-
 		Map<String, String> parameterMap = new HashMap<>();
 		parameterMap.put(XmlConstants.XML_PARAM_HASH_ALGORITHM, hashAlgorithm);
 		parameterMap.put(XmlConstants.XML_PARAM_HASH_ITERATIONS, "" + iterations);
@@ -115,6 +109,16 @@ public class PasswordCreator {
 
 		DefaultEncryptionHandler encryptionHandler = new DefaultEncryptionHandler();
 		encryptionHandler.initialize(parameterMap);
+
+		System.out.print("Password: ");
+		char[] password = r.readLine().trim().toCharArray();
+		System.out.print("Salt [random]: ");
+		String saltTemp = r.readLine().trim();
+		if (saltTemp.isEmpty()) {
+			saltTemp = encryptionHandler.nextToken();
+		}
+		String saltS = StringHelper.getHexString(saltTemp.getBytes());
+		byte[] salt = StringHelper.fromHexString(saltS);
 
 		byte[] passwordHash = encryptionHandler.hashPassword(password, salt);
 		String passwordHashS = StringHelper.getHexString(passwordHash);
