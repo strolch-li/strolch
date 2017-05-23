@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -107,11 +108,15 @@ public class ResponseUtil {
 	}
 
 	public static Response toResponse(Throwable t) {
+		return toResponse(Status.INTERNAL_SERVER_ERROR, t);
+	}
+
+	public static Response toResponse(Status status, Throwable t) {
 		JsonObject response = new JsonObject();
 		response.addProperty(MSG, ExceptionHelper.getExceptionMessageWithCauses(t));
 		String json = new Gson().toJson(response);
 
-		return Response.serverError().entity(json).type(MediaType.APPLICATION_JSON).build();
+		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
 	public static Response toResponse(Paging<JsonObject> paging) {
