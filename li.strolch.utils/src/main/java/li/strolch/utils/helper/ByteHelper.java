@@ -20,6 +20,22 @@ package li.strolch.utils.helper;
  */
 public class ByteHelper {
 
+	public static boolean isBitSet(byte data, int position) {
+		return ((data >> position) & 1) == 1;
+	}
+
+	public static boolean isBitNotSet(short data, int position) {
+		return ((data >> position) & 1) == 0;
+	}
+
+	public static byte setBit(byte data, int position) {
+		return (byte) (data | (1 << position));
+	}
+
+	public static byte clearBit(byte data, int position) {
+		return (byte) (data & ~(1 << position));
+	}
+
 	/**
 	 * Creates a long of the given byte array. They byte array must be 8 bytes long. The byte at index 0 is the highest
 	 * byte
@@ -56,12 +72,57 @@ public class ByteHelper {
 	public static int toInt(byte[] bytes) {
 
 		if (bytes.length != 4)
-			throw new IllegalArgumentException("The input byte array for a long must have 4 values"); //$NON-NLS-1$
+			throw new IllegalArgumentException("The input byte array for an int must have 4 values"); //$NON-NLS-1$
 
 		return ((bytes[0] & 0xff) << 24) //
 				| ((bytes[1] & 0xff) << 16) //
 				| ((bytes[2] & 0xff) << 8) //
 				| ((bytes[3] & 0xff));
+	}
+
+	/**
+	 * Creates a short of the given byte array. They byte array must be 2 bytes long. The byte at index 0 is the highest
+	 * byte
+	 * 
+	 * @param bytes
+	 *            the bytes to convert to an integer
+	 * 
+	 * @return the integer created from the bytes
+	 */
+	public static short toShort(byte[] bytes) {
+
+		if (bytes.length != 2)
+			throw new IllegalArgumentException("The input byte array for a short must have 2 values"); //$NON-NLS-1$
+
+		return (short) (((bytes[0] & 0xff) << 8) //
+				| ((bytes[1] & 0xff)));
+	}
+
+	public static short toShort(byte high, byte low) {
+		return (short) (((high & 0xff) << 8) | (low & 0xff));
+	}
+
+	public static void main(String[] args) {
+		System.out.println(asBinary(toShort((byte) 0x01, (byte) 0x03)));
+	}
+
+	/**
+	 * Formats the given byte array to a binary string, separating each byte by a space
+	 * 
+	 * @param bytes
+	 *            the byte to format to a binary string
+	 * 
+	 * @return the binary string
+	 */
+	public static String asBinary(byte[] bytes) {
+		StringBuilder sb = new StringBuilder();
+
+		for (byte b : bytes) {
+			sb.append(asBinary(b));
+			sb.append(StringHelper.SPACE);
+		}
+
+		return sb.toString();
 	}
 
 	/**
@@ -89,20 +150,36 @@ public class ByteHelper {
 	}
 
 	/**
-	 * Formats the given byte array to a binary string, separating each byte by a space
+	 * Formats the given integer to a binary string, each byte is separated by a space
 	 * 
-	 * @param bytes
-	 *            the byte to format to a binary string
+	 * @param i
+	 *            the integer to format to a string
 	 * 
 	 * @return the binary string
 	 */
-	public static String asBinary(byte[] bytes) {
+	public static String asBinary(short i) {
+
 		StringBuilder sb = new StringBuilder();
 
-		for (byte b : bytes) {
-			sb.append(asBinary(b));
-			sb.append(StringHelper.SPACE);
-		}
+		sb.append(((i >>> 15) & 1));
+		sb.append(((i >>> 14) & 1));
+		sb.append(((i >>> 13) & 1));
+		sb.append(((i >>> 12) & 1));
+		sb.append(((i >>> 11) & 1));
+		sb.append(((i >>> 10) & 1));
+		sb.append(((i >>> 9) & 1));
+		sb.append(((i >>> 8) & 1));
+
+		sb.append(StringHelper.SPACE);
+
+		sb.append(((i >>> 7) & 1));
+		sb.append(((i >>> 6) & 1));
+		sb.append(((i >>> 5) & 1));
+		sb.append(((i >>> 4) & 1));
+		sb.append(((i >>> 3) & 1));
+		sb.append(((i >>> 2) & 1));
+		sb.append(((i >>> 1) & 1));
+		sb.append(((i >>> 0) & 1));
 
 		return sb.toString();
 	}
