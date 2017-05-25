@@ -117,6 +117,11 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
+	public int size() {
+		return this.value.size();
+	}
+
+	@Override
 	public boolean contains(Double value) {
 		return this.value.contains(value);
 	}

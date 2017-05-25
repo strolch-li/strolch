@@ -117,6 +117,11 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	}
 
 	@Override
+	public int size() {
+		return this.value.size();
+	}
+
+	@Override
 	public boolean contains(Integer value) {
 		return this.value.contains(value);
 	}

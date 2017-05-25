@@ -117,6 +117,11 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
+	public int size() {
+		return this.value.size();
+	}
+
+	@Override
 	public boolean contains(String value) {
 		return this.value.contains(value);
 	}
