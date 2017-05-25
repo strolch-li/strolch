@@ -21,18 +21,62 @@ package li.strolch.utils.helper;
 public class ByteHelper {
 
 	public static boolean isBitSet(byte data, int position) {
+		if (position > 7)
+			throw new IllegalStateException("Position " + position + " is not available in a byte!");
 		return ((data >> position) & 1) == 1;
 	}
 
+	public static boolean isBitSet(short data, int position) {
+		if (position > 15)
+			throw new IllegalStateException("Position " + position + " is not available in a short!");
+		return ((data >> position) & 1) == 1;
+	}
+
+	public static boolean isBitSet(int data, int position) {
+		if (position > 31)
+			throw new IllegalStateException("Position " + position + " is not available in an int!");
+		return ((data >> position) & 1) == 1;
+	}
+
+	public static boolean isBitSet(long data, int position) {
+		if (position > 63)
+			throw new IllegalStateException("Position " + position + " is not available in a long!");
+		return ((data >> position) & 1) == 1;
+	}
+
+	public static boolean isBitNotSet(byte data, int position) {
+		if (position > 7)
+			throw new IllegalStateException("Position " + position + " is not available in a byte!");
+		return ((data >> position) & 1) == 0;
+	}
+
 	public static boolean isBitNotSet(short data, int position) {
+		if (position > 15)
+			throw new IllegalStateException("Position " + position + " is not available in a short!");
+		return ((data >> position) & 1) == 0;
+	}
+
+	public static boolean isBitNotSet(int data, int position) {
+		if (position > 31)
+			throw new IllegalStateException("Position " + position + " is not available in an int!");
+		return ((data >> position) & 1) == 0;
+	}
+
+	public static boolean isBitNotSet(long data, int position) {
+		if (position > 63)
+			throw new IllegalStateException("Position " + position + " is not available in a long!");
 		return ((data >> position) & 1) == 0;
 	}
 
 	public static byte setBit(byte data, int position) {
+		if (position > 7)
+			throw new IllegalStateException("Position " + position + " is not available in a byte!");
 		return (byte) (data | (1 << position));
 	}
 
 	public static byte clearBit(byte data, int position) {
+		if (position > 7)
+			throw new IllegalStateException("Position " + position + " is not available in a byte!");
 		return (byte) (data & ~(1 << position));
 	}
 
