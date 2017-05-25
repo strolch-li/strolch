@@ -43,90 +43,94 @@ public class PasswordCreator {
 	@SuppressWarnings("nls")
 	public static void main(String[] args) throws Exception {
 
-		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+		while (true) {
 
-		String hashAlgorithm = null;
-		while (hashAlgorithm == null) {
-			System.out.print("Hash Algorithm [PBKDF2WithHmacSHA512]: ");
-			String readLine = r.readLine().trim();
+			BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 
-			if (readLine.isEmpty()) {
-				hashAlgorithm = "PBKDF2WithHmacSHA512";
-			} else {
+			String hashAlgorithm = null;
+			while (hashAlgorithm == null) {
+				System.out.print("Hash Algorithm [PBKDF2WithHmacSHA512]: ");
+				String readLine = r.readLine().trim();
 
-				try {
-					SecretKeyFactory.getInstance(readLine);
-					hashAlgorithm = readLine;
-				} catch (Exception e) {
-					System.err.println(e.getLocalizedMessage());
-					hashAlgorithm = null;
+				if (readLine.isEmpty()) {
+					hashAlgorithm = "PBKDF2WithHmacSHA512";
+				} else {
+
+					try {
+						SecretKeyFactory.getInstance(readLine);
+						hashAlgorithm = readLine;
+					} catch (Exception e) {
+						System.err.println(e.getLocalizedMessage());
+						hashAlgorithm = null;
+					}
 				}
 			}
-		}
 
-		int iterations = -1;
-		while (iterations == -1) {
-			System.out.print("Hash iterations [200000]: ");
-			String readLine = r.readLine().trim();
+			int iterations = -1;
+			while (iterations == -1) {
+				System.out.print("Hash iterations [10000]: ");
+				String readLine = r.readLine().trim();
 
-			if (readLine.isEmpty()) {
-				iterations = 200000;
-			} else {
+				if (readLine.isEmpty()) {
+					iterations = 10000;
+				} else {
 
-				try {
-					iterations = Integer.parseInt(readLine);
-				} catch (Exception e) {
-					System.err.println(e.getLocalizedMessage());
-					iterations = -1;
+					try {
+						iterations = Integer.parseInt(readLine);
+					} catch (Exception e) {
+						System.err.println(e.getLocalizedMessage());
+						iterations = -1;
+					}
 				}
 			}
-		}
 
-		int keyLength = -1;
-		while (keyLength == -1) {
-			System.out.print("Hash keyLength [256]: ");
-			String readLine = r.readLine().trim();
+			int keyLength = -1;
+			while (keyLength == -1) {
+				System.out.print("Hash keyLength [256]: ");
+				String readLine = r.readLine().trim();
 
-			if (readLine.isEmpty()) {
-				keyLength = 256;
-			} else {
+				if (readLine.isEmpty()) {
+					keyLength = 256;
+				} else {
 
-				try {
-					keyLength = Integer.parseInt(readLine);
-					if (keyLength <= 0)
-						throw new IllegalArgumentException("KeyLength must be > 0");
-				} catch (Exception e) {
-					System.err.println(e.getLocalizedMessage());
-					keyLength = -1;
+					try {
+						keyLength = Integer.parseInt(readLine);
+						if (keyLength <= 0)
+							throw new IllegalArgumentException("KeyLength must be > 0");
+					} catch (Exception e) {
+						System.err.println(e.getLocalizedMessage());
+						keyLength = -1;
+					}
 				}
 			}
+
+			Map<String, String> parameterMap = new HashMap<>();
+			parameterMap.put(XmlConstants.XML_PARAM_HASH_ALGORITHM, hashAlgorithm);
+			parameterMap.put(XmlConstants.XML_PARAM_HASH_ITERATIONS, "" + iterations);
+			parameterMap.put(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, "" + keyLength);
+
+			DefaultEncryptionHandler encryptionHandler = new DefaultEncryptionHandler();
+			encryptionHandler.initialize(parameterMap);
+
+			System.out.print("Password: ");
+			char[] password = r.readLine().trim().toCharArray();
+			System.out.print("Salt [random]: ");
+			String saltTemp = r.readLine().trim();
+			if (saltTemp.isEmpty()) {
+				saltTemp = encryptionHandler.nextToken();
+			}
+			String saltS = StringHelper.getHexString(saltTemp.getBytes());
+			byte[] salt = StringHelper.fromHexString(saltS);
+
+			byte[] passwordHash = encryptionHandler.hashPassword(password, salt);
+			String passwordHashS = StringHelper.getHexString(passwordHash);
+			System.out.println("Hash is: " + passwordHashS);
+			System.out.println("Salt is: " + saltS);
+			System.out.println();
+
+			System.out.println(XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordHashS + "\" "
+					+ XmlConstants.XML_ATTR_SALT + "=\"" + saltS + "\"");
+			System.out.println();
 		}
-
-		Map<String, String> parameterMap = new HashMap<>();
-		parameterMap.put(XmlConstants.XML_PARAM_HASH_ALGORITHM, hashAlgorithm);
-		parameterMap.put(XmlConstants.XML_PARAM_HASH_ITERATIONS, "" + iterations);
-		parameterMap.put(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, "" + keyLength);
-
-		DefaultEncryptionHandler encryptionHandler = new DefaultEncryptionHandler();
-		encryptionHandler.initialize(parameterMap);
-
-		System.out.print("Password: ");
-		char[] password = r.readLine().trim().toCharArray();
-		System.out.print("Salt [random]: ");
-		String saltTemp = r.readLine().trim();
-		if (saltTemp.isEmpty()) {
-			saltTemp = encryptionHandler.nextToken();
-		}
-		String saltS = StringHelper.getHexString(saltTemp.getBytes());
-		byte[] salt = StringHelper.fromHexString(saltS);
-
-		byte[] passwordHash = encryptionHandler.hashPassword(password, salt);
-		String passwordHashS = StringHelper.getHexString(passwordHash);
-		System.out.println("Hash is: " + passwordHashS);
-		System.out.println("Salt is: " + saltS);
-		System.out.println();
-
-		System.out.println(XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordHashS + "\" " + XmlConstants.XML_ATTR_SALT
-				+ "=\"" + saltS + "\"");
 	}
 }
