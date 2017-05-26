@@ -56,6 +56,10 @@ public class StringHelper {
 			(byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd',
 			(byte) 'e', (byte) 'f' };
 
+	public static String asHexString(byte data) {
+		return String.format("%02x", data);
+	}
+
 	public static String asPrettyHexString(byte[] raw) {
 		try {
 			byte[] hex = new byte[3 * raw.length + (raw.length / 8)];
@@ -79,10 +83,6 @@ public class StringHelper {
 			String msg = MessageFormat.format("Something went wrong while converting to HEX: {0}", e.getMessage()); //$NON-NLS-1$
 			throw new RuntimeException(msg, e);
 		}
-	}
-
-	public static void main(String[] args) {
-		System.out.println(asPrettyHexString(fromHexString("010000000000040003000000000000c0")));
 	}
 
 	/**
