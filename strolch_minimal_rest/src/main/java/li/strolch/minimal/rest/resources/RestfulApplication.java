@@ -15,9 +15,11 @@
  */
 package li.strolch.minimal.rest.resources;
 
+import java.util.logging.Level;
+
 import javax.ws.rs.ApplicationPath;
 
-import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 
@@ -35,7 +37,10 @@ public class RestfulApplication extends ResourceConfig {
 		//register(HttpCacheResponseFilter.class);
 		//register(RestfulExceptionMapper.class);
 
-		register(new LoggingFilter(java.util.logging.Logger.getGlobal(), true));
+		LoggingFeature loggingFeature = new LoggingFeature(
+				java.util.logging.Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME), Level.SEVERE,
+				LoggingFeature.Verbosity.PAYLOAD_ANY, Integer.MAX_VALUE);
+		register(loggingFeature);
 
 		property(ServerProperties.TRACING, "ALL");
 		property(ServerProperties.TRACING_THRESHOLD, "TRACE");

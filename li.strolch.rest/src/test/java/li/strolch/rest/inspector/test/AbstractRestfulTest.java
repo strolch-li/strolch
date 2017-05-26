@@ -19,14 +19,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
+import java.util.logging.Level;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.TracingConfig;
@@ -90,10 +91,10 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 			resourceConfig.register(clazz);
 		}
 
-		resourceConfig.register(LoggingFilter.class);
-		//.register(createMoxyJsonResolver())
-		// Logging
-		// Tracing support.
+		LoggingFeature loggingFeature = new LoggingFeature(
+				java.util.logging.Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME), Level.SEVERE,
+				LoggingFeature.Verbosity.PAYLOAD_ANY, Integer.MAX_VALUE);
+		resourceConfig.register(loggingFeature);
 		resourceConfig.property(ServerProperties.TRACING, TracingConfig.ALL.name());
 		resourceConfig.property(ServletProperties.FILTER_FORWARD_ON_404, true);
 		return resourceConfig;
