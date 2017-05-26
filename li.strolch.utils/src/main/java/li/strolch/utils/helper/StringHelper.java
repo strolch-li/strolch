@@ -56,6 +56,35 @@ public class StringHelper {
 			(byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd',
 			(byte) 'e', (byte) 'f' };
 
+	public static String asPrettyHexString(byte[] raw) {
+		try {
+			byte[] hex = new byte[3 * raw.length + (raw.length / 8)];
+			int index = 0;
+
+			for (int i = 0; i < raw.length; i++) {
+				byte b = raw[i];
+				int v = b & 0xFF;
+				hex[index++] = HEX_CHAR_TABLE[v >>> 4];
+				hex[index++] = HEX_CHAR_TABLE[v & 0xF];
+				hex[index++] = ' ';
+
+				if ((i + 1) % 8 == 0) {
+					hex[index++] = ' ';
+				}
+			}
+
+			return new String(hex, "ASCII"); //$NON-NLS-1$
+
+		} catch (UnsupportedEncodingException e) {
+			String msg = MessageFormat.format("Something went wrong while converting to HEX: {0}", e.getMessage()); //$NON-NLS-1$
+			throw new RuntimeException(msg, e);
+		}
+	}
+
+	public static void main(String[] args) {
+		System.out.println(asPrettyHexString(fromHexString("010000000000040003000000000000c0")));
+	}
+
 	/**
 	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
 	 * 
