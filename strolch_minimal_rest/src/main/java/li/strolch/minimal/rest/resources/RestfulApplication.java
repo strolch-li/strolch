@@ -39,7 +39,7 @@ public class RestfulApplication extends ResourceConfig {
 
 		LoggingFeature loggingFeature = new LoggingFeature(
 				java.util.logging.Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME), Level.SEVERE,
-				LoggingFeature.Verbosity.PAYLOAD_ANY, Integer.MAX_VALUE);
+				LoggingFeature.Verbosity.PAYLOAD_ANY, null);
 		register(loggingFeature);
 
 		property(ServerProperties.TRACING, "ALL");

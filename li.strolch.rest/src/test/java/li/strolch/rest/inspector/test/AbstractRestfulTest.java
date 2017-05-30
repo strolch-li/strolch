@@ -93,7 +93,7 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 
 		LoggingFeature loggingFeature = new LoggingFeature(
 				java.util.logging.Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME), Level.SEVERE,
-				LoggingFeature.Verbosity.PAYLOAD_ANY, Integer.MAX_VALUE);
+				LoggingFeature.Verbosity.PAYLOAD_ANY, null);
 		resourceConfig.register(loggingFeature);
 		resourceConfig.property(ServerProperties.TRACING, TracingConfig.ALL.name());
 		resourceConfig.property(ServletProperties.FILTER_FORWARD_ON_404, true);
