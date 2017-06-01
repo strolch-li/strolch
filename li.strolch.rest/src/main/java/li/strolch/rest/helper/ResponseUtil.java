@@ -91,7 +91,7 @@ public class ResponseUtil {
 		String msg = StringHelper.DASH;
 		String exceptionMsg = StringHelper.DASH;
 
-		if (!svcResult.isOk()) {
+		if (svcResult.isNok()) {
 			msg = svcResult.getMessage();
 			Throwable t = svcResult.getThrowable();
 			if (t != null)
@@ -104,11 +104,23 @@ public class ResponseUtil {
 			response.addProperty(EXCEPTION_MSG, exceptionMsg);
 
 		String json = new Gson().toJson(response);
+
+		if (svcResult.isOk())
+			return Response.ok().entity(json).type(MediaType.APPLICATION_JSON).build();
+
 		return Response.serverError().entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
 	public static Response toResponse(Throwable t) {
 		return toResponse(Status.INTERNAL_SERVER_ERROR, t);
+	}
+
+	public static Response toResponse(Status status, String msg) {
+		JsonObject response = new JsonObject();
+		response.addProperty(MSG, msg);
+		String json = new Gson().toJson(response);
+
+		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
 	public static Response toResponse(Status status, Throwable t) {
