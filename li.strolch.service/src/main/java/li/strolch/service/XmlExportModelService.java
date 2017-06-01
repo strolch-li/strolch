@@ -81,7 +81,9 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 		logger.info("Exporting model to real path: " + modelFile.getAbsolutePath());
 
 		XmlExportModelCommand command;
+		String realm;
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
+			realm = tx.getRealmName();
 
 			command = new XmlExportModelCommand(getContainer(), tx);
 			command.setModelFile(modelFile);
@@ -100,7 +102,7 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 
 		ModelStatistics statistics = command.getStatistics();
 		String msg = "Wrote XML Model file {0} for realm {1}: {2} at path: {3}";
-		logger.info(MessageFormat.format(msg, modelFile.getName(), arg.realm, statistics, modelFile.getAbsolutePath()));
+		logger.info(MessageFormat.format(msg, modelFile.getName(), realm, statistics, modelFile.getAbsolutePath()));
 		logger.info(MessageFormat.format("Wrote {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Wrote {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Wrote {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$
