@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags.Json;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.utils.collections.MapOfSets;
 
@@ -62,6 +63,10 @@ public class FromFlatJsonVisitor {
 	}
 
 	public void visit(StrolchRootElement element, JsonObject jsonObject) {
+
+		// update name if possible
+		if (jsonObject.has(Json.NAME))
+			element.setName(jsonObject.get(Json.NAME).getAsString());
 
 		Set<String> bagKeySet = element.getParameterBagKeySet();
 		for (String bagId : bagKeySet) {
