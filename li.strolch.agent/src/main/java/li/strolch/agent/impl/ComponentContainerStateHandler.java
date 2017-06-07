@@ -15,6 +15,8 @@
  */
 package li.strolch.agent.impl;
 
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
+
 import java.text.MessageFormat;
 import java.util.Set;
 
@@ -49,18 +51,24 @@ public class ComponentContainerStateHandler {
 			if (controller.getState() == ComponentState.INITIALIZED)
 				continue;
 
+			long start = System.nanoTime();
+
 			StrolchComponent component = controller.getComponent();
 			String componentName = component.getName();
 			ComponentConfiguration componentConfiguration = this.strolchConfiguration
 					.getComponentConfiguration(componentName);
 
-			String msg = "Initializing component {0}..."; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, componentName));
 			try {
 				component.initialize(componentConfiguration);
 			} catch (Exception e) {
-				throw new StrolchException(MessageFormat.format("Failed to initialize component {0}", componentName), e);
+				throw new StrolchException(MessageFormat.format("Failed to initialize component {0}", componentName),
+						e);
 			}
+
+			long took = System.nanoTime() - start;
+			String msg = "Initialized component {0}. Took {1}"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
+
 		}
 
 		// initialize direct downstream components
@@ -77,15 +85,19 @@ public class ComponentContainerStateHandler {
 			if (controller.getState() == ComponentState.STARTED)
 				continue;
 
+			long start = System.nanoTime();
+
 			StrolchComponent component = controller.getComponent();
-			String msg = "Starting component {0}..."; //$NON-NLS-1$
 			String componentName = component.getName();
-			logger.info(MessageFormat.format(msg, componentName));
 			try {
 				component.start();
 			} catch (Exception e) {
 				throw new StrolchException(MessageFormat.format("Failed to start component {0}", componentName), e);
 			}
+
+			long took = System.nanoTime() - start;
+			String msg = "Started component {0}. Took {1}"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
 		}
 
 		// Start direct downstream components
@@ -102,17 +114,21 @@ public class ComponentContainerStateHandler {
 			if (controller.getState() == ComponentState.STOPPED)
 				continue;
 
+			long start = System.nanoTime();
+
 			StrolchComponent component = controller.getComponent();
-			String msg = "Stopping component {0}..."; //$NON-NLS-1$
 			String componentName = component.getName();
-			logger.info(MessageFormat.format(msg, componentName));
 			try {
 				component.stop();
 			} catch (Exception e) {
-				msg = "Failed to stop component {0} due to {1}"; //$NON-NLS-1$
+				String msg = "Failed to stop component {0} due to {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, componentName, e.getMessage());
 				logger.error(msg, e);
 			}
+
+			long took = System.nanoTime() - start;
+			String msg = "Stopped component {0}. Took {1}"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
 		}
 
 		// Stop direct upstream components
@@ -128,17 +144,21 @@ public class ComponentContainerStateHandler {
 			if (controller.getState() == ComponentState.DESTROYED)
 				continue;
 
+			long start = System.nanoTime();
+
 			StrolchComponent component = controller.getComponent();
-			String msg = "Destroying component {0}..."; //$NON-NLS-1$
 			String componentName = component.getName();
-			logger.info(MessageFormat.format(msg, componentName));
 			try {
 				component.destroy();
 			} catch (Exception e) {
-				msg = "Failed to destroy component {0} due to {1}"; //$NON-NLS-1$
+				String msg = "Failed to destroy component {0} due to {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, componentName, e.getMessage());
 				logger.error(msg, e);
 			}
+
+			long took = System.nanoTime() - start;
+			String msg = "Destroyed component {0}. Took {1}"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
 		}
 
 		// Destroy direct upstream components

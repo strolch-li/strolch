@@ -15,6 +15,8 @@
  */
 package li.strolch.agent.impl;
 
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
@@ -180,6 +182,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 	public void setup(StrolchConfiguration strolchConfiguration) {
 		this.state.validateStateChange(ComponentState.SETUP, "agent");
 
+		long start = System.nanoTime();
+
 		// set the application locale
 		Locale.setDefault(strolchConfiguration.getRuntimeConfiguration().getLocale());
 		String msg = "Application {0}:{1} is using locale {2}"; //$NON-NLS-1$
@@ -215,12 +219,16 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		this.state = ComponentState.SETUP;
 
-		msg = "{0}:{1} Strolch Container setup with {2} components."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.componentMap.size()));
+		long took = System.nanoTime() - start;
+		msg = "{0}:{1} Strolch Container setup with {2} components. Took {3}"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.componentMap.size(),
+				formatNanoDuration(took)));
 	}
 
 	public void initialize(StrolchConfiguration strolchConfiguration) {
 		this.state.validateStateChange(ComponentState.INITIALIZED, "agent");
+
+		long start = System.nanoTime();
 
 		// now we can initialize the components
 		String msg = "{0}:{1} Initializing {2} Strolch Components..."; //$NON-NLS-1$
@@ -233,12 +241,16 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		this.state = ComponentState.INITIALIZED;
 
-		msg = "{0}:{1} All {2} Strolch Components have been initialized."; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
+		long took = System.nanoTime() - start;
+		msg = "{0}:{1} All {2} Strolch Components have been initialized. Took {3}"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
+				formatNanoDuration(took)));
 	}
 
 	public void start() {
 		this.state.validateStateChange(ComponentState.STARTED, "agent");
+
+		long start = System.nanoTime();
 
 		String msg = "{0}:{1} Starting {2} Strolch Components..."; //$NON-NLS-1$
 		String environment = getEnvironment();
@@ -250,14 +262,18 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		this.state = ComponentState.STARTED;
 
-		msg = "{0}:{1} All {2} Strolch Components started. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
+		long took = System.nanoTime() - start;
+		msg = "{0}:{1} All {2} Strolch Components started. Took {3}. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
+				formatNanoDuration(took)));
 		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString())); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary())); //$NON-NLS-1$
 	}
 
 	public void stop() {
 		this.state.validateStateChange(ComponentState.STOPPED, "agent");
+
+		long start = System.nanoTime();
 
 		String msg = "{0}:{1} Stopping {2} Strolch Components..."; //$NON-NLS-1$
 		String environment = getEnvironment();
@@ -270,8 +286,10 @@ public class ComponentContainerImpl implements ComponentContainer {
 			Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
 			containerStateHandler.stop(rootUpstreamComponents);
 
-			msg = "{0}:{1} All {2} Strolch Components have been stopped."; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
+			long took = System.nanoTime() - start;
+			msg = "{0}:{1} All {2} Strolch Components have been stopped. Took {3}"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
+					formatNanoDuration(took)));
 		}
 
 		this.state = ComponentState.STOPPED;
@@ -279,6 +297,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	public void destroy() {
 		this.state.validateStateChange(ComponentState.DESTROYED, "agent");
+
+		long start = System.nanoTime();
 
 		String msg = "{0}:{1} Destroying {2} Strolch Components..."; //$NON-NLS-1$
 		String environment = getEnvironment();
@@ -291,8 +311,10 @@ public class ComponentContainerImpl implements ComponentContainer {
 			Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
 			containerStateHandler.destroy(rootUpstreamComponents);
 
-			msg = "{0}:{1} All {2} Strolch Components have been destroyed!"; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
+			long took = System.nanoTime() - start;
+			msg = "{0}:{1} All {2} Strolch Components have been destroyed! Took {3}"; //$NON-NLS-1$
+			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
+					formatNanoDuration(took)));
 			this.controllerMap.clear();
 			this.componentMap.clear();
 		}
