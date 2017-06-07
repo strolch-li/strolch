@@ -56,6 +56,14 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public abstract void removeFromExecution(String realm, Locator activityLoc);
 
 	/**
+	 * Triggers a to execution for all registered activities in the given realm
+	 * 
+	 * @param realm
+	 *            the realm to trigger execution for
+	 */
+	public abstract void triggerExecution(String realm);
+
+	/**
 	 * <p>
 	 * Returns the {@link DelayedExecutionTimer}
 	 * </p>
@@ -118,4 +126,5 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 *            the {@link Locator} of the {@link Action}
 	 */
 	public abstract void toError(String realm, Locator actionLoc);
+
 }

@@ -101,6 +101,19 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void triggerExecution(String realm) {
+		synchronized (this.registeredActivities) {
+			Set<Locator> locators = this.registeredActivities.getSet(realm);
+			if (locators != null) {
+				for (Locator locator : locators) {
+					// execute async
+					toExecution(realm, locator);
+				}
+			}
+		}
+	}
+
+	@Override
 	public void toExecution(String realm, Locator locator) {
 		this.executorService.execute(() -> {
 			try {
@@ -184,8 +197,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 									KEY_DEFAULT_ACTIVITY_ARCHIVAL);
 						}
 
-						ActivityArchivalPolicy archivalPolicy = getComponent(PolicyHandler.class).getPolicy(policyDef,
-								tx);
+						PolicyHandler policyHandler = getComponent(PolicyHandler.class);
+						ActivityArchivalPolicy archivalPolicy = policyHandler.getPolicy(policyDef, tx);
 						archivalPolicy.archive(activity);
 
 					}
@@ -265,23 +278,6 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		// now trigger a further execution of any other activities needed execution in this realm
 		triggerExecution(realm);
-	}
-
-	/**
-	 * Triggers a to execution for all registered activities in the given realm
-	 * 
-	 * @param realm
-	 */
-	private void triggerExecution(String realm) {
-		synchronized (this.registeredActivities) {
-			Set<Locator> locators = this.registeredActivities.getSet(realm);
-			if (locators != null) {
-				for (Locator locator : locators) {
-					// execute async
-					toExecution(realm, locator);
-				}
-			}
-		}
 	}
 
 	private void toWarning(String realm, Locator actionLoc, PrivilegeContext ctx) {
