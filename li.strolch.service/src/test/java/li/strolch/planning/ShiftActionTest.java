@@ -69,7 +69,7 @@ public class ShiftActionTest {
 		this.resource = ModelGenerator.createResource("@1", "Test With States", "Stated");
 		this.timedState = this.resource.getTimedState(STATE_INTEGER_ID);
 		this.timedState.getTimeEvolution().clear();
-		this.timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
+		this.timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
 
 		this.action = new Action("action", "Action", "Use");
 

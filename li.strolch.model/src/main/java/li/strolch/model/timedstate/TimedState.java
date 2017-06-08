@@ -64,8 +64,8 @@ public class TimedState<T extends IValue> implements ITimedState<T>, Serializabl
 	}
 
 	@Override
-	public <U extends IValueChange<T>> void applyChange(U change) {
-		this.timeVariable.applyChange(change);
+	public <U extends IValueChange<T>> void applyChange(U change, boolean compact) {
+		this.timeVariable.applyChange(change, compact);
 	}
 
 	@Override

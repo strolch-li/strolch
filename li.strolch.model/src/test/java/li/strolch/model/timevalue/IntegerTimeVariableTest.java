@@ -105,7 +105,7 @@ public class IntegerTimeVariableTest {
 		IntegerValue integerValue = new IntegerValue(STEP.intValue());
 
 		IValueChange<IntegerValue> change = new ValueChange<>(PICK, integerValue);
-		this.timeVariable.applyChange(change);
+		this.timeVariable.applyChange(change, false);
 
 		Collection<ITimeValue<IntegerValue>> futureValues = this.timeVariable.getFutureValues(PICK);
 		Long expectedTime = PICK;

@@ -100,7 +100,7 @@ public class FloatTimeVariableTest {
 		FloatValue doubleValue = new FloatValue(STEP.doubleValue());
 
 		IValueChange<FloatValue> change = new ValueChange<>(PICK, doubleValue);
-		this.timeVariable.applyChange(change);
+		this.timeVariable.applyChange(change, true);
 
 		Collection<ITimeValue<FloatValue>> futureValues = this.timeVariable.getFutureValues(PICK);
 		Long expectedTime = PICK;
@@ -126,7 +126,7 @@ public class FloatTimeVariableTest {
 		FloatValue doubleValue = new FloatValue(STEP.doubleValue());
 
 		IValueChange<FloatValue> change = new ValueChange<>(PICK, doubleValue);
-		this.timeVariable.applyChange(change);
+		this.timeVariable.applyChange(change, true);
 
 		ITimeValue<FloatValue> actual = this.timeVariable.getValueAt(PICK);
 		assertNotNull(actual);

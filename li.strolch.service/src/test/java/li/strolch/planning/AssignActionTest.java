@@ -70,13 +70,15 @@ public class AssignActionTest {
 		this.initialResource = ModelGenerator.createResource("initial", "Test With States", "Stated");
 		this.initialTimedState = this.initialResource.getTimedState(STATE_INTEGER_ID);
 		this.initialTimedState.getTimeEvolution().clear();
-		this.initialTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
+		this.initialTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)),
+				true);
 
 		// add target resource with integer state variable
 		this.targetResource = ModelGenerator.createResource("target", "Test With States", "Stated");
 		this.targetTimedState = this.targetResource.getTimedState(STATE_INTEGER_ID);
 		this.targetTimedState.getTimeEvolution().clear();
-		this.targetTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
+		this.targetTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)),
+				true);
 
 		this.action = new Action("action", "Action", "Use");
 

@@ -64,7 +64,7 @@ public abstract class AbstractPlanCommand extends Command {
 		List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
 		for (IValueChange<?> change : changes) {
 			StrolchTimedState timedState = resource.getTimedState(change.getStateId());
-			timedState.applyChange(change);
+			timedState.applyChange(change, true);
 		}
 
 		action.setState(State.PLANNED);
@@ -98,7 +98,7 @@ public abstract class AbstractPlanCommand extends Command {
 		List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
 		for (IValueChange<?> change : changes) {
 			StrolchTimedState timedState = resource.getTimedState(change.getStateId());
-			timedState.applyChange(change.getInverse());
+			timedState.applyChange(change.getInverse(), true);
 		}
 
 		action.setState(State.CREATED);

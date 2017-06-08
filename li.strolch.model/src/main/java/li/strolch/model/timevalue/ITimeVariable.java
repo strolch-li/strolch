@@ -49,8 +49,10 @@ public interface ITimeVariable<T extends IValue> {
 	 *
 	 * @param change
 	 *            the {@link IValueChange} to be applied
+	 * @param compact
+	 *            if set to true, then the values are compacted, otherwiss not
 	 */
-	void applyChange(final IValueChange<T> change);
+	void applyChange(final IValueChange<T> change, boolean compact);
 
 	/**
 	 * Get all {@link ITimeValue} objects whose time field is greater or equal to the given time

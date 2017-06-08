@@ -77,7 +77,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	}
 
 	@Override
-	public void applyChange(final IValueChange<T> change) {
+	public void applyChange(final IValueChange<T> change, boolean compact) {
 
 		SortedSet<ITimeValue<T>> futureValues = getFutureValues(change.getTime());
 		for (ITimeValue<T> value : futureValues) {
@@ -94,7 +94,8 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 			this.container.add(newValue);
 		}
 
-		compact();
+		if (compact)
+			compact();
 	}
 
 	@SuppressWarnings("unchecked")

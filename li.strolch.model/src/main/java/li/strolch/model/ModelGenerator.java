@@ -178,48 +178,48 @@ public class ModelGenerator {
 
 		// float state
 		FloatTimedState floatTimedState = new FloatTimedState(STATE_FLOAT_ID, STATE_FLOAT_NAME);
-		floatTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new FloatValue(STATE_FLOAT_TIME_0)));
+		floatTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new FloatValue(STATE_FLOAT_TIME_0)), true);
 		FloatValue floatValueChange = new FloatValue(STATE_FLOAT_TIME_10);
-		floatTimedState.applyChange(new ValueChange<>(STATE_TIME_10, floatValueChange));
-		floatTimedState.applyChange(new ValueChange<>(STATE_TIME_20, floatValueChange));
-		floatTimedState.applyChange(new ValueChange<>(STATE_TIME_30, floatValueChange));
+		floatTimedState.applyChange(new ValueChange<>(STATE_TIME_10, floatValueChange), true);
+		floatTimedState.applyChange(new ValueChange<>(STATE_TIME_20, floatValueChange), true);
+		floatTimedState.applyChange(new ValueChange<>(STATE_TIME_30, floatValueChange), true);
 		resource.addTimedState(floatTimedState);
 
 		// integer state
 		IntegerTimedState integerTimedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
-		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
+		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
 		IntegerValue integerValueChange = new IntegerValue(STATE_INTEGER_TIME_10);
-		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_10, integerValueChange));
-		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_20, integerValueChange));
-		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_30, integerValueChange));
+		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_10, integerValueChange), true);
+		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_20, integerValueChange), true);
+		integerTimedState.applyChange(new ValueChange<>(STATE_TIME_30, integerValueChange), true);
 		resource.addTimedState(integerTimedState);
 
 		// boolean state
 		BooleanTimedState booleanTimedState = new BooleanTimedState(STATE_BOOLEAN_ID, STATE_BOOLEAN_NAME);
-		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new BooleanValue(STATE_BOOLEAN_TIME_0)));
+		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new BooleanValue(STATE_BOOLEAN_TIME_0)), true);
 		BooleanValue booleanValueChange = new BooleanValue(STATE_BOOLEAN_TIME_10);
-		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_10, booleanValueChange));
+		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_10, booleanValueChange), true);
 		booleanValueChange = booleanValueChange.getInverse();
-		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_20, booleanValueChange));
+		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_20, booleanValueChange), true);
 		booleanValueChange = booleanValueChange.getInverse();
-		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_30, booleanValueChange));
+		booleanTimedState.applyChange(new ValueChange<>(STATE_TIME_30, booleanValueChange), true);
 		resource.addTimedState(booleanTimedState);
 
 		// string state
 		StringSetTimedState stringTimedState = new StringSetTimedState(STATE_STRING_ID, STATE_STRING_NAME);
 		StringSetValue change = new StringSetValue(asSet(STATE_STRING_TIME_0));
-		stringTimedState.applyChange(new ValueChange<>(STATE_TIME_0, change));
+		stringTimedState.applyChange(new ValueChange<>(STATE_TIME_0, change), true);
 		change = change.getInverse();
 		change.add(asSet(STATE_STRING_TIME_10));
-		stringTimedState.applyChange(new ValueChange<>(STATE_TIME_10, change));
+		stringTimedState.applyChange(new ValueChange<>(STATE_TIME_10, change), true);
 		removeInverted(change.getValue());
 		change = change.getInverse();
 		change.add(asSet(STATE_STRING_TIME_20));
-		stringTimedState.applyChange(new ValueChange<>(STATE_TIME_20, change));
+		stringTimedState.applyChange(new ValueChange<>(STATE_TIME_20, change), true);
 		removeInverted(change.getValue());
 		change = change.getInverse();
 		change.add(asSet(STATE_STRING_TIME_30));
-		stringTimedState.applyChange(new ValueChange<>(STATE_TIME_30, change));
+		stringTimedState.applyChange(new ValueChange<>(STATE_TIME_30, change), true);
 		resource.addTimedState(stringTimedState);
 	}
 

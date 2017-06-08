@@ -339,7 +339,7 @@ public class ModelTest {
 		Resource srcRes = createResource("@res01", "Test resource", "MyType");
 		Resource dstRes = createResource("@res01", "Test resource", "MyType");
 		BooleanTimedState timedState = dstRes.getTimedState(STATE_BOOLEAN_ID);
-		timedState.applyChange(new ValueChange<>(System.currentTimeMillis(), new BooleanValue(Boolean.FALSE)));
+		timedState.applyChange(new ValueChange<>(System.currentTimeMillis(), new BooleanValue(Boolean.FALSE)), true);
 		timedState.setName("Ohla");
 		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcRes);
 		List<Locator> mismatches = dstRes.accept(visitor);

@@ -43,7 +43,7 @@ public class TimeStateTest {
 	public void before() {
 
 		final IValueChange<FloatValue> change1 = new ValueChange<>(this.t10, this.expectedValue1);
-		this.state.applyChange(change1);
+		this.state.applyChange(change1, true);
 
 		final ITimeValue<FloatValue> stateAt9 = this.state.getStateAt(9L);
 		assertNull(stateAt9);
@@ -53,7 +53,7 @@ public class TimeStateTest {
 		assertEquals(true, stateAt11.getValue().matches(this.expectedValue1));
 
 		final IValueChange<FloatValue> change2 = new ValueChange<>(this.t30, this.expectedValue1);
-		this.state.applyChange(change2);
+		this.state.applyChange(change2, true);
 
 		final ITimeValue<FloatValue> stateAt31 = this.state.getStateAt(31L);
 		assertNotNull(stateAt31);

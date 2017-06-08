@@ -17,6 +17,7 @@ package li.strolch.model.timedstate;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
@@ -118,8 +119,8 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	}
 
 	@Override
-	public <U extends IValueChange<T>> void applyChange(U change) {
-		this.state.applyChange(change);
+	public <U extends IValueChange<T>> void applyChange(U change, boolean compact) {
+		this.state.applyChange(change, compact);
 	}
 
 	@Override

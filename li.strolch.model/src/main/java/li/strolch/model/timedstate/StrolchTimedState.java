@@ -104,7 +104,7 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 
 	public ITimeValue<T> getPreviousMatch(Long time, T value);
 
-	public <U extends IValueChange<T>> void applyChange(U change);
+	public <U extends IValueChange<T>> void applyChange(U change, boolean compact);
 
 	public ITimeValue<T> getStateAt(Long time);
 

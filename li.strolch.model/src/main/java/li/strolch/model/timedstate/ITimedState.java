@@ -45,7 +45,7 @@ public interface ITimedState<T extends IValue> {
 	 * @param change
 	 *            the state change to be applied
 	 */
-	<U extends IValueChange<T>> void applyChange(final U change);
+	<U extends IValueChange<T>> void applyChange(final U change, boolean compact);
 
 	/**
 	 * @return the state at the given time

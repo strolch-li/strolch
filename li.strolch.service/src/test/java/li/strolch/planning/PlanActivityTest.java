@@ -82,19 +82,19 @@ public class PlanActivityTest {
 		this.resource1 = ModelGenerator.createResource("@1", "Test With States 1", "Stated");
 		this.timedState1 = resource1.getTimedState(STATE_INTEGER_ID);
 		this.timedState1.getTimeEvolution().clear();
-		this.timedState1.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
+		this.timedState1.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
 
 		// create resource with integer state
 		this.resource2 = ModelGenerator.createResource("@2", "Test With States 2", "Stated");
 		this.timedState2 = resource2.getTimedState(STATE_INTEGER_ID);
 		this.timedState2.getTimeEvolution().clear();
-		this.timedState2.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
+		this.timedState2.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
 
 		// create resource with integer state
 		this.resource3 = ModelGenerator.createResource("@3", "Test With States 3", "Stated");
 		this.timedState3 = resource3.getTimedState(STATE_INTEGER_ID);
 		this.timedState3.getTimeEvolution().clear();
-		this.timedState3.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
+		this.timedState3.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
 
 		// create activity element
 		this.activity = new Activity("activity", "Activity", "testType", TimeOrdering.SERIES);

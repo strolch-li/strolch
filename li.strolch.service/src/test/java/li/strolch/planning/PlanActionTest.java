@@ -65,7 +65,7 @@ public class PlanActionTest {
 		this.resource = ModelGenerator.createResource("@1", "Test With States", "Stated");
 		IntegerTimedState timedState = this.resource.getTimedState(STATE_INTEGER_ID);
 		timedState.getTimeEvolution().clear();
-		timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)));
+		timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
 
 		this.action = new Action("action", "Action", "Use");
 

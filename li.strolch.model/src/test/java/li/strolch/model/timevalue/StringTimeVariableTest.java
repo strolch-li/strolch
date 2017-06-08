@@ -104,7 +104,7 @@ public class StringTimeVariableTest {
 
 		IValue<Set<AString>> inverseTestValue = testValue.getInverse();
 		IValueChange<IValue<Set<AString>>> change = new ValueChange<>(PICK, inverseTestValue);
-		this.timeVariable.applyChange(change);
+		this.timeVariable.applyChange(change, true);
 
 		// check the future values
 		Collection<ITimeValue<IValue<Set<AString>>>> futureValues = this.timeVariable.getFutureValues(0L);
