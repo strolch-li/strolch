@@ -38,6 +38,11 @@ public class SetActionToWarningCommand extends ExecutionCommand {
 		Activity rootElement = this.action.getRootElement();
 		tx().lock(rootElement);
 
+		if (this.action.getState() == State.WARNING) {
+			logger.warn("Action " + this.action.getLocator() + " is already in WARNING! Not changing.");
+			return;
+		}
+
 		State currentState = rootElement.getState();
 
 		getExecutionPolicy(this.action).toWarning(this.action);

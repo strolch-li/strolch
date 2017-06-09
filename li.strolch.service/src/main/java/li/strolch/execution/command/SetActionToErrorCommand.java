@@ -38,6 +38,11 @@ public class SetActionToErrorCommand extends ExecutionCommand {
 		Activity rootElement = this.action.getRootElement();
 		tx().lock(rootElement);
 
+		if (this.action.getState() == State.ERROR) {
+			logger.warn("Action " + this.action.getLocator() + " is already in ERROR! Not changing.");
+			return;
+		}
+
 		State currentState = rootElement.getState();
 
 		getExecutionPolicy(this.action).toError(this.action);

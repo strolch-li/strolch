@@ -87,8 +87,11 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 				continue;
 
 			// in series we can never have two Actions in execution, so if we found the action in execution, we stop
-			if (element instanceof Action && state == State.EXECUTION)
+			if (element instanceof Action //
+					&& (state == State.EXECUTION // 
+							|| state == State.WARNING)) {
 				break;
+			}
 
 			boolean canExecute = isExecutable(element);
 			if (canExecute) {
@@ -118,9 +121,19 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	}
 
 	protected boolean isExecutable(IActivityElement element) {
-		if (element.getState().compareTo(State.EXECUTED) >= 0)
+		State state = element.getState();
+		if (state.compareTo(State.EXECUTED) >= 0)
 			return false;
-		return element instanceof Activity || element.getState().compareTo(State.EXECUTION) < 0;
+
+		if (element instanceof Activity)
+			return true;
+
+		// not yet in execution
+		if (state.compareTo(State.EXECUTION) < 0)
+			return true;
+
+		// in stopped or error
+		return state == State.STOPPED || state == State.ERROR;
 	}
 
 	@Override

@@ -38,6 +38,11 @@ public class SetActionToStoppedCommand extends ExecutionCommand {
 		Activity rootElement = this.action.getRootElement();
 		tx().lock(rootElement);
 
+		if (this.action.getState() == State.STOPPED) {
+			logger.warn("Action " + this.action.getLocator() + " is already in STOPPED! Not changing.");
+			return;
+		}
+
 		State currentState = rootElement.getState();
 
 		getExecutionPolicy(this.action).toStopped(this.action);

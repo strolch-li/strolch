@@ -135,21 +135,21 @@ public enum State {
 	 * @return true if {@link #inExecutionPhase()} but not executed and not already in warning
 	 */
 	public boolean canSetToWarning() {
-		return inExecutionPhase() && this != State.EXECUTED && this != State.WARNING;
+		return inExecutionPhase() && this != State.EXECUTED;
 	}
 
 	/**
 	 * @return true if {@link #inExecutionPhase()} but not executed and not already stopped
 	 */
 	public boolean canSetToStopped() {
-		return inExecutionPhase() && this != State.EXECUTED && this != State.STOPPED;
+		return inExecutionPhase() && this != State.EXECUTED;
 	}
 
 	/**
 	 * @return true if {@link #inExecutionPhase()} but not executed and not already in error
 	 */
 	public boolean canSetToError() {
-		return inExecutionPhase() && this != State.EXECUTED && this != State.ERROR;
+		return inExecutionPhase() && this != State.EXECUTED;
 	}
 
 	/**
