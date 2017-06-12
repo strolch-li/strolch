@@ -89,13 +89,16 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 			// in series we can never have two Actions in execution, so if we found the action in execution, we stop
 			if (element instanceof Action //
 					&& (state == State.EXECUTION // 
-							|| state == State.WARNING)) {
+							|| state == State.WARNING //
+							|| state == State.ERROR)) {
 				break;
 			}
 
 			boolean canExecute = isExecutable(element);
 			if (canExecute) {
 				element.accept(this);
+
+				// in series we stop when the first action is set to execution
 				break;
 			}
 		}
@@ -112,6 +115,8 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 			IActivityElement element = iter.next().getValue();
 			if (element.getState().isExecuted())
 				continue;
+
+			// in parallel we execute all the actions in the activity
 
 			boolean canExecute = isExecutable(element);
 			if (canExecute) {
@@ -132,8 +137,12 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 		if (state.compareTo(State.EXECUTION) < 0)
 			return true;
 
-		// in stopped or error
-		return state == State.STOPPED || state == State.ERROR;
+		// in stopped, means we can re-execute
+		if (state == State.STOPPED)
+			return true;
+
+		// if in ERROR, then must first be handled
+		return false;
 	}
 
 	@Override

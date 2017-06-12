@@ -72,7 +72,7 @@ public enum State {
 	 *         {@link #EXECUTED}
 	 */
 	public boolean inExecutionPhase() {
-		return this == EXECUTION || this == STOPPED || this == WARNING || this == ERROR || this == EXECUTED;
+		return this == EXECUTION || this == STOPPED || this == WARNING || this == ERROR;
 	}
 
 	/**
@@ -135,28 +135,28 @@ public enum State {
 	 * @return true if {@link #inExecutionPhase()} but not executed and not already in warning
 	 */
 	public boolean canSetToWarning() {
-		return inExecutionPhase() && this != State.EXECUTED;
+		return inExecutionPhase();
 	}
 
 	/**
 	 * @return true if {@link #inExecutionPhase()} but not executed and not already stopped
 	 */
 	public boolean canSetToStopped() {
-		return inExecutionPhase() && this != State.EXECUTED;
+		return inExecutionPhase();
 	}
 
 	/**
 	 * @return true if {@link #inExecutionPhase()} but not executed and not already in error
 	 */
 	public boolean canSetToError() {
-		return inExecutionPhase() && this != State.EXECUTED;
+		return inExecutionPhase();
 	}
 
 	/**
 	 * @return true if {@link #inExecutionPhase()} but not executed
 	 */
 	public boolean canSetToExecuted() {
-		return inExecutionPhase() && this != State.EXECUTED;
+		return inExecutionPhase();
 	}
 
 	public static State parse(String s) {
@@ -203,9 +203,9 @@ public enum State {
 			}
 
 			// then execution
-			else if (childState.inExecutionPhase()) {
+			else if (childState.inExecutionPhase() || childState == State.EXECUTED) {
 				if (!state.inExecutionWarningPhase()) {
-					if (state.inExecutionPhase())
+					if (state.inExecutionPhase() || state == State.EXECUTED)
 						state = State.min(state, childState);
 					else
 						state = State.EXECUTION;
@@ -214,7 +214,7 @@ public enum State {
 
 			// then planning
 			else if (childState.inPlanningPhase()) {
-				if (state.inExecutionPhase()) {
+				if (state.inExecutionPhase() || state == State.EXECUTED) {
 					if (!state.inExecutionWarningPhase())
 						state = State.EXECUTION;
 				} else {
@@ -227,7 +227,7 @@ public enum State {
 
 			// then created
 			else if (childState.inCreatedPhase()) {
-				if (state.inExecutionPhase()) {
+				if (state.inExecutionPhase() || state == State.EXECUTED) {
 					if (!state.inExecutionWarningPhase())
 						state = State.EXECUTION;
 				} else {
