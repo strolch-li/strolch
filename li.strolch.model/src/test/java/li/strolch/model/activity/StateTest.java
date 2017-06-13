@@ -312,8 +312,8 @@ public class StateTest {
 		this.subAction.setState(State.STOPPED);
 		this.subSubAction1.setState(State.WARNING);
 
-		assertEquals(State.WARNING, this.activity.getState());
-		assertEquals(State.WARNING, this.subActivity.getState());
+		assertEquals(State.STOPPED, this.activity.getState());
+		assertEquals(State.STOPPED, this.subActivity.getState());
 		assertEquals(State.WARNING, this.subSubActivity.getState());
 
 		this.action.setState(State.STOPPED);
@@ -397,8 +397,8 @@ public class StateTest {
 		this.subSubAction1.setState(State.PLANNED);
 		this.subSubAction2.setState(State.PLANNED);
 
-		assertEquals(State.PLANNING, this.activity.getState());
-		assertEquals(State.PLANNING, this.subActivity.getState());
+		assertEquals(State.PLANNED, this.activity.getState());
+		assertEquals(State.PLANNED, this.subActivity.getState());
 		assertEquals(State.PLANNED, this.subSubActivity.getState());
 	}
 }

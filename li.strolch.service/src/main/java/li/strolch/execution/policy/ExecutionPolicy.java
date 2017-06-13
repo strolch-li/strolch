@@ -117,15 +117,23 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * @param action
 	 *            the action to set to warning state
 	 */
-	public void toWarning(Action action) {
+	public abstract void toWarning(Action action);
 
-		action.setState(State.WARNING);
+	protected void setActionState(Action action, State state) {
+
+		action.setState(state);
 
 		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
 		command.setActivity(action.getRootElement());
 		command.doCommand();
 
-		logger.warn("Action " + action.getLocator() + " is now in WARNING!");
+		String msg = "Action " + action.getLocator() + " is now in state " + state;
+		if (state == State.ERROR)
+			logger.error(msg);
+		else if (state == State.STOPPED)
+			logger.warn(msg);
+		else
+			logger.info(msg);
 	}
 
 	/**
@@ -177,5 +185,4 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
 		getContainer().getPrivilegeHandler().runAs(StrolchConstants.SYSTEM_USER_AGENT, runnable);
 	}
-
 }

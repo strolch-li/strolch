@@ -15,15 +15,11 @@
  */
 package li.strolch.model;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.activity.IActivityElement;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -34,14 +30,13 @@ public enum State {
 	CREATED("Created"), //$NON-NLS-1$
 	PLANNING("Planning"), //$NON-NLS-1$
 	PLANNED("Planned"), //$NON-NLS-1$
+	STARTING("Starting"), //$NON-NLS-1$
 	EXECUTION("Execution"), //$NON-NLS-1$
-	STOPPED("Stopped"), //$NON-NLS-1$
 	WARNING("Warning"), //$NON-NLS-1$
 	ERROR("Error"), //$NON-NLS-1$
+	STOPPED("Stopped"), //$NON-NLS-1$
 	EXECUTED("Executed"), //$NON-NLS-1$
 	CLOSED("Closed"); //$NON-NLS-1$
-
-	private static final Logger logger = LoggerFactory.getLogger(State.class);
 
 	private String state;
 
@@ -76,6 +71,13 @@ public enum State {
 	}
 
 	/**
+	 * @return true if the state is {@link #ERROR} or {@link #STOPPED}
+	 */
+	public boolean inErrorPhase() {
+		return this == State.ERROR || this == State.STOPPED;
+	}
+
+	/**
 	 * @return true if the state is one of {@link #STOPPED}, {@link #WARNING} or {@link #ERROR}
 	 */
 	public boolean inExecutionWarningPhase() {
@@ -86,7 +88,7 @@ public enum State {
 	 * @return true if the state is {@link #CLOSED}
 	 */
 	public boolean inClosedPhase() {
-		return this == CLOSED;
+		return this == EXECUTED || this == CLOSED;
 	}
 
 	/**
@@ -118,6 +120,20 @@ public enum State {
 	}
 
 	/**
+	 * @return true if the state is {@link #WARNING}
+	 */
+	public boolean isInWarning() {
+		return this == State.WARNING;
+	}
+
+	/**
+	 * @return true if the state is {@link #ERROR}
+	 */
+	public boolean isInError() {
+		return this == State.ERROR;
+	}
+
+	/**
 	 * @return true if the state is {@link #EXECUTED}
 	 */
 	public boolean isExecuted() {
@@ -132,31 +148,31 @@ public enum State {
 	}
 
 	/**
-	 * @return true if {@link #inExecutionPhase()} but not executed and not already in warning
+	 * @return true if {@link #EXECUTION}
 	 */
 	public boolean canSetToWarning() {
-		return inExecutionPhase();
+		return this == EXECUTION;
 	}
 
 	/**
-	 * @return true if {@link #inExecutionPhase()} but not executed and not already stopped
+	 * @return true if {@link #ERROR}
 	 */
 	public boolean canSetToStopped() {
-		return inExecutionPhase();
+		return this == State.ERROR;
 	}
 
 	/**
-	 * @return true if {@link #inExecutionPhase()} but not executed and not already in error
+	 * @return true if {@link #STARTING} or {@link #EXECUTION} or {@link #WARNING}
 	 */
 	public boolean canSetToError() {
-		return inExecutionPhase();
+		return this == State.STARTING || this == State.EXECUTION || this == State.WARNING;
 	}
 
 	/**
-	 * @return true if {@link #inExecutionPhase()} but not executed
+	 * @return true if {@link #EXECUTION} or {@link #WARNING} or {@link #STOPPED}
 	 */
 	public boolean canSetToExecuted() {
-		return inExecutionPhase();
+		return this == State.EXECUTION || this == State.WARNING || this == State.STOPPED;
 	}
 
 	public static State parse(String s) {
@@ -169,86 +185,49 @@ public enum State {
 		throw new StrolchException("No State for " + s);
 	}
 
-	public static State max(State state1, State state2) {
-		return state1.ordinal() >= state2.ordinal() ? state1 : state2;
-	}
-
-	public static State min(State state1, State state2) {
-		return state1.ordinal() <= state2.ordinal() ? state1 : state2;
-	}
-
 	public static State getState(Activity activity) {
 
-		Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
+		Set<State> states = activity.elementStream().map(e -> e.getValue().getState()).collect(Collectors.toSet());
 
-		IActivityElement first = elementIterator.next().getValue();
-		State state = first.getState();
+		// if only one state
+		if (states.size() == 1)
+			return states.iterator().next();
 
-		while (elementIterator.hasNext()) {
-			IActivityElement child = elementIterator.next().getValue();
-			State childState = child.getState();
+		// error
+		if (states.contains(State.ERROR))
+			return State.ERROR;
 
-			// error trumps all
-			if (childState == State.ERROR) {
-				state = State.ERROR;
-				break;
-			}
+		// stopped
+		if (states.contains(State.STOPPED))
+			return State.STOPPED;
 
-			// then in execution warning
-			if (childState.inExecutionWarningPhase()) {
-				if (state.inExecutionWarningPhase())
-					state = State.max(state, childState);
-				else
-					state = childState;
-			}
+		// warning
+		if (states.contains(State.WARNING))
+			return State.WARNING;
 
-			// then execution
-			else if (childState.inExecutionPhase() || childState == State.EXECUTED) {
-				if (!state.inExecutionWarningPhase()) {
-					if (state.inExecutionPhase() || state == State.EXECUTED)
-						state = State.min(state, childState);
-					else
-						state = State.EXECUTION;
-				}
-			}
+		// execution
+		if (states.contains(State.EXECUTION) || states.contains(State.STARTING))
+			return State.EXECUTION;
+		if (states.contains(State.EXECUTED) && (states.contains(State.CREATED) || states.contains(State.PLANNING)
+				|| states.contains(State.PLANNED)))
+			return State.EXECUTION;
 
-			// then planning
-			else if (childState.inPlanningPhase()) {
-				if (state.inExecutionPhase() || state == State.EXECUTED) {
-					if (!state.inExecutionWarningPhase())
-						state = State.EXECUTION;
-				} else {
-					if (state.inPlanningPhase())
-						state = State.min(state, childState);
-					else if ((state.inClosedPhase() || state.inCreatedPhase()) && childState.inPlanningPhase())
-						state = State.PLANNING;
-				}
-			}
+		// executed
+		if (states.contains(State.EXECUTED) && (states.contains(State.CLOSED)))
+			return State.EXECUTED;
 
-			// then created
-			else if (childState.inCreatedPhase()) {
-				if (state.inExecutionPhase() || state == State.EXECUTED) {
-					if (!state.inExecutionWarningPhase())
-						state = State.EXECUTION;
-				} else {
-					if (state.inPlanningPhase()) {
-						state = State.PLANNING;
-					}
-				}
-			}
+		// planning
+		if (states.contains(State.PLANNING))
+			return State.PLANNING;
+		if (states.contains(State.PLANNED) && (states.contains(State.CREATED) || states.contains(State.PLANNING)))
+			return State.PLANNING;
 
-			// then closed 
-			else if (childState.inClosedPhase()) {
-				state = State.min(state, childState);
-			}
+		// planned
+		if (states.contains(State.PLANNED) && (states.contains(State.CLOSED)))
+			return State.PLANNED;
 
-			// should never occur
-			else {
-				logger.warn("Else case for getState() child: " + child.getLocator() + " childState: " + childState
-						+ " state: " + state);
-			}
-		}
-
-		return state;
+		// should never happen, unless new state is introduced
+		throw new IllegalStateException("Unhandled situation with states: "
+				+ states.stream().map(e -> e.state).collect(Collectors.joining(", ")));
 	}
 }

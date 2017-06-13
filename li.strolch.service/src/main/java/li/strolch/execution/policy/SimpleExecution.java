@@ -1,7 +1,6 @@
 package li.strolch.execution.policy;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.command.UpdateActivityCommand;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -19,9 +18,18 @@ public class SimpleExecution extends ExecutionPolicy {
 		super(container, tx);
 	}
 
+	protected void toStarting(Action action) {
+		setActionState(action, State.STARTING);
+	}
+
 	@Override
 	public void toExecution(Action action) {
 		setActionState(action, State.EXECUTION);
+	}
+
+	@Override
+	public void toWarning(Action action) {
+		setActionState(action, State.WARNING);
 	}
 
 	@Override
@@ -39,23 +47,6 @@ public class SimpleExecution extends ExecutionPolicy {
 	public void toError(Action action) {
 		getDelayedExecutionTimer().cancel(action.getLocator());
 		setActionState(action, State.ERROR);
-	}
-
-	protected void setActionState(Action action, State state) {
-
-		action.setState(state);
-
-		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
-		command.setActivity(action.getRootElement());
-		command.doCommand();
-
-		String msg = "Action " + action.getLocator() + " is now in state " + state;
-		if (state == State.ERROR)
-			logger.error(msg);
-		else if (state == State.STOPPED)
-			logger.warn(msg);
-		else
-			logger.info(msg);
 	}
 
 	@Override

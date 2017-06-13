@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -322,6 +323,15 @@ public class Activity extends AbstractStrolchRootElement
 		if (this.elements == null)
 			return Collections.<String, IActivityElement> emptyMap().entrySet().iterator();
 		return this.elements.entrySet().iterator();
+	}
+
+	/**
+	 * @return the stream for entries, which include the id as key and the {@link IActivityElement} as value
+	 */
+	public Stream<Entry<String, IActivityElement>> elementStream() {
+		if (this.elements == null)
+			return Collections.<String, IActivityElement> emptyMap().entrySet().stream();
+		return this.elements.entrySet().stream();
 	}
 
 	@Override
