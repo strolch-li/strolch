@@ -55,6 +55,9 @@ public class Locator {
 	 */
 	private final List<String> pathElements;
 
+	private String asString;
+	private Integer hashcode;
+
 	/**
 	 * Constructs a new {@link Locator} with the given list of path elements
 	 *
@@ -198,7 +201,9 @@ public class Locator {
 	 */
 	@Override
 	public String toString() {
-		return formatPath(this.pathElements);
+		if (this.asString == null)
+			this.asString = formatPath(this.pathElements);
+		return this.asString;
 	}
 
 	/**
@@ -276,10 +281,12 @@ public class Locator {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((this.pathElements == null) ? 0 : this.pathElements.hashCode());
-		return result;
+		if (this.hashcode == null) {
+			final int prime = 31;
+			this.hashcode = prime * 1 + ((this.pathElements == null) ? 0 : this.pathElements.hashCode());
+		}
+
+		return this.hashcode;
 	}
 
 	@Override
