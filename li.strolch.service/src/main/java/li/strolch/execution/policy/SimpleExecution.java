@@ -1,6 +1,8 @@
 package li.strolch.execution.policy;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -47,6 +49,23 @@ public class SimpleExecution extends ExecutionPolicy {
 	public void toError(Action action) {
 		getDelayedExecutionTimer().cancel(action.getLocator());
 		setActionState(action, State.ERROR);
+	}
+
+	protected void addMessage(LogMessage message) {
+		if (getContainer().hasComponent(OperationsLog.class)) {
+			OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
+			operationsLog.addMessage(message);
+		}
+	}
+
+	protected void toError(String realm, LogMessage message) {
+		addMessage(message);
+		getExecutionHandler().toError(realm, message.getLocator());
+	}
+
+	protected void toWarning(String realm, LogMessage message) {
+		addMessage(message);
+		getExecutionHandler().toWarning(realm, message.getLocator());
 	}
 
 	@Override
