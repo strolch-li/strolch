@@ -63,6 +63,11 @@ public class Tags {
 	public static final String RESOURCE_TYPE = "ResourceType";
 	public static final String STATE_ID = "StateId";
 
+	public static final String LOCATOR = "Locator";
+	public static final String SEVERITY = "Severity";
+	public static final String KEY = "Key";
+	public static final String MESSAGE = "Message";
+
 	public static class Json {
 
 		// elements
@@ -106,6 +111,11 @@ public class Tags {
 		public static final String CREATED_AT = "createdAt";
 		public static final String CREATED_BY = "createdBy";
 		public static final String DELETED = "deleted";
+
+		public static final String LOCATOR = "locator";
+		public static final String SEVERITY = "severity";
+		public static final String KEY = "key";
+		public static final String MESSAGE = "message";
 
 		// miscellaneous
 
