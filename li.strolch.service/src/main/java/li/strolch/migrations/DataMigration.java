@@ -60,8 +60,8 @@ public class DataMigration extends Migration {
 		}
 
 		ModelStatistics statistics = command.getStatistics();
-		logger.info(MessageFormat
-				.format("[{0}] Data migration for {1} loaded {2} Resources and {3} Orders.", getRealm(), getVersion(), statistics.nrOfResources, statistics.nrOfOrders)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("[{0}] Data migration for {1} loaded {2} Resources and {3} Orders.", //$NON-NLS-1$
+				getRealm(), getVersion(), statistics.nrOfResources, statistics.nrOfOrders));
 	}
 
 	@Override
@@ -71,5 +71,4 @@ public class DataMigration extends Migration {
 		cmd.setParameter(currentDataVersionP);
 		cmd.setValueAsString(getVersion().toString());
 	}
-
 }

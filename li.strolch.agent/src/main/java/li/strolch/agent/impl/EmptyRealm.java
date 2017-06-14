@@ -22,6 +22,7 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
+import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.inmemory.InMemoryPersistence;
@@ -85,7 +86,10 @@ public class EmptyRealm extends InternalStrolchRealm {
 	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		super.initialize(container, configuration);
-		this.persistenceHandler = new InMemoryPersistence(container.getPrivilegeHandler(), isVersioningEnabled());
+		OperationsLog operationsLog = container.hasComponent(OperationsLog.class)
+				? container.getComponent(OperationsLog.class) : null;
+		this.persistenceHandler = new InMemoryPersistence(operationsLog, container.getPrivilegeHandler(),
+				isVersioningEnabled());
 		this.resourceMap = new TransactionalResourceMap(this);
 		this.orderMap = new TransactionalOrderMap(this);
 		this.activityMap = new TransactionalActivityMap(this);

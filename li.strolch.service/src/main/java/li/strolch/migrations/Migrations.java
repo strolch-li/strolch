@@ -26,14 +26,19 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
+import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.Version;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.dbc.DBC;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Migrations {
 
@@ -110,7 +115,8 @@ public class Migrations {
 			if (codeMigrations != null && !codeMigrations.isEmpty()) {
 				for (CodeMigration migration : codeMigrations.tailSet(currentCodeMigration)) {
 					String msg = "[{0}] Running code migration {1} {2}";
-					logger.info(MessageFormat.format(msg, realm, migration.getVersion(), migration.getClass().getName()));
+					logger.info(
+							MessageFormat.format(msg, realm, migration.getVersion(), migration.getClass().getName()));
 					migration.migrate(container, certificate);
 					migrationsRan.addElement(realm, migration.getVersion());
 				}
@@ -122,9 +128,28 @@ public class Migrations {
 				logger.info("There were no migrations required!");
 		} else {
 			logger.info("Migrated " + migrationsRan.size() + " realms!");
+			addOperationLogs(migrationsRan);
 		}
 
 		this.migrationsRan = migrationsRan;
+	}
+
+	private void addOperationLogs(MapOfLists<String, Version> migrationsRan) {
+		if (this.container.hasComponent(OperationsLog.class)) {
+			OperationsLog operationsLog = this.container.getComponent(OperationsLog.class);
+			MigrationsHandler migrationsHandler = this.container.getComponent(MigrationsHandler.class);
+			Locator locator = migrationsHandler.getLocator();
+
+			for (String realm : migrationsRan.keySet()) {
+				List<Version> list = migrationsRan.getList(realm);
+				for (Version version : list) {
+					LogMessage logMessage = new LogMessage(realm, locator.append(StrolchAgent.getUniqueId()),
+							LogSeverity.INFO, "strolch-service", "execution.handler.migrations.version")
+									.value("version", version.toString());
+					operationsLog.addMessage(logMessage);
+				}
+			}
+		}
 	}
 
 	/**
@@ -156,7 +181,8 @@ public class Migrations {
 				DBC.INTERIM.assertEquals("Realms do not match!", realm, migration.getRealm());
 				Version migrateVersion = migration.getVersion();
 				boolean isLaterMigration = migrateVersion.compareTo(currentVersion.getCodeVersion()) > 0;
-				DBC.INTERIM.assertTrue("Current version " + currentVersion.getCodeVersion() + " is not before next " + migrateVersion,
+				DBC.INTERIM.assertTrue(
+						"Current version " + currentVersion.getCodeVersion() + " is not before next " + migrateVersion,
 						isLaterMigration);
 
 				String msg = "[{0}] Running code migration {1} {2}";
@@ -171,6 +197,7 @@ public class Migrations {
 				logger.info("There were no migrations required!");
 		} else {
 			logger.info("Migrated " + migrationsRan.size() + " realms!");
+			addOperationLogs(migrationsRan);
 		}
 		this.migrationsRan = migrationsRan;
 	}
@@ -203,7 +230,8 @@ public class Migrations {
 		}
 	}
 
-	private static Map<String, SortedSet<DataMigration>> loadDataMigrations(Set<String> realmNames, File migrationsPath) {
+	private static Map<String, SortedSet<DataMigration>> loadDataMigrations(Set<String> realmNames,
+			File migrationsPath) {
 
 		Map<String, SortedSet<DataMigration>> migrationsByRealm = new HashMap<>();
 
@@ -217,12 +245,12 @@ public class Migrations {
 			for (File realmMigration : realmMigrations) {
 				String realm = realmMigration.getName();
 
-				SortedSet<DataMigration> migrations = new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(
-						o2.getVersion()));
+				SortedSet<DataMigration> migrations = new TreeSet<>(
+						(o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
 				migrationsByRealm.put(realm, migrations);
 
-				File[] migrationFiles = realmMigration.listFiles((FileFilter) pathname -> pathname.getName().endsWith(
-						".xml"));
+				File[] migrationFiles = realmMigration
+						.listFiles((FileFilter) pathname -> pathname.getName().endsWith(".xml"));
 				for (File file : migrationFiles) {
 					String name = file.getName();
 					Version version = Version.valueOf(name.substring(0, name.length() - 4));
@@ -234,7 +262,8 @@ public class Migrations {
 		return migrationsByRealm;
 	}
 
-	private static Map<String, SortedSet<CodeMigration>> loadCodeMigrations(Set<String> realmNames, File migrationsPath) {
+	private static Map<String, SortedSet<CodeMigration>> loadCodeMigrations(Set<String> realmNames,
+			File migrationsPath) {
 
 		Map<String, SortedSet<CodeMigration>> migrationsByRealm = new HashMap<>(); //new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
 
@@ -247,12 +276,12 @@ public class Migrations {
 			for (File realmMigration : realmMigrations) {
 				String realm = realmMigration.getName();
 
-				SortedSet<CodeMigration> migrations = new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(
-						o2.getVersion()));
+				SortedSet<CodeMigration> migrations = new TreeSet<>(
+						(o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
 				migrationsByRealm.put(realm, migrations);
 
-				File[] migrationFiles = realmMigration.listFiles((FileFilter) pathname -> pathname.getName().endsWith(
-						".xml"));
+				File[] migrationFiles = realmMigration
+						.listFiles((FileFilter) pathname -> pathname.getName().endsWith(".xml"));
 				for (File file : migrationFiles) {
 					String name = file.getName();
 					Version version = Version.valueOf(name.substring(0, name.length() - 4));

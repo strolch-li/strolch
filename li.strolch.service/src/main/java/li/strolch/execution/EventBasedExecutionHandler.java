@@ -12,6 +12,9 @@ import li.strolch.execution.command.SetActionToStoppedCommand;
 import li.strolch.execution.command.SetActionToWarningCommand;
 import li.strolch.execution.policy.ActivityArchivalPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
+import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -122,6 +125,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				});
 			} catch (Exception e) {
 				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+
+				if (getContainer().hasComponent(OperationsLog.class)) {
+					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
+							"strolch-service", "execution.handler.failed.execution").value("reason", e));
+				}
 			}
 		});
 	}
@@ -134,7 +142,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					toExecuted(realm, locator, ctx);
 				});
 			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+				logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
+
+				if (getContainer().hasComponent(OperationsLog.class)) {
+					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
+							"strolch-service", "execution.handler.failed.executed").value("reason", e));
+				}
 			}
 		});
 	}
@@ -147,7 +160,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					toStopped(realm, locator, ctx);
 				});
 			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+				logger.error("Failed to set " + locator + " to stopped due to " + e.getMessage(), e);
+
+				if (getContainer().hasComponent(OperationsLog.class)) {
+					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
+							"strolch-service", "execution.handler.failed.stopped").value("reason", e));
+				}
 			}
 		});
 	}
@@ -160,7 +178,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					toError(realm, locator, ctx);
 				});
 			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+				logger.error("Failed to set " + locator + " to error due to " + e.getMessage(), e);
+
+				if (getContainer().hasComponent(OperationsLog.class)) {
+					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
+							"strolch-service", "execution.handler.failed.error").value("reason", e));
+				}
 			}
 		});
 	}
@@ -173,7 +196,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					toWarning(realm, locator, ctx);
 				});
 			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+				logger.error("Failed to set " + locator + " to warning due to " + e.getMessage(), e);
+
+				if (getContainer().hasComponent(OperationsLog.class)) {
+					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
+							"strolch-service", "execution.handler.failed.warning").value("reason", e));
+				}
 			}
 		});
 	}
@@ -205,6 +233,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				});
 			} catch (Exception e) {
 				logger.error("Failed to archive " + activityLoc + " due to " + e.getMessage(), e);
+
+				if (getContainer().hasComponent(OperationsLog.class)) {
+					getComponent(OperationsLog.class)
+							.addMessage(new LogMessage(realm, activityLoc, LogSeverity.EXCEPTION, "strolch-service",
+									"execution.handler.failed.archive").value("reason", e));
+				}
 			}
 		});
 	}

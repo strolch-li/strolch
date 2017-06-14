@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
@@ -33,8 +34,11 @@ public class InMemoryPersistence implements PersistenceHandler {
 	private boolean versioningEnabled;
 	private Map<String, DaoCache> daoCache;
 	private PrivilegeHandler privilegeHandler;
+	private OperationsLog operationsLog;
 
-	public InMemoryPersistence(PrivilegeHandler privilegeHandler, boolean versioningEnabled) {
+	public InMemoryPersistence(OperationsLog operationsLog, PrivilegeHandler privilegeHandler,
+			boolean versioningEnabled) {
+		this.operationsLog = operationsLog;
 		this.privilegeHandler = privilegeHandler;
 		this.versioningEnabled = versioningEnabled;
 		this.daoCache = new HashMap<>();
@@ -42,7 +46,7 @@ public class InMemoryPersistence implements PersistenceHandler {
 
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
-		return new InMemoryTransaction(this.privilegeHandler, realm, certificate, action, this);
+		return new InMemoryTransaction(this.operationsLog, this.privilegeHandler, realm, certificate, action, this);
 	}
 
 	@Override

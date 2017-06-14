@@ -45,8 +45,6 @@ public class CodeMigration extends Migration {
 
 		cmd.setParameter(currentCodeVersionP);
 		cmd.setValueAsString(getVersion().toString());
-		
+
 	}
-	
-	
 }

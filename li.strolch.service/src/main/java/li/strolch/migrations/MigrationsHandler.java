@@ -22,7 +22,12 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Tags;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -172,21 +177,34 @@ public class MigrationsHandler extends StrolchComponent {
 				return;
 			}
 
-			Migrations migrations = new Migrations(getContainer(), getContainer().getRealmNames(),
-					MigrationsHandler.this.verbose);
-			migrations.parseMigrations(MigrationsHandler.this.migrationsPath);
+			try {
 
-			CurrentMigrationVersionQuery query = new CurrentMigrationVersionQuery(getContainer());
-			PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
-			privilegeHandler.runAsAgent(ctx -> query.doQuery(ctx.getCertificate()));
-			Map<String, MigrationVersion> currentVersions = query.getCurrentVersions();
+				Migrations migrations = new Migrations(getContainer(), getContainer().getRealmNames(),
+						MigrationsHandler.this.verbose);
+				migrations.parseMigrations(MigrationsHandler.this.migrationsPath);
 
-			MigrationsHandler.this.migrations = migrations;
-			if (migrations.getMigrationsToRun(currentVersions).isEmpty()) {
-				if (verbose)
-					logger.info("There are no migrations required at the moment!");
-			} else {
-				privilegeHandler.runAsAgent(ctx -> migrations.runMigrations(ctx.getCertificate(), currentVersions));
+				CurrentMigrationVersionQuery query = new CurrentMigrationVersionQuery(getContainer());
+				PrivilegeHandler privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
+				privilegeHandler.runAsAgent(ctx -> query.doQuery(ctx.getCertificate()));
+				Map<String, MigrationVersion> currentVersions = query.getCurrentVersions();
+
+				MigrationsHandler.this.migrations = migrations;
+				if (migrations.getMigrationsToRun(currentVersions).isEmpty()) {
+					if (verbose)
+						logger.info("There are no migrations required at the moment!");
+				} else {
+					privilegeHandler.runAsAgent(ctx -> migrations.runMigrations(ctx.getCertificate(), currentVersions));
+				}
+
+			} catch (Exception e) {
+				logger.error("Failed to run migrations!", e);
+
+				if (getContainer().hasComponent(OperationsLog.class)) {
+					getComponent(OperationsLog.class)
+							.addMessage(new LogMessage(Tags.AGENT, getLocator().append(StrolchAgent.getUniqueId()),
+									LogSeverity.EXCEPTION, "strolch-service", "execution.handler.failed.executed")
+											.value("reason", e));
+				}
 			}
 		}
 	}

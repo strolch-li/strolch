@@ -15,6 +15,8 @@
  */
 package li.strolch.persistence.api;
 
+import static li.strolch.model.Tags.AGENT;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,6 +45,9 @@ import li.strolch.agent.impl.AuditingResourceMap;
 import li.strolch.agent.impl.InternalStrolchRealm;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
+import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
@@ -102,15 +107,17 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private String action;
 	private Certificate certificate;
 	private PrivilegeHandler privilegeHandler;
+	private OperationsLog operationsLog;
 
-	public AbstractTransaction(PrivilegeHandler privilegeHandler, StrolchRealm realm, Certificate certificate,
-			String action) {
+	public AbstractTransaction(OperationsLog operationsLog, PrivilegeHandler privilegeHandler, StrolchRealm realm,
+			Certificate certificate, String action) {
 		DBC.PRE.assertNotNull("privilegeHandler must be set!", privilegeHandler); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("realm must be set!", realm); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("certificate must be set!", certificate); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("action must be set!", action); //$NON-NLS-1$
 
 		this.privilegeHandler = privilegeHandler;
+		this.operationsLog = operationsLog;
 		this.realm = (InternalStrolchRealm) realm;
 		this.action = action;
 		this.certificate = certificate;
@@ -882,6 +889,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (closeDuration >= 100000000L) {
 			sb.append(", close="); //$NON-NLS-1$
 			sb.append(StringHelper.formatNanoDuration(closeDuration));
+		}
+
+		if (this.operationsLog != null) {
+			this.operationsLog.addMessage(
+					new LogMessage(this.realm.getRealm(), Locator.valueOf(AGENT, "tx", StrolchAgent.getUniqueId()),
+							LogSeverity.EXCEPTION, "strolch-agent", "agent.tx.failed").value("reason", e));
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$

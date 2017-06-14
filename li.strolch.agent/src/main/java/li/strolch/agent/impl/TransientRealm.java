@@ -23,6 +23,7 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
+import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.PersistenceHandler;
@@ -103,7 +104,10 @@ public class TransientRealm extends InternalStrolchRealm {
 
 		this.modelFile = configuration.getDataFile(key, null, configuration.getRuntimeConfiguration(), true);
 
-		this.persistenceHandler = new InMemoryPersistence(container.getPrivilegeHandler(), isVersioningEnabled());
+		OperationsLog operationsLog = container.hasComponent(OperationsLog.class)
+				? container.getComponent(OperationsLog.class) : null;
+		this.persistenceHandler = new InMemoryPersistence(operationsLog, container.getPrivilegeHandler(),
+				isVersioningEnabled());
 		this.resourceMap = new TransactionalResourceMap(this);
 		this.orderMap = new TransactionalOrderMap(this);
 		this.activityMap = new TransactionalActivityMap(this);

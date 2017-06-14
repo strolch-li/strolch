@@ -23,6 +23,8 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import li.strolch.model.Locator;
+import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.SystemAction;
@@ -379,5 +381,9 @@ public class StrolchComponent {
 		}
 
 		return this.version;
+	}
+
+	public Locator getLocator() {
+		return Locator.valueOf(Tags.AGENT, getName());
 	}
 }

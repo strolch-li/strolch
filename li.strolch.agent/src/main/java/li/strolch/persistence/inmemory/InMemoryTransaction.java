@@ -16,6 +16,7 @@
 package li.strolch.persistence.inmemory;
 
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.TransactionState;
@@ -26,9 +27,9 @@ public class InMemoryTransaction extends AbstractTransaction {
 
 	private InMemoryPersistence persistenceHandler;
 
-	public InMemoryTransaction(PrivilegeHandler privilegeHandler, StrolchRealm realm, Certificate certificate,
-			String action, InMemoryPersistence persistenceHandler) {
-		super(privilegeHandler, realm, certificate, action);
+	public InMemoryTransaction(OperationsLog operationsLog, PrivilegeHandler privilegeHandler, StrolchRealm realm,
+			Certificate certificate, String action, InMemoryPersistence persistenceHandler) {
+		super(operationsLog, privilegeHandler, realm, certificate, action);
 		this.persistenceHandler = persistenceHandler;
 	}
 

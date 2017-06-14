@@ -11,6 +11,7 @@ import static li.strolch.rest.StrolchRestfulConstants.PREVIOUS_OFFSET;
 import static li.strolch.rest.StrolchRestfulConstants.SIZE;
 
 import java.util.List;
+import java.util.function.Function;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -131,17 +132,23 @@ public class ResponseUtil {
 		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
+	public static <T> Response toResponse(Paging<T> paging, Function<T, JsonObject> visitor) {
+		JsonObject response = new JsonObject();
+		addPagingInfo(paging, response);
+
+		List<T> page = paging.getPage();
+		JsonArray data = new JsonArray();
+		page.forEach(t -> data.add(visitor.apply(t)));
+		response.add(DATA, data);
+
+		String json = new Gson().toJson(response);
+
+		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
 	public static Response toResponse(Paging<JsonObject> paging) {
 		JsonObject response = new JsonObject();
-
-		response.addProperty(MSG, StringHelper.DASH);
-
-		response.addProperty(LIMIT, paging.getLimit());
-		response.addProperty(OFFSET, paging.getOffset());
-		response.addProperty(SIZE, paging.getSize());
-		response.addProperty(PREVIOUS_OFFSET, paging.getPreviousOffset());
-		response.addProperty(NEXT_OFFSET, paging.getNextOffset());
-		response.addProperty(LAST_OFFSET, paging.getLastOffset());
+		addPagingInfo(paging, response);
 
 		List<JsonObject> page = paging.getPage();
 		JsonArray data = new JsonArray();
@@ -156,4 +163,14 @@ public class ResponseUtil {
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
+	private static <T> void addPagingInfo(Paging<T> paging, JsonObject response) {
+		response.addProperty(MSG, StringHelper.DASH);
+
+		response.addProperty(LIMIT, paging.getLimit());
+		response.addProperty(OFFSET, paging.getOffset());
+		response.addProperty(SIZE, paging.getSize());
+		response.addProperty(PREVIOUS_OFFSET, paging.getPreviousOffset());
+		response.addProperty(NEXT_OFFSET, paging.getNextOffset());
+		response.addProperty(LAST_OFFSET, paging.getLastOffset());
+	}
 }

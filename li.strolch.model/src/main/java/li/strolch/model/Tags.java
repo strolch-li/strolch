@@ -18,6 +18,8 @@ package li.strolch.model;
 @SuppressWarnings("nls")
 public class Tags {
 
+	public static final String AGENT = "Agent";
+	
 	public static final String RESOURCE = "Resource";
 	public static final String ORDER = "Order";
 	public static final String ACTIVITY = "Activity";
@@ -67,6 +69,7 @@ public class Tags {
 	public static final String SEVERITY = "Severity";
 	public static final String KEY = "Key";
 	public static final String MESSAGE = "Message";
+	public static final String REALM = "Realm";
 
 	public static class Json {
 
@@ -116,6 +119,7 @@ public class Tags {
 		public static final String SEVERITY = "severity";
 		public static final String KEY = "key";
 		public static final String MESSAGE = "message";
+		public static final String REALM = "realm";
 
 		// miscellaneous
 
