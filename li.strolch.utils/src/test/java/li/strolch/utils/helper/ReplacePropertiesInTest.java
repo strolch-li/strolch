@@ -133,7 +133,7 @@ public class ReplacePropertiesInTest {
 		properties.setProperty("foo", "bar");
 		properties.setProperty("food", "foofoo");
 
-		String result = StringHelper.replacePropertiesIn(properties, '%', expr);
+		String result = StringHelper.replacePropertiesIn(properties, "%", expr);
 
 		assertEquals(expected, result);
 	}

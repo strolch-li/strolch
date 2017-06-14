@@ -415,7 +415,7 @@ public class StringHelper {
 	 */
 	public static String replacePropertiesIn(Properties properties, String value) {
 
-		return replacePropertiesIn(properties, '$', value);
+		return replacePropertiesIn(properties, "$", value);
 	}
 
 	/**
@@ -432,9 +432,9 @@ public class StringHelper {
 	 * 
 	 * @return a new string with all defined properties replaced or if an error occurred the original value is returned
 	 */
-	public static String replacePropertiesIn(Properties properties, char prefix, String value) {
+	public static String replacePropertiesIn(Properties properties, String prefix, String value) {
 
-		String prefixS = String.valueOf(prefix);
+		String startTag = prefix + "{";
 
 		// get a copy of the value
 		String tmpValue = value;
@@ -443,13 +443,8 @@ public class StringHelper {
 		int pos = -1;
 		int stop = 0;
 
-		// loop on $ character positions
-		while ((pos = tmpValue.indexOf(prefix, pos + 1)) != -1) {
-
-			// if pos+1 is not { character then continue
-			if (tmpValue.charAt(pos + 1) != '{') {
-				continue;
-			}
+		// loop on prefix positions
+		while ((pos = tmpValue.indexOf(startTag, pos + 1)) != -1) {
 
 			// find end of sequence with } character
 			stop = tmpValue.indexOf('}', pos + 1);
@@ -462,12 +457,12 @@ public class StringHelper {
 			}
 
 			// get sequence enclosed by pos and stop
-			String sequence = tmpValue.substring(pos + 2, stop);
+			String sequence = tmpValue.substring(pos + 1, stop);
 
 			// make sure sequence doesn't contain $ { } characters
-			if (sequence.contains(prefixS) || sequence.contains("{") || sequence.contains("}")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (sequence.contains(startTag) || sequence.contains("}")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				String msg = "Enclosed sequence in offsets {0} - {1} contains one of the illegal chars: {2} { }: {3}";
-				msg = MessageFormat.format(msg, pos, stop, prefixS, sequence);
+				msg = MessageFormat.format(msg, pos, stop, prefix, sequence);
 				logger.error(msg);
 				tmpValue = value;
 				break;
@@ -483,7 +478,7 @@ public class StringHelper {
 			}
 
 			// property exists, so replace in value
-			tmpValue = tmpValue.replace(prefixS + "{" + sequence + "}", property); //$NON-NLS-1$ //$NON-NLS-2$
+			tmpValue = tmpValue.replace(prefix + "{" + sequence + "}", property); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return tmpValue;
