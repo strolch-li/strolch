@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -894,7 +895,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (this.operationsLog != null) {
 			this.operationsLog.addMessage(
 					new LogMessage(this.realm.getRealm(), Locator.valueOf(AGENT, "tx", StrolchAgent.getUniqueId()),
-							LogSeverity.EXCEPTION, "strolch-agent", "agent.tx.failed").value("reason", e));
+							LogSeverity.EXCEPTION, ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed")
+									.value("reason", e));
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$

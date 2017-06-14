@@ -1,5 +1,7 @@
 package li.strolch.handler.operationslog;
 
+import java.util.ResourceBundle;
+
 import com.google.gson.JsonObject;
 
 import li.strolch.model.Locator;
@@ -13,8 +15,8 @@ public class LogMessage extends I18nMessage {
 	private final Locator locator;
 	private final LogSeverity severity;
 
-	public LogMessage(String realm, Locator locator, LogSeverity logSeverity, String bundleId, String key) {
-		super(bundleId, key);
+	public LogMessage(String realm, Locator locator, LogSeverity logSeverity, ResourceBundle bundle, String key) {
+		super(bundle, key);
 		this.realm = realm;
 		this.locator = locator;
 		this.severity = logSeverity;

@@ -17,6 +17,7 @@ package li.strolch.migrations;
 
 import java.io.File;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -202,8 +203,8 @@ public class MigrationsHandler extends StrolchComponent {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class)
 							.addMessage(new LogMessage(Tags.AGENT, getLocator().append(StrolchAgent.getUniqueId()),
-									LogSeverity.EXCEPTION, "strolch-service", "execution.handler.failed.executed")
-											.value("reason", e));
+									LogSeverity.EXCEPTION, ResourceBundle.getBundle("strolch-service"),
+									"execution.handler.failed.executed").value("reason", e));
 				}
 			}
 		}

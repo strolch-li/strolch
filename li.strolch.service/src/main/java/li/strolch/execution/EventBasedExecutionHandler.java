@@ -1,5 +1,6 @@
 package li.strolch.execution;
 
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -128,7 +129,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
-							"strolch-service", "execution.handler.failed.execution").value("reason", e));
+							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.execution")
+									.value("reason", e));
 				}
 			}
 		});
@@ -146,7 +148,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
-							"strolch-service", "execution.handler.failed.executed").value("reason", e));
+							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
+									.value("reason", e));
 				}
 			}
 		});
@@ -164,7 +167,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
-							"strolch-service", "execution.handler.failed.stopped").value("reason", e));
+							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.stopped")
+									.value("reason", e));
 				}
 			}
 		});
@@ -182,7 +186,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
-							"strolch-service", "execution.handler.failed.error").value("reason", e));
+							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.error")
+									.value("reason", e));
 				}
 			}
 		});
@@ -200,7 +205,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
-							"strolch-service", "execution.handler.failed.warning").value("reason", e));
+							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.warning")
+									.value("reason", e));
 				}
 			}
 		});
@@ -236,8 +242,9 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class)
-							.addMessage(new LogMessage(realm, activityLoc, LogSeverity.EXCEPTION, "strolch-service",
-									"execution.handler.failed.archive").value("reason", e));
+							.addMessage(new LogMessage(realm, activityLoc, LogSeverity.EXCEPTION,
+									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.archive")
+											.value("reason", e));
 				}
 			}
 		});

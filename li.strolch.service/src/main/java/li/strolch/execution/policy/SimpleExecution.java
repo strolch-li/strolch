@@ -20,10 +20,6 @@ public class SimpleExecution extends ExecutionPolicy {
 		super(container, tx);
 	}
 
-	protected void toStarting(Action action) {
-		setActionState(action, State.STARTING);
-	}
-
 	@Override
 	public void toExecution(Action action) {
 		setActionState(action, State.EXECUTION);

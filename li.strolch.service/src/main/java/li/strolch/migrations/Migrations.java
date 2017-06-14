@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -144,8 +145,8 @@ public class Migrations {
 				List<Version> list = migrationsRan.getList(realm);
 				for (Version version : list) {
 					LogMessage logMessage = new LogMessage(realm, locator.append(StrolchAgent.getUniqueId()),
-							LogSeverity.INFO, "strolch-service", "execution.handler.migrations.version")
-									.value("version", version.toString());
+							LogSeverity.INFO, ResourceBundle.getBundle("strolch-service"),
+							"execution.handler.migrations.version").value("version", version.toString());
 					operationsLog.addMessage(logMessage);
 				}
 			}

@@ -10,20 +10,16 @@ import li.strolch.utils.helper.StringHelper;
 
 public class I18nMessage {
 
-	private String bundleId;
+	private ResourceBundle bundle;
 	private String key;
 	private Properties values;
 
-	public I18nMessage(String bundleId, String key) {
-		DBC.INTERIM.assertNotEmpty("bundleId must be set!", bundleId);
+	public I18nMessage(ResourceBundle bundle, String key) {
+		DBC.INTERIM.assertNotNull("bundle must be set!", bundle);
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
-		this.bundleId = bundleId;
+		this.bundle = bundle;
 		this.key = key;
 		this.values = new Properties();
-	}
-
-	public String getBundleId() {
-		return this.bundleId;
 	}
 
 	public String getKey() {
@@ -42,8 +38,7 @@ public class I18nMessage {
 	}
 
 	public String formatMessage() {
-		ResourceBundle bundle = ResourceBundle.getBundle(this.bundleId);
-		String string = bundle.getString(this.key);
+		String string = this.bundle.getString(this.key);
 		return StringHelper.replacePropertiesIn(this.values, EMPTY, string);
 	}
 }
