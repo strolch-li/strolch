@@ -30,7 +30,6 @@ public enum State {
 	CREATED("Created"), //$NON-NLS-1$
 	PLANNING("Planning"), //$NON-NLS-1$
 	PLANNED("Planned"), //$NON-NLS-1$
-	STARTING("Starting"), //$NON-NLS-1$
 	EXECUTION("Execution"), //$NON-NLS-1$
 	WARNING("Warning"), //$NON-NLS-1$
 	ERROR("Error"), //$NON-NLS-1$
@@ -165,7 +164,7 @@ public enum State {
 	 * @return true if {@link #STARTING} or {@link #EXECUTION} or {@link #WARNING}
 	 */
 	public boolean canSetToError() {
-		return this == State.STARTING || this == State.EXECUTION || this == State.WARNING;
+		return this == State.EXECUTION || this == State.WARNING;
 	}
 
 	/**
@@ -206,7 +205,7 @@ public enum State {
 			return State.WARNING;
 
 		// execution
-		if (states.contains(State.EXECUTION) || states.contains(State.STARTING))
+		if (states.contains(State.EXECUTION))
 			return State.EXECUTION;
 		if (states.contains(State.EXECUTED) && (states.contains(State.CREATED) || states.contains(State.PLANNING)
 				|| states.contains(State.PLANNED)))
