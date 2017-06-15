@@ -69,6 +69,7 @@ public class Tags {
 	public static final String SEVERITY = "Severity";
 	public static final String KEY = "Key";
 	public static final String MESSAGE = "Message";
+	public static final String MESSAGES = "Messages";
 	public static final String REALM = "Realm";
 
 	public static class Json {
@@ -119,6 +120,7 @@ public class Tags {
 		public static final String SEVERITY = "severity";
 		public static final String KEY = "key";
 		public static final String MESSAGE = "message";
+		public static final String MESSAGES = "messages";
 		public static final String REALM = "realm";
 
 		// miscellaneous

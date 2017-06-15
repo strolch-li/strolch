@@ -1,5 +1,6 @@
 package li.strolch.handler.operationslog;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,7 +16,8 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 
 public class OperationsLog extends StrolchComponent {
 
-	private Map<String, LinkedHashMap<Locator, LogMessage>> logMessagesByRealm;
+	private Map<String, LinkedHashMap<String, LogMessage>> logMessagesById;
+	private Map<String, LinkedHashMap<Locator, List<LogMessage>>> logMessagesByLocator;
 	private int maxMessages;
 
 	public OperationsLog(ComponentContainer container, String componentName) {
@@ -27,41 +29,67 @@ public class OperationsLog extends StrolchComponent {
 
 		this.maxMessages = configuration.getInt("maxMessages", 10000);
 
-		this.logMessagesByRealm = new HashMap<>();
+		this.logMessagesById = new HashMap<>();
+		this.logMessagesByLocator = new HashMap<>();
 
 		super.initialize(configuration);
 	}
 
 	public void addMessage(LogMessage logMessage) {
 
-		LinkedHashMap<Locator, LogMessage> logMessages = this.logMessagesByRealm.computeIfAbsent(logMessage.getRealm(),
-				this::newBoundedMap);
+		// store in global list
+		LinkedHashMap<String, LogMessage> logMessages = this.logMessagesById.computeIfAbsent(logMessage.getRealm(),
+				this::newBoundedStringMap);
+		logMessages.put(logMessage.getId(), logMessage);
 
-		logMessages.put(logMessage.getLocator(), logMessage);
+		// store under locator
+		LinkedHashMap<Locator, List<LogMessage>> logMessagesLocator = this.logMessagesByLocator
+				.computeIfAbsent(logMessage.getRealm(), this::newBoundedLocatorMap);
+		List<LogMessage> messages = logMessagesLocator.computeIfAbsent(logMessage.getLocator(),
+				(l) -> new ArrayList<LogMessage>());
+		messages.add(logMessage);
 	}
 
-	private LinkedHashMap<Locator, LogMessage> newBoundedMap(String realm) {
-		return new LinkedHashMap<Locator, LogMessage>() {
+	public void clearMessages(String realm, Locator locator) {
+		LinkedHashMap<Locator, List<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
+		if (logMessages != null)
+			logMessages.remove(locator);
+	}
+
+	public Optional<List<LogMessage>> getMessagesFor(String realm, Locator locator) {
+		LinkedHashMap<Locator, List<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
+		if (logMessages == null)
+			return Optional.empty();
+		return Optional.ofNullable(logMessages.get(locator));
+	}
+
+	public List<LogMessage> getMessages(String realm) {
+		LinkedHashMap<String, LogMessage> logMessages = this.logMessagesById.get(realm);
+		if (logMessages == null)
+			return Collections.emptyList();
+
+		return logMessages.entrySet().stream().map(e -> e.getValue()).collect(Collectors.toList());
+	}
+
+	private LinkedHashMap<String, LogMessage> newBoundedStringMap(String realm) {
+		return new LinkedHashMap<String, LogMessage>() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected boolean removeEldestEntry(java.util.Map.Entry<Locator, LogMessage> eldest) {
+			protected boolean removeEldestEntry(java.util.Map.Entry<String, LogMessage> eldest) {
 				return size() > maxMessages;
 			}
 		};
 	}
 
-	public Optional<LogMessage> getMessage(String realm, Locator locator) {
-		LinkedHashMap<Locator, LogMessage> logMessages = this.logMessagesByRealm.computeIfAbsent(realm,
-				this::newBoundedMap);
-		return Optional.ofNullable(logMessages.get(locator));
-	}
+	private LinkedHashMap<Locator, List<LogMessage>> newBoundedLocatorMap(String realm) {
+		return new LinkedHashMap<Locator, List<LogMessage>>() {
+			private static final long serialVersionUID = 1L;
 
-	public List<LogMessage> getMessages(String realm) {
-		LinkedHashMap<Locator, LogMessage> logMessages = this.logMessagesByRealm.get(realm);
-		if (logMessages == null)
-			return Collections.emptyList();
-
-		return logMessages.entrySet().stream().map(e -> e.getValue()).collect(Collectors.toList());
+			@Override
+			protected boolean removeEldestEntry(java.util.Map.Entry<Locator, List<LogMessage>> eldest) {
+				return size() > maxMessages;
+			}
+		};
 	}
 }
