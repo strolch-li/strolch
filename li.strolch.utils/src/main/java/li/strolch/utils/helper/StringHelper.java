@@ -97,14 +97,32 @@ public class StringHelper {
 	 *             if {@link UnsupportedEncodingException} is thrown
 	 */
 	public static String getHexString(byte[] raw) throws RuntimeException {
+		return getHexString(raw, 0, raw.length);
+	}
+
+	/**
+	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
+	 * 
+	 * @param raw
+	 *            the bytes to convert to String using numbers in hexadecimal
+	 * 
+	 * @return the encoded string
+	 * 
+	 * @throws RuntimeException
+	 *             if {@link UnsupportedEncodingException} is thrown
+	 */
+	public static String getHexString(byte[] raw, int offset, int length) throws RuntimeException {
 		try {
-			byte[] hex = new byte[2 * raw.length];
+			byte[] hex = new byte[2 * length];
 			int index = 0;
 
-			for (byte b : raw) {
+			int pos = offset;
+			for (int i = 0; i < length; i++) {
+				byte b = raw[pos];
 				int v = b & 0xFF;
 				hex[index++] = HEX_CHAR_TABLE[v >>> 4];
 				hex[index++] = HEX_CHAR_TABLE[v & 0xF];
+				pos++;
 			}
 
 			return new String(hex, "ASCII"); //$NON-NLS-1$
@@ -414,7 +432,6 @@ public class StringHelper {
 	 * @return a new string with all defined properties replaced or if an error occurred the original value is returned
 	 */
 	public static String replacePropertiesIn(Properties properties, String value) {
-
 		return replacePropertiesIn(properties, "$", value);
 	}
 
@@ -435,6 +452,7 @@ public class StringHelper {
 	public static String replacePropertiesIn(Properties properties, String prefix, String value) {
 
 		String startTag = prefix + "{";
+		int tagLength = startTag.length();
 
 		// get a copy of the value
 		String tmpValue = value;
@@ -444,7 +462,7 @@ public class StringHelper {
 		int stop = 0;
 
 		// loop on prefix positions
-		while ((pos = tmpValue.indexOf(startTag, pos + 1)) != -1) {
+		while ((pos = tmpValue.indexOf(startTag, pos)) != -1) {
 
 			// find end of sequence with } character
 			stop = tmpValue.indexOf('}', pos + 1);
@@ -457,7 +475,8 @@ public class StringHelper {
 			}
 
 			// get sequence enclosed by pos and stop
-			String sequence = tmpValue.substring(pos + 1, stop);
+
+			String sequence = tmpValue.substring(pos + tagLength, stop);
 
 			// make sure sequence doesn't contain $ { } characters
 			if (sequence.contains(startTag) || sequence.contains("}")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -478,7 +497,7 @@ public class StringHelper {
 			}
 
 			// property exists, so replace in value
-			tmpValue = tmpValue.replace(prefix + "{" + sequence + "}", property); //$NON-NLS-1$ //$NON-NLS-2$
+			tmpValue = tmpValue.replace(startTag + sequence + "}", property); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return tmpValue;

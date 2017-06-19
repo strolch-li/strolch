@@ -137,4 +137,19 @@ public class ReplacePropertiesInTest {
 
 		assertEquals(expected, result);
 	}
+
+	@Test
+	public void shouldReplaceProps10() {
+
+		String expr = "%{foo},bla %{food}. ";
+		String expected = "bar,bla foofoo. ";
+
+		Properties properties = new Properties();
+		properties.setProperty("foo", "bar");
+		properties.setProperty("food", "foofoo");
+
+		String result = StringHelper.replacePropertiesIn(properties, "%", expr);
+
+		assertEquals(expected, result);
+	}
 }
