@@ -225,6 +225,9 @@ public enum State {
 		if (states.contains(State.PLANNED) && (states.contains(State.CLOSED)))
 			return State.PLANNED;
 
+		if (states.contains(State.CREATED) && (states.contains(State.CLOSED)))
+			return State.CREATED;
+
 		// should never happen, unless new state is introduced
 		throw new IllegalStateException("Unhandled situation with states: "
 				+ states.stream().map(e -> e.state).collect(Collectors.joining(", ")));
