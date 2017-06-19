@@ -74,10 +74,82 @@ public class ByteHelper {
 		return (byte) (data | (1 << position));
 	}
 
+	public static short setBit(short data, int position) {
+		if (position > 15)
+			throw new IllegalStateException("Position " + position + " is not available in a short!");
+		return (short) (data | (1 << position));
+	}
+
+	public static int setBit(int data, int position) {
+		if (position > 31)
+			throw new IllegalStateException("Position " + position + " is not available in an int!");
+		return (data | (1 << position));
+	}
+
+	public static long setBit(long data, int position) {
+		if (position > 63)
+			throw new IllegalStateException("Position " + position + " is not available in a long!");
+		return (data | (1 << position));
+	}
+
 	public static byte clearBit(byte data, int position) {
 		if (position > 7)
 			throw new IllegalStateException("Position " + position + " is not available in a byte!");
 		return (byte) (data & ~(1 << position));
+	}
+
+	public static short clearBit(short data, int position) {
+		if (position > 15)
+			throw new IllegalStateException("Position " + position + " is not available in a short!");
+		return (short) (data & ~(1 << position));
+	}
+
+	public static int clearBit(int data, int position) {
+		if (position > 31)
+			throw new IllegalStateException("Position " + position + " is not available in a int!");
+		return (data & ~(1 << position));
+	}
+
+	public static long clearBit(long data, int position) {
+		if (position > 63)
+			throw new IllegalStateException("Position " + position + " is not available in a long!");
+		return (data & ~(1 << position));
+	}
+
+	public static int countSetBits(byte activeChannels) {
+		int setBits = 0;
+		for (int i = 0; i < 8; i++) {
+			if (isBitSet(activeChannels, i))
+				setBits++;
+		}
+		return setBits;
+	}
+
+	public static int countSetBits(short activeChannels) {
+		int setBits = 0;
+		for (int i = 0; i < 16; i++) {
+			if (isBitSet(activeChannels, i))
+				setBits++;
+		}
+		return setBits;
+	}
+
+	public static int countSetBits(int activeChannels) {
+		int setBits = 0;
+		for (int i = 0; i < 32; i++) {
+			if (isBitSet(activeChannels, i))
+				setBits++;
+		}
+		return setBits;
+	}
+
+	public static int countSetBits(long activeChannels) {
+		int setBits = 0;
+		for (int i = 0; i < 64; i++) {
+			if (isBitSet(activeChannels, i))
+				setBits++;
+		}
+		return setBits;
 	}
 
 	/**
@@ -144,10 +216,6 @@ public class ByteHelper {
 
 	public static short toShort(byte high, byte low) {
 		return (short) (((high & 0xff) << 8) | (low & 0xff));
-	}
-
-	public static void main(String[] args) {
-		System.out.println(asBinary(toShort((byte) 0x01, (byte) 0x03)));
 	}
 
 	/**
