@@ -139,18 +139,27 @@ public class ActivityTest {
 
 		Activity a = new Activity("bla", "Bla", "Bla", TimeOrdering.SERIES);
 
+		Action a0 = new Action("a0", "A0", "Wait");
+		a.addElement(a0);
 		Action a1 = new Action("a1", "A1", "Consume");
 		a.addElement(a1);
 		Action a2 = new Action("a2", "A2", "Consume");
 		a.addElement(a2);
-		Action a3 = new Action("a3", "A3", "Consume");
+		Action a3 = new Action("a3", "A3", "Produce");
 		a.addElement(a3);
-		Action a4 = new Action("a4", "A4", "Consume");
+		Action a4 = new Action("a4", "A4", "Produce");
 		a.addElement(a4);
+		Action a5 = new Action("a5", "A5", "Use");
+		a.addElement(a5);
 
-		Optional<IActivityElement> previousElement = a.getPreviousElement(a1);
-		Optional<IActivityElement> nextElement = a.getNextElement(a1);
+		Optional<IActivityElement> previousElement = a.getPreviousElement(a0);
 		assertFalse(previousElement.isPresent());
+		Optional<IActivityElement> nextElement = a.getNextElement(a0);
+		assertEquals("a1", nextElement.get().getId());
+
+		previousElement = a.getPreviousElement(a1);
+		assertEquals("a0", previousElement.get().getId());
+		nextElement = a.getNextElement(a1);
 		assertEquals("a2", nextElement.get().getId());
 
 		previousElement = a.getPreviousElement(a2);
@@ -166,6 +175,11 @@ public class ActivityTest {
 		previousElement = a.getPreviousElement(a4);
 		nextElement = a.getNextElement(a4);
 		assertEquals("a3", previousElement.get().getId());
+		assertEquals("a5", nextElement.get().getId());
+
+		previousElement = a.getPreviousElement(a5);
+		nextElement = a.getNextElement(a5);
+		assertEquals("a4", previousElement.get().getId());
 		assertFalse(nextElement.isPresent());
 	}
 
@@ -187,10 +201,16 @@ public class ActivityTest {
 		Action a5 = new Action("a5", "A5", "Use");
 		a.addElement(a5);
 
+		// a0
+		Optional<IActivityElement> nextElement = a.getNextElementByType(a0, "Consume");
+		assertEquals("a1", nextElement.get().getId());
+		nextElement = a.getNextElementByType(a0, "Produce");
+		assertEquals("a3", nextElement.get().getId());
+
 		// a1
 		Optional<IActivityElement> previousElement = a.getPreviousElementByType(a1, "Consume");
 		assertFalse(previousElement.isPresent());
-		Optional<IActivityElement> nextElement = a.getNextElementByType(a1, "Consume");
+		nextElement = a.getNextElementByType(a1, "Consume");
 		assertEquals("a2", nextElement.get().getId());
 		nextElement = a.getNextElementByType(a1, "Produce");
 		assertEquals("a3", nextElement.get().getId());
@@ -220,6 +240,16 @@ public class ActivityTest {
 		assertFalse(nextElement.isPresent());
 		nextElement = a.getNextElementByType(a4, "Use");
 		assertEquals("a5", nextElement.get().getId());
+
+		// a5
+		previousElement = a.getPreviousElementByType(a5, "Produce");
+		assertEquals("a4", previousElement.get().getId());
+		previousElement = a.getPreviousElementByType(a5, "Consume");
+		assertEquals("a2", previousElement.get().getId());
+		nextElement = a.getNextElementByType(a5, "Produce");
+		assertFalse(nextElement.isPresent());
+		nextElement = a.getNextElementByType(a5, "Use");
+		assertFalse(nextElement.isPresent());
 	}
 
 	@Test

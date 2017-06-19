@@ -228,7 +228,7 @@ public class Activity extends AbstractStrolchRootElement
 
 		boolean foundElem = false;
 		Iterator<IActivityElement> iter = reversed.iterator();
-		IActivityElement elem = iter.next();
+		IActivityElement elem;
 		while (iter.hasNext()) {
 			elem = iter.next();
 
@@ -267,7 +267,7 @@ public class Activity extends AbstractStrolchRootElement
 		Iterator<Entry<String, IActivityElement>> iter = elementIterator();
 
 		boolean foundElem = false;
-		IActivityElement elem = iter.next().getValue();
+		IActivityElement elem;
 		while (iter.hasNext()) {
 			elem = iter.next().getValue();
 
