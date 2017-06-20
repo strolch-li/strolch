@@ -37,7 +37,7 @@
 				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 				<includes>
-					<include>**/componentVersion.properties</include>
+					<include>**/*.properties</include>
 				</includes>
 			</resource>
 		</resources>
