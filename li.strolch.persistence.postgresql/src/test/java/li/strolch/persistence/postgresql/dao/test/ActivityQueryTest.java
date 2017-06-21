@@ -119,7 +119,7 @@ public class ActivityQueryTest extends QueryTest {
 
 		ActivityQuery<Activity> query = ActivityQuery.query("MyType1");
 		query.and().with(new ActivityStateSelection(State.CREATED));
-		performActivityQuery(query, Arrays.asList("@1"));
+		performActivityQuery(query, Arrays.asList("@1", "@3"));
 
 		query = ActivityQuery.query("MyType1");
 		query.and().with(new ActivityStateSelection(State.EXECUTION));
