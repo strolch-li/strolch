@@ -37,7 +37,7 @@ public interface ITimedState<T extends IValue> {
 	ITimeValue<T> getNextMatch(final Long time, T value);
 
 	/**
-	 * @return the new {@link ITimeValue} matching the value in the future
+	 * @return the new {@link ITimeValue} matching the value in the past
 	 */
 	ITimeValue<T> getPreviousMatch(final Long time, T value);
 
