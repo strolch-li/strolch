@@ -7,6 +7,11 @@
 			<Parameter Id="objectType" Name="Object Type" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Slot" />
 			<Parameter Id="hideObjectTypeFromFilterCriteria" Name="Hide objectType from filter criteria" Type="Boolean" Value="true" />
 			<Parameter Id="dateRangeSel" Name="Date Range Selector" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="Bags/parameters/expirationDate" />
+			<Parameter Id="descending" Name="Descending order" Type="Boolean" Value="true" />
+		</ParameterBag>
+
+		<ParameterBag Id="ordering" Name="Ordering" Type="Ordering">
+			<Parameter Id="quantity" Name="Quantity" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/quantity" />
 		</ParameterBag>
 
 		<ParameterBag Id="quantityFilter" Name="Filter" Type="Filter">
@@ -43,6 +48,11 @@
 		<ParameterBag Id="parameters" Name="parameters" Type="Parameters">
 			<Parameter Id="objectType" Name="Object Type" Type="String" Interpretation="Order-Ref" Uom="FromStock" Value="FromStock" />
 			<Parameter Id="dateRangeSel" Name="Date Range Selector" Type="String" Interpretation="Order-Ref" Uom="FromStock" Value="$date" />
+			<Parameter Id="descending" Name="Descending order" Type="Boolean" Value="true" />
+		</ParameterBag>
+
+		<ParameterBag Id="ordering" Name="Ordering" Type="Ordering">
+			<Parameter Id="quantity" Name="Quantity" Type="String" Interpretation="Order-Ref" Uom="FromStock" Value="Bags/parameters/quantity" />
 		</ParameterBag>
 
 		<ParameterBag Id="columns" Name="Display Columns" Type="Display">

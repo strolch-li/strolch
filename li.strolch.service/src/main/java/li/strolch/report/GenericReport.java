@@ -46,9 +46,11 @@ public class GenericReport {
 	private static final String BAG_JOINS = "joins";
 	private static final String BAG_PARAMETERS = "parameters";
 	private static final String BAG_COLUMNS = "columns";
+	private static final String BAG_ORDERING = "ordering";
 
 	private static final String PARAM_OBJECT_TYPE = "objectType";
 	private static final String PARAM_HIDE_OBJECT_TYPE_FROM_FILTER_CRITERIA = "hideObjectTypeFromFilterCriteria";
+	private static final String PARAM_DESCENDING = "descending";
 	private static final String PARAM_DATE_RANGE_SEL = "dateRangeSel";
 	private static final String PARAM_FIELD_REF = "fieldRef";
 	private static final String PARAM_POLICY = "policy";
@@ -72,6 +74,8 @@ public class GenericReport {
 	private StringParameter objectTypeP;
 	private boolean hideObjectTypeFromFilterCriteria;
 	private ParameterBag columnsBag;
+	private List<StringParameter> orderingParams;
+	private boolean descending;
 	private Set<String> columnIds;
 	private StringParameter dateRangeSelP;
 
@@ -95,7 +99,21 @@ public class GenericReport {
 				&& hideObjectTypeFromFilterCriteriaP.getValue();
 		this.columnsBag = this.report.getParameterBag(BAG_COLUMNS, true);
 		this.columnIds = this.columnsBag.getParameterKeySet();
+
+		if (this.report.hasParameter(BAG_PARAMETERS, PARAM_DESCENDING))
+			this.descending = this.report.getParameter(BAG_PARAMETERS, PARAM_DESCENDING).getValue();
+
 		this.dateRangeSelP = this.report.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
+
+		// evaluate ordering params
+		if (this.report.hasParameterBag(BAG_ORDERING)) {
+			ParameterBag orderingBag = this.report.getParameterBag(BAG_ORDERING);
+			if (orderingBag.hasParameters()) {
+				this.orderingParams = orderingBag.getParameters().stream().map(e -> (StringParameter) e)
+						.collect(Collectors.toList());
+				this.orderingParams.sort((c1, c2) -> Integer.compare(c1.getIndex(), c2.getIndex()));
+			}
+		}
 
 		// evaluate filters
 		this.filtersByPolicy = new HashMap<>();
@@ -160,7 +178,15 @@ public class GenericReport {
 	public Stream<Map<String, StrolchRootElement>> buildStream() {
 
 		// query the main objects and return a stream
-		return queryRows().map(e -> evaluateRow(e)).filter(e -> filter(e));
+		Stream<Map<String, StrolchRootElement>> stream = queryRows().map(e -> evaluateRow(e));
+
+		if (hasFilter())
+			stream = stream.filter(e -> filter(e));
+
+		if (hasOrdering())
+			stream = stream.sorted((e1, e2) -> sort(e1, e2));
+
+		return stream;
 	}
 
 	public Stream<ReportElement> doReport() {
@@ -186,6 +212,56 @@ public class GenericReport {
 								(m, e) -> m.addElement(e.getType(), e), //
 								(m1, m2) -> m1.addAll(m2), //
 								m -> m));
+	}
+
+	private boolean hasOrdering() {
+		return this.orderingParams != null && !this.orderingParams.isEmpty();
+	}
+
+	private int sort(Map<String, StrolchRootElement> row1, Map<String, StrolchRootElement> row2) {
+
+		for (StringParameter fieldRefP : this.orderingParams) {
+
+			String type = fieldRefP.getUom();
+
+			StrolchRootElement column1 = row1.get(type);
+			if (column1 == null)
+				return -1;
+			StrolchRootElement column2 = row2.get(type);
+			if (column2 == null)
+				return 1;
+
+			int sortVal;
+			if (fieldRefP.getValue().startsWith("$")) {
+				String columnValue1 = evaluateColumnValue(fieldRefP, row1);
+				String columnValue2 = evaluateColumnValue(fieldRefP, row2);
+
+				if (this.descending) {
+					sortVal = columnValue1.compareTo(columnValue2);
+				} else {
+					sortVal = columnValue2.compareTo(columnValue1);
+				}
+
+			} else {
+				Parameter<?> param1 = lookupParameter(fieldRefP, column1);
+				Parameter<?> param2 = lookupParameter(fieldRefP, column2);
+
+				if (this.descending)
+					sortVal = param1.compareTo(param2);
+				else
+					sortVal = param2.compareTo(param1);
+			}
+
+			if (sortVal != 0)
+				return sortVal;
+		}
+
+		return 0;
+	}
+
+	private boolean hasFilter() {
+		return !this.filtersByPolicy.isEmpty() || this.dateRange != null
+				|| (this.filtersById != null && !this.filtersById.isEmpty());
 	}
 
 	private boolean filter(Map<String, StrolchRootElement> row) {
@@ -362,19 +438,19 @@ public class GenericReport {
 	private Stream<StrolchRootElement> queryRows() {
 
 		// find the type of object for which the report is created
-		if (objectTypeP.getInterpretation().equals(StrolchConstants.INTERPRETATION_RESOURCE_REF)) {
+		if (this.objectTypeP.getInterpretation().equals(StrolchConstants.INTERPRETATION_RESOURCE_REF)) {
 
-			return this.tx.getResourceMap().getElementsBy(this.tx, objectTypeP.getUom()).stream()
+			return this.tx.getResourceMap().getElementsBy(this.tx, this.objectTypeP.getUom()).stream()
 					.map(e -> e.getRootElement());
 
-		} else if (objectTypeP.getInterpretation().equals(StrolchConstants.INTERPRETATION_ORDER_REF)) {
+		} else if (this.objectTypeP.getInterpretation().equals(StrolchConstants.INTERPRETATION_ORDER_REF)) {
 
-			return this.tx.getOrderMap().getElementsBy(this.tx, objectTypeP.getUom()).stream()
+			return this.tx.getOrderMap().getElementsBy(this.tx, this.objectTypeP.getUom()).stream()
 					.map(e -> e.getRootElement());
 
 		} else {
 
-			throw new IllegalArgumentException("Unhandled element type " + objectTypeP.getInterpretation());
+			throw new IllegalArgumentException("Unhandled element type " + this.objectTypeP.getInterpretation());
 		}
 	}
 
