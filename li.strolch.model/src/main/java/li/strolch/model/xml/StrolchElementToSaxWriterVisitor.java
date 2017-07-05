@@ -53,6 +53,7 @@ import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
+import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -200,8 +201,10 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 
 		writeStartStrolchElement(Tags.ACTION, empty, action);
 		this.writer.writeAttribute(Tags.STATE, action.getState().getName());
-		this.writer.writeAttribute(Tags.RESOURCE_ID, action.getResourceId());
-		this.writer.writeAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
+		if (StringHelper.isNotEmpty(action.getResourceId()))
+			this.writer.writeAttribute(Tags.RESOURCE_ID, action.getResourceId());
+		if (StringHelper.isNotEmpty(action.getResourceType()))
+			this.writer.writeAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
 
 		if (action.hasParameterBags())
 			writeParameterBags(action);

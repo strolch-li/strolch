@@ -46,6 +46,7 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.helper.DomUtil;
+import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -143,8 +144,11 @@ public class StrolchElementToDomVisitor implements StrolchRootElementVisitor<Doc
 		Element element = document.createElement(Tags.ACTION);
 		fillElement(element, action);
 
-		element.setAttribute(Tags.RESOURCE_ID, action.getResourceId());
-		element.setAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
+		if (StringHelper.isNotEmpty(action.getResourceId()))
+			element.setAttribute(Tags.RESOURCE_ID, action.getResourceId());
+		if (StringHelper.isNotEmpty(action.getResourceType()))
+			element.setAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
+
 		element.setAttribute(Tags.STATE, action.getState().getName());
 
 		if (action.hasPolicyDefs())

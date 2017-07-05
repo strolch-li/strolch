@@ -45,6 +45,12 @@ public class UpdateOrderService extends AbstractService<UpdateOrderArg, ServiceR
 	protected ServiceResult internalDoService(UpdateOrderArg arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
+
+			if (arg.refreshUnknownVersion && !arg.order.hasVersion()) {
+				Order current = tx.getOrderBy(arg.order.getType(), arg.order.getId(), true);
+				arg.order.setVersion(current.getVersion());
+			}
+
 			UpdateOrderCommand command = new UpdateOrderCommand(getContainer(), tx);
 			command.setOrder(arg.order);
 
@@ -57,6 +63,7 @@ public class UpdateOrderService extends AbstractService<UpdateOrderArg, ServiceR
 
 	public static class UpdateOrderArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
+		public boolean refreshUnknownVersion = false;
 		public Order order;
 	}
 }

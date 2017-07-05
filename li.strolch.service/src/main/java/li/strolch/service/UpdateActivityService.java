@@ -45,6 +45,12 @@ public class UpdateActivityService extends AbstractService<UpdateActivityArg, Se
 	protected ServiceResult internalDoService(UpdateActivityArg arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
+
+			if (arg.refreshUnknownVersion && !arg.activity.hasVersion()) {
+				Activity current = tx.getActivityBy(arg.activity.getType(), arg.activity.getId(), true);
+				arg.activity.setVersion(current.getVersion());
+			}
+
 			UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx);
 			command.setActivity(arg.activity);
 
@@ -57,6 +63,7 @@ public class UpdateActivityService extends AbstractService<UpdateActivityArg, Se
 
 	public static class UpdateActivityArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
+		public boolean refreshUnknownVersion = false;
 		public Activity activity;
 	}
 }

@@ -45,6 +45,12 @@ public class UpdateResourceService extends AbstractService<UpdateResourceArg, Se
 	protected ServiceResult internalDoService(UpdateResourceArg arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
+
+			if (arg.refreshUnknownVersion && !arg.resource.hasVersion()) {
+				Resource current = tx.getResourceBy(arg.resource.getType(), arg.resource.getId(), true);
+				arg.resource.setVersion(current.getVersion());
+			}
+
 			UpdateResourceCommand command = new UpdateResourceCommand(getContainer(), tx);
 			command.setResource(arg.resource);
 
@@ -57,6 +63,7 @@ public class UpdateResourceService extends AbstractService<UpdateResourceArg, Se
 
 	public static class UpdateResourceArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
+		public boolean refreshUnknownVersion = false;
 		public Resource resource;
 	}
 }
