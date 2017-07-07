@@ -218,6 +218,12 @@ public class ByteHelper {
 		return (short) (((high & 0xff) << 8) | (low & 0xff));
 	}
 
+	public static byte[] toByteArrayLittleEndian(short value) {
+		byte low = (byte) (value & 0xff);
+		byte high = (byte) ((value >> 8) & 0xff);
+		return new byte[] { low, high };
+	}
+
 	/**
 	 * Formats the given byte array to a binary string, separating each byte by a space
 	 * 
