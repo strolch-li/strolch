@@ -160,7 +160,7 @@ public class XmlTest {
 		PrivilegeConfigDomWriter configSaxWriter = new PrivilegeConfigDomWriter(containerModel, configFile);
 		configSaxWriter.write();
 
-		String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(configFile));
+		String fileHash = StringHelper.toHexString(FileHelper.hashFileSha256(configFile));
 		assertEquals("800b8e42e15b6b3bb425fa9c12a011d587d2b12343a1d1371eaa36dc1b2ea5f4", fileHash);
 	}
 
@@ -185,8 +185,8 @@ public class XmlTest {
 		assertEquals("1", admin.getUserId());
 		assertEquals("admin", admin.getUsername());
 		assertEquals("cb69962946617da006a2f95776d78b49e5ec7941d2bdb2d25cdb05f957f64344",
-				StringHelper.getHexString(admin.getPassword()));
-		assertEquals("61646d696e", StringHelper.getHexString(admin.getSalt()));
+				StringHelper.toHexString(admin.getPassword()));
+		assertEquals("61646d696e", StringHelper.toHexString(admin.getSalt()));
 		assertEquals("Application", admin.getFirstname());
 		assertEquals("Administrator", admin.getLastname());
 		assertEquals(UserState.ENABLED, admin.getUserState());

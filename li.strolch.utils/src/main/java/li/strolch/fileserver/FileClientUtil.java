@@ -95,7 +95,7 @@ public class FileClientUtil {
 			}
 
 			// now validate hashes
-			String dstFileHash = StringHelper.getHexString(FileHelper.hashFileSha256(dstFile));
+			String dstFileHash = StringHelper.toHexString(FileHelper.hashFileSha256(dstFile));
 			if (!dstFileHash.equals(origFilePart.getFileHash())) {
 				msg = "Downloading the file {0} failed because the hashes don''t match. Expected: {1} / Actual: {2}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, origFilePart.getFileName(), origFilePart.getFileHash(), dstFileHash);
@@ -123,7 +123,7 @@ public class FileClientUtil {
 
 			// get the size of the file
 			long fileLength = srcFile.length();
-			String fileHash = StringHelper.getHexString(FileHelper.hashFileSha256(srcFile));
+			String fileHash = StringHelper.toHexString(FileHelper.hashFileSha256(srcFile));
 
 			// create the file part to send
 			FilePart filePart = new FilePart(srcFile.getName(), fileType);

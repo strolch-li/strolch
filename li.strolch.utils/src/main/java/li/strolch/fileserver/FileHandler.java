@@ -104,7 +104,7 @@ public class FileHandler {
 			filePart.setFileLength(fileSize);
 
 			// set the SHA256 of the file
-			filePart.setFileHash(StringHelper.getHexString(FileHelper.hashFileSha256(file)));
+			filePart.setFileHash(StringHelper.toHexString(FileHelper.hashFileSha256(file)));
 		}
 
 		// variables defining the part of the file we're going to return
@@ -221,7 +221,7 @@ public class FileHandler {
 
 		// if this is the last part, then validate the hashes
 		if (filePart.isLastPart()) {
-			String dstFileHash = StringHelper.getHexString(FileHelper.hashFileSha256(dstFile));
+			String dstFileHash = StringHelper.toHexString(FileHelper.hashFileSha256(dstFile));
 			if (!dstFileHash.equals(filePart.getFileHash())) {
 				String msg = "Uploading the file {0} failed because the hashes don''t match. Expected: {1} / Actual: {2}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, filePart.getFileName(), filePart.getFileHash(), dstFileHash);

@@ -15,6 +15,7 @@
  */
 package li.strolch.utils.helper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -56,11 +57,15 @@ public class StringHelper {
 			(byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd',
 			(byte) 'e', (byte) 'f' };
 
-	public static String asHexString(byte data) {
+	public static String toHexString(byte data) {
 		return String.format("%02x", data);
 	}
 
-	public static String asPrettyHexString(byte[] raw) {
+	public static byte fromHexByte(String encoded) {
+		return Byte.valueOf(encoded, 16);
+	}
+
+	public static String toPrettyHexString(byte[] raw) {
 		try {
 			byte[] hex = new byte[3 * raw.length + (raw.length / 8)];
 			int index = 0;
@@ -85,19 +90,15 @@ public class StringHelper {
 		}
 	}
 
-	/**
-	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
-	 * 
-	 * @param raw
-	 *            the bytes to convert to String using numbers in hexadecimal
-	 * 
-	 * @return the encoded string
-	 * 
-	 * @throws RuntimeException
-	 *             if {@link UnsupportedEncodingException} is thrown
-	 */
-	public static String getHexString(byte[] raw) throws RuntimeException {
-		return getHexString(raw, 0, raw.length);
+	public static byte[] fromPrettyHexString(String prettyHex) {
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		String[] split = prettyHex.split(" ");
+		for (String encoded : split) {
+			out.write(fromHexByte(encoded));
+		}
+
+		return out.toByteArray();
 	}
 
 	/**
@@ -111,7 +112,22 @@ public class StringHelper {
 	 * @throws RuntimeException
 	 *             if {@link UnsupportedEncodingException} is thrown
 	 */
-	public static String getHexString(byte[] raw, int offset, int length) throws RuntimeException {
+	public static String toHexString(byte[] raw) throws RuntimeException {
+		return toHexString(raw, 0, raw.length);
+	}
+
+	/**
+	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
+	 * 
+	 * @param raw
+	 *            the bytes to convert to String using numbers in hexadecimal
+	 * 
+	 * @return the encoded string
+	 * 
+	 * @throws RuntimeException
+	 *             if {@link UnsupportedEncodingException} is thrown
+	 */
+	public static String toHexString(byte[] raw, int offset, int length) throws RuntimeException {
 		try {
 			byte[] hex = new byte[2 * length];
 			int index = 0;
@@ -165,11 +181,11 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashMd5AsHex(String string) {
-		return getHexString(hashMd5(string.getBytes()));
+		return toHexString(hashMd5(string.getBytes()));
 	}
 
 	/**
-	 * Generates the MD5 Hash of a string. Use {@link StringHelper#getHexString(byte[])} to convert the byte array to a
+	 * Generates the MD5 Hash of a string. Use {@link StringHelper#toHexString(byte[])} to convert the byte array to a
 	 * Hex String which is printable
 	 * 
 	 * @param string
@@ -182,7 +198,7 @@ public class StringHelper {
 	}
 
 	/**
-	 * Generates the MD5 Hash of a byte array Use {@link StringHelper#getHexString(byte[])} to convert the byte array to
+	 * Generates the MD5 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
 	 * a Hex String which is printable
 	 * 
 	 * @param bytes
@@ -203,11 +219,11 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashSha1AsHex(String string) {
-		return getHexString(hashSha1(string.getBytes()));
+		return toHexString(hashSha1(string.getBytes()));
 	}
 
 	/**
-	 * Generates the SHA1 Hash of a string Use {@link StringHelper#getHexString(byte[])} to convert the byte array to a
+	 * Generates the SHA1 Hash of a string Use {@link StringHelper#toHexString(byte[])} to convert the byte array to a
 	 * Hex String which is printable
 	 * 
 	 * @param string
@@ -220,7 +236,7 @@ public class StringHelper {
 	}
 
 	/**
-	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#getHexString(byte[])} to convert the byte array
+	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array
 	 * to a Hex String which is printable
 	 * 
 	 * @param bytes
@@ -241,11 +257,11 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashSha256AsHex(String string) {
-		return getHexString(hashSha256(string.getBytes()));
+		return toHexString(hashSha256(string.getBytes()));
 	}
 
 	/**
-	 * Generates the SHA-256 Hash of a string Use {@link StringHelper#getHexString(byte[])} to convert the byte array to
+	 * Generates the SHA-256 Hash of a string Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
 	 * a Hex String which is printable
 	 * 
 	 * @param string
@@ -258,7 +274,7 @@ public class StringHelper {
 	}
 
 	/**
-	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#getHexString(byte[])} to convert the byte array
+	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array
 	 * to a Hex String which is printable
 	 * 
 	 * @param bytes
@@ -281,7 +297,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashAsHex(String algorithm, String string) {
-		return getHexString(hash(algorithm, string));
+		return toHexString(hash(algorithm, string));
 	}
 
 	/**
@@ -319,7 +335,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashAsHex(String algorithm, byte[] bytes) {
-		return getHexString(hash(algorithm, bytes));
+		return toHexString(hash(algorithm, bytes));
 	}
 
 	/**

@@ -300,8 +300,8 @@ public class FileHelper {
 			outBuffer.flush();
 
 			if (checksum) {
-				String fromFileMD5 = StringHelper.getHexString(FileHelper.hashFileMd5(fromFile));
-				String toFileMD5 = StringHelper.getHexString(FileHelper.hashFileMd5(toFile));
+				String fromFileMD5 = StringHelper.toHexString(FileHelper.hashFileMd5(fromFile));
+				String toFileMD5 = StringHelper.toHexString(FileHelper.hashFileMd5(toFile));
 				if (!fromFileMD5.equals(toFileMD5)) {
 					FileHelper.logger.error(MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}", //$NON-NLS-1$
 							fromFileMD5, toFileMD5));
@@ -492,7 +492,7 @@ public class FileHelper {
 
 	/**
 	 * Creates the MD5 hash of the given file, returning the hash as a byte array. Use
-	 * {@link StringHelper#getHexString(byte[])} to create a HEX string of the bytes
+	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 * 
 	 * @param file
 	 *            the file to hash
@@ -505,7 +505,7 @@ public class FileHelper {
 
 	/**
 	 * Creates the SHA1 hash of the given file, returning the hash as a byte array. Use
-	 * {@link StringHelper#getHexString(byte[])} to create a HEX string of the bytes
+	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 * 
 	 * @param file
 	 *            the file to hash
@@ -518,7 +518,7 @@ public class FileHelper {
 
 	/**
 	 * Creates the SHA256 hash of the given file, returning the hash as a byte array. Use
-	 * {@link StringHelper#getHexString(byte[])} to create a HEX string of the bytes
+	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 * 
 	 * @param file
 	 *            the file to hash
@@ -531,7 +531,7 @@ public class FileHelper {
 
 	/**
 	 * Creates the hash of the given file with the given algorithm, returning the hash as a byte array. Use
-	 * {@link StringHelper#getHexString(byte[])} to create a HEX string of the bytes
+	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 * 
 	 * @param file
 	 *            the file to hash

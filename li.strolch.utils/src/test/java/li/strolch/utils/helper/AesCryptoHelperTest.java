@@ -146,8 +146,8 @@ public class AesCryptoHelperTest {
 			AesCryptoHelper.encrypt(password, salt, clearTextFileS, encryptedFileS);
 			AesCryptoHelper.decrypt(password, salt, encryptedFileS, decryptedFileS);
 
-			String inputSha256 = StringHelper.getHexString(FileHelper.hashFileSha256(new File(clearTextFileS)));
-			String doutputSha256 = StringHelper.getHexString(FileHelper.hashFileSha256(new File(decryptedFileS)));
+			String inputSha256 = StringHelper.toHexString(FileHelper.hashFileSha256(new File(clearTextFileS)));
+			String doutputSha256 = StringHelper.toHexString(FileHelper.hashFileSha256(new File(decryptedFileS)));
 
 			assertEquals(inputSha256, doutputSha256);
 

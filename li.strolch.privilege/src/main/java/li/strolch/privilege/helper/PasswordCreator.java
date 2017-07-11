@@ -119,11 +119,11 @@ public class PasswordCreator {
 			if (saltTemp.isEmpty()) {
 				saltTemp = encryptionHandler.nextToken();
 			}
-			String saltS = StringHelper.getHexString(saltTemp.getBytes());
+			String saltS = StringHelper.toHexString(saltTemp.getBytes());
 			byte[] salt = StringHelper.fromHexString(saltS);
 
 			byte[] passwordHash = encryptionHandler.hashPassword(password, salt);
-			String passwordHashS = StringHelper.getHexString(passwordHash);
+			String passwordHashS = StringHelper.toHexString(passwordHash);
 			System.out.println("Hash is: " + passwordHashS);
 			System.out.println("Salt is: " + saltS);
 			System.out.println();
