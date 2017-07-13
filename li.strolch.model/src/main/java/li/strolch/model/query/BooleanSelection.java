@@ -16,7 +16,6 @@
 package li.strolch.model.query;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,7 +41,10 @@ public abstract class BooleanSelection implements Selection {
 	}
 
 	public BooleanSelection(Selection... selections) {
-		this.selections = Arrays.asList(selections);
+		this.selections = new ArrayList<Selection>();
+		for (Selection selection : selections) {
+			this.selections.add(selection);
+		}
 	}
 
 	@Override
