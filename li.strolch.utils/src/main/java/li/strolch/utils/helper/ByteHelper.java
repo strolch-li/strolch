@@ -224,6 +224,16 @@ public class ByteHelper {
 		return new byte[] { low, high };
 	}
 
+	public static byte reverse(byte x) {
+		byte b = 0;
+		for (int i = 0; i < 8; ++i) {
+			b <<= 1;
+			b |= (x & 1);
+			x >>= 1;
+		}
+		return b;
+	}
+
 	/**
 	 * Formats the given byte array to a binary string, separating each byte by a space
 	 * 
