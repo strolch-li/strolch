@@ -21,10 +21,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import li.strolch.command.AddResourceCommand;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.persistence.api.AddResourceCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;

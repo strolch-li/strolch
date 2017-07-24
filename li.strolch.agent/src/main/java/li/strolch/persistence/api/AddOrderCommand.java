@@ -13,67 +13,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.command;
+package li.strolch.persistence.api;
 
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.OrderMap;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.Resource;
-import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.model.Order;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddResourceCommand extends Command {
+public class AddOrderCommand extends Command {
 
-	private Resource resource;
+	private Order order;
 	private boolean added;
 
 	/**
 	 * @param tx
 	 */
-	public AddResourceCommand(ComponentContainer container, StrolchTransaction tx) {
+	public AddOrderCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
 	/**
-	 * @param resource
-	 *            the resource to set
+	 * @param order
+	 *            the order to set
 	 */
-	public void setResource(Resource resource) {
-		this.resource = resource;
+	public void setOrder(Order order) {
+		this.order = order;
 	}
 
 	@Override
 	public void validate() {
-		DBC.PRE.assertNotNull("Resource may not be null!", this.resource);
+		DBC.PRE.assertNotNull("Order may not be null!", this.order);
 	}
 
 	@Override
 	public void doCommand() {
 
-		tx().lock(this.resource);
+		tx().lock(this.order);
 
-		ResourceMap resourceMap = tx().getResourceMap();
-		if (resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {
-			String msg = MessageFormat.format("The Resource {0} already exists!", this.resource.getLocator());
+		OrderMap orderMap = tx().getOrderMap();
+		if (orderMap.hasElement(tx(), this.order.getType(), this.order.getId())) {
+			String msg = MessageFormat.format("The Order {0} already exists!", this.order.getLocator());
 			throw new StrolchException(msg);
 		}
 
-		resourceMap.add(tx(), this.resource);
+		orderMap.add(tx(), this.order);
 		this.added = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.added && this.resource != null && tx().isRollingBack()) {
-			ResourceMap resourceMap = tx().getResourceMap();
-			if (resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId()))
-				resourceMap.remove(tx(), this.resource);
+		if (this.added && this.order != null && tx().isRollingBack()) {
+			OrderMap orderMap = tx().getOrderMap();
+			if (orderMap.hasElement(tx(), this.order.getType(), this.order.getId()))
+				orderMap.remove(tx(), this.order);
 		}
 	}
 }

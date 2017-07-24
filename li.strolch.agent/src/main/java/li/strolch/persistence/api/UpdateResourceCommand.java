@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.command;
+package li.strolch.persistence.api;
 
 import java.text.MessageFormat;
 
@@ -21,22 +21,22 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
-import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RemoveResourceCommand extends Command {
+public class UpdateResourceCommand extends Command {
 
 	private Resource resource;
-	private boolean removed;
+	private Resource replaced;
+	private boolean updated;
 
 	/**
 	 * @param tx
 	 */
-	public RemoveResourceCommand(ComponentContainer container, StrolchTransaction tx) {
+	public UpdateResourceCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
@@ -59,23 +59,24 @@ public class RemoveResourceCommand extends Command {
 		tx().lock(this.resource);
 
 		ResourceMap resourceMap = tx().getResourceMap();
-		if (!resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {
-			String msg = "The Resource {0} can not be removed as it does not exist!!";
+		this.replaced = resourceMap.getBy(tx(), this.resource.getType(), this.resource.getId());
+		if (this.replaced == null) {
+			String msg = "The Resource {0} can not be updated as it does not exist!!";
 			msg = MessageFormat.format(msg, this.resource.getLocator());
 			throw new StrolchException(msg);
 		}
 
-		resourceMap.remove(tx(), this.resource);
-		this.removed = true;
+		resourceMap.update(tx(), this.resource);
+		this.updated = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.resource != null && tx().isRollingBack() && this.removed) {
+		if (this.updated && tx().isRollingBack()) {
 			if (tx().isVersioningEnabled())
 				tx().getResourceMap().undoVersion(tx(), this.resource);
 			else
-				tx().getResourceMap().add(tx(), this.resource);
+				tx().getResourceMap().update(tx(), this.replaced);
 		}
 	}
 }

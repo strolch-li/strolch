@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.command;
+package li.strolch.persistence.api;
 
 import java.text.MessageFormat;
 
@@ -21,23 +21,21 @@ import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.activity.Activity;
-import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateActivityCommand extends Command {
+public class AddActivityCommand extends Command {
 
 	private Activity activity;
-	private Activity replaced;
-	private boolean updated;
+	private boolean added;
 
 	/**
 	 * @param tx
 	 */
-	public UpdateActivityCommand(ComponentContainer container, StrolchTransaction tx) {
+	public AddActivityCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
@@ -60,24 +58,21 @@ public class UpdateActivityCommand extends Command {
 		tx().lock(this.activity);
 
 		ActivityMap activityMap = tx().getActivityMap();
-		this.replaced = activityMap.getBy(tx(), this.activity.getType(), this.activity.getId());
-		if (this.replaced == null) {
-			String msg = "The Activity {0} can not be updated as it does not exist!!";
-			msg = MessageFormat.format(msg, this.activity.getLocator());
+		if (activityMap.hasElement(tx(), this.activity.getType(), this.activity.getId())) {
+			String msg = MessageFormat.format("The Activity {0} already exists!", this.activity.getLocator());
 			throw new StrolchException(msg);
 		}
 
-		activityMap.update(tx(), this.activity);
-		this.updated = true;
+		activityMap.add(tx(), this.activity);
+		this.added = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.updated && tx().isRollingBack()) {
-			if (tx().isVersioningEnabled())
-				tx().getActivityMap().undoVersion(tx(), this.activity);
-			else
-				tx().getActivityMap().update(tx(), this.replaced);
+		if (this.added && this.activity != null && tx().isRollingBack()) {
+			ActivityMap activityMap = tx().getActivityMap();
+			if (activityMap.hasElement(tx(), this.activity.getType(), this.activity.getId()))
+				activityMap.remove(tx(), this.activity);
 		}
 	}
 }

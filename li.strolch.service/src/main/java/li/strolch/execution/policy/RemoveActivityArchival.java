@@ -1,8 +1,8 @@
 package li.strolch.execution.policy;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.command.RemoveActivityCommand;
 import li.strolch.model.activity.Activity;
+import li.strolch.persistence.api.RemoveActivityCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 
 public class RemoveActivityArchival extends ActivityArchivalPolicy {

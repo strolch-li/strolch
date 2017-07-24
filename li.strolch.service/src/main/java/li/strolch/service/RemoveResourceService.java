@@ -15,8 +15,8 @@
  */
 package li.strolch.service;
 
-import li.strolch.command.RemoveResourceCommand;
 import li.strolch.model.Resource;
+import li.strolch.persistence.api.RemoveResourceCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;

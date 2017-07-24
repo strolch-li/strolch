@@ -35,7 +35,6 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.db.DbMigrationState;
 import li.strolch.db.DbSchemaVersionCheck;
-import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
@@ -131,10 +130,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
-		OperationsLog operationsLog = getContainer().hasComponent(OperationsLog.class)
-				? getContainer().getComponent(OperationsLog.class) : null;
-		return new PostgreSqlStrolchTransaction(operationsLog, getContainer().getPrivilegeHandler(), realm, certificate,
-				action, this);
+		return new PostgreSqlStrolchTransaction(getContainer(), realm, certificate, action, this);
 	}
 
 	Connection getConnection(String realm) {

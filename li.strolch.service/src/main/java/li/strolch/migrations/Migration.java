@@ -18,11 +18,11 @@ package li.strolch.migrations;
 import java.io.File;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.command.AddResourceCommand;
 import li.strolch.command.parameter.SetParameterCommand;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.persistence.api.AddResourceCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.Version;

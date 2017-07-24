@@ -15,9 +15,9 @@
  */
 package li.strolch.service;
 
-import li.strolch.command.UpdateOrderCommand;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.UpdateOrderCommand;
 import li.strolch.service.UpdateOrderService.UpdateOrderArg;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;

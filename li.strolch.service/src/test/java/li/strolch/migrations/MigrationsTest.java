@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.command.AddOrderCommand;
-import li.strolch.command.RemoveOrderCommand;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
+import li.strolch.persistence.api.AddOrderCommand;
+import li.strolch.persistence.api.RemoveOrderCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;

@@ -17,12 +17,12 @@ package li.strolch.service;
 
 import org.junit.Test;
 
-import li.strolch.command.AddResourceCommand;
-import li.strolch.command.RemoveResourceCommand;
-import li.strolch.command.UpdateResourceCommand;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
+import li.strolch.persistence.api.AddResourceCommand;
+import li.strolch.persistence.api.RemoveResourceCommand;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.UpdateResourceCommand;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;

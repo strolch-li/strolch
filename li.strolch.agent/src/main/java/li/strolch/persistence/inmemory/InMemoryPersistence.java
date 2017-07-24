@@ -18,8 +18,8 @@ package li.strolch.persistence.inmemory;
 import java.util.HashMap;
 import java.util.Map;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.OrderDao;
@@ -27,26 +27,22 @@ import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.runtime.privilege.PrivilegeHandler;
 
 public class InMemoryPersistence implements PersistenceHandler {
 
 	private boolean versioningEnabled;
 	private Map<String, DaoCache> daoCache;
-	private PrivilegeHandler privilegeHandler;
-	private OperationsLog operationsLog;
+	private ComponentContainer container;
 
-	public InMemoryPersistence(OperationsLog operationsLog, PrivilegeHandler privilegeHandler,
-			boolean versioningEnabled) {
-		this.operationsLog = operationsLog;
-		this.privilegeHandler = privilegeHandler;
+	public InMemoryPersistence(ComponentContainer container, boolean versioningEnabled) {
+		this.container = container;
 		this.versioningEnabled = versioningEnabled;
 		this.daoCache = new HashMap<>();
 	}
 
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
-		return new InMemoryTransaction(this.operationsLog, this.privilegeHandler, realm, certificate, action, this);
+		return new InMemoryTransaction(this.container, realm, certificate, action, this);
 	}
 
 	@Override

@@ -13,71 +13,68 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.command;
+package li.strolch.persistence.api;
 
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.OrderMap;
+import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.Order;
-import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.model.Resource;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateOrderCommand extends Command {
+public class RemoveResourceCommand extends Command {
 
-	private Order order;
-	private Order replaced;
-	private boolean updated;
+	private Resource resource;
+	private boolean removed;
 
 	/**
 	 * @param tx
 	 */
-	public UpdateOrderCommand(ComponentContainer container, StrolchTransaction tx) {
+	public RemoveResourceCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
 	/**
-	 * @param order
-	 *            the order to set
+	 * @param resource
+	 *            the resource to set
 	 */
-	public void setOrder(Order order) {
-		this.order = order;
+	public void setResource(Resource resource) {
+		this.resource = resource;
 	}
 
 	@Override
 	public void validate() {
-		DBC.PRE.assertNotNull("Order may not be null!", this.order);
+		DBC.PRE.assertNotNull("Resource may not be null!", this.resource);
 	}
 
 	@Override
 	public void doCommand() {
 
-		tx().lock(this.order);
+		tx().lock(this.resource);
 
-		OrderMap orderMap = tx().getOrderMap();
-		this.replaced = orderMap.getBy(tx(), this.order.getType(), this.order.getId());
-		if (this.replaced == null) {
-			String msg = "The Order {0} can not be updated as it does not exist!!";
-			msg = MessageFormat.format(msg, this.order.getLocator());
+		ResourceMap resourceMap = tx().getResourceMap();
+		if (!resourceMap.hasElement(tx(), this.resource.getType(), this.resource.getId())) {
+			String msg = "The Resource {0} can not be removed as it does not exist!!";
+			msg = MessageFormat.format(msg, this.resource.getLocator());
 			throw new StrolchException(msg);
 		}
 
-		orderMap.update(tx(), this.order);
-		this.updated = true;
+		resourceMap.remove(tx(), this.resource);
+		this.removed = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.updated && tx().isRollingBack()) {
+		if (this.resource != null && tx().isRollingBack() && this.removed) {
 			if (tx().isVersioningEnabled())
-				tx().getOrderMap().undoVersion(tx(), this.order);
+				tx().getResourceMap().undoVersion(tx(), this.resource);
 			else
-				tx().getOrderMap().update(tx(), this.replaced);
+				tx().getResourceMap().add(tx(), this.resource);
 		}
 	}
 }

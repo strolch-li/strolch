@@ -19,6 +19,7 @@ import java.util.List;
 
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchComponent;
@@ -26,6 +27,7 @@ import li.strolch.agent.api.StrolchLockException;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
@@ -142,6 +144,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the {@link PersistenceHandler}
 	 */
 	public PersistenceHandler getPersistenceHandler();
+
+	/**
+	 * Return the {@link ComponentContainer}
+	 * 
+	 * @return the reference to the container
+	 */
+	public ComponentContainer getContainer();
 
 	/**
 	 * Returns the currently set {@link TransactionCloseStrategy}
@@ -948,4 +957,103 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *             if the {@link StringListParameter} is not a properly configured as a reference parameter
 	 */
 	public List<Order> getOrdersBy(StringListParameter refP, boolean assertExists) throws StrolchException;
+
+	/**
+	 * Adds and thus persists the given {@link Resource} by calling the relevant {@link Command}
+	 * 
+	 * @param resource
+	 *            the resource to add
+	 * 
+	 * @throws StrolchModelException
+	 *             if the resource is null, or a resource with the given ID already exists
+	 */
+	public void addResource(Resource resource) throws StrolchModelException;
+
+	/**
+	 * Adds and thus persists the given {@link Order} by calling the relevant {@link Command}
+	 * 
+	 * @param order
+	 *            the order to add
+	 * 
+	 * @throws StrolchModelException
+	 *             if the order is null, or an order with the given ID already exists
+	 */
+	public void addOrder(Order order) throws StrolchException;
+
+	/**
+	 * Adds and thus persists the given {@link Activity} by calling the relevant {@link Command}
+	 * 
+	 * @param activity
+	 *            the activity to add
+	 * 
+	 * @throws StrolchModelException
+	 *             if the activity is null, or an activity with the given ID already exists
+	 */
+	public void addActivity(Activity activity) throws StrolchException;
+
+	/**
+	 * Updates the given {@link Resource} by calling the relevant {@link Command}
+	 * 
+	 * @param resource
+	 *            the resource to update
+	 * 
+	 * @throws StrolchModelException
+	 *             if the resource is null
+	 */
+	public void updateResource(Resource resource) throws StrolchException;
+
+	/**
+	 * Updates the given {@link Order} by calling the relevant {@link Command}
+	 * 
+	 * @param order
+	 *            the order to update
+	 * 
+	 * @throws StrolchModelException
+	 *             if the order is null
+	 */
+	public void updateOrder(Order order);
+
+	/**
+	 * Updates the given {@link Activity} by calling the relevant {@link Command}
+	 * 
+	 * @param activity
+	 *            the activity to update
+	 * 
+	 * @throws StrolchModelException
+	 *             if the activity is null
+	 */
+	public void updateActivity(Activity activity) throws StrolchException;
+
+	/**
+	 * Removes the given {@link Resource} by calling the relevant {@link Command}
+	 * 
+	 * @param resource
+	 *            the resource to remove
+	 * 
+	 * @throws StrolchModelException
+	 *             if the resource is null
+	 */
+	public void removeResource(Resource resource) throws StrolchException;
+
+	/**
+	 * Removes the given {@link Order} by calling the relevant {@link Command}
+	 * 
+	 * @param order
+	 *            the order to remove
+	 * 
+	 * @throws StrolchModelException
+	 *             if the order is null
+	 */
+	public void removeOrder(Order order) throws StrolchException;
+
+	/**
+	 * Removes the given {@link Activity} by calling the relevant {@link Command}
+	 * 
+	 * @param activity
+	 *            the activity to remove
+	 * 
+	 * @throws StrolchModelException
+	 *             if the activity is null
+	 */
+	public void removeActivity(Activity activity) throws StrolchException;
 }

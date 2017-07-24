@@ -23,6 +23,7 @@ import org.junit.Before;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
+import li.strolch.persistence.api.AddResourceCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 

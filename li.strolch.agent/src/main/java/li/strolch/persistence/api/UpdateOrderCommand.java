@@ -13,69 +13,70 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.command;
+package li.strolch.persistence.api;
 
 import java.text.MessageFormat;
 
-import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.OrderMap;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.activity.Activity;
-import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.model.Order;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RemoveActivityCommand extends Command {
+public class UpdateOrderCommand extends Command {
 
-	private Activity activity;
-	private boolean removed;
+	private Order order;
+	private Order replaced;
+	private boolean updated;
 
 	/**
 	 * @param tx
 	 */
-	public RemoveActivityCommand(ComponentContainer container, StrolchTransaction tx) {
+	public UpdateOrderCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
 	/**
-	 * @param activity
-	 *            the activity to set
+	 * @param order
+	 *            the order to set
 	 */
-	public void setActivity(Activity activity) {
-		this.activity = activity;
+	public void setOrder(Order order) {
+		this.order = order;
 	}
 
 	@Override
 	public void validate() {
-		DBC.PRE.assertNotNull("Activity may not be null!", this.activity);
+		DBC.PRE.assertNotNull("Order may not be null!", this.order);
 	}
 
 	@Override
 	public void doCommand() {
 
-		tx().lock(this.activity);
+		tx().lock(this.order);
 
-		ActivityMap activityMap = tx().getActivityMap();
-		if (!activityMap.hasElement(tx(), this.activity.getType(), this.activity.getId())) {
-			String msg = "The Activity {0} can not be removed as it does not exist!";
-			msg = MessageFormat.format(msg, this.activity.getLocator());
+		OrderMap orderMap = tx().getOrderMap();
+		this.replaced = orderMap.getBy(tx(), this.order.getType(), this.order.getId());
+		if (this.replaced == null) {
+			String msg = "The Order {0} can not be updated as it does not exist!!";
+			msg = MessageFormat.format(msg, this.order.getLocator());
 			throw new StrolchException(msg);
 		}
 
-		activityMap.remove(tx(), this.activity);
-		this.removed = true;
+		orderMap.update(tx(), this.order);
+		this.updated = true;
 	}
 
 	@Override
 	public void undo() {
-		if (this.activity != null && tx().isRollingBack() && this.removed) {
+		if (this.updated && tx().isRollingBack()) {
 			if (tx().isVersioningEnabled())
-				tx().getActivityMap().undoVersion(tx(), this.activity);
+				tx().getOrderMap().undoVersion(tx(), this.order);
 			else
-				tx().getActivityMap().add(tx(), this.activity);
+				tx().getOrderMap().update(tx(), this.replaced);
 		}
 	}
 }

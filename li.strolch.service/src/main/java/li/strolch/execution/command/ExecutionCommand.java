@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.command.UpdateActivityCommand;
-import li.strolch.command.UpdateOrderCommand;
 import li.strolch.exception.StrolchException;
 import li.strolch.execution.policy.ConfirmationPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
@@ -21,6 +19,8 @@ import li.strolch.model.activity.TimeOrderingVisitor;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.UpdateActivityCommand;
+import li.strolch.persistence.api.UpdateOrderCommand;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.service.api.Command;
 import li.strolch.utils.helper.StringHelper;

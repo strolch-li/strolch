@@ -1,7 +1,6 @@
 package li.strolch.execution.policy;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.command.UpdateResourceCommand;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
@@ -9,6 +8,7 @@ import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.UpdateResourceCommand;
 
 /**
  * <p>

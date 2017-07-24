@@ -15,8 +15,8 @@
  */
 package li.strolch.service;
 
-import li.strolch.command.RemoveActivityCommand;
 import li.strolch.model.activity.Activity;
+import li.strolch.persistence.api.RemoveActivityCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;

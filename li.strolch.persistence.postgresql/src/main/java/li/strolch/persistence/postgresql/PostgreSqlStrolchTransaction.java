@@ -20,8 +20,8 @@ import java.sql.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.AuditDao;
@@ -29,7 +29,6 @@ import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.runtime.privilege.PrivilegeHandler;
 
 public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 
@@ -42,10 +41,10 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	private AuditDao auditDao;
 	private Connection connection;
 
-	public PostgreSqlStrolchTransaction(OperationsLog operationsLog, PrivilegeHandler privilegeHandler,
+	public PostgreSqlStrolchTransaction(ComponentContainer container,
 			StrolchRealm realm, Certificate certificate, String action,
 			PostgreSqlPersistenceHandler persistenceHandler) {
-		super(operationsLog, privilegeHandler, realm, certificate, action);
+		super(container, realm, certificate, action);
 		this.persistenceHandler = persistenceHandler;
 	}
 

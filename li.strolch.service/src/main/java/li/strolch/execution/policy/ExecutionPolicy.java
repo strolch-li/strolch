@@ -2,7 +2,6 @@ package li.strolch.execution.policy;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.command.UpdateActivityCommand;
 import li.strolch.exception.StrolchException;
 import li.strolch.execution.DelayedExecutionTimer;
 import li.strolch.execution.ExecutionHandler;
@@ -10,6 +9,7 @@ import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.UpdateActivityCommand;
 import li.strolch.policy.StrolchPolicy;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;

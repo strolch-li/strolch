@@ -15,9 +15,9 @@
  */
 package li.strolch.service;
 
-import li.strolch.command.UpdateActivityCommand;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.UpdateActivityCommand;
 import li.strolch.service.UpdateActivityService.UpdateActivityArg;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;

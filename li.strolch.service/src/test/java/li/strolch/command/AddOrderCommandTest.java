@@ -23,6 +23,7 @@ import org.junit.Before;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
+import li.strolch.persistence.api.AddOrderCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 

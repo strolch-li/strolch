@@ -15,8 +15,8 @@
  */
 package li.strolch.service;
 
-import li.strolch.command.RemoveOrderCommand;
 import li.strolch.model.Order;
+import li.strolch.persistence.api.RemoveOrderCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;

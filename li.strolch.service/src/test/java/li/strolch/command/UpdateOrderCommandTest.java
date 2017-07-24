@@ -19,6 +19,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.UpdateOrderCommand;
 import li.strolch.service.api.Command;
 
 import static org.junit.Assert.assertEquals;

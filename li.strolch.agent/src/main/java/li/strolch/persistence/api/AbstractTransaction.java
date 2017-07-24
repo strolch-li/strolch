@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
+import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ObserverEvent;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.agent.api.OrderMap;
@@ -46,6 +47,7 @@ import li.strolch.agent.impl.AuditingResourceMap;
 import li.strolch.agent.impl.InternalStrolchRealm;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchModelException;
 import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
@@ -80,6 +82,7 @@ import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.objectfilter.ObjectFilter;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -87,7 +90,14 @@ import li.strolch.utils.helper.StringHelper;
 public abstract class AbstractTransaction implements StrolchTransaction {
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractTransaction.class);
+
+	private ComponentContainer container;
+	private PrivilegeHandler privilegeHandler;
+	private OperationsLog operationsLog;
+
 	private InternalStrolchRealm realm;
+
+	private ObjectFilter objectFilter;
 
 	private TransactionCloseStrategy closeStrategy;
 	private boolean suppressUpdates;
@@ -107,18 +117,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private String action;
 	private Certificate certificate;
-	private PrivilegeHandler privilegeHandler;
-	private OperationsLog operationsLog;
 
-	public AbstractTransaction(OperationsLog operationsLog, PrivilegeHandler privilegeHandler, StrolchRealm realm,
-			Certificate certificate, String action) {
-		DBC.PRE.assertNotNull("privilegeHandler must be set!", privilegeHandler); //$NON-NLS-1$
+	public AbstractTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate,
+			String action) {
+		DBC.PRE.assertNotNull("container must be set!", container); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("realm must be set!", realm); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("certificate must be set!", certificate); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("action must be set!", action); //$NON-NLS-1$
 
-		this.privilegeHandler = privilegeHandler;
-		this.operationsLog = operationsLog;
+		this.container = container;
+		this.privilegeHandler = container.getPrivilegeHandler();
+		if (container.hasComponent(OperationsLog.class))
+			this.operationsLog = container.getComponent(OperationsLog.class);
 		this.realm = (InternalStrolchRealm) realm;
 		this.action = action;
 		this.certificate = certificate;
@@ -334,6 +344,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 					this.realm.isAuditTrailEnabledForRead());
 		}
 		return this.auditTrail;
+	}
+
+	@Override
+	public ComponentContainer getContainer() {
+		return this.container;
 	}
 
 	private void assertQueryAllowed(StrolchQuery query) {
@@ -634,9 +649,175 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return getActivityMap().getBy(this, refP, assertExists);
 	}
 
+	private ObjectFilter getObjectFilter() {
+		if (this.objectFilter == null)
+			this.objectFilter = new ObjectFilter();
+		return this.objectFilter;
+	}
+
+	@Override
+	public void addResource(Resource resource) throws StrolchModelException {
+		DBC.PRE.assertNotNull("resource must not be null", resource);
+		DBC.PRE.assertFalse("resource already exists with id " + resource.getId(),
+				getResourceMap().hasElement(this, resource.getType(), resource.getId()));
+		getObjectFilter().add(Tags.RESOURCE, resource);
+	}
+
+	@Override
+	public void addOrder(Order order) throws StrolchException {
+		DBC.PRE.assertNotNull("order must not be null", order);
+		DBC.PRE.assertFalse("order already exists with id " + order.getId(),
+				getOrderMap().hasElement(this, order.getType(), order.getId()));
+		getObjectFilter().add(Tags.ORDER, order);
+	}
+
+	@Override
+	public void addActivity(Activity activity) throws StrolchException {
+		DBC.PRE.assertNotNull("activity must not be null", activity);
+		DBC.PRE.assertFalse("activity already exists with id " + activity.getId(),
+				getActivityMap().hasElement(this, activity.getType(), activity.getId()));
+		getObjectFilter().add(Tags.ACTIVITY, activity);
+	}
+
+	@Override
+	public void updateResource(Resource resource) throws StrolchException {
+		DBC.PRE.assertNotNull("resource must not be null", resource);
+		getObjectFilter().update(Tags.RESOURCE, resource);
+	}
+
+	@Override
+	public void updateOrder(Order order) {
+		DBC.PRE.assertNotNull("order must not be null", order);
+		getObjectFilter().update(Tags.ORDER, order);
+	}
+
+	@Override
+	public void updateActivity(Activity activity) throws StrolchException {
+		DBC.PRE.assertNotNull("activity must not be null", activity);
+		getObjectFilter().update(Tags.ACTIVITY, activity);
+	}
+
+	@Override
+	public void removeResource(Resource resource) throws StrolchException {
+		DBC.PRE.assertNotNull("resource must not be null", resource);
+		getObjectFilter().remove(Tags.RESOURCE, resource);
+	}
+
+	@Override
+	public void removeOrder(Order order) throws StrolchException {
+		DBC.PRE.assertNotNull("order must not be null", order);
+		getObjectFilter().remove(Tags.ORDER, order);
+	}
+
+	@Override
+	public void removeActivity(Activity activity) throws StrolchException {
+		DBC.PRE.assertNotNull("activity must not be null", activity);
+		getObjectFilter().remove(Tags.ACTIVITY, activity);
+	}
+
+	private void addModelChangeCommands() {
+		if (this.objectFilter == null)
+			return;
+
+		List<Object> removed;
+		List<Object> updated;
+		List<Object> added;
+
+		/*
+		 * Resources
+		 */
+		removed = this.objectFilter.getRemoved(Tags.RESOURCE);
+		if (!removed.isEmpty()) {
+			for (Object obj : removed) {
+				RemoveResourceCommand cmd = new RemoveResourceCommand(getContainer(), this);
+				cmd.setResource((Resource) obj);
+				addCommand(cmd);
+			}
+		}
+
+		updated = this.objectFilter.getUpdated(Tags.RESOURCE);
+		if (!updated.isEmpty()) {
+			for (Object obj : updated) {
+				UpdateResourceCommand cmd = new UpdateResourceCommand(getContainer(), this);
+				cmd.setResource((Resource) obj);
+				addCommand(cmd);
+			}
+		}
+
+		added = this.objectFilter.getAdded(Tags.RESOURCE);
+		if (!added.isEmpty()) {
+			for (Object obj : added) {
+				AddResourceCommand cmd = new AddResourceCommand(getContainer(), this);
+				cmd.setResource((Resource) obj);
+				addCommand(cmd);
+			}
+		}
+
+		/*
+		 * Orders
+		 */
+		removed = this.objectFilter.getRemoved(Tags.ORDER);
+		if (!removed.isEmpty()) {
+			for (Object obj : removed) {
+				RemoveOrderCommand cmd = new RemoveOrderCommand(getContainer(), this);
+				cmd.setOrder((Order) obj);
+				addCommand(cmd);
+			}
+		}
+
+		updated = this.objectFilter.getUpdated(Tags.ORDER);
+		if (!updated.isEmpty()) {
+			for (Object obj : updated) {
+				UpdateOrderCommand cmd = new UpdateOrderCommand(getContainer(), this);
+				cmd.setOrder((Order) obj);
+				addCommand(cmd);
+			}
+		}
+
+		added = this.objectFilter.getAdded(Tags.ORDER);
+		if (!added.isEmpty()) {
+			for (Object obj : added) {
+				AddOrderCommand cmd = new AddOrderCommand(getContainer(), this);
+				cmd.setOrder((Order) obj);
+				addCommand(cmd);
+			}
+		}
+
+		/*
+		 * Activities
+		 */
+		removed = this.objectFilter.getRemoved(Tags.ACTIVITY);
+		if (!removed.isEmpty()) {
+			for (Object obj : removed) {
+				RemoveActivityCommand cmd = new RemoveActivityCommand(getContainer(), this);
+				cmd.setActivity((Activity) obj);
+				addCommand(cmd);
+			}
+		}
+
+		updated = this.objectFilter.getUpdated(Tags.ACTIVITY);
+		if (!updated.isEmpty()) {
+			for (Object obj : updated) {
+				UpdateActivityCommand cmd = new UpdateActivityCommand(getContainer(), this);
+				cmd.setActivity((Activity) obj);
+				addCommand(cmd);
+			}
+		}
+
+		added = this.objectFilter.getAdded(Tags.ACTIVITY);
+		if (!added.isEmpty()) {
+			for (Object obj : added) {
+				AddActivityCommand cmd = new AddActivityCommand(getContainer(), this);
+				cmd.setActivity((Activity) obj);
+				addCommand(cmd);
+			}
+		}
+	}
+
 	@Override
 	public void flush() {
 		try {
+			addModelChangeCommands();
 			validateCommands();
 			doCommands();
 			writeChanges();
@@ -656,6 +837,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		try {
 			this.txResult.setState(TransactionState.COMMITTING);
 
+			addModelChangeCommands();
 			validateCommands();
 			doCommands();
 			writeChanges();
