@@ -101,6 +101,20 @@ public class StrolchConstants {
 		public static final String PRIVILEGE_INVALIDATE_SESSION = "InvalidateSession";
 		public static final String PRIVILEGE_GET_SESSION = "GetSession";
 
+		public static final String PRIVILEGE_ADD_RESOURCE = "AddResource";
+		public static final String PRIVILEGE_UPDATE_RESOURCE = "UpdateResource";
+		public static final String PRIVILEGE_REMOVE_RESOURCE = "RemoveResource";
+
+		public static final String PRIVILEGE_ADD_ORDER = "AddOrder";
+		public static final String PRIVILEGE_UPDATE_ORDER = "UpdateOrder";
+		public static final String PRIVILEGE_REMOVE_ORDER = "RemoveOrder";
+
+		public static final String PRIVILEGE_ADD_ACTIVITY = "AddActivity";
+		public static final String PRIVILEGE_UPDATE_ACTIVITY = "UpdateActivity";
+		public static final String PRIVILEGE_REMOVE_ACTIVITY = "RemoveActivity";
+		
+		public static final String PRIVILEGE_GET_PREFIX= "Get";
+
 		public static final String INTERNAL = StrolchModelConstants.INTERNAL;
 	}
 

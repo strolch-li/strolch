@@ -9,6 +9,43 @@
 		<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
+
+		<Privilege name="GetResource" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="GetOrder" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="GetActivity" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="AddResource" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="AddOrder" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="AddActivity" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="UpdateResource" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="UpdateOrder" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="UpdateActivity" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="RemoveResource" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="RemoveOrder" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="RemoveActivity" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
 	</Role>
 
 	<Role name="AppUser">
@@ -16,6 +53,43 @@
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
 		<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+
+		<Privilege name="GetResource" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="GetOrder" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="GetActivity" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="AddResource" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="AddOrder" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="AddActivity" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="UpdateResource" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="UpdateOrder" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="UpdateActivity" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="RemoveResource" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="RemoveOrder" policy="ModelPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="RemoveActivity" policy="ModelPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
 	</Role>

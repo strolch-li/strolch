@@ -21,9 +21,11 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.model.Order;
+import li.strolch.model.Tags;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -35,11 +37,14 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AuditingOrderMap extends AuditingElementMapFacade<Order> implements OrderMap {
 
-	/**
-	 * @param elementMap
-	 */
-	public AuditingOrderMap(ElementMap<Order> elementMap, boolean observeAccessReads) {
-		super(elementMap, observeAccessReads);
+	public AuditingOrderMap(PrivilegeHandler privilegeHandler, ElementMap<Order> elementMap,
+			boolean observeAccessReads) {
+		super(privilegeHandler, elementMap, observeAccessReads);
+	}
+
+	@Override
+	protected String getElementType() {
+		return Tags.ORDER;
 	}
 
 	@Override

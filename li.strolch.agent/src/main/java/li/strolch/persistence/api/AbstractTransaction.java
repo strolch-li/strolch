@@ -16,6 +16,15 @@
 package li.strolch.persistence.api;
 
 import static li.strolch.model.Tags.AGENT;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_ADD_ACTIVITY;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_ADD_ORDER;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_ADD_RESOURCE;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_REMOVE_ACTIVITY;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_REMOVE_ORDER;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_REMOVE_RESOURCE;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_UPDATE_ACTIVITY;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_UPDATE_ORDER;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_UPDATE_RESOURCE;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -78,6 +87,7 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.ExceptionHelper;
@@ -314,7 +324,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public ResourceMap getResourceMap() {
 		if (this.resourceMap == null) {
-			this.resourceMap = new AuditingResourceMap(this.realm.getResourceMap(),
+			this.resourceMap = new AuditingResourceMap(this.privilegeHandler, this.realm.getResourceMap(),
 					this.realm.isAuditTrailEnabledForRead());
 		}
 		return this.resourceMap;
@@ -323,7 +333,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public OrderMap getOrderMap() {
 		if (this.orderMap == null) {
-			this.orderMap = new AuditingOrderMap(this.realm.getOrderMap(), this.realm.isAuditTrailEnabledForRead());
+			this.orderMap = new AuditingOrderMap(this.privilegeHandler, this.realm.getOrderMap(),
+					this.realm.isAuditTrailEnabledForRead());
 		}
 		return this.orderMap;
 	}
@@ -331,7 +342,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public ActivityMap getActivityMap() {
 		if (this.activityMap == null) {
-			this.activityMap = new AuditingActivityMap(this.realm.getActivityMap(),
+			this.activityMap = new AuditingActivityMap(this.privilegeHandler, this.realm.getActivityMap(),
 					this.realm.isAuditTrailEnabledForRead());
 		}
 		return this.activityMap;
@@ -658,60 +669,99 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void addResource(Resource resource) throws StrolchModelException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
+
+		this.privilegeHandler.getPrivilegeContext(this.certificate)
+				.validateAction(new TransactedRestrictable(this, PRIVILEGE_ADD_RESOURCE, resource));
+
 		DBC.PRE.assertFalse("resource already exists with id " + resource.getId(),
 				getResourceMap().hasElement(this, resource.getType(), resource.getId()));
+
 		getObjectFilter().add(Tags.RESOURCE, resource);
 	}
 
 	@Override
 	public void addOrder(Order order) throws StrolchException {
 		DBC.PRE.assertNotNull("order must not be null", order);
+
+		this.privilegeHandler.getPrivilegeContext(this.certificate)
+				.validateAction(new TransactedRestrictable(this, PRIVILEGE_ADD_ORDER, order));
+
 		DBC.PRE.assertFalse("order already exists with id " + order.getId(),
 				getOrderMap().hasElement(this, order.getType(), order.getId()));
+
 		getObjectFilter().add(Tags.ORDER, order);
 	}
 
 	@Override
 	public void addActivity(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
+
+		this.privilegeHandler.getPrivilegeContext(this.certificate)
+				.validateAction(new TransactedRestrictable(this, PRIVILEGE_ADD_ACTIVITY, activity));
+
 		DBC.PRE.assertFalse("activity already exists with id " + activity.getId(),
 				getActivityMap().hasElement(this, activity.getType(), activity.getId()));
+
 		getObjectFilter().add(Tags.ACTIVITY, activity);
 	}
 
 	@Override
 	public void updateResource(Resource resource) throws StrolchException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
+
+		this.privilegeHandler.getPrivilegeContext(this.certificate)
+				.validateAction(new TransactedRestrictable(this, PRIVILEGE_UPDATE_RESOURCE, resource));
+
 		getObjectFilter().update(Tags.RESOURCE, resource);
 	}
 
 	@Override
 	public void updateOrder(Order order) {
 		DBC.PRE.assertNotNull("order must not be null", order);
+
+		this.privilegeHandler.getPrivilegeContext(this.certificate)
+				.validateAction(new TransactedRestrictable(this, PRIVILEGE_UPDATE_ORDER, order));
+
 		getObjectFilter().update(Tags.ORDER, order);
 	}
 
 	@Override
 	public void updateActivity(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
+
+		this.privilegeHandler.getPrivilegeContext(this.certificate)
+				.validateAction(new TransactedRestrictable(this, PRIVILEGE_UPDATE_ACTIVITY, activity));
+
 		getObjectFilter().update(Tags.ACTIVITY, activity);
 	}
 
 	@Override
 	public void removeResource(Resource resource) throws StrolchException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
+
+		this.privilegeHandler.getPrivilegeContext(this.certificate)
+				.validateAction(new TransactedRestrictable(this, PRIVILEGE_REMOVE_RESOURCE, resource));
+
 		getObjectFilter().remove(Tags.RESOURCE, resource);
 	}
 
 	@Override
 	public void removeOrder(Order order) throws StrolchException {
 		DBC.PRE.assertNotNull("order must not be null", order);
+
+		this.privilegeHandler.getPrivilegeContext(this.certificate)
+				.validateAction(new TransactedRestrictable(this, PRIVILEGE_REMOVE_ORDER, order));
+
 		getObjectFilter().remove(Tags.ORDER, order);
 	}
 
 	@Override
 	public void removeActivity(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
+
+		this.privilegeHandler.getPrivilegeContext(this.certificate)
+				.validateAction(new TransactedRestrictable(this, PRIVILEGE_REMOVE_ACTIVITY, activity));
+
 		getObjectFilter().remove(Tags.ACTIVITY, activity);
 	}
 

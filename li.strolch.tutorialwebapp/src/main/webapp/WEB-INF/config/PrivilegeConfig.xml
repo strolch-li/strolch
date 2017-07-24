@@ -34,6 +34,7 @@
 
 	<Policies>
 		<Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
+		<Policy name="ModelPrivilege" class="li.strolch.runtime.privilege.ModelPrivilege" />
 	</Policies>
 
 </Privilege>

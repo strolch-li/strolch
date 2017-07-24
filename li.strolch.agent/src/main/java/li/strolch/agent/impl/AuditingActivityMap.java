@@ -20,10 +20,12 @@ import java.util.List;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
+import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.visitor.ActivityVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -35,11 +37,14 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AuditingActivityMap extends AuditingElementMapFacade<Activity> implements ActivityMap {
 
-	/**
-	 * @param elementMap
-	 */
-	public AuditingActivityMap(ElementMap<Activity> elementMap, boolean observeAccessReads) {
-		super(elementMap, observeAccessReads);
+	public AuditingActivityMap(PrivilegeHandler privilegeHandler, ElementMap<Activity> elementMap,
+			boolean observeAccessReads) {
+		super(privilegeHandler, elementMap, observeAccessReads);
+	}
+
+	@Override
+	protected String getElementType() {
+		return Tags.ACTIVITY;
 	}
 
 	@Override

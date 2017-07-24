@@ -21,9 +21,11 @@ import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Resource;
+import li.strolch.model.Tags;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -35,11 +37,14 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AuditingResourceMap extends AuditingElementMapFacade<Resource> implements ResourceMap {
 
-	/**
-	 * @param elementMap
-	 */
-	public AuditingResourceMap(ElementMap<Resource> elementMap, boolean observeAccessReads) {
-		super(elementMap, observeAccessReads);
+	public AuditingResourceMap(PrivilegeHandler privilegeHandler, ElementMap<Resource> elementMap,
+			boolean observeAccessReads) {
+		super(privilegeHandler, elementMap, observeAccessReads);
+	}
+
+	@Override
+	protected String getElementType() {
+		return Tags.RESOURCE;
 	}
 
 	@Override

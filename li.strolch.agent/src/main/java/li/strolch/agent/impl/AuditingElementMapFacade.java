@@ -15,6 +15,8 @@
  */
 package li.strolch.agent.impl;
 
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_PREFIX;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +30,8 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -37,14 +41,19 @@ import li.strolch.utils.dbc.DBC;
  * </p>
  * 
  * <p>
+ * Privilege is validated on the <code>getBy*()</code> methods.
+ * </p>
+ * 
+ * <p>
  * In a single transaction an StrolchRootElement may be created, updated and then deleted - this implementation does not
  * "squash" such actions, but registers them separately
  * </p>
  * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AuditingElementMapFacade<T extends StrolchRootElement> implements ElementMap<T> {
+public abstract class AuditingElementMapFacade<T extends StrolchRootElement> implements ElementMap<T> {
 
+	private PrivilegeHandler privilegeHandler;
 	protected ElementMap<T> elementMap;
 
 	protected Set<T> read;
@@ -56,8 +65,11 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 
 	protected boolean observeAccessReads;
 
-	public AuditingElementMapFacade(ElementMap<T> elementMap, boolean observeAccessReads) {
+	public AuditingElementMapFacade(PrivilegeHandler privilegeHandler, ElementMap<T> elementMap,
+			boolean observeAccessReads) {
+		DBC.PRE.assertNotNull("PrivilegeHandler must be set!", privilegeHandler); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("ElementMap must be set!", elementMap); //$NON-NLS-1$
+		this.privilegeHandler = privilegeHandler;
 		this.elementMap = elementMap;
 		this.observeAccessReads = observeAccessReads;
 
@@ -153,14 +165,26 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	@Override
 	public T getBy(StrolchTransaction tx, String type, String id) {
 		T element = this.elementMap.getBy(tx, type, id);
+
+		if (element != null)
+			this.privilegeHandler.getPrivilegeContext(tx.getCertificate())
+					.validateAction(new TransactedRestrictable(tx, PRIVILEGE_GET_PREFIX + getElementType(), element));
+
 		if (this.observeAccessReads && element != null)
 			this.read.add(element);
 		return element;
 	}
 
+	protected abstract String getElementType();
+
 	@Override
 	public T getBy(StrolchTransaction tx, String type, String id, boolean assertExists) throws StrolchException {
 		T element = this.elementMap.getBy(tx, type, id, assertExists);
+
+		if (element != null)
+			this.privilegeHandler.getPrivilegeContext(tx.getCertificate())
+					.validateAction(new TransactedRestrictable(tx, PRIVILEGE_GET_PREFIX + getElementType(), element));
+
 		if (this.observeAccessReads && element != null)
 			this.read.add(element);
 		return element;
@@ -169,6 +193,11 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	@Override
 	public T getBy(StrolchTransaction tx, String type, String id, int version) {
 		T element = this.elementMap.getBy(tx, type, id, version);
+
+		if (element != null)
+			this.privilegeHandler.getPrivilegeContext(tx.getCertificate())
+					.validateAction(new TransactedRestrictable(tx, PRIVILEGE_GET_PREFIX + getElementType(), element));
+
 		if (this.observeAccessReads && element != null)
 			this.read.add(element);
 		return element;
@@ -178,6 +207,11 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	public T getBy(StrolchTransaction tx, String type, String id, int version, boolean assertExists)
 			throws StrolchException {
 		T element = this.elementMap.getBy(tx, type, id, version, assertExists);
+
+		if (element != null)
+			this.privilegeHandler.getPrivilegeContext(tx.getCertificate())
+					.validateAction(new TransactedRestrictable(tx, PRIVILEGE_GET_PREFIX + getElementType(), element));
+
 		if (this.observeAccessReads && element != null)
 			this.read.add(element);
 		return element;
@@ -186,6 +220,11 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	@Override
 	public T getBy(StrolchTransaction tx, StringParameter refP, boolean assertExists) throws StrolchException {
 		T element = this.elementMap.getBy(tx, refP, assertExists);
+
+		if (element != null)
+			this.privilegeHandler.getPrivilegeContext(tx.getCertificate())
+					.validateAction(new TransactedRestrictable(tx, PRIVILEGE_GET_PREFIX + getElementType(), element));
+
 		if (this.observeAccessReads && element != null)
 			this.read.add(element);
 		return element;
@@ -195,6 +234,12 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists)
 			throws StrolchException {
 		List<T> elements = this.elementMap.getBy(tx, refP, assertExists);
+
+		for (T element : elements) {
+			this.privilegeHandler.getPrivilegeContext(tx.getCertificate())
+					.validateAction(new TransactedRestrictable(tx, PRIVILEGE_GET_PREFIX + getElementType(), element));
+		}
+
 		if (this.observeAccessReads && !elements.isEmpty())
 			this.read.addAll(elements);
 		return elements;
@@ -203,6 +248,11 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	@Override
 	public List<T> getVersionsFor(StrolchTransaction tx, String type, String id) {
 		List<T> versions = this.elementMap.getVersionsFor(tx, type, id);
+
+		if (!versions.isEmpty())
+			this.privilegeHandler.getPrivilegeContext(tx.getCertificate()).validateAction(new TransactedRestrictable(tx,
+					PRIVILEGE_GET_PREFIX + getElementType(), versions.get(versions.size() - 1)));
+
 		if (this.observeAccessReads && !versions.isEmpty())
 			this.read.add(versions.get(versions.size() - 1));
 		return versions;
@@ -211,6 +261,12 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	@Override
 	public List<T> getAllElements(StrolchTransaction tx) {
 		List<T> elements = this.elementMap.getAllElements(tx);
+
+		for (T element : elements) {
+			this.privilegeHandler.getPrivilegeContext(tx.getCertificate())
+					.validateAction(new TransactedRestrictable(tx, PRIVILEGE_GET_PREFIX + getElementType(), element));
+		}
+
 		if (this.observeAccessReads && !elements.isEmpty())
 			this.read.addAll(elements);
 		return elements;
@@ -219,6 +275,12 @@ public class AuditingElementMapFacade<T extends StrolchRootElement> implements E
 	@Override
 	public List<T> getElementsBy(StrolchTransaction tx, String type) {
 		List<T> elements = this.elementMap.getElementsBy(tx, type);
+
+		for (T element : elements) {
+			this.privilegeHandler.getPrivilegeContext(tx.getCertificate())
+					.validateAction(new TransactedRestrictable(tx, PRIVILEGE_GET_PREFIX + getElementType(), element));
+		}
+
 		if (this.observeAccessReads && !elements.isEmpty())
 			this.read.addAll(elements);
 		return elements;
