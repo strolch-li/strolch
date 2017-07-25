@@ -17,6 +17,7 @@ package li.strolch.privilege.policy;
 
 import java.text.MessageFormat;
 
+import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.i18n.PrivilegeMessages;
 import li.strolch.privilege.model.Certificate;
@@ -40,7 +41,8 @@ import li.strolch.privilege.model.Restrictable;
 public class UsernameFromCertificatePrivilege implements PrivilegePolicy {
 
 	@Override
-	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable) {
+	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+			throws AccessDeniedException {
 		PrivilegePolicyHelper.preValidate(privilege, restrictable);
 
 		// get the value on which the action is to be performed

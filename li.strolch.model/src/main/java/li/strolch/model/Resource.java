@@ -63,6 +63,11 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	}
 
 	@Override
+	public String getObjectType() {
+		return Tags.RESOURCE;
+	}
+
+	@Override
 	public boolean hasVersion() {
 		return this.version != null;
 	}

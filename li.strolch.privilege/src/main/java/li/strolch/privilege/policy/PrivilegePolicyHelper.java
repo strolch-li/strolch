@@ -30,7 +30,20 @@ import li.strolch.utils.helper.StringHelper;
  */
 public class PrivilegePolicyHelper {
 
-	public static String preValidate(IPrivilege privilege, Restrictable restrictable) {
+	/**
+	 * Validates the given values and returns the privilege name
+	 * 
+	 * @param privilege
+	 *            the {@link IPrivilege}
+	 * @param restrictable
+	 *            the {@link Restrictable}
+	 * 
+	 * @return the privilege name
+	 * 
+	 * @throws PrivilegeException
+	 *             if something is wrong
+	 */
+	public static String preValidate(IPrivilege privilege, Restrictable restrictable) throws PrivilegeException {
 		if (privilege == null)
 			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.privilegeNull")); //$NON-NLS-1$
 		if (restrictable == null)
@@ -54,27 +67,42 @@ public class PrivilegePolicyHelper {
 	}
 
 	/**
+	 * Validates privilege is granted by checking first if all is allows, then the deny values, then the allow values.
+	 * If the privilegeValue is in the deny list or not in the allow list, then access is denied and the
+	 * {@link AccessDeniedException} is thrown
+	 * 
+	 * @param ctx
+	 *            the context
 	 * @param privilege
+	 *            the privielge
+	 * @param restrictable
+	 *            the restrictable
 	 * @param privilegeValue
+	 *            the privilege value
+	 * 
+	 * @throws AccessDeniedException
+	 *             if access is denied
 	 */
 	public static void checkByAllowDenyValues(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
-			String privilegeValue) {
+			String privilegeValue) throws AccessDeniedException {
+
+		// now check values allowed
+		if (privilege.isAllowed(privilegeValue))
+			return;
 
 		// first check values not allowed
 		if (privilege.isDenied(privilegeValue)) {
+
 			// then throw access denied
 			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
 					ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
 			throw new AccessDeniedException(msg);
 		}
 
-		// now check values allowed
-		if (privilege.isAllowed(privilegeValue))
-			return;
-
 		// default is not allowed
 		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
 				ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
+
 		throw new AccessDeniedException(msg);
 	}
 }

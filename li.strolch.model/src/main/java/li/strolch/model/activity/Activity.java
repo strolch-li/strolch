@@ -83,6 +83,11 @@ public class Activity extends AbstractStrolchRootElement
 		this.timeOrdering = timeOrdering;
 	}
 
+	@Override
+	public String getObjectType() {
+		return Tags.ACTIVITY;
+	}
+
 	public TimeOrdering getTimeOrdering() {
 		return this.timeOrdering;
 	}

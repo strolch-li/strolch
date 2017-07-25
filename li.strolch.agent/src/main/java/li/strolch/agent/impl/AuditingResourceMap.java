@@ -25,7 +25,6 @@ import li.strolch.model.Tags;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -37,9 +36,8 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AuditingResourceMap extends AuditingElementMapFacade<Resource> implements ResourceMap {
 
-	public AuditingResourceMap(PrivilegeHandler privilegeHandler, ElementMap<Resource> elementMap,
-			boolean observeAccessReads) {
-		super(privilegeHandler, elementMap, observeAccessReads);
+	public AuditingResourceMap(ElementMap<Resource> elementMap, boolean observeAccessReads) {
+		super(elementMap, observeAccessReads);
 	}
 
 	@Override

@@ -49,6 +49,7 @@ import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.visitor.ActivityVisitor;
 import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.model.visitor.ResourceVisitor;
+import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
@@ -1056,4 +1057,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *             if the activity is null
 	 */
 	public void removeActivity(Activity activity) throws StrolchException;
+
+	/**
+	 * Asserts that the current {@link Certificate} has access to the given element with the given operation
+	 * 
+	 * @param operation
+	 *            the operation to be performed
+	 * @param element
+	 *            the element on which the operation is performed
+	 * 
+	 * @throws AccessDeniedException
+	 */
+	public void assertHasPrivilege(Operation operation, StrolchRootElement element) throws AccessDeniedException;
 }

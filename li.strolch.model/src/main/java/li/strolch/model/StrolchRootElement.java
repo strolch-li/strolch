@@ -27,6 +27,13 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 public interface StrolchRootElement extends StrolchElement, PolicyContainer, ParameterBagContainer {
 
 	/**
+	 * Returns the object type
+	 * 
+	 * @return the object type
+	 */
+	public String getObjectType();
+
+	/**
 	 * Set the type of this {@link StrolchRootElement}. Not that this method should only be called for new elements, not
 	 * if this element has already been persisted!
 	 * 

@@ -7,6 +7,7 @@ import static li.strolch.service.test.AbstractRealmServiceTest.dropSchema;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,7 +17,9 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
+import li.strolch.persistence.api.Operation;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.testbase.runtime.RuntimeMock;
 
@@ -31,7 +34,6 @@ public class InMemoryTransactionTest {
 	public static void beforeClass() throws Exception {
 
 		dropSchema("jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
-		dropSchema("jdbc:postgresql://localhost/transactionaluserdb", "transactionaluser", "test");
 
 		runtimeMock = new RuntimeMock().mockRuntime(TARGET_RUNTIME, CONFIG_SRC);
 		runtimeMock.startContainer();
@@ -44,15 +46,15 @@ public class InMemoryTransactionTest {
 
 	@Test
 	public void runTransient() {
-		shouldRunAll(REALM_TRANSIENT);
+		runAll(REALM_TRANSIENT);
 	}
 
 	@Test
 	public void runCached() {
-		shouldRunAll(REALM_CACHED);
+		runAll(REALM_CACHED);
 	}
 
-	private void shouldRunAll(String realmName) {
+	private void runAll(String realmName) {
 
 		shouldCrudResource(realmName);
 		shouldCrudResource1(realmName);
@@ -65,6 +67,136 @@ public class InMemoryTransactionTest {
 		shouldCrudActivity(realmName);
 		shouldCrudActivity1(realmName);
 		shouldCrudActivity2(realmName);
+
+		shouldAssertPrivilegeResource(realmName);
+		shouldAssertPrivilegeOrder(realmName);
+		shouldAssertPrivilegeActivity(realmName);
+	}
+
+	private void shouldAssertPrivilegeResource(String realmName) {
+		String id = "@203";
+		String type = "Car";
+
+		// create
+		Resource newRes = ModelGenerator.createResource(id, "200", type);
+		try (StrolchTransaction tx = openTx(realmName)) {
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.GET, newRes);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.ADD, newRes);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.UPDATE, newRes);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.REMOVE, newRes);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+		}
+	}
+
+	private void shouldAssertPrivilegeOrder(String realmName) {
+		String id = "@203";
+		String type = "Car";
+
+		// create
+		Order newOrder = ModelGenerator.createOrder(id, "200", type);
+		try (StrolchTransaction tx = openTx(realmName)) {
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.GET, newOrder);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.ADD, newOrder);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.UPDATE, newOrder);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.REMOVE, newOrder);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+		}
+	}
+
+	private void shouldAssertPrivilegeActivity(String realmName) {
+		String id = "@203";
+		String type = "Car";
+
+		// create
+		Activity newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
+		try (StrolchTransaction tx = openTx(realmName)) {
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.GET, newActivity);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.ADD, newActivity);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.UPDATE, newActivity);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+
+			// privilege assertion
+			try {
+				tx.assertHasPrivilege(Operation.REMOVE, newActivity);
+				fail();
+			} catch (AccessDeniedException e) {
+				// as expected
+			}
+		}
 	}
 
 	public void shouldCrudResource(String realmName) {
@@ -74,6 +206,10 @@ public class InMemoryTransactionTest {
 		// create
 		Resource newRes = ModelGenerator.createResource(id, "200", type);
 		try (StrolchTransaction tx = openTx(realmName)) {
+
+			// privilege assertion
+			tx.assertHasPrivilege(Operation.ADD, newRes);
+
 			tx.addResource(newRes);
 			tx.commitOnClose();
 		}
@@ -86,6 +222,11 @@ public class InMemoryTransactionTest {
 		// update
 		try (StrolchTransaction tx = openTx(realmName)) {
 			Resource res = tx.getResourceBy(type, id);
+
+			// privilege assertion
+			tx.assertHasPrivilege(Operation.GET, res);
+			tx.assertHasPrivilege(Operation.UPDATE, res);
+
 			res.setName("Foo foo");
 			tx.updateResource(res);
 			tx.commitOnClose();
@@ -100,6 +241,10 @@ public class InMemoryTransactionTest {
 		// remove
 		try (StrolchTransaction tx = openTx(realmName)) {
 			Resource res = tx.getResourceBy(type, id);
+
+			// privilege assertion
+			tx.assertHasPrivilege(Operation.REMOVE, res);
+
 			tx.removeResource(res);
 			tx.commitOnClose();
 		}
@@ -129,6 +274,10 @@ public class InMemoryTransactionTest {
 		// create
 		Order newOrder = ModelGenerator.createOrder(id, "200", type);
 		try (StrolchTransaction tx = openTx(realmName)) {
+
+			// privilege assertion
+			tx.assertHasPrivilege(Operation.ADD, newOrder);
+
 			tx.addOrder(newOrder);
 			tx.commitOnClose();
 		}
@@ -141,6 +290,11 @@ public class InMemoryTransactionTest {
 		// update
 		try (StrolchTransaction tx = openTx(realmName)) {
 			Order order = tx.getOrderBy(type, id);
+
+			// privilege assertion
+			tx.assertHasPrivilege(Operation.GET, order);
+			tx.assertHasPrivilege(Operation.UPDATE, order);
+
 			order.setName("Foo foo");
 			tx.updateOrder(order);
 			tx.commitOnClose();
@@ -155,6 +309,10 @@ public class InMemoryTransactionTest {
 		// remove
 		try (StrolchTransaction tx = openTx(realmName)) {
 			Order order = tx.getOrderBy(type, id);
+
+			// privilege assertion
+			tx.assertHasPrivilege(Operation.REMOVE, order);
+
 			tx.removeOrder(order);
 			tx.commitOnClose();
 		}
@@ -184,6 +342,10 @@ public class InMemoryTransactionTest {
 		// create
 		Activity newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
 		try (StrolchTransaction tx = openTx(realmName)) {
+
+			// privilege assertion
+			tx.assertHasPrivilege(Operation.ADD, newActivity);
+
 			tx.addActivity(newActivity);
 			tx.commitOnClose();
 		}
@@ -196,6 +358,11 @@ public class InMemoryTransactionTest {
 		// update
 		try (StrolchTransaction tx = openTx(realmName)) {
 			Activity activity = tx.getActivityBy(type, id);
+
+			// privilege assertion
+			tx.assertHasPrivilege(Operation.GET, activity);
+			tx.assertHasPrivilege(Operation.UPDATE, activity);
+
 			activity.setName("Foo foo");
 			tx.updateActivity(activity);
 			tx.commitOnClose();
@@ -210,6 +377,10 @@ public class InMemoryTransactionTest {
 		// remove
 		try (StrolchTransaction tx = openTx(realmName)) {
 			Activity activity = tx.getActivityBy(type, id);
+
+			// privilege assertion
+			tx.assertHasPrivilege(Operation.REMOVE, activity);
+
 			tx.removeActivity(activity);
 			tx.commitOnClose();
 		}
@@ -255,7 +426,7 @@ public class InMemoryTransactionTest {
 		String id = "@202";
 		String type = "Bike";
 
-		// create and update
+		// create, update and remove
 		Resource newRes = ModelGenerator.createResource(id, "200", type);
 		try (StrolchTransaction tx = openTx(realmName)) {
 			tx.addResource(newRes);
@@ -304,7 +475,7 @@ public class InMemoryTransactionTest {
 			tx.commitOnClose();
 		}
 
-		// should not exist
+		// create, update and remove
 		try (StrolchTransaction tx = openTx(realmName)) {
 			assertFalse("Order should not exist!", tx.getOrderMap().hasElement(tx, type, id));
 		}
@@ -333,7 +504,7 @@ public class InMemoryTransactionTest {
 		String id = "@202";
 		String type = "Bike";
 
-		// create and update
+		// create, update and remove
 		Activity newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
 		try (StrolchTransaction tx = openTx(realmName)) {
 			tx.addActivity(newActivity);

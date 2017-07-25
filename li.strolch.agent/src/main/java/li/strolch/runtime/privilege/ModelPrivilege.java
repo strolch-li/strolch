@@ -3,6 +3,7 @@ package li.strolch.runtime.privilege;
 import java.text.MessageFormat;
 
 import li.strolch.model.StrolchRootElement;
+import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.i18n.PrivilegeMessages;
 import li.strolch.privilege.model.IPrivilege;
@@ -20,7 +21,8 @@ public class ModelPrivilege implements PrivilegePolicy {
 	 * @see li.strolch.privilege.policy.PrivilegePolicy#validateAction(IPrivilege, Restrictable)
 	 */
 	@Override
-	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable) {
+	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+			throws AccessDeniedException {
 		PrivilegePolicyHelper.preValidate(privilege, restrictable);
 
 		// get the value on which the action is to be performed

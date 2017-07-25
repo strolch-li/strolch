@@ -82,6 +82,11 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	@Override
+	public String getObjectType() {
+		return Tags.ORDER;
+	}
+
+	@Override
 	public boolean hasVersion() {
 		return this.version != null;
 	}

@@ -25,7 +25,6 @@ import li.strolch.model.Tags;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -37,9 +36,8 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AuditingOrderMap extends AuditingElementMapFacade<Order> implements OrderMap {
 
-	public AuditingOrderMap(PrivilegeHandler privilegeHandler, ElementMap<Order> elementMap,
-			boolean observeAccessReads) {
-		super(privilegeHandler, elementMap, observeAccessReads);
+	public AuditingOrderMap(ElementMap<Order> elementMap, boolean observeAccessReads) {
+		super(elementMap, observeAccessReads);
 	}
 
 	@Override

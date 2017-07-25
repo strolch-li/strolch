@@ -25,7 +25,6 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.visitor.ActivityVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -37,9 +36,8 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AuditingActivityMap extends AuditingElementMapFacade<Activity> implements ActivityMap {
 
-	public AuditingActivityMap(PrivilegeHandler privilegeHandler, ElementMap<Activity> elementMap,
-			boolean observeAccessReads) {
-		super(privilegeHandler, elementMap, observeAccessReads);
+	public AuditingActivityMap(ElementMap<Activity> elementMap, boolean observeAccessReads) {
+		super(elementMap, observeAccessReads);
 	}
 
 	@Override

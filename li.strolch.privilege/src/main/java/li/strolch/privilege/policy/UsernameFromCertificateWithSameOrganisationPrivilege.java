@@ -44,7 +44,8 @@ public class UsernameFromCertificateWithSameOrganisationPrivilege extends Userna
 	private static final String PARAM_ORGANISATION = "organisation";
 
 	@Override
-	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable) {
+	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+			throws AccessDeniedException {
 		PrivilegePolicyHelper.preValidate(privilege, restrictable);
 
 		// get the value on which the action is to be performed

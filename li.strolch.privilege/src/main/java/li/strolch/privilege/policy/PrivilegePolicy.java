@@ -49,6 +49,6 @@ public interface PrivilegePolicy {
 	 * @throws AccessDeniedException
 	 *             if action not allowed
 	 */
-	public abstract void validateAction(PrivilegeContext context, IPrivilege privilege, Restrictable restrictable)
+	public void validateAction(PrivilegeContext context, IPrivilege privilege, Restrictable restrictable)
 			throws AccessDeniedException;
 }
