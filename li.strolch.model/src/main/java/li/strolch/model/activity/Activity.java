@@ -306,6 +306,34 @@ public class Activity extends AbstractStrolchRootElement
 		return this.elements;
 	}
 
+	/**
+	 * Returns all the actions as a flat list
+	 * 
+	 * @return the list of actions
+	 */
+	public List<Action> getActionsAsFlatList() {
+		List<Action> actions = new ArrayList<>();
+		getActionsAsFlatList(actions);
+		return actions;
+	}
+
+	private void getActionsAsFlatList(List<Action> actions) {
+		for (IActivityElement element : this.elements.values()) {
+			if (element instanceof Activity)
+				((Activity) element).getActionsAsFlatList(actions);
+			else
+				actions.add((Action) element);
+		}
+	}
+
+	/**
+	 * Returns all the actions in the entire hierarchy with the given state
+	 * 
+	 * @param state
+	 *            the state of the action to return
+	 * 
+	 * @return the list of actions with the given state
+	 */
 	public List<Action> getActionsWithState(State state) {
 		List<Action> actions = new ArrayList<>();
 		getActionsWithState(actions, state);
@@ -317,6 +345,29 @@ public class Activity extends AbstractStrolchRootElement
 			if (element instanceof Activity)
 				((Activity) element).getActionsWithState(actions, state);
 			else if (element.getState() == state)
+				actions.add((Action) element);
+		}
+	}
+
+	/**
+	 * Returns all the actions in the entire hierarchy with the given type
+	 * 
+	 * @param type
+	 *            the type of action to return
+	 * 
+	 * @return the list of actions with the given type
+	 */
+	public List<Action> getActionsByType(String type) {
+		List<Action> actions = new ArrayList<>();
+		getActionsByType(actions, type);
+		return actions;
+	}
+
+	private void getActionsByType(List<Action> actions, String type) {
+		for (IActivityElement element : this.elements.values()) {
+			if (element instanceof Activity)
+				((Activity) element).getActionsByType(actions, type);
+			else if (element.getType().equals(type))
 				actions.add((Action) element);
 		}
 	}
