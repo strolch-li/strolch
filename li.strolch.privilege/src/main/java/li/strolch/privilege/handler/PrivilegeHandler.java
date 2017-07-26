@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.NotAuthenticatedException;
 import li.strolch.privilege.base.PrivilegeConflictResolution;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
@@ -603,8 +604,10 @@ public interface PrivilegeHandler {
 	 * 
 	 * @throws PrivilegeException
 	 *             if there is anything wrong with this certificate
+	 * @throws NotAuthenticatedException
+	 *             if the certificate has expired
 	 */
-	public void isCertificateValid(Certificate certificate) throws PrivilegeException;
+	public void isCertificateValid(Certificate certificate) throws PrivilegeException, NotAuthenticatedException;
 
 	/**
 	 * Returns the {@link PrivilegeContext} for the given {@link Certificate}. The {@link PrivilegeContext} is an
@@ -617,8 +620,11 @@ public interface PrivilegeHandler {
 	 * 
 	 * @throws PrivilegeException
 	 *             if there is a configuration error or the {@link Certificate} is invalid
+	 * @throws NotAuthenticatedException
+	 *             if the certificate has expired
 	 */
-	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException;
+	public PrivilegeContext getPrivilegeContext(Certificate certificate)
+			throws PrivilegeException, NotAuthenticatedException;
 
 	/**
 	 * Validate that the given password meets certain requirements. What these requirements are is a decision made by

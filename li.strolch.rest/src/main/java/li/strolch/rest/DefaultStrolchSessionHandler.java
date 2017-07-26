@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
@@ -152,22 +152,26 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public Certificate validate(String authToken) {
+	public Certificate validate(String authToken) throws StrolchNotAuthenticatedException {
 		DBC.PRE.assertNotEmpty("authToken must be set!", authToken); //$NON-NLS-1$
 
 		Certificate certificate = this.certificateMap.get(authToken);
-
 		if (certificate == null)
-			throw new StrolchException(MessageFormat.format("No certificate exists for sessionId {0}", authToken)); //$NON-NLS-1$
+			throw new StrolchNotAuthenticatedException(
+					MessageFormat.format("No certificate exists for sessionId {0}", authToken)); //$NON-NLS-1$
 
 		return validate(certificate);
 	}
 
 	@Override
-	public Certificate validate(Certificate certificate) {
-		this.privilegeHandler.isCertificateValid(certificate);
-		certificate.setLastAccess(new Date());
-		return certificate;
+	public Certificate validate(Certificate certificate) throws StrolchNotAuthenticatedException {
+		try {
+			this.privilegeHandler.isCertificateValid(certificate);
+			certificate.setLastAccess(new Date());
+			return certificate;
+		} catch (PrivilegeException e) {
+			throw new StrolchNotAuthenticatedException(e.getMessage(), e);
+		}
 	}
 
 	@Override

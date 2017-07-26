@@ -30,6 +30,7 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.base.NotAuthenticatedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.DefaultPrivilegeHandler;
 import li.strolch.privilege.handler.EncryptionHandler;
@@ -141,7 +142,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public void isCertificateValid(Certificate certificate) throws PrivilegeException {
+	public void isCertificateValid(Certificate certificate) throws PrivilegeException, NotAuthenticatedException {
 		assertStarted();
 		this.privilegeHandler.isCertificateValid(certificate);
 	}

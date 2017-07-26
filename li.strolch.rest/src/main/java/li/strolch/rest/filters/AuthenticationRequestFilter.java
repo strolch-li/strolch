@@ -35,6 +35,8 @@ import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import li.strolch.exception.StrolchAccessDeniedException;
+import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -46,7 +48,7 @@ import li.strolch.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Provider
-@Priority(Priorities.AUTHENTICATION) 
+@Priority(Priorities.AUTHENTICATION)
 public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthenticationRequestFilter.class);
@@ -105,6 +107,15 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					.getComponent(StrolchSessionHandler.class);
 			Certificate certificate = sessionHandler.validate(sessionId);
 			requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
+		} catch (StrolchNotAuthenticatedException e) {
+			logger.error(e.getMessage());
+			requestContext.abortWith(
+					Response.status(Response.Status.UNAUTHORIZED).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("User is not authenticated!").build()); //$NON-NLS-1$
+		} catch (StrolchAccessDeniedException e) {
+			logger.error(e.getMessage());
+			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("User is not authorized!").build()); //$NON-NLS-1$
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			requestContext.abortWith(

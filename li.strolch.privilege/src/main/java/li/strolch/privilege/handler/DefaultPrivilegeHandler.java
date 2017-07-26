@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
+import li.strolch.privilege.base.NotAuthenticatedException;
 import li.strolch.privilege.base.PrivilegeConflictResolution;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
@@ -1389,7 +1390,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public void isCertificateValid(Certificate certificate) {
+	public void isCertificateValid(Certificate certificate) throws PrivilegeException, NotAuthenticatedException {
 
 		// certificate  must not be null
 		if (certificate == null)
@@ -1399,7 +1400,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext privilegeContext = this.privilegeContextMap.get(certificate.getSessionId());
 		if (privilegeContext == null) {
 			String msg = MessageFormat.format("There is no session information for {0}", certificate); //$NON-NLS-1$
-			throw new AccessDeniedException(msg);
+			throw new NotAuthenticatedException(msg);
 		}
 
 		// validate certificate has not been tampered with
@@ -1416,7 +1417,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					ZoneId.systemDefault());
 			if (dateTime.plusHours(1).isBefore(LocalDateTime.now())) {
 				invalidateSession(sessionCertificate);
-				throw new PrivilegeException("Certificate has already expired!"); //$NON-NLS-1$
+				throw new NotAuthenticatedException("Certificate has already expired!"); //$NON-NLS-1$
 			}
 		}
 
@@ -1433,7 +1434,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException {
+	public PrivilegeContext getPrivilegeContext(Certificate certificate)
+			throws PrivilegeException, NotAuthenticatedException {
 
 		// first validate certificate
 		isCertificateValid(certificate);

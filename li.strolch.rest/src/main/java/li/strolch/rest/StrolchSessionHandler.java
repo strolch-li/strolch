@@ -18,6 +18,7 @@ package li.strolch.rest;
 import java.util.List;
 import java.util.Locale;
 
+import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Usage;
@@ -30,9 +31,9 @@ public interface StrolchSessionHandler {
 
 	public Certificate authenticate(String username, char[] password);
 
-	public Certificate validate(String authToken);
+	public Certificate validate(String authToken) throws StrolchNotAuthenticatedException;
 
-	public Certificate validate(Certificate certificate);
+	public Certificate validate(Certificate certificate) throws StrolchNotAuthenticatedException;
 
 	public void invalidate(Certificate certificate);
 
