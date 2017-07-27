@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.NotAuthenticatedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Usage;
@@ -68,7 +69,7 @@ public class ServiceTest extends AbstractServiceTest {
 				new Date(), null,
 				new HashSet<String>(), null);
 		ServiceResult svcResult = getServiceHandler().doService(badCert, testService);
-		assertThat(svcResult.getThrowable(), instanceOf(AccessDeniedException.class));
+		assertThat(svcResult.getThrowable(), instanceOf(NotAuthenticatedException.class));
 	}
 
 	@Test
