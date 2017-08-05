@@ -15,7 +15,6 @@
  */
 package li.strolch.utils.helper;
 
-import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -61,10 +60,6 @@ public class StringHelper {
 		return String.format("%02x", data);
 	}
 
-	public static byte fromHexByte(String encoded) {
-		return Byte.valueOf(encoded, 16);
-	}
-
 	public static String toPrettyHexString(byte[] raw) {
 		try {
 			byte[] hex = new byte[3 * raw.length + (raw.length / 8)];
@@ -91,14 +86,13 @@ public class StringHelper {
 	}
 
 	public static byte[] fromPrettyHexString(String prettyHex) {
-
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		String[] split = prettyHex.split(" ");
-		for (String encoded : split) {
-			out.write(fromHexByte(encoded));
+		String s = prettyHex.replace(" ", "");
+		int len = s.length();
+		byte[] data = new byte[len / 2];
+		for (int i = 0; i < len; i += 2) {
+			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
 		}
-
-		return out.toByteArray();
+		return data;
 	}
 
 	/**
@@ -236,8 +230,8 @@ public class StringHelper {
 	}
 
 	/**
-	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array
-	 * to a Hex String which is printable
+	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
+	 * a Hex String which is printable
 	 * 
 	 * @param bytes
 	 *            the bytes to hash
@@ -274,8 +268,8 @@ public class StringHelper {
 	}
 
 	/**
-	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array
-	 * to a Hex String which is printable
+	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
+	 * a Hex String which is printable
 	 * 
 	 * @param bytes
 	 *            the bytes to hash
