@@ -1225,8 +1225,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		audit.setId(StrolchAgent.getUniqueIdLong());
 		audit.setUsername(this.certificate.getUsername());
-		audit.setFirstname(this.certificate.getFirstname());
-		audit.setLastname(this.certificate.getLastname());
+		audit.setFirstname(this.certificate.getFirstname() == null ? this.certificate.getUsername()
+				: this.certificate.getFirstname());
+		audit.setLastname(this.certificate.getLastname() == null ? this.certificate.getUsername()
+				: this.certificate.getLastname());
 		audit.setDate(new Date());
 
 		audit.setElementType(elementType);
