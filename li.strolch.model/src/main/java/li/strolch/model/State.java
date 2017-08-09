@@ -73,7 +73,7 @@ public enum State {
 	 * @return true if the state is {@link #ERROR} or {@link #STOPPED}
 	 */
 	public boolean inErrorPhase() {
-		return this == State.ERROR || this == State.STOPPED;
+		return this == ERROR || this == STOPPED;
 	}
 
 	/**
@@ -94,42 +94,42 @@ public enum State {
 	 * @return true if the state is {@link #CREATED}
 	 */
 	public boolean isCreated() {
-		return this == State.CREATED;
+		return this == CREATED;
 	}
 
 	/**
 	 * @return true if the state is {@link #PLANNING}
 	 */
 	public boolean isInPlanning() {
-		return this == State.PLANNING;
+		return this == PLANNING;
 	}
 
 	/**
 	 * @return true if the state is {@link #PLANNED}
 	 */
 	public boolean isInPlanned() {
-		return this == State.PLANNED;
+		return this == PLANNED;
 	}
 
 	/**
 	 * @return true if the state is {@link #EXECUTION}
 	 */
 	public boolean isInExecution() {
-		return this == State.EXECUTION;
+		return this == EXECUTION;
 	}
 
 	/**
 	 * @return true if the state is {@link #WARNING}
 	 */
 	public boolean isInWarning() {
-		return this == State.WARNING;
+		return this == WARNING;
 	}
 
 	/**
 	 * @return true if the state is {@link #ERROR}
 	 */
 	public boolean isInError() {
-		return this == State.ERROR;
+		return this == ERROR;
 	}
 
 	/**
@@ -157,21 +157,21 @@ public enum State {
 	 * @return true if {@link #ERROR}
 	 */
 	public boolean canSetToStopped() {
-		return this == State.ERROR;
+		return this == ERROR;
 	}
 
 	/**
 	 * @return true if {@link #STARTING} or {@link #EXECUTION} or {@link #WARNING}
 	 */
 	public boolean canSetToError() {
-		return this == State.EXECUTION || this == State.WARNING;
+		return this == EXECUTION || this == WARNING || this == ERROR;
 	}
 
 	/**
 	 * @return true if {@link #EXECUTION} or {@link #WARNING} or {@link #STOPPED}
 	 */
 	public boolean canSetToExecuted() {
-		return this == State.EXECUTION || this == State.WARNING || this == State.STOPPED;
+		return this == EXECUTION || this == WARNING || this == STOPPED;
 	}
 
 	public static State parse(String s) {
@@ -193,40 +193,40 @@ public enum State {
 			return states.iterator().next();
 
 		// error
-		if (states.contains(State.ERROR))
-			return State.ERROR;
+		if (states.contains(ERROR))
+			return ERROR;
 
 		// stopped
-		if (states.contains(State.STOPPED))
-			return State.STOPPED;
+		if (states.contains(STOPPED))
+			return STOPPED;
 
 		// warning
-		if (states.contains(State.WARNING))
-			return State.WARNING;
+		if (states.contains(WARNING))
+			return WARNING;
 
 		// execution
-		if (states.contains(State.EXECUTION))
-			return State.EXECUTION;
-		if (states.contains(State.EXECUTED) && (states.contains(State.CREATED) || states.contains(State.PLANNING)
-				|| states.contains(State.PLANNED)))
-			return State.EXECUTION;
+		if (states.contains(EXECUTION))
+			return EXECUTION;
+		if (states.contains(EXECUTED)
+				&& (states.contains(CREATED) || states.contains(PLANNING) || states.contains(PLANNED)))
+			return EXECUTION;
 
 		// executed
-		if (states.contains(State.EXECUTED) && (states.contains(State.CLOSED)))
-			return State.EXECUTED;
+		if (states.contains(EXECUTED) && (states.contains(CLOSED)))
+			return EXECUTED;
 
 		// planning
-		if (states.contains(State.PLANNING))
-			return State.PLANNING;
-		if (states.contains(State.PLANNED) && (states.contains(State.CREATED) || states.contains(State.PLANNING)))
-			return State.PLANNING;
+		if (states.contains(PLANNING))
+			return PLANNING;
+		if (states.contains(PLANNED) && (states.contains(CREATED) || states.contains(PLANNING)))
+			return PLANNING;
 
 		// planned
-		if (states.contains(State.PLANNED) && (states.contains(State.CLOSED)))
-			return State.PLANNED;
+		if (states.contains(PLANNED) && (states.contains(CLOSED)))
+			return PLANNED;
 
-		if (states.contains(State.CREATED) && (states.contains(State.CLOSED)))
-			return State.CREATED;
+		if (states.contains(CREATED) && (states.contains(CLOSED)))
+			return CREATED;
 
 		// should never happen, unless new state is introduced
 		throw new IllegalStateException("Unhandled situation with states: "
