@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.policy.PolicyDef;
@@ -101,12 +102,27 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		strolchTimedState.setParent(this);
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	public <T extends StrolchTimedState<? extends IValue<?>>> T getTimedState(String id) {
+		return getTimedState(id, false);
+	}
+
+	public <T extends StrolchTimedState<? extends IValue<?>>> T getTimedState(String id, boolean assertExists) {
 		if (this.timedStateMap == null) {
+			if (assertExists) {
+				String msg = "The TimedState {0} does not exist";
+				throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(Tags.STATE, id)));
+			}
 			return null;
 		}
-		return (T) this.timedStateMap.get(id);
+
+		@SuppressWarnings("unchecked")
+		T timedState = (T) this.timedStateMap.get(id);
+		if (timedState == null && assertExists) {
+			String msg = "The TimedState {0} does not exist";
+			throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(Tags.STATE, id)));
+		}
+
+		return timedState;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
