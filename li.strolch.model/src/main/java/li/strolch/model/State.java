@@ -150,7 +150,7 @@ public enum State {
 	 * @return true if {@link #EXECUTION}
 	 */
 	public boolean canSetToWarning() {
-		return this == EXECUTION;
+		return this == EXECUTION || this == WARNING;
 	}
 
 	/**

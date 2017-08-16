@@ -41,4 +41,35 @@ public class I18nMessage {
 		String string = this.bundle.getString(this.key);
 		return StringHelper.replacePropertiesIn(this.values, EMPTY, string);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.key == null) ? 0 : this.key.hashCode());
+		result = prime * result + ((this.values == null) ? 0 : this.values.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		I18nMessage other = (I18nMessage) obj;
+		if (this.key == null) {
+			if (other.key != null)
+				return false;
+		} else if (!this.key.equals(other.key))
+			return false;
+		if (this.values == null) {
+			if (other.values != null)
+				return false;
+		} else if (!this.values.equals(other.values))
+			return false;
+		return true;
+	}
 }

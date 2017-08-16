@@ -74,8 +74,10 @@ public class LogMessage extends I18nMessage {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+		int result = super.hashCode();
+		result = prime * result + ((this.locator == null) ? 0 : this.locator.hashCode());
+		result = prime * result + ((this.realm == null) ? 0 : this.realm.hashCode());
+		result = prime * result + ((this.severity == null) ? 0 : this.severity.hashCode());
 		return result;
 	}
 
@@ -83,15 +85,22 @@ public class LogMessage extends I18nMessage {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		LogMessage other = (LogMessage) obj;
-		if (this.id == null) {
-			if (other.id != null)
+		if (this.locator == null) {
+			if (other.locator != null)
 				return false;
-		} else if (!this.id.equals(other.id))
+		} else if (!this.locator.equals(other.locator))
+			return false;
+		if (this.realm == null) {
+			if (other.realm != null)
+				return false;
+		} else if (!this.realm.equals(other.realm))
+			return false;
+		if (this.severity != other.severity)
 			return false;
 		return true;
 	}

@@ -2,6 +2,7 @@ package li.strolch.handler.operationslog;
 
 public enum LogSeverity {
 	INFO("Info"), //
+	NOTIFICATION("Notification"), //
 	WARN("Warn"), //
 	ERROR("Error"), //
 	EXCEPTION("Exception");

@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -16,8 +17,8 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 
 public class OperationsLog extends StrolchComponent {
 
-	private Map<String, LinkedHashMap<String, LogMessage>> logMessagesById;
-	private Map<String, LinkedHashMap<Locator, List<LogMessage>>> logMessagesByLocator;
+	private Map<String, LinkedHashMap<LogMessage, LogMessage>> logMessagesByRealmAndId;
+	private Map<String, LinkedHashMap<Locator, LinkedHashSet<LogMessage>>> logMessagesByLocator;
 	private int maxMessages;
 
 	public OperationsLog(ComponentContainer container, String componentName) {
@@ -29,7 +30,7 @@ public class OperationsLog extends StrolchComponent {
 
 		this.maxMessages = configuration.getInt("maxMessages", 10000);
 
-		this.logMessagesById = new HashMap<>();
+		this.logMessagesByRealmAndId = new HashMap<>();
 		this.logMessagesByLocator = new HashMap<>();
 
 		super.initialize(configuration);
@@ -38,56 +39,56 @@ public class OperationsLog extends StrolchComponent {
 	public void addMessage(LogMessage logMessage) {
 
 		// store in global list
-		LinkedHashMap<String, LogMessage> logMessages = this.logMessagesById.computeIfAbsent(logMessage.getRealm(),
-				this::newBoundedStringMap);
-		logMessages.put(logMessage.getId(), logMessage);
+		LinkedHashMap<LogMessage, LogMessage> logMessages = this.logMessagesByRealmAndId
+				.computeIfAbsent(logMessage.getRealm(), this::newBoundedStringMap);
+		logMessages.put(logMessage, logMessage);
 
 		// store under locator
-		LinkedHashMap<Locator, List<LogMessage>> logMessagesLocator = this.logMessagesByLocator
+		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesLocator = this.logMessagesByLocator
 				.computeIfAbsent(logMessage.getRealm(), this::newBoundedLocatorMap);
-		List<LogMessage> messages = logMessagesLocator.computeIfAbsent(logMessage.getLocator(),
-				(l) -> new ArrayList<LogMessage>());
+		LinkedHashSet<LogMessage> messages = logMessagesLocator.computeIfAbsent(logMessage.getLocator(),
+				(l) -> new LinkedHashSet<LogMessage>());
 		messages.add(logMessage);
 	}
 
 	public void clearMessages(String realm, Locator locator) {
-		LinkedHashMap<Locator, List<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
+		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
 		if (logMessages != null)
 			logMessages.remove(locator);
 	}
 
-	public Optional<List<LogMessage>> getMessagesFor(String realm, Locator locator) {
-		LinkedHashMap<Locator, List<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
+	public Optional<Set<LogMessage>> getMessagesFor(String realm, Locator locator) {
+		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
 		if (logMessages == null)
 			return Optional.empty();
 		return Optional.ofNullable(logMessages.get(locator));
 	}
 
 	public List<LogMessage> getMessages(String realm) {
-		LinkedHashMap<String, LogMessage> logMessages = this.logMessagesById.get(realm);
+		LinkedHashMap<LogMessage, LogMessage> logMessages = this.logMessagesByRealmAndId.get(realm);
 		if (logMessages == null)
 			return Collections.emptyList();
 
-		return logMessages.entrySet().stream().map(e -> e.getValue()).collect(Collectors.toList());
+		return new ArrayList<>(logMessages.keySet());
 	}
 
-	private LinkedHashMap<String, LogMessage> newBoundedStringMap(String realm) {
-		return new LinkedHashMap<String, LogMessage>() {
+	private LinkedHashMap<LogMessage, LogMessage> newBoundedStringMap(String realm) {
+		return new LinkedHashMap<LogMessage, LogMessage>() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected boolean removeEldestEntry(java.util.Map.Entry<String, LogMessage> eldest) {
+			protected boolean removeEldestEntry(java.util.Map.Entry<LogMessage, LogMessage> eldest) {
 				return size() > maxMessages;
 			}
 		};
 	}
 
-	private LinkedHashMap<Locator, List<LogMessage>> newBoundedLocatorMap(String realm) {
-		return new LinkedHashMap<Locator, List<LogMessage>>() {
+	private LinkedHashMap<Locator, LinkedHashSet<LogMessage>> newBoundedLocatorMap(String realm) {
+		return new LinkedHashMap<Locator, LinkedHashSet<LogMessage>>() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected boolean removeEldestEntry(java.util.Map.Entry<Locator, List<LogMessage>> eldest) {
+			protected boolean removeEldestEntry(java.util.Map.Entry<Locator, LinkedHashSet<LogMessage>> eldest) {
 				return size() > maxMessages;
 			}
 		};
