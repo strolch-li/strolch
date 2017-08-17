@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -75,6 +76,10 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.Result;
+import li.strolch.service.LocatorArgument;
+import li.strolch.service.RemoveActivityService;
+import li.strolch.service.RemoveOrderService;
+import li.strolch.service.RemoveResourceService;
 import li.strolch.service.UpdateActivityService;
 import li.strolch.service.UpdateActivityService.UpdateActivityArg;
 import li.strolch.service.UpdateOrderService;
@@ -909,6 +914,57 @@ public class Inspector {
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
 		}
 
+		return Result.toResponse(result);
+	}
+
+	@DELETE
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/resources/{type}/{id}")
+	public Response removeResource(@PathParam("realm") String realm, @PathParam("type") String type,
+			@PathParam("id") String id, @Context HttpServletRequest request) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		RemoveResourceService svc = new RemoveResourceService();
+		LocatorArgument arg = svc.getArgumentInstance();
+		arg.locator = Resource.locatorFor(type, id);
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		return Result.toResponse(result);
+	}
+
+	@DELETE
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/orders/{type}/{id}")
+	public Response removeOrder(@PathParam("realm") String realm, @PathParam("type") String type,
+			@PathParam("id") String id, @Context HttpServletRequest request) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		RemoveOrderService svc = new RemoveOrderService();
+		LocatorArgument arg = svc.getArgumentInstance();
+		arg.locator = Resource.locatorFor(type, id);
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		return Result.toResponse(result);
+	}
+
+	@DELETE
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/activities/{type}/{id}")
+	public Response removeActivity(@PathParam("realm") String realm, @PathParam("type") String type,
+			@PathParam("id") String id, @Context HttpServletRequest request) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		RemoveActivityService svc = new RemoveActivityService();
+		LocatorArgument arg = svc.getArgumentInstance();
+		arg.locator = Resource.locatorFor(type, id);
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		return Result.toResponse(result);
 	}
 }
