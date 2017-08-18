@@ -502,6 +502,7 @@ public class StringHelper {
 
 			// if no property exists, then log and continue
 			if (property.isEmpty()) {
+				pos = stop;
 				// logger.warn("No system property found for sequence " + sequence);
 				continue;
 			}
