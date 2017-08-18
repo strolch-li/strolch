@@ -56,17 +56,20 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/appVersion.properties</exclude>
+				</excludes>
 				<includes>
 					<include>**/*.properties</include>
 				</includes>
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
-				<excludes>
-					<exclude>**/*.properties</exclude>
-				</excludes>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/appVersion.properties</include>
+				</includes>
 			</resource>
 		</resources>
 		<plugins>

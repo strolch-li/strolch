@@ -35,9 +35,19 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/componentVersion.properties</exclude>
+				</excludes>
 				<includes>
 					<include>**/*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/componentVersion.properties</include>
 				</includes>
 			</resource>
 		</resources>
