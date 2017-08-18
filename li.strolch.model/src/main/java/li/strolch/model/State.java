@@ -84,7 +84,7 @@ public enum State {
 	}
 
 	/**
-	 * @return true if the state is {@link #CLOSED}
+	 * @return true if the state is {@link #EXECUTED} or {@link #CLOSED}
 	 */
 	public boolean inClosedPhase() {
 		return this == EXECUTED || this == CLOSED;
