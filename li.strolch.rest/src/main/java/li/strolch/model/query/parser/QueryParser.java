@@ -189,13 +189,13 @@ public abstract class QueryParser extends CompositeParser {
 		actions();
 	}
 
-	public static ResourceQuery<Resource> parseToResourceQuery(String queryString, boolean withPrefix,
-			boolean withAny) {
-		return parseToResourceQuery(new MapOfSets<>(), withPrefix, queryString, withAny);
+	public static ResourceQuery<Resource> parseToResourceQuery(String queryString, boolean withPrefix, boolean withAny,
+			boolean allowType) {
+		return parseToResourceQuery(new MapOfSets<>(), withPrefix, queryString, withAny, allowType);
 	}
 
 	public static ResourceQuery<Resource> parseToResourceQuery(MapOfSets<String, String> bagParamSet,
-			boolean withPrefix, String queryString, boolean withAny) {
+			boolean withPrefix, String queryString, boolean withAny, boolean allowType) {
 		QueryParser parser = new QueryParser(new ResourceQuery<>()) {
 			@Override
 			public MapOfSets<String, String> getBagParamSet() {
@@ -209,7 +209,7 @@ public abstract class QueryParser extends CompositeParser {
 
 			@Override
 			public boolean allowType() {
-				return true;
+				return allowType;
 			}
 		};
 		Result result = parser.parse(queryString);
@@ -222,12 +222,13 @@ public abstract class QueryParser extends CompositeParser {
 		return query;
 	}
 
-	public static OrderQuery<Order> parseToOrderQuery(String queryString, boolean withPrefix, boolean withAny) {
-		return parseToOrderQuery(new MapOfSets<>(), withPrefix, queryString, withAny);
+	public static OrderQuery<Order> parseToOrderQuery(String queryString, boolean withPrefix, boolean withAny,
+			boolean allowType) {
+		return parseToOrderQuery(new MapOfSets<>(), withPrefix, queryString, withAny, allowType);
 	}
 
 	public static OrderQuery<Order> parseToOrderQuery(MapOfSets<String, String> bagParamSet, boolean withPrefix,
-			String queryString, boolean withAny) {
+			String queryString, boolean withAny, boolean allowType) {
 		QueryParser parser = new QueryParser(new OrderQuery<>()) {
 			@Override
 			public MapOfSets<String, String> getBagParamSet() {
@@ -241,7 +242,7 @@ public abstract class QueryParser extends CompositeParser {
 
 			@Override
 			public boolean allowType() {
-				return true;
+				return allowType;
 			}
 		};
 		Result result = parser.parse(queryString);
@@ -254,13 +255,13 @@ public abstract class QueryParser extends CompositeParser {
 		return query;
 	}
 
-	public static ActivityQuery<Activity> parseToActivityQuery(String queryString, boolean withPrefix,
-			boolean withAny) {
-		return parseToActivityQuery(new MapOfSets<>(), withPrefix, queryString, withAny);
+	public static ActivityQuery<Activity> parseToActivityQuery(String queryString, boolean withPrefix, boolean withAny,
+			boolean allowType) {
+		return parseToActivityQuery(new MapOfSets<>(), withPrefix, queryString, withAny, allowType);
 	}
 
 	public static ActivityQuery<Activity> parseToActivityQuery(MapOfSets<String, String> bagParamSet,
-			boolean withPrefix, String queryString, boolean withAny) {
+			boolean withPrefix, String queryString, boolean withAny, boolean allowType) {
 		QueryParser parser = new QueryParser(new ActivityQuery<>()) {
 			@Override
 			public MapOfSets<String, String> getBagParamSet() {
@@ -274,7 +275,7 @@ public abstract class QueryParser extends CompositeParser {
 
 			@Override
 			public boolean allowType() {
-				return true;
+				return allowType;
 			}
 		};
 		Result result = parser.parse(queryString);

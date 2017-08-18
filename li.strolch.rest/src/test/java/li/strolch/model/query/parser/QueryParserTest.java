@@ -23,56 +23,56 @@ public class QueryParserTest {
 
 	@Test
 	public void shouldIgnoreGibberish() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("sdf dfg3 !sdf", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("sdf dfg3 !sdf", true, false, true);
 		assertFalse(query.hasNavigation());
 		assertFalse(query.hasSelection());
 	}
 
 	@Test
 	public void shouldParseEmpty1() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("", false, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("", false, false, true);
 		assertFalse(query.hasNavigation());
 		assertFalse(query.hasSelection());
 	}
-	
+
 	@Test
 	public void shouldParseEmpty2() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("", true, false, true);
 		assertFalse(query.hasNavigation());
 		assertFalse(query.hasSelection());
 	}
 
 	@Test
 	public void shouldParseEmptyId() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("id:", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("id:", true, false, true);
 		assertFalse(query.hasNavigation());
 		assertFalse(query.hasSelection());
 	}
 
 	@Test
 	public void shouldParseEmptyName() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("name:", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("name:", true, false, true);
 		assertFalse(query.hasNavigation());
 		assertFalse(query.hasSelection());
 	}
 
 	@Test
 	public void shouldParseEmptyType() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("type:", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("type:", true, false, true);
 		assertFalse(query.hasNavigation());
 		assertFalse(query.hasSelection());
 	}
 
 	@Test
 	public void shouldParseEmptyIdNameType() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("id: name: type:", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("id: name: type:", true, false, true);
 		assertFalse(query.hasNavigation());
 		assertFalse(query.hasSelection());
 	}
 
 	@Test
 	public void shouldParseId() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("id:asd", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("id:asd", true, false, true);
 		OrSelection or = (OrSelection) query.getSelection();
 		List<Selection> selections = or.getSelections();
 		assertEquals(1, selections.size());
@@ -86,7 +86,7 @@ public class QueryParserTest {
 
 	@Test
 	public void shouldParseIds() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("id:asd id:bbb", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("id:asd id:bbb", true, false, true);
 		OrSelection or = (OrSelection) query.getSelection();
 		List<Selection> selections = or.getSelections();
 		assertEquals(1, selections.size());
@@ -101,7 +101,7 @@ public class QueryParserTest {
 
 	@Test
 	public void shouldParseName() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("name:asd", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("name:asd", true, false, true);
 		OrSelection or = (OrSelection) query.getSelection();
 		List<Selection> selections = or.getSelections();
 		assertEquals(1, selections.size());
@@ -112,7 +112,7 @@ public class QueryParserTest {
 
 	@Test
 	public void shouldParseNames() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("name:asd name:bbb", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("name:asd name:bbb", true, false, true);
 		OrSelection or = (OrSelection) query.getSelection();
 		List<Selection> selections = or.getSelections();
 		assertEquals(2, selections.size());
@@ -126,7 +126,7 @@ public class QueryParserTest {
 
 	@Test
 	public void shouldParseType() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("type:asd", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("type:asd", true, false, true);
 		assertFalse(query.hasSelection());
 		assertTrue(query.hasNavigation());
 		StrolchTypeNavigation navigation = (StrolchTypeNavigation) query.getNavigation();
@@ -135,7 +135,7 @@ public class QueryParserTest {
 
 	@Test
 	public void shouldReplaceMultipleType() {
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("type:asd type:fff", true, false);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("type:asd type:fff", true, false, true);
 		assertFalse(query.hasSelection());
 		assertTrue(query.hasNavigation());
 		StrolchTypeNavigation navigation = (StrolchTypeNavigation) query.getNavigation();
@@ -145,7 +145,7 @@ public class QueryParserTest {
 	@Test
 	public void shouldParseIdNameType() {
 		ResourceQuery<Resource> query = QueryParser
-				.parseToResourceQuery("id:foo name:bar type:asd date:1970-01-01T01:00:00.000+01:00", true, false);
+				.parseToResourceQuery("id:foo name:bar type:asd date:1970-01-01T01:00:00.000+01:00", true, false, true);
 		OrSelection or = (OrSelection) query.getSelection();
 		List<Selection> selections = or.getSelections();
 		assertEquals(2, selections.size());
@@ -157,7 +157,7 @@ public class QueryParserTest {
 	@Test
 	public void shouldParseWithWhitespace() {
 		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery("  id:foo  name:bar  type:asd \t ", true,
-				false);
+				false, true);
 		OrSelection or = (OrSelection) query.getSelection();
 		List<Selection> selections = or.getSelections();
 		assertEquals(2, selections.size());
@@ -173,7 +173,7 @@ public class QueryParserTest {
 		maps.addElement("parameters", "date");
 
 		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(maps, true,
-				"type:asd id:asd email:bla@dsfdfg.ch date:1970-01-01T01:00:00.000+01:00", false);
+				"type:asd id:asd email:bla@dsfdfg.ch date:1970-01-01T01:00:00.000+01:00", false, true);
 		assertTrue(query.hasNavigation());
 		OrSelection or = (OrSelection) query.getSelection();
 		List<Selection> selections = or.getSelections();
@@ -200,7 +200,7 @@ public class QueryParserTest {
 		maps.addElement("parameters", "date");
 
 		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(maps, false,
-				"asd bla@dsfdfg.ch 1970-01-01T01:00:00.000+01:00", false);
+				"asd bla@dsfdfg.ch 1970-01-01T01:00:00.000+01:00", false, true);
 		assertFalse(query.hasNavigation());
 		OrSelection or = (OrSelection) query.getSelection();
 		List<Selection> selections = or.getSelections();

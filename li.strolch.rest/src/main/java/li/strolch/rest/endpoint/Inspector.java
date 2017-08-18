@@ -388,7 +388,7 @@ public class Inspector {
 		List<Resource> resources = new ArrayList<>();
 
 		// parse the query string
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(queryData.getQuery(), true, true);
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(queryData.getQuery(), true, true, false);
 
 		// set navigation to requested type
 		query.setNavigation(new StrolchTypeNavigation(type));
@@ -438,7 +438,7 @@ public class Inspector {
 		List<Order> orders = new ArrayList<>();
 
 		// parse the query string
-		OrderQuery<Order> query = QueryParser.parseToOrderQuery(queryData.getQuery(), true, true);
+		OrderQuery<Order> query = QueryParser.parseToOrderQuery(queryData.getQuery(), true, true, false);
 		query.setNavigation(new StrolchTypeNavigation(type));
 
 		// query the data
@@ -472,7 +472,7 @@ public class Inspector {
 		List<Activity> activities = new ArrayList<>();
 
 		// parse the query string
-		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true, true);
+		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true, true, false);
 		query.setNavigation(new StrolchTypeNavigation(type));
 
 		// query the data
@@ -944,7 +944,7 @@ public class Inspector {
 
 		RemoveOrderService svc = new RemoveOrderService();
 		LocatorArgument arg = svc.getArgumentInstance();
-		arg.locator = Resource.locatorFor(type, id);
+		arg.locator = Order.locatorFor(type, id);
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -961,7 +961,7 @@ public class Inspector {
 
 		RemoveActivityService svc = new RemoveActivityService();
 		LocatorArgument arg = svc.getArgumentInstance();
-		arg.locator = Resource.locatorFor(type, id);
+		arg.locator = Activity.locatorFor(type, id);
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
