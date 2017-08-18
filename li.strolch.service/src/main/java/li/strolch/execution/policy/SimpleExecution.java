@@ -54,14 +54,14 @@ public class SimpleExecution extends ExecutionPolicy {
 		}
 	}
 
-	protected void toError(String realm, LogMessage message) {
+	protected void toError(LogMessage message) {
 		addMessage(message);
-		getExecutionHandler().toError(realm, message.getLocator());
+		getExecutionHandler().toError(message.getRealm(), message.getLocator());
 	}
 
-	protected void toWarning(String realm, LogMessage message) {
+	protected void toWarning(LogMessage message) {
 		addMessage(message);
-		getExecutionHandler().toWarning(realm, message.getLocator());
+		getExecutionHandler().toWarning(message.getRealm(), message.getLocator());
 	}
 
 	@Override

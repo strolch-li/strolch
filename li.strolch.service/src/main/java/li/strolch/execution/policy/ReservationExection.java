@@ -45,6 +45,13 @@ public class ReservationExection extends DurationExecution {
 			return super.isExecutable(action);
 		}
 
+		if (action.getType().equals(TYPE_RESERVE))
+			return !isReserved(action);
+		else
+			return isReserved(action);
+	}
+
+	protected boolean isReserved(Action action) {
 		// get resource
 		Resource resource = getResource(action);
 
@@ -53,10 +60,7 @@ public class ReservationExection extends DurationExecution {
 					+ resource.getLocator());
 
 		BooleanParameter reservedP = resource.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
-		if (action.getType().equals(TYPE_RESERVE))
-			return !reservedP.getValue();
-		else
-			return reservedP.getValue();
+		return reservedP.getValue().booleanValue();
 	}
 
 	@Override

@@ -154,10 +154,10 @@ public enum State {
 	}
 
 	/**
-	 * @return true if {@link #ERROR}
+	 * @return true if {@link #ERROR} or {@link #STOPPED}
 	 */
 	public boolean canSetToStopped() {
-		return this == ERROR;
+		return this == ERROR || this == State.STOPPED;
 	}
 
 	/**
