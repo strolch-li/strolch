@@ -249,9 +249,9 @@ public class Inspector {
 			JsonArray typeArrJ = new JsonArray();
 			mapOverview.add(Tags.Json.TYPES, typeArrJ);
 
-			List<String> types = new ArrayList<>();
+			List<String> types = new ArrayList<>(resourceMap.getTypes(tx));
 			Collections.sort(types);
-			resourceMap.getTypes(tx).forEach(type -> {
+			types.forEach(type -> {
 
 				JsonObject typeJ = new JsonObject();
 				typeJ.addProperty(Tags.Json.TYPE, type);
@@ -295,9 +295,9 @@ public class Inspector {
 			JsonArray typeArrJ = new JsonArray();
 			mapOverview.add(Tags.Json.TYPES, typeArrJ);
 
-			List<String> types = new ArrayList<>();
+			List<String> types = new ArrayList<>(orderMap.getTypes(tx));
 			Collections.sort(types);
-			orderMap.getTypes(tx).forEach(type -> {
+			types.forEach(type -> {
 
 				JsonObject typeJ = new JsonObject();
 				typeJ.addProperty(Tags.Json.TYPE, type);
@@ -343,9 +343,9 @@ public class Inspector {
 			JsonArray typeArrJ = new JsonArray();
 			mapOverview.add(Tags.Json.TYPES, typeArrJ);
 
-			List<String> types = new ArrayList<>();
+			List<String> types = new ArrayList<>(activityMap.getTypes(tx));
 			Collections.sort(types);
-			activityMap.getTypes(tx).forEach(type -> {
+			types.forEach(type -> {
 
 				JsonObject typeJ = new JsonObject();
 				typeJ.addProperty(Tags.Json.TYPE, type);
