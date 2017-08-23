@@ -30,6 +30,8 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 	@Override
 	public void destroy() {
 
+		this.simulationTasks.values().forEach(task -> task.cancel(false));
+
 		if (this.scheduledExecutorService != null) {
 			this.scheduledExecutorService.shutdown();
 			while (!this.scheduledExecutorService.isTerminated()) {
