@@ -2,28 +2,38 @@
 
 # usage
 if [ $# != 2 ] ; then
-  echo -e "Usage: ${0} <release_branch> <hotfix_version>"
+  echo -e "Usage: ${0} <source_branch> <version>"
   exit 1
 fi
 
 
 # Confirm
-releaseBranch="${1}"
-hotfixVersion="${2}"
-echo -e "INFO: Do you want to make hotfix version ${hotfixVersion} from release branch ${releaseBranch}? y/n"
+sourceBranch=${1}
+releaseVersion=${2}
+echo -e "INFO: Do you want to release version ${releaseVersion} from branch ${sourceBranch}? y/n"
 read a
 if [[ "${a}" != "y" && "${a}" != "Y" ]] ; then
   exit 0;
 fi
 
 
-# validate tag does not exist
+# validate tag and release branch do not exist
 echo -e "INFO: Fetching tags and branches and validating they do not exist..."
 if ! git fetch --all --tags > /dev/null ; then
   echo -e "ERROR: Tags and branches could not be fetched!"
   exit 1
 fi
-if git tag | grep ${hotfixVersion} > /dev/null ; then
+if git tag | grep "${releaseVersion}" > /dev/null ; then
+  echo -e "ERROR: Tag already exists!"
+  exit 1
+fi
+if git branch --all | grep "release/${releaseVersion}" > /dev/null ; then
+  echo -e "ERROR: Tag already exists!"
+  exit 1
+fi
+
+# validate tag does not exist
+if git tag | grep "${releaseVersion}" > /dev/null ; then
   echo -e "ERROR: Tag already exists!"
   exit 1
 fi
@@ -47,25 +57,29 @@ if ! gpg-agent 2>&1 | grep "running and available" ; then
 fi
 
 
-# Checkout release branch
-echo -e "\nINFO: Checking out release branch ${releaseBranch}"
-if ! git checkout ${releaseBranch} ; then
-  echo -e "ERROR: Failed to checkout branch ${releaseBranch}"
+# Checkout source branch
+echo -e "\nINFO: Checking out source branch ${sourceBranch}"
+if ! git checkout ${sourceBranch} ; then
+  echo -e "ERROR: Failed to checkout branch ${sourceBranch}"
   exit 1
 fi
 
 
-# create temp branch
-echo -e "\nINFO: Creating temp branch..."
+# create new release branch, and temp tag
+echo -e "\nINFO: Creating release and temp branches..."
+if ! git checkout -b release/${releaseVersion} ; then 
+  echo -e "ERROR: Failed to create release branch!"
+  exit 1
+fi
 if ! git checkout -b temp ; then
   echo -e "ERROR: Failed to create temp branch!"
   exit 1
 fi
 
 
-# set hotfix version
+# set release version
 echo -e "\nINFO: Setting version..."
-if ! mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${hotfixVersion} > /dev/null ; then
+if ! mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${releaseVersion} > /dev/null ; then
   echo -e "ERROR: Failed to set new version!"
   exit 1
 fi
@@ -85,11 +99,11 @@ if ! git add . ; then
   echo -e "ERROR: Failed to git add"
   exit 1
 fi
-if ! git commit -m "[Project] Set new version ${hotfixVersion}" ; then
+if ! git commit -m "[Project] Set new version ${releaseVersion}" ; then
   echo -e "ERROR: Failed to git commit"
   exit 1
 fi
-if ! git tag --sign --message "[Project] New Version ${hotfixVersion}" ${hotfixVersion} ; then
+if ! git tag --sign --message "[Project] New Version ${releaseVersion}" ${releaseVersion} ; then
   echo -e "ERROR: Failed to git tag"
   exit 1
 fi
@@ -97,7 +111,7 @@ fi
 
 # cleanup
 echo -e "\nINFO: Cleaning up..."
-if ! git checkout ${releaseBranch} ; then
+if ! git checkout release/${releaseVersion} ; then
   echo -e "ERROR: Failed to checkout release branch"
   exit 1
 fi
@@ -108,21 +122,26 @@ fi
 
 
 # git push
-echo -e "\nINFO: Hotfix ${hotfixVersion} created. Do you want to push to origin? y/n"
+echo -e "\nINFO: Release ${releaseVersion} created. Do you want to push to origin? y/n"
 read a
 if [[ "${a}" == "y" || "${a}" == "Y" ]] ; then
   echo -e "INFO: Pushing to origin..."
-  if ! git push origin ${hotfixVersion} ; then
+  if ! git push origin release/${releaseVersion} ; then
+    echo -e "ERROR: Failed to push release branch"
+    exit 1
+  fi
+  if ! git push origin ${releaseVersion} ; then
     echo -e "ERROR: Failed to push tag"
     exit 1
   fi
-  echo -e "\nINFO: Pushed hotfix tag ${hotfixVersion}"
+  echo -e "\nINFO: Pushed release branch and tag for release version ${releaseVersion}"
 else
   echo -e "WARN: Release not pushed!"
 fi
 
 
-echo -e "\nINFO: Hotfix ${hotfixVersion} created."
+echo -e "\nINFO: Release ${releaseVersion} created."
+echo -e "INFO: Don't forget to update snapshot version!"
 
 
 exit 0
