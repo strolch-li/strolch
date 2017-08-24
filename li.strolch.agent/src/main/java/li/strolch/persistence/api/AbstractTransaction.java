@@ -822,6 +822,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				addCommand(cmd);
 			}
 		}
+
+		// clear, so that we don't do it twice in case of a flush()
+		this.objectFilter.clearCache();
 	}
 
 	@Override
