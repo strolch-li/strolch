@@ -234,6 +234,10 @@ public class ByteHelper {
 		return b;
 	}
 
+	public static byte invert(byte x) {
+		return (byte) (x ^ 0xff);
+	}
+
 	/**
 	 * Formats the given byte array to a binary string, separating each byte by a space
 	 * 
