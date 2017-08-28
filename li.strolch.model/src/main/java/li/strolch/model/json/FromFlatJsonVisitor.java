@@ -12,6 +12,7 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags.Json;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.utils.collections.MapOfSets;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * <p>
@@ -63,6 +64,10 @@ public class FromFlatJsonVisitor {
 	}
 
 	public void visit(StrolchRootElement element, JsonObject jsonObject) {
+
+		DBC.PRE.assertTrue("objectType must be set!", jsonObject.has(Json.OBJECT_TYPE));
+		DBC.PRE.assertEquals("objectType must be the same!", element.getObjectType(),
+				jsonObject.get(Json.OBJECT_TYPE).getAsString());
 
 		// update name if possible
 		if (jsonObject.has(Json.NAME))

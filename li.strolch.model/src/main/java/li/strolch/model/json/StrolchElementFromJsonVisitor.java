@@ -35,6 +35,7 @@ import li.strolch.model.State;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.Tags;
+import li.strolch.model.Tags.Json;
 import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -55,6 +56,11 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 public class StrolchElementFromJsonVisitor {
 
 	public void fillElement(JsonObject jsonObject, Order order) {
+
+		DBC.PRE.assertTrue("objectType must be set!", jsonObject.has(Json.OBJECT_TYPE));
+		DBC.PRE.assertEquals("objectType must be the same!", order.getObjectType(),
+				jsonObject.get(Json.OBJECT_TYPE).getAsString());
+
 		fillElement(jsonObject, (GroupedParameterizedElement) order);
 
 		parseVersion(order, jsonObject);
@@ -80,6 +86,11 @@ public class StrolchElementFromJsonVisitor {
 	}
 
 	public void fillElement(JsonObject jsonObject, Resource resource) {
+
+		DBC.PRE.assertTrue("objectType must be set!", jsonObject.has(Json.OBJECT_TYPE));
+		DBC.PRE.assertEquals("objectType must be the same!", resource.getObjectType(),
+				jsonObject.get(Json.OBJECT_TYPE).getAsString());
+
 		fillElement(jsonObject, (GroupedParameterizedElement) resource);
 
 		parseVersion(resource, jsonObject);
@@ -146,6 +157,11 @@ public class StrolchElementFromJsonVisitor {
 	}
 
 	public void fillElement(JsonObject jsonObject, Activity activity) {
+
+		DBC.PRE.assertTrue("objectType must be set!", jsonObject.has(Json.OBJECT_TYPE));
+		DBC.PRE.assertEquals("objectType must be the same!", activity.getObjectType(),
+				jsonObject.get(Json.OBJECT_TYPE).getAsString());
+
 		fillElement(jsonObject, (GroupedParameterizedElement) activity);
 
 		if (!jsonObject.has(Tags.Json.TIME_ORDERING))

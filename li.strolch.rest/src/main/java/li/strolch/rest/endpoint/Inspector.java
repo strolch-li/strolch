@@ -27,6 +27,7 @@ import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -55,6 +56,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
+import li.strolch.model.Tags.Json;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.ActivityFromJsonVisitor;
 import li.strolch.model.json.FromFlatJsonVisitor;
@@ -76,6 +78,12 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.Result;
+import li.strolch.service.AddActivityService;
+import li.strolch.service.AddActivityService.AddActivityArg;
+import li.strolch.service.AddOrderService;
+import li.strolch.service.AddOrderService.AddOrderArg;
+import li.strolch.service.AddResourceService;
+import li.strolch.service.AddResourceService.AddResourceArg;
 import li.strolch.service.LocatorArgument;
 import li.strolch.service.RemoveActivityService;
 import li.strolch.service.RemoveOrderService;
@@ -87,6 +95,7 @@ import li.strolch.service.UpdateOrderService.UpdateOrderArg;
 import li.strolch.service.UpdateResourceService;
 import li.strolch.service.UpdateResourceService.UpdateResourceArg;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -405,7 +414,7 @@ public class Inspector {
 		RestfulHelper.doOrdering(queryData, resources);
 
 		// build JSON response
-		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor();
+		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
 		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, resources, toJsonVisitor);
 
 		// marshall result
@@ -453,7 +462,7 @@ public class Inspector {
 		RestfulHelper.doOrdering(queryData, orders);
 
 		// build JSON response
-		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor();
+		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
 		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, orders, toJsonVisitor);
 
 		// marshall result
@@ -487,7 +496,7 @@ public class Inspector {
 		RestfulHelper.doOrdering(queryData, activities);
 
 		// build JSON response
-		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor();
+		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
 		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, activities, toJsonVisitor);
 
 		// marshall result
@@ -510,7 +519,7 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withVersion();
 		if (Boolean.parseBoolean(flat))
 			visitor.flat();
 		return Response.ok().entity(toString(resource.accept(visitor))).build();
@@ -536,6 +545,108 @@ public class Inspector {
 		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{realm}/orders/{type}/{id}")
+	public Response getOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Order order;
+		try (StrolchTransaction tx = openTx(cert, realm)) {
+			order = tx.getOrderMap().getBy(tx, type, id);
+		}
+		if (order == null) {
+			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
+		}
+
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withVersion();
+		if (Boolean.parseBoolean(flat))
+			visitor.flat();
+		return Response.ok().entity(toString(order.accept(visitor))).build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/orders/{type}/{id}")
+	public Response getOrderAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@PathParam("type") String type, @PathParam("id") String id) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Order order;
+		try (StrolchTransaction tx = openTx(cert, realm)) {
+			order = tx.getOrderMap().getBy(tx, type, id);
+		}
+		if (order == null) {
+			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
+		}
+
+		String asXml = order.accept(new StrolchElementToXmlStringVisitor());
+		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+	}
+
+	/**
+	 * <p>
+	 * Activity inspector
+	 * </p>
+	 * 
+	 * <p>
+	 * Returns the activity with the given id
+	 * </p>
+	 * 
+	 * @param realm
+	 *            the realm for which the activity is to be returned
+	 * @param type
+	 *            the type of the activity
+	 * @param id
+	 *            the id of the activity
+	 * 
+	 * @return the activity with the given id
+	 */
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{realm}/activities/{type}/{id}")
+	public Response getActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Activity activity;
+		try (StrolchTransaction tx = openTx(cert, realm)) {
+			activity = tx.getActivityMap().getBy(tx, type, id);
+		}
+		if (activity == null) {
+			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
+		}
+
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withVersion();
+		if (Boolean.parseBoolean(flat))
+			visitor.flat();
+		return Response.ok().entity(toString(activity.accept(visitor))).build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/activities/{type}/{id}")
+	public Response getActivityAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@PathParam("type") String type, @PathParam("id") String id) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Activity activity;
+		try (StrolchTransaction tx = openTx(cert, realm)) {
+			activity = tx.getActivityMap().getBy(tx, type, id);
+		}
+		if (activity == null) {
+			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
+		}
+
+		String asXml = activity.accept(new StrolchElementToXmlStringVisitor());
+		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+	}
+
 	@PUT
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
@@ -545,25 +656,7 @@ public class Inspector {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		Resource resource;
-		try {
-			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
-
-			if (listener.getResources().size() == 0)
-				throw new StrolchPersistenceException(
-						MessageFormat.format("No Resources parsed from xml value for {0} / {1}", id, type));
-			if (listener.getResources().size() > 1)
-				throw new StrolchPersistenceException(
-						MessageFormat.format("Multiple Resources parsed from xml value for {0} / {1}", id, type));
-
-			resource = listener.getResources().get(0);
-
-		} catch (Exception e) {
-			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to extract Resources from xml value for {0} / {1}", id, type), e);
-		}
+		Resource resource = parseResourceFromXml(type, data);
 
 		UpdateResourceService svc = new UpdateResourceService();
 		UpdateResourceArg arg = new UpdateResourceArg();
@@ -620,55 +713,13 @@ public class Inspector {
 		// do service
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
 			if (flat)
 				toJsonVisitor.flat();
 			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
 		}
 
 		return Result.toResponse(result);
-	}
-
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{realm}/orders/{type}/{id}")
-	public Response getOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
-
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-
-		Order order;
-		try (StrolchTransaction tx = openTx(cert, realm)) {
-			order = tx.getOrderMap().getBy(tx, type, id);
-		}
-		if (order == null) {
-			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
-		}
-
-		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
-		if (Boolean.parseBoolean(flat))
-			visitor.flat();
-		return Response.ok().entity(toString(order.accept(visitor))).build();
-	}
-
-	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	@Path("{realm}/orders/{type}/{id}")
-	public Response getOrderAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @PathParam("id") String id) {
-
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-
-		Order order;
-		try (StrolchTransaction tx = openTx(cert, realm)) {
-			order = tx.getOrderMap().getBy(tx, type, id);
-		}
-		if (order == null) {
-			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
-		}
-
-		String asXml = order.accept(new StrolchElementToXmlStringVisitor());
-		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
 	@PUT
@@ -680,25 +731,7 @@ public class Inspector {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		Order order;
-		try {
-			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
-
-			if (listener.getOrders().size() == 0)
-				throw new StrolchPersistenceException(
-						MessageFormat.format("No Orders parsed from xml value for {0} / {1}", id, type));
-			if (listener.getOrders().size() > 1)
-				throw new StrolchPersistenceException(
-						MessageFormat.format("Multiple Orders parsed from xml value for {0} / {1}", id, type));
-
-			order = listener.getOrders().get(0);
-
-		} catch (Exception e) {
-			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to extract Order from xml value for {0} / {1}", id, type), e);
-		}
+		Order order = parseOrderFromXml(type, data);
 
 		UpdateOrderService svc = new UpdateOrderService();
 		UpdateOrderArg arg = new UpdateOrderArg();
@@ -755,73 +788,13 @@ public class Inspector {
 		// do service
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
 			if (flat)
 				toJsonVisitor.flat();
 			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
 		}
 
 		return Result.toResponse(result);
-	}
-
-	/**
-	 * <p>
-	 * Activity inspector
-	 * </p>
-	 * 
-	 * <p>
-	 * Returns the activity with the given id
-	 * </p>
-	 * 
-	 * @param realm
-	 *            the realm for which the activity is to be returned
-	 * @param type
-	 *            the type of the activity
-	 * @param id
-	 *            the id of the activity
-	 * 
-	 * @return the activity with the given id
-	 */
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{realm}/activities/{type}/{id}")
-	public Response getActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
-
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-
-		Activity activity;
-		try (StrolchTransaction tx = openTx(cert, realm)) {
-			activity = tx.getActivityMap().getBy(tx, type, id);
-		}
-		if (activity == null) {
-			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
-		}
-
-		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
-		if (Boolean.parseBoolean(flat))
-			visitor.flat();
-		return Response.ok().entity(toString(activity.accept(visitor))).build();
-	}
-
-	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	@Path("{realm}/activities/{type}/{id}")
-	public Response getActivityAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @PathParam("id") String id) {
-
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-
-		Activity activity;
-		try (StrolchTransaction tx = openTx(cert, realm)) {
-			activity = tx.getActivityMap().getBy(tx, type, id);
-		}
-		if (activity == null) {
-			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
-		}
-
-		String asXml = activity.accept(new StrolchElementToXmlStringVisitor());
-		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
 	@PUT
@@ -833,25 +806,7 @@ public class Inspector {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		Activity activity;
-		try {
-			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
-
-			if (listener.getActivities().size() == 0)
-				throw new StrolchPersistenceException(
-						MessageFormat.format("No Activities parsed from xml value for {0} / {1}", id, type));
-			if (listener.getActivities().size() > 1)
-				throw new StrolchPersistenceException(
-						MessageFormat.format("Multiple Activities parsed from xml value for {0} / {1}", id, type));
-
-			activity = listener.getActivities().get(0);
-
-		} catch (Exception e) {
-			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to extract Activities from xml value for {0} / {1}", id, type), e);
-		}
+		Activity activity = parseActivityFromXml(type, data);
 
 		UpdateActivityService svc = new UpdateActivityService();
 		UpdateActivityArg arg = new UpdateActivityArg();
@@ -908,7 +863,248 @@ public class Inspector {
 		// do service
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			if (flat)
+				toJsonVisitor.flat();
+			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_XML)
+	@Consumes(MediaType.APPLICATION_XML)
+	@Path("{realm}/resources")
+	public Response addResourceAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			String data) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Resource resource = parseResourceFromXml(null, data);
+
+		AddResourceService svc = new AddResourceService();
+		AddResourceArg arg = new AddResourceArg();
+		arg.resource = resource;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			String asXml = resource.accept(new StrolchElementToXmlStringVisitor());
+			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("{realm}/resources")
+	public Response addResourceAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			String data) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		// parse from complete JSON
+		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		ResourceFromJsonVisitor visitor = new ResourceFromJsonVisitor();
+		Resource resource = visitor.visit(jsonObject);
+
+		AddResourceService svc = new AddResourceService();
+		AddResourceArg arg = new AddResourceArg();
+		arg.resource = resource;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("{realm}/resources/{type}")
+	public Response addResourceAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		boolean flat = Boolean.parseBoolean(flatS);
+
+		Resource resource = parseNewResourceFromJson(cert, realm, type, data, flat);
+
+		AddResourceService svc = new AddResourceService();
+		AddResourceArg arg = new AddResourceArg();
+		arg.resource = resource;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			if (flat)
+				toJsonVisitor.flat();
+			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_XML)
+	@Consumes(MediaType.APPLICATION_XML)
+	@Path("{realm}/orders")
+	public Response addOrderAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm, String data) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Order order = parseOrderFromXml(null, data);
+
+		AddOrderService svc = new AddOrderService();
+		AddOrderArg arg = new AddOrderArg();
+		arg.order = order;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			String asXml = order.accept(new StrolchElementToXmlStringVisitor());
+			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("{realm}/orders")
+	public Response addOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm, String data) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		// parse from complete JSON
+		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		OrderFromJsonVisitor visitor = new OrderFromJsonVisitor();
+		Order order = visitor.visit(jsonObject);
+
+		AddOrderService svc = new AddOrderService();
+		AddOrderArg arg = new AddOrderArg();
+		arg.order = order;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("{realm}/orders/{type}")
+	public Response addOrderAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		boolean flat = Boolean.parseBoolean(flatS);
+
+		Order order = parseNewOrderFromJson(cert, realm, type, data, flat);
+
+		AddOrderService svc = new AddOrderService();
+		AddOrderArg arg = new AddOrderArg();
+		arg.order = order;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			if (flat)
+				toJsonVisitor.flat();
+			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_XML)
+	@Consumes(MediaType.APPLICATION_XML)
+	@Path("{realm}/activities")
+	public Response addActivitiyAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			String data) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		Activity activity = parseActivityFromXml(null, data);
+
+		AddActivityService svc = new AddActivityService();
+		AddActivityArg arg = new AddActivityArg();
+		arg.activity = activity;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			String asXml = activity.accept(new StrolchElementToXmlStringVisitor());
+			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("{realm}/activities")
+	public Response addActivitiyAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			String data) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		// parse from complete JSON
+		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		ActivityFromJsonVisitor visitor = new ActivityFromJsonVisitor();
+		Activity activity = visitor.visit(jsonObject);
+
+		AddActivityService svc = new AddActivityService();
+		AddActivityArg arg = new AddActivityArg();
+		arg.activity = activity;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
+		}
+
+		return Result.toResponse(result);
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("{realm}/activities/{type}")
+	public Response addActivitiyAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		boolean flat = Boolean.parseBoolean(flatS);
+
+		Activity activity = parseNewActivityFromJson(cert, realm, type, data, flat);
+
+		AddActivityService svc = new AddActivityService();
+		AddActivityArg arg = new AddActivityArg();
+		arg.activity = activity;
+		arg.realm = realm;
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		if (result.isOk()) {
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
 			if (flat)
 				toJsonVisitor.flat();
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
@@ -966,5 +1162,146 @@ public class Inspector {
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		return Result.toResponse(result);
+	}
+
+	private Resource parseResourceFromXml(String type, String data) {
+		Resource resource;
+		try {
+			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
+			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
+
+			if (listener.getResources().size() == 0)
+				throw new StrolchPersistenceException("No Resource parsed from xml value"
+						+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+			if (listener.getResources().size() > 1)
+				throw new StrolchPersistenceException("Multiple Resources parsed from xml value"
+						+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+
+			resource = listener.getResources().get(0);
+
+		} catch (Exception e) {
+			throw new StrolchPersistenceException("Failed to extract Resource from xml value"
+					+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
+		}
+		return resource;
+	}
+
+	private Order parseOrderFromXml(String type, String data) {
+		Order order;
+		try {
+			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
+			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
+
+			if (listener.getOrders().size() == 0)
+				throw new StrolchPersistenceException(
+						"No Order parsed from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+			if (listener.getOrders().size() > 1)
+				throw new StrolchPersistenceException("Multiple Orders parsed from xml value"
+						+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+
+			order = listener.getOrders().get(0);
+
+		} catch (Exception e) {
+			throw new StrolchPersistenceException("Failed to extract Order from xml value"
+					+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
+		}
+		return order;
+	}
+
+	private Activity parseActivityFromXml(String type, String data) {
+		Activity activity;
+		try {
+			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
+			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
+
+			if (listener.getActivities().size() == 0)
+				throw new StrolchPersistenceException("No Activity parsed from xml value"
+						+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+			if (listener.getActivities().size() > 1)
+				throw new StrolchPersistenceException("Multiple Activities parsed from xml value"
+						+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+
+			activity = listener.getActivities().get(0);
+
+		} catch (Exception e) {
+			throw new StrolchPersistenceException("Failed to extract Activity from xml value"
+					+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
+		}
+		return activity;
+	}
+
+	private Resource parseNewResourceFromJson(Certificate cert, String realm, String type, String data, boolean flat) {
+
+		// parse JSON string
+		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		Resource resource;
+		if (flat) {
+
+			// parse from flat JSON
+			try (StrolchTransaction tx = openTx(cert, realm)) {
+				resource = tx.getResourceTemplate(type, true);
+			}
+			resource.setId(jsonObject.get(Json.ID).getAsString());
+			new FromFlatJsonVisitor().visit(resource, jsonObject);
+
+		} else {
+
+			// parse from complete JSON
+			ResourceFromJsonVisitor visitor = new ResourceFromJsonVisitor();
+			resource = visitor.visit(jsonObject);
+		}
+
+		return resource;
+	}
+
+	private Order parseNewOrderFromJson(Certificate cert, String realm, String type, String data, boolean flat) {
+
+		// parse JSON string
+		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		Order order;
+		if (flat) {
+
+			// parse from flat JSON
+			try (StrolchTransaction tx = openTx(cert, realm)) {
+				order = tx.getOrderTemplate(type, true);
+			}
+			order.setId(jsonObject.get(Json.ID).getAsString());
+			new FromFlatJsonVisitor().visit(order, jsonObject);
+
+		} else {
+
+			// parse from complete JSON
+			OrderFromJsonVisitor visitor = new OrderFromJsonVisitor();
+			order = visitor.visit(jsonObject);
+		}
+
+		return order;
+	}
+
+	private Activity parseNewActivityFromJson(Certificate cert, String realm, String type, String data, boolean flat) {
+
+		// parse JSON string
+		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		Activity activity;
+		if (flat) {
+
+			// parse from flat JSON
+			try (StrolchTransaction tx = openTx(cert, realm)) {
+				activity = tx.getActivityTemplate(type, true);
+			}
+			activity.setId(jsonObject.get(Json.ID).getAsString());
+			new FromFlatJsonVisitor().visit(activity, jsonObject);
+
+		} else {
+
+			// parse from complete JSON
+			ActivityFromJsonVisitor visitor = new ActivityFromJsonVisitor();
+			activity = visitor.visit(jsonObject);
+		}
+
+		return activity;
 	}
 }
