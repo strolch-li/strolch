@@ -15,6 +15,10 @@
  */
 package li.strolch.rest.endpoint;
 
+import static li.strolch.rest.StrolchRestfulConstants.MSG;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -39,6 +43,8 @@ import javax.ws.rs.core.Response;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 import com.google.gson.Gson;
@@ -76,6 +82,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
+import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.Result;
 import li.strolch.service.AddActivityService;
@@ -94,6 +101,9 @@ import li.strolch.service.UpdateOrderService;
 import li.strolch.service.UpdateOrderService.UpdateOrderArg;
 import li.strolch.service.UpdateResourceService;
 import li.strolch.service.UpdateResourceService.UpdateResourceArg;
+import li.strolch.service.XmlImportModelArgument;
+import li.strolch.service.XmlImportModelResult;
+import li.strolch.service.XmlImportModelService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.helper.StringHelper;
 
@@ -102,6 +112,8 @@ import li.strolch.utils.helper.StringHelper;
  */
 @Path("strolch/inspector")
 public class Inspector {
+
+	private static final Logger logger = LoggerFactory.getLogger(Inspector.class);
 
 	private StrolchTransaction openTx(Certificate certificate, String realm) {
 		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm).openTx(certificate,
@@ -870,6 +882,51 @@ public class Inspector {
 		}
 
 		return Result.toResponse(result);
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_XML)
+	@Consumes(MediaType.APPLICATION_XML)
+	@Path("{realm}/import")
+	public Response importAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm, String data) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		File tempFile = null;
+		try {
+
+			tempFile = File.createTempFile("strolch_model_upload_", ".xml");
+			try (FileWriter out = new FileWriter(tempFile)) {
+				out.write(data);
+			}
+
+			XmlImportModelService svc = new XmlImportModelService();
+			XmlImportModelArgument arg = new XmlImportModelArgument();
+			arg.modelFileName = tempFile.getAbsolutePath();
+			arg.allowInclude = false;
+			arg.external = true;
+			arg.addOrders = true;
+			arg.addResources = true;
+			arg.updateOrders = true;
+			arg.updateResources = true;
+			arg.orderTypes = Collections.emptySet();
+			arg.resourceTypes = Collections.emptySet();
+			arg.realm = realm;
+
+			XmlImportModelResult svcResult = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert,
+					svc, arg);
+			if (svcResult.isOk())
+				return ResponseUtil.toResponse(MSG, svcResult.getStatistics().toString());
+			return ResponseUtil.toResponse(svcResult);
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return ResponseUtil.toResponse(e);
+		} finally {
+			if (tempFile != null) {
+				tempFile.delete();
+			}
+		}
 	}
 
 	@POST
