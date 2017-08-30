@@ -139,7 +139,7 @@ public class InMemoryDao<T extends StrolchRootElement> implements StrolchDao<T> 
 			return null;
 		ArrayDeque<T> list = byType.get(id);
 		if (list == null)
-			return new ArrayList<>();
+			return new ArrayList<>(0);
 		return new ArrayList<>(list);
 	}
 
@@ -196,7 +196,7 @@ public class InMemoryDao<T extends StrolchRootElement> implements StrolchDao<T> 
 		}
 
 		if (list == null) {
-			list = new ArrayDeque<>();
+			list = new ArrayDeque<>(2);
 			byType.put(element.getId(), list);
 		}
 
