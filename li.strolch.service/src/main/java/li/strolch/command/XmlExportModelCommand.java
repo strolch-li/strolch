@@ -24,8 +24,8 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import javax.xml.stream.XMLStreamWriter;
@@ -162,7 +162,7 @@ public class XmlExportModelCommand extends Command {
 
 			if (this.doResources) {
 				ResourceMap resourceMap = tx().getResourceMap();
-				Set<String> resourceTypesToExport = new TreeSet<>(resourceMap.getTypes(tx()));
+				Set<String> resourceTypesToExport = resourceMap.getTypes(tx());
 				if (!this.resourceTypes.isEmpty())
 					resourceTypesToExport.retainAll(this.resourceTypes);
 
@@ -192,7 +192,7 @@ public class XmlExportModelCommand extends Command {
 
 			if (this.doOrders) {
 				OrderMap orderMap = tx().getOrderMap();
-				Set<String> orderTypesToExport = new TreeSet<>(orderMap.getTypes(tx()));
+				Set<String> orderTypesToExport = orderMap.getTypes(tx());
 				if (!this.orderTypes.isEmpty())
 					orderTypesToExport.retainAll(this.orderTypes);
 
@@ -221,7 +221,7 @@ public class XmlExportModelCommand extends Command {
 
 			if (this.doActivities) {
 				ActivityMap activityMap = tx().getActivityMap();
-				Set<String> activityTypesToExport = new TreeSet<>(activityMap.getTypes(tx()));
+				Set<String> activityTypesToExport = activityMap.getTypes(tx());
 				if (!this.activityTypes.isEmpty())
 					activityTypesToExport.retainAll(this.activityTypes);
 
@@ -276,27 +276,18 @@ public class XmlExportModelCommand extends Command {
 
 	private void writeOrdersByType(XMLStreamWriter writer, OrderMap orderMap, String type) {
 		StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
-		Set<String> keysByType = new TreeSet<>(orderMap.getKeysBy(tx(), type));
-		for (String id : keysByType) {
-			Order order = orderMap.getBy(tx(), type, id);
+		List<Order> orders = orderMap.getElementsBy(tx(), type);
+		for (Order order : orders) {
 			order.accept(visitor);
 			this.statistics.nrOfOrders++;
 			logElementsWritten();
 		}
 	}
 
-	private void logElementsWritten() {
-		if (this.nextLogTime < System.currentTimeMillis()) {
-			logger.info("Wrote " + this.statistics.getNrOfElements() + " of " + this.elementsToWrite + " Elements.");
-			this.nextLogTime = System.currentTimeMillis() + LOG_INTERVAL;
-		}
-	}
-
 	private void writeResourcesByType(XMLStreamWriter writer, ResourceMap resourceMap, String type) {
 		StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
-		Set<String> keysByType = new TreeSet<>(resourceMap.getKeysBy(tx(), type));
-		for (String id : keysByType) {
-			Resource resource = resourceMap.getBy(tx(), type, id);
+		List<Resource> resources = resourceMap.getElementsBy(tx(), type);
+		for (Resource resource : resources) {
 			resource.accept(visitor);
 			this.statistics.nrOfResources++;
 			logElementsWritten();
@@ -305,12 +296,18 @@ public class XmlExportModelCommand extends Command {
 
 	private void writeActivitiesByType(XMLStreamWriter writer, ActivityMap activityMap, String type) {
 		StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
-		Set<String> keysByType = new TreeSet<>(activityMap.getKeysBy(tx(), type));
-		for (String id : keysByType) {
-			Activity activity = activityMap.getBy(tx(), type, id);
+		List<Activity> activities = activityMap.getElementsBy(tx(), type);
+		for (Activity activity : activities) {
 			activity.accept(visitor);
 			this.statistics.nrOfActivities++;
 			logElementsWritten();
+		}
+	}
+
+	private void logElementsWritten() {
+		if (this.nextLogTime < System.currentTimeMillis()) {
+			logger.info("Wrote " + this.statistics.getNrOfElements() + " of " + this.elementsToWrite + " Elements.");
+			this.nextLogTime = System.currentTimeMillis() + LOG_INTERVAL;
 		}
 	}
 
