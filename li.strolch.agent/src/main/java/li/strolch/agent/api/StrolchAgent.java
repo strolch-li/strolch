@@ -21,6 +21,10 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,41 +46,110 @@ public class StrolchAgent {
 	private ComponentContainerImpl container;
 	private StrolchConfiguration strolchConfiguration;
 	private StrolchVersion appVersion;
+	private ExecutorService executor;
+	private ScheduledExecutorService scheduledExecutor;
 
 	public StrolchAgent(StrolchVersion appVersion) {
 		this.appVersion = appVersion;
 	}
 
+	/**
+	 * Return the {@link StrolchConfiguration}
+	 * 
+	 * @return the {@link StrolchConfiguration}
+	 */
 	public StrolchConfiguration getStrolchConfiguration() {
 		return this.strolchConfiguration;
 	}
 
+	/**
+	 * Return the container
+	 * 
+	 * @return the container
+	 */
 	public ComponentContainer getContainer() {
 		return this.container;
 	}
 
+	/**
+	 * @return the name of this application as is defined in the configuration
+	 */
 	public String getApplicationName() {
 		return this.strolchConfiguration.getRuntimeConfiguration().getApplicationName();
 	}
 
+	/**
+	 * Return the {@link ExecutorService} instantiated for this agent
+	 * 
+	 * @return the {@link ExecutorService} instantiated for this agent
+	 */
+	public ExecutorService getExecutor() {
+		return this.executor;
+	}
+
+	/**
+	 * Return the {@link ScheduledExecutorService} instantiated for this agent
+	 * 
+	 * @return the {@link ScheduledExecutorService} instantiated for this agent
+	 */
+	public ScheduledExecutorService getScheduledExecutor() {
+		return this.scheduledExecutor;
+	}
+
+	/**
+	 * Initializes the underlying container and prepares the executor services. Before calling this method,
+	 * {@link #setup(String, File, File, File)} must have ben called
+	 */
 	public void initialize() {
 		if (this.container == null)
 			throw new RuntimeException("Please call setup first!");
+		this.executor = Executors.newCachedThreadPool();
+		this.scheduledExecutor = Executors.newScheduledThreadPool(4);
 		this.container.initialize(this.strolchConfiguration);
 	}
 
+	/**
+	 * Starts the container
+	 */
 	public void start() {
 		if (this.container == null)
 			throw new RuntimeException("Please call setup first!");
 		this.container.start();
 	}
 
+	/**
+	 * Stops the container
+	 */
 	public void stop() {
 		if (this.container != null)
 			this.container.stop();
 	}
 
+	private void shutdownExecutorService(ExecutorService executor) {
+		try {
+			logger.info("Shutting down executor...");
+			executor.shutdown();
+			executor.awaitTermination(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			logger.error("Was interrupted while shutting down tasks");
+		} finally {
+			if (!executor.isTerminated()) {
+				logger.error("Tasks not stopped after " + 5 + "s. Shutting down now.");
+				executor.shutdownNow();
+			}
+		}
+	}
+
+	/**
+	 * Destroys the container and the executor services
+	 */
 	public void destroy() {
+
+		if (this.executor != null)
+			shutdownExecutorService(this.executor);
+		if (this.scheduledExecutor != null)
+			shutdownExecutorService(this.scheduledExecutor);
+
 		if (this.container != null)
 			this.container.destroy();
 		this.container = null;
@@ -139,6 +212,11 @@ public class StrolchAgent {
 
 	private VersionQueryResult versionQueryResult;
 
+	/**
+	 * Returns the version of this agent
+	 * 
+	 * @return the version of this agent
+	 */
 	public VersionQueryResult getVersion() {
 		if (this.versionQueryResult == null) {
 

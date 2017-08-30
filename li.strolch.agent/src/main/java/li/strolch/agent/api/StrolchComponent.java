@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,6 +112,24 @@ public class StrolchComponent {
 	 */
 	protected ComponentConfiguration getConfiguration() {
 		return this.configuration;
+	}
+
+	/**
+	 * Return the {@link ExecutorService} instantiated for this agent
+	 * 
+	 * @return the {@link ExecutorService} instantiated for this agent
+	 */
+	protected ExecutorService getExecutorService() {
+		return this.container.getAgent().getExecutor();
+	}
+
+	/**
+	 * Return the {@link ScheduledExecutorService} instantiated for this agent
+	 * 
+	 * @return the {@link ScheduledExecutorService} instantiated for this agent
+	 */
+	protected ScheduledExecutorService getScheduledExecutor() {
+		return this.container.getAgent().getScheduledExecutor();
 	}
 
 	/**
@@ -383,6 +403,9 @@ public class StrolchComponent {
 		return this.version;
 	}
 
+	/**
+	 * @return Returns the locator of this agent
+	 */
 	public Locator getLocator() {
 		return Locator.valueOf(Tags.AGENT, getName());
 	}
