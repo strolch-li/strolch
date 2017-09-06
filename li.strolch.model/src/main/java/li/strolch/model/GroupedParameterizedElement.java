@@ -141,6 +141,24 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	/**
+	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
+	 * 
+	 * @param bagKey
+	 *            the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * @param interpretation
+	 *            the interpretation for which the parameters are to be returned
+	 * 
+	 * @return the parameters with the given interpretation
+	 */
+	public List<Parameter<?>> getParametersByInterpretation(String bagKey, String interpretation) {
+		ParameterBag bag = getParameterBag(bagKey);
+		if (bag == null)
+			return Collections.emptyList();
+
+		return bag.getParametersByInterpretation(interpretation);
+	}
+
+	/**
 	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key
 	 * 
 	 * @param bagKey

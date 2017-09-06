@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -170,6 +171,23 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 			return Collections.emptyList();
 		}
 		return new ArrayList<>(this.parameterMap.values());
+	}
+
+	/**
+	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
+	 * 
+	 * @param interpretation
+	 *            the interpretation for which the parameters are to be returned
+	 * 
+	 * @return the parameters with the given interpretation
+	 */
+	public List<Parameter<?>> getParametersByInterpretation(String interpretation) {
+		if (this.parameterMap == null) {
+			return Collections.emptyList();
+		}
+
+		return this.parameterMap.values().stream().filter(p -> p.getInterpretation().equals(interpretation))
+				.collect(Collectors.toList());
 	}
 
 	/**
