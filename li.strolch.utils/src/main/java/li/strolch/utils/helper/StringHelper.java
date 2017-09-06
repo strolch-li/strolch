@@ -143,6 +143,13 @@ public class StringHelper {
 		}
 	}
 
+	public static byte fromHexStringByte(String encoded) {
+		if (encoded.length() != 2)
+			throw new IllegalArgumentException("Input string must be exactly two characters long."); //$NON-NLS-1$
+		byte result = (byte) Integer.parseInt(encoded, 16);
+		return result;
+	}
+
 	/**
 	 * Returns a byte array of a given string by converting each character of the string to a number base 16
 	 * 
