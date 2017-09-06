@@ -238,6 +238,22 @@ public class ByteHelper {
 		return (byte) (x ^ 0xff);
 	}
 
+	public static byte setLowerNibble(byte b, byte nibble) {
+		return (byte) ((b & ~(0xf)) | nibble);
+	}
+
+	public static byte setUpperNibble(byte b, byte nibble) {
+		return (byte) ((b & ~(0xf << 4)) | (nibble << 4));
+	}
+
+	public static byte getUpperNibble(byte b) {
+		return (byte) ((byte) (0xf0 & b) >> 4);
+	}
+
+	public static byte getLowerNibble(byte b) {
+		return (byte) (0xf & b);
+	}
+
 	/**
 	 * Formats the given byte array to a binary string, separating each byte by a space
 	 * 
