@@ -928,7 +928,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			if (!this.commands.isEmpty()) {
 				autoCloseableRollback();
-				String msg = "There are commands registered on a read-only transaction. Changing to rollback! Probably due to an exception!";
+				String msg = "There are commands registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
+				throw new IllegalStateException(msg);
+			}
+
+			if (!this.objectFilter.isEmpty()) {
+				autoCloseableRollback();
+				String msg = "There are modified objects registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
 				throw new IllegalStateException(msg);
 			}
 
