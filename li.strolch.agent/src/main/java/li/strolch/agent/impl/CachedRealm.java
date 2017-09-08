@@ -108,11 +108,13 @@ public class CachedRealm extends InternalStrolchRealm {
 	@Override
 	public void start(PrivilegeContext privilegeContext) {
 		super.start(privilegeContext);
-		
+
 		long start = System.nanoTime();
 		int nrOfOrders = 0;
 		int nrOfResources = 0;
 		int nrOfActivities = 0;
+
+		logger.info(MessageFormat.format("Loading Model from Database for realm {0}...", getRealm())); //$NON-NLS-1$
 
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			ResourceDao resourceDao = tx.getPersistenceHandler().getResourceDao(tx);

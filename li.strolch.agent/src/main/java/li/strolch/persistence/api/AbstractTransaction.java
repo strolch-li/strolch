@@ -932,7 +932,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				throw new IllegalStateException(msg);
 			}
 
-			if (!this.objectFilter.isEmpty()) {
+			if (this.objectFilter != null && !this.objectFilter.isEmpty()) {
 				autoCloseableRollback();
 				String msg = "There are modified objects registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
 				throw new IllegalStateException(msg);
