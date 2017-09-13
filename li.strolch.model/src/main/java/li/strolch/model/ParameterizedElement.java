@@ -191,6 +191,26 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	}
 
 	/**
+	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
+	 * 
+	 * @param interpretation
+	 *            the interpretation for which the parameters are to be returned
+	 * @param uom
+	 *            the uom for which the parameters are to be returned
+	 * 
+	 * @return the parameters with the given interpretation
+	 */
+	public List<Parameter<?>> getParametersByInterpretationAndUom(String interpretation, String uom) {
+		if (this.parameterMap == null) {
+			return Collections.emptyList();
+		}
+
+		return this.parameterMap.values().stream()
+				.filter(p -> p.getInterpretation().equals(interpretation) && p.getUom().equals(uom))
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * Returns true, if the this {@link ParameterizedElement} has any {@link Parameter Parameters}, false otherwise
 	 * 
 	 * @return true, if the this {@link ParameterizedElement} has any {@link Parameter Parameters}, false otherwise
