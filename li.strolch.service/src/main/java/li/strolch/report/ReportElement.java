@@ -1,22 +1,22 @@
 package li.strolch.report;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class ReportElement {
 
-	private Set<String> columnKeys;
+	private List<String> columnKeys;
 	private Function<String, String> columnGetter;
 
-	public ReportElement(Set<String> columnKeys, Function<String, String> columnGetter) {
+	public ReportElement(List<String> columnKeys, Function<String, String> columnGetter) {
 		super();
 		this.columnGetter = columnGetter;
 		this.columnKeys = columnKeys;
 	}
 
-	public Set<String> getColumnKeys() {
+	public List<String> getColumnKeys() {
 		return this.columnKeys;
 	}
 

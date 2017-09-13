@@ -76,7 +76,7 @@ public class GenericReport {
 	private ParameterBag columnsBag;
 	private List<StringParameter> orderingParams;
 	private boolean descending;
-	private Set<String> columnIds;
+	private List<String> columnIds;
 	private StringParameter dateRangeSelP;
 
 	private DateRange dateRange;
@@ -98,7 +98,11 @@ public class GenericReport {
 		this.hideObjectTypeFromFilterCriteria = hideObjectTypeFromFilterCriteriaP != null
 				&& hideObjectTypeFromFilterCriteriaP.getValue();
 		this.columnsBag = this.report.getParameterBag(BAG_COLUMNS, true);
-		this.columnIds = this.columnsBag.getParameterKeySet();
+		
+		this.columnIds = this.columnsBag.getParameters().stream() //
+				.sorted((p1, p2) -> Integer.compare(p1.getIndex(), p2.getIndex())) //
+				.map(p -> p.getId()) //
+				.collect(Collectors.toList());
 
 		if (this.report.hasParameter(BAG_PARAMETERS, PARAM_DESCENDING))
 			this.descending = this.report.getParameter(BAG_PARAMETERS, PARAM_DESCENDING).getValue();
@@ -141,11 +145,8 @@ public class GenericReport {
 		return this;
 	}
 
-	public List<String> getOrderedColumnKeys() {
-		return this.columnsBag.getParameters().stream() //
-				.sorted((p1, p2) -> Integer.compare(p1.getIndex(), p2.getIndex())) //
-				.map(p -> p.getId()) //
-				.collect(Collectors.toList());
+	public List<String> getColumnKeys() {
+		return this.columnIds;
 	}
 
 	public GenericReport filter(String type, String... ids) {
@@ -480,7 +481,8 @@ public class GenericReport {
 	private StrolchRootElement addColumnJoin(Map<String, StrolchRootElement> refs, ParameterBag joinBag,
 			StringParameter joinP, boolean optional) {
 
-		String elementType = joinP.getInterpretation().substring(0, joinP.getInterpretation().indexOf(SUFFIX_REF));
+		String interpretation = joinP.getInterpretation();
+		String elementType = interpretation.substring(0, interpretation.indexOf(SUFFIX_REF));
 		String joinType = joinP.getUom();
 		String dependencyType = joinP.getValue();
 
@@ -501,8 +503,7 @@ public class GenericReport {
 			throw new IllegalStateException("Invalid join definition value: " + joinP.getValue() + " on: "
 					+ joinP.getLocator() + " as " + dependency.getLocator() + " has no ParameterBag " + BAG_RELATIONS);
 
-		List<Parameter<?>> relationParams = relationsBag.getParameters().stream()
-				.filter(p -> p.getUom().equals(joinType)).collect(Collectors.toList());
+		List<Parameter<?>> relationParams = relationsBag.getParametersByInterpretationAndUom(interpretation, joinType);
 		if (relationParams.isEmpty()) {
 			throw new IllegalStateException(
 					"Found no relation parameters with UOM " + joinType + " on dependency " + dependency.getLocator());
