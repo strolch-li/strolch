@@ -25,7 +25,6 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -143,7 +142,6 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		DBC.PRE.assertNotNull("Passwort must be set", password); //$NON-NLS-1$
 
 		Certificate certificate = this.privilegeHandler.authenticate(username, password);
-		certificate.setLastAccess(new Date());
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
@@ -167,7 +165,6 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	public Certificate validate(Certificate certificate) throws StrolchNotAuthenticatedException {
 		try {
 			this.privilegeHandler.isCertificateValid(certificate);
-			certificate.setLastAccess(new Date());
 			return certificate;
 		} catch (PrivilegeException e) {
 			throw new StrolchNotAuthenticatedException(e.getMessage(), e);
@@ -196,7 +193,6 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		DBC.PRE.assertNotEmpty("challenge must be set", challenge); //$NON-NLS-1$
 
 		Certificate certificate = this.privilegeHandler.getPrivilegeHandler().validateChallenge(username, challenge);
-		certificate.setLastAccess(new Date());
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$

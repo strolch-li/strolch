@@ -1431,6 +1431,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// everything is ok
+
+		certificate.setLastAccess(new Date());
 	}
 
 	@Override
