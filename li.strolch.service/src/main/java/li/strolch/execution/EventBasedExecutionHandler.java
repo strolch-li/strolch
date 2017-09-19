@@ -287,6 +287,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 						ActivityArchivalPolicy archivalPolicy = policyHandler.getPolicy(policyDef, tx);
 						archivalPolicy.archive(activity);
 
+						tx.commitOnClose();
 					}
 				});
 			} catch (Exception e) {
