@@ -105,7 +105,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	 * @return the file in the config directory of the root of the application
 	 */
 	public File getConfigFile(String context, String fileName, boolean checkExists) {
-		File configFile = new File(getDataPath(), fileName);
+		File configFile = new File(getConfigPath(), fileName);
 		if (checkExists && (!configFile.isFile() || !configFile.canRead())) {
 			String msg = "[{0}] requires config file which does not exist with name: {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, getName(), context, fileName);
