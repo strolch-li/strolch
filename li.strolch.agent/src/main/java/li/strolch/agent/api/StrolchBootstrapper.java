@@ -310,6 +310,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 			throw new StrolchConfigurationException(msg);
 		}
 
+		LoggingLoader.reloadLogging(this.configPathF);
+
 		String env;
 		if (StringHelper.isEmpty(this.environmentOverride)) {
 			env = this.environment;
@@ -364,7 +366,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 		}
 
 		String root = StringHelper.isEmpty(this.rootS)
-				? new File(System.getProperty(SYS_PROP_USER_DIR)).getAbsolutePath() : this.rootS;
+				? new File(System.getProperty(SYS_PROP_USER_DIR)).getAbsolutePath()
+				: this.rootS;
 		String config = StringHelper.isEmpty(this.configS) ? PATH_CONFIG : this.configS;
 		String data = StringHelper.isEmpty(this.dataS) ? PATH_DATA : this.dataS;
 		String temp = StringHelper.isEmpty(this.tempS) ? PATH_TEMP : this.tempS;

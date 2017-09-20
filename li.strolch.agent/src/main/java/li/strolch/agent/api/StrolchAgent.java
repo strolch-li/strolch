@@ -34,6 +34,7 @@ import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.helper.SystemHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -41,6 +42,7 @@ import li.strolch.utils.helper.StringHelper;
 public class StrolchAgent {
 
 	public static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties"; //$NON-NLS-1$
+
 	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
 
 	private ComponentContainerImpl container;
@@ -176,6 +178,7 @@ public class StrolchAgent {
 		logger.info(" - Config: " + configPathF.getAbsolutePath());
 		logger.info(" - Data: " + dataPathF.getAbsolutePath());
 		logger.info(" - Temp: " + tempPathF.getAbsolutePath());
+		logger.info(" - user.dir: " + SystemHelper.getUserDir());
 
 		this.strolchConfiguration = ConfigurationParser.parseConfiguration(environment, configPathF, dataPathF,
 				tempPathF);
