@@ -29,8 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -64,7 +63,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	private Map<String, Certificate> certificateMap;
 	private boolean reloadSessions;
 	private long sessionTtl;
-	private Timer sessionTimeoutTimer;
+
+	private ScheduledFuture<?> sessionHandler;
 
 	public DefaultStrolchSessionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -97,20 +97,21 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 					+ (certificates.size() - this.certificateMap.size()) + " had timed out and were removed.");
 		}
 
-		this.sessionTimeoutTimer = new Timer("SessionTimeoutTimer", true); //$NON-NLS-1$
-		long delay = TimeUnit.MINUTES.toMillis(5);
-		long checkInterval = TimeUnit.MINUTES.toMillis(1);
-		this.sessionTimeoutTimer.schedule(new SessionTimeoutTask(), delay, checkInterval);
+		this.sessionHandler = getScheduledExecutor().scheduleWithFixedDelay(this::handleSessions, 5, 1,
+				TimeUnit.MINUTES);
 
 		super.start();
 	}
 
 	@Override
 	public void stop() throws Exception {
+
+		if (this.sessionHandler != null)
+			this.sessionHandler.cancel(true);
+
 		if (this.reloadSessions) {
 
-			runAsAgent(ctx -> getContainer().getPrivilegeHandler().getPrivilegeHandler()
-					.persistSessions(ctx.getCertificate()));
+			persistSessions();
 
 		} else if (this.certificateMap != null) {
 			synchronized (this.certificateMap) {
@@ -121,11 +122,6 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			}
 		}
 
-		if (this.sessionTimeoutTimer != null) {
-			this.sessionTimeoutTimer.cancel();
-		}
-
-		this.sessionTimeoutTimer = null;
 		this.privilegeHandler = null;
 		super.stop();
 	}
@@ -217,18 +213,13 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		return this.certificateMap;
 	}
 
-	/**
-	 * Simpler {@link TimerTask} to check for sessions which haven't been active for
-	 * {@link DefaultStrolchSessionHandler#PARAM_SESSION_TTL_MINUTES} minutes.
-	 * 
-	 * @author Robert von Burg <eitch@eitchnet.ch>
-	 */
-	private class SessionTimeoutTask extends TimerTask {
+	private void handleSessions() {
+		checkSessionsForTimeout();
+		persistSessions();
+	}
 
-		@Override
-		public void run() {
-			checkSessionsForTimeout();
-		}
+	private void persistSessions() {
+		runAsAgent(ctx -> this.privilegeHandler.getPrivilegeHandler().persistSessions(ctx.getCertificate()));
 	}
 
 	private void checkSessionsForTimeout() {
