@@ -74,6 +74,10 @@
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<buildTimestamp>${maven.build.timestamp}</buildTimestamp>
 		<jersey.version>2.25.1</jersey.version>
+		<warFinalName>NOT_SET</warFinalName>
+		<tomcat7Url>NOT_SET</tomcat7Url>
+		<tomcat7ServerId>NOT_SET</tomcat7ServerId>
+		<gpg.keyname>NOT_SET</gpg.keyname>
 	</properties>
 
 	<modules>
@@ -112,7 +116,6 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- Test -->
@@ -273,7 +276,6 @@
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
 				<version>1.2.3</version>
-				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -514,7 +516,6 @@
 					<configuration>
 						<serverId>oss.sonatype.org</serverId>
 						<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-						<description>${project.version}</description>
 					</configuration>
 					<executions>
 						<execution>
