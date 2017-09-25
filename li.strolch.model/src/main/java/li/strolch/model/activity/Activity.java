@@ -15,33 +15,22 @@
  */
 package li.strolch.model.activity;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
-import li.strolch.model.AbstractStrolchRootElement;
-import li.strolch.model.Locator;
+import li.strolch.model.*;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.State;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
-import li.strolch.model.Version;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 /**
  * Parameterized object grouping a collection of {@link Activity} and {@link Action} objects defining the process to be
@@ -540,6 +529,7 @@ public class Activity extends AbstractStrolchRootElement
 		return visitor.visitActivity(this);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey) {
 
@@ -548,7 +538,7 @@ public class Activity extends AbstractStrolchRootElement
 			return parameter;
 
 		if (this.parent != null)
-			return this.parent.findParameter(bagKey, paramKey);
+			return (T) this.parent.findParameter(bagKey, paramKey);
 
 		return null;
 	}
