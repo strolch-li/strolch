@@ -64,7 +64,6 @@ public class XmlModelSaxReader extends DefaultHandler {
 	private Deque<Activity> activityStack;
 	private ParameterBag pBag;
 	private StrolchTimedState<? extends IValue<?>> state;
-	private StrolchValueType stateType;
 	private PolicyDefs policies;
 
 	public XmlModelSaxReader(StrolchElementListener listener) {
@@ -94,9 +93,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String resId = attributes.getValue(Tags.ID);
 			String resName = attributes.getValue(Tags.NAME);
 			String resType = attributes.getValue(Tags.TYPE);
-			Resource resource = new Resource(resId, resName, resType);
 
-			this.parameterizedElement = resource;
+			this.parameterizedElement = new Resource(resId, resName, resType);
 
 			break;
 
@@ -172,8 +170,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String pBagId = attributes.getValue(Tags.ID);
 			String pBagName = attributes.getValue(Tags.NAME);
 			String pBagType = attributes.getValue(Tags.TYPE);
-			ParameterBag pBag = new ParameterBag(pBagId, pBagName, pBagType);
-			this.pBag = pBag;
+			this.pBag = new ParameterBag(pBagId, pBagName, pBagType);
 
 			break;
 
@@ -189,8 +186,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 				String paramIndexS = attributes.getValue(Tags.INDEX);
 
 				int index = StringHelper.isEmpty(paramIndexS) ? 0 : Integer.valueOf(paramIndexS);
-				boolean paramHidden = StringHelper.isEmpty(paramHiddenS) ? false
-						: StringHelper.parseBoolean(paramHiddenS);
+				boolean paramHidden = !StringHelper.isEmpty(paramHiddenS) && StringHelper.parseBoolean(paramHiddenS);
 				String paramUom = attributes.getValue(Tags.UOM);
 				String paramInterpretation = attributes.getValue(Tags.INTERPRETATION);
 
@@ -209,8 +205,9 @@ public class XmlModelSaxReader extends DefaultHandler {
 				this.pBag.addParameter(param);
 
 			} catch (Exception e) {
-				throw new StrolchException("Failed to instantiate parameter " + paramId + " for bag "
-						+ this.pBag.getLocator() + " due to " + e.getMessage(), e);
+				throw new StrolchException(
+						"Failed to instantiate parameter " + paramId + " for bag " + this.pBag.getLocator() + " due to "
+								+ e.getMessage(), e);
 			}
 
 			break;
@@ -220,17 +217,16 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String stateId = attributes.getValue(Tags.ID);
 			try {
 				String stateName = attributes.getValue(Tags.NAME);
-				String stateType = attributes.getValue(Tags.TYPE);
+				String stateTypeS = attributes.getValue(Tags.TYPE);
 				String stateHiddenS = attributes.getValue(Tags.HIDDEN);
 				String stateIndexS = attributes.getValue(Tags.INDEX);
 				String stateUom = attributes.getValue(Tags.UOM);
 				String stateInterpretation = attributes.getValue(Tags.INTERPRETATION);
 				int stateIndex = StringHelper.isEmpty(stateIndexS) ? 0 : Integer.valueOf(stateIndexS);
-				boolean stateHidden = StringHelper.isEmpty(stateHiddenS) ? false
-						: StringHelper.parseBoolean(stateHiddenS);
+				boolean stateHidden = !StringHelper.isEmpty(stateHiddenS) && StringHelper.parseBoolean(stateHiddenS);
 
-				this.stateType = StrolchValueType.parse(stateType);
-				this.state = this.stateType.timedStateInstance();
+				StrolchValueType stateType = StrolchValueType.parse(stateTypeS);
+				this.state = stateType.timedStateInstance();
 				this.state.setId(stateId);
 				this.state.setName(stateName);
 				this.state.setIndex(stateIndex);
@@ -239,8 +235,9 @@ public class XmlModelSaxReader extends DefaultHandler {
 				this.state.setUom(stateUom);
 
 			} catch (Exception e) {
-				throw new StrolchException("Failed to instantiate TimedState " + stateId + " for resource "
-						+ this.parameterizedElement.getLocator() + " due to " + e.getMessage(), e);
+				throw new StrolchException(
+						"Failed to instantiate TimedState " + stateId + " for resource " + this.parameterizedElement
+								.getLocator() + " due to " + e.getMessage(), e);
 			}
 
 			break;
@@ -294,7 +291,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 			break;
 
 		default:
-			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+			throw new IllegalArgumentException(
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
 		}
 	}
 
@@ -378,7 +376,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 			break;
 
 		default:
-			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+			throw new IllegalArgumentException(
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
 		}
 	}
 }

@@ -30,7 +30,6 @@ public class OrSelection extends BooleanSelection {
 		super(selections);
 	}
 
-	@SafeVarargs
 	public OrSelection(Selection... selections) {
 		super(selections);
 	}

@@ -26,14 +26,10 @@ public class AndSelection extends BooleanSelection {
 		super();
 	}
 
-	@SafeVarargs
 	public AndSelection(Selection... selections) {
 		super(selections);
 	}
 
-	/**
-	 * @param selections
-	 */
 	public AndSelection(List<Selection> selections) {
 		super(selections);
 	}

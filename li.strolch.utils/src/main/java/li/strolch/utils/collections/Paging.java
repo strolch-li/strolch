@@ -145,7 +145,7 @@ public class Paging<T> {
 
 		} else {
 
-			paging.lastOffset = paging.size % limit == 0 ? paging.size - limit : ((int) paging.size / limit) * limit;
+			paging.lastOffset = paging.size % limit == 0 ? paging.size - limit : (paging.size / limit) * limit;
 			paging.nextOffset = Math.min(paging.lastOffset, limit + offset);
 			paging.previousOffset = Math.max(0, offset - limit);
 		}

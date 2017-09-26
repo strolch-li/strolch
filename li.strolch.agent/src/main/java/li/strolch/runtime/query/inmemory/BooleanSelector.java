@@ -32,7 +32,6 @@ public abstract class BooleanSelector<T extends StrolchElement> implements Selec
 		this.selectors = new ArrayList<>(1);
 	}
 
-	@SafeVarargs
 	public BooleanSelector(Selector<T>... selector) {
 		this.selectors = Arrays.asList(selector);
 	}

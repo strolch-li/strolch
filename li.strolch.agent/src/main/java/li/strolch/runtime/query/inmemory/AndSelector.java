@@ -32,14 +32,6 @@ public class AndSelector<T extends StrolchElement> extends BooleanSelector<T> {
 		super(selectors);
 	}
 
-	public AndSelector(@SuppressWarnings("unchecked") Selector<T>... selector) {
-		super(selector);
-	}
-
-	public AndSelector(Selector<T> leftHandSide, Selector<T> rightHandSide) {
-		super(leftHandSide, rightHandSide);
-	}
-
 	@Override
 	public AndSelector<T> with(Selector<T> selector) {
 		super.with(selector);
