@@ -668,24 +668,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void addResource(Resource resource) throws StrolchModelException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
-		DBC.PRE.assertFalse("resource already exists with id " + resource.getId(),
-				getResourceMap().hasElement(this, resource.getType(), resource.getId()));
 		getObjectFilter().add(Tags.RESOURCE, resource);
 	}
 
 	@Override
 	public void addOrder(Order order) throws StrolchException {
 		DBC.PRE.assertNotNull("order must not be null", order);
-		DBC.PRE.assertFalse("order already exists with id " + order.getId(),
-				getOrderMap().hasElement(this, order.getType(), order.getId()));
 		getObjectFilter().add(Tags.ORDER, order);
 	}
 
 	@Override
 	public void addActivity(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
-		DBC.PRE.assertFalse("activity already exists with id " + activity.getId(),
-				getActivityMap().hasElement(this, activity.getType(), activity.getId()));
 		getObjectFilter().add(Tags.ACTIVITY, activity);
 	}
 
