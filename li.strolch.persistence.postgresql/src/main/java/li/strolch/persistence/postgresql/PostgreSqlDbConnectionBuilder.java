@@ -15,6 +15,7 @@
  */
 package li.strolch.persistence.postgresql;
 
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,11 +23,8 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.sql.DataSource;
-
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.DbConnectionBuilder;
@@ -191,7 +189,7 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		}
 
 		/**
-		 * @see com.zaxxer.hikari.AbstractHikariConfig#validate()
+		 * @see com.zaxxer.hikari.HikariDataSource#validate()
 		 */
 		public void validate() {
 			this.ds.validate();

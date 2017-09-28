@@ -137,7 +137,7 @@ public class ObserverUpdateTest {
 		}
 
 		// observer updates are async...
-		Thread.sleep(100L);
+		Thread.sleep(200L);
 
 		assertEquals(2, observer.results.size());
 		assertEquals(1, observer.results.get(Tags.ORDER).getCreated().size());
