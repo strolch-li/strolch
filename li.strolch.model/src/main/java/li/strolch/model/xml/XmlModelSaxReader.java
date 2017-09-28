@@ -365,6 +365,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 			this.policies = null;
 
+			break;
+
 		case Tags.POLICY:
 		case Tags.VERSION:
 		case Tags.PARAMETER:
