@@ -5,7 +5,6 @@
 			<applicationName>minimal</applicationName>
 			<Properties>
 				<locale>en</locale>
-				<verbose>true</verbose>
 			</Properties>
 		</Runtime>
 		<Component>
@@ -66,9 +65,6 @@
 			<impl>li.strolch.service.api.DefaultServiceHandler</impl>
 			<depends>RealmHandler</depends>
 			<depends>PrivilegeHandler</depends>
-			<Properties>
-				<verbose>true</verbose>
-			</Properties>
 		</Component>
 	</env>
 </StrolchConfiguration>
