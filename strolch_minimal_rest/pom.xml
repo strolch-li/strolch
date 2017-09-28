@@ -1,276 +1,270 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>li.strolch</groupId>
-		<artifactId>li.strolch</artifactId>
-		<version>1.6.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>li.strolch</groupId>
+        <artifactId>li.strolch</artifactId>
+        <version>1.6.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-	<artifactId>strolch_minimal_rest</artifactId>
-	<packaging>war</packaging>
-	<inceptionYear>2014</inceptionYear>
-	<name>strolch_minimal_rest</name>
-	<url>http://www.strolch.li</url>
+    <artifactId>strolch_minimal_rest</artifactId>
+    <packaging>war</packaging>
+    <inceptionYear>2014</inceptionYear>
+    <name>strolch_minimal_rest</name>
+    <url>http://www.strolch.li</url>
 
-	<issueManagement>
-		<system>Github Issues</system>
-		<url>https://github.com/4treesCH/strolch/issues</url>
-	</issueManagement>
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/4treesCH/strolch/issues</url>
+    </issueManagement>
 
-	<scm>
-		<connection>scm:git:https://github.com/4treesCH/strolch.git</connection>
-		<developerConnection>scm:git:https://github.com/4treesCH/strolch.git</developerConnection>
-		<url>https://github.com/4treesCH/strolch</url>
-	</scm>
+    <scm>
+        <connection>scm:git:https://github.com/4treesCH/strolch.git</connection>
+        <developerConnection>scm:git:https://github.com/4treesCH/strolch.git</developerConnection>
+        <url>https://github.com/4treesCH/strolch</url>
+    </scm>
 
-	<licenses>
-		<license>
-			<name>Apache License 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
 
-	<organization>
-		<name>Strolch</name>
-		<url>http://www.strolch.li</url>
-	</organization>
+    <organization>
+        <name>Strolch</name>
+        <url>http://www.strolch.li</url>
+    </organization>
 
-	<developers>
-		<developer>
-			<id>eitch</id>
-			<name>Robert von Burg</name>
-			<email>eitch@eitchnet.ch</email>
-			<url>http://www.eitchnet.ch</url>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <id>eitch</id>
+            <name>Robert von Burg</name>
+            <email>eitch@eitchnet.ch</email>
+            <url>http://www.eitchnet.ch</url>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
 
-	<properties>
-		<m2eclipse.wtp.contextRoot>strolch_minimal</m2eclipse.wtp.contextRoot>
-		<warFinalName>strolch_minimal</warFinalName>
+    <properties>
+        <m2eclipse.wtp.contextRoot>strolch_minimal</m2eclipse.wtp.contextRoot>
+        <warFinalName>strolch_minimal</warFinalName>
 
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
-		<buildTimestamp>${maven.build.timestamp}</buildTimestamp>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+        <buildTimestamp>${maven.build.timestamp}</buildTimestamp>
 
-		<java-version>1.8</java-version>
+        <java-version>1.8</java-version>
 
-		<jersey.version>2.25.1</jersey.version>
-		<jaxrs.api.version>2.0</jaxrs.api.version>
+        <strolch.version>${project.version}</strolch.version>
 
-		<tomcat7Url>http://tomcat.eitchnet.ch:8080/manager/text</tomcat7Url>
-		<tomcat7ServerId>tomcat7.eitchnet.ch</tomcat7ServerId>
+        <tomcat7Url>http://tomcat.eitchnet.ch:8080/manager/text</tomcat7Url>
+        <tomcat7ServerId>tomcat7.eitchnet.ch</tomcat7ServerId>
 
-	</properties>
+    </properties>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>li.strolch</groupId>
-				<artifactId>li.strolch.bom</artifactId>
-				<type>pom</type>
-				<version>${project.version}</version>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.glassfish.jersey</groupId>
-				<artifactId>jersey-bom</artifactId>
-				<version>${jersey.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>javax.ws.rs</groupId>
-				<artifactId>javax.ws.rs-api</artifactId>
-				<version>${jaxrs.api.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>li.strolch</groupId>
+                <artifactId>li.strolch.bom</artifactId>
+                <type>pom</type>
+                <version>${project.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey</groupId>
+                <artifactId>jersey-bom</artifactId>
+                <version>${jersey.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-	<dependencies>
+    <dependencies>
 
-		<!-- base -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <!-- base -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
-		<!-- eitchnet -->
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.utils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.privilege</artifactId>
-		</dependency>
+        <!-- eitchnet -->
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.privilege</artifactId>
+        </dependency>
 
-		<!-- strolch -->
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.agent</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.service</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.rest</artifactId>
-		</dependency>
+        <!-- strolch -->
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.agent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.rest</artifactId>
+        </dependency>
 
-		<!-- Servlet 3.0 API -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
+        <!-- Servlet 3.0 API -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Web -->
-		<dependency>
-			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-servlet</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-grizzly2-http</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<!-- uncomment this to get JSON support: <dependency> <groupId>org.glassfish.jersey.media</groupId> <artifactId>jersey-media-moxy</artifactId> </dependency> -->
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-		</dependency>
+        <!-- Web -->
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- uncomment this to get JSON support: <dependency> <groupId>org.glassfish.jersey.media</groupId> <artifactId>jersey-media-moxy</artifactId> </dependency> -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
 
-		<!-- testing -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <!-- testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<finalName>${warFinalName}</finalName>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/*.properties</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
-				<excludes>
-					<exclude>**/*.properties</exclude>
-				</excludes>
-			</resource>
-		</resources>
+    <build>
+        <finalName>${warFinalName}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
 
-		<plugins>
+        <plugins>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<!-- version>3.3</version -->
-				<configuration>
-					<source>${java-version}</source>
-					<target>${java-version}</target>
-					<showDeprecation>true</showDeprecation>
-					<showWarnings>true</showWarnings>
-					<compilerArgument>-Xlint:all</compilerArgument>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java-version}</source>
+                    <target>${java-version}</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgument>-Xlint:all</compilerArgument>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
-					<downloadJavadocs>true</downloadJavadocs>
-					<downloadSources>true</downloadSources>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <configuration>
+                    <downloadJavadocs>true</downloadJavadocs>
+                    <downloadSources>true</downloadSources>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<warName>${warFinalName}-${project.version}</warName>
-					<webResources>
-						<resource>
-							<directory>src/main/non-packaged-resources</directory>
-							<targetPath>WEB-INF</targetPath>
-							<filtering>true</filtering>
-							<includes>
-								<include>**/ENV.properties</include>
-							</includes>
-						</resource>
-					</webResources>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <warName>${warFinalName}-${project.version}</warName>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/non-packaged-resources</directory>
+                            <targetPath>WEB-INF</targetPath>
+                            <filtering>true</filtering>
+                            <includes>
+                                <include>**/ENV.properties</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<!-- Publish to Tomcat: mvn tomcat7:redeploy -->
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<configuration>
-					<url>${tomcat7Url}</url>
-					<server>${tomcat7ServerId}</server>
-					<path>/${warFinalName}</path>
-				</configuration>
-			</plugin>
+            <plugin>
+                <!-- Publish to Tomcat: mvn tomcat7:redeploy -->
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <configuration>
+                    <url>${tomcat7Url}</url>
+                    <server>${tomcat7ServerId}</server>
+                    <path>/${warFinalName}</path>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<configuration>
-					<skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <configuration>
+                    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+                </configuration>
+            </plugin>
 
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 
-	<profiles>
-		<profile>
-			<id>m2e</id>
-			<!-- This profile is only activated when building in Eclipse with m2e -->
-			<activation>
-				<property>
-					<name>m2e.version</name>
-				</property>
-			</activation>
-			<properties>
-				<strolch.env>dev</strolch.env>
-			</properties>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>m2e</id>
+            <!-- This profile is only activated when building in Eclipse with m2e -->
+            <activation>
+                <property>
+                    <name>m2e.version</name>
+                </property>
+            </activation>
+            <properties>
+                <strolch.env>dev</strolch.env>
+            </properties>
+        </profile>
+    </profiles>
 </project>

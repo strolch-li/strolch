@@ -1,141 +1,121 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>li.strolch</groupId>
-		<artifactId>li.strolch</artifactId>
-		<version>1.6.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>li.strolch</groupId>
+        <artifactId>li.strolch</artifactId>
+        <version>1.6.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-	<artifactId>li.strolch.tutorialwebapp</artifactId>
-	<name>li.strolch.tutorialwebapp</name>
-	<description>Tutorial webapp to show case using Strolch in a servlet container</description>
-	<packaging>war</packaging>
-	<inceptionYear>2011</inceptionYear>
+    <artifactId>li.strolch.tutorialwebapp</artifactId>
+    <name>li.strolch.tutorialwebapp</name>
+    <description>Tutorial webapp to show case using Strolch in a servlet container</description>
+    <packaging>war</packaging>
+    <inceptionYear>2011</inceptionYear>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<warFinalName>tutorialwebapp</warFinalName>
-		<tomcat7ServerId>tomcat7.eitchnet.ch</tomcat7ServerId>
-		<tomcat7Url>http://tomcat.eitchnet.ch:8080/manager/text</tomcat7Url>
-		<m2eclipse.wtp.contextRoot>${warFinalName}</m2eclipse.wtp.contextRoot>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <warFinalName>tutorialwebapp</warFinalName>
+        <tomcat7ServerId>tomcat7.eitchnet.ch</tomcat7ServerId>
+        <tomcat7Url>http://tomcat.eitchnet.ch:8080/manager/text</tomcat7Url>
+        <m2eclipse.wtp.contextRoot>${warFinalName}</m2eclipse.wtp.contextRoot>
+    </properties>
 
-	<dependencies>
-		<!-- main -->
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.rest</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.persistence.postgresql</artifactId>
-		</dependency>
+    <dependencies>
 
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <!-- Base -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
 
-		<!-- test dependencies -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <!-- main -->
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.persistence.postgresql</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
+        <!-- web -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<finalName>${warFinalName}</finalName>
+    <build>
+        <finalName>${warFinalName}</finalName>
 
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
-				<excludes>
-					<exclude>**/appVersion.properties</exclude>
-				</excludes>
-				<includes>
-					<include>**/*.properties</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/appVersion.properties</include>
-				</includes>
-			</resource>
-		</resources>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/appVersion.properties</exclude>
+                </excludes>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/appVersion.properties</include>
+                </includes>
+            </resource>
+        </resources>
 
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-			</plugin>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<warName>${warFinalName}-${project.version}</warName>
-					<webResources>
-						<resource>
-							<directory>src/main/non-packaged-resources</directory>
-							<targetPath>WEB-INF</targetPath>
-							<filtering>true</filtering>
-							<includes>
-								<include>**/ENV.properties</include>
-							</includes>
-						</resource>
-					</webResources>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+            </plugin>
 
-			<plugin>
-				<!-- Publish to Tomcat7: mvn tomcat7:redeploy -->
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<configuration>
-					<url>${tomcat7Url}</url>
-					<server>${tomcat7ServerId}</server>
-					<path>/${warFinalName}</path>
-				</configuration>
-			</plugin>
+            <plugin>
+                <!-- Publish to Tomcat7: mvn tomcat7:redeploy -->
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+            </plugin>
 
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<configuration>
-					<skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <configuration>
+                    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+                </configuration>
+            </plugin>
 
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 
-	<profiles>
-		<profile>
-			<id>m2e</id>
-			<!-- This profile is only activated when building in Eclipse with m2e -->
-			<activation>
-				<property>
-					<name>m2e.version</name>
-				</property>
-			</activation>
-			<properties>
-				<strolch.env>dev</strolch.env>
-			</properties>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>m2e</id>
+            <!-- This profile is only activated when building in Eclipse with m2e -->
+            <activation>
+                <property>
+                    <name>m2e.version</name>
+                </property>
+            </activation>
+            <properties>
+                <strolch.env>dev</strolch.env>
+            </properties>
+        </profile>
+    </profiles>
 </project>

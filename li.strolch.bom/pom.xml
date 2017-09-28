@@ -34,11 +34,6 @@
 			</dependency>
 			<dependency>
 				<groupId>li.strolch</groupId>
-				<artifactId>li.strolch.persistence.xml</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>li.strolch</groupId>
 				<artifactId>li.strolch.persistence.postgresql</artifactId>
 				<version>${project.version}</version>
 			</dependency>

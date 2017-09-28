@@ -1,86 +1,109 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>li.strolch</groupId>
-		<artifactId>li.strolch</artifactId>
-		<version>1.6.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>li.strolch</groupId>
+        <artifactId>li.strolch</artifactId>
+        <version>1.6.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-	<artifactId>li.strolch.service</artifactId>
-	<name>li.strolch.service</name>
-	<description>Service API for Strolch</description>
-	<inceptionYear>2011</inceptionYear>
+    <artifactId>li.strolch.service</artifactId>
+    <name>li.strolch.service</name>
+    <description>Service API for Strolch</description>
+    <inceptionYear>2011</inceptionYear>
 
-	<dependencies>
-		<!-- main -->
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.agent</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.privilege</artifactId>
-		</dependency>
+    <dependencies>
 
-		<!-- mocking framework -->
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>2.0.8-beta</version>
-			<scope>test</scope>
-		</dependency>
+        <!-- Base -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
 
-		<!-- test -->
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.testbase</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>li.strolch</groupId>
-			<artifactId>li.strolch.persistence.postgresql</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <!-- main -->
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.agent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.privilege</artifactId>
+        </dependency>
 
-	</dependencies>
+        <!-- test -->
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.testbase</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.persistence.postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-	<build>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+        </dependency>
 
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
-				<excludes>
-					<exclude>**/componentVersion.properties</exclude>
-				</excludes>
-				<includes>
-					<include>**/*.properties</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**/componentVersion.properties</include>
-				</includes>
-			</resource>
-		</resources>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
 
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+    </dependencies>
+
+    <build>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/componentVersion.properties</exclude>
+                </excludes>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/componentVersion.properties</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
