@@ -15,24 +15,21 @@
  */
 package li.strolch.rest.endpoint;
 
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Map;
 
+import com.google.gson.JsonObject;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.utils.xml.XmlKeyValue;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -54,9 +51,11 @@ public class PrivilegePoliciesService {
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		Map<String, String> policyDefs = privilegeHandler.getPolicyDefs(cert);
-		List<XmlKeyValue> values = XmlKeyValue.valueOf(policyDefs);
-		GenericEntity<List<XmlKeyValue>> entity = new GenericEntity<List<XmlKeyValue>>(values) {
-		};
-		return Response.ok(entity, MediaType.APPLICATION_JSON).build();
+
+		JsonObject policiesJ = new JsonObject();
+		for (String key : policyDefs.keySet()) {
+			policiesJ.addProperty(key, policyDefs.get(key));
+		}
+		return Response.ok(policiesJ.toString(), MediaType.APPLICATION_JSON).build();
 	}
 }

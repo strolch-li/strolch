@@ -20,7 +20,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -44,10 +43,6 @@ public class VersionQuery {
 		instance.getSessionHandler().validate(cert);
 
 		VersionQueryResult versionQueryResult = instance.getContainer().getAgent().getVersion();
-		GenericEntity<VersionQueryResult> entity = new GenericEntity<VersionQueryResult>(versionQueryResult,
-				VersionQueryResult.class) {
-			//
-		};
-		return Response.ok().entity(entity).build();
+		return Response.ok(versionQueryResult.toJson().toString(), MediaType.APPLICATION_JSON).build();
 	}
 }

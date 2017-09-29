@@ -21,37 +21,17 @@
  */
 package li.strolch.communication;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
-@XmlRootElement(name = "ConnectionInfo")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class ConnectionInfo {
 
-	@XmlAttribute(name = "id")
 	private String id;
-
-	@XmlAttribute(name = "localUri")
 	private String localUri;
-
-	@XmlAttribute(name = "remoteUri")
 	private String remoteUri;
-
-	@XmlAttribute(name = "mode")
 	private ConnectionMode mode;
-
-	@XmlAttribute(name = "queueSize")
 	private int queueSize;
-
-	@XmlAttribute(name = "state")
 	private ConnectionState state;
-
-	@XmlAttribute(name = "stateMsg")
 	private String stateMsg;
 
 	/**
@@ -62,8 +42,7 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param id the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
@@ -77,8 +56,7 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param localUri
-	 *            the localUri to set
+	 * @param localUri the localUri to set
 	 */
 	public void setLocalUri(String localUri) {
 		this.localUri = localUri;
@@ -92,8 +70,7 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param remoteUri
-	 *            the remoteUri to set
+	 * @param remoteUri the remoteUri to set
 	 */
 	public void setRemoteUri(String remoteUri) {
 		this.remoteUri = remoteUri;
@@ -107,8 +84,7 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param mode
-	 *            the mode to set
+	 * @param mode the mode to set
 	 */
 	public void setMode(ConnectionMode mode) {
 		this.mode = mode;
@@ -122,8 +98,7 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param state
-	 *            the state to set
+	 * @param state the state to set
 	 */
 	public void setState(ConnectionState state) {
 		this.state = state;
@@ -137,8 +112,7 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param stateMsg
-	 *            the stateMsg to set
+	 * @param stateMsg the stateMsg to set
 	 */
 	public void setStateMsg(String stateMsg) {
 		this.stateMsg = stateMsg;
@@ -152,8 +126,7 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param queueSize
-	 *            the queueSize to set
+	 * @param queueSize the queueSize to set
 	 */
 	public void setQueueSize(int queueSize) {
 		this.queueSize = queueSize;

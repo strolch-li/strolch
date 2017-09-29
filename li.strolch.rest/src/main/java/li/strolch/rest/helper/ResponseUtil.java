@@ -1,27 +1,19 @@
 package li.strolch.rest.helper;
 
-import static li.strolch.rest.StrolchRestfulConstants.DATA;
-import static li.strolch.rest.StrolchRestfulConstants.EXCEPTION_MSG;
-import static li.strolch.rest.StrolchRestfulConstants.LAST_OFFSET;
-import static li.strolch.rest.StrolchRestfulConstants.LIMIT;
-import static li.strolch.rest.StrolchRestfulConstants.MSG;
-import static li.strolch.rest.StrolchRestfulConstants.NEXT_OFFSET;
-import static li.strolch.rest.StrolchRestfulConstants.OFFSET;
-import static li.strolch.rest.StrolchRestfulConstants.PREVIOUS_OFFSET;
-import static li.strolch.rest.StrolchRestfulConstants.SIZE;
-
-import java.util.List;
-import java.util.function.Function;
+import static li.strolch.rest.StrolchRestfulConstants.*;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import java.util.List;
+import java.util.function.Function;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
+import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.helper.ExceptionHelper;
@@ -39,6 +31,15 @@ public class ResponseUtil {
 		String json = new Gson().toJson(response);
 
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
+	public static Response toResponse(String errorMsg) {
+		JsonObject response = new JsonObject();
+		response.addProperty(MSG, errorMsg);
+
+		String json = new Gson().toJson(response);
+
+		return Response.serverError().entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
 	public static Response toResponse(String prop, String value) {
@@ -92,9 +93,9 @@ public class ResponseUtil {
 		String msg = StringHelper.DASH;
 		String exceptionMsg = StringHelper.DASH;
 
+		Throwable t = svcResult.getThrowable();
 		if (svcResult.isNok()) {
 			msg = svcResult.getMessage();
-			Throwable t = svcResult.getThrowable();
 			if (t != null)
 				exceptionMsg = StringHelper.formatExceptionMessage(t);
 		}
@@ -109,11 +110,26 @@ public class ResponseUtil {
 		if (svcResult.isOk())
 			return Response.ok().entity(json).type(MediaType.APPLICATION_JSON).build();
 
-		return Response.serverError().entity(json).type(MediaType.APPLICATION_JSON).build();
+		Status status;
+		if (t instanceof AccessDeniedException) {
+			status = Status.FORBIDDEN;
+		} else if (t instanceof PrivilegeException) {
+			status = Status.UNAUTHORIZED;
+		} else {
+			status = Status.INTERNAL_SERVER_ERROR;
+		}
+
+		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
 	public static Response toResponse(Throwable t) {
-		return toResponse(Status.INTERNAL_SERVER_ERROR, t);
+		if (t instanceof AccessDeniedException) {
+			return ResponseUtil.toResponse(Status.FORBIDDEN, t);
+		} else if (t instanceof PrivilegeException) {
+			return ResponseUtil.toResponse(Status.UNAUTHORIZED, t);
+		} else {
+			return toResponse(Status.INTERNAL_SERVER_ERROR, t);
+		}
 	}
 
 	public static Response toResponse(Status status, String msg) {

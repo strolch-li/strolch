@@ -15,6 +15,9 @@
  */
 package li.strolch.model.audit;
 
+import java.util.Arrays;
+import java.util.List;
+
 import li.strolch.model.query.StringSelection;
 import li.strolch.utils.StringMatchMode;
 
@@ -24,7 +27,7 @@ import li.strolch.utils.StringMatchMode;
 public class ActionSelection extends AuditSelection {
 
 	private StringSelection actionSelection;
-	private AccessType[] accessTypes;
+	private List<AccessType> accessTypes;
 
 	public ActionSelection(AuditQuery<?> query) {
 		super(query);
@@ -35,12 +38,17 @@ public class ActionSelection extends AuditSelection {
 		return this;
 	}
 
-	public ActionSelection accessTypes(AccessType... accessTypes) {
+	public ActionSelection accessTypes(List<AccessType> accessTypes) {
 		this.accessTypes = accessTypes;
 		return this;
 	}
 
-	public AccessType[] getAccessTypes() {
+	public ActionSelection accessTypes(AccessType... accessTypes) {
+		this.accessTypes = Arrays.asList(accessTypes);
+		return this;
+	}
+
+	public List<AccessType> getAccessTypes() {
 		return this.accessTypes;
 	}
 
@@ -49,7 +57,7 @@ public class ActionSelection extends AuditSelection {
 	}
 
 	public boolean isWildcardActionType() {
-		return this.accessTypes == null || this.accessTypes.length == 0;
+		return this.accessTypes == null || this.accessTypes.isEmpty();
 	}
 
 	public boolean isWildcardAction() {

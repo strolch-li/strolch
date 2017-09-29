@@ -18,57 +18,31 @@ package li.strolch.agent.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "VersionQueryResult")
 public class VersionQueryResult {
 
-	@XmlElement(name = "appVersion", type = StrolchVersion.class)
 	private StrolchVersion appVersion;
-	@XmlElement(name = "agentVersion", type = AgentVersion.class)
 	private AgentVersion agentVersion;
-	@XmlElement(name = "componentVersions", type = ComponentVersion.class)
 	private List<ComponentVersion> componentVersions;
-	@XmlElement(name = "errors", type = String.class)
 	private List<String> errors;
 
-	public VersionQueryResult() {
-		// no-arg constructor for JAXB
-	}
-
-	/**
-	 * @return the appVersion
-	 */
 	public StrolchVersion getAppVersion() {
 		return this.appVersion;
 	}
 
-	/**
-	 * @param appVersion
-	 *            the appVersion to set
-	 */
 	public void setAppVersion(StrolchVersion appVersion) {
 		this.appVersion = appVersion;
 	}
 
-	/**
-	 * @return the agentVersion
-	 */
 	public AgentVersion getAgentVersion() {
 		return this.agentVersion;
 	}
 
-	/**
-	 * @param agentVersion
-	 *            the agentVersion to set
-	 */
 	public void setAgentVersion(AgentVersion agentVersion) {
 		this.agentVersion = agentVersion;
 	}
@@ -87,40 +61,42 @@ public class VersionQueryResult {
 		this.errors.add(error);
 	}
 
-	/**
-	 * @return the componentVersions
-	 */
 	public List<ComponentVersion> getComponentVersions() {
 		return this.componentVersions;
 	}
 
-	/**
-	 * @param componentVersions
-	 *            the componentVersions to set
-	 */
 	public void setComponentVersions(List<ComponentVersion> componentVersions) {
 		this.componentVersions = componentVersions;
 	}
 
-	/**
-	 * @return the errors
-	 */
 	public List<String> getErrors() {
 		return this.errors;
 	}
 
-	/**
-	 * @param errors
-	 *            the errors to set
-	 */
 	public void setErrors(List<String> errors) {
 		this.errors = errors;
 	}
 
-	/**
-	 * @return
-	 */
 	public boolean hasErrors() {
 		return this.errors != null && !this.errors.isEmpty();
+	}
+
+	public JsonObject toJson() {
+		JsonObject jsonObject = new JsonObject();
+
+		jsonObject.add("appVersion", this.appVersion.toJson());
+		jsonObject.add("agentVersion", this.agentVersion.toJson());
+
+		JsonArray componentVersionsJ = new JsonArray();
+		this.componentVersions.forEach(c -> componentVersionsJ.add(c.toJson()));
+		jsonObject.add("componentVersions", componentVersionsJ);
+
+		if (this.errors != null) {
+			JsonArray errorsJ = new JsonArray();
+			this.errors.forEach(errorsJ::add);
+			jsonObject.add("errors", errorsJ);
+		}
+
+		return jsonObject;
 	}
 }

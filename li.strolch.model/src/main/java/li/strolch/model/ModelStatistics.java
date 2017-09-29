@@ -19,37 +19,18 @@ import static li.strolch.utils.helper.StringHelper.NULL;
 
 import java.util.Date;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import li.strolch.model.xml.Iso8601DateAdapter;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@XmlRootElement(name = "ModelStatistics")
-@XmlAccessorType(XmlAccessType.NONE)
 public class ModelStatistics {
 
-	@XmlAttribute(name = "startTime")
-	@XmlJavaTypeAdapter(value = Iso8601DateAdapter.class)
 	public Date startTime;
-
-	@XmlAttribute(name = "duractionNanos")
 	public long durationNanos;
-
-	@XmlAttribute(name = "nrOfResources")
 	public long nrOfResources;
-
-	@XmlAttribute(name = "nrOfOrders")
 	public long nrOfOrders;
-
-	@XmlAttribute(name = "nrOfActivities")
 	public long nrOfActivities;
 
 	/**
@@ -82,8 +63,8 @@ public class ModelStatistics {
 
 	/**
 	 * Adds the statistics of the other statistics to this statistics instance
-	 * 
-	 * @param statistics
+	 *
+	 * @param statistics further statistics to add to this {@link ModelStatistics}
 	 */
 	public void add(ModelStatistics statistics) {
 		this.nrOfOrders += statistics.nrOfOrders;
@@ -94,7 +75,8 @@ public class ModelStatistics {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(getClass().getSimpleName() + " [startTime=");
+		builder.append(getClass().getSimpleName());
+		builder.append(" [startTime=");
 		builder.append(this.startTime == null ? NULL : ISO8601FormatFactory.getInstance().formatDate(this.startTime));
 		builder.append(", durationNanos=");
 		builder.append(StringHelper.formatNanoDuration(this.durationNanos));

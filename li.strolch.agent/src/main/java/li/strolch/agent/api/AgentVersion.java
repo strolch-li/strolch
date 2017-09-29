@@ -17,54 +17,44 @@ package li.strolch.agent.api;
 
 import java.util.Properties;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.google.gson.JsonObject;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "AgentVersion")
 public class AgentVersion extends StrolchVersion {
 
-	@XmlAttribute(name = "agentName")
+	public static final String AGENT_NAME = "agentName";
+
 	private String agentName;
 
-	public AgentVersion() {
-		// no-arg constructor for JAXB
-	}
-
-	/**
-	 * @param agentName
-	 * @param properties
-	 */
 	public AgentVersion(String agentName, Properties properties) {
 		super(properties);
 		this.agentName = agentName;
 	}
 
-	/**
-	 * @return the agentName
-	 */
 	public String getAgentName() {
 		return this.agentName;
 	}
 
-	/**
-	 * @param agentName
-	 *            the agentName to set
-	 */
 	public void setAgentName(String agentName) {
 		this.agentName = agentName;
 	}
 
-	@SuppressWarnings("nls")
+	@Override
+	public JsonObject toJson() {
+		JsonObject jsonObject = super.toJson();
+
+		jsonObject.addProperty(AGENT_NAME, this.agentName);
+
+		return jsonObject;
+	}
+
 	@Override
 	public String toString() {
-		return "AgentVersion [agentName=" + this.agentName + ", groupId=" + getGroupId() + ", artifactId="
-				+ getArtifactId() + ", artifactVersion=" + getArtifactVersion() + ", scmRevision=" + getScmRevision()
-				+ ", scmBranch=" + getScmBranch() + ", buildTimestamp=" + getBuildTimestamp() + "]";
+		return "AgentVersion{agentName='" + this.agentName + "' , groupId='" + getGroupId() + "' , artifactId='"
+				+ getArtifactId() + "' , artifactVersion='" + getArtifactVersion() + "' , scmRevision='"
+				+ getScmRevision() + "' , scmBranch='" + getScmBranch() + "' , buildTimestamp='" + getBuildTimestamp()
+				+ "' }";
 	}
 }

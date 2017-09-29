@@ -19,38 +19,21 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
-@XmlRootElement(name = "UserSession")
-@XmlAccessorType(XmlAccessType.NONE)
 public class UserSession {
 
-	@XmlAttribute(name = "sessionId")
 	private String sessionId;
-	@XmlAttribute(name = "loginTime")
 	private Date loginTime;
-	@XmlAttribute(name = "username")
 	private String username;
-	@XmlAttribute(name = "firstname")
 	private String firstname;
-	@XmlAttribute(name = "lastname")
 	private String lastname;
-	@XmlElement(name = "roles")
 	private Set<String> userRoles;
-	@XmlAttribute(name = "locale")
 	private Locale locale;
-	@XmlAttribute(name = "lastAccess")
 	private Date lastAccess;
-
-	public UserSession() {
-		// no-arg constructor for JAXB
-	}
 
 	public UserSession(Certificate certificate) {
 		this.sessionId = certificate.getSessionId();
@@ -93,5 +76,26 @@ public class UserSession {
 
 	public Set<String> getUserRoles() {
 		return userRoles;
+	}
+
+	public JsonObject toJson() {
+		JsonObject jsonObject = new JsonObject();
+
+		jsonObject.addProperty("sessionId", this.sessionId);
+		jsonObject.addProperty("loginTime", ISO8601FormatFactory.getInstance().formatDate(this.loginTime));
+		jsonObject.addProperty("username", this.username);
+		jsonObject.addProperty("firstname", this.firstname);
+		jsonObject.addProperty("lastname", this.lastname);
+
+		jsonObject.addProperty("locale", this.locale.toString());
+		jsonObject.addProperty("lastAccess", ISO8601FormatFactory.getInstance().formatDate(this.lastAccess));
+
+		JsonArray rolesJ = new JsonArray();
+		for (String role : this.userRoles) {
+			rolesJ.add(role);
+		}
+		jsonObject.add("roles", rolesJ);
+
+		return jsonObject;
 	}
 }

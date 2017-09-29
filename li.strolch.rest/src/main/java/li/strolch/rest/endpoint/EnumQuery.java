@@ -15,18 +15,16 @@
  */
 package li.strolch.rest.endpoint;
 
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Locale;
 
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
@@ -34,7 +32,6 @@ import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.runtime.query.enums.EnumHandler;
 import li.strolch.runtime.query.enums.StrolchEnum;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,11 +57,7 @@ public class EnumQuery {
 			Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 			Locale locale = RestfulHelper.getLocale(headers);
 			StrolchEnum strolchEnum = enumHandler.getEnum(cert, name, locale);
-
-			GenericEntity<StrolchEnum> entity = new GenericEntity<StrolchEnum>(strolchEnum, StrolchEnum.class) {
-				//
-			};
-			return Response.ok().entity(entity).build();
+			return Response.ok().entity(strolchEnum.toJson().toString()).build();
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

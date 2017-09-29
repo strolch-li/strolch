@@ -20,12 +20,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.utils.helper.StringHelper;
@@ -34,40 +28,25 @@ import li.strolch.utils.helper.StringHelper;
  * To keep certain details of the {@link Role} itself hidden from remote clients and make sure instances are only edited
  * by users with the correct privilege, this representational version is allowed to be viewed by remote clients and
  * simply wraps all public data from the {@link Role}
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@XmlRootElement(name = "Role")
-@XmlAccessorType(XmlAccessType.NONE)
 public class RoleRep implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlAttribute(name = "name")
 	private String name;
-
-	@XmlElement(name = "privileges")
 	private List<PrivilegeRep> privileges;
 
 	/**
 	 * Default constructor
-	 * 
-	 * @param name
-	 *            the name of this role
-	 * @param privileges
-	 *            the list of privileges granted to this role
+	 *
+	 * @param name       the name of this role
+	 * @param privileges the list of privileges granted to this role
 	 */
 	public RoleRep(String name, List<PrivilegeRep> privileges) {
 		this.name = name;
 		this.privileges = privileges;
-	}
-
-	/**
-	 * 
-	 */
-	@SuppressWarnings("unused")
-	private RoleRep() {
-		// no-arg constructor for JAXB
 	}
 
 	/**
@@ -98,8 +77,7 @@ public class RoleRep implements Serializable {
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -107,7 +85,7 @@ public class RoleRep implements Serializable {
 
 	/**
 	 * Returns the privileges assigned to this Role as a list
-	 * 
+	 *
 	 * @return the privileges assigned to this Role as a list
 	 */
 	public List<PrivilegeRep> getPrivileges() {
@@ -116,9 +94,8 @@ public class RoleRep implements Serializable {
 
 	/**
 	 * Sets the privileges on this from a list
-	 * 
-	 * @param privileges
-	 *            the list of privileges to assign to this role
+	 *
+	 * @param privileges the list of privileges to assign to this role
 	 */
 	public void setPrivileges(List<PrivilegeRep> privileges) {
 		this.privileges = privileges;
@@ -126,7 +103,7 @@ public class RoleRep implements Serializable {
 
 	/**
 	 * Returns a string representation of this object displaying its concrete type and its values
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@SuppressWarnings("nls")
@@ -164,5 +141,9 @@ public class RoleRep implements Serializable {
 		} else if (!this.name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
+		return visitor.visitRoleRep(this);
 	}
 }

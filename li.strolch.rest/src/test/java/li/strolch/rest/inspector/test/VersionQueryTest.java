@@ -17,52 +17,70 @@ package li.strolch.rest.inspector.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
-
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import li.strolch.agent.api.AgentVersion;
-import li.strolch.agent.api.ComponentVersion;
-import li.strolch.agent.api.VersionQueryResult;
-
-import org.junit.Ignore;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@Ignore
 @SuppressWarnings("nls")
 public class VersionQueryTest extends AbstractRestfulTest {
 
 	private static final String ROOT_PATH = "strolch/version";
+	private String authToken;
+
+	@Before
+	public void before() {
+		this.authToken = authenticate();
+	}
+
+	@After
+	public void after() {
+		if (this.authToken != null)
+			logout(this.authToken);
+	}
 
 	@Test
 	public void shouldQueryVersion() {
 
 		// query
-		Response result = target().path(ROOT_PATH).request(MediaType.APPLICATION_JSON).get();
+		Response result = target() //
+				.path(ROOT_PATH) //
+				.request(MediaType.APPLICATION_JSON) //
+				.header(HttpHeaders.AUTHORIZATION, this.authToken) //
+				.get();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
-		VersionQueryResult versionQueryResult = result.readEntity(VersionQueryResult.class);
-		if (versionQueryResult.hasErrors()) {
-			for (String error : versionQueryResult.getErrors()) {
-				logger.error(error);
+		String versionQueryResultS = result.readEntity(String.class);
+
+		JsonObject versionQueryResultJ = new JsonParser().parse(versionQueryResultS).getAsJsonObject();
+
+		if (versionQueryResultJ.has("errors")) {
+			JsonArray errorsJ = versionQueryResultJ.get("errors").getAsJsonArray();
+			for (JsonElement errorJ : errorsJ) {
+				logger.error(errorJ.getAsString());
 			}
 		}
 
-		AgentVersion agentVersion = versionQueryResult.getAgentVersion();
-		logger.info(agentVersion.toString());
-		List<ComponentVersion> componentVersions = versionQueryResult.getComponentVersions();
-		assertEquals(6, componentVersions.size());
-		for (ComponentVersion version : componentVersions) {
-			logger.info(version.toString());
-			assertEquals("li.strolch", agentVersion.getGroupId());
-		}
+		JsonObject agentVersionJ = versionQueryResultJ.get("agentVersion").getAsJsonObject();
+		assertEquals("StrolchPersistenceTest", agentVersionJ.get("agentName").getAsString());
+		assertEquals("li.strolch", agentVersionJ.get("groupId").getAsString());
+		assertEquals("li.strolch.agent", agentVersionJ.get("artifactId").getAsString());
 
-		assertEquals("StrolchPersistenceTest", agentVersion.getAgentName());
-		assertEquals("li.strolch", agentVersion.getGroupId());
-		assertEquals("li.strolch.agent", agentVersion.getArtifactId());
+		JsonArray componentVersionsJ = versionQueryResultJ.get("componentVersions").getAsJsonArray();
+		assertEquals(6, componentVersionsJ.size());
+		for (JsonElement element : componentVersionsJ) {
+			JsonObject componentVersionJ = element.getAsJsonObject();
+			assertEquals("li.strolch", componentVersionJ.get("groupId").getAsString());
+		}
 	}
 }

@@ -1,4 +1,4 @@
-package li.strolch.rest.util;
+package li.strolch.service;
 
 import com.google.gson.JsonElement;
 

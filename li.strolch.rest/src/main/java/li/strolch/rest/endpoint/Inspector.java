@@ -17,6 +17,13 @@ package li.strolch.rest.endpoint;
 
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.StringReader;
@@ -26,34 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
-
+import com.google.gson.*;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
@@ -64,11 +44,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.model.Tags.Json;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.json.ActivityFromJsonVisitor;
-import li.strolch.model.json.FromFlatJsonVisitor;
-import li.strolch.model.json.OrderFromJsonVisitor;
-import li.strolch.model.json.ResourceFromJsonVisitor;
-import li.strolch.model.json.StrolchElementToJsonVisitor;
+import li.strolch.model.json.*;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
@@ -84,28 +60,19 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.rest.helper.RestfulHelper;
-import li.strolch.rest.model.Result;
-import li.strolch.service.AddActivityService;
+import li.strolch.rest.model.QueryData;
+import li.strolch.service.*;
 import li.strolch.service.AddActivityService.AddActivityArg;
-import li.strolch.service.AddOrderService;
 import li.strolch.service.AddOrderService.AddOrderArg;
-import li.strolch.service.AddResourceService;
 import li.strolch.service.AddResourceService.AddResourceArg;
-import li.strolch.service.LocatorArgument;
-import li.strolch.service.RemoveActivityService;
-import li.strolch.service.RemoveOrderService;
-import li.strolch.service.RemoveResourceService;
-import li.strolch.service.UpdateActivityService;
 import li.strolch.service.UpdateActivityService.UpdateActivityArg;
-import li.strolch.service.UpdateOrderService;
 import li.strolch.service.UpdateOrderService.UpdateOrderArg;
-import li.strolch.service.UpdateResourceService;
 import li.strolch.service.UpdateResourceService.UpdateResourceArg;
-import li.strolch.service.XmlImportModelArgument;
-import li.strolch.service.XmlImportModelResult;
-import li.strolch.service.XmlImportModelService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -116,8 +83,8 @@ public class Inspector {
 	private static final Logger logger = LoggerFactory.getLogger(Inspector.class);
 
 	private StrolchTransaction openTx(Certificate certificate, String realm) {
-		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm).openTx(certificate,
-				Inspector.class);
+		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm)
+				.openTx(certificate, Inspector.class);
 	}
 
 	private String toString(JsonObject jsonObject) {
@@ -129,11 +96,11 @@ public class Inspector {
 	 * <p>
 	 * Root path of the inspector
 	 * </p>
-	 * 
+	 * <p>
 	 * <p>
 	 * Returns the root element, which is an overview of the configured realms
 	 * </p>
-	 * 
+	 *
 	 * @return the root element, which is an overview of the configured realms
 	 */
 	@GET
@@ -176,14 +143,12 @@ public class Inspector {
 	 * <p>
 	 * Realm inspector
 	 * </p>
-	 * 
+	 * <p>
 	 * <p>
 	 * Returns the overview of a specific relam
 	 * </p>
-	 * 
-	 * @param realm
-	 *            the realm for which the overview is to be returned
-	 * 
+	 *
+	 * @param realm the realm for which the overview is to be returned
 	 * @return the overview of a specific relam
 	 */
 	@GET
@@ -246,10 +211,8 @@ public class Inspector {
 	 * <p>
 	 * Returns an overview of the {@link Resource Resources}. This is a list of all the types and the size each type has
 	 * </p>
-	 * 
-	 * @param realm
-	 *            the realm for which the resource overview is to be returned
-	 * 
+	 *
+	 * @param realm the realm for which the resource overview is to be returned
 	 * @return an overview of the {@link Resource Resources}. This is a list of all the types and the size each type has
 	 */
 	@GET
@@ -292,10 +255,8 @@ public class Inspector {
 	 * <p>
 	 * Returns an overview of the {@link Order Orders}. This is a list of all the types and the size each type has
 	 * </p>
-	 * 
-	 * @param realm
-	 *            the realm for which the order overview is to be returned
-	 * 
+	 *
+	 * @param realm the realm for which the order overview is to be returned
 	 * @return an overview of the {@link Order Orders}. This is a list of all the types and the size each type has
 	 */
 	@GET
@@ -339,12 +300,10 @@ public class Inspector {
 	 * Returns an overview of the {@link Activity Activities}. This is a list of all the types and the size each type
 	 * has
 	 * </p>
-	 * 
-	 * @param realm
-	 *            the realm for which the activity overview is to be returned
-	 * 
+	 *
+	 * @param realm the realm for which the activity overview is to be returned
 	 * @return an overview of the {@link Activity Activities}. This is a list of all the types and the size each type
-	 *         has
+	 * has
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -389,13 +348,11 @@ public class Inspector {
 	 * Returns an overview of the {@link Resource Resources} with the given type. This is a list of overviews of the
 	 * resources
 	 * </p>
-	 * 
-	 * @param realm
-	 *            the realm for which the resource type overview is to be returned
-	 * @param type
-	 *            marshall
+	 *
+	 * @param realm the realm for which the resource type overview is to be returned
+	 * @param type  marshall
 	 * @return an overview of the {@link Resource Resources} with the given type. This is a list of overviews of the
-	 *         resources
+	 * resources
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -440,11 +397,9 @@ public class Inspector {
 	 * <p>
 	 * Returns an overview of the {@link Order Orders} with the given type. This is a list of overviews of the orders
 	 * </p>
-	 * 
-	 * @param realm
-	 *            the realm for which the order type overview is to be returned
+	 *
+	 * @param realm the realm for which the order type overview is to be returned
 	 * @param type
-	 * 
 	 * @return an overview of the {@link Order Orders} with the given type. This is a list of overviews of the orders
 	 */
 	@GET
@@ -603,18 +558,14 @@ public class Inspector {
 	 * <p>
 	 * Activity inspector
 	 * </p>
-	 * 
+	 * <p>
 	 * <p>
 	 * Returns the activity with the given id
 	 * </p>
-	 * 
-	 * @param realm
-	 *            the realm for which the activity is to be returned
-	 * @param type
-	 *            the type of the activity
-	 * @param id
-	 *            the id of the activity
-	 * 
+	 *
+	 * @param realm the realm for which the activity is to be returned
+	 * @param type  the type of the activity
+	 * @param id    the id of the activity
 	 * @return the activity with the given id
 	 */
 	@GET
@@ -681,7 +632,7 @@ public class Inspector {
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@PUT
@@ -731,7 +682,7 @@ public class Inspector {
 			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@PUT
@@ -756,7 +707,7 @@ public class Inspector {
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@PUT
@@ -806,7 +757,7 @@ public class Inspector {
 			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@PUT
@@ -831,7 +782,7 @@ public class Inspector {
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@PUT
@@ -881,7 +832,7 @@ public class Inspector {
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@POST
@@ -913,8 +864,8 @@ public class Inspector {
 			arg.resourceTypes = Collections.emptySet();
 			arg.realm = realm;
 
-			XmlImportModelResult svcResult = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert,
-					svc, arg);
+			XmlImportModelResult svcResult = RestfulStrolchComponent.getInstance().getServiceHandler()
+					.doService(cert, svc, arg);
 			if (svcResult.isOk())
 				return ResponseUtil.toResponse(MSG, svcResult.getStatistics().toString());
 			return ResponseUtil.toResponse(svcResult);
@@ -951,7 +902,7 @@ public class Inspector {
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@POST
@@ -979,7 +930,7 @@ public class Inspector {
 			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@POST
@@ -1007,7 +958,7 @@ public class Inspector {
 			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@POST
@@ -1031,7 +982,7 @@ public class Inspector {
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@POST
@@ -1058,7 +1009,7 @@ public class Inspector {
 			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@POST
@@ -1086,7 +1037,7 @@ public class Inspector {
 			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@POST
@@ -1111,7 +1062,7 @@ public class Inspector {
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@POST
@@ -1139,7 +1090,7 @@ public class Inspector {
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@POST
@@ -1167,7 +1118,7 @@ public class Inspector {
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
 		}
 
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@DELETE
@@ -1184,7 +1135,7 @@ public class Inspector {
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@DELETE
@@ -1201,7 +1152,7 @@ public class Inspector {
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	@DELETE
@@ -1218,7 +1169,7 @@ public class Inspector {
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
-		return Result.toResponse(result);
+		return ResponseUtil.toResponse(result);
 	}
 
 	private Resource parseResourceFromXml(String type, String data) {
@@ -1229,17 +1180,23 @@ public class Inspector {
 			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
 
 			if (listener.getResources().size() == 0)
-				throw new StrolchPersistenceException("No Resource parsed from xml value"
-						+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+				throw new StrolchPersistenceException(
+						"No Resource parsed from xml value" + (StringHelper.isNotEmpty(type) ?
+								" for type " + type :
+								""));
 			if (listener.getResources().size() > 1)
-				throw new StrolchPersistenceException("Multiple Resources parsed from xml value"
-						+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+				throw new StrolchPersistenceException(
+						"Multiple Resources parsed from xml value" + (StringHelper.isNotEmpty(type) ?
+								" for type " + type :
+								""));
 
 			resource = listener.getResources().get(0);
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException("Failed to extract Resource from xml value"
-					+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
+			throw new StrolchPersistenceException(
+					"Failed to extract Resource from xml value" + (StringHelper.isNotEmpty(type) ?
+							" for type " + type :
+							""), e);
 		}
 		return resource;
 	}
@@ -1255,14 +1212,18 @@ public class Inspector {
 				throw new StrolchPersistenceException(
 						"No Order parsed from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
 			if (listener.getOrders().size() > 1)
-				throw new StrolchPersistenceException("Multiple Orders parsed from xml value"
-						+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+				throw new StrolchPersistenceException(
+						"Multiple Orders parsed from xml value" + (StringHelper.isNotEmpty(type) ?
+								" for type " + type :
+								""));
 
 			order = listener.getOrders().get(0);
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException("Failed to extract Order from xml value"
-					+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
+			throw new StrolchPersistenceException(
+					"Failed to extract Order from xml value" + (StringHelper.isNotEmpty(type) ?
+							" for type " + type :
+							""), e);
 		}
 		return order;
 	}
@@ -1275,17 +1236,23 @@ public class Inspector {
 			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
 
 			if (listener.getActivities().size() == 0)
-				throw new StrolchPersistenceException("No Activity parsed from xml value"
-						+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+				throw new StrolchPersistenceException(
+						"No Activity parsed from xml value" + (StringHelper.isNotEmpty(type) ?
+								" for type " + type :
+								""));
 			if (listener.getActivities().size() > 1)
-				throw new StrolchPersistenceException("Multiple Activities parsed from xml value"
-						+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+				throw new StrolchPersistenceException(
+						"Multiple Activities parsed from xml value" + (StringHelper.isNotEmpty(type) ?
+								" for type " + type :
+								""));
 
 			activity = listener.getActivities().get(0);
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException("Failed to extract Activity from xml value"
-					+ (StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
+			throw new StrolchPersistenceException(
+					"Failed to extract Activity from xml value" + (StringHelper.isNotEmpty(type) ?
+							" for type " + type :
+							""), e);
 		}
 		return activity;
 	}

@@ -15,15 +15,10 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.ActionSelection;
-import li.strolch.model.audit.Audit;
-import li.strolch.model.audit.ElementSelection;
-import li.strolch.model.audit.IdentitySelection;
+import li.strolch.model.audit.*;
 import li.strolch.model.query.StringSelection;
 
 /**
@@ -111,8 +106,8 @@ public abstract class AuditSelector {
 		private StringSelection actionSelection;
 
 		public ActionSelector(ActionSelection selection) {
-			if (selection.getAccessTypes() != null && selection.getAccessTypes().length != 0)
-				this.accessTypes = new HashSet<>(Arrays.asList(selection.getAccessTypes()));
+			if (selection.getAccessTypes() != null && !selection.getAccessTypes().isEmpty())
+				this.accessTypes = new HashSet<>(selection.getAccessTypes());
 			this.actionSelection = selection.getActionSelection();
 		}
 

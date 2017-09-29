@@ -1,4 +1,4 @@
-package li.strolch.rest.endpoint;
+package li.strolch.rest.model;
 
 import javax.ws.rs.QueryParam;
 

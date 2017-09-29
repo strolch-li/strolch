@@ -15,6 +15,7 @@
  */
 package li.strolch.privilege.handler;
 
+import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,41 +23,13 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.crypto.SecretKey;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import li.strolch.privilege.base.AccessDeniedException;
-import li.strolch.privilege.base.InvalidCredentialsException;
-import li.strolch.privilege.base.NotAuthenticatedException;
-import li.strolch.privilege.base.PrivilegeConflictResolution;
-import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.model.Certificate;
-import li.strolch.privilege.model.IPrivilege;
-import li.strolch.privilege.model.PrivilegeContext;
-import li.strolch.privilege.model.PrivilegeRep;
-import li.strolch.privilege.model.Restrictable;
-import li.strolch.privilege.model.RoleRep;
-import li.strolch.privilege.model.SimpleRestrictable;
-import li.strolch.privilege.model.Usage;
-import li.strolch.privilege.model.UserRep;
-import li.strolch.privilege.model.UserState;
+import li.strolch.privilege.base.*;
+import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.PrivilegeImpl;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
@@ -68,23 +41,24 @@ import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
 import li.strolch.utils.collections.Tuple;
 import li.strolch.utils.helper.AesCryptoHelper;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
  * This is default implementation of the {@link PrivilegeHandler}
  * </p>
- * 
+ * <p>
  * The following list describes implementation details:
  * <ul>
- * <li>any methods which change the model are first validated by checking if the certificate is for an admin user by
- * calling {@link #assertIsPrivilegeAdmin(Certificate)}</li>
+ * <li>any methods which change the model are first validated by checking if the certificate has the appropriate privilege</li>
  * <li>all model requests are delegated to the configured {@link PrivilegeHandler}, except for the session id to
  * {@link Certificate} map, no model data is kept in this implementation. This also means that to return the
  * representation objects, for every new model query, a new representation object is created</li>
  * <li>when creating new users, or editing users then a null password is understood as no password set</li>
  * <li>Password requirements are simple: Non null and non empty/length 0</li>
  * </ul>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DefaultPrivilegeHandler implements PrivilegeHandler {
@@ -201,7 +175,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext prvCtx = getPrivilegeContext(certificate);
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ACTION, PRIVILEGE_ACTION_GET_CERTIFICATES));
 
-		return this.privilegeContextMap.values().stream().map(p -> p.getCertificate()).collect(Collectors.toList());
+		return this.privilegeContextMap.values().stream().map(PrivilegeContext::getCertificate)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -224,7 +199,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 		});
 
-		List<RoleRep> roles = rolesStream.map(r -> r.asRoleRep()).collect(Collectors.toList());
+		List<RoleRep> roles = rolesStream.map(Role::asRoleRep).collect(Collectors.toList());
 		return roles;
 	}
 
@@ -248,7 +223,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 		});
 
-		List<UserRep> users = usersStream.map(u -> u.asUserRep()).collect(Collectors.toList());
+		List<UserRep> users = usersStream.map(User::asUserRep).collect(Collectors.toList());
 		return users;
 	}
 
@@ -266,7 +241,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		UserState selUserState = selectorRep.getUserState();
 		Locale selLocale = selectorRep.getLocale();
 		Set<String> selRoles = selectorRep.getRoles();
-		Map<String, String> selPropertyMap = selectorRep.getPropertyMap();
+		Map<String, String> selPropertyMap = selectorRep.getProperties();
 
 		List<UserRep> result = new ArrayList<>();
 		List<User> allUsers = this.persistenceHandler.getAllUsers();
@@ -343,8 +318,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// properties
 			propertySelected = isSelectedByProperty(selPropertyMap, user.getProperties());
 
-			boolean selected = userIdSelected && usernameSelected && firstnameSelected && lastnameSelected
-					&& userStateSelected && localeSelected && roleSelected && propertySelected;
+			boolean selected =
+					userIdSelected && usernameSelected && firstnameSelected && lastnameSelected && userStateSelected
+							&& localeSelected && roleSelected && propertySelected;
 
 			if (selected)
 				result.add(user.asUserRep());
@@ -357,14 +333,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * Checks if the given properties contains values which are contained in the selectionMap. If the selectionMap is
 	 * null or empty, then true is returned. If a key/value pair from the selectionMap is not in the properties, then
 	 * false is returned
-	 * 
-	 * @param selectionMap
-	 *            the map defining the expected properties
-	 * @param properties
-	 *            the properties which must be a sub set of selectionMap to have this method return true
-	 * 
+	 *
+	 * @param selectionMap the map defining the expected properties
+	 * @param properties   the properties which must be a sub set of selectionMap to have this method return true
 	 * @return If the selectionMap is null or empty, then true is returned. If a key/value pair from the selectionMap is
-	 *         not in the properties, then false is returned
+	 * not in the properties, then false is returned
 	 */
 	private boolean isSelectedByProperty(Map<String, String> selectionMap, Map<String, String> properties) {
 
@@ -387,14 +360,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * Checks if the given roles contains the given selectionRoles, if this is the case, or selectionRoles is null or
 	 * empty, then true is returned, otherwise false
-	 * 
-	 * @param selectionRoles
-	 *            the required roles
-	 * @param roles
-	 *            the roles to check if they contain the selectionRoles
-	 * 
+	 *
+	 * @param selectionRoles the required roles
+	 * @param roles          the roles to check if they contain the selectionRoles
 	 * @return Checks if the given roles contains the given selectionRoles, if this is the case, or selectionRoles is
-	 *         null or empty, then true is returned, otherwise false
+	 * null or empty, then true is returned, otherwise false
 	 */
 	private boolean isSelectedByRole(Set<String> selectionRoles, Set<String> roles) {
 
@@ -544,7 +514,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private User createUser(UserRep userRep, byte[] passwordHash, byte[] salt) {
 		User user = new User(userRep.getUserId(), userRep.getUsername(), passwordHash, salt, userRep.getFirstname(),
 				userRep.getLastname(), userRep.getUserState(), userRep.getRoles(), userRep.getLocale(),
-				userRep.getPropertyMap());
+				userRep.getProperties());
 		return user;
 	}
 
@@ -559,15 +529,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get existing user
 		User existingUser = this.persistenceHandler.getUser(userRep.getUsername());
 		if (existingUser == null) {
-			throw new PrivilegeException(MessageFormat.format("User {0} does not exist!", userRep.getUsername())); //$NON-NLS-1$
+			throw new PrivilegeException(
+					MessageFormat.format("User {0} does not exist!", userRep.getUsername())); //$NON-NLS-1$
 		}
 
 		// if nothing to do, then stop
 		if (StringHelper.isEmpty(userRep.getFirstname()) && StringHelper.isEmpty(userRep.getLastname())
-				&& userRep.getLocale() == null
-				&& (userRep.getProperties() == null || userRep.getProperties().isEmpty())) {
-			throw new PrivilegeException(MessageFormat.format("All updateable fields are empty for update of user {0}", //$NON-NLS-1$
-					userRep.getUsername()));
+				&& userRep.getLocale() == null && (userRep.getProperties() == null || userRep.getProperties()
+				.isEmpty())) {
+			throw new PrivilegeException(
+					MessageFormat.format("All updateable fields are empty for update of user {0}", //$NON-NLS-1$
+							userRep.getUsername()));
 		}
 
 		String userId = existingUser.getUserId();
@@ -589,7 +561,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (userRep.getLocale() != null)
 			locale = userRep.getLocale();
 		if (userRep.getProperties() != null && !userRep.getProperties().isEmpty())
-			propertyMap = userRep.getPropertyMap();
+			propertyMap = userRep.getProperties();
 
 		// create new user
 		User newUser = new User(userId, username, password, salt, firstname, lastname, userState, roles, locale,
@@ -702,7 +674,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// ignore if user does not have role
 		Set<String> currentRoles = existingUser.getRoles();
 		if (!currentRoles.contains(roleName)) {
-			String msg = MessageFormat.format("User {0} does not have role {1}", existingUser.getUsername(), roleName); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("User {0} does not have role {1}", existingUser.getUsername(), roleName); //$NON-NLS-1$
 			throw new PrivilegeException(msg);
 		}
 
@@ -922,7 +895,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		prvCtx.assertHasPrivilege(PRIVILEGE_REMOVE_ROLE);
 
 		// validate no user is using this role
-		Set<String> roles = new HashSet<>(Arrays.asList(roleName));
+		Set<String> roles = new HashSet<>(Collections.singletonList(roleName));
 		UserRep selector = new UserRep(null, null, null, null, null, roles, null, null);
 		List<UserRep> usersWithRole = queryUsers(certificate, selector);
 		if (!usersWithRole.isEmpty()) {
@@ -1021,7 +994,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// ignore if role does not have privilege
 		if (!existingRole.hasPrivilege(privilegeName)) {
-			String msg = MessageFormat.format("Role {0} does not have Privilege {1}", roleName, privilegeName); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Role {0} does not have Privilege {1}", roleName, privilegeName); //$NON-NLS-1$
 			throw new PrivilegeException(msg);
 		}
 
@@ -1097,7 +1071,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		try {
 			// username must be at least 2 characters in length
 			if (username == null || username.length() < 2) {
-				String msg = MessageFormat.format("The given username ''{0}'' is shorter than 2 characters", username); //$NON-NLS-1$
+				String msg = MessageFormat
+						.format("The given username ''{0}'' is shorter than 2 characters", username); //$NON-NLS-1$
 				throw new PrivilegeException(msg);
 			}
 
@@ -1154,7 +1129,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			return false;
 
 		List<Certificate> sessions = new ArrayList<>(this.privilegeContextMap.values()).stream()
-				.map(p -> p.getCertificate()).filter(c -> !c.getUserState().isSystem()).collect(Collectors.toList());
+				.map(PrivilegeContext::getCertificate).filter(c -> !c.getUserState().isSystem())
+				.collect(Collectors.toList());
 
 		try (OutputStream fout = Files.newOutputStream(this.persistSessionsPath.toPath());
 				OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, fout)) {
@@ -1234,18 +1210,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	/**
 	 * Checks the credentials and validates that the user may log in.
-	 * 
-	 * @param username
-	 *            the username of the {@link User} to check against
-	 * @param password
-	 *            the password of this user
-	 * 
+	 *
+	 * @param username the username of the {@link User} to check against
+	 * @param password the password of this user
 	 * @return the {@link User} if the credentials are valid and the user may login
-	 * 
-	 * @throws AccessDeniedException
-	 *             if anything is wrong with the credentials or the user state
-	 * @throws InvalidCredentialsException
-	 *             if the given credentials are invalid, the user does not exist, or has no password set
+	 * @throws AccessDeniedException       if anything is wrong with the credentials or the user state
+	 * @throws InvalidCredentialsException if the given credentials are invalid, the user does not exist, or has no password set
 	 */
 	private User checkCredentialsAndUserState(String username, char[] password)
 			throws InvalidCredentialsException, AccessDeniedException {
@@ -1282,25 +1252,26 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					MessageFormat.format("User {0} has no password and may not login!", username)); //$NON-NLS-1$
 		byte[] salt = user.getSalt();
 		if (salt == null)
-			throw new AccessDeniedException(MessageFormat.format("User {0} has no salt and may not login!", salt)); //$NON-NLS-1$
+			throw new AccessDeniedException(
+					MessageFormat.format("User {0} has no salt and may not login!", salt)); //$NON-NLS-1$
 
 		// we only work with hashed passwords
 		byte[] passwordHash = this.encryptionHandler.hashPassword(password, salt);
 
 		// validate password
 		if (!Arrays.equals(passwordHash, pwHash))
-			throw new InvalidCredentialsException(MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
+			throw new InvalidCredentialsException(
+					MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
 
 		return user;
 	}
 
 	/**
 	 * Builds a {@link PrivilegeContext} for the given {@link User} and its {@link Certificate}
-	 * 
-	 * @param certificate
-	 * @param user
-	 * 
-	 * @return
+	 *
+	 * @param certificate the certificate for which to build the {@link PrivilegeContext}
+	 * @param user        the user for which to build the {@link PrivilegeContext}
+	 * @return the {@link PrivilegeContext}
 	 */
 	private PrivilegeContext buildPrivilegeContext(Certificate certificate, User user) {
 
@@ -1413,8 +1384,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate that challenge certificate is not expired (1 hour only) 
 		if (sessionCertificate.getUsage() != Usage.ANY) {
-			LocalDateTime dateTime = LocalDateTime.ofInstant(sessionCertificate.getLoginTime().toInstant(),
-					ZoneId.systemDefault());
+			LocalDateTime dateTime = LocalDateTime
+					.ofInstant(sessionCertificate.getLoginTime().toInstant(), ZoneId.systemDefault());
 			if (dateTime.plusHours(1).isBefore(LocalDateTime.now())) {
 				invalidateSession(sessionCertificate);
 				throw new NotAuthenticatedException("Certificate has already expired!"); //$NON-NLS-1$
@@ -1447,7 +1418,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	/**
 	 * This simple implementation validates that the password is not null, and that the password string is not empty
-	 * 
+	 *
 	 * @see li.strolch.privilege.handler.PrivilegeHandler#validatePassword(char[])
 	 */
 	@Override
@@ -1496,20 +1467,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * Initializes the concrete {@link EncryptionHandler}. The passed parameter map contains any configuration this
 	 * {@link PrivilegeHandler} might need. This method may only be called once and this must be enforced by the
 	 * concrete implementation
-	 * 
-	 * @param parameterMap
-	 *            a map containing configuration properties
-	 * @param encryptionHandler
-	 *            the {@link EncryptionHandler} instance for this {@link PrivilegeHandler}
-	 * @param persistenceHandler
-	 *            the {@link PersistenceHandler} instance for this {@link PrivilegeHandler}
-	 * @param userChallengeHandler
-	 *            the handler to challenge a user's actions e.g. password change or authentication
-	 * @param policyMap
-	 *            map of {@link PrivilegePolicy} classes
-	 * 
-	 * @throws PrivilegeException
-	 *             if the this method is called multiple times or an initialization exception occurs
+	 *
+	 * @param parameterMap         a map containing configuration properties
+	 * @param encryptionHandler    the {@link EncryptionHandler} instance for this {@link PrivilegeHandler}
+	 * @param persistenceHandler   the {@link PersistenceHandler} instance for this {@link PrivilegeHandler}
+	 * @param userChallengeHandler the handler to challenge a user's actions e.g. password change or authentication
+	 * @param policyMap            map of {@link PrivilegePolicy} classes
+	 * @throws PrivilegeException if the this method is called multiple times or an initialization exception occurs
 	 */
 	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
 			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
@@ -1713,9 +1677,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	/**
 	 * Validates that the policies which are not null on the privileges of the role exist
-	 * 
-	 * @param role
-	 *            the role for which the policies are to be checked
+	 *
+	 * @param role the role for which the policies are to be checked
 	 */
 	private void validatePolicies(Role role) {
 		for (String privilegeName : role.getPrivilegeNames()) {
@@ -1732,9 +1695,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * Passwords should not be kept as strings, as string are immutable, this method thus clears the char array so that
 	 * the password is not in memory anymore
-	 * 
-	 * @param password
-	 *            the char array containing the passwort which is to be set to zeroes
+	 *
+	 * @param password the char array containing the passwort which is to be set to zeroes
 	 */
 	private void clearPassword(char[] password) {
 		if (password != null) {
@@ -1781,11 +1743,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get the system user
 		User systemUser = this.persistenceHandler.getUser(username);
 		if (systemUser == null)
-			throw new PrivilegeException(MessageFormat.format("System user {0} does not exist!", username)); //$NON-NLS-1$
+			throw new PrivilegeException(
+					MessageFormat.format("System user {0} does not exist!", username)); //$NON-NLS-1$
 
 		// validate this is a system user
 		if (systemUser.getUserState() != UserState.SYSTEM)
-			throw new PrivilegeException(MessageFormat.format("User {0} is not a System user!", username)); //$NON-NLS-1$
+			throw new PrivilegeException(
+					MessageFormat.format("User {0} is not a System user!", username)); //$NON-NLS-1$
 
 		// get privilegeContext for this system user
 		PrivilegeContext systemUserPrivilegeContext = getSystemUserPrivilegeContext(username);
@@ -1802,10 +1766,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * Returns the {@link Certificate} for the given system username. If it does not yet exist, then it is created by
 	 * authenticating the system user
-	 * 
-	 * @param systemUsername
-	 *            the name of the system user
-	 * 
+	 *
+	 * @param systemUsername the name of the system user
 	 * @return the {@link Certificate} for this system user
 	 */
 	private PrivilegeContext getSystemUserPrivilegeContext(String systemUsername) {
@@ -1814,14 +1776,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		User user = this.persistenceHandler.getUser(systemUsername);
 		// no user means no authentication
 		if (user == null) {
-			String msg = MessageFormat.format("The system user with username {0} does not exist!", systemUsername); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("The system user with username {0} does not exist!", systemUsername); //$NON-NLS-1$
 			throw new AccessDeniedException(msg);
 		}
 
 		// validate password
 		byte[] pwHash = user.getPassword();
 		if (pwHash != null) {
-			String msg = MessageFormat.format("System users must not have a password: {0}", systemUsername); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("System users must not have a password: {0}", systemUsername); //$NON-NLS-1$
 			throw new AccessDeniedException(msg);
 		}
 
@@ -1834,7 +1798,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate user has at least one role
 		if (user.getRoles().isEmpty()) {
-			String msg = MessageFormat.format("The system user {0} does not have any roles defined!", systemUsername); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("The system user {0} does not have any roles defined!", systemUsername); //$NON-NLS-1$
 			throw new PrivilegeException(msg);
 		}
 
@@ -1865,14 +1830,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * is not stored in a database. The privilege name is a class name and is then used to instantiate a new
 	 * {@link PrivilegePolicy} object
 	 * </p>
-	 * 
-	 * @param policyName
-	 *            the class name of the {@link PrivilegePolicy} object to return
-	 * 
+	 *
+	 * @param policyName the class name of the {@link PrivilegePolicy} object to return
 	 * @return the {@link PrivilegePolicy} object
-	 * 
-	 * @throws PrivilegeException
-	 *             if the {@link PrivilegePolicy} object for the given policy name could not be instantiated
+	 * @throws PrivilegeException if the {@link PrivilegePolicy} object for the given policy name could not be instantiated
 	 */
 	private PrivilegePolicy getPolicy(String policyName) {
 

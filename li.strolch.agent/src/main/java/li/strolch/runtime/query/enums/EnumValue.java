@@ -15,63 +15,43 @@
  */
 package li.strolch.runtime.query.enums;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.google.gson.JsonObject;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "EnumValue")
 public class EnumValue {
 
-	@XmlAttribute(name = "id")
 	private String id;
-	@XmlAttribute(name = "value")
 	private String value;
 
-	public EnumValue() {
-		// no-arg constructor for JAXB
-	}
-
-	/**
-	 * @param id
-	 * @param value
-	 */
 	public EnumValue(String id, String value) {
 		this.id = id;
 		this.value = value;
 	}
 
-	/**
-	 * @return the key
-	 */
 	public String getId() {
 		return this.id;
 	}
 
-	/**
-	 * @param id
-	 *            the id to set
-	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
-	/**
-	 * @return the value
-	 */
 	public String getValue() {
 		return this.value;
 	}
 
-	/**
-	 * @param value
-	 *            the value to set
-	 */
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public JsonObject toJson() {
+		JsonObject jsonObject = new JsonObject();
+
+		jsonObject.addProperty("id", this.id);
+		jsonObject.addProperty("value", this.value);
+
+		return jsonObject;
 	}
 }

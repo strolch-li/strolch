@@ -29,11 +29,11 @@ import li.strolch.privilege.policy.PrivilegePolicy;
 /**
  * This context gives access to a logged in user's privilege data e.g. the {@link UserRep}, {@link Certificate} and the
  * user's list of {@link PrivilegeRep}
- * 
+ * <p>
  * <p>
  * Note: This is an internal object which is not to be serialized to clients
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PrivilegeContext {
@@ -71,7 +71,7 @@ public class PrivilegeContext {
 		return this.privileges.keySet();
 	}
 
-	public void assertHasPrivilege(String privilegeName) {
+	public void assertHasPrivilege(String privilegeName) throws AccessDeniedException {
 		if (!this.privileges.containsKey(privilegeName)) {
 			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"), //$NON-NLS-1$
 					userRep.getUsername(), privilegeName);
@@ -79,12 +79,12 @@ public class PrivilegeContext {
 		}
 	}
 
-	public IPrivilege getPrivilege(String privilegeName) {
+	public IPrivilege getPrivilege(String privilegeName) throws AccessDeniedException {
 		assertHasPrivilege(privilegeName);
 		return this.privileges.get(privilegeName);
 	}
 
-	public PrivilegePolicy getPolicy(String policyName) {
+	public PrivilegePolicy getPolicy(String policyName) throws PrivilegeException {
 		PrivilegePolicy policy = this.policies.get(policyName);
 		if (policy == null) {
 			String msg = "The PrivilegePolicy {0} does not exist on the PrivilegeContext!"; //$NON-NLS-1$
@@ -101,23 +101,20 @@ public class PrivilegeContext {
 	 * Validates if the user for this context has the privilege to access to the given {@link Restrictable}. If the user
 	 * has the privilege, then this method returns with no exception and void, if the user does not have the privilege,
 	 * then a {@link AccessDeniedException} is thrown.
-	 * 
-	 * @param restrictable
-	 *            the {@link Restrictable} which the user wants to access
-	 * 
-	 * @throws AccessDeniedException
-	 *             if the user does not have access
-	 * @throws PrivilegeException
-	 *             if there is an internal error due to wrongly configured privileges or programming errors
+	 *
+	 * @param restrictable the {@link Restrictable} which the user wants to access
+	 * @throws AccessDeniedException if the user does not have access
+	 * @throws PrivilegeException    if there is an internal error due to wrongly configured privileges or programming errors
 	 */
-	public void validateAction(Restrictable restrictable) throws AccessDeniedException, PrivilegeException {
+	public void validateAction(Restrictable restrictable) throws PrivilegeException, AccessDeniedException {
 
 		// the privilege for the restrictable
 		String privilegeName = restrictable.getPrivilegeName();
 		IPrivilege privilege = this.privileges.get(privilegeName);
 		if (privilege == null) {
-			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
-					getUsername(), privilegeName, restrictable.getClass().getName());
+			String msg = MessageFormat
+					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
+							getUsername(), privilegeName, restrictable.getClass().getName());
 			throw new AccessDeniedException(msg);
 		}
 

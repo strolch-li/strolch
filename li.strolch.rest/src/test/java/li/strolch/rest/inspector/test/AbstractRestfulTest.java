@@ -15,15 +15,27 @@
  */
 package li.strolch.rest.inspector.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.logging.Level;
 
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Application;
-
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import li.strolch.rest.StrolchRestfulClasses;
+import li.strolch.rest.endpoint.Inspector;
+import li.strolch.rest.filters.AuthenticationRequestFilter;
+import li.strolch.testbase.runtime.RuntimeMock;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.grizzly2.servlet.GrizzlyWebContainerFactory;
@@ -43,15 +55,13 @@ import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import li.strolch.rest.StrolchRestfulClasses;
-import li.strolch.rest.endpoint.Inspector;
-import li.strolch.testbase.runtime.RuntimeMock;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
 public abstract class AbstractRestfulTest extends JerseyTest {
+
+	public static final String AUTHENTICATION_PATH = "strolch/authentication";
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractRestfulTest.class);
 	private static final String RUNTIME_PATH = "target/withPrivilegeRuntime/"; //$NON-NLS-1$
@@ -78,6 +88,48 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 		forceEnable(TestProperties.LOG_TRAFFIC);
 		enable(TestProperties.DUMP_ENTITY);
 		return createApp();
+	}
+
+	protected String authenticate() {
+		return authenticate("jill", "jill");
+	}
+
+	protected void logout(String authToken) {
+		logout("jill", authToken);
+	}
+
+	protected String authenticate(String username, String password) {
+
+		// login
+		JsonObject login = new JsonObject();
+		login.addProperty("username", username);
+		login.addProperty("password", Base64.getEncoder().encodeToString(username.getBytes()));
+		Entity<String> entity = Entity.entity(login.toString(), MediaType.APPLICATION_JSON);
+
+		Response result = target() //
+				.path(AUTHENTICATION_PATH) //
+				.request(MediaType.APPLICATION_JSON) //
+				.post(entity);
+		assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
+
+		JsonObject loginResult = new JsonParser().parse(result.readEntity(String.class)).getAsJsonObject();
+		assertEquals("jill", loginResult.get("username").getAsString());
+		assertEquals(64, loginResult.get("authToken").getAsString().length());
+		assertNull(loginResult.get("msg"));
+
+		return loginResult.get("authToken").getAsString();
+	}
+
+	protected void logout(String username, String authToken) {
+
+		Response result = target() //
+				.path(AUTHENTICATION_PATH + "/" + authToken) //
+				.request(MediaType.APPLICATION_JSON) //
+				.delete();
+		assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
+
+		JsonObject logoutResult = new JsonParser().parse(result.readEntity(String.class)).getAsJsonObject();
+		assertEquals("jill has been logged out.", logoutResult.get("msg").getAsString());
 	}
 
 	public static ResourceConfig createApp() {
@@ -122,8 +174,10 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 					@Override
 					public void start() {
 						try {
-							this.server = GrizzlyWebContainerFactory.create(baseUri, Collections.singletonMap(
-									"jersey.config.server.provider.packages", Inspector.class.getPackage().getName()));
+							this.server = GrizzlyWebContainerFactory.create(baseUri, Collections
+									.singletonMap("jersey.config.server.provider.packages",
+											Inspector.class.getPackage().getName() + ";"
+													+ AuthenticationRequestFilter.class.getPackage().getName()));
 						} catch (ProcessingException e) {
 							throw new TestContainerException(e);
 						} catch (IOException e) {

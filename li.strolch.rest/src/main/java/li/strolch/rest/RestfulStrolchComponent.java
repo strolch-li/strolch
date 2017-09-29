@@ -17,8 +17,6 @@ package li.strolch.rest;
 
 import java.text.MessageFormat;
 
-import org.glassfish.jersey.server.ServerProperties;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
@@ -51,7 +49,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 * <li>{@code ALL} - tracing support is enabled for every request.</li>
 	 * </ul>
 	 * 
-	 * @see ServerProperties#TRACING
+	 * @see org.glassfish.jersey.server.ServerProperties#TRACING
 	 */
 	private static final String PARAM_REST_TRACING = "restTracing"; //$NON-NLS-1$
 
@@ -63,7 +61,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 * <li>{@code VERBOSE}</li>
 	 * </ul>
 	 * 
-	 * @see ServerProperties#TRACING_THRESHOLD
+	 * @see org.glassfish.jersey.server.ServerProperties#TRACING_THRESHOLD
 	 */
 	private static final String PARAM_REST_TRACING_THRESHOLD = "restTracingThreshold"; //$NON-NLS-1$
 

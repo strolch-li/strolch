@@ -46,10 +46,6 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 	private String realm;
 	private Map<String, Locator> enumLocators;
 
-	/**
-	 * @param container
-	 * @param componentName
-	 */
 	public DefaultEnumHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
@@ -83,28 +79,24 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 
 		Locator enumLocator = this.enumLocators.get(name);
 		if (enumLocator == null)
-			throw new StrolchException(MessageFormat.format("No enumeration is configured for the name {0}", name)); //$NON-NLS-1$
+			throw new StrolchException(
+					MessageFormat.format("No enumeration is configured for the name {0}", name)); //$NON-NLS-1$
 
 		try (StrolchTransaction tx = getContainer().getRealm(this.realm).openTx(certificate, EnumHandler.class)) {
 			Resource enumeration = tx.findElement(enumLocator);
 			ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, locale);
 
 			Set<String> parameterKeySet = enumValuesByLanguage.getParameterKeySet();
-			Map<String, EnumValue> values = new HashMap<>(parameterKeySet.size());
+			Map<String, String> values = new HashMap<>(parameterKeySet.size());
 			for (String paramKey : parameterKeySet) {
 				StringParameter enumParam = enumValuesByLanguage.getParameter(paramKey);
-				values.put(paramKey, new EnumValue(paramKey, enumParam.getValue()));
+				values.put(paramKey, enumParam.getValue());
 			}
 
 			return new StrolchEnum(name, locale, values);
 		}
 	}
 
-	/**
-	 * @param enumeration
-	 * @param locale
-	 * @return
-	 */
 	private ParameterBag findParameterBagByLanguage(Resource enumeration, Locale locale) {
 
 		String localeS = locale.getLanguage() + UNDERLINE + locale.getCountry() + UNDERLINE + locale.getVariant();

@@ -16,25 +16,18 @@
 package li.strolch.privilege.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.helper.StringHelper;
-import li.strolch.utils.xml.XmlKeyValue;
 
 /**
  * To keep certain details of the {@link User} itself hidden from remote clients and make sure instances are only edited
  * by users with the correct privilege, this representational version is allowed to be viewed by remote clients and
  * simply wraps all public data from the {@link User}
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class UserRep implements Serializable {
@@ -55,27 +48,19 @@ public class UserRep implements Serializable {
 
 	private Set<String> roles;
 
-	private List<XmlKeyValue> properties;
+	private Map<String, String> properties;
 
 	/**
 	 * Default constructor
-	 * 
-	 * @param userId
-	 *            the user's id
-	 * @param username
-	 *            the user's login name
-	 * @param firstname
-	 *            the user's first name
-	 * @param lastname
-	 *            the user's last name
-	 * @param userState
-	 *            the user's {@link UserState}
-	 * @param roles
-	 *            the set of {@link Role}s assigned to this user
-	 * @param locale
-	 *            the user's {@link Locale}
-	 * @param propertyMap
-	 *            a {@link Map} containing string value pairs of properties for this user
+	 *
+	 * @param userId      the user's id
+	 * @param username    the user's login name
+	 * @param firstname   the user's first name
+	 * @param lastname    the user's last name
+	 * @param userState   the user's {@link UserState}
+	 * @param roles       the set of {@link Role}s assigned to this user
+	 * @param locale      the user's {@link Locale}
+	 * @param propertyMap a {@link Map} containing string value pairs of properties for this user
 	 */
 	public UserRep(String userId, String username, String firstname, String lastname, UserState userState,
 			Set<String> roles, Locale locale, Map<String, String> propertyMap) {
@@ -86,11 +71,11 @@ public class UserRep implements Serializable {
 		this.userState = userState;
 		this.roles = roles;
 		this.locale = locale;
-		this.properties = propertyMap == null ? new ArrayList<>() : XmlKeyValue.valueOf(propertyMap);
+		this.properties = propertyMap == null ? null : new HashMap<>(propertyMap);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@SuppressWarnings("unused")
 	private UserRep() {
@@ -130,9 +115,8 @@ public class UserRep implements Serializable {
 
 	/**
 	 * Set the userId
-	 * 
-	 * @param userId
-	 *            to set
+	 *
+	 * @param userId to set
 	 */
 	public void setUserId(String userId) {
 		this.userId = userId;
@@ -146,8 +130,7 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param username
-	 *            the username to set
+	 * @param username the username to set
 	 */
 	public void setUsername(String username) {
 		this.username = username;
@@ -161,8 +144,7 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param firstname
-	 *            the firstname to set
+	 * @param firstname the firstname to set
 	 */
 	public void setFirstname(String firstname) {
 		this.firstname = firstname;
@@ -176,8 +158,7 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param lastname
-	 *            the lastname to set
+	 * @param lastname the lastname to set
 	 */
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
@@ -191,8 +172,7 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param userState
-	 *            the userState to set
+	 * @param userState the userState to set
 	 */
 	public void setUserState(UserState userState) {
 		this.userState = userState;
@@ -206,8 +186,7 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param roles
-	 *            the roles to set
+	 * @param roles the roles to set
 	 */
 	public void setRoles(Set<String> roles) {
 		this.roles = roles;
@@ -215,10 +194,8 @@ public class UserRep implements Serializable {
 
 	/**
 	 * Returns true if this user has the given role
-	 * 
-	 * @param role
-	 *            the role to check for
-	 * 
+	 *
+	 * @param role the role to check for
 	 * @return returns true if this user has the given role
 	 */
 	public boolean hasRole(String role) {
@@ -233,8 +210,7 @@ public class UserRep implements Serializable {
 	}
 
 	/**
-	 * @param locale
-	 *            the locale to set
+	 * @param locale the locale to set
 	 */
 	public void setLocale(Locale locale) {
 		this.locale = locale;
@@ -242,96 +218,53 @@ public class UserRep implements Serializable {
 
 	/**
 	 * Returns the property with the given key
-	 * 
-	 * @param key
-	 *            the key for which the property is to be returned
-	 * 
+	 *
+	 * @param key the key for which the property is to be returned
 	 * @return the property with the given key, or null if the property is not defined
 	 */
 	public String getProperty(String key) {
 		if (this.properties == null)
 			return null;
-		for (XmlKeyValue keyValue : this.properties) {
-			if (keyValue.getKey().equals(key))
-				return keyValue.getValue();
-		}
-		return null;
+		return this.properties.get(key);
 	}
 
 	/**
 	 * Set the property with the key to the value
-	 * 
-	 * @param key
-	 *            the key of the property to set
-	 * @param value
-	 *            the value of the property to set
+	 *
+	 * @param key   the key of the property to set
+	 * @param value the value of the property to set
 	 */
 	public void setProperty(String key, String value) {
 		if (this.properties == null)
-			this.properties = new ArrayList<>();
-
-		boolean updated = false;
-
-		for (XmlKeyValue keyValue : this.properties) {
-			if (keyValue.getKey().equals(key)) {
-				keyValue.setValue(value);
-				updated = true;
-			}
-		}
-
-		if (!updated) {
-			this.properties.add(new XmlKeyValue(key, value));
-		}
+			this.properties = new HashMap<>(1);
+		this.properties.put(key, value);
 	}
 
 	/**
 	 * Returns the {@link Set} of keys of all properties
-	 * 
+	 *
 	 * @return the {@link Set} of keys of all properties
 	 */
 	public Set<String> getPropertyKeySet() {
 		if (this.properties == null)
 			return new HashSet<>();
-		Set<String> keySet = new HashSet<>(this.properties.size());
-		for (XmlKeyValue keyValue : this.properties) {
-			keySet.add(keyValue.getKey());
-		}
-		return keySet;
+		return new HashSet<>(this.properties.keySet());
 	}
 
 	/**
 	 * Returns the map of properties
-	 * 
+	 *
 	 * @return the map of properties
 	 */
-	public Map<String, String> getPropertyMap() {
+	public Map<String, String> getProperties() {
 		if (this.properties == null)
 			return new HashMap<>();
-		return XmlKeyValue.toMap(this.properties);
-	}
-
-	/**
-	 * Returns the string map properties of this user as a list of {@link XmlKeyValue} elements
-	 * 
-	 * @return the string map properties of this user as a list of {@link XmlKeyValue} elements
-	 */
-	public List<XmlKeyValue> getProperties() {
-		return this.properties == null ? new ArrayList<>() : this.properties;
-	}
-
-	/**
-	 * Sets the string map properties of this user from the given list of {@link XmlKeyValue}
-	 * 
-	 * @param values
-	 *            the list of {@link XmlKeyValue} from which to set the properties
-	 */
-	public void setProperties(List<XmlKeyValue> values) {
-		this.properties = values;
+		return new HashMap<>(this.properties);
 	}
 
 	/**
 	 * Returns a string representation of this object displaying its concrete type and its values
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@SuppressWarnings("nls")
@@ -385,12 +318,15 @@ public class UserRep implements Serializable {
 	public UserRep clone() {
 
 		Set<String> roles = new HashSet<>(this.roles);
-		Map<String, String> propertyMap = new HashMap<>();
-		this.properties.forEach(e -> propertyMap.put(e.getKey(), e.getValue()));
+		Map<String, String> propertyMap = this.properties == null ? null : new HashMap<>(this.properties);
 
 		UserRep clone = new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState, roles,
 				this.locale, propertyMap);
 
 		return clone;
+	}
+
+	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
+		return visitor.visitUserRep(this);
 	}
 }

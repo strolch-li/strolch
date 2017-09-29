@@ -20,12 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.ActionSelection;
-import li.strolch.model.audit.AuditQuery;
-import li.strolch.model.audit.AuditQueryVisitor;
-import li.strolch.model.audit.ElementSelection;
-import li.strolch.model.audit.IdentitySelection;
+import li.strolch.model.audit.*;
 import li.strolch.model.query.StringSelection;
 import li.strolch.utils.StringMatchMode;
 
@@ -131,21 +126,21 @@ public class PostgreSqlAuditQueryVisitor implements AuditQueryVisitor {
 
 		if (!selection.isWildcardActionType()) {
 
-			AccessType[] accessTypes = selection.getAccessTypes();
+			List<AccessType> accessTypes = selection.getAccessTypes();
 			ensureAnd();
 			this.sb.append(this.indent);
-			if (accessTypes.length == 1) {
+			if (accessTypes.size() == 1) {
 				this.sb.append(PostgreSqlAuditDao.ACCESS_TYPE + " = ?");
 				this.sb.append(PostgreSqlAuditDao.ACCESS_TYPE_TYPE);
 				this.sb.append("\n");
-				this.values.add(accessTypes[0].name());
+				this.values.add(accessTypes.get(0).name());
 			} else {
 				this.sb.append(PostgreSqlAuditDao.ACCESS_TYPE + " in (");
-				for (int i = 0; i < accessTypes.length; i++) {
+				for (int i = 0; i < accessTypes.size(); i++) {
 					this.sb.append("?");
 					this.sb.append(PostgreSqlAuditDao.ACCESS_TYPE_TYPE);
-					this.values.add(accessTypes[i].name());
-					if (i < accessTypes.length - 1)
+					this.values.add(accessTypes.get(i).name());
+					if (i < accessTypes.size() - 1)
 						this.sb.append(", ");
 				}
 				this.sb.append(" )\n");

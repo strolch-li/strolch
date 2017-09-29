@@ -32,7 +32,7 @@ import li.strolch.model.Tags;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.rest.endpoint.QueryData;
+import li.strolch.rest.model.QueryData;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;

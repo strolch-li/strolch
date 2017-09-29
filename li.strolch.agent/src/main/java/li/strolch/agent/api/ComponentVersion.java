@@ -17,54 +17,44 @@ package li.strolch.agent.api;
 
 import java.util.Properties;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.google.gson.JsonObject;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "ComponentVersion")
 public class ComponentVersion extends StrolchVersion {
 
-	@XmlAttribute(name = "componentName")
+	private static final String COMPONENT_VERSION = "componentName";
+
 	private String componentName;
 
-	public ComponentVersion() {
-		// no-arg constructor for JAXB
-	}
-
-	/**
-	 * @param componentName
-	 * @param properties
-	 */
 	public ComponentVersion(String componentName, Properties properties) {
 		super(properties);
 		this.componentName = componentName;
 	}
 
-	/**
-	 * @return the componentName
-	 */
 	public String getComponentName() {
 		return this.componentName;
 	}
 
-	/**
-	 * @param componentName
-	 *            the componentName to set
-	 */
 	public void setComponentName(String componentName) {
 		this.componentName = componentName;
 	}
 
-	@SuppressWarnings("nls")
+	@Override
+	public JsonObject toJson() {
+		JsonObject jsonObject = super.toJson();
+
+		jsonObject.addProperty(COMPONENT_VERSION, this.componentName);
+
+		return jsonObject;
+	}
+
 	@Override
 	public String toString() {
-		return "ComponentVersion [componentName=" + this.componentName + ", groupId=" + getGroupId() + ", artifactId="
-				+ getArtifactId() + ", artifactVersion=" + getArtifactVersion() + ", scmRevision=" + getScmRevision()
-				+ ", scmBranch=" + getScmBranch() + ", buildTimestamp=" + getBuildTimestamp() + "]";
+		return "ComponentVersion{componentName='" + this.componentName + "' , groupId='" + getGroupId()
+				+ "' , artifactId='" + getArtifactId() + "' , artifactVersion='" + getArtifactVersion()
+				+ "' , scmRevision='" + getScmRevision() + "' , scmBranch='" + getScmBranch() + "' , buildTimestamp='"
+				+ getBuildTimestamp() + "' }";
 	}
 }

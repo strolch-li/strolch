@@ -15,21 +15,19 @@
  */
 package li.strolch.rest;
 
-import java.text.MessageFormat;
-
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.privilege.model.Restrictable;
-import li.strolch.rest.model.Result;
+import li.strolch.rest.helper.ResponseUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Provider
 public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception> {
@@ -42,7 +40,7 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 		logger.error(MessageFormat.format("Handling exception {0}", ex.getClass()), ex); //$NON-NLS-1$
 
 		if (ex instanceof NotFoundException)
-			return Response.status(Status.NOT_FOUND).entity(new Result(ex)).type(MediaType.APPLICATION_JSON).build();
+			return ResponseUtil.toResponse(Status.NOT_FOUND, ex);
 
 		if (ex instanceof StrolchAccessDeniedException) {
 			StrolchAccessDeniedException e = (StrolchAccessDeniedException) ex;
@@ -64,6 +62,6 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 			return Response.status(Status.UNAUTHORIZED).entity(sb.toString()).type(MediaType.TEXT_PLAIN).build();
 		}
 
-		return Response.serverError().entity(new Result(ex)).type(MediaType.APPLICATION_JSON).build();
+		return ResponseUtil.toResponse(ex);
 	}
 }

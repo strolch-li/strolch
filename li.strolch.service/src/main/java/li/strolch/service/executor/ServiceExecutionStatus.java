@@ -15,19 +15,12 @@
  */
 package li.strolch.service.executor;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@XmlRootElement(name = "ServiceExecutionStatus")
-@XmlAccessorType(XmlAccessType.NONE)
 public class ServiceExecutionStatus {
 
 	private String serviceName;
@@ -42,7 +35,6 @@ public class ServiceExecutionStatus {
 		this.serviceName = serviceName;
 	}
 
-	@XmlAttribute(name = "serviceName")
 	public String getServiceName() {
 		return serviceName;
 	}
@@ -55,7 +47,6 @@ public class ServiceExecutionStatus {
 		this.result = svcResult;
 	}
 
-	@XmlAttribute(name = "msg")
 	public String getMsg() {
 		if (this.result == null)
 			return StringHelper.DASH;
@@ -64,19 +55,16 @@ public class ServiceExecutionStatus {
 		return this.result.getMessage();
 	}
 
-	@XmlAttribute(name = "state")
 	public String getState() {
 		if (this.result == null)
 			return StringHelper.DASH;
 		return this.result.getState().name();
 	}
 
-	@XmlAttribute(name = "done")
 	public boolean isDone() {
 		return this.result != null;
 	}
 
-	@XmlAttribute(name = "started")
 	public synchronized boolean isStarted() {
 		return started;
 	}

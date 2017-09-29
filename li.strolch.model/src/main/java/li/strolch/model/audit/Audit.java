@@ -18,60 +18,27 @@ package li.strolch.model.audit;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import li.strolch.model.StrolchRootElement;
-import li.strolch.model.xml.Iso8601DateAdapter;
 
 /**
  * Used to log/audit access to {@link StrolchRootElement}
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@XmlRootElement(name = "Audit")
-@XmlAccessorType(XmlAccessType.NONE)
 public class Audit implements Comparable<Audit>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlAttribute(name = "id")
 	private Long id;
-
-	@XmlAttribute(name = "username")
 	private String username;
-
-	@XmlAttribute(name = "firstname")
 	private String firstname;
-
-	@XmlAttribute(name = "lastname")
 	private String lastname;
-
-	@XmlElement(name = "date")
-	@XmlJavaTypeAdapter(Iso8601DateAdapter.class)
 	private Date date;
-
-	@XmlAttribute(name = "elementType")
 	private String elementType;
-
-	@XmlAttribute(name = "elementSubType")
 	private String elementSubType;
-
-	@XmlAttribute(name = "elementAccessed")
 	private String elementAccessed;
-
-	@XmlElement(name = "newVersion")
-	@XmlJavaTypeAdapter(Iso8601DateAdapter.class)
 	private Date newVersion;
-
-	@XmlAttribute(name = "action")
 	private String action;
-
-	@XmlAttribute(name = "accessType")
 	private AccessType accessType;
 
 	public Long getId() {

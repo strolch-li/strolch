@@ -15,44 +15,25 @@
  */
 package li.strolch.rest.endpoint;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import java.util.List;
 
+import com.google.gson.JsonArray;
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.privilege.base.AccessDeniedException;
-import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.model.json.PrivilegeElementToJsonVisitor;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeRep;
 import li.strolch.privilege.model.RoleRep;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.rest.model.Result;
+import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.service.api.ServiceHandler;
-import li.strolch.service.privilege.roles.PrivilegeAddOrReplacePrivilegeOnRoleArgument;
-import li.strolch.service.privilege.roles.PrivilegeAddOrReplacePrivilegeOnRoleService;
-import li.strolch.service.privilege.roles.PrivilegeAddRoleService;
-import li.strolch.service.privilege.roles.PrivilegeRemovePrivilegeFromRoleArgument;
-import li.strolch.service.privilege.roles.PrivilegeRemovePrivilegeFromRoleService;
-import li.strolch.service.privilege.roles.PrivilegeRemoveRoleService;
-import li.strolch.service.privilege.roles.PrivilegeRoleArgument;
-import li.strolch.service.privilege.roles.PrivilegeRoleNameArgument;
-import li.strolch.service.privilege.roles.PrivilegeRoleResult;
-import li.strolch.service.privilege.roles.PrivilegeUpdateRoleService;
+import li.strolch.service.privilege.roles.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -72,9 +53,8 @@ public class PrivilegeRolesService {
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		List<RoleRep> roles = privilegeHandler.getRoles(cert);
-		GenericEntity<List<RoleRep>> entity = new GenericEntity<List<RoleRep>>(roles) {
-		};
-		return Response.ok(entity, MediaType.APPLICATION_JSON).build();
+		JsonArray rolesJ = toJson(roles);
+		return Response.ok(rolesJ.toString(), MediaType.APPLICATION_JSON).build();
 	}
 
 	@GET
@@ -85,7 +65,7 @@ public class PrivilegeRolesService {
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		RoleRep role = privilegeHandler.getRole(cert, rolename);
-		return Response.ok(role, MediaType.APPLICATION_JSON).build();
+		return Response.ok(role.accept(new PrivilegeElementToJsonVisitor()), MediaType.APPLICATION_JSON).build();
 	}
 
 	@POST
@@ -111,9 +91,10 @@ public class PrivilegeRolesService {
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		if (!rolename.equals(updatedRole.getName()))
-			return Response.serverError().entity(new Result("Path rolename and data do not have same role name!"))
-					.type(MediaType.APPLICATION_JSON).build();
+		if (!rolename.equals(updatedRole.getName())) {
+			String msg = "Path rolename and data do not have same role name!";
+			return ResponseUtil.toResponse(msg);
+		}
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		PrivilegeUpdateRoleService svc = new PrivilegeUpdateRoleService();
@@ -178,17 +159,17 @@ public class PrivilegeRolesService {
 
 	private Response handleServiceResult(PrivilegeRoleResult svcResult) {
 		if (svcResult.isOk()) {
-			return Response.ok(svcResult.getRole(), MediaType.APPLICATION_JSON).build();
-		} else if (svcResult.getThrowable() != null) {
-			Throwable t = svcResult.getThrowable();
-			if (t instanceof AccessDeniedException) {
-				return Response.status(Status.FORBIDDEN).entity(new Result(t.getMessage()))
-						.type(MediaType.APPLICATION_JSON).build();
-			} else if (t instanceof PrivilegeException) {
-				return Response.status(Status.UNAUTHORIZED).entity(new Result(t.getMessage())).build();
-			}
+			RoleRep roleRep = svcResult.getRole();
+			return Response.ok(roleRep.accept(new PrivilegeElementToJsonVisitor()), MediaType.APPLICATION_JSON).build();
 		}
+		return ResponseUtil.toResponse(svcResult);
+	}
 
-		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(new Result(svcResult.getMessage())).build();
+	private JsonArray toJson(List<RoleRep> roles) {
+		JsonArray rolesArr = new JsonArray();
+		for (RoleRep roleRep : roles) {
+			rolesArr.add(roleRep.accept(new PrivilegeElementToJsonVisitor()));
+		}
+		return rolesArr;
 	}
 }

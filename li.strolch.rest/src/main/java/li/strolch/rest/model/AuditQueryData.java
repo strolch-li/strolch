@@ -15,38 +15,44 @@
  */
 package li.strolch.rest.model;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.ws.rs.QueryParam;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@XmlRootElement(name = "AuditQuery")
-@XmlAccessorType(XmlAccessType.NONE)
-public class AuditQuery {
+public class AuditQueryData {
 
-	@XmlAttribute(name = "elementType")
+	@QueryParam("elementType")
 	private String elementType;
 
-	@XmlAttribute(name = "elementSubType")
+	@QueryParam("elementSubType")
 	private String elementSubType;
 
-	@XmlAttribute(name = "elementId")
+	@QueryParam("elementId")
 	private String elementId;
 
-	@XmlElement(name = "identity")
-	private IdentitySelection identity;
+	@QueryParam("username")
+	private String username;
 
-	@XmlElement(name = "action")
-	private ActionSelection action;
+	@QueryParam("firstname")
+	private String firstname;
 
-	@XmlElement(name = "dateRange")
-	private DateRange dateRange;
+	@QueryParam("lastname")
+	private String lastname;
 
-	@XmlElement(name = "limit")
+	@QueryParam("action")
+	private String action;
+
+	@QueryParam("accessTypes")
+	private String accessTypes;
+
+	@QueryParam("fromDate")
+	private String fromDate;
+
+	@QueryParam("toDate")
+	private String toDate;
+
+	@QueryParam("limit")
 	private long limit;
 
 	public String getElementType() {
@@ -73,28 +79,60 @@ public class AuditQuery {
 		this.elementId = elementId;
 	}
 
-	public IdentitySelection getIdentity() {
-		return identity;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setIdentity(IdentitySelection identity) {
-		this.identity = identity;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public ActionSelection getAction() {
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+	public String getAction() {
 		return action;
 	}
 
-	public void setAction(ActionSelection action) {
+	public void setAction(String action) {
 		this.action = action;
 	}
 
-	public DateRange getDateRange() {
-		return dateRange;
+	public String getAccessTypes() {
+		return accessTypes;
 	}
 
-	public void setDateRange(DateRange dateRange) {
-		this.dateRange = dateRange;
+	public void setAccessTypes(String accessTypes) {
+		this.accessTypes = accessTypes;
+	}
+
+	public String getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(String fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public String getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(String toDate) {
+		this.toDate = toDate;
 	}
 
 	public long getLimit() {

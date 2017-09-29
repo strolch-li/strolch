@@ -1,9 +1,5 @@
 package li.strolch.rest.endpoint;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
@@ -12,11 +8,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
@@ -34,6 +32,7 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.RestfulHelper;
+import li.strolch.rest.model.QueryData;
 
 @Path("strolch/model")
 public class ModelQuery {

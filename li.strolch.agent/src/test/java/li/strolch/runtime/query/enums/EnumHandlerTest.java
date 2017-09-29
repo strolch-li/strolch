@@ -17,16 +17,13 @@ package li.strolch.runtime.query.enums;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
-
-import org.junit.Test;
 
 import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.privilege.model.Certificate;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -49,26 +46,20 @@ public class EnumHandlerTest {
 			StrolchEnum sexEnum = enumHandler.getEnum(certificate, "sex", Locale.ENGLISH);
 			assertEquals("sex", sexEnum.getName());
 			assertEquals("en", sexEnum.getLocale());
-			assertEquals(3, sexEnum.getValues().size());
-			List<String> values = sexEnum.getEnumValues();
-			Collections.sort(values);
-			assertEquals("both", values.get(0));
+			assertEquals(3, sexEnum.size());
+			assertEquals("both", sexEnum.getValue("both"));
 
 			StrolchEnum salutationsEnum = enumHandler.getEnum(certificate, "salutations", Locale.UK);
 			assertEquals("salutations", salutationsEnum.getName());
 			assertEquals("en_GB", salutationsEnum.getLocale());
-			assertEquals(3, salutationsEnum.getValues().size());
-			values = salutationsEnum.getEnumValues();
-			Collections.sort(values);
-			assertEquals("Mr", values.get(0));
+			assertEquals(3, salutationsEnum.size());
+			assertEquals("Mr", salutationsEnum.getValue("mr"));
 
 			StrolchEnum religionsEnum = enumHandler.getEnum(certificate, "religions", Locale.CANADA);
 			assertEquals("religions", religionsEnum.getName());
 			assertEquals("en_CA", religionsEnum.getLocale());
-			assertEquals(9, religionsEnum.getValues().size());
-			values = religionsEnum.getEnumValues();
-			Collections.sort(values);
-			assertEquals("Atheist", values.get(0));
+			assertEquals(9, religionsEnum.size());
+			assertEquals("Atheist", religionsEnum.getValue("Atheist"));
 		});
 	}
 }

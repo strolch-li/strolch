@@ -15,38 +15,41 @@
  */
 package li.strolch.rest.model.visitor;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import li.strolch.model.audit.AccessType;
+import li.strolch.model.audit.ActionSelection;
 import li.strolch.model.audit.Audit;
-import li.strolch.rest.model.ActionSelection;
-import li.strolch.rest.model.AuditQuery;
-import li.strolch.rest.model.DateRange;
-import li.strolch.rest.model.IdentitySelection;
+import li.strolch.model.audit.AuditQuery;
+import li.strolch.rest.model.AuditQueryData;
 import li.strolch.utils.StringMatchMode;
+import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public class ToAuditQueryVisitor {
 
-	public li.strolch.model.audit.AuditQuery<Audit> create(AuditQuery query) {
+	public li.strolch.model.audit.AuditQuery<Audit> create(AuditQueryData query) {
 
 		// validate element type
 		String elementType = query.getElementType();
 		if (StringHelper.isEmpty(elementType)) {
-			throw new IllegalArgumentException("elementType on AuditQuery is empty!");
+			throw new IllegalArgumentException("elementType on AuditQueryData is empty!");
 		}
 
 		// validate date range
-		DateRange dateRange = query.getDateRange();
-		if (dateRange == null || dateRange.getFromDate() == null || dateRange.getToDate() == null) {
-			throw new IllegalArgumentException("DateRange on AuditQuery is not valid or is missing!");
+		if (query.getFromDate() == null || query.getToDate() == null) {
+			throw new IllegalArgumentException("fromDate or toDate must be set!");
 		}
-		li.strolch.utils.collections.DateRange dr = new li.strolch.utils.collections.DateRange().from(
-				dateRange.getFromDate(), dateRange.isFromInclusive()).to(dateRange.getToDate(),
-				dateRange.isToInclusive());
+		Date fromDate = ISO8601FormatFactory.getInstance().parseDate(query.getFromDate());
+		Date toDate = ISO8601FormatFactory.getInstance().parseDate(query.getToDate());
+		DateRange dr = new DateRange().from(fromDate, true).to(toDate, false);
 
 		// create query
-		li.strolch.model.audit.AuditQuery<Audit> auditQuery = li.strolch.model.audit.AuditQuery.query(elementType, dr);
+		AuditQuery<Audit> auditQuery = AuditQuery.query(elementType, dr);
 
 		// limit
 		auditQuery.limit(query.getLimit());
@@ -62,31 +65,26 @@ public class ToAuditQueryVisitor {
 		}
 
 		// action
-		ActionSelection action = query.getAction();
-		if (action != null) {
-			String actionS = action.getAction();
-			li.strolch.model.audit.ActionSelection actionSelection = auditQuery.action();
-			if (StringHelper.isNotEmpty(actionS))
-				actionSelection.actions(StringMatchMode.ci(), actionS);
-			List<AccessType> accessTypes = action.getAccessTypes();
-			if (accessTypes != null && !accessTypes.isEmpty()) {
-				AccessType[] accessTypesArr = new AccessType[accessTypes.size()];
-				accessTypes.toArray(accessTypesArr);
-				actionSelection.accessTypes(accessTypesArr);
-			}
+		String actionS = query.getAction();
+		ActionSelection actionSelection = auditQuery.action();
+		if (StringHelper.isNotEmpty(actionS))
+			actionSelection.actions(StringMatchMode.ci(), actionS);
+		String accessTypesS = query.getAccessTypes();
+		if (StringHelper.isNotEmpty(accessTypesS)) {
+			String[] accessTypes = accessTypesS.split("\\|");
+			List<AccessType> accessTypeList = Arrays.stream(accessTypes).map(AccessType::valueOf)
+					.collect(Collectors.toList());
+			actionSelection.accessTypes(accessTypeList);
 		}
 
 		// identity
-		IdentitySelection identity = query.getIdentity();
-		if (identity != null) {
-			li.strolch.model.audit.IdentitySelection identitySelection = auditQuery.identity();
-			if (StringHelper.isNotEmpty(identity.getFirstname()))
-				identitySelection.firstnames(StringMatchMode.ci(), identity.getFirstname());
-			if (StringHelper.isNotEmpty(identity.getLastname()))
-				identitySelection.lastnames(StringMatchMode.ci(), identity.getLastname());
-			if (StringHelper.isNotEmpty(identity.getUsername()))
-				identitySelection.usernames(StringMatchMode.ci(), identity.getUsername());
-		}
+		li.strolch.model.audit.IdentitySelection identitySelection = auditQuery.identity();
+		if (StringHelper.isNotEmpty(query.getFirstname()))
+			identitySelection.firstnames(StringMatchMode.ci(), query.getFirstname());
+		if (StringHelper.isNotEmpty(query.getLastname()))
+			identitySelection.lastnames(StringMatchMode.ci(), query.getLastname());
+		if (StringHelper.isNotEmpty(query.getUsername()))
+			identitySelection.usernames(StringMatchMode.ci(), query.getUsername());
 
 		return auditQuery;
 	}
