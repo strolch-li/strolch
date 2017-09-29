@@ -18,6 +18,8 @@ package li.strolch.service.test;
 import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -91,10 +93,11 @@ public abstract class AbstractRealmServiceTest {
 		if (!Driver.isRegistered())
 			Driver.register();
 
-		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
-				PostgreSqlPersistenceHandler.class);
-		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
-				PostgreSqlPersistenceHandler.class, dbVersion, "drop"); //$NON-NLS-1$
+		Version dbVersion = DbSchemaVersionCheck
+				.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX, PostgreSqlPersistenceHandler.class);
+		String sql = DbSchemaVersionCheck
+				.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX, PostgreSqlPersistenceHandler.class, dbVersion,
+						"drop"); //$NON-NLS-1$
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();
 		}
@@ -156,10 +159,11 @@ public abstract class AbstractRealmServiceTest {
 			Class<? extends Service<T, U>> svcClass, Class<?> expectedServiceResultType, T arg, Runner before,
 			Runner validator, Runner after) {
 		try {
-			runTransient(svcClass.newInstance(), expectedServiceResultType, arg, before, validator, after);
-			runCached(svcClass.newInstance(), expectedServiceResultType, arg, before, validator, after);
-			runTransactional(svcClass.newInstance(), expectedServiceResultType, arg, before, validator, after);
-		} catch (InstantiationException | IllegalAccessException e) {
+			Constructor<? extends Service<T, U>> constructor = svcClass.getConstructor();
+			runTransient(constructor.newInstance(), expectedServiceResultType, arg, before, validator, after);
+			runCached(constructor.newInstance(), expectedServiceResultType, arg, before, validator, after);
+			runTransactional(constructor.newInstance(), expectedServiceResultType, arg, before, validator, after);
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException("Failed to instantiate class " + svcClass.getName() + ": " + e.getMessage(), e);
 		}
 	}

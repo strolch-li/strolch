@@ -15,6 +15,7 @@
  */
 package li.strolch.privilege.model.internal;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -117,11 +118,12 @@ public class PrivilegeContainerModel {
 			// load class and try to create a new instance
 			@SuppressWarnings("unchecked")
 			Class<PrivilegePolicy> clazz = (Class<PrivilegePolicy>) Class.forName(policyClassName);
-			clazz.newInstance();
+
+			clazz.getConstructor().newInstance();
 
 			this.policies.put(privilegeName, clazz);
 
-		} catch (InstantiationException e) {
+		} catch (InstantiationException | InvocationTargetException e) {
 			String msg = "Configured Privilege Policy {0} with class {1} could not be instantiated."; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, privilegeName, policyClassName);
 			throw new PrivilegeException(msg, e);
@@ -131,6 +133,10 @@ public class PrivilegeContainerModel {
 			throw new PrivilegeException(msg, e);
 		} catch (ClassNotFoundException e) {
 			String msg = "Configured Privilege Policy {0} with class {1} does not exist."; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, privilegeName, policyClassName);
+			throw new PrivilegeException(msg, e);
+		} catch (NoSuchMethodException e) {
+			String msg = "Configured Privilege Policy {0} with class {1} has missing parameterless constructor"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, privilegeName, policyClassName);
 			throw new PrivilegeException(msg, e);
 		}

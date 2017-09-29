@@ -26,7 +26,7 @@ public class NotSelector<T extends StrolchElement> extends BooleanSelector<T> {
 	/**
 	 * @param selector
 	 */
-	public NotSelector(Selector<T> selector) {
+	NotSelector(Selector<T> selector) {
 		super(selector);
 	}
 

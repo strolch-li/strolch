@@ -1847,7 +1847,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegePolicy policy;
 		try {
 
-			policy = policyClazz.newInstance();
+			policy = policyClazz.getConstructor().newInstance();
 		} catch (Exception e) {
 			String msg = "The class for the policy with the name {0} does not exist!{1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, policyName, policyName);

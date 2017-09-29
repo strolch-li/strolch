@@ -32,15 +32,6 @@ public class OrSelector<T extends StrolchElement> extends BooleanSelector<T> {
 		super(selectors);
 	}
 
-	@SafeVarargs
-	public OrSelector(Selector<T>... selector) {
-		super(selector);
-	}
-
-	public OrSelector(Selector<T> leftHandSide, Selector<T> rightHandSide) {
-		super(leftHandSide, rightHandSide);
-	}
-
 	@Override
 	public OrSelector<T> with(Selector<T> selector) {
 		super.with(selector);
