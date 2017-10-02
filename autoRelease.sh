@@ -1,10 +1,19 @@
 #!/bin/bash
 
 # usage
-if [ $# != 2 ] ; then
-  echo -e "Usage: ${0} <release_branch> <hotfix_version>"
+if [ $# != 1 ] ; then
+  echo -e "Usage: ${0} <release_branch>"
   exit 1
 fi
+
+releaseBranch="${1}"
+
+lastTag="$(git for-each-ref --format="%(refname)" --sort=-taggerdate --count=1 refs/tags | cut -d '/' -f 3)"
+majorVersion=$(echo $lastTag | cut -d '.' -f 1)
+minorVersion=$(echo $lastTag | cut -d '.' -f 2)
+updateVersion=$(echo $lastTag | cut -d '.' -f 3)
+newUpdateVersion=$((updateVersion+1))
+newVersion="${majorVersion}.${minorVersion}.${newUpdateVersion}"
 
 
 # cleanup trap
@@ -17,9 +26,8 @@ trap cleanup EXIT
 
 
 # Confirm
-releaseBranch="${1}"
-hotfixVersion="${2}"
-echo -e "INFO: Do you want to make hotfix version ${hotfixVersion} from release branch ${releaseBranch}? y/n"
+echo -e "INFO: Previous tag: ${lastTag}"
+echo -e "INFO: Do you want to create release ${newVersion} from release branch ${releaseBranch}? y/n"
 read a
 if [[ "${a}" != "y" && "${a}" != "Y" ]] ; then
   exit 0;
