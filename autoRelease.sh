@@ -16,10 +16,18 @@ newUpdateVersion=$((updateVersion+1))
 newVersion="${majorVersion}.${minorVersion}.${newUpdateVersion}"
 
 
+## Make sure no changes
+if ! git diff-index --quiet HEAD -- ; then
+  echo "ERROR: You have unsaved changes."
+  exit 1
+fi
+
+
 # cleanup trap
 function cleanup {
   echo -e "\nINFO: Cleaning up..."
   git checkout ${releaseBranch}
+  git checkout .
   git branch -D temp
 }
 trap cleanup EXIT
