@@ -40,7 +40,7 @@ if ! git fetch --all --tags > /dev/null ; then
   echo -e "ERROR: Tags and branches could not be fetched!"
   exit 1
 fi
-if git tag | grep ${hotfixVersion} > /dev/null ; then
+if git tag | grep ${newVersion} > /dev/null ; then
   echo -e "ERROR: Tag already exists!"
   exit 1
 fi
@@ -82,7 +82,7 @@ fi
 
 # set hotfix version
 echo -e "\nINFO: Setting version..."
-if ! mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${hotfixVersion} > /dev/null ; then
+if ! mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${newVersion} > /dev/null ; then
   echo -e "ERROR: Failed to set new version!"
   exit 1
 fi
@@ -102,30 +102,30 @@ if ! git add . ; then
   echo -e "ERROR: Failed to git add"
   exit 1
 fi
-if ! git commit -m "[Project] Set new version ${hotfixVersion}" ; then
+if ! git commit -m "[Project] Set new version ${newVersion}" ; then
   echo -e "ERROR: Failed to git commit"
   exit 1
 fi
-if ! git tag --sign --message "[Project] New Version ${hotfixVersion}" ${hotfixVersion} ; then
+if ! git tag --sign --message "[Project] New Version ${newVersion}" ${newVersion} ; then
   echo -e "ERROR: Failed to git tag"
   exit 1
 fi
 
 
 # git push
-echo -e "\nINFO: Hotfix ${hotfixVersion} created. Do you want to push to origin? y/n"
+echo -e "\nINFO: Hotfix ${newVersion} created. Do you want to push to origin? y/n"
 read a
 if [[ "${a}" == "y" || "${a}" == "Y" ]] ; then
   echo -e "INFO: Pushing to origin..."
-  if ! git push origin ${hotfixVersion} ; then
+  if ! git push origin ${newVersion} ; then
     echo -e "ERROR: Failed to push tag"
     exit 1
   fi
-  echo -e "\nINFO: Pushed hotfix tag ${hotfixVersion}"
+  echo -e "\nINFO: Pushed hotfix tag ${newVersion}"
 else
   echo -e "WARN: Release not pushed!"
 fi
 
 
-echo -e "\nINFO: Hotfix ${hotfixVersion} created."
+echo -e "\nINFO: Hotfix ${newVersion} created."
 exit 0
