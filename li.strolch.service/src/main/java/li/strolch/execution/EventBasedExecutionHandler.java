@@ -141,7 +141,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					} else if (state == State.EXECUTION) {
 						activity.getActionsWithState(State.EXECUTION).forEach(a -> a.setState(State.STOPPED));
 					}
-					tx.updateActivity(activity);
+					tx.update(activity);
 
 					// register for execution
 					this.registeredActivities.addElement(realmName, activity.getLocator());

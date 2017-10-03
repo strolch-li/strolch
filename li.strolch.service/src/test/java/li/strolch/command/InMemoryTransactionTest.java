@@ -210,7 +210,7 @@ public class InMemoryTransactionTest {
 			// privilege assertion
 			tx.assertHasPrivilege(Operation.ADD, newRes);
 
-			tx.addResource(newRes);
+			tx.add(newRes);
 			tx.commitOnClose();
 		}
 
@@ -228,7 +228,7 @@ public class InMemoryTransactionTest {
 			tx.assertHasPrivilege(Operation.UPDATE, res);
 
 			res.setName("Foo foo");
-			tx.updateResource(res);
+			tx.update(res);
 			tx.commitOnClose();
 		}
 
@@ -245,7 +245,7 @@ public class InMemoryTransactionTest {
 			// privilege assertion
 			tx.assertHasPrivilege(Operation.REMOVE, res);
 
-			tx.removeResource(res);
+			tx.remove(res);
 			tx.commitOnClose();
 		}
 
@@ -257,7 +257,7 @@ public class InMemoryTransactionTest {
 		// create again
 		newRes = ModelGenerator.createResource(id, "200", type);
 		try (StrolchTransaction tx = openTx(realmName)) {
-			tx.addResource(newRes);
+			tx.add(newRes);
 			tx.commitOnClose();
 		}
 
@@ -278,7 +278,7 @@ public class InMemoryTransactionTest {
 			// privilege assertion
 			tx.assertHasPrivilege(Operation.ADD, newOrder);
 
-			tx.addOrder(newOrder);
+			tx.add(newOrder);
 			tx.commitOnClose();
 		}
 
@@ -296,7 +296,7 @@ public class InMemoryTransactionTest {
 			tx.assertHasPrivilege(Operation.UPDATE, order);
 
 			order.setName("Foo foo");
-			tx.updateOrder(order);
+			tx.update(order);
 			tx.commitOnClose();
 		}
 
@@ -313,7 +313,7 @@ public class InMemoryTransactionTest {
 			// privilege assertion
 			tx.assertHasPrivilege(Operation.REMOVE, order);
 
-			tx.removeOrder(order);
+			tx.remove(order);
 			tx.commitOnClose();
 		}
 
@@ -325,7 +325,7 @@ public class InMemoryTransactionTest {
 		// create again
 		newOrder = ModelGenerator.createOrder(id, "200", type);
 		try (StrolchTransaction tx = openTx(realmName)) {
-			tx.addOrder(newOrder);
+			tx.add(newOrder);
 			tx.commitOnClose();
 		}
 
@@ -346,7 +346,7 @@ public class InMemoryTransactionTest {
 			// privilege assertion
 			tx.assertHasPrivilege(Operation.ADD, newActivity);
 
-			tx.addActivity(newActivity);
+			tx.add(newActivity);
 			tx.commitOnClose();
 		}
 
@@ -364,7 +364,7 @@ public class InMemoryTransactionTest {
 			tx.assertHasPrivilege(Operation.UPDATE, activity);
 
 			activity.setName("Foo foo");
-			tx.updateActivity(activity);
+			tx.update(activity);
 			tx.commitOnClose();
 		}
 
@@ -381,7 +381,7 @@ public class InMemoryTransactionTest {
 			// privilege assertion
 			tx.assertHasPrivilege(Operation.REMOVE, activity);
 
-			tx.removeActivity(activity);
+			tx.remove(activity);
 			tx.commitOnClose();
 		}
 
@@ -393,7 +393,7 @@ public class InMemoryTransactionTest {
 		// create again
 		newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
 		try (StrolchTransaction tx = openTx(realmName)) {
-			tx.addActivity(newActivity);
+			tx.add(newActivity);
 			tx.commitOnClose();
 		}
 
@@ -410,9 +410,9 @@ public class InMemoryTransactionTest {
 		// create and update
 		Resource newRes = ModelGenerator.createResource(id, "200", type);
 		try (StrolchTransaction tx = openTx(realmName)) {
-			tx.addResource(newRes);
+			tx.add(newRes);
 			newRes.setName("Foo foo!");
-			tx.updateResource(newRes);
+			tx.update(newRes);
 			tx.commitOnClose();
 		}
 
@@ -429,10 +429,10 @@ public class InMemoryTransactionTest {
 		// create, update and remove
 		Resource newRes = ModelGenerator.createResource(id, "200", type);
 		try (StrolchTransaction tx = openTx(realmName)) {
-			tx.addResource(newRes);
+			tx.add(newRes);
 			newRes.setName("Foo foo!");
-			tx.updateResource(newRes);
-			tx.removeResource(newRes);
+			tx.update(newRes);
+			tx.remove(newRes);
 			tx.commitOnClose();
 		}
 
@@ -449,9 +449,9 @@ public class InMemoryTransactionTest {
 		// create and update
 		Order newOrder = ModelGenerator.createOrder(id, "200", type);
 		try (StrolchTransaction tx = openTx(realmName)) {
-			tx.addOrder(newOrder);
+			tx.add(newOrder);
 			newOrder.setName("Foo foo!");
-			tx.updateOrder(newOrder);
+			tx.update(newOrder);
 			tx.commitOnClose();
 		}
 
@@ -468,10 +468,10 @@ public class InMemoryTransactionTest {
 		// create and update
 		Order newOrder = ModelGenerator.createOrder(id, "200", type);
 		try (StrolchTransaction tx = openTx(realmName)) {
-			tx.addOrder(newOrder);
+			tx.add(newOrder);
 			newOrder.setName("Foo foo!");
-			tx.updateOrder(newOrder);
-			tx.removeOrder(newOrder);
+			tx.update(newOrder);
+			tx.remove(newOrder);
 			tx.commitOnClose();
 		}
 
@@ -488,9 +488,9 @@ public class InMemoryTransactionTest {
 		// create and update
 		Activity newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
 		try (StrolchTransaction tx = openTx(realmName)) {
-			tx.addActivity(newActivity);
+			tx.add(newActivity);
 			newActivity.setName("Foo foo!");
-			tx.updateActivity(newActivity);
+			tx.update(newActivity);
 			tx.commitOnClose();
 		}
 
@@ -507,10 +507,10 @@ public class InMemoryTransactionTest {
 		// create, update and remove
 		Activity newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
 		try (StrolchTransaction tx = openTx(realmName)) {
-			tx.addActivity(newActivity);
+			tx.add(newActivity);
 			newActivity.setName("Foo foo!");
-			tx.updateActivity(newActivity);
-			tx.removeActivity(newActivity);
+			tx.update(newActivity);
+			tx.remove(newActivity);
 			tx.commitOnClose();
 		}
 

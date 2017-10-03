@@ -16,7 +16,7 @@ public class RemoveActivityArchival extends ActivityArchivalPolicy {
 		if (!activity.getState().isExecuted())
 			throw new IllegalStateException("Can not archive non-executed " + activity.getLocator());
 
-		tx().removeActivity(activity);
+		tx().remove(activity);
 
 		logger.info("Removing " + activity.getLocator());
 	}

@@ -668,55 +668,55 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void addResource(Resource resource) throws StrolchModelException {
+	public void add(Resource resource) throws StrolchModelException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		getObjectFilter().add(Tags.RESOURCE, resource);
 	}
 
 	@Override
-	public void addOrder(Order order) throws StrolchException {
+	public void add(Order order) throws StrolchException {
 		DBC.PRE.assertNotNull("order must not be null", order);
 		getObjectFilter().add(Tags.ORDER, order);
 	}
 
 	@Override
-	public void addActivity(Activity activity) throws StrolchException {
+	public void add(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		getObjectFilter().add(Tags.ACTIVITY, activity);
 	}
 
 	@Override
-	public void updateResource(Resource resource) throws StrolchException {
+	public void update(Resource resource) throws StrolchException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		getObjectFilter().update(Tags.RESOURCE, resource);
 	}
 
 	@Override
-	public void updateOrder(Order order) {
+	public void update(Order order) {
 		DBC.PRE.assertNotNull("order must not be null", order);
 		getObjectFilter().update(Tags.ORDER, order);
 	}
 
 	@Override
-	public void updateActivity(Activity activity) throws StrolchException {
+	public void update(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		getObjectFilter().update(Tags.ACTIVITY, activity);
 	}
 
 	@Override
-	public void removeResource(Resource resource) throws StrolchException {
+	public void remove(Resource resource) throws StrolchException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		getObjectFilter().remove(Tags.RESOURCE, resource);
 	}
 
 	@Override
-	public void removeOrder(Order order) throws StrolchException {
+	public void remove(Order order) throws StrolchException {
 		DBC.PRE.assertNotNull("order must not be null", order);
 		getObjectFilter().remove(Tags.ORDER, order);
 	}
 
 	@Override
-	public void removeActivity(Activity activity) throws StrolchException {
+	public void remove(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		getObjectFilter().remove(Tags.ACTIVITY, activity);
 	}

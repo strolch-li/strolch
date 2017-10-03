@@ -968,7 +968,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException
 	 *             if the resource is null, or a resource with the given ID already exists
 	 */
-	public void addResource(Resource resource) throws StrolchModelException;
+	public void add(Resource resource) throws StrolchModelException;
 
 	/**
 	 * Adds and thus persists the given {@link Order} by calling the relevant {@link Command}
@@ -979,7 +979,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException
 	 *             if the order is null, or an order with the given ID already exists
 	 */
-	public void addOrder(Order order) throws StrolchException;
+	public void add(Order order) throws StrolchException;
 
 	/**
 	 * Adds and thus persists the given {@link Activity} by calling the relevant {@link Command}
@@ -990,7 +990,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException
 	 *             if the activity is null, or an activity with the given ID already exists
 	 */
-	public void addActivity(Activity activity) throws StrolchException;
+	public void add(Activity activity) throws StrolchException;
 
 	/**
 	 * Updates the given {@link Resource} by calling the relevant {@link Command}
@@ -1001,7 +1001,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException
 	 *             if the resource is null
 	 */
-	public void updateResource(Resource resource) throws StrolchException;
+	public void update(Resource resource) throws StrolchException;
 
 	/**
 	 * Updates the given {@link Order} by calling the relevant {@link Command}
@@ -1012,7 +1012,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException
 	 *             if the order is null
 	 */
-	public void updateOrder(Order order);
+	public void update(Order order);
 
 	/**
 	 * Updates the given {@link Activity} by calling the relevant {@link Command}
@@ -1023,7 +1023,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException
 	 *             if the activity is null
 	 */
-	public void updateActivity(Activity activity) throws StrolchException;
+	public void update(Activity activity) throws StrolchException;
 
 	/**
 	 * Removes the given {@link Resource} by calling the relevant {@link Command}
@@ -1034,7 +1034,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException
 	 *             if the resource is null
 	 */
-	public void removeResource(Resource resource) throws StrolchException;
+	public void remove(Resource resource) throws StrolchException;
 
 	/**
 	 * Removes the given {@link Order} by calling the relevant {@link Command}
@@ -1045,7 +1045,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException
 	 *             if the order is null
 	 */
-	public void removeOrder(Order order) throws StrolchException;
+	public void remove(Order order) throws StrolchException;
 
 	/**
 	 * Removes the given {@link Activity} by calling the relevant {@link Command}
@@ -1056,7 +1056,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException
 	 *             if the activity is null
 	 */
-	public void removeActivity(Activity activity) throws StrolchException;
+	public void remove(Activity activity) throws StrolchException;
 
 	/**
 	 * Asserts that the current {@link Certificate} has access to the given element with the given operation
