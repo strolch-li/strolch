@@ -1817,9 +1817,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);
 
 		// log
-		String msg = "The system user ''{0}'' is logged in with session {1}"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, systemUsername, systemUserCertificate.getSessionId());
-		logger.info(msg);
+		if (logger.isDebugEnabled()) {
+			String msg = "The system user ''{0}'' is logged in with session {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, systemUsername, systemUserCertificate.getSessionId());
+			logger.info(msg);
+		}
 
 		return privilegeContext;
 	}
