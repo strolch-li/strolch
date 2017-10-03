@@ -15,27 +15,18 @@
  */
 package li.strolch.utils.helper;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
-import java.text.MessageFormat;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.*;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.nio.file.Files;
+import java.text.MessageFormat;
 
+import li.strolch.utils.exceptions.XmlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
@@ -43,8 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import li.strolch.utils.exceptions.XmlException;
 
 /**
  * Helper class for performing XML based tasks
@@ -226,7 +215,6 @@ public class XmlHelper {
 			}
 
 			if (!lineSep.equals("\n")) { //$NON-NLS-1$
-				XmlHelper.logger.info("Overriding line separator to \\n"); //$NON-NLS-1$
 				System.setProperty(PROP_LINE_SEPARATOR, UNIX_LINE_SEP);
 			}
 
