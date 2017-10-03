@@ -161,11 +161,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	public TransactionCloseStrategy getCloseStrategy();
 
 	/**
-	 * DO NOT CALL THIS METHOD. If the currently set close strategy is {@link TransactionCloseStrategy#DO_NOTHING}, then
+	 * DO NOT CALL THIS METHOD. If the currently set close strategy is {@link TransactionCloseStrategy#READ_ONLY}, then
 	 * when the transaction is closed, this method is called no changes to the model is performed but locks on objects
 	 * are released and any other resources are released
 	 */
-	public void autoCloseableDoNothing() throws StrolchTransactionException;
+	public void autoCloseableReadOnly() throws StrolchTransactionException;
 
 	/**
 	 * DO NOT CALL THIS METHOD. If the currently set close strategy is {@link TransactionCloseStrategy#COMMIT}, then
@@ -202,7 +202,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	public void close() throws StrolchTransactionException;
 
 	/**
-	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#DO_NOTHING}
+	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#READ_ONLY}
 	 */
 	public void doNothingOnClose();
 
@@ -322,17 +322,17 @@ public interface StrolchTransaction extends AutoCloseable {
 	public boolean isSuppressAuditsForAudits();
 
 	/**
-	 * If the given argument is true, then logging of a {@link TransactionCloseStrategy#DO_NOTHING} will be suppressed
+	 * If the given argument is true, then logging of a {@link TransactionCloseStrategy#READ_ONLY} will be suppressed
 	 * 
 	 * @param SuppressDoNothingLogging
-	 *            true to suppress logging of a {@link TransactionCloseStrategy#DO_NOTHING}, false to enable logging
+	 *            true to suppress logging of a {@link TransactionCloseStrategy#READ_ONLY}, false to enable logging
 	 */
 	void setSuppressDoNothingLogging(boolean suppressDoNothingLogging);
 
 	/**
-	 * Returns true if logging of a {@link TransactionCloseStrategy#DO_NOTHING} should be suppressed
+	 * Returns true if logging of a {@link TransactionCloseStrategy#READ_ONLY} should be suppressed
 	 * 
-	 * @return true if logging of a {@link TransactionCloseStrategy#DO_NOTHING} should be suppressed
+	 * @return true if logging of a {@link TransactionCloseStrategy#READ_ONLY} should be suppressed
 	 */
 	boolean isSuppressDoNothingLogging();
 

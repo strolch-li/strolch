@@ -120,8 +120,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private String action;
 	private Certificate certificate;
 
-	public AbstractTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate,
-			String action) {
+	public AbstractTransaction(ComponentContainer container,
+							   StrolchRealm realm,
+							   Certificate certificate,
+							   String action) {
 		DBC.PRE.assertNotNull("container must be set!", container); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("realm must be set!", realm); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("certificate must be set!", certificate); //$NON-NLS-1$
@@ -138,7 +140,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.commands = new ArrayList<>();
 		this.flushedCommands = new ArrayList<>();
 		this.lockedElements = new HashSet<>();
-		this.closeStrategy = TransactionCloseStrategy.DO_NOTHING;
+		this.closeStrategy = TransactionCloseStrategy.READ_ONLY;
 		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), new Date());
 		this.txResult.setState(TransactionState.OPEN);
 	}
@@ -212,7 +214,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void doNothingOnClose() {
-		setCloseStrategy(TransactionCloseStrategy.DO_NOTHING);
+		setCloseStrategy(TransactionCloseStrategy.READ_ONLY);
 	}
 
 	@Override
@@ -870,7 +872,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 					rollback();
 					handleRollback(start);
 				} catch (Exception exc) {
-					logger.error("Failed to roll back after failing to undo commands: " + exc.getMessage(), exc); //$NON-NLS-1$
+					logger.error("Failed to roll back after failing to undo commands: " + exc.getMessage(),
+							exc); //$NON-NLS-1$
 				}
 				logger.error("Transaction failed due to " + e.getMessage(), e);
 				handleFailure(start, ex);
@@ -915,7 +918,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void autoCloseableDoNothing() throws StrolchTransactionException {
+	public void autoCloseableReadOnly() throws StrolchTransactionException {
 		long start = System.nanoTime();
 		try {
 			this.txResult.setState(TransactionState.CLOSING);
@@ -937,7 +940,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			// rollback and release any resources
 			rollback();
 
-			handleDoNothing(start, auditTrailDuration);
+			handleReadOnly(start, auditTrailDuration);
 			this.txResult.setState(TransactionState.CLOSED);
 		} catch (Exception e) {
 			handleFailure(start, e);
@@ -953,7 +956,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	protected abstract void commit() throws Exception;
 
-	private void handleDoNothing(long start, long auditTrailDuration) {
+	private void handleReadOnly(long start, long auditTrailDuration) {
 
 		if (this.suppressDoNothingLogging)
 			return;
@@ -1091,7 +1094,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			this.operationsLog.addMessage(
 					new LogMessage(this.realm.getRealm(), Locator.valueOf(AGENT, "tx", StrolchAgent.getUniqueId()),
 							LogSeverity.EXCEPTION, ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed")
-									.value("reason", e));
+							.value("reason", e));
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$
@@ -1200,15 +1203,19 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return auditTrailDuration;
 	}
 
-	private <T extends StrolchRootElement> void auditsFor(List<Audit> audits, AccessType accessType, String elementType,
-			Set<T> elements) {
+	private <T extends StrolchRootElement> void auditsFor(List<Audit> audits,
+														  AccessType accessType,
+														  String elementType,
+														  Set<T> elements) {
 		for (StrolchRootElement element : elements) {
 			audits.add(auditFrom(accessType, element));
 		}
 	}
 
-	private <T extends StrolchRootElement> void auditsForAudits(List<Audit> audits, AccessType accessType,
-			String elementType, Set<Audit> elements) {
+	private <T extends StrolchRootElement> void auditsForAudits(List<Audit> audits,
+																AccessType accessType,
+																String elementType,
+																Set<Audit> elements) {
 		for (Audit element : elements) {
 			audits.add(auditFrom(accessType, elementType, StringHelper.DASH, element.getId().toString()));
 		}
@@ -1228,10 +1235,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		audit.setId(StrolchAgent.getUniqueIdLong());
 		audit.setUsername(this.certificate.getUsername());
-		audit.setFirstname(this.certificate.getFirstname() == null ? this.certificate.getUsername()
-				: this.certificate.getFirstname());
-		audit.setLastname(this.certificate.getLastname() == null ? this.certificate.getUsername()
-				: this.certificate.getLastname());
+		audit.setFirstname(this.certificate.getFirstname() == null ?
+				this.certificate.getUsername() :
+				this.certificate.getFirstname());
+		audit.setLastname(this.certificate.getLastname() == null ?
+				this.certificate.getUsername() :
+				this.certificate.getLastname());
 		audit.setDate(new Date());
 
 		audit.setElementType(elementType);

@@ -38,7 +38,7 @@ public enum TransactionCloseStrategy {
 	 * the transaction.
 	 * </p>
 	 */
-	DO_NOTHING() {
+	READ_ONLY() {
 
 		@Override
 		public boolean isReadonly() {
@@ -47,7 +47,7 @@ public enum TransactionCloseStrategy {
 
 		@Override
 		public void close(StrolchTransaction tx) throws StrolchException {
-			tx.autoCloseableDoNothing();
+			tx.autoCloseableReadOnly();
 		}
 	},
 
