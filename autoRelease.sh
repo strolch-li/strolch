@@ -80,7 +80,7 @@ if ! git checkout -b temp ; then
   exit 1
 fi
 
-# set hotfix version
+# set release version
 echo -e "\nINFO: Setting version..."
 if ! mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${newVersion} > /dev/null ; then
   echo -e "ERROR: Failed to set new version!"
@@ -117,7 +117,7 @@ if ! mvn source:jar install -DskipTests > /dev/null ; then
 fi
 
 # git push
-echo -e "\nINFO: Hotfix ${newVersion} created. Do you want to push to origin? y/n"
+echo -e "\nINFO: Release ${newVersion} created. Do you want to push to origin? y/n"
 read a
 if [[ "${a}" == "y" || "${a}" == "Y" ]] ; then
   echo -e "INFO: Pushing to origin..."
@@ -125,11 +125,10 @@ if [[ "${a}" == "y" || "${a}" == "Y" ]] ; then
     echo -e "ERROR: Failed to push tag"
     exit 1
   fi
-  echo -e "\nINFO: Pushed hotfix tag ${newVersion}"
+  echo -e "\nINFO: Pushed release tag ${newVersion}"
 else
   echo -e "WARN: Release not pushed!"
 fi
 
-
-echo -e "\nINFO: Hotfix ${newVersion} created."
+echo -e "\nINFO: Release ${newVersion} created."
 exit 0
