@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * <li>A reference to the current state of the object</li>
  * <li>An identifier of the operation that needs to be performed on this</li>
  * </ul>
- * 
+ *
  * @author Michael Gatto &lt;michael@gatto.ch&gt;
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
@@ -61,15 +61,21 @@ public class ObjectCache {
 	private Operation operation;
 
 	/**
+	 * object The objectKey that shall be cached
+	 */
+	private Object objectKey;
+
+	/**
 	 * object The object that shall be cached
 	 */
 	private Object object;
 
 	@SuppressWarnings("nls")
-	public ObjectCache(long id, String key, Object object, Operation operation) {
+	public ObjectCache(long id, String key, Object objectKey, Object object, Operation operation) {
 
 		this.id = id;
 		this.key = key;
+		this.objectKey = objectKey;
 		this.object = object;
 		this.operation = operation;
 
@@ -82,29 +88,30 @@ public class ObjectCache {
 			sb.append(" OP: ");
 			sb.append(this.operation);
 			sb.append(" / ");
-			sb.append(object.toString());
+			sb.append(objectKey.toString());
 			logger.debug(sb.toString());
 		}
 	}
 
 	/**
 	 * Set the new object version of this cache.
-	 * 
+	 *
 	 * @param object
-	 *            the object to set
+	 * 		the object to set
 	 */
 	public void setObject(Object object) {
 		if (logger.isDebugEnabled()) {
-			logger.debug(MessageFormat.format("Updating ID {0} to value {1}", this.id, object.toString())); //$NON-NLS-1$
+			logger.debug(
+					MessageFormat.format("Updating ID {0} to value {1}", this.id, object.toString())); //$NON-NLS-1$
 		}
 		this.object = object;
 	}
 
 	/**
 	 * Change the operation to execute for this object.
-	 * 
+	 *
 	 * @param newOperation
-	 *            the operation to set
+	 * 		the operation to set
 	 */
 	public void setOperation(Operation newOperation) {
 		if (logger.isDebugEnabled()) {
@@ -115,30 +122,22 @@ public class ObjectCache {
 		this.operation = newOperation;
 	}
 
-	/**
-	 * @return the id
-	 */
 	public long getId() {
 		return this.id;
 	}
 
-	/**
-	 * @return the key
-	 */
 	public String getKey() {
 		return this.key;
 	}
 
-	/**
-	 * @return the operation
-	 */
 	public Operation getOperation() {
 		return this.operation;
 	}
 
-	/**
-	 * @return the object
-	 */
+	public Object getObjectKey() {
+		return objectKey;
+	}
+
 	public Object getObject() {
 		return this.object;
 	}

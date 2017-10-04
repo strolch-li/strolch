@@ -27,28 +27,27 @@ import java.util.Set;
  * <p>
  * Collection to store a tree with a depth of 3 elements. This solves having to always write the declaration:
  * </p>
- * 
+ * <p>
  * <pre>
  * Map&lt;String, Map&lt;String, MyObject&gt;&gt; mapOfMaps = new HashMap&lt;&gt;;
  * </pre>
- * 
+ * <p>
  * <p>
  * As an example to persist a map of MyObject where the branches are String one would write it as follows:
  * </p>
- * 
+ * <p>
  * <pre>
  * MapOfMaps&lt;String, String, MyObject&gt; mapOfMaps = new MapOfMaps&lt;&gt;();
  * </pre>
- * 
- * 
- * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
- * 
+ *
  * @param <T>
- *            The key to a map with U as the key and V as the value
+ * 		The key to a map with U as the key and V as the value
  * @param <U>
- *            The key to get a value (leaf)
+ * 		The key to get a value (leaf)
  * @param <V>
- *            The value stored in the tree (leaf)
+ * 		The value stored in the tree (leaf)
+ *
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class MapOfMaps<T, U, V> {
 
@@ -56,6 +55,10 @@ public class MapOfMaps<T, U, V> {
 
 	public MapOfMaps() {
 		this.mapOfMaps = new HashMap<>();
+	}
+
+	public MapOfMaps(int initialSize) {
+		this.mapOfMaps = new HashMap<>(initialSize);
 	}
 
 	public Set<T> keySet() {
@@ -74,11 +77,7 @@ public class MapOfMaps<T, U, V> {
 	}
 
 	public V addElement(T t, U u, V v) {
-		Map<U, V> map = this.mapOfMaps.get(t);
-		if (map == null) {
-			map = new HashMap<>();
-			this.mapOfMaps.put(t, map);
-		}
+		Map<U, V> map = this.mapOfMaps.computeIfAbsent(t, k -> new HashMap<>());
 		return map.put(u, v);
 	}
 
@@ -100,11 +99,7 @@ public class MapOfMaps<T, U, V> {
 	}
 
 	public void addMap(T t, Map<U, V> u) {
-		Map<U, V> map = this.mapOfMaps.get(t);
-		if (map == null) {
-			map = new HashMap<>();
-			this.mapOfMaps.put(t, map);
-		}
+		Map<U, V> map = this.mapOfMaps.computeIfAbsent(t, k -> new HashMap<>());
 		map.putAll(u);
 	}
 
@@ -140,9 +135,7 @@ public class MapOfMaps<T, U, V> {
 
 	public boolean containsElement(T t, U u) {
 		Map<U, V> map = this.mapOfMaps.get(t);
-		if (map == null)
-			return false;
-		return map.containsKey(u);
+		return map != null && map.containsKey(u);
 	}
 
 	public int sizeKeys() {
@@ -152,9 +145,8 @@ public class MapOfMaps<T, U, V> {
 	public int size() {
 		int size = 0;
 		Set<Entry<T, Map<U, V>>> entrySet = this.mapOfMaps.entrySet();
-		Iterator<Entry<T, Map<U, V>>> iter = entrySet.iterator();
-		while (iter.hasNext()) {
-			size += iter.next().getValue().size();
+		for (Entry<T, Map<U, V>> anEntrySet : entrySet) {
+			size += anEntrySet.getValue().size();
 		}
 		return size;
 	}

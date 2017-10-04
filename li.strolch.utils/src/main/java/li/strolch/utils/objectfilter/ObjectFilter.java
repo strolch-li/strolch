@@ -16,14 +16,9 @@
 package li.strolch.utils.objectfilter;
 
 import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import li.strolch.utils.collections.MapOfMaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +66,7 @@ import org.slf4j.LoggerFactory;
  * <td>Err!</td>
  * </tr>
  * </table>
- * 
+ *
  * @author Michael Gatto &lt;michael@gatto.ch&gt; (initial version)
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt; (minor modifications, refactorings)
  */
@@ -81,15 +76,27 @@ public class ObjectFilter {
 
 	private static long id = ObjectCache.UNSET;
 
-	private final Map<Object, ObjectCache> cache;
+	private final MapOfMaps<String, Object, ObjectCache> cache;
 	private final Set<String> keySet;
 
 	/**
 	 * Default constructor initializing the filter
 	 */
 	public ObjectFilter() {
-		this.cache = new HashMap<>(1);
+		this.cache = new MapOfMaps<>(1);
 		this.keySet = new HashSet<>(1);
+	}
+
+	private void replaceKey(ObjectCache cached, Object newObjectKey, Object newObject) {
+		if (cached.getObjectKey() != newObjectKey) {
+			if (ObjectFilter.logger.isDebugEnabled()) {
+				String msg = "Replacing key for object as they are not the same reference: old: {0} / new: {1}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, cached.getObjectKey(), newObjectKey);
+				ObjectFilter.logger.warn(msg);
+			}
+			ObjectCache objectCache = this.cache.removeElement(cached.getKey(), cached.getObjectKey());
+			this.cache.addElement(objectCache.getKey(), newObjectKey, objectCache);
+		}
 	}
 
 	/**
@@ -112,33 +119,37 @@ public class ObjectFilter {
 	 * <td>Update(O2)</td>
 	 * </tr>
 	 * </table>
-	 * 
+	 *
 	 * @param key
-	 *            the key to register the object with
+	 * 		the key to register the object with
+	 * @param objectKey
+	 * 		the key for the object
 	 * @param objectToAdd
-	 *            The object for which addition shall be registered.
+	 * 		The object for which addition shall be registered.
 	 */
-	public void add(String key, Object objectToAdd) {
+	public void add(String key, Object objectKey, Object objectToAdd) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
-			ObjectFilter.logger.debug(MessageFormat.format("add object {0} with key {1}", objectToAdd, key)); //$NON-NLS-1$
+			ObjectFilter.logger
+					.debug(MessageFormat.format("add object {0} with key {1}", objectToAdd, key)); //$NON-NLS-1$
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
-		ObjectCache cached = this.cache.get(objectToAdd);
+		ObjectCache cached = this.cache.getElement(key, objectKey);
 		if (cached == null) {
 
 			// The object has not yet been added to the cache.
 			// Hence, we add it now, with the ADD operation.
-			ObjectCache cacheObj = new ObjectCache(dispenseID(), key, objectToAdd, Operation.ADD);
-			this.cache.put(objectToAdd, cacheObj);
+			ObjectCache cacheObj = new ObjectCache(dispenseID(), key, objectKey, objectToAdd, Operation.ADD);
+			this.cache.addElement(key, objectKey, cacheObj);
 
 		} else {
 
 			String existingKey = cached.getKey();
 			if (!existingKey.equals(key)) {
 				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
-				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
-						Operation.ADD.toString(), existingKey, key, objectToAdd.toString()));
+				throw new IllegalArgumentException(MessageFormat
+						.format(msg, Long.toString(id), Operation.ADD.toString(), existingKey, key,
+								objectKey.toString()));
 			}
 
 			// The object is in cache: update the version as required, keeping in mind that most
@@ -151,7 +162,7 @@ public class ObjectFilter {
 				throw new IllegalStateException("Stale State exception: Invalid + after +="); //$NON-NLS-1$
 			case REMOVE:
 				// replace key if necessary
-				replaceKey(cached.getObject(), objectToAdd);
+				replaceKey(cached, objectKey, objectToAdd);
 
 				// update operation's object
 				cached.setObject(objectToAdd);
@@ -164,18 +175,6 @@ public class ObjectFilter {
 
 		// register the key
 		this.keySet.add(key);
-	}
-
-	private void replaceKey(Object oldObject, Object newObject) {
-		if (oldObject != newObject) {
-			if (ObjectFilter.logger.isDebugEnabled()) {
-				String msg = "Replacing key for object as they are not the same reference: old: {0} / new: {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, oldObject, newObject);
-				ObjectFilter.logger.warn(msg);
-			}
-			ObjectCache objectCache = this.cache.remove(oldObject);
-			this.cache.put(newObject, objectCache);
-		}
 	}
 
 	/**
@@ -197,33 +196,37 @@ public class ObjectFilter {
 	 * <td>Err!</td>
 	 * </tr>
 	 * </table>
-	 * 
+	 *
 	 * @param key
-	 *            the key to register the object with
+	 * 		the key to register the object with
+	 * @param objectKey
+	 * 		the key for the object
 	 * @param objectToUpdate
-	 *            The object for which update shall be registered.
+	 * 		The object for which update shall be registered.
 	 */
-	public void update(String key, Object objectToUpdate) {
+	public void update(String key, Object objectKey, Object objectToUpdate) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
-			ObjectFilter.logger.debug(MessageFormat.format("update object {0} with key {1}", objectToUpdate, key)); //$NON-NLS-1$
+			ObjectFilter.logger
+					.debug(MessageFormat.format("update object {0} with key {1}", objectKey, key)); //$NON-NLS-1$
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
-		ObjectCache cached = this.cache.get(objectToUpdate);
+		ObjectCache cached = this.cache.getElement(key, objectKey);
 		if (cached == null) {
 
 			// The object got an ID during this run, but was not added to this cache.
 			// Hence, we add it now, with the current operation.
-			ObjectCache cacheObj = new ObjectCache(dispenseID(), key, objectToUpdate, Operation.MODIFY);
-			this.cache.put(objectToUpdate, cacheObj);
+			ObjectCache cacheObj = new ObjectCache(dispenseID(), key, objectKey, objectToUpdate, Operation.MODIFY);
+			this.cache.addElement(key, objectKey, cacheObj);
 
 		} else {
 
 			String existingKey = cached.getKey();
 			if (!existingKey.equals(key)) {
 				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
-				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
-						Operation.MODIFY.toString(), existingKey, key, objectToUpdate.toString()));
+				throw new IllegalArgumentException(MessageFormat
+						.format(msg, Long.toString(id), Operation.MODIFY.toString(), existingKey, key,
+								objectToUpdate.toString()));
 			}
 
 			// The object is in cache: update the version as required.
@@ -232,7 +235,7 @@ public class ObjectFilter {
 			case ADD:
 			case MODIFY:
 				// replace key if necessary
-				replaceKey(cached.getObject(), objectToUpdate);
+				replaceKey(cached, objectKey, objectToUpdate);
 
 				// update operation's object
 				cached.setObject(objectToUpdate);
@@ -267,31 +270,35 @@ public class ObjectFilter {
 	 * <td>Err!</td>
 	 * </tr>
 	 * </table>
-	 * 
+	 *
 	 * @param key
-	 *            the key to register the object with
+	 * 		the key to register the object with
+	 * @param objectKey
+	 * 		the key for the object
 	 * @param objectToRemove
-	 *            The object for which removal shall be registered.
+	 * 		The object for which removal shall be registered.
 	 */
-	public void remove(String key, Object objectToRemove) {
+	public void remove(String key, Object objectKey, Object objectToRemove) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
-			ObjectFilter.logger.debug(MessageFormat.format("remove object {0} with key {1}", objectToRemove, key)); //$NON-NLS-1$
+			ObjectFilter.logger
+					.debug(MessageFormat.format("remove object {0} with key {1}", objectKey, key)); //$NON-NLS-1$
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
-		ObjectCache cached = this.cache.get(objectToRemove);
+		ObjectCache cached = this.cache.getElement(key, objectKey);
 		if (cached == null) {
 			// The object got an ID during this run, but was not added to this cache.
 			// Hence, we add it now, with the current operation.
-			ObjectCache cacheObj = new ObjectCache(dispenseID(), key, objectToRemove, Operation.REMOVE);
-			this.cache.put(objectToRemove, cacheObj);
+			ObjectCache cacheObj = new ObjectCache(dispenseID(), key, objectKey, objectToRemove, Operation.REMOVE);
+			this.cache.addElement(key, objectKey, cacheObj);
 		} else {
 
 			String existingKey = cached.getKey();
 			if (!existingKey.equals(key)) {
 				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
-				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
-						Operation.REMOVE.toString(), existingKey, key, objectToRemove.toString()));
+				throw new IllegalArgumentException(MessageFormat
+						.format(msg, Long.toString(id), Operation.REMOVE.toString(), existingKey, key,
+								objectKey.toString()));
 			}
 
 			// The object is in cache: update the version as required.
@@ -300,11 +307,11 @@ public class ObjectFilter {
 			case ADD:
 				// this is a case where we're removing the object from the cache, since we are
 				// removing it now and it was added previously.
-				this.cache.remove(objectToRemove);
+				this.cache.removeElement(key, objectKey);
 				break;
 			case MODIFY:
 				// replace key if necessary
-				replaceKey(cached.getObject(), objectToRemove);
+				replaceKey(cached, objectKey, objectToRemove);
 
 				// update operation's object
 				cached.setObject(objectToRemove);
@@ -322,129 +329,133 @@ public class ObjectFilter {
 	}
 
 	/**
-	 * Register, under the given key, the addition of the given list of objects.
-	 * 
-	 * @param key
-	 *            the key to register the objects with
-	 * @param addedObjects
-	 *            The objects for which addition shall be registered.
+	 * Register the addition of the given object. Since no key is provided, the class name is used as a key.
+	 *
+	 * @param object
+	 * 		The object that shall be registered for addition
 	 */
-	public void addAll(String key, Collection<Object> addedObjects) {
-		for (Object addObj : addedObjects) {
-			add(key, addObj);
-		}
-	}
-
-	/**
-	 * Register, under the given key, the update of the given list of objects.
-	 * 
-	 * @param key
-	 *            the key to register the objects with
-	 * @param updatedObjects
-	 *            The objects for which update shall be registered.
-	 */
-	public void updateAll(String key, Collection<Object> updatedObjects) {
-		for (Object update : updatedObjects) {
-			update(key, update);
-		}
-	}
-
-	/**
-	 * Register, under the given key, the removal of the given list of objects.
-	 * 
-	 * @param key
-	 *            the key to register the objects with
-	 * @param removedObjects
-	 *            The objects for which removal shall be registered.
-	 */
-	public void removeAll(String key, Collection<Object> removedObjects) {
-		for (Object removed : removedObjects) {
-			remove(key, removed);
-		}
+	public void add(Object object) {
+		add(object.getClass().getName(), object, object);
 	}
 
 	/**
 	 * Register the addition of the given object. Since no key is provided, the class name is used as a key.
-	 * 
+	 *
+	 * @param objectKey
+	 * 		the key for the object
 	 * @param object
-	 *            The object that shall be registered for addition
+	 * 		The object that shall be registered for addition
 	 */
-	public void add(Object object) {
-		add(object.getClass().getName(), object);
+	public void add(Object objectKey, Object object) {
+		add(object.getClass().getName(), objectKey, object);
 	}
 
 	/**
 	 * Register the update of the given object. Since no key is provided, the class name is used as a key.
-	 * 
+	 *
 	 * @param object
-	 *            The object that shall be registered for updating
+	 * 		The object that shall be registered for updating
 	 */
 	public void update(Object object) {
-		update(object.getClass().getName(), object);
+		update(object.getClass().getName(), object, object);
+	}
+
+	/**
+	 * Register the update of the given object. Since no key is provided, the class name is used as a key.
+	 *
+	 * @param objectKey
+	 * 		the key for the object
+	 * @param object
+	 * 		The object that shall be registered for updating
+	 */
+	public void update(Object objectKey, Object object) {
+		update(object.getClass().getName(), objectKey, object);
 	}
 
 	/**
 	 * Register the removal of the given object. Since no key is provided, the class name is used as a key.
-	 * 
+	 *
 	 * @param object
-	 *            The object that shall be registered for removal
+	 * 		The object that shall be registered for removal
 	 */
 	public void remove(Object object) {
-		remove(object.getClass().getName(), object);
+		remove(object.getClass().getName(), object, object);
 	}
 
 	/**
-	 * Register the addition of all objects in the list. Since no key is provided, the class name of each object is used
-	 * as a key.
-	 * 
-	 * @param objects
-	 *            The objects that shall be registered for addition
+	 * Register the removal of the given object. Since no key is provided, the class name is used as a key.
+	 *
+	 * @param objectKey
+	 * 		the key for the object
+	 * @param object
+	 * 		The object that shall be registered for removal
 	 */
-	public void addAll(List<Object> objects) {
-		for (Object addedObj : objects) {
-			add(addedObj.getClass().getName(), addedObj);
-		}
+	public void remove(Object objectKey, Object object) {
+		remove(object.getClass().getName(), objectKey, object);
 	}
 
 	/**
-	 * Register the updating of all objects in the list. Since no key is provided, the class name of each object is used
-	 * as a key.
-	 * 
-	 * @param updateObjects
-	 *            The objects that shall be registered for updating
+	 * Returns the ObjectCache for the given key and objectKey
+	 *
+	 * @param key
+	 * 		the key under which it was registered
+	 * @param objectKey
+	 * 		the objectKey
+	 *
+	 * @return the ObjectCache, or null
 	 */
-	public void updateAll(List<Object> updateObjects) {
-		for (Object update : updateObjects) {
-			update(update.getClass().getName(), update);
-		}
+	public ObjectCache getCache(String key, Object objectKey) {
+		return this.cache.getElement(key, objectKey);
 	}
 
 	/**
-	 * Register the removal of all objects in the list. Since no key is provided, the class name of each object is used
-	 * as a key.
-	 * 
-	 * @param removedObjects
-	 *            The objects that shall be registered for removal
+	 * Returns the element with the given key and objectKey
+	 *
+	 * @param key
+	 * 		the key under which it was registered
+	 * @param objectKey
+	 * 		the objectKey
+	 * @param <V>
+	 * 		the class to which to cast the element to
+	 *
+	 * @return the element, or null
 	 */
-	public void removeAll(List<Object> removedObjects) {
-		for (Object removed : removedObjects) {
-			remove(removed.getClass().getName(), removed);
-		}
+	public <V> V getElement(String key, Object objectKey) {
+		ObjectCache cache = this.cache.getElement(key, objectKey);
+		if (cache == null)
+			return null;
+		@SuppressWarnings("unchecked")
+		V element = (V) cache.getObject();
+		return element;
+	}
+
+	/**
+	 * Return true if the element with the given key and objectKey exist
+	 *
+	 * @param key
+	 * 		the key under which it was registered
+	 * @param objectKey
+	 * 		the objectKey
+	 *
+	 * @return true if the element with the given key and objectKey exist
+	 */
+	public boolean hasElement(String key, Object objectKey) {
+		return this.cache.containsElement(key, objectKey);
 	}
 
 	/**
 	 * Get all objects that were registered under the given key and that have as a resulting final action an addition.
-	 * 
+	 *
 	 * @param key
-	 *            The registration key of the objects to match
-	 * 
+	 * 		The registration key of the objects to match
+	 *
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
 	public List<Object> getAdded(String key) {
 		List<Object> addedObjects = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.values();
+		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.ADD && (objectCache.getKey().equals(key))) {
+			if (objectCache.getOperation() == Operation.ADD) {
 				addedObjects.add(objectCache.getObject());
 			}
 		}
@@ -453,19 +464,19 @@ public class ObjectFilter {
 
 	/**
 	 * Get all objects that were registered under the given key and that have as a resulting final action an addition.
-	 * 
+	 *
 	 * @param clazz
-	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
-	 *            The registration key of the objects to match
-	 * 
+	 * 		The registration key of the objects to match
+	 *
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
-	public <V extends Object> List<V> getAdded(Class<V> clazz, String key) {
+	public <V> List<V> getAdded(Class<V> clazz, String key) {
 		List<V> addedObjects = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.values();
+		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.ADD && (objectCache.getKey().equals(key))) {
+			if (objectCache.getOperation() == Operation.ADD) {
 				if (objectCache.getObject().getClass() == clazz) {
 					@SuppressWarnings("unchecked")
 					V object = (V) objectCache.getObject();
@@ -478,17 +489,17 @@ public class ObjectFilter {
 
 	/**
 	 * Get all objects that were registered under the given key and that have as a resulting final action an update.
-	 * 
+	 *
 	 * @param key
-	 *            registration key of the objects to match
-	 * 
+	 * 		registration key of the objects to match
+	 *
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
 	public List<Object> getUpdated(String key) {
 		List<Object> updatedObjects = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.values();
+		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.MODIFY && (objectCache.getKey().equals(key))) {
+			if (objectCache.getOperation() == Operation.MODIFY) {
 				updatedObjects.add(objectCache.getObject());
 			}
 		}
@@ -497,19 +508,19 @@ public class ObjectFilter {
 
 	/**
 	 * Get all objects that were registered under the given key and that have as a resulting final action an update.
-	 * 
+	 *
 	 * @param clazz
-	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
-	 *            registration key of the objects to match
-	 * 
+	 * 		registration key of the objects to match
+	 *
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
-	public <V extends Object> List<V> getUpdated(Class<V> clazz, String key) {
+	public <V> List<V> getUpdated(Class<V> clazz, String key) {
 		List<V> updatedObjects = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.values();
+		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.MODIFY && (objectCache.getKey().equals(key))) {
+			if (objectCache.getOperation() == Operation.MODIFY) {
 				if (objectCache.getObject().getClass() == clazz) {
 					@SuppressWarnings("unchecked")
 					V object = (V) objectCache.getObject();
@@ -522,17 +533,17 @@ public class ObjectFilter {
 
 	/**
 	 * Get all objects that were registered under the given key that have as a resulting final action their removal.
-	 * 
+	 *
 	 * @param key
-	 *            The registration key of the objects to match
-	 * 
+	 * 		The registration key of the objects to match
+	 *
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public List<Object> getRemoved(String key) {
 		List<Object> removedObjects = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.values();
+		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.REMOVE && (objectCache.getKey().equals(key))) {
+			if (objectCache.getOperation() == Operation.REMOVE) {
 				removedObjects.add(objectCache.getObject());
 			}
 		}
@@ -541,19 +552,19 @@ public class ObjectFilter {
 
 	/**
 	 * Get all objects that were registered under the given key that have as a resulting final action their removal.
-	 * 
+	 *
 	 * @param clazz
-	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
-	 *            The registration key of the objects to match
-	 * 
+	 * 		The registration key of the objects to match
+	 *
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
-	public <V extends Object> List<V> getRemoved(Class<V> clazz, String key) {
+	public <V> List<V> getRemoved(Class<V> clazz, String key) {
 		List<V> removedObjects = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.values();
+		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.REMOVE && (objectCache.getKey().equals(key))) {
+			if (objectCache.getOperation() == Operation.REMOVE) {
 				if (objectCache.getObject().getClass() == clazz) {
 					@SuppressWarnings("unchecked")
 					V object = (V) objectCache.getObject();
@@ -566,24 +577,22 @@ public class ObjectFilter {
 
 	/**
 	 * Get all objects that were registered under the given key
-	 * 
+	 *
 	 * @param clazz
-	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
-	 *            The registration key of the objects to match
-	 * 
+	 * 		The registration key of the objects to match
+	 *
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
-	public <V extends Object> List<V> getAll(Class<V> clazz, String key) {
+	public <V> List<V> getAll(Class<V> clazz, String key) {
 		List<V> objects = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.values();
+		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getKey().equals(key)) {
-				if (objectCache.getObject().getClass() == clazz) {
-					@SuppressWarnings("unchecked")
-					V object = (V) objectCache.getObject();
-					objects.add(object);
-				}
+			if (objectCache.getObject().getClass() == clazz) {
+				@SuppressWarnings("unchecked")
+				V object = (V) objectCache.getObject();
+				objects.add(object);
 			}
 		}
 		return objects;
@@ -591,15 +600,15 @@ public class ObjectFilter {
 
 	/**
 	 * Get all objects that of the given class
-	 * 
+	 *
 	 * @param clazz
-	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
-	 * 
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 *
 	 * @return The list of all objects that of the given class
 	 */
-	public <V extends Object> List<V> getAll(Class<V> clazz) {
+	public <V> List<V> getAll(Class<V> clazz) {
 		List<V> objects = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.values();
+		Collection<ObjectCache> allObjs = this.cache.getAllElements();
 		for (ObjectCache objectCache : allObjs) {
 			if (objectCache.getObject().getClass() == clazz) {
 				@SuppressWarnings("unchecked")
@@ -613,19 +622,17 @@ public class ObjectFilter {
 	/**
 	 * Get all the objects that were processed in this transaction, that were registered under the given key. No action
 	 * is associated to the object.
-	 * 
+	 *
 	 * @param key
-	 *            The registration key for which the objects shall be retrieved
-	 * 
+	 * 		The registration key for which the objects shall be retrieved
+	 *
 	 * @return The list of objects matching the given key.
 	 */
 	public List<Object> getAll(String key) {
 		List<Object> allObjects = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.values();
+		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getKey().equals(key)) {
-				allObjects.add(objectCache.getObject());
-			}
+			allObjects.add(objectCache.getObject());
 		}
 		return allObjects;
 	}
@@ -633,26 +640,19 @@ public class ObjectFilter {
 	/**
 	 * Get all the objects that were processed in this transaction, that were registered under the given key. No action
 	 * is associated to the object.
-	 * 
+	 *
 	 * @param key
-	 *            The registration key for which the objects shall be retrieved
-	 * 
+	 * 		The registration key for which the objects shall be retrieved
+	 *
 	 * @return The list of objects matching the given key.
 	 */
 	public List<ObjectCache> getCache(String key) {
-		List<ObjectCache> allCache = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.values();
-		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getKey().equals(key)) {
-				allCache.add(objectCache);
-			}
-		}
-		return allCache;
+		return this.cache.getAllElements(key);
 	}
 
 	/**
 	 * Return the set of keys that are currently present in the object filter.
-	 * 
+	 *
 	 * @return The set containing the keys of that have been added to the filter.
 	 */
 	public Set<String> keySet() {

@@ -15,50 +15,21 @@
  */
 package li.strolch.persistence.api;
 
+import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.model.Tags.AGENT;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.AuditTrail;
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.ObserverEvent;
-import li.strolch.agent.api.ObserverHandler;
-import li.strolch.agent.api.OrderMap;
-import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.agent.api.StrolchLockException;
-import li.strolch.agent.api.StrolchRealm;
-import li.strolch.agent.impl.AuditingActivityMap;
-import li.strolch.agent.impl.AuditingAuditMapFacade;
-import li.strolch.agent.impl.AuditingOrderMap;
-import li.strolch.agent.impl.AuditingResourceMap;
-import li.strolch.agent.impl.InternalStrolchRealm;
+import li.strolch.agent.api.*;
+import li.strolch.agent.impl.*;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
-import li.strolch.model.GroupedParameterizedElement;
-import li.strolch.model.Locator;
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
+import li.strolch.model.*;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.audit.AccessType;
@@ -73,11 +44,11 @@ import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StrolchQuery;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
-import li.strolch.model.visitor.ElementTypeVisitor;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.service.api.Command;
@@ -85,6 +56,8 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.objectfilter.ObjectFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -279,7 +252,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public <T extends StrolchRootElement> void lock(Locator locator) throws StrolchLockException {
+	public boolean needsCommit() {
+		return !this.objectFilter.isEmpty() || !this.commands.isEmpty() || !this.flushedCommands.isEmpty();
+	}
+
+	@Override
+	public void lock(Locator locator) throws StrolchLockException {
 		this.realm.lock(locator);
 		this.lockedElements.add(locator);
 	}
@@ -511,33 +489,52 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		throw new StrolchException(MessageFormat.format(msg, locator, stateOrBagOrActivity));
 	}
 
+	private <V> V getElementFromFilter(String key, Locator locator) {
+		if (this.objectFilter == null)
+			return null;
+		return this.objectFilter.getElement(key, locator);
+	}
+
+	private boolean hasElementInFilter(String key, Locator locator) {
+		return this.objectFilter != null && this.objectFilter.hasElement(key, locator);
+	}
+
 	@Override
 	public Resource getResourceTemplate(String type) {
-		return getResourceMap().getTemplate(this, type);
+		return getResourceTemplate(type, false);
 	}
 
 	@Override
 	public Resource getResourceTemplate(String type, boolean assertExists) throws StrolchException {
+		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(StrolchConstants.TEMPLATE, type));
+		if (element != null)
+			return element;
 		return getResourceMap().getTemplate(this, type, assertExists);
 	}
 
 	@Override
 	public Order getOrderTemplate(String type) {
-		return getOrderMap().getTemplate(this, type);
+		return getOrderTemplate(type, false);
 	}
 
 	@Override
 	public Order getOrderTemplate(String type, boolean assertExists) throws StrolchException {
+		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(StrolchConstants.TEMPLATE, type));
+		if (element != null)
+			return element;
 		return getOrderMap().getTemplate(this, type, assertExists);
 	}
 
 	@Override
 	public Activity getActivityTemplate(String type) {
-		return getActivityMap().getTemplate(this, type);
+		return getActivityTemplate(type, false);
 	}
 
 	@Override
 	public Activity getActivityTemplate(String type, boolean assertExists) throws StrolchException {
+		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(StrolchConstants.TEMPLATE, type));
+		if (element != null)
+			return element;
 		return getActivityMap().getTemplate(this, type, assertExists);
 	}
 
@@ -548,31 +545,43 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Order getOrderBy(String type, String id, boolean assertExists) throws StrolchException {
+		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(type, id));
+		if (element != null)
+			return element;
 		return getOrderMap().getBy(this, type, id, assertExists);
 	}
 
 	@Override
 	public Order getOrderBy(StringParameter refP) throws StrolchException {
-		DBC.PRE.assertNotNull("refP", refP);
 		return getOrderBy(refP, false);
 	}
 
 	@Override
 	public Order getOrderBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
+		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ORDER_REF, refP);
+		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(refP.getUom(), refP.getValue()));
+		if (element != null)
+			return element;
 		return getOrderMap().getBy(this, refP, assertExists);
 	}
 
 	@Override
 	public List<Order> getOrdersBy(StringListParameter refP) throws StrolchException {
-		DBC.PRE.assertNotNull("refP", refP);
-		return getOrderMap().getBy(this, refP, false);
+		return getOrdersBy(refP, false);
 	}
 
 	@Override
 	public List<Order> getOrdersBy(StringListParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
-		return getOrderMap().getBy(this, refP, assertExists);
+		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ORDER_REF, refP);
+		List<Order> elements = new ArrayList<>();
+		for (String id : refP.getValue()) {
+			Order element = getOrderBy(refP.getUom(), id, assertExists);
+			if (element != null)
+				elements.add(element);
+		}
+		return elements;
 	}
 
 	@Override
@@ -582,36 +591,43 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Resource getResourceBy(String type, String id, boolean assertExists) throws StrolchException {
-		Resource resource = getResourceMap().getBy(this, type, id);
-		if (assertExists && resource == null) {
-			String msg = "No Resource exists with the id {0} with type {1}";
-			throw new StrolchException(MessageFormat.format(msg, id, type));
-		}
-		return resource;
+		Resource result = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(type, id));
+		if (result != null)
+			return result;
+		return getResourceMap().getBy(this, type, id, assertExists);
 	}
 
 	@Override
 	public Resource getResourceBy(StringParameter refP) throws StrolchException {
-		DBC.PRE.assertNotNull("refP", refP);
 		return getResourceBy(refP, false);
 	}
 
 	@Override
 	public Resource getResourceBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
+		ElementMapHelpers.assertIsRefParam(INTERPRETATION_RESOURCE_REF, refP);
+		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(refP.getUom(), refP.getValue()));
+		if (element != null)
+			return element;
 		return getResourceMap().getBy(this, refP, assertExists);
 	}
 
 	@Override
 	public List<Resource> getResourcesBy(StringListParameter refP) throws StrolchException {
-		DBC.PRE.assertNotNull("refP", refP);
-		return getResourceMap().getBy(this, refP, false);
+		return getResourcesBy(refP, false);
 	}
 
 	@Override
 	public List<Resource> getResourcesBy(StringListParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
-		return getResourceMap().getBy(this, refP, assertExists);
+		ElementMapHelpers.assertIsRefParam(INTERPRETATION_RESOURCE_REF, refP);
+		List<Resource> elements = new ArrayList<>();
+		for (String id : refP.getValue()) {
+			Resource element = getResourceBy(refP.getUom(), id, assertExists);
+			if (element != null)
+				elements.add(element);
+		}
+		return elements;
 	}
 
 	@Override
@@ -621,36 +637,61 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Activity getActivityBy(String type, String id, boolean assertExists) throws StrolchException {
-		Activity activity = getActivityMap().getBy(this, type, id);
-		if (assertExists && activity == null) {
-			String msg = "No Activity exists with the id {0} with type {1}";
-			throw new StrolchException(MessageFormat.format(msg, id, type));
-		}
-		return activity;
+		Activity result = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(type, id));
+		if (result != null)
+			return result;
+		return getActivityMap().getBy(this, type, id, assertExists);
 	}
 
 	@Override
 	public Activity getActivityBy(StringParameter refP) throws StrolchException {
-		DBC.PRE.assertNotNull("refP", refP);
 		return getActivityBy(refP, false);
 	}
 
 	@Override
 	public Activity getActivityBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
+		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ACTIVITY_REF, refP);
+		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(refP.getUom(), refP.getValue()));
+		if (element != null)
+			return element;
 		return getActivityMap().getBy(this, refP, assertExists);
 	}
 
 	@Override
 	public List<Activity> getActivitiesBy(StringListParameter refP) throws StrolchException {
-		DBC.PRE.assertNotNull("refP", refP);
-		return getActivityMap().getBy(this, refP, false);
+		return getActivitiesBy(refP, false);
 	}
 
 	@Override
 	public List<Activity> getActivitiesBy(StringListParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
-		return getActivityMap().getBy(this, refP, assertExists);
+		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ACTIVITY_REF, refP);
+		List<Activity> elements = new ArrayList<>();
+		for (String id : refP.getValue()) {
+			Activity element = getActivityBy(refP.getUom(), id, assertExists);
+			if (element != null)
+				elements.add(element);
+		}
+		return elements;
+	}
+
+	@Override
+	public boolean hasResource(String type, String id) {
+		boolean inFilter = hasElementInFilter(Tags.RESOURCE, Resource.locatorFor(type, id));
+		return inFilter || getResourceMap().hasElement(this, type, id);
+	}
+
+	@Override
+	public boolean hasOrder(String type, String id) {
+		boolean inFilter = hasElementInFilter(Tags.ORDER, Order.locatorFor(type, id));
+		return inFilter || getOrderMap().hasElement(this, type, id);
+	}
+
+	@Override
+	public boolean hasActivity(String type, String id) {
+		boolean inFilter = hasElementInFilter(Tags.ACTIVITY, Activity.locatorFor(type, id));
+		return inFilter || getActivityMap().hasElement(this, type, id);
 	}
 
 	private ObjectFilter getObjectFilter() {
@@ -670,55 +711,55 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void add(Resource resource) throws StrolchModelException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
-		getObjectFilter().add(Tags.RESOURCE, resource);
+		getObjectFilter().add(Tags.RESOURCE, resource.getLocator(), resource);
 	}
 
 	@Override
 	public void add(Order order) throws StrolchException {
 		DBC.PRE.assertNotNull("order must not be null", order);
-		getObjectFilter().add(Tags.ORDER, order);
+		getObjectFilter().add(Tags.ORDER, order.getLocator(), order);
 	}
 
 	@Override
 	public void add(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
-		getObjectFilter().add(Tags.ACTIVITY, activity);
+		getObjectFilter().add(Tags.ACTIVITY, activity.getLocator(), activity);
 	}
 
 	@Override
 	public void update(Resource resource) throws StrolchException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
-		getObjectFilter().update(Tags.RESOURCE, resource);
+		getObjectFilter().update(Tags.RESOURCE, resource.getLocator(), resource);
 	}
 
 	@Override
 	public void update(Order order) {
 		DBC.PRE.assertNotNull("order must not be null", order);
-		getObjectFilter().update(Tags.ORDER, order);
+		getObjectFilter().update(Tags.ORDER, order.getLocator(), order);
 	}
 
 	@Override
 	public void update(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
-		getObjectFilter().update(Tags.ACTIVITY, activity);
+		getObjectFilter().update(Tags.ACTIVITY, activity.getLocator(), activity);
 	}
 
 	@Override
 	public void remove(Resource resource) throws StrolchException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
-		getObjectFilter().remove(Tags.RESOURCE, resource);
+		getObjectFilter().remove(Tags.RESOURCE, resource.getLocator(), resource);
 	}
 
 	@Override
 	public void remove(Order order) throws StrolchException {
 		DBC.PRE.assertNotNull("order must not be null", order);
-		getObjectFilter().remove(Tags.ORDER, order);
+		getObjectFilter().remove(Tags.ORDER, order.getLocator(), order);
 	}
 
 	@Override
 	public void remove(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
-		getObjectFilter().remove(Tags.ACTIVITY, activity);
+		getObjectFilter().remove(Tags.ACTIVITY, activity.getLocator(), activity);
 	}
 
 	private void addModelChangeCommands() {
@@ -923,6 +964,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		try {
 			this.txResult.setState(TransactionState.CLOSING);
 
+			Thread.currentThread().getUncaughtExceptionHandler();
+			StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
 			if (!this.commands.isEmpty()) {
 				autoCloseableRollback();
 				String msg = "There are commands registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
@@ -943,6 +987,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			handleReadOnly(start, auditTrailDuration);
 			this.txResult.setState(TransactionState.CLOSED);
 		} catch (Exception e) {
+			this.txResult.setState(TransactionState.ROLLING_BACK);
+			try {
+				undoCommands();
+				rollback();
+			} catch (Exception e1) {
+				logger.error("Failed to rollback after exception", e);
+			}
 			handleFailure(start, e);
 			this.txResult.setState(TransactionState.FAILED);
 		} finally {
@@ -1062,7 +1113,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		logger.error(sb.toString());
 	}
 
-	protected void handleFailure(long closeStartNanos, Exception e) {
+	private void handleFailure(long closeStartNanos, Exception e) {
 
 		long end = System.nanoTime();
 		long txDuration = end - this.txResult.getStartNanos();
@@ -1099,7 +1150,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$
 		msg = MessageFormat.format(msg, getRealmName(), ExceptionHelper.getExceptionMessage(e), sb.toString());
-		throw new StrolchTransactionException(msg, e);
+		StrolchTransactionException ex = new StrolchTransactionException(msg, e);
+
+		if (this.closeStrategy == TransactionCloseStrategy.COMMIT)
+			throw ex;
+		else
+			logger.error("Transaction failed in non-commit mode! Logging TX exception, so exception is not suppressed.",
+					ex);
 	}
 
 	private boolean isAuditTrailEnabled() {
@@ -1116,36 +1173,35 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		if (this.resourceMap != null) {
 			if (!this.resourceMap.getCreated().isEmpty())
-				event.added.addList(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getCreated()));
+				event.added.addList(Tags.RESOURCE, new ArrayList<>(this.resourceMap.getCreated()));
 			if (!this.resourceMap.getUpdated().isEmpty())
-				event.updated.addList(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getUpdated()));
+				event.updated.addList(Tags.RESOURCE, new ArrayList<>(this.resourceMap.getUpdated()));
 			if (!this.resourceMap.getDeleted().isEmpty())
-				event.removed.addList(Tags.RESOURCE, new ArrayList<StrolchRootElement>(this.resourceMap.getDeleted()));
+				event.removed.addList(Tags.RESOURCE, new ArrayList<>(this.resourceMap.getDeleted()));
 		}
 
 		if (this.orderMap != null) {
 			if (!this.orderMap.getCreated().isEmpty())
-				event.added.addList(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getCreated()));
+				event.added.addList(Tags.ORDER, new ArrayList<>(this.orderMap.getCreated()));
 			if (!this.orderMap.getUpdated().isEmpty())
-				event.updated.addList(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getUpdated()));
+				event.updated.addList(Tags.ORDER, new ArrayList<>(this.orderMap.getUpdated()));
 			if (!this.orderMap.getDeleted().isEmpty())
-				event.removed.addList(Tags.ORDER, new ArrayList<StrolchRootElement>(this.orderMap.getDeleted()));
+				event.removed.addList(Tags.ORDER, new ArrayList<>(this.orderMap.getDeleted()));
 		}
 
 		if (this.activityMap != null) {
 			if (!this.activityMap.getCreated().isEmpty())
-				event.added.addList(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getCreated()));
+				event.added.addList(Tags.ACTIVITY, new ArrayList<>(this.activityMap.getCreated()));
 			if (!this.activityMap.getUpdated().isEmpty())
-				event.updated.addList(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getUpdated()));
+				event.updated.addList(Tags.ACTIVITY, new ArrayList<>(this.activityMap.getUpdated()));
 			if (!this.activityMap.getDeleted().isEmpty())
-				event.removed.addList(Tags.ACTIVITY, new ArrayList<StrolchRootElement>(this.activityMap.getDeleted()));
+				event.removed.addList(Tags.ACTIVITY, new ArrayList<>(this.activityMap.getDeleted()));
 		}
 
 		ObserverHandler observerHandler = this.realm.getObserverHandler();
 		observerHandler.notify(event);
 
-		long observerUpdateDuration = System.nanoTime() - observerUpdateStart;
-		return observerUpdateDuration;
+		return System.nanoTime() - observerUpdateStart;
 	}
 
 	private boolean isObserverUpdatesEnabled() {
@@ -1166,26 +1222,26 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		if (this.orderMap != null) {
 			if (this.realm.isAuditTrailEnabledForRead())
-				auditsFor(audits, AccessType.READ, Tags.ORDER, this.orderMap.getRead());
-			auditsFor(audits, AccessType.CREATE, Tags.ORDER, this.orderMap.getCreated());
-			auditsFor(audits, AccessType.UPDATE, Tags.ORDER, this.orderMap.getUpdated());
-			auditsFor(audits, AccessType.DELETE, Tags.ORDER, this.orderMap.getDeleted());
+				auditsFor(audits, AccessType.READ, this.orderMap.getRead());
+			auditsFor(audits, AccessType.CREATE, this.orderMap.getCreated());
+			auditsFor(audits, AccessType.UPDATE, this.orderMap.getUpdated());
+			auditsFor(audits, AccessType.DELETE, this.orderMap.getDeleted());
 		}
 
 		if (this.resourceMap != null) {
 			if (this.realm.isAuditTrailEnabledForRead())
-				auditsFor(audits, AccessType.READ, Tags.RESOURCE, this.resourceMap.getRead());
-			auditsFor(audits, AccessType.CREATE, Tags.RESOURCE, this.resourceMap.getCreated());
-			auditsFor(audits, AccessType.UPDATE, Tags.RESOURCE, this.resourceMap.getUpdated());
-			auditsFor(audits, AccessType.DELETE, Tags.RESOURCE, this.resourceMap.getDeleted());
+				auditsFor(audits, AccessType.READ, this.resourceMap.getRead());
+			auditsFor(audits, AccessType.CREATE, this.resourceMap.getCreated());
+			auditsFor(audits, AccessType.UPDATE, this.resourceMap.getUpdated());
+			auditsFor(audits, AccessType.DELETE, this.resourceMap.getDeleted());
 		}
 
 		if (this.activityMap != null) {
 			if (this.realm.isAuditTrailEnabledForRead())
-				auditsFor(audits, AccessType.READ, Tags.ACTIVITY, this.activityMap.getRead());
-			auditsFor(audits, AccessType.CREATE, Tags.ACTIVITY, this.activityMap.getCreated());
-			auditsFor(audits, AccessType.UPDATE, Tags.ACTIVITY, this.activityMap.getUpdated());
-			auditsFor(audits, AccessType.DELETE, Tags.ACTIVITY, this.activityMap.getDeleted());
+				auditsFor(audits, AccessType.READ, this.activityMap.getRead());
+			auditsFor(audits, AccessType.CREATE, this.activityMap.getCreated());
+			auditsFor(audits, AccessType.UPDATE, this.activityMap.getUpdated());
+			auditsFor(audits, AccessType.DELETE, this.activityMap.getDeleted());
 		}
 
 		if (this.auditTrail != null && !isSuppressAuditsForAudits()) {
@@ -1199,23 +1255,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (!audits.isEmpty())
 			this.realm.getAuditTrail().addAll(this, audits);
 
-		long auditTrailDuration = System.nanoTime() - auditTrailStart;
-		return auditTrailDuration;
+		return System.nanoTime() - auditTrailStart;
 	}
 
-	private <T extends StrolchRootElement> void auditsFor(List<Audit> audits,
-														  AccessType accessType,
-														  String elementType,
-														  Set<T> elements) {
+	private <T extends StrolchRootElement> void auditsFor(List<Audit> audits, AccessType accessType, Set<T> elements) {
 		for (StrolchRootElement element : elements) {
 			audits.add(auditFrom(accessType, element));
 		}
 	}
 
-	private <T extends StrolchRootElement> void auditsForAudits(List<Audit> audits,
-																AccessType accessType,
-																String elementType,
-																Set<Audit> elements) {
+	private void auditsForAudits(List<Audit> audits, AccessType accessType, String elementType, Set<Audit> elements) {
 		for (Audit element : elements) {
 			audits.add(auditFrom(accessType, elementType, StringHelper.DASH, element.getId().toString()));
 		}
@@ -1223,7 +1272,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Audit auditFrom(AccessType accessType, StrolchRootElement element) {
-		String type = element.accept(new ElementTypeVisitor());
+		String type = element.getObjectType();
 		String subType = element.getType();
 		String id = element.getId();
 		return auditFrom(accessType, type, subType, id);

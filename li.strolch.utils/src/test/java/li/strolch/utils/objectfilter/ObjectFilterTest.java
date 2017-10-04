@@ -15,15 +15,11 @@
  */
 package li.strolch.utils.objectfilter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
 import org.junit.Test;
-
-import li.strolch.utils.objectfilter.ObjectFilter;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
@@ -37,7 +33,7 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(myObj);
+		filter.add(myObj, myObj);
 
 		testAssertions(filter, 1, 1, 1, 0, 0);
 	}
@@ -48,7 +44,7 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.update(myObj);
+		filter.update(myObj, myObj);
 
 		testAssertions(filter, 1, 1, 0, 1, 0);
 	}
@@ -59,7 +55,7 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.remove(myObj);
+		filter.remove(myObj, myObj);
 
 		testAssertions(filter, 1, 1, 0, 0, 1);
 	}
@@ -72,9 +68,9 @@ public class ObjectFilterTest {
 		Object objToRemove = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(objToAdd);
-		filter.update(objToUpdate);
-		filter.remove(objToRemove);
+		filter.add(objToAdd, objToAdd);
+		filter.update(objToUpdate, objToUpdate);
+		filter.remove(objToRemove, objToRemove);
 
 		testAssertions(filter, 3, 1, 1, 1, 1);
 	}
@@ -85,9 +81,9 @@ public class ObjectFilterTest {
 		Object objToAddUpdateRemove = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(objToAddUpdateRemove);
-		filter.update(objToAddUpdateRemove);
-		filter.remove(objToAddUpdateRemove);
+		filter.add(objToAddUpdateRemove, objToAddUpdateRemove);
+		filter.update(objToAddUpdateRemove, objToAddUpdateRemove);
+		filter.remove(objToAddUpdateRemove, objToAddUpdateRemove);
 
 		testAssertions(filter, 0, 1, 0, 0, 0);
 	}
@@ -98,10 +94,10 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(myObj);
+		filter.add(myObj, myObj);
 
 		try {
-			filter.add(myObj);
+			filter.add(myObj, myObj);
 			fail("Should have failed adding twice!");
 		} catch (RuntimeException e) {
 			assertEquals("Stale State exception: Invalid + after +", e.getMessage());
@@ -116,10 +112,10 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.remove(myObj);
+		filter.remove(myObj, myObj);
 
 		try {
-			filter.remove(myObj);
+			filter.remove(myObj, myObj);
 			fail("Should have failed removing twice!");
 		} catch (RuntimeException e) {
 			assertEquals("Stale State exception: Invalid - after -", e.getMessage());
@@ -134,8 +130,8 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.update(myObj);
-		filter.update(myObj);
+		filter.update(myObj, myObj);
+		filter.update(myObj, myObj);
 		testAssertions(filter, 1, 1, 0, 1, 0);
 	}
 
@@ -145,9 +141,9 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(myObj);
-		filter.update(myObj);
-		filter.update(myObj);
+		filter.add(myObj, myObj);
+		filter.update(myObj, myObj);
+		filter.update(myObj, myObj);
 		testAssertions(filter, 1, 1, 1, 0, 0);
 	}
 
@@ -156,10 +152,10 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.update(myObj);
+		filter.update(myObj, myObj);
 
 		try {
-			filter.add(myObj);
+			filter.add(myObj, myObj);
 			fail("Should have failed add after modify");
 		} catch (RuntimeException e) {
 			assertEquals("Stale State exception: Invalid + after +=", e.getMessage());
@@ -173,8 +169,8 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.remove(myObj);
-		filter.add(myObj);
+		filter.remove(myObj, myObj);
+		filter.add(myObj, myObj);
 
 		testAssertions(filter, 1, 1, 0, 1, 0);
 	}
@@ -184,10 +180,10 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.remove(myObj);
+		filter.remove(myObj, myObj);
 
 		try {
-			filter.update(myObj);
+			filter.update(myObj, myObj);
 			fail("Should have failed modify after remove");
 		} catch (RuntimeException e) {
 			assertEquals("Stale State exception: Invalid += after -", e.getMessage());
@@ -201,10 +197,10 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(myObj);
+		filter.add(myObj, myObj);
 
 		try {
-			filter.update("different_key", myObj);
+			filter.update("different_key", myObj, myObj);
 			fail("Should have failed because of different key for already registered object");
 		} catch (RuntimeException e) {
 			String msg = "Object may be present in the same filter instance only once, registered using one key only";
@@ -222,8 +218,8 @@ public class ObjectFilterTest {
 		assertEquals("Test objects are not equal!", obj1, obj2);
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.remove(Object.class.getName(), obj1);
-		filter.add(Object.class.getName(), obj2);
+		filter.remove(Object.class.getName(), obj1, obj1);
+		filter.add(Object.class.getName(), obj2, obj2);
 
 		testAssertions(filter, 1, 1, 0, 1, 0);
 
@@ -241,8 +237,8 @@ public class ObjectFilterTest {
 		assertEquals("Test objects are not equal!", obj1, obj2);
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(Object.class.getName(), obj1);
-		filter.update(Object.class.getName(), obj2);
+		filter.add(Object.class.getName(), obj1, obj1);
+		filter.update(Object.class.getName(), obj2, obj2);
 
 		testAssertions(filter, 1, 1, 1, 0, 0);
 
@@ -260,8 +256,8 @@ public class ObjectFilterTest {
 		assertEquals("Test objects are not equal!", obj1, obj2);
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.update(Object.class.getName(), obj1);
-		filter.update(Object.class.getName(), obj2);
+		filter.update(Object.class.getName(), obj1, obj1);
+		filter.update(Object.class.getName(), obj2, obj2);
 
 		testAssertions(filter, 1, 1, 0, 1, 0);
 
@@ -279,8 +275,8 @@ public class ObjectFilterTest {
 		assertEquals("Test objects are not equal!", obj1, obj2);
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.update(Object.class.getName(), obj1);
-		filter.remove(Object.class.getName(), obj2);
+		filter.update(Object.class.getName(), obj1, obj1);
+		filter.remove(Object.class.getName(), obj2, obj2);
 
 		testAssertions(filter, 1, 1, 0, 0, 1);
 
@@ -296,8 +292,8 @@ public class ObjectFilterTest {
 		Object myObj = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(myObj);
-		filter.remove(myObj);
+		filter.add(myObj, myObj);
+		filter.remove(myObj, myObj);
 		testAssertions(filter, 0, 1, 0, 0, 0);
 	}
 
@@ -309,9 +305,9 @@ public class ObjectFilterTest {
 		Object myObj3 = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(myObj1);
-		filter.update(myObj2);
-		filter.remove(myObj3);
+		filter.add(myObj1, myObj1);
+		filter.update(myObj2, myObj2);
+		filter.remove(myObj3, myObj3);
 
 		filter.clearCache();
 
@@ -326,9 +322,9 @@ public class ObjectFilterTest {
 		Object myObj3 = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(myObj1);
-		filter.update(myObj2);
-		filter.remove(myObj3);
+		filter.add(myObj1, myObj1);
+		filter.update(myObj2, myObj2);
+		filter.remove(myObj3, myObj3);
 
 		testAssertions(filter, 3, 1, 1, 1, 1);
 
@@ -345,7 +341,7 @@ public class ObjectFilterTest {
 		Object myObj1 = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.add(myObj1);
+		filter.add(myObj1, myObj1);
 
 		testAssertions(filter, 1, 1, 1, 0, 0);
 
@@ -360,7 +356,7 @@ public class ObjectFilterTest {
 		Object myObj1 = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.update(myObj1);
+		filter.update(myObj1, myObj1);
 
 		testAssertions(filter, 1, 1, 0, 1, 0);
 
@@ -375,7 +371,7 @@ public class ObjectFilterTest {
 		Object myObj1 = new Object();
 
 		ObjectFilter filter = new ObjectFilter();
-		filter.remove(myObj1);
+		filter.remove(myObj1, myObj1);
 
 		testAssertions(filter, 1, 1, 0, 0, 1);
 

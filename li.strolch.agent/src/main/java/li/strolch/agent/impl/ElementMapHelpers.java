@@ -25,7 +25,7 @@ import li.strolch.model.parameter.Parameter;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-class ElementMapHelpers {
+public class ElementMapHelpers {
 
 	public static void assertIsRefParam(String expectedInterpretation, Parameter<?> refP) {
 
