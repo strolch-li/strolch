@@ -96,8 +96,11 @@ public class ResponseUtil {
 		Throwable t = svcResult.getThrowable();
 		if (svcResult.isNok()) {
 			msg = svcResult.getMessage();
-			if (t != null)
+			if (t != null) {
 				exceptionMsg = StringHelper.formatExceptionMessage(t);
+				if (StringHelper.isEmpty(msg))
+					msg = exceptionMsg;
+			}
 		}
 
 		JsonObject response = new JsonObject();
