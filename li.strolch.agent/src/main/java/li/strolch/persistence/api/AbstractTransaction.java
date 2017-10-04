@@ -253,7 +253,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public boolean needsCommit() {
-		return !this.objectFilter.isEmpty() || !this.commands.isEmpty() || !this.flushedCommands.isEmpty();
+		return (this.objectFilter != null && !this.objectFilter.isEmpty()) || !this.commands.isEmpty()
+				|| !this.flushedCommands.isEmpty();
 	}
 
 	@Override
