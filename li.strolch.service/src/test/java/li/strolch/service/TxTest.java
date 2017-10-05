@@ -18,6 +18,7 @@ package li.strolch.service;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
@@ -190,7 +191,7 @@ public class TxTest extends AbstractRealmServiceTest {
 		@Override
 		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
 
-			String id = "flushSuccessfully";
+			String id = StrolchAgent.getUniqueId();
 			Resource resource = ModelGenerator.createResource(id, id, id);
 
 			boolean txFailed = false;
@@ -203,7 +204,7 @@ public class TxTest extends AbstractRealmServiceTest {
 				txFailed = true;
 			}
 
-			assertTrue("TX should have failed!", txFailed);
+			assertTrue("TX should have failed as commitOnClose is missing!", txFailed);
 
 			return ServiceResult.success();
 		}

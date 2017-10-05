@@ -918,7 +918,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 							exc); //$NON-NLS-1$
 				}
 				logger.error("Transaction failed due to " + e.getMessage(), e);
-				handleFailure(start, ex);
+				handleFailure(false, start, ex);
 			}
 
 			try {
@@ -927,14 +927,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			} catch (Exception ex) {
 				logger.error("Transaction failed due to " + e.getMessage(), e);
 				logger.error("Failed to commit transaction and then rollback due to " + ex.getMessage(), ex);
-				handleFailure(start, e);
+				handleFailure(false, start, e);
 			}
 
 			this.txResult.setState(TransactionState.FAILED);
 
-			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, getRealmName(), ExceptionHelper.getExceptionMessage(e));
-			throw new StrolchTransactionException(msg, e);
+			handleFailure(true, start, e);
 
 		} finally {
 			releaseElementLocks();
@@ -952,7 +950,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			handleRollback(start);
 			this.txResult.setState(TransactionState.ROLLED_BACK);
 		} catch (Exception e) {
-			handleFailure(start, e);
+			handleFailure(true, start, e);
 			this.txResult.setState(TransactionState.FAILED);
 		} finally {
 			releaseElementLocks();
@@ -962,6 +960,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void autoCloseableReadOnly() throws StrolchTransactionException {
 		long start = System.nanoTime();
+		boolean throwException = false;
 		try {
 			this.txResult.setState(TransactionState.CLOSING);
 
@@ -995,7 +994,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			} catch (Exception e1) {
 				logger.error("Failed to rollback after exception", e);
 			}
-			handleFailure(start, e);
+			handleFailure(true, start, e);
 			this.txResult.setState(TransactionState.FAILED);
 		} finally {
 			releaseElementLocks();
@@ -1114,7 +1113,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		logger.error(sb.toString());
 	}
 
-	private void handleFailure(long closeStartNanos, Exception e) {
+	private void handleFailure(boolean throwEx, long closeStartNanos, Exception e) {
 
 		long end = System.nanoTime();
 		long txDuration = end - this.txResult.getStartNanos();
@@ -1153,7 +1152,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		msg = MessageFormat.format(msg, getRealmName(), ExceptionHelper.getExceptionMessage(e), sb.toString());
 		StrolchTransactionException ex = new StrolchTransactionException(msg, e);
 
-		if (this.closeStrategy == TransactionCloseStrategy.COMMIT)
+		if (throwEx)
 			throw ex;
 		else
 			logger.error("Transaction failed in non-commit mode! Logging TX exception, so exception is not suppressed.",

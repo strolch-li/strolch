@@ -33,7 +33,6 @@ import li.strolch.xmlpers.objref.TypeRef;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class ObjectDao {
 
@@ -54,7 +53,7 @@ public class ObjectDao {
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
 		ctx.getObjectRef().lock();
-		this.objectFilter.add(ctx.getObjectRef().getType(), ctx);
+		this.objectFilter.add(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 	}
 
 	public <T> void addAll(List<T> objects) {
@@ -64,7 +63,7 @@ public class ObjectDao {
 			for (T object : objects) {
 				PersistenceContext<T> ctx = createCtx(object);
 				ctx.getObjectRef().lock();
-				this.objectFilter.add(ctx.getObjectRef().getType(), ctx);
+				this.objectFilter.add(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 			}
 		}
 	}
@@ -74,7 +73,7 @@ public class ObjectDao {
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
 		ctx.getObjectRef().lock();
-		this.objectFilter.update(ctx.getObjectRef().getType(), ctx);
+		this.objectFilter.update(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 	}
 
 	public <T> void updateAll(List<T> objects) {
@@ -84,7 +83,7 @@ public class ObjectDao {
 			for (T object : objects) {
 				PersistenceContext<T> ctx = createCtx(object);
 				ctx.getObjectRef().lock();
-				this.objectFilter.update(ctx.getObjectRef().getType(), ctx);
+				this.objectFilter.update(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 			}
 		}
 	}
@@ -94,7 +93,7 @@ public class ObjectDao {
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
 		ctx.getObjectRef().lock();
-		this.objectFilter.remove(ctx.getObjectRef().getType(), ctx);
+		this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 	}
 
 	public <T> void removeAll(List<T> objects) {
@@ -104,7 +103,7 @@ public class ObjectDao {
 			for (T object : objects) {
 				PersistenceContext<T> ctx = createCtx(object);
 				ctx.getObjectRef().lock();
-				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx);
+				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 			}
 		}
 	}
@@ -132,7 +131,7 @@ public class ObjectDao {
 
 					PersistenceContext<T> ctx = createCtx(idRef);
 					ctx.getObjectRef().lock();
-					this.objectFilter.remove(ctx.getObjectRef().getType(), ctx);
+					this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 					removed++;
 				}
 			}
@@ -161,7 +160,7 @@ public class ObjectDao {
 
 				PersistenceContext<T> ctx = createCtx(idRef);
 				ctx.getObjectRef().lock();
-				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx);
+				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 				removed++;
 			}
 		} finally {
@@ -176,7 +175,7 @@ public class ObjectDao {
 		assertIsIdRef(objectRef);
 		PersistenceContext<T> ctx = createCtx(objectRef);
 		ctx.getObjectRef().lock();
-		this.objectFilter.remove(objectRef.getType(), ctx);
+		this.objectFilter.remove(objectRef.getType(), ctx.getObjectRef(), ctx);
 	}
 
 	public <T> void removeAll(ObjectRef parentRef) {
@@ -193,7 +192,7 @@ public class ObjectDao {
 				ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
 				PersistenceContext<T> ctx = createCtx(childRef);
 				ctx.getObjectRef().lock();
-				this.objectFilter.remove(childRef.getType(), ctx);
+				this.objectFilter.remove(childRef.getType(), ctx.getObjectRef(), ctx);
 			}
 		} finally {
 			parentRef.unlock();
@@ -206,7 +205,7 @@ public class ObjectDao {
 
 		objectRef.lock();
 		try {
-			PersistenceContext<T> ctx = objectRef.<T> createPersistenceContext(this.tx);
+			PersistenceContext<T> ctx = objectRef.<T>createPersistenceContext(this.tx);
 			return this.fileDao.exists(ctx);
 		} finally {
 			objectRef.unlock();
@@ -219,7 +218,7 @@ public class ObjectDao {
 
 		objectRef.lock();
 		try {
-			PersistenceContext<T> ctx = objectRef.<T> createPersistenceContext(this.tx);
+			PersistenceContext<T> ctx = objectRef.<T>createPersistenceContext(this.tx);
 			this.fileDao.performRead(ctx);
 			return ctx.getObject();
 		} finally {
@@ -288,18 +287,19 @@ public class ObjectDao {
 	}
 
 	public <T> PersistenceContext<T> createCtx(T object) {
-		return this.ctxFactoryDelegator.<T> getCtxFactory(object.getClass()).createCtx(this.tx.getObjectRefCache(),
-				object);
+		return this.ctxFactoryDelegator.<T>getCtxFactory(object.getClass())
+				.createCtx(this.tx.getObjectRefCache(), object);
 	}
 
 	public <T> PersistenceContext<T> createCtx(ObjectRef objectRef) {
 		String type = objectRef.getType();
-		PersistenceContextFactory<T> ctxFactory = this.ctxFactoryDelegator.<T> getCtxFactory(type);
+		PersistenceContextFactory<T> ctxFactory = this.ctxFactoryDelegator.<T>getCtxFactory(type);
 		return ctxFactory.createCtx(objectRef);
 	}
 
 	private void assertNotClosed() {
 		if (!this.tx.isOpen())
-			throw new IllegalStateException("Transaction has been closed and thus no operation can be performed!"); //$NON-NLS-1$
+			throw new IllegalStateException(
+					"Transaction has been closed and thus no operation can be performed!"); //$NON-NLS-1$
 	}
 }
