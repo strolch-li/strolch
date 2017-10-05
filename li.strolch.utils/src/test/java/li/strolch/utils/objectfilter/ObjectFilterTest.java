@@ -193,24 +193,6 @@ public class ObjectFilterTest {
 	}
 
 	@Test
-	public void shouldNotAcceptDifferentKeyForSameObject() {
-		Object myObj = new Object();
-
-		ObjectFilter filter = new ObjectFilter();
-		filter.add(myObj, myObj);
-
-		try {
-			filter.update("different_key", myObj, myObj);
-			fail("Should have failed because of different key for already registered object");
-		} catch (RuntimeException e) {
-			String msg = "Object may be present in the same filter instance only once, registered using one key only";
-			assertTrue("Encountered exception: " + e.getMessage(), e.getMessage().contains(msg));
-		}
-
-		testAssertions(filter, 1, 1, 1, 0, 0);
-	}
-
-	@Test
 	public void shouldReplaceOnAddAfterRemove() {
 
 		TestObject obj1 = new TestObject(1);

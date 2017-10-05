@@ -218,18 +218,6 @@ public class ObjectFilter {
 
 		if (cached == null) {
 
-			List<ObjectCache> allElements = this.cache.getAllElements();
-
-			// check if the object is already in the cache with an other key
-			if (allElements.stream().anyMatch(oCache -> oCache.getObject().equals(objectToUpdate))) {
-				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
-
-				Optional<ObjectCache> duplicateObj = allElements.stream()
-						.filter(oCache -> oCache.getObject().equals(objectToUpdate)).findFirst();
-				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
-						Operation.MODIFY.toString(), duplicateObj.get().getKey(), key, objectToUpdate.toString()));
-			}
-
 			// The object got an ID during this run, but was not added to this cache.
 			// Hence, we add it now, with the current operation.
 			ObjectCache cacheObj = new ObjectCache(dispenseID(), key, objectKey, objectToUpdate, Operation.MODIFY);
