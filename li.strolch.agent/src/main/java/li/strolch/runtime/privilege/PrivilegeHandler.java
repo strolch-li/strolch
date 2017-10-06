@@ -24,183 +24,170 @@ import li.strolch.runtime.StrolchConstants;
 
 /**
  * The privilege handler for authenticating users and performing actions as a system user
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface PrivilegeHandler {
 
 	/**
 	 * Authenticate a user
-	 * 
+	 *
 	 * @param username
-	 *            the username
+	 * 		the username
 	 * @param password
-	 *            the password
-	 * 
+	 * 		the password
+	 *
 	 * @return the certificate
-	 * 
-	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, byte[])
+	 *
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, char[])
 	 */
-	public Certificate authenticate(String username, char[] password);
-
-	/**
-	 * Validate that the certificate is still valid
-	 * 
-	 * @param certificate
-	 *            the certificate
-	 * 
-	 * @throws PrivilegeException
-	 *             if the certificate is not valid
-	 * 
-	 * @see li.strolch.privilege.handler.PrivilegeHandler#isCertificateValid(Certificate)
-	 */
-	public void isCertificateValid(Certificate certificate) throws PrivilegeException;
-
-	/**
-	 * Invalidates the given certificate
-	 * 
-	 * @param certificate
-	 *            the certificate
-	 * 
-	 * @return true if the certificate was invalidated, or false if it was already invalidated
-	 * 
-	 * @see li.strolch.privilege.handler.PrivilegeHandler#invalidateSession(li.strolch.privilege.model.Certificate)
-	 */
-	public boolean invalidateSession(Certificate certificate);
-
-	/**
-	 * Notifies that the session has timed out, i.e. the certificate must be invalidated
-	 * 
-	 * @param certificate
-	 *            the certificate that has timed out
-	 * @return true if the certificate was invalidated, or false it was already invalidated
-	 * 
-	 * @see li.strolch.privilege.handler.PrivilegeHandler#invalidateSession(li.strolch.privilege.model.Certificate)
-	 */
-	public boolean sessionTimeout(Certificate certificate);
+	Certificate authenticate(String username, char[] password);
 
 	/**
 	 * Returns the {@link PrivilegeContext} for the given certificate
-	 * 
+	 *
 	 * @param certificate
-	 *            the certificate
-	 * 
+	 * 		the certificate
+	 *
 	 * @return the {@link PrivilegeContext} for the given certificate
-	 * 
+	 *
 	 * @throws PrivilegeException
-	 *             if the certificate is not valid anymore
-	 * 
-	 * @see li.strolch.privilege.handler.PrivilegeHandler#getPrivilegeContext(li.strolch.privilege.model.Certificate)
+	 * 		if the certificate is not valid anymore
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#validate(li.strolch.privilege.model.Certificate)
 	 */
-	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException;
+	PrivilegeContext validate(Certificate certificate) throws PrivilegeException;
+
+	/**
+	 * Invalidates the given certificate
+	 *
+	 * @param certificate
+	 * 		the certificate
+	 *
+	 * @return true if the certificate was invalidated, or false if it was already invalidated
+	 *
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#invalidate(li.strolch.privilege.model.Certificate)
+	 */
+	boolean invalidate(Certificate certificate);
+
+	/**
+	 * Notifies that the session has timed out, i.e. the certificate must be invalidated
+	 *
+	 * @param certificate
+	 * 		the certificate that has timed out
+	 *
+	 * @return true if the certificate was invalidated, or false it was already invalidated
+	 *
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#invalidate(li.strolch.privilege.model.Certificate)
+	 */
+	boolean sessionTimeout(Certificate certificate);
 
 	/**
 	 * Run the given {@link SystemAction} as the given system user
-	 * 
+	 *
 	 * @param username
-	 *            the system username
+	 * 		the system username
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @throws PrivilegeException
-	 *             if there is something wrong
+	 * 		if there is something wrong
 	 */
-	public void runAs(String username, SystemAction action) throws PrivilegeException;
+	void runAs(String username, SystemAction action) throws PrivilegeException;
 
 	/**
 	 * Run the given {@link SystemActionWithResult} as the given system user
-	 * 
+	 *
 	 * @param username
-	 *            the system username
+	 * 		the system username
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
-	 *             if there is something wrong
+	 * 		if there is something wrong
 	 */
-	public <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException;
+	<T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException;
 
 	/**
 	 * Run the given {@link PrivilegedRunnable} as the given system user
-	 * 
+	 *
 	 * @param username
-	 *            the system username
+	 * 		the system username
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @throws PrivilegeException
-	 *             if there is something wrong
+	 * 		if there is something wrong
 	 */
-	public void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException;
+	void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException;
 
 	/**
 	 * Run the given {@link PrivilegedRunnable} as the given system user
-	 * 
+	 *
 	 * @param username
-	 *            the system username
+	 * 		the system username
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
-	 *             if there is something wrong
+	 * 		if there is something wrong
 	 */
-	public <T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException;
+	<T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException;
 
 	/**
 	 * Run the given {@link SystemAction} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
-	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 *
+	 * @param action
+	 * 		the action to perform
+	 *
 	 * @throws PrivilegeException
-	 *             if there is something wrong
+	 * 		if there is something wrong
 	 */
-	public void runAsAgent(SystemAction action) throws PrivilegeException;
+	void runAsAgent(SystemAction action) throws PrivilegeException;
 
 	/**
 	 * Run the given {@link SystemActionWithResult} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
-	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 *
+	 * @param action
+	 * 		the action to perform
+	 *
 	 * @throws PrivilegeException
-	 *             if there is something wrong
+	 * 		if there is something wrong
 	 */
-	public <T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException;
+	<T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException;
 
 	/**
 	 * Run the given {@link PrivilegedRunnable} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
+	 *
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @throws PrivilegeException
-	 *             if there is something wrong
+	 * 		if there is something wrong
 	 */
-	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException;
+	void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException;
 
 	/**
 	 * Run the given {@link PrivilegedRunnableWithResult} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
+	 *
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
-	 *             if there is something wrong
+	 * 		if there is something wrong
 	 */
-	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException;
+	<T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException;
 
 	/**
 	 * Returns the {@link li.strolch.privilege.handler.PrivilegeHandler}
-	 * 
+	 *
 	 * @return the {@link li.strolch.privilege.handler.PrivilegeHandler}
 	 */
-	public abstract li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler();
+	li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler();
 
 }

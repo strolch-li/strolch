@@ -105,6 +105,10 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 				this.currentElement = qName;
 				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
 				getContainerModel().setUserChallengeHandlerClassName(className);
+			} else if (qName.equals(XmlConstants.XML_HANDLER_SSO)) {
+				this.currentElement = qName;
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				getContainerModel().setSsoHandlerClassName(className);
 			}
 		}
 
@@ -123,6 +127,8 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 				getContainerModel().setPersistenceHandlerParameterMap(parametersChild.getParameterMap());
 			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_USER_CHALLENGE)) {
 				getContainerModel().setUserChallengeHandlerParameterMap(parametersChild.getParameterMap());
+			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_SSO)) {
+				getContainerModel().setSsoHandlerParameterMap(parametersChild.getParameterMap());
 			}
 		}
 	}

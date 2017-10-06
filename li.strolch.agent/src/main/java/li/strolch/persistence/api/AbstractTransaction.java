@@ -336,7 +336,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private void assertQueryAllowed(StrolchQuery query) {
 		try {
-			PrivilegeContext privilegeContext = this.privilegeHandler.getPrivilegeContext(this.certificate);
+			PrivilegeContext privilegeContext = this.privilegeHandler.validate(this.certificate);
 			privilegeContext.validateAction(query);
 		} catch (PrivilegeException e) {
 			throw new StrolchAccessDeniedException(this.certificate, query, ExceptionHelper.getExceptionMessage(e), e);
@@ -705,7 +705,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public void assertHasPrivilege(Operation operation, StrolchRootElement element) throws AccessDeniedException {
 		DBC.PRE.assertNotNull("operation must not be null", operation);
 		DBC.PRE.assertNotNull("element must not be null", element);
-		this.privilegeHandler.getPrivilegeContext(this.certificate)
+		this.privilegeHandler.validate(this.certificate)
 				.validateAction(new TransactedRestrictable(this, operation.getPrivilegeName(element), element));
 	}
 
@@ -960,12 +960,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void autoCloseableReadOnly() throws StrolchTransactionException {
 		long start = System.nanoTime();
-		boolean throwException = false;
 		try {
 			this.txResult.setState(TransactionState.CLOSING);
-
-			Thread.currentThread().getUncaughtExceptionHandler();
-			StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 
 			if (!this.commands.isEmpty()) {
 				autoCloseableRollback();
@@ -1217,8 +1213,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		long auditTrailStart = System.nanoTime();
 
 		List<Audit> audits = new ArrayList<>();
-
-		// TODO this is bad... doesn't account for a created and deleted in same TX...
 
 		if (this.orderMap != null) {
 			if (this.realm.isAuditTrailEnabledForRead())

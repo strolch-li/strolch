@@ -30,14 +30,8 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.privilege.base.NotAuthenticatedException;
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.handler.DefaultPrivilegeHandler;
-import li.strolch.privilege.handler.EncryptionHandler;
-import li.strolch.privilege.handler.PersistenceHandler;
-import li.strolch.privilege.handler.SystemAction;
-import li.strolch.privilege.handler.SystemActionWithResult;
-import li.strolch.privilege.handler.XmlPersistenceHandler;
+import li.strolch.privilege.handler.*;
 import li.strolch.privilege.helper.PrivilegeInitializationHelper;
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.Certificate;
@@ -67,24 +61,22 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 		// initialize privilege
 		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
-		File privilegeConfigFile = configuration.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML,
-				runtimeConfiguration);
-		li.strolch.privilege.handler.PrivilegeHandler privilegeHandler = initializeFromXml(configuration,
-				privilegeConfigFile);
-		this.privilegeHandler = privilegeHandler;
+		File privilegeConfigFile = configuration
+				.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML, runtimeConfiguration);
+		this.privilegeHandler = initializeFromXml(configuration, privilegeConfigFile);
 	}
 
 	/**
 	 * Initializes the {@link DefaultPrivilegeHandler} from the configuration file
-	 * 
+	 *
 	 * @param privilegeXmlFile
-	 *            a {@link File} reference to the XML file containing the configuration for Privilege
-	 * 
+	 * 		a {@link File} reference to the XML file containing the configuration for Privilege
+	 *
 	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
-	 *         {@link PersistenceHandler} are set and initialized as well
+	 * {@link PersistenceHandler} are set and initialized as well
 	 */
 	private li.strolch.privilege.handler.PrivilegeHandler initializeFromXml(ComponentConfiguration configuration,
-			File privilegeXmlFile) {
+																			File privilegeXmlFile) {
 
 		// make sure file exists
 		if (!privilegeXmlFile.exists()) {
@@ -142,14 +134,13 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public void isCertificateValid(Certificate certificate) throws PrivilegeException, NotAuthenticatedException {
-		assertStarted();
-		this.privilegeHandler.isCertificateValid(certificate);
+	public PrivilegeContext validate(Certificate certificate) throws PrivilegeException {
+		return this.privilegeHandler.validate(certificate);
 	}
 
 	@Override
-	public boolean invalidateSession(Certificate certificate) {
-		boolean invalidateSession = this.privilegeHandler.invalidateSession(certificate);
+	public boolean invalidate(Certificate certificate) {
+		boolean invalidateSession = this.privilegeHandler.invalidate(certificate);
 		StrolchRealm realm = getContainer().getRealm(certificate);
 		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.LOGOUT)) {
 			tx.setSuppressDoNothingLogging(true);
@@ -164,7 +155,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	@Override
 	public boolean sessionTimeout(Certificate certificate) {
 		assertStarted();
-		boolean invalidateSession = this.privilegeHandler.invalidateSession(certificate);
+		boolean invalidateSession = this.privilegeHandler.invalidate(certificate);
 		StrolchRealm realm = getContainer().getRealm(certificate);
 		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.SESSION_TIME_OUT)) {
 			tx.setSuppressDoNothingLogging(true);
@@ -213,13 +204,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 	@Override
 	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
-		return this.privilegeHandler.runWithResult(StrolchConstants.SYSTEM_USER_AGENT,
-				new StrolchSystemActionWithResult<>(runnable));
-	}
-
-	@Override
-	public PrivilegeContext getPrivilegeContext(Certificate certificate) throws PrivilegeException {
-		return this.privilegeHandler.getPrivilegeContext(certificate);
+		return this.privilegeHandler
+				.runWithResult(StrolchConstants.SYSTEM_USER_AGENT, new StrolchSystemActionWithResult<>(runnable));
 	}
 
 	@Override

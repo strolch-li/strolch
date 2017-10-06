@@ -89,7 +89,7 @@ public class RuntimeMock {
 	}
 
 	public boolean logout(Certificate cert) {
-		return getPrivilegeHandler().invalidateSession(cert);
+		return getPrivilegeHandler().invalidate(cert);
 	}
 
 	public RuntimeMock mockRuntime(String targetPath, String srcPath) {
@@ -235,8 +235,7 @@ public class RuntimeMock {
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to read " + StrolchAgent.AGENT_VERSION_PROPERTIES, e);
 		}
-		StrolchVersion version = new StrolchVersion(properties);
-		return version;
+		return new StrolchVersion(properties);
 	}
 
 }

@@ -69,6 +69,11 @@ public class XmlConstants {
 	public static final String XML_HANDLER_ENCRYPTION = "EncryptionHandler";
 
 	/**
+	 * XML_HANDLER_ENCRYPTION = "EncryptionHandler" :
+	 */
+	public static final String XML_HANDLER_SSO = "SsoHandler";
+
+	/**
 	 * XML_HANDLER_PRIVILEGE = "PrivilegeHandler" :
 	 */
 	public static final String XML_HANDLER_PRIVILEGE = "PrivilegeHandler";

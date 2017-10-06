@@ -21,6 +21,7 @@ import java.util.Locale;
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Usage;
 import li.strolch.rest.model.UserSession;
 
@@ -29,46 +30,46 @@ import li.strolch.rest.model.UserSession;
  */
 public interface StrolchSessionHandler {
 
-	public Certificate authenticate(String username, char[] password);
+	Certificate authenticate(String username, char[] password);
 
-	public Certificate validate(String authToken) throws StrolchNotAuthenticatedException;
+	Certificate validate(String authToken) throws StrolchNotAuthenticatedException;
 
-	public Certificate validate(Certificate certificate) throws StrolchNotAuthenticatedException;
+	PrivilegeContext validate(Certificate certificate) throws StrolchNotAuthenticatedException;
 
-	public void invalidate(Certificate certificate);
+	List<UserSession> getSessions(Certificate certificate);
 
-	public List<UserSession> getSessions(Certificate certificate);
+	UserSession getSession(Certificate certificate, String sessionId);
 
-	public UserSession getSession(Certificate certificate, String sessionId);
+	void invalidate(Certificate certificate);
 
-	public void invalidateSession(Certificate certificate, String sessionId);
+	void invalidate(Certificate certificate, String sessionId);
 
-	public void setSessionLocale(Certificate certificate, String sessionId, Locale locale);
+	void setSessionLocale(Certificate certificate, String sessionId, Locale locale);
 
 	/**
 	 * Initiate a password reset challenge for the given username
-	 * 
+	 *
 	 * @param usage
-	 *            the usage for which the challenge is requested
+	 * 		the usage for which the challenge is requested
 	 * @param username
-	 *            the username of the user to initiate the challenge for
+	 * 		the username of the user to initiate the challenge for
 	 */
-	public void initiateChallengeFor(Usage usage, String username);
+	void initiateChallengeFor(Usage usage, String username);
 
 	/**
 	 * Validate the response of a challenge for the given username
-	 * 
+	 *
 	 * @param username
-	 *            the username of the user for which the challenge is to be validated
+	 * 		the username of the user for which the challenge is to be validated
 	 * @param challenge
-	 *            the challenge from the user
-	 * 
+	 * 		the challenge from the user
+	 *
 	 * @return certificate with which the user can access the system with the {@link Usage} set to the value from the
-	 *         initiated challenge
-	 * 
+	 * initiated challenge
+	 *
 	 * @throws PrivilegeException
-	 *             if anything goes wrong
+	 * 		if anything goes wrong
 	 */
-	public Certificate validateChallenge(String username, String challenge) throws PrivilegeException;
+	Certificate validateChallenge(String username, String challenge) throws PrivilegeException;
 
 }

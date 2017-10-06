@@ -93,7 +93,7 @@ public class AuthenticationService {
 
 			PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getContainer()
 					.getPrivilegeHandler();
-			PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
+			PrivilegeContext privilegeContext = privilegeHandler.validate(certificate);
 			loginResult.addProperty("sessionId", certificate.getSessionId());
 			loginResult.addProperty("authToken", certificate.getAuthToken());
 			loginResult.addProperty("username", certificate.getUsername());

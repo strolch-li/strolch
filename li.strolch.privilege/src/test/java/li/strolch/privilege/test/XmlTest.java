@@ -16,30 +16,13 @@
 package li.strolch.privilege.test;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 import li.strolch.privilege.handler.DefaultEncryptionHandler;
+import li.strolch.privilege.handler.MailUserChallengeHandler;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.handler.XmlPersistenceHandler;
 import li.strolch.privilege.model.IPrivilege;
@@ -48,15 +31,16 @@ import li.strolch.privilege.model.internal.PrivilegeContainerModel;
 import li.strolch.privilege.model.internal.PrivilegeImpl;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
-import li.strolch.privilege.xml.PrivilegeConfigDomWriter;
-import li.strolch.privilege.xml.PrivilegeConfigSaxReader;
-import li.strolch.privilege.xml.PrivilegeRolesDomWriter;
-import li.strolch.privilege.xml.PrivilegeRolesSaxReader;
-import li.strolch.privilege.xml.PrivilegeUsersDomWriter;
-import li.strolch.privilege.xml.PrivilegeUsersSaxReader;
+import li.strolch.privilege.test.model.DummySsoHandler;
+import li.strolch.privilege.xml.*;
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.XmlHelper;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -64,12 +48,13 @@ import li.strolch.utils.helper.XmlHelper;
 @SuppressWarnings("nls")
 public class XmlTest {
 
-	private static final String TARGET_TEST = "./target/test";
+	private static final String TARGET_TEST = "target/test/";
+	private static final String SRC_TEST = "src/test/resources/config/";
 	private static final Logger logger = LoggerFactory.getLogger(XmlTest.class);
 
 	/**
 	 * @throws Exception
-	 *             if something goes wrong
+	 * 		if something goes wrong
 	 */
 	@BeforeClass
 	public static void init() throws Exception {
@@ -89,17 +74,17 @@ public class XmlTest {
 		if (!tmpDir.exists())
 			return;
 
-		File tmpFile = new File("target/test/PrivilegeTest.xml");
+		File tmpFile = new File(TARGET_TEST + "PrivilegeTest.xml");
 		if (tmpFile.exists() && !tmpFile.delete()) {
 			throw new RuntimeException("Tmp still exists and can not be deleted at " + tmpFile.getAbsolutePath());
 		}
 
-		tmpFile = new File("target/test/PrivilegeUsersTest.xml");
+		tmpFile = new File(TARGET_TEST + "PrivilegeUsersTest.xml");
 		if (tmpFile.exists() && !tmpFile.delete()) {
 			throw new RuntimeException("Tmp still exists and can not be deleted at " + tmpFile.getAbsolutePath());
 		}
 
-		tmpFile = new File("target/test/PrivilegeRolesTest.xml");
+		tmpFile = new File(TARGET_TEST + "PrivilegeRolesTest.xml");
 		if (tmpFile.exists() && !tmpFile.delete()) {
 			throw new RuntimeException("Tmp still exists and can not be deleted at " + tmpFile.getAbsolutePath());
 		}
@@ -115,7 +100,7 @@ public class XmlTest {
 
 		PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
 		PrivilegeConfigSaxReader saxReader = new PrivilegeConfigSaxReader(containerModel);
-		File xmlFile = new File("config/PrivilegeConfig.xml");
+		File xmlFile = new File(SRC_TEST + "PrivilegeConfig.xml");
 		XmlHelper.parseDocument(xmlFile, saxReader);
 		logger.info(containerModel.toString());
 
@@ -153,22 +138,24 @@ public class XmlTest {
 		containerModel.setEncryptionHandlerParameterMap(encryptionHandlerParameterMap);
 		containerModel.setPersistenceHandlerClassName(XmlPersistenceHandler.class.getName());
 		containerModel.setPersistenceHandlerParameterMap(persistenceHandlerParameterMap);
+		containerModel.setUserChallengeHandlerClassName(MailUserChallengeHandler.class.getName());
+		containerModel.setSsoHandlerClassName(DummySsoHandler.class.getName());
 
 		containerModel.addPolicy("DefaultPrivilege", "li.strolch.privilege.policy.DefaultPrivilege");
 
-		File configFile = new File("./target/test/PrivilegeTest.xml");
+		File configFile = new File(TARGET_TEST + "PrivilegeTest.xml");
 		PrivilegeConfigDomWriter configSaxWriter = new PrivilegeConfigDomWriter(containerModel, configFile);
 		configSaxWriter.write();
 
 		String fileHash = StringHelper.toHexString(FileHelper.hashFileSha256(configFile));
-		assertEquals("800b8e42e15b6b3bb425fa9c12a011d587d2b12343a1d1371eaa36dc1b2ea5f4", fileHash);
+		assertEquals("55c1212446707563877009f2090a39ad2fdf5462108109bbe0c10759d100a482", fileHash);
 	}
 
 	@Test
 	public void canReadUsers() {
 
 		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader();
-		File xmlFile = new File("config/PrivilegeUsers.xml");
+		File xmlFile = new File(SRC_TEST + "PrivilegeUsers.xml");
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
 		List<User> users = xmlHandler.getUsers();
@@ -215,7 +202,7 @@ public class XmlTest {
 	public void canReadRoles() {
 
 		PrivilegeRolesSaxReader xmlHandler = new PrivilegeRolesSaxReader();
-		File xmlFile = new File("config/PrivilegeRoles.xml");
+		File xmlFile = new File(SRC_TEST + "PrivilegeRoles.xml");
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
 		List<Role> roles = xmlHandler.getRoles();
@@ -253,7 +240,7 @@ public class XmlTest {
 		// AppUser
 		Role appUser = findRole("AppUser", roles);
 		assertEquals("AppUser", appUser.getName());
-		assertEquals(new HashSet<>(Arrays.asList("li.strolch.privilege.test.model.TestRestrictable")),
+		assertEquals(new HashSet<>(Collections.singletonList("li.strolch.privilege.test.model.TestRestrictable")),
 				appUser.getPrivilegeNames());
 
 		IPrivilege testRestrictable = appUser.getPrivilege("li.strolch.privilege.test.model.TestRestrictable");
@@ -267,8 +254,9 @@ public class XmlTest {
 		Role systemAdminPrivileges = findRole("system_admin_privileges", roles);
 		assertEquals("system_admin_privileges", systemAdminPrivileges.getName());
 		assertEquals(2, systemAdminPrivileges.getPrivilegeNames().size());
-		assertThat(systemAdminPrivileges.getPrivilegeNames(), containsInAnyOrder(
-				"li.strolch.privilege.handler.SystemAction", "li.strolch.privilege.test.model.TestSystemRestrictable"));
+		assertThat(systemAdminPrivileges.getPrivilegeNames(),
+				containsInAnyOrder("li.strolch.privilege.handler.SystemAction",
+						"li.strolch.privilege.test.model.TestSystemRestrictable"));
 
 		IPrivilege testSystemUserAction = systemAdminPrivileges
 				.getPrivilege("li.strolch.privilege.handler.SystemAction");
@@ -302,11 +290,6 @@ public class XmlTest {
 		assertThat(testSystemUserAction2.getDenyList(), containsInAnyOrder("goodbye"));
 	}
 
-	/**
-	 * @param username
-	 * @param users
-	 * @return
-	 */
 	private User findUser(String username, List<User> users) {
 		for (User user : users) {
 			if (user.getUsername().equals(username))
@@ -316,11 +299,6 @@ public class XmlTest {
 		throw new RuntimeException("No user exists with username " + username);
 	}
 
-	/**
-	 * @param name
-	 * @param roles
-	 * @return
-	 */
 	private Role findRole(String name, List<Role> roles) {
 		for (Role role : roles) {
 			if (role.getName().equals(name))
@@ -353,7 +331,7 @@ public class XmlTest {
 				UserState.ENABLED, userRoles, Locale.ENGLISH, propertyMap);
 		users.add(user2);
 
-		File modelFile = new File("./target/test/PrivilegeUsersTest.xml");
+		File modelFile = new File(TARGET_TEST + "PrivilegeUsersTest.xml");
 		PrivilegeUsersDomWriter configSaxWriter = new PrivilegeUsersDomWriter(users, modelFile);
 		configSaxWriter.write();
 
@@ -408,7 +386,7 @@ public class XmlTest {
 		Role role2 = new Role("role2", privilegeMap);
 		roles.add(role2);
 
-		File modelFile = new File("./target/test/PrivilegeRolesTest.xml");
+		File modelFile = new File(TARGET_TEST + "PrivilegeRolesTest.xml");
 		PrivilegeRolesDomWriter configSaxWriter = new PrivilegeRolesDomWriter(roles, modelFile);
 		configSaxWriter.write();
 

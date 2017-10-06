@@ -25,8 +25,7 @@ public class AbstractPrivilegeTest {
 	protected void login(String username, char[] password) {
 		Certificate certificate = privilegeHandler.authenticate(username, password);
 		assertTrue("Certificate is null!", certificate != null);
-		PrivilegeContext privilegeContext = privilegeHandler.getPrivilegeContext(certificate);
-		this.ctx = privilegeContext;
+		this.ctx = privilegeHandler.validate(certificate);
 	}
 
 	protected void logout() {
@@ -34,7 +33,7 @@ public class AbstractPrivilegeTest {
 			try {
 				PrivilegeContext privilegeContext = this.ctx;
 				this.ctx = null;
-				privilegeHandler.invalidateSession(privilegeContext.getCertificate());
+				privilegeHandler.invalidate(privilegeContext.getCertificate());
 			} catch (PrivilegeException e) {
 				String msg = "There is no PrivilegeContext currently bound to the ThreadLocal!";
 				if (!e.getMessage().equals(msg))
@@ -43,18 +42,18 @@ public class AbstractPrivilegeTest {
 		}
 	}
 
-	protected static void prepareConfigs(String dst, String configFilename, String usersFilename,
-			String rolesFilename) {
+	protected static void prepareConfigs(String dst,
+										 String configFilename,
+										 String usersFilename,
+										 String rolesFilename) {
 		try {
-			String pwd = System.getProperty("user.dir");
-
-			File configPath = new File(pwd, "config");
+			File configPath = new File("src/test/resources/config");
 
 			File privilegeConfigFile = new File(configPath, configFilename);
 			File privilegeUsersFile = new File(configPath, usersFilename);
 			File privilegeRolesFile = new File(configPath, rolesFilename);
 
-			File targetPath = new File(pwd, "target/" + dst);
+			File targetPath = new File("target/" + dst);
 			if (!targetPath.mkdirs())
 				throw new RuntimeException("Could not create parent " + targetPath);
 
@@ -79,8 +78,7 @@ public class AbstractPrivilegeTest {
 
 	protected static void removeConfigs(String dst) {
 		try {
-			String pwd = System.getProperty("user.dir");
-			File targetPath = new File(pwd, "target");
+			File targetPath = new File("target");
 			targetPath = new File(targetPath, dst);
 			if (targetPath.exists() && !FileHelper.deleteFile(targetPath, true)) {
 				throw new RuntimeException(
@@ -94,8 +92,7 @@ public class AbstractPrivilegeTest {
 
 	protected static File getPrivilegeConfigFile(String dst, String configFilename) {
 		try {
-			String pwd = System.getProperty("user.dir");
-			File targetPath = new File(pwd, "target");
+			File targetPath = new File("target");
 			targetPath = new File(targetPath, dst);
 			return new File(targetPath, configFilename);
 		} catch (Exception e) {

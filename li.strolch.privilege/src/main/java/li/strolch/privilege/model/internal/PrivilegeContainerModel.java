@@ -27,11 +27,11 @@ import li.strolch.privilege.policy.PrivilegePolicy;
 /**
  * This class is used during XML parsing to hold the model before it is properly validated and made accessible through
  * the {@link PrivilegeHandler}
- * 
+ *
  * <p>
  * Note: This is an internal object which is not to be serialized or passed to clients
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PrivilegeContainerModel {
@@ -39,10 +39,12 @@ public class PrivilegeContainerModel {
 	private String encryptionHandlerClassName;
 	private String persistenceHandlerClassName;
 	private String userChallengeHandlerClassName;
+	private String ssoHandlerClassName;
 
 	private Map<String, String> encryptionHandlerParameterMap;
 	private Map<String, String> persistenceHandlerParameterMap;
 	private Map<String, String> challengeHandlerParameterMap;
+	private Map<String, String> ssoHandlerParameterMap;
 
 	private Map<String, String> parameterMap;
 
@@ -53,6 +55,7 @@ public class PrivilegeContainerModel {
 		this.encryptionHandlerParameterMap = new HashMap<>();
 		this.persistenceHandlerParameterMap = new HashMap<>();
 		this.challengeHandlerParameterMap = new HashMap<>();
+		this.ssoHandlerParameterMap = new HashMap<>();
 	}
 
 	public Map<String, String> getParameterMap() {
@@ -103,12 +106,28 @@ public class PrivilegeContainerModel {
 		this.userChallengeHandlerClassName = userChallengeHandlerClassName;
 	}
 
+	public String getSsoHandlerClassName() {
+		return this.ssoHandlerClassName;
+	}
+
+	public void setSsoHandlerClassName(String ssoHandlerClassName) {
+		this.ssoHandlerClassName = ssoHandlerClassName;
+	}
+
 	public Map<String, String> getUserChallengeHandlerParameterMap() {
 		return this.challengeHandlerParameterMap;
 	}
 
 	public void setUserChallengeHandlerParameterMap(Map<String, String> challengeHandlerParameterMap) {
 		this.challengeHandlerParameterMap = challengeHandlerParameterMap;
+	}
+
+	public Map<String, String> getSsoHandlerParameterMap() {
+		return this.ssoHandlerParameterMap;
+	}
+
+	public void setSsoHandlerParameterMap(Map<String, String> ssoHandlerParameterMap) {
+		this.ssoHandlerParameterMap = ssoHandlerParameterMap;
 	}
 
 	public void addPolicy(String privilegeName, String policyClassName) {
@@ -160,6 +179,8 @@ public class PrivilegeContainerModel {
 		builder.append(this.persistenceHandlerParameterMap.size());
 		builder.append(", challengeHandlerParameterMap=");
 		builder.append(this.challengeHandlerParameterMap.size());
+		builder.append(", ssoHandlerParameterMap=");
+		builder.append(this.ssoHandlerParameterMap.size());
 		builder.append(", parameterMap=");
 		builder.append(this.parameterMap.size());
 		builder.append(", policies=");

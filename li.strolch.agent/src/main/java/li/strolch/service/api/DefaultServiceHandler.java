@@ -39,10 +39,6 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	private PrivilegeHandler privilegeHandler;
 	private boolean throwOnPrivilegeFail;
 
-	/**
-	 * @param container
-	 * @param componentName
-	 */
 	public DefaultServiceHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
@@ -74,7 +70,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		PrivilegeContext privilegeContext;
 		String username = certificate == null ? "null" : certificate.getUsername();
 		try {
-			privilegeContext = this.privilegeHandler.getPrivilegeContext(certificate);
+			privilegeContext = this.privilegeHandler.validate(certificate);
 			privilegeContext.validateAction(service);
 		} catch (PrivilegeException e) {
 

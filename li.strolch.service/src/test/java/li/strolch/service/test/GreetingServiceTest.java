@@ -43,7 +43,7 @@ public class GreetingServiceTest extends AbstractServiceTest {
 					greetingArgument);
 			assertThat(greetingResult.getGreeting(), containsString("Hello Robert. Nice to meet you!")); //$NON-NLS-1$
 		} finally {
-			runtimeMock.getPrivilegeHandler().invalidateSession(certificate);
+			runtimeMock.getPrivilegeHandler().invalidate(certificate);
 		}
 	}
 }

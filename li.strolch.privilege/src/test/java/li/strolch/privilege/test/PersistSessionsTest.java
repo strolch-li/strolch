@@ -38,11 +38,11 @@ public class PersistSessionsTest extends AbstractPrivilegeTest {
 
 		// login and assert sessions file was written
 		login("admin", "admin".toCharArray());
-		this.privilegeHandler.isCertificateValid(ctx.getCertificate());
+		this.privilegeHandler.validate(ctx.getCertificate());
 		assertTrue("Sessions File should have been created!", sessionsFile.isFile());
 
 		// re-initialize and assert still logged in
 		initialize(PersistSessionsTest.class.getSimpleName(), "PrivilegeConfig.xml");
-		this.privilegeHandler.isCertificateValid(ctx.getCertificate());
+		this.privilegeHandler.validate(ctx.getCertificate());
 	}
 }

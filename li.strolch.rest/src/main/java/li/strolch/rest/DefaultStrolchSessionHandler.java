@@ -116,7 +116,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		} else if (this.certificateMap != null) {
 			synchronized (this.certificateMap) {
 				for (Certificate certificate : this.certificateMap.values()) {
-					this.privilegeHandler.invalidateSession(certificate);
+					this.privilegeHandler.invalidate(certificate);
 				}
 				this.certificateMap.clear();
 			}
@@ -154,14 +154,13 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			throw new StrolchNotAuthenticatedException(
 					MessageFormat.format("No certificate exists for sessionId {0}", authToken)); //$NON-NLS-1$
 
-		return validate(certificate);
+		return validate(certificate).getCertificate();
 	}
 
 	@Override
-	public Certificate validate(Certificate certificate) throws StrolchNotAuthenticatedException {
+	public PrivilegeContext validate(Certificate certificate) throws StrolchNotAuthenticatedException {
 		try {
-			this.privilegeHandler.isCertificateValid(certificate);
-			return certificate;
+			return this.privilegeHandler.validate(certificate);
 		} catch (PrivilegeException e) {
 			throw new StrolchNotAuthenticatedException(e.getMessage(), e);
 		}
@@ -176,7 +175,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			logger.error(MessageFormat
 					.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
 
-		this.privilegeHandler.invalidateSession(certificate);
+		this.privilegeHandler.invalidate(certificate);
 	}
 
 	@Override
@@ -255,7 +254,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public UserSession getSession(Certificate certificate, String sessionId) {
-		PrivilegeContext ctx = this.privilegeHandler.getPrivilegeContext(certificate);
+		PrivilegeContext ctx = this.privilegeHandler.validate(certificate);
 		ctx.assertHasPrivilege(PRIVILEGE_GET_SESSION);
 		synchronized (this.certificateMap) {
 			for (Certificate cert : certificateMap.values()) {
@@ -271,7 +270,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public List<UserSession> getSessions(Certificate certificate) {
-		PrivilegeContext ctx = this.privilegeHandler.getPrivilegeContext(certificate);
+		PrivilegeContext ctx = this.privilegeHandler.validate(certificate);
 		ctx.assertHasPrivilege(PRIVILEGE_GET_SESSION);
 		List<UserSession> sessions = new ArrayList<>(this.certificateMap.size());
 		synchronized (this.certificateMap) {
@@ -289,8 +288,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public void invalidateSession(Certificate certificate, String sessionId) {
-		PrivilegeContext ctx = this.privilegeHandler.getPrivilegeContext(certificate);
+	public void invalidate(Certificate certificate, String sessionId) {
+		PrivilegeContext ctx = this.privilegeHandler.validate(certificate);
 		ctx.assertHasPrivilege(PRIVILEGE_INVALIDATE_SESSION);
 
 		Map<String, Certificate> map;

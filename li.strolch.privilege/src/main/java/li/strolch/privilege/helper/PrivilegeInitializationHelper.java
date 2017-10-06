@@ -22,11 +22,7 @@ import java.text.MessageFormat;
 import java.util.Map;
 
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.handler.DefaultPrivilegeHandler;
-import li.strolch.privilege.handler.EncryptionHandler;
-import li.strolch.privilege.handler.PersistenceHandler;
-import li.strolch.privilege.handler.PrivilegeHandler;
-import li.strolch.privilege.handler.UserChallengeHandler;
+import li.strolch.privilege.handler.*;
 import li.strolch.privilege.model.internal.PrivilegeContainerModel;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.privilege.xml.PrivilegeConfigSaxReader;
@@ -36,19 +32,19 @@ import li.strolch.utils.helper.XmlHelper;
 /**
  * This class implements the initializing of the {@link PrivilegeHandler} by loading an XML file containing the
  * configuration
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PrivilegeInitializationHelper {
 
 	/**
 	 * Initializes the {@link DefaultPrivilegeHandler} from the configuration file
-	 * 
+	 *
 	 * @param privilegeXmlFile
-	 *            a {@link File} reference to the XML file containing the configuration for Privilege
-	 * 
+	 * 		a {@link File} reference to the XML file containing the configuration for Privilege
+	 *
 	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
-	 *         {@link PersistenceHandler} are set and initialized as well
+	 * {@link PersistenceHandler} are set and initialized as well
 	 */
 	public static PrivilegeHandler initializeFromXml(File privilegeXmlFile) {
 
@@ -72,12 +68,12 @@ public class PrivilegeInitializationHelper {
 	/**
 	 * Initializes the {@link PrivilegeHandler} by loading from the given input stream. This stream must be a valid XML
 	 * source
-	 * 
+	 *
 	 * @param privilegeConfigInputStream
-	 *            the XML stream containing the privilege configuration
-	 * 
+	 * 		the XML stream containing the privilege configuration
+	 *
 	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
-	 *         {@link PersistenceHandler} are set and initialized as well
+	 * {@link PersistenceHandler} are set and initialized as well
 	 */
 	public static PrivilegeHandler initializeFromXml(InputStream privilegeConfigInputStream) {
 
@@ -91,12 +87,12 @@ public class PrivilegeInitializationHelper {
 
 	/**
 	 * Initializes the {@link PrivilegeHandler} by initializing from the given {@link PrivilegeContainerModel}
-	 * 
+	 *
 	 * @param containerModel
-	 *            the configuration for the {@link PrivilegeHandler}
-	 * 
+	 * 		the configuration for the {@link PrivilegeHandler}
+	 *
 	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
-	 *         {@link PersistenceHandler} are set and initialized as well
+	 * {@link PersistenceHandler} are set and initialized as well
 	 */
 	public static PrivilegeHandler initializeFromXml(PrivilegeContainerModel containerModel) {
 
@@ -137,13 +133,31 @@ public class PrivilegeInitializationHelper {
 			throw new PrivilegeException(msg, e);
 		}
 
+		// initialize SSO handler
+		SingleSignOnHandler ssoHandler;
+		if (containerModel.getSsoHandlerClassName() == null) {
+			ssoHandler = null;
+		} else {
+			String ssoHandlerClassName = containerModel.getSsoHandlerClassName();
+			ssoHandler = ClassHelper.instantiateClass(ssoHandlerClassName);
+			parameterMap = containerModel.getSsoHandlerParameterMap();
+			try {
+				ssoHandler.initialize(parameterMap);
+			} catch (Exception e) {
+				String msg = "SingleSignOnHandler {0} could not be initialized"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, ssoHandlerClassName);
+				throw new PrivilegeException(msg, e);
+			}
+		}
+
 		// initialize privilege handler
 		DefaultPrivilegeHandler privilegeHandler = new DefaultPrivilegeHandler();
 		parameterMap = containerModel.getParameterMap();
 		Map<String, Class<PrivilegePolicy>> policyMap = containerModel.getPolicies();
 		try {
-			privilegeHandler.initialize(parameterMap, encryptionHandler, persistenceHandler, challengeHandler,
-					policyMap);
+			privilegeHandler
+					.initialize(parameterMap, encryptionHandler, persistenceHandler, challengeHandler, ssoHandler,
+							policyMap);
 		} catch (Exception e) {
 			String msg = "PrivilegeHandler {0} could not be initialized"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, privilegeHandler.getClass().getName());

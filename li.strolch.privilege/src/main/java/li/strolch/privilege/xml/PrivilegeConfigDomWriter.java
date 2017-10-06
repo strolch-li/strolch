@@ -15,20 +15,20 @@
  */
 package li.strolch.privilege.xml;
 
+import static li.strolch.privilege.helper.XmlConstants.*;
+
 import java.io.File;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.internal.PrivilegeContainerModel;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.helper.XmlHelper;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class PrivilegeConfigDomWriter {
 
@@ -36,7 +36,7 @@ public class PrivilegeConfigDomWriter {
 	private final File configFile;
 
 	/**
-	 * 
+	 *
 	 */
 	public PrivilegeConfigDomWriter(PrivilegeContainerModel containerModel, File configFile) {
 		this.containerModel = containerModel;
@@ -44,72 +44,77 @@ public class PrivilegeConfigDomWriter {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void write() {
 
 		// create document root
 		Document doc = XmlHelper.createDocument();
-		Element rootElement = doc.createElement(XmlConstants.XML_ROOT_PRIVILEGE);
+		Element rootElement = doc.createElement(XML_ROOT_PRIVILEGE);
 		doc.appendChild(rootElement);
 
-		Element containerElement = doc.createElement(XmlConstants.XML_CONTAINER);
+		Element containerElement = doc.createElement(XML_CONTAINER);
 		rootElement.appendChild(containerElement);
 
-		Element parameterElement;
-		Element parametersElement;
-
-		// Parameters
-		parametersElement = doc.createElement(XmlConstants.XML_PARAMETERS);
-		containerElement.appendChild(parametersElement);
-		for (Entry<String, String> entry : this.containerModel.getParameterMap().entrySet()) {
-			parameterElement = doc.createElement(XmlConstants.XML_PARAMETER);
-			parameterElement.setAttribute(XmlConstants.XML_ATTR_NAME, entry.getKey());
-			parameterElement.setAttribute(XmlConstants.XML_ATTR_VALUE, entry.getValue());
-			parametersElement.appendChild(parameterElement);
-		}
-
 		// create EncryptionHandler
-		Element encryptionHandlerElem = doc.createElement(XmlConstants.XML_HANDLER_ENCRYPTION);
+		Element encryptionHandlerElem = doc.createElement(XML_HANDLER_ENCRYPTION);
 		containerElement.appendChild(encryptionHandlerElem);
-		encryptionHandlerElem.setAttribute(XmlConstants.XML_ATTR_CLASS,
-				this.containerModel.getEncryptionHandlerClassName());
+		encryptionHandlerElem.setAttribute(XML_ATTR_CLASS, this.containerModel.getEncryptionHandlerClassName());
 		// Parameters
-		parametersElement = doc.createElement(XmlConstants.XML_PARAMETERS);
-		encryptionHandlerElem.appendChild(parametersElement);
-		for (Entry<String, String> entry : this.containerModel.getEncryptionHandlerParameterMap().entrySet()) {
-			parameterElement = doc.createElement(XmlConstants.XML_PARAMETER);
-			parameterElement.setAttribute(XmlConstants.XML_ATTR_NAME, entry.getKey());
-			parameterElement.setAttribute(XmlConstants.XML_ATTR_VALUE, entry.getValue());
-			parametersElement.appendChild(parameterElement);
-		}
+		fillParameterMap(doc, encryptionHandlerElem, this.containerModel.getEncryptionHandlerParameterMap());
 
 		// create PersistenceHandler
-		Element persistenceHandlerElem = doc.createElement(XmlConstants.XML_HANDLER_PERSISTENCE);
+		Element persistenceHandlerElem = doc.createElement(XML_HANDLER_PERSISTENCE);
 		containerElement.appendChild(persistenceHandlerElem);
-		persistenceHandlerElem.setAttribute(XmlConstants.XML_ATTR_CLASS,
-				this.containerModel.getPersistenceHandlerClassName());
+		persistenceHandlerElem.setAttribute(XML_ATTR_CLASS, this.containerModel.getPersistenceHandlerClassName());
 		// Parameters
-		parametersElement = doc.createElement(XmlConstants.XML_PARAMETERS);
-		persistenceHandlerElem.appendChild(parametersElement);
-		for (Entry<String, String> entry : this.containerModel.getPersistenceHandlerParameterMap().entrySet()) {
-			parameterElement = doc.createElement(XmlConstants.XML_PARAMETER);
-			parameterElement.setAttribute(XmlConstants.XML_ATTR_NAME, entry.getKey());
-			parameterElement.setAttribute(XmlConstants.XML_ATTR_VALUE, entry.getValue());
-			parametersElement.appendChild(parameterElement);
+		fillParameterMap(doc, persistenceHandlerElem, this.containerModel.getPersistenceHandlerParameterMap());
+
+		// Parameters
+		fillParameterMap(doc, containerElement, this.containerModel.getParameterMap());
+
+		// create UserChallengeHandler
+		Element userChallengeHandlerElem = doc.createElement(XML_HANDLER_USER_CHALLENGE);
+		containerElement.appendChild(userChallengeHandlerElem);
+		userChallengeHandlerElem.setAttribute(XML_ATTR_CLASS, this.containerModel.getUserChallengeHandlerClassName());
+		// Parameters
+		fillParameterMap(doc, userChallengeHandlerElem, this.containerModel.getUserChallengeHandlerParameterMap());
+
+		// create SingleSignOnHandler
+		if (this.containerModel.getSsoHandlerClassName() != null) {
+			Element ssoHandlerElem = doc.createElement(XML_HANDLER_SSO);
+			containerElement.appendChild(ssoHandlerElem);
+			ssoHandlerElem.setAttribute(XML_ATTR_CLASS, this.containerModel.getSsoHandlerClassName());
+			// Parameters
+			fillParameterMap(doc, ssoHandlerElem, this.containerModel.getSsoHandlerParameterMap());
 		}
 
 		// Policies
-		Element policiesElem = doc.createElement(XmlConstants.XML_POLICIES);
+		Element policiesElem = doc.createElement(XML_POLICIES);
 		rootElement.appendChild(policiesElem);
 		for (Entry<String, Class<PrivilegePolicy>> entry : this.containerModel.getPolicies().entrySet()) {
-			Element policyElem = doc.createElement(XmlConstants.XML_POLICY);
-			policyElem.setAttribute(XmlConstants.XML_ATTR_NAME, entry.getKey());
-			policyElem.setAttribute(XmlConstants.XML_ATTR_CLASS, entry.getValue().getName());
+			Element policyElem = doc.createElement(XML_POLICY);
+			policyElem.setAttribute(XML_ATTR_NAME, entry.getKey());
+			policyElem.setAttribute(XML_ATTR_CLASS, entry.getValue().getName());
 			policiesElem.appendChild(policyElem);
 		}
 
 		// write the container file to disk
 		XmlHelper.writeDocument(doc, this.configFile);
+	}
+
+	private void fillParameterMap(Document doc, Element parent, Map<String, String> parameterMap) {
+
+		if (parameterMap != null && !parameterMap.isEmpty()) {
+			Element parametersElement = doc.createElement(XML_PARAMETERS);
+			for (Entry<String, String> entry : parameterMap.entrySet()) {
+				Element parameterElement = doc.createElement(XML_PARAMETER);
+				parameterElement.setAttribute(XML_ATTR_NAME, entry.getKey());
+				parameterElement.setAttribute(XML_ATTR_VALUE, entry.getValue());
+				parametersElement.appendChild(parameterElement);
+			}
+
+			parent.appendChild(parametersElement);
+		}
 	}
 }

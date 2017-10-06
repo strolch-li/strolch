@@ -68,7 +68,7 @@ public class UserSessionsService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		logger.info("[" + cert.getUsername() + "] Invalidating session " + sessionId);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-		sessionHandler.invalidateSession(cert, sessionId);
+		sessionHandler.invalidate(cert, sessionId);
 		return ResponseUtil.toResponse();
 	}
 

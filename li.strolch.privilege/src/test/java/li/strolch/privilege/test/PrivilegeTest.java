@@ -59,9 +59,9 @@ import li.strolch.utils.helper.ArraysHelper;
 
 /**
  * JUnit for performing Privilege tests. This JUnit is by no means complete, but checks the bare minimum.br />
- * 
+ *
  * TODO add more tests, especially with deny and allow lists
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
@@ -117,9 +117,10 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 		}
 	}
 
+	@Test
 	public void testFailAuthenticationNOk() throws Exception {
 		this.exception.expect(AccessDeniedException.class);
-		this.exception.expectMessage("blabla");
+		this.exception.expectMessage("User admin failed to authenticate: Password is incorrect for admin");
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_BAD));
 		} finally {
@@ -127,9 +128,10 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 		}
 	}
 
+	@Test
 	public void testFailAuthenticationPWNull() throws Exception {
 		this.exception.expect(PrivilegeException.class);
-		this.exception.expectMessage("blabla");
+		this.exception.expectMessage("User admin failed to authenticate: A password may not be empty!");
 		try {
 			login(ADMIN, null);
 		} finally {
@@ -324,7 +326,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			Certificate certificate = this.ctx.getCertificate();
 
 			UserRep selectorRep = new UserRep(null, null, null, null, null,
-					new HashSet<>(Arrays.asList("PrivilegeAdmin")), null, null);
+					new HashSet<>(Collections.singletonList("PrivilegeAdmin")), null, null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(1, users.size());
 			assertEquals(ADMIN, users.get(0).getUsername());
@@ -341,8 +343,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			Certificate certificate = this.ctx.getCertificate();
 
-			UserRep selectorRep = new UserRep(null, null, null, null, null, new HashSet<>(Arrays.asList(ROLE_TEMP)),
-					null, null);
+			UserRep selectorRep = new UserRep(null, null, null, null, null,
+					new HashSet<>(Collections.singletonList(ROLE_TEMP)), null, null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(0, users.size());
 
@@ -384,12 +386,13 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	public void shouldSetPasswordWithChallenge() {
 		this.privilegeHandler.initiateChallengeFor(Usage.SET_PASSWORD, ADMIN);
 		UserChallenge userChallenge = TestUserChallengeHandler.getInstance().getChallenges().values().stream()
-				.filter(u -> u.getUser().getUsername().equals(ADMIN)).findFirst().get();
+				.filter(u -> u.getUser().getUsername().equals(ADMIN)).findFirst()
+				.orElseThrow(() -> new IllegalStateException("Missing admin user!"));
 		Certificate certificate = this.privilegeHandler.validateChallenge(ADMIN, userChallenge.getChallenge());
 		this.privilegeHandler.setUserPassword(certificate, ADMIN, ArraysHelper.copyOf(PASS_TED));
 
 		try {
-			this.privilegeHandler.isCertificateValid(certificate);
+			this.privilegeHandler.validate(certificate);
 			fail("Certificate should not be valid anymore!");
 		} catch (PrivilegeException e) {
 			// expected
@@ -398,7 +401,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 		// change password back
 		certificate = this.privilegeHandler.authenticate(ADMIN, PASS_TED);
 		this.privilegeHandler.setUserPassword(certificate, ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
-		this.privilegeHandler.invalidateSession(certificate);
+		this.privilegeHandler.invalidate(certificate);
 	}
 
 	/**
@@ -651,8 +654,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// let's add a new user ted
 			HashSet<String> roles = new HashSet<>();
 			roles.add(ROLE_USER);
-			userRep = new UserRep(null, TED, "Ted", "Newman", UserState.ENABLED, roles, null,
-					new HashMap<String, String>());
+			userRep = new UserRep(null, TED, "Ted", "Newman", UserState.ENABLED, roles, null, new HashMap<>());
 			Certificate certificate = this.ctx.getCertificate();
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + TED);
@@ -765,7 +767,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			// let's add a new user bob
 			UserRep userRep = new UserRep(null, BOB, "Bob", "Newman", UserState.NEW,
-					new HashSet<>(Arrays.asList(ROLE_MY)), null, new HashMap<String, String>());
+					new HashSet<>(Collections.singletonList(ROLE_MY)), null, new HashMap<>());
 			Certificate certificate = this.ctx.getCertificate();
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + BOB);
