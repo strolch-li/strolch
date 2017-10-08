@@ -42,6 +42,19 @@ public interface PrivilegeHandler {
 	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, char[])
 	 */
 	Certificate authenticate(String username, char[] password);
+	
+	/**
+	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
+	 *
+	 * @param data
+	 * 		the data to perform the SSO
+	 *
+	 * @return the {@link Certificate} for the user
+	 *
+	 * @throws PrivilegeException
+	 * 		if something goes wrong with the SSO
+	 */
+	Certificate authenticateSingleSignOn(Object data) throws PrivilegeException;
 
 	/**
 	 * Returns the {@link PrivilegeContext} for the given certificate
