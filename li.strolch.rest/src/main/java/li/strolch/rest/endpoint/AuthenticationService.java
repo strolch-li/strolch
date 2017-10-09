@@ -212,7 +212,7 @@ public class AuthenticationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
-	public Response validateSessions(@PathParam("authToken") String authToken) {
+	public Response validateSession(@PathParam("authToken") String authToken) {
 
 		try {
 
