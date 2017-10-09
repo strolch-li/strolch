@@ -141,9 +141,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.LOGIN)) {
 			tx.setSuppressDoNothingLogging(true);
 			tx.setSuppressAudits(true);
-			// the id should be set with the username!! But how to get from data?
 			Audit audit = tx.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE,
-					StrolchPrivilegeConstants.CERTIFICATE, "sso");
+					StrolchPrivilegeConstants.CERTIFICATE, certificate.getUsername());
 			tx.getAuditTrail().add(tx, audit);
 		}
 		return certificate;
