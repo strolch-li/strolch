@@ -19,8 +19,6 @@ import li.strolch.model.activity.TimeOrderingVisitor;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.persistence.api.UpdateActivityCommand;
-import li.strolch.persistence.api.UpdateOrderCommand;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.service.api.Command;
 import li.strolch.utils.helper.StringHelper;
@@ -39,8 +37,7 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 		if (StringHelper.isEmpty(resourceType) || resourceType.equals(DASH))
 			throw new StrolchException("No resourceType defined on action " + action.getLocator());
 
-		Resource resource = tx.getResourceBy(resourceType, resourceId, true);
-		return resource;
+		return tx.getResourceBy(resourceType, resourceId, true);
 	}
 
 	protected void updateOrderState(Activity rootElement, State currentState, State newState) {
@@ -56,9 +53,7 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 
 		order.setState(rootElement.getState());
 
-		UpdateOrderCommand cmd = new UpdateOrderCommand(getContainer(), tx());
-		cmd.setOrder(order);
-		cmd.doCommand();
+		tx().update(order);
 	}
 
 	protected ExecutionPolicy getExecutionPolicy(Action action) {
@@ -89,8 +84,8 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 			// in series we can never have two Actions in execution, so if we found the action in execution, we stop
 			if (element instanceof Action //
 					&& (state == State.EXECUTION // 
-							|| state == State.WARNING //
-							|| state == State.ERROR)) {
+					|| state == State.WARNING //
+					|| state == State.ERROR)) {
 				break;
 			}
 
@@ -155,7 +150,11 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	public Void visitAction(Action action) {
 		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
 
-		if (executionPolicy.isExecutable(action)) {
+		if (!executionPolicy.isExecutable(action)) {
+			logger.info("Action " + action.getLocator() + " is not yet executable.");
+		} else {
+
+			logger.info("Action " + action.getLocator() + " is now being executed...");
 
 			// we catch all exceptions because we can't undo, thus need to set the state to ERROR in this case
 			// this is only required because we execute actions in same TX as we set to executed any previous actions
@@ -166,9 +165,7 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 				logger.error("Failed to set " + action.getLocator() + " to execution due to " + e.getMessage(), e);
 				action.setState(State.ERROR);
 
-				UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
-				command.setActivity(action.getRootElement());
-				command.doCommand();
+				tx().update(action.getRootElement());
 
 				getConfirmationPolicy(action).toError(action);
 			}

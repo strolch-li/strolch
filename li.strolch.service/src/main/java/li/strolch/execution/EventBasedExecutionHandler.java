@@ -33,7 +33,7 @@ import li.strolch.utils.dbc.DBC;
 /**
  * The event based execution handler waits for events in that the {@link ExecutionPolicy} implementations must call the
  * relevant methods when the work is complete. Afterwards the next {@link Action} in the procedure is executed
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class EventBasedExecutionHandler extends ExecutionHandler {
@@ -70,9 +70,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			logger.info("Not restarting execution of activities.");
 		} else {
 			logger.info("Restarting execution of activities.");
-			runAsAgent(ctx -> {
-				restartActivityExecution(ctx);
-			});
+			runAsAgent(this::restartActivityExecution);
 		}
 
 		super.start();
@@ -182,7 +180,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.execution")
-									.value("reason", e));
+							.value("reason", e));
 				}
 			}
 		});
@@ -201,7 +199,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
-									.value("reason", e));
+							.value("reason", e));
 				}
 			}
 		});
@@ -220,7 +218,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.stopped")
-									.value("reason", e));
+							.value("reason", e));
 				}
 			}
 		});
@@ -239,7 +237,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.error")
-									.value("reason", e));
+							.value("reason", e));
 				}
 			}
 		});
@@ -258,7 +256,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.warning")
-									.value("reason", e));
+							.value("reason", e));
 				}
 			}
 		});
@@ -294,10 +292,10 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				logger.error("Failed to archive " + activityLoc + " due to " + e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
-					getComponent(OperationsLog.class)
-							.addMessage(new LogMessage(realm, activityLoc, LogSeverity.EXCEPTION,
+					getComponent(OperationsLog.class).addMessage(
+							new LogMessage(realm, activityLoc, LogSeverity.EXCEPTION,
 									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.archive")
-											.value("reason", e));
+									.value("reason", e));
 				}
 			}
 		});
@@ -320,7 +318,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			ExecuteActivityCommand command = new ExecuteActivityCommand(getContainer(), tx);
 			command.setActivity(activity);
-			tx.addCommand(command);
+			command.doCommand();
 
 			tx.commitOnClose();
 		}
@@ -339,7 +337,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			// set this action to executed
 			SetActionToExecutedCommand command = new SetActionToExecutedCommand(getContainer(), tx);
 			command.setAction(action);
-			tx.addCommand(command);
+			command.doCommand();
 
 			// flush so we can see that changes performed
 			tx.flush();
@@ -361,9 +359,9 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				ExecuteActivityCommand execCommand = new ExecuteActivityCommand(getContainer(), tx);
 				execCommand.setActivity(activity);
-				tx.addCommand(execCommand);
+				execCommand.doCommand();
 
-				// flush so we can see that changes performed
+				// flush so we can see the changes performed
 				tx.flush();
 			}
 
@@ -384,7 +382,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			SetActionToWarningCommand command = new SetActionToWarningCommand(getContainer(), tx);
 			command.setAction((Action) elem);
-			tx.addCommand(command);
+			command.doCommand();
 
 			tx.commitOnClose();
 		}
@@ -400,7 +398,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			SetActionToErrorCommand command = new SetActionToErrorCommand(getContainer(), tx);
 			command.setAction((Action) elem);
-			tx.addCommand(command);
+			command.doCommand();
 
 			tx.commitOnClose();
 		}
@@ -416,7 +414,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			SetActionToStoppedCommand command = new SetActionToStoppedCommand(getContainer(), tx);
 			command.setAction((Action) elem);
-			tx.addCommand(command);
+			command.doCommand();
 
 			tx.commitOnClose();
 		}

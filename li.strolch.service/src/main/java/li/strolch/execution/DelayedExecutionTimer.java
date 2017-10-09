@@ -31,7 +31,7 @@ public interface DelayedExecutionTimer {
 	/**
 	 * Cancels any delayed execution for the given {@link Locator}
 	 * 
-	 * @param actionLocator
+	 * @param locator
 	 *            the {@link Action}'s {@link Locator}
 	 */
 	void cancel(Locator locator);

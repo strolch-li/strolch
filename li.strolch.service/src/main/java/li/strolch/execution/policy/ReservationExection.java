@@ -8,7 +8,6 @@ import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.persistence.api.UpdateResourceCommand;
 
 /**
  * <p>
@@ -17,12 +16,12 @@ import li.strolch.persistence.api.UpdateResourceCommand;
  * and only allows execution if the value is false, in which case the {@link #toExecution(Action)} method sets the value
  * to true, and the {@link #toExecuted(Action)} method returns the value to false.
  * </p>
- * 
+ *
  * <p>
  * <b>Note:</b> the reservation is done for {@link Action} of type {@link #TYPE_RESERVE} and releasing is done for
  * {@link Action} of type {@link #TYPE_RELEASE}
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ReservationExection extends DurationExecution {
@@ -38,6 +37,8 @@ public class ReservationExection extends DurationExecution {
 
 	@Override
 	public boolean isExecutable(Action action) {
+
+		tx().lock(getResource(action));
 
 		// only check if reserve
 		if (!action.getType().equals(TYPE_RESERVE) && !action.getType().equals(TYPE_RELEASE)) {
@@ -56,15 +57,18 @@ public class ReservationExection extends DurationExecution {
 		Resource resource = getResource(action);
 
 		if (!resource.hasParameter(BAG_PARAMETERS, PARAM_RESERVED))
-			throw new StrolchModelException("Parameter " + PARAM_RESERVED + " on bag " + BAG_PARAMETERS + " missing on "
-					+ resource.getLocator());
+			throw new StrolchModelException(
+					"Parameter " + PARAM_RESERVED + " on bag " + BAG_PARAMETERS + " missing on " + resource
+							.getLocator());
 
 		BooleanParameter reservedP = resource.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
-		return reservedP.getValue().booleanValue();
+		return reservedP.getValue();
 	}
 
 	@Override
 	public void toExecution(Action action) {
+
+		tx().lock(getResource(action));
 
 		// only do if reserve
 		if (!action.getType().equals(TYPE_RESERVE) && !action.getType().equals(TYPE_RELEASE)) {
@@ -85,6 +89,8 @@ public class ReservationExection extends DurationExecution {
 
 	@Override
 	public void toExecuted(Action action) {
+
+		tx().lock(getResource(action));
 
 		// only do if release
 		if (!action.getType().equals(TYPE_RESERVE) && !action.getType().equals(TYPE_RELEASE)) {
@@ -109,8 +115,6 @@ public class ReservationExection extends DurationExecution {
 		reservedP.setValue(reserved);
 
 		// save changes
-		UpdateResourceCommand command = new UpdateResourceCommand(getContainer(), tx());
-		command.setResource(resource);
-		command.doCommand();
+		tx().update(resource);
 	}
 }

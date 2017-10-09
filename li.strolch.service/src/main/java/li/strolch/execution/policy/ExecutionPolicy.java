@@ -9,7 +9,6 @@ import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.persistence.api.UpdateActivityCommand;
 import li.strolch.policy.StrolchPolicy;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
@@ -123,9 +122,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 
 		action.setState(state);
 
-		UpdateActivityCommand command = new UpdateActivityCommand(getContainer(), tx());
-		command.setActivity(action.getRootElement());
-		command.doCommand();
+		tx().update(action.getRootElement());
 
 		String msg = "Action " + action.getLocator() + " is now in state " + state;
 		if (state == State.ERROR)
@@ -158,9 +155,6 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * {@link ComponentContainer#getRealm(Certificate)}. This transaction should be used in a try-with-resource clause
 	 * so it is properly closed.
 	 * 
-	 * @param action
-	 *            the action to use for the opened TX
-	 * 
 	 * @return the open {@link StrolchTransaction}
 	 * 
 	 * @throws StrolchException
@@ -175,12 +169,12 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnable} as the system user {@link StrolchConstants#SYSTEM_USER_EXECUTION}
+	 * Performs the given {@link PrivilegedRunnable} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 * 
 	 * @param runnable
 	 *            the runnable to perform
 	 * 
-	 * @throws PrivilegeException
+	 * @throws PrivilegeException if the agent is missing the privilege
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
 		getContainer().getPrivilegeHandler().runAs(StrolchConstants.SYSTEM_USER_AGENT, runnable);
