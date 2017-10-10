@@ -891,6 +891,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			addModelChangeCommands();
 			validateCommands();
 			doCommands();
+
+			// do it twice, since some commands might generate new model changes
+			if (this.objectFilter != null && !this.objectFilter.isEmpty()) {
+				addModelChangeCommands();
+				validateCommands();
+				doCommands();
+			}
+
 			writeChanges();
 
 			long auditTrailDuration = writeAuditTrail();
