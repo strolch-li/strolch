@@ -157,8 +157,9 @@ public class Migrations {
 	 * @param cert
 	 * @param codeMigrationsByRealm
 	 */
-	public void runCodeMigrations(Certificate cert, Map<String, MigrationVersion> currentVersions,
-			MapOfLists<String, CodeMigration> codeMigrationsByRealm) {
+	public void runCodeMigrations(Certificate cert,
+								  Map<String, MigrationVersion> currentVersions,
+								  MapOfLists<String, CodeMigration> codeMigrationsByRealm) {
 
 		MapOfLists<String, Version> migrationsRan = new MapOfLists<>();
 
@@ -197,15 +198,16 @@ public class Migrations {
 			if (this.verbose)
 				logger.info("There were no migrations required!");
 		} else {
-			logger.info("Migrated " + migrationsRan.size() + " realms!");
+			logger.info(
+					"Performed " + migrationsRan.size() + " migrations on " + migrationsRan.sizeKeys() + " realms.");
 			addOperationLogs(migrationsRan);
 		}
 		this.migrationsRan = migrationsRan;
 	}
 
 	private static void logDetectedMigrations(Set<String> realmNames,
-			Map<String, SortedSet<DataMigration>> allDataMigrations,
-			Map<String, SortedSet<CodeMigration>> allCodeMigrations) {
+											  Map<String, SortedSet<DataMigration>> allDataMigrations,
+											  Map<String, SortedSet<CodeMigration>> allCodeMigrations) {
 
 		for (String realm : realmNames) {
 
@@ -232,7 +234,7 @@ public class Migrations {
 	}
 
 	private static Map<String, SortedSet<DataMigration>> loadDataMigrations(Set<String> realmNames,
-			File migrationsPath) {
+																			File migrationsPath) {
 
 		Map<String, SortedSet<DataMigration>> migrationsByRealm = new HashMap<>();
 
@@ -264,7 +266,7 @@ public class Migrations {
 	}
 
 	private static Map<String, SortedSet<CodeMigration>> loadCodeMigrations(Set<String> realmNames,
-			File migrationsPath) {
+																			File migrationsPath) {
 
 		Map<String, SortedSet<CodeMigration>> migrationsByRealm = new HashMap<>(); //new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
 
