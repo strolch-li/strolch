@@ -30,6 +30,7 @@ import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.*;
+import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.audit.AccessType;
@@ -629,6 +630,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				elements.add(element);
 		}
 		return elements;
+	}
+
+	@Override
+	public Resource getResourceFor(Action action) throws StrolchException {
+		return getResourceFor(action, false);
+	}
+
+	@Override
+	public Resource getResourceFor(Action action, boolean assertExists) throws StrolchException {
+		DBC.PRE.assertNotEmpty("action.resourceType must be set", action.getResourceType());
+		DBC.PRE.assertNotEmpty("action.resourceId must be set", action.getResourceId());
+		return getResourceBy(action.getResourceType(), action.getResourceId(), assertExists);
 	}
 
 	@Override

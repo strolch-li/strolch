@@ -35,6 +35,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
@@ -762,6 +763,36 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
 	 */
 	public List<Resource> getResourcesBy(StringListParameter refP, boolean assertExists) throws StrolchException;
+
+	/**
+	 * <p>Returns the {@link Resource} for the given {@link Action}. This is done by getting the resource by {@link Action#getResourceType()} and {@link Action#getResourceId()}</p>
+	 *
+	 * <p>Should the resource not exist, then null is returned</p>
+	 *
+	 * @param action
+	 * 		the action for which to return the resoruce
+	 *
+	 * @return the resource referenced by the action, or null if it does not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the action is null, or something else goes wrong
+	 */
+	public Resource getResourceFor(Action action) throws StrolchException;
+
+	/**
+	 * <p>Returns the {@link Resource} for the given {@link Action}. This is done by getting the resource by {@link Action#getResourceType()} and {@link Action#getResourceId()}</p>
+	 *
+	 * <p>Should the resource not exist and <code>assertExists</code> is true, then an exception is thrown, otherwise null is returned</p>
+	 *
+	 * @param action
+	 * 		the action for which to return the resoruce
+	 *
+	 * @return the resource referenced by the action. If the resource does not exist and <code>assertExists</code> is true then an exception is thrown, otherwise null is returnee
+	 *
+	 * @throws StrolchException
+	 * 		if the action is null and <code>assertExists</code> is true, or something else goes wrong
+	 */
+	public Resource getResourceFor(Action action, boolean assertExists) throws StrolchException;
 
 	/**
 	 * Returns the {@link Activity} with the given type and id, or null if it does not exist
