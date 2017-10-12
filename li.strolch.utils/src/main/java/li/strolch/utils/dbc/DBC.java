@@ -27,7 +27,9 @@ import li.strolch.utils.helper.StringHelper;
  */
 public enum DBC {
 
-	PRE, INTERIM, POST;
+	PRE,
+	INTERIM,
+	POST;
 
 	public <T> void assertEquals(String msg, T value1, T value2) {
 		if (value1 == null && value2 == null)
@@ -37,6 +39,18 @@ public enum DBC {
 			return;
 
 		if (value2 != null && value2.equals(value1))
+			return;
+
+		String ex = "{0}: {1} != {2}"; //$NON-NLS-1$
+		ex = MessageFormat.format(ex, msg, value1, value2);
+		throw new DbcException(ex);
+	}
+
+	public <T> void assertEqualsIgnoreOrdering(String msg, Collection<T> value1, Collection<T> value2) {
+		if (value1 == null && value2 == null)
+			return;
+
+		if (value1 != null && value2 != null && value1.containsAll(value2) && value2.containsAll(value1))
 			return;
 
 		String ex = "{0}: {1} != {2}"; //$NON-NLS-1$
@@ -150,7 +164,8 @@ public enum DBC {
 
 	public void assertExists(String msg, File file) {
 		if (!file.exists()) {
-			String ex = MessageFormat.format("Illegal situation as file ({0}) does not exist: {1}", file, msg); //$NON-NLS-1$
+			String ex = MessageFormat
+					.format("Illegal situation as file ({0}) does not exist: {1}", file, msg); //$NON-NLS-1$
 			ex = MessageFormat.format(ex, msg);
 			throw new DbcException(ex);
 		}
