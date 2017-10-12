@@ -31,6 +31,8 @@ import li.strolch.rest.model.UserSession;
 public interface StrolchSessionHandler {
 
 	Certificate authenticate(String username, char[] password);
+	
+	Certificate authenticateSingleSignOn(Object data);
 
 	Certificate validate(String authToken) throws StrolchNotAuthenticatedException;
 

@@ -144,6 +144,16 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		return certificate;
 	}
+	
+	@Override
+	public Certificate authenticateSingleSignOn(Object data) {
+		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data);
+
+		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
+
+		return certificate;
+	}
 
 	@Override
 	public Certificate validate(String authToken) throws StrolchNotAuthenticatedException {
