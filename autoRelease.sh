@@ -9,10 +9,19 @@ fi
 releaseBranch="${1}"
 
 lastTag="$(git for-each-ref --format="%(refname)" --sort=-taggerdate --count=1 refs/tags | cut -d '/' -f 3)"
-majorVersion=$(echo $lastTag | cut -d '.' -f 1)
-minorVersion=$(echo $lastTag | cut -d '.' -f 2)
-updateVersion=$(echo $lastTag | cut -d '.' -f 3)
-newUpdateVersion=$((updateVersion+1))
+if [[ "${lastTag}" == '' ]] ; then
+  lastTag="0.0.0"
+  majorVersion="1"
+  minorVersion="0"
+  updateVersion="0"
+  newUpdateVersion="0"
+else
+  majorVersion=$(echo $lastTag | cut -d '.' -f 1)
+  minorVersion=$(echo $lastTag | cut -d '.' -f 2)
+  updateVersion=$(echo $lastTag | cut -d '.' -f 3)
+  newUpdateVersion=$((updateVersion+1))
+fi
+
 newVersion="${majorVersion}.${minorVersion}.${newUpdateVersion}"
 
 ## Make sure no changes
