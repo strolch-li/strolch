@@ -6,6 +6,9 @@ if [ $# != 2 ] ; then
   exit 1
 fi
 
+releaseBranch="${1}"
+newVersion="${2}"
+
 # cleanup trap
 function cleanup {
   echo -e "\nINFO: Cleaning up..."
@@ -16,8 +19,6 @@ function cleanup {
 trap cleanup EXIT
 
 # Confirm
-releaseBranch="${1}"
-newVersion="${2}"
 echo -e "INFO: Do you want to make release version ${newVersion} from release branch ${releaseBranch}? y/n"
 read a
 if [[ "${a}" != "y" && "${a}" != "Y" ]] ; then
@@ -103,18 +104,11 @@ if ! mvn source:jar install -DskipTests > /dev/null ; then
 fi
 
 # git push
-echo -e "\nINFO: Release ${newVersion} created. Do you want to push to origin? y/n"
-read a
-if [[ "${a}" == "y" || "${a}" == "Y" ]] ; then
-  echo -e "INFO: Pushing to origin..."
-  if ! git push origin ${newVersion} ; then
-    echo -e "ERROR: Failed to push tag"
-    exit 1
-  fi
-  echo -e "\nINFO: Pushed release tag ${newVersion}"
-else
-  echo -e "WARN: Release not pushed!"
+if ! git push origin ${newVersion} ; then
+  echo -e "ERROR: Failed to push tag"
+  exit 1
 fi
+echo -e "\nINFO: Pushed release tag ${newVersion}"
 
 echo -e "\nINFO: Release ${newVersion} created."
 exit 0
