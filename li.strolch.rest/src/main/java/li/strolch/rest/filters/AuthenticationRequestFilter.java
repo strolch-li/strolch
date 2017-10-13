@@ -17,11 +17,6 @@ package li.strolch.rest.filters;
 
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -31,9 +26,10 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
@@ -42,6 +38,8 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
@@ -58,6 +56,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	protected Set<String> getUnsecuredPaths() {
 		Set<String> list = new HashSet<>();
 		list.add("strolch/authentication");
+		list.add("strolch/authentication/sso");
 		return list;
 	}
 
