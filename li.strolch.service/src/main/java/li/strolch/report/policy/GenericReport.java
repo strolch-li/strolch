@@ -467,7 +467,12 @@ public class GenericReport extends ReportPolicy {
 					"Invalid join definition value: " + joinP.getValue() + " on: " + joinP.getLocator() + " as "
 							+ dependency.getLocator() + " has no ParameterBag " + BAG_RELATIONS);
 
-		List<Parameter<?>> relationParams = relationsBag.getParametersByInterpretationAndUom(interpretation, joinType);
+		List<Parameter<?>> relationParams = relationsBag //
+				.getParametersByInterpretationAndUom(interpretation, joinType) //
+				.stream() //
+				.filter(s -> s.getType().equals(StrolchValueType.STRING.getType())) //
+				.collect(Collectors.toList()); //
+
 		if (relationParams.isEmpty()) {
 			throw new IllegalStateException(
 					"Found no relation parameters with UOM " + joinType + " on dependency " + dependency.getLocator());
