@@ -1,34 +1,24 @@
-package li.strolch.report;
+package li.strolch.report.policy;
 
+import static java.util.Comparator.comparingInt;
+import static li.strolch.report.ReportConstants.*;
 import static li.strolch.utils.helper.StringHelper.DASH;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.gson.JsonObject;
-
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.model.Locator;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.StrolchValueType;
-import li.strolch.model.parameter.BooleanParameter;
-import li.strolch.model.parameter.DateParameter;
-import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.*;
+import li.strolch.model.parameter.*;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.ElementDateVisitor;
 import li.strolch.model.visitor.ElementStateVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
-import li.strolch.report.policy.ReportFilterPolicy;
+import li.strolch.report.ReportElement;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
@@ -37,42 +27,13 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
-public class GenericReport {
+public class GenericReport extends ReportPolicy {
 
-	private static final String TYPE_REPORT = "Report";
-	private static final String TYPE_FILTER = "Filter";
+	private Resource reportRes;
 
-	private static final String BAG_RELATIONS = "relations";
-	private static final String BAG_JOINS = "joins";
-	private static final String BAG_PARAMETERS = "parameters";
-	private static final String BAG_COLUMNS = "columns";
-	private static final String BAG_ORDERING = "ordering";
-
-	private static final String PARAM_OBJECT_TYPE = "objectType";
-	private static final String PARAM_HIDE_OBJECT_TYPE_FROM_FILTER_CRITERIA = "hideObjectTypeFromFilterCriteria";
-	private static final String PARAM_DESCENDING = "descending";
-	private static final String PARAM_DATE_RANGE_SEL = "dateRangeSel";
-	private static final String PARAM_FIELD_REF = "fieldRef";
-	private static final String PARAM_POLICY = "policy";
-
-	private static final String COL_ID = "$id";
-	private static final String COL_NAME = "$name";
-	private static final String COL_TYPE = "$type";
-	private static final String COL_STATE = "$state";
-	private static final String COL_DATE = "$date";
-	private static final String COL_SEARCH = "$search";
-
-	private static final String SEARCH_SEPARATOR = ":";
-
-	private static final String SUFFIX_REF = "-Ref";
-
-	// input
-	private StrolchTransaction tx;
-	private String reportId;
-
-	private Resource report;
-	private StringParameter objectTypeP;
 	private boolean hideObjectTypeFromFilterCriteria;
+	private String objectType;
+
 	private ParameterBag columnsBag;
 	private List<StringParameter> orderingParams;
 	private boolean descending;
@@ -83,52 +44,55 @@ public class GenericReport {
 	private Map<ReportFilterPolicy, StringParameter> filtersByPolicy;
 	private MapOfSets<String, String> filtersById;
 
-	public GenericReport(ComponentContainer container, StrolchTransaction tx, String reportId) {
-		this.tx = tx;
-		this.reportId = reportId;
+	public GenericReport(ComponentContainer container, StrolchTransaction tx) {
+		super(container, tx);
+	}
 
-		// get the report
-		this.report = this.tx.getResourceBy(TYPE_REPORT, this.reportId, true);
+	public void initialize(String reportId) {
 
-		// prepare
-		this.objectTypeP = this.report.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
+		// get the reportRes
+		this.reportRes = tx().getResourceBy(TYPE_REPORT, reportId, true);
 
-		BooleanParameter hideObjectTypeFromFilterCriteriaP = this.report.getParameter(BAG_PARAMETERS,
-				PARAM_HIDE_OBJECT_TYPE_FROM_FILTER_CRITERIA);
-		this.hideObjectTypeFromFilterCriteria = hideObjectTypeFromFilterCriteriaP != null
-				&& hideObjectTypeFromFilterCriteriaP.getValue();
-		this.columnsBag = this.report.getParameterBag(BAG_COLUMNS, true);
-		
+		BooleanParameter hideObjectTypeFromFilterCriteriaP = this.reportRes
+				.getParameter(BAG_PARAMETERS, PARAM_HIDE_OBJECT_TYPE_FROM_FILTER_CRITERIA);
+		this.hideObjectTypeFromFilterCriteria =
+				hideObjectTypeFromFilterCriteriaP != null && hideObjectTypeFromFilterCriteriaP.getValue();
+		if (this.hideObjectTypeFromFilterCriteria) {
+			this.objectType = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE).getValue();
+		}
+
+		this.columnsBag = this.reportRes.getParameterBag(BAG_COLUMNS, true);
+
 		this.columnIds = this.columnsBag.getParameters().stream() //
-				.sorted((p1, p2) -> Integer.compare(p1.getIndex(), p2.getIndex())) //
-				.map(p -> p.getId()) //
+				.sorted(comparingInt(Parameter::getIndex)) //
+				.map(StrolchElement::getId) //
 				.collect(Collectors.toList());
 
-		if (this.report.hasParameter(BAG_PARAMETERS, PARAM_DESCENDING))
-			this.descending = this.report.getParameter(BAG_PARAMETERS, PARAM_DESCENDING).getValue();
+		if (this.reportRes.hasParameter(BAG_PARAMETERS, PARAM_DESCENDING))
+			this.descending = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_DESCENDING).getValue();
 
-		this.dateRangeSelP = this.report.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
+		this.dateRangeSelP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
 
 		// evaluate ordering params
-		if (this.report.hasParameterBag(BAG_ORDERING)) {
-			ParameterBag orderingBag = this.report.getParameterBag(BAG_ORDERING);
+		if (this.reportRes.hasParameterBag(BAG_ORDERING)) {
+			ParameterBag orderingBag = this.reportRes.getParameterBag(BAG_ORDERING);
 			if (orderingBag.hasParameters()) {
 				this.orderingParams = orderingBag.getParameters().stream().map(e -> (StringParameter) e)
 						.collect(Collectors.toList());
-				this.orderingParams.sort((c1, c2) -> Integer.compare(c1.getIndex(), c2.getIndex()));
+				this.orderingParams.sort(comparingInt(AbstractParameter::getIndex));
 			}
 		}
 
 		// evaluate filters
 		this.filtersByPolicy = new HashMap<>();
-		List<ParameterBag> filterBags = this.report.getParameterBagsByType(TYPE_FILTER);
+		List<ParameterBag> filterBags = this.reportRes.getParameterBagsByType(TYPE_FILTER);
 		for (ParameterBag filterBag : filterBags) {
 
 			// prepare filter function policy
 			StringParameter functionP = filterBag.getParameter(PARAM_POLICY);
-			PolicyHandler policyHandler = container.getComponent(PolicyHandler.class);
+			PolicyHandler policyHandler = getContainer().getComponent(PolicyHandler.class);
 			PolicyDef policyDef = PolicyDef.valueOf(functionP.getInterpretation(), functionP.getUom());
-			ReportFilterPolicy filterFunction = policyHandler.getPolicy(policyDef, tx);
+			ReportFilterPolicy filterFunction = policyHandler.getPolicy(policyDef, tx());
 			filterFunction.init(functionP.getValue());
 
 			StringParameter fieldRefP = filterBag.getParameter(PARAM_FIELD_REF);
@@ -179,13 +143,13 @@ public class GenericReport {
 	public Stream<Map<String, StrolchRootElement>> buildStream() {
 
 		// query the main objects and return a stream
-		Stream<Map<String, StrolchRootElement>> stream = queryRows().map(e -> evaluateRow(e));
+		Stream<Map<String, StrolchRootElement>> stream = queryRows().map(this::evaluateRow);
 
 		if (hasFilter())
-			stream = stream.filter(e -> filter(e));
+			stream = stream.filter(this::filter);
 
 		if (hasOrdering())
-			stream = stream.sorted((e1, e2) -> sort(e1, e2));
+			stream = stream.sorted(this::sort);
 
 		return stream;
 	}
@@ -198,28 +162,30 @@ public class GenericReport {
 		}));
 	}
 
+	protected boolean filterCriteria(StrolchRootElement element) {
+		if (this.hideObjectTypeFromFilterCriteria)
+			return !element.getType().equals(this.objectType);
+		return true;
+	}
+
 	public MapOfSets<String, StrolchRootElement> generateFilterCriteria() {
 		return buildStream() //
-				.flatMap(e -> {
-					Stream<StrolchRootElement> stream = e.values().stream();
-					if (this.hideObjectTypeFromFilterCriteria) {
-						stream = stream.filter(element -> !element.getType().equals(this.objectTypeP.getValue()));
-					}
-					return stream;
-				}) //
+
+				.flatMap(e -> e.values().stream().filter(this::filterCriteria)) //
+
 				.collect( //
 						Collector.of( //
-								() -> new MapOfSets<String, StrolchRootElement>(), //
+								(Supplier<MapOfSets<String, StrolchRootElement>>) MapOfSets::new, //
 								(m, e) -> m.addElement(e.getType(), e), //
-								(m1, m2) -> m1.addAll(m2), //
+								MapOfSets::addAll, //
 								m -> m));
 	}
 
-	private boolean hasOrdering() {
+	protected boolean hasOrdering() {
 		return this.orderingParams != null && !this.orderingParams.isEmpty();
 	}
 
-	private int sort(Map<String, StrolchRootElement> row1, Map<String, StrolchRootElement> row2) {
+	protected int sort(Map<String, StrolchRootElement> row1, Map<String, StrolchRootElement> row2) {
 
 		for (StringParameter fieldRefP : this.orderingParams) {
 
@@ -260,12 +226,12 @@ public class GenericReport {
 		return 0;
 	}
 
-	private boolean hasFilter() {
-		return !this.filtersByPolicy.isEmpty() || this.dateRange != null
-				|| (this.filtersById != null && !this.filtersById.isEmpty());
+	protected boolean hasFilter() {
+		return !this.filtersByPolicy.isEmpty() || this.dateRange != null || (this.filtersById != null
+				&& !this.filtersById.isEmpty());
 	}
 
-	private boolean filter(Map<String, StrolchRootElement> row) {
+	protected boolean filter(Map<String, StrolchRootElement> row) {
 
 		// do filtering by policies
 		for (ReportFilterPolicy filterPolicy : this.filtersByPolicy.keySet()) {
@@ -290,7 +256,7 @@ public class GenericReport {
 		if (this.dateRange != null) {
 			if (this.dateRangeSelP == null)
 				throw new IllegalStateException(
-						"DateRange defined, but report does not defined a date range selector!");
+						"DateRange defined, but reportRes does not defined a date range selector!");
 
 			String type = this.dateRangeSelP.getUom();
 			StrolchRootElement element = row.get(type);
@@ -306,8 +272,8 @@ public class GenericReport {
 				Parameter<?> param = lookupParameter(this.dateRangeSelP, element);
 				if (StrolchValueType.parse(param.getType()) != StrolchValueType.DATE)
 					throw new IllegalStateException(
-							"Date Range selector is invalid, as referenced parameter is not a Date but a "
-									+ param.getType());
+							"Date Range selector is invalid, as referenced parameter is not a Date but a " + param
+									.getType());
 
 				date = ((DateParameter) param).getValue();
 			}
@@ -332,16 +298,7 @@ public class GenericReport {
 		return true;
 	}
 
-	public Stream<JsonObject> doReportAsJson() {
-
-		return doReport().map(e -> {
-			JsonObject o = new JsonObject();
-			e.keyValueStream().forEach(elem -> o.addProperty(elem.getKey(), elem.getValue()));
-			return o;
-		});
-	}
-
-	private String evaluateColumnValue(StringParameter columnDefP, Map<String, StrolchRootElement> row) {
+	protected String evaluateColumnValue(StringParameter columnDefP, Map<String, StrolchRootElement> row) {
 
 		String columnDef = columnDefP.getValue();
 		String refType = columnDefP.getUom();
@@ -376,22 +333,24 @@ public class GenericReport {
 		return columnValue;
 	}
 
-	private Parameter<?> findParameter(StringParameter columnDefP, StrolchRootElement column) {
+	protected Parameter<?> findParameter(StringParameter columnDefP, StrolchRootElement column) {
 
 		String columnDef = columnDefP.getValue();
 
 		String[] searchParts = columnDef.split(SEARCH_SEPARATOR);
 		if (searchParts.length != 3)
-			throw new IllegalStateException("Parameter search reference (" + columnDef
-					+ ") is invalid as it does not have 3 parts for " + columnDefP.getLocator());
+			throw new IllegalStateException(
+					"Parameter search reference (" + columnDef + ") is invalid as it does not have 3 parts for "
+							+ columnDefP.getLocator());
 
 		String parentParamId = searchParts[1];
 		String paramRef = searchParts[2];
 
 		String[] locatorParts = paramRef.split(Locator.PATH_SEPARATOR);
 		if (locatorParts.length != 3)
-			throw new IllegalStateException("Parameter search reference (" + paramRef
-					+ ") is invalid as it does not have 3 parts for " + columnDefP.getLocator());
+			throw new IllegalStateException(
+					"Parameter search reference (" + paramRef + ") is invalid as it does not have 3 parts for "
+							+ columnDefP.getLocator());
 
 		String bagKey = locatorParts[1];
 		String paramKey = locatorParts[2];
@@ -399,7 +358,7 @@ public class GenericReport {
 		return findParameter(column, parentParamId, bagKey, paramKey);
 	}
 
-	private Parameter<?> findParameter(StrolchRootElement element, String parentParamId, String bagKey,
+	protected Parameter<?> findParameter(StrolchRootElement element, String parentParamId, String bagKey,
 			String paramKey) {
 
 		Parameter<?> parameter = element.getParameter(bagKey, paramKey);
@@ -410,52 +369,56 @@ public class GenericReport {
 		if (parentRefP == null)
 			return null;
 
-		Resource parent = this.tx.getResourceBy(parentRefP);
+		Resource parent = tx().getResourceBy(parentRefP);
 		if (parent == null)
 			return null;
 
 		return findParameter(parent, parentParamId, bagKey, paramKey);
 	}
 
-	private Parameter<?> lookupParameter(StringParameter paramRefP, StrolchRootElement column) {
+	protected Parameter<?> lookupParameter(StringParameter paramRefP, StrolchRootElement column) {
 		String paramRef = paramRefP.getValue();
 
 		String[] locatorParts = paramRef.split(Locator.PATH_SEPARATOR);
 		if (locatorParts.length != 3)
-			throw new IllegalStateException("Parameter reference (" + paramRef
-					+ ") is invalid as it does not have 3 parts for " + paramRefP.getLocator());
+			throw new IllegalStateException(
+					"Parameter reference (" + paramRef + ") is invalid as it does not have 3 parts for " + paramRefP
+							.getLocator());
 
 		String bagKey = locatorParts[1];
 		String paramKey = locatorParts[2];
 
 		Parameter<?> param = column.getParameter(bagKey, paramKey);
 		if (param == null)
-			throw new IllegalStateException("Parameter reference (" + paramRef + ") for " + paramRefP.getLocator()
-					+ " not found on " + column.getLocator());
+			throw new IllegalStateException(
+					"Parameter reference (" + paramRef + ") for " + paramRefP.getLocator() + " not found on " + column
+							.getLocator());
 
 		return param;
 	}
 
-	private Stream<StrolchRootElement> queryRows() {
+	protected Stream<StrolchRootElement> queryRows() {
 
-		// find the type of object for which the report is created
-		if (this.objectTypeP.getInterpretation().equals(StrolchConstants.INTERPRETATION_RESOURCE_REF)) {
+		StringParameter objectTypeP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
 
-			return this.tx.getResourceMap().getElementsBy(this.tx, this.objectTypeP.getUom()).stream()
-					.map(e -> e.getRootElement());
+		// find the type of object for which the reportRes is created
+		switch (objectTypeP.getInterpretation()) {
+		case StrolchConstants.INTERPRETATION_RESOURCE_REF:
 
-		} else if (this.objectTypeP.getInterpretation().equals(StrolchConstants.INTERPRETATION_ORDER_REF)) {
+			return tx().getResourceMap().getElementsBy(tx(), objectTypeP.getUom()).stream()
+					.map(Resource::getRootElement);
 
-			return this.tx.getOrderMap().getElementsBy(this.tx, this.objectTypeP.getUom()).stream()
-					.map(e -> e.getRootElement());
+		case StrolchConstants.INTERPRETATION_ORDER_REF:
 
-		} else {
+			return tx().getOrderMap().getElementsBy(tx(), objectTypeP.getUom()).stream().map(Order::getRootElement);
 
-			throw new IllegalArgumentException("Unhandled element type " + this.objectTypeP.getInterpretation());
+		default:
+
+			throw new IllegalArgumentException("Unhandled element type " + objectTypeP.getInterpretation());
 		}
 	}
 
-	private Map<String, StrolchRootElement> evaluateRow(StrolchRootElement resource) {
+	protected Map<String, StrolchRootElement> evaluateRow(StrolchRootElement resource) {
 
 		// interpretation -> Resource-Ref, etc.
 		// uom -> object type
@@ -466,10 +429,10 @@ public class GenericReport {
 		// and add the starting point
 		refs.put(resource.getType(), resource);
 
-		if (!this.report.hasParameterBag(BAG_JOINS))
+		if (!this.reportRes.hasParameterBag(BAG_JOINS))
 			return refs;
 
-		ParameterBag joinBag = this.report.getParameterBag(BAG_JOINS);
+		ParameterBag joinBag = this.reportRes.getParameterBag(BAG_JOINS);
 		for (String paramId : joinBag.getParameterKeySet()) {
 			StringParameter joinP = joinBag.getParameter(paramId);
 			addColumnJoin(refs, joinBag, joinP, true);
@@ -478,7 +441,7 @@ public class GenericReport {
 		return refs;
 	}
 
-	private StrolchRootElement addColumnJoin(Map<String, StrolchRootElement> refs, ParameterBag joinBag,
+	protected StrolchRootElement addColumnJoin(Map<String, StrolchRootElement> refs, ParameterBag joinBag,
 			StringParameter joinP, boolean optional) {
 
 		String interpretation = joinP.getInterpretation();
@@ -500,8 +463,9 @@ public class GenericReport {
 
 		ParameterBag relationsBag = dependency.getParameterBag(BAG_RELATIONS);
 		if (relationsBag == null)
-			throw new IllegalStateException("Invalid join definition value: " + joinP.getValue() + " on: "
-					+ joinP.getLocator() + " as " + dependency.getLocator() + " has no ParameterBag " + BAG_RELATIONS);
+			throw new IllegalStateException(
+					"Invalid join definition value: " + joinP.getValue() + " on: " + joinP.getLocator() + " as "
+							+ dependency.getLocator() + " has no ParameterBag " + BAG_RELATIONS);
 
 		List<Parameter<?>> relationParams = relationsBag.getParametersByInterpretationAndUom(interpretation, joinType);
 		if (relationParams.isEmpty()) {
@@ -509,8 +473,9 @@ public class GenericReport {
 					"Found no relation parameters with UOM " + joinType + " on dependency " + dependency.getLocator());
 		}
 		if (relationParams.size() > 1) {
-			throw new IllegalStateException("Found multiple possible relation parameters for UOM " + joinType
-					+ " on dependency " + dependency.getLocator());
+			throw new IllegalStateException(
+					"Found multiple possible relation parameters for UOM " + joinType + " on dependency " + dependency
+							.getLocator());
 		}
 
 		StringParameter relationP = (StringParameter) relationParams.get(0);
@@ -519,7 +484,7 @@ public class GenericReport {
 		}
 
 		Locator locator = Locator.valueOf(elementType, joinType, relationP.getValue());
-		StrolchRootElement joinElem = this.tx.findElement(locator, true);
+		StrolchRootElement joinElem = tx().findElement(locator, true);
 		if (joinElem == null)
 			return null;
 

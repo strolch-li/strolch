@@ -22,15 +22,15 @@ import li.strolch.utils.helper.StringHelper;
  * <p>
  * A Policy definition defines a reference to delegation
  * </p>
- * 
+ *
  * <p>
  * The {@link #getType()} defines the policy interface which the value references a concrete implementation
  * </p>
- * 
+ *
  * <p>
  * To actually resolve a policy, use a {@link PolicyDefVisitor} which handles difference resolving strategies
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class PolicyDef {
@@ -39,9 +39,11 @@ public abstract class PolicyDef {
 
 	/**
 	 * Create a new policy definition
-	 * 
+	 *
 	 * @param type
+	 * 		the type of policy
 	 * @param value
+	 * 		the value referencing a policy implementation
 	 */
 	public PolicyDef(String type, String value) {
 		super();
@@ -51,7 +53,7 @@ public abstract class PolicyDef {
 
 	/**
 	 * Returns the type of policy being referenced, i.e. the interface
-	 * 
+	 *
 	 * @return the type of policy being referenced, i.e. the interface
 	 */
 	public String getType() {
@@ -60,7 +62,7 @@ public abstract class PolicyDef {
 
 	/**
 	 * Returns which policy instance is being referenced
-	 * 
+	 *
 	 * @return which policy instance is being referenced
 	 */
 	public String getValue() {
@@ -70,23 +72,25 @@ public abstract class PolicyDef {
 	/**
 	 * Resolves an instance to the policy. The {@link PolicyDefVisitor} handles the resolving of an actual policy
 	 * implementation instantiating the found class and returning a new instance
-	 * 
+	 *
 	 * @param visitor
-	 * @return
+	 * 		the policy definition visitor
+	 *
+	 * @return a concrete policy implementation
 	 */
 	public abstract <T> Class<T> accept(PolicyDefVisitor visitor) throws ClassNotFoundException;
 
 	/**
 	 * Returns the value formatted for XML marshalling, so that the {@link #valueOf(String, String)} can then again
 	 * parse the value and instantiate a concrete {@link PolicyDef} instance
-	 * 
+	 *
 	 * @return the value formatted for XML marshalling
 	 */
 	public abstract String getValueForXml();
 
 	/**
 	 * Return a clone of this {@link PolicyDef} instance
-	 * 
+	 *
 	 * @return a clone of this {@link PolicyDef} instance
 	 */
 	public abstract PolicyDef getClone();
@@ -104,12 +108,12 @@ public abstract class PolicyDef {
 
 	/**
 	 * Returns a {@link PolicyDef} instance which handles the given type of XML Value
-	 * 
+	 *
 	 * @param type
-	 *            the type
+	 * 		the type
 	 * @param xmlValue
-	 *            the XML formatted value with the prefix denoting the {@link PolicyDef} type
-	 * 
+	 * 		the XML formatted value with the prefix denoting the {@link PolicyDef} type
+	 *
 	 * @return a {@link PolicyDef} instance which handles the given type of XML Value
 	 */
 	public static PolicyDef valueOf(String type, String xmlValue) {

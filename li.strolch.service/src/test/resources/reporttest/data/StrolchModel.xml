@@ -41,6 +41,10 @@
 			<Parameter Id="Location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="Storage" />
 		</ParameterBag>
 
+		<Policies>
+			<Policy Type="ReportPolicy" Value="java:li.strolch.report.policy.GenericReport" />
+		</Policies>
+
 	</Resource>
 
 	<Resource Id="fromStockReport" Name="FromStock Report" Type="Report">
@@ -68,6 +72,10 @@
 			<Parameter Id="Product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="FromStock" />
 			<Parameter Id="Location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="FromStock" />
 		</ParameterBag>
+
+		<Policies>
+			<Policy Type="ReportPolicy" Value="java:li.strolch.report.policy.GenericReport" />
+		</Policies>
 
 	</Resource>
 

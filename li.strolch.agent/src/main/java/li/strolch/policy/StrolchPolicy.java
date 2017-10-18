@@ -31,7 +31,7 @@ import li.strolch.utils.helper.StringHelper;
 
 /**
  * Interface for all Strolch policies, which are instantiated by the {@link PolicyHandler}
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class StrolchPolicy {
@@ -42,11 +42,12 @@ public abstract class StrolchPolicy {
 	private final StrolchTransaction tx;
 
 	/**
-	 * Instantiate a new {@link Command}
-	 * 
+	 * Instantiate a new {@link StrolchPolicy}
+	 *
 	 * @param container
-	 *            the {@link ComponentContainer} to access components at runtime
+	 * 		the {@link ComponentContainer} to access components at runtime
 	 * @param tx
+	 * 		the transaction for this policy
 	 */
 	public StrolchPolicy(ComponentContainer container, StrolchTransaction tx) {
 		this.container = container;
@@ -56,14 +57,14 @@ public abstract class StrolchPolicy {
 	/**
 	 * Allows the concrete {@link Command} implementation access to {@link StrolchComponent StrolchComponents} at
 	 * runtime
-	 * 
+	 *
 	 * @param clazz
-	 *            the type of component to be returned
-	 * 
+	 * 		the type of component to be returned
+	 *
 	 * @return the component with the given {@link Class} which is registered on the {@link ComponentContainer}
-	 * 
+	 *
 	 * @throws IllegalArgumentException
-	 *             if the component with the given class does not exist
+	 * 		if the component with the given class does not exist
 	 */
 	protected <V> V getComponent(Class<V> clazz) throws IllegalArgumentException {
 		return this.container.getComponent(clazz);
@@ -78,7 +79,7 @@ public abstract class StrolchPolicy {
 
 	/**
 	 * Returns the {@link StrolchTransaction} bound to this {@link Command}'s runtime
-	 * 
+	 *
 	 * @return the {@link StrolchTransaction} bound to this {@link Command}'s runtime
 	 */
 	protected StrolchTransaction tx() {
@@ -87,16 +88,16 @@ public abstract class StrolchPolicy {
 
 	/**
 	 * Return the defined {@link Resource} on the given {@link Action}
-	 * 
+	 *
 	 * @param action
-	 *            the action for which to get the {@link Resource}
-	 * 
+	 * 		the action for which to get the {@link Resource}
+	 *
 	 * @return the {@link Resource}
-	 * 
+	 *
 	 * @throws IllegalArgumentException
-	 *             if the resource is not defined on the action, i.e. fields are empty or a dash
+	 * 		if the resource is not defined on the action, i.e. fields are empty or a dash
 	 * @throws StrolchException
-	 *             if the resource does not exist, which is referenced by the action
+	 * 		if the resource does not exist, which is referenced by the action
 	 */
 	protected Resource getResource(Action action) throws IllegalArgumentException, StrolchException {
 		String resourceId = action.getResourceId();
@@ -106,8 +107,7 @@ public abstract class StrolchPolicy {
 		if (StringHelper.isEmpty(resourceType) || resourceType.equals(DASH))
 			throw new IllegalArgumentException("No resourceType defined on action " + action.getLocator());
 
-		Resource resource = this.tx.getResourceBy(resourceType, resourceId, true);
-		return resource;
+		return this.tx.getResourceBy(resourceType, resourceId, true);
 	}
 
 	/**
