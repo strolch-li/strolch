@@ -28,7 +28,7 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 
 	/**
 	 * Returns the object type
-	 * 
+	 *
 	 * @return the object type
 	 */
 	public String getObjectType();
@@ -36,21 +36,21 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	/**
 	 * Set the type of this {@link StrolchRootElement}. Not that this method should only be called for new elements, not
 	 * if this element has already been persisted!
-	 * 
-	 * @param type
+	 *
+	 * @param type the new type
 	 */
 	public void setType(String type);
 
 	/**
 	 * Returns true if this {@link StrolchRootElement} has a version set
-	 * 
+	 *
 	 * @return true if this {@link StrolchRootElement} has a version set
 	 */
 	public boolean hasVersion();
 
 	/**
 	 * Returns the current version of this object, or null if no version is set
-	 * 
+	 *
 	 * @return the current version of this object, or null if no version is set
 	 */
 	public Version getVersion();
@@ -59,35 +59,43 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * <p>
 	 * Sets the version of this object
 	 * </p>
-	 * 
+	 *
 	 * @param version
-	 *            the version to set
-	 * 
+	 * 		the version to set
+	 *
 	 * @throws IllegalArgumentException
-	 *             if the given version's locator is not equal to the current element's locator
+	 * 		if the given version's locator is not equal to the current element's locator
 	 */
 	public void setVersion(Version version) throws IllegalArgumentException;
 
 	/**
+	 * Return a clone of this {@link StrolchElement}
+	 *
+	 * @return a clone of this {@link StrolchElement}
+	 */
+	@Override
+	public StrolchRootElement getClone();
+
+	/**
 	 * Visitor pattern accept method. Takes a {@link StrolchRootElementVisitor} to visit this element
-	 * 
+	 *
 	 * @param visitor
-	 *            the visitor
-	 * 
+	 * 		the visitor
+	 *
 	 * @return the result of the visitation
 	 */
 	public <T> T accept(StrolchElementVisitor<T> visitor);
 
 	/**
 	 * Formats this {@link StrolchRootElement} as an XML string
-	 * 
+	 *
 	 * @return the formatted XML string
 	 */
 	public String toXmlString();
 
 	/**
 	 * Formats this element as a JSON string
-	 * 
+	 *
 	 * @return the formatted JSON string
 	 */
 	public String toJsonString();
@@ -95,7 +103,7 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	/**
 	 * Formats this element as a flat JSON string, i.e. all parameter bags are removed and parameters are on the root
 	 * element of the JSON object
-	 * 
+	 *
 	 * @return the formatted JSON string
 	 */
 	public String toFlatJsonString();
