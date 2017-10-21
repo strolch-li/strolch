@@ -522,9 +522,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public Order getOrderTemplate(String type, boolean assertExists) throws StrolchException {
 		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(StrolchConstants.TEMPLATE, type));
-		if (element != null)
-			return element;
-		return getOrderMap().getTemplate(this, type, assertExists);
+		if (element == null)
+			element = getOrderMap().getTemplate(this, type, assertExists);
+		
+		if(element != null) 
+			element.setDate(new Date());
+		
+		return element;
 	}
 
 	@Override
