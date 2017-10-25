@@ -15,12 +15,15 @@
  */
 package li.strolch.privilege.helper;
 
+import static li.strolch.privilege.base.PrivilegeConstants.DEFAULT_ALGORITHM;
+import static li.strolch.privilege.base.PrivilegeConstants.DEFAULT_SMALL_ITERATIONS;
+import static li.strolch.privilege.base.PrivilegeConstants.DEFAULT_KEY_LENGTH;
+
+import javax.crypto.SecretKeyFactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.crypto.SecretKeyFactory;
 
 import li.strolch.privilege.handler.DefaultEncryptionHandler;
 import li.strolch.utils.helper.StringHelper;
@@ -29,16 +32,17 @@ import li.strolch.utils.helper.StringHelper;
  * <p>
  * Simple main class which can be used to create a hash from a password which the user must type in at the command line
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PasswordCreator {
 
 	/**
 	 * @param args
-	 *            the args from the command line, NOT USED
+	 * 		the args from the command line, NOT USED
+	 *
 	 * @throws Exception
-	 *             thrown if anything goes wrong
+	 * 		thrown if anything goes wrong
 	 */
 	@SuppressWarnings("nls")
 	public static void main(String[] args) throws Exception {
@@ -49,11 +53,11 @@ public class PasswordCreator {
 
 			String hashAlgorithm = null;
 			while (hashAlgorithm == null) {
-				System.out.print("Hash Algorithm [PBKDF2WithHmacSHA512]: ");
+				System.out.print("Hash Algorithm [" + DEFAULT_ALGORITHM + "]: ");
 				String readLine = r.readLine().trim();
 
 				if (readLine.isEmpty()) {
-					hashAlgorithm = "PBKDF2WithHmacSHA512";
+					hashAlgorithm = DEFAULT_ALGORITHM;
 				} else {
 
 					try {
@@ -68,11 +72,11 @@ public class PasswordCreator {
 
 			int iterations = -1;
 			while (iterations == -1) {
-				System.out.print("Hash iterations [10000]: ");
+				System.out.print("Hash iterations [" + DEFAULT_SMALL_ITERATIONS + "]: ");
 				String readLine = r.readLine().trim();
 
 				if (readLine.isEmpty()) {
-					iterations = 10000;
+					iterations = DEFAULT_SMALL_ITERATIONS;
 				} else {
 
 					try {
@@ -86,11 +90,11 @@ public class PasswordCreator {
 
 			int keyLength = -1;
 			while (keyLength == -1) {
-				System.out.print("Hash keyLength [256]: ");
+				System.out.print("Hash keyLength [" + DEFAULT_KEY_LENGTH + "]: ");
 				String readLine = r.readLine().trim();
 
 				if (readLine.isEmpty()) {
-					keyLength = 256;
+					keyLength = DEFAULT_KEY_LENGTH;
 				} else {
 
 					try {
@@ -98,6 +102,7 @@ public class PasswordCreator {
 						if (keyLength <= 0)
 							throw new IllegalArgumentException("KeyLength must be > 0");
 					} catch (Exception e) {
+						System.err.println(e.getLocalizedMessage());
 						System.err.println(e.getLocalizedMessage());
 						keyLength = -1;
 					}
@@ -128,8 +133,9 @@ public class PasswordCreator {
 			System.out.println("Salt is: " + saltS);
 			System.out.println();
 
-			System.out.println(XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordHashS + "\" "
-					+ XmlConstants.XML_ATTR_SALT + "=\"" + saltS + "\"");
+			System.out.println(
+					XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordHashS + "\" " + XmlConstants.XML_ATTR_SALT + "=\""
+							+ saltS + "\"");
 			System.out.println();
 		}
 	}

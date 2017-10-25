@@ -15,6 +15,13 @@
  */
 package li.strolch.privilege.handler;
 
+import static li.strolch.privilege.base.PrivilegeConstants.DEFAULT_ALGORITHM;
+import static li.strolch.privilege.base.PrivilegeConstants.DEFAULT_ITERATIONS;
+import static li.strolch.privilege.base.PrivilegeConstants.DEFAULT_KEY_LENGTH;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -22,28 +29,24 @@ import java.security.spec.InvalidKeySpecException;
 import java.text.MessageFormat;
 import java.util.Map;
 
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.helper.Crypt;
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
  * This default {@link EncryptionHandler} creates tokens using a {@link SecureRandom} object. Hashing is done by using
  * {@link MessageDigest} and the configured algorithm which is passed in the parameters
  * </p>
- * 
+ *
  * Required parameters:
  * <ul>
  * <li>{@link XmlConstants#XML_PARAM_HASH_ALGORITHM}</li>
  * </ul>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DefaultEncryptionHandler implements EncryptionHandler {
@@ -74,6 +77,26 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	private int keyLength;
 
 	@Override
+	public Crypt newCryptInstance() {
+		return new Crypt().setAlgorithm(this.algorithm).setIterations(this.iterations).setKeyLength(this.keyLength);
+	}
+
+	@Override
+	public String getAlgorithm() {
+		return this.algorithm;
+	}
+
+	@Override
+	public int getIterations() {
+		return this.iterations;
+	}
+
+	@Override
+	public int getKeyLength() {
+		return this.keyLength;
+	}
+
+	@Override
 	public String nextToken() {
 		byte[] bytes = new byte[32];
 		this.secureRandom.nextBytes(bytes);
@@ -94,8 +117,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 			SecretKeyFactory skf = SecretKeyFactory.getInstance(this.algorithm);
 			PBEKeySpec spec = new PBEKeySpec(password, salt, this.iterations, this.keyLength);
 			SecretKey key = skf.generateSecret(spec);
-			byte[] res = key.getEncoded();
-			return res;
+			return key.getEncoded();
 
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			throw new IllegalStateException(e);
@@ -108,14 +130,17 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		this.secureRandom = new SecureRandom();
 
 		// get hash algorithm parameters
-		this.algorithm = parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_ALGORITHM, "PBKDF2WithHmacSHA512");
-		this.iterations = Integer.parseInt(parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_ITERATIONS, "200000"));
-		this.keyLength = Integer.parseInt(parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, "256"));
+		this.algorithm = parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_ALGORITHM, DEFAULT_ALGORITHM);
+		this.iterations = Integer.parseInt(
+				parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_ITERATIONS, String.valueOf(DEFAULT_ITERATIONS)));
+		this.keyLength = Integer.parseInt(
+				parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, String.valueOf(DEFAULT_KEY_LENGTH)));
 
 		// test hash algorithm
 		try {
 			hashPassword("test".toCharArray(), "test".getBytes()); //$NON-NLS-1$
-			DefaultEncryptionHandler.logger.info(MessageFormat.format("Using hashing algorithm {0}", this.algorithm)); //$NON-NLS-1$
+			DefaultEncryptionHandler.logger
+					.info(MessageFormat.format("Using hashing algorithm {0}", this.algorithm)); //$NON-NLS-1$
 		} catch (Exception e) {
 			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), XmlConstants.XML_PARAM_HASH_ALGORITHM,
