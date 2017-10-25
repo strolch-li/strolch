@@ -17,6 +17,7 @@ package li.strolch.runtime.query.enums;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gson.JsonObject;
 import li.strolch.utils.helper.StringHelper;
@@ -71,6 +72,10 @@ public class StrolchEnum {
 
 	public int size() {
 		return this.values.size();
+	}
+
+	public Set<String> keySet() {
+		return this.values.keySet();
 	}
 
 	public JsonObject toJson() {
