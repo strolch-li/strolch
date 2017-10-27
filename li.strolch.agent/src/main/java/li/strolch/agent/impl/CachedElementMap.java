@@ -88,7 +88,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	public T getTemplate(StrolchTransaction tx, String type, boolean assertExists) {
 		T t = getCachedDao().queryBy(StrolchConstants.TEMPLATE, type);
 		if (assertExists && t == null) {
-			String msg = "The template for type {0} does not exist!"; //$NON-NLS-1$
+			String msg = "The template with type {0} does not exist!"; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, type));
 		}
 
@@ -111,7 +111,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	public T getBy(StrolchTransaction tx, String type, String id, boolean assertExists) throws StrolchException {
 		T t = getCachedDao().queryBy(type, id);
 		if (assertExists && t == null) {
-			String msg = "The element for type {0} and id {1} does not exist!"; //$NON-NLS-1$
+			String msg = "The element with type {0} and id {1} does not exist!"; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, type, id));
 		}
 
@@ -135,7 +135,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 			throws StrolchException {
 		T t = getDbDao(tx).queryBy(type, id, version);
 		if (assertExists && t == null) {
-			String msg = "The element for type {0} and id {1} and version {2} does not exist!"; //$NON-NLS-1$
+			String msg = "The element with type {0} and id {1} and version {2} does not exist!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, type, id, version);
 			throw new StrolchException(msg);
 		}
@@ -147,7 +147,12 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		assertIsRefParam(refP);
 		String type = refP.getUom();
 		String id = refP.getValue();
-		return getBy(tx, type, id, assertExists);
+		T t = getBy(tx, type, id, false);
+		if (assertExists && t == null) {
+			String msg = "The element with type {0} and id {1} does not exist for param {2}"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, type, id, refP.getLocator()));
+		}
+		return t;
 	}
 
 	@Override
@@ -207,7 +212,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	/**
 	 * Special method used when starting the container to cache the values. Not to be used anywhere else but from the
 	 * {@link CachedRealm}
-	 * 
+	 *
 	 * @param element
 	 * @param tx
 	 */
