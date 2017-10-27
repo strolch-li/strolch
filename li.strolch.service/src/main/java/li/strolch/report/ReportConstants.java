@@ -17,6 +17,7 @@ public class ReportConstants {
 	public static final String PARAM_DATE_RANGE_SEL = "dateRangeSel";
 	public static final String PARAM_FIELD_REF = "fieldRef";
 	public static final String PARAM_POLICY = "policy";
+	public static final String PARAM_ALLOW_MISSING_COLUMNS = "allowMissingColumns";
 
 	public static final String COL_ID = "$id";
 	public static final String COL_NAME = "$name";

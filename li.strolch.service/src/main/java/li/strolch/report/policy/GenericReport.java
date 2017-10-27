@@ -2,7 +2,7 @@ package li.strolch.report.policy;
 
 import static java.util.Comparator.comparingInt;
 import static li.strolch.report.ReportConstants.*;
-import static li.strolch.utils.helper.StringHelper.DASH;
+import static li.strolch.utils.helper.StringHelper.EMPTY;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -37,6 +37,7 @@ public class GenericReport extends ReportPolicy {
 	private ParameterBag columnsBag;
 	private List<StringParameter> orderingParams;
 	private boolean descending;
+	private boolean allowMissingColumns;
 	private List<String> columnIds;
 	private StringParameter dateRangeSelP;
 
@@ -70,6 +71,9 @@ public class GenericReport extends ReportPolicy {
 
 		if (this.reportRes.hasParameter(BAG_PARAMETERS, PARAM_DESCENDING))
 			this.descending = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_DESCENDING).getValue();
+		if (this.reportRes.hasParameter(BAG_PARAMETERS, PARAM_ALLOW_MISSING_COLUMNS))
+			this.allowMissingColumns = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_ALLOW_MISSING_COLUMNS)
+					.getValue();
 
 		this.dateRangeSelP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
 
@@ -192,9 +196,11 @@ public class GenericReport extends ReportPolicy {
 			String type = fieldRefP.getUom();
 
 			StrolchRootElement column1 = row1.get(type);
+			StrolchRootElement column2 = row2.get(type);
+			if (column1 == null && column2 == null)
+				continue;
 			if (column1 == null)
 				return -1;
-			StrolchRootElement column2 = row2.get(type);
 			if (column2 == null)
 				return 1;
 
@@ -210,13 +216,21 @@ public class GenericReport extends ReportPolicy {
 				}
 
 			} else {
-				Parameter<?> param1 = lookupParameter(fieldRefP, column1);
-				Parameter<?> param2 = lookupParameter(fieldRefP, column2);
+				Optional<Parameter<?>> param1 = lookupParameter(fieldRefP, column1);
+				Optional<Parameter<?>> param2 = lookupParameter(fieldRefP, column2);
+
+				if (!param1.isPresent() && !param2.isPresent())
+					continue;
+
+				if (param1.isPresent() && !param2.isPresent())
+					return 1;
+				else if (!param1.isPresent())
+					return -1;
 
 				if (this.descending)
-					sortVal = param1.compareTo(param2);
+					sortVal = param1.get().compareTo(param2.get());
 				else
-					sortVal = param2.compareTo(param1);
+					sortVal = param2.get().compareTo(param1.get());
 			}
 
 			if (sortVal != 0)
@@ -246,8 +260,8 @@ public class GenericReport extends ReportPolicy {
 				if (!filterPolicy.filter(columnValue))
 					return false;
 			} else {
-				Parameter<?> param = lookupParameter(fieldRefP, column);
-				if (!filterPolicy.filter(param))
+				Optional<Parameter<?>> param = lookupParameter(fieldRefP, column);
+				if (param.isPresent() && !filterPolicy.filter(param.get()))
 					return false;
 			}
 		}
@@ -269,13 +283,13 @@ public class GenericReport extends ReportPolicy {
 			if (dateRangeSel.equals(COL_DATE)) {
 				date = element.accept(new ElementDateVisitor());
 			} else {
-				Parameter<?> param = lookupParameter(this.dateRangeSelP, element);
-				if (StrolchValueType.parse(param.getType()) != StrolchValueType.DATE)
+				Optional<Parameter<?>> param = lookupParameter(this.dateRangeSelP, element);
+				if (!param.isPresent() || StrolchValueType.parse(param.get().getType()) != StrolchValueType.DATE)
 					throw new IllegalStateException(
-							"Date Range selector is invalid, as referenced parameter is not a Date but a " + param
-									.getType());
+							"Date Range selector is invalid, as referenced parameter is not a Date but " + (param
+									.isPresent() ? param.get().getType() : "null"));
 
-				date = ((DateParameter) param).getValue();
+				date = ((DateParameter) param.get()).getValue();
 			}
 
 			if (!this.dateRange.contains(date))
@@ -309,7 +323,7 @@ public class GenericReport extends ReportPolicy {
 		String columnValue;
 
 		if (column == null)
-			columnValue = DASH;
+			columnValue = EMPTY;
 		else if (columnDef.equals(COL_ID)) {
 			columnValue = column.getId();
 		} else if (columnDef.equals(COL_NAME)) {
@@ -323,11 +337,11 @@ public class GenericReport extends ReportPolicy {
 		} else if (columnDef.startsWith(COL_SEARCH)) {
 			Parameter<?> parameter = findParameter(columnDefP, column);
 			if (parameter == null)
-				columnValue = DASH;
+				columnValue = EMPTY;
 			else
 				columnValue = parameter.getValueAsString();
 		} else {
-			columnValue = lookupParameter(columnDefP, column).getValueAsString();
+			columnValue = lookupParameter(columnDefP, column).orElseGet(StringParameter::new).getValueAsString();
 		}
 
 		return columnValue;
@@ -376,7 +390,7 @@ public class GenericReport extends ReportPolicy {
 		return findParameter(parent, parentParamId, bagKey, paramKey);
 	}
 
-	protected Parameter<?> lookupParameter(StringParameter paramRefP, StrolchRootElement column) {
+	protected Optional<Parameter<?>> lookupParameter(StringParameter paramRefP, StrolchRootElement column) {
 		String paramRef = paramRefP.getValue();
 
 		String[] locatorParts = paramRef.split(Locator.PATH_SEPARATOR);
@@ -389,12 +403,12 @@ public class GenericReport extends ReportPolicy {
 		String paramKey = locatorParts[2];
 
 		Parameter<?> param = column.getParameter(bagKey, paramKey);
-		if (param == null)
+		if (!allowMissingColumns && param == null)
 			throw new IllegalStateException(
 					"Parameter reference (" + paramRef + ") for " + paramRefP.getLocator() + " not found on " + column
 							.getLocator());
 
-		return param;
+		return Optional.ofNullable(param);
 	}
 
 	protected Stream<StrolchRootElement> queryRows() {
