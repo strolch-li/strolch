@@ -262,7 +262,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		});
 	}
 
-	private void archiveActivity(String realm, Locator activityLoc) {
+	@Override
+	public void archiveActivity(String realm, Locator activityLoc) {
 		this.executorService.execute(() -> {
 			try {
 				runAsAgent(ctx -> {
