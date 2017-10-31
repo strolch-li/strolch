@@ -13,7 +13,7 @@ public class RemoveActivityArchival extends ActivityArchivalPolicy {
 	@Override
 	public void archive(Activity activity) {
 
-		if (!activity.getState().isExecuted())
+		if (!activity.getState().isExecuted() && !activity.getState().isClosed())
 			throw new IllegalStateException("Can not archive non-executed " + activity.getLocator());
 
 		tx().remove(activity);
