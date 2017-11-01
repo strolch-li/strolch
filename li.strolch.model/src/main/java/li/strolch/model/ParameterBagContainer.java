@@ -65,7 +65,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the removed {@link Parameter} or null if it did not exist
 	 */
-	public <T> Parameter<T> removeParameter(String bagKey, String paramKey);
+	public <U, T extends Parameter<U>> T removeParameter(String bagKey, String paramKey);
 
 	/**
 	 * Returns the {@link ParameterBag} with the given key, or null if it does not exist
