@@ -144,6 +144,17 @@ public class InMemoryDao<T extends StrolchRootElement> implements StrolchDao<T> 
 	}
 
 	@Override
+	public int queryLatestVersionFor(String type, String id) {
+		Map<String, ArrayDeque<T>> byType = this.elementMap.get(type);
+		if (byType == null)
+			return -1;
+		ArrayDeque<T> list = byType.get(id);
+		if (list == null || list.isEmpty())
+			return -1;
+		return list.stream().mapToInt(e -> e.getVersion().getVersion()).max().orElse(-1);
+	}
+
+	@Override
 	public long queryVersionsSizeFor(String type, String id) {
 		Map<String, ArrayDeque<T>> byType = this.elementMap.get(type);
 		if (byType == null)

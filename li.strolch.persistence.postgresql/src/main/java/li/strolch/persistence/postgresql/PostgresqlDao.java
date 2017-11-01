@@ -278,6 +278,30 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	@Override
+	public int queryLatestVersionFor(String type, String id) {
+
+		String sql = "select count(*), max(version) from " + getTableName() + " where type = ? and id = ?";
+
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+			statement.setString(1, type);
+			statement.setString(2, id);
+
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				int count = result.getInt(1);
+				int max = result.getInt(2);
+				if (count == 0)
+					return -1;
+				else
+					return max;
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
 	public long queryVersionsSizeFor(String type, String id) {
 
 		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ?";
@@ -477,8 +501,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {1}",
-					element.getLocator(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(MessageFormat
+					.format("Failed to remove {0} due to {1}", element.getLocator(), e.getLocalizedMessage()), e);
 		}
 
 		if (count == 0) {
@@ -498,8 +522,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {1}",
-					element.getLocator(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(MessageFormat
+					.format("Failed to remove {0} due to {1}", element.getLocator(), e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -528,8 +552,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					modCount = updateStmt.executeUpdate();
 					if (modCount != 1) {
 						String msg = "Expected to update 1 element with id {0} but SQL statement modified {1} elements! Verify that element {2} with version {3} exists!";
-						msg = MessageFormat.format(msg, element.getId(), modCount, element.getLocator(),
-								previousVersion);
+						msg = MessageFormat
+								.format(msg, element.getId(), modCount, element.getLocator(), previousVersion);
 						throw new StrolchPersistenceException(msg);
 					}
 
@@ -537,8 +561,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove version {0} due to {1}",
-					element.getLocator(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(MessageFormat
+					.format("Failed to remove version {0} due to {1}", element.getLocator(), e.getLocalizedMessage()),
+					e);
 		}
 	}
 

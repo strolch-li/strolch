@@ -22,7 +22,7 @@
 			<depends>PrivilegeHandler</depends>
 			<depends>PersistenceHandler</depends>
 			<Properties>
-				<realms>defaultRealm, svcTransient, svcCached, svcTransactional</realms>
+				<realms>defaultRealm, svcTransient, svcCached, svcCachedAuditsVersioning, svcTransactional</realms>
 
 				<dataStoreMode>EMPTY</dataStoreMode>
 
@@ -34,6 +34,12 @@
 				<tryLockTimeUnit.svcCached>SECONDS</tryLockTimeUnit.svcCached>
 				<tryLockTime.svcCached>1</tryLockTime.svcCached>
 				<dataStoreMode.svcCached>CACHED</dataStoreMode.svcCached>
+
+				<tryLockTimeUnit.svcCachedAuditsVersioning>SECONDS</tryLockTimeUnit.svcCachedAuditsVersioning>
+				<tryLockTime.svcCachedAuditsVersioning>1</tryLockTime.svcCachedAuditsVersioning>
+				<dataStoreMode.svcCachedAuditsVersioning>CACHED</dataStoreMode.svcCachedAuditsVersioning>
+				<enableAuditTrail.svcCachedAuditsVersioning>true</enableAuditTrail.svcCachedAuditsVersioning>
+				<enableVersioning.svcCachedAuditsVersioning>true</enableVersioning.svcCachedAuditsVersioning>
 
 				<tryLockTimeUnit.svcTransactional>SECONDS</tryLockTimeUnit.svcTransactional>
 				<tryLockTime.svcTransactional>1</tryLockTime.svcTransactional>
@@ -53,6 +59,11 @@
 				<db.username.svcCached>cacheduser</db.username.svcCached>
 				<db.password.svcCached>test</db.password.svcCached>
 				<db.pool.maximumPoolSize.svcCached>1</db.pool.maximumPoolSize.svcCached>
+
+				<db.url.svcCachedAuditsVersioning>jdbc:postgresql://localhost/cacheduserauditsversioningdb</db.url.svcCachedAuditsVersioning>
+				<db.username.svcCachedAuditsVersioning>cacheduserauditsversioning</db.username.svcCachedAuditsVersioning>
+				<db.password.svcCachedAuditsVersioning>test</db.password.svcCachedAuditsVersioning>
+				<db.pool.maximumPoolSize.svcCachedAuditsVersioning>1</db.pool.maximumPoolSize.svcCachedAuditsVersioning>
 
 				<db.url.svcTransactional>jdbc:postgresql://localhost/transactionaluserdb</db.url.svcTransactional>
 				<db.username.svcTransactional>transactionaluser</db.username.svcTransactional>

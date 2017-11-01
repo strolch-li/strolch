@@ -42,21 +42,21 @@ public class StoreToDaoElementListener implements StrolchElementListener {
 	@Override
 	public void notifyResource(Resource resource) {
 		if (resource.getVersion() == null)
-			Version.setInitialVersionFor(resource, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(resource, -1, tx.getCertificate().getUsername());
 		this.resourceDao.save(resource);
 	}
 
 	@Override
 	public void notifyOrder(Order order) {
 		if (order.getVersion() == null)
-			Version.setInitialVersionFor(order, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(order, -1, tx.getCertificate().getUsername());
 		this.orderDao.save(order);
 	}
 
 	@Override
 	public void notifyActivity(Activity activity) {
 		if (activity.getVersion() == null)
-			Version.setInitialVersionFor(activity, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(activity, -1, tx.getCertificate().getUsername());
 		this.activityDao.save(activity);
 	}
 }

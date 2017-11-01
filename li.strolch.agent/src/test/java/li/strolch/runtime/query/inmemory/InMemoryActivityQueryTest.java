@@ -287,7 +287,7 @@ public class InMemoryActivityQueryTest {
 
 	private Activity getBallActivity() {
 		Activity res1 = new Activity("childrensBall", "Ball 1", "Ball", TimeOrdering.SERIES);
-		Version.setInitialVersionFor(res1, "test");
+		Version.setInitialVersionFor(res1, -1, "test");
 		ParameterBag bag = new ParameterBag("parameters", "Ball Details", "Parameters");
 		bag.addParameter(new StringParameter("color", "Color", "red"));
 		bag.addParameter(new BooleanParameter("forChildren", "Color", true));
@@ -331,7 +331,7 @@ public class InMemoryActivityQueryTest {
 		activitys.add(activity6);
 
 		for (Activity activity : activitys) {
-			Version.setInitialVersionFor(activity, "test");
+			Version.setInitialVersionFor(activity, -1, "test");
 		}
 
 		return activitys;

@@ -305,7 +305,7 @@ public class InMemoryOrderQueryTest {
 
 	private Order getBallOrder() {
 		Order o1 = new Order("childrensBall", "Ball 1", "Ball");
-		Version.setInitialVersionFor(o1, "test");
+		Version.setInitialVersionFor(o1, -1, "test");
 		ParameterBag bag = new ParameterBag("parameters", "Ball Details", "Parameters");
 		bag.addParameter(new StringParameter("color", "Color", "red"));
 		bag.addParameter(new BooleanParameter("forChildren", "Color", true));
@@ -336,7 +336,7 @@ public class InMemoryOrderQueryTest {
 		orders.add(res6);
 
 		for (Order order : orders) {
-			Version.setInitialVersionFor(order, "test");
+			Version.setInitialVersionFor(order, -1, "test");
 		}
 		return orders;
 	}

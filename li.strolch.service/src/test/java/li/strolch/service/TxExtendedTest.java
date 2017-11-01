@@ -190,19 +190,46 @@ public class TxExtendedTest extends AbstractRealmServiceTest {
 				assertNotNull(tx.getActivityBy(type, activity.getId()));
 			}
 
+			// remove elements
 			try (StrolchTransaction tx = openTx(arg.realm)) {
 				tx.remove(resource);
 				tx.remove(order);
 				tx.remove(activity);
 
+				// can't assert that they aren't on the maps anymore, as that is not currently supported
+
 				tx.commitOnClose();
 			}
 
+			// assert they don't exist anymore
 			try (StrolchTransaction tx = openTx(arg.realm)) {
 
 				assertNull(tx.getResourceBy(type, resource.getId()));
 				assertNull(tx.getOrderBy(type, order.getId()));
 				assertNull(tx.getActivityBy(type, activity.getId()));
+
+			}
+
+			// add with same ID
+			try (StrolchTransaction tx = openTx(arg.realm)) {
+
+				tx.add(resource.getClone());
+				tx.add(order.getClone());
+				tx.add(activity.getClone());
+
+				assertTrue(tx.hasResource(type, resId));
+				assertTrue(tx.hasOrder(type, orderId));
+				assertTrue(tx.hasActivity(type, activityId));
+
+				tx.commitOnClose();
+			}
+
+			// assert they exist
+			try (StrolchTransaction tx = openTx(arg.realm)) {
+
+				assertTrue(tx.hasResource(type, resId));
+				assertTrue(tx.hasOrder(type, orderId));
+				assertTrue(tx.hasActivity(type, activityId));
 
 			}
 

@@ -20,6 +20,11 @@ Start PostgreSQL console and create the users:
 	create database transactionaluserdb;
 	GRANT ALL PRIVILEGES ON DATABASE transactionaluserdb to transactionaluser;
 	GRANT CONNECT ON DATABASE transactionaluserdb TO transactionaluser;
+	
+	create user cacheduserauditsversioning with password 'test';
+	create database cacheduserauditsversioningdb;
+	GRANT ALL PRIVILEGES ON DATABASE cacheduserauditsversioningdb to cacheduserauditsversioning;
+	GRANT CONNECT ON DATABASE cacheduserauditsversioningdb TO cacheduserauditsversioning;
 
 You can revoke the privileges with the following:
 

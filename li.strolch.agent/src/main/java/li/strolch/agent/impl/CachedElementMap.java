@@ -173,6 +173,11 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	}
 
 	@Override
+	public int getLatestVersionFor(StrolchTransaction tx, String type, String id) {
+		return getDbDao(tx).queryLatestVersionFor(type, id);
+	}
+
+	@Override
 	public synchronized List<T> getAllElements(StrolchTransaction tx) {
 		List<T> all = getCachedDao().queryAll();
 		return all.stream().map(t -> {
@@ -214,7 +219,6 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	 * {@link CachedRealm}
 	 *
 	 * @param element
-	 * @param tx
 	 */
 	synchronized void insert(T element) {
 		getCachedDao().save(element);
@@ -222,10 +226,12 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 
 	@Override
 	public synchronized void add(StrolchTransaction tx, T element) {
-		if (realm.isVersioningEnabled())
-			Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
-		else
-			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+		if (realm.isVersioningEnabled()) {
+			int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId());
+			Version.setInitialVersionFor(element, latestVersion, tx.getCertificate().getUsername());
+		} else {
+			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
+		}
 
 		// first perform cached change
 		getCachedDao().save(element);
@@ -236,10 +242,12 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	@Override
 	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
-			if (realm.isVersioningEnabled())
-				Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
-			else
-				Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+			if (realm.isVersioningEnabled()) {
+				int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId());
+				Version.setInitialVersionFor(element, latestVersion, tx.getCertificate().getUsername());
+			} else {
+				Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
+			}
 		}
 
 		// first perform cached change
@@ -253,7 +261,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		if (realm.isVersioningEnabled())
 			Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
 		else
-			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
 
 		// first perform cached change
 		getCachedDao().update(element);
@@ -267,7 +275,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 			if (realm.isVersioningEnabled())
 				Version.updateVersionFor(t, tx.getCertificate().getUsername(), false);
 			else
-				Version.setInitialVersionFor(t, tx.getCertificate().getUsername());
+				Version.setInitialVersionFor(t, -1, tx.getCertificate().getUsername());
 		}
 
 		// first perform cached change
@@ -281,7 +289,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		if (realm.isVersioningEnabled())
 			Version.updateVersionFor(element, tx.getCertificate().getUsername(), true);
 		else
-			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
 
 		if (this.realm.isVersioningEnabled()) {
 
@@ -305,7 +313,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 			if (realm.isVersioningEnabled())
 				Version.updateVersionFor(t, tx.getCertificate().getUsername(), true);
 			else
-				Version.setInitialVersionFor(t, tx.getCertificate().getUsername());
+				Version.setInitialVersionFor(t, -1, tx.getCertificate().getUsername());
 		}
 
 		if (this.realm.isVersioningEnabled()) {

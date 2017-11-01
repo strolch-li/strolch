@@ -35,16 +35,16 @@ import li.strolch.utils.dbc.DBC;
  * This {@link AuditTrail} facade registers all actions performed i.e. it registers which {@link StrolchRootElement
  * StrolchRootElements} are retrieved, created, updated and deleted.
  * </p>
- * 
+ *
  * <p>
  * Privilege is validated on the <code>getBy*()</code> methods.
  * </p>
- * 
+ *
  * <p>
  * In a single transaction an StrolchRootElement may be created, updated and then deleted - this implementation does not
  * "squash" such actions, but registers them separately
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class AuditingElementMapFacade<T extends StrolchRootElement> implements ElementMap<T> {
@@ -212,6 +212,11 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 		if (this.observeAccessReads && !versions.isEmpty())
 			this.read.add(versions.get(versions.size() - 1));
 		return versions;
+	}
+
+	@Override
+	public int getLatestVersionFor(StrolchTransaction tx, String type, String id) {
+		return this.elementMap.getLatestVersionFor(tx, type, id);
 	}
 
 	@Override

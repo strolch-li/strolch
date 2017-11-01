@@ -36,9 +36,9 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  * @param <T>
+ *
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class TransactionalElementMap<T extends StrolchRootElement> implements ElementMap<T> {
 
@@ -205,6 +205,11 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 	}
 
 	@Override
+	public int getLatestVersionFor(StrolchTransaction tx, String type, String id) {
+		return getDao(tx).queryLatestVersionFor(type, id);
+	}
+
+	@Override
 	public List<T> getAllElements(StrolchTransaction tx) {
 		List<T> all = getDao(tx).queryAll();
 
@@ -251,10 +256,12 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 
 	@Override
 	public void add(StrolchTransaction tx, T element) {
-		if (realm.isVersioningEnabled())
-			Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
-		else
-			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+		if (realm.isVersioningEnabled()) {
+			int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId());
+			Version.setInitialVersionFor(element, latestVersion, tx.getCertificate().getUsername());
+		} else {
+			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
+		}
 
 		getDao(tx).save(element);
 		getDao(tx).flush();
@@ -263,10 +270,12 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 	@Override
 	public void addAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
-			if (realm.isVersioningEnabled())
-				Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
-			else
-				Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+			if (realm.isVersioningEnabled()) {
+				int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId());
+				Version.setInitialVersionFor(element, latestVersion, tx.getCertificate().getUsername());
+			} else {
+				Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
+			}
 		}
 
 		getDao(tx).saveAll(elements);
@@ -278,7 +287,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 		if (realm.isVersioningEnabled())
 			Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
 		else
-			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
 
 		getDao(tx).update(element);
 		getDao(tx).flush();
@@ -290,7 +299,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 			if (realm.isVersioningEnabled())
 				Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
 			else
-				Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+				Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
 		}
 
 		getDao(tx).updateAll(elements);
@@ -303,7 +312,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 			Version.updateVersionFor(element, tx.getCertificate().getUsername(), true);
 			getDao(tx).update(element);
 		} else {
-			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
 			getDao(tx).remove(element);
 		}
 		getDao(tx).flush();
@@ -315,7 +324,7 @@ public abstract class TransactionalElementMap<T extends StrolchRootElement> impl
 			if (realm.isVersioningEnabled())
 				Version.updateVersionFor(element, tx.getCertificate().getUsername(), true);
 			else
-				Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+				Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
 		}
 
 		if (this.realm.isVersioningEnabled()) {
