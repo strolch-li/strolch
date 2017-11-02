@@ -255,6 +255,10 @@ public class GenericReport extends ReportPolicy {
 
 			StrolchRootElement column = row.get(type);
 
+			// if column is null, then don't include in result
+			if (column == null)
+				return false;
+
 			if (fieldRefP.getValue().startsWith("$")) {
 				String columnValue = evaluateColumnValue(fieldRefP, row);
 				if (!filterPolicy.filter(columnValue))
