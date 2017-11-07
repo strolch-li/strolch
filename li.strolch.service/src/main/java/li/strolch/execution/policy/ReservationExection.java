@@ -7,6 +7,8 @@ import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.parameter.BooleanParameter;
+import li.strolch.model.timevalue.impl.FloatValue;
+import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 
 /**
@@ -70,8 +72,10 @@ public class ReservationExection extends DurationExecution {
 
 		tx().lock(getResource(action));
 
-		// only do if reserve
-		if (!action.getType().equals(TYPE_RESERVE) && !action.getType().equals(TYPE_RELEASE)) {
+		// only do if reserve or release
+		boolean isReserve = action.getType().equals(TYPE_RESERVE);
+		boolean isRelease = action.getType().equals(TYPE_RELEASE);
+		if (!isReserve && !isRelease) {
 			// otherwise delegate to super class
 			super.toExecution(action);
 
@@ -92,8 +96,10 @@ public class ReservationExection extends DurationExecution {
 
 		tx().lock(getResource(action));
 
-		// only do if release
-		if (!action.getType().equals(TYPE_RESERVE) && !action.getType().equals(TYPE_RELEASE)) {
+		// only do if reserve or release
+		boolean isReserve = action.getType().equals(TYPE_RESERVE);
+		boolean isRelease = action.getType().equals(TYPE_RELEASE);
+		if (!isReserve && !isRelease) {
 			// otherwise delegate to super class
 			super.toExecuted(action);
 
@@ -102,6 +108,9 @@ public class ReservationExection extends DurationExecution {
 
 		setReservation(action);
 		setActionState(action, State.EXECUTED);
+
+		FloatValue value = new FloatValue(isReserve ? 1.0D : 0.0D);
+		action.addChange(new ValueChange<>(System.currentTimeMillis(), value, ""));
 	}
 
 	public void setReservation(Action action) {
