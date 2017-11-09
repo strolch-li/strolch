@@ -22,8 +22,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.StringReader;
@@ -50,9 +53,7 @@ import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StrolchTypeNavigation;
 import li.strolch.model.query.parser.QueryParser;
-import li.strolch.model.xml.SimpleStrolchElementListener;
-import li.strolch.model.xml.StrolchElementToXmlStringVisitor;
-import li.strolch.model.xml.XmlModelSaxReader;
+import li.strolch.model.xml.*;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
@@ -75,6 +76,8 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 /**
+ * The RESTful inspector for Strolch. It allows to inspect the realms, and their respective elements. Supporting querying and retrieving, in multiple formats: XML, JSON and flat JSON
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/inspector")
@@ -92,69 +95,40 @@ public class Inspector {
 		return gson.toJson(jsonObject);
 	}
 
-	/**
-	 * <p>
-	 * Root path of the inspector
-	 * </p>
-	 * <p>
-	 * <p>
-	 * Returns the root element, which is an overview of the configured realms
-	 * </p>
-	 *
-	 * @return the root element, which is an overview of the configured realms
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAgent(@Context HttpServletRequest request) {
-		try {
+	public Response getAgentOverview(@Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-			Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		JsonObject agentOverview = new JsonObject();
+		JsonArray realmsArr = new JsonArray();
+		agentOverview.add(Tags.Json.REALMS, realmsArr);
 
-			JsonObject agentOverview = new JsonObject();
-			JsonArray realmsArr = new JsonArray();
-			agentOverview.add(Tags.Json.REALMS, realmsArr);
+		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
+		Set<String> realmNames = container.getRealmNames();
+		for (String realmName : realmNames) {
 
-			ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
-			Set<String> realmNames = container.getRealmNames();
-			for (String realmName : realmNames) {
+			JsonObject realmJ = new JsonObject();
 
-				JsonObject realmJ = new JsonObject();
+			try (StrolchTransaction tx = openTx(cert, realmName)) {
+				long size = 0;
+				size += tx.getResourceMap().querySize(tx);
+				size += tx.getOrderMap().querySize(tx);
 
-				try (StrolchTransaction tx = openTx(cert, realmName)) {
-					long size = 0;
-					size += tx.getResourceMap().querySize(tx);
-					size += tx.getOrderMap().querySize(tx);
+				realmJ.addProperty(Tags.Json.NAME, realmName);
+				realmJ.addProperty(Tags.Json.SIZE, size);
 
-					realmJ.addProperty(Tags.Json.NAME, realmName);
-					realmJ.addProperty(Tags.Json.SIZE, size);
-
-					realmsArr.add(realmJ);
-				}
+				realmsArr.add(realmJ);
 			}
-
-			return Response.ok().entity(toString(agentOverview)).build();
-
-		} catch (Exception e) {
-			throw e;
 		}
+
+		return Response.ok().entity(toString(agentOverview)).build();
 	}
 
-	/**
-	 * <p>
-	 * Realm inspector
-	 * </p>
-	 * <p>
-	 * <p>
-	 * Returns the overview of a specific relam
-	 * </p>
-	 *
-	 * @param realm the realm for which the overview is to be returned
-	 * @return the overview of a specific relam
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}")
-	public Response getRealm(@Context HttpServletRequest request, @PathParam("realm") String realm) {
+	public Response getRealmOverview(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
@@ -204,17 +178,35 @@ public class Inspector {
 		return Response.ok().entity(toString(realmDetailJ)).build();
 	}
 
-	/**
-	 * <p>
-	 * Resource inspector
-	 * </p>
-	 * <p>
-	 * Returns an overview of the {@link Resource Resources}. This is a list of all the types and the size each type has
-	 * </p>
-	 *
-	 * @param realm the realm for which the resource overview is to be returned
-	 * @return an overview of the {@link Resource Resources}. This is a list of all the types and the size each type has
-	 */
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/xml")
+	public Response exportRealmToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		StreamingOutput streamingOutput = stream -> {
+			try (StrolchTransaction tx = openTx(cert, realm)) {
+				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
+
+				tx.getResourceMap().getAllElements(tx).forEach(e -> e.accept(visitor));
+				tx.getOrderMap().getAllElements(tx).forEach(e -> e.accept(visitor));
+				tx.getActivityMap().getAllElements(tx).forEach(e -> e.accept(visitor));
+
+				writer.writeEndDocument();
+				stream.flush();
+
+			} catch (XMLStreamException e) {
+				throw new IllegalStateException("Failed to write XML to " + stream, e);
+			}
+		};
+
+		String fileName = "strolch_export_" + realm + "_" + System.currentTimeMillis() + ".xml";
+		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+	}
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources")
@@ -248,17 +240,6 @@ public class Inspector {
 		return Response.ok().entity(toString(mapOverview)).build();
 	}
 
-	/**
-	 * <p>
-	 * Order inspector
-	 * </p>
-	 * <p>
-	 * Returns an overview of the {@link Order Orders}. This is a list of all the types and the size each type has
-	 * </p>
-	 *
-	 * @param realm the realm for which the order overview is to be returned
-	 * @return an overview of the {@link Order Orders}. This is a list of all the types and the size each type has
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders")
@@ -292,19 +273,6 @@ public class Inspector {
 		return Response.ok().entity(toString(mapOverview)).build();
 	}
 
-	/**
-	 * <p>
-	 * Activity inspector
-	 * </p>
-	 * <p>
-	 * Returns an overview of the {@link Activity Activities}. This is a list of all the types and the size each type
-	 * has
-	 * </p>
-	 *
-	 * @param realm the realm for which the activity overview is to be returned
-	 * @return an overview of the {@link Activity Activities}. This is a list of all the types and the size each type
-	 * has
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities")
@@ -338,22 +306,87 @@ public class Inspector {
 		return Response.ok().entity(toString(mapOverview)).build();
 	}
 
-	// TODO for the get element type details, we should not simply query all objects, but rather find a solution to query only the id, name, type and date, state for the order
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/resources/xml")
+	public Response exportResourcesToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-	/**
-	 * <p>
-	 * Resource type inspector
-	 * </p>
-	 * <p>
-	 * Returns an overview of the {@link Resource Resources} with the given type. This is a list of overviews of the
-	 * resources
-	 * </p>
-	 *
-	 * @param realm the realm for which the resource type overview is to be returned
-	 * @param type  marshall
-	 * @return an overview of the {@link Resource Resources} with the given type. This is a list of overviews of the
-	 * resources
-	 */
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		StreamingOutput streamingOutput = stream -> {
+			try (StrolchTransaction tx = openTx(cert, realm)) {
+				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
+
+				tx.getResourceMap().getAllElements(tx).forEach(e -> e.accept(visitor));
+
+				writer.writeEndDocument();
+				stream.flush();
+
+			} catch (XMLStreamException e) {
+				throw new IllegalStateException("Failed to write XML to " + stream, e);
+			}
+		};
+
+		String fileName = "strolch_export_resources_" + realm + "_" + System.currentTimeMillis() + ".xml";
+		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/orders/xml")
+	public Response exportOrdersToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		StreamingOutput streamingOutput = stream -> {
+			try (StrolchTransaction tx = openTx(cert, realm)) {
+				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
+
+				tx.getOrderMap().getAllElements(tx).forEach(e -> e.accept(visitor));
+
+				writer.writeEndDocument();
+				stream.flush();
+
+			} catch (XMLStreamException e) {
+				throw new IllegalStateException("Failed to write XML to " + stream, e);
+			}
+		};
+
+		String fileName = "strolch_export_orders_" + realm + "_" + System.currentTimeMillis() + ".xml";
+		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/activities/xml")
+	public Response exportActivitiesToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		StreamingOutput streamingOutput = stream -> {
+			try (StrolchTransaction tx = openTx(cert, realm)) {
+				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
+
+				tx.getActivityMap().getAllElements(tx).forEach(e -> e.accept(visitor));
+
+				writer.writeEndDocument();
+				stream.flush();
+
+			} catch (XMLStreamException e) {
+				throw new IllegalStateException("Failed to write XML to " + stream, e);
+			}
+		};
+
+		String fileName = "strolch_export_activities_" + realm + "_" + System.currentTimeMillis() + ".xml";
+		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+	}
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}")
@@ -390,18 +423,6 @@ public class Inspector {
 		return Response.ok(toString(root)).build();
 	}
 
-	/**
-	 * <p>
-	 * Order type inspector
-	 * </p>
-	 * <p>
-	 * Returns an overview of the {@link Order Orders} with the given type. This is a list of overviews of the orders
-	 * </p>
-	 *
-	 * @param realm the realm for which the order type overview is to be returned
-	 * @param type
-	 * @return an overview of the {@link Order Orders} with the given type. This is a list of overviews of the orders
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders/{type}")
@@ -468,6 +489,105 @@ public class Inspector {
 
 		// marshall result
 		return Response.ok(toString(root)).build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/resources/{type}/xml")
+	public Response exportResourcesOfTypeToXml(@BeanParam QueryData queryData, @PathParam("realm") String realm,
+			@PathParam("type") String type, @Context HttpServletRequest request) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		queryData.initializeUnsetFields();
+		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(queryData.getQuery(), true, true, false);
+		query.setNavigation(new StrolchTypeNavigation(type));
+
+		StreamingOutput streamingOutput = stream -> {
+			try (StrolchTransaction tx = openTx(cert, realm)) {
+
+				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
+
+				tx.doQuery(query).forEach(e -> e.accept(visitor));
+
+				writer.writeEndDocument();
+				stream.flush();
+
+			} catch (XMLStreamException e) {
+				throw new IllegalStateException("Failed to write XML to " + stream, e);
+			}
+		};
+
+		String fileName = "strolch_export_resources_" + type + "_" + realm + "_" + System.currentTimeMillis() + ".xml";
+		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/orders/{type}/xml")
+	public Response exportOrdersOfTypeToXml(@BeanParam QueryData queryData, @PathParam("realm") String realm,
+			@PathParam("type") String type, @Context HttpServletRequest request) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		queryData.initializeUnsetFields();
+		OrderQuery<Order> query = QueryParser.parseToOrderQuery(queryData.getQuery(), true, true, false);
+		query.setNavigation(new StrolchTypeNavigation(type));
+
+		StreamingOutput streamingOutput = stream -> {
+			try (StrolchTransaction tx = openTx(cert, realm)) {
+
+				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
+
+				tx.doQuery(query).forEach(e -> e.accept(visitor));
+
+				writer.writeEndDocument();
+				stream.flush();
+
+			} catch (XMLStreamException e) {
+				throw new IllegalStateException("Failed to write XML to " + stream, e);
+			}
+		};
+
+		String fileName = "strolch_export_orders_" + type + "_" + realm + "_" + System.currentTimeMillis() + ".xml";
+		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_XML)
+	@Path("{realm}/activities/{type}/xml")
+	public Response exportActivitiesOfTypeToXml(@BeanParam QueryData queryData, @PathParam("realm") String realm,
+			@PathParam("type") String type, @Context HttpServletRequest request) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		queryData.initializeUnsetFields();
+		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true, true, false);
+		query.setNavigation(new StrolchTypeNavigation(type));
+
+		StreamingOutput streamingOutput = stream -> {
+			try (StrolchTransaction tx = openTx(cert, realm)) {
+
+				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
+
+				tx.doQuery(query).forEach(e -> e.accept(visitor));
+
+				writer.writeEndDocument();
+				stream.flush();
+
+			} catch (XMLStreamException e) {
+				throw new IllegalStateException("Failed to write XML to " + stream, e);
+			}
+		};
+
+		String fileName = "strolch_export_activities_" + type + "_" + realm + "_" + System.currentTimeMillis() + ".xml";
+		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
 	}
 
 	@GET
@@ -554,20 +674,6 @@ public class Inspector {
 		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
-	/**
-	 * <p>
-	 * Activity inspector
-	 * </p>
-	 * <p>
-	 * <p>
-	 * Returns the activity with the given id
-	 * </p>
-	 *
-	 * @param realm the realm for which the activity is to be returned
-	 * @param type  the type of the activity
-	 * @param id    the id of the activity
-	 * @return the activity with the given id
-	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}/{id}")
