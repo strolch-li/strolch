@@ -2,13 +2,18 @@ package li.strolch.utils;
 
 import static li.strolch.utils.helper.StringHelper.EMPTY;
 
+import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class I18nMessage {
+
+	private static final Logger logger = LoggerFactory.getLogger(I18nMessage.class);
 
 	private ResourceBundle bundle;
 	private String key;
@@ -32,14 +37,18 @@ public class I18nMessage {
 
 	public I18nMessage value(String key, String value) {
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
-		DBC.INTERIM.assertNotEmpty("value must be set!", value);
-		this.values.setProperty(key, value);
+		this.values.setProperty(key, value == null ? "-" : value);
 		return this;
 	}
 
 	public String formatMessage() {
-		String string = this.bundle.getString(this.key);
-		return StringHelper.replacePropertiesIn(this.values, EMPTY, string);
+		try {
+			String string = this.bundle.getString(this.key);
+			return StringHelper.replacePropertiesIn(this.values, EMPTY, string);
+		} catch (MissingResourceException e) {
+			logger.error("Key " + this.key + " is missing in bundle " + this.bundle.getBaseBundleName());
+			return this.key;
+		}
 	}
 
 	@Override
