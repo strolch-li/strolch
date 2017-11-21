@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A helper class to perform different actions on {@link String}s
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class StringHelper {
@@ -52,9 +52,22 @@ public class StringHelper {
 	/**
 	 * Hex char table for fast calculating of hex values
 	 */
-	private static final byte[] HEX_CHAR_TABLE = { (byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4',
-			(byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd',
-			(byte) 'e', (byte) 'f' };
+	private static final byte[] HEX_CHAR_TABLE = { (byte) '0',
+			(byte) '1',
+			(byte) '2',
+			(byte) '3',
+			(byte) '4',
+			(byte) '5',
+			(byte) '6',
+			(byte) '7',
+			(byte) '8',
+			(byte) '9',
+			(byte) 'a',
+			(byte) 'b',
+			(byte) 'c',
+			(byte) 'd',
+			(byte) 'e',
+			(byte) 'f' };
 
 	public static String toHexString(byte data) {
 		return String.format("%02x", data);
@@ -80,7 +93,8 @@ public class StringHelper {
 			return new String(hex, "ASCII"); //$NON-NLS-1$
 
 		} catch (UnsupportedEncodingException e) {
-			String msg = MessageFormat.format("Something went wrong while converting to HEX: {0}", e.getMessage()); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Something went wrong while converting to HEX: {0}", e.getMessage()); //$NON-NLS-1$
 			throw new RuntimeException(msg, e);
 		}
 	}
@@ -97,14 +111,14 @@ public class StringHelper {
 
 	/**
 	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
-	 * 
+	 *
 	 * @param raw
-	 *            the bytes to convert to String using numbers in hexadecimal
-	 * 
+	 * 		the bytes to convert to String using numbers in hexadecimal
+	 *
 	 * @return the encoded string
-	 * 
+	 *
 	 * @throws RuntimeException
-	 *             if {@link UnsupportedEncodingException} is thrown
+	 * 		if {@link UnsupportedEncodingException} is thrown
 	 */
 	public static String toHexString(byte[] raw) throws RuntimeException {
 		return toHexString(raw, 0, raw.length);
@@ -112,14 +126,14 @@ public class StringHelper {
 
 	/**
 	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
-	 * 
+	 *
 	 * @param raw
-	 *            the bytes to convert to String using numbers in hexadecimal
-	 * 
+	 * 		the bytes to convert to String using numbers in hexadecimal
+	 *
 	 * @return the encoded string
-	 * 
+	 *
 	 * @throws RuntimeException
-	 *             if {@link UnsupportedEncodingException} is thrown
+	 * 		if {@link UnsupportedEncodingException} is thrown
 	 */
 	public static String toHexString(byte[] raw, int offset, int length) throws RuntimeException {
 		try {
@@ -138,7 +152,8 @@ public class StringHelper {
 			return new String(hex, "ASCII"); //$NON-NLS-1$
 
 		} catch (UnsupportedEncodingException e) {
-			String msg = MessageFormat.format("Something went wrong while converting to HEX: {0}", e.getMessage()); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Something went wrong while converting to HEX: {0}", e.getMessage()); //$NON-NLS-1$
 			throw new RuntimeException(msg, e);
 		}
 	}
@@ -152,10 +167,10 @@ public class StringHelper {
 
 	/**
 	 * Returns a byte array of a given string by converting each character of the string to a number base 16
-	 * 
+	 *
 	 * @param encoded
-	 *            the string to convert to a byt string
-	 * 
+	 * 		the string to convert to a byt string
+	 *
 	 * @return the encoded byte stream
 	 */
 	public static byte[] fromHexString(String encoded) {
@@ -175,10 +190,10 @@ public class StringHelper {
 
 	/**
 	 * Generates the MD5 Hash of a string and converts it to a HEX string
-	 * 
+	 *
 	 * @param string
-	 *            the string to hash
-	 * 
+	 * 		the string to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashMd5AsHex(String string) {
@@ -188,10 +203,10 @@ public class StringHelper {
 	/**
 	 * Generates the MD5 Hash of a string. Use {@link StringHelper#toHexString(byte[])} to convert the byte array to a
 	 * Hex String which is printable
-	 * 
+	 *
 	 * @param string
-	 *            the string to hash
-	 * 
+	 * 		the string to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashMd5(String string) {
@@ -201,10 +216,10 @@ public class StringHelper {
 	/**
 	 * Generates the MD5 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
 	 * a Hex String which is printable
-	 * 
+	 *
 	 * @param bytes
-	 *            the bytes to hash
-	 * 
+	 * 		the bytes to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashMd5(byte[] bytes) {
@@ -213,10 +228,10 @@ public class StringHelper {
 
 	/**
 	 * Generates the SHA1 Hash of a string and converts it to a HEX String
-	 * 
+	 *
 	 * @param string
-	 *            the string to hash
-	 * 
+	 * 		the string to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashSha1AsHex(String string) {
@@ -226,10 +241,10 @@ public class StringHelper {
 	/**
 	 * Generates the SHA1 Hash of a string Use {@link StringHelper#toHexString(byte[])} to convert the byte array to a
 	 * Hex String which is printable
-	 * 
+	 *
 	 * @param string
-	 *            the string to hash
-	 * 
+	 * 		the string to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha1(String string) {
@@ -239,10 +254,10 @@ public class StringHelper {
 	/**
 	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
 	 * a Hex String which is printable
-	 * 
+	 *
 	 * @param bytes
-	 *            the bytes to hash
-	 * 
+	 * 		the bytes to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha1(byte[] bytes) {
@@ -251,10 +266,10 @@ public class StringHelper {
 
 	/**
 	 * Generates the SHA-256 Hash of a string and converts it to a HEX String
-	 * 
+	 *
 	 * @param string
-	 *            the string to hash
-	 * 
+	 * 		the string to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashSha256AsHex(String string) {
@@ -264,10 +279,10 @@ public class StringHelper {
 	/**
 	 * Generates the SHA-256 Hash of a string Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
 	 * a Hex String which is printable
-	 * 
+	 *
 	 * @param string
-	 *            the string to hash
-	 * 
+	 * 		the string to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha256(String string) {
@@ -277,10 +292,10 @@ public class StringHelper {
 	/**
 	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
 	 * a Hex String which is printable
-	 * 
+	 *
 	 * @param bytes
-	 *            the bytes to hash
-	 * 
+	 * 		the bytes to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha256(byte[] bytes) {
@@ -289,12 +304,12 @@ public class StringHelper {
 
 	/**
 	 * Returns the hash of an algorithm
-	 * 
+	 *
 	 * @param algorithm
-	 *            the algorithm to use
+	 * 		the algorithm to use
 	 * @param string
-	 *            the string to hash
-	 * 
+	 * 		the string to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashAsHex(String algorithm, String string) {
@@ -303,12 +318,12 @@ public class StringHelper {
 
 	/**
 	 * Returns the hash of an algorithm
-	 * 
+	 *
 	 * @param algorithm
-	 *            the algorithm to use
+	 * 		the algorithm to use
 	 * @param string
-	 *            the string to hash
-	 * 
+	 * 		the string to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hash(String algorithm, String string) {
@@ -327,12 +342,12 @@ public class StringHelper {
 
 	/**
 	 * Returns the hash of an algorithm
-	 * 
+	 *
 	 * @param algorithm
-	 *            the algorithm to use
+	 * 		the algorithm to use
 	 * @param bytes
-	 *            the bytes to hash
-	 * 
+	 * 		the bytes to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static String hashAsHex(String algorithm, byte[] bytes) {
@@ -341,12 +356,12 @@ public class StringHelper {
 
 	/**
 	 * Returns the hash of an algorithm
-	 * 
+	 *
 	 * @param algorithm
-	 *            the algorithm to use
+	 * 		the algorithm to use
 	 * @param bytes
-	 *            the bytes to hash
-	 * 
+	 * 		the bytes to hash
+	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hash(String algorithm, byte[] bytes) {
@@ -366,15 +381,16 @@ public class StringHelper {
 	/**
 	 * Normalizes the length of a String. Does not shorten it when it is too long, but lengthens it, depending on the
 	 * options set: adding the char at the beginning or appending it at the end
-	 * 
+	 *
 	 * @param value
-	 *            string to normalize
+	 * 		string to normalize
 	 * @param length
-	 *            length string must have
+	 * 		length string must have
 	 * @param beginning
-	 *            add at beginning of value
+	 * 		add at beginning of value
 	 * @param c
-	 *            char to append when appending
+	 * 		char to append when appending
+	 *
 	 * @return the new string
 	 */
 	public static String normalizeLength(String value, int length, boolean beginning, char c) {
@@ -384,17 +400,18 @@ public class StringHelper {
 	/**
 	 * Normalizes the length of a String. Shortens it when it is too long, giving out a logger warning, or lengthens it,
 	 * depending on the options set: appending the char at the beginning or the end
-	 * 
+	 *
 	 * @param value
-	 *            string to normalize
+	 * 		string to normalize
 	 * @param length
-	 *            length string must have
+	 * 		length string must have
 	 * @param beginning
-	 *            append at beginning of value
+	 * 		append at beginning of value
 	 * @param shorten
-	 *            allow shortening of value
+	 * 		allow shortening of value
 	 * @param c
-	 *            char to append when appending
+	 * 		char to append when appending
+	 *
 	 * @return the new string
 	 */
 	public static String normalizeLength(String value, int length, boolean beginning, boolean shorten, char c) {
@@ -428,9 +445,9 @@ public class StringHelper {
 
 	/**
 	 * Calls {@link #replacePropertiesIn(Properties, String)}, with {@link System#getProperties()} as input
-	 * 
+	 *
 	 * @return a new string with all defined system properties replaced or if an error occurred the original value is
-	 *         returned
+	 * returned
 	 */
 	public static String replaceSystemPropertiesIn(String value) {
 		return replacePropertiesIn(System.getProperties(), value);
@@ -440,12 +457,12 @@ public class StringHelper {
 	 * Traverses the given string searching for occurrences of ${...} sequences. Theses sequences are replaced with a
 	 * {@link Properties#getProperty(String)} value if such a value exists in the properties map. If the value of the
 	 * sequence is not in the properties, then the sequence is not replaced
-	 * 
+	 *
 	 * @param properties
-	 *            the {@link Properties} in which to get the value
+	 * 		the {@link Properties} in which to get the value
 	 * @param value
-	 *            the value in which to replace any system properties
-	 * 
+	 * 		the value in which to replace any system properties
+	 *
 	 * @return a new string with all defined properties replaced or if an error occurred the original value is returned
 	 */
 	public static String replacePropertiesIn(Properties properties, String value) {
@@ -456,14 +473,14 @@ public class StringHelper {
 	 * Traverses the given string searching for occurrences of <code>prefix</code>{...} sequences. Theses sequences are
 	 * replaced with a {@link Properties#getProperty(String)} value if such a value exists in the properties map. If the
 	 * value of the sequence is not in the properties, then the sequence is not replaced
-	 * 
+	 *
 	 * @param properties
-	 *            the {@link Properties} in which to get the value
+	 * 		the {@link Properties} in which to get the value
 	 * @param prefix
-	 *            the prefix to use, for instance use <code>$</code> to replace occurrences of <code>$</code>{...}
+	 * 		the prefix to use, for instance use <code>$</code> to replace occurrences of <code>$</code>{...}
 	 * @param value
-	 *            the value in which to replace any system properties
-	 * 
+	 * 		the value in which to replace any system properties
+	 *
 	 * @return a new string with all defined properties replaced or if an error occurred the original value is returned
 	 */
 	public static String replacePropertiesIn(Properties properties, String prefix, String value) {
@@ -486,7 +503,8 @@ public class StringHelper {
 
 			// if no stop found, then break as another sequence should be able to start
 			if (stop == -1) {
-				logger.error(MessageFormat.format("Sequence starts at offset {0} but does not end!", pos)); //$NON-NLS-1$
+				logger.error(
+						MessageFormat.format("Sequence starts at offset {0} but does not end!", pos)); //$NON-NLS-1$
 				tmpValue = value;
 				break;
 			}
@@ -505,10 +523,10 @@ public class StringHelper {
 			}
 
 			// sequence is good, so see if we have a property for it
-			String property = properties.getProperty(sequence, StringHelper.EMPTY);
+			String property = properties.getProperty(sequence);
 
 			// if no property exists, then log and continue
-			if (property.isEmpty()) {
+			if (property == null) {
 				pos = stop;
 				// logger.warn("No system property found for sequence " + sequence);
 				continue;
@@ -524,9 +542,9 @@ public class StringHelper {
 	/**
 	 * Calls {@link #replaceProperties(Properties, Properties)} with null as the second argument. This allows for
 	 * replacing all properties with itself
-	 * 
+	 *
 	 * @param properties
-	 *            the properties in which the values must have any ${...} replaced by values of the respective key
+	 * 		the properties in which the values must have any ${...} replaced by values of the respective key
 	 */
 	public static void replaceProperties(Properties properties) {
 		replaceProperties(properties, null);
@@ -535,11 +553,11 @@ public class StringHelper {
 	/**
 	 * Checks every value in the {@link Properties} and then then replaces any ${...} variables with keys in this
 	 * {@link Properties} value using {@link StringHelper#replacePropertiesIn(Properties, String)}
-	 * 
+	 *
 	 * @param properties
-	 *            the properties in which the values must have any ${...} replaced by values of the respective key
+	 * 		the properties in which the values must have any ${...} replaced by values of the respective key
 	 * @param altProperties
-	 *            if properties does not contain the ${...} key, then try these alternative properties
+	 * 		if properties does not contain the ${...} key, then try these alternative properties
 	 */
 	public static void replaceProperties(Properties properties, Properties altProperties) {
 
@@ -569,12 +587,12 @@ public class StringHelper {
 	 * to differ. The length of string returned is currently 40 characters, or less if either of the given strings are
 	 * shorter. The format of the string is 3 lines. The first line has information about where in the strings the
 	 * difference occurs, and the second and third lines contain contexts
-	 * 
+	 *
 	 * @param s1
-	 *            the first string
+	 * 		the first string
 	 * @param s2
-	 *            the second string
-	 * 
+	 * 		the second string
+	 *
 	 * @return the string from which the strings differ with a length of 40 characters within the original strings
 	 */
 	public static String printUnequalContext(String s1, String s2) {
@@ -610,10 +628,10 @@ public class StringHelper {
 
 	/**
 	 * Formats the given number of milliseconds to a time like #h/m/s/ms/us/ns
-	 * 
+	 *
 	 * @param millis
-	 *            the number of milliseconds
-	 * 
+	 * 		the number of milliseconds
+	 *
 	 * @return format the given number of milliseconds to a time like #h/m/s/ms/us/ns
 	 */
 	public static String formatMillisecondsDuration(final long millis) {
@@ -622,10 +640,10 @@ public class StringHelper {
 
 	/**
 	 * Formats the given number of nanoseconds to a time like #h/m/s/ms/us/ns
-	 * 
+	 *
 	 * @param nanos
-	 *            the number of nanoseconds
-	 * 
+	 * 		the number of nanoseconds
+	 *
 	 * @return format the given number of nanoseconds to a time like #h/m/s/ms/us/ns
 	 */
 	public static String formatNanoDuration(final long nanos) {
@@ -667,10 +685,10 @@ public class StringHelper {
 
 	/**
 	 * Simply returns true if the value is null, or empty
-	 * 
+	 *
 	 * @param value
-	 *            the value to check
-	 * 
+	 * 		the value to check
+	 *
 	 * @return true if the value is null, or empty
 	 */
 	public static boolean isEmpty(String value) {
@@ -679,10 +697,10 @@ public class StringHelper {
 
 	/**
 	 * Simply returns true if the value is neither null nor empty
-	 * 
+	 *
 	 * @param value
-	 *            the value to check
-	 * 
+	 * 		the value to check
+	 *
 	 * @return true if the value is neither null nor empty
 	 */
 	public static boolean isNotEmpty(String value) {
@@ -694,22 +712,23 @@ public class StringHelper {
 	 * Parses the given string value to a boolean. This extends the default {@link Boolean#parseBoolean(String)} as it
 	 * throws an exception if the string value is not equal to "true" or "false" being case insensitive.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * This additional restriction is important where false should really be caught, not any random vaue for false
 	 * </p>
-	 * 
+	 *
 	 * @param value
-	 *            the value to check
-	 * 
+	 * 		the value to check
+	 *
 	 * @return true or false, depending on the string value
-	 * 
+	 *
 	 * @throws RuntimeException
-	 *             if the value is empty, or not equal to the case insensitive value "true" or "false"
+	 * 		if the value is empty, or not equal to the case insensitive value "true" or "false"
 	 */
 	public static boolean parseBoolean(String value) throws RuntimeException {
 		if (isEmpty(value))
-			throw new RuntimeException("Value to parse to boolean is empty! Expected case insensitive true or false"); //$NON-NLS-1$
+			throw new RuntimeException(
+					"Value to parse to boolean is empty! Expected case insensitive true or false"); //$NON-NLS-1$
 		String tmp = value.toLowerCase();
 		if (tmp.equals(Boolean.TRUE.toString())) {
 			return true;
@@ -742,10 +761,10 @@ public class StringHelper {
 
 	/**
 	 * If the value parameter is empty, then a {@link #DASH} is returned, otherwise the value is returned
-	 * 
+	 *
 	 * @param value
-	 *            the value
-	 * 
+	 * 		the value
+	 *
 	 * @return the non-empty value, or a {@link #DASH}
 	 */
 	public static String valueOrDash(String value) {
@@ -756,7 +775,7 @@ public class StringHelper {
 
 	/**
 	 * Return a pseudo unique id which is incremented on each call. The id is initialized from the current time
-	 * 
+	 *
 	 * @return a pseudo unique id
 	 */
 	public static synchronized String getUniqueId() {
@@ -765,7 +784,7 @@ public class StringHelper {
 
 	/**
 	 * Return a pseudo unique id which is incremented on each call. The id is initialized from the current time
-	 * 
+	 *
 	 * @return a pseudo unique id
 	 */
 	public static synchronized long getUniqueIdLong() {
