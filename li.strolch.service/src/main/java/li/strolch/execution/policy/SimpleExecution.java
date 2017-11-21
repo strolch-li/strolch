@@ -69,6 +69,7 @@ public class SimpleExecution extends ExecutionPolicy {
 	}
 
 	protected void toError(LogMessage message) {
+		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
 		addMessage(message);
 		getExecutionHandler().toError(message.getRealm(), message.getLocator());
 	}
