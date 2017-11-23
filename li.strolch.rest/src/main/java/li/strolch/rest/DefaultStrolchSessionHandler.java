@@ -144,7 +144,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		return certificate;
 	}
-	
+
 	@Override
 	public Certificate authenticateSingleSignOn(Object data) {
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data);
@@ -263,7 +263,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public UserSession getSession(Certificate certificate, String sessionId) {
+	public UserSession getSession(Certificate certificate, String sessionId) throws AccessDeniedException, PrivilegeException {
 		PrivilegeContext ctx = this.privilegeHandler.validate(certificate);
 		ctx.assertHasPrivilege(PRIVILEGE_GET_SESSION);
 		synchronized (this.certificateMap) {

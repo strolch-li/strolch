@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 import li.strolch.exception.StrolchNotAuthenticatedException;
+import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
@@ -26,26 +27,113 @@ import li.strolch.privilege.model.Usage;
 import li.strolch.rest.model.UserSession;
 
 /**
+ * The {@link StrolchSessionHandler} implements session management. It authenticates, validates and invalidates session depending on the concrete implementation
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface StrolchSessionHandler {
 
+	/**
+	 * Authenticates a user with the given credentials
+	 *
+	 * @param username
+	 * 		the username
+	 * @param password
+	 * 		the password
+	 *
+	 * @return the {@link Certificate} for the logged in user
+	 */
 	Certificate authenticate(String username, char[] password);
-	
+
+	/**
+	 * Performs a single-sign-on with the given data, if SSO is enabled
+	 *
+	 * @param data
+	 * 		the data to pass to the SSO handler
+	 *
+	 * @return the {@link Certificate} for the logged in user
+	 */
 	Certificate authenticateSingleSignOn(Object data);
 
+	/**
+	 * Validates that a {@link Certificate} exists with the given auth token and is still valid
+	 *
+	 * @param authToken
+	 * 		the auth token for the certificate
+	 *
+	 * @return the {@link Certificate} for the given auth token
+	 *
+	 * @throws StrolchNotAuthenticatedException
+	 * 		if no logged in user exists with the given auth token
+	 */
 	Certificate validate(String authToken) throws StrolchNotAuthenticatedException;
 
+	/**
+	 * Validate that the given {@link Certificate} is still valid
+	 *
+	 * @param certificate
+	 * 		the certificate to validate
+	 *
+	 * @return the {@link PrivilegeContext} for the given certificate to perform authorization checks against
+	 *
+	 * @throws StrolchNotAuthenticatedException
+	 * 		if no logged in user exists with the given auth token
+	 */
 	PrivilegeContext validate(Certificate certificate) throws StrolchNotAuthenticatedException;
 
+	/**
+	 * Returns all the {@link UserSession}
+	 *
+	 * @param certificate
+	 * 		the certificate to validate if the requester may perform this action
+	 *
+	 * @return the list of {@link UserSession}
+	 */
 	List<UserSession> getSessions(Certificate certificate);
 
-	UserSession getSession(Certificate certificate, String sessionId);
+	/**
+	 * Return the {@link UserSession} with the given sessionId
+	 *
+	 * @param certificate
+	 * 		the certificate to validate if the requester may perform this action
+	 * @param sessionId
+	 * 		the id of the {@link UserSession} to return
+	 *
+	 * @return the user session
+	 *
+	 * @throws AccessDeniedException
+	 * 		if the given {@link Certificate} may not access the {@link UserSession}
+	 * @throws PrivilegeException
+	 * 		if the {@link UserSession} does not exist, or another issues arises
+	 */
+	UserSession getSession(Certificate certificate, String sessionId) throws AccessDeniedException, PrivilegeException;
 
+	/**
+	 * Invalidates the given certificate
+	 *
+	 * @param certificate
+	 * 		the certificate to invalidate
+	 */
 	void invalidate(Certificate certificate);
 
+	/**
+	 * Invalidates the {@link Certificate} with the given sessionId
+	 *
+	 * @param certificate
+	 * 		the certificate of the user requesting to invalidate the requested certificate
+	 */
 	void invalidate(Certificate certificate, String sessionId);
 
+	/**
+	 * Set the locale of the given sessionId to the given locale
+	 *
+	 * @param certificate
+	 * 		the certificate of the user requesting to invalidate the requested certificate
+	 * @param sessionId
+	 * 		the ID of the session on which to set the locale
+	 * @param locale
+	 * 		the locale to set
+	 */
 	void setSessionLocale(Certificate certificate, String sessionId, Locale locale);
 
 	/**
@@ -73,5 +161,4 @@ public interface StrolchSessionHandler {
 	 * 		if anything goes wrong
 	 */
 	Certificate validateChallenge(String username, String challenge) throws PrivilegeException;
-
 }
