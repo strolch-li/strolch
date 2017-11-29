@@ -17,11 +17,15 @@ package li.strolch.service.api;
 
 import java.io.Serializable;
 
+import com.google.gson.JsonObject;
+import li.strolch.utils.helper.ExceptionHelper;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ServiceResult implements Serializable {
 	private static final long serialVersionUID = 1L;
+
 	private ServiceResultState state;
 	private String message;
 	private Throwable throwable;
@@ -30,27 +34,15 @@ public class ServiceResult implements Serializable {
 		//
 	}
 
-	/**
-	 * @param state
-	 */
 	public ServiceResult(ServiceResultState state) {
 		this.state = state;
 	}
 
-	/**
-	 * @param state
-	 * @param message
-	 */
 	public ServiceResult(ServiceResultState state, String message) {
 		this.state = state;
 		this.message = message;
 	}
 
-	/**
-	 * @param state
-	 * @param message
-	 * @param throwable
-	 */
 	public ServiceResult(ServiceResultState state, String message, Throwable throwable) {
 		this.state = state;
 		this.message = message;
@@ -71,32 +63,18 @@ public class ServiceResult implements Serializable {
 		return this.state != ServiceResultState.SUCCESS;
 	}
 
-	/**
-	 * @return the state
-	 */
 	public ServiceResultState getState() {
 		return this.state;
 	}
 
-	/**
-	 * @param state
-	 *            the state to set
-	 */
 	public void setState(ServiceResultState state) {
 		this.state = state;
 	}
 
-	/**
-	 * @return the message
-	 */
 	public String getMessage() {
 		return this.message;
 	}
 
-	/**
-	 * @param message
-	 *            the message to set
-	 */
 	public void setMessage(String message) {
 		this.message = message;
 	}
@@ -122,17 +100,10 @@ public class ServiceResult implements Serializable {
 		return t;
 	}
 
-	/**
-	 * @return the throwable
-	 */
 	public Throwable getThrowable() {
 		return this.throwable;
 	}
 
-	/**
-	 * @param throwable
-	 *            the throwable to set
-	 */
 	public void setThrowable(Throwable throwable) {
 		this.throwable = throwable;
 	}
@@ -159,5 +130,15 @@ public class ServiceResult implements Serializable {
 
 	public static ServiceResult failed(String error, Throwable t) {
 		return new ServiceResult(ServiceResultState.FAILED, error, t);
+	}
+
+	public JsonObject toJson() {
+		JsonObject json = new JsonObject();
+
+		json.addProperty("state", state.name());
+		json.addProperty("message", message);
+		json.addProperty("throwable", ExceptionHelper.formatException(throwable));
+
+		return json;
 	}
 }

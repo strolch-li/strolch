@@ -19,6 +19,7 @@ import static li.strolch.utils.helper.StringHelper.NULL;
 
 import java.util.Date;
 
+import com.google.gson.JsonObject;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
@@ -64,7 +65,8 @@ public class ModelStatistics {
 	/**
 	 * Adds the statistics of the other statistics to this statistics instance
 	 *
-	 * @param statistics further statistics to add to this {@link ModelStatistics}
+	 * @param statistics
+	 * 		further statistics to add to this {@link ModelStatistics}
 	 */
 	public void add(ModelStatistics statistics) {
 		this.nrOfOrders += statistics.nrOfOrders;
@@ -88,5 +90,18 @@ public class ModelStatistics {
 		builder.append(this.nrOfActivities);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public JsonObject toJson() {
+		JsonObject json = new JsonObject();
+
+		json.addProperty("startTime",
+				this.startTime == null ? NULL : ISO8601FormatFactory.getInstance().formatDate(this.startTime));
+		json.addProperty("durationNanos", durationNanos);
+		json.addProperty("nrOfResources", nrOfResources);
+		json.addProperty("nrOfOrders", nrOfOrders);
+		json.addProperty("nrOfActivities", nrOfActivities);
+
+		return json;
 	}
 }

@@ -15,6 +15,7 @@
  */
 package li.strolch.service.executor;
 
+import com.google.gson.JsonObject;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.helper.StringHelper;
 
@@ -26,10 +27,6 @@ public class ServiceExecutionStatus {
 	private String serviceName;
 	private volatile boolean started;
 	private volatile ServiceResult result;
-
-	public ServiceExecutionStatus() {
-		// no arg constructor for JAXB
-	}
 
 	public ServiceExecutionStatus(String serviceName) {
 		this.serviceName = serviceName;
@@ -71,5 +68,15 @@ public class ServiceExecutionStatus {
 
 	public synchronized void started() {
 		this.started = true;
+	}
+
+	public JsonObject toJson() {
+		JsonObject json = new JsonObject();
+
+		json.addProperty("serviceName", serviceName);
+		json.addProperty("started", started);
+		json.add("result", result.toJson());
+
+		return json;
 	}
 }
