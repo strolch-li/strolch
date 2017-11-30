@@ -40,6 +40,10 @@
             <groupId>li.strolch</groupId>
             <artifactId>li.strolch.service</artifactId>
         </dependency>
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>li.strolch.soql</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>javax.mail</groupId>

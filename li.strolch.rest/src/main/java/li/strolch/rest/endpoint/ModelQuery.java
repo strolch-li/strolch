@@ -48,7 +48,7 @@ public class ModelQuery {
 			StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
 			visitor.flat();
 
-			// TODO do query
+			// TODO MS do query
 
 		}
 

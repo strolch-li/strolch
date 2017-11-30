@@ -197,6 +197,11 @@
                 <artifactId>li.strolch.privilege</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>li.strolch</groupId>
+                <artifactId>li.strolch.soql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>li.strolch</groupId>

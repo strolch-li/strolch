@@ -17,7 +17,7 @@
     <inceptionYear>2011</inceptionYear>
 
     <properties>
-        <warFinalName>planningwebapp</warFinalName>
+        <warFinalName>susi</warFinalName>
         <tomcat7ServerId>tomcat7.eitchnet.ch</tomcat7ServerId>
         <tomcat7Url>http://tomcat.eitchnet.ch:8080/manager/text</tomcat7Url>
         <m2eclipse.wtp.contextRoot>${warFinalName}</m2eclipse.wtp.contextRoot>
