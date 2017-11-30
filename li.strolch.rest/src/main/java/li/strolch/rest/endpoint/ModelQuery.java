@@ -1,10 +1,7 @@
 package li.strolch.rest.endpoint;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -14,6 +11,7 @@ import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.OrderMap;
@@ -37,15 +35,36 @@ import li.strolch.rest.model.QueryData;
 @Path("strolch/model")
 public class ModelQuery {
 
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("query")
+	public Response doQuery(@Context HttpServletRequest request, @QueryParam("realmName") String realmName) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		List<JsonObject> result = new ArrayList<>();
+		try (StrolchTransaction tx = openTx(cert, realmName)) {
+
+			StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+			visitor.flat();
+
+			// TODO do query
+
+		}
+
+		JsonObject json = new JsonObject();
+		JsonArray arrJ = new JsonArray();
+		result.forEach(arrJ::add);
+
+		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
 	/**
 	 * Query {@link Resource Resources} by parsing the query string in {@link QueryData#getQuery()} using
 	 * {@link QueryParser}
-	 * 
-	 * @param queryData
-	 *            the data from the client
-	 * @param request
-	 *            the {@link HttpServletRequest} on which to get the {@link Certificate}
-	 * 
+	 *
+	 * @param queryData the data from the client
+	 * @param request   the {@link HttpServletRequest} on which to get the {@link Certificate}
 	 * @return {@link Response} containing the JSONified {@link Resource Resources} queried
 	 */
 	@GET
@@ -95,12 +114,9 @@ public class ModelQuery {
 
 	/**
 	 * Query {@link Order Orders} by parsing the query string in {@link QueryData#getQuery()} using {@link QueryParser}
-	 * 
-	 * @param queryData
-	 *            the data from the client
-	 * @param request
-	 *            the {@link HttpServletRequest} on which to get the {@link Certificate}
-	 * 
+	 *
+	 * @param queryData the data from the client
+	 * @param request   the {@link HttpServletRequest} on which to get the {@link Certificate}
 	 * @return {@link Response} containing the JSONified {@link Order Orders} queried
 	 */
 	@GET
@@ -151,12 +167,9 @@ public class ModelQuery {
 	/**
 	 * Query {@link Activity Activities} by parsing the query string in {@link QueryData#getQuery()} using
 	 * {@link QueryParser}
-	 * 
-	 * @param queryData
-	 *            the data from the client
-	 * @param request
-	 *            the {@link HttpServletRequest} on which to get the {@link Certificate}
-	 * 
+	 *
+	 * @param queryData the data from the client
+	 * @param request   the {@link HttpServletRequest} on which to get the {@link Certificate}
 	 * @return {@link Response} containing the JSONified {@link Activity Activities} queried
 	 */
 	@GET
@@ -205,7 +218,7 @@ public class ModelQuery {
 	}
 
 	private StrolchTransaction openTx(Certificate certificate, String realm) {
-		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm).openTx(certificate,
-				ModelQuery.class);
+		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm)
+				.openTx(certificate, ModelQuery.class);
 	}
 }
