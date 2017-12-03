@@ -7,6 +7,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -63,6 +64,10 @@ public class ResponseUtil {
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
+	public static <T> Response toResponse(String member, T t, Function<T, JsonObject> toJson) {
+		return toResponse(member, toJson.apply(t));
+	}
+
 	public static Response toResponse(String member, JsonElement jsonElement) {
 		JsonObject response = new JsonObject();
 		response.addProperty(MSG, StringHelper.DASH);
@@ -71,6 +76,10 @@ public class ResponseUtil {
 		String json = new Gson().toJson(response);
 
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
+	public static <T> Response toResponse(String member, List<T> list, Function<T, JsonObject> toJson) {
+		return toResponse(member, list.stream().map(toJson).collect(Collectors.toList()));
 	}
 
 	public static Response toResponse(String member, List<JsonObject> jsonObjects) {
