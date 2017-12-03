@@ -29,6 +29,7 @@ public class StatementTest {
 
 		CommonTokenStream tokens = new CommonTokenStream(lexer); // create a parser that feeds off the tokens buffer
 		SOQLParser parser = new SOQLParser(tokens);
+		parser.addErrorListener(new VerboseListener());
 
 		ParseTree tree = parser.select_statement(); // begin parsing at block
 
@@ -54,6 +55,27 @@ public class StatementTest {
 		soqlStatement.selectClause = listener.getSelectClause();
 
 		return soqlStatement;
+	}
+	
+	@Test
+	public void test0() throws Exception {
+
+		String s = "SELECT r FROM Resource r";
+
+		final ParseTree tree = parseString(s);
+		final CompiledStatement compiledStatement = compile(tree);
+		
+		// System.out.println(compiledStatement);
+
+		final Map<String, Object> inputObjects = new HashMap<>();
+		inputObjects.put("r", new MockObject());
+
+		final Map<String, Object> queryParameter = new HashMap<>();
+
+		final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+
+		assertEquals(1, result.size());
+
 	}
 
 	@Test
@@ -254,7 +276,7 @@ public class StatementTest {
 	@Test
 	public void test10() throws Exception {
 
-		String s = "SELECT a.getParameter(:param_1, :param_2) FROM Activity a";
+		String s = "SELECT a.getParameter(:param_1,:param_2) FROM Activity a";
 
 		final ParseTree tree = parseString(s);
 		final CompiledStatement compiledStatement = compile(tree);
