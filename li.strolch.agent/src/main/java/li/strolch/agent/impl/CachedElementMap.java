@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -163,7 +163,16 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		String type = refP.getUom();
 		List<String> ids = refP.getValue();
 
-		return ids.stream().map(id -> getBy(tx, type, id, assertExists)).filter(Objects::nonNull)
+		return ids.stream() //
+				.map(id -> {
+					T t = getBy(tx, type, id, false);
+					if (assertExists && t == null) {
+						String msg = "The element with type {0} and id {1} does not exist for param {2}"; //$NON-NLS-1$
+						throw new StrolchException(MessageFormat.format(msg, type, id, refP.getLocator()));
+					}
+					return t;
+				}) //
+				.filter(Objects::nonNull) //
 				.collect(Collectors.toList());
 	}
 
@@ -370,7 +379,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	@Override
 	public T revertToVersion(StrolchTransaction tx, String type, String id, int version) throws StrolchException {
 		if (!this.realm.isVersioningEnabled()) {
-			throw new StrolchPersistenceException("Can not und a version if versioning is not enabled!");
+			throw new StrolchPersistenceException("Can not undo a version if versioning is not enabled!");
 		}
 
 		// get the current and specified version
@@ -393,7 +402,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	@Override
 	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException {
 		if (!this.realm.isVersioningEnabled()) {
-			throw new StrolchPersistenceException("Can not und a version if versioning is not enabled!");
+			throw new StrolchPersistenceException("Can not undo a version if versioning is not enabled!");
 		}
 
 		String type = element.getType();
