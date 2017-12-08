@@ -1,12 +1,12 @@
 package li.strolch.soql.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import li.strolch.model.ParameterBag;
+import li.strolch.model.Resource;
+import li.strolch.model.StrolchElement;
+import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.Parameter;
+import li.strolch.soql.antlr4.generated.SOQLLexer;
+import li.strolch.soql.antlr4.generated.SOQLParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -14,445 +14,439 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.Test;
 
-import li.strolch.soql.antlr4.generated.SOQLLexer;
-import li.strolch.soql.antlr4.generated.SOQLParser;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class StatementTest {
 
-	/**
-	 * @throws Exception
-	 */
-	private ParseTree parseString(final String s) throws Exception {
+    /**
+     * @throws Exception
+     */
+    private ParseTree parseString(final String s) throws Exception {
 
-		CharStream input = CharStreams.fromString(s);
-		SOQLLexer lexer = new SOQLLexer(input); // create a buffer of tokens pulled from the lexer
+        CharStream input = CharStreams.fromString(s);
+        SOQLLexer lexer = new SOQLLexer(input); // create a buffer of tokens pulled from the lexer
 
-		CommonTokenStream tokens = new CommonTokenStream(lexer); // create a parser that feeds off the tokens buffer
-		SOQLParser parser = new SOQLParser(tokens);
-		parser.addErrorListener(new VerboseListener());
+        CommonTokenStream tokens = new CommonTokenStream(lexer); // create a parser that feeds off the tokens buffer
+        SOQLParser parser = new SOQLParser(tokens);
+        parser.addErrorListener(new VerboseListener());
 
-		ParseTree tree = parser.select_statement(); // begin parsing at block
+        ParseTree tree = parser.select_statement(); // begin parsing at block
 
-		System.out.println(tree.toStringTree(parser)); // print LISP-style tree
+        System.out.println(tree.toStringTree(parser)); // print LISP-style tree
 
-		return tree;
-	}
+        return tree;
+    }
 
-	/**
-	 * @param tree
-	 * @return CompiledSOQLStatement the compiled SOQL statement
-	 * @throws Exception
-	 */
-	private CompiledStatement compile(final ParseTree tree) throws Exception {
+    /**
+     * @param tree
+     * @return CompiledSOQLStatement the compiled SOQL statement
+     * @throws Exception
+     */
+    private CompiledStatement compile(final ParseTree tree) throws Exception {
 
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		final SOQLListener listener = new SOQLListener();
-		walker.walk(listener, tree);
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        final SOQLListener listener = new SOQLListener();
+        walker.walk(listener, tree);
 
-		final CompiledStatement soqlStatement = new CompiledStatement();
-		soqlStatement.entities = listener.getEntities();
-		soqlStatement.whereExpression = listener.getWhereExpression();
-		soqlStatement.selectClause = listener.getSelectClause();
+        final CompiledStatement soqlStatement = new CompiledStatement();
+        soqlStatement.entities = listener.getEntities();
+        soqlStatement.whereExpression = listener.getWhereExpression();
+        soqlStatement.selectClause = listener.getSelectClause();
 
-		return soqlStatement;
-	}
-	
-	@Test
-	public void test0() throws Exception {
+        return soqlStatement;
+    }
 
-		String s = "SELECT r FROM Resource r";
+    /**
+     * @return a test parameter with String value
+     */
+    public StrolchElement getTestElement() {
+        final Resource resource = new Resource();
+        resource.setId("testId");
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
-		
-		// System.out.println(compiledStatement);
+        final ParameterBag bag = new ParameterBag();
+        bag.setId("testBag");
+        resource.addParameterBag(bag);
 
-		final Map<String, Object> inputObjects = new HashMap<>();
-		inputObjects.put("r", new MockObject());
+        final Parameter parameter = new FloatParameter();
+        parameter.setId("testId");
+        parameter.setValue(100d);
 
-		final Map<String, Object> queryParameter = new HashMap<>();
+        resource.addParameter("testBag", parameter);
+        return resource;
+    }
 
-		final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+    @Test
+    public void test0() throws Exception {
 
-		assertEquals(1, result.size());
+        String s = "SELECT r FROM Resource r";
 
-	}
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-	@Test
-	public void test1() throws Exception {
+        // System.out.println(compiledStatement);
 
-		String s = "SELECT r, a, a.getId() FROM Resource r, Activity a";
+        final Map<String, Object> inputObjects = new HashMap<>();
+        inputObjects.put("r", getTestElement());
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
-		
-		// System.out.println(compiledStatement);
+        final Map<String, Object> queryParameter = new HashMap<>();
 
-		final Map<String, Object> inputObjects = new HashMap<>();
-		inputObjects.put("r", new MockObject());
-		inputObjects.put("a", new MockObject());
+        final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		final Map<String, Object> queryParameter = new HashMap<>();
+        assertEquals(1, result.size());
 
-		final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+    }
 
-		assertEquals(3, result.size());
+    @Test
+    public void test1() throws Exception {
 
-	}
+        String s = "SELECT r, a, a.getId() FROM Resource r, Activity a";
 
-	/**
-	 * positive test of a comparison expression in a WHERE clause 
-	 */
-	@Test
-	public void test2() throws Exception {
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		String s = "SELECT r FROM Resource r WHERE r.getName() = \"testName\"";
+        // System.out.println(compiledStatement);
 
-		final ParseTree tree = parseString(s);
+        final Map<String, Object> inputObjects = new HashMap<>();
+        inputObjects.put("r", getTestElement());
+        inputObjects.put("a", getTestElement());
 
-		final CompiledStatement compiledStatement = compile(tree);
+        final Map<String, Object> queryParameter = new HashMap<>();
 
-		final Map<String, Object> inputObjects = new HashMap<>();
-		inputObjects.put("r", new MockObject());
+        final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		final Map<String, Object> queryParameter = new HashMap<>();
+        assertEquals(3, result.size());
 
-		final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+    }
 
-		assertEquals(1, result.size());
-	}
+    /**
+     * positive test of a comparison expression in a WHERE clause
+     */
+    @Test
+    public void test2() throws Exception {
 
-	/**
-	 * negative test of a comparison expression in a WHERE clause 
-	 */
-	@Test
-	public void test3() throws Exception {
+        String s = "SELECT r FROM Resource r WHERE r.getId() = \"testId\"";
 
-		String s = "SELECT r FROM Resource r WHERE r.getName() = \"testNameDiffering\"";
+        final ParseTree tree = parseString(s);
 
-		final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		final CompiledStatement compiledStatement = compile(tree);
+        final Map<String, Object> inputObjects = new HashMap<>();
+        inputObjects.put("r", getTestElement());
 
-		final Map<String, Object> inputObjects = new HashMap<>();
-		inputObjects.put("r", new MockObject());
+        final Map<String, Object> queryParameter = new HashMap<>();
 
-		final Map<String, Object> queryParameter = new HashMap<>();
+        final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        assertEquals(1, result.size());
+    }
 
-		assertTrue(result.isEmpty());
+    /**
+     * negative test of a comparison expression in a WHERE clause
+     */
+    @Test
+    public void test3() throws Exception {
 
-	}
+        String s = "SELECT r FROM Resource r WHERE r.getId() = \"testIdNoMatch\"";
 
-	/**
-	 * positive test of a AND combined comparison expressions in WHERE clause 
-	 */
-	@Test
-	public void test4() throws Exception {
+        final ParseTree tree = parseString(s);
 
-		String s = "SELECT r, a FROM Resource r, Activity a WHERE r.getType() = a.getType() AND r.getName() = \"testName\"";
+        final CompiledStatement compiledStatement = compile(tree);
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
+        final Map<String, Object> inputObjects = new HashMap<>();
+        inputObjects.put("r", getTestElement());
 
-		final Map<String, Object> inputObjects = new HashMap<>();
-		inputObjects.put("r", new MockObject());
-		inputObjects.put("a", new MockObject());
+        final Map<String, Object> queryParameter = new HashMap<>();
 
-		final Map<String, Object> parameter = new HashMap<>();
+        final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		final List<Object> result = compiledStatement.evaluate(inputObjects, parameter);
+        assertTrue(result.isEmpty());
 
-		assertEquals(2, result.size());
-	}
+    }
 
-	/**
-	 * positive test of a comparison expression with query parameter
-	 */
-	@Test
-	public void test5() throws Exception {
+    /**
+     * positive test of a AND combined comparison expressions in WHERE clause
+     */
+    @Test
+    public void test4() throws Exception {
 
-		String s = "SELECT a FROM Activity a WHERE a.getName() = :outer_var";
+        String s = "SELECT r, a FROM Resource r, Activity a WHERE r.getId() = a.getId() AND r.getId() = \"testId\"";
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		final Map<String, Object> queryParameter = new HashMap<>();
-		queryParameter.put("outer_var", "testName");
+        final Map<String, Object> inputObjects = new HashMap<>();
+        inputObjects.put("r", getTestElement());
+        inputObjects.put("a", getTestElement());
 
-		final Map<String, Object> inputObjects = new HashMap<>();
-		inputObjects.put("a", new MockObject());
-		
-		final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        final Map<String, Object> parameter = new HashMap<>();
 
-		assertEquals(1, result.size());
-	}
+        final List<Object> result = compiledStatement.evaluate(inputObjects, parameter);
 
-	/**
-	 * positive test of a method call in comparison expression of a WHERE clause 
-	 */
-	@Test
-	public void test6() throws Exception {
+        assertEquals(2, result.size());
+    }
 
-		String s = "SELECT a FROM Activity a WHERE a.getNumber() < :parameter";
+    /**
+     * positive test of a comparison expression with query parameter
+     */
+    @Test
+    public void test5() throws Exception {
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
+        String s = "SELECT a FROM Activity a WHERE a.getId() = :outer_var";
 
-		final Map<String, Object> inputObjects = new HashMap<>();
-		inputObjects.put("a", new MockObject());
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		final Map<String, Object> queryParameter = new HashMap<>();
-		queryParameter.put("parameter", 1234);
+        final Map<String, Object> queryParameter = new HashMap<>();
+        queryParameter.put("outer_var", "testId");
 
-		final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        final Map<String, Object> inputObjects = new HashMap<>();
+        inputObjects.put("a", getTestElement());
 
-		assertEquals(1, result.size());
-	}
+        final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-	/**
-	 * negative test of a method call in comparison expression of a WHERE clause 
-	 */
-	@Test
-	public void test8() throws Exception {
+        assertEquals(1, result.size());
+    }
 
-		String s = "SELECT a FROM Activity a WHERE a.getNumber() > :parameter";
+    /**
+     * positive test of a method call in comparison expression of a WHERE clause
+     */
+    @Test
+    public void test6() throws Exception {
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
+        String s = "SELECT a FROM Activity a WHERE a.getParameter(:p_1, :p_2).getValue() < :parameter";
 
-		final Map<String, Object> inputObjects = new HashMap<>();
-		inputObjects.put("a", new MockObject());
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		final Map<String, Object> queryParameter = new HashMap<>();
-		queryParameter.put("parameter", 122);
+        final Map<String, Object> inputObjects = new HashMap<>();
+        inputObjects.put("a", getTestElement());
 
-		final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        final Map<String, Object> queryParameter = new HashMap<>();
+        queryParameter.put("p_1", "testBag");
+        queryParameter.put("p_2", "testId");
+        queryParameter.put("parameter", 101d);
 
-		assertEquals(0, result.size());
-	}
+        final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-	/**
-	 * negative test of a method call in SELECT statement
-	 */
-	@Test
-	public void test9() throws Exception {
+        assertEquals(1, result.size());
+    }
 
-		String s = "SELECT a.getParameter(:param_1) FROM Activity a";
+    /**
+     * negative test of a method call in comparison expression of a WHERE clause
+     */
+    @Test
+    public void test8() throws Exception {
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
+        String s = "SELECT a FROM Activity a WHERE a.getParameter(:p_1, :p_2).getValue() > :parameter";
 
-		final Map<String, Object> inputObjects = new HashMap<>();
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		final MockObject a = new MockObject();
-		
-		String matchingKey = "pid";
-		a.putParameter(matchingKey, new MockParameter());
+        final Map<String, Object> inputObjects = new HashMap<>();
+        inputObjects.put("a", getTestElement());
 
-		inputObjects.put("a", a);
+        final Map<String, Object> queryParameter = new HashMap<>();
+        queryParameter.put("p_1", "testBag");
+        queryParameter.put("p_2", "testId");
+        queryParameter.put("parameter", 101d);
 
-		Map<String, Object> queryParameter = new HashMap<>();
-		queryParameter.put("param_1", matchingKey);
+        final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        assertEquals(0, result.size());
+    }
 
-		assertEquals(1, result.size());
-		
-		String nonMatchingKey = "noPid";
-		
-		queryParameter = new HashMap<>();
-		queryParameter.put("param_1", nonMatchingKey);
+    /**
+     * negative test of a method call in SELECT statement
+     */
+    @Test
+    public void test9() throws Exception {
 
-		result = compiledStatement.evaluate(inputObjects, queryParameter);
+        String s = "SELECT a.getParameterBag(:param_1) FROM Resource a";
 
-		assertTrue(result.isEmpty());
-	}
-	
-	/**
-	 * positive test of a method call with multiple method arguments 
-	 */
-	@Test
-	public void test10() throws Exception {
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		String s = "SELECT a.getParameter(:param_1,:param_2) FROM Activity a";
+        final Map<String, Object> inputObjects = new HashMap<>();
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
+        inputObjects.put("a", getTestElement());
 
-		final Map<String, Object> inputObjects = new HashMap<>();
+        Map<String, Object> queryParameter = new HashMap<>();
+        queryParameter.put("param_1", "testBag");
 
-		final MockObject a = new MockObject();
-		
-		String matchingKey = "pid";
-		a.putParameter(matchingKey, new MockParameter());
+        List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		inputObjects.put("a", a);
+        assertEquals(1, result.size());
 
-		Map<String, Object> queryParameter = new HashMap<>();
-		queryParameter.put("param_1", matchingKey);
-		queryParameter.put("param_2", matchingKey);
+        String nonMatchingKey = "noPid";
 
-		List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        queryParameter = new HashMap<>();
+        queryParameter.put("param_1", nonMatchingKey);
 
-		assertEquals(1, result.size());
-		
-		String nonMatchingKey = "noPid";
-		
-		queryParameter = new HashMap<>();
-		queryParameter.put("param_1", nonMatchingKey);
-		queryParameter.put("param_2", "");
+        result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		result = compiledStatement.evaluate(inputObjects, queryParameter);
+        assertTrue(result.isEmpty());
+    }
 
-		assertTrue(result.isEmpty());
-	}
-	
-	/**
-	 * positive test of a chained method call in SELECT clause 
-	 */
-	@Test
-	public void test11() throws Exception {
+    /**
+     * positive test of a method call with multiple method arguments
+     */
+    @Test
+    public void test10() throws Exception {
 
-		String s = "SELECT a.getParameter(:param_1).getType() FROM Activity a";
+        String s = "SELECT a.getParameter(:param_1,:param_2) FROM Activity a";
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		final Map<String, Object> inputObjects = new HashMap<>();
+        final Map<String, Object> inputObjects = new HashMap<>();
 
-		final MockObject a = new MockObject();
-		
-		String matchingKey = "pid";
-		a.putParameter(matchingKey, new MockParameter());
+        inputObjects.put("a", getTestElement());
 
-		inputObjects.put("a", a);
+        Map<String, Object> queryParameter = new HashMap<>();
+        queryParameter.put("param_1", "testBag");
+        queryParameter.put("param_2", "testId");
 
-		final Map<String, Object> queryParameter = new HashMap<>();
-		queryParameter.put("param_1", matchingKey);
+        List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        assertEquals(1, result.size());
 
-		assertEquals(1, result.size());
-		
-		assertEquals("testType", result.get(0));
-	}
-	
-	/**
-	 * positive test of a chained method call in WHERE clause 
-	 */
-	@Test
-	public void test12() throws Exception {
+        queryParameter = new HashMap<>();
+        queryParameter.put("param_1", "nex");
+        queryParameter.put("param_2", "testId");
 
-		String s = "SELECT a FROM Activity a WHERE a.getParameter(:param_1).getType() = \"testType\"";
+        result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
+        assertTrue(result.isEmpty());
+    }
 
-		final Map<String, Object> inputObjects = new HashMap<>();
+    /**
+     * positive test of a chained method call in SELECT clause
+     */
+    @Test
+    public void test11() throws Exception {
 
-		final MockObject a = new MockObject();
-		
-		String matchingKey = "pid";
-		a.putParameter(matchingKey, new MockParameter());
+        String s = "SELECT a.getParameterBag(:param_1).getId() FROM Activity a";
 
-		inputObjects.put("a", a);
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		final Map<String, Object> queryParameter = new HashMap<>();
-		queryParameter.put("param_1", matchingKey);
+        final Map<String, Object> inputObjects = new HashMap<>();
 
-		List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        inputObjects.put("a", getTestElement());
 
-		assertEquals(1, result.size());
-	
-	}
-	
-	/**
-	 * negative test of a chained method call in WHERE clause 
-	 */
-	@Test
-	public void test14() throws Exception {
+        final Map<String, Object> queryParameter = new HashMap<>();
+        queryParameter.put("param_1", "testBag");
 
-		String s = "SELECT a FROM Activity a WHERE a.getParameter(:param_1).getType() = :param_2";
+        List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
-		
-		final Map<String, Object> inputObjects = new HashMap<>();
+        assertEquals(1, result.size());
 
-		final MockObject a = new MockObject();
-		
-		final String matchingKey = "pid";
-		a.putParameter(matchingKey, new MockParameter());
+        assertEquals("testBag", result.get(0));
+    }
 
-		inputObjects.put("a", a);
+    /**
+     * positive test of a chained method call in WHERE clause
+     */
+    @Test
+    public void test12() throws Exception {
 
-		final Map<String, Object> queryParameter = new HashMap<>();
-		queryParameter.put("param_1", matchingKey);
-		queryParameter.put("param_2", "notMatchingString");
+        String s = "SELECT a FROM Activity a WHERE a.getParameter(:p_1, :p_2).getType() = \"Float\"";
 
-		List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		assertEquals(0, result.size());
-	}
-	
-	/**
-	 * test an where expression with a NOT inversion
-	 */
-	@Test
-	public void test15() throws Exception {
+        final Map<String, Object> inputObjects = new HashMap<>();
 
-		String s = "SELECT a FROM Activity a WHERE NOT a.getParameter(:param_1).getType() = :param_2";
+        inputObjects.put("a", getTestElement());
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
+        final Map<String, Object> queryParameter = new HashMap<>();
+        queryParameter.put("p_1", "testBag");
+        queryParameter.put("p_2", "testId");
 
-		final Map<String, Object> inputObjects = new HashMap<>();
+        List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		final MockObject a = new MockObject();
-		
-		final String matchingKey = "pid";
-		a.putParameter(matchingKey, new MockParameter());
+        assertEquals(1, result.size());
 
-		inputObjects.put("a", a);
+    }
 
-		final Map<String, Object> queryParameter = new HashMap<>();
-		queryParameter.put("param_1", matchingKey);
-		queryParameter.put("param_2", "notMatchingString");
+    /**
+     * negative test of a chained method call in WHERE clause
+     */
+    @Test
+    public void test14() throws Exception {
 
-		List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        String s = "SELECT a FROM Activity a WHERE a.getParameter(:p_1, :p_2).getType() = :p_3";
 
-		assertEquals(1, result.size());
-	}
-	
-	/**
-	 * test an where expression with a NOT inversion
-	 */
-	@Test
-	public void test16() throws Exception {
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
 
-		String s = "SELECT a FROM Activity a WHERE a.getParameter(:param_1).getType() = :param_2";
+        final Map<String, Object> inputObjects = new HashMap<>();
 
-		final ParseTree tree = parseString(s);
-		final CompiledStatement compiledStatement = compile(tree);
+        inputObjects.put("a", getTestElement());
 
-		final Map<String, Object> inputObjects = new HashMap<>();
+        final Map<String, Object> queryParameter = new HashMap<>();
+        queryParameter.put("p_1", "testBag");
+        queryParameter.put("p_2", "testId");
+        queryParameter.put("p_3", "String");
 
-		final MockObject a = new MockObject();
-		
-		final String matchingKey = "pid";
-		a.putParameter(matchingKey, new MockParameter());
+        List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
-		inputObjects.put("a", a);
+        assertEquals(0, result.size());
+    }
 
-		final Map<String, Object> queryParameter = new HashMap<>();
-		queryParameter.put("param_1", matchingKey);
-		queryParameter.put("param_2", "testType"); 
+    /**
+     * test an where expression with a NOT inversion
+     */
+    @Test
+    public void test15() throws Exception {
 
-		List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+        String s = "SELECT a FROM Activity a WHERE NOT a.getParameter(:p_1, :p_2).getType() = :p_3";
 
-		assertEquals(1, result.size());
-	}
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
+
+        final Map<String, Object> inputObjects = new HashMap<>();
+
+        inputObjects.put("a", getTestElement());
+
+        final Map<String, Object> queryParameter = new HashMap<>();
+        queryParameter.put("p_1", "testBag");
+        queryParameter.put("p_2", "testId");
+        queryParameter.put("p_3", "String");
+
+        List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+
+        assertEquals(1, result.size());
+    }
+
+    /**
+     * test null pointer in chained method calls, when the first call returns null
+     */
+    @Test
+    public void test16() throws Exception {
+
+        String s = "SELECT a FROM Activity a WHERE a.getParameter(:p_1, :p_2).getType() = :p_3";
+
+        final ParseTree tree = parseString(s);
+        final CompiledStatement compiledStatement = compile(tree);
+
+        final Map<String, Object> inputObjects = new HashMap<>();
+
+        inputObjects.put("a", getTestElement());
+
+        final Map<String, Object> queryParameter = new HashMap<>();
+        queryParameter.put("p_1", "testBag");
+        queryParameter.put("p_2", "bullshitId");
+        queryParameter.put("p_3", "String");
+
+        List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
+
+        assertEquals(0, result.size());
+    }
 
 }

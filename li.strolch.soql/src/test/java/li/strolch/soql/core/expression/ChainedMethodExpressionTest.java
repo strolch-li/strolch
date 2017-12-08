@@ -5,16 +5,38 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
+import li.strolch.model.ParameterBag;
+import li.strolch.model.Resource;
+import li.strolch.model.StrolchElement;
+import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringParameter;
 import org.junit.Test;
 
-import li.strolch.soql.core.MockObject;
-import li.strolch.soql.core.MockParameter;
 import li.strolch.soql.core.expresssion.ChainedMethodExpression;
 import li.strolch.soql.core.expresssion.MethodArgumentDeclaration;
 import li.strolch.soql.core.expresssion.MethodExpression;
 import li.strolch.soql.core.expresssion.ParameterReference;
 
 public class ChainedMethodExpressionTest {
+
+	/**
+	 * @return a test parameter with String value
+	 */
+	public StrolchElement getTestElement() {
+		final Resource resource = new Resource();
+		resource.setId("testId");
+
+		final ParameterBag bag = new ParameterBag();
+		bag.setId("testBag");
+		resource.addParameterBag(bag);
+
+		final Parameter parameter = new StringParameter();
+		parameter.setId("testId");
+		parameter.setValue("testValue");
+
+		resource.addParameter("testBag", parameter);
+		return resource;
+	}
 
 	@Test
 	public void test() {
@@ -38,11 +60,9 @@ public class ChainedMethodExpressionTest {
 		chainedMethodExpression.addMethodExpression(methodExpression);
 
 		// prepare the runtime objects
-		MockObject mockObject = new MockObject();
-		mockObject.putParameter(matchingKey, new MockParameter());
 
 		Map<String, Object> inputObjects = new HashMap<>();
-		inputObjects.put("a", mockObject);
+		inputObjects.put("a", getTestElement());
 
 		Map<String, Object> queryParameter = new HashMap<>();
 		queryParameter.put("param_1", matchingKey);
@@ -50,7 +70,7 @@ public class ChainedMethodExpressionTest {
 		// evaluate the chained expression
 		Object result = chainedMethodExpression.evaluate(inputObjects, queryParameter);
 
-		assertEquals(MockParameter.class, result.getClass());
+		assertEquals(StringParameter.class, result.getClass());
 
 	}
 
@@ -81,11 +101,9 @@ public class ChainedMethodExpressionTest {
 		chainedMethodExpression.addMethodExpression(methodExpression_2);
 
 		// prepare the runtime objects
-		MockObject mockObject = new MockObject();
-		mockObject.putParameter(matchingKey, new MockParameter());
 
 		Map<String, Object> inputObjects = new HashMap<>();
-		inputObjects.put("a", mockObject);
+		inputObjects.put("a", getTestElement());
 
 		Map<String, Object> queryParameter = new HashMap<>();
 		queryParameter.put("param_1", matchingKey);
