@@ -10,8 +10,6 @@ import li.strolch.soql.core.SOQLEvaluationException;
 
 /**
  * extract state field value by reflection
- *
- * TODO: interpret null pointer in chained expression as null !!
  * 
  * @author msmock
  */

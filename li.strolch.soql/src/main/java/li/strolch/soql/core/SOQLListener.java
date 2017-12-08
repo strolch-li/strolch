@@ -185,7 +185,6 @@ public class SOQLListener extends SOQLBaseListener {
 		pointer = chainedMethodExpression;
 	}
 
-	// TODO here we are
 	@Override
 	public void enterMethod_expression(Method_expressionContext ctx) {
 		MethodExpression methodExpression = new MethodExpression();
@@ -193,7 +192,6 @@ public class SOQLListener extends SOQLBaseListener {
 		pointer = methodExpression;
 	}
 
-	// TODO here we are
 	@Override
 	public void exitMethod_expression(Method_expressionContext ctx) {
 		pointer = pointer.getParent();
