@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -155,10 +155,10 @@ public class ByteHelper {
 	/**
 	 * Creates a long of the given byte array. They byte array must be 8 bytes long. The byte at index 0 is the highest
 	 * byte
-	 * 
+	 *
 	 * @param bytes
-	 *            the bytes to convert to a long
-	 * 
+	 * 		the bytes to convert to a long
+	 *
 	 * @return the long created from the bytes
 	 */
 	public static long toLong(byte[] bytes) {
@@ -179,10 +179,10 @@ public class ByteHelper {
 	/**
 	 * Creates an integer of the given byte array. They byte array must be 4 bytes long. The byte at index 0 is the
 	 * highest byte
-	 * 
+	 *
 	 * @param bytes
-	 *            the bytes to convert to an integer
-	 * 
+	 * 		the bytes to convert to an integer
+	 *
 	 * @return the integer created from the bytes
 	 */
 	public static int toInt(byte[] bytes) {
@@ -199,10 +199,10 @@ public class ByteHelper {
 	/**
 	 * Creates a short of the given byte array. They byte array must be 2 bytes long. The byte at index 0 is the highest
 	 * byte
-	 * 
+	 *
 	 * @param bytes
-	 *            the bytes to convert to an integer
-	 * 
+	 * 		the bytes to convert to an integer
+	 *
 	 * @return the integer created from the bytes
 	 */
 	public static short toShort(byte[] bytes) {
@@ -247,19 +247,19 @@ public class ByteHelper {
 	}
 
 	public static byte getUpperNibble(byte b) {
-		return (byte) ((byte) (0xf0 & b) >> 4);
+		return (byte) (b >>> 4 & 0x0f);
 	}
 
 	public static byte getLowerNibble(byte b) {
-		return (byte) (0xf & b);
+		return (byte) (0x0f & b);
 	}
 
 	/**
 	 * Formats the given byte array to a binary string, separating each byte by a space
-	 * 
+	 *
 	 * @param bytes
-	 *            the byte to format to a binary string
-	 * 
+	 * 		the byte to format to a binary string
+	 *
 	 * @return the binary string
 	 */
 	public static String asBinary(byte[] bytes) {
@@ -275,10 +275,10 @@ public class ByteHelper {
 
 	/**
 	 * Formats the given byte to a binary string
-	 * 
+	 *
 	 * @param b
-	 *            the byte to format to a binary string
-	 * 
+	 * 		the byte to format to a binary string
+	 *
 	 * @return the binary string
 	 */
 	public static String asBinary(byte b) {
@@ -299,10 +299,10 @@ public class ByteHelper {
 
 	/**
 	 * Formats the given integer to a binary string, each byte is separated by a space
-	 * 
+	 *
 	 * @param i
-	 *            the integer to format to a string
-	 * 
+	 * 		the integer to format to a string
+	 *
 	 * @return the binary string
 	 */
 	public static String asBinary(short i) {
@@ -334,10 +334,10 @@ public class ByteHelper {
 
 	/**
 	 * Formats the given integer to a binary string, each byte is separated by a space
-	 * 
+	 *
 	 * @param i
-	 *            the integer to format to a string
-	 * 
+	 * 		the integer to format to a string
+	 *
 	 * @return the binary string
 	 */
 	public static String asBinary(int i) {
@@ -391,10 +391,10 @@ public class ByteHelper {
 
 	/**
 	 * Formats the given long to a binary string, each byte is separated by a space
-	 * 
+	 *
 	 * @param i
-	 *            the long to format
-	 * 
+	 * 		the long to format
+	 *
 	 * @return the binary string
 	 */
 	public static String asBinary(long i) {
