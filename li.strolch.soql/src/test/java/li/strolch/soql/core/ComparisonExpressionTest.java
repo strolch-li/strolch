@@ -1,4 +1,4 @@
-package li.strolch.soql.core.expression;
+package li.strolch.soql.core;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -12,6 +12,9 @@ import li.strolch.soql.core.expresssion.ComparisonExpression;
 import li.strolch.soql.core.expresssion.ParameterReference;
 import li.strolch.soql.core.expresssion.ValueDeclaration;
 
+/**
+ * @author msmock
+ */
 public class ComparisonExpressionTest {
 
 	@Test
@@ -130,7 +133,7 @@ public class ComparisonExpressionTest {
 	}
 	
 	@Test
-	public void testNumericLessEuals() {
+	public void testNumericLessEquals() {
 
 		ParameterReference vd_1 = new ParameterReference();
 		vd_1.varName = "a";

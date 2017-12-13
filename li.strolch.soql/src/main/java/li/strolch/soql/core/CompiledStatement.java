@@ -8,6 +8,9 @@ import java.util.Map;
 import li.strolch.soql.core.expresssion.SelectClause;
 import li.strolch.soql.core.expresssion.WhereExpression;
 
+/**
+ * @author msmock
+ */
 public class CompiledStatement {
 
 	// the map of entities declared in the FROM clause with their nicknames as keys

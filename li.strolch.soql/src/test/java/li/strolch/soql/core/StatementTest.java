@@ -1,84 +1,17 @@
 package li.strolch.soql.core;
 
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.parameter.FloatParameter;
-import li.strolch.model.parameter.Parameter;
-import li.strolch.soql.antlr4.generated.SOQLLexer;
-import li.strolch.soql.antlr4.generated.SOQLParser;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class StatementTest {
-
-    /**
-     * @throws Exception
-     */
-    private ParseTree parseString(final String s) throws Exception {
-
-        CharStream input = CharStreams.fromString(s);
-        SOQLLexer lexer = new SOQLLexer(input); // create a buffer of tokens pulled from the lexer
-
-        CommonTokenStream tokens = new CommonTokenStream(lexer); // create a parser that feeds off the tokens buffer
-        SOQLParser parser = new SOQLParser(tokens);
-        parser.addErrorListener(new VerboseListener());
-
-        ParseTree tree = parser.select_statement(); // begin parsing at block
-
-        System.out.println(tree.toStringTree(parser)); // print LISP-style tree
-
-        return tree;
-    }
-
-    /**
-     * @param tree
-     * @return CompiledSOQLStatement the compiled SOQL statement
-     * @throws Exception
-     */
-    private CompiledStatement compile(final ParseTree tree) throws Exception {
-
-        final ParseTreeWalker walker = new ParseTreeWalker();
-        final SOQLListener listener = new SOQLListener();
-        walker.walk(listener, tree);
-
-        final CompiledStatement soqlStatement = new CompiledStatement();
-        soqlStatement.entities = listener.getEntities();
-        soqlStatement.whereExpression = listener.getWhereExpression();
-        soqlStatement.selectClause = listener.getSelectClause();
-
-        return soqlStatement;
-    }
-
-    /**
-     * @return a test parameter with String value
-     */
-    public StrolchElement getTestElement() {
-        final Resource resource = new Resource();
-        resource.setId("testId");
-
-        final ParameterBag bag = new ParameterBag();
-        bag.setId("testBag");
-        resource.addParameterBag(bag);
-
-        final Parameter parameter = new FloatParameter();
-        parameter.setId("testId");
-        parameter.setValue(100d);
-
-        resource.addParameter("testBag", parameter);
-        return resource;
-    }
+/**
+ * @author msmock
+ */
+public class StatementTest extends BaseTest{
 
     @Test
     public void test0() throws Exception {
@@ -91,14 +24,13 @@ public class StatementTest {
         // System.out.println(compiledStatement);
 
         final Map<String, Object> inputObjects = new HashMap<>();
-        inputObjects.put("r", getTestElement());
+        inputObjects.put("r", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
 
         final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
         assertEquals(1, result.size());
-
     }
 
     @Test
@@ -112,15 +44,14 @@ public class StatementTest {
         // System.out.println(compiledStatement);
 
         final Map<String, Object> inputObjects = new HashMap<>();
-        inputObjects.put("r", getTestElement());
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("r", getTestResource("testId"));
+        inputObjects.put("a", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
 
         final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
         assertEquals(3, result.size());
-
     }
 
     /**
@@ -136,7 +67,7 @@ public class StatementTest {
         final CompiledStatement compiledStatement = compile(tree);
 
         final Map<String, Object> inputObjects = new HashMap<>();
-        inputObjects.put("r", getTestElement());
+        inputObjects.put("r", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
 
@@ -158,14 +89,13 @@ public class StatementTest {
         final CompiledStatement compiledStatement = compile(tree);
 
         final Map<String, Object> inputObjects = new HashMap<>();
-        inputObjects.put("r", getTestElement());
+        inputObjects.put("r", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
 
         final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
         assertTrue(result.isEmpty());
-
     }
 
     /**
@@ -180,8 +110,8 @@ public class StatementTest {
         final CompiledStatement compiledStatement = compile(tree);
 
         final Map<String, Object> inputObjects = new HashMap<>();
-        inputObjects.put("r", getTestElement());
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("r", getTestResource("testId"));
+        inputObjects.put("a", getTestResource("testId"));
 
         final Map<String, Object> parameter = new HashMap<>();
 
@@ -205,7 +135,7 @@ public class StatementTest {
         queryParameter.put("outer_var", "testId");
 
         final Map<String, Object> inputObjects = new HashMap<>();
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("a", getTestResource("testId"));
 
         final List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
@@ -224,7 +154,7 @@ public class StatementTest {
         final CompiledStatement compiledStatement = compile(tree);
 
         final Map<String, Object> inputObjects = new HashMap<>();
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("a", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
         queryParameter.put("p_1", "testBag");
@@ -248,7 +178,7 @@ public class StatementTest {
         final CompiledStatement compiledStatement = compile(tree);
 
         final Map<String, Object> inputObjects = new HashMap<>();
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("a", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
         queryParameter.put("p_1", "testBag");
@@ -273,7 +203,7 @@ public class StatementTest {
 
         final Map<String, Object> inputObjects = new HashMap<>();
 
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("a", getTestResource("testId"));
 
         Map<String, Object> queryParameter = new HashMap<>();
         queryParameter.put("param_1", "testBag");
@@ -305,7 +235,7 @@ public class StatementTest {
 
         final Map<String, Object> inputObjects = new HashMap<>();
 
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("a", getTestResource("testId"));
 
         Map<String, Object> queryParameter = new HashMap<>();
         queryParameter.put("param_1", "testBag");
@@ -337,7 +267,7 @@ public class StatementTest {
 
         final Map<String, Object> inputObjects = new HashMap<>();
 
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("a", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
         queryParameter.put("param_1", "testBag");
@@ -362,7 +292,7 @@ public class StatementTest {
 
         final Map<String, Object> inputObjects = new HashMap<>();
 
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("a", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
         queryParameter.put("p_1", "testBag");
@@ -371,7 +301,6 @@ public class StatementTest {
         List<Object> result = compiledStatement.evaluate(inputObjects, queryParameter);
 
         assertEquals(1, result.size());
-
     }
 
     /**
@@ -387,7 +316,7 @@ public class StatementTest {
 
         final Map<String, Object> inputObjects = new HashMap<>();
 
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("a", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
         queryParameter.put("p_1", "testBag");
@@ -412,7 +341,7 @@ public class StatementTest {
 
         final Map<String, Object> inputObjects = new HashMap<>();
 
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("a", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
         queryParameter.put("p_1", "testBag");
@@ -436,8 +365,7 @@ public class StatementTest {
         final CompiledStatement compiledStatement = compile(tree);
 
         final Map<String, Object> inputObjects = new HashMap<>();
-
-        inputObjects.put("a", getTestElement());
+        inputObjects.put("a", getTestResource("testId"));
 
         final Map<String, Object> queryParameter = new HashMap<>();
         queryParameter.put("p_1", "testBag");
