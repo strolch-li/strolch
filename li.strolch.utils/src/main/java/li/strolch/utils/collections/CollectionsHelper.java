@@ -1,11 +1,28 @@
 package li.strolch.utils.collections;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class CollectionsHelper {
+
+	public static <T> boolean equals(List<T> one, List<T> two, Comparator<T> comparator) {
+		if (one == null && two == null)
+			return true;
+		if (one == null || two == null || one.size() != two.size())
+			return false;
+
+		// copy lists
+		one = new ArrayList<>(one);
+		two = new ArrayList<>(two);
+
+		one.sort(comparator);
+		two.sort(comparator);
+
+		return one.equals(two);
+	}
 
 	public static <T> Collector<T, List<T>, T> singletonCollector() {
 		return singletonCollector(null);
