@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class CollectionsHelper {
 
-	public static <T> boolean equals(List<T> one, List<T> two, Comparator<T> comparator) {
+	public static <T> boolean equalsUnordered(List<T> one, List<T> two, Comparator<T> comparator) {
 		if (one == null && two == null)
 			return true;
 		if (one == null || two == null || one.size() != two.size())
