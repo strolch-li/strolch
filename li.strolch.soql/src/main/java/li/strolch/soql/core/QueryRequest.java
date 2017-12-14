@@ -38,7 +38,7 @@ public class QueryRequest {
     /**
      * @return the query as JsonObject
      */
-    public JsonObject toJson() {
+    public JsonObject asJson() {
 
         final JsonObject rootJ = new JsonObject();
         rootJ.addProperty(Tags.Json.OBJECT_TYPE, "QueryRequest");
