@@ -16,17 +16,11 @@
 package li.strolch.utils.objectfilter;
 
 import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 import li.strolch.utils.collections.MapOfMaps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements a filter where modifications to an object are collected, and only the most recent action and
@@ -161,9 +155,9 @@ public class ObjectFilter {
 			Operation op = cached.getOperation();
 			switch (op) {
 			case ADD:
-				throw new IllegalStateException("Stale State exception: Invalid + after +"); //$NON-NLS-1$
+				throw new IllegalStateException("Stale State exception: Invalid + after + for " + objectKey); //$NON-NLS-1$
 			case MODIFY:
-				throw new IllegalStateException("Stale State exception: Invalid + after +="); //$NON-NLS-1$
+				throw new IllegalStateException("Stale State exception: Invalid + after += for " + objectKey); //$NON-NLS-1$
 			case REMOVE:
 				// replace key if necessary
 				replaceKey(cached, objectKey, objectToAdd);
@@ -237,7 +231,7 @@ public class ObjectFilter {
 				cached.setObject(objectToUpdate);
 				break;
 			case REMOVE:
-				throw new IllegalStateException("Stale State exception: Invalid += after -"); //$NON-NLS-1$
+				throw new IllegalStateException("Stale State exception: Invalid += after - for " + objectKey); //$NON-NLS-1$
 			default:
 				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
@@ -312,7 +306,7 @@ public class ObjectFilter {
 				cached.setOperation(Operation.REMOVE);
 				break;
 			case REMOVE:
-				throw new IllegalStateException("Stale State exception: Invalid - after -"); //$NON-NLS-1$
+				throw new IllegalStateException("Stale State exception: Invalid - after - for " + objectKey); //$NON-NLS-1$
 			default:
 				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
