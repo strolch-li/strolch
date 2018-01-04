@@ -2,34 +2,49 @@ package li.strolch.soql.core;
 
 import com.google.gson.JsonObject;
 
+import li.strolch.model.Tags;
+
 /**
  * @author msmock
  */
 public class QueryResponse extends QueryRequest {
 
-    // the returned objects
-    static final String RESULT_SET = "resultSet";
+	static final String RESULT_SET = "resultSet";
 
-    // an exception or error message in case of error
-    public String message;
+	// an exception or error message in case of error
+	public String message;
 
-    //
-    public final ResultSet resultSet = new ResultSet();
+	// the returned objects
+	public ResultSet resultSet = new ResultSet();
 
-    /**
-     * @return the query as JsonObject
-     */
-    public JsonObject asJson() {
+	/**
+	 * @param resultSet the resultSet to set
+	 */
+	public void setResultSet(ResultSet resultSet) {
+		this.resultSet = resultSet;
+	}
 
-        final JsonObject rootJ = super.asJson();
+	/**
+	 * @return the resultSet
+	 */
+	public ResultSet getResultSet() {
+		return resultSet;
+	}
 
-        if (message != null && !message.isEmpty()) {
-            rootJ.addProperty("Message", message);
-        }
+	/**
+	 * @return the query as JsonObject
+	 */
+	public JsonObject asJson() {
 
-        rootJ.add(RESULT_SET, resultSet.asJson());
+        JsonObject rootJ = super.asJson();
+        rootJ.addProperty(Tags.Json.OBJECT_TYPE, "QueryResponse");
 
-        return rootJ;
-    }
+		if (message != null && !message.isEmpty()) {
+			rootJ.addProperty("Message", message);
+		}
+
+		rootJ.add(RESULT_SET, resultSet.asJson());
+		return rootJ;
+	}
 
 }

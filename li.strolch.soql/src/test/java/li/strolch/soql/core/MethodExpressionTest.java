@@ -1,23 +1,21 @@
 package li.strolch.soql.core;
 
-import com.google.gson.JsonObject;
+import static org.junit.Assert.assertEquals;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
+
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
-import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
-import li.strolch.model.json.StrolchElementToJsonVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.soql.core.expresssion.ChainedMethodExpression;
 import li.strolch.soql.core.expresssion.MethodArgumentDeclaration;
 import li.strolch.soql.core.expresssion.MethodExpression;
 import li.strolch.soql.core.expresssion.ParameterReference;
-import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author msmock
@@ -32,7 +30,7 @@ public class MethodExpressionTest {
         bag.setId("testBag");
         resource.addParameterBag(bag);
 
-        final Parameter parameter = new StringParameter();
+        final Parameter<String> parameter = new StringParameter();
         parameter.setId("testId");
         parameter.setValue("testValue");
 

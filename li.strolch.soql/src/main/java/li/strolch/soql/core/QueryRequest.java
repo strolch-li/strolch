@@ -14,66 +14,70 @@ import java.util.Set;
  */
 public class QueryRequest {
 
-    public static final String STATEMENT = "statement";
-    public static final String PARAMETER = "parameter";
+	public static final String STATEMENT = "statement";
+	public static final String PARAMETER = "queryParameter";
 
-    // the SOQL query string
-    private String statement;
+	// the SOQL query string
+	String statement;
 
-    // the parameter of the SOQL query
-    private Map<String, String> parameter = new HashMap<>();
+	// the parameter of the SOQL query
+	Map<String, Object> parameter = new HashMap<>();
 
-    public String getStatement() {
-        return statement;
-    }
+	public String getStatement() {
+		return statement;
+	}
 
-    public void setStatement(String statement) {
-        this.statement = statement;
-    }
+	public void setStatement(String statement) {
+		this.statement = statement;
+	}
 
-    public Map<String, String> getParameter() {
-        return parameter;
-    }
+	public Map<String, Object> getParameter() {
+		return parameter;
+	}
 
-    /**
-     * @return the query as JsonObject
-     */
-    public JsonObject asJson() {
+	public void setParameter(Map<String, Object> parameter) {
+		this.parameter = parameter;
+	}
 
-        final JsonObject rootJ = new JsonObject();
-        rootJ.addProperty(Tags.Json.OBJECT_TYPE, "QueryRequest");
-        rootJ.addProperty(STATEMENT, statement);
+	/**
+	 * @return the query as JsonObject
+	 */
+	public JsonObject asJson() {
 
-        final JsonObject parameterJ = new JsonObject();
-        rootJ.add(PARAMETER, parameterJ);
+		JsonObject rootJ = new JsonObject();
+		rootJ.addProperty(Tags.Json.OBJECT_TYPE, "QueryRequest");
+		rootJ.addProperty(STATEMENT, statement);
 
-        final Set<String> keys = parameter.keySet();
-        for (Iterator<String> iterator = keys.iterator(); iterator.hasNext(); ) {
-            final String key = iterator.next();
-            final Object param = parameter.get(key);
-            parameterJ.addProperty(key, param.toString());
-        }
+		JsonObject parameterJ = new JsonObject();
+		rootJ.add(PARAMETER, parameterJ);
 
-        return rootJ;
-    }
+		Set<String> keys = parameter.keySet();
+		for (Iterator<String> iterator = keys.iterator(); iterator.hasNext();) {
+			String key = iterator.next();
+			Object param = parameter.get(key);
+			parameterJ.addProperty(key, param.toString());
+		}
 
-    /**
-     * build request from Json object
-     *
-     * @return
-     */
-    public QueryRequest fromJson(JsonObject jsonObject) {
+		return rootJ;
+	}
 
-        final String statement = jsonObject.get(STATEMENT).getAsString();
-        setStatement(statement);
+	/**
+	 * build request from Json object
+	 *
+	 * @return
+	 */
+	public QueryRequest fromJson(JsonObject jsonObject) {
 
-        final JsonObject params = jsonObject.getAsJsonObject(PARAMETER);
-        final Set<Map.Entry<String, JsonElement>> entrySet = params.entrySet();
-        for (final Map.Entry<String, JsonElement> entry : entrySet) {
-            parameter.put(entry.getKey(), entry.getValue().getAsString());
-        }
+		String statement = jsonObject.get(STATEMENT).getAsString();
+		setStatement(statement);
 
-        return this;
-    }
+		JsonObject params = jsonObject.getAsJsonObject(PARAMETER);
+		Set<Map.Entry<String, JsonElement>> entrySet = params.entrySet();
+		for (Map.Entry<String, JsonElement> entry : entrySet) {
+			parameter.put(entry.getKey(), entry.getValue().getAsString());
+		}
+
+		return this;
+	}
 
 }

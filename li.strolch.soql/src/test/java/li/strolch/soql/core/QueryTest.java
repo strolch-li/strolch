@@ -1,28 +1,19 @@
 package li.strolch.soql.core;
 
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.parameter.FloatParameter;
-import li.strolch.model.parameter.Parameter;
+import static org.junit.Assert.assertEquals;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.junit.Test;
+
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.query.StrolchElementQuery;
-import li.strolch.soql.antlr4.generated.SOQLLexer;
-import li.strolch.soql.antlr4.generated.SOQLParser;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.junit.Test;
-
-import java.util.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author msmock
@@ -31,7 +22,7 @@ public class QueryTest extends BaseTest {
 
     /**
      * @param entities
-     * @return Map<String   ,   StrolchElementQuery> of queries for the entities
+     * @return Map of queries for the entities defining the objects returned
      */
     public Map<String, StrolchElementQuery> resolveEntities(final Map<String, String> entities) {
 

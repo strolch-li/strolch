@@ -1,125 +1,156 @@
 package li.strolch.soql.core;
 
-import li.strolch.model.*;
-import li.strolch.model.parameter.FloatParameter;
-import li.strolch.model.parameter.Parameter;
-import li.strolch.model.query.ActivityQuery;
-import li.strolch.model.query.OrderQuery;
-import li.strolch.model.query.ResourceQuery;
-import li.strolch.model.query.StrolchElementQuery;
-import li.strolch.soql.antlr4.generated.SOQLLexer;
-import li.strolch.soql.antlr4.generated.SOQLParser;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.junit.Test;
 
-import java.util.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import li.strolch.model.Order;
+import li.strolch.model.ParameterBag;
+import li.strolch.model.Resource;
+import li.strolch.model.State;
+import li.strolch.model.StrolchRootElement;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.parameter.FloatParameter;
+import li.strolch.model.parameter.Parameter;
+import li.strolch.soql.antlr4.generated.SOQLLexer;
+import li.strolch.soql.antlr4.generated.SOQLParser;
 
 /**
  * @author msmock
  */
 public abstract class BaseTest {
 
-    /**
-     * parse the string and return the antlr tree
-     *
-     * @throws Exception
-     */
-    ParseTree parseString(final String s) throws Exception {
+	/**
+	 * parse the string and return the antlr tree
+	 *
+	 * @throws Exception
+	 */
+	ParseTree parseString(final String s) throws Exception {
 
-        final CharStream input = CharStreams.fromString(s);
-        final SOQLLexer lexer = new SOQLLexer(input); // create a buffer of tokens pulled from the lexer
+		final CharStream input = CharStreams.fromString(s);
+		final SOQLLexer lexer = new SOQLLexer(input); // create a buffer of tokens pulled from the lexer
 
-        final CommonTokenStream tokens = new CommonTokenStream(lexer); // create a parser that feeds off the tokens buffer
-        final SOQLParser parser = new SOQLParser(tokens);
-        parser.addErrorListener(new VerboseListener());
+		final CommonTokenStream tokens = new CommonTokenStream(lexer); // create a parser that feeds off the tokens
+																		// buffer
+		final SOQLParser parser = new SOQLParser(tokens);
+		parser.addErrorListener(new VerboseListener());
 
-        final ParseTree tree = parser.select_statement(); // begin parsing at block
+		final ParseTree tree = parser.select_statement(); // begin parsing at block
 
-        // System.out.println(tree.toStringTree(parser)); // print LISP-style tree
+		// System.out.println(tree.toStringTree(parser)); // print LISP-style tree
 
-        return tree;
-    }
+		return tree;
+	}
 
-    /**
-     * compile the antlr tree to executable
-     *
-     * @param tree
-     * @return CompiledSOQLStatement
-     * @throws Exception
-     */
-    CompiledStatement compile(final ParseTree tree) throws Exception {
+	/**
+	 * compile the antlr tree to executable
+	 *
+	 * @param tree
+	 * @return CompiledSOQLStatement
+	 * @throws Exception
+	 */
+	CompiledStatement compile(final ParseTree tree) throws Exception {
 
-        final ParseTreeWalker walker = new ParseTreeWalker();
-        final SOQLListener listener = new SOQLListener();
-        walker.walk(listener, tree);
+		final ParseTreeWalker walker = new ParseTreeWalker();
+		final SOQLListener listener = new SOQLListener();
+		walker.walk(listener, tree);
 
-        final CompiledStatement soqlStatement = new CompiledStatement();
-        soqlStatement.entities = listener.getEntities();
-        soqlStatement.whereExpression = listener.getWhereExpression();
-        soqlStatement.selectClause = listener.getSelectClause();
+		final CompiledStatement soqlStatement = new CompiledStatement();
+		soqlStatement.entities = listener.getEntities();
+		soqlStatement.whereExpression = listener.getWhereExpression();
+		soqlStatement.selectClause = listener.getSelectClause();
 
-        return soqlStatement;
-    }
+		return soqlStatement;
+	}
 
-    /**
-     * @return a test resource
-     */
-    StrolchRootElement getTestResource(final String id) {
-        final Resource resource = new Resource();
-        resource.setId(id);
+	/**
+	 * @return a test resource
+	 */
+	StrolchRootElement getTestResource(final String id) {
+		final Resource resource = new Resource();
+		resource.setId(id);
 
-        final ParameterBag bag = new ParameterBag();
-        bag.setId("testBag");
-        resource.addParameterBag(bag);
+		final ParameterBag bag = new ParameterBag();
+		bag.setId("testBag");
+		resource.addParameterBag(bag);
 
-        final Parameter parameter = new FloatParameter();
-        parameter.setId("testId");
-        parameter.setValue(100d);
+		final Parameter<Double> parameter = new FloatParameter();
+		parameter.setId("testId");
+		parameter.setValue(100d);
 
-        resource.addParameter("testBag", parameter);
-        return resource;
-    }
+		resource.addParameter("testBag", parameter);
+		return resource;
+	}
 
-    /**
-     * @return a test order
-     */
-    StrolchRootElement getTestOrder(final String id) {
-        final Order order = new Order();
-        order.setId("testId");
+	/**
+	 * @return a test order
+	 */
+	StrolchRootElement getTestOrder(String id) {
+		Order order = new Order();
+		order.setId(id);
+		order.setState(State.CREATED);
 
-        final ParameterBag bag = new ParameterBag();
-        bag.setId("testBag");
-        order.addParameterBag(bag);
+		order.setDate(new Date());
 
-        final Parameter parameter = new FloatParameter();
-        parameter.setId("testId");
-        parameter.setValue(100d);
+		ParameterBag bag = new ParameterBag();
+		bag.setId("testBag");
+		order.addParameterBag(bag);
 
-        order.addParameter("testBag", parameter);
-        return order;
-    }
+		Parameter<Double> parameter = new FloatParameter();
+		parameter.setId("testId");
+		parameter.setValue(100d);
 
-    List<StrolchRootElement> getTestRessources(int n) {
-        final List<StrolchRootElement> result = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) {
-            result.add(getTestResource(String.valueOf(n)));
-        }
-        return result;
-    }
+		order.addParameter("testBag", parameter);
+		return order;
+	}
 
-    List<StrolchRootElement> getTestOrders(int n) {
-        final List<StrolchRootElement> result = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) {
-            result.add(getTestOrder(String.valueOf(n)));
-        }
-        return result;
-    }
+	/**
+	 * @return a test order
+	 */
+	StrolchRootElement getTestActivity(final String id) {
+		final Activity activity = new Activity();
+		activity.setId(id);
+
+		final ParameterBag bag = new ParameterBag();
+		bag.setId("testBag");
+		activity.addParameterBag(bag);
+
+		final Parameter<Double> parameter = new FloatParameter();
+		parameter.setId("testId");
+		parameter.setValue(100d);
+
+		activity.addParameter("testBag", parameter);
+		return activity;
+	}
+
+	List<StrolchRootElement> getTestRessources(int n) {
+		final List<StrolchRootElement> result = new ArrayList<>(n);
+		for (int i = 0; i < n; i++) {
+			result.add(getTestResource(String.valueOf(i)));
+		}
+		return result;
+	}
+
+	List<StrolchRootElement> getTestOrders(int n) {
+		final List<StrolchRootElement> result = new ArrayList<>(n);
+		for (int i = 0; i < n; i++) {
+			result.add(getTestOrder(String.valueOf(i)));
+		}
+		return result;
+	}
+
+	List<StrolchRootElement> getTestActivities(int n) {
+		final List<StrolchRootElement> result = new ArrayList<>(n);
+		for (int i = 0; i < n; i++) {
+			result.add(getTestActivity(String.valueOf(i)));
+		}
+		return result;
+	}
 
 }
