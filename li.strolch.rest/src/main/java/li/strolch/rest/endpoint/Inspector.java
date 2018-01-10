@@ -440,7 +440,7 @@ public class Inspector {
 
 		// query the data
 		long dataSetSize = 0L;
-		try (StrolchTransaction tx = openTx(cert, queryData.getRealmName())) {
+		try (StrolchTransaction tx = openTx(cert, realm)) {
 			OrderMap orderMap = tx.getOrderMap();
 			dataSetSize = orderMap.querySize(tx);
 			orders.addAll(tx.doQuery(query));
@@ -474,7 +474,7 @@ public class Inspector {
 
 		// query the data
 		long dataSetSize = 0L;
-		try (StrolchTransaction tx = openTx(cert, queryData.getRealmName())) {
+		try (StrolchTransaction tx = openTx(cert, realm)) {
 			ActivityMap activityMap = tx.getActivityMap();
 			dataSetSize = activityMap.querySize(tx);
 			activities.addAll(tx.doQuery(query));
