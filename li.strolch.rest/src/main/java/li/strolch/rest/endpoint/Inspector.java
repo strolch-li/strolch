@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -396,8 +396,6 @@ public class Inspector {
 		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		List<Resource> resources = new ArrayList<>();
-
 		// parse the query string
 		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(queryData.getQuery(), true, true, false);
 
@@ -405,11 +403,12 @@ public class Inspector {
 		query.setNavigation(new StrolchTypeNavigation(type));
 
 		// query the data
+		List<Resource> resources;
 		long dataSetSize = 0L;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			dataSetSize = resourceMap.querySize(tx);
-			resources.addAll(tx.doQuery(query));
+			resources = tx.doQuery(query);
 		}
 
 		// do ordering
@@ -432,18 +431,17 @@ public class Inspector {
 		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		List<Order> orders = new ArrayList<>();
-
 		// parse the query string
 		OrderQuery<Order> query = QueryParser.parseToOrderQuery(queryData.getQuery(), true, true, false);
 		query.setNavigation(new StrolchTypeNavigation(type));
 
 		// query the data
+		List<Order> orders;
 		long dataSetSize = 0L;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			OrderMap orderMap = tx.getOrderMap();
 			dataSetSize = orderMap.querySize(tx);
-			orders.addAll(tx.doQuery(query));
+			orders = tx.doQuery(query);
 		}
 
 		// do ordering
@@ -466,18 +464,17 @@ public class Inspector {
 		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		List<Activity> activities = new ArrayList<>();
-
 		// parse the query string
 		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true, true, false);
 		query.setNavigation(new StrolchTypeNavigation(type));
 
 		// query the data
+		List<Activity> activities;
 		long dataSetSize = 0L;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			ActivityMap activityMap = tx.getActivityMap();
 			dataSetSize = activityMap.querySize(tx);
-			activities.addAll(tx.doQuery(query));
+			activities = tx.doQuery(query);
 		}
 
 		// do ordering
@@ -981,7 +978,8 @@ public class Inspector {
 			return ResponseUtil.toResponse(e);
 		} finally {
 			if (tempFile != null) {
-				tempFile.delete();
+				if (!tempFile.delete())
+					logger.error("Failed to delete " + tempFile.getAbsolutePath());
 			}
 		}
 	}
