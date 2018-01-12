@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Martin Smock <martin.smock@bluewin.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,7 +43,7 @@ import li.strolch.model.visitor.IActivityElementVisitor;
  * An {@link Action} represents a single step within an {@link Activity}, that is, one that is not further decomposed
  * within the {@link Activity}. A {@link Activity} applies {@link IValueChange} objects at the start and end time of the
  * {@link Activity}.
- * 
+ *
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class Action extends GroupedParameterizedElement implements IActivityElement, PolicyContainer {
@@ -91,7 +91,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * @param resourceId
-	 *            the id of the {@link Resource} the {@link Action} acts on
+	 * 		the id of the {@link Resource} the {@link Action} acts on
 	 */
 	public void setResourceId(String resourceId) {
 		this.resourceId = resourceId;
@@ -107,7 +107,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * @param state
-	 *            the target <code>State</code> of the a<code>Action</code>
+	 * 		the target <code>State</code> of the a<code>Action</code>
 	 */
 	public void setState(State state) {
 		this.state = state;
@@ -122,6 +122,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * @param resourceType
+	 * 		the resource type
 	 */
 	public void setResourceType(String resourceType) {
 		this.resourceType = resourceType;
@@ -129,7 +130,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * Returns true if this {@link Action} contains any {@link IValueChange changes}, false if not
-	 * 
+	 *
 	 * @return true if this {@link Action} contains any {@link IValueChange changes}, false if not
 	 */
 	public boolean hasChanges() {
@@ -137,9 +138,9 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @param add
-	 *            <code>IValueChange</code> to be applied to the <code>Resource</code>
-	 * 
+	 * @param change
+	 * 		<code>IValueChange</code> to be applied to the <code>Resource</code>
+	 *
 	 * @return <tt>true</tt> (as specified by {@link Collection#add})
 	 */
 	public boolean addChange(IValueChange<? extends IValue<?>> change) {
@@ -158,7 +159,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	public Iterator<IValueChange<? extends IValue<?>>> changesIterator() {
 		if (this.changes == null)
-			return Collections.<IValueChange<? extends IValue<?>>> emptyList().iterator();
+			return Collections.<IValueChange<? extends IValue<?>>>emptyList().iterator();
 		return this.changes.iterator();
 	}
 
@@ -210,6 +211,11 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	@Override
 	public boolean hasPolicyDefs() {
 		return this.policyDefs != null;
+	}
+
+	@Override
+	public PolicyDef getPolicyDef(Class<?> clazz) {
+		return getPolicyDefs().getPolicyDef(clazz.getSimpleName());
 	}
 
 	@Override
