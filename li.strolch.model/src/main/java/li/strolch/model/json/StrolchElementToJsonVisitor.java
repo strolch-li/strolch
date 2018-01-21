@@ -45,6 +45,7 @@ public class StrolchElementToJsonVisitor
 
 	private MapOfSets<String, String> ignoredKeys;
 	private Set<String> ignoredStates;
+	private Set<String> ignoredBagTypes;
 
 	private BiConsumer<Resource, JsonObject> resourceHook;
 	private BiConsumer<Order, JsonObject> orderHook;
@@ -60,6 +61,7 @@ public class StrolchElementToJsonVisitor
 	public StrolchElementToJsonVisitor() {
 		this.ignoredKeys = new MapOfSets<>();
 		this.ignoredStates = new HashSet<>();
+		this.ignoredBagTypes = new HashSet<>();
 	}
 
 	public boolean isFlat() {
@@ -110,6 +112,11 @@ public class StrolchElementToJsonVisitor
 
 	public StrolchElementToJsonVisitor ignoreParameter(String bagId, String paramId) {
 		this.ignoredKeys.addElement(bagId, paramId);
+		return this;
+	}
+	
+	public StrolchElementToJsonVisitor ignoreBagParameterTyp(String type) {
+		this.ignoredBagTypes.add(type);
 		return this;
 	}
 
@@ -335,6 +342,8 @@ public class StrolchElementToJsonVisitor
 				continue;
 
 			ParameterBag parameterBag = element.getParameterBag(bagId);
+			if(ignoredBagTypes.contains(parameterBag.getType()))
+				continue;
 
 			Set<String> parameterKeySet = parameterBag.getParameterKeySet();
 			for (String paramId : parameterKeySet) {
