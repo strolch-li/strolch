@@ -728,6 +728,7 @@ public class Inspector {
 
 		UpdateResourceService svc = new UpdateResourceService();
 		UpdateResourceArg arg = new UpdateResourceArg();
+		arg.refreshUnknownVersion = true;
 		arg.resource = resource;
 		arg.realm = realm;
 
@@ -769,14 +770,12 @@ public class Inspector {
 			// parse from complete JSON
 			ResourceFromJsonVisitor visitor = new ResourceFromJsonVisitor();
 			resource = visitor.visit(jsonObject);
-
-			// we are missing a version, so:
-			arg.refreshUnknownVersion = true;
 		}
 
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, resource.getId());
 
 		// prepare argument
+		arg.refreshUnknownVersion = true;
 		arg.resource = resource;
 		arg.realm = realm;
 
@@ -806,6 +805,7 @@ public class Inspector {
 
 		UpdateOrderService svc = new UpdateOrderService();
 		UpdateOrderArg arg = new UpdateOrderArg();
+		arg.refreshUnknownVersion = true;
 		arg.order = order;
 		arg.realm = realm;
 
@@ -847,14 +847,12 @@ public class Inspector {
 			// parse from complete JSON
 			OrderFromJsonVisitor visitor = new OrderFromJsonVisitor();
 			order = visitor.visit(jsonObject);
-
-			// we are missing a version, so:
-			arg.refreshUnknownVersion = true;
 		}
 
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, order.getId());
 
 		// prepare argument
+		arg.refreshUnknownVersion = true;
 		arg.order = order;
 		arg.realm = realm;
 
@@ -884,6 +882,7 @@ public class Inspector {
 
 		UpdateActivityService svc = new UpdateActivityService();
 		UpdateActivityArg arg = new UpdateActivityArg();
+		arg.refreshUnknownVersion = true;
 		arg.activity = activity;
 		arg.realm = realm;
 
@@ -925,14 +924,12 @@ public class Inspector {
 			// parse from complete JSON
 			ActivityFromJsonVisitor visitor = new ActivityFromJsonVisitor();
 			activity = visitor.visit(jsonObject);
-
-			// we are missing a version, so:
-			arg.refreshUnknownVersion = true;
 		}
 
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, activity.getId());
 
 		// prepare argument
+		arg.refreshUnknownVersion = true;
 		arg.activity = activity;
 		arg.realm = realm;
 
