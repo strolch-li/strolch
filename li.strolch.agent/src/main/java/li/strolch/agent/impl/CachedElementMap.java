@@ -267,7 +267,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 
 	@Override
 	public synchronized void update(StrolchTransaction tx, T element) {
-		updateVersion(tx, element);
+		updateVersion(tx, element, false);
 
 		// first perform cached change
 		getCachedDao().update(element);
@@ -278,7 +278,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	@Override
 	public synchronized void updateAll(StrolchTransaction tx, List<T> elements) {
 		for (T t : elements) {
-			updateVersion(tx, t);
+			updateVersion(tx, t, false);
 		}
 
 		// first perform cached change
@@ -289,7 +289,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 
 	@Override
 	public synchronized void remove(StrolchTransaction tx, T element) {
-		updateVersion(tx, element);
+		updateVersion(tx, element, true);
 
 		if (this.realm.isVersioningEnabled()) {
 
@@ -310,7 +310,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	@Override
 	public synchronized void removeAll(StrolchTransaction tx, List<T> elements) {
 		for (T t : elements) {
-			updateVersion(tx, t);
+			updateVersion(tx, t, true);
 		}
 
 		if (this.realm.isVersioningEnabled()) {
@@ -329,9 +329,9 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 		}
 	}
 
-	private void updateVersion(StrolchTransaction tx, T element) {
+	private void updateVersion(StrolchTransaction tx, T element, boolean deleted) {
 		if (this.realm.isVersioningEnabled()) {
-			Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
+			Version.updateVersionFor(element, tx.getCertificate().getUsername(), deleted);
 		} else {
 			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
 		}
