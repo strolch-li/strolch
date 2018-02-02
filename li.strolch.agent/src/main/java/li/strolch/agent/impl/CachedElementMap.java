@@ -21,9 +21,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
@@ -37,6 +34,8 @@ import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -228,6 +227,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	 * {@link CachedRealm}
 	 *
 	 * @param element
+	 * 		the element to insert
 	 */
 	synchronized void insert(T element) {
 		getCachedDao().save(element);
@@ -235,7 +235,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 
 	@Override
 	public synchronized void add(StrolchTransaction tx, T element) {
-		if (realm.isVersioningEnabled()) {
+		if (this.realm.isVersioningEnabled()) {
 			int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId());
 			Version.setInitialVersionFor(element, latestVersion, tx.getCertificate().getUsername());
 		} else {
@@ -251,7 +251,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	@Override
 	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
-			if (realm.isVersioningEnabled()) {
+			if (this.realm.isVersioningEnabled()) {
 				int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId());
 				Version.setInitialVersionFor(element, latestVersion, tx.getCertificate().getUsername());
 			} else {
@@ -267,10 +267,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 
 	@Override
 	public synchronized void update(StrolchTransaction tx, T element) {
-		if (realm.isVersioningEnabled())
-			Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
-		else
-			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
+		updateVersion(tx, element);
 
 		// first perform cached change
 		getCachedDao().update(element);
@@ -281,10 +278,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	@Override
 	public synchronized void updateAll(StrolchTransaction tx, List<T> elements) {
 		for (T t : elements) {
-			if (realm.isVersioningEnabled())
-				Version.updateVersionFor(t, tx.getCertificate().getUsername(), false);
-			else
-				Version.setInitialVersionFor(t, -1, tx.getCertificate().getUsername());
+			updateVersion(tx, t);
 		}
 
 		// first perform cached change
@@ -295,10 +289,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 
 	@Override
 	public synchronized void remove(StrolchTransaction tx, T element) {
-		if (realm.isVersioningEnabled())
-			Version.updateVersionFor(element, tx.getCertificate().getUsername(), true);
-		else
-			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
+		updateVersion(tx, element);
 
 		if (this.realm.isVersioningEnabled()) {
 
@@ -319,10 +310,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 	@Override
 	public synchronized void removeAll(StrolchTransaction tx, List<T> elements) {
 		for (T t : elements) {
-			if (realm.isVersioningEnabled())
-				Version.updateVersionFor(t, tx.getCertificate().getUsername(), true);
-			else
-				Version.setInitialVersionFor(t, -1, tx.getCertificate().getUsername());
+			updateVersion(tx, t);
 		}
 
 		if (this.realm.isVersioningEnabled()) {
@@ -338,6 +326,14 @@ public abstract class CachedElementMap<T extends StrolchRootElement> implements 
 			getCachedDao().removeAll(elements);
 			// last is to perform DB changes
 			getDbDao(tx).removeAll(elements);
+		}
+	}
+
+	private void updateVersion(StrolchTransaction tx, T element) {
+		if (this.realm.isVersioningEnabled()) {
+			Version.updateVersionFor(element, tx.getCertificate().getUsername(), false);
+		} else {
+			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
 		}
 	}
 

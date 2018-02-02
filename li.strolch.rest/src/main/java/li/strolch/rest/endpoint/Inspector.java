@@ -70,6 +70,7 @@ import li.strolch.service.UpdateActivityService.UpdateActivityArg;
 import li.strolch.service.UpdateOrderService.UpdateOrderArg;
 import li.strolch.service.UpdateResourceService.UpdateResourceArg;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -723,6 +724,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		Resource resource = parseResourceFromXml(type, data);
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, resource.getId());
 
 		UpdateResourceService svc = new UpdateResourceService();
 		UpdateResourceArg arg = new UpdateResourceArg();
@@ -772,6 +774,8 @@ public class Inspector {
 			arg.refreshUnknownVersion = true;
 		}
 
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, resource.getId());
+
 		// prepare argument
 		arg.resource = resource;
 		arg.realm = realm;
@@ -798,6 +802,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		Order order = parseOrderFromXml(type, data);
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, order.getId());
 
 		UpdateOrderService svc = new UpdateOrderService();
 		UpdateOrderArg arg = new UpdateOrderArg();
@@ -847,6 +852,8 @@ public class Inspector {
 			arg.refreshUnknownVersion = true;
 		}
 
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, order.getId());
+
 		// prepare argument
 		arg.order = order;
 		arg.realm = realm;
@@ -873,6 +880,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		Activity activity = parseActivityFromXml(type, data);
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, activity.getId());
 
 		UpdateActivityService svc = new UpdateActivityService();
 		UpdateActivityArg arg = new UpdateActivityArg();
@@ -921,6 +929,8 @@ public class Inspector {
 			// we are missing a version, so:
 			arg.refreshUnknownVersion = true;
 		}
+
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, activity.getId());
 
 		// prepare argument
 		arg.activity = activity;
@@ -1148,7 +1158,7 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
 	@Path("{realm}/activities")
-	public Response addActivitiyAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
+	public Response addActivityAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -1173,7 +1183,7 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities")
-	public Response addActivitiyAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
+	public Response addActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -1201,7 +1211,7 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}")
-	public Response addActivitiyAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
+	public Response addActivityAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -1295,6 +1305,9 @@ public class Inspector {
 								""));
 
 			resource = listener.getResources().get(0);
+			resource.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, resource.getType());
 
 		} catch (Exception e) {
 			throw new StrolchPersistenceException(
@@ -1322,6 +1335,9 @@ public class Inspector {
 								""));
 
 			order = listener.getOrders().get(0);
+			order.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, order.getType());
 
 		} catch (Exception e) {
 			throw new StrolchPersistenceException(
@@ -1351,6 +1367,9 @@ public class Inspector {
 								""));
 
 			activity = listener.getActivities().get(0);
+			activity.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, activity.getType());
 
 		} catch (Exception e) {
 			throw new StrolchPersistenceException(
@@ -1380,6 +1399,9 @@ public class Inspector {
 			// parse from complete JSON
 			ResourceFromJsonVisitor visitor = new ResourceFromJsonVisitor();
 			resource = visitor.visit(jsonObject);
+			resource.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, resource.getType());
 		}
 
 		return resource;
@@ -1404,6 +1426,9 @@ public class Inspector {
 			// parse from complete JSON
 			OrderFromJsonVisitor visitor = new OrderFromJsonVisitor();
 			order = visitor.visit(jsonObject);
+			order.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, order.getType());
 		}
 
 		return order;
@@ -1428,6 +1453,9 @@ public class Inspector {
 			// parse from complete JSON
 			ActivityFromJsonVisitor visitor = new ActivityFromJsonVisitor();
 			activity = visitor.visit(jsonObject);
+			activity.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, activity.getType());
 		}
 
 		return activity;
