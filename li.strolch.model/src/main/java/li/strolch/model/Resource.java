@@ -209,6 +209,9 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		if (this.policyDefs != null)
 			clone.setPolicyDefs(this.policyDefs.getClone());
 
+		if (withVersion)
+			clone.setVersion(this.version);
+
 		return clone;
 	}
 
