@@ -77,6 +77,13 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	public StrolchRootElement getClone();
 
 	/**
+	 * Return a clone of this {@link StrolchElement}
+	 *
+	 * @return a clone of this {@link StrolchElement}
+	 */
+	public StrolchRootElement getClone(boolean withVersion);
+
+	/**
 	 * Visitor pattern accept method. Takes a {@link StrolchRootElementVisitor} to visit this element
 	 *
 	 * @param visitor

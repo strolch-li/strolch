@@ -480,6 +480,12 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public Activity getClone() {
+		return getClone(false);
+	}
+
+	@Override
+	public Activity getClone(boolean withVersion) {
+
 		Activity clone = new Activity();
 		clone.timeOrdering = this.timeOrdering;
 

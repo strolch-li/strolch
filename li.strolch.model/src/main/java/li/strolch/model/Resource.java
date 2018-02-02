@@ -190,6 +190,12 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@Override
 	public Resource getClone() {
+		return getClone(false);
+	}
+
+	@Override
+	public Resource getClone(boolean withVersion) {
+
 		Resource clone = new Resource();
 
 		super.fillClone(clone);

@@ -157,6 +157,12 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 
 	@Override
 	public Order getClone() {
+		return getClone(false);
+	}
+
+	@Override
+	public Order getClone(boolean withVersion) {
+
 		Order clone = new Order();
 
 		super.fillClone(clone);
