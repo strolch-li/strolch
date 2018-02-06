@@ -14,8 +14,7 @@ import li.strolch.model.json.StrolchElementToJsonVisitor;
  * The query result set as List of Lists
  * <p>
  *
- * TODO: the result set should carry arbitrary objects, not only
- * StrolchRootElements
+ * TODO: the result set should carry arbitrary objects, not only StrolchRootElements
  *
  * @author msmock
  */
@@ -36,7 +35,7 @@ public class ResultSet {
 			if (object instanceof StrolchRootElement) {
 				toBeAdded.add((StrolchRootElement) object);
 			} else {
-				System.out.println("Could not add object " + object + " of class " + object.getClass()
+				throw new SOQLEvaluationException("Could not add object " + object + " of class " + object.getClass()
 						+ " to result set. Only StrolchRootElements are supported yet.");
 			}
 		}

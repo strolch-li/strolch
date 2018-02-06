@@ -5,7 +5,7 @@ import java.util.Iterator;
 /**
  * Iterator used to build the cartesian product defined in the FROM clause
  */
-public class IndexPointer implements Iterator {
+public class IndexPointer implements Iterator<int[]> {
 
     final int[] numberOfEntities;
     final int[] pointer;

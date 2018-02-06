@@ -1,12 +1,12 @@
 package li.strolch.soql.core;
 
-import com.google.gson.JsonObject;
-import li.strolch.model.StrolchRootElement;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import com.google.gson.JsonObject;
 
 /**
  * @author msmock
@@ -56,6 +56,7 @@ public class SerialisationTest extends BaseTest {
 		assertEquals("10010", query.getParameter().get("p"));
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void testResponse2JSON() {
 		final QueryResponse response = buildTestResponse();

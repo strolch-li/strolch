@@ -96,7 +96,7 @@ public abstract class BaseTest {
 		order.setId(id);
 		order.setState(State.CREATED);
 
-		order.setDate(new Date());
+		order.setDate(new Date(117, 10, 01));
 
 		ParameterBag bag = new ParameterBag();
 		bag.setId("testBag");

@@ -1,19 +1,30 @@
 package li.strolch.soql.core;
 
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.query.ActivityQuery;
-import li.strolch.model.query.OrderQuery;
-import li.strolch.model.query.ResourceQuery;
-import li.strolch.model.query.StrolchElementQuery;
-import li.strolch.soql.antlr4.generated.SOQLLexer;
-import li.strolch.soql.antlr4.generated.SOQLParser;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import java.util.*;
+import li.strolch.agent.api.ActivityMap;
+import li.strolch.agent.api.OrderMap;
+import li.strolch.agent.api.ResourceMap;
+import li.strolch.model.Resource;
+import li.strolch.model.StrolchRootElement;
+import li.strolch.model.query.ActivityQuery;
+import li.strolch.model.query.OrderQuery;
+import li.strolch.model.query.ResourceQuery;
+import li.strolch.model.query.StrolchElementQuery;
+import li.strolch.model.query.StrolchTypeNavigation;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.soql.antlr4.generated.SOQLLexer;
+import li.strolch.soql.antlr4.generated.SOQLParser;
 
 /**
  * Main class to process a SOQL query. It performs the queries to retrieve the
@@ -26,16 +37,10 @@ import java.util.*;
 public class QueryProcessor {
 
 	// Map of queries to retrieve the input objects
-	protected Map<String, StrolchElementQuery> queries;
+	protected Map<String, StrolchElementQuery<?>> queries;
 
 	// Map of entities the input objects are taken from
 	protected Map<String, List<StrolchRootElement>> inputCollections;
-
-	/**
-	 * empty constructor
-	 */
-	public QueryProcessor() {
-	}
 
 	/**
 	 * Set the input map of collections to take the input objects from. For testing
@@ -51,7 +56,7 @@ public class QueryProcessor {
 	 * @param request
 	 * @return the query response object covering the result set
 	 */
-	public QueryResponse process(QueryRequest request) {
+	public QueryResponse process(QueryRequest request, StrolchTransaction tx) {
 
 		String statement = request.getStatement();
 
@@ -66,17 +71,15 @@ public class QueryProcessor {
 		}
 
 		// build the input collections, if not set already
-		if (inputCollections == null) {
-			queries = entity2Query(compiledStatement.entities);
-			// TODO perform the queries
-		}
+		if (inputCollections == null)
+			inputCollections = queryInputCollection(compiledStatement.entities, tx);
 
 		// build cartesian product
-		Object[] keys = inputCollections.keySet().toArray(); 
+		Object[] keys = inputCollections.keySet().toArray();
 		List<List<StrolchRootElement>> cartesianProduct = buildCartesianProduct(inputCollections, keys);
 
-		ResultSet resultSet = new ResultSet(); 
-		
+		ResultSet resultSet = new ResultSet();
+
 		// apply the compiled statement to any row of the cartesian product
 		for (List<StrolchRootElement> row : cartesianProduct) {
 			Map<String, Object> inputObjects = new HashMap<>();
@@ -88,23 +91,24 @@ public class QueryProcessor {
 			if (!resultRow.isEmpty())
 				resultSet.add(resultRow);
 		}
-		
+
 		QueryResponse response = new QueryResponse();
 		response.setStatement(statement);
 		response.setParameter(request.getParameter());
-		response.setResultSet(resultSet); 
+		response.setResultSet(resultSet);
 
 		return response;
-
 	}
 
 	/**
 	 * @param inputCollections
 	 * @param keys
-	 * @return List of Lists of the elements to be taken as input for the compiled statement
+	 * @return List of Lists of the elements to be taken as input for the compiled
+	 *         statement
 	 */
-	private List<List<StrolchRootElement>> buildCartesianProduct(Map<String, List<StrolchRootElement>> inputCollections, Object[] keys) {
-		
+	private List<List<StrolchRootElement>> buildCartesianProduct(Map<String, List<StrolchRootElement>> inputCollections,
+			Object[] keys) {
+
 		int numberOfKeys = keys.length;
 
 		// get an overview of how many elements we have to take into account
@@ -154,7 +158,7 @@ public class QueryProcessor {
 	}
 
 	/**
-	 * compile the antlr tree to executeable code
+	 * compile the antlr tree to executable code
 	 *
 	 * @param tree
 	 * @return CompiledSOQLStatement
@@ -175,15 +179,14 @@ public class QueryProcessor {
 	}
 
 	/**
-	 * Resolve the entities extracted from the FROM clause to the
-	 * StrolchElementQuery to be performed to retrieve the input objects.
-	 *
+	 * Query all strolch root elements declared in the FROM clause of the query
+	 * 
 	 * @param entities
-	 * @return Map of queries for the entities defining the objects returned
+	 * @return the input collection
 	 */
-	Map<String, StrolchElementQuery> entity2Query(Map<String, String> entities) {
+	Map<String, List<StrolchRootElement>> queryInputCollection(Map<String, String> entities, StrolchTransaction tx) {
 
-		Map<String, StrolchElementQuery> result = new HashMap<>();
+		Map<String, List<StrolchRootElement>> result = new HashMap<>();
 
 		Set<String> keys = entities.keySet();
 		for (String key : keys) {
@@ -191,16 +194,40 @@ public class QueryProcessor {
 
 			switch (clazzKey) {
 			case "Resource":
-				result.put(key, new ResourceQuery());
+				List<StrolchRootElement> resources = new ArrayList<>();
+				ResourceMap resourceMap = tx.getResourceMap();
+				Set<String> resourceTypes = resourceMap.getTypes(tx);
+				for (String type : resourceTypes) {
+					ResourceQuery<Resource> query = new ResourceQuery<>(new StrolchTypeNavigation(type));
+					resources.addAll(tx.doQuery(query));
+				}
+				result.put(clazzKey, resources);
 				break;
+
 			case "Order":
-				result.put(key, new OrderQuery());
+				List<StrolchRootElement> orders = new ArrayList<>();
+				OrderMap orderMap = tx.getOrderMap();
+				Set<String> orderTypes = orderMap.getTypes(tx);
+				for (String type : orderTypes) {
+					OrderQuery<Resource> query = new OrderQuery<>(new StrolchTypeNavigation(type));
+					orders.addAll(tx.doQuery(query));
+				}
+				result.put(clazzKey, orders);
 				break;
+
 			case "Activity":
-				result.put(key, new ActivityQuery());
+				List<StrolchRootElement> activities = new ArrayList<>();
+				ActivityMap activityMap = tx.getActivityMap();
+				Set<String> activityTypes = activityMap.getTypes(tx);
+				for (String type : activityTypes) {
+					ActivityQuery<Resource> query = new ActivityQuery<>(new StrolchTypeNavigation(type));
+					activities.addAll(tx.doQuery(query));
+				}
+				result.put(clazzKey, activities);
 				break;
+
 			default:
-				String s = "Unable to resolve " + clazzKey + " to strolch entity query.";
+				String s = "Unable to resolve " + clazzKey + " to strolch root entities.";
 				throw new SOQLParseException(s);
 			}
 		}
