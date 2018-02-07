@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,27 +18,21 @@ package li.strolch.db;
 import static li.strolch.db.DbConstants.PROP_DB_VERSION;
 import static li.strolch.db.DbConstants.RESOURCE_DB_VERSION;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.utils.Version;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.FileHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
@@ -56,13 +50,13 @@ public class DbSchemaVersionCheck {
 
 	/**
 	 * @param app
-	 *            the app name
+	 * 		the app name
 	 * @param ctxClass
-	 *            the context class
+	 * 		the context class
 	 * @param allowSchemaCreation
-	 *            true allows creating the schema
+	 * 		true allows creating the schema
 	 * @param allowSchemaDrop
-	 *            true allows dropping the schema
+	 * 		true allows dropping the schema
 	 */
 	public DbSchemaVersionCheck(String app, Class<?> ctxClass, boolean allowSchemaCreation,
 			boolean allowSchemaMigration, boolean allowSchemaDrop) {
@@ -96,16 +90,16 @@ public class DbSchemaVersionCheck {
 
 	/**
 	 * Checks the state of the realm's DB schema
-	 * 
+	 *
 	 * @param realm
-	 *            the realm
+	 * 		the realm
 	 * @param ds
-	 *            the {@link DataSource}
-	 * 
+	 * 		the {@link DataSource}
+	 *
 	 * @return the state
-	 * 
+	 *
 	 * @throws DbException
-	 *             if something goes wrong
+	 * 		if something goes wrong
 	 */
 	public DbMigrationState checkSchemaVersion(String realm, DataSource ds) throws DbException {
 
@@ -146,27 +140,19 @@ public class DbSchemaVersionCheck {
 
 	/**
 	 * @param con
-	 *            the connection
+	 * 		the connection
 	 * @param app
-	 *            the app for which to get the version
-	 * 
+	 * 		the app for which to get the version
+	 *
 	 * @return the version
-	 * 
+	 *
 	 * @throws SQLException
-	 *             if something goes wrong
+	 * 		if something goes wrong
 	 */
 	public static Version getCurrentVersion(Connection con, String app) throws SQLException {
 
-		// first see if we have any schema
-		String sql = "select table_schema, table_name, table_type from information_schema.tables where table_name = ?";
-		try (PreparedStatement st = con.prepareStatement(sql)) {
-			st.setString(1, PROP_DB_VERSION);
-			if (!st.executeQuery().next())
-				return null;
-		}
-
 		// first find current version
-		sql = "select id, version from db_version where app = ? order by id desc;";
+		String sql = "select id, version from db_version where app = ? order by id desc;";
 		Version currentVersion = null;
 		try (PreparedStatement st = con.prepareStatement(sql)) {
 			st.setString(1, app);
@@ -174,6 +160,9 @@ public class DbSchemaVersionCheck {
 				if (rs.next())
 					currentVersion = Version.valueOf(rs.getString(2));
 			}
+		} catch (Exception e) {
+			logger.error("Failed to query version for app " + app, e);
+			return null;
 		}
 
 		return currentVersion;
@@ -181,16 +170,16 @@ public class DbSchemaVersionCheck {
 
 	/**
 	 * @param realm
-	 *            the realm
+	 * 		the realm
 	 * @param expectedDbVersion
-	 *            the expected version
-	 * 
+	 * 		the expected version
+	 *
 	 * @return the migration state
-	 * 
+	 *
 	 * @throws SQLException
-	 *             if something goes wrong
+	 * 		if something goes wrong
 	 * @throws DbException
-	 *             if something goes wrong
+	 * 		if something goes wrong
 	 */
 	public DbMigrationState detectMigrationState(String realm, Version expectedDbVersion, Version currentVersion)
 			throws SQLException, DbException {
@@ -213,20 +202,21 @@ public class DbSchemaVersionCheck {
 			return DbMigrationState.MIGRATED;
 		}
 
-		throw new DbException(MessageFormat.format("[{0}:{1}]Current version {2} is later than expected version {3}",
-				this.app, realm, currentVersion, expectedDbVersion));
+		throw new DbException(MessageFormat
+				.format("[{0}:{1}]Current version {2} is later than expected version {3}", this.app, realm,
+						currentVersion, expectedDbVersion));
 	}
 
 	/**
 	 * @param app
-	 *            the app
+	 * 		the app
 	 * @param ctxClass
-	 *            the context class
-	 * 
+	 * 		the context class
+	 *
 	 * @return the version
-	 * 
+	 *
 	 * @throws DbException
-	 *             if something goes wrong
+	 * 		if something goes wrong
 	 */
 	public static Version getExpectedDbVersion(String app, Class<?> ctxClass) throws DbException {
 		Properties dbVersionProps = new Properties();
@@ -251,18 +241,18 @@ public class DbSchemaVersionCheck {
 
 	/**
 	 * @param scriptPrefix
-	 *            script file prefix
+	 * 		script file prefix
 	 * @param ctxClass
-	 *            the class to get the class loader to use to load the resource
+	 * 		the class to get the class loader to use to load the resource
 	 * @param version
-	 *            the version to load
+	 * 		the version to load
 	 * @param type
-	 *            the operation type
-	 * 
+	 * 		the operation type
+	 *
 	 * @return the SQL to perform
-	 * 
+	 *
 	 * @throws DbException
-	 *             if something goes wrong
+	 * 		if something goes wrong
 	 */
 	public static String getSql(String scriptPrefix, Class<?> ctxClass, Version version, String type)
 			throws DbException {
@@ -279,14 +269,13 @@ public class DbSchemaVersionCheck {
 	}
 
 	/**
-	 * 
 	 * @param realm
-	 *            the realm to create the schema for (a {@link DataSource} must exist for it)
+	 * 		the realm to create the schema for (a {@link DataSource} must exist for it)
 	 * @param version
-	 *            the version to upgrade to
-	 * 
+	 * 		the version to upgrade to
+	 *
 	 * @throws DbException
-	 *             if something goes wrong
+	 * 		if something goes wrong
 	 */
 	public void createSchema(Connection con, String realm, Version version) throws DbException {
 
@@ -307,21 +296,21 @@ public class DbSchemaVersionCheck {
 			throw new DbException("Failed to execute schema generation SQL: " + e.getMessage(), e);
 		}
 
-		logger.info(MessageFormat.format("[{0}:{1}] Successfully created schema with version {2}", this.app, realm,
-				version));
+		logger.info(MessageFormat
+				.format("[{0}:{1}] Successfully created schema with version {2}", this.app, realm, version));
 	}
 
 	/**
 	 * Upgrades the schema to the given version. If the current version is below the given version, then currently this
 	 * method drops the schema and recreates it. Real migration must still be implemented
-	 * 
+	 *
 	 * @param realm
-	 *            the realm to migrate (a {@link DataSource} must exist for it)
+	 * 		the realm to migrate (a {@link DataSource} must exist for it)
 	 * @param version
-	 *            the version to upgrade to
-	 * 
+	 * 		the version to upgrade to
+	 *
 	 * @throws DbException
-	 *             if something goes wrong
+	 * 		if something goes wrong
 	 */
 	public void migrateSchema(Connection con, String realm, Version version) throws DbException {
 
@@ -341,18 +330,18 @@ public class DbSchemaVersionCheck {
 			throw new DbException("Failed to execute schema migration SQL: " + e.getMessage(), e);
 		}
 
-		logger.info(MessageFormat.format("[{0}:{1}] Successfully migrated schema to version {2}", this.app, realm,
-				version));
+		logger.info(MessageFormat
+				.format("[{0}:{1}] Successfully migrated schema to version {2}", this.app, realm, version));
 	}
 
 	/**
 	 * @param realm
-	 *            the realm for which the schema must be dropped (a {@link DataSource} must exist for it)
+	 * 		the realm for which the schema must be dropped (a {@link DataSource} must exist for it)
 	 * @param version
-	 *            the version with which to to drop the schema
-	 * 
+	 * 		the version with which to to drop the schema
+	 *
 	 * @throws DbException
-	 *             if something goes wrong
+	 * 		if something goes wrong
 	 */
 	public void dropSchema(Connection con, String realm, Version version) throws DbException {
 
@@ -373,7 +362,7 @@ public class DbSchemaVersionCheck {
 			throw new DbException("Failed to execute schema drop SQL: " + e.getMessage(), e);
 		}
 
-		logger.info(MessageFormat.format("[{0}:{1}] Successfully dropped schema with version {2}", this.app, realm,
-				version));
+		logger.info(MessageFormat
+				.format("[{0}:{1}] Successfully dropped schema with version {2}", this.app, realm, version));
 	}
 }
