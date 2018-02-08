@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,6 +70,16 @@ public interface EncryptionHandler {
 	byte[] nextSalt();
 
 	/**
+	 * Hashes the given password configured algorithm
+	 *
+	 * @param password
+	 * 		the password
+	 *
+	 * @return the hashed password
+	 */
+	byte[] hashPasswordWithoutSalt(final char[] password);
+
+	/**
 	 * Hashes the given password with the given salt with the configured algorithm
 	 *
 	 * @param password
@@ -80,6 +90,24 @@ public interface EncryptionHandler {
 	 * @return the hashed password
 	 */
 	byte[] hashPassword(final char[] password, final byte[] salt);
+
+	/**
+	 * Hashes the given password with the given salt and algorithm properties
+	 *
+	 * @param password
+	 * 		the password
+	 * @param salt
+	 * 		the salt
+	 * @param algorithm
+	 * 		the algorithm
+	 * @param iterations
+	 * 		the iterations
+	 * @param keyLength
+	 * 		the keyLength
+	 *
+	 * @return the hashed password
+	 */
+	byte[] hashPassword(final char[] password, final byte[] salt, String algorithm, int iterations, int keyLength);
 
 	/**
 	 * Initialize the concrete {@link EncryptionHandler}. The passed parameter map contains any configuration the

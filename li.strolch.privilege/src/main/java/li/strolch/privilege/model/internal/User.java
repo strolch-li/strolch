@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,12 +30,12 @@ import li.strolch.utils.helper.StringHelper;
 /**
  * This class defines the actual login information for a given user which can be granted privileges. Every user is
  * granted a set of {@link Role}s and has a {@link UserState} including detail information like first name and lastname
- * 
+ *
  * <p>
  * Note: This is an internal object which is not to be serialized or passed to clients, {@link UserRep}s are used for
  * that
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public final class User {
@@ -45,6 +45,9 @@ public final class User {
 	private final String username;
 	private final byte[] password;
 	private final byte[] salt;
+	private final String hashAlgorithm;
+	private final int hashIterations;
+	private final int hashKeyLength;
 
 	private final String firstname;
 	private final String lastname;
@@ -59,28 +62,37 @@ public final class User {
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param userId
-	 *            the user's id
+	 * 		the user's id
 	 * @param username
-	 *            the user's login name
+	 * 		the user's login name
 	 * @param password
-	 *            the user's password (hashed)
+	 * 		the user's password (hashed)
+	 * @param salt
+	 * 		the password salt
+	 * @param hashAlgorithm
+	 * 		the algorithm for the hash
+	 * @param hashIterations
+	 * 		the nr of iterations for hashing
+	 * @param hashKeyLength
+	 * 		the hash key length
 	 * @param firstname
-	 *            the user's first name
+	 * 		the user's first name
 	 * @param lastname
-	 *            the user's lastname
+	 * 		the user's lastname
 	 * @param userState
-	 *            the user's {@link UserState}
+	 * 		the user's {@link UserState}
 	 * @param roles
-	 *            the set of {@link Role}s assigned to this user
+	 * 		the set of {@link Role}s assigned to this user
 	 * @param locale
-	 *            the user's {@link Locale}
+	 * 		the user's {@link Locale}
 	 * @param propertyMap
-	 *            a {@link Map} containing string value pairs of properties for this user
+	 * 		a {@link Map} containing string value pairs of properties for this user
 	 */
-	public User(String userId, String username, byte[] password, byte[] salt, String firstname, String lastname,
-			UserState userState, Set<String> roles, Locale locale, Map<String, String> propertyMap) {
+	public User(String userId, String username, byte[] password, byte[] salt, String hashAlgorithm, int hashIterations,
+			int hashKeyLength, String firstname, String lastname, UserState userState, Set<String> roles, Locale locale,
+			Map<String, String> propertyMap) {
 
 		if (StringHelper.isEmpty(userId)) {
 			throw new PrivilegeException("No UserId defined!"); //$NON-NLS-1$
@@ -100,7 +112,7 @@ public final class User {
 			}
 		}
 
-		// password may be null, meaning not able to login
+		// password, salt and hash* may be null, meaning not able to login
 		// roles may be null, meaning not able to login and must be added later
 		// locale may be null, meaning use system default
 		// properties may be null, meaning no properties
@@ -110,6 +122,11 @@ public final class User {
 		this.username = username;
 		this.password = password;
 		this.salt = salt;
+
+		this.hashAlgorithm = hashAlgorithm;
+		this.hashIterations = hashIterations;
+		this.hashKeyLength = hashKeyLength;
+
 		this.userState = userState;
 
 		this.firstname = firstname;
@@ -147,7 +164,7 @@ public final class User {
 
 	/**
 	 * Returns the hashed password for this {@link User}
-	 * 
+	 *
 	 * @return the hashed password for this {@link User}
 	 */
 	public byte[] getPassword() {
@@ -156,11 +173,38 @@ public final class User {
 
 	/**
 	 * Return the salt for this {@link User}
-	 * 
+	 *
 	 * @return the salt for this {@link User}
 	 */
 	public byte[] getSalt() {
 		return this.salt;
+	}
+
+	/**
+	 * Return the hash algorithm
+	 *
+	 * @return the hash algorithm
+	 */
+	public String getHashAlgorithm() {
+		return this.hashAlgorithm;
+	}
+
+	/**
+	 * Return the hashIterations
+	 *
+	 * @return hashIterations
+	 */
+	public int getHashIterations() {
+		return this.hashIterations;
+	}
+
+	/**
+	 * Return the hashKeyLength
+	 *
+	 * @return hashKeyLength
+	 */
+	public int getHashKeyLength() {
+		return this.hashKeyLength;
 	}
 
 	/**
@@ -193,10 +237,10 @@ public final class User {
 
 	/**
 	 * Returns true if this user has the specified role
-	 * 
+	 *
 	 * @param role
-	 *            the name of the {@link Role} to check for
-	 * 
+	 * 		the name of the {@link Role} to check for
+	 *
 	 * @return true if the this user has the specified role
 	 */
 	public boolean hasRole(String role) {
@@ -212,10 +256,10 @@ public final class User {
 
 	/**
 	 * Returns the property with the given key
-	 * 
+	 *
 	 * @param key
-	 *            the key for which the property is to be returned
-	 * 
+	 * 		the key for which the property is to be returned
+	 *
 	 * @return the property with the given key, or null if the property is not defined
 	 */
 	public String getProperty(String key) {
@@ -224,7 +268,7 @@ public final class User {
 
 	/**
 	 * Returns the {@link Set} of keys of all properties
-	 * 
+	 *
 	 * @return the {@link Set} of keys of all properties
 	 */
 	public Set<String> getPropertyKeySet() {
@@ -233,7 +277,7 @@ public final class User {
 
 	/**
 	 * Returns the map of properties
-	 * 
+	 *
 	 * @return the map of properties
 	 */
 	public Map<String, String> getProperties() {
@@ -250,7 +294,7 @@ public final class User {
 
 	/**
 	 * Returns a string representation of this object displaying its concrete type and its values
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@SuppressWarnings("nls")

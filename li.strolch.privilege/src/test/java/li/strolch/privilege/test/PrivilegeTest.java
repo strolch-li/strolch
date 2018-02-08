@@ -70,6 +70,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	private static final String ROLE_PRIVILEGE_ADMIN = "PrivilegeAdmin";
 	private static final String PRIVILEGE_USER_ACCESS = "UserAccessPrivilege";
 	private static final String ADMIN = "admin";
+	private static final String ADMIN2 = "admin2";
 	private static final char[] PASS_ADMIN = "admin".toCharArray();
 	private static final String BOB = "bob";
 	private static final String TED = "ted";
@@ -112,6 +113,15 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	public void testAuthenticationOk() throws Exception {
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void testAuthenticationAdmin2Ok() throws Exception {
+		try {
+			login(ADMIN2, ArraysHelper.copyOf(PASS_ADMIN));
 		} finally {
 			logout();
 		}
@@ -328,7 +338,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			UserRep selectorRep = new UserRep(null, null, null, null, null,
 					new HashSet<>(Collections.singletonList("PrivilegeAdmin")), null, null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
-			assertEquals(1, users.size());
+			assertEquals(2, users.size());
 			assertEquals(ADMIN, users.get(0).getUsername());
 
 		} finally {

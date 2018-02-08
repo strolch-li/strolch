@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,6 @@ import li.strolch.privilege.xml.*;
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.XmlHelper;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -52,23 +51,19 @@ public class XmlTest {
 	private static final String SRC_TEST = "src/test/resources/config/";
 	private static final Logger logger = LoggerFactory.getLogger(XmlTest.class);
 
-	/**
-	 * @throws Exception
-	 * 		if something goes wrong
-	 */
 	@BeforeClass
-	public static void init() throws Exception {
+	public static void init() {
 
 		cleanUp();
 
 		File tmpDir = new File("target/test");
 		if (tmpDir.exists())
 			FileHelper.deleteFile(tmpDir, false);
-		tmpDir.mkdirs();
+		if (!tmpDir.mkdirs())
+			throw new IllegalStateException("Could not create temp dir " + tmpDir.getAbsolutePath());
 	}
 
-	@AfterClass
-	public static void cleanUp() throws Exception {
+	public static void cleanUp() {
 
 		File tmpDir = new File("target/test");
 		if (!tmpDir.exists())
@@ -161,7 +156,7 @@ public class XmlTest {
 		List<User> users = xmlHandler.getUsers();
 		assertNotNull(users);
 
-		assertEquals(3, users.size());
+		assertEquals(4, users.size());
 
 		//
 		// users
@@ -319,15 +314,15 @@ public class XmlTest {
 		propertyMap.put("prop1", "value1");
 		userRoles = new HashSet<>();
 		userRoles.add("role1");
-		User user1 = new User("1", "user1", "blabla".getBytes(), "blabla".getBytes(), "Bob", "White",
-				UserState.DISABLED, userRoles, Locale.ENGLISH, propertyMap);
+		User user1 = new User("1", "user1", "blabla".getBytes(), "blabla".getBytes(), "PBKDF2WithHmacSHA512", 10000,
+				256, "Bob", "White", UserState.DISABLED, userRoles, Locale.ENGLISH, propertyMap);
 		users.add(user1);
 
 		propertyMap = new HashMap<>();
 		propertyMap.put("prop2", "value2");
 		userRoles = new HashSet<>();
 		userRoles.add("role2");
-		User user2 = new User("2", "user2", "haha".getBytes(), "haha".getBytes(), "Leonard", "Sheldon",
+		User user2 = new User("2", "user2", "haha".getBytes(), "haha".getBytes(), null, -1, -1, "Leonard", "Sheldon",
 				UserState.ENABLED, userRoles, Locale.ENGLISH, propertyMap);
 		users.add(user2);
 
