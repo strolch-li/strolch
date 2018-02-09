@@ -52,9 +52,9 @@ public class AuditingActivityMap extends AuditingElementMapFacade<Activity> impl
 
 	@Override
 	public <U> List<U> doQuery(StrolchTransaction tx, ActivityQuery<U> query) {
-		ActivityVisitor<U> activityVisitor = query.getActivityVisitor();
+		ActivityVisitor<U> activityVisitor = query.getVisitor();
 		DBC.PRE.assertNotNull("activityVisitor on query", activityVisitor);
-		query.setActivityVisitor(activity -> {
+		query.setVisitor(activity -> {
 			this.read.add(activity);
 			return activity.accept(activityVisitor);
 		});

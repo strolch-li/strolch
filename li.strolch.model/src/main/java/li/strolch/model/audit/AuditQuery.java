@@ -50,11 +50,11 @@ public class AuditQuery<U> implements StrolchQuery {
 		this.selections = new ArrayList<>();
 	}
 
-	public AuditVisitor<U> getAuditVisitor() {
+	public AuditVisitor<U> getVisitor() {
 		return this.auditVisitor;
 	}
 
-	public AuditQuery<U> setAuditVisitor(AuditVisitor<U> auditVisitor) {
+	public AuditQuery<U> setVisitor(AuditVisitor<U> auditVisitor) {
 		DBC.PRE.assertNotNull("auditVisitor", auditVisitor);
 		this.auditVisitor = auditVisitor;
 		return this;

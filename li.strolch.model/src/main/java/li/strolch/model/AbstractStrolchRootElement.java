@@ -2,8 +2,7 @@ package li.strolch.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import li.strolch.model.json.StrolchElementToJsonVisitor;
+import li.strolch.model.json.StrolchRootElementToJsonVisitor;
 import li.strolch.model.xml.StrolchElementToXmlStringVisitor;
 
 public abstract class AbstractStrolchRootElement extends GroupedParameterizedElement implements StrolchRootElement {
@@ -26,12 +25,12 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 	@Override
 	public String toJsonString() {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.toJson(this.accept(new StrolchElementToJsonVisitor()));
+		return gson.toJson(this.accept(new StrolchRootElementToJsonVisitor()));
 	}
 
 	@Override
 	public String toFlatJsonString() {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.toJson(this.accept(new StrolchElementToJsonVisitor().flat()));
+		return gson.toJson(this.accept(new StrolchRootElementToJsonVisitor().flat()));
 	}
 }

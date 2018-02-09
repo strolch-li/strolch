@@ -203,8 +203,8 @@ public class AuditingAuditMapFacade implements AuditTrail {
 
 	@Override
 	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> query) {
-		AuditVisitor<U> auditVisitor = query.getAuditVisitor();
-		query.setAuditVisitor(audit -> {
+		AuditVisitor<U> auditVisitor = query.getVisitor();
+		query.setVisitor(audit -> {
 			this.read.add(audit);
 			return auditVisitor.visitAudit(audit);
 		});

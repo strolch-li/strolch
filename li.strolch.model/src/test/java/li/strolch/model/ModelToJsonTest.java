@@ -25,14 +25,14 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.json.ActivityFromJsonVisitor;
 import li.strolch.model.json.OrderFromJsonVisitor;
 import li.strolch.model.json.ResourceFromJsonVisitor;
-import li.strolch.model.json.StrolchElementToJsonVisitor;
+import li.strolch.model.json.StrolchRootElementToJsonVisitor;
 import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
 
 public class ModelToJsonTest extends ModelMarshallingTest {
 
 	@Override
 	protected Order formatAndParseOrder(Order order) {
-		StrolchElementToJsonVisitor jsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+		StrolchRootElementToJsonVisitor jsonVisitor = new StrolchRootElementToJsonVisitor().withVersion();
 		JsonObject jsonObject = order.accept(jsonVisitor).getAsJsonObject();
 
 		Order parsedOrder = new OrderFromJsonVisitor().visit(jsonObject);
@@ -47,7 +47,7 @@ public class ModelToJsonTest extends ModelMarshallingTest {
 	@Override
 	protected Resource formatAndParseResource(Resource resource) {
 
-		StrolchElementToJsonVisitor jsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+		StrolchRootElementToJsonVisitor jsonVisitor = new StrolchRootElementToJsonVisitor().withVersion();
 		JsonObject jsonObject = resource.accept(jsonVisitor).getAsJsonObject();
 
 		Resource parsedResource = new ResourceFromJsonVisitor().visit(jsonObject);
@@ -62,7 +62,7 @@ public class ModelToJsonTest extends ModelMarshallingTest {
 	@Override
 	protected Activity formatAndParseActivity(Activity activity) {
 
-		StrolchElementToJsonVisitor jsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+		StrolchRootElementToJsonVisitor jsonVisitor = new StrolchRootElementToJsonVisitor().withVersion();
 		JsonObject jsonObject = activity.accept(jsonVisitor).getAsJsonObject();
 
 		Activity parsedActivity = new ActivityFromJsonVisitor().visit(jsonObject);

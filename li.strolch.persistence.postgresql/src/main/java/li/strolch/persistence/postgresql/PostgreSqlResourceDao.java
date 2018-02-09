@@ -15,25 +15,17 @@
  */
 package li.strolch.persistence.postgresql;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLXML;
-import java.sql.Timestamp;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
-
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.*;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
@@ -43,6 +35,8 @@ import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
 public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements ResourceDao {
@@ -241,7 +235,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 					String id = result.getString("id");
 					SQLXML sqlxml = result.getSQLXML("asxml");
 					Resource t = parseFromXml(id, queryVisitor.getType(), sqlxml);
-					list.add(t.accept(query.getResourceVisitor()));
+					list.add(t.accept(query.getVisitor()));
 				}
 			}
 		} catch (SQLException e) {

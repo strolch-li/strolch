@@ -36,7 +36,7 @@ public class InMemoryAuditQueryVisitor<U> implements AuditQueryVisitor {
 	private List<AuditSelector> selectors;
 
 	public InMemoryAuditQuery<U> toInMemory(AuditQuery<U> auditQuery) {
-		AuditVisitor<U> auditVisitor = auditQuery.getAuditVisitor();
+		AuditVisitor<U> auditVisitor = auditQuery.getVisitor();
 		DBC.PRE.assertNotNull("auditVisitor", auditVisitor); //$NON-NLS-1$
 
 		this.selectors = new ArrayList<>();

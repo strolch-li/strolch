@@ -23,7 +23,7 @@ import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.model.query.ResourceQuery;
-import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 
@@ -52,9 +52,9 @@ public class AuditingResourceMap extends AuditingElementMapFacade<Resource> impl
 
 	@Override
 	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery<U> query) {
-		StrolchElementVisitor<U> resourceVisitor = query.getResourceVisitor();
+		ResourceVisitor<U> resourceVisitor = query.getVisitor();
 		DBC.PRE.assertNotNull("resourceVisitor on query", resourceVisitor);
-		query.setResourceVisitor(resource -> {
+		query.setVisitor(resource -> {
 			this.read.add(resource);
 			return resource.accept(resourceVisitor);
 		});

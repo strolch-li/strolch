@@ -347,28 +347,28 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public <U> List<U> doQuery(OrderQuery<U> query) {
 		assertQueryAllowed(query);
-		DBC.PRE.assertNotNull("orderVisitor", query.getOrderVisitor());
+		DBC.PRE.assertNotNull("orderVisitor", query.getVisitor());
 		return getOrderMap().doQuery(this, query);
 	}
 
 	@Override
 	public <U> List<U> doQuery(ResourceQuery<U> query) {
 		assertQueryAllowed(query);
-		DBC.PRE.assertNotNull("resourceVisitor", query.getResourceVisitor());
+		DBC.PRE.assertNotNull("resourceVisitor", query.getVisitor());
 		return getResourceMap().doQuery(this, query);
 	}
 
 	@Override
 	public <U> List<U> doQuery(ActivityQuery<U> query) {
 		assertQueryAllowed(query);
-		DBC.PRE.assertNotNull("activityVisitor", query.getActivityVisitor());
+		DBC.PRE.assertNotNull("activityVisitor", query.getVisitor());
 		return getActivityMap().doQuery(this, query);
 	}
 
 	@Override
 	public <U> List<U> doQuery(AuditQuery<U> query) {
 		assertQueryAllowed(query);
-		DBC.PRE.assertNotNull("auditVisitor", query.getAuditVisitor());
+		DBC.PRE.assertNotNull("auditVisitor", query.getVisitor());
 		return getAuditTrail().doQuery(this, query);
 	}
 

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,6 @@ import li.strolch.model.Order;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
 import li.strolch.model.visitor.OrderVisitor;
-import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -30,17 +29,17 @@ import li.strolch.utils.dbc.DBC;
  * mechanism allows you to query only the values of a {@link Parameter} instead of having to return all the elements and
  * then performing this transformation.
  * </p>
- * 
+ *
  * <p>
  * The {@link OrderVisitor} is intended for situations where the query result should not be {@link Order} but some other
  * object type. For instance in a restful API, the result might have to be mapped to a POJO, thus using this method can
  * perform the mapping step for you
  * </p>
- * 
+ *
  * @param <U>
- *            defines the return type of this query. Depending on the user {@link OrderVisitor} this query can return an
- *            {@link Order}, or any type of object to which the visitor mapped the order
- * 
+ * 		defines the return type of this query. Depending on the user {@link OrderVisitor} this query can return an
+ * 		{@link Order}, or any type of object to which the visitor mapped the order
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
@@ -64,7 +63,7 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 		this.orderVisitor = identityVisitor;
 	}
 
-	public OrderVisitor<U> getOrderVisitor() {
+	public OrderVisitor<U> getVisitor() {
 		return this.orderVisitor;
 	}
 
@@ -74,15 +73,9 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 		return this;
 	}
 
-	public OrderQuery<U> setVisitor(StrolchElementVisitor<U> visitor) {
+	public OrderQuery<U> setVisitor(OrderVisitor<U> visitor) {
 		DBC.PRE.assertNotNull("visitor", visitor);
-		this.orderVisitor = visitor::visitOrder;
-		return this;
-	}
-
-	public OrderQuery<U> setOrderVisitor(OrderVisitor<U> orderVisitor) {
-		DBC.PRE.assertNotNull("orderVisitor", orderVisitor);
-		this.orderVisitor = orderVisitor;
+		this.orderVisitor = visitor;
 		return this;
 	}
 
@@ -122,7 +115,7 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 	}
 
 	public static OrderQuery<Order> query(String type) {
-		return new OrderQuery<Order>(new StrolchTypeNavigation(type));
+		return new OrderQuery<>(new StrolchTypeNavigation(type));
 	}
 
 	public static OrderQuery<Order> query(String type, StrolchQueryOrdering ordering) {
@@ -130,10 +123,10 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 	}
 
 	public static <U> OrderQuery<U> query(String type, OrderVisitor<U> orderVisitor) {
-		return new OrderQuery<U>(new StrolchTypeNavigation(type)).setOrderVisitor(orderVisitor);
+		return new OrderQuery<U>(new StrolchTypeNavigation(type)).setVisitor(orderVisitor);
 	}
 
 	public static <U> OrderQuery<U> query(String type, OrderVisitor<U> orderVisitor, StrolchQueryOrdering ordering) {
-		return new OrderQuery<U>(new StrolchTypeNavigation(type)).setOrdering(ordering);
+		return new OrderQuery<U>(new StrolchTypeNavigation(type)).setVisitor(orderVisitor).setOrdering(ordering);
 	}
 }
