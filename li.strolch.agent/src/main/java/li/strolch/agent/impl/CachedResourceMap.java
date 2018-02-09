@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,16 +26,13 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.persistence.inmemory.InMemoryResourceDao;
+import li.strolch.runtime.query.inmemory.InMemoryQuery;
+import li.strolch.runtime.query.inmemory.InMemoryResourceQueryVisitor;
 
 public class CachedResourceMap extends CachedElementMap<Resource> implements ResourceMap {
 
-	private ResourceDao cachedDao;
-
 	public CachedResourceMap(StrolchRealm realm) {
 		super(realm);
-		// the cached DAO should not have versioning enabled
-		this.cachedDao = new InMemoryResourceDao(false);
 	}
 
 	@Override
@@ -49,12 +46,9 @@ public class CachedResourceMap extends CachedElementMap<Resource> implements Res
 	}
 
 	@Override
-	public ResourceDao getCachedDao() {
-		return this.cachedDao;
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery<U> query) {
-		return getCachedDao().doQuery(query);
+	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery<U> resourceQuery) {
+		InMemoryResourceQueryVisitor visitor = new InMemoryResourceQueryVisitor();
+		InMemoryQuery<Resource, U> query = visitor.visit(resourceQuery);
+		return query.doQuery(tx, this);
 	}
 }

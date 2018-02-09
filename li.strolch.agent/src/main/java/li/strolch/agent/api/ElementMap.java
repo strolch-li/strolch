@@ -444,7 +444,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * <p>
 	 * <b>Note:</b> This method should only be used in the same transaction where the element was created to undo a
 	 * change in the same transaction. If there is a requirement to revert to a previous version, then the
-	 * {@link #revertToVersion(StrolchTransaction, StrolchRootElement)} method.
+	 * {@link #revertToVersion(StrolchTransaction, StrolchRootElement)} method should be used.
 	 * </p>
 	 *
 	 * @param tx

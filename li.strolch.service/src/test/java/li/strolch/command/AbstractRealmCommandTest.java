@@ -15,22 +15,12 @@
  */
 package li.strolch.command;
 
-import static li.strolch.service.test.AbstractRealmServiceTest.CONFIG_SRC;
-import static li.strolch.service.test.AbstractRealmServiceTest.REALM_CACHED;
-import static li.strolch.service.test.AbstractRealmServiceTest.REALM_TRANSACTIONAL;
-import static li.strolch.service.test.AbstractRealmServiceTest.REALM_TRANSIENT;
-import static li.strolch.service.test.AbstractRealmServiceTest.RUNTIME_PATH;
-import static li.strolch.service.test.AbstractRealmServiceTest.dropSchema;
-import static li.strolch.service.test.AbstractRealmServiceTest.importFromXml;
+import static li.strolch.service.test.AbstractRealmServiceTest.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
@@ -39,6 +29,9 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.service.api.Command;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -57,7 +50,6 @@ public abstract class AbstractRealmCommandTest {
 	public void beforeClass() throws Exception {
 
 		dropSchema("jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
-		dropSchema("jdbc:postgresql://localhost/transactionaluserdb", "transactionaluser", "test");
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
@@ -67,7 +59,6 @@ public abstract class AbstractRealmCommandTest {
 
 		certificate = runtimeMock.getPrivilegeHandler().authenticate(getUsername(), getUsername().toCharArray());
 		importFromXml(REALM_CACHED, certificate, getServiceHandler());
-		importFromXml(REALM_TRANSACTIONAL, certificate, getServiceHandler());
 	}
 
 	@After
@@ -129,12 +120,6 @@ public abstract class AbstractRealmCommandTest {
 	public void shouldDoCommandCached() {
 		doCommandAsFail(REALM_CACHED);
 		doCommand(REALM_CACHED);
-	}
-
-	@Test
-	public void shouldDoCommandTransactional() {
-		doCommandAsFail(REALM_TRANSACTIONAL);
-		doCommand(REALM_TRANSACTIONAL);
 	}
 
 	private class FailCommandFacade extends Command {

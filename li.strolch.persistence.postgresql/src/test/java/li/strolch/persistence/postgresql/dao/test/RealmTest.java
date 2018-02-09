@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -86,10 +86,10 @@ public class RealmTest extends AbstractModelTest {
 
 		{
 			StrolchRealm firstRealm = runtimeMock.getRealm(FIRST);
-			assertEquals(DataStoreMode.TRANSACTIONAL, firstRealm.getMode());
+			assertEquals(DataStoreMode.CACHED, firstRealm.getMode());
 			Resource expectedRes1 = ModelGenerator.createResource(expectedId1, "Bla bla", type); //$NON-NLS-1$
 			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST)) {
-				tx.getResourceMap().add(tx, expectedRes1);
+				tx.add(expectedRes1);
 				tx.commitOnClose();
 			}
 
@@ -101,10 +101,10 @@ public class RealmTest extends AbstractModelTest {
 
 		{
 			StrolchRealm secondRealm = runtimeMock.getRealm(SECOND);
-			assertEquals(DataStoreMode.TRANSACTIONAL, secondRealm.getMode());
+			assertEquals(DataStoreMode.CACHED, secondRealm.getMode());
 			Resource expectedRes2 = ModelGenerator.createResource(expectedId2, "Bla bla", type); //$NON-NLS-1$
 			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
-				tx.getResourceMap().add(tx, expectedRes2);
+				tx.add(expectedRes2);
 				tx.commitOnClose();
 			}
 

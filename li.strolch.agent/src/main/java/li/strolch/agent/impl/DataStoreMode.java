@@ -54,17 +54,6 @@ public enum DataStoreMode {
 		public InternalStrolchRealm createRealm(String realm) {
 			return new CachedRealm(realm);
 		}
-	}, //
-	TRANSACTIONAL {
-		@Override
-		public boolean isTransient() {
-			return false;
-		}
-
-		@Override
-		public InternalStrolchRealm createRealm(String realm) {
-			return new TransactionalRealm(realm);
-		}
 	}; //
 
 	public abstract InternalStrolchRealm createRealm(String realm);

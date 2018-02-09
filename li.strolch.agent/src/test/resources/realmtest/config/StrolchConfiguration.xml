@@ -17,26 +17,19 @@
 			</Properties>
 		</Component>
 		<Component>
-			<name>PersistenceHandler</name>
-			<api>li.strolch.persistence.api.PersistenceHandler</api>
-			<impl>li.strolch.runtime.query.inmemory.InMemoryPersistenceHandler</impl>
-		</Component>
-		<Component>
 			<name>RealmHandler</name>
 			<api>li.strolch.agent.api.RealmHandler</api>
 			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
 			<depends>PrivilegeHandler</depends>
-			<depends>PersistenceHandler</depends>
 			<Properties>
-				<realms>defaultRealm, myRealm, otherRealm, cachedRealm, transactionalRealm, emptyRealm</realms>
+				<realms>defaultRealm, myRealm, otherRealm, emptyRealm</realms>
 				<dataStoreMode>TRANSIENT</dataStoreMode>
 				<dataStoreFile>DefaultRealm.xml</dataStoreFile>
+				<enableAuditTrail>true</enableAuditTrail>
 				<dataStoreMode.myRealm>TRANSIENT</dataStoreMode.myRealm>
 				<dataStoreFile.myRealm>MyRealm.xml</dataStoreFile.myRealm>
 				<dataStoreMode.otherRealm>TRANSIENT</dataStoreMode.otherRealm>
 				<dataStoreFile.otherRealm>OtherRealm.xml</dataStoreFile.otherRealm>
-				<dataStoreMode.transactionalRealm>TRANSACTIONAL</dataStoreMode.transactionalRealm>
-				<dataStoreMode.cachedRealm>CACHED</dataStoreMode.cachedRealm>
 				<dataStoreMode.emptyRealm>EMPTY</dataStoreMode.emptyRealm>
 			</Properties>
 		</Component>

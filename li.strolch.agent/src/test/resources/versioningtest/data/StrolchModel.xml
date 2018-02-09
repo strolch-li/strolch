@@ -25,5 +25,6 @@
 
 	<IncludeFile file="Resources.xml" />
 	<IncludeFile file="Orders.xml" />
+	<IncludeFile file="Activities.xml" />
 
 </StrolchModel>

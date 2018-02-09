@@ -52,7 +52,6 @@ public abstract class AbstractRealmServiceTest {
 
 	public static final String REALM_CACHED = "svcCached";
 	public static final String REALM_CACHED_AUDITS_VERSIONING = "svcCachedAuditsVersioning";
-	public static final String REALM_TRANSACTIONAL = "svcTransactional";
 	public static final String REALM_TRANSIENT = "svcTransient";
 	public static final String RUNTIME_PATH = "target/svcTestRuntime/"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/test/resources/svctest"; //$NON-NLS-1$
@@ -70,7 +69,6 @@ public abstract class AbstractRealmServiceTest {
 	public void before() throws Exception {
 
 		dropSchema("jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
-		dropSchema("jdbc:postgresql://localhost/transactionaluserdb", "transactionaluser", "test");
 		dropSchema("jdbc:postgresql://localhost/cacheduserauditsversioningdb", "cacheduserauditsversioning", "test");
 
 		File rootPath = new File(RUNTIME_PATH);
@@ -81,7 +79,6 @@ public abstract class AbstractRealmServiceTest {
 
 		this.certificate = runtimeMock.getPrivilegeHandler().authenticate(getUsername(), getUsername().toCharArray());
 		importFromXml(REALM_CACHED, this.certificate, getServiceHandler());
-		importFromXml(REALM_TRANSACTIONAL, this.certificate, getServiceHandler());
 		importFromXml(REALM_CACHED_AUDITS_VERSIONING, this.certificate, getServiceHandler());
 	}
 
@@ -166,21 +163,9 @@ public abstract class AbstractRealmServiceTest {
 			runTransient(constructor.newInstance(), expectedServiceResultType, arg, before, validator, after);
 			runCached(constructor.newInstance(), expectedServiceResultType, arg, before, validator, after);
 			runCachedWithAuditsAndVersioning(constructor.newInstance(), expectedServiceResultType, arg, before, validator, after);
-			runTransactional(constructor.newInstance(), expectedServiceResultType, arg, before, validator, after);
 		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException("Failed to instantiate class " + svcClass.getName() + ": " + e.getMessage(), e);
 		}
-	}
-
-	protected <T extends ServiceArgument, U extends ServiceResult> void runTransactional(Service<T, U> svc,
-			Class<?> expectedServiceResultType, T arg) {
-		runTransactional(svc, expectedServiceResultType, arg, null, null, null);
-	}
-
-	protected <T extends ServiceArgument, U extends ServiceResult> void runTransactional(Service<T, U> svc,
-			Class<?> expectedServiceResultType, T arg, Runner before, Runner validator, Runner after) {
-		doService(REALM_TRANSACTIONAL, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before,
-				validator, after);
 	}
 
 	protected <T extends ServiceArgument, U extends ServiceResult> void runCached(Service<T, U> svc,

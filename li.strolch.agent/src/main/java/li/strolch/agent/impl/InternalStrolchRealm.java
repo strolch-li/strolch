@@ -56,6 +56,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	private boolean versioningEnabled;
 	private boolean updateObservers;
 	private ObserverHandler observerHandler;
+	protected ComponentContainer container;
 
 	public InternalStrolchRealm(String realm) {
 		DBC.PRE.assertNotEmpty("RealmName may not be empty!", realm); //$NON-NLS-1$
@@ -84,6 +85,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	}
 
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
+		this.container = container;
 
 		logger.info("Initializing Realm " + getRealm() + "...");
 

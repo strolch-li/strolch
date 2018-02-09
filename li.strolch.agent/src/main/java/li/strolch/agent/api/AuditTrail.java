@@ -56,9 +56,9 @@ public interface AuditTrail {
 
 	public void addAll(StrolchTransaction tx, List<Audit> audits);
 
-	public Audit update(StrolchTransaction tx, Audit audit);
+	public void update(StrolchTransaction tx, Audit audit);
 
-	public List<Audit> updateAll(StrolchTransaction tx, List<Audit> audits);
+	public void updateAll(StrolchTransaction tx, List<Audit> audits);
 
 	public void remove(StrolchTransaction tx, Audit audit);
 

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ import li.strolch.agent.impl.DataStoreMode;
 public class RealmTest {
 
 	@Test
-	public void shouldStartRealmTestContainer() {
+	public void shouldStartRealmTestContainer() throws Exception {
 
 		try {
 			RuntimeMock.runInStrolch(PATH_REALM_RUNTIME, PATH_REALM_CONTAINER, agent -> {
@@ -46,17 +46,15 @@ public class RealmTest {
 
 				ComponentContainer container = agent.getContainer();
 				Set<String> realmNames = container.getRealmNames();
-				assertEquals(6, realmNames.size());
+				assertEquals(4, realmNames.size());
 
-				Set<String> expectedRealmNames = new HashSet<>(Arrays.asList("defaultRealm", "myRealm", "otherRealm",
-						"cachedRealm", "transactionalRealm", "emptyRealm"));
+				Set<String> expectedRealmNames = new HashSet<>(
+						Arrays.asList("defaultRealm", "myRealm", "otherRealm", "emptyRealm"));
 				assertEquals(expectedRealmNames, realmNames);
 
 				assertEquals(DataStoreMode.TRANSIENT, container.getRealm("defaultRealm").getMode());
 				assertEquals(DataStoreMode.TRANSIENT, container.getRealm("myRealm").getMode());
 				assertEquals(DataStoreMode.TRANSIENT, container.getRealm("otherRealm").getMode());
-				assertEquals(DataStoreMode.CACHED, container.getRealm("cachedRealm").getMode());
-				assertEquals(DataStoreMode.TRANSACTIONAL, container.getRealm("transactionalRealm").getMode());
 				assertEquals(DataStoreMode.EMPTY, container.getRealm("emptyRealm").getMode());
 			});
 		} catch (Exception e) {

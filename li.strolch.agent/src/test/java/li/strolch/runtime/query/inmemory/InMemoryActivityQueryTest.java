@@ -1,12 +1,7 @@
 package li.strolch.runtime.query.inmemory;
 
-import static li.strolch.model.query.ParameterSelection.booleanSelection;
-import static li.strolch.model.query.ParameterSelection.floatListSelection;
-import static li.strolch.model.query.ParameterSelection.floatSelection;
-import static li.strolch.model.query.ParameterSelection.integerListSelection;
-import static li.strolch.model.query.ParameterSelection.longListSelection;
-import static li.strolch.model.query.ParameterSelection.stringListSelection;
-import static li.strolch.model.query.ParameterSelection.stringSelection;
+import static li.strolch.agent.ComponentContainerTest.PATH_EMPTY_CONTAINER;
+import static li.strolch.model.query.ParameterSelection.*;
 import static li.strolch.utils.StringMatchMode.ci;
 import static li.strolch.utils.StringMatchMode.es;
 import static org.junit.Assert.assertEquals;
@@ -15,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
-
+import li.strolch.RuntimeMock;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.State;
@@ -24,268 +19,281 @@ import li.strolch.model.Version;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
-import li.strolch.model.parameter.BooleanParameter;
-import li.strolch.model.parameter.FloatListParameter;
-import li.strolch.model.parameter.FloatParameter;
-import li.strolch.model.parameter.IntegerListParameter;
-import li.strolch.model.parameter.LongListParameter;
-import li.strolch.model.parameter.StringListParameter;
-import li.strolch.model.parameter.StringParameter;
-import li.strolch.model.query.ActivityQuery;
-import li.strolch.model.query.ActivityStateSelection;
-import li.strolch.model.query.IdSelection;
-import li.strolch.model.query.NameSelection;
-import li.strolch.model.query.ParameterSelection;
-import li.strolch.persistence.inmemory.InMemoryActivityDao;
+import li.strolch.model.parameter.*;
+import li.strolch.model.query.*;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.runtime.StrolchConstants;
+import li.strolch.runtime.privilege.PrivilegeHandler;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class InMemoryActivityQueryTest {
 
-	protected InMemoryActivityDao daoInstance() {
-		return new InMemoryActivityDao(false);
+	public static final String PATH_RUNTIME = "target/" + InMemoryActivityQueryTest.class.getSimpleName();
+	private static RuntimeMock runtimeMock;
+	private static Certificate certificate;
+
+	private static Certificate login(StrolchAgent agent) {
+		PrivilegeHandler privilegeHandler = agent.getContainer().getPrivilegeHandler();
+		return privilegeHandler.authenticate("test", "test".toCharArray());
+	}
+
+	@BeforeClass
+	public static void beforeClass() {
+		runtimeMock = new RuntimeMock(PATH_RUNTIME, PATH_EMPTY_CONTAINER);
+		runtimeMock.mockRuntime();
+		runtimeMock.startContainer();
+
+		certificate = login(runtimeMock.getAgent());
+
+		try (StrolchTransaction tx = openTx()) {
+			getActivities().forEach(tx::add);
+			tx.add(getBallActivity());
+			tx.commitOnClose();
+		}
+	}
+
+	private static StrolchTransaction openTx() {
+		return runtimeMock.getAgent().getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
+				.openTx(certificate, "test");
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		if (runtimeMock != null)
+			runtimeMock.close();
 	}
 
 	@Test
 	public void shouldQueryById() {
 
-		List<Activity> activitys = getActivities();
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activitys);
+		try (StrolchTransaction tx = openTx()) {
 
-		ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType1");
-		activityQuery.with(new IdSelection("@1"));
+			ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType1");
+			activityQuery.with(new IdSelection("@1"));
 
-		List<Activity> result = dao.doQuery(activityQuery);
-		assertEquals(1, result.size());
-		assertEquals("@1", result.get(0).getId());
+			List<Activity> result = tx.doQuery(activityQuery);
+			assertEquals(1, result.size());
+			assertEquals("@1", result.get(0).getId());
+		}
 	}
 
 	@Test
 	public void shouldQueryByIdOr() {
 
-		List<Activity> activitys = getActivities();
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activitys);
+		try (StrolchTransaction tx = openTx()) {
 
-		ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType2");
-		activityQuery.or().with(new IdSelection("@3"), new IdSelection("@4"));
+			ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType2");
+			activityQuery.or().with(new IdSelection("@3"), new IdSelection("@4"));
 
-		List<Activity> result = dao.doQuery(activityQuery);
-		assertEquals(2, result.size());
-		assertEquals("@3", result.get(0).getId());
-		assertEquals("@4", result.get(1).getId());
+			List<Activity> result = tx.doQuery(activityQuery);
+			assertEquals(2, result.size());
+			assertEquals("@3", result.get(0).getId());
+			assertEquals("@4", result.get(1).getId());
+		}
 	}
 
 	@Test
 	public void shouldQueryByIdAnd() {
 
-		List<Activity> activitys = getActivities();
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activitys);
+		try (StrolchTransaction tx = openTx()) {
 
-		ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType2");
-		activityQuery.and().with(new IdSelection("@3"), new NameSelection("Activity 3", es()));
+			ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType2");
+			activityQuery.and().with(new IdSelection("@3"), new NameSelection("Activity 3", es()));
 
-		List<Activity> result = dao.doQuery(activityQuery);
-		assertEquals(1, result.size());
-		assertEquals("@3", result.get(0).getId());
+			List<Activity> result = tx.doQuery(activityQuery);
+			assertEquals(1, result.size());
+			assertEquals("@3", result.get(0).getId());
+		}
 	}
 
 	@Test
 	public void shouldNotQueryByIdAnd() {
 
-		List<Activity> activitys = getActivities();
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activitys);
+		try (StrolchTransaction tx = openTx()) {
 
-		ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType1");
-		activityQuery.and().with(new IdSelection("@3"), new NameSelection("@4", es()));
+			ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType1");
+			activityQuery.and().with(new IdSelection("@3"), new NameSelection("@4", es()));
 
-		List<Activity> result = dao.doQuery(activityQuery);
-		assertEquals(0, result.size());
+			List<Activity> result = tx.doQuery(activityQuery);
+			assertEquals(0, result.size());
+		}
 	}
 
 	@Test
 	public void shouldQueryByParameter() {
 
-		List<Activity> activitys = getActivities();
-		activitys.add(getBallActivity());
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activitys);
+		try (StrolchTransaction tx = openTx()) {
 
-		ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
-		ballQuery.and().with(
-				//
-				stringSelection("parameters", "color", "red", es()),
-				booleanSelection("parameters", "forChildren", true), floatSelection("parameters", "diameter", 22.0));
+			ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
+			ballQuery.and().with(
+					//
+					stringSelection("parameters", "color", "red", es()),
+					booleanSelection("parameters", "forChildren", true),
+					floatSelection("parameters", "diameter", 22.0));
 
-		List<Activity> result = dao.doQuery(ballQuery);
-		assertEquals(1, result.size());
+			List<Activity> result = tx.doQuery(ballQuery);
+			assertEquals(1, result.size());
+		}
 	}
 
 	@Test
 	public void shouldQueryByListParameter() {
 
-		List<Activity> activitys = getActivities();
-		activitys.add(getBallActivity());
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activitys);
+		try (StrolchTransaction tx = openTx()) {
 
-		ActivityQuery<Activity> ballQuery;
-		List<Activity> result;
+			ActivityQuery<Activity> ballQuery;
+			List<Activity> result;
 
-		// string list
-		{
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("a", "z")));
-			result = dao.doQuery(ballQuery);
-			assertEquals(0, result.size());
+			// string list
+			{
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("a", "z")));
+				result = tx.doQuery(ballQuery);
+				assertEquals(0, result.size());
 
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("a")));
-			result = dao.doQuery(ballQuery);
-			assertEquals(1, result.size());
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("a")));
+				result = tx.doQuery(ballQuery);
+				assertEquals(1, result.size());
 
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("c", "b", "a")));
-			result = dao.doQuery(ballQuery);
-			assertEquals(1, result.size());
-		}
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and()
+						.with(stringListSelection("parameters", "stringListValues", Arrays.asList("c", "b", "a")));
+				result = tx.doQuery(ballQuery);
+				assertEquals(1, result.size());
+			}
 
-		// integer list
-		{
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(1, 5)));
-			result = dao.doQuery(ballQuery);
-			assertEquals(0, result.size());
+			// integer list
+			{
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(1, 5)));
+				result = tx.doQuery(ballQuery);
+				assertEquals(0, result.size());
 
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(1)));
-			result = dao.doQuery(ballQuery);
-			assertEquals(1, result.size());
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(1)));
+				result = tx.doQuery(ballQuery);
+				assertEquals(1, result.size());
 
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(3, 2, 1)));
-			result = dao.doQuery(ballQuery);
-			assertEquals(1, result.size());
-		}
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(3, 2, 1)));
+				result = tx.doQuery(ballQuery);
+				assertEquals(1, result.size());
+			}
 
-		// float list
-		{
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(4.0, 8.0)));
-			result = dao.doQuery(ballQuery);
-			assertEquals(0, result.size());
+			// float list
+			{
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(4.0, 8.0)));
+				result = tx.doQuery(ballQuery);
+				assertEquals(0, result.size());
 
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(4.0)));
-			result = dao.doQuery(ballQuery);
-			assertEquals(1, result.size());
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(4.0)));
+				result = tx.doQuery(ballQuery);
+				assertEquals(1, result.size());
 
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(6.2, 5.1, 4.0)));
-			result = dao.doQuery(ballQuery);
-			assertEquals(1, result.size());
-		}
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(6.2, 5.1, 4.0)));
+				result = tx.doQuery(ballQuery);
+				assertEquals(1, result.size());
+			}
 
-		// long list
-		{
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(8L, 11L)));
-			result = dao.doQuery(ballQuery);
-			assertEquals(0, result.size());
+			// long list
+			{
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(8L, 11L)));
+				result = tx.doQuery(ballQuery);
+				assertEquals(0, result.size());
 
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(8L)));
-			result = dao.doQuery(ballQuery);
-			assertEquals(1, result.size());
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(8L)));
+				result = tx.doQuery(ballQuery);
+				assertEquals(1, result.size());
 
-			ballQuery = ActivityQuery.query("Ball");
-			ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(10L, 9L, 8L)));
-			result = dao.doQuery(ballQuery);
-			assertEquals(1, result.size());
+				ballQuery = ActivityQuery.query("Ball");
+				ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(10L, 9L, 8L)));
+				result = tx.doQuery(ballQuery);
+				assertEquals(1, result.size());
+			}
 		}
 	}
 
 	@Test
 	public void shouldQueryByNullParameter1() {
-		List<Activity> activitys = getActivities();
-		activitys.add(getBallActivity());
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activitys);
 
-		ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
-		ballQuery.and().with( //
-				ParameterSelection.nullSelection("parameters", "color"));
+		try (StrolchTransaction tx = openTx()) {
 
-		List<Activity> result = dao.doQuery(ballQuery);
-		assertEquals(0, result.size());
+			ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
+			ballQuery.and().with( //
+					ParameterSelection.nullSelection("parameters", "color"));
+
+			List<Activity> result = tx.doQuery(ballQuery);
+			assertEquals(0, result.size());
+		}
 	}
 
 	@Test
 	public void shouldQueryByNullParameter2() {
-		List<Activity> activitys = getActivities();
-		activitys.add(getBallActivity());
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activitys);
+		try (StrolchTransaction tx = openTx()) {
 
-		ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
-		ballQuery.and().with( //
-				ParameterSelection.nullSelection("parameters", "weight"));
+			ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
+			ballQuery.and().with( //
+					ParameterSelection.nullSelection("parameters", "weight"));
 
-		List<Activity> result = dao.doQuery(ballQuery);
-		assertEquals(1, result.size());
+			List<Activity> result = tx.doQuery(ballQuery);
+			assertEquals(1, result.size());
+		}
 	}
 
 	@Test
 	public void shouldQueryByNullParameter3() {
-		List<Activity> activitys = getActivities();
-		activitys.add(getBallActivity());
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activitys);
+		try (StrolchTransaction tx = openTx()) {
 
-		ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
-		ballQuery.and().with( //
-				ParameterSelection.nullSelection("parameters", "weight"));
+			ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
+			ballQuery.and().with( //
+					ParameterSelection.nullSelection("parameters", "weight"));
 
-		List<Activity> result = dao.doQuery(ballQuery);
-		assertEquals(1, result.size());
+			List<Activity> result = tx.doQuery(ballQuery);
+			assertEquals(1, result.size());
+		}
 	}
 
 	@Test
 	public void shouldQueryByName() {
 
-		List<Activity> activities = getActivities();
-		activities.add(getBallActivity());
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activities);
+		try (StrolchTransaction tx = openTx()) {
 
-		ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
-		ballQuery.with(new NameSelection("ball ", ci()));
+			ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
+			ballQuery.with(new NameSelection("ball ", ci()));
 
-		List<Activity> result = dao.doQuery(ballQuery);
-		assertEquals(1, result.size());
+			List<Activity> result = tx.doQuery(ballQuery);
+			assertEquals(1, result.size());
+		}
 	}
 
 	@Test
 	public void shouldQueryByState() {
 
-		List<Activity> activities = getActivities();
-		InMemoryActivityDao dao = daoInstance();
-		dao.saveAll(activities);
+		try (StrolchTransaction tx = openTx()) {
 
-		ActivityQuery<Activity> ballQuery = ActivityQuery.query("MyType1");
-		ballQuery.with(new ActivityStateSelection(State.STOPPED));
+			ActivityQuery<Activity> ballQuery = ActivityQuery.query("MyType1");
+			ballQuery.with(new ActivityStateSelection(State.STOPPED));
 
-		List<Activity> result = dao.doQuery(ballQuery);
-		assertEquals(2, result.size());
+			List<Activity> result = tx.doQuery(ballQuery);
+			assertEquals(2, result.size());
 
-		ballQuery = ActivityQuery.query("MyType2");
-		ballQuery.with(new ActivityStateSelection(State.STOPPED));
-		result = dao.doQuery(ballQuery);
-		assertEquals(1, result.size());
+			ballQuery = ActivityQuery.query("MyType2");
+			ballQuery.with(new ActivityStateSelection(State.STOPPED));
+			result = tx.doQuery(ballQuery);
+			assertEquals(1, result.size());
+		}
 	}
 
-	private Activity getBallActivity() {
+	private static Activity getBallActivity() {
 		Activity res1 = new Activity("childrensBall", "Ball 1", "Ball", TimeOrdering.SERIES);
 		Version.setInitialVersionFor(res1, -1, "test");
 		ParameterBag bag = new ParameterBag("parameters", "Ball Details", "Parameters");
@@ -302,7 +310,7 @@ public class InMemoryActivityQueryTest {
 		return res1;
 	}
 
-	private List<Activity> getActivities() {
+	private static List<Activity> getActivities() {
 
 		Activity activity1 = ModelGenerator.createActivity("@1", "Activity 1", "MyType1", TimeOrdering.SERIES);
 		((Action) activity1.getElement("action_" + activity1.getId())).setState(State.STOPPED);
@@ -322,18 +330,18 @@ public class InMemoryActivityQueryTest {
 		Activity activity6 = ModelGenerator.createActivity("@6", "Activity 6", "MyType3", TimeOrdering.SERIES);
 		((Action) activity6.getElement("action_" + activity6.getId())).setState(State.CLOSED);
 
-		List<Activity> activitys = new ArrayList<>();
-		activitys.add(activity1);
-		activitys.add(activity2);
-		activitys.add(activity3);
-		activitys.add(activity4);
-		activitys.add(activity5);
-		activitys.add(activity6);
+		List<Activity> activities = new ArrayList<>();
+		activities.add(activity1);
+		activities.add(activity2);
+		activities.add(activity3);
+		activities.add(activity4);
+		activities.add(activity5);
+		activities.add(activity6);
 
-		for (Activity activity : activitys) {
+		for (Activity activity : activities) {
 			Version.setInitialVersionFor(activity, -1, "test");
 		}
 
-		return activitys;
+		return activities;
 	}
 }
