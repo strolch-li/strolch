@@ -76,7 +76,7 @@ public class OrderQuery<U> extends StrolchElementQuery<OrderQueryVisitor> {
 
 	public OrderQuery<U> setVisitor(StrolchElementVisitor<U> visitor) {
 		DBC.PRE.assertNotNull("visitor", visitor);
-		this.orderVisitor = visitor.asOrderVisitor();
+		this.orderVisitor = visitor::visitOrder;
 		return this;
 	}
 

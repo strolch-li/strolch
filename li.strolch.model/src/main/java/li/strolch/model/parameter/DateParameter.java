@@ -18,7 +18,7 @@ package li.strolch.model.parameter;
 import java.util.Date;
 
 import li.strolch.model.StrolchValueType;
-import li.strolch.model.visitor.ParameterVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
@@ -105,7 +105,7 @@ public class DateParameter extends AbstractParameter<Date> {
 	}
 
 	@Override
-	public <U> U accept(ParameterVisitor visitor) {
+	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitDateParam(this);
 	}
 

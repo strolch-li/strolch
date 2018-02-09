@@ -20,7 +20,7 @@ import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.model.visitor.IActivityElementVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 
 /**
  * Marker for all child elements of {@link Activity} objects
@@ -97,5 +97,5 @@ public interface IActivityElement extends StrolchElement {
 	 * 
 	 * @return the result of the visitor being accepted
 	 */
-	public <T> T accept(IActivityElementVisitor<T> visitor);
+	public <T> T accept(StrolchElementVisitor<T> visitor);
 }

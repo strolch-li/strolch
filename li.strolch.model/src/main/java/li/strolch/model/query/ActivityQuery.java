@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,17 +30,17 @@ import li.strolch.utils.dbc.DBC;
  * mechanism allows you to query e.g. a specific {@link Action} instead of having to return all the elements and then
  * performing this transformation.
  * </p>
- * 
+ *
  * <p>
  * The {@link ActivityVisitor} is intended for situations where the query result should not be {@link Activity} but some
  * other object type. For instance in a restful API, the result might have to be mapped to a POJO, thus using this
  * method can perform the mapping step for you
  * </p>
- * 
+ *
  * @param <U>
- *            defines the return type of this query. Depending on the user {@link ActivityVisitor} this query can return
- *            an {@link Activity}, or any type of object to which the visitor mapped the activity
- * 
+ * 		defines the return type of this query. Depending on the user {@link ActivityVisitor} this query can return
+ * 		an {@link Activity}, or any type of object to which the visitor mapped the activity
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ActivityQuery<U> extends StrolchElementQuery<ActivityQueryVisitor> {
@@ -76,7 +76,7 @@ public class ActivityQuery<U> extends StrolchElementQuery<ActivityQueryVisitor> 
 
 	public ActivityQuery<U> setVisitor(StrolchElementVisitor<U> visitor) {
 		DBC.PRE.assertNotNull("visitor", visitor);
-		this.activityVisitor = visitor.asActivityVisitor();
+		this.activityVisitor = visitor::visitActivity;
 		return this;
 	}
 

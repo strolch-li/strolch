@@ -17,27 +17,18 @@
 package li.strolch.model.activity;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
-import li.strolch.model.GroupedParameterizedElement;
-import li.strolch.model.Locator;
+import li.strolch.model.*;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.PolicyContainer;
-import li.strolch.model.Resource;
-import li.strolch.model.State;
-import li.strolch.model.Tags;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-import li.strolch.model.visitor.IActivityElementVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 
 /**
  * An {@link Action} represents a single step within an {@link Activity}, that is, one that is not further decomposed
@@ -315,7 +306,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
-	public <T> T accept(IActivityElementVisitor<T> visitor) {
+	public <T> T accept(StrolchElementVisitor<T> visitor) {
 		return visitor.visitAction(this);
 	}
 }

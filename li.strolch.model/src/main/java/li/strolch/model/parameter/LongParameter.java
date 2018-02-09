@@ -16,7 +16,7 @@
 package li.strolch.model.parameter;
 
 import li.strolch.model.StrolchValueType;
-import li.strolch.model.visitor.ParameterVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -102,7 +102,7 @@ public class LongParameter extends AbstractParameter<Long> {
 	}
 
 	@Override
-	public <U> U accept(ParameterVisitor visitor) {
+	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitLongParam(this);
 	}
 

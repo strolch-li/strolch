@@ -17,6 +17,8 @@ package li.strolch.model;
 
 import java.io.Serializable;
 
+import li.strolch.model.visitor.StrolchElementVisitor;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -143,4 +145,6 @@ public interface StrolchElement extends Serializable {
 	 */
 	@Override
 	public boolean equals(Object obj);
+
+	public <U> U accept(StrolchElementVisitor<U> visitor);
 }

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,6 @@ package li.strolch.model.parameter;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchModelConstants;
-import li.strolch.model.visitor.ParameterVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -27,29 +26,29 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 
 	/**
 	 * Returns the value of the parameter as string
-	 * 
+	 *
 	 * @return the value as string
 	 */
 	public String getValueAsString();
 
 	/**
 	 * Set the value of the parameter from a string
-	 * 
+	 *
 	 * @param valueAsString
-	 *            the string from which to set the value
+	 * 		the string from which to set the value
 	 */
 	public void setValueFromString(String valueAsString);
 
 	/**
 	 * the value of the parameter
-	 * 
+	 *
 	 * @return
 	 */
 	public <U extends T> U getValue();
 
 	/**
 	 * the value of the parameter
-	 * 
+	 *
 	 * @param value
 	 */
 	public void setValue(T value);
@@ -61,50 +60,50 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 
 	/**
 	 * @return true if the value is empty, i.e. if the value is the same as the value which would be set if
-	 *         {@link #clear()} was called
+	 * {@link #clear()} was called
 	 */
 	public boolean isEmpty();
 
 	/**
 	 * get the hidden attribute
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isHidden();
 
 	/**
 	 * set the hidden attribute
-	 * 
+	 *
 	 * @param hidden
 	 */
 	public void setHidden(boolean hidden);
 
 	/**
 	 * Get the UOM of this {@link Parameter}
-	 * 
+	 *
 	 * @return
 	 */
 	public String getUom();
 
 	/**
 	 * Set the UOM of this {@link Parameter}
-	 * 
+	 *
 	 * @param uom
 	 */
 	public void setUom(String uom);
 
 	/**
 	 * Returns the index of this {@link Parameter}. This can be used to sort the parameters in a UI
-	 * 
+	 *
 	 * @return the index of this {@link Parameter}. This can be used to sort the parameters in a UI
 	 */
 	public int getIndex();
 
 	/**
 	 * Set the index of this {@link Parameter}. This can be used to sort the parameters in a UI
-	 * 
+	 *
 	 * @param index
-	 *            the index to set
+	 * 		the index to set
 	 */
 	public void setIndex(int index);
 
@@ -116,7 +115,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_ORDER_REF}</li>
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
-	 * 
+	 *
 	 * @return string value
 	 */
 	public String getInterpretation();
@@ -129,14 +128,14 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_ORDER_REF}</li>
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param interpretation
 	 */
 	public void setInterpretation(String interpretation);
 
 	/**
 	 * The {@link ParameterizedElement} parent to which this {@link Parameter} belongs
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -158,6 +157,4 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 
 	@Override
 	public Parameter<T> getClone();
-
-	public <U> U accept(ParameterVisitor visitor);
 }

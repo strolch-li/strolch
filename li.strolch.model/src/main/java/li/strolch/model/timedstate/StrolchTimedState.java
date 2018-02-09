@@ -23,7 +23,6 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-import li.strolch.model.visitor.TimedStateVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -124,6 +123,4 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 
 	@Override
 	public StrolchTimedState<T> getClone();
-
-	public <U> U accept(TimedStateVisitor visitor);
 }

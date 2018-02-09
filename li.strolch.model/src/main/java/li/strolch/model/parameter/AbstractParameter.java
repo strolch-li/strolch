@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,13 +26,12 @@ import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.StrolchRootElement;
-import li.strolch.model.visitor.ParameterVisitor;
 import li.strolch.utils.helper.StringHelper;
 
 /**
- * @author Robert von Burg <eitch@eitchnet.ch>
- *
  * @param <T>
+ *
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class AbstractParameter<T> extends AbstractStrolchElement implements Parameter<T> {
 
@@ -148,10 +147,10 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 * Validates that the value is legal. This is the case when it is not null in this implementation
 	 *
 	 * @param value
-	 *            the value to check for this parameter instance
+	 * 		the value to check for this parameter instance
 	 *
 	 * @throws StrolchException
-	 *             if the value is null
+	 * 		if the value is null
 	 */
 	protected void validateValue(T value) throws StrolchException {
 		if (value == null) {
@@ -173,11 +172,6 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		clone.setInterpretation(this.interpretation);
 		clone.setUom(this.uom);
 		clone.setIndex(this.index);
-	}
-
-	@Override
-	public <U> U accept(ParameterVisitor visitor) {
-		return visitor.visitParam(this);
 	}
 
 	@SuppressWarnings("nls")

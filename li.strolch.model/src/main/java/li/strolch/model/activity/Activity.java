@@ -28,7 +28,6 @@ import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
-import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 
@@ -537,11 +536,6 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public <T> T accept(StrolchElementVisitor<T> visitor) {
-		return visitor.visitActivity(this);
-	}
-
-	@Override
-	public <T> T accept(IActivityElementVisitor<T> visitor) {
 		return visitor.visitActivity(this);
 	}
 

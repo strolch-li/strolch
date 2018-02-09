@@ -30,6 +30,7 @@ import java.util.Properties;
 
 import li.strolch.utils.Version;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.helper.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,10 +108,17 @@ public class DbSchemaVersionCheck {
 
 		Version expectedDbVersion = getExpectedDbVersion(this.app, this.ctxClass);
 
+		// get current version
+		Version currentVersion;
 		try (Connection con = ds.getConnection()) {
+			currentVersion = getCurrentVersion(con, this.app);
+		} catch (SQLException e) {
+			String msg = "Failed to open DB connection to {0} due to: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, ds, e.getMessage());
+			throw new DbException(msg, e);
+		}
 
-			// get current version
-			Version currentVersion = getCurrentVersion(con, this.app);
+		try (Connection con = ds.getConnection()) {
 			DbMigrationState migrationType = detectMigrationState(realm, expectedDbVersion, currentVersion);
 
 			switch (migrationType) {
@@ -161,7 +169,7 @@ public class DbSchemaVersionCheck {
 					currentVersion = Version.valueOf(rs.getString(2));
 			}
 		} catch (Exception e) {
-			logger.error("Failed to query version for app " + app, e);
+			logger.error("Failed to query version for app " + app + ": " + ExceptionHelper.formatExceptionMessage(e));
 			return null;
 		}
 

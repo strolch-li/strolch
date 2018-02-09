@@ -1,47 +1,31 @@
 package li.strolch.model.json;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.function.BiConsumer;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
+import com.google.gson.JsonPrimitive;
 import li.strolch.exception.StrolchModelException;
-import li.strolch.model.AbstractStrolchElement;
-import li.strolch.model.GroupedParameterizedElement;
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.PolicyContainer;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchModelConstants;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.StrolchValueType;
-import li.strolch.model.Tags;
-import li.strolch.model.Version;
+import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
-import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.*;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
-import li.strolch.model.timedstate.StrolchTimedState;
+import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-import li.strolch.model.visitor.IActivityElementVisitor;
-import li.strolch.model.visitor.StrolchRootElementVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
-public class StrolchElementToJsonVisitor
-		implements StrolchRootElementVisitor<JsonObject>, IActivityElementVisitor<JsonObject> {
+public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonElement> {
 
 	private MapOfSets<String, String> ignoredKeys;
 	private Set<String> ignoredStates;
@@ -114,7 +98,7 @@ public class StrolchElementToJsonVisitor
 		this.ignoredKeys.addElement(bagId, paramId);
 		return this;
 	}
-	
+
 	public StrolchElementToJsonVisitor ignoreBagParameterTyp(String type) {
 		this.ignoredBagTypes.add(type);
 		return this;
@@ -141,23 +125,144 @@ public class StrolchElementToJsonVisitor
 	}
 
 	@Override
-	public JsonObject visitResource(Resource resource) {
+	public JsonElement visitResource(Resource resource) {
 		return toJson(resource);
 	}
 
 	@Override
-	public JsonObject visitOrder(Order order) {
+	public JsonElement visitOrder(Order order) {
 		return toJson(order);
 	}
 
 	@Override
-	public JsonObject visitActivity(Activity activity) {
+	public JsonElement visitActivity(Activity activity) {
 		return toJson(activity);
 	}
 
 	@Override
-	public JsonObject visitAction(Action action) {
+	public JsonElement visitAction(Action action) {
 		return toJson(action);
+	}
+
+	@Override
+	public JsonElement visitBooleanParam(BooleanParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitDateParam(DateParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitDurationParam(DurationParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitFloatParam(FloatParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitIntegerParam(IntegerParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitLongParam(LongParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitStringParam(StringParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitStringListParam(StringListParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitIntegerListParam(IntegerListParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitFloatListParam(FloatListParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitLongListParam(LongListParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
+	public JsonElement visitBooleanState(BooleanTimedState state) {
+		if (isFlat())
+			return stateToJsonFlat(state);
+		return stateToJsonFull(state);
+	}
+
+	@Override
+	public JsonElement visitFloatState(FloatTimedState state) {
+		if (isFlat())
+			return stateToJsonFlat(state);
+		return stateToJsonFull(state);
+	}
+
+	@Override
+	public JsonElement visitIntegerState(IntegerTimedState state) {
+		if (isFlat())
+			return stateToJsonFlat(state);
+		return stateToJsonFull(state);
+	}
+
+	@Override
+	public JsonElement visitStringState(StringSetTimedState state) {
+		if (isFlat())
+			return stateToJsonFlat(state);
+		return stateToJsonFull(state);
+	}
+
+	@Override
+	public JsonObject visitParameterBag(ParameterBag bag) {
+
+		if (isFlat()) {
+
+			JsonObject rootJ = new JsonObject();
+
+			Set<String> ignoredParamIds = this.ignoredKeys.getSet(bag.getId());
+			addParameterBagFlat(rootJ, ignoredParamIds, bag);
+
+			return rootJ;
+		}
+
+		return parameterBagToJsonFull(bag);
 	}
 
 	protected JsonObject toJson(Resource element) {
@@ -168,7 +273,7 @@ public class StrolchElementToJsonVisitor
 		toJson(element, rootJ);
 
 		addVersion(element, rootJ);
-		addParameters(element, rootJ);
+		addParameterizedElements(element, rootJ);
 		addStates(element, rootJ);
 		addPolicies(element, rootJ);
 
@@ -188,7 +293,7 @@ public class StrolchElementToJsonVisitor
 		rootJ.addProperty(Tags.Json.STATE, element.getState().getName());
 
 		addVersion(element, rootJ);
-		addParameters(element, rootJ);
+		addParameterizedElements(element, rootJ);
 		addPolicies(element, rootJ);
 
 		if (this.orderHook != null)
@@ -219,7 +324,7 @@ public class StrolchElementToJsonVisitor
 
 		if (element.isRootElement())
 			addVersion(element, rootJ);
-		addParameters(element, rootJ);
+		addParameterizedElements(element, rootJ);
 		addPolicies(element, rootJ);
 
 		if (this.activityHook != null)
@@ -265,7 +370,7 @@ public class StrolchElementToJsonVisitor
 		rootJ.addProperty(Tags.Json.START, formatDate(element.getStart()));
 		rootJ.addProperty(Tags.Json.END, formatDate(element.getEnd()));
 
-		addParameters(element, rootJ);
+		addParameterizedElements(element, rootJ);
 		addPolicies(element, rootJ);
 
 		if (this.actionHook != null)
@@ -324,14 +429,14 @@ public class StrolchElementToJsonVisitor
 		return rootJ;
 	}
 
-	protected void addParameters(GroupedParameterizedElement element, JsonObject rootJ) {
+	protected void addParameterizedElements(GroupedParameterizedElement element, JsonObject rootJ) {
 		if (isFlat())
-			addParametersFlat(element, rootJ);
+			addParameterizedElementsFlat(element, rootJ);
 		else
-			addParameterFull(element, rootJ);
+			addParameterizedElementsFull(element, rootJ);
 	}
 
-	protected void addParametersFlat(GroupedParameterizedElement element, JsonObject rootJ) {
+	protected void addParameterizedElementsFlat(GroupedParameterizedElement element, JsonObject rootJ) {
 
 		Set<String> bagKeySet = element.getParameterBagKeySet();
 		for (String bagId : bagKeySet) {
@@ -342,36 +447,41 @@ public class StrolchElementToJsonVisitor
 				continue;
 
 			ParameterBag parameterBag = element.getParameterBag(bagId);
-			if(ignoredBagTypes.contains(parameterBag.getType()))
+			if (ignoredBagTypes.contains(parameterBag.getType()))
 				continue;
 
-			Set<String> parameterKeySet = parameterBag.getParameterKeySet();
-			for (String paramId : parameterKeySet) {
+			addParameterBagFlat(rootJ, ignoredParamIds, parameterBag);
+		}
+	}
 
-				// see if this parameter must be ignored
-				if (ignoredParamIds != null && ignoredParamIds.contains(paramId))
-					continue;
+	private void addParameterBagFlat(JsonObject rootJ, Set<String> ignoredParamIds, ParameterBag parameterBag) {
 
-				if (rootJ.has(paramId)) {
-					throw new StrolchModelException(
-							"JsonObject already has a member with ID " + paramId + ": " + parameterBag.getLocator());
-				}
+		Set<String> parameterKeySet = parameterBag.getParameterKeySet();
+		for (String paramId : parameterKeySet) {
 
-				Parameter<?> param = parameterBag.getParameter(paramId);
+			// see if this parameter must be ignored
+			if (ignoredParamIds != null && ignoredParamIds.contains(paramId))
+				continue;
 
-				StrolchValueType type = StrolchValueType.parse(param.getType());
-				if (type.isBoolean()) {
-					rootJ.addProperty(paramId, (Boolean) param.getValue());
-				} else if (type.isNumber()) {
-					rootJ.addProperty(paramId, (Number) param.getValue());
-				} else {
-					rootJ.addProperty(paramId, param.getValueAsString());
-				}
+			if (rootJ.has(paramId)) {
+				throw new StrolchModelException(
+						"JsonObject already has a member with ID " + paramId + ": " + parameterBag.getLocator());
+			}
+
+			Parameter<?> param = parameterBag.getParameter(paramId);
+
+			StrolchValueType type = StrolchValueType.parse(param.getType());
+			if (type.isBoolean()) {
+				rootJ.addProperty(paramId, (Boolean) param.getValue());
+			} else if (type.isNumber()) {
+				rootJ.addProperty(paramId, (Number) param.getValue());
+			} else {
+				rootJ.addProperty(paramId, param.getValueAsString());
 			}
 		}
 	}
 
-	protected void addParameterFull(GroupedParameterizedElement element, JsonObject rootJ) {
+	protected void addParameterizedElementsFull(GroupedParameterizedElement element, JsonObject rootJ) {
 
 		if (!element.hasParameterBags())
 			return;
@@ -382,40 +492,48 @@ public class StrolchElementToJsonVisitor
 		for (String bagKey : element.getParameterBagKeySet()) {
 			ParameterBag bag = element.getParameterBag(bagKey);
 
-			JsonObject bagJ = new JsonObject();
-			parameterBagsJ.add(bagKey, bagJ);
-
-			toJson(bag, bagJ);
-
 			if (!bag.hasParameters())
 				continue;
 
-			JsonObject paramsJ = new JsonObject();
-			bagJ.add(Tags.Json.PARAMETERS, paramsJ);
-
-			for (String paramKey : bag.getParameterKeySet()) {
-				Parameter<?> param = bag.getParameter(paramKey);
-
-				JsonObject paramJ = new JsonObject();
-				paramsJ.add(paramKey, paramJ);
-
-				toJson((AbstractStrolchElement) param, paramJ);
-
-				if (!StrolchModelConstants.INTERPRETATION_NONE.equals(param.getInterpretation()))
-					paramJ.addProperty(Tags.Json.INTERPRETATION, param.getInterpretation());
-
-				if (param.isHidden())
-					paramJ.addProperty(Tags.Json.HIDDEN, param.isHidden());
-
-				if (!StrolchModelConstants.UOM_NONE.equals(param.getUom()))
-					paramJ.addProperty(Tags.Json.UOM, param.getUom());
-
-				if (param.getIndex() != 0)
-					paramJ.addProperty(Tags.Json.INDEX, param.getIndex());
-
-				paramJ.addProperty(Tags.Json.VALUE, param.getValueAsString());
-			}
+			parameterBagsJ.add(bagKey, parameterBagToJsonFull(bag));
 		}
+	}
+
+	private JsonObject parameterBagToJsonFull(ParameterBag bag) {
+		JsonObject bagJ = new JsonObject();
+
+		toJson(bag, bagJ);
+
+		JsonObject paramsJ = new JsonObject();
+		bagJ.add(Tags.Json.PARAMETERS, paramsJ);
+
+		for (String paramKey : bag.getParameterKeySet()) {
+			Parameter<?> param = bag.getParameter(paramKey);
+			paramsJ.add(paramKey, paramToJsonFull(param));
+		}
+
+		return bagJ;
+	}
+
+	private JsonObject paramToJsonFull(Parameter<?> param) {
+		JsonObject paramJ = new JsonObject();
+
+		toJson((AbstractStrolchElement) param, paramJ);
+
+		if (!StrolchModelConstants.INTERPRETATION_NONE.equals(param.getInterpretation()))
+			paramJ.addProperty(Tags.Json.INTERPRETATION, param.getInterpretation());
+
+		if (param.isHidden())
+			paramJ.addProperty(Tags.Json.HIDDEN, param.isHidden());
+
+		if (!StrolchModelConstants.UOM_NONE.equals(param.getUom()))
+			paramJ.addProperty(Tags.Json.UOM, param.getUom());
+
+		if (param.getIndex() != 0)
+			paramJ.addProperty(Tags.Json.INDEX, param.getIndex());
+
+		paramJ.addProperty(Tags.Json.VALUE, param.getValueAsString());
+		return paramJ;
 	}
 
 	protected void addStates(Resource resource, JsonObject rootJ) {
@@ -440,31 +558,11 @@ public class StrolchElementToJsonVisitor
 				continue;
 
 			StrolchTimedState<IValue<?>> state = element.getTimedState(stateKey);
-
-			JsonObject stateJ = new JsonObject();
-			timedStatesJ.add(stateKey, stateJ);
-
-			toJson((AbstractStrolchElement) state, stateJ);
-
-			JsonArray valuesJ = new JsonArray();
-			stateJ.add(Tags.Json.VALUES, valuesJ);
-
-			SortedSet<ITimeValue<IValue<?>>> values = state.getTimeEvolution().getValues();
-			for (ITimeValue<IValue<?>> value : values) {
-
-				JsonObject valueJ = new JsonObject();
-				valuesJ.add(valueJ);
-
-				Long time = value.getTime();
-				String valueS = value.getValue().getValueAsString();
-
-				valueJ.addProperty(Tags.Json.TIME, formatDate(time));
-				valueJ.addProperty(Tags.Json.VALUE, valueS);
-			}
+			timedStatesJ.add(stateKey, stateToJsonFull(state));
 		}
 	}
 
-	private void addTimedStatesFlat(Resource element, JsonObject jsonObject) {
+	private void addTimedStatesFlat(Resource element, JsonObject rootJ) {
 
 		if (!element.hasTimedStates())
 			return;
@@ -475,27 +573,54 @@ public class StrolchElementToJsonVisitor
 			if (this.ignoredStates.contains(stateKey))
 				continue;
 
-			// get values
-			StrolchTimedState<IValue<?>> stateT = element.getTimedState(stateKey);
-			ITimeVariable<IValue<?>> timeEvolution = stateT.getTimeEvolution();
+			StrolchTimedState<IValue<?>> state = element.getTimedState(stateKey);
 
-			if (jsonObject.has(stateKey)) {
+			if (rootJ.has(stateKey)) {
 				throw new StrolchModelException(
-						"JsonObject already has a member with ID " + stateKey + ": " + stateT.getLocator());
+						"JsonObject already has a member with ID " + stateKey + ": " + state.getLocator());
 			}
 
 			// build JSON data
-			JsonArray arrayJ = new JsonArray();
-			for (ITimeValue<IValue<?>> v : timeEvolution.getValues()) {
-				JsonObject obj = new JsonObject();
-				obj.addProperty(Tags.Json.DATE, ISO8601FormatFactory.getInstance().formatDate(v.getTime()));
-				obj.addProperty(Tags.Json.VALUE, v.getValue().getValueAsString());
-
-				arrayJ.add(obj);
-			}
-
-			jsonObject.add(stateKey, arrayJ);
+			rootJ.add(stateKey, stateToJsonFlat(state));
 		}
+	}
+
+	private JsonObject stateToJsonFull(StrolchTimedState<? extends IValue<?>> state) {
+		JsonObject stateJ = new JsonObject();
+
+		toJson((AbstractStrolchElement) state, stateJ);
+
+		JsonArray valuesJ = new JsonArray();
+		stateJ.add(Tags.Json.VALUES, valuesJ);
+
+		SortedSet<? extends ITimeValue<? extends IValue<?>>> values = state.getTimeEvolution().getValues();
+		for (ITimeValue<? extends IValue<?>> value : values) {
+
+			JsonObject valueJ = new JsonObject();
+			valuesJ.add(valueJ);
+
+			Long time = value.getTime();
+			String valueS = value.getValue().getValueAsString();
+
+			valueJ.addProperty(Tags.Json.TIME, formatDate(time));
+			valueJ.addProperty(Tags.Json.VALUE, valueS);
+		}
+		return stateJ;
+	}
+
+	private JsonArray stateToJsonFlat(StrolchTimedState<? extends IValue<?>> state) {
+
+		ITimeVariable<? extends IValue<?>> timeEvolution = state.getTimeEvolution();
+
+		JsonArray arrayJ = new JsonArray();
+		for (ITimeValue<? extends IValue<?>> v : timeEvolution.getValues()) {
+			JsonObject obj = new JsonObject();
+			obj.addProperty(Tags.Json.DATE, ISO8601FormatFactory.getInstance().formatDate(v.getTime()));
+			obj.addProperty(Tags.Json.VALUE, v.getValue().getValueAsString());
+
+			arrayJ.add(obj);
+		}
+		return arrayJ;
 	}
 
 	protected void addVersion(StrolchRootElement element, JsonObject rootJ) {

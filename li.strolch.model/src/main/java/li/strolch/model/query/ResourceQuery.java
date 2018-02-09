@@ -76,7 +76,7 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 
 	public ResourceQuery<U> setVisitor(StrolchElementVisitor<U> visitor) {
 		DBC.PRE.assertNotNull("visitor", visitor);
-		this.resourceVisitor = visitor.asResourceVisitor();
+		this.resourceVisitor = visitor::visitResource;
 		return this;
 	}
 

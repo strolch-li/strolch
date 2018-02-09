@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,7 +59,7 @@ public class SetParameterCommand extends Command {
 
 	/**
 	 * @param parameter
-	 *            the parameter to set
+	 * 		the parameter to set
 	 */
 	public void setParameter(Parameter<?> parameter) {
 		this.parameter = parameter;
@@ -67,7 +67,7 @@ public class SetParameterCommand extends Command {
 
 	/**
 	 * @param name
-	 *            the name to set
+	 * 		the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -75,7 +75,7 @@ public class SetParameterCommand extends Command {
 
 	/**
 	 * @param interpretation
-	 *            the interpretation to set
+	 * 		the interpretation to set
 	 */
 	public void setInterpretation(String interpretation) {
 		this.interpretation = interpretation;
@@ -83,7 +83,7 @@ public class SetParameterCommand extends Command {
 
 	/**
 	 * @param uom
-	 *            the uom to set
+	 * 		the uom to set
 	 */
 	public void setUom(String uom) {
 		this.uom = uom;
@@ -91,7 +91,7 @@ public class SetParameterCommand extends Command {
 
 	/**
 	 * @param hidden
-	 *            the hidden to set
+	 * 		the hidden to set
 	 */
 	public void setHidden(Boolean hidden) {
 		this.hidden = hidden;
@@ -99,7 +99,7 @@ public class SetParameterCommand extends Command {
 
 	/**
 	 * @param index
-	 *            the index to set
+	 * 		the index to set
 	 */
 	public void setIndex(Integer index) {
 		this.index = index;
@@ -107,7 +107,7 @@ public class SetParameterCommand extends Command {
 
 	/**
 	 * @param valueAsString
-	 *            the valueAsString to set
+	 * 		the valueAsString to set
 	 */
 	public void setValueAsString(String valueAsString) {
 		this.valueAsString = valueAsString;
@@ -142,13 +142,13 @@ public class SetParameterCommand extends Command {
 		}
 		if (this.index != null) {
 			this.oldIndex = this.parameter.getIndex();
-			this.parameter.setIndex(this.index.intValue());
+			this.parameter.setIndex(this.index);
 		}
 
 		if (this.valueAsString != null) {
 			this.oldValueAsString = this.parameter.getValueAsString();
-			SetParameterValueVisitor visitor = new SetParameterValueVisitor();
-			visitor.setValue(this.parameter, this.valueAsString);
+			SetParameterValueVisitor visitor = new SetParameterValueVisitor(this.valueAsString);
+			this.parameter.accept(visitor);
 		}
 
 		if (hasChanges()) {
@@ -179,12 +179,12 @@ public class SetParameterCommand extends Command {
 				this.parameter.setHidden(this.oldHidden);
 			}
 			if (this.oldIndex != null) {
-				this.parameter.setIndex(this.oldIndex.intValue());
+				this.parameter.setIndex(this.oldIndex);
 			}
 
 			if (this.oldValueAsString != null) {
-				SetParameterValueVisitor visitor = new SetParameterValueVisitor();
-				visitor.setValue(this.parameter, this.oldValueAsString);
+				SetParameterValueVisitor visitor = new SetParameterValueVisitor(this.oldValueAsString);
+				this.parameter.accept(visitor);
 			}
 
 			if (hasChanges()) {

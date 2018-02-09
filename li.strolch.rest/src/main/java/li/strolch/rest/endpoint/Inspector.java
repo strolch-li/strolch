@@ -91,9 +91,9 @@ public class Inspector {
 				.openTx(certificate, Inspector.class);
 	}
 
-	private String toString(JsonObject jsonObject) {
+	private String toString(JsonElement jsonElement) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.toJson(jsonObject);
+		return gson.toJson(jsonElement);
 	}
 
 	@GET
@@ -607,6 +607,7 @@ public class Inspector {
 		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withVersion();
 		if (Boolean.parseBoolean(flat))
 			visitor.flat();
+
 		return Response.ok().entity(toString(resource.accept(visitor))).build();
 	}
 

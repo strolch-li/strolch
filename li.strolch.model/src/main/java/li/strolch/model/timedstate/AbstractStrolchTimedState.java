@@ -18,18 +18,12 @@ package li.strolch.model.timedstate;
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
-import li.strolch.model.AbstractStrolchElement;
-import li.strolch.model.Locator;
+import li.strolch.model.*;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-import li.strolch.model.visitor.TimedStateVisitor;
 import li.strolch.utils.helper.StringHelper;
 
 /**
@@ -175,11 +169,6 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 		clone.interpretation = this.interpretation;
 		clone.uom = this.uom;
 		clone.state = this.state.getCopy();
-	}
-
-	@Override
-	public <U> U accept(TimedStateVisitor visitor) {
-		return visitor.visitTimedState(this);
 	}
 
 	@SuppressWarnings("nls")
