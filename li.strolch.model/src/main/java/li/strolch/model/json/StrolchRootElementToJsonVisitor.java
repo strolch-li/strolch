@@ -31,6 +31,11 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		return this.visitor.visitActivity(activity).getAsJsonObject();
 	}
 
+	@Override
+	public JsonObject visitAction(Action action) {
+		return this.visitor.visitAction(action).getAsJsonObject();
+	}
+
 	public OrderVisitor<JsonObject> asOrderVisitor() {
 		return this::visitOrder;
 	}
