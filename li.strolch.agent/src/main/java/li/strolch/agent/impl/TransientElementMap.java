@@ -25,6 +25,7 @@ import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Version;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
@@ -242,6 +243,8 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	@Override
 	public synchronized void add(StrolchTransaction tx, T element) {
+		if (!element.hasVersion())
+			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
 
 		Map<String, T> byType = this.elementMap.computeIfAbsent(element.getType(), k -> new HashMap<>());
 
@@ -258,6 +261,9 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
+			if (!element.hasVersion())
+				Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
+
 			Map<String, T> byType = this.elementMap.computeIfAbsent(element.getType(), k -> new HashMap<>());
 
 			// assert no object already exists with this id
