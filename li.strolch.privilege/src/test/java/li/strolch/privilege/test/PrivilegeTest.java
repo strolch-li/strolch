@@ -601,7 +601,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			this.ctx.validateAction(restrictable);
 			fail("Should fail as bob does not have role app");
 		} catch (AccessDeniedException e) {
-			String msg = "User bob does not have the privilege li.strolch.privilege.test.model.TestRestrictable needed for Restrictable li.strolch.privilege.test.model.TestRestrictable";
+			String msg = "User bob does not have the privilege li.strolch.privilege.test.model.TestRestrictable needed for Restrictable li.strolch.privilege.test.model.TestRestrictable and value li.strolch.privilege.test.model.TestRestrictable";
 			assertEquals(msg, e.getLocalizedMessage());
 		} finally {
 			logout();
