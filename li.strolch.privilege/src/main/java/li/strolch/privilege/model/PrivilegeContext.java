@@ -114,7 +114,7 @@ public class PrivilegeContext {
 		if (privilege == null) {
 			String msg = MessageFormat
 					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
-							getUsername(), privilegeName, restrictable.getClass().getName());
+							getUsername(), privilegeName, restrictable.getClass().getName(), restrictable.getPrivilegeValue());
 			throw new AccessDeniedException(msg);
 		}
 
