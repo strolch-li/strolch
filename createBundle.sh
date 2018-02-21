@@ -10,7 +10,7 @@ fi
 
 bundle_name="${projectName}-${projectVersion}"
 workDir="${ROOT}/target/${bundle_name}"
-DIST_STROLCH="/var/www/eitch/strolch.li/dist/${projectVersion}"
+DIST_STROLCH="/opt/www/eitch/strolch.li/dist/${projectVersion}"
 DEPLOY_SERVER="hosting.eitchnet.ch"
 
 echo "INFO: Creating bundle ${bundle_name}"
