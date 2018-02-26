@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Roles>
+	<Role name="agent">
+		<Privilege name="li.strolch.privilege.handler.SystemAction" policy="DefaultPrivilege">
+			<Allow>li.strolch.runtime.privilege.StrolchSystemAction</Allow>
+			<Allow>li.strolch.runtime.privilege.StrolchSystemActionWithResult</Allow>
+		</Privilege>
+	</Role>
+	<Role name="AppUser">
+		<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+	</Role>
+</Roles>
