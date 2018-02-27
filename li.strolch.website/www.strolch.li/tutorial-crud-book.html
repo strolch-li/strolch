@@ -80,6 +80,8 @@ public class RestfulApplication extends ResourceConfig {
 
     // add strolch resources
     register(AuthenticationService.class);
+    register(ModelQuery.class);
+	register(Inspector.class);
 
     // add project resources by package name
     packages(BooksResource.class.getPackage().getName());
@@ -199,9 +201,7 @@ public class BooksResource {
     try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getClass())) {
 
       // prepare the query
-      ResourceQuery&lt;JsonObject&gt; query = new BooksQuery&lt;JsonObject&gt;() //
-          // set transformation to JSON
-          .setVisitor(new StrolchElementToJsonVisitor().flat());
+      ResourceQuery&lt;Resource&gt; query = new BooksQuery&lt;JsonObject&gt;();
 
       // prepare selections
       if (StringHelper.isEmpty(queryS)) {
@@ -217,13 +217,15 @@ public class BooksResource {
       }
 
       // perform the query
-      List&lt;JsonObject&gt; books = tx.doQuery(query);
+      List&lt;Resource&gt; books = tx.doQuery(query);
 
       // perform paging
-      Paging&lt;JsonObject&gt; page = Paging.asPage(books, offset, limit);
+      Paging&lt;Resource&gt; paging = Paging.asPage(books, offset, limit);
+      List&lt;Resource&gt; page = paging.getPage();
 
       // return result
-      return ResponseUtil.toResponse(StrolchRestfulConstants.DATA, page.getPage());
+      ResourceVisitor&lt;JsonObject&gt; visitor = new StrolchRootElementToJsonVisitor().flat().asResourceVisitor();
+      return ResponseUtil.listToResponse(StrolchRestfulConstants.DATA, page, a -&gt; a.accept(visitor));
     }
   }
 }
@@ -259,7 +261,7 @@ public Response get(@Context HttpServletRequest request, @PathParam("id") String
       return ResponseUtil.toResponse(Status.NOT_FOUND, "Book " + id + " does not exist!");
 
     // transform to JSON
-    JsonObject bookJ = book.accept(new StrolchElementToJsonVisitor().flat());
+    JsonObject bookJ = book.accept(new StrolchRootElementToJsonVisitor().flat());
 
     // return
     return ResponseUtil.toResponse(StrolchRestfulConstants.DATA, bookJ);
@@ -336,12 +338,10 @@ public class CreateBookService extends AbstractService<JsonServiceArgument, Json
       book = tx.getResourceTemplate(BookShopConstants.TYPE_BOOK);
 
       // map all values from the JSON object into the new book element
-      new FromFlatJsonVisitor().visit(book, arg.jsonElement.getAsJsonObject());
+      book.accept(new FromFlatJsonVisitor(arg.jsonElement.getAsJsonObject()).ignoreBag(BAG_RELATIONS));
 
-      // add command to store the resource
-      AddResourceCommand cmd = new AddResourceCommand(getContainer(), tx);
-      cmd.setResource(book);
-      tx.addCommand(cmd);
+      // save changes
+      tx.add(book);
 
       // notify the TX that it should commit on close
       tx.commitOnClose();
@@ -437,12 +437,10 @@ public class UpdateBookService extends AbstractService&lt;JsonServiceArgument, J
       book = tx.getResourceBy(BookShopConstants.TYPE_BOOK, arg.objectId, true);
 
       // map all values from the JSON object into the new book element
-      new FromFlatJsonVisitor().visit(book, arg.jsonElement.getAsJsonObject());
+      book.accept(new FromFlatJsonVisitor(arg.jsonElement.getAsJsonObject()).ignoreBag(BAG_RELATIONS));
 
-      // add command to update the resource
-      UpdateResourceCommand cmd = new UpdateResourceCommand(getContainer(), tx);
-      cmd.setResource(book);
-      tx.addCommand(cmd);
+      // save changes
+      tx.update(book);
 
       // notify the TX that it should commit on close
       tx.commitOnClose();
@@ -527,10 +525,8 @@ public class RemoveBookService extends AbstractService&lt;StringServiceArgument,
       // get the existing book
       Resource book = tx.getResourceBy(BookShopConstants.TYPE_BOOK, arg.value, true);
 
-      // add command to remove the resource
-      RemoveResourceCommand cmd = new RemoveResourceCommand(getContainer(), tx);
-      cmd.setResource(book);
-      tx.addCommand(cmd);
+      // save changes
+      tx.remove(book);
 
       // notify the TX that it should commit on close
       tx.commitOnClose();
