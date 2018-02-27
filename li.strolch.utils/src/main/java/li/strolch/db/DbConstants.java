@@ -24,10 +24,12 @@ public class DbConstants {
 	public static final String PROP_DB_IGNORE_REALM = "db.ignore.realm"; //$NON-NLS-1$
 	public static final String PROP_DB_USERNAME = "db.username"; //$NON-NLS-1$
 	public static final String PROP_DB_PASSWORD = "db.password"; //$NON-NLS-1$
+	public static final String PROP_DB_VERBOSE = "db.verbose"; //$NON-NLS-1$
 	public static final String PROP_ALLOW_SCHEMA_CREATION = "allowSchemaCreation";
 	public static final String PROP_ALLOW_SCHEMA_MIGRATION = "allowSchemaMigration";
 	public static final String PROP_ALLOW_SCHEMA_DROP = "allowSchemaDrop";
 	public static final String PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE = "allowDataInitOnSchemaCreate";
+	public static final String PROP_ALLOW_DATA_INIT_ON_EMPTY_DB = "allowDataInitOnEmptyDb";
 	public static final String PROP_DB_VERSION = "db_version";
 	public static final String RESOURCE_DB_VERSION = "/{0}_db_version.properties";
 }

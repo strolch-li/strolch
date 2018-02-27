@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +50,6 @@ import li.strolch.xmlpers.test.model.MyModel;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 
@@ -66,6 +65,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 
 	private void setup(IoMode ioMode) {
 		Properties properties = new Properties();
+		properties.setProperty(PersistenceConstants.PROP_XML_IO_MOD, ioMode.name());
 		properties.setProperty(PersistenceConstants.PROP_BASEPATH, BASEPATH + ioMode.name());
 		setup(properties);
 	}
@@ -73,35 +73,30 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 	@Test
 	public void testCrudSax() {
 		setup(IoMode.SAX);
-		testCrud(IoMode.SAX);
+		testCrud();
 	}
 
 	@Test
 	public void testCrudDom() {
 		setup(IoMode.DOM);
-		testCrud(IoMode.DOM);
+		testCrud();
 	}
 
-	private PersistenceTransaction freshTx(IoMode ioMode) {
-		PersistenceTransaction tx = this.persistenceManager.openTx();
-		tx.setIoMode(ioMode);
-		return tx;
-	}
-
-	private void testCrud(IoMode ioMode) {
+	private void testCrud() {
 
 		ObjectDao objectDao;
 
 		// create new resource
 		MyModel resource = createResource();
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			objectDao = tx.getObjectDao();
 			objectDao.add(resource);
 		}
 
 		// read resource
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			IdOfSubTypeRef resRef = tx.getObjectRefCache().getIdOfSubTypeRef(TestConstants.TYPE_RES, RES_TYPE, RES_ID);
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			IdOfSubTypeRef resRef = tx.getManager().getObjectRefCache()
+					.getIdOfSubTypeRef(TestConstants.TYPE_RES, RES_TYPE, RES_ID);
 			objectDao = tx.getObjectDao();
 			resource = objectDao.queryById(resRef);
 			assertResource(resource);
@@ -112,22 +107,24 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		}
 
 		// read modified resource
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			IdOfSubTypeRef resRef = tx.getObjectRefCache().getIdOfSubTypeRef(TestConstants.TYPE_RES, RES_TYPE, RES_ID);
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			IdOfSubTypeRef resRef = tx.getManager().getObjectRefCache()
+					.getIdOfSubTypeRef(TestConstants.TYPE_RES, RES_TYPE, RES_ID);
 			objectDao = tx.getObjectDao();
 			resource = objectDao.queryById(resRef);
 			assertResourceUpdated(resource);
 		}
 
 		// delete resource
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			objectDao = tx.getObjectDao();
 			objectDao.remove(resource);
 		}
 
 		// fail to read
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			IdOfSubTypeRef resRef = tx.getObjectRefCache().getIdOfSubTypeRef(TestConstants.TYPE_RES, RES_TYPE, RES_ID);
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			IdOfSubTypeRef resRef = tx.getManager().getObjectRefCache()
+					.getIdOfSubTypeRef(TestConstants.TYPE_RES, RES_TYPE, RES_ID);
 			objectDao = tx.getObjectDao();
 			resource = objectDao.queryById(resRef);
 			assertNull(resource);
@@ -167,15 +164,15 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		}
 
 		// save all
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			ObjectDao objectDao = tx.getObjectDao();
 			objectDao.addAll(resources);
 			resources.clear();
 		}
 
 		// query all
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			SubTypeRef subTypeRef = tx.getObjectRefCache().getSubTypeRef(TestConstants.TYPE_RES, type);
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			SubTypeRef subTypeRef = tx.getManager().getObjectRefCache().getSubTypeRef(TestConstants.TYPE_RES, type);
 			ObjectDao objectDao = tx.getObjectDao();
 			resources = objectDao.queryAll(subTypeRef);
 			assertEquals("Expected to find 10 entries!", 10, resources.size()); //$NON-NLS-1$
@@ -185,8 +182,8 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		}
 
 		// now query them again
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			SubTypeRef subTypeRef = tx.getObjectRefCache().getSubTypeRef(TestConstants.TYPE_RES, type);
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			SubTypeRef subTypeRef = tx.getManager().getObjectRefCache().getSubTypeRef(TestConstants.TYPE_RES, type);
 			ObjectDao objectDao = tx.getObjectDao();
 			resources = objectDao.queryAll(subTypeRef);
 			assertEquals("Expected to find 0 entries!", 0, resources.size()); //$NON-NLS-1$
@@ -210,22 +207,23 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 
 		// read by id
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			ObjectRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
+			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
 			MyModel resource = tx.getObjectDao().queryById(objectRef);
 			assertNotNull("Expected to read resource by ID", resource); //$NON-NLS-1$
 		}
 
 		// delete by id
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			ObjectRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
+			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
 			tx.getObjectDao().removeById(objectRef);
 		}
 
 		// fail to read by id
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			ObjectRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
+			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
 			MyModel resource = tx.getObjectDao().queryById(objectRef);
-			assertNull("Expected that resource was deleted by ID, thus can not be read anymore", resource); //$NON-NLS-1$
+			assertNull("Expected that resource was deleted by ID, thus can not be read anymore",
+					resource); //$NON-NLS-1$
 		}
 	}
 
@@ -317,7 +315,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		// read / modify
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 
-			ObjectRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, subType, id);
+			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, subType, id);
 			Object resource = tx.getObjectDao().queryById(objectRef);
 			assertNotNull(resource);
 			tx.getObjectDao().update(resource);
@@ -326,7 +324,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		// read / delete
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 
-			ObjectRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, subType, id);
+			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, subType, id);
 			Object resource = tx.getObjectDao().queryById(objectRef);
 			assertNotNull(resource);
 			tx.getObjectDao().remove(resource);
@@ -335,7 +333,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		// make sure deleted, then recreate
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 
-			ObjectRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, subType, id);
+			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, subType, id);
 			Object resource = tx.getObjectDao().queryById(objectRef);
 			assertNull(resource);
 
@@ -347,7 +345,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		// read / modify / delete
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 
-			ObjectRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, subType, id);
+			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, subType, id);
 			Object resource = tx.getObjectDao().queryById(objectRef);
 			assertNotNull(resource);
 			tx.getObjectDao().update(resource);

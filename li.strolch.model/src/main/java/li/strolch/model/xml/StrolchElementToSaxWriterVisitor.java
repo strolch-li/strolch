@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,29 +18,14 @@ package li.strolch.model.xml;
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.Map.Entry;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.model.GroupedParameterizedElement;
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.ParameterizedElement;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
-import li.strolch.model.Version;
+import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -154,8 +139,8 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 	}
 
 	protected void writeElement(Activity activity) throws XMLStreamException {
-		boolean empty = activity.hasVersion() && !activity.hasParameterBags() && !activity.hasElements()
-				&& !activity.hasPolicyDefs();
+		boolean empty = activity.hasVersion() && !activity.hasParameterBags() && !activity.hasElements() && !activity
+				.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.ACTIVITY, empty, activity);
 		this.writer.writeAttribute(Tags.TIME_ORDERING, activity.getTimeOrdering().getName());
@@ -191,8 +176,8 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 		Version version = rootElement.getVersion();
 		this.writer.writeAttribute(Tags.VERSION, Integer.toString(version.getVersion()));
 		this.writer.writeAttribute(Tags.CREATED_BY, version.getCreatedBy());
-		this.writer.writeAttribute(Tags.CREATED_AT,
-				ISO8601FormatFactory.getInstance().formatDate(version.getCreatedAt()));
+		this.writer
+				.writeAttribute(Tags.CREATED_AT, ISO8601FormatFactory.getInstance().formatDate(version.getCreatedAt()));
 		this.writer.writeAttribute(Tags.DELETED, Boolean.toString(version.isDeleted()));
 	}
 
@@ -261,8 +246,8 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 
 			for (ITimeValue<IValue<?>> timeValue : values) {
 				this.writer.writeEmptyElement(Tags.VALUE);
-				this.writer.writeAttribute(Tags.TIME,
-						ISO8601FormatFactory.getInstance().formatDate(timeValue.getTime()));
+				this.writer
+						.writeAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(timeValue.getTime()));
 				this.writer.writeAttribute(Tags.VALUE, timeValue.getValue().getValueAsString());
 			}
 
@@ -299,7 +284,7 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 	protected void writeParameters(ParameterizedElement element) throws XMLStreamException {
 
 		List<Parameter<?>> parameters = new ArrayList<>(element.getParameters());
-		Collections.sort(parameters, (o1, o2) -> Integer.valueOf(o1.getIndex()).compareTo(o2.getIndex()));
+		parameters.sort(Comparator.comparingInt(Parameter::getIndex));
 		for (Parameter<?> parameter : parameters) {
 			writeStartStrolchElement(Tags.PARAMETER, true, parameter);
 

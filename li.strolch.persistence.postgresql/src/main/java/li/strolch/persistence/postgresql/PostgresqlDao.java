@@ -53,6 +53,37 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	protected abstract T parseFromXml(String id, String type, SQLXML xml);
 
 	@Override
+	public long querySize() {
+		String sql = "select count(*) from " + getTableName() + " where latest = true";
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				return result.getLong(1);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public long querySize(String type) {
+		String sql = "select count(*) from " + getTableName() + " where type = ? and latest = true";
+		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+			statement.setString(1, type);
+
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				return result.getLong(1);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
 	public Set<String> queryTypes() {
 		Set<String> keySet = new HashSet<>();
 
@@ -343,35 +374,6 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			internalRemoveVersion(element);
 			txResult.incDeleted(1);
 		});
-	}
-
-	private long querySize() {
-		String sql = "select count(*) from " + getTableName() + " where latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
-
-			try (ResultSet result = statement.executeQuery()) {
-				result.next();
-				return result.getLong(1);
-			}
-
-		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
-		}
-	}
-
-	private long querySize(String type) {
-		String sql = "select count(*) from " + getTableName() + " where type = ? and latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
-			statement.setString(1, type);
-
-			try (ResultSet result = statement.executeQuery()) {
-				result.next();
-				return result.getLong(1);
-			}
-
-		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
-		}
 	}
 
 	/**

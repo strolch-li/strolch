@@ -40,6 +40,20 @@ import li.strolch.model.StrolchRootElement;
 public interface StrolchDao<T extends StrolchRootElement> {
 
 	/**
+	 * Returns the number of elements in the underlying persistence layer, regardless of type
+	 *
+	 * @return the number of elements in the underlying persistence layer
+	 */
+	public long querySize();
+
+	/**
+	 * Returns the number of elements in the underlying persistence layer for the given type
+	 *
+	 * @return the number of elements in the underlying persistence layer for the given type
+	 */
+	public long querySize(String type);
+
+	/**
 	 * Queries the current list of types from the underlying persistence layer
 	 *
 	 * @return the list of types

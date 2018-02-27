@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@
 package li.strolch.xmlpers.objref;
 
 import java.io.File;
+import java.util.Objects;
 
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceTransaction;
@@ -23,20 +24,18 @@ import li.strolch.xmlpers.impl.PathBuilder;
 
 public abstract class ObjectRef extends LockableObject {
 
-	protected final String realmName;
 	protected final String name;
 
-	protected ObjectRef(String realmName, String name) {
-		this.realmName = realmName;
+	protected ObjectRef(String name) {
 		this.name = name;
-	}
-
-	public String getRealmName() {
-		return this.realmName;
 	}
 
 	public String getName() {
 		return this.name;
+	}
+
+	public File getPath(PathBuilder pathBuilder) {
+		return pathBuilder.getPath(this);
 	}
 
 	public abstract boolean isRoot();
@@ -51,18 +50,25 @@ public abstract class ObjectRef extends LockableObject {
 
 	public abstract ObjectRef getChildTypeRef(PersistenceTransaction tx, String type);
 
-	public abstract File getPath(PathBuilder pathBuilder);
-
 	public abstract <T> PersistenceContext<T> createPersistenceContext(PersistenceTransaction tx);
 
 	@Override
 	public String toString() {
-		return getName();
+		return this.name;
 	}
 
 	@Override
-	public abstract boolean equals(Object obj);
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		ObjectRef objectRef = (ObjectRef) o;
+		return Objects.equals(this.name, objectRef.name);
+	}
 
 	@Override
-	public abstract int hashCode();
+	public int hashCode() {
+		return Objects.hash(this.name);
+	}
 }

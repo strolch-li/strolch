@@ -129,9 +129,8 @@
         <module>li.strolch.model</module>
         <module>li.strolch.testbase</module>
 
-        <!-- Deactivate XML Persistence and see later if we want to add it back <module>li.strolch.persistence.xml</module> -->
-
         <module>li.strolch.persistence.postgresql</module>
+        <module>li.strolch.persistence.xml</module>
         <module>li.strolch.agent</module>
         <module>li.strolch.service</module>
         <module>li.strolch.rest</module>

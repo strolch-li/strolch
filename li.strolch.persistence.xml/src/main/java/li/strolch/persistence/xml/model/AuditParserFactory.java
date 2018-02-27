@@ -29,6 +29,6 @@ public class AuditParserFactory implements ParserFactory<Audit> {
 
 	@Override
 	public SaxParser<Audit> getSaxParser() {
-		throw new UnsupportedOperationException("Not yet implemented!"); //$NON-NLS-1$
+		return new AuditSaxParser();
 	}
 }

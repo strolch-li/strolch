@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -118,8 +118,10 @@ public class CachedRealm extends InternalStrolchRealm {
 
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			ResourceDao resourceDao = tx.getPersistenceHandler().getResourceDao(tx);
+			logger.info("Reading " + resourceDao.querySize() + " Resources from DB...");
 			Set<String> resourceTypes = resourceDao.queryTypes();
 			for (String type : resourceTypes) {
+				logger.info("Reading " + resourceDao.querySize(type) + " Resources of type " + type + " from DB...");
 				List<Resource> resources = resourceDao.queryAll(type);
 				for (Resource resource : resources) {
 					this.resourceMap.insert(resource);
@@ -132,8 +134,10 @@ public class CachedRealm extends InternalStrolchRealm {
 
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			OrderDao orderDao = tx.getPersistenceHandler().getOrderDao(tx);
+			logger.info("Reading " + orderDao.querySize() + " Orders from DB...");
 			Set<String> orderTypes = orderDao.queryTypes();
 			for (String type : orderTypes) {
+				logger.info("Reading " + orderDao.querySize(type) + " Orders of type " + type + " from DB...");
 				List<Order> orders = orderDao.queryAll(type);
 				for (Order order : orders) {
 					this.orderMap.insert(order);
@@ -146,8 +150,10 @@ public class CachedRealm extends InternalStrolchRealm {
 
 		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
 			ActivityDao activityDao = tx.getPersistenceHandler().getActivityDao(tx);
+			logger.info("Reading " + activityDao.querySize() + " Activities from DB...");
 			Set<String> activityTypes = activityDao.queryTypes();
 			for (String type : activityTypes) {
+				logger.info("Reading " + activityDao.querySize(type) + " Activities of type " + type + " from DB...");
 				List<Activity> activities = activityDao.queryAll(type);
 				for (Activity activity : activities) {
 					this.activityMap.insert(activity);
@@ -160,7 +166,8 @@ public class CachedRealm extends InternalStrolchRealm {
 
 		long duration = System.nanoTime() - start;
 		String durationS = StringHelper.formatNanoDuration(duration);
-		logger.info(MessageFormat.format("Loading Model from Database for realm {0} took {1}.", getRealm(), durationS)); //$NON-NLS-1$
+		logger.info(MessageFormat
+				.format("Loading Model from Database for realm {0} took {1}.", getRealm(), durationS)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Orders", nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Resources", nrOfResources)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Activities", nrOfActivities)); //$NON-NLS-1$

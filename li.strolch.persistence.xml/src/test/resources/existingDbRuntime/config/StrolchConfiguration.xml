@@ -30,7 +30,7 @@
 			<api>li.strolch.persistence.api.PersistenceHandler</api>
 			<impl>li.strolch.persistence.xml.XmlPersistenceHandler</impl>
 			<Properties>
-				<verbose>true</verbose>
+				<dbStorePath>dbStore</dbStorePath>
 			</Properties>
 		</Component>
 	</env>

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,13 +49,11 @@ public class XmlAuditDao implements AuditDao {
 	}
 
 	protected IdOfSubTypeRef getIdRef(String type, Long id) {
-		IdOfSubTypeRef idRef = this.tx.getObjectRefCache().getIdOfSubTypeRef(getClassType(), type, id.toString());
-		return idRef;
+		return this.tx.getManager().getObjectRefCache().getIdOfSubTypeRef(getClassType(), type, id.toString());
 	}
 
 	protected SubTypeRef getTypeRef(String type) {
-		SubTypeRef typeRef = this.tx.getObjectRefCache().getSubTypeRef(getClassType(), type);
-		return typeRef;
+		return this.tx.getManager().getObjectRefCache().getSubTypeRef(getClassType(), type);
 	}
 
 	@Override
@@ -97,15 +95,13 @@ public class XmlAuditDao implements AuditDao {
 
 	@Override
 	public Set<String> queryTypes() {
-		TypeRef typeRef = this.tx.getObjectRefCache().getTypeRef(getClassType());
-		Set<String> types = this.tx.getMetadataDao().queryTypeSet(typeRef);
-		return types;
+		TypeRef typeRef = this.tx.getManager().getObjectRefCache().getTypeRef(getClassType());
+		return this.tx.getMetadataDao().queryTypeSet(typeRef);
 	}
 
 	@Override
 	public Audit queryBy(String type, Long id) {
-		Audit t = this.tx.getObjectDao().queryById(getIdRef(type, id));
-		return t;
+		return this.tx.getObjectDao().queryById(getIdRef(type, id));
 	}
 
 	@Override
@@ -190,7 +186,6 @@ public class XmlAuditDao implements AuditDao {
 
 	@Override
 	public <U> List<U> doQuery(AuditQuery<U> query) {
-		// TODO implement XML file based querying...
-		throw new UnsupportedOperationException("not yet implemented!");
+		throw new UnsupportedOperationException("not yet supported!");
 	}
 }

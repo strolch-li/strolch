@@ -15,15 +15,12 @@
  */
 package li.strolch.persistence.api;
 
-import java.util.List;
-
 import li.strolch.model.activity.Activity;
-import li.strolch.model.query.ActivityQuery;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface ActivityDao extends StrolchDao<Activity> {
 
-	public <U> List<U> doQuery(ActivityQuery<U> query);
+	// marker interface
 }

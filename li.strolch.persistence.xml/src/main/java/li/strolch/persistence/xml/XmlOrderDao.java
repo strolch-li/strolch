@@ -15,11 +15,8 @@
  */
 package li.strolch.persistence.xml;
 
-import java.util.List;
-
 import li.strolch.model.Order;
 import li.strolch.model.Tags;
-import li.strolch.model.query.OrderQuery;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchTransaction;
 
@@ -32,11 +29,5 @@ public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
 	@Override
 	protected String getClassType() {
 		return Tags.ORDER;
-	}
-
-	@Override
-	public <U> List<U> doQuery(OrderQuery<U> query) {
-		// TODO implement XML file based querying...
-		throw new UnsupportedOperationException("not yet implemented!");
 	}
 }

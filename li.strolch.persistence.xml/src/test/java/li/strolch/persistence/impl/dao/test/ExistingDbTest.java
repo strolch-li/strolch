@@ -19,19 +19,17 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.persistence.xml.XmlPersistenceHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 import li.strolch.utils.helper.FileHelper;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class ExistingDbTest {
 
@@ -49,8 +47,8 @@ public class ExistingDbTest {
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
 
-		File dbStoreSrcPath = new File(CONFIG_SRC, "data/" + XmlPersistenceHandler.DB_STORE_PATH);
-		File dbStoreDstPath = new File(RUNTIME_PATH, "data/" + XmlPersistenceHandler.DB_STORE_PATH);
+		File dbStoreSrcPath = new File(CONFIG_SRC, "data/dbStore");
+		File dbStoreDstPath = new File(RUNTIME_PATH, "data/dbStore");
 		if (!dbStoreDstPath.exists() && !dbStoreDstPath.mkdir()) {
 			throw new RuntimeException("Could not create db store " + dbStoreDstPath.getAbsolutePath());
 		}
@@ -70,7 +68,7 @@ public class ExistingDbTest {
 	public void shouldQueryExistingData() {
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
-		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.getBytes());
+		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.toCharArray());
 
 		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, TEST)) {
 			Resource resource = tx.getResourceMap().getBy(tx, "MyType", "@1"); //$NON-NLS-1$ //$NON-NLS-2$

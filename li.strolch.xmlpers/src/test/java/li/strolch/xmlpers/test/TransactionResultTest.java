@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,23 +26,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import li.strolch.xmlpers.api.*;
+import li.strolch.xmlpers.test.model.Book;
+import li.strolch.xmlpers.test.model.MyModel;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import li.strolch.xmlpers.api.IoMode;
-import li.strolch.xmlpers.api.ModificationResult;
-import li.strolch.xmlpers.api.ObjectDao;
-import li.strolch.xmlpers.api.PersistenceConstants;
-import li.strolch.xmlpers.api.PersistenceTransaction;
-import li.strolch.xmlpers.api.TransactionResult;
-import li.strolch.xmlpers.test.model.Book;
-import li.strolch.xmlpers.test.model.MyModel;
-
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class TransactionResultTest extends AbstractPersistenceTest {
 
@@ -59,12 +52,6 @@ public class TransactionResultTest extends AbstractPersistenceTest {
 		setup(properties);
 	}
 
-	private PersistenceTransaction freshTx() {
-		PersistenceTransaction tx = this.persistenceManager.openTx();
-		tx.setIoMode(IoMode.SAX);
-		return tx;
-	}
-
 	@Test
 	public void testWithTxResult() {
 
@@ -72,7 +59,7 @@ public class TransactionResultTest extends AbstractPersistenceTest {
 		performChanges(txResult);
 		String logMessage = txResult.getLogMessage();
 		logger.info(logMessage);
-		assertThat(logMessage, containsString("TX for realm defaultRealm was completed after")); //$NON-NLS-1$
+		assertThat(logMessage, containsString("TX was completed after")); //$NON-NLS-1$
 		assertThat(logMessage, containsString("30 objects in 2 types were modified")); //$NON-NLS-1$
 		assertThat(txResult.getKeys(), containsInAnyOrder("Resource", "Book")); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -119,12 +106,13 @@ public class TransactionResultTest extends AbstractPersistenceTest {
 		i = 0;
 		for (; i < 10; i++) {
 			String title = "Tx Result Test Book " + i; //$NON-NLS-1$
-			Book book = new Book((long) i, title, "Douglas Adams", "Apress", Math.random() * i); //$NON-NLS-1$ //$NON-NLS-2$
+			Book book = new Book((long) i, title, "Douglas Adams", "Apress",
+					Math.random() * i); //$NON-NLS-1$ //$NON-NLS-2$
 			books.add(book);
 		}
 
 		// save all
-		try (PersistenceTransaction tx = freshTx();) {
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			tx.setTransactionResult(txResult);
 			ObjectDao objectDao = tx.getObjectDao();
 			objectDao.addAll(resources);

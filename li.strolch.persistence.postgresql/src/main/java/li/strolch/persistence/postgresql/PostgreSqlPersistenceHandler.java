@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,6 @@ import li.strolch.persistence.postgresql.PostgreSqlDbConnectionBuilder.StrolchPo
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.DbConnectionBuilder;
-import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import org.postgresql.Driver;
 
@@ -64,7 +63,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 	/**
 	 * Returns the map of {@link DataSource} which can be used in maintenance mode
-	 * 
+	 *
 	 * @return the dsMap
 	 */
 	public Map<String, DataSource> getDataSources() {
@@ -78,8 +77,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		boolean allowSchemaCreation = configuration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
 		boolean allowSchemaMigration = configuration.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION, Boolean.FALSE);
 		boolean allowSchemaDrop = configuration.getBoolean(PROP_ALLOW_SCHEMA_DROP, Boolean.FALSE);
-		boolean allowDataInitOnSchemaCreate = configuration.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE,
-				Boolean.FALSE);
+		boolean allowDataInitOnSchemaCreate = configuration
+				.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE, Boolean.FALSE);
 
 		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX, this.getClass(),
 				allowSchemaCreation, allowSchemaMigration, allowSchemaDrop);
@@ -125,7 +124,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	Connection getConnection(String realm) {
 		DataSource ds = this.dsMap.get(realm);
 		if (ds == null) {
-			String msg = MessageFormat.format("There is no DataSource registered for the realm {0}", realm); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("There is no DataSource registered for the realm {0}", realm); //$NON-NLS-1$
 			throw new StrolchPersistenceException(msg);
 		}
 
@@ -155,16 +155,5 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	@Override
 	public AuditDao getAuditDao(StrolchTransaction tx) {
 		return ((PostgreSqlStrolchTransaction) tx).getAuditDao();
-	}
-
-	@Override
-	public void performDbInitialization() {
-		ComponentContainer container = getContainer();
-		StrolchAgent agent = container.getAgent();
-		PrivilegeHandler privilegeHandler = container.getPrivilegeHandler();
-		StrolchConfiguration strolchConfiguration = getContainer().getAgent().getStrolchConfiguration();
-		PostgreSqlDbInitializer sqlDbInitializer = new PostgreSqlDbInitializer(agent, this,
-				strolchConfiguration.getComponentConfiguration(getName()));
-		privilegeHandler.runAsAgent(sqlDbInitializer);
 	}
 }

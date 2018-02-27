@@ -15,19 +15,17 @@
  */
 package li.strolch.model.xml;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Date;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.StringHelper;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -38,10 +36,6 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 
 	private InputStream stream;
 
-	/**
-	 * @param listener
-	 * @param stream
-	 */
 	public XmlModelSaxStreamReader(StrolchElementListener listener, InputStream stream) {
 		super(listener);
 		this.stream = stream;

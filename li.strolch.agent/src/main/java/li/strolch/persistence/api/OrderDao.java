@@ -15,15 +15,12 @@
  */
 package li.strolch.persistence.api;
 
-import java.util.List;
-
 import li.strolch.model.Order;
-import li.strolch.model.query.OrderQuery;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface OrderDao extends StrolchDao<Order> {
 
-	public <U> List<U> doQuery(OrderQuery<U> query);
+	// marker interface
 }

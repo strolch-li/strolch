@@ -93,9 +93,4 @@ public interface PersistenceHandler {
 	 * @return the {@link AuditDao}
 	 */
 	public AuditDao getAuditDao(StrolchTransaction tx);
-
-	/**
-	 * Performs a database specific initialization of the underlying database for each realm.
-	 */
-	public void performDbInitialization();
 }

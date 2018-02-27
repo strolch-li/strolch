@@ -24,7 +24,7 @@ public class OrderParserFactory implements ParserFactory<Order> {
 
 	@Override
 	public DomParser<Order> getDomParser() {
-		return new OrderDomParser();
+		throw new UnsupportedOperationException("DOM Mode is not supported!");
 	}
 
 	@Override
