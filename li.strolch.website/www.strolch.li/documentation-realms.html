@@ -68,10 +68,6 @@
                 persistence layer. This allows for fast in-memory qeuries, but makes sure no data is lost when the agent
                 is restarted.
             </li>
-            <li>TRANSACTIONAL <br/> In this mode no data is kept in-memory and every query, and element retrieval is
-                passed to the persistence layer to be retrieved from the underlying database. This is similar to typical
-                Java applications where JPA is used.
-            </li>
         </ul>
 
         <p>Realms are mostly hidden from a developer as a <code>StrolchTransaction</code> exposes all important
@@ -79,7 +75,7 @@
             specific project. If the project only requires one realm, then the <code>defaultRealm</code> can be used,
             where the developer only is required to configure the mode and any relevant model file.</p>
 
-        <p>If the mode is CACHED or TRANSACTIONAL, then the <code>PersistenceHandler</code> component is required to be
+        <p>If the mode is CACHED, then the <code>PersistenceHandler</code> component is required to be
             configured, so that the DAOs know how to access the underlying database.</p>
 
         <p>The configuration in the <code>StrolchConfiguration.xml</code> file is as follows:</p>
@@ -93,10 +89,10 @@
       &lt;api&gt;li.strolch.agent.api.RealmHandler&lt;/api&gt;
       &lt;impl&gt;li.strolch.agent.impl.DefaultRealmHandler&lt;/impl&gt;
       &lt;depends&gt;PrivilegeHandler&lt;/depends&gt;
-      &lt;!-- if CACHED or TRANSACTIONAL: --&gt;
+      &lt;!-- if CACHED: --&gt;
       &lt;!--depends&gt;PersistenceHandler&lt;/depends--&gt;
       &lt;Properties&gt;
-        &lt;dataStoreMode&gt;EMPTY|TRANSIENT|CACHED|TRANSACTIONAL&lt;/dataStoreMode&gt;
+        &lt;dataStoreMode&gt;EMPTY|TRANSIENT|CACHED&lt;/dataStoreMode&gt;
         &lt;dataStoreFile&gt;StrolchModel.xml&lt;/dataStoreFile&gt;
       &lt;/Properties&gt;
     &lt;/Component&gt;
@@ -120,10 +116,9 @@
       &lt;depends&gt;PrivilegeHandler&lt;/depends&gt;
       &lt;depends&gt;PersistenceHandler&lt;/depends&gt;
       &lt;Properties&gt;
-        &lt;realms&gt;defaultRealm, cachedRealm, transactionalRealm&lt;/realms&gt;
+        &lt;realms&gt;defaultRealm, cachedRealm&lt;/realms&gt;
         &lt;dataStoreMode&gt;TRANSIENT&lt;/dataStoreMode&gt;
         &lt;dataStoreFile&gt;DefaultRealm.xml&lt;/dataStoreFile&gt;
-        &lt;dataStoreMode.transactionalRealm&gt;TRANSACTIONAL&lt;/dataStoreMode.transactionalRealm&gt;
         &lt;dataStoreMode.cachedRealm&gt;CACHED&lt;/dataStoreMode.cachedRealm&gt;
         &lt;dataStoreMode.emptyRealm&gt;EMPTY&lt;/dataStoreMode.emptyRealm&gt;
       &lt;/Properties&gt;
@@ -136,11 +131,6 @@
       &lt;Properties&gt;
         &lt;allowSchemaCreation&gt;true&lt;/allowSchemaCreation&gt;
         &lt;allowSchemaDrop&gt;true&lt;/allowSchemaDrop&gt;
-
-        &lt;db.url.transactionalRealm&gt;jdbc:postgresql://localhost/testdb1&lt;/db.url.transactionalRealm&gt;
-        &lt;db.username.transactionalRealm&gt;testuser1&lt;/db.username.transactionalRealm&gt;
-        &lt;db.password.transactionalRealm&gt;test&lt;/db.password.transactionalRealm&gt;
-        &lt;db.pool.maximumPoolSize.transactionalRealm&gt;1&lt;/db.pool.maximumPoolSize.transactionalRealm&gt;
 
         &lt;db.url.cachedRealm&gt;jdbc:postgresql://localhost/testdb2&lt;/db.url.cachedRealm&gt;
         &lt;db.username.cachedRealm&gt;testuser2&lt;/db.username.cachedRealm&gt;

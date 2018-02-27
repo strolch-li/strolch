@@ -210,10 +210,6 @@ try (StrolchTransaction tx = openTx(realmName)) {
                 <p>In this mode, all data is stored in memory, and any changes made are written back to the persistence
                     layer. This allows for fast in-memory quries, but makes sure no data is lost when the agent is
                     restarted.</p></li>
-            <li>TRANSACTIONAL
-                <p>In this mode no data is kept in memory and every query, and root element retrieval is passed to the
-                    persistence layer to be retrieved from the underlying database. This is what comes closest to a
-                    typical Java+Hibernate implementation.</p></li>
         </ul>
 
         <p>Strolch Realms are also responsible for opening Transactions, as these are bound to the persistence layer
@@ -404,8 +400,7 @@ public class SetParameterCommand extends Command {
                     </li>
                     <li>Configure and maintain the realms, which implement the multi-client capability</li>
                     <li>Provide a default ServiceHandler to perform Services at runtime</li>
-                    <li>Implements the realms which each can operate in different modes data store modes: TRANSACTIONAL,
-                        CACHED, TRANSIENT
+                    <li>Implements the realms which each can operate in different modes data store modes: CACHED, TRANSIENT
                     </li>
                 </ul>
             </li>
@@ -425,12 +420,12 @@ public class SetParameterCommand extends Command {
             <li><a href="https://github.com/4treesCH/strolch/tree/master/li.strolch.persistence.postgresql">li.strolch.persistence.postgresql</a>
 
                 <p>Implements a PostgreSQL persistence layer so that the Strolch model can be persisted to a PostgreSQL
-                    RDBMS when the realm is configured to have a data store mode of either CACHED or TRANSACTIONAL</p>
+                    RDBMS when the realm is configured to have a data store mode of CACHED.</p>
             </li>
             <li><a href="https://github.com/4treesCH/strolch/tree/master/li.strolch.persistence.xml">li.strolch.persistence.xml</a>
 
                 <p>Implements an XML persistence layer so that the Strolch model can be persisted to XML files when the
-                    realm is configured to have a data store mode of either CACHED or TRANSACTIONAL.</p>
+                    realm is configured to have a data store mode of CACHED.</p>
             </li>
             <li><a href="https://github.com/4treesCH/strolch/tree/master/li.strolch.rest">li.strolch.rest</a>
 
