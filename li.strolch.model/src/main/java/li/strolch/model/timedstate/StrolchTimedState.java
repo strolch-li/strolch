@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,6 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-import li.strolch.model.visitor.TimedStateVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -33,44 +32,46 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 
 	/**
 	 * get the hidden attribute
-	 * 
-	 * @return
+	 *
+	 * @return the hidden value
 	 */
 	public boolean isHidden();
 
 	/**
 	 * set the hidden attribute
-	 * 
+	 *
 	 * @param hidden
+	 * 		the new hidden value
 	 */
 	public void setHidden(boolean hidden);
 
 	/**
 	 * Get the UOM of this {@link Parameter}
-	 * 
-	 * @return
+	 *
+	 * @return the UOM
 	 */
 	public String getUom();
 
 	/**
 	 * Set the UOM of this {@link Parameter}
-	 * 
+	 *
 	 * @param uom
+	 * 		the new UOM
 	 */
 	public void setUom(String uom);
 
 	/**
 	 * Returns the index of this {@link Parameter}. This can be used to sort the parameters in a UI
-	 * 
+	 *
 	 * @return the index of this {@link Parameter}. This can be used to sort the parameters in a UI
 	 */
 	public int getIndex();
 
 	/**
 	 * Set the index of this {@link Parameter}. This can be used to sort the parameters in a UI
-	 * 
+	 *
 	 * @param index
-	 *            the index to set
+	 * 		the index to set
 	 */
 	public void setIndex(int index);
 
@@ -82,7 +83,7 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_ORDER_REF}</li>
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
-	 * 
+	 *
 	 * @return string value
 	 */
 	public String getInterpretation();
@@ -95,8 +96,9 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_ORDER_REF}</li>
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param interpretation
+	 * 		the interpretation
 	 */
 	public void setInterpretation(String interpretation);
 
@@ -112,9 +114,9 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 * set the value at a point in time to a given time value object from a string value
 	 *
 	 * @param time
-	 *            the time to set the {@link IValue}
+	 * 		the time to set the {@link IValue}
 	 * @param value
-	 *            the string to parse to an {@link IValue}
+	 * 		the string to parse to an {@link IValue}
 	 */
 	void setStateFromStringAt(final Long time, final String value);
 
@@ -124,6 +126,4 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 
 	@Override
 	public StrolchTimedState<T> getClone();
-
-	public <U> U accept(TimedStateVisitor visitor);
 }

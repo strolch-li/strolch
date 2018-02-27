@@ -52,9 +52,9 @@ public class AuditingOrderMap extends AuditingElementMapFacade<Order> implements
 
 	@Override
 	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery<U> query) {
-		OrderVisitor<U> orderVisitor = query.getOrderVisitor();
+		OrderVisitor<U> orderVisitor = query.getVisitor();
 		DBC.PRE.assertNotNull("orderVisitor on query", orderVisitor);
-		query.setOrderVisitor(order -> {
+		query.setVisitor(order -> {
 			this.read.add(order);
 			return order.accept(orderVisitor);
 		});

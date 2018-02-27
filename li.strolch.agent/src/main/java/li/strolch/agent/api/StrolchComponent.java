@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,17 +42,17 @@ import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
  * A {@link StrolchComponent} is a configurable extension to Strolch. Every major feature should be implemented as a
  * {@link StrolchComponent} so that they can be easily added or removed from a Strolch runtime.
  * </p>
- * 
+ *
  * <p>
  * A {@link StrolchComponent} has access to the container and can perform different operations. They can be passive or
  * active and their life cycle is bound to the container's life cycle
  * </p>
- * 
+ *
  * <p>
  * A {@link StrolchComponent} is registered in the Strolch configuration file and can have different configuration
  * depending on the container's runtime environment
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class StrolchComponent {
@@ -68,11 +68,11 @@ public class StrolchComponent {
 	/**
 	 * Constructor which takes a reference to the container and the component's name under which it can be retrieved at
 	 * runtime (although one mostly retrieves the component by interface class for automatic casting)
-	 * 
+	 *
 	 * @param container
-	 *            the container
+	 * 		the container
 	 * @param componentName
-	 *            the component name
+	 * 		the component name
 	 */
 	public StrolchComponent(ComponentContainer container, String componentName) {
 		this.container = container;
@@ -89,7 +89,7 @@ public class StrolchComponent {
 
 	/**
 	 * Returns the current component's state
-	 * 
+	 *
 	 * @return the component's current state
 	 */
 	public ComponentState getState() {
@@ -98,7 +98,7 @@ public class StrolchComponent {
 
 	/**
 	 * Returns the reference to the container for sub classes
-	 * 
+	 *
 	 * @return the reference to the container
 	 */
 	protected ComponentContainer getContainer() {
@@ -107,7 +107,7 @@ public class StrolchComponent {
 
 	/**
 	 * The components current configuration dependent on the environment which is loaded
-	 * 
+	 *
 	 * @return the component's configuration
 	 */
 	protected ComponentConfiguration getConfiguration() {
@@ -116,7 +116,7 @@ public class StrolchComponent {
 
 	/**
 	 * Return the {@link ExecutorService} instantiated for this agent
-	 * 
+	 *
 	 * @return the {@link ExecutorService} instantiated for this agent
 	 */
 	protected ExecutorService getExecutorService() {
@@ -124,12 +124,36 @@ public class StrolchComponent {
 	}
 
 	/**
+	 * Return the {@link ExecutorService} for the given poolName instantiated for this agent
+	 *
+	 * @param poolName
+	 * 		the name of the pool
+	 *
+	 * @return the {@link ExecutorService} for the given poolName  instantiated for this agent
+	 */
+	protected ExecutorService getExecutorService(String poolName) {
+		return this.container.getAgent().getExecutor(poolName);
+	}
+
+	/**
 	 * Return the {@link ScheduledExecutorService} instantiated for this agent
-	 * 
+	 *
 	 * @return the {@link ScheduledExecutorService} instantiated for this agent
 	 */
 	protected ScheduledExecutorService getScheduledExecutor() {
 		return this.container.getAgent().getScheduledExecutor();
+	}
+
+	/**
+	 * Return the {@link ScheduledExecutorService} for the given poolName instantiated for this agent
+	 *
+	 * @param poolName
+	 * 		the name of the pool
+	 *
+	 * @return the {@link ScheduledExecutorService} instantiated for this agent
+	 */
+	protected ScheduledExecutorService getScheduledExecutor(String poolName) {
+		return this.container.getAgent().getScheduledExecutor(poolName);
 	}
 
 	/**
@@ -156,8 +180,9 @@ public class StrolchComponent {
 
 	/**
 	 * Life cycle step setup. This is a very early step in the container's startup phase.
-	 * 
+	 *
 	 * @param configuration
+	 * 		the configuration
 	 */
 	public void setup(ComponentConfiguration configuration) {
 		this.state = this.state.validateStateChange(ComponentState.SETUP, getName());
@@ -165,9 +190,12 @@ public class StrolchComponent {
 
 	/**
 	 * Life cycle step initialize. Here you would typically read configuration values
-	 * 
+	 *
 	 * @param configuration
+	 * 		the configuration
+	 *
 	 * @throws Exception
+	 * 		if something goes wrong
 	 */
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 		this.configuration = configuration;
@@ -177,8 +205,9 @@ public class StrolchComponent {
 	/**
 	 * Life cycle step start. This is the last step of startup and is where threads and connections etc. would be
 	 * prepared. Can also be called after stop, to restart the component.
-	 * 
+	 *
 	 * @throws Exception
+	 * 		if something goes wrong
 	 */
 	public void start() throws Exception {
 		this.state = this.state.validateStateChange(ComponentState.STARTED, getName());
@@ -187,8 +216,9 @@ public class StrolchComponent {
 	/**
 	 * Life cycle step stop. This is the first step in the tearing down of the container. Stop all active threads and
 	 * connections here. After stop is called, another start might also be called to restart the component.
-	 * 
+	 *
 	 * @throws Exception
+	 * 		if something goes wrong
 	 */
 	public void stop() throws Exception {
 		this.state = this.state.validateStateChange(ComponentState.STOPPED, getName());
@@ -197,8 +227,9 @@ public class StrolchComponent {
 	/**
 	 * Life cycle step destroy. This is the last step in the tearing down of the container. Here you would release
 	 * remaining resources and the component can not be started anymore afterwards
-	 * 
+	 *
 	 * @throws Exception
+	 * 		if something goes wrong
 	 */
 	public void destroy() throws Exception {
 		this.state = this.state.validateStateChange(ComponentState.DESTROYED, getName());
@@ -207,13 +238,14 @@ public class StrolchComponent {
 	/**
 	 * Returns the reference to the {@link StrolchComponent} with the given name, if it exists. If it does not exist, an
 	 * {@link IllegalArgumentException} is thrown
-	 * 
+	 *
 	 * @param clazz
-	 * 
+	 * 		the type of component to return
+	 *
 	 * @return the component with the given name
-	 * 
+	 *
 	 * @throws IllegalArgumentException
-	 *             if the component does not exist
+	 * 		if the component does not exist
 	 */
 	protected <V> V getComponent(Class<V> clazz) {
 		return this.container.getComponent(clazz);
@@ -221,13 +253,14 @@ public class StrolchComponent {
 
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the given system user
-	 * 
+	 *
 	 * @param username
-	 *            the name of the system user to perform the action as
+	 * 		the name of the system user to perform the action as
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
 	 */
 	protected void runAs(String username, SystemAction action) throws PrivilegeException {
 		this.container.getPrivilegeHandler().runAs(username, action);
@@ -235,15 +268,16 @@ public class StrolchComponent {
 
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the given system user
-	 * 
+	 *
 	 * @param username
-	 *            the name of the system user to perform the action as
+	 * 		the name of the system user to perform the action as
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
 	 */
 	protected <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runWithResult(username, action);
@@ -251,13 +285,14 @@ public class StrolchComponent {
 
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the given system user
-	 * 
+	 *
 	 * @param username
-	 *            the name of the system user to perform the action as
+	 * 		the name of the system user to perform the action as
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
 	 */
 	protected void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException {
 		this.container.getPrivilegeHandler().runAs(username, runnable);
@@ -265,15 +300,16 @@ public class StrolchComponent {
 
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the given system user
-	 * 
+	 *
 	 * @param username
-	 *            the name of the system user to perform the action as
+	 * 		the name of the system user to perform the action as
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
 	 */
 	protected <T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runWithResult(username, runnable);
@@ -281,13 +317,12 @@ public class StrolchComponent {
 
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the given system user
-	 * 
-	 * @param username
-	 *            the name of the system user to perform the action as
+	 *
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
 	 */
 	protected void runAsAgent(SystemAction action) throws PrivilegeException {
 		this.container.getPrivilegeHandler().runAsAgent(action);
@@ -295,15 +330,14 @@ public class StrolchComponent {
 
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the given system user
-	 * 
-	 * @param username
-	 *            the name of the system user to perform the action as
+	 *
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
 	 */
 	protected <T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runAsAgentWithResult(action);
@@ -312,11 +346,12 @@ public class StrolchComponent {
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
 	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
+	 *
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
 		this.container.getPrivilegeHandler().runAsAgent(runnable);
@@ -325,13 +360,14 @@ public class StrolchComponent {
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
 	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
+	 *
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
 	 */
 	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runAsAgentWithResult(runnable);
@@ -339,10 +375,10 @@ public class StrolchComponent {
 
 	/**
 	 * Opens a {@link StrolchTransaction} for the default realm and certificate
-	 * 
+	 *
 	 * @param cert
-	 *            the certificate authorizing the transaction
-	 * 
+	 * 		the certificate authorizing the transaction
+	 *
 	 * @return the newly created transaction
 	 */
 	protected StrolchTransaction openTx(Certificate cert) {
@@ -351,12 +387,12 @@ public class StrolchComponent {
 
 	/**
 	 * Opens a {@link StrolchTransaction} for the given realm and certificate
-	 * 
+	 *
 	 * @param realm
-	 *            the name of the realm in which to open the transaction
+	 * 		the name of the realm in which to open the transaction
 	 * @param cert
-	 *            the certificate authorizing the transaction
-	 * 
+	 * 		the certificate authorizing the transaction
+	 *
 	 * @return the newly created transaction
 	 */
 	protected StrolchTransaction openTx(String realm, Certificate cert) {
@@ -365,14 +401,14 @@ public class StrolchComponent {
 
 	/**
 	 * Opens a {@link StrolchTransaction} for the given realm and certificate
-	 * 
+	 *
 	 * @param realm
-	 *            the name of the realm in which to open the transaction
+	 * 		the name of the realm in which to open the transaction
 	 * @param cert
-	 *            the certificate authorizing the transaction
+	 * 		the certificate authorizing the transaction
 	 * @param clazz
-	 *            the clazz describing the transaction context
-	 * 
+	 * 		the clazz describing the transaction context
+	 *
 	 * @return the newly created transaction
 	 */
 	protected StrolchTransaction openTx(String realm, Certificate cert, Class<?> clazz) {
@@ -382,9 +418,11 @@ public class StrolchComponent {
 	/**
 	 * Returns the version of this component. The version should be stored in the file
 	 * {@link #COMPONENT_VERSION_PROPERTIES}. See {@link ComponentVersion} for more information
-	 * 
+	 *
 	 * @return the component's version.
+	 *
 	 * @throws IOException
+	 * 		if the properties file containing the version could not be read
 	 */
 	public ComponentVersion getVersion() throws IOException {
 		if (this.version == null) {
@@ -395,8 +433,7 @@ public class StrolchComponent {
 				Properties properties = new Properties();
 				properties.load(stream);
 
-				ComponentVersion componentVersion = new ComponentVersion(getName(), properties);
-				this.version = componentVersion;
+				this.version = new ComponentVersion(getName(), properties);
 			}
 		}
 

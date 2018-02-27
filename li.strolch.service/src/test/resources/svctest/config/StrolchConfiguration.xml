@@ -22,7 +22,7 @@
 			<depends>PrivilegeHandler</depends>
 			<depends>PersistenceHandler</depends>
 			<Properties>
-				<realms>defaultRealm, svcTransient, svcCached, svcCachedAuditsVersioning, svcTransactional</realms>
+				<realms>defaultRealm, svcTransient, svcCached, svcCachedAuditsVersioning</realms>
 
 				<dataStoreMode>EMPTY</dataStoreMode>
 
@@ -41,9 +41,6 @@
 				<enableAuditTrail.svcCachedAuditsVersioning>true</enableAuditTrail.svcCachedAuditsVersioning>
 				<enableVersioning.svcCachedAuditsVersioning>true</enableVersioning.svcCachedAuditsVersioning>
 
-				<tryLockTimeUnit.svcTransactional>SECONDS</tryLockTimeUnit.svcTransactional>
-				<tryLockTime.svcTransactional>1</tryLockTime.svcTransactional>
-				<dataStoreMode.svcTransactional>TRANSACTIONAL</dataStoreMode.svcTransactional>
 			</Properties>
 		</Component>
 
@@ -64,11 +61,6 @@
 				<db.username.svcCachedAuditsVersioning>cacheduserauditsversioning</db.username.svcCachedAuditsVersioning>
 				<db.password.svcCachedAuditsVersioning>test</db.password.svcCachedAuditsVersioning>
 				<db.pool.maximumPoolSize.svcCachedAuditsVersioning>1</db.pool.maximumPoolSize.svcCachedAuditsVersioning>
-
-				<db.url.svcTransactional>jdbc:postgresql://localhost/transactionaluserdb</db.url.svcTransactional>
-				<db.username.svcTransactional>transactionaluser</db.username.svcTransactional>
-				<db.password.svcTransactional>test</db.password.svcTransactional>
-				<db.pool.maximumPoolSize.svcTransactional>1</db.pool.maximumPoolSize.svcTransactional>
 
 			</Properties>
 		</Component>

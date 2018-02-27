@@ -3,14 +3,9 @@ package li.strolch.execution;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.execution.command.ExecuteActivityCommand;
-import li.strolch.execution.command.SetActionToErrorCommand;
-import li.strolch.execution.command.SetActionToExecutedCommand;
-import li.strolch.execution.command.SetActionToStoppedCommand;
-import li.strolch.execution.command.SetActionToWarningCommand;
+import li.strolch.execution.command.*;
 import li.strolch.execution.policy.ActivityArchivalPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.handler.operationslog.LogMessage;
@@ -25,7 +20,6 @@ import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.privilege.model.PrivilegeContext;
-import li.strolch.runtime.ThreadPoolFactory;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.dbc.DBC;
@@ -40,8 +34,6 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	private static final String KEY_DEFAULT_ACTIVITY_ARCHIVAL = "key:DefaultActivityArchival";
 	private static final String PROP_RESTART_EXECUTION = "restartExecution";
-
-	private ExecutorService executorService;
 
 	private MapOfSets<String, Locator> registeredActivities;
 
@@ -62,8 +54,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	@Override
 	public void start() throws Exception {
 
-		this.executorService = Executors.newCachedThreadPool(new ThreadPoolFactory("ExecutionHandler"));
-		this.delayedExecutionTimer = new SimpleDurationExecutionTimer();
+		this.delayedExecutionTimer = new SimpleDurationExecutionTimer(getContainer().getAgent());
 
 		// restart execution of activities already in execution
 		if (!getConfiguration().getBoolean(PROP_RESTART_EXECUTION, Boolean.FALSE)) {
@@ -78,15 +69,6 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void stop() throws Exception {
-
-		if (this.executorService != null) {
-			this.executorService.shutdown();
-			while (!this.executorService.isTerminated()) {
-				logger.info("Waiting for executor service to terminate...");
-				Thread.sleep(50L);
-			}
-			this.executorService = null;
-		}
 
 		if (this.delayedExecutionTimer != null) {
 			this.delayedExecutionTimer.destroy();
@@ -169,7 +151,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toExecution(String realm, Locator locator) {
-		this.executorService.execute(() -> {
+		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
 					toExecution(realm, locator, ctx);
@@ -186,9 +168,13 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		});
 	}
 
+	private ExecutorService getExecutor() {
+		return getExecutorService("ExecutionHandler");
+	}
+
 	@Override
 	public void toExecuted(String realm, Locator locator) {
-		this.executorService.execute(() -> {
+		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
 					toExecuted(realm, locator, ctx);
@@ -207,7 +193,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toStopped(String realm, Locator locator) {
-		this.executorService.execute(() -> {
+		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
 					toStopped(realm, locator, ctx);
@@ -226,7 +212,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toError(String realm, Locator locator) {
-		this.executorService.execute(() -> {
+		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
 					toError(realm, locator, ctx);
@@ -245,7 +231,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toWarning(String realm, Locator locator) {
-		this.executorService.execute(() -> {
+		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
 					toWarning(realm, locator, ctx);
@@ -264,7 +250,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void archiveActivity(String realm, Locator activityLoc) {
-		this.executorService.execute(() -> {
+		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
 					try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ActivityArchivalPolicy.class)) {
@@ -344,7 +330,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			tx.flush();
 
 			// if the activity is now executed, remove it from the registered activities
-			Activity activity = action.getRootElement();
+			Activity activity = action.getRootElement().getClone(true);
 			if (activity.getState().isExecuted()) {
 
 				synchronized (this.registeredActivities) {

@@ -5,12 +5,12 @@ import java.util.Set;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import li.strolch.exception.StrolchModelException;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.StrolchRootElement;
+import li.strolch.model.*;
 import li.strolch.model.Tags.Json;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.dbc.DBC;
 
@@ -19,26 +19,32 @@ import li.strolch.utils.dbc.DBC;
  * Maps a given {@link JsonObject} to a {@link StrolchRootElement}. All {@link Parameter Parameters} on the element are
  * iterated and expected to be found as a member on the {@link JsonObject}.
  * </p>
- * 
+ * <p>
  * <p>
  * To ignore {@link Parameter Parameters} or {@link ParameterBag ParameterBags} use the
  * {@link #ignoreParameter(String, String)} and {@link #ignoreBag(String)} methods
  * </p>
- * 
+ * <p>
  * <p>
  * {@link Parameter} can be made optional by using the {@link #optionalParameter(String, String)} method
  * </p>
- * 
- * @author Robert von Burg <eitch@eitchnet.ch>
  *
- * @param <T>
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class FromFlatJsonVisitor {
+public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
 	private MapOfSets<String, String> ignoredKeys;
 	private MapOfSets<String, String> optionalKeys;
 
+	private JsonObject srcObject;
+
 	public FromFlatJsonVisitor() {
+		this.ignoredKeys = new MapOfSets<>();
+		this.optionalKeys = new MapOfSets<>();
+	}
+
+	public FromFlatJsonVisitor(JsonObject srcObject) {
+		this.srcObject = srcObject;
 		this.ignoredKeys = new MapOfSets<>();
 		this.optionalKeys = new MapOfSets<>();
 	}
@@ -63,17 +69,58 @@ public class FromFlatJsonVisitor {
 		return this;
 	}
 
-	public void visit(StrolchRootElement element, JsonObject jsonObject) {
+	@Override
+	public Void visitResource(Resource dstElement) {
+		if (this.srcObject.has(Json.OBJECT_TYPE)) {
+			DBC.PRE.assertEquals("objectType must be the same, if set on JsonObject!", dstElement.getObjectType(),
+					srcObject.get(Json.OBJECT_TYPE).getAsString());
+		}
 
-		DBC.PRE.assertTrue("objectType must be set!", jsonObject.has(Json.OBJECT_TYPE));
-		DBC.PRE.assertEquals("objectType must be the same!", element.getObjectType(),
-				jsonObject.get(Json.OBJECT_TYPE).getAsString());
+		visit(dstElement);
+		return null;
+	}
+
+	@Override
+	public Void visitOrder(Order dstElement) {
+		if (this.srcObject.has(Json.OBJECT_TYPE)) {
+			DBC.PRE.assertEquals("objectType must be the same, if set on JsonObject!", dstElement.getObjectType(),
+					srcObject.get(Json.OBJECT_TYPE).getAsString());
+		}
+
+		visit(dstElement);
+		return null;
+	}
+
+	@Override
+	public Void visitActivity(Activity dstElement) {
+		throw new UnsupportedOperationException("Activity elements are not supported by this visitor!");
+	}
+
+	public void visit(StrolchRootElement dstElement, JsonObject srcObject) {
+		if (this.srcObject != null && this.srcObject != srcObject) {
+			throw new IllegalStateException("The srcObject was already set with a different value in the constructor!");
+		}
+
+		DBC.PRE.assertTrue("objectType must be set!", srcObject.has(Json.OBJECT_TYPE));
+		DBC.PRE.assertEquals("objectType must be the same!", dstElement.getObjectType(),
+				srcObject.get(Json.OBJECT_TYPE).getAsString());
+
+		this.srcObject = srcObject;
+		visit(dstElement);
+	}
+
+	public void visit(StrolchRootElement dstElement) {
+
+		// types must be the same, if exists on source element
+		if (this.srcObject.has(Json.TYPE))
+			DBC.PRE.assertEquals("type must be the same!", dstElement.getObjectType(),
+					this.srcObject.get(Json.TYPE).getAsString());
 
 		// update name if possible
-		if (jsonObject.has(Json.NAME))
-			element.setName(jsonObject.get(Json.NAME).getAsString());
+		if (this.srcObject.has(Json.NAME))
+			dstElement.setName(srcObject.get(Json.NAME).getAsString());
 
-		Set<String> bagKeySet = element.getParameterBagKeySet();
+		Set<String> bagKeySet = dstElement.getParameterBagKeySet();
 		for (String bagId : bagKeySet) {
 
 			// see if we have to ignore this bag i.e. empty set existing
@@ -81,7 +128,7 @@ public class FromFlatJsonVisitor {
 			if (ignoredParamIds != null && ignoredParamIds.isEmpty())
 				continue;
 
-			ParameterBag parameterBag = element.getParameterBag(bagId);
+			ParameterBag parameterBag = dstElement.getParameterBag(bagId);
 
 			Set<String> parameterKeySet = parameterBag.getParameterKeySet();
 			for (String paramId : parameterKeySet) {
@@ -90,7 +137,7 @@ public class FromFlatJsonVisitor {
 				if (ignoredParamIds != null && ignoredParamIds.contains(paramId))
 					continue;
 
-				JsonElement jsonElement = jsonObject.get(paramId);
+				JsonElement jsonElement = this.srcObject.get(paramId);
 				if (jsonElement == null) {
 					if (this.optionalKeys.containsElement(bagId, paramId))
 						continue;
@@ -98,8 +145,9 @@ public class FromFlatJsonVisitor {
 				}
 
 				if (!jsonElement.isJsonPrimitive()) {
-					throw new StrolchModelException("JsonElement " + paramId + " is not a json primitive but a "
-							+ jsonElement.getClass().getName());
+					throw new StrolchModelException(
+							"JsonElement " + paramId + " is not a json primitive but a " + jsonElement.getClass()
+									.getName());
 				}
 
 				Parameter<?> parameter = parameterBag.getParameter(paramId);

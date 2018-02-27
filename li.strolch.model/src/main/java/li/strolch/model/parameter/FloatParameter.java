@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +16,12 @@
 package li.strolch.model.parameter;
 
 import li.strolch.model.StrolchValueType;
-import li.strolch.model.visitor.ParameterVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.MathHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
 public class FloatParameter extends AbstractParameter<Double> {
 
@@ -40,8 +40,11 @@ public class FloatParameter extends AbstractParameter<Double> {
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public FloatParameter(String id, String name, Double value) {
 		super(id, name);
@@ -62,17 +65,19 @@ public class FloatParameter extends AbstractParameter<Double> {
 
 	@Override
 	public void setValue(Double value) {
+		assertNotReadonly();
 		validateValue(value);
-		this.value = value;
+		this.value = MathHelper.toPrecision(value, 8);
 	}
 
 	/**
 	 * Sets the value to 0
-	 * 
+	 *
 	 * @see Parameter#clear()
 	 */
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value = 0.0D;
 	}
 
@@ -103,7 +108,7 @@ public class FloatParameter extends AbstractParameter<Double> {
 	}
 
 	@Override
-	public <U> U accept(ParameterVisitor visitor) {
+	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitFloatParam(this);
 	}
 

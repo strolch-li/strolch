@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,6 +70,7 @@ import li.strolch.service.UpdateActivityService.UpdateActivityArg;
 import li.strolch.service.UpdateOrderService.UpdateOrderArg;
 import li.strolch.service.UpdateResourceService.UpdateResourceArg;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,9 +91,9 @@ public class Inspector {
 				.openTx(certificate, Inspector.class);
 	}
 
-	private String toString(JsonObject jsonObject) {
+	private String toString(JsonElement jsonElement) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.toJson(jsonObject);
+		return gson.toJson(jsonElement);
 	}
 
 	@GET
@@ -396,8 +397,6 @@ public class Inspector {
 		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		List<Resource> resources = new ArrayList<>();
-
 		// parse the query string
 		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(queryData.getQuery(), true, true, false);
 
@@ -405,11 +404,12 @@ public class Inspector {
 		query.setNavigation(new StrolchTypeNavigation(type));
 
 		// query the data
+		List<Resource> resources;
 		long dataSetSize = 0L;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			dataSetSize = resourceMap.querySize(tx);
-			resources.addAll(tx.doQuery(query));
+			resources = tx.doQuery(query);
 		}
 
 		// do ordering
@@ -432,18 +432,17 @@ public class Inspector {
 		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		List<Order> orders = new ArrayList<>();
-
 		// parse the query string
 		OrderQuery<Order> query = QueryParser.parseToOrderQuery(queryData.getQuery(), true, true, false);
 		query.setNavigation(new StrolchTypeNavigation(type));
 
 		// query the data
+		List<Order> orders;
 		long dataSetSize = 0L;
-		try (StrolchTransaction tx = openTx(cert, queryData.getRealmName())) {
+		try (StrolchTransaction tx = openTx(cert, realm)) {
 			OrderMap orderMap = tx.getOrderMap();
 			dataSetSize = orderMap.querySize(tx);
-			orders.addAll(tx.doQuery(query));
+			orders = tx.doQuery(query);
 		}
 
 		// do ordering
@@ -466,18 +465,17 @@ public class Inspector {
 		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		List<Activity> activities = new ArrayList<>();
-
 		// parse the query string
 		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true, true, false);
 		query.setNavigation(new StrolchTypeNavigation(type));
 
 		// query the data
+		List<Activity> activities;
 		long dataSetSize = 0L;
-		try (StrolchTransaction tx = openTx(cert, queryData.getRealmName())) {
+		try (StrolchTransaction tx = openTx(cert, realm)) {
 			ActivityMap activityMap = tx.getActivityMap();
 			dataSetSize = activityMap.querySize(tx);
-			activities.addAll(tx.doQuery(query));
+			activities = tx.doQuery(query);
 		}
 
 		// do ordering
@@ -609,6 +607,7 @@ public class Inspector {
 		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withVersion();
 		if (Boolean.parseBoolean(flat))
 			visitor.flat();
+
 		return Response.ok().entity(toString(resource.accept(visitor))).build();
 	}
 
@@ -726,9 +725,11 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		Resource resource = parseResourceFromXml(type, data);
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, resource.getId());
 
 		UpdateResourceService svc = new UpdateResourceService();
 		UpdateResourceArg arg = new UpdateResourceArg();
+		arg.refreshUnknownVersion = true;
 		arg.resource = resource;
 		arg.realm = realm;
 
@@ -770,12 +771,12 @@ public class Inspector {
 			// parse from complete JSON
 			ResourceFromJsonVisitor visitor = new ResourceFromJsonVisitor();
 			resource = visitor.visit(jsonObject);
-
-			// we are missing a version, so:
-			arg.refreshUnknownVersion = true;
 		}
 
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, resource.getId());
+
 		// prepare argument
+		arg.refreshUnknownVersion = true;
 		arg.resource = resource;
 		arg.realm = realm;
 
@@ -801,9 +802,11 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		Order order = parseOrderFromXml(type, data);
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, order.getId());
 
 		UpdateOrderService svc = new UpdateOrderService();
 		UpdateOrderArg arg = new UpdateOrderArg();
+		arg.refreshUnknownVersion = true;
 		arg.order = order;
 		arg.realm = realm;
 
@@ -845,12 +848,12 @@ public class Inspector {
 			// parse from complete JSON
 			OrderFromJsonVisitor visitor = new OrderFromJsonVisitor();
 			order = visitor.visit(jsonObject);
-
-			// we are missing a version, so:
-			arg.refreshUnknownVersion = true;
 		}
 
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, order.getId());
+
 		// prepare argument
+		arg.refreshUnknownVersion = true;
 		arg.order = order;
 		arg.realm = realm;
 
@@ -876,9 +879,11 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		Activity activity = parseActivityFromXml(type, data);
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, activity.getId());
 
 		UpdateActivityService svc = new UpdateActivityService();
 		UpdateActivityArg arg = new UpdateActivityArg();
+		arg.refreshUnknownVersion = true;
 		arg.activity = activity;
 		arg.realm = realm;
 
@@ -920,12 +925,12 @@ public class Inspector {
 			// parse from complete JSON
 			ActivityFromJsonVisitor visitor = new ActivityFromJsonVisitor();
 			activity = visitor.visit(jsonObject);
-
-			// we are missing a version, so:
-			arg.refreshUnknownVersion = true;
 		}
 
+		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, activity.getId());
+
 		// prepare argument
+		arg.refreshUnknownVersion = true;
 		arg.activity = activity;
 		arg.realm = realm;
 
@@ -981,7 +986,8 @@ public class Inspector {
 			return ResponseUtil.toResponse(e);
 		} finally {
 			if (tempFile != null) {
-				tempFile.delete();
+				if (!tempFile.delete())
+					logger.error("Failed to delete " + tempFile.getAbsolutePath());
 			}
 		}
 	}
@@ -1150,7 +1156,7 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
 	@Path("{realm}/activities")
-	public Response addActivitiyAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
+	public Response addActivityAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -1175,7 +1181,7 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities")
-	public Response addActivitiyAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
+	public Response addActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -1203,7 +1209,7 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}")
-	public Response addActivitiyAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
+	public Response addActivityAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -1297,6 +1303,9 @@ public class Inspector {
 								""));
 
 			resource = listener.getResources().get(0);
+			resource.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, resource.getType());
 
 		} catch (Exception e) {
 			throw new StrolchPersistenceException(
@@ -1324,6 +1333,9 @@ public class Inspector {
 								""));
 
 			order = listener.getOrders().get(0);
+			order.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, order.getType());
 
 		} catch (Exception e) {
 			throw new StrolchPersistenceException(
@@ -1353,6 +1365,9 @@ public class Inspector {
 								""));
 
 			activity = listener.getActivities().get(0);
+			activity.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, activity.getType());
 
 		} catch (Exception e) {
 			throw new StrolchPersistenceException(
@@ -1382,6 +1397,9 @@ public class Inspector {
 			// parse from complete JSON
 			ResourceFromJsonVisitor visitor = new ResourceFromJsonVisitor();
 			resource = visitor.visit(jsonObject);
+			resource.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, resource.getType());
 		}
 
 		return resource;
@@ -1406,6 +1424,9 @@ public class Inspector {
 			// parse from complete JSON
 			OrderFromJsonVisitor visitor = new OrderFromJsonVisitor();
 			order = visitor.visit(jsonObject);
+			order.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, order.getType());
 		}
 
 		return order;
@@ -1430,6 +1451,9 @@ public class Inspector {
 			// parse from complete JSON
 			ActivityFromJsonVisitor visitor = new ActivityFromJsonVisitor();
 			activity = visitor.visit(jsonObject);
+			activity.setVersion(null);
+
+			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, activity.getType());
 		}
 
 		return activity;

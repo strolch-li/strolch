@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@
 package li.strolch.model.parameter;
 
 import li.strolch.model.StrolchValueType;
-import li.strolch.model.visitor.ParameterVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
@@ -40,8 +40,11 @@ public class DurationParameter extends AbstractParameter<Long> {
 	 * Default Constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public DurationParameter(String id, String name, Long value) {
 		super(id, name);
@@ -61,17 +64,19 @@ public class DurationParameter extends AbstractParameter<Long> {
 
 	@Override
 	public void setValue(Long value) {
+		assertNotReadonly();
 		validateValue(value);
 		this.value = value;
 	}
 
 	/**
 	 * Sets the value to 0
-	 * 
+	 *
 	 * @see Parameter#clear()
 	 */
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value = 0L;
 	}
 
@@ -102,7 +107,7 @@ public class DurationParameter extends AbstractParameter<Long> {
 	}
 
 	@Override
-	public <U> U accept(ParameterVisitor visitor) {
+	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitDurationParam(this);
 	}
 

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -204,8 +204,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 		});
 
-		List<RoleRep> roles = rolesStream.map(Role::asRoleRep).collect(Collectors.toList());
-		return roles;
+		return rolesStream.map(Role::asRoleRep).collect(Collectors.toList());
 	}
 
 	@Override
@@ -228,8 +227,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 		});
 
-		List<UserRep> users = usersStream.map(User::asUserRep).collect(Collectors.toList());
-		return users;
+		return usersStream.map(User::asUserRep).collect(Collectors.toList());
 	}
 
 	@Override
@@ -241,8 +239,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		String selUserId = selectorRep.getUserId();
 		String selUsername = selectorRep.getUsername();
-		String selFirstname = selectorRep.getFirstname();
-		String selLastname = selectorRep.getLastname();
+		String selFirstName = selectorRep.getFirstname();
+		String selLastName = selectorRep.getLastname();
 		UserState selUserState = selectorRep.getUserState();
 		Locale selLocale = selectorRep.getLocale();
 		Set<String> selRoles = selectorRep.getRoles();
@@ -262,60 +260,30 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// selections
 			boolean userIdSelected;
 			boolean usernameSelected;
-			boolean firstnameSelected;
-			boolean lastnameSelected;
+			boolean firstNameSelected;
+			boolean lastNameSelected;
 			boolean userStateSelected;
 			boolean localeSelected;
 			boolean roleSelected;
 			boolean propertySelected;
 
 			// userId
-			if (selUserId == null)
-				userIdSelected = true;
-			else if (selUserId.equals(user.getUserId()))
-				userIdSelected = true;
-			else
-				userIdSelected = false;
+			userIdSelected = selUserId == null || selUserId.equals(user.getUserId());
 
 			// username
-			if (selUsername == null)
-				usernameSelected = true;
-			else if (selUsername.equals(user.getUsername()))
-				usernameSelected = true;
-			else
-				usernameSelected = false;
+			usernameSelected = selUsername == null || selUsername.equals(user.getUsername());
 
 			// firstname
-			if (selFirstname == null)
-				firstnameSelected = true;
-			else if (selFirstname.equals(user.getFirstname()))
-				firstnameSelected = true;
-			else
-				firstnameSelected = false;
+			firstNameSelected = selFirstName == null || selFirstName.equals(user.getFirstname());
 
 			// lastname
-			if (selLastname == null)
-				lastnameSelected = true;
-			else if (selLastname.equals(user.getLastname()))
-				lastnameSelected = true;
-			else
-				lastnameSelected = false;
+			lastNameSelected = selLastName == null || selLastName.equals(user.getLastname());
 
 			// user state
-			if (selUserState == null)
-				userStateSelected = true;
-			else if (selUserState.equals(user.getUserState()))
-				userStateSelected = true;
-			else
-				userStateSelected = false;
+			userStateSelected = selUserState == null || selUserState.equals(user.getUserState());
 
 			// locale
-			if (selLocale == null)
-				localeSelected = true;
-			else if (selLocale.equals(user.getLocale()))
-				localeSelected = true;
-			else
-				localeSelected = false;
+			localeSelected = selLocale == null || selLocale.equals(user.getLocale());
 
 			// roles
 			roleSelected = isSelectedByRole(selRoles, user.getRoles());
@@ -324,7 +292,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			propertySelected = isSelectedByProperty(selPropertyMap, user.getProperties());
 
 			boolean selected =
-					userIdSelected && usernameSelected && firstnameSelected && lastnameSelected && userStateSelected
+					userIdSelected && usernameSelected && firstNameSelected && lastNameSelected && userStateSelected
 							&& localeSelected && roleSelected && propertySelected;
 
 			if (selected)
@@ -378,11 +346,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * null or empty, then true is returned, otherwise false
 	 */
 	private boolean isSelectedByRole(Set<String> selectionRoles, Set<String> roles) {
-
-		if (selectionRoles == null)
-			return true;
-
-		return roles.containsAll(selectionRoles);
+		return selectionRoles == null || roles.containsAll(selectionRoles);
 	}
 
 	@Override
@@ -531,7 +495,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Set<String> roles = userRep.getRoles();
 		Locale locale = userRep.getLocale();
 		Map<String, String> properties = userRep.getProperties();
-		return new User(userId, userName, passwordHash, salt, firstName, lastName, state, roles, locale, properties);
+		return new User(userId, userName, passwordHash, salt, this.encryptionHandler.getAlgorithm(),
+				this.encryptionHandler.getIterations(), this.encryptionHandler.getKeyLength(), firstName, lastName,
+				state, roles, locale, properties);
 	}
 
 	@Override
@@ -562,26 +528,30 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String username = existingUser.getUsername();
 		byte[] password = existingUser.getPassword();
 		byte[] salt = existingUser.getSalt();
-		String firstname = existingUser.getFirstname();
-		String lastname = existingUser.getLastname();
+		String firstName = existingUser.getFirstname();
+		String lastName = existingUser.getLastname();
 		UserState userState = existingUser.getUserState();
 		Set<String> roles = existingUser.getRoles();
 		Locale locale = existingUser.getLocale();
 		Map<String, String> propertyMap = existingUser.getProperties();
 
+		String hashAlgorithm = existingUser.getHashAlgorithm();
+		int hashIterations = existingUser.getHashIterations();
+		int hashKeyLength = existingUser.getHashKeyLength();
+
 		// get updated fields
 		if (StringHelper.isNotEmpty(userRep.getFirstname()))
-			firstname = userRep.getFirstname();
+			firstName = userRep.getFirstname();
 		if (StringHelper.isNotEmpty(userRep.getLastname()))
-			lastname = userRep.getLastname();
+			lastName = userRep.getLastname();
 		if (userRep.getLocale() != null)
 			locale = userRep.getLocale();
 		if (userRep.getProperties() != null && !userRep.getProperties().isEmpty())
 			propertyMap = userRep.getProperties();
 
 		// create new user
-		User newUser = new User(userId, username, password, salt, firstname, lastname, userState, roles, locale,
-				propertyMap);
+		User newUser = new User(userId, username, password, salt, hashAlgorithm, hashIterations, hashKeyLength,
+				firstName, lastName, userState, roles, locale, propertyMap);
 
 		// detect privilege conflicts
 		assertNoPrivilegeConflict(newUser);
@@ -656,7 +626,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		newRoles.add(roleName);
 
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
-				existingUser.getSalt(), existingUser.getFirstname(), existingUser.getLastname(),
+				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
+				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
 				existingUser.getUserState(), newRoles, existingUser.getLocale(), existingUser.getProperties());
 
 		// detect privilege conflicts
@@ -699,7 +670,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Set<String> newRoles = new HashSet<>(currentRoles);
 		newRoles.remove(roleName);
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
-				existingUser.getSalt(), existingUser.getFirstname(), existingUser.getLastname(),
+				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
+				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
 				existingUser.getUserState(), newRoles, existingUser.getLocale(), existingUser.getProperties());
 
 		// delegate user replacement to persistence handler
@@ -725,7 +697,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
-				existingUser.getSalt(), existingUser.getFirstname(), existingUser.getLastname(),
+				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
+				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
 				existingUser.getUserState(), existingUser.getRoles(), locale, existingUser.getProperties());
 
 		// if the user is not setting their own locale, then make sure this user may set this user's locale
@@ -776,8 +749,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// create new user
 			User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), passwordHash, salt,
-					existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(),
-					existingUser.getRoles(), existingUser.getLocale(), existingUser.getProperties());
+					this.encryptionHandler.getAlgorithm(), this.encryptionHandler.getIterations(),
+					this.encryptionHandler.getKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
+					existingUser.getUserState(), existingUser.getRoles(), existingUser.getLocale(),
+					existingUser.getProperties());
 
 			if (!certificate.getUsername().equals(username)) {
 				// check that the user may change their own password
@@ -819,7 +794,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
-				existingUser.getSalt(), existingUser.getFirstname(), existingUser.getLastname(), state,
+				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
+				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(), state,
 				existingUser.getRoles(), existingUser.getLocale(), existingUser.getProperties());
 
 		// validate that this user may modify this user's state
@@ -1300,17 +1276,52 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new AccessDeniedException(
 					MessageFormat.format("User {0} has no password and may not login!", username)); //$NON-NLS-1$
 		byte[] salt = user.getSalt();
-		if (salt == null)
-			throw new AccessDeniedException(
-					MessageFormat.format("User {0} has no salt and may not login!", username)); //$NON-NLS-1$
 
 		// we only work with hashed passwords
-		byte[] passwordHash = this.encryptionHandler.hashPassword(password, salt);
+		byte[] passwordHash;
+		if (salt == null) {
+			passwordHash = this.encryptionHandler.hashPasswordWithoutSalt(password);
+		} else if (user.getHashAlgorithm() == null || user.getHashIterations() == -1 || user.getHashKeyLength() == -1) {
+			passwordHash = this.encryptionHandler.hashPassword(password, salt);
+		} else {
+			passwordHash = this.encryptionHandler
+					.hashPassword(password, salt, user.getHashAlgorithm(), user.getHashIterations(),
+							user.getHashKeyLength());
+		}
 
 		// validate password
 		if (!Arrays.equals(passwordHash, pwHash))
 			throw new InvalidCredentialsException(
 					MessageFormat.format("Password is incorrect for {0}", username)); //$NON-NLS-1$
+
+		// see if we need to update the hash
+		if (user.getHashAlgorithm() == null || user.getHashIterations() != this.encryptionHandler.getIterations()
+				|| user.getHashKeyLength() != this.encryptionHandler.getKeyLength()) {
+
+			logger.warn("Updating user " + username + " due to change in hashing algorithm properties ");
+
+			// get new salt for user
+			salt = this.encryptionHandler.nextSalt();
+
+			// hash password
+			passwordHash = this.encryptionHandler.hashPassword(password, salt);
+
+			// create new user
+			User newUser = new User(user.getUserId(), user.getUsername(), passwordHash, salt,
+					this.encryptionHandler.getAlgorithm(), this.encryptionHandler.getIterations(),
+					this.encryptionHandler.getKeyLength(), user.getFirstname(), user.getLastname(), user.getUserState(),
+					user.getRoles(), user.getLocale(), user.getProperties());
+
+			// delegate user replacement to persistence handler
+			this.persistenceHandler.replaceUser(newUser);
+
+			// perform automatic persisting, if enabled
+			if (this.autoPersistOnUserChangesData) {
+				this.persistenceHandler.persist();
+			}
+
+			logger.info("Updated password for " + newUser.getUsername());
+		}
 
 		return user;
 	}
@@ -1515,12 +1526,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @throws PrivilegeException
 	 * 		if the this method is called multiple times or an initialization exception occurs
 	 */
-	public synchronized void initialize(Map<String, String> parameterMap,
-										EncryptionHandler encryptionHandler,
-										PersistenceHandler persistenceHandler,
-										UserChallengeHandler userChallengeHandler,
-										SingleSignOnHandler ssoHandler,
-										Map<String, Class<PrivilegePolicy>> policyMap) {
+	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
+			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
+			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
 
 		if (this.initialized)
 			throw new PrivilegeException("Already initialized!"); //$NON-NLS-1$

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,6 +31,7 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	protected long dbid = Long.MAX_VALUE;
 	protected String id;
 	protected String name;
+	protected boolean readOnly;
 
 	/**
 	 * Empty constructor - for marshalling only!
@@ -43,9 +44,9 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	 * Default constructor
 	 *
 	 * @param id
-	 *            id of this {@link StrolchElement}
+	 * 		id of this {@link StrolchElement}
 	 * @param name
-	 *            name of this {@link StrolchElement}
+	 * 		name of this {@link StrolchElement}
 	 */
 	public AbstractStrolchElement(String id, String name) {
 		setId(id);
@@ -69,6 +70,7 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 
 	@Override
 	public void setId(String id) {
+		assertNotReadonly();
 		if (StringHelper.isEmpty(id)) {
 			String msg = "The id may never be empty for {0}";
 			msg = MessageFormat.format(msg, getClass().getSimpleName());
@@ -84,6 +86,7 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 
 	@Override
 	public void setName(String name) {
+		assertNotReadonly();
 		if (StringHelper.isEmpty(name)) {
 			String msg = "The name may never be empty for {0} {1}";
 			msg = MessageFormat.format(msg, getClass().getSimpleName(), getLocator());
@@ -97,7 +100,7 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	 * implemented as parents must first add their {@link Locator} information
 	 *
 	 * @param locatorBuilder
-	 *            the {@link LocatorBuilder} to which the {@link StrolchElement} must add its locator information
+	 * 		the {@link LocatorBuilder} to which the {@link StrolchElement} must add its locator information
 	 */
 	protected abstract void fillLocator(LocatorBuilder locatorBuilder);
 
@@ -105,10 +108,28 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	 * fills the {@link StrolchElement} clone with the id, name and type
 	 *
 	 * @param clone
+	 * 		the clone to fill
 	 */
 	protected void fillClone(StrolchElement clone) {
 		clone.setId(getId());
 		clone.setName(getName());
+	}
+
+	@Override
+	public boolean isReadOnly() {
+		return this.readOnly;
+	}
+
+	@Override
+	public void setReadOnly() {
+		this.readOnly = true;
+	}
+
+	protected void assertNotReadonly() {
+		if (this.readOnly) {
+			throw new IllegalStateException(
+					"The element " + getLocator() + " is currently readOnly, to modify clone first!");
+		}
 	}
 
 	@Override

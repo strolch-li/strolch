@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,6 @@ import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.query.ordering.StrolchQueryOrdering;
 import li.strolch.model.visitor.ResourceVisitor;
-import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -30,17 +29,17 @@ import li.strolch.utils.dbc.DBC;
  * mechanism allows you to query only the values of a {@link Parameter} instead of having to return all the elements and
  * then performing this transformation.
  * </p>
- * 
+ *
  * <p>
  * The {@link ResourceVisitor} is intended for situations where the query result should not be {@link Resource} but some
  * other object type. For instance in a restful API, the result might have to be mapped to a POJO, thus using this
  * method can perform the mapping step for you
  * </p>
- * 
+ *
  * @param <U>
- *            defines the return type of this query. Depending on the user {@link ResourceVisitor} this query can return
- *            a {@link Resource}, or any type of object to which the visitor mapped the resource
- * 
+ * 		defines the return type of this query. Depending on the user {@link ResourceVisitor} this query can return
+ * 		a {@link Resource}, or any type of object to which the visitor mapped the resource
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> {
@@ -64,7 +63,7 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 		this.resourceVisitor = identityVisitor;
 	}
 
-	public ResourceVisitor<U> getResourceVisitor() {
+	public ResourceVisitor<U> getVisitor() {
 		return this.resourceVisitor;
 	}
 
@@ -74,15 +73,9 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 		return this;
 	}
 
-	public ResourceQuery<U> setVisitor(StrolchElementVisitor<U> visitor) {
+	public ResourceQuery<U> setVisitor(ResourceVisitor<U> visitor) {
 		DBC.PRE.assertNotNull("visitor", visitor);
-		this.resourceVisitor = visitor.asResourceVisitor();
-		return this;
-	}
-
-	public ResourceQuery<U> setResourceVisitor(ResourceVisitor<U> resourceVisitor) {
-		DBC.PRE.assertNotNull("resourceVisitor", resourceVisitor);
-		this.resourceVisitor = resourceVisitor;
+		this.resourceVisitor = visitor;
 		return this;
 	}
 
@@ -122,7 +115,7 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 	}
 
 	public static ResourceQuery<Resource> query(String type) {
-		return new ResourceQuery<Resource>(new StrolchTypeNavigation(type));
+		return new ResourceQuery<>(new StrolchTypeNavigation(type));
 	}
 
 	public static ResourceQuery<Resource> query(String type, StrolchQueryOrdering ordering) {
@@ -130,12 +123,11 @@ public class ResourceQuery<U> extends StrolchElementQuery<ResourceQueryVisitor> 
 	}
 
 	public static <U> ResourceQuery<U> query(String type, ResourceVisitor<U> resourceVisitor) {
-		return new ResourceQuery<U>(new StrolchTypeNavigation(type)).setResourceVisitor(resourceVisitor);
+		return new ResourceQuery<U>(new StrolchTypeNavigation(type)).setVisitor(resourceVisitor);
 	}
 
 	public static <U> ResourceQuery<U> query(String type, ResourceVisitor<U> resourceVisitor,
 			StrolchQueryOrdering ordering) {
-		return new ResourceQuery<U>(new StrolchTypeNavigation(type)).setResourceVisitor(resourceVisitor)
-				.setOrdering(ordering);
+		return new ResourceQuery<U>(new StrolchTypeNavigation(type)).setVisitor(resourceVisitor).setOrdering(ordering);
 	}
 }

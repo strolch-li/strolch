@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@ package li.strolch.model.parameter;
 import java.util.Date;
 
 import li.strolch.model.StrolchValueType;
-import li.strolch.model.visitor.ParameterVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
@@ -43,8 +43,11 @@ public class DateParameter extends AbstractParameter<Date> {
 	 * Default Constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public DateParameter(String id, String name, Date value) {
 		super(id, name);
@@ -64,6 +67,7 @@ public class DateParameter extends AbstractParameter<Date> {
 
 	@Override
 	public void setValue(Date value) {
+		assertNotReadonly();
 		validateValue(value);
 		this.value = value;
 	}
@@ -75,11 +79,12 @@ public class DateParameter extends AbstractParameter<Date> {
 
 	/**
 	 * Sets the value to 1970-01-01 (unix time 0)
-	 * 
+	 *
 	 * @see Parameter#clear()
 	 */
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value = EMPTY_VALUE;
 	}
 
@@ -105,7 +110,7 @@ public class DateParameter extends AbstractParameter<Date> {
 	}
 
 	@Override
-	public <U> U accept(ParameterVisitor visitor) {
+	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitDateParam(this);
 	}
 

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,12 +34,12 @@ import li.strolch.utils.dbc.DBC;
  * This {@link AuditTrail} facade registers all actions performed i.e. it registers which {@link Audit Audits} are
  * retrieved, created, updated and deleted.
  * </p>
- * 
+ *
  * <p>
  * In a single transaction an Audit may be created, updated and then deleted - this implementation does not "squash"
  * such actions, but registers them separately
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class AuditingAuditMapFacade implements AuditTrail {
@@ -163,17 +163,15 @@ public class AuditingAuditMapFacade implements AuditTrail {
 	}
 
 	@Override
-	public Audit update(StrolchTransaction tx, Audit audit) {
-		Audit replaced = this.auditTrail.update(tx, audit);
+	public void update(StrolchTransaction tx, Audit audit) {
+		this.auditTrail.update(tx, audit);
 		this.updated.add(audit);
-		return replaced;
 	}
 
 	@Override
-	public List<Audit> updateAll(StrolchTransaction tx, List<Audit> audits) {
-		List<Audit> replaced = this.auditTrail.updateAll(tx, audits);
+	public void updateAll(StrolchTransaction tx, List<Audit> audits) {
+		this.auditTrail.updateAll(tx, audits);
 		this.updated.addAll(audits);
-		return replaced;
 	}
 
 	@Override
@@ -198,13 +196,14 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		byType = byType + removed;
 		this.deletedAllByType.put(type, byType);
 
+		this.deletedAll += removed;
 		return removed;
 	}
 
 	@Override
 	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> query) {
-		AuditVisitor<U> auditVisitor = query.getAuditVisitor();
-		query.setAuditVisitor(audit -> {
+		AuditVisitor<U> auditVisitor = query.getVisitor();
+		query.setVisitor(audit -> {
 			this.read.add(audit);
 			return auditVisitor.visitAudit(audit);
 		});

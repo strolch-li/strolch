@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,25 +17,23 @@ package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.ObserverEvent;
 import li.strolch.agent.api.ObserverHandler;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.StrolchRootElement;
-import li.strolch.runtime.ThreadPoolFactory;
 import li.strolch.utils.collections.MapOfLists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple {@link ObserverHandler} which keeps a reference to all registered {@link Observer Observers} and notifies
  * them when one of the notify methods are called
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class EventCollectingObserverHandler implements ObserverHandler {
@@ -44,18 +42,19 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 
 	private MapOfLists<String, Observer> observerMap;
 
-	private ScheduledExecutorService executorService;
 	private ObserverEvent observerEvent;
 
 	private ScheduledFuture<?> future;
+	private StrolchAgent agent;
 
-	public EventCollectingObserverHandler() {
+	public EventCollectingObserverHandler(StrolchAgent agent) {
+		this.agent = agent;
 		this.observerMap = new MapOfLists<>();
 	}
 
 	@Override
 	public void start() {
-		this.executorService = Executors.newScheduledThreadPool(1, new ThreadPoolFactory("ObserverHandler"));
+		// nothing to do
 	}
 
 	@Override
@@ -65,20 +64,10 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 			this.future.cancel(false);
 			this.future = null;
 		}
+	}
 
-		if (this.executorService != null) {
-			this.executorService.shutdown();
-			while (!this.executorService.isTerminated()) {
-				logger.info("Waiting for last update to complete...");
-				try {
-					Thread.sleep(50L);
-				} catch (InterruptedException e) {
-					logger.error("Interrupted!");
-				}
-			}
-
-			this.executorService = null;
-		}
+	private ScheduledExecutorService getExecutor() {
+		return this.agent.getScheduledExecutor("Observer");
 	}
 
 	@Override
@@ -97,7 +86,7 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 		}
 
 		if (this.future == null || this.future.isDone()) {
-			this.future = this.executorService.scheduleAtFixedRate(() -> doUpdates(), 100, 100, TimeUnit.MILLISECONDS);
+			this.future = getExecutor().scheduleAtFixedRate(this::doUpdates, 100, 100, TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -126,8 +115,7 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 
 		synchronized (this) {
 			if (this.observerEvent != null) {
-				this.future = this.executorService.scheduleAtFixedRate(() -> doUpdates(), 100, 100,
-						TimeUnit.MILLISECONDS);
+				this.future = getExecutor().scheduleAtFixedRate(this::doUpdates, 100, 100, TimeUnit.MILLISECONDS);
 			}
 		}
 	}

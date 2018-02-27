@@ -68,7 +68,7 @@ public class Locator {
 	 *             if the path is invalid, meaning has less than two elements in it
 	 */
 	private Locator(List<String> pathElements) throws StrolchException {
-		if (pathElements == null || pathElements.isEmpty()) {
+		if (pathElements == null) {
 			throw new StrolchException("The path elements may not be null and must contain at least 1 item"); //$NON-NLS-1$
 		}
 		this.pathElements = Collections.unmodifiableList(new ArrayList<>(pathElements));

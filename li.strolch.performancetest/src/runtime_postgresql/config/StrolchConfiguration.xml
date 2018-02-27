@@ -24,13 +24,9 @@
 				<!-- 
 					EMPTY = only inmemory
 					TRANSIENT = only inmemory
-					TRANSACTIONAL = only DB
 					CACHED = inmemory with persistence in DB
 				-->
-				<realms>transactional, cached</realms>
-				
-				<dataStoreMode.transactional>TRANSACTIONAL</dataStoreMode.transactional>
-				<enableAuditTrail.transactional>true</enableAuditTrail.transactional>
+				<realms>cached</realms>
 				
 				<dataStoreMode.cached>CACHED</dataStoreMode.cached>
 				<enableAuditTrail.cached>true</enableAuditTrail.cached>
@@ -49,12 +45,6 @@
 				<db.username.cached>testuser</db.username.cached>
 				<db.password.cached>test</db.password.cached>
 				<db.pool.maximumPoolSize.cached>1</db.pool.maximumPoolSize.cached>
-				
-				<!-- transactional -->
-				<db.url.transactional>jdbc:postgresql://localhost/testdb</db.url.transactional>
-				<db.username.transactional>testuser</db.username.transactional>
-				<db.password.transactional>test</db.password.transactional>
-				<db.pool.maximumPoolSize.transactional>1</db.pool.maximumPoolSize.transactional>
 			</Properties>
 		</Component>
 		<Component>

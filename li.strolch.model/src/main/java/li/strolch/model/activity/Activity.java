@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Martin Smock <martin.smock@bluewin.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 package li.strolch.model.activity;
+
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -23,19 +28,13 @@ import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
-import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
-
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
 
 /**
  * Parameterized object grouping a collection of {@link Activity} and {@link Action} objects defining the process to be
  * scheduled
- * 
+ *
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class Activity extends AbstractStrolchRootElement
@@ -61,11 +60,11 @@ public class Activity extends AbstractStrolchRootElement
 	 * Default constructor
 	 *
 	 * @param id
-	 *            the id
+	 * 		the id
 	 * @param name
-	 *            the name
+	 * 		the name
 	 * @param type
-	 *            the type
+	 * 		the type
 	 */
 	public Activity(String id, String name, String type, TimeOrdering timeOrdering) {
 		super(id, name, type);
@@ -82,6 +81,7 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	public void setTimeOrdering(TimeOrdering timeOrdering) {
+		assertNotReadonly();
 		this.timeOrdering = timeOrdering;
 	}
 
@@ -118,7 +118,7 @@ public class Activity extends AbstractStrolchRootElement
 
 	/**
 	 * Returns true if this {@link Activity} contains any children i.e. any of {@link Action} or {@link Activity}
-	 * 
+	 *
 	 * @return true if this {@link Activity} contains any children i.e. any of {@link Action} or {@link Activity}
 	 */
 	public boolean hasElements() {
@@ -128,12 +128,12 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * Returns true if this {@link Activity} contains a child with the given id. The element instance type is ignored,
 	 * i.e. {@link Action} or {@link Activity}
-	 * 
+	 *
 	 * @param id
-	 *            the id of the element to check for
-	 * 
+	 * 		the id of the element to check for
+	 *
 	 * @return true if this {@link Activity} contains a child with the given id. The element instance type is ignored,
-	 *         i.e. {@link Action} or {@link Activity}
+	 * i.e. {@link Action} or {@link Activity}
 	 */
 	public boolean hasElement(String id) {
 		return this.elements != null && this.elements.containsKey(id);
@@ -141,12 +141,15 @@ public class Activity extends AbstractStrolchRootElement
 
 	/**
 	 * add an activity element to the <code>LinkedHashMap</code> of <code>IActivityElements</code>
-	 * 
+	 *
 	 * @param activityElement
+	 * 		the element to add
+	 *
 	 * @return the element added
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends IActivityElement> T addElement(IActivityElement activityElement) {
+		assertNotReadonly();
 		DBC.PRE.assertNotEquals("Can't add element to itself!", this, activityElement);
 		DBC.PRE.assertNull("Parent can't already be set!", activityElement.getParent());
 
@@ -167,14 +170,15 @@ public class Activity extends AbstractStrolchRootElement
 
 	/**
 	 * Removes the element with the given id and returns it, if it exists
-	 * 
+	 *
 	 * @param id
-	 *            the id of the element to remove
-	 * 
+	 * 		the id of the element to remove
+	 *
 	 * @return the removed element, or null if it does not exist
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends IActivityElement> T remove(String id) {
+		assertNotReadonly();
 		IActivityElement element = this.elements.remove(id);
 		if (element != null)
 			element.setParent(null);
@@ -183,9 +187,10 @@ public class Activity extends AbstractStrolchRootElement
 
 	/**
 	 * get <code>IActivityElement</code> by id
-	 * 
+	 *
 	 * @param id
-	 *            the id of the <code>IActivityElement</code>
+	 * 		the id of the <code>IActivityElement</code>
+	 *
 	 * @return IActivityElement
 	 */
 	@SuppressWarnings("unchecked")
@@ -297,7 +302,7 @@ public class Activity extends AbstractStrolchRootElement
 
 	/**
 	 * Returns all the actions as a flat list
-	 * 
+	 *
 	 * @return the list of actions
 	 */
 	public List<Action> getActionsAsFlatList() {
@@ -317,10 +322,10 @@ public class Activity extends AbstractStrolchRootElement
 
 	/**
 	 * Returns all the actions in the entire hierarchy with the given state
-	 * 
+	 *
 	 * @param state
-	 *            the state of the action to return
-	 * 
+	 * 		the state of the action to return
+	 *
 	 * @return the list of actions with the given state
 	 */
 	public List<Action> getActionsWithState(State state) {
@@ -340,10 +345,10 @@ public class Activity extends AbstractStrolchRootElement
 
 	/**
 	 * Returns all the actions in the entire hierarchy with the given type
-	 * 
+	 *
 	 * @param type
-	 *            the type of action to return
-	 * 
+	 * 		the type of action to return
+	 *
 	 * @return the list of actions with the given type
 	 */
 	public List<Action> getActionsByType(String type) {
@@ -366,7 +371,7 @@ public class Activity extends AbstractStrolchRootElement
 	 */
 	public Iterator<Entry<String, IActivityElement>> elementIterator() {
 		if (this.elements == null)
-			return Collections.<String, IActivityElement> emptyMap().entrySet().iterator();
+			return Collections.<String, IActivityElement>emptyMap().entrySet().iterator();
 		return this.elements.entrySet().iterator();
 	}
 
@@ -375,7 +380,7 @@ public class Activity extends AbstractStrolchRootElement
 	 */
 	public Stream<Entry<String, IActivityElement>> elementStream() {
 		if (this.elements == null)
-			return Collections.<String, IActivityElement> emptyMap().entrySet().stream();
+			return Collections.<String, IActivityElement>emptyMap().entrySet().stream();
 		return this.elements.entrySet().stream();
 	}
 
@@ -420,6 +425,11 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public PolicyDef getPolicyDef(Class<?> clazz) {
+		return getPolicyDefs().getPolicyDef(clazz.getSimpleName());
+	}
+
+	@Override
 	public PolicyDef getPolicyDef(String type) {
 		return getPolicyDefs().getPolicyDef(type);
 	}
@@ -436,6 +446,7 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
+		assertNotReadonly();
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);
 	}
@@ -473,6 +484,12 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public Activity getClone() {
+		return getClone(false);
+	}
+
+	@Override
+	public Activity getClone(boolean withVersion) {
+
 		Activity clone = new Activity();
 		clone.timeOrdering = this.timeOrdering;
 
@@ -488,7 +505,18 @@ public class Activity extends AbstractStrolchRootElement
 		if (this.policyDefs != null)
 			clone.setPolicyDefs(this.policyDefs.getClone());
 
+		if (withVersion)
+			clone.setVersion(this.version);
+
 		return clone;
+	}
+
+	@Override
+	public void setReadOnly() {
+		if (this.policyDefs != null)
+			this.policyDefs.setReadOnly();
+		elementStream().forEach(e -> e.getValue().setReadOnly());
+		super.setReadOnly();
 	}
 
 	@Override
@@ -521,11 +549,6 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public <T> T accept(StrolchElementVisitor<T> visitor) {
-		return visitor.visitActivity(this);
-	}
-
-	@Override
-	public <T> T accept(IActivityElementVisitor<T> visitor) {
 		return visitor.visitActivity(this);
 	}
 
@@ -562,6 +585,7 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public void setParent(Activity activity) {
+		assertNotReadonly();
 		this.parent = activity;
 	}
 

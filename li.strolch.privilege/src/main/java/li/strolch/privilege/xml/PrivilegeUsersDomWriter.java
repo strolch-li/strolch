@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@
 package li.strolch.privilege.xml;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -35,10 +36,6 @@ public class PrivilegeUsersDomWriter {
 	private List<User> users;
 	private File modelFile;
 
-	/**
-	 * @param users
-	 * @param modelFile
-	 */
 	public PrivilegeUsersDomWriter(List<User> users, File modelFile) {
 		this.users = users;
 		this.modelFile = modelFile;
@@ -51,7 +48,7 @@ public class PrivilegeUsersDomWriter {
 		Element rootElement = doc.createElement(XmlConstants.XML_USERS);
 		doc.appendChild(rootElement);
 
-		this.users.stream().sorted((u1, u2) -> u1.getUserId().compareTo(u2.getUserId())).forEach(user -> {
+		this.users.stream().sorted(Comparator.comparing(User::getUserId)).forEach(user -> {
 
 			// create the user element
 			Element userElement = doc.createElement(XmlConstants.XML_USER);
@@ -59,10 +56,7 @@ public class PrivilegeUsersDomWriter {
 
 			userElement.setAttribute(XmlConstants.XML_ATTR_USER_ID, user.getUserId());
 			userElement.setAttribute(XmlConstants.XML_ATTR_USERNAME, user.getUsername());
-			if (user.getPassword() != null)
-				userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, StringHelper.toHexString(user.getPassword()));
-			if (user.getSalt() != null)
-				userElement.setAttribute(XmlConstants.XML_ATTR_SALT, StringHelper.toHexString(user.getSalt()));
+			writePassword(user, userElement);
 
 			// add first name element
 			if (StringHelper.isNotEmpty(user.getFirstname())) {
@@ -112,5 +106,26 @@ public class PrivilegeUsersDomWriter {
 
 		// write the container file to disk
 		XmlHelper.writeDocument(doc, this.modelFile);
+	}
+
+	private void writePassword(User user, Element userElement) {
+
+		if (user.getPassword() != null && user.getSalt() != null && user.getHashAlgorithm() != null
+				&& user.getHashIterations() != -1 && user.getHashKeyLength() != -1) {
+
+			String algo = user.getHashAlgorithm() + "," + user.getHashIterations() + "," + user.getHashKeyLength();
+			String hash = StringHelper.toHexString(user.getSalt());
+			String password = StringHelper.toHexString(user.getPassword());
+
+			String passwordS = "$" + algo + "$" + hash + "$" + password;
+			userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, passwordS);
+
+		} else {
+
+			if (user.getPassword() != null)
+				userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, StringHelper.toHexString(user.getPassword()));
+			if (user.getSalt() != null)
+				userElement.setAttribute(XmlConstants.XML_ATTR_SALT, StringHelper.toHexString(user.getSalt()));
+		}
 	}
 }

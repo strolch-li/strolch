@@ -256,7 +256,7 @@ public class PrivilegeUsersService {
 	private Response handleServiceResult(PrivilegeUserResult svcResult) {
 		if (svcResult.isOk()) {
 			UserRep userRep = svcResult.getUser();
-			return Response.ok(userRep.accept(new PrivilegeElementToJsonVisitor()), MediaType.APPLICATION_JSON).build();
+			return Response.ok(userRep.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON).build();
 		}
 		return ResponseUtil.toResponse(svcResult);
 	}

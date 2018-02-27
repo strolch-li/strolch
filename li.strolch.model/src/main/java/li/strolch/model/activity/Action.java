@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Martin Smock <martin.smock@bluewin.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,33 +17,24 @@
 package li.strolch.model.activity;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
-import li.strolch.model.GroupedParameterizedElement;
-import li.strolch.model.Locator;
+import li.strolch.model.*;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.PolicyContainer;
-import li.strolch.model.Resource;
-import li.strolch.model.State;
-import li.strolch.model.Tags;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-import li.strolch.model.visitor.IActivityElementVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 
 /**
  * An {@link Action} represents a single step within an {@link Activity}, that is, one that is not further decomposed
  * within the {@link Activity}. A {@link Activity} applies {@link IValueChange} objects at the start and end time of the
  * {@link Activity}.
- * 
+ *
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class Action extends GroupedParameterizedElement implements IActivityElement, PolicyContainer {
@@ -91,9 +82,10 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * @param resourceId
-	 *            the id of the {@link Resource} the {@link Action} acts on
+	 * 		the id of the {@link Resource} the {@link Action} acts on
 	 */
 	public void setResourceId(String resourceId) {
+		assertNotReadonly();
 		this.resourceId = resourceId;
 	}
 
@@ -107,9 +99,10 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * @param state
-	 *            the target <code>State</code> of the a<code>Action</code>
+	 * 		the target <code>State</code> of the a<code>Action</code>
 	 */
 	public void setState(State state) {
+		assertNotReadonly();
 		this.state = state;
 	}
 
@@ -122,14 +115,16 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * @param resourceType
+	 * 		the resource type
 	 */
 	public void setResourceType(String resourceType) {
+		assertNotReadonly();
 		this.resourceType = resourceType;
 	}
 
 	/**
 	 * Returns true if this {@link Action} contains any {@link IValueChange changes}, false if not
-	 * 
+	 *
 	 * @return true if this {@link Action} contains any {@link IValueChange changes}, false if not
 	 */
 	public boolean hasChanges() {
@@ -137,12 +132,13 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @param add
-	 *            <code>IValueChange</code> to be applied to the <code>Resource</code>
-	 * 
+	 * @param change
+	 * 		<code>IValueChange</code> to be applied to the <code>Resource</code>
+	 *
 	 * @return <tt>true</tt> (as specified by {@link Collection#add})
 	 */
 	public boolean addChange(IValueChange<? extends IValue<?>> change) {
+		assertNotReadonly();
 		initChanges();
 		return this.changes.add(change);
 	}
@@ -158,7 +154,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	public Iterator<IValueChange<? extends IValue<?>>> changesIterator() {
 		if (this.changes == null)
-			return Collections.<IValueChange<? extends IValue<?>>> emptyList().iterator();
+			return Collections.<IValueChange<? extends IValue<?>>>emptyList().iterator();
 		return this.changes.iterator();
 	}
 
@@ -196,6 +192,18 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
+	public void setReadOnly() {
+		if (this.policyDefs != null)
+			this.policyDefs.setReadOnly();
+		if (this.changes != null) {
+			for (IValueChange<? extends IValue<?>> change : changes) {
+				change.setReadOnly();
+			}
+		}
+		super.setReadOnly();
+	}
+
+	@Override
 	public PolicyDefs getPolicyDefs() {
 		if (this.policyDefs == null)
 			throw new StrolchPolicyException(getLocator() + " has no Policies defined!");
@@ -213,12 +221,18 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
+	public PolicyDef getPolicyDef(Class<?> clazz) {
+		return getPolicyDefs().getPolicyDef(clazz.getSimpleName());
+	}
+
+	@Override
 	public boolean hasPolicyDef(String type) {
 		return this.policyDefs != null && policyDefs.hasPolicyDef(type);
 	}
 
 	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
+		assertNotReadonly();
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);
 	}
@@ -256,6 +270,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public void setParent(Activity activity) {
+		assertNotReadonly();
 		this.parent = activity;
 	}
 
@@ -309,7 +324,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
-	public <T> T accept(IActivityElementVisitor<T> visitor) {
+	public <T> T accept(StrolchElementVisitor<T> visitor) {
 		return visitor.visitAction(this);
 	}
 }

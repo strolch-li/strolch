@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,43 +23,32 @@ public class RefNameCreator {
 
 	// FIXME validate each name part that it is a valid literal for file names...
 
-	public static String createRootName(String realmName) {
-		assertRealmName(realmName);
-		return SLASH + realmName + SLASH;
+	public static String createRootName() {
+		return SLASH;
 	}
 
-	public static String createTypeName(String realmName, String type) {
-		assertRealmName(realmName);
+	public static String createTypeName(String type) {
 		assertType(type);
-		return SLASH + realmName + SLASH + type + SLASH;
+		return SLASH + type + SLASH;
 	}
 
-	public static String createIdOfTypeName(String realmName, String type, String id) {
-		assertRealmName(realmName);
+	public static String createIdOfTypeName(String type, String id) {
 		assertType(type);
 		assertId(id);
-		return SLASH + realmName + SLASH + type + SLASH + id;
+		return SLASH + type + SLASH + id;
 	}
 
-	public static String createSubTypeName(String realmName, String type, String subType) {
-		assertRealmName(realmName);
+	public static String createSubTypeName(String type, String subType) {
 		assertType(type);
 		assertSubType(subType);
-		return SLASH + realmName + SLASH + type + SLASH + subType + SLASH;
+		return SLASH + type + SLASH + subType + SLASH;
 	}
 
-	public static String createIdOfSubTypeName(String realmName, String type, String subType, String id) {
-		assertRealmName(realmName);
+	public static String createIdOfSubTypeName(String type, String subType, String id) {
 		assertType(type);
 		assertSubType(subType);
 		assertId(id);
-		return SLASH + realmName + SLASH + type + SLASH + subType + SLASH + id;
-	}
-
-	private static void assertRealmName(String realmName) {
-		if (StringHelper.isEmpty(realmName)) {
-			throw new IllegalArgumentException("Realm name may not be empty!"); //$NON-NLS-1$
-		}
+		return SLASH + type + SLASH + subType + SLASH + id;
 	}
 
 	private static void assertType(String type) {

@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,6 @@ package li.strolch.migrations;
 import java.io.File;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.command.parameter.SetParameterCommand;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.privilege.model.Certificate;
@@ -40,11 +39,8 @@ public class CodeMigration extends Migration {
 	}
 
 	@Override
-	protected void setNewVersion(SetParameterCommand cmd, Resource migrationsRes) {
+	protected void setNewVersion(Resource migrationsRes) {
 		StringParameter currentCodeVersionP = migrationsRes.getParameter(BAG_PARAMETERS, PARAM_CURRENT_CODE_VERSION);
-
-		cmd.setParameter(currentCodeVersionP);
-		cmd.setValueAsString(getVersion().toString());
-
+		currentCodeVersionP.setValue(getVersion().toString());
 	}
 }

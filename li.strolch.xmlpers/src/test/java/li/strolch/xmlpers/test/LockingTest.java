@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,6 @@ import li.strolch.xmlpers.test.model.MyModel;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class LockingTest extends AbstractPersistenceTest {
 
@@ -56,6 +55,7 @@ public class LockingTest extends AbstractPersistenceTest {
 	@Before
 	public void before() {
 		Properties properties = new Properties();
+		properties.setProperty(PersistenceConstants.PROP_XML_IO_MOD, IoMode.DOM.name());
 		properties.setProperty(PersistenceConstants.PROP_BASEPATH, BASE_PATH + IoMode.DOM.name());
 		properties.setProperty(PersistenceConstants.PROP_LOCK_TIME_MILLIS, Long.toString(500L));
 		setup(properties);
@@ -222,7 +222,8 @@ public class LockingTest extends AbstractPersistenceTest {
 		@Override
 		protected void doWork(PersistenceTransaction tx) {
 
-			IdOfSubTypeRef objectRef = tx.getObjectRefCache().getIdOfSubTypeRef(TYPE_RES, RES_TYPE, this.resourceId);
+			IdOfSubTypeRef objectRef = tx.getManager().getObjectRefCache()
+					.getIdOfSubTypeRef(TYPE_RES, RES_TYPE, this.resourceId);
 			MyModel resource = tx.getObjectDao().queryById(objectRef);
 			assertNotNull(resource);
 			updateResource(resource);

@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Martin Smock <martin.smock@bluewin.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,11 +20,11 @@ import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.model.visitor.IActivityElementVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 
 /**
  * Marker for all child elements of {@link Activity} objects
- * 
+ *
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public interface IActivityElement extends StrolchElement {
@@ -46,7 +46,7 @@ public interface IActivityElement extends StrolchElement {
 
 	/**
 	 * Set the parent
-	 * 
+	 *
 	 * @param activity
 	 */
 	public void setParent(Activity activity);
@@ -56,11 +56,11 @@ public interface IActivityElement extends StrolchElement {
 	 * Checks if this element contains the {@link Parameter}, or otherwise queries its parent, until the root element is
 	 * reached.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * If the parameter does not exist, null is returned
 	 * </p>
-	 * 
+	 *
 	 * @see GroupedParameterizedElement#getParameter(String, String)
 	 */
 	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey);
@@ -70,11 +70,11 @@ public interface IActivityElement extends StrolchElement {
 	 * Checks if this element contains the {@link Parameter}, or otherwise queries its parent, until the root element is
 	 * reached.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * If the parameter does not exist and <code>assertExists</code> is true, then an
 	 * </p>
-	 * 
+	 *
 	 * @see GroupedParameterizedElement#getParameter(String, String, boolean)
 	 */
 	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey, boolean assertExists)
@@ -91,11 +91,11 @@ public interface IActivityElement extends StrolchElement {
 
 	/**
 	 * Implements the visitor pattern. Concrete implementation will call the proper method on the visitor
-	 * 
+	 *
 	 * @param visitor
-	 *            the visitor to accept
-	 * 
+	 * 		the visitor to accept
+	 *
 	 * @return the result of the visitor being accepted
 	 */
-	public <T> T accept(IActivityElementVisitor<T> visitor);
+	public <T> T accept(StrolchElementVisitor<T> visitor);
 }

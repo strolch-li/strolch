@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -26,15 +28,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.agent.impl.ComponentContainerImpl;
+import li.strolch.runtime.ThreadPoolFactory;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.SystemHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -48,8 +51,9 @@ public class StrolchAgent {
 	private ComponentContainerImpl container;
 	private StrolchConfiguration strolchConfiguration;
 	private StrolchVersion appVersion;
-	private ExecutorService executor;
-	private ScheduledExecutorService scheduledExecutor;
+
+	private Map<String, ExecutorService> executors;
+	private Map<String, ScheduledExecutorService> scheduledExecutors;
 
 	public StrolchAgent(StrolchVersion appVersion) {
 		this.appVersion = appVersion;
@@ -57,7 +61,7 @@ public class StrolchAgent {
 
 	/**
 	 * Return the {@link StrolchConfiguration}
-	 * 
+	 *
 	 * @return the {@link StrolchConfiguration}
 	 */
 	public StrolchConfiguration getStrolchConfiguration() {
@@ -66,7 +70,7 @@ public class StrolchAgent {
 
 	/**
 	 * Return the container
-	 * 
+	 *
 	 * @return the container
 	 */
 	public ComponentContainer getContainer() {
@@ -82,20 +86,42 @@ public class StrolchAgent {
 
 	/**
 	 * Return the {@link ExecutorService} instantiated for this agent
-	 * 
+	 *
 	 * @return the {@link ExecutorService} instantiated for this agent
 	 */
 	public ExecutorService getExecutor() {
-		return this.executor;
+		return getExecutor("Agent");
+	}
+
+	public synchronized ExecutorService getExecutor(String poolName) {
+		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
+		ExecutorService executor = this.executors.get(poolName);
+		if (executor == null) {
+			executor = Executors.newCachedThreadPool(new ThreadPoolFactory(poolName));
+			this.executors.put(poolName, executor);
+		}
+
+		return executor;
 	}
 
 	/**
 	 * Return the {@link ScheduledExecutorService} instantiated for this agent
-	 * 
+	 *
 	 * @return the {@link ScheduledExecutorService} instantiated for this agent
 	 */
 	public ScheduledExecutorService getScheduledExecutor() {
-		return this.scheduledExecutor;
+		return getScheduledExecutor("Agent");
+	}
+
+	public synchronized ScheduledExecutorService getScheduledExecutor(String poolName) {
+		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
+		ScheduledExecutorService executor = this.scheduledExecutors.get(poolName);
+		if (executor == null) {
+			executor = Executors.newScheduledThreadPool(4, new ThreadPoolFactory(poolName));
+			this.scheduledExecutors.put(poolName, executor);
+		}
+
+		return executor;
 	}
 
 	/**
@@ -105,8 +131,10 @@ public class StrolchAgent {
 	public void initialize() {
 		if (this.container == null)
 			throw new RuntimeException("Please call setup first!");
-		this.executor = Executors.newCachedThreadPool();
-		this.scheduledExecutor = Executors.newScheduledThreadPool(4);
+
+		this.executors = new HashMap<>();
+		this.scheduledExecutors = new HashMap<>();
+
 		this.container.initialize(this.strolchConfiguration);
 	}
 
@@ -127,17 +155,23 @@ public class StrolchAgent {
 			this.container.stop();
 	}
 
-	private void shutdownExecutorService(ExecutorService executor) {
-		try {
-			logger.info("Shutting down executor...");
-			executor.shutdown();
-			executor.awaitTermination(5, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			logger.error("Was interrupted while shutting down tasks");
-		} finally {
-			if (!executor.isTerminated()) {
-				logger.error("Tasks not stopped after " + 5 + "s. Shutting down now.");
-				executor.shutdownNow();
+	private <T extends ExecutorService> void shutdownExecutorService(Map<String, T> executors) {
+
+		for (String poolName : executors.keySet()) {
+			logger.info("Shutting down executor pool " + poolName);
+
+			T executor = executors.get(poolName);
+
+			try {
+				executor.shutdown();
+				executor.awaitTermination(5, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				logger.error("Was interrupted while shutting down tasks");
+			} finally {
+				if (!executor.isTerminated()) {
+					logger.error("Tasks not stopped after " + 5 + "s. Shutting down now.");
+					executor.shutdownNow();
+				}
 			}
 		}
 	}
@@ -147,10 +181,10 @@ public class StrolchAgent {
 	 */
 	public void destroy() {
 
-		if (this.executor != null)
-			shutdownExecutorService(this.executor);
-		if (this.scheduledExecutor != null)
-			shutdownExecutorService(this.scheduledExecutor);
+		if (this.executors != null)
+			shutdownExecutorService(this.executors);
+		if (this.scheduledExecutors != null)
+			shutdownExecutorService(this.scheduledExecutors);
 
 		if (this.container != null)
 			this.container.destroy();
@@ -161,15 +195,19 @@ public class StrolchAgent {
 	 * <p>
 	 * <b>Note:</b> Use {@link StrolchBootstrapper} instead of calling this method directly!
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Sets up the agent by parsing the configuration file and initializes the given environment
 	 * </p>
-	 * 
+	 *
 	 * @param environment
+	 * 		the current environment
 	 * @param configPathF
+	 * 		the path to the config directory
 	 * @param dataPathF
+	 * 		the path to the data directory
 	 * @param tempPathF
+	 * 		the path to the temp directory
 	 */
 	void setup(String environment, File configPathF, File dataPathF, File tempPathF) {
 
@@ -180,8 +218,8 @@ public class StrolchAgent {
 		logger.info(" - Temp: " + tempPathF.getAbsolutePath());
 		logger.info(" - user.dir: " + SystemHelper.getUserDir());
 
-		this.strolchConfiguration = ConfigurationParser.parseConfiguration(environment, configPathF, dataPathF,
-				tempPathF);
+		this.strolchConfiguration = ConfigurationParser
+				.parseConfiguration(environment, configPathF, dataPathF, tempPathF);
 
 		ComponentContainerImpl container = new ComponentContainerImpl(this);
 		container.setup(this.strolchConfiguration);
@@ -189,7 +227,8 @@ public class StrolchAgent {
 		this.container = container;
 
 		RuntimeConfiguration config = this.strolchConfiguration.getRuntimeConfiguration();
-		logger.info(MessageFormat.format("Setup Agent {0}:{1}", config.getApplicationName(), config.getEnvironment())); //$NON-NLS-1$
+		logger.info(MessageFormat
+				.format("Setup Agent {0}:{1}", config.getApplicationName(), config.getEnvironment())); //$NON-NLS-1$
 	}
 
 	protected void assertContainerStarted() {
@@ -217,7 +256,7 @@ public class StrolchAgent {
 
 	/**
 	 * Returns the version of this agent
-	 * 
+	 *
 	 * @return the version of this agent
 	 */
 	public VersionQueryResult getVersion() {
@@ -228,13 +267,14 @@ public class StrolchAgent {
 
 			Properties properties = new Properties();
 
-			try (InputStream stream = getClass().getResourceAsStream(AGENT_VERSION_PROPERTIES);) {
+			try (InputStream stream = getClass().getResourceAsStream(AGENT_VERSION_PROPERTIES)) {
 				properties.load(stream);
 				AgentVersion agentVersion = new AgentVersion(
 						getStrolchConfiguration().getRuntimeConfiguration().getApplicationName(), properties);
 				queryResult.setAgentVersion(agentVersion);
 			} catch (IOException e) {
-				String msg = MessageFormat.format("Failed to read version properties for agent: {0}", e.getMessage()); //$NON-NLS-1$
+				String msg = MessageFormat
+						.format("Failed to read version properties for agent: {0}", e.getMessage()); //$NON-NLS-1$
 				queryResult.getErrors().add(msg);
 				logger.error(msg, e);
 			}

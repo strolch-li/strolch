@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,10 +21,10 @@ import java.util.SortedSet;
 /**
  * A timed variable storing a ordered sequence of {@link ITimeValue} objects modeling a time evolution of a quantity.
  *
- * @author Martin Smock <smock.martin@gmail.com>
- *
  * @param <T>
- *            the backing value of the timed value object
+ * 		the backing value of the timed value object
+ *
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("rawtypes")
 public interface ITimeVariable<T extends IValue> {
@@ -33,9 +33,9 @@ public interface ITimeVariable<T extends IValue> {
 	 * set the value at a point in time to a given time value object
 	 *
 	 * @param time
-	 *            the time to set the {@link IValue}
+	 * 		the time to set the {@link IValue}
 	 * @param value
-	 *            the {@link IValue} to set
+	 * 		the {@link IValue} to set
 	 */
 	void setValueAt(final Long time, final T value);
 
@@ -48,9 +48,9 @@ public interface ITimeVariable<T extends IValue> {
 	 * Applies a {@link IValueChange} propagating the change to all future values starting from the time of the change.
 	 *
 	 * @param change
-	 *            the {@link IValueChange} to be applied
+	 * 		the {@link IValueChange} to be applied
 	 * @param compact
-	 *            if set to true, then the values are compacted, otherwiss not
+	 * 		if set to true, then the values are compacted, otherwiss not
 	 */
 	void applyChange(final IValueChange<T> change, boolean compact);
 
@@ -58,7 +58,8 @@ public interface ITimeVariable<T extends IValue> {
 	 * Get all {@link ITimeValue} objects whose time field is greater or equal to the given time
 	 *
 	 * @param time
-	 *            the time the sequence starts with
+	 * 		the time the sequence starts with
+	 *
 	 * @return the sequence of {@link ITimeValue} objects in the future
 	 */
 	Collection<ITimeValue<T>> getFutureValues(final Long time);
@@ -67,7 +68,8 @@ public interface ITimeVariable<T extends IValue> {
 	 * Get all {@link ITimeValue} objects whose time field is strictly smaller than the given time
 	 *
 	 * @param time
-	 *            the time the sequence starts with
+	 * 		the time the sequence starts with
+	 *
 	 * @return the sequence of {@link ITimeValue} objects in the future
 	 */
 	Collection<ITimeValue<T>> getPastValues(final Long time);
@@ -95,4 +97,16 @@ public interface ITimeVariable<T extends IValue> {
 	 * @return a copy of this time variable
 	 */
 	ITimeVariable<T> getCopy();
+
+	/**
+	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it, call <code>getClone()</code> on the parent
+	 *
+	 * @return true if this element is read only
+	 */
+	public boolean isReadonly();
+
+	/**
+	 * Sets this element to readOnly, so that it may not be modified. To modify it, call <code>getClone()</code> on the parent
+	 */
+	public void setReadonly();
 }

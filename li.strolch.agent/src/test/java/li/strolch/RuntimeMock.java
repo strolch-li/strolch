@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,7 +41,7 @@ import li.strolch.utils.helper.StringHelper;
 /**
  * Basically you should use the RuntimeMock class in the testbase project, but to mitigate circular dependencies, in
  * tests of the agent project we use this implementation
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class RuntimeMock implements AutoCloseable {
@@ -110,12 +110,13 @@ public class RuntimeMock implements AutoCloseable {
 			throw new RuntimeException(msg);
 		}
 
-		logger.info(MessageFormat.format("Mocking runtime from {0} to {1}", this.srcPathF.getAbsolutePath(), //$NON-NLS-1$
-				this.targetPathF.getAbsolutePath()));
+		logger.info(
+				MessageFormat.format("Mocking runtime from {0} to {1}", this.srcPathF.getAbsolutePath(), //$NON-NLS-1$
+						this.targetPathF.getAbsolutePath()));
 
 		// setup the container
-		this.agent = new StrolchBootstrapper(getAppVersion()).setupByCopyingRoot("dev", this.srcPathF,
-				this.targetPathF);
+		this.agent = new StrolchBootstrapper(getAppVersion())
+				.setupByCopyingRoot("dev", this.srcPathF, this.targetPathF);
 
 		return this;
 	}
@@ -160,7 +161,7 @@ public class RuntimeMock implements AutoCloseable {
 		return this;
 	}
 
-	public void run(StrolchRunnable runnable) {
+	public void run(StrolchRunnable runnable) throws Exception {
 		runnable.run(getAgent());
 	}
 
@@ -180,7 +181,7 @@ public class RuntimeMock implements AutoCloseable {
 		}
 	}
 
-	public static void runInStrolch(String targetPath, String srcPath, StrolchRunnable runnable) {
+	public static void runInStrolch(String targetPath, String srcPath, StrolchRunnable runnable) throws Exception {
 		try (RuntimeMock runtimeMock = new RuntimeMock(targetPath, srcPath)) {
 			runtimeMock.mockRuntime();
 			runtimeMock.startContainer();
@@ -201,6 +202,6 @@ public class RuntimeMock implements AutoCloseable {
 
 	public interface StrolchRunnable {
 
-		public void run(StrolchAgent agent);
+		public void run(StrolchAgent agent) throws Exception;
 	}
 }

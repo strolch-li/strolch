@@ -16,7 +16,7 @@
 package li.strolch.model.parameter;
 
 import li.strolch.model.StrolchValueType;
-import li.strolch.model.visitor.ParameterVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 
@@ -39,9 +39,9 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	/**
 	 * Default constructors
 	 * 
-	 * @param id
-	 * @param name
-	 * @param value
+	 * @param id the id
+	 * @param name the name
+	 * @param value the value
 	 */
 	public BooleanParameter(String id, String name, Boolean value) {
 		super(id, name);
@@ -61,6 +61,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 
 	@Override
 	public void setValue(Boolean value) {
+		assertNotReadonly();
 		validateValue(value);
 		this.value = value;
 	}
@@ -77,6 +78,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	 */
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value = false;
 	}
 
@@ -102,7 +104,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	}
 
 	@Override
-	public <U> U accept(ParameterVisitor visitor) {
+	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitBooleanParam(this);
 	}
 

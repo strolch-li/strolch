@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.model.StrolchValueType;
-import li.strolch.model.visitor.ParameterVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 
@@ -45,8 +45,11 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public FloatListParameter(String id, String name, List<Double> value) {
 		super(id, name);
@@ -83,6 +86,7 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 
 	@Override
 	public void setValue(List<Double> value) {
+		assertNotReadonly();
 		validateValue(value);
 		if (this.value == null) {
 			this.value = new ArrayList<>(value.size());
@@ -98,16 +102,19 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 
 	@Override
 	public void addValue(Double value) {
+		assertNotReadonly();
 		this.value.add(value);
 	}
 
 	@Override
 	public boolean removeValue(Double value) {
+		assertNotReadonly();
 		return this.value.remove(value);
 	}
 
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value.clear();
 	}
 
@@ -143,7 +150,7 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
-	public <U> U accept(ParameterVisitor visitor) {
+	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitFloatListParam(this);
 	}
 
@@ -168,6 +175,6 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	@Override
 	public int compareTo(Parameter<?> o) {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
-		return Integer.valueOf(this.getValue().size()).compareTo(((FloatListParameter) o).getValue().size());
+		return Integer.compare(this.getValue().size(), ((FloatListParameter) o).getValue().size());
 	}
 }

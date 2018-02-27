@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -97,7 +97,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 					- this.certificateMap.size()) + " had timed out and were removed.");
 		}
 
-		this.sessionHandler = getScheduledExecutor()
+		this.sessionHandler = getScheduledExecutor("SessionHandler")
 				.scheduleWithFixedDelay(this::handleSessions, 5, 1, TimeUnit.MINUTES);
 
 		super.start();
@@ -263,7 +263,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public UserSession getSession(Certificate certificate, String sessionId) throws AccessDeniedException, PrivilegeException {
+	public UserSession getSession(Certificate certificate, String sessionId)
+			throws AccessDeniedException, PrivilegeException {
 		PrivilegeContext ctx = this.privilegeHandler.validate(certificate);
 		ctx.assertHasPrivilege(PRIVILEGE_GET_SESSION);
 		synchronized (this.certificateMap) {

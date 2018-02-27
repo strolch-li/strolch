@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +18,7 @@ package li.strolch.xmlpers.api;
 import java.io.File;
 import java.text.MessageFormat;
 
+import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,8 @@ public class FileDao {
 	private final PathBuilder pathBuilder;
 
 	public FileDao(PersistenceTransaction tx, PathBuilder pathBuilder, boolean verbose) {
+		DBC.PRE.assertNotNull("TX must not be null!", tx);
+		DBC.PRE.assertNotNull("pathBuilder must not be null!", pathBuilder);
 		this.tx = tx;
 		this.pathBuilder = pathBuilder;
 		this.verbose = verbose;
@@ -61,7 +64,7 @@ public class FileDao {
 		assertPathNotExists(path, objectRef);
 		createMissingParents(path, objectRef);
 		FileIo fileIo = new FileIo(path);
-		this.tx.getIoMode().write(ctx, fileIo);
+		this.tx.getManager().getIoMode().write(ctx, fileIo);
 	}
 
 	public <T> void performRead(PersistenceContext<T> ctx) {
@@ -75,7 +78,7 @@ public class FileDao {
 
 		logPath(IoOperation.READ, path, objectRef);
 		FileIo fileIo = new FileIo(path);
-		this.tx.getIoMode().read(ctx, fileIo);
+		this.tx.getManager().getIoMode().read(ctx, fileIo);
 	}
 
 	public <T> void performUpdate(PersistenceContext<T> ctx) {
@@ -85,7 +88,7 @@ public class FileDao {
 		logPath(IoOperation.UPDATE, path, objectRef);
 		assertPathIsFileAndWritable(path, objectRef);
 		FileIo fileIo = new FileIo(path);
-		this.tx.getIoMode().write(ctx, fileIo);
+		this.tx.getManager().getIoMode().write(ctx, fileIo);
 	}
 
 	public <T> void performDelete(PersistenceContext<T> ctx) {
@@ -118,14 +121,27 @@ public class FileDao {
 		try {
 
 			File directoryPath = objectRef.getPath(this.pathBuilder);
+			if (!directoryPath.getAbsolutePath().startsWith(this.pathBuilder.getRootPath().getAbsolutePath())) {
+				String msg = "The path for {0} is invalid as not child of {1}"; //$NON-NLS-1$
+				msg = MessageFormat
+						.format(msg, directoryPath.getAbsolutePath(), this.pathBuilder.getRootPath().getAbsolutePath());
+				throw new IllegalArgumentException(msg);
+			}
+
 			if (!directoryPath.isDirectory()) {
+				String msg = "The path for {0} is not a directory: {1}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, objectRef.getName(), directoryPath.getAbsolutePath());
+				throw new IllegalArgumentException(msg);
+			}
+			String[] list = directoryPath.list();
+			if (list == null) {
 				String msg = "The path for {0} is not a directory: {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, objectRef.getName(), directoryPath.getAbsolutePath());
 				throw new IllegalArgumentException(msg);
 			}
 
 			// stop if empty
-			if (directoryPath.list().length != 0)
+			if (list.length != 0)
 				return;
 
 			// delete
@@ -195,5 +211,4 @@ public class FileDao {
 			throw new XmlPersistenceException(msg);
 		}
 	}
-
 }

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,16 +18,10 @@ package li.strolch.agent.impl;
 import java.io.File;
 import java.text.MessageFormat;
 
-import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.AuditTrail;
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.OrderMap;
-import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.*;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
-import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.persistence.inmemory.InMemoryPersistence;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
@@ -45,7 +39,6 @@ public class TransientRealm extends InternalStrolchRealm {
 	private OrderMap orderMap;
 	private ActivityMap activityMap;
 	private AuditTrail auditTrail;
-	private PersistenceHandler persistenceHandler;
 
 	private File modelFile;
 
@@ -61,13 +54,13 @@ public class TransientRealm extends InternalStrolchRealm {
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action) {
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
-		return this.persistenceHandler.openTx(this, certificate, action);
+		return new TransientTransaction(this.container, this, certificate, action);
 	}
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz) {
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
-		return this.persistenceHandler.openTx(this, certificate, clazz.getName());
+		return new TransientTransaction(this.container, this, certificate, clazz.getName());
 	}
 
 	@Override
@@ -103,15 +96,14 @@ public class TransientRealm extends InternalStrolchRealm {
 
 		this.modelFile = configuration.getDataFile(key, null, configuration.getRuntimeConfiguration(), true);
 
-		this.persistenceHandler = new InMemoryPersistence(container, isVersioningEnabled());
-		this.resourceMap = new TransactionalResourceMap(this);
-		this.orderMap = new TransactionalOrderMap(this);
-		this.activityMap = new TransactionalActivityMap(this);
+		this.resourceMap = new TransientResourceMap();
+		this.orderMap = new TransientOrderMap();
+		this.activityMap = new TransientActivityMap();
 
 		if (isAuditTrailEnabled())
-			this.auditTrail = new TransactionalAuditTrail();
+			this.auditTrail = new TransientAuditTrail();
 		else
-			this.auditTrail = new NoStrategyAuditTrail();
+			this.auditTrail = new NoStrategyAuditTrail(getRealm());
 	}
 
 	@Override
@@ -135,8 +127,9 @@ public class TransientRealm extends InternalStrolchRealm {
 		}
 
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info(MessageFormat.format("Loading XML Model file {0} for realm {1} took {2}.", this.modelFile.getName(), //$NON-NLS-1$
-				getRealm(), durationS));
+		logger.info(MessageFormat
+				.format("Loaded XML Model file {0} for realm {1} took {2}.", this.modelFile.getName(), //$NON-NLS-1$
+						getRealm(), durationS));
 		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$

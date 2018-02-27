@@ -15,18 +15,14 @@
  */
 package li.strolch.rest.helper;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.HttpHeaders;
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.visitor.StrolchElementVisitor;
@@ -36,6 +32,8 @@ import li.strolch.rest.model.QueryData;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -57,7 +55,7 @@ public class RestfulHelper {
 	}
 
 	public static <T extends StrolchRootElement> JsonObject toJson(QueryData queryData, long dataSetSize,
-			List<T> elements, StrolchElementVisitor<JsonObject> toJsonVisitor) {
+			List<T> elements, StrolchElementVisitor<JsonElement> toJsonVisitor) {
 
 		// paging
 		Paging<T> paging = Paging.asPage(elements, queryData.getOffset(), queryData.getLimit());
@@ -83,7 +81,7 @@ public class RestfulHelper {
 		// add items
 		JsonArray data = new JsonArray();
 		for (T t : page) {
-			JsonObject element = t.accept(toJsonVisitor);
+			JsonElement element = t.accept(toJsonVisitor);
 			data.add(element);
 		}
 		root.add("data", data);

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,6 +28,12 @@ import li.strolch.utils.collections.DateRange;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class NoStrategyAuditTrail implements AuditTrail {
+
+	private String realm;
+
+	public NoStrategyAuditTrail(String realm) {
+		this.realm = realm;
+	}
 
 	@Override
 	public boolean isEnabled() {
@@ -75,13 +81,13 @@ public class NoStrategyAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public Audit update(StrolchTransaction tx, Audit audit) {
-		return null;
+	public void update(StrolchTransaction tx, Audit audit) {
+		//
 	}
 
 	@Override
-	public List<Audit> updateAll(StrolchTransaction tx, List<Audit> audits) {
-		return null;
+	public void updateAll(StrolchTransaction tx, List<Audit> audits) {
+		//
 	}
 
 	@Override
@@ -101,6 +107,6 @@ public class NoStrategyAuditTrail implements AuditTrail {
 
 	@Override
 	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> query) {
-		return null;
+		throw new IllegalStateException("Audit trail is not enabled for realm " + this.realm);
 	}
 }

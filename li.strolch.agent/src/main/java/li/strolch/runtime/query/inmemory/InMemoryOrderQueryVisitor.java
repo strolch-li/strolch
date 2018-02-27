@@ -41,7 +41,7 @@ public class InMemoryOrderQueryVisitor extends InMemoryQueryVisitor<Order> imple
 	}
 
 	public <U> InMemoryQuery<Order, U> visit(OrderQuery<U> orderQuery) {
-		OrderVisitor<U> orderVisitor = orderQuery.getOrderVisitor();
+		OrderVisitor<U> orderVisitor = orderQuery.getVisitor();
 		DBC.PRE.assertNotNull("OrderVisitor may not be null!", orderVisitor); //$NON-NLS-1$
 
 		orderQuery.accept(this);

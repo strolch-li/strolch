@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,8 +55,11 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	 * Default Constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param type
+	 * 		the type
 	 */
 	public Order(String id, String name, String type) {
 		super(id, name, type);
@@ -69,10 +72,15 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	 * Extended Constructor for date and {@link State}
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param type
+	 * 		the type
 	 * @param date
+	 * 		the date
 	 * @param state
+	 * 		the state
 	 */
 	public Order(String id, String name, String type, Date date, State state) {
 		super(id, name, type);
@@ -111,6 +119,7 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	public void setDate(Date date) {
+		assertNotReadonly();
 		this.date = date;
 	}
 
@@ -119,6 +128,7 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	public void setState(State state) {
+		assertNotReadonly();
 		this.state = state;
 	}
 
@@ -127,6 +137,11 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 		if (this.policyDefs == null)
 			throw new StrolchPolicyException(getLocator() + " has no Policies defined!");
 		return this.policyDefs;
+	}
+
+	@Override
+	public PolicyDef getPolicyDef(Class<?> clazz) {
+		return getPolicyDefs().getPolicyDef(clazz.getSimpleName());
 	}
 
 	@Override
@@ -146,12 +161,19 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 
 	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
+		assertNotReadonly();
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);
 	}
 
 	@Override
 	public Order getClone() {
+		return getClone(false);
+	}
+
+	@Override
+	public Order getClone(boolean withVersion) {
+
 		Order clone = new Order();
 
 		super.fillClone(clone);
@@ -162,7 +184,17 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 		if (this.policyDefs != null)
 			clone.setPolicyDefs(this.policyDefs.getClone());
 
+		if (withVersion)
+			clone.setVersion(this.version);
+
 		return clone;
+	}
+
+	@Override
+	public void setReadOnly() {
+		if (this.policyDefs != null)
+			this.policyDefs.setReadOnly();
+		super.setReadOnly();
 	}
 
 	@Override

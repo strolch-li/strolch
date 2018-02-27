@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -117,6 +117,9 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		String username;
 		byte[] password;
 		byte[] salt;
+		String hashAlgorithm;
+		int hashIterations = -1;
+		int hashKeyLength = -1;
 		String firstName;
 		String lastname;
 		UserState userState;
@@ -137,12 +140,46 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			if (qName.equals(XmlConstants.XML_USER)) {
 				this.userId = attributes.getValue(XmlConstants.XML_ATTR_USER_ID);
 				this.username = attributes.getValue(XmlConstants.XML_ATTR_USERNAME);
-				String passwordS = attributes.getValue(XmlConstants.XML_ATTR_PASSWORD);
-				if (!StringHelper.isEmpty(passwordS))
-					this.password = StringHelper.fromHexString(passwordS);
-				String saltS = attributes.getValue(XmlConstants.XML_ATTR_SALT);
-				if (!StringHelper.isEmpty(saltS))
-					this.salt = StringHelper.fromHexString(saltS);
+
+				String password = attributes.getValue(XmlConstants.XML_ATTR_PASSWORD);
+				String salt = attributes.getValue(XmlConstants.XML_ATTR_SALT);
+				parsePassword(password, salt);
+			}
+		}
+
+		private void parsePassword(String passwordS, String salt) {
+
+			if (StringHelper.isNotEmpty(salt))
+				this.salt = StringHelper.fromHexString(salt);
+
+			if (StringHelper.isEmpty(passwordS))
+				return;
+
+			if (!passwordS.startsWith("$")) {
+				this.password = StringHelper.fromHexString(passwordS);
+			} else {
+
+				String[] parts = passwordS.split("\\$");
+				if (parts.length != 4) {
+					logger.error("Illegal password " + passwordS + ": Starts with $, but does not have 3 parts!");
+				} else {
+
+					String hashAlgorithm = parts[1];
+					String[] hashParts = hashAlgorithm.split(",");
+
+					if (hashParts.length != 3) {
+						logger.error("Illegal password " + passwordS
+								+ ": hashAlgorithm part does not have 3 parts separated by comma!");
+					} else {
+
+						this.hashAlgorithm = hashParts[0];
+						this.hashIterations = Integer.parseInt(hashParts[1]);
+						this.hashKeyLength = Integer.parseInt(hashParts[2]);
+
+						this.salt = StringHelper.fromHexString(parts[2]);
+						this.password = StringHelper.fromHexString(parts[3]);
+					}
+				}
 			}
 		}
 
@@ -154,30 +191,51 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 
-			if (qName.equals(XmlConstants.XML_FIRSTNAME)) {
-				this.firstName = this.text.toString().trim();
-			} else if (qName.equals(XmlConstants.XML_LASTNAME)) {
-				this.lastname = this.text.toString().trim();
-			} else if (qName.equals(XmlConstants.XML_STATE)) {
-				this.userState = UserState.valueOf(this.text.toString().trim());
-			} else if (qName.equals(XmlConstants.XML_LOCALE)) {
-				this.locale = new Locale(this.text.toString().trim());
-			} else if (qName.equals(XmlConstants.XML_ROLE)) {
-				this.userRoles.add(this.text.toString().trim());
-			} else if (qName.equals(XmlConstants.XML_ROLES)) {
-				// NO-OP
-			} else if (qName.equals(XmlConstants.XML_PARAMETER)) {
-				// NO-OP
-			} else if (qName.equals(XmlConstants.XML_PARAMETERS)) {
-				// NO-OP
-			} else if (qName.equals(XmlConstants.XML_USER)) {
+			switch (qName) {
+			case XmlConstants.XML_FIRSTNAME:
 
-				User user = new User(this.userId, this.username, this.password, this.salt, this.firstName,
-						this.lastname, this.userState, this.userRoles, this.locale, this.parameters);
+				this.firstName = this.text.toString().trim();
+				break;
+
+			case XmlConstants.XML_LASTNAME:
+
+				this.lastname = this.text.toString().trim();
+				break;
+
+			case XmlConstants.XML_STATE:
+
+				this.userState = UserState.valueOf(this.text.toString().trim());
+				break;
+
+			case XmlConstants.XML_LOCALE:
+
+				this.locale = new Locale(this.text.toString().trim());
+				break;
+
+			case XmlConstants.XML_ROLE:
+
+				this.userRoles.add(this.text.toString().trim());
+				break;
+
+			case XmlConstants.XML_USER:
+
+				User user = new User(this.userId, this.username, this.password, this.salt, this.hashAlgorithm,
+						hashIterations, hashKeyLength, this.firstName, this.lastname, this.userState, this.userRoles,
+						this.locale, this.parameters);
 				logger.info(MessageFormat.format("New User: {0}", user)); //$NON-NLS-1$
+
 				getUsers().add(user);
-			} else {
-				throw new IllegalArgumentException("Unhandled tag " + qName);
+				break;
+
+			default:
+
+				if (!(qName.equals(XmlConstants.XML_ROLES) //
+						|| qName.equals(XmlConstants.XML_PARAMETER) //
+						|| qName.equals(XmlConstants.XML_PARAMETERS))) {
+					throw new IllegalArgumentException("Unhandled tag " + qName);
+				}
+
+				break;
 			}
 		}
 
@@ -191,21 +249,27 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 	class PropertyParser extends ElementParserAdapter {
 
-//	      <Property name="organizationalUnit" value="Development" />
+		// <Property name="organizationalUnit" value="Development" />
 
 		public Map<String, String> parameterMap = new HashMap<>();
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
 				throws SAXException {
-			if (qName.equals(XmlConstants.XML_PROPERTY)) {
+
+			switch (qName) {
+			case XmlConstants.XML_PROPERTY:
+
 				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME);
 				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE);
 				this.parameterMap.put(key, value);
-			} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
-				// NO-OP
-			} else {
-				throw new IllegalArgumentException("Unhandled tag " + qName);
+				break;
+
+			default:
+
+				if (!qName.equals(XmlConstants.XML_PROPERTIES)) {
+					throw new IllegalArgumentException("Unhandled tag " + qName);
+				}
 			}
 		}
 

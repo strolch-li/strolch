@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,23 +18,17 @@ package li.strolch.model.timedstate;
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
-import li.strolch.model.AbstractStrolchElement;
-import li.strolch.model.Locator;
+import li.strolch.model.*;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-import li.strolch.model.visitor.TimedStateVisitor;
 import li.strolch.utils.helper.StringHelper;
 
 /**
  * Wrapper for a {@link IntegerTimedState}
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("rawtypes")
@@ -67,6 +61,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 
 	@Override
 	public void setHidden(boolean hidden) {
+		assertNotReadonly();
 		this.hidden = hidden;
 	}
 
@@ -77,6 +72,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 
 	@Override
 	public void setInterpretation(String interpretation) {
+		assertNotReadonly();
 		if (StringHelper.isEmpty(interpretation)) {
 			this.interpretation = INTERPRETATION_NONE;
 		} else {
@@ -91,6 +87,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 
 	@Override
 	public void setUom(String uom) {
+		assertNotReadonly();
 		if (StringHelper.isEmpty(uom)) {
 			this.uom = UOM_NONE;
 		} else {
@@ -100,6 +97,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 
 	@Override
 	public void setIndex(int index) {
+		assertNotReadonly();
 		this.index = index;
 	}
 
@@ -140,6 +138,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 
 	@Override
 	public void setParent(Resource parent) {
+		assertNotReadonly();
 		this.parent = parent;
 	}
 
@@ -178,8 +177,9 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	}
 
 	@Override
-	public <U> U accept(TimedStateVisitor visitor) {
-		return visitor.visitTimedState(this);
+	public void setReadOnly() {
+		this.state.setReadonly();
+		super.setReadOnly();
 	}
 
 	@SuppressWarnings("nls")

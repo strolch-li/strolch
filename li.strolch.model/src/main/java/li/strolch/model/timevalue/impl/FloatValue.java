@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ import java.io.Serializable;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.utils.helper.MathHelper;
 
 /**
  * {@link IValue} implementation to work with Double valued {@link ITimeValue} objects
@@ -61,7 +62,7 @@ public class FloatValue implements IValue<Double>, Serializable {
 
 	@Override
 	public FloatValue add(Double o) {
-		this.value += o;
+		this.value = MathHelper.toPrecision(this.value + o, 8);
 		return this;
 	}
 

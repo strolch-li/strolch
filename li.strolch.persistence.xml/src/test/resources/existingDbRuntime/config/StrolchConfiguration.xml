@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchConfiguration>
+	<env id="dev">
+		<Runtime>
+			<applicationName>StrolchPersistenceTest</applicationName>
+			<Properties>
+				<verbose>true</verbose>
+			</Properties>
+		</Runtime>
+		<Component>
+			<name>PrivilegeHandler</name>
+			<api>li.strolch.runtime.privilege.PrivilegeHandler</api>
+			<impl>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</impl>
+			<Properties>
+				<privilegeConfigFile>PrivilegeConfig.xml</privilegeConfigFile>
+			</Properties>
+		</Component>
+		<Component>
+			<name>RealmHandler</name>
+			<api>li.strolch.agent.api.RealmHandler</api>
+			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+			<depends>PrivilegeHandler</depends>
+			<depends>PersistenceHandler</depends>
+			<Properties>
+				<dataStoreMode>CACHED</dataStoreMode>
+			</Properties>
+		</Component>
+		<Component>
+			<name>PersistenceHandler</name>
+			<api>li.strolch.persistence.api.PersistenceHandler</api>
+			<impl>li.strolch.persistence.xml.XmlPersistenceHandler</impl>
+			<Properties>
+				<dbStorePath>dbStore</dbStorePath>
+			</Properties>
+		</Component>
+	</env>
+</StrolchConfiguration>

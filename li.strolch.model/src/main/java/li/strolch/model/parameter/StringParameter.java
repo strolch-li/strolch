@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +16,11 @@
 package li.strolch.model.parameter;
 
 import li.strolch.model.StrolchValueType;
-import li.strolch.model.visitor.ParameterVisitor;
+import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- *
  */
 public class StringParameter extends AbstractParameter<String> {
 
@@ -31,7 +30,6 @@ public class StringParameter extends AbstractParameter<String> {
 
 	/**
 	 * Empty constructor
-	 *
 	 */
 	public StringParameter() {
 		//
@@ -41,8 +39,11 @@ public class StringParameter extends AbstractParameter<String> {
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public StringParameter(String id, String name, String value) {
 		super(id, name);
@@ -67,17 +68,19 @@ public class StringParameter extends AbstractParameter<String> {
 
 	@Override
 	public void setValue(String value) {
+		assertNotReadonly();
 		validateValue(value);
 		this.value = value;
 	}
 
 	/**
 	 * Sets the value to the empty string
-	 * 
+	 *
 	 * @see Parameter#clear()
 	 */
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value = "";
 	}
 
@@ -105,7 +108,7 @@ public class StringParameter extends AbstractParameter<String> {
 	}
 
 	@Override
-	public <U> U accept(ParameterVisitor visitor) {
+	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitStringParam(this);
 	}
 
@@ -114,5 +117,4 @@ public class StringParameter extends AbstractParameter<String> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareToIgnoreCase(((StringParameter) o).getValue());
 	}
-
 }

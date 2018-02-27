@@ -15,12 +15,10 @@
  */
 package li.strolch.runtime.configuration;
 
-import static li.strolch.db.DbConstants.PROP_DB_IGNORE_REALM;
-import static li.strolch.db.DbConstants.PROP_DB_PASSWORD;
-import static li.strolch.db.DbConstants.PROP_DB_URL;
-import static li.strolch.db.DbConstants.PROP_DB_USERNAME;
+import static li.strolch.db.DbConstants.*;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -28,15 +26,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.runtime.StrolchConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -50,10 +45,6 @@ public abstract class DbConnectionBuilder {
 	private ComponentContainer container;
 	private ComponentConfiguration configuration;
 
-	/**
-	 * @param container
-	 * @param persistenceHandlerConfiguration
-	 */
 	public DbConnectionBuilder(ComponentContainer container, ComponentConfiguration persistenceHandlerConfiguration) {
 		this.container = container;
 		this.configuration = persistenceHandlerConfiguration;

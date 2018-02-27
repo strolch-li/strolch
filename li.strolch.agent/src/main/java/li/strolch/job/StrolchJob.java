@@ -39,17 +39,18 @@ public abstract class StrolchJob implements Runnable {
 	}
 
 	protected ScheduledExecutorService getScheduledExecutor() {
-		return getAgent().getScheduledExecutor();
+		return getAgent().getScheduledExecutor("StrolchJob");
 	}
 
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
 	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
+	 *
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @throws PrivilegeException
+	 * 		if the agent can not perform the action
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
 		getContainer().getPrivilegeHandler().runAsAgent(runnable);
@@ -57,10 +58,10 @@ public abstract class StrolchJob implements Runnable {
 
 	/**
 	 * Opens a {@link StrolchTransaction} for the default realm and certificate
-	 * 
+	 *
 	 * @param cert
-	 *            the certificate authorizing the transaction
-	 * 
+	 * 		the certificate authorizing the transaction
+	 *
 	 * @return the newly created transaction
 	 */
 	protected StrolchTransaction openTx(Certificate cert) {

@@ -17,13 +17,14 @@ package li.strolch.runtime.query.inmemory;
 
 import java.util.List;
 
+import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
-import li.strolch.persistence.api.AuditDao;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface AuditNavigator {
 
-	public abstract List<Audit> navigate(AuditDao dao);
+	public List<Audit> navigate(StrolchTransaction tx, AuditTrail auditTrail);
 }

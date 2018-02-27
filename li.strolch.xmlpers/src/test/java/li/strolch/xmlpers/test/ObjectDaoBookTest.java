@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,7 +43,6 @@ import li.strolch.xmlpers.test.model.Book;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class ObjectDaoBookTest extends AbstractPersistenceTest {
 
@@ -56,6 +55,7 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 
 	private void setup(IoMode ioMode) {
 		Properties properties = new Properties();
+		properties.setProperty(PersistenceConstants.PROP_XML_IO_MOD, ioMode.name());
 		properties.setProperty(PersistenceConstants.PROP_BASEPATH, BASEPATH + ioMode.name());
 		setup(properties);
 	}
@@ -63,35 +63,29 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 	@Test
 	public void testCrudSax() {
 		setup(IoMode.SAX);
-		testCrud(IoMode.SAX);
+		testCrud();
 	}
 
 	@Test
 	public void testCrudDom() {
 		setup(IoMode.DOM);
-		testCrud(IoMode.DOM);
+		testCrud();
 	}
 
-	private PersistenceTransaction freshTx(IoMode ioMode) {
-		PersistenceTransaction tx = this.persistenceManager.openTx();
-		tx.setIoMode(ioMode);
-		return tx;
-	}
-
-	private void testCrud(IoMode ioMode) {
+	private void testCrud() {
 
 		ObjectDao objectDao;
 
 		// create new book
 		Book book = createBook();
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			objectDao = tx.getObjectDao();
 			objectDao.add(book);
 		}
 
 		// read book
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			IdOfTypeRef bookRef = tx.getObjectRefCache()
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			IdOfTypeRef bookRef = tx.getManager().getObjectRefCache()
 					.getIdOfTypeRef(TestConstants.TYPE_BOOK, Long.toString(BOOK_ID));
 			objectDao = tx.getObjectDao();
 			book = objectDao.queryById(bookRef);
@@ -103,8 +97,8 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 		}
 
 		// read modified book
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			IdOfTypeRef bookRef = tx.getObjectRefCache()
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			IdOfTypeRef bookRef = tx.getManager().getObjectRefCache()
 					.getIdOfTypeRef(TestConstants.TYPE_BOOK, Long.toString(BOOK_ID));
 			objectDao = tx.getObjectDao();
 			book = objectDao.queryById(bookRef);
@@ -112,14 +106,14 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 		}
 
 		// delete book
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			objectDao = tx.getObjectDao();
 			objectDao.remove(book);
 		}
 
 		// fail to read
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			IdOfTypeRef bookRef = tx.getObjectRefCache()
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			IdOfTypeRef bookRef = tx.getManager().getObjectRefCache()
 					.getIdOfTypeRef(TestConstants.TYPE_BOOK, Long.toString(BOOK_ID));
 			objectDao = tx.getObjectDao();
 			book = objectDao.queryById(bookRef);
@@ -149,26 +143,25 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 		// create a list of books
 		List<Book> books = new ArrayList<>(10);
 		for (int i = 0; i < 10; i++) {
-			long id = i;
 			String title = "Bulk Test Book. " + i; //$NON-NLS-1$
 			String author = "Nick Hornby"; //$NON-NLS-1$
 			String press = "Penguin Books"; //$NON-NLS-1$
 			double price = 21.30;
 
-			Book book = createBook(id, title, author, press, price);
+			Book book = createBook((long) i, title, author, press, price);
 			books.add(book);
 		}
 
 		// save all
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			ObjectDao objectDao = tx.getObjectDao();
 			objectDao.addAll(books);
 			books.clear();
 		}
 
 		// query all
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			TypeRef typeRef = tx.getObjectRefCache().getTypeRef(TestConstants.TYPE_BOOK);
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			TypeRef typeRef = tx.getManager().getObjectRefCache().getTypeRef(TestConstants.TYPE_BOOK);
 			ObjectDao objectDao = tx.getObjectDao();
 			books = objectDao.queryAll(typeRef);
 			assertEquals("Expected to find 10 entries!", 10, books.size()); //$NON-NLS-1$
@@ -178,8 +171,8 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 		}
 
 		// now query them again
-		try (PersistenceTransaction tx = freshTx(ioMode);) {
-			TypeRef typeRef = tx.getObjectRefCache().getTypeRef(TestConstants.TYPE_BOOK);
+		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+			TypeRef typeRef = tx.getManager().getObjectRefCache().getTypeRef(TestConstants.TYPE_BOOK);
 			ObjectDao objectDao = tx.getObjectDao();
 			books = objectDao.queryAll(typeRef);
 			assertEquals("Expected to find 0 entries!", 0, books.size()); //$NON-NLS-1$
@@ -205,20 +198,20 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 
 		// read by id
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			ObjectRef objectRef = tx.getObjectRefCache().getIdOfTypeRef(classType, Long.toString(id));
+			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfTypeRef(classType, Long.toString(id));
 			Book book = tx.getObjectDao().queryById(objectRef);
 			assertNotNull("Expected to read book by ID", book); //$NON-NLS-1$
 		}
 
 		// delete by id
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			ObjectRef objectRef = tx.getObjectRefCache().getIdOfTypeRef(classType, Long.toString(id));
+			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfTypeRef(classType, Long.toString(id));
 			tx.getObjectDao().removeById(objectRef);
 		}
 
 		// fail to read by id
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			ObjectRef objectRef = tx.getObjectRefCache().getIdOfTypeRef(classType, Long.toString(id));
+			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfTypeRef(classType, Long.toString(id));
 			Book book = tx.getObjectDao().queryById(objectRef);
 			assertNull("Expected that book was deleted by ID, thus can not be read anymore", book); //$NON-NLS-1$
 		}

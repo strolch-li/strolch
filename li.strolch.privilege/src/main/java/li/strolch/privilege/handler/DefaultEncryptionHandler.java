@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,9 +15,7 @@
  */
 package li.strolch.privilege.handler;
 
-import static li.strolch.privilege.base.PrivilegeConstants.DEFAULT_ALGORITHM;
-import static li.strolch.privilege.base.PrivilegeConstants.DEFAULT_ITERATIONS;
-import static li.strolch.privilege.base.PrivilegeConstants.DEFAULT_KEY_LENGTH;
+import static li.strolch.privilege.base.PrivilegeConstants.*;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -60,6 +58,11 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	 * The {@link SecureRandom} which is used to create new tokens
 	 */
 	private SecureRandom secureRandom;
+
+	/**
+	 * The non-salt algorithm for this instance
+	 */
+	private String nonSaltAlgorithm;
 
 	/**
 	 * The configured algorithm for this instance
@@ -111,11 +114,29 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	}
 
 	@Override
+	public byte[] hashPasswordWithoutSalt(char[] password) {
+		try {
+
+			MessageDigest digest = MessageDigest.getInstance(this.nonSaltAlgorithm);
+			return digest.digest(new String(password).getBytes());
+
+		} catch (NoSuchAlgorithmException e) {
+			throw new PrivilegeException(MessageFormat.format("Algorithm {0} was not found!", nonSaltAlgorithm),
+					e.getCause());
+		}
+	}
+
+	@Override
 	public byte[] hashPassword(char[] password, byte[] salt) {
+		return hashPassword(password, salt, this.algorithm, this.iterations, this.keyLength);
+	}
+
+	@Override
+	public byte[] hashPassword(char[] password, byte[] salt, String algorithm, int iterations, int keyLength) {
 
 		try {
-			SecretKeyFactory skf = SecretKeyFactory.getInstance(this.algorithm);
-			PBEKeySpec spec = new PBEKeySpec(password, salt, this.iterations, this.keyLength);
+			SecretKeyFactory skf = SecretKeyFactory.getInstance(algorithm);
+			PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, keyLength);
 			SecretKey key = skf.generateSecret(spec);
 			return key.getEncoded();
 
@@ -131,10 +152,25 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 
 		// get hash algorithm parameters
 		this.algorithm = parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_ALGORITHM, DEFAULT_ALGORITHM);
+		this.nonSaltAlgorithm = parameterMap
+				.getOrDefault(XmlConstants.XML_PARAM_HASH_ALGORITHM_NON_SALT, DEFAULT_ALGORITHM_NON_SALT);
 		this.iterations = Integer.parseInt(
 				parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_ITERATIONS, String.valueOf(DEFAULT_ITERATIONS)));
 		this.keyLength = Integer.parseInt(
 				parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, String.valueOf(DEFAULT_KEY_LENGTH)));
+
+		// test non-salt hash algorithm
+		try {
+			hashPasswordWithoutSalt("test".toCharArray()); //$NON-NLS-1$
+			DefaultEncryptionHandler.logger.info(MessageFormat
+					.format("Using non-salt hashing algorithm {0}", this.nonSaltAlgorithm)); //$NON-NLS-1$
+		} catch (Exception e) {
+			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}"; //$NON-NLS-1$
+			msg = MessageFormat
+					.format(msg, EncryptionHandler.class.getName(), XmlConstants.XML_PARAM_HASH_ALGORITHM_NON_SALT,
+							e.getLocalizedMessage());
+			throw new PrivilegeException(msg, e);
+		}
 
 		// test hash algorithm
 		try {

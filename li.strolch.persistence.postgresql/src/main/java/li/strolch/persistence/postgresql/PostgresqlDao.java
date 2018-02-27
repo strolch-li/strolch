@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,30 +53,6 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	protected abstract T parseFromXml(String id, String type, SQLXML xml);
 
 	@Override
-	public boolean hasElement(String type, String id) {
-		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ? and latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
-			statement.setString(1, type);
-			statement.setString(2, id);
-
-			try (ResultSet result = statement.executeQuery()) {
-				result.next();
-				long numberOfElements = result.getLong(1);
-				if (numberOfElements == 0)
-					return false;
-				if (numberOfElements == 1)
-					return true;
-
-				String msg = MessageFormat.format("Non unique number of elements with type {0} and id {1}", type, id);
-				throw new StrolchPersistenceException(msg);
-			}
-
-		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public long querySize() {
 		String sql = "select count(*) from " + getTableName() + " where latest = true";
 		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
@@ -108,48 +84,6 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	@Override
-	public Set<String> queryKeySet() {
-
-		Set<String> keySet = new HashSet<>();
-
-		String sql = "select id from " + getTableName() + " where latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
-
-			try (ResultSet result = statement.executeQuery()) {
-				while (result.next()) {
-					keySet.add(result.getString("id"));
-				}
-			}
-
-		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query key set due to: " + e.getMessage(), e);
-		}
-
-		return keySet;
-	}
-
-	@Override
-	public Set<String> queryKeySet(String type) {
-		Set<String> keySet = new HashSet<>();
-
-		String sql = "select id from " + getTableName() + " where type = ? and latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
-			statement.setString(1, type);
-
-			try (ResultSet result = statement.executeQuery()) {
-				while (result.next()) {
-					keySet.add(result.getString("id"));
-				}
-			}
-
-		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query key set due to: " + e.getMessage(), e);
-		}
-
-		return keySet;
-	}
-
-	@Override
 	public Set<String> queryTypes() {
 		Set<String> keySet = new HashSet<>();
 
@@ -167,40 +101,6 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		}
 
 		return keySet;
-	}
-
-	@Override
-	public T queryBy(String type, String id) {
-
-		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
-				+ " where type = ? and id = ? and latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
-			statement.setString(1, type);
-			statement.setString(2, id);
-
-			try (ResultSet result = statement.executeQuery()) {
-				if (!result.next()) {
-					return null;
-				}
-
-				SQLXML sqlxml = result.getSQLXML("asxml");
-				T t = parseFromXml(id, type, sqlxml);
-
-				int v = result.getInt(4);
-				String createdBy = result.getString(5);
-				Date createdAt = result.getDate(6);
-				boolean deleted = result.getBoolean(7);
-				Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
-				t.setVersion(version);
-
-				if (result.next())
-					throw new StrolchPersistenceException("Non unique result for query: " + sql);
-				return t;
-			}
-
-		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
-		}
 	}
 
 	@Override

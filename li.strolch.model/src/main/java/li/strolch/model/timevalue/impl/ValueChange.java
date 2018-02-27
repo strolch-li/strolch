@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,12 +31,13 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	protected Long time;
 	protected T value;
 	protected String stateId;
+	private boolean readonly;
 
 	/**
 	 * @param time
-	 *            the time the change applies
+	 * 		the time the change applies
 	 * @param value
-	 *            the value to be applied
+	 * 		the value to be applied
 	 */
 	public ValueChange(final Long time, final T value) {
 		this.time = time;
@@ -45,11 +46,11 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 
 	/**
 	 * @param time
-	 *            the time the change applies
+	 * 		the time the change applies
 	 * @param value
-	 *            the value to be applied
+	 * 		the value to be applied
 	 * @param stateId
-	 *            the id of the state the change applies to
+	 * 		the id of the state the change applies to
 	 */
 	public ValueChange(final Long time, final T value, final String stateId) {
 		this.time = time;
@@ -150,5 +151,22 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	@Override
 	public IValueChange<T> getClone() {
 		return new ValueChange(this.time, this.value, this.stateId);
+	}
+
+	@Override
+	public boolean isReadOnly() {
+		return this.readonly;
+	}
+
+	@Override
+	public void setReadOnly() {
+		this.readonly = true;
+	}
+
+	protected void assertNotReadonly() {
+		if (this.readonly) {
+			throw new IllegalStateException("The element " + getClass().getSimpleName() + " for stateId " + this.stateId
+					+ " is currently readOnly, to modify clone first!");
+		}
 	}
 }

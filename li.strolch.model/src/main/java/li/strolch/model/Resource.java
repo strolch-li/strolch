@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,8 +56,11 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param type
+	 * 		the type
 	 */
 	public Resource(String id, String name, String type) {
 		super(id, name, type);
@@ -90,6 +93,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@SuppressWarnings("unchecked")
 	public void addTimedState(StrolchTimedState<?> strolchTimedState) {
+		assertNotReadonly();
 		if (this.timedStateMap == null) {
 			this.timedStateMap = new HashMap<>(1, 1.0F);
 		}
@@ -127,6 +131,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T extends StrolchTimedState> T removeTimedState(String id) {
+		assertNotReadonly();
 		if (this.timedStateMap == null) {
 			return null;
 		}
@@ -163,6 +168,11 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	}
 
 	@Override
+	public PolicyDef getPolicyDef(Class<?> clazz) {
+		return getPolicyDefs().getPolicyDef(clazz.getSimpleName());
+	}
+
+	@Override
 	public PolicyDef getPolicyDef(String type) {
 		return getPolicyDefs().getPolicyDef(type);
 	}
@@ -179,12 +189,19 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
+		assertNotReadonly();
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);
 	}
 
 	@Override
 	public Resource getClone() {
+		return getClone(false);
+	}
+
+	@Override
+	public Resource getClone(boolean withVersion) {
+
 		Resource clone = new Resource();
 
 		super.fillClone(clone);
@@ -198,7 +215,22 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		if (this.policyDefs != null)
 			clone.setPolicyDefs(this.policyDefs.getClone());
 
+		if (withVersion)
+			clone.setVersion(this.version);
+
 		return clone;
+	}
+
+	@Override
+	public void setReadOnly() {
+		if (this.policyDefs != null)
+			this.policyDefs.setReadOnly();
+		if (this.timedStateMap != null) {
+			for (StrolchTimedState<IValue<?>> timedState : this.timedStateMap.values()) {
+				timedState.setReadOnly();
+			}
+		}
+		super.setReadOnly();
 	}
 
 	@Override

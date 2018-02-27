@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,34 +15,28 @@
  */
 package li.strolch.persistence.postgresql;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLXML;
-import java.sql.Timestamp;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
-
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.SQLXML;
+import java.sql.Timestamp;
+import java.text.MessageFormat;
+import java.util.Calendar;
 
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
-import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.xml.SimpleStrolchElementListener;
 import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
 public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements ResourceDao {
@@ -106,8 +100,8 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			// version
 			preparedStatement.setInt(2, res.getVersion().getVersion());
 			preparedStatement.setString(3, res.getVersion().getCreatedBy());
-			preparedStatement.setTimestamp(4, new Timestamp(res.getVersion().getCreatedAt().getTime()),
-					Calendar.getInstance());
+			preparedStatement
+					.setTimestamp(4, new Timestamp(res.getVersion().getCreatedAt().getTime()), Calendar.getInstance());
 			preparedStatement.setBoolean(5, res.getVersion().isDeleted());
 
 			preparedStatement.setBoolean(6, !res.getVersion().isDeleted());
@@ -130,8 +124,8 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			}
 
 		} catch (SQLException | SAXException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to insert Resource {0} due to {1}",
-					res.getLocator(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(MessageFormat
+					.format("Failed to insert Resource {0} due to {1}", res.getLocator(), e.getLocalizedMessage()), e);
 		}
 
 		if (res.getVersion().isFirstVersion()) {
@@ -154,8 +148,8 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to insert Resource {0} due to {1}",
-					res.getLocator(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(MessageFormat
+					.format("Failed to insert Resource {0} due to {1}", res.getLocator(), e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -170,15 +164,15 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 		// make sure is first version when versioning is not enabled
 		if (!resource.getVersion().isFirstVersion()) {
-			throw new StrolchPersistenceException(MessageFormat.format(
-					"Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
-					resource.getVersion()));
+			throw new StrolchPersistenceException(MessageFormat
+					.format("Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
+							resource.getVersion()));
 		}
 
 		// and also not marked as deleted!
 		if (resource.getVersion().isDeleted()) {
-			throw new StrolchPersistenceException(
-					MessageFormat.format("Versioning is not enabled, so version can not be marked as deleted for {0}",
+			throw new StrolchPersistenceException(MessageFormat
+					.format("Versioning is not enabled, so version can not be marked as deleted for {0}",
 							resource.getVersion()));
 		}
 
@@ -218,36 +212,9 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			}
 
 		} catch (SQLException | SAXException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Resource {0} due to {1}",
-					resource.getLocator(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(MessageFormat
+					.format("Failed to update Resource {0} due to {1}", resource.getLocator(), e.getLocalizedMessage()),
+					e);
 		}
-	}
-
-	@Override
-	public <U> List<U> doQuery(ResourceQuery<U> query) {
-
-		PostgreSqlResourceQueryVisitor queryVisitor = new PostgreSqlResourceQueryVisitor("id, asxml");
-		query.accept(queryVisitor);
-		queryVisitor.validate();
-
-		List<U> list = new ArrayList<>();
-
-		String sql = queryVisitor.getSql();
-		try (PreparedStatement ps = tx().getConnection().prepareStatement(sql)) {
-			queryVisitor.setValues(ps);
-
-			try (ResultSet result = ps.executeQuery()) {
-				while (result.next()) {
-					String id = result.getString("id");
-					SQLXML sqlxml = result.getSQLXML("asxml");
-					Resource t = parseFromXml(id, queryVisitor.getType(), sqlxml);
-					list.add(t.accept(query.getResourceVisitor()));
-				}
-			}
-		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to perform query due to: " + e.getMessage(), e);
-		}
-
-		return list;
 	}
 }

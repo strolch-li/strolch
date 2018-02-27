@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,6 @@ import java.util.Collections;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.XmlImportModelCommand;
-import li.strolch.command.parameter.SetParameterCommand;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.Resource;
@@ -60,15 +59,14 @@ public class DataMigration extends Migration {
 		}
 
 		ModelStatistics statistics = command.getStatistics();
-		logger.info(MessageFormat.format("[{0}] Data migration for {1} loaded {2} Resources and {3} Orders.", //$NON-NLS-1$
-				getRealm(), getVersion(), statistics.nrOfResources, statistics.nrOfOrders));
+		logger.info(
+				MessageFormat.format("[{0}] Data migration for {1} loaded {2} Resources and {3} Orders.", //$NON-NLS-1$
+						getRealm(), getVersion(), statistics.nrOfResources, statistics.nrOfOrders));
 	}
 
 	@Override
-	protected void setNewVersion(SetParameterCommand cmd, Resource migrationsRes) {
+	protected void setNewVersion(Resource migrationsRes) {
 		StringParameter currentDataVersionP = migrationsRes.getParameter(BAG_PARAMETERS, PARAM_CURRENT_DATA_VERSION);
-
-		cmd.setParameter(currentDataVersionP);
-		cmd.setValueAsString(getVersion().toString());
+		currentDataVersionP.setValue(getVersion().toString());
 	}
 }

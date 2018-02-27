@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,7 +57,7 @@ public class FindByLocatorTest {
 	}
 
 	@Test
-	public void shouldFindByResource() {
+	public void shouldFindByResource() throws Exception {
 		runtimeMock.run(agent -> {
 			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test")) {
@@ -79,7 +79,8 @@ public class FindByLocatorTest {
 						resStringParam);
 
 				// TimedState on Resource
-				Locator locResIntegerState = Locator.valueOf("Resource/TestType/MyTestResource/TimedState/@integerState");
+				Locator locResIntegerState = Locator
+						.valueOf("Resource/TestType/MyTestResource/TimedState/@integerState");
 				IntegerTimedState integerS = tx.findElement(locResIntegerState);
 				assertNotNull("Should have found a IntegerTimedState with the locator " + locResIntegerState, integerS);
 
@@ -88,7 +89,7 @@ public class FindByLocatorTest {
 	}
 
 	@Test
-	public void shouldFindByOrder() {
+	public void shouldFindByOrder() throws Exception {
 		runtimeMock.run(agent -> {
 			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test")) {
@@ -113,7 +114,7 @@ public class FindByLocatorTest {
 	}
 
 	@Test
-	public void shouldFindByActivity() {
+	public void shouldFindByActivity() throws Exception {
 		runtimeMock.run(agent -> {
 			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test")) {
@@ -137,7 +138,7 @@ public class FindByLocatorTest {
 	}
 
 	@Test
-	public void shouldFindByAction() {
+	public void shouldFindByAction() throws Exception {
 		runtimeMock.run(agent -> {
 			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test")) {

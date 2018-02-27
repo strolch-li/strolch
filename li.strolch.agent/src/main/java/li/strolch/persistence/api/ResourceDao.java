@@ -15,15 +15,12 @@
  */
 package li.strolch.persistence.api;
 
-import java.util.List;
-
 import li.strolch.model.Resource;
-import li.strolch.model.query.ResourceQuery;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface ResourceDao extends StrolchDao<Resource> {
 
-	public <U> List<U> doQuery(ResourceQuery<U> query);
+	// marker interface
 }

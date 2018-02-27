@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@ public class ObjectDao {
 		this.tx = tx;
 		this.fileDao = fileDao;
 		this.objectFilter = objectFilter;
-		this.ctxFactoryDelegator = this.tx.getRealm().getCtxFactoryDelegator();
+		this.ctxFactoryDelegator = this.tx.getManager().getCtxFactory();
 	}
 
 	public <T> void add(T object) {
@@ -258,15 +258,14 @@ public class ObjectDao {
 		}
 	}
 
-	public Set<String> queryKeySet(ObjectRef parentRef) {
+	private Set<String> queryKeySet(ObjectRef parentRef) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
 		parentRef.lock();
 		try {
 			MetadataDao metadataDao = this.tx.getMetadataDao();
-			Set<String> keySet = metadataDao.queryKeySet(parentRef);
-			return keySet;
+			return metadataDao.queryKeySet(parentRef);
 		} finally {
 			parentRef.unlock();
 		}
@@ -279,8 +278,7 @@ public class ObjectDao {
 		parentRef.lock();
 		try {
 			MetadataDao metadataDao = this.tx.getMetadataDao();
-			long size = metadataDao.querySize(parentRef);
-			return size;
+			return metadataDao.querySize(parentRef);
 		} finally {
 			parentRef.unlock();
 		}
@@ -288,7 +286,7 @@ public class ObjectDao {
 
 	public <T> PersistenceContext<T> createCtx(T object) {
 		return this.ctxFactoryDelegator.<T>getCtxFactory(object.getClass())
-				.createCtx(this.tx.getObjectRefCache(), object);
+				.createCtx(this.tx.getManager().getObjectRefCache(), object);
 	}
 
 	public <T> PersistenceContext<T> createCtx(ObjectRef objectRef) {
