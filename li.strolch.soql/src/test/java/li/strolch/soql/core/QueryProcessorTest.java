@@ -20,7 +20,7 @@ public class QueryProcessorTest extends BaseTest {
 		List<StrolchRootElement> resources = getTestRessources(10);
 		List<StrolchRootElement> orders = getTestOrders(10);
 
-		Map<String, List<StrolchRootElement>> inputCollections = new HashMap<>();
+		Map<String, List<? extends StrolchRootElement>> inputCollections = new HashMap<>();
 		inputCollections.put("r", resources);
 		inputCollections.put("o", orders);
 
@@ -31,13 +31,14 @@ public class QueryProcessorTest extends BaseTest {
 		request.getParameter().put("id", "0");
 		request.setStatement("SELECT r,o FROM Resource r, Order o WHERE r.getId() = :id AND o.getId() = :id");
 
-		String expected = "{\"objectType\":\"QueryResponse\",\"statement\":\"SELECT r,o FROM Resource r, Order o WHERE r.getId() = :id AND "
-				+ "o.getId() = :id\",\"queryParameter\":{\"id\":\"0\"},\"resultSet\":[[{\"objectType\":\"Resource\",\"id\":\"0\",\"name\":null,"
-				+ "\"type\":null,\"parameterBags\":{\"testBag\":{\"id\":\"testBag\",\"name\":null,\"type\":null,"
-				+ "\"parameters\":{\"testId\":{\"id\":\"testId\",\"name\":null,\"type\":\"Float\",\"value\":\"100.0\"}}}}},"
-				+ "{\"objectType\":\"Order\",\"id\":\"0\",\"name\":null,\"type\":null,\"date\":\"2017-11-01T00:00:00.000+01:00\","
-				+ "\"state\":\"Created\",\"parameterBags\":{\"testBag\":{\"id\":\"testBag\",\"name\":null,\"type\":null,"
-				+ "\"parameters\":{\"testId\":{\"id\":\"testId\",\"name\":null,\"type\":\"Float\",\"value\":\"100.0\"}}}}}]]}";
+		String expected =
+				"{\"objectType\":\"QueryResponse\",\"statement\":\"SELECT r,o FROM Resource r, Order o WHERE r.getId() = :id AND "
+						+ "o.getId() = :id\",\"queryParameter\":{\"id\":\"0\"},\"resultSet\":[[{\"objectType\":\"Resource\",\"id\":\"0\",\"name\":null,"
+						+ "\"type\":null,\"parameterBags\":{\"testBag\":{\"id\":\"testBag\",\"name\":null,\"type\":null,"
+						+ "\"parameters\":{\"testId\":{\"id\":\"testId\",\"name\":null,\"type\":\"Float\",\"value\":\"100.0\"}}}}},"
+						+ "{\"objectType\":\"Order\",\"id\":\"0\",\"name\":null,\"type\":null,\"date\":\"2017-11-01T00:00:00.000+01:00\","
+						+ "\"state\":\"Created\",\"parameterBags\":{\"testBag\":{\"id\":\"testBag\",\"name\":null,\"type\":null,"
+						+ "\"parameters\":{\"testId\":{\"id\":\"testId\",\"name\":null,\"type\":\"Float\",\"value\":\"100.0\"}}}}}]]}";
 
 		Assert.assertEquals(expected, processor.process(request, null).asJson().toString());
 	}
@@ -52,7 +53,7 @@ public class QueryProcessorTest extends BaseTest {
 		List<StrolchRootElement> resources = getTestRessources(10);
 		List<StrolchRootElement> orders = getTestOrders(10);
 
-		Map<String, List<StrolchRootElement>> inputCollections = new HashMap<>();
+		Map<String, List<? extends StrolchRootElement>> inputCollections = new HashMap<>();
 		inputCollections.put("r", resources);
 		inputCollections.put("o", orders);
 

@@ -1,12 +1,10 @@
 package li.strolch.soql.core;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.google.gson.JsonArray;
-
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.json.StrolchElementToJsonVisitor;
 
@@ -20,13 +18,11 @@ import li.strolch.model.json.StrolchElementToJsonVisitor;
  */
 public class ResultSet {
 
-	final StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
-
-	public final List<List<StrolchRootElement>> rows = new ArrayList<>();
+	private final List<List<StrolchRootElement>> rows = new ArrayList<>();
 
 	/**
 	 * @param row
-	 *            the result of the execution of a single statement
+	 * 		the result of the execution of a single statement
 	 */
 	public void add(final List<Object> row) {
 
@@ -40,18 +36,25 @@ public class ResultSet {
 			}
 		}
 
-		rows.add(toBeAdded);
+		this.rows.add(toBeAdded);
 	}
 
 	/**
+	 * @param flat
+	 * 		if JSON should be flat or not
+	 *
 	 * @return all rows as JSON Array
 	 */
-	public JsonArray asJson() {
+	public JsonArray asJson(boolean flat) {
 
 		JsonArray rowsAsJson = new JsonArray();
 
-		for (Iterator<List<StrolchRootElement>> rowsIter = rows.iterator(); rowsIter.hasNext();)
-			rowsAsJson.add(row2Json(rowsIter.next()));
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+		if (flat)
+			visitor.flat();
+
+		for (List<StrolchRootElement> row : this.rows)
+			rowsAsJson.add(row2Json(row, visitor));
 
 		return rowsAsJson;
 	}
@@ -59,10 +62,10 @@ public class ResultSet {
 	/**
 	 * @return a single row as JSON Array
 	 */
-	private JsonArray row2Json(final List<StrolchRootElement> evalResult) {
+	private JsonArray row2Json(final List<StrolchRootElement> evalResult, StrolchElementToJsonVisitor visitor) {
 		JsonArray rowAsJson = new JsonArray();
-		for (Iterator<StrolchRootElement> iterator = evalResult.iterator(); iterator.hasNext();) {
-			rowAsJson.add(iterator.next().accept(visitor));
+		for (StrolchRootElement anEvalResult : evalResult) {
+			rowAsJson.add(anEvalResult.accept(visitor));
 		}
 		return rowAsJson;
 	}

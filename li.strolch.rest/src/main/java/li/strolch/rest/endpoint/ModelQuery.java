@@ -9,10 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
@@ -31,40 +28,41 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.QueryData;
+import li.strolch.soql.core.QueryProcessor;
+import li.strolch.soql.core.QueryRequest;
+import li.strolch.soql.core.QueryResponse;
 
 @Path("strolch/model")
 public class ModelQuery {
 
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("query")
-	public Response doQuery(@Context HttpServletRequest request, @QueryParam("realmName") String realmName) {
-
+	@Path("soql")
+	public Response doQuery(@Context HttpServletRequest request, @QueryParam("realmName") String realmName,
+			@QueryParam("flat") String flat, String data) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		List<JsonObject> result = new ArrayList<>();
+		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+
+		QueryResponse queryResponse;
 		try (StrolchTransaction tx = openTx(cert, realmName)) {
-
-			StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
-			visitor.flat();
-
-			// TODO MS do query
-
+			QueryRequest queryRequest = QueryRequest.fromJson(jsonObject);
+			QueryProcessor queryProcessor = new QueryProcessor();
+			queryResponse = queryProcessor.process(queryRequest, tx);
 		}
 
-		JsonObject json = new JsonObject();
-		JsonArray arrJ = new JsonArray();
-		result.forEach(arrJ::add);
-
-		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+		return Response.ok(queryResponse.asJson(Boolean.parseBoolean(flat)).toString(), MediaType.APPLICATION_JSON).build();
 	}
 
 	/**
 	 * Query {@link Resource Resources} by parsing the query string in {@link QueryData#getQuery()} using
 	 * {@link QueryParser}
 	 *
-	 * @param queryData the data from the client
-	 * @param request   the {@link HttpServletRequest} on which to get the {@link Certificate}
+	 * @param queryData
+	 * 		the data from the client
+	 * @param request
+	 * 		the {@link HttpServletRequest} on which to get the {@link Certificate}
+	 *
 	 * @return {@link Response} containing the JSONified {@link Resource Resources} queried
 	 */
 	@GET
@@ -115,8 +113,11 @@ public class ModelQuery {
 	/**
 	 * Query {@link Order Orders} by parsing the query string in {@link QueryData#getQuery()} using {@link QueryParser}
 	 *
-	 * @param queryData the data from the client
-	 * @param request   the {@link HttpServletRequest} on which to get the {@link Certificate}
+	 * @param queryData
+	 * 		the data from the client
+	 * @param request
+	 * 		the {@link HttpServletRequest} on which to get the {@link Certificate}
+	 *
 	 * @return {@link Response} containing the JSONified {@link Order Orders} queried
 	 */
 	@GET
@@ -168,8 +169,11 @@ public class ModelQuery {
 	 * Query {@link Activity Activities} by parsing the query string in {@link QueryData#getQuery()} using
 	 * {@link QueryParser}
 	 *
-	 * @param queryData the data from the client
-	 * @param request   the {@link HttpServletRequest} on which to get the {@link Certificate}
+	 * @param queryData
+	 * 		the data from the client
+	 * @param request
+	 * 		the {@link HttpServletRequest} on which to get the {@link Certificate}
+	 *
 	 * @return {@link Response} containing the JSONified {@link Activity Activities} queried
 	 */
 	@GET

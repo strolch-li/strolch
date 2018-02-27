@@ -23,7 +23,7 @@ public class ComparisonExpression extends AbstractBooleanExpression {
     @Override
     public boolean evaluate(Map<String, Object> inputObjects, Map<String, Object> queryParameter) {
 
-        boolean result = false;
+        boolean result;
 
         switch (operator) {
             case "=":

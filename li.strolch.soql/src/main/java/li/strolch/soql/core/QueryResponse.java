@@ -1,7 +1,8 @@
 package li.strolch.soql.core;
 
-import com.google.gson.JsonObject;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
+import com.google.gson.JsonObject;
 import li.strolch.model.Tags;
 
 /**
@@ -9,42 +10,38 @@ import li.strolch.model.Tags;
  */
 public class QueryResponse extends QueryRequest {
 
-	static final String RESULT_SET = "resultSet";
+	private static final String RESULT_SET = "resultSet";
 
-	// an exception or error message in case of error
-	public String message;
+	private String message;
 
-	// the returned objects
-	public ResultSet resultSet = new ResultSet();
+	private ResultSet resultSet = new ResultSet();
 
-	/**
-	 * @param resultSet the resultSet to set
-	 */
+	public String getMessage() {
+		return this.message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
 	public void setResultSet(ResultSet resultSet) {
 		this.resultSet = resultSet;
 	}
 
-	/**
-	 * @return the resultSet
-	 */
 	public ResultSet getResultSet() {
-		return resultSet;
+		return this.resultSet;
 	}
 
-	/**
-	 * @return the query as JsonObject
-	 */
-	public JsonObject asJson() {
+	public JsonObject asJson(boolean flat) {
 
-        JsonObject rootJ = super.asJson();
-        rootJ.addProperty(Tags.Json.OBJECT_TYPE, "QueryResponse");
+		JsonObject rootJ = super.asJson();
+		rootJ.addProperty(Tags.Json.OBJECT_TYPE, "QueryResponse");
 
-		if (message != null && !message.isEmpty()) {
-			rootJ.addProperty("Message", message);
+		if (isNotEmpty(this.message)) {
+			rootJ.addProperty("Message", this.message);
 		}
 
-		rootJ.add(RESULT_SET, resultSet.asJson());
+		rootJ.add(RESULT_SET, this.resultSet.asJson(flat));
 		return rootJ;
 	}
-
 }

@@ -1,30 +1,17 @@
 package li.strolch.soql.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import li.strolch.model.StrolchRootElement;
+import li.strolch.model.query.StrolchElementQuery;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.soql.antlr4.generated.SOQLLexer;
+import li.strolch.soql.antlr4.generated.SOQLParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-
-import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.OrderMap;
-import li.strolch.agent.api.ResourceMap;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.query.ActivityQuery;
-import li.strolch.model.query.OrderQuery;
-import li.strolch.model.query.ResourceQuery;
-import li.strolch.model.query.StrolchElementQuery;
-import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.soql.antlr4.generated.SOQLLexer;
-import li.strolch.soql.antlr4.generated.SOQLParser;
 
 /**
  * Main class to process a SOQL query. It performs the queries to retrieve the
@@ -40,20 +27,23 @@ public class QueryProcessor {
 	protected Map<String, StrolchElementQuery<?>> queries;
 
 	// Map of entities the input objects are taken from
-	protected Map<String, List<StrolchRootElement>> inputCollections;
+	private Map<String, List<? extends StrolchRootElement>> inputCollections;
 
 	/**
 	 * Set the input map of collections to take the input objects from. For testing
 	 * purposes only.
 	 *
 	 * @param inputCollections
+	 * 		the input data
 	 */
-	void setInputCollections(Map<String, List<StrolchRootElement>> inputCollections) {
+	void setInputCollections(Map<String, List<? extends StrolchRootElement>> inputCollections) {
 		this.inputCollections = inputCollections;
 	}
 
 	/**
 	 * @param request
+	 * 		the query request
+	 *
 	 * @return the query response object covering the result set
 	 */
 	public QueryResponse process(QueryRequest request, StrolchTransaction tx) {
@@ -65,18 +55,16 @@ public class QueryProcessor {
 			ParseTree tree = parseStatement(statement);
 			compiledStatement = compile(tree);
 		} catch (Exception e) {
-			// TODO add error handling
-			e.printStackTrace();
-			throw new SOQLParseException(e.getMessage());
+			throw new SOQLParseException("Failed to parse String " + statement, e);
 		}
 
 		// build the input collections, if not set already
-		if (inputCollections == null)
-			inputCollections = queryInputCollection(compiledStatement.entities, tx);
+		if (this.inputCollections == null)
+			this.inputCollections = queryInputCollection(compiledStatement.entities, tx);
 
 		// build cartesian product
-		Object[] keys = inputCollections.keySet().toArray();
-		List<List<StrolchRootElement>> cartesianProduct = buildCartesianProduct(inputCollections, keys);
+		Object[] keys = this.inputCollections.keySet().toArray();
+		List<List<StrolchRootElement>> cartesianProduct = buildCartesianProduct(this.inputCollections, keys);
 
 		ResultSet resultSet = new ResultSet();
 
@@ -102,12 +90,15 @@ public class QueryProcessor {
 
 	/**
 	 * @param inputCollections
+	 * 		the data
 	 * @param keys
+	 * 		the keys
+	 *
 	 * @return List of Lists of the elements to be taken as input for the compiled
-	 *         statement
+	 * statement
 	 */
-	private List<List<StrolchRootElement>> buildCartesianProduct(Map<String, List<StrolchRootElement>> inputCollections,
-			Object[] keys) {
+	private List<List<StrolchRootElement>> buildCartesianProduct(
+			Map<String, List<? extends StrolchRootElement>> inputCollections, Object[] keys) {
 
 		int numberOfKeys = keys.length;
 
@@ -130,7 +121,7 @@ public class QueryProcessor {
 			// fasten your seat belts, here we go
 			for (int keyIndex = 0; keyIndex < numberOfKeys; keyIndex++) {
 				Object key = keys[keyIndex];
-				List<StrolchRootElement> elements = inputCollections.get(key);
+				List<? extends StrolchRootElement> elements = inputCollections.get(key);
 				StrolchRootElement element = elements.get(pointer[keyIndex]);
 				row.add(element);
 			}
@@ -140,10 +131,8 @@ public class QueryProcessor {
 
 	/**
 	 * parse the string and return the antlr tree
-	 *
-	 * @throws Exception
 	 */
-	ParseTree parseStatement(String s) throws Exception {
+	private ParseTree parseStatement(String s) {
 
 		// build a buffer of tokens pulled from the lexer
 		CharStream input = CharStreams.fromString(s);
@@ -161,10 +150,11 @@ public class QueryProcessor {
 	 * compile the antlr tree to executable code
 	 *
 	 * @param tree
+	 * 		the tree to compile to a statement
+	 *
 	 * @return CompiledSOQLStatement
-	 * @throws Exception
 	 */
-	CompiledStatement compile(ParseTree tree) throws Exception {
+	private CompiledStatement compile(ParseTree tree) {
 
 		ParseTreeWalker walker = new ParseTreeWalker();
 		SOQLListener listener = new SOQLListener();
@@ -180,13 +170,16 @@ public class QueryProcessor {
 
 	/**
 	 * Query all strolch root elements declared in the FROM clause of the query
-	 * 
+	 *
 	 * @param entities
+	 * 		the entity types to query
+	 *
 	 * @return the input collection
 	 */
-	Map<String, List<StrolchRootElement>> queryInputCollection(Map<String, String> entities, StrolchTransaction tx) {
+	private Map<String, List<? extends StrolchRootElement>> queryInputCollection(Map<String, String> entities,
+			StrolchTransaction tx) {
 
-		Map<String, List<StrolchRootElement>> result = new HashMap<>();
+		Map<String, List<? extends StrolchRootElement>> result = new HashMap<>();
 
 		Set<String> keys = entities.keySet();
 		for (String key : keys) {
@@ -194,44 +187,23 @@ public class QueryProcessor {
 
 			switch (clazzKey) {
 			case "Resource":
-				List<StrolchRootElement> resources = new ArrayList<>();
-				ResourceMap resourceMap = tx.getResourceMap();
-				Set<String> resourceTypes = resourceMap.getTypes(tx);
-				for (String type : resourceTypes) {
-					ResourceQuery<Resource> query = new ResourceQuery<>(new StrolchTypeNavigation(type));
-					resources.addAll(tx.doQuery(query));
-				}
-				result.put(clazzKey, resources);
+				result.put(key, tx.getResourceMap().getAllElements(tx));
 				break;
 
 			case "Order":
-				List<StrolchRootElement> orders = new ArrayList<>();
-				OrderMap orderMap = tx.getOrderMap();
-				Set<String> orderTypes = orderMap.getTypes(tx);
-				for (String type : orderTypes) {
-					OrderQuery<Resource> query = new OrderQuery<>(new StrolchTypeNavigation(type));
-					orders.addAll(tx.doQuery(query));
-				}
-				result.put(clazzKey, orders);
+				result.put(key, tx.getOrderMap().getAllElements(tx));
 				break;
 
 			case "Activity":
-				List<StrolchRootElement> activities = new ArrayList<>();
-				ActivityMap activityMap = tx.getActivityMap();
-				Set<String> activityTypes = activityMap.getTypes(tx);
-				for (String type : activityTypes) {
-					ActivityQuery<Resource> query = new ActivityQuery<>(new StrolchTypeNavigation(type));
-					activities.addAll(tx.doQuery(query));
-				}
-				result.put(clazzKey, activities);
+				result.put(key, tx.getActivityMap().getAllElements(tx));
 				break;
 
 			default:
-				String s = "Unable to resolve " + clazzKey + " to strolch root entities.";
+				String s = "Unable to resolve " + clazzKey + " " + key + " to strolch root entities.";
 				throw new SOQLParseException(s);
 			}
 		}
+
 		return result;
 	}
-
 }
