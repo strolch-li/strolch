@@ -55,7 +55,9 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 */
 	public AbstractParameter(String id, String name) {
 		super(id, name);
@@ -68,6 +70,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	@Override
 	public void setHidden(boolean hidden) {
+		assertNotReadonly();
 		this.hidden = hidden;
 	}
 
@@ -78,6 +81,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	@Override
 	public void setInterpretation(String interpretation) {
+		assertNotReadonly();
 		if (StringHelper.isEmpty(interpretation)) {
 			this.interpretation = INTERPRETATION_NONE;
 		} else {
@@ -92,6 +96,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	@Override
 	public void setUom(String uom) {
+		assertNotReadonly();
 		if (StringHelper.isEmpty(uom)) {
 			this.uom = UOM_NONE;
 		} else {
@@ -101,6 +106,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	@Override
 	public void setIndex(int index) {
+		assertNotReadonly();
 		this.index = index;
 	}
 
@@ -116,6 +122,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	@Override
 	public void setParent(ParameterizedElement parent) {
+		assertNotReadonly();
 		this.parent = parent;
 	}
 
@@ -164,6 +171,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 * Fills the {@link Parameter} clone with the id, name, hidden, interpretation and uom
 	 *
 	 * @param clone
+	 * 		the clone to fill
 	 */
 	protected void fillClone(Parameter<?> clone) {
 		super.fillClone(clone);

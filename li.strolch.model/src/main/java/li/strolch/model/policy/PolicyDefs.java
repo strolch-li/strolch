@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,20 +28,21 @@ import li.strolch.utils.dbc.DBC;
 
 /**
  * The {@link PolicyDefs} contains the policy configuration of any {@link StrolchRootElement} which requires policies
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PolicyDefs {
 
 	private StrolchElement parent;
-
 	private Map<String, PolicyDef> policyDefMap;
+	private boolean readOnly;
 
 	public PolicyDefs() {
 		this.policyDefMap = new HashMap<>(1, 1.0F);
 	}
 
 	public void setParent(StrolchElement parent) {
+		assertNotReadonly();
 		this.parent = parent;
 	}
 
@@ -70,11 +71,13 @@ public class PolicyDefs {
 	}
 
 	public void addOrUpdate(PolicyDef policyDef) {
+		assertNotReadonly();
 		DBC.PRE.assertNotNull("policyDef", policyDef);
 		this.policyDefMap.put(policyDef.getType(), policyDef);
 	}
 
 	public void remove(String type) {
+		assertNotReadonly();
 		this.policyDefMap.remove(type);
 	}
 
@@ -89,9 +92,24 @@ public class PolicyDefs {
 		return sb.toString();
 	}
 
+	public boolean isReadOnly() {
+		return this.readOnly;
+	}
+
+	public void setReadOnly() {
+		this.readOnly = true;
+	}
+
+	protected void assertNotReadonly() {
+		if (this.readOnly) {
+			throw new IllegalStateException(
+					"The element " + getLocator() + " is currently readOnly, to modify clone first!");
+		}
+	}
+
 	/**
 	 * Returns a clone of this {@link PolicyDefs}
-	 * 
+	 *
 	 * @return a clone of this {@link PolicyDefs}
 	 */
 	public PolicyDefs getClone() {

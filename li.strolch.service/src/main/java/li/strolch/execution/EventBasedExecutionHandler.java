@@ -330,7 +330,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			tx.flush();
 
 			// if the activity is now executed, remove it from the registered activities
-			Activity activity = action.getRootElement();
+			Activity activity = action.getRootElement().getClone(true);
 			if (activity.getState().isExecuted()) {
 
 				synchronized (this.registeredActivities) {

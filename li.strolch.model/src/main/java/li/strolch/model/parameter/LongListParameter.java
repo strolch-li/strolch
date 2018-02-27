@@ -45,8 +45,11 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public LongListParameter(String id, String name, List<Long> value) {
 		super(id, name);
@@ -83,6 +86,7 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 
 	@Override
 	public void setValue(List<Long> value) {
+		assertNotReadonly();
 		validateValue(value);
 		if (this.value == null) {
 			this.value = new ArrayList<>(value.size());
@@ -98,16 +102,19 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 
 	@Override
 	public void addValue(Long value) {
+		assertNotReadonly();
 		this.value.add(value);
 	}
 
 	@Override
 	public boolean removeValue(Long value) {
+		assertNotReadonly();
 		return this.value.remove(value);
 	}
 
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value.clear();
 	}
 
@@ -168,6 +175,6 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	@Override
 	public int compareTo(Parameter<?> o) {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
-		return Integer.valueOf(this.getValue().size()).compareTo(((LongListParameter) o).getValue().size());
+		return Integer.compare(this.getValue().size(), ((LongListParameter) o).getValue().size());
 	}
 }

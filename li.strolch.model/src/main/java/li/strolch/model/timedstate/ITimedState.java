@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,10 +23,10 @@ import li.strolch.model.timevalue.IValueChange;
 /**
  * A time based state characterized by a {@link IValue} object implementation.
  *
- * @author Martin Smock <smock.martin@gmail.com>
- *
  * @param <T>
- *            IValue implementation representing the state at a given time
+ * 		IValue implementation representing the state at a given time
+ *
+ * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("rawtypes")
 public interface ITimedState<T extends IValue> {
@@ -43,7 +43,7 @@ public interface ITimedState<T extends IValue> {
 
 	/**
 	 * @param change
-	 *            the state change to be applied
+	 * 		the state change to be applied
 	 */
 	<U extends IValueChange<T>> void applyChange(final U change, boolean compact);
 
@@ -61,4 +61,16 @@ public interface ITimedState<T extends IValue> {
 	 * @return a copy of this timed state
 	 */
 	ITimedState<T> getCopy();
+
+	/**
+	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it, call <code>getClone()</code> on the parent
+	 *
+	 * @return true if this element is read only
+	 */
+	public boolean isReadonly();
+
+	/**
+	 * Sets this element to readOnly, so that it may not be modified. To modify it, call <code>getClone()</code> on the parent
+	 */
+	public void setReadonly();
 }

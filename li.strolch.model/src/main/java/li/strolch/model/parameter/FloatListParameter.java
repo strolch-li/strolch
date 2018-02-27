@@ -45,8 +45,11 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public FloatListParameter(String id, String name, List<Double> value) {
 		super(id, name);
@@ -83,6 +86,7 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 
 	@Override
 	public void setValue(List<Double> value) {
+		assertNotReadonly();
 		validateValue(value);
 		if (this.value == null) {
 			this.value = new ArrayList<>(value.size());
@@ -98,16 +102,19 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 
 	@Override
 	public void addValue(Double value) {
+		assertNotReadonly();
 		this.value.add(value);
 	}
 
 	@Override
 	public boolean removeValue(Double value) {
+		assertNotReadonly();
 		return this.value.remove(value);
 	}
 
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value.clear();
 	}
 
@@ -168,6 +175,6 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	@Override
 	public int compareTo(Parameter<?> o) {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
-		return Integer.valueOf(this.getValue().size()).compareTo(((FloatListParameter) o).getValue().size());
+		return Integer.compare(this.getValue().size(), ((FloatListParameter) o).getValue().size());
 	}
 }

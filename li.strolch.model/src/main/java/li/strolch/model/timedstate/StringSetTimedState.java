@@ -36,6 +36,7 @@ public class StringSetTimedState extends AbstractStrolchTimedState<StringSetValu
 
 	@Override
 	public void setStateFromStringAt(Long time, String value) {
+		assertNotReadonly();
 		getTimeEvolution().setValueAt(time, new StringSetValue(value));
 	}
 

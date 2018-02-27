@@ -36,6 +36,7 @@ public class IntegerTimedState extends AbstractStrolchTimedState<IntegerValue> {
 
 	@Override
 	public void setStateFromStringAt(Long time, String value) {
+		assertNotReadonly();
 		getTimeEvolution().setValueAt(time, new IntegerValue(value));
 	}
 

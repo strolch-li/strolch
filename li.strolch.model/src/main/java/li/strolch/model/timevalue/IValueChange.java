@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@ import li.strolch.model.timevalue.impl.TimeVariable;
 /**
  * Interface for operators to be used to change the values of {@link ITimeValue} in a {@link ITimeVariable} or
  * {@link AbstractStrolchTimedState}.
- * 
+ *
  * @author Martin Smock <smock.martin@gmail.com>
  */
 @SuppressWarnings("rawtypes")
@@ -34,7 +34,7 @@ public interface IValueChange<T extends IValue> {
 
 	/**
 	 * @param id
-	 *            the id of the {@link AbstractStrolchTimedState} the change applies to
+	 * 		the id of the {@link AbstractStrolchTimedState} the change applies to
 	 */
 	void setStateId(String id);
 
@@ -61,4 +61,16 @@ public interface IValueChange<T extends IValue> {
 	 * @return a copy of this
 	 */
 	IValueChange<T> getClone();
+
+	/**
+	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it, call {@link #getClone()}
+	 *
+	 * @return true if this element is read only
+	 */
+	public boolean isReadOnly();
+
+	/**
+	 * Sets this element to readOnly, so that it may not be modified. To modify it, call {@link #getClone()}
+	 */
+	public void setReadOnly();
 }

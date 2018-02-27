@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class TransientElementMap<T extends StrolchRootElement> implements ElementMap<T> {
 
-	private static final Logger logger = LoggerFactory.getLogger(TransientElementMap.class);
+	protected static final Logger logger = LoggerFactory.getLogger(TransientElementMap.class);
 
 	private Map<String, Map<String, T>> elementMap;
 
@@ -124,8 +124,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		// TODO cloning has its issues, as queries don't return a clone!
 		@SuppressWarnings("unchecked")
-		T clone = (T) t.getClone();
-		clone.setVersion(t.getVersion());
+		T clone = (T) t.getClone(true);
 		return clone;
 	}
 
@@ -171,8 +170,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 				.flatMap(identity()) //
 				.map(t -> {
 					@SuppressWarnings("unchecked")
-					T clone = (T) t.getClone();
-					clone.setVersion(t.getVersion());
+					T clone = (T) t.getClone(true);
 					return clone;
 				}) //
 				.collect(Collectors.toList());
@@ -189,8 +187,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 				.map(Map.Entry::getValue) //
 				.collect(Collectors.toList()).stream().map(t -> {
 					@SuppressWarnings("unchecked")
-					T clone = (T) t.getClone();
-					clone.setVersion(t.getVersion());
+					T clone = (T) t.getClone(true);
 					return clone;
 				}).collect(Collectors.toList());
 	}
@@ -239,6 +236,9 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		}
 
 		byType.put(element.getId(), element);
+
+		// now make read only
+		element.setReadOnly();
 	}
 
 	@Override
@@ -256,6 +256,9 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		}
 
 		byType.put(element.getId(), element);
+
+		// now make read only
+		element.setReadOnly();
 	}
 
 	@Override
@@ -274,6 +277,9 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 			}
 
 			byType.put(element.getId(), element);
+
+			// now make read only
+			element.setReadOnly();
 		}
 	}
 
@@ -294,6 +300,9 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		}
 
 		byType.put(element.getId(), element);
+
+		// now make read only
+		element.setReadOnly();
 	}
 
 	@Override
@@ -314,6 +323,9 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 			}
 
 			byType.put(element.getId(), element);
+
+			// now make read only
+			element.setReadOnly();
 		}
 	}
 

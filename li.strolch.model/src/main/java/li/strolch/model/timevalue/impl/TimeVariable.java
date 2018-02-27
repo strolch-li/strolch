@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,6 +35,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	private static final long serialVersionUID = 1L;
 
 	public SortedSet<ITimeValue<T>> container = new TreeSet<>();
+	private boolean readonly;
 
 	@Override
 	public ITimeValue<T> getValueAt(final Long time) {
@@ -51,6 +52,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 
 	@Override
 	public void setValueAt(final Long time, final T targetValue) {
+		assertNotReadonly();
 		ITimeValue<T> current = getValueAt(time);
 		if (current != null && current.getTime().equals(time)) {
 			current.setValue(targetValue);
@@ -78,6 +80,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 
 	@Override
 	public void applyChange(final IValueChange<T> change, boolean compact) {
+		assertNotReadonly();
 
 		SortedSet<ITimeValue<T>> futureValues = getFutureValues(change.getTime());
 		for (ITimeValue<T> value : futureValues) {
@@ -88,7 +91,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 		if (initialValue == null) {
 			ITimeValue<T> newValue = new TimeValue<>(change.getTime(), change.getValue());
 			this.container.add(newValue);
-		} else if (initialValue.getTime().longValue() < change.getTime().longValue()) {
+		} else if (initialValue.getTime() < change.getTime()) {
 			ITimeValue<T> newValue = new TimeValue<>(change.getTime(), initialValue.getValue());
 			newValue.add(change.getValue());
 			this.container.add(newValue);
@@ -121,6 +124,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.container.clear();
 	}
 
@@ -132,5 +136,22 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 		}
 
 		return clone;
+	}
+
+	@Override
+	public boolean isReadonly() {
+		return this.readonly;
+	}
+
+	@Override
+	public void setReadonly() {
+		this.readonly = true;
+	}
+
+	protected void assertNotReadonly() {
+		if (this.readonly) {
+			throw new IllegalStateException("The element " + this.getClass().getSimpleName()
+					+ " is currently readOnly, to modify clone first!");
+		}
 	}
 }

@@ -56,8 +56,11 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param type
+	 * 		the type
 	 */
 	public Resource(String id, String name, String type) {
 		super(id, name, type);
@@ -90,6 +93,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@SuppressWarnings("unchecked")
 	public void addTimedState(StrolchTimedState<?> strolchTimedState) {
+		assertNotReadonly();
 		if (this.timedStateMap == null) {
 			this.timedStateMap = new HashMap<>(1, 1.0F);
 		}
@@ -127,6 +131,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T extends StrolchTimedState> T removeTimedState(String id) {
+		assertNotReadonly();
 		if (this.timedStateMap == null) {
 			return null;
 		}
@@ -184,6 +189,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
+		assertNotReadonly();
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);
 	}
@@ -213,6 +219,18 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 			clone.setVersion(this.version);
 
 		return clone;
+	}
+
+	@Override
+	public void setReadOnly() {
+		if (this.policyDefs != null)
+			this.policyDefs.setReadOnly();
+		if (this.timedStateMap != null) {
+			for (StrolchTimedState<IValue<?>> timedState : this.timedStateMap.values()) {
+				timedState.setReadOnly();
+			}
+		}
+		super.setReadOnly();
 	}
 
 	@Override

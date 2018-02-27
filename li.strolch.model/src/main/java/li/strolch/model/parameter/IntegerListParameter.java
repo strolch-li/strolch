@@ -45,8 +45,11 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public IntegerListParameter(String id, String name, List<Integer> value) {
 		super(id, name);
@@ -83,6 +86,7 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 
 	@Override
 	public void setValue(List<Integer> value) {
+		assertNotReadonly();
 		validateValue(value);
 		if (this.value == null) {
 			this.value = new ArrayList<>(value.size());
@@ -98,16 +102,19 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 
 	@Override
 	public void addValue(Integer value) {
+		assertNotReadonly();
 		this.value.add(value);
 	}
 
 	@Override
 	public boolean removeValue(Integer value) {
+		assertNotReadonly();
 		return this.value.remove(value);
 	}
 
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value.clear();
 	}
 
@@ -168,6 +175,6 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	@Override
 	public int compareTo(Parameter<?> o) {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
-		return Integer.valueOf(this.getValue().size()).compareTo(((IntegerListParameter) o).getValue().size());
+		return Integer.compare(this.getValue().size(), ((IntegerListParameter) o).getValue().size());
 	}
 }

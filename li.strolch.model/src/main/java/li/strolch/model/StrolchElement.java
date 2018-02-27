@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,7 +65,7 @@ public interface StrolchElement extends Serializable {
 	 * Set the currently set long value which defines the primary key for use in RDBM-Systems
 	 *
 	 * @param dbid
-	 *            the dbid to set
+	 * 		the dbid to set
 	 */
 	public void setDbid(long dbid);
 
@@ -90,14 +90,14 @@ public interface StrolchElement extends Serializable {
 
 	/**
 	 * Returns the {@link StrolchRootElement} for this {@link StrolchElement}
-	 * 
+	 *
 	 * @return the {@link StrolchRootElement} for this {@link StrolchElement}
 	 */
 	public StrolchRootElement getRootElement();
 
 	/**
 	 * Returns true if this element is a {@link StrolchRootElement}, false if not
-	 * 
+	 *
 	 * @return true if this element is a {@link StrolchRootElement}, false if not
 	 */
 	public boolean isRootElement();
@@ -110,18 +110,30 @@ public interface StrolchElement extends Serializable {
 	public StrolchElement getClone();
 
 	/**
+	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it, call {@link #getClone()}
+	 *
+	 * @return true if this element is read only
+	 */
+	public boolean isReadOnly();
+
+	/**
+	 * Sets this element to readOnly, so that it may not be modified. To modify it, call {@link #getClone()}
+	 */
+	public void setReadOnly();
+
+	/**
 	 * <p>
 	 * Returns the hashcode of this element.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * For most {@link StrolchElement} the equals and hashcode methods would only take into account the ID of the
 	 * element, but certain implementations might require more specific attributes
 	 * </p>
-	 * 
-	 * @see Object#hashCode()
-	 * 
+	 *
 	 * @return the hashcode of this element
+	 *
+	 * @see Object#hashCode()
 	 */
 	@Override
 	public int hashCode();
@@ -130,18 +142,18 @@ public interface StrolchElement extends Serializable {
 	 * <p>
 	 * Returns true if this object equals the given parameter object
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * For most {@link StrolchElement} the equals and hashcode methods would only take into account the ID of the
 	 * element, but certain implementations might require more specific attributes
 	 * </p>
-	 * 
-	 * @see Object#equals(Object)
-	 * 
+	 *
 	 * @param obj
-	 *            the object to which to check for equality
-	 * 
+	 * 		the object to which to check for equality
+	 *
 	 * @return true if this object equals the given parameter object
+	 *
+	 * @see Object#equals(Object)
 	 */
 	@Override
 	public boolean equals(Object obj);

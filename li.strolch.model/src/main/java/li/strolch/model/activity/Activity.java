@@ -81,6 +81,7 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	public void setTimeOrdering(TimeOrdering timeOrdering) {
+		assertNotReadonly();
 		this.timeOrdering = timeOrdering;
 	}
 
@@ -142,11 +143,13 @@ public class Activity extends AbstractStrolchRootElement
 	 * add an activity element to the <code>LinkedHashMap</code> of <code>IActivityElements</code>
 	 *
 	 * @param activityElement
+	 * 		the element to add
 	 *
 	 * @return the element added
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends IActivityElement> T addElement(IActivityElement activityElement) {
+		assertNotReadonly();
 		DBC.PRE.assertNotEquals("Can't add element to itself!", this, activityElement);
 		DBC.PRE.assertNull("Parent can't already be set!", activityElement.getParent());
 
@@ -175,6 +178,7 @@ public class Activity extends AbstractStrolchRootElement
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends IActivityElement> T remove(String id) {
+		assertNotReadonly();
 		IActivityElement element = this.elements.remove(id);
 		if (element != null)
 			element.setParent(null);
@@ -442,6 +446,7 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
+		assertNotReadonly();
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);
 	}
@@ -504,6 +509,14 @@ public class Activity extends AbstractStrolchRootElement
 			clone.setVersion(this.version);
 
 		return clone;
+	}
+
+	@Override
+	public void setReadOnly() {
+		if (this.policyDefs != null)
+			this.policyDefs.setReadOnly();
+		elementStream().forEach(e -> e.getValue().setReadOnly());
+		super.setReadOnly();
 	}
 
 	@Override
@@ -572,6 +585,7 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public void setParent(Activity activity) {
+		assertNotReadonly();
 		this.parent = activity;
 	}
 

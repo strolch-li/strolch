@@ -40,8 +40,11 @@ public class FloatParameter extends AbstractParameter<Double> {
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public FloatParameter(String id, String name, Double value) {
 		super(id, name);
@@ -62,6 +65,7 @@ public class FloatParameter extends AbstractParameter<Double> {
 
 	@Override
 	public void setValue(Double value) {
+		assertNotReadonly();
 		validateValue(value);
 		this.value = MathHelper.toPrecision(value, 8);
 	}
@@ -73,6 +77,7 @@ public class FloatParameter extends AbstractParameter<Double> {
 	 */
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value = 0.0D;
 	}
 

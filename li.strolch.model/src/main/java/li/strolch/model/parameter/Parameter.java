@@ -42,7 +42,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * the value of the parameter
 	 *
-	 * @return
+	 * @return the value
 	 */
 	public <U extends T> U getValue();
 
@@ -50,6 +50,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * the value of the parameter
 	 *
 	 * @param value
+	 * 		the new value
 	 */
 	public void setValue(T value);
 
@@ -67,7 +68,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * get the hidden attribute
 	 *
-	 * @return
+	 * @return hidden value
 	 */
 	public boolean isHidden();
 
@@ -75,13 +76,14 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * set the hidden attribute
 	 *
 	 * @param hidden
+	 * 		new hidden value
 	 */
 	public void setHidden(boolean hidden);
 
 	/**
 	 * Get the UOM of this {@link Parameter}
 	 *
-	 * @return
+	 * @return the UOM
 	 */
 	public String getUom();
 
@@ -89,6 +91,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * Set the UOM of this {@link Parameter}
 	 *
 	 * @param uom
+	 * 		the new UOM
 	 */
 	public void setUom(String uom);
 
@@ -130,13 +133,14 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * </ul>
 	 *
 	 * @param interpretation
+	 * 		the interpretation
 	 */
 	public void setInterpretation(String interpretation);
 
 	/**
 	 * The {@link ParameterizedElement} parent to which this {@link Parameter} belongs
 	 *
-	 * @return
+	 * @return the parent
 	 */
 	@Override
 	public ParameterizedElement getParent();

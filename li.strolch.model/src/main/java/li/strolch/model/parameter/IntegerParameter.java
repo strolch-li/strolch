@@ -39,8 +39,11 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public IntegerParameter(String id, String name, Integer value) {
 		super(id, name);
@@ -65,6 +68,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 
 	@Override
 	public void setValue(Integer value) {
+		assertNotReadonly();
 		validateValue(value);
 		this.value = value;
 	}
@@ -76,6 +80,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	 */
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value = 0;
 	}
 

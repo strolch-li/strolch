@@ -85,6 +85,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	 * 		the id of the {@link Resource} the {@link Action} acts on
 	 */
 	public void setResourceId(String resourceId) {
+		assertNotReadonly();
 		this.resourceId = resourceId;
 	}
 
@@ -101,6 +102,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	 * 		the target <code>State</code> of the a<code>Action</code>
 	 */
 	public void setState(State state) {
+		assertNotReadonly();
 		this.state = state;
 	}
 
@@ -116,6 +118,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	 * 		the resource type
 	 */
 	public void setResourceType(String resourceType) {
+		assertNotReadonly();
 		this.resourceType = resourceType;
 	}
 
@@ -135,6 +138,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	 * @return <tt>true</tt> (as specified by {@link Collection#add})
 	 */
 	public boolean addChange(IValueChange<? extends IValue<?>> change) {
+		assertNotReadonly();
 		initChanges();
 		return this.changes.add(change);
 	}
@@ -188,6 +192,18 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
+	public void setReadOnly() {
+		if (this.policyDefs != null)
+			this.policyDefs.setReadOnly();
+		if (this.changes != null) {
+			for (IValueChange<? extends IValue<?>> change : changes) {
+				change.setReadOnly();
+			}
+		}
+		super.setReadOnly();
+	}
+
+	@Override
 	public PolicyDefs getPolicyDefs() {
 		if (this.policyDefs == null)
 			throw new StrolchPolicyException(getLocator() + " has no Policies defined!");
@@ -216,6 +232,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
+		assertNotReadonly();
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);
 	}
@@ -253,6 +270,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public void setParent(Activity activity) {
+		assertNotReadonly();
 		this.parent = activity;
 	}
 

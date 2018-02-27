@@ -15,6 +15,7 @@
  */
 package li.strolch.model;
 
+import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
 
 public class StrolchModelConstants {

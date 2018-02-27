@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,10 +15,11 @@
  */
 package li.strolch.service.parameter;
 
-import li.strolch.command.parameter.SetParameterCommand;
 import li.strolch.model.Locator;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.TxUpdateStrolchRootElementVisitor;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -49,18 +50,29 @@ public class SetParameterService extends AbstractService<SetParameterArg, Servic
 
 			Parameter<?> parameter = tx.findElement(arg.locator);
 
-			SetParameterCommand command = new SetParameterCommand(getContainer(), tx);
-			command.setParameter(parameter);
+			if (arg.name != null) {
+				parameter.setName(arg.name);
+			}
+			if (arg.interpretation != null) {
+				parameter.setInterpretation(arg.interpretation);
+			}
+			if (arg.uom != null) {
+				parameter.setUom(arg.uom);
+			}
+			if (arg.hidden != null) {
+				parameter.setHidden(arg.hidden);
+			}
+			if (arg.index != null) {
+				parameter.setIndex(arg.index);
+			}
 
-			command.setName(arg.name);
-			command.setInterpretation(arg.interpretation);
-			command.setUom(arg.uom);
-			command.setHidden(arg.hidden);
-			command.setIndex(arg.index);
+			if (arg.valueAsString != null) {
+				parameter.setValueFromString(arg.valueAsString);
+			}
 
-			command.setValueAsString(arg.valueAsString);
+			StrolchRootElement rootElement = parameter.getRootElement();
+			rootElement.accept(new TxUpdateStrolchRootElementVisitor(tx));
 
-			tx.addCommand(command);
 			tx.commitOnClose();
 		}
 

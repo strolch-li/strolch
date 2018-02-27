@@ -26,15 +26,12 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class CachedElementMap<T extends StrolchRootElement> extends TransientElementMap<T> {
 
-	private static final Logger logger = LoggerFactory.getLogger(CachedElementMap.class);
 	private StrolchRealm realm;
 
 	public CachedElementMap(StrolchRealm realm) {

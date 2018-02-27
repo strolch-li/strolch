@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -398,7 +398,7 @@ public class ModelTest {
 
 	private void assertParams(ParameterBagContainer bagContainer) {
 		Boolean bool = bagContainer.getParameter(BAG_ID, PARAM_BOOLEAN_ID).getValue();
-		assertEquals(true, bool.booleanValue());
+		assertEquals(true, bool);
 
 		String string = bagContainer.getParameter(BAG_ID, PARAM_STRING_ID).getValue();
 		assertEquals("Strolch", string);
@@ -410,7 +410,7 @@ public class ModelTest {
 		assertEquals(1354295525628L, date.getTime());
 
 		Double doubl = bagContainer.getParameter(BAG_ID, PARAM_FLOAT_ID).getValue();
-		assertEquals(44.3, doubl.doubleValue(), 0.0001);
+		assertEquals(44.3, doubl, 0.0001);
 
 		Long lon = bagContainer.getParameter(BAG_ID, PARAM_LONG_ID).getValue();
 		assertEquals(4453234566L, lon.longValue());
@@ -447,11 +447,11 @@ public class ModelTest {
 
 		BooleanParameter boolParam = bag.getParameter(PARAM_BOOLEAN_ID);
 		assertNotNull("Boolean Param missing with id " + PARAM_BOOLEAN_ID, boolParam);
-		assertEquals(true, boolParam.getValue().booleanValue());
+		assertEquals(true, boolParam.getValue());
 
 		FloatParameter floatParam = bag.getParameter(PARAM_FLOAT_ID);
 		assertNotNull("Float Param missing with id " + PARAM_FLOAT_ID, floatParam);
-		assertEquals(44.3, floatParam.getValue().doubleValue(), 0.0001);
+		assertEquals(44.3, floatParam.getValue(), 0.0001);
 
 		IntegerParameter integerParam = bag.getParameter(PARAM_INTEGER_ID);
 		assertNotNull("Integer Param missing with id " + PARAM_INTEGER_ID, integerParam);
@@ -537,9 +537,6 @@ public class ModelTest {
 		assertEquals("55", longListP.getValueAsString());
 	}
 
-	/**
-	 * @param resource
-	 */
 	private void validateStates(Resource resource) {
 		BooleanTimedState booleanState = resource.getTimedState(STATE_BOOLEAN_ID);
 		assertNotNull("Boolean State missing with id " + STATE_BOOLEAN_ID, booleanState);

@@ -55,8 +55,11 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	 * Default Constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param type
+	 * 		the type
 	 */
 	public Order(String id, String name, String type) {
 		super(id, name, type);
@@ -69,10 +72,15 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	 * Extended Constructor for date and {@link State}
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param type
+	 * 		the type
 	 * @param date
+	 * 		the date
 	 * @param state
+	 * 		the state
 	 */
 	public Order(String id, String name, String type, Date date, State state) {
 		super(id, name, type);
@@ -111,6 +119,7 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	public void setDate(Date date) {
+		assertNotReadonly();
 		this.date = date;
 	}
 
@@ -119,6 +128,7 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	public void setState(State state) {
+		assertNotReadonly();
 		this.state = state;
 	}
 
@@ -151,6 +161,7 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 
 	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
+		assertNotReadonly();
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);
 	}
@@ -177,6 +188,13 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 			clone.setVersion(this.version);
 
 		return clone;
+	}
+
+	@Override
+	public void setReadOnly() {
+		if (this.policyDefs != null)
+			this.policyDefs.setReadOnly();
+		super.setReadOnly();
 	}
 
 	@Override

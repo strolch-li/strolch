@@ -36,8 +36,11 @@ public class ParameterBag extends ParameterizedElement {
 	 * Default constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param type
+	 * 		the type
 	 */
 	public ParameterBag(String id, String name, String type) {
 		super(id, name, type);

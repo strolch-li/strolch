@@ -40,8 +40,11 @@ public class DurationParameter extends AbstractParameter<Long> {
 	 * Default Constructor
 	 *
 	 * @param id
+	 * 		the id
 	 * @param name
+	 * 		the name
 	 * @param value
+	 * 		the value
 	 */
 	public DurationParameter(String id, String name, Long value) {
 		super(id, name);
@@ -61,6 +64,7 @@ public class DurationParameter extends AbstractParameter<Long> {
 
 	@Override
 	public void setValue(Long value) {
+		assertNotReadonly();
 		validateValue(value);
 		this.value = value;
 	}
@@ -72,6 +76,7 @@ public class DurationParameter extends AbstractParameter<Long> {
 	 */
 	@Override
 	public void clear() {
+		assertNotReadonly();
 		this.value = 0L;
 	}
 

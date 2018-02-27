@@ -36,6 +36,7 @@ public class BooleanTimedState extends AbstractStrolchTimedState<BooleanValue> {
 
 	@Override
 	public void setStateFromStringAt(Long time, String value) {
+		assertNotReadonly();
 		getTimeEvolution().setValueAt(time, new BooleanValue(value));
 	}
 

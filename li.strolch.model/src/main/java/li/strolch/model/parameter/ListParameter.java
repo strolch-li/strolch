@@ -53,14 +53,14 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	/**
 	 * Returns true if the list of values is empty, false if not
 	 *
-	 * @returns true if the list of values is empty, false if not
+	 * @return true if the list of values is empty, false if not
 	 */
 	public boolean isEmpty();
 
 	/**
 	 * Returns the size of the list of values
 	 *
-	 * @returns the size of the list of values
+	 * @return the size of the list of values
 	 */
 	public int size();
 

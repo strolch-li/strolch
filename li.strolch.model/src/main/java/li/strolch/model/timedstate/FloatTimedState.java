@@ -36,6 +36,7 @@ public class FloatTimedState extends AbstractStrolchTimedState<FloatValue> {
 
 	@Override
 	public void setStateFromStringAt(Long time, String value) {
+		assertNotReadonly();
 		getTimeEvolution().setValueAt(time, new FloatValue(value));
 	}
 
