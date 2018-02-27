@@ -23,13 +23,4 @@ public abstract class PerformanceTest {
 		ServiceHandler svcHandler = runtime().getServiceHandler();
 		svcHandler.doService(certificate, new PerformanceTestService(), argInstance());
 	}
-
-	@Test
-	public void runPerformanceTestTransactional() {
-
-		Certificate certificate = runtime().getPrivilegeHandler().authenticate("transactional", "transactional".toCharArray());
-
-		ServiceHandler svcHandler = runtime().getServiceHandler();
-		svcHandler.doService(certificate, new PerformanceTestService(), argInstance());
-	}
 }

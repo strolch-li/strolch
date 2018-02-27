@@ -35,16 +35,9 @@
 		<Component>
 			<name>PersistenceHandler</name>
 			<api>li.strolch.persistence.api.PersistenceHandler</api>
-			<impl>li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler</impl>
+			<impl>li.strolch.persistence.xml.XmlPersistenceHandler</impl>
 			<Properties>
-				<allowSchemaCreation>true</allowSchemaCreation>
-				<allowSchemaDrop>true</allowSchemaDrop>
-				
-				<!-- cached -->
-				<db.url.cached>jdbc:postgresql://localhost/testdb</db.url.cached>
-				<db.username.cached>testuser</db.username.cached>
-				<db.password.cached>test</db.password.cached>
-				<db.pool.maximumPoolSize.cached>1</db.pool.maximumPoolSize.cached>
+				<dbStorePath.cached>dbStore</dbStorePath.cached>
 			</Properties>
 		</Component>
 		<Component>
