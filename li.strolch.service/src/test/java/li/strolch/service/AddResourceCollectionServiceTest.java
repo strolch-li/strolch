@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.service.AddResourceCollectionService.AddResourceCollectionArg;
+import li.strolch.service.api.Service;
+import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
 import org.junit.Test;
@@ -27,10 +29,22 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddResourceCollectionServiceTest extends AbstractRealmServiceTest {
+public class AddResourceCollectionServiceTest
+		extends AbstractRealmServiceTest<AddResourceCollectionArg, ServiceResult> {
 
 	@Test
 	public void runTest() {
+
+		runServiceInAllRealmTypes();
+	}
+
+	@Override
+	protected Class<? extends Service<AddResourceCollectionArg, ServiceResult>> getSvcClass() {
+		return AddResourceCollectionService.class;
+	}
+
+	@Override
+	protected AddResourceCollectionArg getArgInstance() {
 
 		AddResourceCollectionArg arg = new AddResourceCollectionArg();
 
@@ -41,6 +55,6 @@ public class AddResourceCollectionServiceTest extends AbstractRealmServiceTest {
 
 		arg.resources = resources;
 
-		runServiceInAllRealmTypes(AddResourceCollectionService.class, arg);
+		return arg;
 	}
 }

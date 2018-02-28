@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@
  */
 package li.strolch.service;
 
+import li.strolch.service.api.Service;
 import org.junit.Test;
 
 import li.strolch.model.ModelGenerator;
@@ -29,24 +30,36 @@ import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import li.strolch.utils.dbc.DBC;
 
-public class FlushTxTest extends AbstractRealmServiceTest {
+public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceResult> {
+
+	private Class<? extends Service<ServiceArgument, ServiceResult>> svcClass;
 
 	@Test
 	public void shouldFlushSuccessfully1() {
-
-		runServiceInAllRealmTypes(FlushingCommandsService1.class, new ServiceArgument());
+		this.svcClass = FlushingCommandsService1.class;
+		runServiceInAllRealmTypes();
 	}
 
 	@Test
 	public void shouldFlushSuccessfully2() {
-
-		runServiceInAllRealmTypes(FlushingCommandsService2.class, new ServiceArgument());
+		this.svcClass = FlushingCommandsService2.class;
+		runServiceInAllRealmTypes();
 	}
 
 	@Test
 	public void shouldRollbackSuccessfully() {
+		this.svcClass = RollbackAfterFlushCommandsService.class;
+		runServiceInAllRealmTypes();
+	}
 
-		runServiceInAllRealmTypes(RollbackAfterFlushCommandsService.class, new ServiceArgument());
+	@Override
+	protected Class<? extends Service<ServiceArgument, ServiceResult>> getSvcClass() {
+		return this.svcClass;
+	}
+
+	@Override
+	protected ServiceArgument getArgInstance() {
+		return new ServiceArgument();
 	}
 
 	public static class FlushingCommandsService1 extends AbstractService<ServiceArgument, ServiceResult> {

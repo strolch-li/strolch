@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.io.IOException;
 
+import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.service.test.AbstractRealmServiceTest;
@@ -31,9 +32,24 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class XmlExportModelServiceTest extends AbstractRealmServiceTest {
+public class XmlExportModelServiceTest extends AbstractRealmServiceTest<XmlExportModelArgument, ServiceResult> {
 
 	private static final String TMP_XML_EXPORT_XML = "tmpXmlExport.xml";
+
+	@Override
+	protected Class<? extends Service<XmlExportModelArgument, ServiceResult>> getSvcClass() {
+		return XmlExportModelService.class;
+	}
+
+	@Override
+	protected XmlExportModelArgument getArgInstance() {
+
+		XmlExportModelArgument arg = new XmlExportModelArgument();
+		arg.modelFileName = TMP_XML_EXPORT_XML;
+		arg.multiFile = true;
+
+		return arg;
+	}
 
 	@Test
 	public void runTest() {
@@ -41,14 +57,11 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest {
 		Runner before = (strolchRealm, container) -> {
 			File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
 			if (file.exists())
-				file.delete();
+				if (!file.delete())
+					throw new IllegalStateException("Failed to delete " + file.getAbsolutePath());
 		};
 
-		XmlExportModelArgument arg = new XmlExportModelArgument();
-		arg.modelFileName = TMP_XML_EXPORT_XML;
-		arg.multiFile = true;
-
-		runServiceInAllRealmTypes(XmlExportModelService.class, arg, before, null, null);
+		runServiceInAllRealmTypes(before, null, null);
 	}
 
 	@Test
@@ -56,7 +69,8 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest {
 		File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
 		if (!file.exists()) {
 			try {
-				file.createNewFile();
+				if (!file.createNewFile())
+					throw new IllegalStateException("Could not create new file " + file.getAbsolutePath());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -79,7 +93,8 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest {
 		File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
 		if (!file.exists()) {
 			try {
-				file.createNewFile();
+				if (!file.createNewFile())
+					throw new IllegalStateException("Could not create new file " + file.getAbsolutePath());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -95,4 +110,5 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest {
 		ServiceResult result = getServiceHandler().doService(this.certificate, svc, arg);
 		assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
 	}
+
 }

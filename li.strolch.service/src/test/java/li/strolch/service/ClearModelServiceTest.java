@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.service.api.Service;
+import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 
 import org.junit.Test;
@@ -26,7 +28,9 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ClearModelServiceTest extends AbstractRealmServiceTest {
+public class ClearModelServiceTest extends AbstractRealmServiceTest<ClearModelArgument, ServiceResult> {
+
+	private ClearModelArgument arg;
 
 	@Test
 	public void runClearTest() {
@@ -38,11 +42,11 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest {
 			}
 		};
 
-		ClearModelArgument arg = new ClearModelArgument();
-		arg.clearOrders = true;
-		arg.clearResources = true;
+		this.arg = new ClearModelArgument();
+		this.arg.clearOrders = true;
+		this.arg.clearResources = true;
 
-		runServiceInAllRealmTypes(ClearModelService.class, arg, null, validator, null);
+		runServiceInAllRealmTypes(null, validator, null);
 	}
 
 	@Test
@@ -55,11 +59,11 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest {
 			}
 		};
 
-		ClearModelArgument arg = new ClearModelArgument();
-		arg.clearOrders = true;
-		arg.clearResources = false;
+		this.arg = new ClearModelArgument();
+		this.arg.clearOrders = true;
+		this.arg.clearResources = false;
 
-		runServiceInAllRealmTypes(ClearModelService.class, arg, null, validator, null);
+		runServiceInAllRealmTypes(null, validator, null);
 	}
 
 	@Test
@@ -72,10 +76,20 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest {
 			}
 		};
 
-		ClearModelArgument arg = new ClearModelArgument();
-		arg.clearOrders = false;
-		arg.clearResources = true;
+		this.arg = new ClearModelArgument();
+		this.arg.clearOrders = false;
+		this.arg.clearResources = true;
 
-		runServiceInAllRealmTypes(ClearModelService.class, arg, null, validator, null);
+		runServiceInAllRealmTypes(null, validator, null);
+	}
+
+	@Override
+	protected Class<? extends Service<ClearModelArgument, ServiceResult>> getSvcClass() {
+		return ClearModelService.class;
+	}
+
+	@Override
+	protected ClearModelArgument getArgInstance() {
+		return this.arg;
 	}
 }

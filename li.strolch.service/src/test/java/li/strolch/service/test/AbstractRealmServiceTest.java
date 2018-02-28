@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,16 +18,8 @@ package li.strolch.service.test;
 import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-
-import org.junit.After;
-import org.junit.Before;
-import org.postgresql.Driver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
@@ -37,18 +29,19 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.service.XmlImportModelArgument;
 import li.strolch.service.XmlImportModelResult;
 import li.strolch.service.XmlImportModelService;
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceHandler;
-import li.strolch.service.api.ServiceResult;
-import li.strolch.service.api.ServiceResultState;
+import li.strolch.service.api.*;
 import li.strolch.testbase.runtime.RuntimeMock;
 import li.strolch.utils.Version;
+import org.junit.After;
+import org.junit.Before;
+import org.postgresql.Driver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class AbstractRealmServiceTest {
+public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U extends ServiceResult> {
 
 	public static final String REALM_CACHED = "svcCached";
 	public static final String REALM_CACHED_AUDITS_VERSIONING = "svcCachedAuditsVersioning";
@@ -113,9 +106,11 @@ public abstract class AbstractRealmServiceTest {
 		assertServiceResult(ServiceResultState.SUCCESS, XmlImportModelResult.class, result);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void doService(String realm,
-			ServiceResultState expectedState, Class<?> expectedServiceResultType, Service<T, U> svc, T arg,
-			Runner before, Runner validator, Runner after) {
+	private void doService(String realm, ServiceResultState expectedState, Class<?> expectedServiceResultType,
+			Runner before, Runner validator, Runner after) throws IllegalAccessException, InstantiationException {
+
+		Service<T, U> svc = getSvcClass().newInstance();
+		T arg = getArgInstance();
 
 		if (before != null)
 			before.run(runtimeMock.getContainer().getRealm(realm), runtimeMock.getContainer());
@@ -137,62 +132,60 @@ public abstract class AbstractRealmServiceTest {
 	}
 
 	public interface Runner {
-		public void run(StrolchRealm strolchRealm, ComponentContainer container);
+		void run(StrolchRealm strolchRealm, ComponentContainer container);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(
-			Class<? extends Service<T, U>> svcClass, T arg) {
-		runServiceInAllRealmTypes(svcClass, arg, null, null, null);
+	protected abstract Class<? extends Service<T, U>> getSvcClass();
+
+	protected abstract T getArgInstance();
+
+	protected void runServiceInAllRealmTypes() {
+		runServiceInAllRealmTypes(null, null, null);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(
-			Class<? extends Service<T, U>> svcClass, Class<?> expectedServiceResultType, T arg) {
-		runServiceInAllRealmTypes(svcClass, expectedServiceResultType, arg, null, null, null);
+	protected void runServiceInAllRealmTypes(Class<?> expectedServiceResultType) {
+		runServiceInAllRealmTypes(expectedServiceResultType, null, null, null);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(
-			Class<? extends Service<T, U>> svcClass, T arg, Runner before, Runner validator, Runner after) {
-		runServiceInAllRealmTypes(svcClass, ServiceResult.class, arg, before, validator, after);
+	protected void runServiceInAllRealmTypes(Runner before, Runner validator, Runner after) {
+		runServiceInAllRealmTypes(ServiceResult.class, before, validator, after);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runServiceInAllRealmTypes(
-			Class<? extends Service<T, U>> svcClass, Class<?> expectedServiceResultType, T arg, Runner before,
-			Runner validator, Runner after) {
+	protected void runServiceInAllRealmTypes(Class<?> expectedServiceResultType, Runner before, Runner validator,
+			Runner after) {
 		try {
-			Constructor<? extends Service<T, U>> constructor = svcClass.getConstructor();
-			runTransient(constructor.newInstance(), expectedServiceResultType, arg, before, validator, after);
-			runCached(constructor.newInstance(), expectedServiceResultType, arg, before, validator, after);
-			runCachedWithAuditsAndVersioning(constructor.newInstance(), expectedServiceResultType, arg, before, validator, after);
-		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-			throw new RuntimeException("Failed to instantiate class " + svcClass.getName() + ": " + e.getMessage(), e);
+
+			runTransient(expectedServiceResultType, before, validator, after);
+			runCached(expectedServiceResultType, before, validator, after);
+			runCachedWithAuditsAndVersioning(expectedServiceResultType, before, validator, after);
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException("Failed to instantiate class " + getSvcClass().getName() + ": " + e.getMessage(),
+					e);
 		}
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runCached(Service<T, U> svc,
-			Class<?> expectedServiceResultType, T arg) {
-		runCached(svc, expectedServiceResultType, arg, null, null, null);
+	private void runCached(Class<?> expectedServiceResultType, Runner before, Runner validator, Runner after)
+			throws InstantiationException, IllegalAccessException {
+		doService(REALM_CACHED, ServiceResultState.SUCCESS, expectedServiceResultType, before, validator, after);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runCached(Service<T, U> svc,
-			Class<?> expectedServiceResultType, T arg, Runner before, Runner validator, Runner after) {
-		doService(REALM_CACHED, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before, validator,
-				after);
+	private void runCachedWithAuditsAndVersioning(Class<?> expectedServiceResultType, Runner before, Runner validator,
+			Runner after) throws InstantiationException, IllegalAccessException {
+		doService(REALM_CACHED_AUDITS_VERSIONING, ServiceResultState.SUCCESS, expectedServiceResultType, before,
+				validator, after);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runCachedWithAuditsAndVersioning(Service<T, U> svc,
-			Class<?> expectedServiceResultType, T arg, Runner before, Runner validator, Runner after) {
-		doService(REALM_CACHED_AUDITS_VERSIONING, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before, validator,
-				after);
+	protected void runTransient() throws IllegalAccessException, InstantiationException {
+		runTransient(null);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runTransient(Service<T, U> svc,
-			Class<?> expectedServiceResultType, T arg) {
-		runTransient(svc, expectedServiceResultType, arg, null, null, null);
+	protected void runTransient(Class<?> expectedServiceResultType)
+			throws IllegalAccessException, InstantiationException {
+		runTransient(expectedServiceResultType, null, null, null);
 	}
 
-	protected <T extends ServiceArgument, U extends ServiceResult> void runTransient(Service<T, U> svc,
-			Class<?> expectedServiceResultType, T arg, Runner before, Runner validator, Runner after) {
-		doService(REALM_TRANSIENT, ServiceResultState.SUCCESS, expectedServiceResultType, svc, arg, before, validator,
-				after);
+	private void runTransient(Class<?> expectedServiceResultType, Runner before, Runner validator, Runner after)
+			throws InstantiationException, IllegalAccessException {
+		doService(REALM_TRANSIENT, ServiceResultState.SUCCESS, expectedServiceResultType, before, validator, after);
 	}
 }
