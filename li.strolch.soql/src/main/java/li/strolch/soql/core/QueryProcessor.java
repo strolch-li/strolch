@@ -49,8 +49,9 @@ public class QueryProcessor {
 	public QueryResponse process(QueryRequest request, StrolchTransaction tx) {
 
 		String statement = request.getStatement();
+		Map<String, Object> parameterMap = request.getParameterMap();
 
-		CompiledStatement compiledStatement = null;
+		CompiledStatement compiledStatement;
 		try {
 			ParseTree tree = parseStatement(statement);
 			compiledStatement = compile(tree);
@@ -74,7 +75,7 @@ public class QueryProcessor {
 			for (int i = 0; i < row.size(); i++) {
 				inputObjects.put((String) keys[i], row.get(i));
 			}
-			List<Object> resultRow = compiledStatement.evaluate(inputObjects, request.getParameter());
+			List<Object> resultRow = compiledStatement.evaluate(inputObjects, parameterMap);
 
 			if (!resultRow.isEmpty())
 				resultSet.add(resultRow);
@@ -82,7 +83,7 @@ public class QueryProcessor {
 
 		QueryResponse response = new QueryResponse();
 		response.setStatement(statement);
-		response.setParameter(request.getParameter());
+		response.setParameterMap(parameterMap);
 		response.setResultSet(resultSet);
 
 		return response;

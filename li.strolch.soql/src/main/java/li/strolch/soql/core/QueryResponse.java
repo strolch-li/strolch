@@ -32,6 +32,10 @@ public class QueryResponse extends QueryRequest {
 		return this.resultSet;
 	}
 
+	public JsonObject asJson() {
+		return asJson(false);
+	}
+
 	public JsonObject asJson(boolean flat) {
 
 		JsonObject rootJ = super.asJson();

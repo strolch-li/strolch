@@ -19,8 +19,8 @@ public class QueryRequest {
 	// the SOQL query string
 	private String statement;
 
-	// the parameter of the SOQL query
-	private Map<String, Object> parameter;
+	// the parameterMap of the SOQL query
+	private Map<String, Object> parameterMap;
 
 	public String getStatement() {
 		return statement;
@@ -30,18 +30,18 @@ public class QueryRequest {
 		this.statement = statement;
 	}
 
-	public Map<String, Object> getParameter() {
-		return parameter;
+	public Map<String, Object> getParameterMap() {
+		return parameterMap;
 	}
 
-	public void setParameter(Map<String, Object> parameter) {
-		this.parameter = parameter;
+	public void setParameterMap(Map<String, Object> parameter) {
+		this.parameterMap = parameter;
 	}
 
 	public void addParameter(String key, Object value) {
-		if (this.parameter == null)
-			this.parameter = new HashMap<>();
-		this.parameter.put(key, value);
+		if (this.parameterMap == null)
+			this.parameterMap = new HashMap<>();
+		this.parameterMap.put(key, value);
 	}
 
 	/**
@@ -56,9 +56,9 @@ public class QueryRequest {
 		JsonObject parameterJ = new JsonObject();
 		rootJ.add(PARAMETER, parameterJ);
 
-		Set<String> keys = this.parameter.keySet();
+		Set<String> keys = this.parameterMap.keySet();
 		for (String key : keys) {
-			Object param = this.parameter.get(key);
+			Object param = this.parameterMap.get(key);
 			parameterJ.addProperty(key, param.toString());
 		}
 

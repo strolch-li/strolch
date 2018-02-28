@@ -28,7 +28,7 @@ public class QueryProcessorTest extends BaseTest {
 		processor.setInputCollections(inputCollections);
 
 		QueryRequest request = new QueryRequest();
-		request.getParameter().put("id", "0");
+		request.addParameter("id", "0");
 		request.setStatement("SELECT r,o FROM Resource r, Order o WHERE r.getId() = :id AND o.getId() = :id");
 
 		String expected =
@@ -61,7 +61,7 @@ public class QueryProcessorTest extends BaseTest {
 		processor.setInputCollections(inputCollections);
 
 		QueryRequest request = new QueryRequest();
-		request.getParameter().put("id", "5");
+		request.addParameter("id", "5");
 		request.setStatement(
 				"SELECT r, o, r.getId() FROM Resource r, Order o WHERE r.getId() = :id AND o.getId() = :id");
 

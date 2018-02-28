@@ -17,7 +17,7 @@ public class SerialisationTest extends BaseTest {
 		String s = "SELECT a FROM Activity a WHERE a.getId() = :p";
 		final QueryRequest request = new QueryRequest();
 		request.setStatement(s);
-		request.getParameter().put("r", "Just a string!");
+		request.addParameter("r", "Just a string!");
 		return request;
 	}
 
@@ -25,7 +25,7 @@ public class SerialisationTest extends BaseTest {
 		String s = "SELECT a FROM Activity a WHERE a.getId() = :p";
 		final QueryResponse response = new QueryResponse();
 		response.setStatement(s);
-		response.getParameter().put("r", "Just a string!");
+		response.addParameter("r", "Just a string!");
 		return response;
 	}
 
@@ -46,14 +46,13 @@ public class SerialisationTest extends BaseTest {
 
 		final QueryRequest initial = new QueryRequest();
 		initial.setStatement(s);
-		initial.getParameter().put("p", "10010");
+		initial.addParameter("p", "10010");
 		final JsonObject jsonObject = initial.asJson();
 
-		final QueryRequest query = new QueryRequest();
-		query.fromJson(jsonObject);
+		final QueryRequest query = QueryRequest.fromJson(jsonObject);
 
 		assertEquals(s, query.getStatement());
-		assertEquals("10010", query.getParameter().get("p"));
+		assertEquals("10010", query.getParameterMap().get("p"));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
