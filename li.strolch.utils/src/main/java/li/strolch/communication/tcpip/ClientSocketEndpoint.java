@@ -1,12 +1,12 @@
 /*
  * Copyright 2014 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.Map;
 
+import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ import li.strolch.utils.helper.StringHelper;
  * This endpoint is maintained as a client connection. This means that this endpoint opens the {@link Socket} to the
  * remote server
  * </p>
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ClientSocketEndpoint implements CommunicationEndpoint {
@@ -95,15 +96,13 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 	/**
 	 * Checks the state of the connection and returns true if {@link Socket} is connected and ready for transmission,
 	 * false otherwise
-	 * 
+	 *
 	 * @return true if {@link Socket} is connected and ready for transmission, false otherwise
 	 */
 	protected boolean checkConnection() {
-		return !this.closed
-				&& this.connected
-				&& (this.socket != null && !this.socket.isClosed() && this.socket.isBound()
-						&& this.socket.isConnected() && !this.socket.isInputShutdown() && !this.socket
-							.isOutputShutdown());
+		return !this.closed && this.connected && (this.socket != null && !this.socket.isClosed() && this.socket
+				.isBound() && this.socket.isConnected() && !this.socket.isInputShutdown() && !this.socket
+				.isOutputShutdown());
 	}
 
 	/**
@@ -175,8 +174,9 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 				// configure the socket
 				if (logger.isDebugEnabled()) {
 					String msg = "BufferSize (send/read): {0} / {1} SoLinger: {2} TcpNoDelay: {3}"; //$NON-NLS-1$
-					logger.info(MessageFormat.format(msg, this.socket.getSendBufferSize(),
-							this.socket.getReceiveBufferSize(), this.socket.getSoLinger(), this.socket.getTcpNoDelay()));
+					logger.info(MessageFormat
+							.format(msg, this.socket.getSendBufferSize(), this.socket.getReceiveBufferSize(),
+									this.socket.getSoLinger(), this.socket.getTcpNoDelay()));
 				}
 				//outputSocket.setSendBufferSize(1);
 				//outputSocket.setSoLinger(true, 0);
@@ -213,9 +213,8 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 				this.connection.notifyStateChange(ConnectionState.DISCONNECTED, null);
 			} catch (Exception e) {
 				String msg = "Error while connecting to {0}:{1}: {2}"; //$NON-NLS-1$
-				logger.error(
-						MessageFormat.format(msg, this.remoteInputAddressS, Integer.toString(this.remoteInputPort)),
-						e.getMessage());
+				logger.error(MessageFormat.format(msg, this.remoteInputAddressS, Integer.toString(this.remoteInputPort),
+						ExceptionHelper.formatExceptionMessage(e)));
 				this.connection.notifyStateChange(ConnectionState.BROKEN, e.getLocalizedMessage());
 			}
 		}
@@ -234,7 +233,8 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 			try {
 				this.outputStream.close();
 			} catch (IOException e) {
-				logger.error(MessageFormat.format("Error closing OutputStream: {0}", e.getLocalizedMessage())); //$NON-NLS-1$
+				logger.error(
+						MessageFormat.format("Error closing OutputStream: {0}", e.getLocalizedMessage())); //$NON-NLS-1$
 			} finally {
 				this.outputStream = null;
 			}
@@ -244,7 +244,8 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 			try {
 				this.inputStream.close();
 			} catch (IOException e) {
-				logger.error(MessageFormat.format("Error closing InputStream: {0}", e.getLocalizedMessage())); //$NON-NLS-1$
+				logger.error(
+						MessageFormat.format("Error closing InputStream: {0}", e.getLocalizedMessage())); //$NON-NLS-1$
 			} finally {
 				this.inputStream = null;
 			}
@@ -254,7 +255,8 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 			try {
 				this.socket.close();
 			} catch (IOException e) {
-				logger.error(MessageFormat.format("Error closing OutputSocket: {0}", e.getLocalizedMessage())); //$NON-NLS-1$
+				logger.error(
+						MessageFormat.format("Error closing OutputSocket: {0}", e.getLocalizedMessage())); //$NON-NLS-1$
 			} finally {
 				this.socket = null;
 			}
@@ -287,7 +289,7 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 	 * <li>connectOnStart - if true, then when the connection is started, the connection to the remote address is
 	 * attempted. default is {@link SocketEndpointConstants#CONNECT_ON_START}
 	 * </ul>
-	 * 
+	 *
 	 * @see CommunicationEndpoint#configure(CommunicationConnection, IoMessageVisitor)
 	 */
 	@Override
@@ -361,8 +363,9 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 			try {
 				this.retry = Long.parseLong(retryS);
 			} catch (NumberFormatException e) {
-				throw ConnectionMessages.throwInvalidParameter(ClientSocketEndpoint.class,
-						SocketEndpointConstants.PARAMETER_RETRY, retryS);
+				throw ConnectionMessages
+						.throwInvalidParameter(ClientSocketEndpoint.class, SocketEndpointConstants.PARAMETER_RETRY,
+								retryS);
 			}
 		}
 
@@ -371,9 +374,9 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 		if (StringHelper.isNotEmpty(connectOnStartS)) {
 			this.connectOnStart = StringHelper.parseBoolean(connectOnStartS);
 		} else {
-			ConnectionMessages.warnUnsetParameter(ClientSocketEndpoint.class,
-					SocketEndpointConstants.PARAMETER_CONNECT_ON_START,
-					String.valueOf(SocketEndpointConstants.CONNECT_ON_START));
+			ConnectionMessages
+					.warnUnsetParameter(ClientSocketEndpoint.class, SocketEndpointConstants.PARAMETER_CONNECT_ON_START,
+							String.valueOf(SocketEndpointConstants.CONNECT_ON_START));
 			this.connectOnStart = SocketEndpointConstants.CONNECT_ON_START;
 		}
 
@@ -382,17 +385,18 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 		if (StringHelper.isNotEmpty(closeAfterSendS)) {
 			this.closeAfterSend = StringHelper.parseBoolean(closeAfterSendS);
 		} else {
-			ConnectionMessages.warnUnsetParameter(ClientSocketEndpoint.class,
-					SocketEndpointConstants.PARAMETER_CLOSE_AFTER_SEND,
-					String.valueOf(SocketEndpointConstants.CLOSE_AFTER_SEND));
+			ConnectionMessages
+					.warnUnsetParameter(ClientSocketEndpoint.class, SocketEndpointConstants.PARAMETER_CLOSE_AFTER_SEND,
+							String.valueOf(SocketEndpointConstants.CLOSE_AFTER_SEND));
 			this.closeAfterSend = SocketEndpointConstants.CLOSE_AFTER_SEND;
 		}
 
 		// configure if timeout on connection should be activated
 		String useTimeoutS = parameters.get(SocketEndpointConstants.PARAMETER_USE_TIMEOUT);
 		if (useTimeoutS == null || useTimeoutS.length() == 0) {
-			ConnectionMessages.warnUnsetParameter(ClientSocketEndpoint.class,
-					SocketEndpointConstants.PARAMETER_USE_TIMEOUT, String.valueOf(SocketEndpointConstants.USE_TIMEOUT));
+			ConnectionMessages
+					.warnUnsetParameter(ClientSocketEndpoint.class, SocketEndpointConstants.PARAMETER_USE_TIMEOUT,
+							String.valueOf(SocketEndpointConstants.USE_TIMEOUT));
 			this.useTimeout = SocketEndpointConstants.USE_TIMEOUT;
 		} else {
 			this.useTimeout = Boolean.parseBoolean(useTimeoutS);
@@ -402,8 +406,9 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 			// configure timeout on connection
 			String timeoutS = parameters.get(SocketEndpointConstants.PARAMETER_TIMEOUT);
 			if (timeoutS == null || timeoutS.length() == 0) {
-				ConnectionMessages.warnUnsetParameter(ClientSocketEndpoint.class,
-						SocketEndpointConstants.PARAMETER_TIMEOUT, String.valueOf(SocketEndpointConstants.TIMEOUT));
+				ConnectionMessages
+						.warnUnsetParameter(ClientSocketEndpoint.class, SocketEndpointConstants.PARAMETER_TIMEOUT,
+								String.valueOf(SocketEndpointConstants.TIMEOUT));
 				this.timeout = SocketEndpointConstants.TIMEOUT;
 			} else {
 				try {
@@ -418,9 +423,9 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 		// configure if the connection should be cleared on connect
 		String clearOnConnectS = parameters.get(SocketEndpointConstants.PARAMETER_CLEAR_ON_CONNECT);
 		if (clearOnConnectS == null || clearOnConnectS.length() == 0) {
-			ConnectionMessages.warnUnsetParameter(ClientSocketEndpoint.class,
-					SocketEndpointConstants.PARAMETER_CLEAR_ON_CONNECT,
-					String.valueOf(SocketEndpointConstants.CLEAR_ON_CONNECT));
+			ConnectionMessages
+					.warnUnsetParameter(ClientSocketEndpoint.class, SocketEndpointConstants.PARAMETER_CLEAR_ON_CONNECT,
+							String.valueOf(SocketEndpointConstants.CLEAR_ON_CONNECT));
 			this.clearOnConnect = SocketEndpointConstants.CLEAR_ON_CONNECT;
 		} else {
 			this.clearOnConnect = Boolean.parseBoolean(clearOnConnectS);
@@ -459,13 +464,14 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 
 	/**
 	 * Allows this end point to connect and then opens the connection to the defined remote server
-	 * 
+	 *
 	 * @see CommunicationEndpoint#start()
 	 */
 	@Override
 	public void start() {
 		if (!this.closed) {
-			logger.warn(MessageFormat.format("CommunicationConnection {0} already started.", this.connection.getId())); //$NON-NLS-1$
+			logger.warn(MessageFormat
+					.format("CommunicationConnection {0} already started.", this.connection.getId())); //$NON-NLS-1$
 		} else {
 			// logger.info(MessageFormat.format("Enabling connection {0}...", this.connection.getId())); //$NON-NLS-1$
 			this.closed = false;
@@ -478,7 +484,7 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 
 	/**
 	 * Closes this connection and disallows this end point to reconnect
-	 * 
+	 *
 	 * @see CommunicationEndpoint#stop()
 	 */
 	@Override
