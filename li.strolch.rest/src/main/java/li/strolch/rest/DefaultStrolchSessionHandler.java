@@ -23,18 +23,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -49,6 +42,8 @@ import li.strolch.rest.model.UserSession;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.dbc.DBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -64,7 +59,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	private boolean reloadSessions;
 	private long sessionTtl;
 
-	private ScheduledFuture<?> sessionHandler;
+	private ScheduledFuture<?> validateSessionsTask;
+	private Future<?> persistSessionsTask;
 
 	public DefaultStrolchSessionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -97,8 +93,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 					- this.certificateMap.size()) + " had timed out and were removed.");
 		}
 
-		this.sessionHandler = getScheduledExecutor("SessionHandler")
-				.scheduleWithFixedDelay(this::handleSessions, 5, 1, TimeUnit.MINUTES);
+		this.validateSessionsTask = getScheduledExecutor("SessionHandler")
+				.scheduleWithFixedDelay(this::checkSessionsForTimeout, 5, 1, TimeUnit.MINUTES);
 
 		super.start();
 	}
@@ -106,8 +102,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	@Override
 	public void stop() throws Exception {
 
-		if (this.sessionHandler != null)
-			this.sessionHandler.cancel(true);
+		if (this.validateSessionsTask != null)
+			this.validateSessionsTask.cancel(true);
 
 		if (this.reloadSessions) {
 
@@ -170,9 +166,23 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	@Override
 	public PrivilegeContext validate(Certificate certificate) throws StrolchNotAuthenticatedException {
 		try {
-			return this.privilegeHandler.validate(certificate);
+			PrivilegeContext privilegeContext = this.privilegeHandler.validate(certificate);
+
+			if (this.persistSessionsTask != null)
+				this.persistSessionsTask = getScheduledExecutor("SessionHandler")
+						.schedule(this::persistSessions, 5, TimeUnit.SECONDS);
+
+			return privilegeContext;
 		} catch (PrivilegeException e) {
 			throw new StrolchNotAuthenticatedException(e.getMessage(), e);
+		}
+	}
+
+	private void persistSessions() {
+		try {
+			runAsAgent(ctx -> this.privilegeHandler.getPrivilegeHandler().persistSessions(ctx.getCertificate()));
+		} finally {
+			this.persistSessionsTask = null;
 		}
 	}
 
@@ -206,44 +216,11 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		return certificate;
 	}
 
-	protected void sessionTimeout(Certificate certificate) {
-		DBC.PRE.assertNotNull("Certificate must be given!", certificate); //$NON-NLS-1$
-
-		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
-		if (removedCert == null)
-			logger.error(MessageFormat
-					.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
-
-		this.privilegeHandler.sessionTimeout(certificate);
-	}
-
-	/**
-	 * @return the certificateMap
-	 */
-	protected Map<String, Certificate> getCertificateMap() {
-		return this.certificateMap;
-	}
-
-	private void handleSessions() {
-
-		boolean changed = checkSessionsForTimeout();
-
-		// save sessions every few minutes
-		if (!changed)
-			persistSessions();
-	}
-
-	private void persistSessions() {
-		runAsAgent(ctx -> this.privilegeHandler.getPrivilegeHandler().persistSessions(ctx.getCertificate()));
-	}
-
-	private boolean checkSessionsForTimeout() {
+	private void checkSessionsForTimeout() {
 		Map<String, Certificate> certificateMap;
 		synchronized (this.certificateMap) {
 			certificateMap = new HashMap<>(this.certificateMap);
 		}
-
-		boolean changed = false;
 
 		LocalDateTime timeOutTime = LocalDateTime.now().minus(sessionTtl, ChronoUnit.MILLIS);
 		ZoneId systemDefault = ZoneId.systemDefault();
@@ -254,12 +231,19 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 				String msg = "Session {0} for user {1} has expired, invalidating session..."; //$NON-NLS-1$
 				logger.info(MessageFormat.format(msg, certificate.getSessionId(), certificate.getUsername()));
 				sessionTimeout(certificate);
-
-				changed = true;
 			}
 		}
+	}
 
-		return changed;
+	private void sessionTimeout(Certificate certificate) {
+		DBC.PRE.assertNotNull("Certificate must be given!", certificate); //$NON-NLS-1$
+
+		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
+		if (removedCert == null)
+			logger.error(MessageFormat
+					.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
+
+		this.privilegeHandler.sessionTimeout(certificate);
 	}
 
 	@Override
