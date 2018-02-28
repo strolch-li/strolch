@@ -400,6 +400,5 @@ public class CommunicationConnection implements Runnable {
 		message.setState(State.PENDING, State.PENDING.name());
 
 		this.messageQueue.add(message);
-		this.messageQueue.add(message);
 	}
 }
