@@ -250,6 +250,7 @@ public class CommunicationConnection implements Runnable {
 	 */
 	public void handleNewMessage(IoMessage message) {
 		ConnectionMessages.assertConfigured(this, "Can not be notified of new message yet!"); //$NON-NLS-1$
+		logger.info("Received new message " + message.getKey() + " " + message.getId() + " " + message.getState());
 
 		// if the state of the message is already later than ACCEPTED 
 		// then an underlying component has already set the state, so 
@@ -262,18 +263,20 @@ public class CommunicationConnection implements Runnable {
 
 	public void notifyObservers(IoMessage message) {
 
-		logger.info(
-				"Notifying observers for key " + message.getKey() + " with message " + message.getId() + " / " + message
-						.getState());
-
 		List<ConnectionObserver> observers;
 		synchronized (this.connectionObservers) {
 			List<ConnectionObserver> list = this.connectionObservers.getList(message.getKey());
-			if (list == null)
+			if (list == null) {
+				logger.info("No observers waiting for key " + message.getKey());
 				return;
+			}
 
 			observers = new ArrayList<>(list);
 		}
+
+		logger.info(
+				"Notifying " + observers.size() + " observers for key " + message.getKey() + " with message " + message
+						.getId() + " / " + message.getState());
 
 		for (ConnectionObserver observer : observers) {
 			try {
