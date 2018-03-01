@@ -1,12 +1,12 @@
 /*
  * Copyright 2014 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -187,7 +187,8 @@ public class CommunicationConnection implements Runnable {
 			if (this.queueThread != null) {
 				logger.warn(MessageFormat.format("{0}: Already connected!", this.id)); //$NON-NLS-1$
 			} else {
-				logger.info(MessageFormat.format("Starting Connection {0} to {1}...", this.id, getRemoteUri())); //$NON-NLS-1$
+				logger.info(MessageFormat
+						.format("Starting Connection {0} to {1}...", this.id, getRemoteUri())); //$NON-NLS-1$
 				this.run = true;
 				this.queueThread = new Thread(this, MessageFormat.format("{0}_OUT", this.id)); //$NON-NLS-1$
 				this.queueThread.start();
@@ -243,8 +244,9 @@ public class CommunicationConnection implements Runnable {
 
 	/**
 	 * Called by the underlying endpoint when a new message has been received and parsed
-	 * 
-	 * @param message the message to handle
+	 *
+	 * @param message
+	 * 		the message to handle
 	 */
 	public void handleNewMessage(IoMessage message) {
 		ConnectionMessages.assertConfigured(this, "Can not be notified of new message yet!"); //$NON-NLS-1$
@@ -259,6 +261,11 @@ public class CommunicationConnection implements Runnable {
 	}
 
 	public void notifyObservers(IoMessage message) {
+
+		logger.info(
+				"Notifying observers for key " + message.getKey() + " with message " + message.getId() + " / " + message
+						.getState());
+
 		List<ConnectionObserver> observers;
 		synchronized (this.connectionObservers) {
 			List<ConnectionObserver> list = this.connectionObservers.getList(message.getKey());
@@ -270,6 +277,7 @@ public class CommunicationConnection implements Runnable {
 
 		for (ConnectionObserver observer : observers) {
 			try {
+				logger.info("Notifying observer " + observer.getClass().getSimpleName());
 				observer.notify(message.getKey(), message);
 			} catch (Exception e) {
 				String msg = "Failed to notify observer for key {0} on message with id {1}"; //$NON-NLS-1$
@@ -334,8 +342,9 @@ public class CommunicationConnection implements Runnable {
 	/**
 	 * Called when an outgoing message has been handled. This method logs the message state and then notifies all
 	 * observers
-	 * 
-	 * @param message the message which is done
+	 *
+	 * @param message
+	 * 		the message which is done
 	 */
 	public void done(IoMessage message) {
 		ConnectionMessages.assertConfigured(this, "Can not notify observers yet!"); //$NON-NLS-1$
@@ -389,8 +398,9 @@ public class CommunicationConnection implements Runnable {
 	/**
 	 * Send the message using the underlying endpoint. Do not change the state of the message, this will be done by the
 	 * caller
-	 * 
-	 * @param message the message to send
+	 *
+	 * @param message
+	 * 		the message to send
 	 */
 	public void send(IoMessage message) {
 		ConnectionMessages.assertConfigured(this, "Can not send yet"); //$NON-NLS-1$
