@@ -266,17 +266,13 @@ public class CommunicationConnection implements Runnable {
 		List<ConnectionObserver> observers;
 		synchronized (this.connectionObservers) {
 			List<ConnectionObserver> list = this.connectionObservers.getList(message.getKey());
-			if (list == null) {
+			if (list == null || list.isEmpty()) {
 				logger.info("No observers waiting for key " + message.getKey());
 				return;
 			}
 
 			observers = new ArrayList<>(list);
 		}
-
-		logger.info(
-				"Notifying " + observers.size() + " observers for key " + message.getKey() + " with message " + message
-						.getId() + " / " + message.getState());
 
 		for (ConnectionObserver observer : observers) {
 			try {

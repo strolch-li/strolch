@@ -524,6 +524,11 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 
 				message.setState(State.DONE, State.DONE.name());
 
+				// since send was ok, allow to reconnect immediately
+				if (this.closeAfterSend) {
+					this.lastConnect = System.currentTimeMillis() - this.retry;
+				}
+
 			} catch (Exception e) {
 				if (this.closed) {
 					logger.warn("Socket has been closed!"); //$NON-NLS-1$
