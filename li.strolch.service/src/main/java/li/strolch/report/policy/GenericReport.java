@@ -415,20 +415,20 @@ public class GenericReport extends ReportPolicy {
 		return Optional.ofNullable(param);
 	}
 
-	protected Stream<StrolchRootElement> queryRows() {
+	protected Stream<? extends StrolchRootElement> queryRows() {
 
 		StringParameter objectTypeP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
 
 		// find the type of object for which the reportRes is created
 		switch (objectTypeP.getInterpretation()) {
+
 		case StrolchConstants.INTERPRETATION_RESOURCE_REF:
 
-			return tx().getResourceMap().getElementsBy(tx(), objectTypeP.getUom()).stream()
-					.map(Resource::getRootElement);
+			return tx().getResourceMap().getElementsBy(tx(), objectTypeP.getUom()).stream();
 
 		case StrolchConstants.INTERPRETATION_ORDER_REF:
 
-			return tx().getOrderMap().getElementsBy(tx(), objectTypeP.getUom()).stream().map(Order::getRootElement);
+			return tx().getOrderMap().getElementsBy(tx(), objectTypeP.getUom()).stream();
 
 		default:
 
