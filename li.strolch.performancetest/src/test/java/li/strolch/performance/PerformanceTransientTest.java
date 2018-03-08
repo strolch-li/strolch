@@ -15,58 +15,100 @@
  */
 package li.strolch.performance;
 
-import java.io.File;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.postgresql.Driver;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 
 import li.strolch.privilege.model.Certificate;
 import li.strolch.service.api.ServiceHandler;
-import li.strolch.testbase.runtime.RuntimeMock;
-import li.strolch.utils.helper.FileHelper;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PerformanceTransientTest {
+public class PerformanceTransientTest extends PerformanceTest {
 
 	public static final String RUNTIME_PATH = "target/runtime_transient_test/"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/runtime_transient"; //$NON-NLS-1$
 
-	protected static RuntimeMock runtimeMock;
-
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-
-		File rootPath = new File(RUNTIME_PATH);
-		File configSrc = new File(CONFIG_SRC);
-		runtimeMock = new RuntimeMock();
-		runtimeMock.mockRuntime(rootPath, configSrc);
-		runtimeMock.startContainer();
-	}
-
-	@Test
-	public void runPerformanceTest() {
-
-		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("transient", "transient".toCharArray());
-
-		ServiceHandler svcHandler = runtimeMock.getServiceHandler();
-		svcHandler.doService(certificate, new PerformanceTestService(), new PerformanceTestArgument());
+		buildRuntime(CONFIG_SRC, RUNTIME_PATH);
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception {
-		if (runtimeMock != null)
-			runtimeMock.destroyRuntime();
+		afterClass(RUNTIME_PATH);
+	}
 
-		File rootPath = new File(RUNTIME_PATH);
-		if (rootPath.exists()) {
-			FileHelper.deleteFile(rootPath, false);
+	@Test
+	public void runPerformanceTest() {
+		Certificate certificate = runtime().getPrivilegeHandler().authenticate("transient", "transient".toCharArray());
+		ServiceHandler svcHandler = runtime().getServiceHandler();
+		svcHandler.doService(certificate, new PerformanceTestService(), argInstance());
+	}
+
+	@Test
+	@Ignore
+	public void runParallelPerformanceTest() {
+
+		int nrOfTasks = 5;
+
+		ForkJoinPool commonPool = ForkJoinPool.commonPool();
+
+		List<ForkJoinTask<Long>> tasks = new ArrayList<>();
+		for (int i = 0; i < nrOfTasks; i++) {
+			PerformanceTask task = new PerformanceTask();
+			tasks.add(task);
+			commonPool.execute(task);
 		}
 
-		if (Driver.isRegistered())
-			Driver.deregister();
+		logger.info("Executing " + tasks.size() + " tasks...");
+
+		List<Long> results = new ArrayList<>();
+		for (ForkJoinTask<Long> task : tasks) {
+			results.add(task.join());
+		}
+		logger.info("Executed " + tasks.size() + " tasks.");
+		for (int i = 0; i < results.size(); i++) {
+			logger.info("Task " + i + " executed " + results.get(0) + " TXs");
+		}
+
+		long avg = (long) results.stream().mapToLong(l -> l).average().getAsDouble();
+		logger.info("Average TXs was " + avg);
+	}
+
+	public class PerformanceTask extends ForkJoinTask<Long> {
+
+		private long nrOfTxs;
+
+		@Override
+		public Long getRawResult() {
+			return this.nrOfTxs;
+		}
+
+		@Override
+		protected void setRawResult(Long value) {
+			// ignore
+		}
+
+		@Override
+		protected boolean exec() {
+
+			Certificate certificate = runtime().getPrivilegeHandler()
+					.authenticate("transient", "transient".toCharArray());
+			ServiceHandler svcHandler = runtime().getServiceHandler();
+			PerformanceTestResult svcResult = svcHandler
+					.doService(certificate, new PerformanceTestService(), new PerformanceTestArgument());
+			runtime().getPrivilegeHandler().invalidate(certificate);
+
+			this.nrOfTxs = svcResult.getNrOfTxs();
+
+			return true;
+		}
 	}
 }

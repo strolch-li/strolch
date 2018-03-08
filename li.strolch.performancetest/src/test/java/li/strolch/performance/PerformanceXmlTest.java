@@ -15,49 +15,24 @@
  */
 package li.strolch.performance;
 
-import java.io.File;
-
-import li.strolch.testbase.runtime.RuntimeMock;
-import li.strolch.utils.helper.FileHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PerformanceXmlTest extends PerformanceTest {
+public class PerformanceXmlTest extends PerformanceDbTest {
 
 	public static final String RUNTIME_PATH = "target/runtime_xml_test/"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/runtime_xml"; //$NON-NLS-1$
 
-	private static final Logger logger = LoggerFactory.getLogger(PerformanceXmlTest.class);
-
-	protected static RuntimeMock runtimeMock;
-
-	@Override
-	protected RuntimeMock runtime() {
-		return runtimeMock;
-	}
-
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		File rootPath = new File(RUNTIME_PATH);
-		File configSrc = new File(CONFIG_SRC);
-		runtimeMock = new RuntimeMock();
-		runtimeMock.mockRuntime(rootPath, configSrc);
-		runtimeMock.startContainer();
+		buildRuntime(CONFIG_SRC, RUNTIME_PATH);
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception {
-		if (runtimeMock != null)
-			runtimeMock.destroyRuntime();
-
-		File rootPath = new File(RUNTIME_PATH);
-		if (rootPath.exists()) {
-			FileHelper.deleteFile(rootPath, false);
-		}
+		afterClass(RUNTIME_PATH);
 	}
 }

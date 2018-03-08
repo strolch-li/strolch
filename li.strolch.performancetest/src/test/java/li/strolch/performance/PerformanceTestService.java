@@ -24,19 +24,19 @@ import li.strolch.persistence.api.AddResourceCommand;
 import li.strolch.persistence.api.RemoveResourceCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.SystemHelper;
 
-public class PerformanceTestService extends AbstractService<PerformanceTestArgument, ServiceResult> {
+public class PerformanceTestService extends AbstractService<PerformanceTestArgument, PerformanceTestResult> {
 
 	private static final String MY_TYPE = "MyType";
 	private static final long serialVersionUID = 1L;
 	private PerformanceTestArgument arg;
 
 	@Override
-	protected ServiceResult getResultInstance() {
-		return new ServiceResult(ServiceResultState.FAILED);
+	protected PerformanceTestResult getResultInstance() {
+		return new PerformanceTestResult(ServiceResultState.FAILED);
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 	}
 
 	@Override
-	protected ServiceResult internalDoService(PerformanceTestArgument arg) throws Exception {
+	protected PerformanceTestResult internalDoService(PerformanceTestArgument arg) throws Exception {
 
 		this.arg = arg;
 		long start = System.currentTimeMillis();
@@ -58,6 +58,7 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 		long resolutionMillis = TimeUnit.SECONDS.toMillis(1);
 		long resolutionSeconds = TimeUnit.MILLISECONDS.toSeconds(resolutionMillis);
 		long nextLog = start + resolutionMillis;
+		long allTx = 0;
 		long nrOfTx = 0;
 
 		String resId = null;
@@ -76,16 +77,23 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 			}
 
 			nrOfTx++;
+			allTx++;
 			long now = System.currentTimeMillis();
 			if (System.currentTimeMillis() >= nextLog) {
 				nextLog = now + resolutionMillis;
-				logger.info("Performing " + (nrOfTx / resolutionSeconds) + " TXs/s (" + SystemHelper.getMemorySummary()
-						+ ")");
+				logger.info(
+						getCertificate().getSessionId() + ": Performing " + (nrOfTx / resolutionSeconds) + " TXs/s ("
+								+ SystemHelper.getMemorySummary() + ")");
 				nrOfTx = 0;
 			}
 		}
 
-		return ServiceResult.success();
+		long end = System.currentTimeMillis();
+		long took = end - start;
+		long txPerSec = allTx / (took / 1000);
+		logger.info("Took " + StringHelper.formatMillisecondsDuration(took) + " with " + txPerSec + " TXs/s");
+
+		return new PerformanceTestResult(allTx);
 	}
 
 	private boolean run(long start) {

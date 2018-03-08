@@ -15,85 +15,29 @@
  */
 package li.strolch.performance;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.text.MessageFormat;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.postgresql.Driver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import li.strolch.db.DbSchemaVersionCheck;
-import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
-import li.strolch.testbase.runtime.RuntimeMock;
-import li.strolch.utils.Version;
-import li.strolch.utils.helper.FileHelper;
-import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PerformancePostgreVersioningSqlTest extends PerformanceTest {
+public class PerformancePostgreVersioningSqlTest extends PerformanceDbTest {
 
 	public static final String RUNTIME_PATH = "target/runtime_postgresql_test/"; //$NON-NLS-1$
-	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/runtime_postgresql_versioning"; //$NON-NLS-1$
 
 	public static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
 	public static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
 	public static final String DB_PASSWORD = "test"; //$NON-NLS-1$
 
-	private static final Logger logger = LoggerFactory.getLogger(PerformancePostgreVersioningSqlTest.class);
-
-	protected static RuntimeMock runtimeMock;
-
-	@Override
-	protected RuntimeMock runtime() {
-		return runtimeMock;
-	}
-
-	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {
-
-		if (!Driver.isRegistered())
-			Driver.register();
-
-		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
-				PostgreSqlPersistenceHandler.class);
-		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
-		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
-				PostgreSqlPersistenceHandler.class, dbVersion, "drop"); //$NON-NLS-1$
-		logger.info(StringHelper.NEW_LINE + sql);
-		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
-			connection.prepareStatement(sql).execute();
-		}
-	}
-
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-
 		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
-
-		File rootPath = new File(RUNTIME_PATH);
-		File configSrc = new File(CONFIG_SRC);
-		runtimeMock = new RuntimeMock();
-		runtimeMock.mockRuntime(rootPath, configSrc);
-		runtimeMock.startContainer();
+		buildRuntime(CONFIG_SRC, RUNTIME_PATH);
 	}
 
 	@AfterClass
 	public static void afterClass() throws Exception {
-		if (runtimeMock != null)
-			runtimeMock.destroyRuntime();
-
-		File rootPath = new File(RUNTIME_PATH);
-		if (rootPath.exists()) {
-			FileHelper.deleteFile(rootPath, false);
-		}
-
-		if (Driver.isRegistered())
-			Driver.deregister();
+		afterClass(RUNTIME_PATH);
 	}
 }
