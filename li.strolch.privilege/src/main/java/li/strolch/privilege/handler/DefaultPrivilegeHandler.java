@@ -1242,7 +1242,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @throws InvalidCredentialsException
 	 * 		if the given credentials are invalid, the user does not exist, or has no password set
 	 */
-	private User checkCredentialsAndUserState(String username, char[] password)
+	private synchronized User checkCredentialsAndUserState(String username, char[] password)
 			throws InvalidCredentialsException, AccessDeniedException {
 
 		// and validate the password
