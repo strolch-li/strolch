@@ -53,6 +53,7 @@ import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.service.api.Command;
+import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.helper.StringHelper;
@@ -74,6 +75,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private InternalStrolchRealm realm;
 
 	private ObjectFilter objectFilter;
+	private MapOfMaps<String, String, Resource> resourceCache;
+	private MapOfMaps<String, String, Order> orderCache;
+	private MapOfMaps<String, String, Activity> activityCache;
 
 	private TransactionCloseStrategy closeStrategy;
 	private boolean suppressUpdates;
@@ -522,10 +526,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(StrolchConstants.TEMPLATE, type));
 		if (element == null)
 			element = getOrderMap().getTemplate(this, type, assertExists);
-
-		if (element != null)
-			element.setDate(new Date());
-
 		return element;
 	}
 
@@ -552,7 +552,21 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(type, id));
 		if (element != null)
 			return element;
-		return getOrderMap().getBy(this, type, id, assertExists);
+
+		if (this.orderCache != null) {
+			element = this.orderCache.getElement(type, id);
+			if (element != null)
+				return element;
+		}
+
+		element = getOrderMap().getBy(this, type, id, assertExists);
+		if (element != null) {
+			if (this.orderCache == null)
+				this.orderCache = new MapOfMaps<>(1);
+			this.orderCache.addElement(type, id, element);
+		}
+
+		return element;
 	}
 
 	@Override
@@ -564,10 +578,25 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public Order getOrderBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ORDER_REF, refP);
+
 		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(refP.getUom(), refP.getValue()));
 		if (element != null)
 			return element;
-		return getOrderMap().getBy(this, refP, assertExists);
+
+		if (this.orderCache != null) {
+			element = this.orderCache.getElement(refP.getUom(), refP.getValue());
+			if (element != null)
+				return element;
+		}
+
+		element = getOrderMap().getBy(this, refP, assertExists);
+		if (element != null) {
+			if (this.orderCache == null)
+				this.orderCache = new MapOfMaps<>(1);
+			this.orderCache.addElement(refP.getUom(), refP.getValue(), element);
+		}
+
+		return element;
 	}
 
 	@Override
@@ -595,10 +624,24 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Resource getResourceBy(String type, String id, boolean assertExists) throws StrolchException {
-		Resource result = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(type, id));
-		if (result != null)
-			return result;
-		return getResourceMap().getBy(this, type, id, assertExists);
+		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(type, id));
+		if (element != null)
+			return element;
+
+		if (this.resourceCache != null) {
+			element = this.resourceCache.getElement(type, id);
+			if (element != null)
+				return element;
+		}
+
+		element = getResourceMap().getBy(this, type, id, assertExists);
+		if (element != null) {
+			if (this.resourceCache == null)
+				this.resourceCache = new MapOfMaps<>(1);
+			this.resourceCache.addElement(type, id, element);
+		}
+
+		return element;
 	}
 
 	@Override
@@ -610,10 +653,25 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public Resource getResourceBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_RESOURCE_REF, refP);
+
 		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(refP.getUom(), refP.getValue()));
 		if (element != null)
 			return element;
-		return getResourceMap().getBy(this, refP, assertExists);
+
+		if (this.resourceCache != null) {
+			element = this.resourceCache.getElement(refP.getUom(), refP.getValue());
+			if (element != null)
+				return element;
+		}
+
+		element = getResourceMap().getBy(this, refP, assertExists);
+		if (element != null) {
+			if (this.resourceCache == null)
+				this.resourceCache = new MapOfMaps<>(1);
+			this.resourceCache.addElement(refP.getUom(), refP.getValue(), element);
+		}
+
+		return element;
 	}
 
 	@Override
@@ -653,10 +711,24 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Activity getActivityBy(String type, String id, boolean assertExists) throws StrolchException {
-		Activity result = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(type, id));
-		if (result != null)
-			return result;
-		return getActivityMap().getBy(this, type, id, assertExists);
+		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(type, id));
+		if (element != null)
+			return element;
+
+		if (this.activityCache != null) {
+			element = this.activityCache.getElement(type, id);
+			if (element != null)
+				return element;
+		}
+
+		element = getActivityMap().getBy(this, type, id, assertExists);
+		if (element != null) {
+			if (this.activityCache == null)
+				this.activityCache = new MapOfMaps<>(1);
+			this.activityCache.addElement(type, id, element);
+		}
+
+		return element;
 	}
 
 	@Override
@@ -668,10 +740,25 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public Activity getActivityBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ACTIVITY_REF, refP);
+
 		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(refP.getUom(), refP.getValue()));
 		if (element != null)
 			return element;
-		return getActivityMap().getBy(this, refP, assertExists);
+
+		if (this.activityCache != null) {
+			element = this.activityCache.getElement(refP.getUom(), refP.getValue());
+			if (element != null)
+				return element;
+		}
+
+		element = getActivityMap().getBy(this, refP, assertExists);
+		if (element != null) {
+			if (this.activityCache == null)
+				this.activityCache = new MapOfMaps<>(1);
+			this.activityCache.addElement(refP.getUom(), refP.getValue(), element);
+		}
+
+		return element;
 	}
 
 	@Override
