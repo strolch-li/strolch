@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,9 +19,6 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Set;
 
-import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.OrderMap;
-import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
@@ -47,15 +44,9 @@ public class InMemoryElementListener implements StrolchElementListener {
 	private boolean failOnUpdate;
 
 	private StrolchTransaction tx;
-	private ResourceMap resourceMap;
-	private OrderMap orderMap;
-	private ActivityMap activityMap;
 
 	public InMemoryElementListener(StrolchTransaction tx) {
 		this.tx = tx;
-		this.resourceMap = tx.getResourceMap();
-		this.orderMap = tx.getOrderMap();
-		this.activityMap = tx.getActivityMap();
 
 		this.addResources = true;
 		this.addOrders = true;
@@ -70,7 +61,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	/**
 	 * @param addResources
-	 *            the addResources to set
+	 * 		the addResources to set
 	 */
 	public void setAddResources(boolean addResources) {
 		this.addResources = addResources;
@@ -78,7 +69,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	/**
 	 * @param addOrders
-	 *            the addOrders to set
+	 * 		the addOrders to set
 	 */
 	public void setAddOrders(boolean addOrders) {
 		this.addOrders = addOrders;
@@ -86,7 +77,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	/**
 	 * @param addActivities
-	 *            the addActivities to set
+	 * 		the addActivities to set
 	 */
 	public void setAddActivities(boolean addActivities) {
 		this.addActivities = addActivities;
@@ -94,7 +85,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	/**
 	 * @param updateResources
-	 *            the updateResources to set
+	 * 		the updateResources to set
 	 */
 	public void setUpdateResources(boolean updateResources) {
 		this.updateResources = updateResources;
@@ -102,7 +93,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	/**
 	 * @param updateOrders
-	 *            the updateOrders to set
+	 * 		the updateOrders to set
 	 */
 	public void setUpdateOrders(boolean updateOrders) {
 		this.updateOrders = updateOrders;
@@ -110,7 +101,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	/**
 	 * @param updateActivities
-	 *            the updateActivities to set
+	 * 		the updateActivities to set
 	 */
 	public void setUpdateActivities(boolean updateActivities) {
 		this.updateActivities = updateActivities;
@@ -118,7 +109,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	/**
 	 * @param orderTypes
-	 *            the orderTypes to set
+	 * 		the orderTypes to set
 	 */
 	public void setOrderTypes(Set<String> orderTypes) {
 		this.orderTypes = orderTypes;
@@ -126,7 +117,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	/**
 	 * @param resourceTypes
-	 *            the resourceTypes to set
+	 * 		the resourceTypes to set
 	 */
 	public void setResourceTypes(Set<String> resourceTypes) {
 		this.resourceTypes = resourceTypes;
@@ -134,7 +125,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	/**
 	 * @param activityTypes
-	 *            the activityTypes to set
+	 * 		the activityTypes to set
 	 */
 	public void setActivityTypes(Set<String> activityTypes) {
 		this.activityTypes = activityTypes;
@@ -142,7 +133,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	/**
 	 * @param failOnUpdate
-	 *            the failOnUpdate to set
+	 * 		the failOnUpdate to set
 	 */
 	public void setFailOnUpdate(boolean failOnUpdate) {
 		this.failOnUpdate = failOnUpdate;
@@ -153,18 +144,18 @@ public class InMemoryElementListener implements StrolchElementListener {
 		if (!this.resourceTypes.isEmpty() && !this.resourceTypes.contains(resource.getType()))
 			return;
 
-		if (this.resourceMap.hasElement(this.tx, resource.getType(), resource.getId())) {
+		if (this.tx.hasResource(resource.getType(), resource.getId())) {
 			if (this.updateResources) {
 				// we need to update the version, thus we set the current version
-				Resource current = this.resourceMap.getBy(tx, resource.getType(), resource.getId());
+				Resource current = this.tx.getResourceBy(resource.getType(), resource.getId());
 				resource.setVersion(current.getVersion());
-				this.resourceMap.update(this.tx, resource);
+				this.tx.update(resource);
 			} else if (this.failOnUpdate) {
 				throw new StrolchException(MessageFormat
 						.format("Resource {0} already exists and updating is disallowed!", resource.getLocator()));
 			}
 		} else if (this.addResources) {
-			this.resourceMap.add(this.tx, resource);
+			this.tx.add(resource);
 		}
 		// else ignore
 	}
@@ -174,18 +165,18 @@ public class InMemoryElementListener implements StrolchElementListener {
 		if (!this.orderTypes.isEmpty() && !this.orderTypes.contains(order.getType()))
 			return;
 
-		if (this.orderMap.hasElement(this.tx, order.getType(), order.getId())) {
+		if (this.tx.hasOrder(order.getType(), order.getId())) {
 			if (this.updateOrders) {
 				// we need to update the version, thus we set the current version
-				Order current = this.orderMap.getBy(tx, order.getType(), order.getId());
+				Order current = this.tx.getOrderBy(order.getType(), order.getId());
 				order.setVersion(current.getVersion());
-				this.orderMap.update(this.tx, order);
+				this.tx.update(order);
 			} else if (failOnUpdate) {
-				throw new StrolchException(MessageFormat.format("Order {0} already exists and updating is disallowed!",
-						order.getLocator()));
+				throw new StrolchException(MessageFormat
+						.format("Order {0} already exists and updating is disallowed!", order.getLocator()));
 			}
 		} else if (this.addOrders) {
-			this.orderMap.add(this.tx, order);
+			this.tx.add(order);
 		}
 		// else ignore
 	}
@@ -195,18 +186,18 @@ public class InMemoryElementListener implements StrolchElementListener {
 		if (!this.activityTypes.isEmpty() && !this.activityTypes.contains(activity.getType()))
 			return;
 
-		if (this.activityMap.hasElement(this.tx, activity.getType(), activity.getId())) {
+		if (this.tx.hasActivity(activity.getType(), activity.getId())) {
 			if (this.updateActivities) {
 				// we need to update the version, thus we set the current version
-				Activity current = this.activityMap.getBy(tx, activity.getType(), activity.getId());
+				Activity current = this.tx.getActivityBy(activity.getType(), activity.getId());
 				activity.setVersion(current.getVersion());
-				this.activityMap.update(this.tx, activity);
+				this.tx.update(activity);
 			} else if (failOnUpdate) {
 				throw new StrolchException(MessageFormat
 						.format("Activity {0} already exists and updating is disallowed!", activity.getLocator()));
 			}
 		} else if (this.addActivities) {
-			this.activityMap.add(this.tx, activity);
+			this.tx.add(activity);
 		}
 		// else ignore
 	}
