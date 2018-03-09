@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -99,7 +99,7 @@ public class LockingTest {
 		runRunners(runners);
 
 		// now assert that we can perform another such service, thus validating that the resource is not locked any longer
-		doLockServiceTest(false);
+		doLockServiceTest();
 	}
 
 	private void runRunners(List<LockingRunner> runners) throws InterruptedException {
@@ -137,13 +137,13 @@ public class LockingTest {
 		runRunners(runners);
 
 		// now assert that we can perform another such service, thus validating that the resource is not locked any longer
-		doLockServiceTest(false);
+		doLockServiceTest();
 	}
 
-	private void doLockServiceTest(boolean longRunning) {
+	private void doLockServiceTest() {
 		LockingServiceTest svc = new LockingServiceTest();
 		LockingArgumentTest arg = new LockingArgumentTest();
-		arg.longRunning = longRunning;
+		arg.longRunning = false;
 		arg.resourceLoc = Locator.valueOf(RESOURCE_LOCATOR);
 		ServiceResult result = getServiceHandler().doService(login(), svc, arg);
 		assertEquals(ServiceResultState.SUCCESS, result.getState());
@@ -156,10 +156,6 @@ public class LockingTest {
 
 		private ServiceResult result;
 
-		/**
-		 * @param svc
-		 * @param arg
-		 */
 		public LockingRunner(LockingServiceTest svc, LockingArgumentTest arg) {
 			super();
 			this.svc = svc;
@@ -170,7 +166,7 @@ public class LockingTest {
 		public void run() {
 
 			while (!LockingTest.this.run) {
-				continue;
+				// spin lock
 			}
 
 			this.result = getServiceHandler().doService(login(), this.svc, this.arg);
@@ -207,14 +203,14 @@ public class LockingTest {
 			try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 				if (!arg.longRunning)
-					Thread.sleep(200l);
+					Thread.sleep(500L);
 
 				Resource res = tx.findElement(arg.resourceLoc);
 				for (int i = 0; i < arg.nrOfLocks; i++)
 					tx.lock(res);
 
 				if (arg.longRunning)
-					Thread.sleep(5000l);
+					Thread.sleep(5000L);
 
 				tx.commitOnClose();
 			}
