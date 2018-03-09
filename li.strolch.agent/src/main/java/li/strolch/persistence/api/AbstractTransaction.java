@@ -851,18 +851,27 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public void remove(Resource resource) throws StrolchException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		getObjectFilter().remove(Tags.RESOURCE, resource.getLocator(), resource);
+		if (this.resourceCache != null) {
+			this.resourceCache.removeElement(resource.getType(), resource.getId());
+		}
 	}
 
 	@Override
 	public void remove(Order order) throws StrolchException {
 		DBC.PRE.assertNotNull("order must not be null", order);
 		getObjectFilter().remove(Tags.ORDER, order.getLocator(), order);
+		if (this.orderCache != null) {
+			this.orderCache.removeElement(order.getType(), order.getId());
+		}
 	}
 
 	@Override
 	public void remove(Activity activity) throws StrolchException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		getObjectFilter().remove(Tags.ACTIVITY, activity.getLocator(), activity);
+		if (this.activityCache != null) {
+			this.activityCache.removeElement(activity.getType(), activity.getId());
+		}
 	}
 
 	private void addModelChangeCommands() {
@@ -965,6 +974,22 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		// clear, so that we don't do it twice in case of a flush()
 		this.objectFilter.clearCache();
+	}
+
+	@Override
+	public void clearCache() {
+		if (this.orderCache != null) {
+			this.orderCache.clear();
+			this.orderCache = null;
+		}
+		if (this.resourceCache != null) {
+			this.resourceCache.clear();
+			this.resourceCache = null;
+		}
+		if (this.activityCache != null) {
+			this.activityCache.clear();
+			this.activityCache = null;
+		}
 	}
 
 	@Override

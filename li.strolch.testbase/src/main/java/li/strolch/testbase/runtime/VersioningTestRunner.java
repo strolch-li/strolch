@@ -117,6 +117,7 @@ public class VersioningTestRunner {
 
 			// now undo
 			tx.getResourceMap().undoVersion(tx, res1);
+			tx.clearCache();
 
 			// and validate we have again version 2
 			res1 = tx.getResourceBy(type, id, true);
@@ -142,14 +143,17 @@ public class VersioningTestRunner {
 			res1 = tx.getResourceBy(type, id, true);
 			assertEquals(2, res1.getVersion().getVersion());
 			tx.getResourceMap().undoVersion(tx, res1);
+			tx.clearCache();
 
 			res1 = tx.getResourceBy(type, id, true);
 			assertEquals(1, res1.getVersion().getVersion());
 			tx.getResourceMap().undoVersion(tx, res1);
+			tx.clearCache();
 
 			res1 = tx.getResourceBy(type, id, true);
 			assertEquals(0, res1.getVersion().getVersion());
 			tx.getResourceMap().undoVersion(tx, res1);
+			tx.clearCache();
 
 			// and validate all are deleted
 			assertFalse(tx.hasResource(type, id));
@@ -313,6 +317,7 @@ public class VersioningTestRunner {
 
 			// now undo
 			tx.getOrderMap().undoVersion(tx, order1);
+			tx.clearCache();
 
 			// and validate we have again version 2
 			order1 = tx.getOrderBy(type, id, true);
@@ -338,14 +343,17 @@ public class VersioningTestRunner {
 			order1 = tx.getOrderBy(type, id, true);
 			assertEquals(2, order1.getVersion().getVersion());
 			tx.getOrderMap().undoVersion(tx, order1);
+			tx.clearCache();
 
 			order1 = tx.getOrderBy(type, id, true);
 			assertEquals(1, order1.getVersion().getVersion());
 			tx.getOrderMap().undoVersion(tx, order1);
+			tx.clearCache();
 
 			order1 = tx.getOrderBy(type, id, true);
 			assertEquals(0, order1.getVersion().getVersion());
 			tx.getOrderMap().undoVersion(tx, order1);
+			tx.clearCache();
 
 			// and validate all are deleted
 			assertFalse(tx.hasOrder(type, id));
@@ -509,6 +517,7 @@ public class VersioningTestRunner {
 
 			// now undo
 			tx.getActivityMap().undoVersion(tx, act1);
+			tx.clearCache();
 
 			// and validate we have again version 2
 			act1 = tx.getActivityBy(type, id, true);
@@ -534,14 +543,17 @@ public class VersioningTestRunner {
 			act1 = tx.getActivityBy(type, id, true);
 			assertEquals(2, act1.getVersion().getVersion());
 			tx.getActivityMap().undoVersion(tx, act1);
+			tx.clearCache();
 
 			act1 = tx.getActivityBy(type, id, true);
 			assertEquals(1, act1.getVersion().getVersion());
 			tx.getActivityMap().undoVersion(tx, act1);
+			tx.clearCache();
 
 			act1 = tx.getActivityBy(type, id, true);
 			assertEquals(0, act1.getVersion().getVersion());
 			tx.getActivityMap().undoVersion(tx, act1);
+			tx.clearCache();
 
 			// and validate all are deleted
 			assertFalse(tx.hasActivity(type, id));
