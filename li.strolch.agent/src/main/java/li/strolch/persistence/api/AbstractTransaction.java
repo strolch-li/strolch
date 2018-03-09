@@ -999,6 +999,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			validateCommands();
 			doCommands();
 			writeChanges();
+			clearCache();
 		} catch (Exception e) {
 			this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
 
