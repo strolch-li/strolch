@@ -17,11 +17,13 @@ package li.strolch.performance;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PerformanceXmlTest extends PerformanceDbTest {
+public class PerformanceXmlTest extends PerformanceTest {
 
 	public static final String RUNTIME_PATH = "target/runtime_xml_test/"; //$NON-NLS-1$
 	public static final String CONFIG_SRC = "src/runtime_xml"; //$NON-NLS-1$
@@ -34,5 +36,16 @@ public class PerformanceXmlTest extends PerformanceDbTest {
 	@AfterClass
 	public static void afterClass() throws Exception {
 		afterClass(RUNTIME_PATH);
+	}
+
+	@Test
+	public void runPerformanceTestCached() {
+		runPerformanceTest("cached");
+	}
+
+	@Test
+	@Ignore
+	public void runParallelPerformanceTest() {
+		runParallelPerformanceTest("cached");
 	}
 }

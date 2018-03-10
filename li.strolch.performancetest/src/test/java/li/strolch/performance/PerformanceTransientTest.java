@@ -15,13 +15,6 @@
  */
 package li.strolch.performance;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
-
-import li.strolch.privilege.model.Certificate;
-import li.strolch.service.api.ServiceHandler;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -47,71 +40,12 @@ public class PerformanceTransientTest extends PerformanceTest {
 
 	@Test
 	public void runPerformanceTest() {
-		Certificate certificate = runtime().getPrivilegeHandler().authenticate("transient", "transient".toCharArray());
-		ServiceHandler svcHandler = runtime().getServiceHandler();
-		svcHandler.doService(certificate, new PerformanceTestService(), argInstance());
+		runPerformanceTest("transient");
 	}
 
 	@Test
 	@Ignore
 	public void runParallelPerformanceTest() {
-
-		int nrOfTasks = 5;
-
-		ForkJoinPool commonPool = ForkJoinPool.commonPool();
-
-		long start = System.currentTimeMillis();
-		List<ForkJoinTask<Long>> tasks = new ArrayList<>();
-		for (int i = 0; i < nrOfTasks; i++) {
-			PerformanceTask task = new PerformanceTask();
-			tasks.add(task);
-			commonPool.execute(task);
-		}
-
-		logger.info("Executing " + tasks.size() + " tasks...");
-
-		List<Long> results = new ArrayList<>();
-		for (ForkJoinTask<Long> task : tasks) {
-			results.add(task.join());
-		}
-		logger.info("Executed " + tasks.size() + " tasks.");
-		for (int i = 0; i < results.size(); i++) {
-			logger.info("Task " + i + " executed " + results.get(i) + " TXs");
-		}
-
-		long avg = (long) results.stream().mapToLong(l -> l).average().getAsDouble();
-		long took = System.currentTimeMillis() - start;
-		long txPerSec = avg / (took / 1000);
-		logger.info("Average TXs was " + avg + " with " + txPerSec + " TXs/s");
-	}
-
-	public class PerformanceTask extends ForkJoinTask<Long> {
-
-		private long nrOfTxs;
-
-		@Override
-		public Long getRawResult() {
-			return this.nrOfTxs;
-		}
-
-		@Override
-		protected void setRawResult(Long value) {
-			// ignore
-		}
-
-		@Override
-		protected boolean exec() {
-
-			Certificate certificate = runtime().getPrivilegeHandler()
-					.authenticate("transient", "transient".toCharArray());
-			ServiceHandler svcHandler = runtime().getServiceHandler();
-			PerformanceTestResult svcResult = svcHandler
-					.doService(certificate, new PerformanceTestService(), new PerformanceTestArgument());
-			runtime().getPrivilegeHandler().invalidate(certificate);
-
-			this.nrOfTxs = svcResult.getNrOfTxs();
-
-			return true;
-		}
+		runParallelPerformanceTest("transient");
 	}
 }
