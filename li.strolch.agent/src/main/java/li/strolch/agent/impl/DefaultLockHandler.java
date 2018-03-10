@@ -16,18 +16,17 @@
 package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.LockHandler;
 import li.strolch.agent.api.StrolchLockException;
 import li.strolch.model.Locator;
 import li.strolch.utils.dbc.DBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -50,7 +49,7 @@ public class DefaultLockHandler implements LockHandler {
 		this.realm = realm;
 		this.tryLockTimeUnit = tryLockTimeUnit;
 		this.tryLockTime = tryLockTime;
-		this.lockMap = new HashMap<>();
+		this.lockMap = new ConcurrentHashMap<>();
 	}
 
 	public String getRealm() {
@@ -59,12 +58,7 @@ public class DefaultLockHandler implements LockHandler {
 
 	@Override
 	public void lock(Locator locator) throws StrolchLockException {
-		ReentrantLock lock = this.lockMap.get(locator);
-		if (lock == null) {
-			lock = new ReentrantLock(true);
-			this.lockMap.put(locator, lock);
-		}
-
+		ReentrantLock lock = this.lockMap.computeIfAbsent(locator, l -> new ReentrantLock(true));
 		lock(this.tryLockTimeUnit, this.tryLockTime, lock, locator);
 	}
 
@@ -74,8 +68,7 @@ public class DefaultLockHandler implements LockHandler {
 		if (lock == null || !lock.isHeldByCurrentThread()) {
 			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", locator)); //$NON-NLS-1$
 		} else {
-			if (logger.isDebugEnabled())
-				logger.debug("unlocking " + locator); //$NON-NLS-1$
+			// logger.debug("unlocking " + locator); //$NON-NLS-1$
 			unlock(lock);
 		}
 	}
@@ -83,11 +76,15 @@ public class DefaultLockHandler implements LockHandler {
 	@Override
 	public void releaseLock(Locator locator) throws StrolchLockException {
 		ReentrantLock lock = this.lockMap.get(locator);
-		if (lock == null || !lock.isHeldByCurrentThread()) {
-			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", locator)); //$NON-NLS-1$
+		if (lock == null) {
+			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", locator));
+		} else if (!lock.isHeldByCurrentThread()) {
+			if (lock.isLocked())
+				logger.error(MessageFormat.format("Lock not held by this thread for element {0}", locator));
+			else
+				logger.error(MessageFormat.format("Element {0} is not locked!", locator));
 		} else {
-			if (logger.isDebugEnabled())
-				logger.debug("releasing lock " + locator); //$NON-NLS-1$
+			//logger.info("releasing lock " + locator); //$NON-NLS-1$
 			releaseLock(lock);
 		}
 	}
@@ -105,8 +102,7 @@ public class DefaultLockHandler implements LockHandler {
 				throw new StrolchLockException(msg);
 			}
 
-			if (logger.isDebugEnabled())
-				logger.debug("locked " + locator); //$NON-NLS-1$
+			// logger.debug("locked " + locator); //$NON-NLS-1$
 
 		} catch (InterruptedException e) {
 			throw new StrolchLockException(e.getMessage(), e); //$NON-NLS-1$
