@@ -91,7 +91,8 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 		long end = System.currentTimeMillis();
 		long took = end - start;
 		long txPerSec = allTx / (took / 1000);
-		logger.info("Took " + StringHelper.formatMillisecondsDuration(took) + " with " + txPerSec + " TXs/s");
+		logger.info("Took " + StringHelper.formatMillisecondsDuration(took) + " for " + allTx + " TXs with " + txPerSec
+				+ " TXs/s");
 
 		return new PerformanceTestResult(allTx);
 	}

@@ -60,6 +60,7 @@ public class PerformanceTransientTest extends PerformanceTest {
 
 		ForkJoinPool commonPool = ForkJoinPool.commonPool();
 
+		long start = System.currentTimeMillis();
 		List<ForkJoinTask<Long>> tasks = new ArrayList<>();
 		for (int i = 0; i < nrOfTasks; i++) {
 			PerformanceTask task = new PerformanceTask();
@@ -75,11 +76,13 @@ public class PerformanceTransientTest extends PerformanceTest {
 		}
 		logger.info("Executed " + tasks.size() + " tasks.");
 		for (int i = 0; i < results.size(); i++) {
-			logger.info("Task " + i + " executed " + results.get(0) + " TXs");
+			logger.info("Task " + i + " executed " + results.get(i) + " TXs");
 		}
 
 		long avg = (long) results.stream().mapToLong(l -> l).average().getAsDouble();
-		logger.info("Average TXs was " + avg);
+		long took = System.currentTimeMillis() - start;
+		long txPerSec = avg / (took / 1000);
+		logger.info("Average TXs was " + avg + " with " + txPerSec + " TXs/s");
 	}
 
 	public class PerformanceTask extends ForkJoinTask<Long> {
