@@ -17,7 +17,6 @@ package li.strolch.performance;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -49,7 +48,6 @@ public class PerformancePostgreSqlTest extends PerformanceTest {
 	}
 
 	@Test
-	@Ignore
 	public void runParallelPerformanceTest() {
 		runParallelPerformanceTest("cached");
 	}

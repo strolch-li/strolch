@@ -44,7 +44,7 @@
 				<db.url.cached>jdbc:postgresql://localhost/testdb</db.url.cached>
 				<db.username.cached>testuser</db.username.cached>
 				<db.password.cached>test</db.password.cached>
-				<db.pool.maximumPoolSize.cached>1</db.pool.maximumPoolSize.cached>
+				<db.pool.maximumPoolSize.cached>5</db.pool.maximumPoolSize.cached>
 			</Properties>
 		</Component>
 		<Component>

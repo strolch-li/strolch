@@ -17,7 +17,6 @@ package li.strolch.performance;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -44,7 +43,6 @@ public class PerformanceTransientTest extends PerformanceTest {
 	}
 
 	@Test
-	@Ignore
 	public void runParallelPerformanceTest() {
 		runParallelPerformanceTest("transient");
 	}
