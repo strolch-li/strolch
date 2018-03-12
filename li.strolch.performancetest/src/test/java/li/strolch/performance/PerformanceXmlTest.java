@@ -39,11 +39,16 @@ public class PerformanceXmlTest extends PerformanceTest {
 
 	@Test
 	public void runPerformanceTestCached() {
-		runPerformanceTest("cached");
+		runPerformanceTest("cached", 1);
+	}
+
+	@Test
+	public void runPerformanceTestBulk() {
+		runPerformanceTest("cached", 20);
 	}
 
 	@Test
 	public void runParallelPerformanceTest() {
-		runParallelPerformanceTest("cached");
+		runParallelPerformanceTest("cached", 1);
 	}
 }

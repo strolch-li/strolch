@@ -31,8 +31,10 @@ public abstract class PerformanceTest {
 		return runtimeMock;
 	}
 
-	protected PerformanceTestArgument argInstance() {
-		return new PerformanceTestArgument();
+	protected PerformanceTestArgument argInstance(int nrOfElements) {
+		PerformanceTestArgument arg = new PerformanceTestArgument();
+		arg.nrOfElements = nrOfElements;
+		return arg;
 	}
 
 	public static void buildRuntime(String sourcePath, String targetPath) {
@@ -73,13 +75,16 @@ public abstract class PerformanceTest {
 			Driver.deregister();
 	}
 
-	protected void runPerformanceTest(String username) {
+	protected void runPerformanceTest(String username, int nrOfElements) {
 		Certificate certificate = runtime().getPrivilegeHandler().authenticate(username, username.toCharArray());
 		ServiceHandler svcHandler = runtime().getServiceHandler();
-		svcHandler.doService(certificate, new PerformanceTestService(), argInstance());
+		PerformanceTestResult svcResult = svcHandler
+				.doService(certificate, new PerformanceTestService(), argInstance(nrOfElements));
+		if (svcResult.isNok())
+			throw new IllegalStateException("Performance test failed", svcResult.getThrowable());
 	}
 
-	protected void runParallelPerformanceTest(String username) {
+	protected void runParallelPerformanceTest(String username, int nrOfElements) {
 
 		int nrOfTasks = 5;
 
@@ -88,7 +93,7 @@ public abstract class PerformanceTest {
 		long start = System.currentTimeMillis();
 		List<ForkJoinTask<Long>> tasks = new ArrayList<>();
 		for (int i = 0; i < nrOfTasks; i++) {
-			PerformanceTask task = new PerformanceTask(username);
+			PerformanceTask task = new PerformanceTask(username, nrOfElements);
 			tasks.add(task);
 			commonPool.execute(task);
 		}
@@ -113,15 +118,20 @@ public abstract class PerformanceTest {
 	public class PerformanceTask extends ForkJoinTask<Long> {
 
 		private String username;
-		private long nrOfTxs;
+		private int nrOfElements;
+		private PerformanceTestResult svcResult;
 
-		public PerformanceTask(String username) {
+		public PerformanceTask(String username, int nrOfElements) {
 			this.username = username;
+			this.nrOfElements = nrOfElements;
 		}
 
 		@Override
 		public Long getRawResult() {
-			return this.nrOfTxs;
+			if (this.svcResult == null)
+				return 0L;
+			else
+				return this.svcResult.getNrOfTxs();
 		}
 
 		@Override
@@ -135,11 +145,11 @@ public abstract class PerformanceTest {
 			Certificate certificate = runtime().getPrivilegeHandler()
 					.authenticate(username, this.username.toCharArray());
 			ServiceHandler svcHandler = runtime().getServiceHandler();
-			PerformanceTestResult svcResult = svcHandler
-					.doService(certificate, new PerformanceTestService(), new PerformanceTestArgument());
+			this.svcResult = svcHandler.doService(certificate, new PerformanceTestService(), argInstance(nrOfElements));
 			runtime().getPrivilegeHandler().invalidate(certificate);
 
-			this.nrOfTxs = svcResult.getNrOfTxs();
+			if (this.svcResult.isNok())
+				throw new IllegalStateException("Task failed!", this.svcResult.getThrowable());
 
 			return true;
 		}

@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,13 +15,18 @@
  */
 package li.strolch.performance;
 
+import static li.strolch.model.ModelGenerator.BAG_ID;
+import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
-import li.strolch.persistence.api.AddResourceCommand;
-import li.strolch.persistence.api.RemoveResourceCommand;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResultState;
@@ -61,17 +66,50 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 		long allTx = 0;
 		long nrOfTx = 0;
 
-		String resId = null;
+		List<String> resourceIds = new ArrayList<>();
 
 		while (run(start)) {
 
 			try (StrolchTransaction tx = openUserTx()) {
 
-				if (resId != null) {
-					Resource toDelete = queryResource(tx, resId);
-					deleteResource(tx, toDelete);
+				if (resourceIds.isEmpty()) {
+					for (int i = 0; i < arg.nrOfElements; i++) {
+						resourceIds.add(createResource(tx));
+					}
+				} else {
+
+					if (resourceIds.size() > 10) {
+
+						int removeTo = resourceIds.size() / 3;
+						int updateTo = (resourceIds.size() / 3) * 2;
+
+						// we have many, so update some, change some, create some
+						List<String> toRemove = new ArrayList<>(resourceIds.subList(0, removeTo));
+						List<String> toUpdate = new ArrayList<>(resourceIds.subList(removeTo, updateTo));
+						resourceIds.removeAll(toRemove);
+
+						for (String resourceId : toRemove) {
+							tx.remove(tx.getResourceBy(MY_TYPE, resourceId, true));
+						}
+						for (String resourceId : toUpdate) {
+							Resource resource = tx.getResourceBy(MY_TYPE, resourceId, true);
+							StringParameter stringP = resource.getParameter(BAG_ID, PARAM_STRING_ID);
+							stringP.setValue("Yellow!");
+							tx.update(resource);
+						}
+						for (int i = 0; i < removeTo; i++) {
+							resourceIds.add(createResource(tx));
+						}
+
+					} else {
+
+						for (Iterator<String> iterator = resourceIds.iterator(); iterator.hasNext(); ) {
+							String resourceId = iterator.next();
+							tx.remove(tx.getResourceBy(MY_TYPE, resourceId, true));
+							iterator.remove();
+						}
+					}
 				}
-				resId = createResource(tx);
 
 				tx.commitOnClose();
 			}
@@ -101,24 +139,10 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 		return System.currentTimeMillis() < start + this.arg.unit.toMillis(this.arg.duration);
 	}
 
-	private void deleteResource(StrolchTransaction tx, Resource toDelete) {
-		RemoveResourceCommand cmd = new RemoveResourceCommand(getContainer(), tx);
-		cmd.setResource(toDelete);
-		tx.addCommand(cmd);
-	}
-
-	private Resource queryResource(StrolchTransaction tx, String resId) {
-		return tx.getResourceBy(MY_TYPE, resId);
-	}
-
 	private String createResource(StrolchTransaction tx) {
 		String id = StrolchAgent.getUniqueId();
 		Resource resource = ModelGenerator.createResource(id, id, MY_TYPE);
-
-		AddResourceCommand cmd = new AddResourceCommand(getContainer(), tx);
-		cmd.setResource(resource);
-		tx.addCommand(cmd);
-
-		return id;
+		tx.add(resource);
+		return resource.getId();
 	}
 }
