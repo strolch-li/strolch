@@ -141,7 +141,7 @@ public class StrolchSearchTest {
 					.asOrders() //
 					.toList();
 
-			assertEquals(2, result.size());
+			assertEquals(7, result.size());
 		}
 	}
 
