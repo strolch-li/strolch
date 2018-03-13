@@ -20,6 +20,7 @@ import static li.strolch.model.Tags.AGENT;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Stream;
 
 import li.strolch.agent.api.*;
 import li.strolch.agent.impl.*;
@@ -501,6 +502,21 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private boolean hasElementInFilter(String key, Locator locator) {
 		return this.objectFilter != null && this.objectFilter.hasElement(key, locator);
+	}
+
+	@Override
+	public Stream<Resource> streamResources(String... types) {
+		return getResourceMap().stream(this, types);
+	}
+
+	@Override
+	public Stream<Order> streamOrders(String... types) {
+		return getOrderMap().stream(this, types);
+	}
+
+	@Override
+	public Stream<Activity> streamActivities(String... types) {
+		return getActivityMap().stream(this, types);
 	}
 
 	@Override

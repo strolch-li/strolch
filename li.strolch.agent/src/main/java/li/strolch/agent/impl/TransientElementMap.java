@@ -20,6 +20,7 @@ import static java.util.function.Function.identity;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.StrolchAgent;
@@ -186,6 +187,36 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 			T clone = (T) t.getClone(true);
 			return clone;
 		}).collect(Collectors.toList());
+	}
+
+	@Override
+	public synchronized Stream<T> stream(StrolchTransaction tx, String... types) {
+
+		if (types.length == 0) {
+			List<T> elements = new ArrayList<>();
+			for (Map<String, T> map : this.elementMap.values()) {
+				elements.addAll(map.values());
+			}
+			return elements.stream();
+		}
+
+		if (types.length == 1) {
+			Map<String, T> byType = this.elementMap.get(types[0]);
+			if (byType == null)
+				return Stream.empty();
+
+			return new ArrayList<>(byType.values()).stream();
+		}
+
+		List<T> elements = new ArrayList<>();
+		for (String type : types) {
+			Map<String, T> byType = this.elementMap.get(type);
+			if (byType == null)
+				return Stream.empty();
+
+			elements.addAll(byType.values());
+		}
+		return elements.stream();
 	}
 
 	@Override

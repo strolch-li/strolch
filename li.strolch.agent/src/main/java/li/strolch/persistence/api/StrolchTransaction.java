@@ -16,6 +16,7 @@
 package li.strolch.persistence.api;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
@@ -537,6 +538,36 @@ public interface StrolchTransaction extends AutoCloseable {
 	 */
 	public <T extends StrolchElement> T findElement(Locator locator, boolean allowNull)
 			throws StrolchException, ClassCastException;
+
+	/**
+	 * Returns a stream of resources for the given types, if empty, streams all possible types
+	 *
+	 * @param types
+	 * 		the types of resources to return in the stream, if empty, streams all possible types
+	 *
+	 * @return a stream of resources
+	 */
+	public Stream<Resource> streamResources(String... types);
+
+	/**
+	 * Returns a stream of orders for the given types, if empty, streams all possible types
+	 *
+	 * @param types
+	 * 		the types of orders to return in the stream, if empty, streams all possible types
+	 *
+	 * @return a stream of orders
+	 */
+	public Stream<Order> streamOrders(String... types);
+
+	/**
+	 * Returns a stream of activities for the given types, if empty, streams all possible types
+	 *
+	 * @param types
+	 * 		the types of activities to return in the stream, if empty, streams all possible types
+	 *
+	 * @return a stream of activities
+	 */
+	public Stream<Activity> streamActivities(String... types);
 
 	/**
 	 * <p>

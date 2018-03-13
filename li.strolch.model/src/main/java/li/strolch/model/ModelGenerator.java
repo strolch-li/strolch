@@ -15,45 +15,19 @@
  */
 package li.strolch.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.parameter.BooleanParameter;
-import li.strolch.model.parameter.DateParameter;
-import li.strolch.model.parameter.DurationParameter;
-import li.strolch.model.parameter.FloatListParameter;
-import li.strolch.model.parameter.FloatParameter;
-import li.strolch.model.parameter.IntegerListParameter;
-import li.strolch.model.parameter.IntegerParameter;
-import li.strolch.model.parameter.LongListParameter;
-import li.strolch.model.parameter.LongParameter;
-import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringListParameter;
-import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.parameter.*;
 import li.strolch.model.policy.JavaPolicyDef;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
-import li.strolch.model.timedstate.BooleanTimedState;
-import li.strolch.model.timedstate.FloatTimedState;
-import li.strolch.model.timedstate.IntegerTimedState;
-import li.strolch.model.timedstate.StringSetTimedState;
-import li.strolch.model.timedstate.StrolchTimedState;
-import li.strolch.model.timevalue.impl.AString;
-import li.strolch.model.timevalue.impl.BooleanValue;
-import li.strolch.model.timevalue.impl.FloatValue;
-import li.strolch.model.timevalue.impl.IntegerValue;
-import li.strolch.model.timevalue.impl.StringSetValue;
-import li.strolch.model.timevalue.impl.ValueChange;
+import li.strolch.model.timedstate.*;
+import li.strolch.model.timevalue.impl.*;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
@@ -230,12 +204,7 @@ public class ModelGenerator {
 	}
 
 	private static void removeInverted(Set<AString> set) {
-		for (Iterator<AString> iter = set.iterator(); iter.hasNext();) {
-			AString aString = iter.next();
-			if (aString.isInverse()) {
-				iter.remove();
-			}
-		}
+		set.removeIf(AString::isInverse);
 	}
 
 	/**
