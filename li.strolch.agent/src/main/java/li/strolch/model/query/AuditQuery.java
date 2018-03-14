@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model.audit;
+package li.strolch.model.query;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.model.query.StrolchQuery;
+import li.strolch.model.audit.Audit;
+import li.strolch.model.audit.AuditVisitor;
+import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.dbc.DBC;
 

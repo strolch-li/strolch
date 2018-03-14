@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model.audit;
+package li.strolch.model.query;
 
-import li.strolch.model.query.StringSelection;
 import li.strolch.utils.StringMatchMode;
 
 /**

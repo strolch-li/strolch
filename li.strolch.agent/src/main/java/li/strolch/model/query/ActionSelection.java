@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.model.audit;
+package li.strolch.model.query;
 
 import java.util.Arrays;
 import java.util.List;
 
-import li.strolch.model.query.StringSelection;
+import li.strolch.model.audit.AccessType;
 import li.strolch.utils.StringMatchMode;
 
 /**
