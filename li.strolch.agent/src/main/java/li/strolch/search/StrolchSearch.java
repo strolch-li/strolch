@@ -30,7 +30,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	 *
 	 * @return this object for chaining
 	 */
-	public StrolchSearch internal() {
+	public StrolchSearch<T> internal() {
 		this.privilegeValue = StrolchModelConstants.INTERNAL;
 		return this;
 	}
@@ -58,28 +58,28 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	protected abstract void define();
 
 	@SuppressWarnings("unchecked")
-	protected StrolchSearch resources(String... types) {
+	protected StrolchSearch<T> resources(String... types) {
 		this.navigator = tx -> (Stream<T>) tx.streamResources(types);
 		return this;
 	}
 
 	@SuppressWarnings("unchecked")
-	protected StrolchSearch orders(String... types) {
+	protected StrolchSearch<T> orders(String... types) {
 		this.navigator = tx -> (Stream<T>) tx.streamOrders(types);
 		return this;
 	}
 
 	@SuppressWarnings("unchecked")
-	protected StrolchSearch activities(String... types) {
+	protected StrolchSearch<T> activities(String... types) {
 		this.navigator = tx -> (Stream<T>) tx.streamActivities(types);
 		return this;
 	}
 
-	protected StrolchSearch where(SearchExpression searchExpression) {
+	protected StrolchSearch<T> where(SearchExpression expression) {
 		if (this.expression == null)
-			this.expression = searchExpression;
+			this.expression = expression;
 		else
-			this.expression = this.expression.and(searchExpression);
+			this.expression = this.expression.and(expression);
 		return this;
 	}
 

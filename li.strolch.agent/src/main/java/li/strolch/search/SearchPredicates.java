@@ -1,52 +1,50 @@
 package li.strolch.search;
 
-import java.util.Date;
-
 import li.strolch.utils.collections.DateRange;
 
 public interface SearchPredicates {
 
 	default SearchPredicate isEqualTo(Object right) {
-		return PredicatesSupport.isEqualTo(right, false);
+		return PredicatesSupport.isEqualTo(right);
 	}
 
 	default SearchPredicate isNotEqualTo(Object right) {
-		return PredicatesSupport.isEqualTo(right, false).not();
+		return PredicatesSupport.isNotEqualTo(right);
 	}
 
 	default SearchPredicate isEqualToIgnoreCase(Object right) {
-		return PredicatesSupport.isEqualTo(right, true);
+		return PredicatesSupport.isEqualToIgnoreCase(right);
 	}
 
 	default SearchPredicate isNotEqualToIgnoreCase(Object right) {
-		return PredicatesSupport.isEqualTo(right, true).not();
+		return PredicatesSupport.isNotEqualToIgnoreCase(right);
 	}
 
 	default SearchPredicate startsWith(Object right) {
-		return PredicatesSupport.startsWith(right, false);
+		return PredicatesSupport.startsWith(right);
 	}
 
 	default SearchPredicate startsWithIgnoreCase(Object right) {
-		return PredicatesSupport.startsWith(right, true);
+		return PredicatesSupport.startsWithIgnoreCase(right);
 	}
 
 	default SearchPredicate endsWith(Object right) {
-		return PredicatesSupport.endsWith(right, false);
+		return PredicatesSupport.endsWith(right);
 	}
 
 	default SearchPredicate endsWithIgnoreCase(Object right) {
-		return PredicatesSupport.endsWith(right, true);
+		return PredicatesSupport.endsWithIgnoreCase(right);
 	}
 
 	default SearchPredicate contains(Object right) {
-		return PredicatesSupport.contains(right, false);
+		return PredicatesSupport.contains(right);
 	}
 
 	default SearchPredicate containsIgnoreCase(Object right) {
-		return PredicatesSupport.contains(right, true);
+		return PredicatesSupport.containsIgnoreCase(right);
 	}
 
 	default SearchPredicate inRange(DateRange range) {
-		return left -> range.contains((Date) left);
+		return PredicatesSupport.inRange(range);
 	}
 }

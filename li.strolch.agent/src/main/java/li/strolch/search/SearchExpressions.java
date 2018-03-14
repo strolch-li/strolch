@@ -1,11 +1,5 @@
 package li.strolch.search;
 
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.activity.Activity;
-import li.strolch.model.parameter.Parameter;
-
 public interface SearchExpressions {
 
 	default SearchExpression not(SearchExpression expression) {
@@ -13,66 +7,46 @@ public interface SearchExpressions {
 	}
 
 	default ExpressionBuilder id() {
-		return StrolchElement::getId;
+		return ExpressionsSupport.id();
 	}
 
 	default SearchExpression id(SearchPredicate predicate) {
-		return element -> predicate.matches(element.getId());
+		return ExpressionsSupport.id(predicate);
 	}
 
 	default ExpressionBuilder name() {
-		return StrolchElement::getName;
+		return ExpressionsSupport.name();
 	}
 
 	default SearchExpression name(SearchPredicate predicate) {
-		return element -> predicate.matches(element.getName());
+		return ExpressionsSupport.name(predicate);
 	}
 
 	default ExpressionBuilder date() {
-		return element -> ((Order) element).getDate();
+		return ExpressionsSupport.date();
 	}
 
 	default SearchExpression date(SearchPredicate predicate) {
-		return element -> predicate.matches(((Order) element).getDate());
+		return ExpressionsSupport.date(predicate);
 	}
 
 	default ExpressionBuilder state() {
-		return element -> {
-			if (element instanceof Order)
-				return ((Order) element).getState();
-			if (element instanceof Activity)
-				return ((Activity) element).getState();
-			throw new IllegalArgumentException(element.getObjectType() + " does not have a state!");
-		};
+		return ExpressionsSupport.state();
 	}
 
 	default SearchExpression state(SearchPredicate predicate) {
-		return element -> predicate.matches(state().extract(element));
+		return ExpressionsSupport.state(predicate);
 	}
 
 	default ExpressionBuilder param(String bagId, String paramId) {
-		return element -> {
-			ParameterBag bag = element.getParameterBag(bagId);
-			if (bag == null)
-				return null;
-
-			Parameter<?> param = bag.getParameter(paramId);
-			return param == null ? null : param.getValue();
-		};
+		return ExpressionsSupport.param(bagId, paramId);
 	}
 
 	default SearchExpression param(String bagId, String paramId, SearchPredicate predicate) {
-		return element -> predicate.matches(param(bagId, paramId).extract(element));
+		return ExpressionsSupport.param(bagId, paramId, predicate);
 	}
 
 	default SearchExpression paramNull(String bagId, String paramId) {
-		return element -> {
-			ParameterBag bag = element.getParameterBag(bagId);
-			if (bag == null)
-				return true;
-
-			Parameter<?> param = bag.getParameter(paramId);
-			return param == null;
-		};
+		return ExpressionsSupport.paramNull(bagId, paramId);
 	}
 }

@@ -4,6 +4,10 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static li.strolch.agent.api.StrolchAgent.getUniqueId;
 import static li.strolch.model.ModelGenerator.*;
+import static li.strolch.search.ExpressionsSupport.name;
+import static li.strolch.search.ExpressionsSupport.param;
+import static li.strolch.search.ExpressionsSupport.state;
+import static li.strolch.search.PredicatesSupport.*;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
@@ -191,6 +195,42 @@ public class StrolchSearchTest {
 					.toMap(Activity::getId, Activity::getState);
 
 			assertEquals(1, states.size());
+		}
+	}
+
+	@Test
+	public void shouldSearchGeneric() {
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+
+			Map<String, State> states = new GenericSearch<Activity>() //
+
+					.activities() //
+					.where(state().isEqualTo(State.PLANNING) //
+							.and(name(isEqualTo("Activity")))) //
+
+					.search(tx) //
+					.toMap(Activity::getId, Activity::getState);
+
+			assertEquals(1, states.size());
+		}
+	}
+
+	@Test
+	public void shouldSearchGeneric1() {
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+
+			assertEquals(4, new GenericSearch<Resource>() //
+					.resources() //
+					.where(param(BAG_ID, PARAM_STRING_ID, contains("rol"))) //
+					.search(tx) //
+					.toList().size());
+			assertEquals(4, new GenericSearch<Resource>() //
+					.resources() //
+					.where(param(BAG_ID, PARAM_STRING_ID, startsWithIgnoreCase("STR"))) //
+					.search(tx) //
+					.toList().size());
 		}
 	}
 
