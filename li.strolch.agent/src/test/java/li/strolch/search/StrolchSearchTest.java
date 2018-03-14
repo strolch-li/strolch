@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 public class StrolchSearchTest {
 
-	public static final Logger logger = LoggerFactory.getLogger(ParallelTests.class);
+	public static final Logger logger = LoggerFactory.getLogger(StrolchSearchTest.class);
 
 	private static final String TARGET_PATH = "target/" + StrolchSearchTest.class.getSimpleName();
 	private static final String SOURCE_PATH = "src/test/resources/transienttest";
@@ -108,7 +108,6 @@ public class StrolchSearchTest {
 					// do search, returns SearchResult
 					.search(tx)
 					// transform, either:
-					.asResources() //  asOrders(), asActivities() or map to something entirely different:
 					.map(a -> a.accept(toJsonVisitor))
 					// finishing as toList, toSet, toPaging
 					.toList();
@@ -122,15 +121,15 @@ public class StrolchSearchTest {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-			List<Order> result = new StrolchSearch() {
+			List<Order> result = new StrolchSearch<Order>() {
 				@Override
-				public StrolchSearch prepare() {
+				public void define() {
 
 					DateRange dateRange = new DateRange() //
 							.from(ISO8601FormatFactory.getInstance().parseDate("2012-01-01T00:00:00.000+01:00"), true)
 							.to(ISO8601FormatFactory.getInstance().parseDate("2013-01-01T00:00:00.000+01:00"), true);
 
-					return orders() //
+					orders() //
 							.where(date(isEqualTo(new Date(1384929777699L))) //
 									.or(state(isEqualTo(State.CREATED)) //
 											.and(param(BAG_ID, PARAM_STRING_ID, isEqualTo("Strolch"))) //
@@ -138,7 +137,6 @@ public class StrolchSearchTest {
 				}
 			} //
 					.search(tx) //
-					.asOrders() //
 					.toList();
 
 			assertEquals(7, result.size());
@@ -150,14 +148,14 @@ public class StrolchSearchTest {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-			StrolchSearch search = new StrolchSearch() {
+			StrolchSearch<Order> search = new StrolchSearch<Order>() {
 				@Override
-				public StrolchSearch prepare() {
-					return orders("SortingType").where(state(isEqualTo(State.CREATED)));
+				public void define() {
+					orders("SortingType").where(state(isEqualTo(State.CREATED)));
 				}
 			};
 
-			List<StrolchRootElement> result;
+			List<Order> result;
 
 			result = search //
 					.search(tx) //
@@ -180,24 +178,23 @@ public class StrolchSearchTest {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-			Map<String, State> states = new StrolchSearch() {
+			Map<String, State> states = new StrolchSearch<Activity>() {
 				@Override
-				public StrolchSearch prepare() {
-					return activities() //
-							.where(state(isEqualTo(State.PLANNING)) //
+				public void define() {
+					activities() //
+							.where(state().isEqualTo(State.PLANNING) //
 									.and(name(isEqualTo("Activity"))) //
 							);
 				}
 			} //
 					.search(tx) //
-					.asActivities() //
 					.toMap(Activity::getId, Activity::getState);
 
 			assertEquals(1, states.size());
 		}
 	}
 
-	public class BallSearch extends StrolchSearch {
+	public class BallSearch extends StrolchSearch<Resource> {
 
 		private String id;
 		private String status;
@@ -210,8 +207,8 @@ public class StrolchSearchTest {
 		}
 
 		@Override
-		public StrolchSearch prepare() {
-			return resources("Ball") //
+		public void define() {
+			resources("Ball") //
 					.where(id(isEqualTo(this.id))  //
 							.or(param("parameters", "status", isEqualTo(this.status))  //
 									.and(not(param("parameters", "color", isEqualTo(this.color)))) //

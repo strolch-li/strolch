@@ -8,9 +8,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import li.strolch.model.Order;
-import li.strolch.model.Resource;
-import li.strolch.model.activity.Activity;
 import li.strolch.utils.collections.Paging;
 
 public class SearchResult<T> {
@@ -23,18 +20,6 @@ public class SearchResult<T> {
 
 	public Stream<T> asStream() {
 		return this.stream;
-	}
-
-	public RootElementSearchResult<Resource> asResources() {
-		return new RootElementSearchResult<>(this.stream.map(e -> (Resource) e));
-	}
-
-	public RootElementSearchResult<Order> asOrders() {
-		return new RootElementSearchResult<>(this.stream.map(e -> (Order) e));
-	}
-
-	public RootElementSearchResult<Activity> asActivities() {
-		return new RootElementSearchResult<>(this.stream.map(e -> (Activity) e));
 	}
 
 	public <U> SearchResult<U> map(Function<T, U> mapper) {

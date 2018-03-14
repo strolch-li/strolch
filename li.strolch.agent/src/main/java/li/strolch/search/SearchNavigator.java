@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
 
-public interface SearchNavigator {
+public interface SearchNavigator<T extends StrolchRootElement> {
 
-	Stream<? extends StrolchRootElement> navigate(StrolchTransaction tx);
+	Stream<T> navigate(StrolchTransaction tx);
 }
