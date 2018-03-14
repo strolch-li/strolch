@@ -18,34 +18,21 @@ package li.strolch.persistence.api;
 import java.util.List;
 import java.util.stream.Stream;
 
-import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.AuditTrail;
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.OrderMap;
-import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.api.StrolchLockException;
-import li.strolch.agent.api.StrolchRealm;
+import li.strolch.agent.api.*;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
-import li.strolch.model.Locator;
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
+import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.audit.AuditQuery;
 import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.query.ActivityQuery;
+import li.strolch.model.query.AuditQuery;
 import li.strolch.model.query.OrderQuery;
 import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.visitor.ActivityVisitor;
@@ -330,7 +317,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * If the given argument is true, then logging of a {@link TransactionCloseStrategy#READ_ONLY} will be suppressed
 	 *
-	 * @param SuppressDoNothingLogging
+	 * @param suppressDoNothingLogging
 	 * 		true to suppress logging of a {@link TransactionCloseStrategy#READ_ONLY}, false to enable logging
 	 */
 	void setSuppressDoNothingLogging(boolean suppressDoNothingLogging);

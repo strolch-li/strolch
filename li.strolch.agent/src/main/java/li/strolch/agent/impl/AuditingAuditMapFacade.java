@@ -15,16 +15,12 @@
  */
 package li.strolch.agent.impl;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.audit.AuditQuery;
 import li.strolch.model.audit.AuditVisitor;
+import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.dbc.DBC;

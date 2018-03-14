@@ -20,15 +20,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.audit.AuditQuery;
+import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.utils.collections.DateRange;

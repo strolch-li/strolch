@@ -15,33 +15,13 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.CONFIG_SRC;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_PASSWORD;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_STORE_PATH_DIR;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_URL;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_USERNAME;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.RUNTIME_PATH;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
+import java.sql.*;
+import java.util.*;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.StrolchRealm;
@@ -49,9 +29,9 @@ import li.strolch.model.ModelGenerator;
 import li.strolch.model.Tags;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.audit.AuditQuery;
 import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.audit.NoStrategyAuditVisitor;
+import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.postgresql.PostgreSqlAuditQueryVisitor;
@@ -60,6 +40,11 @@ import li.strolch.runtime.StrolchConstants;
 import li.strolch.testbase.runtime.RuntimeMock;
 import li.strolch.utils.StringMatchMode;
 import li.strolch.utils.collections.DateRange;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

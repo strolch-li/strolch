@@ -19,7 +19,7 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import li.strolch.model.audit.Audit;
-import li.strolch.model.audit.AuditQuery;
+import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;

@@ -20,8 +20,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.model.audit.*;
-import li.strolch.model.query.StringSelection;
+import li.strolch.model.audit.AccessType;
+import li.strolch.model.query.*;
 import li.strolch.utils.StringMatchMode;
 
 /**

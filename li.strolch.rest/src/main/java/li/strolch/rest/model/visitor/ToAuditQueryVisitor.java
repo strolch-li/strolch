@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.ActionSelection;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.audit.AuditQuery;
+import li.strolch.model.query.ActionSelection;
+import li.strolch.model.query.AuditQuery;
 import li.strolch.rest.model.AuditQueryData;
 import li.strolch.utils.StringMatchMode;
 import li.strolch.utils.collections.DateRange;
@@ -32,7 +32,7 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public class ToAuditQueryVisitor {
 
-	public li.strolch.model.audit.AuditQuery<Audit> create(AuditQueryData query) {
+	public li.strolch.model.query.AuditQuery<Audit> create(AuditQueryData query) {
 
 		// validate element type
 		String elementType = query.getElementType();
@@ -78,7 +78,7 @@ public class ToAuditQueryVisitor {
 		}
 
 		// identity
-		li.strolch.model.audit.IdentitySelection identitySelection = auditQuery.identity();
+		li.strolch.model.query.IdentitySelection identitySelection = auditQuery.identity();
 		if (StringHelper.isNotEmpty(query.getFirstname()))
 			identitySelection.firstnames(StringMatchMode.ci(), query.getFirstname());
 		if (StringHelper.isNotEmpty(query.getLastname()))

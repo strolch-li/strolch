@@ -4,7 +4,7 @@ import java.util.*;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.audit.AuditQuery;
+import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.query.inmemory.InMemoryAuditQuery;
 import li.strolch.runtime.query.inmemory.InMemoryAuditQueryVisitor;

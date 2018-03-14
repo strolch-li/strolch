@@ -18,7 +18,11 @@ package li.strolch.runtime.query.inmemory;
 import java.util.HashSet;
 import java.util.Set;
 
-import li.strolch.model.audit.*;
+import li.strolch.model.audit.AccessType;
+import li.strolch.model.audit.Audit;
+import li.strolch.model.query.ActionSelection;
+import li.strolch.model.query.ElementSelection;
+import li.strolch.model.query.IdentitySelection;
 import li.strolch.model.query.StringSelection;
 
 /**
