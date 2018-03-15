@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,10 +54,11 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	private Set<String> unsecuredPaths;
 
 	protected Set<String> getUnsecuredPaths() {
-		Set<String> list = new HashSet<>();
-		list.add("strolch/authentication");
-		list.add("strolch/authentication/sso");
-		return list;
+		Set<String> paths = new HashSet<>();
+		paths.add("strolch/authentication");
+		paths.add("strolch/authentication/sso");
+		paths.add("strolch/version");
+		return paths;
 	}
 
 	@Override
@@ -85,17 +86,19 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 				logger.error(
 						"No Authorization header or cookie on request to URL " + requestContext.getUriInfo().getPath());
 				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Missing Authorization!") //$NON-NLS-1$
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+						.entity("Missing Authorization!") //$NON-NLS-1$
 						.build());
 				return;
 			}
 
 			sessionId = cookie.getValue();
 			if (StringHelper.isEmpty(sessionId)) {
-				logger.error("Authorization Cookie value missing on request to URL "
-						+ requestContext.getUriInfo().getPath());
+				logger.error("Authorization Cookie value missing on request to URL " + requestContext.getUriInfo()
+						.getPath());
 				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Missing Authorization!") //$NON-NLS-1$
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+						.entity("Missing Authorization!") //$NON-NLS-1$
 						.build());
 				return;
 			}
@@ -113,8 +116,9 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 							.entity("User is not authenticated!").build()); //$NON-NLS-1$
 		} catch (StrolchAccessDeniedException e) {
 			logger.error(e.getMessage());
-			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("User is not authorized!").build()); //$NON-NLS-1$
+			requestContext.abortWith(
+					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("User is not authorized!").build()); //$NON-NLS-1$
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			requestContext.abortWith(
