@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,6 +38,7 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.service.JsonServiceArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.privilege.users.*;
@@ -133,6 +134,24 @@ public class PrivilegeUsersService {
 		PrivilegeUpdateUserService svc = new PrivilegeUpdateUserService();
 		PrivilegeUserArgument arg = new PrivilegeUserArgument();
 		arg.user = new PrivilegeElementFromJsonVisitor().userRepFromJson(updatedFields);
+
+		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
+		return handleServiceResult(svcResult);
+	}
+
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{username}/roles")
+	public Response updateRolesOnUser(@PathParam("username") String username, String data,
+			@Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+		PrivilegeUpdateUserRolesService svc = new PrivilegeUpdateUserRolesService();
+		JsonServiceArgument arg = svc.getArgumentInstance();
+		arg.objectId = username;
+		arg.jsonElement = new JsonParser().parse(data);
 
 		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
 		return handleServiceResult(svcResult);
@@ -256,7 +275,9 @@ public class PrivilegeUsersService {
 	private Response handleServiceResult(PrivilegeUserResult svcResult) {
 		if (svcResult.isOk()) {
 			UserRep userRep = svcResult.getUser();
-			return Response.ok(userRep.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON).build();
+			return Response
+					.ok(userRep.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
+					.build();
 		}
 		return ResponseUtil.toResponse(svcResult);
 	}
