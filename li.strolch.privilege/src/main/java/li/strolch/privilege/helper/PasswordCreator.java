@@ -120,12 +120,11 @@ public class PasswordCreator {
 			System.out.print("Password: ");
 			char[] password = r.readLine().trim().toCharArray();
 			System.out.print("Salt [random]: ");
-			String saltTemp = r.readLine().trim();
-			if (saltTemp.isEmpty()) {
-				saltTemp = encryptionHandler.nextToken();
+			String saltS = r.readLine().trim();
+			if (saltS.isEmpty()) {
+				saltS = encryptionHandler.nextToken();
 			}
-			String saltS = StringHelper.toHexString(saltTemp.getBytes());
-			byte[] salt = StringHelper.fromHexString(saltS);
+			byte[] salt = saltS.getBytes();
 
 			byte[] passwordHash = encryptionHandler.hashPassword(password, salt);
 			String passwordHashS = StringHelper.toHexString(passwordHash);
