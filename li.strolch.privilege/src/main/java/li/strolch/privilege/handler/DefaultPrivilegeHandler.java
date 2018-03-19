@@ -544,10 +544,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			firstName = userRep.getFirstname();
 		if (StringHelper.isNotEmpty(userRep.getLastname()))
 			lastName = userRep.getLastname();
-		if (userRep.getLocale() != null)
-			locale = userRep.getLocale();
 		if (userRep.getProperties() != null && !userRep.getProperties().isEmpty())
 			propertyMap = userRep.getProperties();
+
+		if (userRep.getLocale() != null)
+			locale = userRep.getLocale();
+		if (userRep.getUserState() != userState)
+			userState = userRep.getUserState();
+		if (!userRep.getRoles().equals(roles))
+			roles = userRep.getRoles();
 
 		// create new user
 		User newUser = new User(userId, username, password, salt, hashAlgorithm, hashIterations, hashKeyLength,

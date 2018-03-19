@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,25 +57,30 @@ public interface PrivilegeHandler {
 	 * <code>allAllowed</code>
 	 */
 	String PRIVILEGE_ACTION_PERSIST = "Persist";
+
 	/**
 	 * For Privilege "PrivilegeAction" value required to be able to persist session if not exempted by
 	 * <code>allAllowed</code>
 	 */
 	String PRIVILEGE_ACTION_PERSIST_SESSIONS = "PersistSessions";
+
 	/**
 	 * For Privilege "PrivilegeAction" value required to be able to reload changes if not exempted by
 	 * <code>allAllowed</code>
 	 */
 	String PRIVILEGE_ACTION_RELOAD = "Reload";
+
 	/**
 	 * For Privilege "PrivilegeAction" value required to get currently configured policies if not
 	 * <code>allAllowed</code>
 	 */
 	String PRIVILEGE_ACTION_GET_POLICIES = "GetPolicies";
+
 	/**
 	 * For Privilege "PrivilegeAction" value required to get a certificate if not <code>allAllowed</code>
 	 */
 	String PRIVILEGE_ACTION_GET_CERTIFICATE = "GetCertificate";
+
 	/**
 	 * For Privilege "PrivilegeAction" value required to get all certificates if not <code>allAllowed</code>
 	 */
@@ -87,14 +92,17 @@ public interface PrivilegeHandler {
 	 * Privilege "PrivilegeGetRole" which is used to validate that a user can get a specific role
 	 */
 	String PRIVILEGE_GET_ROLE = "PrivilegeGetRole";
+
 	/**
 	 * Privilege "PrivilegeAddRole" which is used to validate that a user can add a specific role
 	 */
 	String PRIVILEGE_ADD_ROLE = "PrivilegeAddRole";
+
 	/**
 	 * Privilege "PrivilegeRemoveRole" which is used to validate that a user can remove a specific role
 	 */
 	String PRIVILEGE_REMOVE_ROLE = "PrivilegeRemoveRole";
+
 	/**
 	 * Privilege "PrivilegeModifyRole" which is used to validate that a user can modify a specific role. <b>Note:</b>
 	 * This includes modifying of the privileges on the role
@@ -107,37 +115,51 @@ public interface PrivilegeHandler {
 	 * Privilege "PrivilegeGetUser" which is used to validate that a user can get a specific user
 	 */
 	String PRIVILEGE_GET_USER = "PrivilegeGetUser";
+
 	/**
 	 * Privilege "PrivilegeAddUser" which is used to validate that a user can add a specific user
 	 */
 	String PRIVILEGE_ADD_USER = "PrivilegeAddUser";
+
 	/**
 	 * Privilege "PrivilegeRemoveUser" which is used to validate that a user can remove a specific user
 	 */
 	String PRIVILEGE_REMOVE_USER = "PrivilegeRemoveUser";
+
 	/**
 	 * Privilege "PrivilegeModifyUser" which is used to validate that a user can modify a specific user
 	 */
 	String PRIVILEGE_MODIFY_USER = "PrivilegeModifyUser";
+
+	/**
+	 * Privilege "PRIVILEGE_MODIFY_USER_ROLES" which is used to validate that a user may modify the roles of a user
+	 * user
+	 */
+	String PRIVILEGE_MODIFY_USER_ROLES = "PrivilegeModifyUserRoles";
+
 	/**
 	 * Privilege "PrivilegeAddRoleToUser" which is used to validate that a user can add a specific role to a specific
 	 * user
 	 */
 	String PRIVILEGE_ADD_ROLE_TO_USER = "PrivilegeAddRoleToUser";
+
 	/**
 	 * Privilege "PrivilegeRemoveRoleFromUser" which is used to validate that a user can remove a specific role from a
 	 * specific user
 	 */
 	String PRIVILEGE_REMOVE_ROLE_FROM_USER = "PrivilegeRemoveRoleFromUser";
+
 	/**
 	 * Privilege "PRIVILEGE_SET_USER_LOCALE" which is used to validate that a user can set the locale of a user, or
 	 * their own
 	 */
 	String PRIVILEGE_SET_USER_LOCALE = "PrivilegeSetUserLocale";
+
 	/**
 	 * Privilege "PRIVILEGE_SET_USER_STATE" which is used to validate that a user can set the state of a user
 	 */
 	String PRIVILEGE_SET_USER_STATE = "PrivilegeSetUserState";
+
 	/**
 	 * Privilege "PRIVILEGE_SET_USER_PASSWORD" which is used to validate that a user can set the password of a user, or
 	 * their own
