@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,37 +15,16 @@
  */
 package li.strolch.rest.endpoint;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
 import java.text.MessageFormat;
 import java.util.Base64;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
-
+import com.google.gson.*;
 import li.strolch.exception.StrolchException;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
@@ -60,6 +39,8 @@ import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.helper.ExceptionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -92,8 +73,9 @@ public class AuthenticationService {
 				sb.append("Password was not given!"); //$NON-NLS-1$
 			}
 
-			char[] password = passwordE == null ? new char[] {}
-					: new String(Base64.getDecoder().decode(passwordE.getAsString())).toCharArray();
+			char[] password = passwordE == null ?
+					new char[] {} :
+					new String(Base64.getDecoder().decode(passwordE.getAsString())).toCharArray();
 			if (password.length < 3) {
 				if (sb.length() > 0)
 					sb.append("\n");
@@ -101,8 +83,10 @@ public class AuthenticationService {
 			}
 
 			if (sb.length() != 0) {
-				loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", sb.toString())); //$NON-NLS-2$
-				return Response.status(Status.BAD_REQUEST).entity(loginResult).build();
+				logger.error("Authentication failed due to: " + sb.toString());
+				loginResult.addProperty("msg",
+						MessageFormat.format("Could not log in due to: {0}", sb.toString())); //$NON-NLS-2$
+				return Response.status(Status.BAD_REQUEST).entity(loginResult.toString()).build();
 			}
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
@@ -116,11 +100,13 @@ public class AuthenticationService {
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
 		} catch (AccessDeniedException e) {
 			logger.error("Authentication failed due to: " + e.getMessage());
-			loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
+			loginResult.addProperty("msg",
+					MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
 		} catch (StrolchException | PrivilegeException e) {
 			logger.error(e.getMessage(), e);
-			loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
+			loginResult.addProperty("msg",
+					MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
 			return Response.status(Status.FORBIDDEN).entity(loginResult.toString()).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -150,11 +136,13 @@ public class AuthenticationService {
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
 		} catch (AccessDeniedException e) {
 			logger.error("Authentication failed due to: " + e.getMessage());
-			loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
+			loginResult.addProperty("msg",
+					MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
 		} catch (StrolchException | PrivilegeException e) {
 			logger.error(e.getMessage(), e);
-			loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
+			loginResult.addProperty("msg",
+					MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
 			return Response.status(Status.FORBIDDEN).entity(loginResult.toString()).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -186,12 +174,14 @@ public class AuthenticationService {
 
 		} catch (StrolchException | PrivilegeException e) {
 			logger.error("Failed to invalidate session due to: " + e.getMessage());
-			logoutResult.addProperty("msg", MessageFormat.format("Could not logout due to: {0}", e.getMessage())); //$NON-NLS-2$
+			logoutResult.addProperty("msg",
+					MessageFormat.format("Could not logout due to: {0}", e.getMessage())); //$NON-NLS-2$
 			return Response.status(Status.UNAUTHORIZED).entity(logoutResult.toString()).build();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
-			logoutResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
+			logoutResult
+					.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
 			return Response.serverError().entity(logoutResult.toString()).build();
 		}
 	}
