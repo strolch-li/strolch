@@ -1070,7 +1070,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			if (username == null || username.length() < 2) {
 				String msg = MessageFormat
 						.format("The given username ''{0}'' is shorter than 2 characters", username); //$NON-NLS-1$
-				throw new PrivilegeException(msg);
+				throw new InvalidCredentialsException(msg);
 			}
 
 			// check the password
@@ -1079,7 +1079,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// validate user has at least one role
 			Set<String> userRoles = user.getRoles();
 			if (userRoles.isEmpty()) {
-				throw new PrivilegeException(
+				throw new InvalidCredentialsException(
 						MessageFormat.format("User {0} does not have any roles defined!", username)); //$NON-NLS-1$
 			}
 
@@ -1104,10 +1104,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// return the certificate
 			return certificate;
 
+		} catch (PrivilegeException e) {
+			throw e;
 		} catch (RuntimeException e) {
 			String msg = "User {0} failed to authenticate: {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, username, e.getMessage());
-			throw new InvalidCredentialsException(msg, e);
+			throw new PrivilegeException(msg, e);
 		} finally {
 			clearPassword(password);
 		}

@@ -57,8 +57,8 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		JsonObject jsonObject = new JsonObject();
 
 		jsonObject.addProperty("name", privilegeRep.getName());
-		jsonObject.addProperty("policy", privilegeRep.getName());
-		jsonObject.addProperty("allAllowed", privilegeRep.getName());
+		jsonObject.addProperty("policy", privilegeRep.getPolicy());
+		jsonObject.addProperty("allAllowed", privilegeRep.isAllAllowed());
 
 		JsonArray denyListJ = new JsonArray();
 		privilegeRep.getDenyList().forEach(denyListJ::add);

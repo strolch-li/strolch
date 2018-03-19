@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,12 +45,17 @@ public class PrivilegeRep implements Serializable {
 	/**
 	 * Default constructor
 	 *
-	 * @param name       the name of this privilege, which is unique to all privileges known in the {@link PrivilegeHandler}
-	 * @param policy     the {@link PrivilegePolicy} configured to evaluate if the privilege is granted
-	 * @param allAllowed a boolean defining if a {@link Role} with this {@link IPrivilege} has unrestricted access to a
-	 *                   {@link Restrictable}
-	 * @param denyList   a list of deny rules for this {@link IPrivilege}
-	 * @param allowList  a list of allow rules for this {@link IPrivilege}
+	 * @param name
+	 * 		the name of this privilege, which is unique to all privileges known in the {@link PrivilegeHandler}
+	 * @param policy
+	 * 		the {@link PrivilegePolicy} configured to evaluate if the privilege is granted
+	 * @param allAllowed
+	 * 		a boolean defining if a {@link Role} with this {@link IPrivilege} has unrestricted access to a
+	 * 		{@link Restrictable}
+	 * @param denyList
+	 * 		a list of deny rules for this {@link IPrivilege}
+	 * @param allowList
+	 * 		a list of allow rules for this {@link IPrivilege}
 	 */
 	public PrivilegeRep(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
 		this.name = name;
@@ -89,7 +94,8 @@ public class PrivilegeRep implements Serializable {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 * 		the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -103,7 +109,8 @@ public class PrivilegeRep implements Serializable {
 	}
 
 	/**
-	 * @param policy the policy to set
+	 * @param policy
+	 * 		the policy to set
 	 */
 	public void setPolicy(String policy) {
 		this.policy = policy;
@@ -117,7 +124,8 @@ public class PrivilegeRep implements Serializable {
 	}
 
 	/**
-	 * @param allAllowed the allAllowed to set
+	 * @param allAllowed
+	 * 		the allAllowed to set
 	 */
 	public void setAllAllowed(boolean allAllowed) {
 		this.allAllowed = allAllowed;
@@ -131,7 +139,8 @@ public class PrivilegeRep implements Serializable {
 	}
 
 	/**
-	 * @param denyList the denyList to set
+	 * @param denyList
+	 * 		the denyList to set
 	 */
 	public void setDenyList(Set<String> denyList) {
 		this.denyList = denyList;
@@ -145,7 +154,8 @@ public class PrivilegeRep implements Serializable {
 	}
 
 	/**
-	 * @param allowList the allowList to set
+	 * @param allowList
+	 * 		the allowList to set
 	 */
 	public void setAllowList(Set<String> allowList) {
 		this.allowList = allowList;

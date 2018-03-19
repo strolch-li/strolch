@@ -6,6 +6,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import li.strolch.privilege.model.PrivilegeRep;
+import li.strolch.privilege.model.RoleRep;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
 
@@ -13,6 +15,63 @@ public class PrivilegeElementFromJsonVisitor {
 
 	public UserRep userRepFromJson(String string) {
 		return userRepFromJson(new JsonParser().parse(string).getAsJsonObject());
+	}
+
+	public RoleRep roleRepFromJson(String string) {
+		return roleRepFromJson(new JsonParser().parse(string).getAsJsonObject());
+	}
+
+	public PrivilegeRep privilegeRepFromJson(String string) {
+		return privilegeRepFromJson(new JsonParser().parse(string).getAsJsonObject());
+	}
+
+	public RoleRep roleRepFromJson(JsonObject jsonObject) {
+
+		JsonElement nameE = jsonObject.get("name");
+		JsonElement privilegesE = jsonObject.get("privileges");
+
+		String name = nameE == null ? null : nameE.getAsString();
+
+		List<PrivilegeRep> privileges = new ArrayList<>();
+		if (privilegesE != null) {
+			JsonArray privilegesArr = privilegesE.getAsJsonArray();
+			for (JsonElement privilegeE : privilegesArr) {
+				privileges.add(privilegeRepFromJson(privilegeE.getAsJsonObject()));
+			}
+		}
+
+		return new RoleRep(name, privileges);
+	}
+
+	public PrivilegeRep privilegeRepFromJson(JsonObject privilegeJ) {
+
+		JsonElement privilegeNameE = privilegeJ.get("name");
+		JsonElement policyE = privilegeJ.get("policy");
+		JsonElement allAllowedE = privilegeJ.get("allAllowed");
+		JsonElement denyListE = privilegeJ.get("denyList");
+		JsonElement allowListE = privilegeJ.get("allowList");
+
+		String privilegeName = privilegeNameE == null ? null : privilegeNameE.getAsString();
+		String policy = policyE == null ? null : policyE.getAsString();
+		boolean allAllowed = allAllowedE != null && allAllowedE.getAsBoolean();
+
+		Set<String> denyList = new HashSet<>();
+		if (denyListE != null) {
+			JsonArray denyListArr = denyListE.getAsJsonArray();
+			for (JsonElement denyValueE : denyListArr) {
+				denyList.add(denyValueE.getAsString());
+			}
+		}
+
+		Set<String> allowList = new HashSet<>();
+		if (allowListE != null) {
+			JsonArray allowListArr = allowListE.getAsJsonArray();
+			for (JsonElement allowValueE : allowListArr) {
+				allowList.add(allowValueE.getAsString());
+			}
+		}
+
+		return new PrivilegeRep(privilegeName, policy, allAllowed, denyList, allowList);
 	}
 
 	public UserRep userRepFromJson(JsonObject jsonObject) {
