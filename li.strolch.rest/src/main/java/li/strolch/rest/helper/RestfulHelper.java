@@ -24,7 +24,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.model.StrolchRootElement;
-import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.model.QueryData;
@@ -51,7 +51,7 @@ public class RestfulHelper {
 	}
 
 	public static <T extends StrolchRootElement> JsonObject toJson(QueryData queryData, long dataSetSize,
-			RootElementSearchResult<T> result, StrolchElementVisitor<JsonElement> toJsonVisitor) {
+			RootElementSearchResult<T> result, StrolchRootElementVisitor<JsonObject> toJsonVisitor) {
 
 		// paging
 		Paging<T> paging = result.toPaging(queryData.getOffset(), queryData.getLimit());

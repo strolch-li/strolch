@@ -48,6 +48,9 @@ import li.strolch.model.Tags;
 import li.strolch.model.Tags.Json;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.*;
+import li.strolch.model.visitor.ActivityVisitor;
+import li.strolch.model.visitor.OrderVisitor;
+import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.model.xml.*;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -70,6 +73,7 @@ import li.strolch.service.UpdateResourceService.UpdateResourceArg;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -390,7 +394,8 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}")
 	public Response queryResourcesByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
-			@PathParam("realm") String realm, @PathParam("type") String type) {
+			@PathParam("realm") String realm, @PathParam("type") String type,
+			@QueryParam("overview") Boolean overview) {
 
 		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -410,8 +415,20 @@ public class Inspector {
 		result = SearchBuilder.orderBy(result, queryData.getOrderBy(), queryData.isDescending());
 
 		// build JSON response
-		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, toJsonVisitor);
+		ResourceVisitor<JsonObject> visitor;
+		if (overview == null || !overview) {
+			visitor = new StrolchRootElementToJsonVisitor().withVersion().asResourceVisitor();
+		} else {
+			visitor = e -> {
+				JsonObject jsonObject = new JsonObject();
+				jsonObject.addProperty(Json.OBJECT_TYPE, e.getObjectType());
+				jsonObject.addProperty(Json.ID, e.getId());
+				jsonObject.addProperty(Json.NAME, e.getName());
+				jsonObject.addProperty(Json.TYPE, e.getType());
+				return jsonObject;
+			};
+		}
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, visitor);
 
 		// marshall result
 		return Response.ok(toString(root)).build();
@@ -421,7 +438,8 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders/{type}")
 	public Response queryOrdersByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
-			@PathParam("realm") String realm, @PathParam("type") String type) {
+			@PathParam("realm") String realm, @PathParam("type") String type,
+			@QueryParam("overview") Boolean overview) {
 
 		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -441,8 +459,22 @@ public class Inspector {
 		result = SearchBuilder.orderBy(result, queryData.getOrderBy(), queryData.isDescending());
 
 		// build JSON response
-		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, toJsonVisitor);
+		OrderVisitor<JsonObject> visitor;
+		if (overview == null || !overview) {
+			visitor = new StrolchRootElementToJsonVisitor().withVersion().asOrderVisitor();
+		} else {
+			visitor = e -> {
+				JsonObject jsonObject = new JsonObject();
+				jsonObject.addProperty(Json.OBJECT_TYPE, e.getObjectType());
+				jsonObject.addProperty(Json.ID, e.getId());
+				jsonObject.addProperty(Json.NAME, e.getName());
+				jsonObject.addProperty(Json.TYPE, e.getType());
+				jsonObject.addProperty(Json.STATE, e.getState().name());
+				jsonObject.addProperty(Json.DATE, ISO8601FormatFactory.getInstance().formatDate(e.getDate()));
+				return jsonObject;
+			};
+		}
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, visitor);
 
 		// marshall result
 		return Response.ok(toString(root)).build();
@@ -451,8 +483,9 @@ public class Inspector {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}")
-	public Response queryActivitiesByType(@BeanParam QueryData queryData, @PathParam("realm") String realm,
-			@PathParam("type") String type, @Context HttpServletRequest request) {
+	public Response queryActivitiesByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
+			@PathParam("realm") String realm, @PathParam("type") String type,
+			@QueryParam("overview") Boolean overview) {
 
 		queryData.initializeUnsetFields();
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -472,8 +505,22 @@ public class Inspector {
 		result = SearchBuilder.orderBy(result, queryData.getOrderBy(), queryData.isDescending());
 
 		// build JSON response
-		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, toJsonVisitor);
+		ActivityVisitor<JsonObject> visitor;
+		if (overview == null || !overview) {
+			visitor = new StrolchRootElementToJsonVisitor().withVersion().asActivityVisitor();
+		} else {
+			visitor = e -> {
+				JsonObject jsonObject = new JsonObject();
+				jsonObject.addProperty(Json.OBJECT_TYPE, e.getObjectType());
+				jsonObject.addProperty(Json.ID, e.getId());
+				jsonObject.addProperty(Json.NAME, e.getName());
+				jsonObject.addProperty(Json.TYPE, e.getType());
+				jsonObject.addProperty(Json.STATE, e.getState().name());
+				jsonObject.addProperty(Json.TIME_ORDERING, e.getTimeOrdering().name());
+				return jsonObject;
+			};
+		}
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, visitor);
 
 		// marshall result
 		return Response.ok(toString(root)).build();
