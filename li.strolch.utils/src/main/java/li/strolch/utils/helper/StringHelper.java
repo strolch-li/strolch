@@ -774,6 +774,20 @@ public class StringHelper {
 	}
 
 	/**
+	 * Returns the string trimmed, or the empty string if null
+	 *
+	 * @param value
+	 * 		the value to trim
+	 *
+	 * @return the trimmed string, or the empty string if null
+	 */
+	public static String trimOrEmpty(String value) {
+		if (value == null)
+			return EMPTY;
+		return value.trim();
+	}
+
+	/**
 	 * Return a pseudo unique id which is incremented on each call. The id is initialized from the current time
 	 *
 	 * @return a pseudo unique id
