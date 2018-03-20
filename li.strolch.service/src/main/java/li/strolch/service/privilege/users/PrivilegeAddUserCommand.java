@@ -11,7 +11,6 @@ import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
 /**
- * 
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PrivilegeAddUserCommand extends Command {
@@ -48,11 +47,13 @@ public class PrivilegeAddUserCommand extends Command {
 		PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler().getPrivilegeHandler();
 
 		this.userOut = privilegeHandler.addUser(tx().getCertificate(), this.userIn, null);
+		privilegeHandler.persist(tx().getCertificate());
 
 		tx().setSuppressAuditsForAudits(true);
 
-		this.audit = tx().auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE,
-				StrolchPrivilegeConstants.USER, this.userOut.getUsername());
+		this.audit = tx()
+				.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.USER,
+						this.userOut.getUsername());
 		tx().getAuditTrail().add(tx(), this.audit);
 	}
 
