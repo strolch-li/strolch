@@ -13,5 +13,8 @@
 		<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
+		<Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
 	</Role>
 </Roles>
