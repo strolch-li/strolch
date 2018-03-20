@@ -48,11 +48,6 @@ import li.strolch.model.Tags;
 import li.strolch.model.Tags.Json;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.*;
-import li.strolch.model.query.ActivityQuery;
-import li.strolch.model.query.OrderQuery;
-import li.strolch.model.query.ResourceQuery;
-import li.strolch.model.query.StrolchTypeNavigation;
-import li.strolch.model.query.parser.QueryParser;
 import li.strolch.model.xml.*;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -62,6 +57,9 @@ import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.QueryData;
+import li.strolch.search.GenericSearch;
+import li.strolch.search.RootElementSearchResult;
+import li.strolch.search.SearchBuilder;
 import li.strolch.service.*;
 import li.strolch.service.AddActivityService.AddActivityArg;
 import li.strolch.service.AddOrderService.AddOrderArg;
@@ -398,26 +396,22 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		// parse the query string
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(queryData.getQuery(), true, true, false);
-
-		// set navigation to requested type
-		query.setNavigation(new StrolchTypeNavigation(type));
+		GenericSearch<Resource> search = SearchBuilder.buildResourceSearch(queryData.getQuery(), type);
 
 		// query the data
-		List<Resource> resources;
+		RootElementSearchResult<Resource> result;
 		long dataSetSize = 0L;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			ResourceMap resourceMap = tx.getResourceMap();
-			dataSetSize = resourceMap.querySize(tx);
-			resources = tx.doQuery(query);
+			dataSetSize = tx.getResourceMap().querySize(tx);
+			result = search.search(tx);
 		}
 
 		// do ordering
-		RestfulHelper.doOrdering(queryData, resources);
+		result = SearchBuilder.orderBy(result, queryData.getOrderBy(), queryData.isDescending());
 
 		// build JSON response
 		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, resources, toJsonVisitor);
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, toJsonVisitor);
 
 		// marshall result
 		return Response.ok(toString(root)).build();
@@ -433,24 +427,22 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		// parse the query string
-		OrderQuery<Order> query = QueryParser.parseToOrderQuery(queryData.getQuery(), true, true, false);
-		query.setNavigation(new StrolchTypeNavigation(type));
+		GenericSearch<Order> search = SearchBuilder.buildOrderSearch(queryData.getQuery(), type);
 
 		// query the data
-		List<Order> orders;
+		RootElementSearchResult<Order> result;
 		long dataSetSize = 0L;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			OrderMap orderMap = tx.getOrderMap();
-			dataSetSize = orderMap.querySize(tx);
-			orders = tx.doQuery(query);
+			dataSetSize = tx.getOrderMap().querySize(tx);
+			result = search.search(tx);
 		}
 
 		// do ordering
-		RestfulHelper.doOrdering(queryData, orders);
+		result = SearchBuilder.orderBy(result, queryData.getOrderBy(), queryData.isDescending());
 
 		// build JSON response
 		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, orders, toJsonVisitor);
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, toJsonVisitor);
 
 		// marshall result
 		return Response.ok(toString(root)).build();
@@ -466,24 +458,22 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		// parse the query string
-		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true, true, false);
-		query.setNavigation(new StrolchTypeNavigation(type));
+		GenericSearch<Activity> search = SearchBuilder.buildActivitySearch(queryData.getQuery(), type);
 
 		// query the data
-		List<Activity> activities;
+		RootElementSearchResult<Activity> result;
 		long dataSetSize = 0L;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			ActivityMap activityMap = tx.getActivityMap();
-			dataSetSize = activityMap.querySize(tx);
-			activities = tx.doQuery(query);
+			dataSetSize = tx.getActivityMap().querySize(tx);
+			result = search.search(tx);
 		}
 
 		// do ordering
-		RestfulHelper.doOrdering(queryData, activities);
+		result = SearchBuilder.orderBy(result, queryData.getOrderBy(), queryData.isDescending());
 
 		// build JSON response
 		StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, activities, toJsonVisitor);
+		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, toJsonVisitor);
 
 		// marshall result
 		return Response.ok(toString(root)).build();
@@ -498,8 +488,8 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		queryData.initializeUnsetFields();
-		ResourceQuery<Resource> query = QueryParser.parseToResourceQuery(queryData.getQuery(), true, true, false);
-		query.setNavigation(new StrolchTypeNavigation(type));
+
+		GenericSearch<Resource> search = SearchBuilder.buildResourceSearch(queryData.getQuery(), type);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -507,7 +497,7 @@ public class Inspector {
 				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
-				tx.doQuery(query).forEach(e -> e.accept(visitor));
+				search.search(tx).map(e -> e.accept(visitor));
 
 				writer.writeEndDocument();
 				stream.flush();
@@ -531,8 +521,8 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		queryData.initializeUnsetFields();
-		OrderQuery<Order> query = QueryParser.parseToOrderQuery(queryData.getQuery(), true, true, false);
-		query.setNavigation(new StrolchTypeNavigation(type));
+
+		GenericSearch<Order> search = SearchBuilder.buildOrderSearch(queryData.getQuery(), type);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -540,7 +530,7 @@ public class Inspector {
 				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
-				tx.doQuery(query).forEach(e -> e.accept(visitor));
+				search.search(tx).map(e -> e.accept(visitor));
 
 				writer.writeEndDocument();
 				stream.flush();
@@ -564,8 +554,8 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		queryData.initializeUnsetFields();
-		ActivityQuery<Activity> query = QueryParser.parseToActivityQuery(queryData.getQuery(), true, true, false);
-		query.setNavigation(new StrolchTypeNavigation(type));
+
+		GenericSearch<Activity> search = SearchBuilder.buildActivitySearch(queryData.getQuery(), type);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -573,7 +563,7 @@ public class Inspector {
 				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
-				tx.doQuery(query).forEach(e -> e.accept(visitor));
+				search.search(tx).map(e -> e.accept(visitor));
 
 				writer.writeEndDocument();
 				stream.flush();

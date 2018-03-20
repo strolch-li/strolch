@@ -49,9 +49,12 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 
 		// then validate status
 		DBC.PRE.assertNotNull("navigation not set! Call one of resources(), orders() or activities()", this.navigator);
-		DBC.PRE.assertNotNull("expression not set! Call where()!", this.expression);
 
-		Stream<T> stream = this.navigator.navigate(tx).filter(e -> this.expression.matches(e));
+		Stream<T> stream = this.navigator.navigate(tx);
+
+		if (this.expression != null)
+			stream = stream.filter(e -> this.expression.matches(e));
+
 		return new RootElementSearchResult<T>(stream);
 	}
 

@@ -235,6 +235,18 @@ public class StrolchSearchTest {
 		}
 	}
 
+	@Test
+	public void shouldSearchGeneric2() {
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+
+			assertEquals(7, new GenericSearch<Resource>() //
+					.resources() //
+					.search(tx) //
+					.toList().size());
+		}
+	}
+
 	public class BallSearch extends StrolchSearch<Resource> {
 
 		private String id;

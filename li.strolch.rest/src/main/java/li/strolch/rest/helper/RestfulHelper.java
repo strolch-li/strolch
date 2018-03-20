@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,23 +24,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.model.QueryData;
+import li.strolch.search.RootElementSearchResult;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class RestfulHelper {
-
-	private static final Logger logger = LoggerFactory.getLogger(RestfulHelper.class);
 
 	public static Locale getLocale(HttpHeaders headers) {
 		if (headers == null || StringHelper.isEmpty(headers.getHeaderString(HttpHeaders.ACCEPT_LANGUAGE)))
@@ -55,10 +51,10 @@ public class RestfulHelper {
 	}
 
 	public static <T extends StrolchRootElement> JsonObject toJson(QueryData queryData, long dataSetSize,
-			List<T> elements, StrolchElementVisitor<JsonElement> toJsonVisitor) {
+			RootElementSearchResult<T> result, StrolchElementVisitor<JsonElement> toJsonVisitor) {
 
 		// paging
-		Paging<T> paging = Paging.asPage(elements, queryData.getOffset(), queryData.getLimit());
+		Paging<T> paging = result.toPaging(queryData.getOffset(), queryData.getLimit());
 
 		// get page
 		List<T> page = paging.getPage();
@@ -86,22 +82,5 @@ public class RestfulHelper {
 		}
 		root.add("data", data);
 		return root;
-	}
-
-	public static <T extends StrolchRootElement> void doOrdering(QueryData queryData, List<T> resources) {
-		if (StringHelper.isNotEmpty(queryData.getOrderBy())) {
-			if (queryData.getOrderBy().equals(Tags.Json.ID)) {
-				resources.sort((r1, r2) -> !queryData.isDescending() ? r1.getId().compareTo(r2.getId())
-						: r2.getId().compareTo(r1.getId()));
-			} else if (queryData.getOrderBy().equals(Tags.Json.NAME)) {
-				resources.sort((r1, r2) -> !queryData.isDescending() ? r1.getName().compareTo(r2.getName())
-						: r2.getName().compareTo(r1.getName()));
-			} else if (queryData.getOrderBy().equals(Tags.Json.TYPE)) {
-				resources.sort((r1, r2) -> !queryData.isDescending() ? r1.getType().compareTo(r2.getType())
-						: r2.getType().compareTo(r1.getType()));
-			} else {
-				logger.warn("Unhandled ordering " + queryData.getOrderBy());
-			}
-		}
 	}
 }

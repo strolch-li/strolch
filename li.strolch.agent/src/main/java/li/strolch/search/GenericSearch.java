@@ -10,24 +10,24 @@ public class GenericSearch<T extends StrolchRootElement> extends StrolchSearch<T
 	}
 
 	@SuppressWarnings("unchecked")
-	protected GenericSearch<T> resources(String... types) {
+	public GenericSearch<T> resources(String... types) {
 		super.resources(types);
 		return this;
 	}
 
 	@SuppressWarnings("unchecked")
-	protected GenericSearch<T> orders(String... types) {
+	public GenericSearch<T> orders(String... types) {
 		super.orders(types);
 		return this;
 	}
 
 	@SuppressWarnings("unchecked")
-	protected GenericSearch<T> activities(String... types) {
+	public GenericSearch<T> activities(String... types) {
 		super.activities(types);
 		return this;
 	}
 
-	protected GenericSearch<T> where(SearchExpression expression) {
+	public GenericSearch<T> where(SearchExpression expression) {
 		super.where(expression);
 		return this;
 	}

@@ -68,11 +68,6 @@
             <artifactId>gson</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.petitparser.java-petitparser</groupId>
-            <artifactId>petitparser-core</artifactId>
-        </dependency>
-
         <!-- test -->
         <dependency>
             <groupId>li.strolch</groupId>

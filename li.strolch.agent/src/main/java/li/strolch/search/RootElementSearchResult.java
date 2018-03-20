@@ -13,7 +13,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 		super(stream);
 	}
 
-	public SearchResult<T> orderById(boolean reversed) {
+	public RootElementSearchResult<T> orderById(boolean reversed) {
 		Comparator<T> comparator = Comparator.comparing(StrolchElement::getId);
 		if (reversed)
 			comparator = comparator.reversed();
@@ -21,7 +21,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 		return this;
 	}
 
-	public SearchResult<T> orderByName(boolean reversed) {
+	public RootElementSearchResult<T> orderByName(boolean reversed) {
 		Comparator<T> comparator = Comparator.comparing(StrolchElement::getName);
 		if (reversed)
 			comparator = comparator.reversed();
@@ -29,7 +29,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 		return this;
 	}
 
-	public SearchResult<T> orderByParam(String bagId, String paramId, boolean reversed) {
+	public RootElementSearchResult<T> orderByParam(String bagId, String paramId, boolean reversed) {
 		Comparator<T> comparator = (o1, o2) -> {
 			Parameter<?> param1 = o1.getParameter(bagId, paramId);
 			Parameter<?> param2 = o2.getParameter(bagId, paramId);
