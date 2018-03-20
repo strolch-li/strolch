@@ -549,9 +549,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		if (userRep.getLocale() != null)
 			locale = userRep.getLocale();
-		if (userRep.getUserState() != userState)
+		if (userRep.getUserState() != null)
 			userState = userRep.getUserState();
-		if (!userRep.getRoles().equals(roles))
+		if (userRep.getRoles() != null && !userRep.getRoles().equals(roles))
 			roles = userRep.getRoles();
 
 		// create new user

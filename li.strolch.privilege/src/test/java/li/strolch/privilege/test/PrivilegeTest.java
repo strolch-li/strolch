@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
+import li.strolch.privilege.base.InvalidCredentialsException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -129,8 +130,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void testFailAuthenticationNOk() throws Exception {
-		this.exception.expect(AccessDeniedException.class);
-		this.exception.expectMessage("User admin failed to authenticate: Password is incorrect for admin");
+		this.exception.expect(InvalidCredentialsException.class);
+		this.exception.expectMessage("Password is incorrect for admin");
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_BAD));
 		} finally {
@@ -141,7 +142,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	@Test
 	public void testFailAuthenticationPWNull() throws Exception {
 		this.exception.expect(PrivilegeException.class);
-		this.exception.expectMessage("User admin failed to authenticate: A password may not be empty!");
+		this.exception.expectMessage("A password may not be empty!");
 		try {
 			login(ADMIN, null);
 		} finally {
