@@ -94,6 +94,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private String action;
 	private Certificate certificate;
+	private PrivilegeContext privilegeContext;
 
 	public AbstractTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate,
 			String action) {
@@ -169,6 +170,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public Certificate getCertificate() {
 		return certificate;
+	}
+
+	@Override
+	public PrivilegeContext getPrivilegeContext() {
+		if (this.privilegeContext == null) {
+			this.privilegeContext = this.privilegeHandler.validate(this.certificate);
+		}
+		return this.privilegeContext;
 	}
 
 	@Override
@@ -336,8 +345,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private void assertQueryAllowed(StrolchQuery query) {
 		try {
-			PrivilegeContext privilegeContext = this.privilegeHandler.validate(this.certificate);
-			privilegeContext.validateAction(query);
+			getPrivilegeContext().validateAction(query);
 		} catch (PrivilegeException e) {
 			throw new StrolchAccessDeniedException(this.certificate, query, ExceptionHelper.getExceptionMessage(e), e);
 		}
@@ -819,7 +827,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public void assertHasPrivilege(Operation operation, StrolchRootElement element) throws AccessDeniedException {
 		DBC.PRE.assertNotNull("operation must not be null", operation);
 		DBC.PRE.assertNotNull("element must not be null", element);
-		this.privilegeHandler.validate(this.certificate)
+		getPrivilegeContext()
 				.validateAction(new TransactedRestrictable(this, operation.getPrivilegeName(element), element));
 	}
 

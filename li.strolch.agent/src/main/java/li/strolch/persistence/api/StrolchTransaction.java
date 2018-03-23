@@ -40,6 +40,7 @@ import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
 
@@ -96,6 +97,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the {@link Certificate} which allowed this TX to be opened
 	 */
 	public Certificate getCertificate();
+
+	/**
+	 * Returns the {@link PrivilegeContext} for this TX's certificate
+	 *
+	 * @return the {@link PrivilegeContext} for this TX's certificate
+	 */
+	public PrivilegeContext getPrivilegeContext();
 
 	/**
 	 * Returns a reference to the {@link AuditTrail} for the {@link StrolchRealm} for which this transaction was opened
