@@ -122,6 +122,31 @@ public class StrolchSearchTest {
 	}
 
 	@Test
+	public void shouldSearchResources1() {
+
+		StrolchRootElementToJsonVisitor toJsonVisitor = new StrolchRootElementToJsonVisitor();
+
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+
+			List<JsonObject> result = new NewBallSearch() //
+					.id("the-id") //
+					.status("bla") //
+					.color("yellow") //
+
+					// do search, returns SearchResult
+					.search(tx)
+					// transform, either:
+					.map(a -> a.accept(toJsonVisitor))
+					// finishing as toList, toSet, toPaging
+					.toList();
+
+			assertEquals(1, result.size());
+		}
+	}
+
+	@Test
 	public void shouldSearchOrders() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
@@ -244,6 +269,29 @@ public class StrolchSearchTest {
 					.resources() //
 					.search(tx) //
 					.toList().size());
+		}
+	}
+
+	public class NewBallSearch extends StrolchSearch<Resource> {
+
+		@Override
+		protected void define() {
+			resources("Ball");
+		}
+
+		public NewBallSearch id(String id) {
+			where(id(isEqualTo(id)));
+			return this;
+		}
+
+		public NewBallSearch status(String status) {
+			where(param("parameters", "status", isEqualTo(status)));
+			return this;
+		}
+
+		public NewBallSearch color(String color) {
+			where(param("parameters", "color", isEqualTo(color)));
+			return this;
 		}
 	}
 

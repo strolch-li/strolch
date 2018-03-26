@@ -25,6 +25,29 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	}
 
 	/**
+	 * Allows to implement the search expression in one method, or to prepare a project specific search expression
+	 */
+	protected void define() {
+		// default is empty
+	}
+
+	/**
+	 * Adds  the given {@link SearchExpression} to the current search
+	 *
+	 * @param expression
+	 * 		the {@link SearchExpression} to add to this search
+	 *
+	 * @return this for chaining
+	 */
+	public StrolchSearch<T> where(SearchExpression expression) {
+		if (this.expression == null)
+			this.expression = expression;
+		else
+			this.expression = this.expression.and(expression);
+		return this;
+	}
+
+	/**
 	 * Marks this search as an internal search, thus allowing it to be performed without the authenticated user to need
 	 * the required privilege
 	 *
@@ -58,8 +81,6 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 		return new RootElementSearchResult<T>(stream);
 	}
 
-	protected abstract void define();
-
 	@SuppressWarnings("unchecked")
 	protected StrolchSearch<T> resources(String... types) {
 		this.navigator = tx -> (Stream<T>) tx.streamResources(types);
@@ -75,14 +96,6 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	@SuppressWarnings("unchecked")
 	protected StrolchSearch<T> activities(String... types) {
 		this.navigator = tx -> (Stream<T>) tx.streamActivities(types);
-		return this;
-	}
-
-	protected StrolchSearch<T> where(SearchExpression expression) {
-		if (this.expression == null)
-			this.expression = expression;
-		else
-			this.expression = this.expression.and(expression);
 		return this;
 	}
 
