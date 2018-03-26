@@ -27,9 +27,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	/**
 	 * Allows to implement the search expression in one method, or to prepare a project specific search expression
 	 */
-	protected void define() {
-		// default is empty
-	}
+	protected abstract void define();
 
 	/**
 	 * Adds  the given {@link SearchExpression} to the current search
