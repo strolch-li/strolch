@@ -224,6 +224,12 @@ public class ByteHelper {
 		return new byte[] { low, high };
 	}
 
+	public static byte[] toByteArrayBigEndian(short value) {
+		byte low = (byte) (value & 0xff);
+		byte high = (byte) ((value >> 8) & 0xff);
+		return new byte[] { high, low };
+	}
+
 	public static byte reverse(byte x) {
 		byte b = 0;
 		for (int i = 0; i < 8; ++i) {
