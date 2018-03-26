@@ -15,30 +15,16 @@
  */
 package li.strolch.planning;
 
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
-import static li.strolch.model.ModelGenerator.STATE_TIME_0;
-import static li.strolch.model.ModelGenerator.STATE_TIME_10;
-import static li.strolch.model.ModelGenerator.STATE_TIME_20;
+import static li.strolch.model.ModelGenerator.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.SortedSet;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import li.strolch.model.Locator;
-import li.strolch.model.ModelGenerator;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.State;
-import li.strolch.model.Tags;
+import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.parameter.IntegerParameter;
-import li.strolch.model.parameter.Parameter;
 import li.strolch.model.timedstate.IntegerTimedState;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.ITimeValue;
@@ -48,7 +34,9 @@ import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.planning.PlanActionCommand;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
@@ -139,7 +127,7 @@ public class PlanActionTest {
 	 */
 	protected static void createChanges(Action action) {
 
-		Parameter<Integer> parameter = action.getParameter("objective", "quantity");
+		IntegerParameter parameter = action.getParameter("objective", "quantity");
 		Integer quantity = parameter.getValue();
 
 		IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(quantity));
