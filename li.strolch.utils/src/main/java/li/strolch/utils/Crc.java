@@ -3,9 +3,29 @@ package li.strolch.utils;
 import static li.strolch.utils.helper.ByteHelper.toByteArrayBigEndian;
 
 /**
- * Implements Cyclic Redundancy Checks
+ * <p>Implements Cyclic Redundancy Checks</p>
+ *
+ * <p>Fast byte-wise CRC16 calculation, using the code from Christian d'Heureuse, Inventec Informatik AG, Switzerland, www.source-code.biz</p>
  */
 public class Crc {
+
+	private static final short[] crcTable;
+
+	static {
+		int poly = 0x1021;
+		crcTable = new short[256];
+		for (int x = 0; x < 256; x++) {
+			int w = x << 8;
+			for (int i = 0; i < 8; i++) {
+				if ((w & 0x8000) != 0) {
+					w = (w << 1) ^ poly;
+				} else {
+					w = w << 1;
+				}
+			}
+			crcTable[x] = (short) w;
+		}
+	}
 
 	/**
 	 * Implements a CRC-CCITT (XModem), using the initial value 0x0000 and the polynomial 0x1021
@@ -32,20 +52,10 @@ public class Crc {
 	 * @see <a href="https://www.lammertbies.nl/comm/info/crc-calculation.html">crc-calculation</a>
 	 */
 	public static short crcCcittBytes(byte[] bytes) {
-		int crc = 0x0000;          // initial value
-		int polynomial = 0x1021;   // 0001 0000 0010 0001  (0, 5, 12)
-
-		for (byte b : bytes) {
-			for (int i = 0; i < 8; i++) {
-				boolean bit = ((b >> (7 - i) & 1) == 1);
-				boolean c15 = ((crc >> 15 & 1) == 1);
-				crc <<= 1;
-				if (c15 ^ bit)
-					crc ^= polynomial;
-			}
+		int crc = 0x0000;
+		for (byte aData : bytes) {
+			crc = ((crc << 8) & 0xFF00) ^ (crcTable[(crc >> 8) ^ (aData & 0xFF)] & 0xFFFF);
 		}
-
-		crc &= 0xffff;
 		return (short) crc;
 	}
 }
