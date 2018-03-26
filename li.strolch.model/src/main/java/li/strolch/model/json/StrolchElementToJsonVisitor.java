@@ -1,5 +1,7 @@
 package li.strolch.model.json;
 
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
@@ -10,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.*;
+import li.strolch.model.Tags.Json;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -268,7 +271,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	protected JsonObject toJson(Resource element) {
 
 		JsonObject rootJ = new JsonObject();
-		rootJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.RESOURCE);
+		rootJ.addProperty(Json.OBJECT_TYPE, Json.RESOURCE);
 
 		toJson(element, rootJ);
 
@@ -286,11 +289,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	protected JsonObject toJson(Order element) {
 
 		JsonObject rootJ = new JsonObject();
-		rootJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ORDER);
+		rootJ.addProperty(Json.OBJECT_TYPE, Json.ORDER);
 
 		toJson(element, rootJ);
-		rootJ.addProperty(Tags.Json.DATE, formatDate(element.getDate()));
-		rootJ.addProperty(Tags.Json.STATE, element.getState().getName());
+		rootJ.addProperty(Json.DATE, formatDate(element.getDate()));
+		rootJ.addProperty(Json.STATE, element.getState().getName());
 
 		addVersion(element, rootJ);
 		addParameterizedElements(element, rootJ);
@@ -314,13 +317,13 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	protected JsonObject toJson(Activity element, JsonObject rootJ, int currentDepth) {
 
-		rootJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ACTIVITY);
+		rootJ.addProperty(Json.OBJECT_TYPE, Json.ACTIVITY);
 
 		toJson((AbstractStrolchElement) element, rootJ);
-		rootJ.addProperty(Tags.Json.TIME_ORDERING, element.getTimeOrdering().getName());
-		rootJ.addProperty(Tags.Json.STATE, element.getState().getName());
-		rootJ.addProperty(Tags.Json.START, formatDate(element.getStart()));
-		rootJ.addProperty(Tags.Json.END, formatDate(element.getEnd()));
+		rootJ.addProperty(Json.TIME_ORDERING, element.getTimeOrdering().getName());
+		rootJ.addProperty(Json.STATE, element.getState().getName());
+		rootJ.addProperty(Json.START, formatDate(element.getStart()));
+		rootJ.addProperty(Json.END, formatDate(element.getEnd()));
 
 		if (element.isRootElement())
 			addVersion(element, rootJ);
@@ -337,7 +340,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		if (iter.hasNext()) {
 
 			JsonArray elementsJ = new JsonArray();
-			rootJ.add(Tags.Json.ELEMENTS, elementsJ);
+			rootJ.add(Json.ELEMENTS, elementsJ);
 
 			while (iter.hasNext()) {
 				IActivityElement activityElement = iter.next().getValue();
@@ -360,15 +363,15 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	protected JsonObject toJson(Action element, JsonObject rootJ) {
 
-		rootJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ACTION);
+		rootJ.addProperty(Json.OBJECT_TYPE, Json.ACTION);
 
 		// attributes
 		toJson((AbstractStrolchElement) element, rootJ);
-		rootJ.addProperty(Tags.Json.RESOURCE_ID, element.getResourceId());
-		rootJ.addProperty(Tags.Json.RESOURCE_TYPE, element.getResourceType());
-		rootJ.addProperty(Tags.Json.STATE, element.getState().getName());
-		rootJ.addProperty(Tags.Json.START, formatDate(element.getStart()));
-		rootJ.addProperty(Tags.Json.END, formatDate(element.getEnd()));
+		rootJ.addProperty(Json.RESOURCE_ID, element.getResourceId());
+		rootJ.addProperty(Json.RESOURCE_TYPE, element.getResourceType());
+		rootJ.addProperty(Json.STATE, element.getState().getName());
+		rootJ.addProperty(Json.START, formatDate(element.getStart()));
+		rootJ.addProperty(Json.END, formatDate(element.getEnd()));
 
 		addParameterizedElements(element, rootJ);
 		addPolicies(element, rootJ);
@@ -381,17 +384,18 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		if (iter.hasNext()) {
 
 			JsonArray changesJ = new JsonArray();
-			rootJ.add(Tags.Json.VALUE_CHANGES, changesJ);
+			rootJ.add(Json.VALUE_CHANGES, changesJ);
 
 			while (iter.hasNext()) {
 				IValueChange<? extends IValue<?>> valueChange = iter.next();
 
 				JsonObject changeJ = new JsonObject();
 
-				changeJ.addProperty(Tags.Json.STATE_ID, valueChange.getStateId());
-				changeJ.addProperty(Tags.Json.TIME, formatDate(valueChange.getTime()));
-				changeJ.addProperty(Tags.Json.VALUE, valueChange.getValue().getValueAsString());
-				changeJ.addProperty(Tags.Json.TYPE, valueChange.getValue().getType());
+				if (isNotEmpty(valueChange.getStateId()))
+					changeJ.addProperty(Json.STATE_ID, valueChange.getStateId());
+				changeJ.addProperty(Json.TIME, formatDate(valueChange.getTime()));
+				changeJ.addProperty(Json.VALUE, valueChange.getValue().getValueAsString());
+				changeJ.addProperty(Json.TYPE, valueChange.getValue().getType());
 
 				changesJ.add(changeJ);
 			}
@@ -409,7 +413,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		PolicyDefs policyDefs = policyContainer.getPolicyDefs();
 
 		JsonObject policyDefsJ = new JsonObject();
-		rootJ.add(Tags.Json.POLICIES, policyDefsJ);
+		rootJ.add(Json.POLICIES, policyDefsJ);
 
 		for (String type : policyDefs.getPolicyTypes()) {
 			PolicyDef policyDef = policyDefs.getPolicyDef(type);
@@ -419,12 +423,12 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	protected JsonObject toJson(AbstractStrolchElement element, JsonObject rootJ) {
 
-		rootJ.addProperty(Tags.Json.ID, element.getId());
+		rootJ.addProperty(Json.ID, element.getId());
 
 		if (!isWithoutElementName())
-			rootJ.addProperty(Tags.Json.NAME, element.getName());
+			rootJ.addProperty(Json.NAME, element.getName());
 
-		rootJ.addProperty(Tags.Json.TYPE, element.getType());
+		rootJ.addProperty(Json.TYPE, element.getType());
 
 		return rootJ;
 	}
@@ -487,7 +491,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 			return;
 
 		JsonObject parameterBagsJ = new JsonObject();
-		rootJ.add(Tags.Json.PARAMETER_BAGS, parameterBagsJ);
+		rootJ.add(Json.PARAMETER_BAGS, parameterBagsJ);
 
 		for (String bagKey : element.getParameterBagKeySet()) {
 			ParameterBag bag = element.getParameterBag(bagKey);
@@ -505,7 +509,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		toJson(bag, bagJ);
 
 		JsonObject paramsJ = new JsonObject();
-		bagJ.add(Tags.Json.PARAMETERS, paramsJ);
+		bagJ.add(Json.PARAMETERS, paramsJ);
 
 		for (String paramKey : bag.getParameterKeySet()) {
 			Parameter<?> param = bag.getParameter(paramKey);
@@ -521,18 +525,18 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		toJson((AbstractStrolchElement) param, paramJ);
 
 		if (!StrolchModelConstants.INTERPRETATION_NONE.equals(param.getInterpretation()))
-			paramJ.addProperty(Tags.Json.INTERPRETATION, param.getInterpretation());
+			paramJ.addProperty(Json.INTERPRETATION, param.getInterpretation());
 
 		if (param.isHidden())
-			paramJ.addProperty(Tags.Json.HIDDEN, param.isHidden());
+			paramJ.addProperty(Json.HIDDEN, param.isHidden());
 
 		if (!StrolchModelConstants.UOM_NONE.equals(param.getUom()))
-			paramJ.addProperty(Tags.Json.UOM, param.getUom());
+			paramJ.addProperty(Json.UOM, param.getUom());
 
 		if (param.getIndex() != 0)
-			paramJ.addProperty(Tags.Json.INDEX, param.getIndex());
+			paramJ.addProperty(Json.INDEX, param.getIndex());
 
-		paramJ.addProperty(Tags.Json.VALUE, param.getValueAsString());
+		paramJ.addProperty(Json.VALUE, param.getValueAsString());
 		return paramJ;
 	}
 
@@ -549,7 +553,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 			return;
 
 		JsonObject timedStatesJ = new JsonObject();
-		rootJ.add(Tags.Json.TIMED_STATES, timedStatesJ);
+		rootJ.add(Json.TIMED_STATES, timedStatesJ);
 
 		for (String stateKey : element.getTimedStateKeySet()) {
 
@@ -591,7 +595,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		toJson((AbstractStrolchElement) state, stateJ);
 
 		JsonArray valuesJ = new JsonArray();
-		stateJ.add(Tags.Json.VALUES, valuesJ);
+		stateJ.add(Json.VALUES, valuesJ);
 
 		SortedSet<? extends ITimeValue<? extends IValue<?>>> values = state.getTimeEvolution().getValues();
 		for (ITimeValue<? extends IValue<?>> value : values) {
@@ -602,8 +606,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 			Long time = value.getTime();
 			String valueS = value.getValue().getValueAsString();
 
-			valueJ.addProperty(Tags.Json.TIME, formatDate(time));
-			valueJ.addProperty(Tags.Json.VALUE, valueS);
+			valueJ.addProperty(Json.TIME, formatDate(time));
+			valueJ.addProperty(Json.VALUE, valueS);
 		}
 		return stateJ;
 	}
@@ -615,8 +619,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		JsonArray arrayJ = new JsonArray();
 		for (ITimeValue<? extends IValue<?>> v : timeEvolution.getValues()) {
 			JsonObject obj = new JsonObject();
-			obj.addProperty(Tags.Json.DATE, ISO8601FormatFactory.getInstance().formatDate(v.getTime()));
-			obj.addProperty(Tags.Json.VALUE, v.getValue().getValueAsString());
+			obj.addProperty(Json.DATE, ISO8601FormatFactory.getInstance().formatDate(v.getTime()));
+			obj.addProperty(Json.VALUE, v.getValue().getValueAsString());
 
 			arrayJ.add(obj);
 		}
@@ -632,11 +636,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		Version version = element.getVersion();
 
 		JsonObject versionJ = new JsonObject();
-		versionJ.addProperty(Tags.Json.VERSION, version.getVersion());
-		versionJ.addProperty(Tags.Json.CREATED_BY, version.getCreatedBy());
-		versionJ.addProperty(Tags.Json.CREATED_AT, formatDate(version.getCreatedAt()));
-		versionJ.addProperty(Tags.Json.DELETED, version.isDeleted());
-		rootJ.add(Tags.Json.VERSION, versionJ);
+		versionJ.addProperty(Json.VERSION, version.getVersion());
+		versionJ.addProperty(Json.CREATED_BY, version.getCreatedBy());
+		versionJ.addProperty(Json.CREATED_AT, formatDate(version.getCreatedAt()));
+		versionJ.addProperty(Json.DELETED, version.isDeleted());
+		rootJ.add(Json.VERSION, versionJ);
 	}
 
 	private static String formatDate(Date date) {

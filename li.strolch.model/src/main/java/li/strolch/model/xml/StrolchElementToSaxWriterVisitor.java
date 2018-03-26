@@ -17,6 +17,7 @@ package li.strolch.model.xml;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -38,7 +39,6 @@ import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -186,9 +186,9 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 
 		writeStartStrolchElement(Tags.ACTION, empty, action);
 		this.writer.writeAttribute(Tags.STATE, action.getState().getName());
-		if (StringHelper.isNotEmpty(action.getResourceId()))
+		if (isNotEmpty(action.getResourceId()))
 			this.writer.writeAttribute(Tags.RESOURCE_ID, action.getResourceId());
-		if (StringHelper.isNotEmpty(action.getResourceType()))
+		if (isNotEmpty(action.getResourceType()))
 			this.writer.writeAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
 
 		if (action.hasParameterBags())
@@ -197,7 +197,8 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 		if (action.hasChanges()) {
 			for (IValueChange<? extends IValue<?>> change : action.getChanges()) {
 				this.writer.writeEmptyElement(Tags.VALUE_CHANGE);
-				this.writer.writeAttribute(Tags.STATE_ID, change.getStateId());
+				if (isNotEmpty(change.getStateId()))
+					this.writer.writeAttribute(Tags.STATE_ID, change.getStateId());
 				this.writer.writeAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(change.getTime()));
 				this.writer.writeAttribute(Tags.VALUE, change.getValue().getValueAsString());
 				this.writer.writeAttribute(Tags.TYPE, change.getValue().getType());

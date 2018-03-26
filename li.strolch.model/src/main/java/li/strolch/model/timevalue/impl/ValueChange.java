@@ -15,6 +15,8 @@
  */
 package li.strolch.model.timevalue.impl;
 
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
+
 import java.io.Serializable;
 
 import li.strolch.model.timevalue.IValue;
@@ -55,7 +57,7 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	public ValueChange(final Long time, final T value, final String stateId) {
 		this.time = time;
 		this.value = value;
-		this.stateId = stateId;
+		this.stateId = trimOrEmpty(stateId);
 	}
 
 	@Override

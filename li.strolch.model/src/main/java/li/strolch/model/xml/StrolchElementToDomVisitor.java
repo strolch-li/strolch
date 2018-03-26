@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,25 +15,14 @@
  */
 package li.strolch.model.xml;
 
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+
+import javax.xml.parsers.DocumentBuilder;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 
-import javax.xml.parsers.DocumentBuilder;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import li.strolch.model.AbstractStrolchElement;
-import li.strolch.model.GroupedParameterizedElement;
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.ParameterizedElement;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchModelConstants;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
-import li.strolch.model.Version;
+import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -46,8 +35,9 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.helper.DomUtil;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -144,9 +134,9 @@ public class StrolchElementToDomVisitor implements StrolchRootElementVisitor<Doc
 		Element element = document.createElement(Tags.ACTION);
 		fillElement(element, action);
 
-		if (StringHelper.isNotEmpty(action.getResourceId()))
+		if (isNotEmpty(action.getResourceId()))
 			element.setAttribute(Tags.RESOURCE_ID, action.getResourceId());
-		if (StringHelper.isNotEmpty(action.getResourceType()))
+		if (isNotEmpty(action.getResourceType()))
 			element.setAttribute(Tags.RESOURCE_TYPE, action.getResourceType());
 
 		element.setAttribute(Tags.STATE, action.getState().getName());
@@ -168,7 +158,8 @@ public class StrolchElementToDomVisitor implements StrolchRootElementVisitor<Doc
 
 	protected Element toDom(IValueChange<? extends IValue<?>> value) {
 		Element element = document.createElement(Tags.VALUE_CHANGE);
-		element.setAttribute(Tags.STATE_ID, value.getStateId());
+		if (isNotEmpty(value.getStateId()))
+			element.setAttribute(Tags.STATE_ID, value.getStateId());
 		element.setAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(value.getTime()));
 		element.setAttribute(Tags.VALUE, value.getValue().getValueAsString());
 		element.setAttribute(Tags.TYPE, value.getValue().getType());

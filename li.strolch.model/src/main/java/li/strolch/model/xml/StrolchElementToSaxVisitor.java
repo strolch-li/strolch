@@ -17,6 +17,7 @@ package li.strolch.model.xml;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import java.text.MessageFormat;
 import java.util.Iterator;
@@ -24,19 +25,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
-
-import li.strolch.model.GroupedParameterizedElement;
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
-import li.strolch.model.Version;
+import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -48,8 +37,11 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -328,10 +320,10 @@ public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Voi
 	protected AttributesImpl attributesFor(Action action) {
 		AttributesImpl attributes = attributesFor((StrolchElement) action);
 
-		if (StringHelper.isNotEmpty(action.getResourceId()))
+		if (isNotEmpty(action.getResourceId()))
 			attributes.addAttribute(null, null, Tags.RESOURCE_ID, Tags.CDATA, action.getResourceId());
 
-		if (StringHelper.isNotEmpty(action.getResourceType()))
+		if (isNotEmpty(action.getResourceType()))
 			attributes.addAttribute(null, null, Tags.RESOURCE_TYPE, Tags.CDATA, action.getResourceType());
 
 		if (!action.getState().isCreated())
@@ -343,7 +335,7 @@ public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Voi
 	protected AttributesImpl attributesFor(IValueChange<? extends IValue<?>> valueChange) {
 		AttributesImpl attributes = new AttributesImpl();
 
-		if (StringHelper.isNotEmpty(valueChange.getStateId()))
+		if (isNotEmpty(valueChange.getStateId()))
 			attributes.addAttribute(null, null, Tags.STATE_ID, Tags.CDATA, valueChange.getStateId());
 
 		attributes.addAttribute(null, null, Tags.TIME, Tags.CDATA,
