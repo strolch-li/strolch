@@ -147,7 +147,7 @@ public class Inspector {
 				elementMapJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.RESOURCE);
 				elementMapJ.addProperty(Tags.Json.NR_OF_ELEMENTS, resourceMap.querySize(tx));
 				JsonArray typesJ = new JsonArray();
-				resourceMap.getTypes(tx).forEach(type -> typesJ.add(new JsonPrimitive(type)));
+				resourceMap.getTypes(tx).forEach(typesJ::add);
 				elementMapJ.add(Tags.Json.TYPES, typesJ);
 
 				elementMapsArr.add(elementMapJ);
@@ -159,7 +159,7 @@ public class Inspector {
 				elementMapJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ORDER);
 				elementMapJ.addProperty(Tags.Json.NR_OF_ELEMENTS, orderMap.querySize(tx));
 				JsonArray typesJ = new JsonArray();
-				orderMap.getTypes(tx).forEach(type -> typesJ.add(new JsonPrimitive(type)));
+				orderMap.getTypes(tx).forEach(typesJ::add);
 				elementMapJ.add(Tags.Json.TYPES, typesJ);
 
 				elementMapsArr.add(elementMapJ);
@@ -171,7 +171,7 @@ public class Inspector {
 				elementMapJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ACTIVITY);
 				elementMapJ.addProperty(Tags.Json.NR_OF_ELEMENTS, activityMap.querySize(tx));
 				JsonArray typesJ = new JsonArray();
-				activityMap.getTypes(tx).forEach(type -> typesJ.add(new JsonPrimitive(type)));
+				activityMap.getTypes(tx).forEach(typesJ::add);
 				elementMapJ.add(Tags.Json.TYPES, typesJ);
 
 				elementMapsArr.add(elementMapJ);
@@ -193,9 +193,9 @@ public class Inspector {
 				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
-				tx.getResourceMap().getAllElements(tx).forEach(e -> e.accept(visitor));
-				tx.getOrderMap().getAllElements(tx).forEach(e -> e.accept(visitor));
-				tx.getActivityMap().getAllElements(tx).forEach(e -> e.accept(visitor));
+				tx.streamResources().forEach(e -> e.accept(visitor));
+				tx.streamOrders().forEach(e -> e.accept(visitor));
+				tx.streamActivities().forEach(e -> e.accept(visitor));
 
 				writer.writeEndDocument();
 				stream.flush();
@@ -321,7 +321,7 @@ public class Inspector {
 				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
-				tx.getResourceMap().getAllElements(tx).forEach(e -> e.accept(visitor));
+				tx.streamResources().forEach(e -> e.accept(visitor));
 
 				writer.writeEndDocument();
 				stream.flush();
@@ -348,7 +348,7 @@ public class Inspector {
 				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
-				tx.getOrderMap().getAllElements(tx).forEach(e -> e.accept(visitor));
+				tx.streamOrders().forEach(e -> e.accept(visitor));
 
 				writer.writeEndDocument();
 				stream.flush();
@@ -375,7 +375,7 @@ public class Inspector {
 				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
-				tx.getActivityMap().getAllElements(tx).forEach(e -> e.accept(visitor));
+				tx.streamActivities().forEach(e -> e.accept(visitor));
 
 				writer.writeEndDocument();
 				stream.flush();
@@ -405,7 +405,7 @@ public class Inspector {
 
 		// query the data
 		RootElementSearchResult<Resource> result;
-		long dataSetSize = 0L;
+		long dataSetSize;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			dataSetSize = tx.getResourceMap().querySize(tx);
 			result = search.search(tx);
@@ -449,7 +449,7 @@ public class Inspector {
 
 		// query the data
 		RootElementSearchResult<Order> result;
-		long dataSetSize = 0L;
+		long dataSetSize;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			dataSetSize = tx.getOrderMap().querySize(tx);
 			result = search.search(tx);
@@ -495,7 +495,7 @@ public class Inspector {
 
 		// query the data
 		RootElementSearchResult<Activity> result;
-		long dataSetSize = 0L;
+		long dataSetSize;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			dataSetSize = tx.getActivityMap().querySize(tx);
 			result = search.search(tx);
@@ -544,7 +544,7 @@ public class Inspector {
 				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
-				search.search(tx).map(e -> e.accept(visitor));
+				search.search(tx).forEach(e -> e.accept(visitor));
 
 				writer.writeEndDocument();
 				stream.flush();
@@ -577,7 +577,7 @@ public class Inspector {
 				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
-				search.search(tx).map(e -> e.accept(visitor));
+				search.search(tx).forEach(e -> e.accept(visitor));
 
 				writer.writeEndDocument();
 				stream.flush();
@@ -610,7 +610,7 @@ public class Inspector {
 				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
-				search.search(tx).map(e -> e.accept(visitor));
+				search.search(tx).forEach(e -> e.accept(visitor));
 
 				writer.writeEndDocument();
 				stream.flush();
@@ -635,7 +635,7 @@ public class Inspector {
 
 		Resource resource;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			resource = tx.getResourceMap().getBy(tx, type, id);
+			resource = tx.getResourceBy(type, id);
 		}
 		if (resource == null) {
 			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
@@ -658,7 +658,7 @@ public class Inspector {
 
 		Resource resource;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			resource = tx.getResourceMap().getBy(tx, type, id);
+			resource = tx.getResourceBy(type, id);
 		}
 		if (resource == null) {
 			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
@@ -678,7 +678,7 @@ public class Inspector {
 
 		Order order;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			order = tx.getOrderMap().getBy(tx, type, id);
+			order = tx.getOrderBy(type, id);
 		}
 		if (order == null) {
 			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
@@ -700,7 +700,7 @@ public class Inspector {
 
 		Order order;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			order = tx.getOrderMap().getBy(tx, type, id);
+			order = tx.getOrderBy( type, id);
 		}
 		if (order == null) {
 			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
@@ -720,7 +720,7 @@ public class Inspector {
 
 		Activity activity;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			activity = tx.getActivityMap().getBy(tx, type, id);
+			activity = tx.getActivityBy(type, id);
 		}
 		if (activity == null) {
 			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
@@ -742,7 +742,7 @@ public class Inspector {
 
 		Activity activity;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			activity = tx.getActivityMap().getBy(tx, type, id);
+			activity = tx.getActivityBy(type, id);
 		}
 		if (activity == null) {
 			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
