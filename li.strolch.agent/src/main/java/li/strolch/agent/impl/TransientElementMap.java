@@ -327,7 +327,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public synchronized void updateAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
-			update(tx, element);
+			internalUpdate(tx, element);
 		}
 	}
 
