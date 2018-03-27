@@ -409,13 +409,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		String id = elements.get(2);
 		switch (objectClassType) {
 		case Tags.RESOURCE:
-			groupedParameterizedElement = getResourceMap().getBy(this, type, id);
+			groupedParameterizedElement = getResourceBy(type, id);
 			break;
 		case Tags.ORDER:
-			groupedParameterizedElement = getOrderMap().getBy(this, type, id);
+			groupedParameterizedElement = getOrderBy(type, id);
 			break;
 		case Tags.ACTIVITY:
-			groupedParameterizedElement = getActivityMap().getBy(this, type, id);
+			groupedParameterizedElement = getActivityBy(type, id);
 			break;
 		default:
 			throw new StrolchException(MessageFormat.format("Unknown object class {0}", objectClassType)); //$NON-NLS-1$

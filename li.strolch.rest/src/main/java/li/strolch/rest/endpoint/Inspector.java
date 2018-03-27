@@ -60,9 +60,7 @@ import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.QueryData;
-import li.strolch.search.GenericSearch;
-import li.strolch.search.RootElementSearchResult;
-import li.strolch.search.SearchBuilder;
+import li.strolch.search.*;
 import li.strolch.service.*;
 import li.strolch.service.AddActivityService.AddActivityArg;
 import li.strolch.service.AddOrderService.AddOrderArg;
@@ -401,7 +399,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		// parse the query string
-		GenericSearch<Resource> search = SearchBuilder.buildResourceSearch(queryData.getQuery(), type);
+		ResourceSearch search = SearchBuilder.buildResourceSearch(queryData.getQuery(), type);
 
 		// query the data
 		RootElementSearchResult<Resource> result;
@@ -445,7 +443,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		// parse the query string
-		GenericSearch<Order> search = SearchBuilder.buildOrderSearch(queryData.getQuery(), type);
+		OrderSearch search = SearchBuilder.buildOrderSearch(queryData.getQuery(), type);
 
 		// query the data
 		RootElementSearchResult<Order> result;
@@ -491,7 +489,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		// parse the query string
-		GenericSearch<Activity> search = SearchBuilder.buildActivitySearch(queryData.getQuery(), type);
+		ActivitySearch search = SearchBuilder.buildActivitySearch(queryData.getQuery(), type);
 
 		// query the data
 		RootElementSearchResult<Activity> result;
@@ -536,7 +534,7 @@ public class Inspector {
 
 		queryData.initializeUnsetFields();
 
-		GenericSearch<Resource> search = SearchBuilder.buildResourceSearch(queryData.getQuery(), type);
+		ResourceSearch search = SearchBuilder.buildResourceSearch(queryData.getQuery(), type);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -569,7 +567,7 @@ public class Inspector {
 
 		queryData.initializeUnsetFields();
 
-		GenericSearch<Order> search = SearchBuilder.buildOrderSearch(queryData.getQuery(), type);
+		OrderSearch search = SearchBuilder.buildOrderSearch(queryData.getQuery(), type);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -602,7 +600,7 @@ public class Inspector {
 
 		queryData.initializeUnsetFields();
 
-		GenericSearch<Activity> search = SearchBuilder.buildActivitySearch(queryData.getQuery(), type);
+		ActivitySearch search = SearchBuilder.buildActivitySearch(queryData.getQuery(), type);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -700,7 +698,7 @@ public class Inspector {
 
 		Order order;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			order = tx.getOrderBy( type, id);
+			order = tx.getOrderBy(type, id);
 		}
 		if (order == null) {
 			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$

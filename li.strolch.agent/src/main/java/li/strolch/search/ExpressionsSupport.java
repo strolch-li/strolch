@@ -1,42 +1,40 @@
 package li.strolch.search;
 
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.StrolchElement;
+import li.strolch.model.*;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
 
 public class ExpressionsSupport {
 
-	public static SearchExpression not(SearchExpression expression) {
+	public static <T extends StrolchRootElement> SearchExpression<T> not(SearchExpression<T> expression) {
 		return element -> !expression.matches(element);
 	}
 
-	public static ExpressionBuilder id() {
+	public static <T extends StrolchRootElement> ExpressionBuilder<T> id() {
 		return StrolchElement::getId;
 	}
 
-	public static SearchExpression id(SearchPredicate predicate) {
+	public static <T extends StrolchRootElement> SearchExpression<T> id(SearchPredicate predicate) {
 		return element -> predicate.matches(element.getId());
 	}
 
-	public static ExpressionBuilder name() {
+	public static <T extends StrolchRootElement> ExpressionBuilder<T> name() {
 		return StrolchElement::getName;
 	}
 
-	public static SearchExpression name(SearchPredicate predicate) {
+	public static <T extends StrolchRootElement> SearchExpression<T> name(SearchPredicate predicate) {
 		return element -> predicate.matches(element.getName());
 	}
 
-	public static ExpressionBuilder date() {
+	public static <T extends StrolchRootElement> ExpressionBuilder<T> date() {
 		return element -> ((Order) element).getDate();
 	}
 
-	public static SearchExpression date(SearchPredicate predicate) {
+	public static <T extends StrolchRootElement> SearchExpression<T> date(SearchPredicate predicate) {
 		return element -> predicate.matches(((Order) element).getDate());
 	}
 
-	public static ExpressionBuilder state() {
+	public static <T extends StrolchRootElement> ExpressionBuilder<T> state() {
 		return element -> {
 			if (element instanceof Order)
 				return ((Order) element).getState();
@@ -46,11 +44,11 @@ public class ExpressionsSupport {
 		};
 	}
 
-	public static SearchExpression state(SearchPredicate predicate) {
+	public static <T extends StrolchRootElement> SearchExpression<T> state(SearchPredicate predicate) {
 		return element -> predicate.matches(state().extract(element));
 	}
 
-	public static ExpressionBuilder param(String bagId, String paramId) {
+	public static <T extends StrolchRootElement> ExpressionBuilder<T> param(String bagId, String paramId) {
 		return element -> {
 			ParameterBag bag = element.getParameterBag(bagId);
 			if (bag == null)
@@ -61,11 +59,12 @@ public class ExpressionsSupport {
 		};
 	}
 
-	public static SearchExpression param(String bagId, String paramId, SearchPredicate predicate) {
+	public static <T extends StrolchRootElement> SearchExpression<T> param(String bagId, String paramId,
+			SearchPredicate predicate) {
 		return element -> predicate.matches(param(bagId, paramId).extract(element));
 	}
 
-	public static SearchExpression paramNull(String bagId, String paramId) {
+	public static <T extends StrolchRootElement> SearchExpression<T> paramNull(String bagId, String paramId) {
 		return element -> {
 			ParameterBag bag = element.getParameterBag(bagId);
 			if (bag == null)

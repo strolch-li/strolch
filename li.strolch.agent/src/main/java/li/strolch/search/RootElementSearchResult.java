@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.visitor.StrolchRootElementVisitor;
 
 public class RootElementSearchResult<T extends StrolchRootElement> extends SearchResult<T> {
 
@@ -45,5 +46,9 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 			comparator = comparator.reversed();
 		this.stream = this.stream.sorted(comparator);
 		return this;
+	}
+
+	public <U> SearchResult<U> visitor(StrolchRootElementVisitor<U> visitor) {
+		return new SearchResult<U>(this.stream.map(e -> e.accept(visitor)));
 	}
 }

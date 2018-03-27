@@ -13,21 +13,34 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.ExceptionHelper;
 
 public abstract class StrolchSearch<T extends StrolchRootElement>
-		implements SearchExpressions, SearchPredicates, Restrictable {
+		implements SearchExpressions<T>, SearchPredicates, Restrictable {
 
 	private String privilegeValue;
 
-	private SearchNavigator<T> navigator;
-	private SearchExpression expression;
+	private SearchExpression<T> expression;
 
 	public StrolchSearch() {
 		this.privilegeValue = getClass().getName();
 	}
 
+	protected abstract SearchNavigator<T> getNavigator();
+
+	/**
+	 * Used to configure the navigator
+	 *
+	 * @param types
+	 * 		the types of elements to search
+	 *
+	 * @return this for chaining
+	 */
+	public abstract StrolchSearch<T> types(String... types);
+
 	/**
 	 * Allows to implement the search expression in one method, or to prepare a project specific search expression
 	 */
-	protected abstract void define();
+	protected void define() {
+		// default is no-op
+	}
 
 	/**
 	 * Adds  the given {@link SearchExpression} to the current search
@@ -37,7 +50,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	 *
 	 * @return this for chaining
 	 */
-	public StrolchSearch<T> where(SearchExpression expression) {
+	public StrolchSearch<T> where(SearchExpression<T> expression) {
 		if (this.expression == null)
 			this.expression = expression;
 		else
@@ -68,33 +81,15 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 		// first prepare
 		define();
 
-		// then validate status
-		DBC.PRE.assertNotNull("navigation not set! Call one of resources(), orders() or activities()", this.navigator);
+		// then validate navigator
+		DBC.PRE.assertNotNull("navigation not set! Call types()", getNavigator());
 
-		Stream<T> stream = this.navigator.navigate(tx);
+		Stream<T> stream = getNavigator().navigate(tx);
 
 		if (this.expression != null)
 			stream = stream.filter(e -> this.expression.matches(e));
 
-		return new RootElementSearchResult<T>(stream);
-	}
-
-	@SuppressWarnings("unchecked")
-	protected StrolchSearch<T> resources(String... types) {
-		this.navigator = tx -> (Stream<T>) tx.streamResources(types);
-		return this;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected StrolchSearch<T> orders(String... types) {
-		this.navigator = tx -> (Stream<T>) tx.streamOrders(types);
-		return this;
-	}
-
-	@SuppressWarnings("unchecked")
-	protected StrolchSearch<T> activities(String... types) {
-		this.navigator = tx -> (Stream<T>) tx.streamActivities(types);
-		return this;
+		return new RootElementSearchResult<>(stream);
 	}
 
 	/**

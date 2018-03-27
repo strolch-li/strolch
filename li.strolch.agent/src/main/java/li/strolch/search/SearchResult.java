@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,6 +26,10 @@ public class SearchResult<T> {
 
 	public <U> SearchResult<U> map(Function<T, U> mapper) {
 		return new SearchResult<>(this.stream.map(mapper));
+	}
+
+	public SearchResult<T> filter(Predicate<T> predicate) {
+		return new SearchResult<>(this.stream.filter(predicate));
 	}
 
 	public SearchResult<T> orderBy(Comparator<? super T> comparator) {

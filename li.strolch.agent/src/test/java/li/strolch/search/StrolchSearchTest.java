@@ -130,10 +130,24 @@ public class StrolchSearchTest {
 
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-			List<JsonObject> result = new NewBallSearch() //
-					.id("the-id") //
-					.status("bla") //
-					.color("yellow") //
+			List<JsonObject> result = new BallSearch("the-id", "STATUS", "yellow")
+					.where(element -> element.hasTimedState(STATE_FLOAT_ID)).search(tx)
+					.map(a -> a.accept(toJsonVisitor)).toList();
+
+			assertEquals(2, result.size());
+		}
+	}
+
+	@Test
+	public void shouldSearchResources2() {
+
+		StrolchRootElementToJsonVisitor toJsonVisitor = new StrolchRootElementToJsonVisitor();
+
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+
+			List<JsonObject> result = new NewBallSearch().id("the-id").status("bla").color("yellow")
 
 					// do search, returns SearchResult
 					.search(tx)
@@ -147,27 +161,57 @@ public class StrolchSearchTest {
 	}
 
 	@Test
+	public void shouldSearchResources3() {
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+
+			assertEquals(4,
+					new ResourceSearch().types().where(param(BAG_ID, PARAM_STRING_ID, contains("rol"))).search(tx)
+							.toList().size());
+			assertEquals(4,
+					new ResourceSearch().types().where(param(BAG_ID, PARAM_STRING_ID, startsWithIgnoreCase("STR")))
+							.search(tx).toList().size());
+		}
+	}
+
+	@Test
+	public void shouldSearchResources4() {
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+
+			assertEquals(7, new ResourceSearch().types().search(tx).toList().size());
+		}
+	}
+
+	@Test
+	public void shouldSearchResources5() {
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+
+			assertEquals(2, new ResourceSearch().types("sdf", "Ball").search(tx).toList().size());
+			assertEquals(2, new ResourceSearch().types("Ball", "sdf").search(tx).toList().size());
+			assertEquals(2, new ResourceSearch().types("4gdf", "Ball", "sdf").search(tx).toList().size());
+		}
+	}
+
+	@Test
 	public void shouldSearchOrders() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-			List<Order> result = new StrolchSearch<Order>() {
+			List<Order> result = new OrderSearch() {
 				@Override
 				public void define() {
 
-					DateRange dateRange = new DateRange() //
+					DateRange dateRange = new DateRange()
 							.from(ISO8601FormatFactory.getInstance().parseDate("2012-01-01T00:00:00.000+01:00"), true)
 							.to(ISO8601FormatFactory.getInstance().parseDate("2013-01-01T00:00:00.000+01:00"), true);
 
-					orders() //
-							.where(date(isEqualTo(new Date(1384929777699L))) //
-									.or(state(isEqualTo(State.CREATED)) //
-											.and(param(BAG_ID, PARAM_STRING_ID, isEqualTo("Strolch"))) //
-											.and(param(BAG_ID, PARAM_DATE_ID, inRange(dateRange)))));
+					types().where(date(isEqualTo(new Date(1384929777699L))).or(state(isEqualTo(State.CREATED))
+							.and(param(BAG_ID, PARAM_STRING_ID, isEqualTo("Strolch")))
+							.and(param(BAG_ID, PARAM_DATE_ID, inRange(dateRange)))));
 				}
-			} //
-					.search(tx) //
-					.toList();
+			}.search(tx).toList();
 
 			assertEquals(7, result.size());
 		}
@@ -178,28 +222,34 @@ public class StrolchSearchTest {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-			StrolchSearch<Order> search = new StrolchSearch<Order>() {
+			StrolchSearch<Order> search = new OrderSearch() {
 				@Override
 				public void define() {
-					orders("SortingType").where(state(isEqualTo(State.CREATED)));
+					types("SortingType").where(state(isEqualTo(State.CREATED)));
 				}
 			};
 
 			List<Order> result;
 
-			result = search //
-					.search(tx) //
-					.orderById(true) //
-					.toList();
+			result = search.search(tx).orderById(true).toList();
 			assertEquals(5, result.size());
 			assertEquals("ggg", result.get(0).getId());
 
-			result = search //
-					.search(tx) //
-					.orderByName(false) //
-					.toList();
+			result = search.search(tx).orderByName(false).toList();
 			assertEquals(5, result.size());
 			assertEquals("aaa", result.get(0).getId());
+		}
+	}
+
+	@Test
+	public void shouldSearchOrders2() {
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+
+			assertEquals(5, new OrderSearch().types("sdf", "SortingType").search(tx).toList().size());
+			assertEquals(5, new OrderSearch().types("SortingType", "sdf").search(tx).toList().size());
+			assertEquals(5, new OrderSearch().types("4gdf", "SortingType", "sdf").search(tx).toList().size());
+			assertEquals(7, new OrderSearch().types().search(tx).toList().size());
 		}
 	}
 
@@ -208,75 +258,71 @@ public class StrolchSearchTest {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-			Map<String, State> states = new StrolchSearch<Activity>() {
+			Map<String, State> states = new ActivitySearch() {
 				@Override
 				public void define() {
-					activities() //
-							.where(state().isEqualTo(State.PLANNING) //
-									.and(name(isEqualTo("Activity"))) //
-							);
+					types().where(state().isEqualTo(State.PLANNING).and(name(isEqualTo("Activity"))));
 				}
-			} //
-					.search(tx) //
-					.toMap(Activity::getId, Activity::getState);
+			}.search(tx).toMap(Activity::getId, Activity::getState);
 
 			assertEquals(1, states.size());
 		}
 	}
 
 	@Test
-	public void shouldSearchGeneric() {
+	public void shouldSearchActivities1() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-			Map<String, State> states = new GenericSearch<Activity>() //
+			Map<String, State> states = new ActivitySearch()
 
-					.activities() //
-					.where(state().isEqualTo(State.PLANNING) //
-							.and(name(isEqualTo("Activity")))) //
+					.types().where(state().isEqualTo(State.PLANNING).and(name(isEqualTo("Activity"))).asActivityExp())
 
-					.search(tx) //
-					.toMap(Activity::getId, Activity::getState);
+					.search(tx).toMap(Activity::getId, Activity::getState);
 
 			assertEquals(1, states.size());
 		}
 	}
 
 	@Test
-	public void shouldSearchGeneric1() {
+	public void shouldSearchActivities2() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-			assertEquals(4, new GenericSearch<Resource>() //
-					.resources() //
-					.where(param(BAG_ID, PARAM_STRING_ID, contains("rol"))) //
-					.search(tx) //
-					.toList().size());
-			assertEquals(4, new GenericSearch<Resource>() //
-					.resources() //
-					.where(param(BAG_ID, PARAM_STRING_ID, startsWithIgnoreCase("STR"))) //
-					.search(tx) //
-					.toList().size());
+			assertEquals(2, new ActivitySearch().types("sdf", "ActivityType").search(tx).toList().size());
+			assertEquals(2, new ActivitySearch().types("ActivityType", "sdf").search(tx).toList().size());
+			assertEquals(2, new ActivitySearch().types("4gdf", "ActivityType", "sdf").search(tx).toList().size());
+			assertEquals(2, new ActivitySearch().types().search(tx).toList().size());
 		}
 	}
 
 	@Test
-	public void shouldSearchGeneric2() {
+	public void shouldSearchActivities3() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-			assertEquals(7, new GenericSearch<Resource>() //
-					.resources() //
-					.search(tx) //
-					.toList().size());
+			assertEquals(1, new ActivitySearch().types("sdf", "ActivityType")
+					.where(element -> element.getActionsByType("Use").size() == 4).search(tx).toList().size());
 		}
 	}
 
-	public class NewBallSearch extends StrolchSearch<Resource> {
+	@Test
+	public void shouldSearchRootElements() {
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+
+			assertEquals(9,
+					new RootElementSearch().types("SortingType", "Ball", "ActivityType").search(tx).toList().size());
+			assertEquals(16, new RootElementSearch().types().search(tx).toList().size());
+			assertEquals(2, new RootElementSearch().types("ActivityType").search(tx).toList().size());
+		}
+	}
+
+	public class NewBallSearch extends ResourceSearch {
 
 		@Override
 		protected void define() {
-			resources("Ball");
+			types("Ball");
 		}
 
 		public NewBallSearch id(String id) {
@@ -295,7 +341,7 @@ public class StrolchSearchTest {
 		}
 	}
 
-	public class BallSearch extends StrolchSearch<Resource> {
+	public class BallSearch extends ResourceSearch {
 
 		private String id;
 		private String status;
@@ -309,37 +355,36 @@ public class StrolchSearchTest {
 
 		@Override
 		public void define() {
-			resources("Ball") //
-					.where(id(isEqualTo(this.id))  //
-							.or(param("parameters", "status", isEqualTo(this.status))  //
-									.and(not(param("parameters", "color", isEqualTo(this.color)))) //
+			types("Ball").where(id(isEqualTo(this.id)).or(param("parameters", "status", isEqualTo(this.status))
+							.and(not(param("parameters", "color", isEqualTo(this.color))))
 
-									.and(param(BAG_ID, PARAM_FLOAT_ID, isEqualTo(44.3D))) //
+							.and(param(BAG_ID, PARAM_FLOAT_ID, isEqualTo(44.3D)))
 
-									.and(param(BAG_ID, PARAM_STRING_ID, isEqualTo("Strolch"))) //
-									.and(param(BAG_ID, PARAM_STRING_ID, isEqualToIgnoreCase("strolch"))) //
-									.and(param(BAG_ID, PARAM_STRING_ID, isNotEqualTo("dfgdfg"))) //
-									.and(param(BAG_ID, PARAM_STRING_ID, isNotEqualToIgnoreCase("dfgdfg"))) //
-									.and(param(BAG_ID, PARAM_STRING_ID, contains("rol"))) //
-									.and(param(BAG_ID, PARAM_STRING_ID, containsIgnoreCase("ROL"))) //
-									.and(param(BAG_ID, PARAM_STRING_ID, startsWith("Str"))) //
-									.and(param(BAG_ID, PARAM_STRING_ID, startsWithIgnoreCase("str"))) //
-									.and(param(BAG_ID, PARAM_STRING_ID, endsWith("lch"))) //
-									.and(param(BAG_ID, PARAM_STRING_ID, endsWithIgnoreCase("LCH"))) //
+							.and(param(BAG_ID, PARAM_STRING_ID, isEqualTo("Strolch")))
+							.and(param(BAG_ID, PARAM_STRING_ID, isEqualToIgnoreCase("strolch")))
+							.and(param(BAG_ID, PARAM_STRING_ID, isNotEqualTo("dfgdfg")))
+							.and(param(BAG_ID, PARAM_STRING_ID, isNotEqualToIgnoreCase("dfgdfg")))
+							.and(param(BAG_ID, PARAM_STRING_ID, contains("rol")))
+							.and(param(BAG_ID, PARAM_STRING_ID, containsIgnoreCase("ROL")))
+							.and(param(BAG_ID, PARAM_STRING_ID, startsWith("Str")))
+							.and(param(BAG_ID, PARAM_STRING_ID, startsWithIgnoreCase("str")))
+							.and(param(BAG_ID, PARAM_STRING_ID, endsWith("lch")))
+							.and(param(BAG_ID, PARAM_STRING_ID, endsWithIgnoreCase("LCH")))
 
-									.and(param(BAG_ID, PARAM_BOOLEAN_ID, isEqualTo(true))) //
-									.and(param(BAG_ID, PARAM_DATE_ID, isEqualTo(new Date(1354295525628L)))) //
-									.and(param(BAG_ID, PARAM_INTEGER_ID, isEqualTo(77))) //
+							.and(param(BAG_ID, PARAM_BOOLEAN_ID, isEqualTo(true)))
+							.and(param(BAG_ID, PARAM_DATE_ID, isEqualTo(new Date(1354295525628L))))
+							.and(param(BAG_ID, PARAM_INTEGER_ID, isEqualTo(77)))
 
-									.and(param(BAG_ID, PARAM_LIST_FLOAT_ID, isEqualTo(asList(6.0D, 11.0D, 16.0D)))) //
-									.and(param(BAG_ID, PARAM_LIST_FLOAT_ID, contains(singletonList(6.0D)))) //
+							.and(param(BAG_ID, PARAM_LIST_FLOAT_ID, isEqualTo(asList(6.0D, 11.0D, 16.0D))))
+							.and(param(BAG_ID, PARAM_LIST_FLOAT_ID, contains(singletonList(6.0D))))
 
-									.and(param(BAG_ID, PARAM_LIST_INTEGER_ID, isEqualTo(asList(5, 10, 15)))) //
-									.and(param(BAG_ID, PARAM_LIST_LONG_ID, isEqualTo(asList(7L, 12L, 17L)))) //
-									.and(param(BAG_ID, PARAM_LIST_STRING_ID, isEqualTo(asList("Hello", "World")))) //
+							.and(param(BAG_ID, PARAM_LIST_INTEGER_ID, isEqualTo(asList(5, 10, 15))))
+							.and(param(BAG_ID, PARAM_LIST_LONG_ID, isEqualTo(asList(7L, 12L, 17L))))
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isEqualTo(asList("Hello", "World"))))
 
-									.and(paramNull(BAG_ID, "non-existant")) //
-							));
+							.and(paramNull(BAG_ID, "non-existant"))
+					//
+			));
 		}
 	}
 }
