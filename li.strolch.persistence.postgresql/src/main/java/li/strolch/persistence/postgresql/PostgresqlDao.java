@@ -376,14 +376,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		});
 	}
 
-	/**
-	 * @param element
-	 */
 	protected abstract void internalSave(T element);
 
-	/**
-	 * @param element
-	 */
 	protected abstract void internalUpdate(T element);
 
 	protected void internalRemove(T element) {
@@ -407,7 +401,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		if (count == 0) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to remove {0} as it does not exiset!", element.getLocator()));
+					MessageFormat.format("Failed to remove {0} as it does not exist!", element.getLocator()));
 		}
 
 		sql = "delete from " + getTableName() + " where id = ?";

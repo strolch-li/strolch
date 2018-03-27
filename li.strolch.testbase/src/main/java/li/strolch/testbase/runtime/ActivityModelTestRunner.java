@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,27 +15,17 @@
  */
 package li.strolch.testbase.runtime;
 
-import static li.strolch.model.ModelGenerator.BAG_ID;
-import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
-import static li.strolch.model.ModelGenerator.createActivities;
-import static li.strolch.model.ModelGenerator.createActivity;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.impl.DataStoreMode;
+import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
-import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
@@ -62,8 +52,9 @@ public class ActivityModelTestRunner {
 	public void runCreateActivityTest() {
 
 		// create
-		Activity newActivity = createActivity("MyTestActivity", "Test Name", "TestType", TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		Activity newActivity = createActivity("MyTestActivity", "Test Name", "TestType",
+				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.getActivityMap().add(tx, newActivity);
 			tx.commitOnClose();
 		}
@@ -72,16 +63,19 @@ public class ActivityModelTestRunner {
 	public void runQuerySizeTest() {
 
 		// remove all
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.getActivityMap().removeAll(tx, tx.getActivityMap().getAllElements(tx));
 			tx.commitOnClose();
 		}
 
 		// create three activities
-		Activity activity1 = createActivity("myTestActivity1", "Test Name", "QTestType1", TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		Activity activity2 = createActivity("myTestActivity2", "Test Name", "QTestType2", TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		Activity activity3 = createActivity("myTestActivity3", "Test Name", "QTestType3", TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		Activity activity1 = createActivity("myTestActivity1", "Test Name", "QTestType1",
+				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Activity activity2 = createActivity("myTestActivity2", "Test Name", "QTestType2",
+				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Activity activity3 = createActivity("myTestActivity3", "Test Name", "QTestType3",
+				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.getActivityMap().add(tx, activity1);
 			tx.getActivityMap().add(tx, activity2);
 			tx.getActivityMap().add(tx, activity3);
@@ -89,7 +83,7 @@ public class ActivityModelTestRunner {
 		}
 
 		// query size
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			long size = tx.getActivityMap().querySize(tx);
 			assertEquals("Should have three objects", 3, size);
 
@@ -111,46 +105,46 @@ public class ActivityModelTestRunner {
 
 		// create
 		Activity newActivity = createActivity(ID, NAME, TYPE, TimeOrdering.SERIES);
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.getActivityMap().add(tx, newActivity);
 			tx.commitOnClose();
 		}
 
 		// read
-		Activity readActivity = null;
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		Activity readActivity;
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			readActivity = tx.getActivityMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Activity with id " + ID, readActivity);
 
 		// update
-		Parameter<String> sParam = readActivity.getParameter(BAG_ID, PARAM_STRING_ID);
+		StringParameter sParam = readActivity.getParameter(BAG_ID, PARAM_STRING_ID);
 		String newStringValue = "Giddiya!";
 		sParam.setValue(newStringValue);
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.getActivityMap().update(tx, readActivity);
 			tx.commitOnClose();
 		}
 
 		// read updated
-		Activity updatedActivity = null;
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		Activity updatedActivity;
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			updatedActivity = tx.getActivityMap().getBy(tx, TYPE, ID);
 		}
 		assertNotNull("Should read Activity with id " + ID, updatedActivity);
 		if (this.runtimeMock.getRealm(this.realmName).getMode() != DataStoreMode.CACHED)
 			assertFalse("Objects can't be the same reference after re-reading!", readActivity == updatedActivity);
-		Parameter<String> updatedParam = readActivity.getParameter(BAG_ID, PARAM_STRING_ID);
+		StringParameter updatedParam = readActivity.getParameter(BAG_ID, PARAM_STRING_ID);
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.getActivityMap().remove(tx, readActivity);
 			tx.commitOnClose();
 		}
 
 		// fail to re-read
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			Activity activity = tx.getActivityMap().getBy(tx, TYPE, ID);
 			assertNull("Should no read Activity with id " + ID, activity);
 		}
@@ -163,12 +157,12 @@ public class ActivityModelTestRunner {
 		activities.addAll(createActivities(activities.size(), 5, "@", "My Activity", "MyType1", TimeOrdering.SERIES));
 		activities
 				.addAll(createActivities(activities.size(), 5, "@", "Other Activity", "MyType2", TimeOrdering.SERIES));
-		activities.addAll(
-				createActivities(activities.size(), 5, "@", "Further Activity", "MyType3", TimeOrdering.SERIES));
+		activities.addAll(createActivities(activities.size(), 5, "@", "Further Activity", "MyType3",
+				TimeOrdering.SERIES));
 
 		// sort them so we know which activity our objects are
-		Comparator<Activity> comparator = (o1, o2) -> o1.getId().compareTo(o2.getId());
-		Collections.sort(activities, comparator);
+		Comparator<Activity> comparator = Comparator.comparing(AbstractStrolchElement::getId);
+		activities.sort(comparator);
 
 		// first clear the map, so that we have a clean state
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
@@ -243,7 +237,7 @@ public class ActivityModelTestRunner {
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			List<Activity> allActivities = tx.getActivityMap().getAllElements(tx);
-			Collections.sort(allActivities, comparator);
+			allActivities.sort(comparator);
 			assertEquals(activities, allActivities);
 		}
 

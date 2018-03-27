@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -123,11 +123,11 @@ public class ModelGenerator {
 	 * {@link #createParameterBag(String, String, String)}
 	 *
 	 * @param id
-	 *            the id of the {@link Resource}
+	 * 		the id of the {@link Resource}
 	 * @param name
-	 *            the name of the {@link Resource}
+	 * 		the name of the {@link Resource}
 	 * @param type
-	 *            the type of the {@link Resource}
+	 * 		the type of the {@link Resource}
 	 *
 	 * @return the newly created {@link Resource}
 	 */
@@ -146,7 +146,7 @@ public class ModelGenerator {
 	 * Creates {@link StrolchTimedState} instances and adds them to the {@link Resource}
 	 *
 	 * @param resource
-	 *            the resource to which to addd the newly created {@link StrolchTimedState}
+	 * 		the resource to which to addd the newly created {@link StrolchTimedState}
 	 */
 	public static void addTimedStates(Resource resource) {
 
@@ -212,15 +212,15 @@ public class ModelGenerator {
 	 * {@link #createParameterBag(String, String, String)}
 	 *
 	 * @param idStart
-	 *            id range start
+	 * 		id range start
 	 * @param count
-	 *            the number of elements to create
+	 * 		the number of elements to create
 	 * @param idPrefix
-	 *            the prefix to generate IDs for the {@link Resource Resources}
+	 * 		the prefix to generate IDs for the {@link Resource Resources}
 	 * @param name
-	 *            the name of the {@link Resource}
+	 * 		the name of the {@link Resource}
 	 * @param type
-	 *            the type of the {@link Resource}
+	 * 		the type of the {@link Resource}
 	 *
 	 * @return the list of newly created {@link Resource Resources}
 	 */
@@ -238,11 +238,11 @@ public class ModelGenerator {
 	 * {@link #createParameterBag(String, String, String)}
 	 *
 	 * @param id
-	 *            the id of the {@link Order}
+	 * 		the id of the {@link Order}
 	 * @param name
-	 *            the name of the {@link Order}
+	 * 		the name of the {@link Order}
 	 * @param type
-	 *            the type of the {@link Order}
+	 * 		the type of the {@link Order}
 	 *
 	 * @return the newly created {@link Order}
 	 */
@@ -255,15 +255,15 @@ public class ModelGenerator {
 	 * {@link #createParameterBag(String, String, String)}
 	 *
 	 * @param id
-	 *            the id of the {@link Order}
+	 * 		the id of the {@link Order}
 	 * @param name
-	 *            the name of the {@link Order}
+	 * 		the name of the {@link Order}
 	 * @param type
-	 *            the type of the {@link Order}
+	 * 		the type of the {@link Order}
 	 * @param date
-	 *            the date of the {@link Order}
+	 * 		the date of the {@link Order}
 	 * @param state
-	 *            the {@link State} of the {@link Order}
+	 * 		the {@link State} of the {@link Order}
 	 *
 	 * @return the newly created {@link Order}
 	 */
@@ -280,7 +280,7 @@ public class ModelGenerator {
 
 	/**
 	 * Creates a simple {@link PolicyDefs} object with a "ObjectPolicy" with value "java:java.lang.Object"
-	 * 
+	 *
 	 * @return the created {@link PolicyDefs}
 	 */
 	public static PolicyDefs createPolicyDefs() {
@@ -295,15 +295,15 @@ public class ModelGenerator {
 	 * {@link #createParameterBag(String, String, String)}
 	 *
 	 * @param idStart
-	 *            id range start
+	 * 		id range start
 	 * @param count
-	 *            the number of elements to create
+	 * 		the number of elements to create
 	 * @param idPrefix
-	 *            the prefix to generate IDs for the {@link Order Orders}
+	 * 		the prefix to generate IDs for the {@link Order Orders}
 	 * @param name
-	 *            the name of the {@link Order}
+	 * 		the name of the {@link Order}
 	 * @param type
-	 *            the type of the {@link Order}
+	 * 		the type of the {@link Order}
 	 *
 	 * @return the list of newly created {@link Order Orders}
 	 */
@@ -321,15 +321,15 @@ public class ModelGenerator {
 	 * {@link #createParameterBag(String, String, String)}
 	 *
 	 * @param idStart
-	 *            id range start
+	 * 		id range start
 	 * @param count
-	 *            the number of elements to create
+	 * 		the number of elements to create
 	 * @param idPrefix
-	 *            the prefix to generate IDs for the {@link Activity Activities}
+	 * 		the prefix to generate IDs for the {@link Activity Activities}
 	 * @param name
-	 *            the name of the {@link Activity}
+	 * 		the name of the {@link Activity}
 	 * @param type
-	 *            the type of the {@link Activity}
+	 * 		the type of the {@link Activity}
 	 *
 	 * @return the list of newly created {@link Activity Activities}
 	 */
@@ -406,11 +406,11 @@ public class ModelGenerator {
 	 * {@link Parameter}s
 	 *
 	 * @param id
-	 *            the id of the {@link ParameterBag}
+	 * 		the id of the {@link ParameterBag}
 	 * @param name
-	 *            the name of the {@link ParameterBag}
+	 * 		the name of the {@link ParameterBag}
 	 * @param type
-	 *            the type of the {@link ParameterBag}
+	 * 		the type of the {@link ParameterBag}
 	 *
 	 * @return the newly created {@link ParameterBag}
 	 */
@@ -511,8 +511,12 @@ public class ModelGenerator {
 		String[] lastnames = new String[] { "Richards", "Kennedy", "Davids" };
 		String[] types = new String[] { Tags.RESOURCE, Tags.ORDER, Tags.AUDIT };
 		String[] subTypes = new String[] { "Ball", "Something", "Foo", "Bar" };
-		String[] actions = new String[] { "AddResourceService", "UpdateResourceService", "RemoveResourceService",
-				"AddOrderService", "UpdateOrderService", "RemoveOrderService" };
+		String[] actions = new String[] { "AddResourceService",
+				"UpdateResourceService",
+				"RemoveResourceService",
+				"AddOrderService",
+				"UpdateOrderService",
+				"RemoveOrderService" };
 
 		Audit audit = new Audit();
 		audit.setId(StringHelper.getUniqueIdLong());
