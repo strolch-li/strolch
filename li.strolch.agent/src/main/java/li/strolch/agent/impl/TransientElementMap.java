@@ -123,7 +123,6 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (t == null)
 			return null;
 
-		// TODO cloning has its issues, as queries don't return a clone!
 		@SuppressWarnings("unchecked")
 		T clone = (T) t.getClone(true);
 		return clone;
@@ -212,7 +211,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		for (String type : types) {
 			Map<String, T> byType = this.elementMap.get(type);
 			if (byType == null)
-				return Stream.empty();
+				continue;
 
 			elements.addAll(byType.values());
 		}
@@ -291,22 +290,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
-			if (!element.hasVersion())
-				Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
-
-			Map<String, T> byType = this.elementMap.computeIfAbsent(element.getType(), k -> new HashMap<>());
-
-			// assert no object already exists with this id
-			if (byType.containsKey(element.getId())) {
-				String msg = "An element already exists with the id {0}. Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, element.getId());
-				throw new StrolchPersistenceException(msg);
-			}
-
-			byType.put(element.getId(), element);
-
-			// now make read only
-			element.setReadOnly();
+			add(tx, element);
 		}
 	}
 
@@ -335,24 +319,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public synchronized void updateAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
-			Map<String, T> byType = this.elementMap.get(element.getType());
-			if (byType == null) {
-				String msg = "The element does not yet exist with the type {0} and id {1}. Use add() for new objects!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, element.getType(), element.getId());
-				throw new StrolchPersistenceException(msg);
-			}
-
-			// assert no object already exists with this id
-			if (!byType.containsKey(element.getId())) {
-				String msg = "The element does not yet exist with the type {0} and id {1}. Use add() for new objects!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, element.getType(), element.getId());
-				throw new StrolchPersistenceException(msg);
-			}
-
-			byType.put(element.getId(), element);
-
-			// now make read only
-			element.setReadOnly();
+			update(tx, element);
 		}
 	}
 
