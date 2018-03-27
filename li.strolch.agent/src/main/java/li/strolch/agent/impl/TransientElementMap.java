@@ -269,6 +269,10 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	@Override
 	public synchronized void add(StrolchTransaction tx, T element) {
+		internalAdd(tx, element);
+	}
+
+	private void internalAdd(StrolchTransaction tx, T element) {
 		if (!element.hasVersion())
 			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
 
@@ -290,12 +294,16 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
-			add(tx, element);
+			internalAdd(tx, element);
 		}
 	}
 
 	@Override
 	public synchronized void update(StrolchTransaction tx, T element) {
+		internalUpdate(tx, element);
+	}
+
+	private void internalUpdate(StrolchTransaction tx, T element) {
 		Map<String, T> byType = this.elementMap.get(element.getType());
 		if (byType == null) {
 			String msg = "The element does not yet exist with the type {0} and id {1}. Use add() for new objects!"; //$NON-NLS-1$
