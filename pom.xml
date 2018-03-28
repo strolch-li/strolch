@@ -136,8 +136,6 @@
         <module>li.strolch.rest</module>
 
         <!-- test and demo project -->
-        <module>li.strolch.tutorialwebapp</module>
-        <module>li.strolch.planningwebapp</module>
         <module>strolch_minimal_rest</module>
 
         <!-- website -->
