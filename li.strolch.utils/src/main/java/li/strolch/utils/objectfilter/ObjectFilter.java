@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Michael Gatto <michael@gatto.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,9 @@ import org.slf4j.LoggerFactory;
  * object, with the cell containing the "final" action for this object with the version of the object to be retained.
  * Err! symbolize incorrect sequences of events that cause an exception.
  * </p>
- * <table border="1">
+ *
+ * <table border="1" summary="Action state matrix">
+ *
  * <tr>
  * <td>Action \ State in Cache</td>
  * <td>N/A</td>
@@ -44,6 +46,7 @@ import org.slf4j.LoggerFactory;
  * <td>Update(O1)</td>
  * <td>Remove(O1)</td>
  * </tr>
+ *
  * <tr>
  * <td>Add (O2)</td>
  * <td>Add(O2)</td>
@@ -51,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * <td>Err!</td>
  * <td>Update(O2)</td>
  * </tr>
+ *
  * <tr>
  * <td>Update (O2)</td>
  * <td>Update(O2)</td>
@@ -58,6 +62,7 @@ import org.slf4j.LoggerFactory;
  * <td>Update(O2)</td>
  * <td>Err!</td>
  * </tr>
+ *
  * <tr>
  * <td>Remove (O2)</td>
  * <td>Remove(O2)</td>
@@ -65,6 +70,7 @@ import org.slf4j.LoggerFactory;
  * <td>Remove(O2)</td>
  * <td>Err!</td>
  * </tr>
+ *
  * </table>
  *
  * @author Michael Gatto &lt;michael@gatto.ch&gt; (initial version)
@@ -121,16 +127,17 @@ public class ObjectFilter {
 	 * </table>
 	 *
 	 * @param key
-	 *            the key to register the object with
+	 * 		the key to register the object with
 	 * @param objectKey
-	 *            the key for the object
+	 * 		the key for the object
 	 * @param objectToAdd
-	 *            The object for which addition shall be registered.
+	 * 		The object for which addition shall be registered.
 	 */
 	public void add(String key, Object objectKey, Object objectToAdd) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
-			ObjectFilter.logger.debug(MessageFormat.format("add object {0} with key {1}", objectToAdd, key)); //$NON-NLS-1$
+			ObjectFilter.logger
+					.debug(MessageFormat.format("add object {0} with key {1}", objectToAdd, key)); //$NON-NLS-1$
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.getElement(key, objectKey);
@@ -146,8 +153,9 @@ public class ObjectFilter {
 			String existingKey = cached.getKey();
 			if (!existingKey.equals(key)) {
 				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
-				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
-						Operation.ADD.toString(), existingKey, key, objectKey.toString()));
+				throw new IllegalArgumentException(MessageFormat
+						.format(msg, Long.toString(id), Operation.ADD.toString(), existingKey, key,
+								objectKey.toString()));
 			}
 
 			// The object is in cache: update the version as required, keeping in mind that most
@@ -155,9 +163,11 @@ public class ObjectFilter {
 			Operation op = cached.getOperation();
 			switch (op) {
 			case ADD:
-				throw new IllegalStateException("Stale State exception: Invalid + after + for " + objectKey); //$NON-NLS-1$
+				throw new IllegalStateException(
+						"Stale State exception: Invalid + after + for " + objectKey); //$NON-NLS-1$
 			case MODIFY:
-				throw new IllegalStateException("Stale State exception: Invalid + after += for " + objectKey); //$NON-NLS-1$
+				throw new IllegalStateException(
+						"Stale State exception: Invalid + after += for " + objectKey); //$NON-NLS-1$
 			case REMOVE:
 				// replace key if necessary
 				replaceKey(cached, objectKey, objectToAdd);
@@ -176,8 +186,8 @@ public class ObjectFilter {
 	}
 
 	/**
-	 * Register, under the given key, the update of the given object. *
-	 * </p>
+	 * Register, under the given key, the update of the given object.
+	 *
 	 * <table border="1" summary="Allowed operations">
 	 * <tr>
 	 * <td>Action \ State in Cache</td>
@@ -196,16 +206,17 @@ public class ObjectFilter {
 	 * </table>
 	 *
 	 * @param key
-	 *            the key to register the object with
+	 * 		the key to register the object with
 	 * @param objectKey
-	 *            the key for the object
+	 * 		the key for the object
 	 * @param objectToUpdate
-	 *            The object for which update shall be registered.
+	 * 		The object for which update shall be registered.
 	 */
 	public void update(String key, Object objectKey, Object objectToUpdate) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
-			ObjectFilter.logger.debug(MessageFormat.format("update object {0} with key {1}", objectKey, key)); //$NON-NLS-1$
+			ObjectFilter.logger
+					.debug(MessageFormat.format("update object {0} with key {1}", objectKey, key)); //$NON-NLS-1$
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.getElement(key, objectKey);
@@ -231,7 +242,8 @@ public class ObjectFilter {
 				cached.setObject(objectToUpdate);
 				break;
 			case REMOVE:
-				throw new IllegalStateException("Stale State exception: Invalid += after - for " + objectKey); //$NON-NLS-1$
+				throw new IllegalStateException(
+						"Stale State exception: Invalid += after - for " + objectKey); //$NON-NLS-1$
 			default:
 				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
@@ -242,8 +254,8 @@ public class ObjectFilter {
 	}
 
 	/**
-	 * Register, under the given key, the removal of the given object. *
-	 * </p>
+	 * Register, under the given key, the removal of the given object.
+	 *
 	 * <table border="1" summary="allowed operations">
 	 * <tr>
 	 * <td>Action \ State in Cache</td>
@@ -262,16 +274,17 @@ public class ObjectFilter {
 	 * </table>
 	 *
 	 * @param key
-	 *            the key to register the object with
+	 * 		the key to register the object with
 	 * @param objectKey
-	 *            the key for the object
+	 * 		the key for the object
 	 * @param objectToRemove
-	 *            The object for which removal shall be registered.
+	 * 		The object for which removal shall be registered.
 	 */
 	public void remove(String key, Object objectKey, Object objectToRemove) {
 
 		if (ObjectFilter.logger.isDebugEnabled())
-			ObjectFilter.logger.debug(MessageFormat.format("remove object {0} with key {1}", objectKey, key)); //$NON-NLS-1$
+			ObjectFilter.logger
+					.debug(MessageFormat.format("remove object {0} with key {1}", objectKey, key)); //$NON-NLS-1$
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.getElement(key, objectKey);
@@ -285,8 +298,9 @@ public class ObjectFilter {
 			String existingKey = cached.getKey();
 			if (!existingKey.equals(key)) {
 				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
-				throw new IllegalArgumentException(MessageFormat.format(msg, Long.toString(id),
-						Operation.REMOVE.toString(), existingKey, key, objectKey.toString()));
+				throw new IllegalArgumentException(MessageFormat
+						.format(msg, Long.toString(id), Operation.REMOVE.toString(), existingKey, key,
+								objectKey.toString()));
 			}
 
 			// The object is in cache: update the version as required.
@@ -306,7 +320,8 @@ public class ObjectFilter {
 				cached.setOperation(Operation.REMOVE);
 				break;
 			case REMOVE:
-				throw new IllegalStateException("Stale State exception: Invalid - after - for " + objectKey); //$NON-NLS-1$
+				throw new IllegalStateException(
+						"Stale State exception: Invalid - after - for " + objectKey); //$NON-NLS-1$
 			default:
 				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
@@ -320,7 +335,7 @@ public class ObjectFilter {
 	 * Register the addition of the given object. Since no key is provided, the class name is used as a key.
 	 *
 	 * @param object
-	 *            The object that shall be registered for addition
+	 * 		The object that shall be registered for addition
 	 */
 	public void add(Object object) {
 		add(object.getClass().getName(), object, object);
@@ -330,9 +345,9 @@ public class ObjectFilter {
 	 * Register the addition of the given object. Since no key is provided, the class name is used as a key.
 	 *
 	 * @param objectKey
-	 *            the key for the object
+	 * 		the key for the object
 	 * @param object
-	 *            The object that shall be registered for addition
+	 * 		The object that shall be registered for addition
 	 */
 	public void add(Object objectKey, Object object) {
 		add(object.getClass().getName(), objectKey, object);
@@ -342,7 +357,7 @@ public class ObjectFilter {
 	 * Register the update of the given object. Since no key is provided, the class name is used as a key.
 	 *
 	 * @param object
-	 *            The object that shall be registered for updating
+	 * 		The object that shall be registered for updating
 	 */
 	public void update(Object object) {
 		update(object.getClass().getName(), object, object);
@@ -352,9 +367,9 @@ public class ObjectFilter {
 	 * Register the update of the given object. Since no key is provided, the class name is used as a key.
 	 *
 	 * @param objectKey
-	 *            the key for the object
+	 * 		the key for the object
 	 * @param object
-	 *            The object that shall be registered for updating
+	 * 		The object that shall be registered for updating
 	 */
 	public void update(Object objectKey, Object object) {
 		update(object.getClass().getName(), objectKey, object);
@@ -364,7 +379,7 @@ public class ObjectFilter {
 	 * Register the removal of the given object. Since no key is provided, the class name is used as a key.
 	 *
 	 * @param object
-	 *            The object that shall be registered for removal
+	 * 		The object that shall be registered for removal
 	 */
 	public void remove(Object object) {
 		remove(object.getClass().getName(), object, object);
@@ -374,9 +389,9 @@ public class ObjectFilter {
 	 * Register the removal of the given object. Since no key is provided, the class name is used as a key.
 	 *
 	 * @param objectKey
-	 *            the key for the object
+	 * 		the key for the object
 	 * @param object
-	 *            The object that shall be registered for removal
+	 * 		The object that shall be registered for removal
 	 */
 	public void remove(Object objectKey, Object object) {
 		remove(object.getClass().getName(), objectKey, object);
@@ -386,9 +401,9 @@ public class ObjectFilter {
 	 * Returns the ObjectCache for the given key and objectKey
 	 *
 	 * @param key
-	 *            the key under which it was registered
+	 * 		the key under which it was registered
 	 * @param objectKey
-	 *            the objectKey
+	 * 		the objectKey
 	 *
 	 * @return the ObjectCache, or null
 	 */
@@ -400,11 +415,11 @@ public class ObjectFilter {
 	 * Returns the element with the given key and objectKey
 	 *
 	 * @param key
-	 *            the key under which it was registered
+	 * 		the key under which it was registered
 	 * @param objectKey
-	 *            the objectKey
+	 * 		the objectKey
 	 * @param <V>
-	 *            the class to which to cast the element to
+	 * 		the class to which to cast the element to
 	 *
 	 * @return the element, or null
 	 */
@@ -421,9 +436,9 @@ public class ObjectFilter {
 	 * Return true if the element with the given key and objectKey exist
 	 *
 	 * @param key
-	 *            the key under which it was registered
+	 * 		the key under which it was registered
 	 * @param objectKey
-	 *            the objectKey
+	 * 		the objectKey
 	 *
 	 * @return true if the element with the given key and objectKey exist
 	 */
@@ -435,7 +450,7 @@ public class ObjectFilter {
 	 * Get all objects that were registered under the given key and that have as a resulting final action an addition.
 	 *
 	 * @param key
-	 *            The registration key of the objects to match
+	 * 		The registration key of the objects to match
 	 *
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
@@ -454,9 +469,9 @@ public class ObjectFilter {
 	 * Get all objects that were registered under the given key and that have as a resulting final action an addition.
 	 *
 	 * @param clazz
-	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
-	 *            The registration key of the objects to match
+	 * 		The registration key of the objects to match
 	 *
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
@@ -479,7 +494,7 @@ public class ObjectFilter {
 	 * Get all objects that were registered under the given key and that have as a resulting final action an update.
 	 *
 	 * @param key
-	 *            registration key of the objects to match
+	 * 		registration key of the objects to match
 	 *
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
@@ -498,9 +513,9 @@ public class ObjectFilter {
 	 * Get all objects that were registered under the given key and that have as a resulting final action an update.
 	 *
 	 * @param clazz
-	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
-	 *            registration key of the objects to match
+	 * 		registration key of the objects to match
 	 *
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
@@ -523,7 +538,7 @@ public class ObjectFilter {
 	 * Get all objects that were registered under the given key that have as a resulting final action their removal.
 	 *
 	 * @param key
-	 *            The registration key of the objects to match
+	 * 		The registration key of the objects to match
 	 *
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
@@ -542,9 +557,9 @@ public class ObjectFilter {
 	 * Get all objects that were registered under the given key that have as a resulting final action their removal.
 	 *
 	 * @param clazz
-	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
-	 *            The registration key of the objects to match
+	 * 		The registration key of the objects to match
 	 *
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
@@ -567,9 +582,9 @@ public class ObjectFilter {
 	 * Get all objects that were registered under the given key
 	 *
 	 * @param clazz
-	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 * @param key
-	 *            The registration key of the objects to match
+	 * 		The registration key of the objects to match
 	 *
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
@@ -590,7 +605,7 @@ public class ObjectFilter {
 	 * Get all objects that of the given class
 	 *
 	 * @param clazz
-	 *            The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
 	 *
 	 * @return The list of all objects that of the given class
 	 */
@@ -612,7 +627,7 @@ public class ObjectFilter {
 	 * is associated to the object.
 	 *
 	 * @param key
-	 *            The registration key for which the objects shall be retrieved
+	 * 		The registration key for which the objects shall be retrieved
 	 *
 	 * @return The list of objects matching the given key.
 	 */
@@ -630,7 +645,7 @@ public class ObjectFilter {
 	 * is associated to the object.
 	 *
 	 * @param key
-	 *            The registration key for which the objects shall be retrieved
+	 * 		The registration key for which the objects shall be retrieved
 	 *
 	 * @return The list of objects matching the given key.
 	 */

@@ -20,11 +20,9 @@ import li.strolch.utils.dbc.DBC;
  * iterated and expected to be found as a member on the {@link JsonObject}.
  * </p>
  * <p>
- * <p>
  * To ignore {@link Parameter Parameters} or {@link ParameterBag ParameterBags} use the
  * {@link #ignoreParameter(String, String)} and {@link #ignoreBag(String)} methods
  * </p>
- * <p>
  * <p>
  * {@link Parameter} can be made optional by using the {@link #optionalParameter(String, String)} method
  * </p>

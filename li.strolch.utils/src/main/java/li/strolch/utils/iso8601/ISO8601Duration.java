@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,15 +33,15 @@ package li.strolch.utils.iso8601;
  * </ul>
  * <p>
  * An optional preceding minus sign ("-") is also allowed to indicate a negative duration. If the sign is omitted then a
- * positive duration is assumed. For example: <b><an_element duration="PT2H5M2.37S" /></b> is a 2 hour, 5 minute, and
- * 2.37 second duration
+ * positive duration is assumed. For example: <b>&lt;an_element duration="PT2H5M2.37S" /&gt;</b> is a 2 hour, 5 minute,
+ * and 2.37 second duration
  * </p>
  * <p>
  * <b>Remark:</b> since a duration of a day may be measured in hours may vary from 23 an 25 a duration day unit doesn't
  * have a meaning, if we do not know either the start or the end, we restrict ourself to measure a duration in hours,
  * minutes and seconds
  * </p>
- * 
+ *
  * @author Martin Smock &lt;smock.martin@gmail.com&gt;
  * @author Michael Gatto &lt;michael@gatto.ch&gt; (reimplementation using enum)
  */
@@ -50,7 +50,7 @@ public class ISO8601Duration implements DurationFormat {
 
 	/**
 	 * The time representations available, as enum, with the associated millis.
-	 * 
+	 *
 	 * @author gattom
 	 */
 	public enum TimeDuration {
@@ -105,9 +105,10 @@ public class ISO8601Duration implements DurationFormat {
 
 	/**
 	 * check if c is a number char including the decimal decimal dot (.)
-	 * 
+	 *
 	 * @param c
-	 *            the character to check
+	 * 		the character to check
+	 *
 	 * @return boolean return true if the given char is a number or a decimal dot (.), false otherwise
 	 */
 	private static boolean isNumber(char c) {
@@ -119,9 +120,10 @@ public class ISO8601Duration implements DurationFormat {
 
 	/**
 	 * Parses the given string to a pseudo ISO 8601 duration
-	 * 
+	 *
 	 * @param s
-	 *            the string to be parsed to a duration which must be coded as a ISO8601 value
+	 * 		the string to be parsed to a duration which must be coded as a ISO8601 value
+	 *
 	 * @return long the time value which represents the duration
 	 */
 	@Override
@@ -167,11 +169,12 @@ public class ISO8601Duration implements DurationFormat {
 
 	/**
 	 * Return the substring of s starting at index i (in s) that contains a numeric string.
-	 * 
+	 *
 	 * @param index
-	 *            The start index in string s
+	 * 		The start index in string s
 	 * @param s
-	 *            The string to analyze
+	 * 		The string to analyze
+	 *
 	 * @return the substring containing the numeric portion of s starting at index i.
 	 */
 	private String parseNumber(int index, String s) {
@@ -193,13 +196,14 @@ public class ISO8601Duration implements DurationFormat {
 	 * Thus, a duration of 86401000 (one day and one second) will add the representation of one day if unit is DAY (1D)
 	 * and return 1000 as the remainder with respect of this unit. If the given unit is HOUR, then this function adds
 	 * 24H to the {@link StringBuilder}, and returns 1000 as the remainder.
-	 * 
+	 *
 	 * @param sb
-	 *            The {@link StringBuilder} to add the given duration with the right unit
+	 * 		The {@link StringBuilder} to add the given duration with the right unit
 	 * @param duration
-	 *            The duration to add
+	 * 		The duration to add
 	 * @param unit
-	 *            The unit of this duration
+	 * 		The unit of this duration
+	 *
 	 * @return The remainder of the given duration, modulo the time unit.
 	 */
 	private long formatTimeDuration(StringBuilder sb, long duration, TimeDuration unit) {
@@ -232,10 +236,10 @@ public class ISO8601Duration implements DurationFormat {
 
 	/**
 	 * Formats the given time duration to a pseudo ISO 8601 duration string
-	 * 
+	 *
 	 * @param duration
-	 *            the duration
-	 * 
+	 * 		the duration
+	 *
 	 * @return String the duration formatted as a ISO8601 duration string
 	 */
 	@Override

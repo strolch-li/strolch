@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,9 +27,11 @@ import li.strolch.privilege.i18n.PrivilegeMessages;
 import li.strolch.privilege.policy.PrivilegePolicy;
 
 /**
+ * <p>
  * This context gives access to a logged in user's privilege data e.g. the {@link UserRep}, {@link Certificate} and the
  * user's list of {@link PrivilegeRep}
- * <p>
+ * </p>
+ *
  * <p>
  * Note: This is an internal object which is not to be serialized to clients
  * </p>
@@ -102,9 +104,13 @@ public class PrivilegeContext {
 	 * has the privilege, then this method returns with no exception and void, if the user does not have the privilege,
 	 * then a {@link AccessDeniedException} is thrown.
 	 *
-	 * @param restrictable the {@link Restrictable} which the user wants to access
-	 * @throws AccessDeniedException if the user does not have access
-	 * @throws PrivilegeException    if there is an internal error due to wrongly configured privileges or programming errors
+	 * @param restrictable
+	 * 		the {@link Restrictable} which the user wants to access
+	 *
+	 * @throws AccessDeniedException
+	 * 		if the user does not have access
+	 * @throws PrivilegeException
+	 * 		if there is an internal error due to wrongly configured privileges or programming errors
 	 */
 	public void validateAction(Restrictable restrictable) throws PrivilegeException, AccessDeniedException {
 
@@ -114,7 +120,8 @@ public class PrivilegeContext {
 		if (privilege == null) {
 			String msg = MessageFormat
 					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
-							getUsername(), privilegeName, restrictable.getClass().getName(), restrictable.getPrivilegeValue());
+							getUsername(), privilegeName, restrictable.getClass().getName(),
+							restrictable.getPrivilegeValue());
 			throw new AccessDeniedException(msg);
 		}
 

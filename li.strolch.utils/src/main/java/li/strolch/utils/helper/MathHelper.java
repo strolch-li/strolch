@@ -87,13 +87,13 @@ public class MathHelper {
 	 * <p>
 	 * <b>Warning:</b> Do not use the returned value for further calculations. Always finish calculates and use one of
 	 * the following methods:
+	 * </p>
 	 * <ul>
 	 * <li>{@link #isEqualPrecision(double, double)},</li>
 	 * <li>{@link #isGreaterPrecision(double, double)} or</li>
 	 * <li>{@link #isSmallerEqualPrecision(double, double)}</li>
 	 * </ul>
 	 * to test on equality or greater than/ smaller than
-	 * </p>
 	 *
 	 * @param value
 	 * 		the double value to round

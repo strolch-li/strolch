@@ -53,7 +53,7 @@ public class DateHelper {
 	}
 
 	/**
-	 * Formats the given period in the form Pn[DWM] (n days, weeks or months) to the written out form of: <prefix> n
+	 * Formats the given period in the form Pn[DWM] (n days, weeks or months) to the written out form of: &lt;prefix&gt; n
 	 * day(s) / n week(s) / n month(s). Note that the bundle must contain the following keys:
 	 * <ul>
 	 * <li>days</li>

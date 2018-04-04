@@ -53,23 +53,25 @@ import li.strolch.service.api.Command;
  * <p>
  * A Strolch transaction is performed as follows as it is an {@link AutoCloseable} implementation
  * </p>
- * <code>
+ *
+ * <pre>
  * StrolchAgent strolchAgent = getStrolchAgent();
  * StrolchRealm realm = strolchAgent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM);
- * try(StrolchTransaction tx = realm.openTx(certificate, getClass())){
- * // do work e.g. add commands
- * tx.commitOnClose();
+ * try (StrolchTransaction tx = realm.openTx(certificate, getClass())) {
+ *   // do work e.g. add commands
+ *   tx.commitOnClose();
  * }
- * </code>
+ * </pre>
  *
  * <p>
  * A {@link StrolchTransaction} is always opened for a specific realm, should no specific realms be configured, then the
  * {@link StrolchConstants#DEFAULT_REALM} is automatically created.
  * </p>
- * <p>
+ *
  * <p>
  * A {@link StrolchTransaction} takes care of the following:
  * </p>
+ *
  * <ul>
  * <li>Opening and closing database connections</li>
  * <li>Releasing locks to strolch elements, if {@link #lock(StrolchRootElement)} or {@link #lock(Locator)} is used</li>
@@ -113,7 +115,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	public AuditTrail getAuditTrail();
 
 	/**
-	 * Returns a reference to the {@link ResourceMap} for the {@link StrolchRealm} for which this transaction was opened
+	 * Returns a reference to the {@link ResourceMap} for the {@link StrolchRealm} for which this transaction was
+	 * opened
 	 *
 	 * @return the {@link ResourceMap}
 	 */
@@ -127,16 +130,17 @@ public interface StrolchTransaction extends AutoCloseable {
 	public OrderMap getOrderMap();
 
 	/**
-	 * Returns a reference to the {@link ActivityMap} for the {@link StrolchRealm} for which this transaction was opened
+	 * Returns a reference to the {@link ActivityMap} for the {@link StrolchRealm} for which this transaction was
+	 * opened
 	 *
 	 * @return the {@link ActivityMap}
 	 */
 	public ActivityMap getActivityMap();
 
 	/**
-	 * Returns the {@link PersistenceHandler}. If the {@link StrolchRealm} is not running in
-	 * {@link DataStoreMode#TRANSIENT} mode, then the {@link PersistenceHandler} will be a {@link StrolchComponent},
-	 * otherwise it will be the internal in memory persistence handler
+	 * Returns the {@link PersistenceHandler}. If the {@link StrolchRealm} is not running in {@link
+	 * DataStoreMode#TRANSIENT} mode, then the {@link PersistenceHandler} will be a {@link StrolchComponent}, otherwise
+	 * it will be the internal in memory persistence handler
 	 *
 	 * @return the {@link PersistenceHandler}
 	 */
@@ -184,12 +188,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * </p>
 	 * <p>
 	 * <code>
-	 * StrolchAgent strolchAgent = getStrolchAgent();
-	 * StrolchRealm realm = strolchAgent.getContainer().getRealm("defaultRealm");
-	 * try(StrolchTransaction tx = realm.openTx(certificate, getClass())){
-	 * // do work
-	 * tx.commitOnClose();
-	 * }
+	 * StrolchAgent strolchAgent = getStrolchAgent(); StrolchRealm realm = strolchAgent.getContainer().getRealm("defaultRealm");
+	 * try(StrolchTransaction tx = realm.openTx(certificate, getClass())){ // do work tx.commitOnClose(); }
 	 * </code>
 	 * <p>
 	 * After the block is closed, the transaction is automatically closed and all allocated resources are released
@@ -213,8 +213,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	public void rollbackOnClose();
 
 	/**
-	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#ROLLBACK} and returns a
-	 * {@link StrolchTransactionException} which can be thrown by the caller to stop the exception
+	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#ROLLBACK} and returns a {@link
+	 * StrolchTransactionException} which can be thrown by the caller to stop the exception
 	 *
 	 * @param exceptionMessage
 	 *
@@ -231,7 +231,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * <p>
 	 * Performs all registered commands
 	 * </p>
-	 * <p>
+	 *
 	 * <p>
 	 * This method does not release any locks, nor does it notify any observers
 	 * </p>
@@ -246,32 +246,32 @@ public interface StrolchTransaction extends AutoCloseable {
 	public TransactionState getState();
 
 	/**
-	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#OPEN}
+	 * @return if the current state of the StrolchTransaction is {@link TransactionState#OPEN}
 	 */
 	public boolean isOpen();
 
 	/**
-	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#ROLLING_BACK}
+	 * @return if the current state of the StrolchTransaction is {@link TransactionState#ROLLING_BACK}
 	 */
 	public boolean isRollingBack();
 
 	/**
-	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#COMMITTING}
+	 * @return if the current state of the StrolchTransaction is {@link TransactionState#COMMITTING}
 	 */
 	public boolean isCommitting();
 
 	/**
-	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#CLOSING}
+	 * @return if the current state of the StrolchTransaction is {@link TransactionState#CLOSING}
 	 */
 	public boolean isClosing();
 
 	/**
-	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#CLOSED}
+	 * @return if the current state of the StrolchTransaction is {@link TransactionState#CLOSED}
 	 */
 	public boolean isClosed();
 
 	/**
-	 * @return if the current state of the {@link StrolchTransaction} is {@link TransactionState#FAILED}
+	 * @return if the current state of the StrolchTransaction is {@link TransactionState#FAILED}
 	 */
 	public boolean isFailed();
 
@@ -352,6 +352,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		the {@link Locator} of the element to lock
 	 *
 	 * @throws StrolchLockException
+	 * 		if something goes wrong while locking
 	 */
 	public void lock(Locator locator) throws StrolchLockException;
 
@@ -363,6 +364,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		the element to lock
 	 *
 	 * @throws StrolchLockException
+	 * 		if something goes wrong while locking
 	 */
 	public <T extends StrolchRootElement> void lock(T element) throws StrolchLockException;
 
@@ -374,6 +376,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		the element for which the lock is to be released
 	 *
 	 * @throws StrolchLockException
+	 * 		if something goes wrong while unlocking
 	 */
 	public <T extends StrolchRootElement> void releaseLock(T element) throws StrolchLockException;
 
@@ -385,6 +388,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		the {@link Locator} of the element for which the lock is to be released
 	 *
 	 * @throws StrolchLockException
+	 * 		if something goes wrong while unlocking
 	 */
 	public <T extends StrolchRootElement> void releaseLock(Locator locator) throws StrolchLockException;
 
@@ -395,25 +399,26 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * <li>{@link Command#validate()}</li>
 	 * <li>{@link Command#doCommand()}</li>
 	 * </ul>
-	 * <p>
+	 *
 	 * and if an exception occurs:
 	 * <ul>
 	 * <li>{@link Command#undo()}</li>
 	 * </ul>
 	 *
 	 * @param command
+	 * 		the command to add
 	 */
 	public void addCommand(Command command);
 
 	/**
-	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling
-	 * {@link AuditTrail#add(StrolchTransaction, Audit)}
+	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling {@link
+	 * AuditTrail#add(StrolchTransaction, Audit)}
 	 *
 	 * @param accessType
 	 * 		the type of access
 	 * @param elementType
 	 * 		the element type, i.e. {@link Tags#RESOURCE}, {@link Tags#ORDER}
-	 * @param elementType
+	 * @param elementSubType
 	 * 		the element sub type, e.g. {@link Resource#getType()}
 	 * @param id
 	 * 		the id of the element audited
@@ -423,8 +428,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	public Audit auditFrom(AccessType accessType, String elementType, String elementSubType, String id);
 
 	/**
-	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling
-	 * {@link AuditTrail#add(StrolchTransaction, Audit)}
+	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling {@link
+	 * AuditTrail#add(StrolchTransaction, Audit)}
 	 *
 	 * @param accessType
 	 * 		the type of access
@@ -450,9 +455,9 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
-	 * Performs the given {@link ResourceQuery} and each returned {@link Resource} is passed through the
-	 * {@link ResourceVisitor} attached to the {@link ResourceQuery} and the return value of the visitor is added to the
-	 * return list
+	 * Performs the given {@link ResourceQuery} and each returned {@link Resource} is passed through the {@link
+	 * ResourceVisitor} attached to the {@link ResourceQuery} and the return value of the visitor is added to the return
+	 * list
 	 * </p>
 	 *
 	 * @param query
@@ -464,9 +469,9 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>
-	 * Performs the given {@link ActivityQuery} and each returned {@link Activity} is passed through the
-	 * {@link ActivityVisitor} attached to the {@link ActivityQuery} and the return value of the visitor is added to the
-	 * return list
+	 * Performs the given {@link ActivityQuery} and each returned {@link Activity} is passed through the {@link
+	 * ActivityVisitor} attached to the {@link ActivityQuery} and the return value of the visitor is added to the return
+	 * list
 	 * </p>
 	 *
 	 * @param query
@@ -504,16 +509,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * <p>
 	 * Used to find a {@link StrolchElement} by a {@link Locator}.
 	 * </p>
-	 * <p>
+	 *
 	 * <p>
 	 * A Locator has the form <i>&lt;ObjectClassType&gt;/&lt;Type&gt;/&lt;Id&gt;</i> - this is the least amount of path
 	 * elements to find an object. Thus to query a {@link Resource} of type "MyType" and the id "@1" use the following
 	 * path: <i>Resourcee/MyType/@1</i>
 	 * </p>
+	 *
 	 * <p>
-	 * <p>
-	 * This method can also be used to find a deeper element, e.g. a specific {@link Parameter} on an
-	 * {@link ParameterBag} on an {@link Order}. This would be done as follows: <i>Order/MyType/Bag/@1/myParam</i>
+	 * This method can also be used to find a deeper element, e.g. a specific {@link Parameter} on an {@link
+	 * ParameterBag} on an {@link Order}. This would be done as follows: <i>Order/MyType/Bag/@1/myParam</i>
 	 * </p>
 	 *
 	 * @param locator
@@ -522,14 +527,14 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		if element not found, null is returned - presuming Locator has a valid form
 	 *
 	 * @return the element described by the locator. If {@link Locator} references an element which does not exist, i.e.
-	 * an inexistant {@link Resource} or an inexistand {@link Parameter} on a Resource, then a
-	 * {@link StrolchException} is thrown
+	 * an inexistant {@link Resource} or an inexistand {@link Parameter} on a Resource, then a {@link StrolchException}
+	 * is thrown
 	 *
 	 * @throws StrolchException
-	 * 		if the element could not be found and <code>allowNull</code> is false
+	 * 		if the element could not be found and {@code allowNull} is false
 	 * @throws ClassCastException
-	 * 		if the querying code is not asking for the correct instance. Do not query a {@link Parameter} if the
-	 * 		variable to which the result is to be is stored is a {@link Resource}, etc.
+	 * 		if the querying code is not asking for the correct instance. Do not query a {@link Parameter} if the variable
+	 * 		to which the result is to be is stored is a {@link Resource}, etc.
 	 */
 	public <T extends StrolchElement> T findElement(Locator locator, boolean allowNull)
 			throws StrolchException, ClassCastException;
@@ -569,13 +574,12 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * Returns a copy of the {@link Resource} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or
 	 * null if it does not exist
 	 * </p>
+	 *
 	 * <p>
-	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
-	 * {@link StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance
-	 * when creating a {@link Resource} of type <code>Person</code> then having a template with the id
-	 * <code>Person</code> helps creating new Person resources; get the resource and then create a clone:
-	 * {@link Resource#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
+	 * StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
+	 * creating a {@link Resource} of type {@code Person} then having a template with the id {@code Person} helps
+	 * creating new Person resources; get the resource and then create a clone: {@link Resource#getClone()}
 	 * </p>
 	 *
 	 * @param type
@@ -588,24 +592,24 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * <p>
 	 * Returns a copy of the {@link Resource} of Type {@link StrolchConstants#TEMPLATE} with the given type as id. If
-	 * <code>assertExists</code> is true, then an exception is thrown if the template does not exist does not exist
+	 * {@code assertExists} is true, then an exception is thrown if the template does not exist does not exist
 	 * </p>
+	 *
 	 * <p>
-	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
-	 * {@link StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance
-	 * when creating a {@link Resource} of type <code>Person</code> then having a template with the id
-	 * <code>Person</code> helps creating new Person resources; get the resource and then create a clone:
-	 * {@link Resource#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
+	 * StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
+	 * creating a {@link Resource} of type {@code Person} then having a template with the id {@code Person} helps
+	 * creating new Person resources; get the resource and then create a clone: {@link Resource#getClone()}
 	 * </p>
 	 *
 	 * @param type
 	 * 		the id of the {@link Resource} template
 	 *
-	 * @return the copy of the {@link Resource} template with the given id, or if <code>assertExists</code> is true,
-	 * then an exception is thrown if the resource does not exist
+	 * @return the copy of the {@link Resource} template with the given id, or if {@code assertExists} is true, then an
+	 * exception is thrown if the resource does not exist
 	 *
 	 * @throws StrolchException
+	 * 		if the template does not exist and {@code assertExists} is true
 	 */
 	public Resource getResourceTemplate(String type, boolean assertExists) throws StrolchException;
 
@@ -614,13 +618,12 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * Returns a copy of the {@link Order} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or null
 	 * if it does not exist
 	 * </p>
+	 *
 	 * <p>
-	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
-	 * {@link StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance
-	 * when creating an {@link Order} of type <code>PurchaseOrder</code> then having a template with the id
-	 * <code>PurchaseOrder</code> helps creating new PurchaseOrder orders; get the order and then create a clone:
-	 * {@link Order#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
+	 * StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
+	 * creating an {@link Order} of type {@code PurchaseOrder} then having a template with the id {@code PurchaseOrder}
+	 * helps creating new PurchaseOrder orders; get the order and then create a clone: {@link Order#getClone()}
 	 * </p>
 	 *
 	 * @param type
@@ -633,24 +636,24 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * <p>
 	 * Returns a copy of the {@link Order} of Type {@link StrolchConstants#TEMPLATE} with the given type as id. If
-	 * <code>assertExists</code> is true, then an exception is thrown if the template does not exist does not exist
+	 * {@code assertExists} is true, then an exception is thrown if the template does not exist does not exist
 	 * </p>
+	 *
 	 * <p>
-	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
-	 * {@link StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance
-	 * when creating an {@link Order} of type <code>PurchaseOrder</code> then having a template with the id
-	 * <code>PurchaseOrder</code> helps creating new PurchaseOrder orders; get the order and then create a clone:
-	 * {@link Order#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
+	 * StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
+	 * creating an {@link Order} of type {@code PurchaseOrder} then having a template with the id {@code PurchaseOrder}
+	 * helps creating new PurchaseOrder orders; get the order and then create a clone: {@link Order#getClone()}
 	 * </p>
 	 *
 	 * @param type
 	 * 		the id of the {@link Order} template
 	 *
-	 * @return the copy of the {@link Order} template with the given id, or if <code>assertExists</code> is true, then
-	 * an exception is thrown if the order does not exist
+	 * @return the copy of the {@link Order} template with the given id, or if {@code assertExists} is true, then an
+	 * exception is thrown if the order does not exist
 	 *
 	 * @throws StrolchException
+	 * 		if the template does not exist and {@code assertExists} is true
 	 */
 	public Order getOrderTemplate(String type, boolean assertExists) throws StrolchException;
 
@@ -659,13 +662,12 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * Returns a copy of the {@link Activity} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or
 	 * null if it does not exist
 	 * </p>
+	 *
 	 * <p>
-	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
-	 * {@link StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance
-	 * when creating a {@link Activity} of type <code>ToStock</code> then having a template with the id
-	 * <code>ToStock</code> helps creating new ToStock activities; get the activity and then create a clone:
-	 * {@link Activity#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
+	 * StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
+	 * creating a {@link Activity} of type {@code ToStock} then having a template with the id {@code ToStock} helps
+	 * creating new ToStock activities; get the activity and then create a clone: {@link Activity#getClone()}
 	 * </p>
 	 *
 	 * @param type
@@ -678,24 +680,24 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * <p>
 	 * Returns a copy of the {@link Activity} of Type {@link StrolchConstants#TEMPLATE} with the given type as id. If
-	 * <code>assertExists</code> is true, then an exception is thrown if the template does not exist does not exist
+	 * {@code assertExists} is true, then an exception is thrown if the template does not exist does not exist
 	 * </p>
+	 *
 	 * <p>
-	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
-	 * {@link StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance
-	 * when creating a {@link Activity} of type <code>ToStock</code> then having a template with the id
-	 * <code>ToStock</code> helps creating new ToStock activities; get the activity and then create a clone:
-	 * {@link Activity#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
+	 * StrolchConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
+	 * creating a {@link Activity} of type {@code ToStock} then having a template with the id {@code ToStock} helps
+	 * creating new ToStock activities; get the activity and then create a clone: {@link Activity#getClone()}
 	 * </p>
 	 *
 	 * @param type
 	 * 		the id of the {@link Activity} template
 	 *
-	 * @return the copy of the {@link Activity} template with the given id, or if <code>assertExists</code> is true,
-	 * then an exception is thrown if the activity does not exist
+	 * @return the copy of the {@link Activity} template with the given id, or if {@code assertExists} is true, then an
+	 * exception is thrown if the activity does not exist
 	 *
 	 * @throws StrolchException
+	 * 		if the template does not exist and {@code assertExists} is true
 	 */
 	public Activity getActivityTemplate(String type, boolean assertExists) throws StrolchException;
 
@@ -729,9 +731,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	public Resource getResourceBy(String type, String id, boolean assertExists) throws StrolchException;
 
 	/**
-	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference
-	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and
-	 * the UOM must be set to the resource's type and the value is the id of the resource
+	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference {@link
+	 * Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and the UOM
+	 * must be set to the resource's type and the value is the id of the resource
 	 *
 	 * @param refP
 	 * 		the {@link StringParameter} which references a {@link Resource}
@@ -744,9 +746,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	public Resource getResourceBy(StringParameter refP) throws StrolchException;
 
 	/**
-	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference
-	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and
-	 * the UOM must be set to the resource's type and the value is the id of the resource
+	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference {@link
+	 * Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_RESOURCE_REF} and the UOM
+	 * must be set to the resource's type and the value is the id of the resource
 	 *
 	 * @param refP
 	 * 		the {@link StringParameter} which references a {@link Resource}
@@ -756,8 +758,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the resource referenced by the parameter, or null if it does not exist
 	 *
 	 * @throws StrolchException
-	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter, or if the
-	 * 		resource does not exist, and assertExists is true
+	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter, or if the resource does
+	 * 		not exist, and assertExists is true
 	 */
 	public Resource getResourceBy(StringParameter refP, boolean assertExists) throws StrolchException;
 
@@ -788,7 +790,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		if true, and resource does not exist, then a {@link StrolchException} is thrown
 	 *
 	 * @return the resources referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any
-	 * missing resources are not returned unless <code>assertExists</code> is true
+	 * missing resources are not returned unless {@code assertExists} is true
 	 *
 	 * @throws StrolchException
 	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
@@ -796,7 +798,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	public List<Resource> getResourcesBy(StringListParameter refP, boolean assertExists) throws StrolchException;
 
 	/**
-	 * <p>Returns the {@link Resource} for the given {@link Action}. This is done by getting the resource by {@link Action#getResourceType()} and {@link Action#getResourceId()}</p>
+	 * <p>Returns the {@link Resource} for the given {@link Action}. This is done by getting the resource by {@link
+	 * Action#getResourceType()} and {@link Action#getResourceId()}</p>
 	 *
 	 * <p>Should the resource not exist, then null is returned</p>
 	 *
@@ -811,17 +814,20 @@ public interface StrolchTransaction extends AutoCloseable {
 	public Resource getResourceFor(Action action) throws StrolchException;
 
 	/**
-	 * <p>Returns the {@link Resource} for the given {@link Action}. This is done by getting the resource by {@link Action#getResourceType()} and {@link Action#getResourceId()}</p>
+	 * <p>Returns the {@link Resource} for the given {@link Action}. This is done by getting the resource by {@link
+	 * Action#getResourceType()} and {@link Action#getResourceId()}</p>
 	 *
-	 * <p>Should the resource not exist and <code>assertExists</code> is true, then an exception is thrown, otherwise null is returned</p>
+	 * <p>Should the resource not exist and {@code assertExists} is true, then an exception is thrown, otherwise
+	 * null is returned</p>
 	 *
 	 * @param action
 	 * 		the action for which to return the resoruce
 	 *
-	 * @return the resource referenced by the action. If the resource does not exist and <code>assertExists</code> is true then an exception is thrown, otherwise null is returnee
+	 * @return the resource referenced by the action. If the resource does not exist and {@code assertExists} is true
+	 * then an exception is thrown, otherwise null is returnee
 	 *
 	 * @throws StrolchException
-	 * 		if the action is null and <code>assertExists</code> is true, or something else goes wrong
+	 * 		if the action is null and {@code assertExists} is true, or something else goes wrong
 	 */
 	public Resource getResourceFor(Action action, boolean assertExists) throws StrolchException;
 
@@ -855,9 +861,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	public Activity getActivityBy(String type, String id, boolean assertExists) throws StrolchException;
 
 	/**
-	 * Returns the {@link Activity} which is referenced by the given {@link StringParameter}. A reference
-	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF} and
-	 * the UOM must be set to the activity's type and the value is the id of the activity
+	 * Returns the {@link Activity} which is referenced by the given {@link StringParameter}. A reference {@link
+	 * Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF} and the UOM
+	 * must be set to the activity's type and the value is the id of the activity
 	 *
 	 * @param refP
 	 * 		the {@link StringParameter} which references an {@link Activity}
@@ -870,9 +876,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	public Activity getActivityBy(StringParameter refP) throws StrolchException;
 
 	/**
-	 * Returns the {@link Activity} which is referenced by the given {@link StringParameter}. A reference
-	 * {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF} and
-	 * the UOM must be set to the activity's type and the value is the id of the activity
+	 * Returns the {@link Activity} which is referenced by the given {@link StringParameter}. A reference {@link
+	 * Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF} and the UOM
+	 * must be set to the activity's type and the value is the id of the activity
 	 *
 	 * @param refP
 	 * 		the {@link StringParameter} which references an {@link Activity}
@@ -882,16 +888,15 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the activity referenced by the parameter, or null if it does not exist
 	 *
 	 * @throws StrolchException
-	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter, or if the
-	 * 		activity does not exist, and assertExists is true
+	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter, or if the activity does
+	 * 		not exist, and assertExists is true
 	 */
 	public Activity getActivityBy(StringParameter refP, boolean assertExists) throws StrolchException;
 
 	/**
 	 * Returns all {@link Activity Activities} which are referenced by the given {@link StringListParameter}. A
-	 * reference {@link Parameter} must have its interpretation set to
-	 * {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the value
-	 * is the id of the activity
+	 * reference {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF}
+	 * and the UOM must be set to the activity's type and the value is the id of the activity
 	 *
 	 * @param refP
 	 * 		the {@link StringListParameter} which references a list of {@link Activity Activities}
@@ -906,9 +911,8 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * Returns all {@link Activity Activities} which are referenced by the given {@link StringListParameter}. A
-	 * reference {@link Parameter} must have its interpretation set to
-	 * {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the value
-	 * is the id of the activity
+	 * reference {@link Parameter} must have its interpretation set to {@link StrolchConstants#INTERPRETATION_ACTIVITY_REF}
+	 * and the UOM must be set to the activity's type and the value is the id of the activity
 	 *
 	 * @param refP
 	 * 		the {@link StringListParameter} which references a list of {@link Activity Activities}
@@ -916,7 +920,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		if true, and activity does not exist, then a {@link StrolchException} is thrown
 	 *
 	 * @return the activities referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any
-	 * missing activities are not returned unless <code>assertExists</code> is true
+	 * missing activities are not returned unless {@code assertExists} is true
 	 *
 	 * @throws StrolchException
 	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
@@ -980,8 +984,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the order referenced by the parameter, or null if it does not exist
 	 *
 	 * @throws StrolchException
-	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter, or if the order
-	 * 		does not exist, and assertExists is true
+	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter, or if the order does not
+	 * 		exist, and assertExists is true
 	 */
 	public Order getOrderBy(StringParameter refP, boolean assertExists) throws StrolchException;
 
@@ -1012,7 +1016,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		if true, and order does not exist, then a {@link StrolchException} is thrown
 	 *
 	 * @return the orders referenced by the parameter, or the empty list if they do not exist. <b>Note:</b> Any missing
-	 * orders are not returned unless <code>assertExists</code> is true
+	 * orders are not returned unless {@code assertExists} is true
 	 *
 	 * @throws StrolchException
 	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
@@ -1155,7 +1159,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	public void remove(Activity activity) throws StrolchException;
 
 	/**
-	 * Return true if this transaction has any registered elements or commands for persistence. E.g. {@link #add(Order)} or {@link #addCommand(Command)}, etc. were called
+	 * Return true if this transaction has any registered elements or commands for persistence. E.g. {@link #add(Order)}
+	 * or {@link #addCommand(Command)}, etc. were called
 	 *
 	 * @return true if this transaction needs to be committed to persist changes
 	 */
@@ -1170,6 +1175,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		the element on which the operation is performed
 	 *
 	 * @throws AccessDeniedException
+	 * 		if the session for this TX does not have the required privilege
 	 */
 	public void assertHasPrivilege(Operation operation, StrolchRootElement element) throws AccessDeniedException;
 }

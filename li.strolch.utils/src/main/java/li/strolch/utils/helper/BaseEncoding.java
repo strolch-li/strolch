@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,9 +21,11 @@ import java.text.MessageFormat;
  * <p>
  * This class implements the encoding and decoding of RFC 4648 <a>https://tools.ietf.org/html/rfc4648</a>.
  * </p>
- * 
+ *
  * <p>
  * The following implementations are supported:
+ * </p>
+ *
  * <ul>
  * <li>Base64</li>
  * <li>Base64 URL safe</li>
@@ -31,17 +33,16 @@ import java.text.MessageFormat;
  * <li>Base32 HEX</li>
  * <li>Base16 / HEX</li>
  * </ul>
- * </p>
- * 
+ *
  * <p>
  * As a further bonus, it is possible to use the algorithm with a client specified alphabet. In this case the client is
  * responsible for generating the alphabet for use in the decoding
  * </p>
- * 
+ *
  * <p>
  * This class also implements a number of utility methods to check if given data is in a valid encoding
  * </p>
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class BaseEncoding {
@@ -53,71 +54,71 @@ public class BaseEncoding {
 
 	public static final byte PAD = '=';
 
-	static final byte[] BASE_16 = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+	private static final byte[] BASE_16 = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-	static final byte[] BASE_32 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+	private static final byte[] BASE_32 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
 			'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7' };
 
-	static final byte[] BASE_32_HEX = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+	private static final byte[] BASE_32_HEX = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
 			'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V' };
 
-	static final byte[] BASE_32_DMEDIA = { '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+	private static final byte[] BASE_32_DMEDIA = { '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
 			'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y' };
 
-	static final byte[] BASE_32_CROCKFORD = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+	private static final byte[] BASE_32_CROCKFORD = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
 			'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z' };
 
-	static final byte[] BASE_64 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+	private static final byte[] BASE_64 = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
 			'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
 			'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6',
 			'7', '8', '9', '+', '/' };
 
-	static final byte[] BASE_64_SAFE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+	private static final byte[] BASE_64_SAFE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
 			'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
 			'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5',
 			'6', '7', '8', '9', '-', '_' };
 
 	// these reverse base encoding alphabets were generated from the actual alphabet
 
-	static final byte[] REV_BASE_16 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	private static final byte[] REV_BASE_16 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-	static final byte[] REV_BASE_32 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	private static final byte[] REV_BASE_32 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, 26, 27, 28, 29, 30, 31, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 			11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-	static final byte[] REV_BASE_32_CROCKFORD = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	private static final byte[] REV_BASE_32_CROCKFORD = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, 16, 17,
 			-1, 18, 19, -1, 20, 21, -1, 22, 23, 24, 25, 26, -1, 27, 28, 29, 30, 31, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1 };
 
-	static final byte[] REV_BASE_32_DMEDIA = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	private static final byte[] REV_BASE_32_DMEDIA = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, -1, -1, -1, -1, -1, -1, -1, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 			16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1 };
 
-	static final byte[] REV_BASE_32_HEX = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	private static final byte[] REV_BASE_32_HEX = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
 			20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-	static final byte[] REV_BASE_64 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	private static final byte[] REV_BASE_64 = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1,
 			63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 			11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31,
 			32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1 };
 
-	static final byte[] REV_BASE_64_SAFE = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	private static final byte[] REV_BASE_64_SAFE = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62,
 			-1, -1, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 			10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, 63, -1, 26, 27, 28, 29, 30,
@@ -317,12 +318,12 @@ public class BaseEncoding {
 
 	/**
 	 * @param alphabet
-	 *            the alphabet to use
+	 * 		the alphabet to use
 	 * @param bytes
-	 *            the check if encoded
+	 * 		the check if encoded
 	 * @param maxPadding
-	 *            max padding allowed
-	 * 
+	 * 		max padding allowed
+	 *
 	 * @return true if encoded by alphabet
 	 */
 	public static boolean isEncodedByAlphabet(byte[] alphabet, byte[] bytes, int maxPadding) {
@@ -357,19 +358,20 @@ public class BaseEncoding {
 
 	/**
 	 * Encodes the given data to a 64-bit alphabet encoding. Thus the passed alphabet can be any arbitrary alphabet
-	 * 
+	 *
 	 * @param alphabet
-	 *            the 64-bit alphabet to use
+	 * 		the 64-bit alphabet to use
 	 * @param bytes
-	 *            the bytes to encode
-	 * 
+	 * 		the bytes to encode
+	 *
 	 * @return the encoded data
 	 */
 	public static byte[] toBase64(byte[] alphabet, byte[] bytes) {
 		if (bytes.length == 0)
 			return new byte[0];
 		if (alphabet.length != 64) {
-			String msg = MessageFormat.format("Alphabet does not have expected size 64 but is {0}", alphabet.length); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Alphabet does not have expected size 64 but is {0}", alphabet.length); //$NON-NLS-1$
 			throw new RuntimeException(msg);
 		}
 
@@ -467,19 +469,20 @@ public class BaseEncoding {
 
 	/**
 	 * Encodes the given data to a 32-bit alphabet encoding. Thus the passed alphabet can be any arbitrary alphabet
-	 * 
+	 *
 	 * @param alphabet
-	 *            the 32-bit alphabet to use
+	 * 		the 32-bit alphabet to use
 	 * @param bytes
-	 *            the bytes to encode
-	 * 
+	 * 		the bytes to encode
+	 *
 	 * @return the encoded data
 	 */
 	public static byte[] toBase32(byte[] alphabet, byte[] bytes) {
 		if (bytes.length == 0)
 			return new byte[0];
 		if (alphabet.length != 32) {
-			String msg = MessageFormat.format("Alphabet does not have expected size 32 but is {0}", alphabet.length); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Alphabet does not have expected size 32 but is {0}", alphabet.length); //$NON-NLS-1$
 			throw new RuntimeException(msg);
 		}
 
@@ -591,19 +594,20 @@ public class BaseEncoding {
 
 	/**
 	 * Encodes the given data to a 16-bit alphabet encoding. Thus the passed alphabet can be any arbitrary alphabet
-	 * 
+	 *
 	 * @param alphabet
-	 *            the 16-bit alphabet to use
+	 * 		the 16-bit alphabet to use
 	 * @param bytes
-	 *            the bytes to encode
-	 * 
+	 * 		the bytes to encode
+	 *
 	 * @return the encoded data
 	 */
 	public static byte[] toBase16(byte[] alphabet, byte[] bytes) {
 		if (bytes.length == 0)
 			return new byte[0];
 		if (alphabet.length != 16) {
-			String msg = MessageFormat.format("Alphabet does not have expected size 16 but is {0}", alphabet.length); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Alphabet does not have expected size 16 but is {0}", alphabet.length); //$NON-NLS-1$
 			throw new RuntimeException(msg);
 		}
 
@@ -644,12 +648,12 @@ public class BaseEncoding {
 
 	/**
 	 * Decodes the given Base64 encoded data to the original data set
-	 * 
+	 *
 	 * @param alphabet
-	 *            the 64-bit alphabet to use
+	 * 		the 64-bit alphabet to use
 	 * @param bytes
-	 *            the bytes to decode
-	 * 
+	 * 		the bytes to decode
+	 *
 	 * @return the decoded data
 	 */
 	public static byte[] fromBase64(byte[] alphabet, byte[] bytes) {
@@ -657,19 +661,21 @@ public class BaseEncoding {
 		if (inputLength == 0)
 			return new byte[0];
 		if ((inputLength % 4) != 0) {
-			String msg = MessageFormat.format(
-					"The input bytes to be decoded must be multiples of 4, but is multiple of {0}", //$NON-NLS-1$
-					(inputLength % 4));
+			String msg = MessageFormat
+					.format("The input bytes to be decoded must be multiples of 4, but is multiple of {0}",//$NON-NLS-1$
+							(inputLength % 4));
 			throw new RuntimeException(msg);
 		}
 
 		if (alphabet.length != 128) {
-			String msg = MessageFormat.format("Alphabet does not have expected size 128 but is {0}", alphabet.length); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Alphabet does not have expected size 128 but is {0}", alphabet.length); //$NON-NLS-1$
 			throw new RuntimeException(msg);
 		}
 
 		if (!isEncodedByAlphabet(alphabet, bytes, PADDING_64))
-			throw new RuntimeException("The data contains illegal values which are not mapped by the given alphabet!"); //$NON-NLS-1$
+			throw new RuntimeException(
+					"The data contains illegal values which are not mapped by the given alphabet!"); //$NON-NLS-1$
 
 		// find how much padding we have
 		int nrOfBytesPadding = 0;
@@ -783,12 +789,12 @@ public class BaseEncoding {
 
 	/**
 	 * Decodes the given Base32 encoded data to the original data set
-	 * 
+	 *
 	 * @param alphabet
-	 *            the 32-bit alphabet to use
+	 * 		the 32-bit alphabet to use
 	 * @param bytes
-	 *            the bytes to decode
-	 * 
+	 * 		the bytes to decode
+	 *
 	 * @return the decoded data
 	 */
 	public static byte[] fromBase32(byte[] alphabet, byte[] bytes) {
@@ -802,12 +808,14 @@ public class BaseEncoding {
 		}
 
 		if (alphabet.length != 128) {
-			String msg = MessageFormat.format("Alphabet does not have expected size 128 but is {0}", alphabet.length); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Alphabet does not have expected size 128 but is {0}", alphabet.length); //$NON-NLS-1$
 			throw new RuntimeException(msg);
 		}
 
 		if (!isEncodedByAlphabet(alphabet, bytes, PADDING_32))
-			throw new RuntimeException("The data contains illegal values which are not mapped by the given alphabet!"); //$NON-NLS-1$
+			throw new RuntimeException(
+					"The data contains illegal values which are not mapped by the given alphabet!"); //$NON-NLS-1$
 
 		// find how much padding we have
 		int nrOfBytesPadding = 0;
@@ -946,12 +954,12 @@ public class BaseEncoding {
 
 	/**
 	 * Decodes the given Base16 encoded data to the original data set
-	 * 
+	 *
 	 * @param alphabet
-	 *            the 16-bit alphabet to use
+	 * 		the 16-bit alphabet to use
 	 * @param bytes
-	 *            the bytes to decode
-	 * 
+	 * 		the bytes to decode
+	 *
 	 * @return the decoded data
 	 */
 	public static byte[] fromBase16(byte[] alphabet, byte[] bytes) {
@@ -964,17 +972,19 @@ public class BaseEncoding {
 		}
 
 		if (alphabet.length != 128) {
-			String msg = MessageFormat.format("Alphabet does not have expected size 128 but is {0}", alphabet.length); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Alphabet does not have expected size 128 but is {0}", alphabet.length); //$NON-NLS-1$
 			throw new RuntimeException(msg);
 		}
 
 		if (!isEncodedByAlphabet(alphabet, bytes, 0))
-			throw new RuntimeException("The data contains illegal values which are not mapped by the given alphabet!"); //$NON-NLS-1$
+			throw new RuntimeException(
+					"The data contains illegal values which are not mapped by the given alphabet!"); //$NON-NLS-1$
 
 		int dataLength = bytes.length / 2;
 
 		byte[] data = new byte[dataLength];
-		for (int i = 0; i < bytes.length;) {
+		for (int i = 0; i < bytes.length; ) {
 
 			byte b1 = bytes[i++];
 			byte b2 = bytes[i++];

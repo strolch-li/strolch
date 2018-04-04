@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,15 +27,12 @@ import java.util.Set;
  * <p>
  * Collection to store a tree with a depth of 3 elements. This solves having to always write the declaration:
  * </p>
- * <p>
  * <pre>
  * Map&lt;String, Map&lt;String, MyObject&gt;&gt; mapOfMaps = new HashMap&lt;&gt;;
  * </pre>
  * <p>
- * <p>
  * As an example to persist a map of MyObject where the branches are String one would write it as follows:
  * </p>
- * <p>
  * <pre>
  * MapOfMaps&lt;String, String, MyObject&gt; mapOfMaps = new MapOfMaps&lt;&gt;();
  * </pre>
