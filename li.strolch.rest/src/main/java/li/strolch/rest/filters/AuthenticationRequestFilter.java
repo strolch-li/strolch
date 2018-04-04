@@ -42,6 +42,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This authentication request filter secures any requests to a Strolch server, by verifying that the request contains
+ * either the cookie {@link StrolchRestfulConstants#STROLCH_AUTHORIZATION} containing the authorization token, or the
+ * header {@link HttpHeaders#AUTHORIZATION} with the authorization token as its value.
+ *
+ * <br>
+ *
+ * Sub classes should override {@link #validateSession(ContainerRequestContext)} to add further validation.
+ *
  * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -53,6 +61,12 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 	private Set<String> unsecuredPaths;
 
+	/**
+	 * Defines the set of paths which are considered to be unsecured, i.e. can be requested without having logged in
+	 * prior to the request
+	 *
+	 * @return the set of unsecured paths
+	 */
 	protected Set<String> getUnsecuredPaths() {
 		Set<String> paths = new HashSet<>();
 		paths.add("strolch/authentication");
@@ -61,54 +75,39 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		return paths;
 	}
 
-	@Override
-	public void filter(ContainerRequestContext requestContext) throws IOException {
+	/**
+	 * Validates if the path for the given request is for an unsecured path, i.e. no authorization is required
+	 *
+	 * @param requestContext
+	 * 		the request context
+	 *
+	 * @return true if the request context is for an unsecured path, false if not, meaning authorization must be
+	 * validated
+	 */
+	protected boolean isUnsecuredPath(ContainerRequestContext requestContext) {
+
+		// we have to allow OPTIONS for CORS
+		if (requestContext.getMethod().equals("OPTIONS"))
+			return true;
 
 		List<String> matchedURIs = requestContext.getUriInfo().getMatchedURIs();
 
 		// we allow unauthorized access to the authentication service
 		if (this.unsecuredPaths == null)
 			this.unsecuredPaths = getUnsecuredPaths();
-		if (matchedURIs.stream().anyMatch(s -> this.unsecuredPaths.contains(s))) {
+
+		return matchedURIs.stream().anyMatch(s -> this.unsecuredPaths.contains(s));
+	}
+
+	@Override
+	public void filter(ContainerRequestContext requestContext) throws IOException {
+		if (isUnsecuredPath(requestContext))
 			return;
-		}
-
-		// we have to allow OPTIONS for CORS
-		if (requestContext.getMethod().equals("OPTIONS")) {
-			return;
-		}
-
-		String sessionId = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-		if (StringHelper.isEmpty(sessionId)) {
-
-			Cookie cookie = requestContext.getCookies().get(StrolchRestfulConstants.STROLCH_AUTHORIZATION);
-			if (cookie == null) {
-				logger.error(
-						"No Authorization header or cookie on request to URL " + requestContext.getUriInfo().getPath());
-				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-						.entity("Missing Authorization!") //$NON-NLS-1$
-						.build());
-				return;
-			}
-
-			sessionId = cookie.getValue();
-			if (StringHelper.isEmpty(sessionId)) {
-				logger.error("Authorization Cookie value missing on request to URL " + requestContext.getUriInfo()
-						.getPath());
-				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-						.entity("Missing Authorization!") //$NON-NLS-1$
-						.build());
-				return;
-			}
-		}
 
 		try {
-			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance()
-					.getComponent(StrolchSessionHandler.class);
-			Certificate certificate = sessionHandler.validate(sessionId);
-			requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
+
+			validateSession(requestContext);
+
 		} catch (StrolchNotAuthenticatedException e) {
 			logger.error(e.getMessage());
 			requestContext.abortWith(
@@ -125,5 +124,57 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
 							.entity("User cannot access the resource.").build()); //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * Validate the given request context by checking for the authorization cookie or header and then verifying a
+	 * session exists and is valid with the given authoriation token
+	 *
+	 * <br>
+	 *
+	 * Sub classes should override this method and first call super. If the return value is non-null, then further
+	 * validation can be performed
+	 *
+	 * @param requestContext
+	 * 		the request context for the secured path
+	 *
+	 * @return the certificate for the validated session, or null, of the request is aborted to no missing or invalid
+	 * authorization token
+	 */
+	protected Certificate validateSession(ContainerRequestContext requestContext) {
+
+		String sessionId = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+		if (StringHelper.isEmpty(sessionId)) {
+
+			Cookie cookie = requestContext.getCookies().get(StrolchRestfulConstants.STROLCH_AUTHORIZATION);
+			if (cookie == null) {
+				logger.error(
+						"No Authorization header or cookie on request to URL " + requestContext.getUriInfo().getPath());
+				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+						.entity("Missing Authorization!") //$NON-NLS-1$
+						.build());
+				return null;
+			}
+
+			sessionId = cookie.getValue();
+			if (StringHelper.isEmpty(sessionId)) {
+				logger.error("Authorization Cookie value missing on request to URL " + requestContext.getUriInfo()
+						.getPath());
+				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+						.entity("Missing Authorization!") //$NON-NLS-1$
+						.build());
+				return null;
+			}
+		}
+
+		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance()
+				.getComponent(StrolchSessionHandler.class);
+		Certificate certificate = sessionHandler.validate(sessionId);
+
+		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
+
+		return certificate;
 	}
 }
