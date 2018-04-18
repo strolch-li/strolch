@@ -17,6 +17,7 @@ package li.strolch.agent.impl;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ORDER_REF;
 
+import java.util.Date;
 import java.util.List;
 
 import li.strolch.agent.api.OrderMap;
@@ -33,6 +34,13 @@ public class CachedOrderMap extends CachedElementMap<Order> implements OrderMap 
 
 	public CachedOrderMap(StrolchRealm realm) {
 		super(realm);
+	}
+
+	@Override
+	public Order getTemplate(StrolchTransaction tx, String type, boolean assertExists) {
+		Order template = super.getTemplate(tx, type, assertExists);
+		template.setDate(new Date());
+		return template;
 	}
 
 	@Override
