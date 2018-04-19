@@ -60,14 +60,38 @@ public class ObjectHelper {
 				return collection.contains(right);
 		}
 
-		if (left instanceof String && right instanceof String) {
+		if (left instanceof String) {
 			String str = (String) left;
-			String subStr = (String) right;
 
-			if (ignoreCase)
-				return str.toLowerCase().contains(subStr.toLowerCase());
-			else
-				return str.contains(subStr);
+			if (right instanceof String[]) {
+				String[] arr = (String[]) right;
+
+				if (ignoreCase) {
+					str = str.toLowerCase();
+					for (String s : arr) {
+						if (!str.contains(s.toLowerCase()))
+							return false;
+					}
+
+					return true;
+
+				} else {
+					for (String s : arr) {
+						if (!str.contains(s))
+							return false;
+					}
+
+					return true;
+				}
+
+			} else if (right instanceof String) {
+				String subStr = (String) right;
+
+				if (ignoreCase)
+					return str.toLowerCase().contains(subStr.toLowerCase());
+				else
+					return str.contains(subStr);
+			}
 		}
 
 		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());
