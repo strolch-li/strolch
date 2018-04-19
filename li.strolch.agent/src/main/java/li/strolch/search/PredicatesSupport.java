@@ -47,6 +47,14 @@ public class PredicatesSupport {
 		return left -> ObjectHelper.contains(left, right, true);
 	}
 
+	public static SearchPredicate isIn(Object right) {
+		return left -> ObjectHelper.isIn(left, right, false);
+	}
+
+	public static SearchPredicate isInIgnoreCase(Object right) {
+		return left -> ObjectHelper.isIn(left, right, true);
+	}
+
 	public static SearchPredicate inRange(DateRange range) {
 		return left -> range.contains((Date) left);
 	}

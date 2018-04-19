@@ -365,6 +365,10 @@ public class StrolchSearchTest {
 							.and(param(BAG_ID, PARAM_STRING_ID, isNotEqualTo("dfgdfg")))
 							.and(param(BAG_ID, PARAM_STRING_ID, isNotEqualToIgnoreCase("dfgdfg")))
 							.and(param(BAG_ID, PARAM_STRING_ID, contains("rol")))
+							.and(param(BAG_ID, PARAM_STRING_ID, isIn("Strolch")))
+							.and(param(BAG_ID, PARAM_STRING_ID, isIn("Strolch", "sdf")))
+							.and(param(BAG_ID, PARAM_STRING_ID, isInIgnoreCase("strolch")))
+							.and(param(BAG_ID, PARAM_STRING_ID, isInIgnoreCase("strolch", "dfgdfg")))
 							.and(param(BAG_ID, PARAM_STRING_ID, contains(new String[] { "Str", "rol" })))
 							.and(param(BAG_ID, PARAM_STRING_ID, containsIgnoreCase("ROL")))
 							.and(param(BAG_ID, PARAM_STRING_ID, containsIgnoreCase(new String[] { "STR", "ROL" })))
@@ -375,12 +379,19 @@ public class StrolchSearchTest {
 
 							.and(param(BAG_ID, PARAM_BOOLEAN_ID, isEqualTo(true)))
 							.and(param(BAG_ID, PARAM_DATE_ID, isEqualTo(new Date(1354295525628L))))
-							.and(param(BAG_ID, PARAM_INTEGER_ID, isEqualTo(77)))
+
+							.and(param(BAG_ID, PARAM_INTEGER_ID, isEqualTo(77))) //
+							.and(param(BAG_ID, PARAM_INTEGER_ID, isIn(77))) //
+							.and(param(BAG_ID, PARAM_INTEGER_ID, isIn(77, 88))) //
+							.and(param(BAG_ID, PARAM_INTEGER_ID, isIn(asList(77, 88)))) //
 
 							.and(param(BAG_ID, PARAM_LIST_FLOAT_ID, isEqualTo(asList(6.0D, 11.0D, 16.0D))))
 							.and(param(BAG_ID, PARAM_LIST_FLOAT_ID, contains(singletonList(6.0D))))
+							.and(param(BAG_ID, PARAM_LIST_FLOAT_ID, contains(asList(6.0D, 11.0D))))
 
 							.and(param(BAG_ID, PARAM_LIST_INTEGER_ID, isEqualTo(asList(5, 10, 15))))
+							.and(param(BAG_ID, PARAM_LIST_INTEGER_ID, contains(asList(5, 10))))
+
 							.and(param(BAG_ID, PARAM_LIST_LONG_ID, isEqualTo(asList(7L, 12L, 17L))))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isEqualTo(asList("Hello", "World"))))
 

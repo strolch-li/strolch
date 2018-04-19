@@ -47,6 +47,14 @@ public interface ExpressionBuilder<T extends StrolchRootElement> {
 		return element -> PredicatesSupport.containsIgnoreCase(right).matches(extract(element));
 	}
 
+	default SearchExpression<T> isIn(Object right) {
+		return element -> PredicatesSupport.isIn(right).matches(extract(element));
+	}
+
+	default SearchExpression<T> isInIgnoreCase(Object right) {
+		return element -> PredicatesSupport.isInIgnoreCase(right).matches(extract(element));
+	}
+
 	default SearchExpression<T> inRange(DateRange range) {
 		return element -> PredicatesSupport.inRange(range).matches(extract(element));
 	}

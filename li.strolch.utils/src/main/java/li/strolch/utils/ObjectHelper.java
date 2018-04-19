@@ -56,8 +56,7 @@ public class ObjectHelper {
 			Collection<?> collection = (Collection) left;
 			if (right instanceof Collection)
 				return collection.containsAll((Collection) right);
-			else
-				return collection.contains(right);
+			return collection.contains(right);
 		}
 
 		if (left instanceof String) {
@@ -83,8 +82,9 @@ public class ObjectHelper {
 
 					return true;
 				}
+			}
 
-			} else if (right instanceof String) {
+			if (right instanceof String) {
 				String subStr = (String) right;
 
 				if (ignoreCase)
@@ -92,6 +92,42 @@ public class ObjectHelper {
 				else
 					return str.contains(subStr);
 			}
+		}
+
+		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());
+	}
+
+	public static boolean isIn(Object left, Object right, boolean ignoreCase) {
+		if (left == null && right == null)
+			return true;
+		if (left == null)
+			return false;
+		if (right == null)
+			return false;
+
+		if (right instanceof Collection) {
+			Collection<?> collection = (Collection) right;
+			for (Object o : collection) {
+				if (equals(left, o, ignoreCase))
+					return true;
+			}
+
+			return false;
+
+		}
+
+		if (right instanceof Object[]) {
+			Object[] arr = (Object[]) right;
+			for (Object o : arr) {
+				if (equals(left, o, ignoreCase))
+					return true;
+			}
+
+			return false;
+		}
+
+		if (right instanceof String || right instanceof Number) {
+			return equals(left, right, ignoreCase);
 		}
 
 		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());
@@ -111,8 +147,7 @@ public class ObjectHelper {
 
 			if (ignoreCase)
 				return str.toLowerCase().startsWith(subStr.toLowerCase());
-			else
-				return str.startsWith(subStr);
+			return str.startsWith(subStr);
 		}
 
 		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());
@@ -132,8 +167,7 @@ public class ObjectHelper {
 
 			if (ignoreCase)
 				return str.toLowerCase().endsWith(subStr.toLowerCase());
-			else
-				return str.endsWith(subStr);
+			return str.endsWith(subStr);
 		}
 
 		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());

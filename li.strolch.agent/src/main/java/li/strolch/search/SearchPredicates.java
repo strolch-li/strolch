@@ -44,6 +44,22 @@ public interface SearchPredicates {
 		return PredicatesSupport.containsIgnoreCase(right);
 	}
 
+	default SearchPredicate isIn(Object right) {
+		return PredicatesSupport.isIn(right);
+	}
+
+	default SearchPredicate isIn(Object... right) {
+		return PredicatesSupport.isIn(right);
+	}
+
+	default SearchPredicate isInIgnoreCase(Object right) {
+		return PredicatesSupport.isInIgnoreCase(right);
+	}
+
+	default SearchPredicate isInIgnoreCase(Object... right) {
+		return PredicatesSupport.isInIgnoreCase(right);
+	}
+
 	default SearchPredicate inRange(DateRange range) {
 		return PredicatesSupport.inRange(range);
 	}
