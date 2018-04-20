@@ -119,4 +119,9 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareTo(((IntegerParameter) o).getValue());
 	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.INTEGER;
+	}
 }

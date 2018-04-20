@@ -18,6 +18,7 @@ package li.strolch.model.parameter;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchModelConstants;
+import li.strolch.model.StrolchValueType;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -161,4 +162,9 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 
 	@Override
 	public Parameter<T> getClone();
+
+	/**
+	 * @return the {@link StrolchValueType}
+	 */
+	public StrolchValueType getValueType();
 }

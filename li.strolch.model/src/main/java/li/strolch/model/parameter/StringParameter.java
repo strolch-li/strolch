@@ -117,4 +117,9 @@ public class StringParameter extends AbstractParameter<String> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareToIgnoreCase(((StringParameter) o).getValue());
 	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.STRING;
+	}
 }

@@ -119,4 +119,9 @@ public class LongParameter extends AbstractParameter<Long> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareTo(((LongParameter) o).getValue());
 	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.LONG;
+	}
 }

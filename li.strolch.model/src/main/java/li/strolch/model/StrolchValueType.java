@@ -17,24 +17,8 @@ package li.strolch.model;
 
 import java.text.MessageFormat;
 
-import li.strolch.model.parameter.BooleanParameter;
-import li.strolch.model.parameter.DateParameter;
-import li.strolch.model.parameter.DurationParameter;
-import li.strolch.model.parameter.FloatListParameter;
-import li.strolch.model.parameter.FloatParameter;
-import li.strolch.model.parameter.IntegerListParameter;
-import li.strolch.model.parameter.IntegerParameter;
-import li.strolch.model.parameter.LongListParameter;
-import li.strolch.model.parameter.LongParameter;
-import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringListParameter;
-import li.strolch.model.parameter.StringParameter;
-import li.strolch.model.timedstate.BooleanTimedState;
-import li.strolch.model.timedstate.FloatTimedState;
-import li.strolch.model.timedstate.IntegerTimedState;
-import li.strolch.model.timedstate.StringSetTimedState;
-import li.strolch.model.timedstate.StrolchTimedState;
-import li.strolch.model.timedstate.TimedState;
+import li.strolch.model.parameter.*;
+import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.BooleanValue;
@@ -54,6 +38,11 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	BOOLEAN("Boolean") {
+		@Override
+		public Object parseValue(String value) {
+			return BooleanParameter.parseFromString(value);
+		}
+
 		@Override
 		public Parameter<?> parameterInstance() {
 			return new BooleanParameter();
@@ -86,6 +75,11 @@ public enum StrolchValueType {
 	 */
 	INTEGER("Integer") {
 		@Override
+		public Object parseValue(String value) {
+			return IntegerParameter.parseFromString(value);
+		}
+
+		@Override
 		public Parameter<?> parameterInstance() {
 			return new IntegerParameter();
 		}
@@ -117,6 +111,11 @@ public enum StrolchValueType {
 	 */
 	FLOAT("Float") {
 		@Override
+		public Object parseValue(String value) {
+			return FloatParameter.parseFromString(value);
+		}
+
+		@Override
 		public Parameter<?> parameterInstance() {
 			return new FloatParameter();
 		}
@@ -144,6 +143,11 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	LONG("Long") {
+		@Override
+		public Object parseValue(String value) {
+			return LongParameter.parseFromString(value);
+		}
+
 		@Override
 		public Parameter<?> parameterInstance() {
 			return new LongParameter();
@@ -175,6 +179,11 @@ public enum StrolchValueType {
 	 */
 	STRING("String") {
 		@Override
+		public Object parseValue(String value) {
+			return value;
+		}
+
+		@Override
 		public Parameter<?> parameterInstance() {
 			return new StringParameter();
 		}
@@ -205,6 +214,11 @@ public enum StrolchValueType {
 	 */
 	DATE("Date") {
 		@Override
+		public Object parseValue(String value) {
+			return DateParameter.parseFromString(value);
+		}
+
+		@Override
 		public Parameter<?> parameterInstance() {
 			return new DateParameter();
 		}
@@ -229,6 +243,11 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	DURATION("Duration") {
+		@Override
+		public Object parseValue(String value) {
+			return DurationParameter.parseFromString(value);
+		}
+
 		@Override
 		public Parameter<?> parameterInstance() {
 			return new DurationParameter();
@@ -255,6 +274,11 @@ public enum StrolchValueType {
 	 */
 	FLOAT_LIST("FloatList") {
 		@Override
+		public Object parseValue(String value) {
+			return FloatListParameter.parseFromString(value);
+		}
+
+		@Override
 		public Parameter<?> parameterInstance() {
 			return new FloatListParameter();
 		}
@@ -279,6 +303,11 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	INTEGER_LIST("IntegerList") {
+		@Override
+		public Object parseValue(String value) {
+			return IntegerListParameter.parseFromString(value);
+		}
+
 		@Override
 		public Parameter<?> parameterInstance() {
 			return new IntegerListParameter();
@@ -305,6 +334,11 @@ public enum StrolchValueType {
 	 */
 	LONG_LIST("LongList") {
 		@Override
+		public Object parseValue(String value) {
+			return LongListParameter.parseFromString(value);
+		}
+
+		@Override
 		public Parameter<?> parameterInstance() {
 			return new LongListParameter();
 		}
@@ -329,6 +363,11 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	STRING_LIST("StringList") {
+		@Override
+		public Object parseValue(String value) {
+			return StringListParameter.parseFromString(value);
+		}
+
 		@Override
 		public Parameter<?> parameterInstance() {
 			return new StringListParameter();
@@ -356,6 +395,12 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	STRING_SET("StringSet") {
+		@Override
+		public Object parseValue(String value) {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("Parsing value of type {0} is not supported!", getType())); //$NON-NLS-1$
+		}
+
 		@Override
 		public Parameter<?> parameterInstance() {
 			throw new UnsupportedOperationException(
@@ -394,6 +439,8 @@ public enum StrolchValueType {
 		}
 		throw new IllegalArgumentException("Type " + value + " does not exist!");
 	}
+
+	public abstract Object parseValue(String value);
 
 	public abstract Parameter<?> parameterInstance();
 

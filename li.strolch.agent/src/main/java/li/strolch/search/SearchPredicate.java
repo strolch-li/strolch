@@ -1,10 +1,14 @@
 package li.strolch.search;
 
+import li.strolch.search.predicates.NotPredicate;
+
 public interface SearchPredicate {
 
-	boolean matches(Object value);
+	boolean matches(Object left);
+
+	SearchPredicate coerce(ValueCoercer coercer);
 
 	default SearchPredicate not() {
-		return element -> !this.matches(element);
+		return new NotPredicate(this);
 	}
 }

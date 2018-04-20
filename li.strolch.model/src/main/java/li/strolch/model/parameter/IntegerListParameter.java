@@ -177,4 +177,9 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return Integer.compare(this.getValue().size(), ((IntegerListParameter) o).getValue().size());
 	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.INTEGER_LIST;
+	}
 }

@@ -177,4 +177,9 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return Integer.compare(this.getValue().size(), ((LongListParameter) o).getValue().size());
 	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.LONG_LIST;
+	}
 }

@@ -94,6 +94,10 @@ public class ObjectHelper {
 			}
 		}
 
+		// comparing non-strings we use equals, as contains fits as well
+		if (left.getClass() == right.getClass())
+			return left.equals(right);
+
 		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());
 	}
 

@@ -117,4 +117,9 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareTo(((BooleanParameter) o).getValue());
 	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.BOOLEAN;
+	}
 }

@@ -121,4 +121,9 @@ public class FloatParameter extends AbstractParameter<Double> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareTo(((FloatParameter) o).getValue());
 	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.FLOAT;
+	}
 }

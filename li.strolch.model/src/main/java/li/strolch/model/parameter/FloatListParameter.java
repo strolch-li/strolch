@@ -177,4 +177,9 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return Integer.compare(this.getValue().size(), ((FloatListParameter) o).getValue().size());
 	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.FLOAT_LIST;
+	}
 }

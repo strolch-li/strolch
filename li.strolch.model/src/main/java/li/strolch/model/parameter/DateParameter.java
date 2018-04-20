@@ -123,4 +123,9 @@ public class DateParameter extends AbstractParameter<Date> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareTo(((DateParameter) o).getValue());
 	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.DATE;
+	}
 }

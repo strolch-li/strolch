@@ -177,4 +177,9 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return Integer.compare(this.getValue().size(), ((StringListParameter) o).getValue().size());
 	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.STRING_LIST;
+	}
 }

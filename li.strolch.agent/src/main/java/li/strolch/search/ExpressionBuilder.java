@@ -7,6 +7,10 @@ public interface ExpressionBuilder<T extends StrolchRootElement> {
 
 	Object extract(StrolchRootElement element);
 
+	default ValueCoercer getValueCoercer(StrolchRootElement context) {
+		return e -> e;
+	}
+
 	default SearchExpression<T> isEqualTo(Object right) {
 		return element -> PredicatesSupport.isEqualTo(right).matches(extract(element));
 	}
