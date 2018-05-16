@@ -6,7 +6,10 @@ import java.util.Set;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.exception.StrolchModelException;
-import li.strolch.model.*;
+import li.strolch.model.Order;
+import li.strolch.model.ParameterBag;
+import li.strolch.model.Resource;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags.Json;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
@@ -20,8 +23,8 @@ import li.strolch.utils.dbc.DBC;
  * iterated and expected to be found as a member on the {@link JsonObject}.
  * </p>
  * <p>
- * To ignore {@link Parameter Parameters} or {@link ParameterBag ParameterBags} use the
- * {@link #ignoreParameter(String, String)} and {@link #ignoreBag(String)} methods
+ * To ignore {@link Parameter Parameters} or {@link ParameterBag ParameterBags} use the {@link #ignoreParameter(String,
+ * * String)} and {@link #ignoreBag(String)} methods
  * </p>
  * <p>
  * {@link Parameter} can be made optional by using the {@link #optionalParameter(String, String)} method
@@ -111,12 +114,12 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
 		// types must be the same, if exists on source element
 		if (this.srcObject.has(Json.TYPE))
-			DBC.PRE.assertEquals("type must be the same!", dstElement.getObjectType(),
+			DBC.PRE.assertEquals("type must be the same!", dstElement.getType(),
 					this.srcObject.get(Json.TYPE).getAsString());
 
 		// update name if possible
 		if (this.srcObject.has(Json.NAME))
-			dstElement.setName(srcObject.get(Json.NAME).getAsString());
+			dstElement.setName(this.srcObject.get(Json.NAME).getAsString());
 
 		Set<String> bagKeySet = dstElement.getParameterBagKeySet();
 		for (String bagId : bagKeySet) {
