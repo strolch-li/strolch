@@ -27,6 +27,7 @@ public class StrolchSystemAction extends SystemAction {
 		} catch (Exception e) {
 			logger.error("Failed to execute SystemAction for " + privilegeContext.getUsername() + " due to " + e
 					.getMessage(), e);
+			throw e;
 		}
 	}
 }
