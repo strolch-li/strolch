@@ -74,11 +74,15 @@ public class StringHelper {
 	}
 
 	public static String toPrettyHexString(byte[] raw) {
-		try {
-			byte[] hex = new byte[3 * raw.length + (raw.length / 8)];
-			int index = 0;
+		return toPrettyHexString(raw, 0, raw.length);
+	}
 
-			for (int i = 0; i < raw.length; i++) {
+	public static String toPrettyHexString(byte[] raw, int srcPos, int length) {
+		try {
+			byte[] hex = new byte[3 * length + (length / 8)];
+			int index = srcPos;
+
+			for (int i = srcPos; i < length; i++) {
 				byte b = raw[i];
 				int v = b & 0xFF;
 				hex[index++] = HEX_CHAR_TABLE[v >>> 4];
@@ -551,8 +555,8 @@ public class StringHelper {
 	}
 
 	/**
-	 * Checks every value in the {@link Properties} and then then replaces any ${...} variables with keys in this
-	 * {@link Properties} value using {@link StringHelper#replacePropertiesIn(Properties, String)}
+	 * Checks every value in the {@link Properties} and then then replaces any ${...} variables with keys in this {@link
+	 * Properties} value using {@link StringHelper#replacePropertiesIn(Properties, String)}
 	 *
 	 * @param properties
 	 * 		the properties in which the values must have any ${...} replaced by values of the respective key
@@ -708,13 +712,10 @@ public class StringHelper {
 	}
 
 	/**
-	 * <p>
-	 * Parses the given string value to a boolean. This extends the default {@link Boolean#parseBoolean(String)} as it
-	 * throws an exception if the string value is not equal to "true" or "false" being case insensitive.
-	 * </p>
+	 * <p> Parses the given string value to a boolean. This extends the default {@link Boolean#parseBoolean(String)} as
+	 * it throws an exception if the string value is not equal to "true" or "false" being case insensitive. </p>
 	 *
-	 * <p>
-	 * This additional restriction is important where false should really be caught, not any random vaue for false
+	 * <p> This additional restriction is important where false should really be caught, not any random vaue for false
 	 * </p>
 	 *
 	 * @param value
