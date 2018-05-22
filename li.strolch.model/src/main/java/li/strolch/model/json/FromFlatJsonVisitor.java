@@ -142,13 +142,15 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 				if (jsonElement == null) {
 					if (this.optionalKeys.containsElement(bagId, paramId))
 						continue;
-					throw new StrolchModelException("JsonObject is missing member " + paramId);
+					throw new StrolchModelException(
+							"JsonObject is missing member " + paramId + " for " + parameterBag.getLocator() + "/"
+									+ paramId);
 				}
 
 				if (!jsonElement.isJsonPrimitive()) {
 					throw new StrolchModelException(
 							"JsonElement " + paramId + " is not a json primitive but a " + jsonElement.getClass()
-									.getName());
+									.getName() + " for " + parameterBag.getLocator() + "/" + paramId);
 				}
 
 				Parameter<?> parameter = parameterBag.getParameter(paramId);
