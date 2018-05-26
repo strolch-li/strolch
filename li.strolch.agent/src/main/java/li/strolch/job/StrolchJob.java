@@ -1,27 +1,34 @@
 package li.strolch.job;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class StrolchJob implements Runnable {
 
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchJob.class);
 
 	private StrolchAgent agent;
+	private boolean first;
+	private Future<?> future;
 
 	public StrolchJob(StrolchAgent agent) {
 		this.agent = agent;
+		this.first = true;
 	}
 
 	/**
@@ -43,8 +50,8 @@ public abstract class StrolchJob implements Runnable {
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
-	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user {@link
+	 * StrolchConstants#SYSTEM_USER_AGENT}
 	 *
 	 * @param runnable
 	 * 		the runnable to perform
@@ -68,5 +75,50 @@ public abstract class StrolchJob implements Runnable {
 		return getContainer().getRealm(cert).openTx(cert, this.getClass());
 	}
 
-	public abstract Future<?> schedule();
+	@Override
+	public final void run() {
+		try {
+			runAsAgent(this::execute);
+		} catch (Exception e) {
+			logger.error("Execution of Job " + this.getClass().getSimpleName() + " failed.", e);
+		}
+
+		this.first = false;
+		schedule();
+	}
+
+	public void cancel(boolean mayInterruptIfRunning) {
+		if (this.future != null)
+			this.future.cancel(mayInterruptIfRunning);
+	}
+
+	protected abstract long getInitialDelay();
+
+	protected abstract TimeUnit getInitialDelayTimeUnit();
+
+	protected abstract long getDelay();
+
+	protected abstract TimeUnit getDelayTimeUnit();
+
+	public StrolchJob schedule() {
+
+		if (this.first) {
+			long millis = getInitialDelayTimeUnit().toMillis(getInitialDelay());
+			logger.info("First execution of " + getClass().getSimpleName() + " will be at " + ZonedDateTime.now()
+					.plus(millis, ChronoUnit.MILLIS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+			this.future = getScheduledExecutor().schedule(this, getInitialDelay(), getInitialDelayTimeUnit());
+
+		} else {
+			long millis = getDelayTimeUnit().toMillis(getDelay());
+			logger.info("Next execution of " + getClass().getSimpleName() + " will be at " + ZonedDateTime.now()
+					.plus(millis, ChronoUnit.MILLIS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+			this.future = getScheduledExecutor().schedule(this, getDelay(), getDelayTimeUnit());
+		}
+
+		return this;
+	}
+
+	protected abstract void execute(PrivilegeContext ctx);
 }
