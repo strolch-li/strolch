@@ -15,11 +15,7 @@
  */
 package li.strolch.persistence.postgresql;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLXML;
+import java.sql.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,20 +26,21 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Version;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
+import li.strolch.persistence.api.TransactionResult;
 
 @SuppressWarnings("nls")
 public abstract class PostgresqlDao<T extends StrolchRootElement> implements StrolchDao<T> {
 
-	private PostgreSqlStrolchTransaction tx;
+	protected Connection connection;
+	protected final TransactionResult txResult;
+	protected final boolean versioningEnabled;
 	protected List<DaoCommand> commands;
 
-	public PostgresqlDao(PostgreSqlStrolchTransaction tx) {
-		this.tx = tx;
+	public PostgresqlDao(Connection connection, TransactionResult txResult, boolean versioningEnabled) {
+		this.connection = connection;
+		this.txResult = txResult;
+		this.versioningEnabled = versioningEnabled;
 		this.commands = new ArrayList<>();
-	}
-
-	protected PostgreSqlStrolchTransaction tx() {
-		return this.tx;
 	}
 
 	protected abstract String getClassName();
@@ -55,7 +52,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	@Override
 	public long querySize() {
 		String sql = "select count(*) from " + getTableName() + " where latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 
 			try (ResultSet result = statement.executeQuery()) {
 				result.next();
@@ -70,7 +67,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	@Override
 	public long querySize(String type) {
 		String sql = "select count(*) from " + getTableName() + " where type = ? and latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
 
 			try (ResultSet result = statement.executeQuery()) {
@@ -88,7 +85,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		Set<String> keySet = new HashSet<>();
 
 		String sql = "select distinct type from " + getTableName() + " where latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
@@ -108,7 +105,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
 				+ " where type = ? and id = ? and version = ?";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
 			statement.setString(2, id);
 			statement.setInt(3, versionNr);
@@ -149,7 +146,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		List<T> list = new ArrayList<>(1);
 
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
 			statement.setString(2, id);
 
@@ -182,7 +179,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		String sql = "select count(*), max(version) from " + getTableName() + " where type = ? and id = ?";
 
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
 			statement.setString(2, id);
 
@@ -206,7 +203,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ?";
 
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
 			statement.setString(2, id);
 
@@ -227,7 +224,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
 				+ " where latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
@@ -261,7 +258,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
 				+ " where type = ? and latest = true";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
 
 			try (ResultSet result = statement.executeQuery()) {
@@ -385,7 +382,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		// first find out how many there are
 		long count = 0;
 		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ?";
-		try (PreparedStatement statement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, element.getType());
 			statement.setString(2, element.getId());
 
@@ -405,7 +402,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		}
 
 		sql = "delete from " + getTableName() + " where id = ?";
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, element.getId());
 
 			int modCount = preparedStatement.executeUpdate();
@@ -423,7 +420,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	private void internalRemoveVersion(T element) {
 		String sql = "delete from " + getTableName() + " where type = ? and id = ? and version = ? and latest = true";
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, element.getType());
 			preparedStatement.setString(2, element.getId());
 			preparedStatement.setInt(3, element.getVersion().getVersion());
@@ -437,7 +434,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 			if (!element.getVersion().isFirstVersion()) {
 				sql = "update " + getTableName() + " set latest = true where type = ? and id = ? and version = ?";
-				try (PreparedStatement updateStmt = tx().getConnection().prepareStatement(sql)) {
+				try (PreparedStatement updateStmt = this.connection.prepareStatement(sql)) {
 					int previousVersion = element.getVersion().getPreviousVersion();
 					updateStmt.setString(1, element.getType());
 					updateStmt.setString(2, element.getId());
@@ -463,7 +460,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	protected void internalRemoveAll() {
 		String sql = "delete from " + getTableName();
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			preparedStatement.executeUpdate();
 
@@ -475,7 +472,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	protected void internalRemoveAllBy(String type) {
 		String sql = "delete from " + getTableName() + " where type = ?";
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, type);
 
 			preparedStatement.executeUpdate();
@@ -490,7 +487,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	public void flush() {
 		// even though we support rollback we can clear the commands here even if we performed them because the DB transaction will be rolled back
 		for (DaoCommand command : this.commands) {
-			command.doComand(tx().getTxResult());
+			command.doComand(this.txResult);
 		}
 		this.commands.clear();
 	}

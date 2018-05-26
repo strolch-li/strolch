@@ -119,6 +119,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setState(TransactionState.OPEN);
 	}
 
+	public String getAction() {
+		return this.action;
+	}
+
 	public TransactionResult getTxResult() {
 		return this.txResult;
 	}

@@ -87,6 +87,13 @@ import li.strolch.service.api.Command;
 public interface StrolchTransaction extends AutoCloseable {
 
 	/**
+	 * Returns the action for which this transaction was opened
+	 *
+	 * @return the action for which this transaction was opened
+	 */
+	public String getAction();
+
+	/**
 	 * Returns the name of the {@link StrolchRealm} for which this transaction was opened
 	 *
 	 * @return the name of the {@link StrolchRealm} for which this transaction was opened

@@ -61,6 +61,11 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		super.initialize(componentConfiguration);
 	}
 
+	@Override
+	public ComponentConfiguration getConfiguration() {
+		return super.getConfiguration();
+	}
+
 	/**
 	 * Returns the map of {@link DataSource} which can be used in maintenance mode
 	 *
@@ -121,7 +126,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		return new PostgreSqlStrolchTransaction(getContainer(), realm, certificate, action, this);
 	}
 
-	Connection getConnection(String realm) {
+	public Connection getConnection(String realm) {
 		DataSource ds = this.dsMap.get(realm);
 		if (ds == null) {
 			String msg = MessageFormat

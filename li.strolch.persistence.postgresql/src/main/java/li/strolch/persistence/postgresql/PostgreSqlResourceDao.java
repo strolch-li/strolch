@@ -21,10 +21,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.SQLXML;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.MessageFormat;
 import java.util.Calendar;
 
@@ -35,6 +32,7 @@ import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
+import li.strolch.persistence.api.TransactionResult;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -43,8 +41,8 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 	public static final String RESOURCES = "resources";
 
-	protected PostgreSqlResourceDao(PostgreSqlStrolchTransaction tx) {
-		super(tx);
+	protected PostgreSqlResourceDao(Connection connection, TransactionResult txResult, boolean versioningEnabled) {
+		super(connection, txResult, versioningEnabled);
 	}
 
 	@Override
@@ -79,7 +77,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	}
 
 	protected SQLXML createSqlXml(Resource res, PreparedStatement preparedStatement) throws SQLException, SAXException {
-		SQLXML sqlxml = tx().getConnection().createSQLXML();
+		SQLXML sqlxml = this.connection.createSQLXML();
 		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
 		ContentHandler contentHandler = saxResult.getHandler();
 		contentHandler.startDocument();
@@ -92,7 +90,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	protected void internalSave(final Resource res) {
 		String sql = "insert into " + getTableName()
 				+ " (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// id
 			preparedStatement.setString(1, res.getId());
@@ -134,7 +132,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 		// and set the previous version to not be latest anymore
 		sql = "update " + getTableName() + " SET latest = false WHERE id = ? AND version = ?";
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// primary key
 			preparedStatement.setString(1, res.getId());
@@ -157,7 +155,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	protected void internalUpdate(final Resource resource) {
 
 		// with versioning we save a new object
-		if (tx().getRealm().isVersioningEnabled()) {
+		if (this.versioningEnabled) {
 			internalSave(resource);
 			return;
 		}
@@ -179,7 +177,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 		// now we update the existing object
 		String sql = "update " + getTableName()
 				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asxml = ? where id = ? and version = ?";
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// version
 			preparedStatement.setString(1, resource.getVersion().getCreatedBy());

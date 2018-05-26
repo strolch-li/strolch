@@ -21,10 +21,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.SQLXML;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.MessageFormat;
 import java.util.Calendar;
 
@@ -35,6 +32,7 @@ import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
+import li.strolch.persistence.api.TransactionResult;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -43,8 +41,8 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 	public static final String ORDERS = "orders";
 
-	public PostgreSqlOrderDao(PostgreSqlStrolchTransaction tx) {
-		super(tx);
+	public PostgreSqlOrderDao(Connection connection, TransactionResult txResult, boolean versioningEnabled) {
+		super(connection, txResult, versioningEnabled);
 	}
 
 	@Override
@@ -79,7 +77,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	}
 
 	protected SQLXML createSqlXml(Order order, PreparedStatement preparedStatement) throws SQLException, SAXException {
-		SQLXML sqlxml = tx().getConnection().createSQLXML();
+		SQLXML sqlxml = this.connection.createSQLXML();
 		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
 		ContentHandler contentHandler = saxResult.getHandler();
 		contentHandler.startDocument();
@@ -94,7 +92,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 		String sql = "insert into " + getTableName()
 				+ " (id, version, created_by, created_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
 
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// id
 			preparedStatement.setString(1, order.getId());
@@ -139,7 +137,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 		// and set the previous version to not be latest anymore
 		sql = "update " + getTableName() + " SET latest = false WHERE id = ? AND version = ?";
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// primary key
 			preparedStatement.setString(1, order.getId());
@@ -163,7 +161,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	protected void internalUpdate(final Order order) {
 
 		// with versioning we save a new object
-		if (tx().getRealm().isVersioningEnabled()) {
+		if (this.versioningEnabled) {
 			internalSave(order);
 			return;
 		}
@@ -185,7 +183,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 		// now we update the existing object
 		String sql = "update " + getTableName()
 				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? and version = ?";
-		try (PreparedStatement preparedStatement = tx().getConnection().prepareStatement(sql)) {
+		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// version
 			preparedStatement.setString(1, order.getVersion().getCreatedBy());
