@@ -158,7 +158,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 					int v = result.getInt(4);
 					String createdBy = result.getString(5);
-					Date createdAt = result.getDate(6);
+					Date createdAt = new Date(result.getDate(6).getTime());
 					boolean deleted = result.getBoolean(7);
 					Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
 					t.setVersion(version);
@@ -235,7 +235,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 					int v = result.getInt(4);
 					String createdBy = result.getString(5);
-					Date createdAt = result.getDate(6);
+					Date createdAt = new Date(result.getDate(6).getTime());
 					boolean deleted = result.getBoolean(7);
 					Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
 					t.setVersion(version);
@@ -269,7 +269,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 					int v = result.getInt(4);
 					String createdBy = result.getString(5);
-					Date createdAt = result.getDate(6);
+					Date createdAt = new Date(result.getDate(6).getTime());
 					boolean deleted = result.getBoolean(7);
 					Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
 					t.setVersion(version);
