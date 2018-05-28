@@ -36,7 +36,7 @@ public class QueryProcessorTest extends BaseTest {
 						+ "o.getId() = :id\",\"queryParameter\":{\"id\":\"0\"},\"resultSet\":[[{\"objectType\":\"Resource\",\"id\":\"0\",\"name\":null,"
 						+ "\"type\":null,\"parameterBags\":{\"testBag\":{\"id\":\"testBag\",\"name\":null,\"type\":null,"
 						+ "\"parameters\":{\"testId\":{\"id\":\"testId\",\"name\":null,\"type\":\"Float\",\"value\":\"100.0\"}}}}},"
-						+ "{\"objectType\":\"Order\",\"id\":\"0\",\"name\":null,\"type\":null,\"date\":\"2017-11-01T00:00:00.000+01:00\","
+						+ "{\"objectType\":\"Order\",\"id\":\"0\",\"name\":null,\"type\":null,\"date\":\"2017-11-01T00:00:00+01:00\","
 						+ "\"state\":\"Created\",\"parameterBags\":{\"testBag\":{\"id\":\"testBag\",\"name\":null,\"type\":null,"
 						+ "\"parameters\":{\"testId\":{\"id\":\"testId\",\"name\":null,\"type\":\"Float\",\"value\":\"100.0\"}}}}}]]}";
 

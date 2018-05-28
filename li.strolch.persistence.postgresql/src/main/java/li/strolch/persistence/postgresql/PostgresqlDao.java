@@ -123,7 +123,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					throw new StrolchPersistenceException(
 							"Requested version " + versionNr + " != " + v + " for " + t.getLocator());
 				String createdBy = result.getString(5);
-				Date createdAt = result.getDate(6);
+				Date createdAt = new Date(result.getDate(6).getTime());
 				boolean deleted = result.getBoolean(7);
 				Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
 				t.setVersion(version);
