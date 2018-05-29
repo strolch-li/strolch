@@ -88,7 +88,7 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	public void setValue(List<Integer> value) {
 		assertNotReadonly();
 		validateValue(value);
-		this.value = new ArrayList<>(value.size());
+		this.value = new ArrayList<>(value);
 	}
 
 	@Override
