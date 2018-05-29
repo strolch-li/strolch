@@ -20,6 +20,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.report.ReportElement;
 import li.strolch.runtime.StrolchConstants;
+import li.strolch.utils.ObjectHelper;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
@@ -162,7 +163,10 @@ public class GenericReport extends ReportPolicy {
 
 		return buildStream().map(e -> new ReportElement(this.columnIds, columnId -> {
 			StringParameter columnDefP = this.columnsBag.getParameter(columnId, true);
-			return evaluateColumnValue(columnDefP, e);
+			Object value = evaluateColumnValue(columnDefP, e);
+			if (value instanceof Date)
+				return ISO8601FormatFactory.getInstance().formatDate((Date) value);
+			return value.toString();
 		}));
 	}
 
@@ -206,13 +210,13 @@ public class GenericReport extends ReportPolicy {
 
 			int sortVal;
 			if (fieldRefP.getValue().startsWith("$")) {
-				String columnValue1 = evaluateColumnValue(fieldRefP, row1);
-				String columnValue2 = evaluateColumnValue(fieldRefP, row2);
+				Object columnValue1 = evaluateColumnValue(fieldRefP, row1);
+				Object columnValue2 = evaluateColumnValue(fieldRefP, row2);
 
 				if (this.descending) {
-					sortVal = columnValue1.compareTo(columnValue2);
+					sortVal = ObjectHelper.compare(columnValue1, columnValue2, true);
 				} else {
-					sortVal = columnValue2.compareTo(columnValue1);
+					sortVal = ObjectHelper.compare(columnValue2, columnValue1, true);
 				}
 
 			} else {
@@ -260,7 +264,10 @@ public class GenericReport extends ReportPolicy {
 				return false;
 
 			if (fieldRefP.getValue().startsWith("$")) {
-				String columnValue = evaluateColumnValue(fieldRefP, row);
+				Object value = evaluateColumnValue(fieldRefP, row);
+				String columnValue = value instanceof Date ?
+						ISO8601FormatFactory.getInstance().formatDate((Date) value) :
+						value.toString();
 				if (!filterPolicy.filter(columnValue))
 					return false;
 			} else {
@@ -316,7 +323,7 @@ public class GenericReport extends ReportPolicy {
 		return true;
 	}
 
-	protected String evaluateColumnValue(StringParameter columnDefP, Map<String, StrolchRootElement> row) {
+	protected Object evaluateColumnValue(StringParameter columnDefP, Map<String, StrolchRootElement> row) {
 
 		String columnDef = columnDefP.getValue();
 		String refType = columnDefP.getUom();
@@ -324,7 +331,7 @@ public class GenericReport extends ReportPolicy {
 		// get the referenced object
 		StrolchRootElement column = row.get(refType);
 
-		String columnValue;
+		Object columnValue;
 
 		if (column == null)
 			columnValue = EMPTY;
@@ -337,15 +344,15 @@ public class GenericReport extends ReportPolicy {
 		} else if (columnDef.equals(COL_STATE)) {
 			columnValue = column.accept(new ElementStateVisitor()).name();
 		} else if (columnDef.equals(COL_DATE)) {
-			columnValue = ISO8601FormatFactory.getInstance().formatDate(column.accept(new ElementDateVisitor()));
+			columnValue = column.accept(new ElementDateVisitor());
 		} else if (columnDef.startsWith(COL_SEARCH)) {
 			Parameter<?> parameter = findParameter(columnDefP, column);
 			if (parameter == null)
 				columnValue = EMPTY;
 			else
-				columnValue = parameter.getValueAsString();
+				columnValue = parameter.getValue();
 		} else {
-			columnValue = lookupParameter(columnDefP, column).orElseGet(StringParameter::new).getValueAsString();
+			columnValue = lookupParameter(columnDefP, column).orElseGet(StringParameter::new).getValue();
 		}
 
 		return columnValue;
