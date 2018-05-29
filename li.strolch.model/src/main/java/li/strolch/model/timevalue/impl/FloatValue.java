@@ -40,11 +40,11 @@ public class FloatValue implements IValue<Double>, Serializable {
 	}
 
 	public FloatValue(double value) {
-		this.value = Double.valueOf(value);
+		this.value = value;
 	}
 
 	public FloatValue(Integer value) {
-		this.value = this.value.doubleValue();
+		this.value = value.doubleValue();
 	}
 
 	public FloatValue(int value) {
@@ -62,18 +62,18 @@ public class FloatValue implements IValue<Double>, Serializable {
 
 	@Override
 	public FloatValue add(Double o) {
-		this.value = MathHelper.toPrecision(this.value + o, 8);
+		this.value = this.value + o;
 		return this;
 	}
 
 	@Override
 	public Double getValue() {
-		return this.value;
+		return MathHelper.toPrecision(this.value, 8);
 	}
 
 	@Override
 	public String getValueAsString() {
-		return this.value.toString();
+		return MathHelper.toPrecisionString(this.value, 8);
 	}
 
 	@SuppressWarnings("nls")

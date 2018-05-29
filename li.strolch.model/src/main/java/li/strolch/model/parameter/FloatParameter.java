@@ -54,20 +54,20 @@ public class FloatParameter extends AbstractParameter<Double> {
 
 	@Override
 	public String getValueAsString() {
-		return Double.toString(this.value);
+		return MathHelper.toPrecisionString(this.value, 8);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Double getValue() {
-		return this.value;
+		return MathHelper.toPrecision(this.value, 8);
 	}
 
 	@Override
 	public void setValue(Double value) {
 		assertNotReadonly();
 		validateValue(value);
-		this.value = MathHelper.toPrecision(value, 8);
+		this.value = value;
 	}
 
 	/**

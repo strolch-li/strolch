@@ -39,7 +39,7 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 	}
 
 	public IntegerValue(int value) {
-		this.value = Integer.valueOf(value);
+		this.value = value;
 	}
 
 	public IntegerValue(String valueAsString) throws NumberFormatException {

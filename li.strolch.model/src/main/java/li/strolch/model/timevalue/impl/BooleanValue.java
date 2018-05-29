@@ -39,7 +39,7 @@ public class BooleanValue implements IValue<Boolean>, Serializable {
 	}
 
 	public BooleanValue(boolean value) {
-		this.value = Boolean.valueOf(value);
+		this.value = value;
 	}
 
 	public BooleanValue(String valueAsString) throws NumberFormatException {
