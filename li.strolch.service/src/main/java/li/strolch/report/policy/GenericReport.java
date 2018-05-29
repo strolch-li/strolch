@@ -166,6 +166,8 @@ public class GenericReport extends ReportPolicy {
 			Object value = evaluateColumnValue(columnDefP, e);
 			if (value instanceof Date)
 				return ISO8601FormatFactory.getInstance().formatDate((Date) value);
+			if (value instanceof Parameter)
+				return ((Parameter) value).getValueAsString();
 			return value.toString();
 		}));
 	}
@@ -265,9 +267,15 @@ public class GenericReport extends ReportPolicy {
 
 			if (fieldRefP.getValue().startsWith("$")) {
 				Object value = evaluateColumnValue(fieldRefP, row);
-				String columnValue = value instanceof Date ?
-						ISO8601FormatFactory.getInstance().formatDate((Date) value) :
-						value.toString();
+
+				String columnValue;
+				if (value instanceof Date)
+					columnValue = ISO8601FormatFactory.getInstance().formatDate((Date) value);
+				else if (value instanceof Parameter)
+					columnValue = ((Parameter) value).getValueAsString();
+				else
+					columnValue = value.toString();
+
 				if (!filterPolicy.filter(columnValue))
 					return false;
 			} else {
@@ -342,7 +350,7 @@ public class GenericReport extends ReportPolicy {
 		} else if (columnDef.equals(COL_TYPE)) {
 			columnValue = column.getType();
 		} else if (columnDef.equals(COL_STATE)) {
-			columnValue = column.accept(new ElementStateVisitor()).name();
+			columnValue = column.accept(new ElementStateVisitor());
 		} else if (columnDef.equals(COL_DATE)) {
 			columnValue = column.accept(new ElementDateVisitor());
 		} else if (columnDef.startsWith(COL_SEARCH)) {
@@ -350,9 +358,9 @@ public class GenericReport extends ReportPolicy {
 			if (parameter == null)
 				columnValue = EMPTY;
 			else
-				columnValue = parameter.getValue();
+				columnValue = parameter;
 		} else {
-			columnValue = lookupParameter(columnDefP, column).orElseGet(StringParameter::new).getValue();
+			columnValue = lookupParameter(columnDefP, column).orElseGet(StringParameter::new);
 		}
 
 		return columnValue;
