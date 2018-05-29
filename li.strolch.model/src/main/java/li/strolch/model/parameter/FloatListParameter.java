@@ -88,11 +88,7 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	public void setValue(List<Double> value) {
 		assertNotReadonly();
 		validateValue(value);
-		if (this.value == null) {
-			this.value = new ArrayList<>(value.size());
-		}
-		this.value.clear();
-		this.value.addAll(value);
+		this.value = new ArrayList<>(value.size());
 	}
 
 	@Override
