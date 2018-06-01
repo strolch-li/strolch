@@ -1,51 +1,57 @@
 package li.strolch.minimal.rest.main;
 
-import java.io.File;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.InputStream;
 
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchBootstrapper;
-import li.strolch.runtime.configuration.StrolchEnvironment;
+import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebListener
 public class StartupListener implements ServletContextListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(StartupListener.class);
+	private static final String APP_NAME = "Strolch Minimal Rest";
 
 	private StrolchAgent agent;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		try {
-			String realPath = sce.getServletContext().getRealPath("/WEB-INF");
 
-			File pathF = new File(realPath);
-			String environment = StrolchEnvironment.getEnvironmentFromEnvProperties(pathF);
-			logger.info("Starting Strolch Minimal Rest...");
-			this.agent = new StrolchBootstrapper(StartupListener.class).setupByRoot(environment, pathF);
+		logger.info("Starting " + APP_NAME + "...");
+		long start = System.currentTimeMillis();
+		try {
+			String boostrapFileName = "/WEB-INF/" + StrolchBootstrapper.FILE_BOOTSTRAP;
+			InputStream bootstrapFile = sce.getServletContext().getResourceAsStream(boostrapFileName);
+			StrolchBootstrapper bootstrapper = new StrolchBootstrapper(StartupListener.class);
+			this.agent = bootstrapper.setupByBoostrapFile(StartupListener.class, bootstrapFile);
 			this.agent.initialize();
 			this.agent.start();
-
-			logger.info("Started Strolch Minimal Rest.");
-
-		} catch (Exception e) {
-			logger.error("Server startup failed due to: " + e.getMessage(), e);
+		} catch (Throwable e) {
+			logger.error("Failed to start " + APP_NAME + " due to: " + e.getMessage(), e);
 			throw e;
 		}
+
+		long took = System.currentTimeMillis() - start;
+		logger.info("Started " + APP_NAME + " in " + (StringHelper.formatMillisecondsDuration(took)));
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		if (this.agent != null) {
-			this.agent.stop();
-			this.agent.destroy();
+			logger.info("Destroying " + APP_NAME + "...");
+			try {
+				this.agent.stop();
+				this.agent.destroy();
+			} catch (Throwable e) {
+				logger.error("Failed to stop " + APP_NAME + " due to: " + e.getMessage(), e);
+				throw e;
+			}
 		}
-		logger.info("Destroyed Strolch Minimal rest.");
+		logger.info("Destroyed " + APP_NAME);
 	}
 }
