@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -94,6 +95,30 @@ public class XmlHelper {
 
 			SAXParser sp = spf.newSAXParser();
 			sp.parse(xmlFileInputStream, xmlHandler);
+
+		} catch (ParserConfigurationException e) {
+			throw new XmlException("Failed to initialize a SAX Parser: " + e.getMessage(), e); //$NON-NLS-1$
+		} catch (SAXException e) {
+			throw new XmlException("The XML stream is not parseable: " + e.getMessage(), e); //$NON-NLS-1$
+		} catch (IOException e) {
+			throw new XmlException("The XML stream not be read: " + e.getMessage(), e); //$NON-NLS-1$
+		}
+	}
+	
+	/**
+	 * Parses an XML file on the file system and returns the resulting {@link Document} object
+	 * 
+	 * @param xmlInputSource
+	 *            the XML {@link InputSource} which is to be parsed
+	 */
+	public static void parseDocument(InputSource xmlInputSource, DefaultHandler xmlHandler) {
+
+		try {
+
+			SAXParserFactory spf = SAXParserFactory.newInstance();
+
+			SAXParser sp = spf.newSAXParser();
+			sp.parse(xmlInputSource, xmlHandler);
 
 		} catch (ParserConfigurationException e) {
 			throw new XmlException("Failed to initialize a SAX Parser: " + e.getMessage(), e); //$NON-NLS-1$
