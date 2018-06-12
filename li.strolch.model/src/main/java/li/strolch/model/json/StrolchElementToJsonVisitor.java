@@ -77,8 +77,18 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		return this;
 	}
 
+	public StrolchElementToJsonVisitor withElementName() {
+		this.withoutElementName = false;
+		return this;
+	}
+
 	public StrolchElementToJsonVisitor withoutPolicies() {
 		this.withoutPolicies = true;
+		return this;
+	}
+
+	public StrolchElementToJsonVisitor withPolicies() {
+		this.withoutPolicies = false;
 		return this;
 	}
 
