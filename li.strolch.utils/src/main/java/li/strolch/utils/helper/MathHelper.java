@@ -125,6 +125,6 @@ public class MathHelper {
 			return "" + Double.NEGATIVE_INFINITY;
 		if (value == Double.POSITIVE_INFINITY)
 			return "" + Double.POSITIVE_INFINITY;
-		return BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_EVEN).toPlainString();
+		return String.valueOf(BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_EVEN).doubleValue());
 	}
 }
