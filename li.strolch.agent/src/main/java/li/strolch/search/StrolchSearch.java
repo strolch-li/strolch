@@ -87,7 +87,10 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 		Stream<T> stream = getNavigator().navigate(tx);
 
 		if (this.expression != null)
-			stream = stream.filter(e -> this.expression.matches(e));
+			stream = stream.filter(e -> {
+				
+				return this.expression.matches(e);
+			});
 
 		return new RootElementSearchResult<>(stream);
 	}
