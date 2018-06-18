@@ -395,10 +395,14 @@ public class StrolchSearchTest {
 							.and(param(BAG_ID, PARAM_LIST_FLOAT_ID, contains("6.0D,11.0D")))
 
 							.and(param(BAG_ID, PARAM_LIST_INTEGER_ID, isEqualTo(asList(5, 10, 15))))
+							.and(param(BAG_ID, PARAM_LIST_INTEGER_ID, isIn(asList(5, 10))))
 							.and(param(BAG_ID, PARAM_LIST_INTEGER_ID, contains(asList(5, 10))))
 
 							.and(param(BAG_ID, PARAM_LIST_LONG_ID, isEqualTo(asList(7L, 12L, 17L))))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isEqualTo(asList("Hello", "World"))))
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isIn(asList("Hello", "World"))))
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isIn(asList("Hello", "World", "Extra"))))
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isIn(asList("Extra", "Sauce")).not()))
 
 							.and(paramNull(BAG_ID, "non-existant"))
 					//
