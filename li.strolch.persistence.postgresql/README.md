@@ -17,13 +17,13 @@ $ postgres=#
 3.	Create the user and DB:
 $ sudo -u postgres psql
 $ postgres=# 
-create user testUser with password 'test';
+create user testuser with password 'test';
 create database testdb;
 GRANT ALL PRIVILEGES ON DATABASE testdb to testuser;
 GRANT CONNECT ON DATABASE testdb TO testuser ;
    
 # For tests:
-create user testUser with password 'test';
+create user testuser with password 'test';
 create database testdb;
 GRANT ALL PRIVILEGES ON DATABASE testdb to testuser;
 GRANT CONNECT ON DATABASE testdb TO testuser ;
