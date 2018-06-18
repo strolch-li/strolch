@@ -1,6 +1,6 @@
 Strolch
 ==================
-[![Build Status](https://jenkins.eitchnet.ch/job/li.strolch/badge/icon)](https://jenkins.eitchnet.ch/job/li.strolch/)
+[![Build Status](https://ci.4trees.ch/buildStatus/icon?job=li.strolch)](https://ci.4trees.ch/job/li.strolch/)
 
 The main repository which contains all of Strolch.
 
