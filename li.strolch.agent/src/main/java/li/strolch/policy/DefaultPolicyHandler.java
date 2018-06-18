@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@ package li.strolch.policy;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -33,14 +33,15 @@ import li.strolch.policy.StrolchPolicyFileParser.PolicyModel;
 import li.strolch.policy.StrolchPolicyFileParser.PolicyType;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.collections.MapOfMaps;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
 
 /**
  * <p>
- * This is the default Strolch {@link PolicyHandler} which implements {@link PolicyDefVisitor}. This
- * {@link PolicyHandler} parses a policy configuration file to handle the look-up of {@link KeyPolicyDef}
+ * This is the default Strolch {@link PolicyHandler} which implements {@link PolicyDefVisitor}. This {@link
+ * PolicyHandler} parses a policy configuration file to handle the look-up of {@link KeyPolicyDef}
  * </p>
- * 
+ *
  * This {@link StrolchComponent} uses two configuration properties:
  * <ul>
  * <li>{@link #PROP_READ_POLICY_FILE} - Default is false. If false then no configuration file is read. Useful if all
@@ -49,7 +50,7 @@ import li.strolch.utils.helper.XmlHelper;
  * true, then this property is used to determine which configuration file to parse for the policy key mappings for
  * {@link KeyPolicyDef}</li>
  * </ul>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DefaultPolicyHandler extends StrolchComponent implements PolicyHandler, PolicyDefVisitor {
@@ -80,14 +81,14 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 
 	@Override
 	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, StrolchTransaction tx) {
+		DBC.PRE.assertNotNull("tx must not be null!", tx);
 		try {
 
 			Class<T> clazz = policyDef.accept(this);
 			Constructor<T> constructor = clazz.getConstructor(ComponentContainer.class, StrolchTransaction.class);
 			return constructor.newInstance(getContainer(), tx);
 
-		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException | ClassNotFoundException e) {
+		} catch (Exception e) {
 			throw new StrolchPolicyException(
 					MessageFormat.format("Failed to instantiate policy {0} due to {1}", policyDef, e.getMessage()), e);
 		}
@@ -146,29 +147,56 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 
 						// assert API is a Policy
 						if (!StrolchPolicy.class.isAssignableFrom(implClass)) {
-							throw new StrolchPolicyException("Invalid " + StrolchPolicyFileParser.POLICY
-									+ " configuration for Type=" + type + " Key=" + key + " as " + className
-									+ " is not a " + StrolchPolicy.class.getName());
+							throw new StrolchPolicyException(
+									"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
+											+ " Key=" + key + " as " + className + " is not a " + StrolchPolicy.class
+											.getName());
 						}
 
+						// assert is assignable to API class
 						if (!apiClass.isAssignableFrom(implClass)) {
 							throw new StrolchPolicyException(
 									"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
 											+ " Key=" + key + " as " + className + " is not assignable from " + api);
 						}
 
+						// and assert is not abstract
+						if (Modifier.isAbstract(implClass.getModifiers()) || Modifier
+								.isInterface(implClass.getModifiers()))
+							throw new IllegalStateException(
+									"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
+											+ " Key=" + key + " as " + className + " is abstract or an interface!");
+
+						Constructor<?> constructor;
+						try {
+							constructor = implClass.getConstructor(ComponentContainer.class, StrolchTransaction.class);
+						} catch (NoSuchMethodException e) {
+							throw new IllegalStateException(
+									"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
+											+ " Key=" + key
+											+ " as constructor (ComponentContainer, StrolchTransaction) does not exist!");
+						}
+
+						if (Modifier.isAbstract(constructor.getModifiers()) || Modifier
+								.isInterface(constructor.getModifiers()))
+							throw new IllegalStateException(
+									"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
+											+ " Key=" + key + " as constructor is abstract or an interface!");
+
 						// store the implementation class
 						logger.info("Loaded Policy " + type + " / " + key + " / " + className);
 						this.classByTypeMap.addElement(type, key, (Class<? extends StrolchPolicy>) implClass);
 
 					} catch (ClassNotFoundException e) {
-						throw new StrolchPolicyException("Invalid " + StrolchPolicyFileParser.POLICY
-								+ " configuration for Type=" + type + " Key=" + key + " due to " + e.getMessage(), e);
+						throw new StrolchPolicyException(
+								"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
+										+ " Key=" + key + " due to " + e.getMessage(), e);
 					}
 				}
 			} catch (ClassNotFoundException e) {
-				throw new StrolchPolicyException("Invalid " + StrolchPolicyFileParser.POLICY_TYPE
-						+ " configuration for Type=" + type + " due to " + e.getMessage(), e);
+				throw new StrolchPolicyException(
+						"Invalid " + StrolchPolicyFileParser.POLICY_TYPE + " configuration for Type=" + type
+								+ " due to " + e.getMessage(), e);
 			}
 		}
 	}

@@ -22,9 +22,6 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -36,6 +33,9 @@ import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
+import li.strolch.utils.dbc.DBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -102,6 +102,7 @@ public class StrolchComponent {
 	 * @return the reference to the container
 	 */
 	protected ComponentContainer getContainer() {
+		DBC.PRE.assertNotNull("container is null!", this.container);
 		return this.container;
 	}
 
@@ -344,8 +345,8 @@ public class StrolchComponent {
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
-	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user {@link
+	 * StrolchConstants#SYSTEM_USER_AGENT}
 	 *
 	 * @param runnable
 	 * 		the runnable to perform
@@ -358,8 +359,8 @@ public class StrolchComponent {
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
-	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user {@link
+	 * StrolchConstants#SYSTEM_USER_AGENT}
 	 *
 	 * @param runnable
 	 * 		the runnable to perform
@@ -416,8 +417,8 @@ public class StrolchComponent {
 	}
 
 	/**
-	 * Returns the version of this component. The version should be stored in the file
-	 * {@link #COMPONENT_VERSION_PROPERTIES}. See {@link ComponentVersion} for more information
+	 * Returns the version of this component. The version should be stored in the file {@link
+	 * #COMPONENT_VERSION_PROPERTIES}. See {@link ComponentVersion} for more information
 	 *
 	 * @return the component's version.
 	 *
