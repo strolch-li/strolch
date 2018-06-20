@@ -88,7 +88,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		T component = (T) this.componentMap.get(clazz);
 		if (component == null) {
 			String msg = "The component does not exist for class {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, clazz);
+			msg = MessageFormat.format(msg, clazz.getName());
 			throw new IllegalArgumentException(msg);
 		}
 		return component;
