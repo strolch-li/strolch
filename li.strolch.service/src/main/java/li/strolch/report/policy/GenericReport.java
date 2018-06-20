@@ -500,11 +500,7 @@ public class GenericReport extends ReportPolicy {
 					"Invalid join definition value: " + joinP.getValue() + " on: " + joinP.getLocator() + " as "
 							+ dependency.getLocator() + " has no ParameterBag " + BAG_RELATIONS);
 
-		List<Parameter<?>> relationParams = relationsBag //
-				.getParametersByInterpretationAndUom(interpretation, joinType) //
-				.stream() //
-				.filter(s -> s.getType().equals(StrolchValueType.STRING.getType())) //
-				.collect(Collectors.toList()); //
+		List<Parameter<?>> relationParams = relationsBag.getParametersByInterpretationAndUom(interpretation, joinType);
 
 		if (relationParams.isEmpty()) {
 			throw new IllegalStateException(
@@ -516,7 +512,14 @@ public class GenericReport extends ReportPolicy {
 							.getLocator());
 		}
 
-		StringParameter relationP = (StringParameter) relationParams.get(0);
+		Parameter<?> relationParam = relationParams.get(0);
+		if (!relationParam.getType().equals(StrolchValueType.STRING.getType())) {
+			throw new IllegalStateException(
+					"Expect to find relation parameter of type " + StrolchValueType.STRING.getType() + " but found "
+							+ relationParam.getType() + " for " + relationParam.getLocator());
+		}
+
+		StringParameter relationP = (StringParameter) relationParam;
 		if (relationP.getValue().isEmpty() && optional) {
 			return null;
 		}
