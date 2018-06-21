@@ -31,7 +31,7 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonElement> {
 
 	private MapOfSets<String, String> ignoredKeys;
-	private Set<String> ignoredStates;
+	private Set<String> ignoredTimedStates;
 	private Set<String> ignoredBagTypes;
 
 	private BiConsumer<Resource, JsonObject> resourceHook;
@@ -47,7 +47,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	public StrolchElementToJsonVisitor() {
 		this.ignoredKeys = new MapOfSets<>();
-		this.ignoredStates = new HashSet<>();
+		this.ignoredTimedStates = new HashSet<>();
 		this.ignoredBagTypes = new HashSet<>();
 	}
 
@@ -112,7 +112,12 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		return this;
 	}
 
-	public StrolchElementToJsonVisitor ignoreBagParameterTyp(String type) {
+	public StrolchElementToJsonVisitor ignoreTimeState(String timeStateId) {
+		this.ignoredTimedStates.add(timeStateId);
+		return this;
+	}
+
+	public StrolchElementToJsonVisitor ignoreBagByType(String type) {
 		this.ignoredBagTypes.add(type);
 		return this;
 	}
@@ -568,7 +573,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		for (String stateKey : element.getTimedStateKeySet()) {
 
 			// see if we have to ignore this state
-			if (this.ignoredStates.contains(stateKey))
+			if (this.ignoredTimedStates.contains(stateKey))
 				continue;
 
 			StrolchTimedState<IValue<?>> state = element.getTimedState(stateKey);
@@ -584,7 +589,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		for (String stateKey : element.getTimedStateKeySet()) {
 
 			// see if we have to ignore this state
-			if (this.ignoredStates.contains(stateKey))
+			if (this.ignoredTimedStates.contains(stateKey))
 				continue;
 
 			StrolchTimedState<IValue<?>> state = element.getTimedState(stateKey);

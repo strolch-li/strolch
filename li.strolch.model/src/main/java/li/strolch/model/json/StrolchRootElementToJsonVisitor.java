@@ -57,6 +57,7 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		this.visitor.withoutElementName();
 		return this;
 	}
+
 	public StrolchRootElementToJsonVisitor withElementName() {
 		this.visitor.withElementName();
 		return this;
@@ -92,8 +93,13 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		return this;
 	}
 
-	public StrolchRootElementToJsonVisitor ignoreBagParameterTyp(String type) {
-		this.visitor.ignoreBagParameterTyp(type);
+	public StrolchRootElementToJsonVisitor ignoreTimeState(String timeStateId) {
+		this.visitor.ignoreTimeState(timeStateId);
+		return this;
+	}
+
+	public StrolchRootElementToJsonVisitor ignoreBagByType(String type) {
+		this.visitor.ignoreBagByType(type);
 		return this;
 	}
 
