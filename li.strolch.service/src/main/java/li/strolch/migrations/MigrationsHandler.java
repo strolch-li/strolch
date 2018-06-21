@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -162,9 +162,8 @@ public class MigrationsHandler extends StrolchComponent {
 	}
 
 	/**
-	 * Simpler {@link TimerTask} to check for sessions which haven't been active for
-	 * {@link DefaultStrolchSessionHandler#PARAM_SESSION_TTL_MINUTES} minutes.
-	 * 
+	 * Simpler {@link TimerTask} to check for sessions which haven't been active for {@link #PROP_POLL_WAIT} minutes.
+	 *
 	 * @author Robert von Burg <eitch@eitchnet.ch>
 	 */
 	private class MigrationPollTask extends TimerTask {
@@ -201,8 +200,8 @@ public class MigrationsHandler extends StrolchComponent {
 				logger.error("Failed to run migrations!", e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
-					getComponent(OperationsLog.class)
-							.addMessage(new LogMessage(Tags.AGENT, getLocator().append(StrolchAgent.getUniqueId()),
+					getComponent(OperationsLog.class).addMessage(
+							new LogMessage(Tags.AGENT, getLocator().append(StrolchAgent.getUniqueId()),
 									LogSeverity.EXCEPTION, ResourceBundle.getBundle("strolch-service"),
 									"execution.handler.failed.executed").value("reason", e));
 				}

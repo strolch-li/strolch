@@ -51,7 +51,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The following list describes implementation details:
  * <ul>
- * <li>any methods which change the model are first validated by checking if the certificate has the appropriate privilege</li>
+ * <li>any methods which change the model are first validated by checking if the certificate has the appropriate
+ * privilege</li>
  * <li>all model requests are delegated to the configured {@link PrivilegeHandler}, except for the session id to
  * {@link Certificate} map, no model data is kept in this implementation. This also means that to return the
  * representation objects, for every new model query, a new representation object is created</li>
@@ -1166,7 +1167,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			outputStream.flush();
 
 		} catch (Exception e) {
-			throw new PrivilegeException("Failed to persist sessions!", e);
+			logger.error("Failed to persist sessions!", e);
+			if (this.persistSessionsPath.exists() && !this.persistSessionsPath.delete()) {
+				logger.error(
+						"Failed to delete sessions file after failing to write to it, at " + this.persistSessionsPath
+								.getAbsolutePath());
+			}
 		}
 
 		return true;
@@ -1892,8 +1898,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * <p>
 	 * This method instantiates a {@link PrivilegePolicy} object from the given policyName. The {@link PrivilegePolicy}
-	 * is not stored in a database. The privilege name is a class name and is then used to instantiate a new
-	 * {@link PrivilegePolicy} object
+	 * is not stored in a database. The privilege name is a class name and is then used to instantiate a new {@link
+	 * PrivilegePolicy} object
 	 * </p>
 	 *
 	 * @param policyName

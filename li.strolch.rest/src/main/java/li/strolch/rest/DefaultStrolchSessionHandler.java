@@ -112,7 +112,11 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		} else if (this.certificateMap != null) {
 			synchronized (this.certificateMap) {
 				for (Certificate certificate : this.certificateMap.values()) {
-					this.privilegeHandler.invalidate(certificate);
+					try {
+						this.privilegeHandler.invalidate(certificate);
+					} catch (Exception e) {
+						logger.error("Failed to invalidate certificate " + certificate, e);
+					}
 				}
 				this.certificateMap.clear();
 			}
