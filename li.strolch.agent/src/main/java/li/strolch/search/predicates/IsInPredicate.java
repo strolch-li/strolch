@@ -2,6 +2,9 @@ package li.strolch.search.predicates;
 
 import li.strolch.utils.ObjectHelper;
 
+/**
+ * Implements the isIn predicate, delegating to {@link ObjectHelper#isIn(Object, Object, boolean)}
+ */
 public class IsInPredicate extends AbstractSearchPredicate {
 	private final boolean ignoreCase;
 

@@ -3,6 +3,9 @@ package li.strolch.search;
 import li.strolch.search.predicates.*;
 import li.strolch.utils.collections.DateRange;
 
+/**
+ * Implements predicates to be used as static imports when writing searches
+ */
 public class PredicatesSupport {
 
 	public static SearchPredicate isEqualTo(Object right) {

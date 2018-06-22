@@ -2,6 +2,9 @@ package li.strolch.search;
 
 import li.strolch.utils.collections.DateRange;
 
+/**
+ * Declares specific predicates to be performed on a search expression. I.e. defines how the where clause is evaluated
+ */
 public interface SearchPredicates {
 
 	default SearchPredicate isEqualTo(Object right) {

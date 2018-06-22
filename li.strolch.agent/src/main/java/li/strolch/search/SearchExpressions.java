@@ -2,6 +2,11 @@ package li.strolch.search;
 
 import li.strolch.model.StrolchRootElement;
 
+/**
+ * Declares specific search expressions, i.e. extracting the relevant data for a where clause
+ *
+ * @param <T>
+ */
 public interface SearchExpressions<T extends StrolchRootElement> {
 
 	default SearchExpression<T> not(SearchExpression<T> expression) {

@@ -10,18 +10,64 @@ import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * <p>A helper class to build search expressions on {@link StrolchRootElement}</p>
+ *
+ * <p>This is often used in a web context where searches are performed on multiple parameters etc. of an element</p>
+ *
+ * <p>Note that the query string is parsed using the following rules:</p>
+ * <ul>
+ * <li>query is trimmed</li>
+ * <li>empty query means search for everything, i.e. no {@link SearchExpression SearchExpressions} are added</li>
+ * <li>query is split by space, and each part is handled further:</li>
+ * <li>format <code>param:&lt;bagId&gt;:&lt;paramId&gt;:&lt;value&gt;</code> adds search expression for given
+ * bag/param</li>
+ * <li>otherwise search expression for id and name are added</li>
+ * <li>all added search expressions are ORed</li>
+ * </ul>
+ */
 public class SearchBuilder {
 
 	private static final Logger logger = LoggerFactory.getLogger(SearchBuilder.class);
 
+	/**
+	 * Builds an {@link OrderSearch} for the given types with the given query
+	 *
+	 * @param query
+	 * 		the query
+	 * @param types
+	 * 		the type of orders to search
+	 *
+	 * @return the {@link OrderSearch}
+	 */
 	public static OrderSearch buildOrderSearch(String query, String... types) {
 		return buildSearch(new OrderSearch().types(types), query);
 	}
 
+	/**
+	 * Builds an {@link ResourceSearch} for the given types with the given query
+	 *
+	 * @param query
+	 * 		the query
+	 * @param types
+	 * 		the type of resources to search
+	 *
+	 * @return the {@link OrderSearch}
+	 */
 	public static ResourceSearch buildResourceSearch(String query, String... types) {
 		return buildSearch(new ResourceSearch().types(types), query);
 	}
 
+	/**
+	 * Builds an {@link ActivitySearch} for the given types with the given query
+	 *
+	 * @param query
+	 * 		the query
+	 * @param types
+	 * 		the type of activities to search
+	 *
+	 * @return the {@link OrderSearch}
+	 */
 	public static ActivitySearch buildActivitySearch(String query, String... types) {
 		return buildSearch(new ActivitySearch().types(types), query);
 	}

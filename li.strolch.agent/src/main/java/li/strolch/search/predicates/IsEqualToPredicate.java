@@ -2,6 +2,9 @@ package li.strolch.search.predicates;
 
 import li.strolch.utils.ObjectHelper;
 
+/**
+ * Implements the equals predicate, delegating to {@link ObjectHelper#equals(Object, Object, boolean)}
+ */
 public class IsEqualToPredicate extends AbstractSearchPredicate {
 	private final boolean ignoreCase;
 

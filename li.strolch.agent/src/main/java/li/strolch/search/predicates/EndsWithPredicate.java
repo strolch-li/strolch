@@ -2,6 +2,9 @@ package li.strolch.search.predicates;
 
 import li.strolch.utils.ObjectHelper;
 
+/**
+ * Implements the endsWith predicate, delegating to {@link ObjectHelper#endsWith(Object, Object, boolean)}
+ */
 public class EndsWithPredicate extends AbstractSearchPredicate {
 	private final boolean ignoreCase;
 

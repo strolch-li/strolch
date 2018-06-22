@@ -7,6 +7,10 @@ import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.activity.Activity;
 
+/**
+ * Performs a search for any kind of root element, allowing to mix {@link Resource}, {@link Order} and {@link Activity}
+ * in the result
+ */
 public class RootElementSearch extends StrolchSearch<StrolchRootElement> {
 
 	private SearchNavigator<StrolchRootElement> navigator;

@@ -2,6 +2,9 @@ package li.strolch.search;
 
 import li.strolch.model.activity.Activity;
 
+/**
+ * Performs a search for {@link Activity} elements
+ */
 public class ActivitySearch extends StrolchSearch<Activity> {
 
 	private SearchNavigator<Activity> navigator;

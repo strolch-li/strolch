@@ -2,6 +2,9 @@ package li.strolch.search;
 
 import li.strolch.model.Resource;
 
+/**
+ * Performs a search for {@link Resource} elements
+ */
 public class ResourceSearch extends StrolchSearch<Resource> {
 
 	private SearchNavigator<Resource> navigator;

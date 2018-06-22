@@ -3,6 +3,9 @@ package li.strolch.search.predicates;
 import li.strolch.search.SearchPredicate;
 import li.strolch.search.ValueCoercer;
 
+/**
+ * Abstract {@link SearchPredicate} implementing coerce method and storing the right hand side of the where clause
+ */
 public abstract class AbstractSearchPredicate implements SearchPredicate {
 
 	private boolean coerced;

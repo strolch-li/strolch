@@ -5,6 +5,9 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
+/**
+ * Implements search expressions to be statically imported when writing searches
+ */
 public class ExpressionsSupport {
 
 	public static <T extends StrolchRootElement> SearchExpression<T> not(SearchExpression<T> expression) {

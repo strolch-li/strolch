@@ -2,6 +2,9 @@ package li.strolch.search;
 
 import li.strolch.model.Order;
 
+/**
+ * Performs a search of {@link Order} elements
+ */
 public class OrderSearch extends StrolchSearch<Order> {
 
 	private SearchNavigator<Order> navigator;

@@ -3,6 +3,11 @@ package li.strolch.search;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.utils.collections.DateRange;
 
+/**
+ * An interface to add search expressions to easily discover the possible search expressions
+ *
+ * @param <T>
+ */
 public interface ExpressionBuilder<T extends StrolchRootElement> {
 
 	Object extract(StrolchRootElement element);

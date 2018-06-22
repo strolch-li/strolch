@@ -12,6 +12,11 @@ import li.strolch.privilege.model.Restrictable;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.ExceptionHelper;
 
+/**
+ * Class to perform searches on Strolch elements
+ *
+ * @param <T>
+ */
 public abstract class StrolchSearch<T extends StrolchRootElement>
 		implements SearchExpressions<T>, SearchPredicates, Restrictable {
 
@@ -26,7 +31,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	protected abstract SearchNavigator<T> getNavigator();
 
 	/**
-	 * Used to configure the navigator
+	 * Used to configure the navigator, i.e. which <code>type</code> of root elements are to be queried
 	 *
 	 * @param types
 	 * 		the types of elements to search
@@ -59,8 +64,8 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	}
 
 	/**
-	 * Marks this search as an internal search, thus allowing it to be performed without the authenticated user to need
-	 * the required privilege
+	 * Marks this search as an internal search, thus allowing it to be performed without the authenticated user having
+	 * the specific privilege, provided the {@link StrolchModelConstants#INTERNAL} flag is on the search privilege
 	 *
 	 * @return this object for chaining
 	 */
@@ -69,6 +74,14 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 		return this;
 	}
 
+	/**
+	 * Performs the actual search, by first validating the privilege context
+	 *
+	 * @param tx
+	 * 		the TX on which to perform the search
+	 *
+	 * @return the search result
+	 */
 	public RootElementSearchResult<T> search(StrolchTransaction tx) {
 		try {
 			PrivilegeContext privilegeContext = tx.getContainer().getPrivilegeHandler().validate(tx.getCertificate());
@@ -88,7 +101,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 
 		if (this.expression != null)
 			stream = stream.filter(e -> {
-				
+
 				return this.expression.matches(e);
 			});
 

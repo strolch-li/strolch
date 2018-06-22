@@ -2,6 +2,9 @@ package li.strolch.search.predicates;
 
 import li.strolch.utils.ObjectHelper;
 
+/**
+ * Implements the startsWith predicate, delegating to {@link ObjectHelper#startsWith(Object, Object, boolean)}
+ */
 public class StartsWithPredicate extends AbstractSearchPredicate {
 	private final boolean ignoreCase;
 
