@@ -21,11 +21,6 @@ import static org.junit.Assert.assertNull;
 
 import java.io.File;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.ModelGenerator;
@@ -35,6 +30,10 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.AbstractModelTest;
 import li.strolch.testbase.runtime.RuntimeMock;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class RealmTest extends AbstractModelTest {
 
@@ -94,7 +93,7 @@ public class RealmTest extends AbstractModelTest {
 			}
 
 			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST)) {
-				Resource res = tx.getResourceMap().getBy(tx, type, expectedId1);
+				Resource res = tx.getResourceBy(type, expectedId1);
 				assertEquals("Should find object previously added in same realm!", expectedRes1, res); //$NON-NLS-1$
 			}
 		}
@@ -109,7 +108,7 @@ public class RealmTest extends AbstractModelTest {
 			}
 
 			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
-				Resource res = tx.getResourceMap().getBy(tx, type, expectedId2);
+				Resource res = tx.getResourceBy(type, expectedId2);
 				assertEquals("Should find object previously added in same realm!", expectedRes2, res); //$NON-NLS-1$
 			}
 		}
@@ -117,7 +116,7 @@ public class RealmTest extends AbstractModelTest {
 		{
 			StrolchRealm secondRealm = runtimeMock.getRealm(SECOND);
 			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
-				Resource res = tx.getResourceMap().getBy(tx, type, expectedId1);
+				Resource res = tx.getResourceBy(type, expectedId1);
 				assertNull("Should not find object added in differenct realm!", res); //$NON-NLS-1$
 			}
 		}

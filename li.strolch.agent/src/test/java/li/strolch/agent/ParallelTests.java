@@ -1,16 +1,17 @@
 package li.strolch.agent;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
-import java.util.stream.Collectors;
 
 import li.strolch.RuntimeMock;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.ModelGenerator;
+import li.strolch.model.StrolchElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import org.junit.AfterClass;
@@ -95,12 +96,10 @@ public class ParallelTests {
 				StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 				try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
 
-					List<String> ids = tx.getResourceMap().stream(tx).map(AbstractStrolchElement::getId)
-							.collect(Collectors.toList());
+					List<String> ids = tx.streamResources().map(StrolchElement::getId).collect(toList());
 					logger.info("There are " + ids.size() + " Resources!");
 
-					ids = tx.getResourceMap().stream(tx, "SomeType", "TestType").map(AbstractStrolchElement::getId)
-							.collect(Collectors.toList());
+					ids = tx.streamResources("SomeType", "TestType").map(StrolchElement::getId).collect(toList());
 					logger.info("There are " + ids.size() + " Resources of type SomeType");
 				}
 			}

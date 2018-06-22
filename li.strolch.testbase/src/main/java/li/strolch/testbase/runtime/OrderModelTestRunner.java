@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,26 +15,16 @@
  */
 package li.strolch.testbase.runtime;
 
-import static li.strolch.model.ModelGenerator.BAG_ID;
-import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
-import static li.strolch.model.ModelGenerator.createOrder;
-import static li.strolch.model.ModelGenerator.createOrders;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.Order;
-import li.strolch.model.parameter.Parameter;
+import li.strolch.model.StrolchElement;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
@@ -63,7 +53,7 @@ public class OrderModelTestRunner {
 		// create
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			tx.getOrderMap().add(tx, newOrder);
+			tx.add(newOrder);
 			tx.commitOnClose();
 		}
 	}
@@ -85,9 +75,9 @@ public class OrderModelTestRunner {
 		Order order2 = createOrder("myTestOrder2", "Test Name", "QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		Order order3 = createOrder("myTestOrder3", "Test Name", "QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			tx.getOrderMap().add(tx, order1);
-			tx.getOrderMap().add(tx, order2);
-			tx.getOrderMap().add(tx, order3);
+			tx.add(order1);
+			tx.add(order2);
+			tx.add(order3);
 			tx.commitOnClose();
 		}
 
@@ -115,46 +105,46 @@ public class OrderModelTestRunner {
 		// create
 		Order newOrder = createOrder(ID, NAME, TYPE);
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			tx.getOrderMap().add(tx, newOrder);
+			tx.add(newOrder);
 			tx.commitOnClose();
 		}
 
 		// read
 		Order readOrder = null;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			readOrder = tx.getOrderMap().getBy(tx, TYPE, ID);
+			readOrder = tx.getOrderBy(TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, readOrder);
 
 		// update
-		Parameter<String> sParam = readOrder.getParameter(BAG_ID, PARAM_STRING_ID);
+		StringParameter sParam = readOrder.getParameter(BAG_ID, PARAM_STRING_ID);
 		String newStringValue = "Giddiya!";
 		sParam.setValue(newStringValue);
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			tx.getOrderMap().update(tx, readOrder);
+			tx.update(readOrder);
 			tx.commitOnClose();
 		}
 
 		// read updated
 		Order updatedOrder = null;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			updatedOrder = tx.getOrderMap().getBy(tx, TYPE, ID);
+			updatedOrder = tx.getOrderBy(TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, updatedOrder);
 		if (this.runtimeMock.getRealm(this.realmName).getMode() != DataStoreMode.CACHED)
-			assertFalse("Objects can't be the same reference after re-reading!", readOrder == updatedOrder);
-		Parameter<String> updatedParam = readOrder.getParameter(BAG_ID, PARAM_STRING_ID);
+			assertNotSame("Objects can't be the same reference after re-reading!", readOrder, updatedOrder);
+		StringParameter updatedParam = readOrder.getParameter(BAG_ID, PARAM_STRING_ID);
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			tx.getOrderMap().remove(tx, readOrder);
+			tx.remove(readOrder);
 			tx.commitOnClose();
 		}
 
 		// fail to re-read
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			Order order = tx.getOrderMap().getBy(tx, TYPE, ID);
+			Order order = tx.getOrderBy(TYPE, ID);
 			assertNull("Should not read Order with id " + ID, order);
 		}
 	}
@@ -168,8 +158,7 @@ public class OrderModelTestRunner {
 		orders.addAll(createOrders(orders.size(), 5, "@", "Further Order", "MyType3"));
 
 		// sort them so we know which order our objects are
-		Comparator<Order> comparator = (o1, o2) -> o1.getId().compareTo(o2.getId());
-		Collections.sort(orders, comparator);
+		orders.sort(Comparator.comparing(StrolchElement::getId));
 
 		// first clear the map, so that we have a clean state
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
@@ -244,7 +233,7 @@ public class OrderModelTestRunner {
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			List<Order> allOrders = tx.getOrderMap().getAllElements(tx);
-			Collections.sort(allOrders, comparator);
+			allOrders.sort(Comparator.comparing(StrolchElement::getId));
 			assertEquals(orders, allOrders);
 		}
 
@@ -267,11 +256,11 @@ public class OrderModelTestRunner {
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			Order order = tx.getOrderMap().getBy(tx, "MyType1", "@00000001");
+			Order order = tx.getOrderBy("MyType1", "@00000001");
 			assertNotNull(order);
-			order = tx.getOrderMap().getBy(tx, "MyType2", "@00000006");
+			order = tx.getOrderBy("MyType2", "@00000006");
 			assertNotNull(order);
-			order = tx.getOrderMap().getBy(tx, "MyType3", "@00000011");
+			order = tx.getOrderBy("MyType3", "@00000011");
 			assertNotNull(order);
 		}
 	}

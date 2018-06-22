@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,26 +15,16 @@
  */
 package li.strolch.testbase.runtime;
 
-import static li.strolch.model.ModelGenerator.BAG_ID;
-import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
-import static li.strolch.model.ModelGenerator.createResource;
-import static li.strolch.model.ModelGenerator.createResources;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.Resource;
-import li.strolch.model.parameter.Parameter;
+import li.strolch.model.StrolchElement;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
@@ -61,9 +51,10 @@ public class ResourceModelTestRunner {
 	public void runCreateResourceTest() {
 
 		// create
-		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Resource newResource = createResource("MyTestResource", "Test Name",
+				"TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			tx.getResourceMap().add(tx, newResource);
+			tx.add(newResource);
 			tx.commitOnClose();
 		}
 	}
@@ -77,13 +68,16 @@ public class ResourceModelTestRunner {
 		}
 
 		// create three resources
-		Resource resource1 = createResource("myTestResource1", "Test Name", "QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		Resource resource2 = createResource("myTestResource2", "Test Name", "QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		Resource resource3 = createResource("myTestResource3", "Test Name", "QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Resource resource1 = createResource("myTestResource1", "Test Name",
+				"QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Resource resource2 = createResource("myTestResource2", "Test Name",
+				"QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Resource resource3 = createResource("myTestResource3", "Test Name",
+				"QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			tx.getResourceMap().add(tx, resource1);
-			tx.getResourceMap().add(tx, resource2);
-			tx.getResourceMap().add(tx, resource3);
+			tx.add(resource1);
+			tx.add(resource2);
+			tx.add(resource3);
 			tx.commitOnClose();
 		}
 
@@ -111,19 +105,19 @@ public class ResourceModelTestRunner {
 		// create
 		Resource newResource = createResource(ID, NAME, TYPE);
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			tx.getResourceMap().add(tx, newResource);
+			tx.add(newResource);
 			tx.commitOnClose();
 		}
 
 		// read
-		Resource readResource = null;
+		Resource readResource;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			readResource = tx.getResourceMap().getBy(tx, TYPE, ID);
+			readResource = tx.getResourceBy(TYPE, ID);
 		}
 		assertNotNull("Should read Resource with id " + ID, readResource); //$NON-NLS-1$
 
 		// update
-		Parameter<String> sParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
+		StringParameter sParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
 		String newStringValue = "Giddiya!"; //$NON-NLS-1$
 		sParam.setValue(newStringValue);
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
@@ -132,14 +126,14 @@ public class ResourceModelTestRunner {
 		}
 
 		// read updated
-		Resource updatedResource = null;
+		Resource updatedResource;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			updatedResource = tx.getResourceMap().getBy(tx, TYPE, ID);
+			updatedResource = tx.getResourceBy(TYPE, ID);
 		}
 		assertNotNull("Should read Resource with id " + ID, updatedResource); //$NON-NLS-1$
 		if (this.runtimeMock.getRealm(this.realmName).getMode() != DataStoreMode.CACHED)
-			assertFalse("Objects can't be the same reference after re-reading!", readResource == updatedResource); //$NON-NLS-1$
-		Parameter<String> updatedParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
+			assertNotSame("Objects can't be the same reference after re-reading!", readResource, updatedResource); //$NON-NLS-1$
+		StringParameter updatedParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
@@ -150,7 +144,7 @@ public class ResourceModelTestRunner {
 
 		// fail to re-read
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
-			Resource resource = tx.getResourceMap().getBy(tx, TYPE, ID);
+			Resource resource = tx.getResourceBy(TYPE, ID);
 			assertNull("Should no read Resource with id " + ID, resource); //$NON-NLS-1$
 		}
 	}
@@ -164,8 +158,7 @@ public class ResourceModelTestRunner {
 		resources.addAll(createResources(resources.size(), 5, "@", "Further Resource", "MyType3"));
 
 		// sort them so we know which order our objects are
-		Comparator<Resource> comparator = (o1, o2) -> o1.getId().compareTo(o2.getId());
-		Collections.sort(resources, comparator);
+		resources.sort(Comparator.comparing(StrolchElement::getId));
 
 		// first clear the map, so that we have a clean state
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
@@ -240,7 +233,7 @@ public class ResourceModelTestRunner {
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			List<Resource> allResources = tx.getResourceMap().getAllElements(tx);
-			Collections.sort(allResources, comparator);
+			allResources.sort(Comparator.comparing(StrolchElement::getId));
 			assertEquals(resources, allResources);
 		}
 
@@ -263,11 +256,11 @@ public class ResourceModelTestRunner {
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			Resource resource = tx.getResourceMap().getBy(tx, "MyType1", "@00000001");
+			Resource resource = tx.getResourceBy("MyType1", "@00000001");
 			assertNotNull(resource);
-			resource = tx.getResourceMap().getBy(tx, "MyType2", "@00000006");
+			resource = tx.getResourceBy("MyType2", "@00000006");
 			assertNotNull(resource);
-			resource = tx.getResourceMap().getBy(tx, "MyType3", "@00000011");
+			resource = tx.getResourceBy("MyType3", "@00000011");
 			assertNotNull(resource);
 		}
 	}

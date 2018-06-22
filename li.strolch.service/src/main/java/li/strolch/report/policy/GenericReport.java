@@ -439,11 +439,15 @@ public class GenericReport extends ReportPolicy {
 
 		case StrolchConstants.INTERPRETATION_RESOURCE_REF:
 
-			return tx().getResourceMap().getElementsBy(tx(), objectTypeP.getUom()).stream();
+			return tx().streamResources(objectTypeP.getUom());
 
 		case StrolchConstants.INTERPRETATION_ORDER_REF:
 
-			return tx().getOrderMap().getElementsBy(tx(), objectTypeP.getUom()).stream();
+			return tx().streamOrders(objectTypeP.getUom());
+
+		case StrolchConstants.INTERPRETATION_ACTIVITY_REF:
+
+			return tx().streamActivities(objectTypeP.getUom());
 
 		default:
 

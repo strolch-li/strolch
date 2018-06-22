@@ -165,7 +165,7 @@ public class QueryTest {
 			Resource res1 = createResource("@1", "Test Resource", "MyType");
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test")) {
-				tx.getResourceMap().add(tx, res1);
+				tx.add(res1);
 				tx.commitOnClose();
 			}
 
@@ -193,7 +193,7 @@ public class QueryTest {
 			Resource res1 = createResource("@1", "Test Resource", "MyType");
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test")) {
-				tx.getResourceMap().add(tx, res1);
+				tx.add(res1);
 				tx.commitOnClose();
 			}
 
@@ -220,7 +220,7 @@ public class QueryTest {
 			Resource res1 = createResource("@1", "Test Resource", "MyType");
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test")) {
-				tx.getResourceMap().add(tx, res1);
+				tx.add(res1);
 				tx.commitOnClose();
 			}
 
@@ -248,7 +248,7 @@ public class QueryTest {
 			Resource res1 = createResource("@1", "Test Resource", "MyType");
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test")) {
-				tx.getResourceMap().add(tx, res1);
+				tx.add(res1);
 				tx.commitOnClose();
 			}
 
@@ -276,8 +276,8 @@ public class QueryTest {
 			Resource res2 = createResource("@2", "Test Resource", "MyType");
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test")) {
-				tx.getResourceMap().add(tx, res1);
-				tx.getResourceMap().add(tx, res2);
+				tx.add(res1);
+				tx.add(res2);
 				tx.commitOnClose();
 			}
 

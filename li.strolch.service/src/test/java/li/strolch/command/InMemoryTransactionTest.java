@@ -1,16 +1,7 @@
 package li.strolch.command;
 
-import static li.strolch.service.test.AbstractRealmServiceTest.CONFIG_SRC;
-import static li.strolch.service.test.AbstractRealmServiceTest.REALM_CACHED;
-import static li.strolch.service.test.AbstractRealmServiceTest.REALM_TRANSIENT;
-import static li.strolch.service.test.AbstractRealmServiceTest.dropSchema;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static li.strolch.service.test.AbstractRealmServiceTest.*;
+import static org.junit.Assert.*;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
@@ -22,6 +13,8 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.testbase.runtime.RuntimeMock;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class InMemoryTransactionTest {
 
@@ -216,7 +209,7 @@ public class InMemoryTransactionTest {
 
 		// should exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertTrue("Resource should exist!", tx.getResourceMap().hasElement(tx, type, id));
+			assertTrue("Resource should exist!", tx.hasResource(type, id));
 		}
 
 		// update
@@ -251,7 +244,7 @@ public class InMemoryTransactionTest {
 
 		// should not exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertFalse("Resource should not exist!", tx.getResourceMap().hasElement(tx, type, id));
+			assertFalse("Resource should not exist!", tx.hasResource(type, id));
 		}
 
 		// create again
@@ -263,7 +256,7 @@ public class InMemoryTransactionTest {
 
 		// should exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertTrue("Resource should exist!", tx.getResourceMap().hasElement(tx, type, id));
+			assertTrue("Resource should exist!", tx.hasResource(type, id));
 		}
 	}
 
@@ -284,7 +277,7 @@ public class InMemoryTransactionTest {
 
 		// should exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertTrue("Order should exist!", tx.getOrderMap().hasElement(tx, type, id));
+			assertTrue("Order should exist!", tx.hasOrder(type, id));
 		}
 
 		// update
@@ -319,7 +312,7 @@ public class InMemoryTransactionTest {
 
 		// should not exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertFalse("Order should not exist!", tx.getOrderMap().hasElement(tx, type, id));
+			assertFalse("Order should not exist!", tx.hasOrder(type, id));
 		}
 
 		// create again
@@ -331,7 +324,7 @@ public class InMemoryTransactionTest {
 
 		// should exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertTrue("Order should exist!", tx.getOrderMap().hasElement(tx, type, id));
+			assertTrue("Order should exist!", tx.hasOrder(type, id));
 		}
 	}
 
@@ -352,7 +345,7 @@ public class InMemoryTransactionTest {
 
 		// should exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertTrue("Activity should exist!", tx.getActivityMap().hasElement(tx, type, id));
+			assertTrue("Activity should exist!", tx.hasActivity(type, id));
 		}
 
 		// update
@@ -387,7 +380,7 @@ public class InMemoryTransactionTest {
 
 		// should not exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertFalse("Activity should not exist!", tx.getActivityMap().hasElement(tx, type, id));
+			assertFalse("Activity should not exist!", tx.hasActivity(type, id));
 		}
 
 		// create again
@@ -399,7 +392,7 @@ public class InMemoryTransactionTest {
 
 		// should exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertTrue("Activity should exist!", tx.getActivityMap().hasElement(tx, type, id));
+			assertTrue("Activity should exist!", tx.hasActivity(type, id));
 		}
 	}
 
@@ -418,7 +411,7 @@ public class InMemoryTransactionTest {
 
 		// should exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertTrue("Resource should exist!", tx.getResourceMap().hasElement(tx, type, id));
+			assertTrue("Resource should exist!", tx.hasResource(type, id));
 		}
 	}
 
@@ -438,7 +431,7 @@ public class InMemoryTransactionTest {
 
 		// should not exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertFalse("Resource should not exist!", tx.getResourceMap().hasElement(tx, type, id));
+			assertFalse("Resource should not exist!", tx.hasResource(type, id));
 		}
 	}
 
@@ -457,7 +450,7 @@ public class InMemoryTransactionTest {
 
 		// should exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertTrue("Order should exist!", tx.getOrderMap().hasElement(tx, type, id));
+			assertTrue("Order should exist!", tx.hasOrder(type, id));
 		}
 	}
 
@@ -477,7 +470,7 @@ public class InMemoryTransactionTest {
 
 		// create, update and remove
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertFalse("Order should not exist!", tx.getOrderMap().hasElement(tx, type, id));
+			assertFalse("Order should not exist!", tx.hasOrder(type, id));
 		}
 	}
 
@@ -496,7 +489,7 @@ public class InMemoryTransactionTest {
 
 		// should exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertTrue("Activity should exist!", tx.getActivityMap().hasElement(tx, type, id));
+			assertTrue("Activity should exist!", tx.hasActivity(type, id));
 		}
 	}
 
@@ -516,7 +509,7 @@ public class InMemoryTransactionTest {
 
 		// should not exist
 		try (StrolchTransaction tx = openTx(realmName)) {
-			assertFalse("Activity should not exist!", tx.getActivityMap().hasElement(tx, type, id));
+			assertFalse("Activity should not exist!", tx.hasActivity(type, id));
 		}
 	}
 }

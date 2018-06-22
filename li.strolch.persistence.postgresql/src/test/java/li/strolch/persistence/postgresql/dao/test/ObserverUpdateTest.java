@@ -125,14 +125,14 @@ public class ObserverUpdateTest {
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = realm.openTx(certificate, "test")) { //$NON-NLS-1$
-			tx.getOrderMap().add(tx, newOrder);
+			tx.add(newOrder);
 			tx.commitOnClose();
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = realm.openTx(certificate, "test");) { //$NON-NLS-1$
-			tx.getResourceMap().add(tx, newResource);
+			tx.add(newResource);
 			tx.commitOnClose();
 		}
 

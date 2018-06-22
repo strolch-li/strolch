@@ -104,12 +104,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate())) {
 
 				// iterate all activities
-				for (Activity activity : tx.getActivityMap().getAllElements(tx)) {
+				tx.streamActivities().forEach(activity -> {
 
 					// we only want to restart activities which were in execution
 					State state = activity.getState();
 					if (!state.inExecutionPhase())
-						continue;
+						return;
 
 					logger.info("Starting Execution of " + activity.getLocator() + " on realm " + realmName);
 
@@ -125,7 +125,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 					// register for execution
 					this.registeredActivities.addElement(realmName, activity.getLocator());
-				}
+				});
 
 				// commit changes to state
 				tx.commitOnClose();

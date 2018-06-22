@@ -55,7 +55,7 @@ public class ActivityModelTestRunner {
 		Activity newActivity = createActivity("MyTestActivity", "Test Name", "TestType",
 				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			tx.getActivityMap().add(tx, newActivity);
+			tx.add(newActivity);
 			tx.commitOnClose();
 		}
 	}
@@ -76,9 +76,9 @@ public class ActivityModelTestRunner {
 		Activity activity3 = createActivity("myTestActivity3", "Test Name", "QTestType3",
 				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			tx.getActivityMap().add(tx, activity1);
-			tx.getActivityMap().add(tx, activity2);
-			tx.getActivityMap().add(tx, activity3);
+			tx.add(activity1);
+			tx.add(activity2);
+			tx.add(activity3);
 			tx.commitOnClose();
 		}
 
@@ -106,14 +106,14 @@ public class ActivityModelTestRunner {
 		// create
 		Activity newActivity = createActivity(ID, NAME, TYPE, TimeOrdering.SERIES);
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			tx.getActivityMap().add(tx, newActivity);
+			tx.add(newActivity);
 			tx.commitOnClose();
 		}
 
 		// read
 		Activity readActivity;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			readActivity = tx.getActivityMap().getBy(tx, TYPE, ID);
+			readActivity = tx.getActivityBy(TYPE, ID);
 		}
 		assertNotNull("Should read Activity with id " + ID, readActivity);
 
@@ -122,14 +122,14 @@ public class ActivityModelTestRunner {
 		String newStringValue = "Giddiya!";
 		sParam.setValue(newStringValue);
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			tx.getActivityMap().update(tx, readActivity);
+			tx.update(readActivity);
 			tx.commitOnClose();
 		}
 
 		// read updated
 		Activity updatedActivity;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			updatedActivity = tx.getActivityMap().getBy(tx, TYPE, ID);
+			updatedActivity = tx.getActivityBy(TYPE, ID);
 		}
 		assertNotNull("Should read Activity with id " + ID, updatedActivity);
 		if (this.runtimeMock.getRealm(this.realmName).getMode() != DataStoreMode.CACHED)
@@ -139,13 +139,13 @@ public class ActivityModelTestRunner {
 
 		// delete
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			tx.getActivityMap().remove(tx, readActivity);
+			tx.remove(readActivity);
 			tx.commitOnClose();
 		}
 
 		// fail to re-read
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			Activity activity = tx.getActivityMap().getBy(tx, TYPE, ID);
+			Activity activity = tx.getActivityBy(TYPE, ID);
 			assertNull("Should no read Activity with id " + ID, activity);
 		}
 	}
@@ -260,11 +260,11 @@ public class ActivityModelTestRunner {
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
-			Activity activity = tx.getActivityMap().getBy(tx, "MyType1", "@00000001");
+			Activity activity = tx.getActivityBy("MyType1", "@00000001");
 			assertNotNull(activity);
-			activity = tx.getActivityMap().getBy(tx, "MyType2", "@00000006");
+			activity = tx.getActivityBy("MyType2", "@00000006");
 			assertNotNull(activity);
-			activity = tx.getActivityMap().getBy(tx, "MyType3", "@00000011");
+			activity = tx.getActivityBy("MyType3", "@00000011");
 			assertNotNull(activity);
 		}
 	}

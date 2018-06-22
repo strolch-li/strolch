@@ -3,8 +3,12 @@ package li.strolch.soql.core;
 import java.util.*;
 
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags;
 import li.strolch.model.query.StrolchElementQuery;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.search.ActivitySearch;
+import li.strolch.search.OrderSearch;
+import li.strolch.search.ResourceSearch;
 import li.strolch.soql.antlr4.generated.SOQLLexer;
 import li.strolch.soql.antlr4.generated.SOQLParser;
 import org.antlr.v4.runtime.CharStream;
@@ -14,10 +18,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 /**
- * Main class to process a SOQL query. It performs the queries to retrieve the
- * input objects as defined in the FROM clause and evaluates the compiled
- * statement on any cartesian product, returning the objects defined in the
- * SELECT clause.
+ * Main class to process a SOQL query. It performs the queries to retrieve the input objects as defined in the FROM
+ * clause and evaluates the compiled statement on any cartesian product, returning the objects defined in the SELECT
+ * clause.
  *
  * @author msmock
  */
@@ -30,8 +33,7 @@ public class QueryProcessor {
 	private Map<String, List<? extends StrolchRootElement>> inputCollections;
 
 	/**
-	 * Set the input map of collections to take the input objects from. For testing
-	 * purposes only.
+	 * Set the input map of collections to take the input objects from. For testing purposes only.
 	 *
 	 * @param inputCollections
 	 * 		the input data
@@ -95,8 +97,7 @@ public class QueryProcessor {
 	 * @param keys
 	 * 		the keys
 	 *
-	 * @return List of Lists of the elements to be taken as input for the compiled
-	 * statement
+	 * @return List of Lists of the elements to be taken as input for the compiled statement
 	 */
 	private List<List<StrolchRootElement>> buildCartesianProduct(
 			Map<String, List<? extends StrolchRootElement>> inputCollections, Object[] keys) {
@@ -187,16 +188,16 @@ public class QueryProcessor {
 			String clazzKey = entities.get(key);
 
 			switch (clazzKey) {
-			case "Resource":
-				result.put(key, tx.getResourceMap().getAllElements(tx));
+			case Tags.RESOURCE:
+				result.put(key, new ResourceSearch().search(tx).toList());
 				break;
 
-			case "Order":
-				result.put(key, tx.getOrderMap().getAllElements(tx));
+			case Tags.ORDER:
+				result.put(key, new OrderSearch().search(tx).toList());
 				break;
 
-			case "Activity":
-				result.put(key, tx.getActivityMap().getAllElements(tx));
+			case Tags.ACTIVITY:
+				result.put(key, new ActivitySearch().search(tx).toList());
 				break;
 
 			default:
