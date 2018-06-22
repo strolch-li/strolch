@@ -41,6 +41,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	private static final long serialVersionUID = 0L;
 
+	protected Locator locator;
 	protected Version version;
 	protected Map<String, StrolchTimedState<IValue<?>>> timedStateMap;
 	protected PolicyDefs policyDefs;
@@ -240,9 +241,12 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@Override
 	public Locator getLocator() {
-		LocatorBuilder lb = new LocatorBuilder();
-		fillLocator(lb);
-		return lb.build();
+		if (this.locator == null) {
+			LocatorBuilder lb = new LocatorBuilder();
+			fillLocator(lb);
+			this.locator = lb.build();
+		}
+		return this.locator;
 	}
 
 	@Override

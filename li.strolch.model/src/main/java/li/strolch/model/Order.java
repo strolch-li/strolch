@@ -39,6 +39,7 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 
 	private static final long serialVersionUID = 0L;
 
+	protected Locator locator;
 	protected Version version;
 	protected Date date;
 	protected State state;
@@ -204,9 +205,12 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 
 	@Override
 	public Locator getLocator() {
-		LocatorBuilder lb = new LocatorBuilder();
-		fillLocator(lb);
-		return lb.build();
+		if (this.locator == null) {
+			LocatorBuilder lb = new LocatorBuilder();
+			fillLocator(lb);
+			this.locator = lb.build();
+		}
+		return this.locator;
 	}
 
 	@Override

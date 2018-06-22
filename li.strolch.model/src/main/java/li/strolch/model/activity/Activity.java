@@ -42,7 +42,8 @@ public class Activity extends AbstractStrolchRootElement
 
 	private static final long serialVersionUID = 1L;
 
-	private Version version;
+	protected Locator locator;
+	protected Version version;
 
 	protected Activity parent;
 	protected TimeOrdering timeOrdering;
@@ -453,9 +454,12 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public Locator getLocator() {
-		LocatorBuilder lb = new LocatorBuilder();
-		fillLocator(lb);
-		return lb.build();
+		if (this.locator == null) {
+			LocatorBuilder lb = new LocatorBuilder();
+			fillLocator(lb);
+			this.locator = lb.build();
+		}
+		return this.locator;
 	}
 
 	@Override

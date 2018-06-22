@@ -514,17 +514,29 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Stream<Resource> streamResources(String... types) {
-		return getResourceMap().stream(this, types);
+		return getResourceMap().stream(this, types).map(e -> {
+			// perhaps the element was changed before, so we check if it is in the filter first
+			Resource element = getElementFromFilter(Tags.RESOURCE, e.getLocator());
+			return element == null ? e : element;
+		});
 	}
 
 	@Override
 	public Stream<Order> streamOrders(String... types) {
-		return getOrderMap().stream(this, types);
+		return getOrderMap().stream(this, types).map(e -> {
+			// perhaps the element was changed before, so we check if it is in the filter first
+			Order element = getElementFromFilter(Tags.ORDER, e.getLocator());
+			return element == null ? e : element;
+		});
 	}
 
 	@Override
 	public Stream<Activity> streamActivities(String... types) {
-		return getActivityMap().stream(this, types);
+		return getActivityMap().stream(this, types).map(e -> {
+			// perhaps the element was changed before, so we check if it is in the filter first
+			Activity element = getElementFromFilter(Tags.ACTIVITY, e.getLocator());
+			return element == null ? e : element;
+		});
 	}
 
 	@Override
