@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="ico/favicon.ico">
 
-    <title>Strolch: Queries</title>
+    <title>Strolch: Searches</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -45,23 +45,22 @@
 <div class="container">
 
     <div class="page-header">
-        <h1 class="page-title">Documentation: Queries</h1>
-        <p class="lead page-description">This page discusses Strolch Queries.</p>
+        <h1 class="page-title">Documentation: Searches</h1>
+        <p class="lead page-description">This page discusses Strolch Searches.</p>
     </div>
 
     <div class="content">
 
-        <p class="lead"><b>The Query API is deprecated and the search API should be used instead.</b>
-        </p>
-
-        <p>As is custom for every framework, querying the model must be possible. Strolch queries are implemented using
-           the <code>StrolchQuery</code> interface and one of its concrete implementations: <code>ResourceQuery</code>,
-            <code>OrderQuery</code>, <code>ActivityQuery</code>.</p>
+        <p>As is custom for every framework, querying, or searching, the model must be possible. Strolch searches are implemented using
+           the <code>StrolchSearch</code> class and one of its concrete implementations: <code>ResourceSearch</code>,
+            <code>OrderSearch</code>, <code>ActivitySearch</code>.</p>
 
         <p>A Strolch element always has two identifiers: <code>Type</code> and <code>Id</code>. The type is important as
            it classifies an element. So if a car and a house would be modelled in Strolch, then those would both be a
             <code>Resource</code>, but one of type <code>Car</code> and the other of type <code>House</code>. Both would
            have different parameters.</p>
+
+        <!--
 
         <p>Thus one of the inputs for every query is it's type, which is defined as the navigation. It is said that we
            navigate to the Cars, or Houses. Thus when instantiating a ResourceQuery, pass the navigation to the type of
@@ -156,6 +155,8 @@ try (StrolchTransaction tx = openTx()) {
 
   List&lt;Resource&gt; cars = tx.doQuery(query);
 }</pre>
+
+-->
 
         <!-- content here -->
 
