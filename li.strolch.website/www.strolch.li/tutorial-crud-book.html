@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8"/>
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -57,7 +57,7 @@
 
         <p>Since Books are central to the bookshop, we'll first create the <a target="_blank"
                                                                               href="https://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUD</a>
-            REST API for them. The API will be as follows:</p>
+           REST API for them. The API will be as follows:</p>
 
         <pre>
 GET ../rest/books?query=,offset=,limit=
@@ -68,10 +68,10 @@ DELETE ../rest/books/{id}
 </pre>
 
         <p>Thus corresponding with querying, getting, creating, updating and removing of books. So let's go ahead and
-            add these REST APIs to our project.</p>
+           add these REST APIs to our project.</p>
 
         <p>Our project is using JAX-RS 2.0 as the API and Jersey 2.x as the implementation, thus first we need to
-            configure JAX-RS. Thus create the following class:</p>
+           configure JAX-RS. Thus create the following class:</p>
         <pre class="pre-scrollable">
 @ApplicationPath("rest")
 public class RestfulApplication extends ResourceConfig {
@@ -119,10 +119,10 @@ public class BooksResource {
 }
 </pre>
 
-        <h3>Query</h3>
+        <h3>Search</h3>
 
-        <p>The first service we'll add is to query the existing books. The API defines three parameters, with which the
-            result can be controlled. The method can be defined as follows:</p>
+        <p>The first service we'll add is to query, or search for the existing books. The API defines three parameters,
+           with which the result can be controlled. The method can be defined as follows:</p>
 
         <pre>
 @GET
@@ -135,7 +135,7 @@ public Response query(@Context HttpServletRequest request, @QueryParam("query") 
 </pre>
 
         <p>To fill this method we need a few things. First let's define a constants class where we keep String constants
-            which we used in the model file:</p>
+           which we used in the model file:</p>
         <pre>
 public class BookShopConstants {
 
@@ -144,44 +144,64 @@ public class BookShopConstants {
 }
 </pre>
 
-        <p>As this tutorial progesses, more and more constants will be added here. This class helps with two issues:
-            Through the constants we can easily reason over where certain fields, and types are used and of course
-            String literals in code are a rather bad thing.</p>
+        <p>As this tutorial progresses, more and more constants will be added here. This class helps with two issues:
+           Through the constants we can easily reason over where certain fields, and types are used and of course String
+           literals in code are a rather bad thing.</p>
 
-        <p>Queries in Strolch are their own objects, which allows us to implement privilege validation and thus we need
-            to create this class as well. Book entities are Resources, thus we will be creating a
-            <code>ResourceQuery</code>. Since the query is for Resources of type Book, we will define this using a
-            navigation. Thus the resulting query looks as follows:</p>
+        <p>In Strolch there are multiple way to access objects. The old way was using Queries, the new search API is
+           much more fluent and easier to read and write. The search API, as well as the deprecated query API allows us
+           to implement privilege validation and thus one should create corresponding classes for each type of search.
+           Book entities are Resources, thus we will be creating a <code>ResourceSearch</code>. The search is for
+           Resources of type Book thus the resulting search looks as follows:</p>
         <pre>
-public class BooksQuery&lt;U&gt; extends ResourceQuery&lt;U&gt; {
-  public BooksQuery() {
-    super(new StrolchTypeNavigation(BookShopConstants.TYPE_BOOK));
+public class BooksSearch&lt;U&gt; extends ResourceSearch&lt;U&gt; {
+  public BookSearch() {
+    types(TYPE_BOOK);
+  }
+
+  public BookSearch stringQuery(String value) {
+    if (isEmpty(value))
+      return this;
+
+    // split by spaces
+    value = value.trim();
+    String[] values = value.split(" ");
+
+    // add where clauses for id, name and description
+    where(id().containsIgnoreCase(values) //
+            .or(name().containsIgnoreCase(values)) //
+            .or(param(BAG_PARAMETERS, PARAM_DESCRIPTION).containsIgnoreCase(values)));
+
+    return this;
   }
 }
 </pre>
 
+        <p>Note how we added a special method <code>stringQuery(String)</code> - this method defines where a search
+           string entered by the user will be used to match a book. In this case for <code>ID</code>, <code>name</code>
+           and the <code>description</code> parameter.</p>
+
         <p>So that our users can call this query, we must give them this as a privilege. This is done by adding the full
-            class name to the <code>PrivilegeRoles.xml</code> file as follows:</p>
+           class name to the <code>PrivilegeRoles.xml</code> file as follows:</p>
 
         <pre>
 ...
   &lt;Role name="User"&gt;
-    &lt;Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege"&gt;
+    &lt;Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege"&gt;
       &lt;Allow&gt;internal&lt;/Allow&gt;
-      &lt;Allow&gt;li.strolch.bookshop.query.BooksQuery&lt;/Allow&gt;
+      &lt;Allow&gt;li.strolch.bookshop.search.BookSearch&lt;/Allow&gt;
     &lt;/Privilege&gt;
   &lt;/Role&gt;
 ...
 </pre>
 
         <p><b>Note:</b> The <code>internal</code> allow value is a special privilege which is used internally when a
-            service or something performs internal queries. This means that a service can perform a query for object to
-            which the user might not have access, but without which the service could not be completed. We will use this
-            in a later stage.
-        </p>
+                        service or something performs internal queries. This means that a service can perform a query
+                        for object to which the user might not have access, but without which the service could not be
+                        completed. We will use this in a later stage. </p>
 
-        <p>Now we all parts we need to implement the query method. The method will include opening a transaction,
-            instantiating the query, executing the query, and returning the result:</p>
+        <p>Now we have all parts we need to implement the query method. The method will include opening a transaction,
+           instantiating the search, executing the search, and returning the result:</p>
         <pre class="pre-scrollable">
 @Path("books")
 public class BooksResource {
@@ -198,46 +218,31 @@ public class BooksResource {
     int limit = StringHelper.isNotEmpty(limitS) ? Integer.valueOf(limitS) : 0;
 
     // open the TX with the certificate, using this class as context
+    Paging&lt;Resource&gt; paging;
     try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getClass())) {
 
-      // prepare the query
-      ResourceQuery&lt;Resource&gt; query = new BooksQuery&lt;JsonObject&gt;();
-
-      // prepare selections
-      if (StringHelper.isEmpty(queryS)) {
-        query.withAny();
-      } else {
-        OrSelection or = new OrSelection();
-        or.with(ParameterSelection.stringSelection(BookShopConstants.BAG_PARAMETERS,
-            BookShopConstants.PARAM_DESCRIPTION, queryS, StringMatchMode.ci()));
-        or.with(new NameSelection(queryS, StringMatchMode.ci()));
-
-        // add selections
-        query.with(or);
-      }
-
-      // perform the query
-      List&lt;Resource&gt; books = tx.doQuery(query);
-
-      // perform paging
-      Paging&lt;Resource&gt; paging = Paging.asPage(books, offset, limit);
-      List&lt;Resource&gt; page = paging.getPage();
-
-      // return result
-      ResourceVisitor&lt;JsonObject&gt; visitor = new StrolchRootElementToJsonVisitor().flat().asResourceVisitor();
-      return ResponseUtil.listToResponse(StrolchRestfulConstants.DATA, page, a -&gt; a.accept(visitor));
+      // perform a book search
+      paging = new BookSearch() //
+          .stringQuery(queryS) //
+          .search(tx) //
+          .orderByName(false) //
+          .toPaging(offset, limit);
     }
+
+    ResourceVisitor&lt;JsonObject&gt; visitor = new StrolchRootElementToJsonVisitor().flat().asResourceVisitor();
+    return ResponseUtil.toResponse(paging, e -&gt; e.accept(visitor));
   }
 }
 </pre>
 
         <p><b>Note:</b> We automatically transform the Resource objects to JSON using the <code>StrolchElementToJsonVisitor</code>.
-            By calling the method <code>.flat()</code> we have a more compact JSON format. Paging is handled by a util
-            class.</p>
+                        By calling the method <code>.flat()</code> we have a more compact JSON format. Paging is handled
+                        by a util class.</p>
 
-        <p>As a rule we use the format where we return two fields: <code>msg</code> is a dash if all is ok, otherwise an
-            error message will be present. Data is always in the <code>data</code> field. This is just a personal taste,
-            and can be changed to one't taste.</p>
+        <p>The helper class <code>ResponseUtil</code> takes care of creating the JsonObject and the proper page. As a
+           rule we use the format where we return two fields: <code>msg</code> is a dash if all is ok, otherwise an
+           error message will be present. Data is always in the <code>data</code> field. This is just a personal taste,
+           and can be changed to one's own taste.</p>
 
         <h3>Get</h3>
 
@@ -270,11 +275,11 @@ public Response get(@Context HttpServletRequest request, @PathParam("id") String
 </pre>
 
         <p>Note how we simply retrieve the book as a Resource from the TX. This is a good moment to familiarize yourself
-            with the API of the <code>StrolchTransaction</code>. There are methods to retrieve elements, and also
-            perform queries. We will use more of these methods later.</p>
+           with the API of the <code>StrolchTransaction</code>. There are methods to retrieve elements, and also perform
+           queries. We will use more of these methods later.</p>
 
         <p>Further it can be noted that a simple retrieval isn't validated against the user's privileges, the user is
-            authenticated, which is enough for the moment.</p>
+           authenticated, which is enough for the moment.</p>
 
         <h3>Create</h3>
 
@@ -314,7 +319,7 @@ public Response create(@Context HttpServletRequest request, String data) {
 
         The service is implemented as follows:
         <pre class="pre-scrollable">
-public class CreateBookService extends AbstractService<JsonServiceArgument, JsonServiceResult> {
+public class CreateBookService extends AbstractService&lt;JsonServiceArgument, JsonServiceResult&gt; {
   private static final long serialVersionUID = 1L;
 
   @Override
@@ -358,7 +363,7 @@ public class CreateBookService extends AbstractService<JsonServiceArgument, Json
 </pre>
 
         <p><b>Note:</b> For the authenticated user to be able to perform this service, we must add it to their
-            privileges:</p>
+                        privileges:</p>
         <pre>
 ...
   &lt;Role name="User"&gt;
@@ -374,7 +379,7 @@ public class CreateBookService extends AbstractService<JsonServiceArgument, Json
         <h3>Update</h3>
 
         <p>Updating of a book is basically the same as the creation, we just use PUT, verify that the book exists and
-            give the user the privilege.</p>
+           give the user the privilege.</p>
 
         <p><b>PUT Method:</b></p>
         <pre class="pre-scrollable">
@@ -556,21 +561,22 @@ public class RemoveBookService extends AbstractService&lt;StringServiceArgument,
         <h3>Notes:</h3>
         <p>One should now see a pattern emerge:</p>
         <ul>
-            <li>The REST API delegates to the Services, or queries, with the exception of the retrieval of a single
+            <li>The REST API delegates to the Services, or Searches, with the exception of the retrieval of a single
                 object by id.
             </li>
             <li>Services should do initial validation of the input. Not much validation was done here, but more could be
                 done.
             </li>
             <li>Commands are reusable objects to perform recurring work.</li>
-            <li>Queries and Services are privileged actions for which a user must have the privilege to perform the
+            <li>Searches and Services are privileged actions for which a user must have the privilege to perform the
                 action.
             </li>
         </ul>
 
         <p>The book services are quite simple, but as more requirements arise, it should be easy to implement them in
-            the service layer. Thus should a service be required to be performed by an integration layer, then they can
-            simply call the services, since the input is defined and validation is done there.</p>
+           the service layer. Thus should a service be required to be performed by an integration layer, then they can
+           simply call the services, since the input is defined and validation is done there (i.e. NOT in the REST
+           API).</p>
 
         <p>This concludes the CRUD of books.</p>
 
@@ -614,7 +620,7 @@ public class RemoveBookService extends AbstractService&lt;StringServiceArgument,
         s.parentNode.insertBefore(g, s);
     })();
 </script>
-<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt=""/></p></noscript>
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
 <!-- End Piwik Code -->
 
 </body>

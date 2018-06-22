@@ -276,21 +276,6 @@
                 &lt;strolch.env&gt;dev.eitchpc&lt;/strolch.env&gt;
             &lt;/properties&gt;
         &lt;/profile&gt;
-        &lt;profile&gt;
-            &lt;id&gt;m2e.eitchmac&lt;/id&gt;
-            &lt;activation&gt;
-                &lt;property&gt;
-                    &lt;name&gt;user.name&lt;/name&gt;
-                    &lt;value&gt;eitch&lt;/value&gt;
-                &lt;/property&gt;
-                &lt;os&gt;
-                    &lt;family&gt;mac&lt;/family&gt;
-                &lt;/os&gt;
-            &lt;/activation&gt;
-            &lt;properties&gt;
-                &lt;strolch.env&gt;dev.eitchmac&lt;/strolch.env&gt;
-            &lt;/properties&gt;
-        &lt;/profile&gt;
     &lt;/profiles&gt;
 &lt;/project&gt;
 </pre>
@@ -344,10 +329,6 @@
     &lt;root&gt;/home/eitch/src/git/strolch-bookshop/runtime&lt;/root&gt;
     &lt;environment&gt;dev&lt;/environment&gt;
   &lt;/env&gt;
-  &lt;env id="dev.eitchmac" default="true"&gt;
-    &lt;root&gt;/Users/eitch/src/git/strolch-bookshop/runtime&lt;/root&gt;
-    &lt;environment&gt;dev&lt;/environment&gt;
-  &lt;/env>
 &lt;/StrolchBootstrap>
 </pre>
 
@@ -408,8 +389,47 @@
   &lt;Role name="User"&gt;
     &lt;Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege"&gt;
     &lt;/Privilege&gt;
-    &lt;Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege"&gt;
-      &lt;Allow&gt;internal&lt;/Allow&gt;
+
+    &lt;Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege"&gt;
+        &lt;AllAllowed>true&lt;/AllAllowed&gt;
+        &lt;Allow&gt;li.strolch.bookshop.search.BookSearch&lt;/Allow&gt;
+    &lt;/Privilege&gt;
+
+    &lt;Privilege name="GetResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="GetOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="GetActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="AddResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="AddOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="AddActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="UpdateResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="UpdateOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="UpdateActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="RemoveResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="RemoveOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="RemoveActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
     &lt;/Privilege&gt;
   &lt;/Role&gt;
   &lt;Role name="UserPrivileges"&gt;
@@ -424,9 +444,48 @@
     &lt;Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege"&gt;
       &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
     &lt;/Privilege&gt;
-    &lt;Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege"&gt;
-      &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+
+    &lt;Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege"&gt;
+        &lt;AllAllowed>true&lt;/AllAllowed&gt;
     &lt;/Privilege&gt;
+
+    &lt;Privilege name="GetResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="GetOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="GetActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="AddResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="AddOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="AddActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="UpdateResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="UpdateOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="UpdateActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="RemoveResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="RemoveOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="RemoveActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+
     &lt;Privilege name="PrivilegeAddUser" policy="UserAccessPrivilege"&gt;
       &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
     &lt;/Privilege&gt;
@@ -441,12 +500,55 @@
       &lt;Allow&gt;li.strolch.runtime.privilege.StrolchSystemActionWithResult&lt;/Allow&gt;
       &lt;Allow&gt;li.strolch.persistence.postgresql.PostgreSqlSchemaInitializer&lt;/Allow&gt;
     &lt;/Privilege&gt;
+
     &lt;Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege"&gt;
       &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
     &lt;/Privilege&gt;
+
     &lt;Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege"&gt;
       &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
     &lt;/Privilege&gt;
+    &lt;Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege"&gt;
+        &lt;AllAllowed>true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+
+    &lt;Privilege name="GetResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="GetOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="GetActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="AddResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="AddOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="AddActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="UpdateResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="UpdateOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="UpdateActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="RemoveResource" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="RemoveOrder" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="RemoveActivity" policy="ModelPrivilege"&gt;
+        &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+
     &lt;Privilege name="PrivilegeAction" policy="DefaultPrivilege"&gt;
       &lt;Allow&gt;Persist&lt;/Allow&gt;
       &lt;Allow&gt;PersistSessions&lt;/Allow&gt;
@@ -657,6 +759,11 @@
                 unlimited JCE libraries for your JVM and when you restart the server, you don't need to log back in, if
                 your session is still alive.
             </li>
+            <li>In <code>PrivilegeRoles.xml</code> there seems to be a lot of boilerplate. One thing about a highly
+                configurable system is that sometimes the configuration is bigger. In this case we have opted to have
+                the configuration shown and not use default values which you don't see, so that privilege acces is
+                clearly seen.
+            </li>
         </ul>
 
         <p>Your project is now ready to be imported into your favourite IDE. We have used both IntelliJ and Eclipse so
@@ -669,55 +776,59 @@
         <pre class="pre-scrollable">
 package li.strolch.bookshop.web;
 
-import java.io.InputStream;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.InputStream;
 
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchBootstrapper;
+import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebListener
 public class StartupListener implements ServletContextListener {
 
   private static final Logger logger = LoggerFactory.getLogger(StartupListener.class);
+  private static final String APP_NAME = "Bookshop";
 
   private StrolchAgent agent;
 
   @Override
   public void contextInitialized(ServletContextEvent sce) {
 
-    logger.info("Starting Bookshop...");
+    logger.info("Starting " + APP_NAME + "...");
+    long start = System.currentTimeMillis();
     try {
-      // we load the configuration by reading the boot strap file:
       String boostrapFileName = "/WEB-INF/" + StrolchBootstrapper.FILE_BOOTSTRAP;
       InputStream bootstrapFile = sce.getServletContext().getResourceAsStream(boostrapFileName);
       StrolchBootstrapper bootstrapper = new StrolchBootstrapper(StartupListener.class);
-
-      // now setup, initialize and start Strolch:
       this.agent = bootstrapper.setupByBoostrapFile(StartupListener.class, bootstrapFile);
       this.agent.initialize();
       this.agent.start();
-
-    } catch (Exception e) {
-      logger.error("Failed to start Bookshop due to: " + e.getMessage(), e);
+    } catch (Throwable e) {
+      logger.error("Failed to start " + APP_NAME + " due to: " + e.getMessage(), e);
       throw e;
     }
 
-    logger.info("Started Bookshop.");
+    long took = System.currentTimeMillis() - start;
+    logger.info("Started " + APP_NAME + " in " + (StringHelper.formatMillisecondsDuration(took)));
   }
 
   @Override
   public void contextDestroyed(ServletContextEvent sce) {
     if (this.agent != null) {
-      this.agent.stop();
-      this.agent.destroy();
+      logger.info("Destroying " + APP_NAME + "...");
+      try {
+        this.agent.stop();
+        this.agent.destroy();
+      } catch (Throwable e) {
+        logger.error("Failed to stop " + APP_NAME + " due to: " + e.getMessage(), e);
+        throw e;
+      }
     }
-    logger.info("Destroyed Bookshop.");
+    logger.info("Destroyed " + APP_NAME);
   }
 }
 </pre>
@@ -725,7 +836,7 @@ public class StartupListener implements ServletContextListener {
         <p>Now configure your IDE to start the web project, and then once it has started, you should see the following
            in the logs:</p>
         <pre class="pre-scrollable">
-Bookshop:dev All 8 Strolch Components started. Strolch is now ready to be used. Have fun =))
+Bookshop:dev All 8 Strolch Components started. Took 44ms. Strolch is now ready to be used. Have fun =))
 </pre>
 
         <p>This log tells us the name of the app as defined in the StrolchConfiguration.xml file as well as which
