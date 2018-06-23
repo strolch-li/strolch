@@ -51,112 +51,87 @@
 
     <div class="content">
 
-        <p>As is custom for every framework, querying, or searching, the model must be possible. Strolch searches are implemented using
-           the <code>StrolchSearch</code> class and one of its concrete implementations: <code>ResourceSearch</code>,
+        <p>As is custom for every framework, querying, or searching, the model must be possible. Strolch searches are
+           implemented using the <code>StrolchSearch</code> class and one of its concrete implementations: <code>ResourceSearch</code>,
             <code>OrderSearch</code>, <code>ActivitySearch</code>.</p>
 
         <p>A Strolch element always has two identifiers: <code>Type</code> and <code>Id</code>. The type is important as
            it classifies an element. So if a car and a house would be modelled in Strolch, then those would both be a
             <code>Resource</code>, but one of type <code>Car</code> and the other of type <code>House</code>. Both would
-           have different parameters.</p>
+           have different parameters. Thus when searching for objects, the first thing to do is define the type of
+           object being searched.</p>
 
-        <!--
+        <p>The Strolch search API is very expressive and offers multiple ways to perform the same search. The search API
+           consists of three components: The search classes, the search expressions and the search predicates. The
+           concept was taken from the <a href="https://camel.apache.org" target="_blank">Apache Camel</a> project.</p>
 
-        <p>Thus one of the inputs for every query is it's type, which is defined as the navigation. It is said that we
-           navigate to the Cars, or Houses. Thus when instantiating a ResourceQuery, pass the navigation to the type of
-           Resource as well. Same applies for Orders and Activities.</p>
-
-        <p>Further input for a StrolchQuery are the selections. These selections get translated into RDBMS
-            <code>WHERE</code> clauses. Selections support boolean operations thus allowing for complex querying.</p>
-
-        <p>StrolchQueries also support Ordering and object transformation. Following classes provide the most used
-           scenarios:</p>
+        <p>There are four main search classes:</p>
         <ul>
-            <li><code>OrderById</code></li>
-            <li><code>OrderByName</code></li>
-            <li><code>OrderByParameter</code></li>
-            <li><code>*ToDomVisitor</code></li>
-            <li><code>*ToSaxVisitor</code></li>
-            <li><code>*ToJsonVisitor</code></li>
-            <li><code>*ToFlatJsonVisitor</code></li>
+            <li><code>RootElementSearch</code> - search for any of <code>Resource</code>, <code>Order</code> or <code>Activity</code>
+                                               elements
+            </li>
+            <li><code>ResourceSearch</code> - search for <code>Resources</code></li>
+            <li><code>OrderSearch</code> - search for <code>Orders</code></li>
+            <li><code>ActivitySearch</code> - search for <code>Activities</code></li>
         </ul>
 
-        <br />
-        <p>Example: Query all resources of type Car:</p>
+        <p>No search is useful without a <code>where</code> clause, which are called search expressions. When writing a
+           search, there are multiple ways to add such where clauses. Either</p>
+        <ul>
+            <li>override the <code>define()</code> method in your sub class and add the where clauses by calling the
+                <code>where()</code> method, or
+            </li>
+            <li>define special methods on the class e.g. <code>byColor()</code> which also calls the
+                <code>where()</code> method to add a search expression, or
+            </li>
+            <li>directly call the <code>where()</code> method after instantiating a search.</li>
+        </ul>
+
+        <p>When extending the class, then the search expressions are available as methods on the super class, otherwise
+           you can statically import them from
+            <a href="https://github.com/4treesCH/strolch/blob/develop/li.strolch.agent/src/main/java/li/strolch/search/ExpressionsSupport.java"
+               target="_blank">ExpressionsSupport</a>.</p>
+
+        <p>And of course a where clause needs operators, which are called search predicates. Just as search expressions
+           are available in sub classes, so are search predicates and can also be statically imported through
+            <a href="https://github.com/4treesCH/strolch/blob/develop/li.strolch.agent/src/main/java/li/strolch/search/PredicatesSupport.java"
+               target="_blank">PredicatesSupport</a>.</p>
+
+        <p>Examples of search expressions with search predicates follow:</p>
         <pre>
-try (StrolchTransaction tx = openTx()) {
-  ResourceQuery&lt;Resource&gt; query = ResourceQuery.query("Car");
-  query.withAny();
-  List&lt;Resource&gt; cars = tx.doQuery(query);
-}</pre>
+ResourceSearch search = new ResourceSearch();
 
-        <br />
-        <p>Example: Query all resources of type Car, order by Name and transform to JSON:</p>
+// predicate either as parameter, or chained
+search.where(id().isEqualTo("myId"));
+search.where(id(isEqualTo("myId")));
+
+// negating
+search.where(id(isEqualTo("myId")).not());
+
+search.where(param("bagId", "paramId").isIn(Arrays.asList("red", "blue", "green")));
+
+search.where(paramNull("bagId", "paramId")));
+
+// boolean operations
+search.where(id(isEqualTo("myId")) //
+		.or(name(isEqualTo("myName"))));
+        </pre>
+
+        <p>Note how the predicates can be chained to the search expression, or passed as a parameter to the
+           expression.</p>
+
+        <p>See the
+            <a href="https://github.com/4treesCH/strolch/blob/develop/li.strolch.agent/src/test/java/li/strolch/search/StrolchSearchTest.java"
+               target="_blank">StrolchSearchTest</a> for many ways in which you can implement tests.</p>
+
+        <p>Note that strolch searches requires privileges. Thus when you use a strolch search, add it to the role of the
+           user in <code>PrivilegeRoles.xml</code>:</p>
         <pre>
-try (StrolchTransaction tx = openTx()) {
-  ResourceQuery&lt;JsonObject&gt; query = ResourceQuery.query("Car", new ResourceToJsonVisitor(),
-      new OrderByName());
-  query.withAny();
-  List&lt;JsonObject&gt; cars = tx.doQuery(query);
-}</pre>
+&lt;Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege"&gt;
+    &lt;Allow&gt;internal&lt;/Allow&gt; &lt;!-- internal used for when the search is done in an internal service --&gt;
+    &lt;Allow&gt;li.strolch.bookshop.search.BookSearch&lt;/Allow&gt;
+&lt;/Privilege&gt;</pre>
 
-        <br />
-        <p>the previous example can also be written as follows:</p>
-        <pre>
-try (StrolchTransaction tx = openTx()) {
-  ResourceQuery&lt;JsonObject&gt; query = new ResourceQuery<>();
-  query.setNavigation(new StrolchTypeNavigation("Car"));
-  query.setResourceVisitor(new ResourceToJsonVisitor());
-  query.withAny();
-  List&lt;JsonObject&gt; cars = tx.doQuery(query);
-}</pre>
-
-        <br />
-        <p>Example: Query all resources of type Car with color blue:</p>
-        <pre>
-try (StrolchTransaction tx = openTx()) {
-    ResourceQuery&lt;Resource&gt; query = ResourceQuery.query("Car");
-    query.with(ParameterSelection.stringSelection("parameters", "color", "blue", StringMatchMode.es()));
-    List&lt;Resource&gt; cars = tx.doQuery(query);
-}</pre>
-
-        <br />
-        <p>Example: Query all resources of type Car which are not blue:</p>
-        <pre>
-try (StrolchTransaction tx = openTx()) {
-  ResourceQuery&lt;Resource&gt; query = ResourceQuery.query("Car");
-  query.not(ParameterSelection.stringSelection("parameters", "color", "blue", StringMatchMode.es()));
-  List&lt;Resource&gt; cars = tx.doQuery(query);
-}</pre>
-
-        <br />
-        <p>Example: Query all resources of type Car with color blue or yellow:</p>
-        <pre>
-try (StrolchTransaction tx = openTx()) {
-  ResourceQuery&lt;Resource&gt; query = ResourceQuery.query("Car");
-  query.or().with(
-      ParameterSelection.stringSelection("parameters", "color", "blue", StringMatchMode.es()),
-      ParameterSelection.stringSelection("parameters", "color", "yellow", StringMatchMode.es()));
-  List&lt;Resource&gt; cars = tx.doQuery(query);
-}</pre>
-
-        <br />
-        <p>Example: Query all resources of type Car with color blue or yellow owned by Jill:</p>
-        <pre>
-try (StrolchTransaction tx = openTx()) {
-  ResourceQuery&lt;Resource&gt; query = ResourceQuery.query("Car");
-
-  StringParameterSelection owner = ParameterSelection.stringSelection("parameters", "owner", "Jill", StringMatchMode.es());
-  OrSelection colors = new OrSelection().with(
-      ParameterSelection.stringSelection("parameters", "color", "blue", StringMatchMode.es()),
-      ParameterSelection.stringSelection("parameters", "color", "yellow", StringMatchMode.es()));
-
-  query.and().with(owner, colors);
-
-  List&lt;Resource&gt; cars = tx.doQuery(query);
-}</pre>
-
--->
 
         <!-- content here -->
 
