@@ -124,7 +124,6 @@
         <module>li.strolch.privilege</module>
         <module>li.strolch.utils</module>
         <module>li.strolch.xmlpers</module>
-        <module>li.strolch.bom</module>
         <module>li.strolch.model</module>
         <module>li.strolch.soql</module>
         <module>li.strolch.testbase</module>
@@ -135,14 +134,14 @@
         <module>li.strolch.service</module>
         <module>li.strolch.rest</module>
 
-        <!-- test and demo project -->
+        <module>li.strolch.performancetest</module>
         <module>strolch_minimal_rest</module>
-
-        <!-- website -->
+        
         <module>li.strolch.website</module>
 
         <!-- keep a module as last which is deployable to central -->
-        <module>li.strolch.performancetest</module>
+        <module>li.strolch.bom</module>
+
     </modules>
 
     <dependencyManagement>
