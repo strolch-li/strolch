@@ -55,19 +55,21 @@
         <ul>
             <li>1 <code>Service</code> per use-case, should mostly delegate to <code>Commands</code>.</li>
             <li><code>Commands</code> implement use-cases or parts of it, and are thus reusable.</li>
-            <li>Subclass <code>ResourceQuery</code> and <code>OrderQuery</code> when implementing use-case specific
-                querying - this allows privilege checking.
+            <li>Subclass <code>ResourceSearch</code>, <code>OrderSearch</code> and <code>ActivitySearch</code> when
+                implementing use-case specific search - this allows privilege checking.
             </li>
             <li>One Transaction at a time - no TX inside of another TX.</li>
             <li>Commands are added to TXs and performed on close: <code>tx.addCommand(Command)</code> and then <code>tx.commitOnClose()</code>
             </li>
-            <li>Use <code>tx.flush() and as late as possible in your TX <code>tx.commitOnClose()</code></code>
+            <li>Use <code>tx.flush() if you need to perform first some work and then as late as possible call <code>tx.commitOnClose()</code></code>
             </li>
             <li>Only access <code>ElementMap</code>s if really no other way, mostly use <code>tx.get*By()</code>, <code>tx.findBy()</code>
                 and queries - if a specific get is missing, then add the method to <code>StrolchTransaction</code> and
                 send a pull request!
             </li>
-            <li>Don't write logic in REST API beans. Delegate to other classes, making your code reusable!</li>
+            <li>Use <code>tx.stream*()</code> methods to iterate over all elements, if you don't want to use a search.
+            </li>
+            <li>Don't write logic in REST API beans. Delegate to other services, making your code reusable!</li>
             <li>Transform to JSON using the <code>StrolchElementToJsonVisitor</code>.</li>
             <li>References between objects is done by adding a <code>ParameterBag</code> with the id
                 <code>relations</code> to the object and then <code>StringParameters</code> with the value being the ID,

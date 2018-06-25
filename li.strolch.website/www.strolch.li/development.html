@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8"/>
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -64,24 +64,20 @@ cd strolch
 mvn clean install -DskipTests</pre>
 
         <p><b>Note:</b> To run the tests you will need to configure the PostgreSQL Databases. See the README in the
-            module.</p>
+                        module.</p>
 
         <p>After running the Maven build, you will have a full build of all Strolch projects. Now you can start
-            modifying the projects, and add your own features, or, far more interesting, start developing your projects
-            using the Strolch agent.</p>
+           modifying the projects, and add your own features, or, far more interesting, start developing your projects
+           using the Strolch agent.</p>
 
         <h2>Strolch Project Configuration</h2>
         <p>To use Strolch in your own projects, look at the two tutorial apps on how they are configured. You can also
-            simply copy the projects, modify the Maven POMs and remove what ever you do not need.</p>
+           simply copy the projects, modify the Maven POMs and remove what ever you do not need.</p>
 
         <p>The following sections describe the Strolch configuration files and folder structure.</p>
 
-        <p>You can also use the minimal project structures:</p>
-        <ul>
-            <li><a href="https://github.com/4treesCH/strolch/tree/develop/strolch_minimal">strolch_minimal</a></li>
-            <li><a href="https://github.com/4treesCH/strolch/tree/develop/strolch_minimal_rest">strolch_minimal_rest</a>
-            </li>
-        </ul>
+        <p>You can also use the minimal project structure:
+            <a href="https://github.com/4treesCH/strolch/tree/develop/strolch_minimal_rest">strolch_minimal_rest</a></p>
 
         <h3>Project Structure</h3>
         <p>Strolch requires two main directories under the Strolch root:</p>
@@ -91,8 +87,11 @@ mvn clean install -DskipTests</pre>
                     <li>StrolchConfiguration.xml &rarr; Main Strolch configuration file. There you configure the
                         different realms, environments etc.
                     </li>
-                    <li>PrivilegeConfig.xml &rarr; Configuration of the Privilege library</li>
-                    <li>PrivilegeModel.xml &rarr; Configuration file with the differen users, roles and privileges</li>
+                    <li>PrivilegeConfig.xml &rarr; Configuration of the privilege management.</li>
+                    <li>PrivilegeUsers.xml &rarr; Configuration file with the different users and their role
+                        associations.
+                    </li>
+                    <li>PrivilegeRoles.xml &rarr; Configuration file with the different roles and privileges.</li>
                 </ul>
             </li>
             <li>../data/ &rarr; contains the Strolch model and any other data which is modified at runtime.
@@ -101,179 +100,19 @@ mvn clean install -DskipTests</pre>
                     </li>
                 </ul>
             </li>
+            <li>../tmp/ &rarr; contains any temporary files, e.g. log files etc.</li>
         </ul>
 
         <h3>Maven POM</h3>
-        <p>Strolch is built using Maven, so here we show the minimum Maven POM.</p>
+        <p>Strolch is built using Maven, so here we show the minimum Maven POM for a web application:</p>
 
-        <h4>Simple Java App POM</h4>
-        <p>This POM creates a compressed file which contains a runnable Strolch instance. Just unpack and run the <i>startup.sh</i>
-            script.</p>
-        <pre class="pre-scrollable">
-&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
-  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
-
-  &lt;properties&gt;
-    &lt;strolch.version&gt;1.0.0-SNAPSHOT&lt;/strolch.version&gt;
-    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
-    &lt;finalName&gt;strolch_app&lt;/finalName&gt;
-    &lt;m2eclipse.wtp.contextRoot&gt;${finalName}&lt;/m2eclipse.wtp.contextRoot&gt;
-    &lt;buildTimestamp&gt;${maven.build.timestamp}&lt;/buildTimestamp&gt;
-  &lt;/properties&gt;
-
-  &lt;groupId&gt;org.example&lt;/groupId&gt;
-  &lt;artifactId&gt;org.example.strolch.app&lt;/artifactId&gt;
-  &lt;version&gt;1.2.3&lt;/version&gt;
-  &lt;name&gt;org.example.strolch.app&lt;/name&gt;
-
-  &lt;scm&gt;
-    &lt;developerConnection&gt;scm:git:https://git.example.org/strolch_app.git&lt;/developerConnection&gt;
-  &lt;/scm&gt;
-
-  &lt;dependencyManagement&gt;
-    &lt;dependencies&gt;
-      &lt;dependency&gt;
-        &lt;groupId&gt;li.strolch&lt;/groupId&gt;
-        &lt;artifactId&gt;li.strolch.bom&lt;/artifactId&gt;
-        &lt;type&gt;pom&lt;/type&gt;
-        &lt;version&gt;${strolch.version}&lt;/version&gt;
-      &lt;/dependency&gt;
-    &lt;/dependencies&gt;
-  &lt;/dependencyManagement&gt;
-
-  &lt;dependencies&gt;
-    &lt;!-- main --&gt;
-    &lt;dependency&gt;
-      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
-      &lt;artifactId&gt;li.strolch.model&lt;/artifactId&gt;
-      &lt;version&gt;${strolch.version}&lt;/version&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
-      &lt;artifactId&gt;li.strolch.agent&lt;/artifactId&gt;
-      &lt;version&gt;${strolch.version}&lt;/version&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
-      &lt;artifactId&gt;li.strolch.service&lt;/artifactId&gt;
-      &lt;version&gt;${strolch.version}&lt;/version&gt;
-    &lt;/dependency&gt;
-
-    &lt;dependency&gt;
-      &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
-      &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
-      &lt;scope&gt;runtime&lt;/scope&gt;
-      &lt;version&gt;1.7.2&lt;/version&gt;
-    &lt;/dependency&gt;
-
-    &lt;!-- test dependencies --&gt;
-    &lt;dependency&gt;
-      &lt;groupId&gt;junit&lt;/groupId&gt;
-      &lt;artifactId&gt;junit&lt;/artifactId&gt;
-      &lt;scope&gt;test&lt;/scope&gt;
-      &lt;version&gt;4.11&lt;/version&gt;
-    &lt;/dependency&gt;
-  &lt;/dependencies&gt;
-
-  &lt;build&gt;
-    &lt;finalName&gt;${finalName}&lt;/finalName&gt;
-    &lt;resources&gt;
-      &lt;resource&gt;
-        &lt;directory&gt;src/main/resources&lt;/directory&gt;
-        &lt;filtering&gt;true&lt;/filtering&gt;
-        &lt;includes&gt;
-          &lt;include&gt;**/componentVersion.properties&lt;/include&gt;
-        &lt;/includes&gt;
-      &lt;/resource&gt;
-      &lt;resource&gt;
-        &lt;directory&gt;src/main/resources&lt;/directory&gt;
-        &lt;filtering&gt;false&lt;/filtering&gt;
-        &lt;excludes&gt;
-          &lt;exclude&gt;**/componentVersion.properties&lt;/exclude&gt;
-        &lt;/excludes&gt;
-      &lt;/resource&gt;
-    &lt;/resources&gt;
-    &lt;plugins&gt;
-
-      &lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-        &lt;version&gt;3.0&lt;/version&gt;
-        &lt;configuration&gt;
-          &lt;source&gt;1.7&lt;/source&gt;
-          &lt;target&gt;1.7&lt;/target&gt;
-          &lt;showDeprecation&gt;true&lt;/showDeprecation&gt;
-          &lt;showWarnings&gt;true&lt;/showWarnings&gt;
-          &lt;compilerArgument&gt;-Xlint:all&lt;/compilerArgument&gt;
-        &lt;/configuration&gt;
-      &lt;/plugin&gt;
-
-      &lt;plugin&gt;
-        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
-        &lt;artifactId&gt;buildnumber-maven-plugin&lt;/artifactId&gt;
-        &lt;version&gt;1.2&lt;/version&gt;
-        &lt;executions&gt;
-          &lt;execution&gt;
-            &lt;phase&gt;validate&lt;/phase&gt;
-            &lt;goals&gt;
-              &lt;goal&gt;create&lt;/goal&gt;
-            &lt;/goals&gt;
-          &lt;/execution&gt;
-        &lt;/executions&gt;
-        &lt;configuration&gt;
-          &lt;doCheck&gt;false&lt;/doCheck&gt;
-          &lt;doUpdate&gt;false&lt;/doUpdate&gt;
-        &lt;/configuration&gt;
-      &lt;/plugin&gt;
-
-      &lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;
-        &lt;configuration&gt;
-          &lt;archive&gt;
-            &lt;manifest&gt;
-              &lt;addDefaultImplementationEntries&gt;true&lt;/addDefaultImplementationEntries&gt;
-              &lt;addDefaultSpecificationEntries&gt;true&lt;/addDefaultSpecificationEntries&gt;
-
-              &lt;!-- When creating an executable jar, use copy-dependencies plugin with libs in lib/ dir: --&gt;
-              &lt;mainClass&gt;li.strolch.tutorialapp.main.Main&lt;/mainClass&gt;
-              &lt;addClasspath&gt;true&lt;/addClasspath&gt;
-              &lt;classpathPrefix&gt;lib/&lt;/classpathPrefix&gt;
-            &lt;/manifest&gt;
-          &lt;/archive&gt;
-        &lt;/configuration&gt;
-      &lt;/plugin&gt;
-
-      &lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt;
-        &lt;configuration&gt;
-          &lt;descriptor&gt;src/assembly/bin.xml&lt;/descriptor&gt;
-          &lt;finalName&gt;tutorial-app-${project.version}&lt;/finalName&gt;
-        &lt;/configuration&gt;
-        &lt;executions&gt;
-          &lt;execution&gt;
-            &lt;phase&gt;package&lt;/phase&gt;
-            &lt;goals&gt;
-              &lt;goal&gt;single&lt;/goal&gt;
-            &lt;/goals&gt;
-          &lt;/execution&gt;
-        &lt;/executions&gt;
-      &lt;/plugin&gt;
-    &lt;/plugins&gt;
-  &lt;/build&gt;
-&lt;/project&gt;</pre>
-
-        <h4>Webapp POM</h4>
-        <p>This creates a simple WAR which starts Strolch after deployed to a servlet container.</p>
         <pre class="pre-scrollable">
 &lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"&gt;
   &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
 
   &lt;properties&gt;
-    &lt;strolch.version&gt;1.2.3&lt;/strolch.version&gt;
+    &lt;strolch.version&gt;1.6.47&lt;/strolch.version&gt;
     &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
     &lt;warFinalName&gt;strolch_webapp&lt;/warFinalName&gt;
     &lt;m2eclipse.wtp.contextRoot&gt;${warFinalName}&lt;/m2eclipse.wtp.contextRoot&gt;
@@ -445,15 +284,23 @@ mvn clean install -DskipTests</pre>
         <h3>Tools used</h3>
         The following tools are used to develop Strolch and Strolch-based projects:
         <ul class="list-unstyled">
-            <li><a href="https://www.eclipse.org/downloads/"><img style="height: 50px" class="img-thumbnail"
+            <li><a href="https://www.eclipse.org/downloads/"><img style="height: 50px"
+                                                                  class="img-thumbnail"
                                                                   src="https://www.eclipse.org/downloads/packages/sites/all/themes/solstice/_themes/solstice_packages/logo.png"
-                                                                  alt="Eclipse Luna JEE version"/></a></li>
-            <li><a href="https://maven.apache.org/"><img width="250" style="height: 50px; margin-top: 10px"
+                                                                  alt="Eclipse Luna JEE version" /></a></li>
+            <li><a href="https://www.jetbrains.com/idea/download/#section=linux"><img style="height: 50px"
+                                                                                      class="img-thumbnail"
+                                                                                      src="https://upload.wikimedia.org/wikipedia/commons/d/d5/IntelliJ_IDEA_Logo.svg"
+                                                                                      alt="IntelliJ IDEA" /></a></li>
+            <li><a href="https://maven.apache.org/"><img width="250"
+                                                         style="height: 50px; margin-top: 10px"
                                                          class="img-thumbnail"
                                                          src="http://maven.apache.org/images/maventxt_logo_200.gif"
-                                                         alt="Apache Maven 3.0"/></a></li>
-            <li><a href="http://git-scm.com/"><img style="height: 50px; margin-top: 10px" class="img-thumbnail"
-                                                   src="http://git-scm.com/images/logo@2x.png" alt="git scm"/></a></li>
+                                                         alt="Apache Maven 3.0" /></a></li>
+            <li><a href="http://git-scm.com/"><img style="height: 50px; margin-top: 10px"
+                                                   class="img-thumbnail"
+                                                   src="http://git-scm.com/images/logo@2x.png"
+                                                   alt="git scm" /></a></li>
         </ul>
 
     </div><!-- /.content -->
@@ -467,12 +314,12 @@ mvn clean install -DskipTests</pre>
 
 </div><!-- /.container -->
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual xsd as needed -->
+      <!-- Include all compiled plugins (below), or include individual xsd as needed -->
 <script src="js/bootstrap.min.js"></script>
 
-<!-- Piwik -->
+      <!-- Piwik -->
 <script type="text/javascript">
     var _paq = _paq || [];
     _paq.push(['trackPageView']);
@@ -489,8 +336,8 @@ mvn clean install -DskipTests</pre>
         s.parentNode.insertBefore(g, s);
     })();
 </script>
-<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt=""/></p></noscript>
-<!-- End Piwik Code -->
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
+      <!-- End Piwik Code -->
 
 </body>
 </html>
