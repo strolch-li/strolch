@@ -567,7 +567,6 @@
                     <configuration>
                         <serverId>oss.sonatype.org</serverId>
                         <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                        <autoReleaseAfterClose>true</autoReleaseAfterClose>
                     </configuration>
                     <executions>
                         <execution>
