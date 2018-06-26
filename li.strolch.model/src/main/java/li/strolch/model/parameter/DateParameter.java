@@ -99,6 +99,11 @@ public class DateParameter extends AbstractParameter<Date> {
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.DATE;
+	}
+
+	@Override
 	public DateParameter getClone() {
 		DateParameter clone = new DateParameter();
 
@@ -124,8 +129,4 @@ public class DateParameter extends AbstractParameter<Date> {
 		return this.getValue().compareTo(((DateParameter) o).getValue());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.DATE;
-	}
 }

@@ -135,6 +135,11 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.INTEGER_LIST;
+	}
+
+	@Override
 	public IntegerListParameter getClone() {
 		IntegerListParameter clone = new IntegerListParameter();
 
@@ -174,8 +179,4 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 		return Integer.compare(this.getValue().size(), ((IntegerListParameter) o).getValue().size());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.INTEGER_LIST;
-	}
 }

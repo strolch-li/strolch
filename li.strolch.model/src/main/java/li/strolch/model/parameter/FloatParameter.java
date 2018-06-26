@@ -97,6 +97,11 @@ public class FloatParameter extends AbstractParameter<Double> {
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.FLOAT;
+	}
+
+	@Override
 	public FloatParameter getClone() {
 		FloatParameter clone = new FloatParameter();
 
@@ -122,8 +127,4 @@ public class FloatParameter extends AbstractParameter<Double> {
 		return this.getValue().compareTo(((FloatParameter) o).getValue());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.FLOAT;
-	}
 }

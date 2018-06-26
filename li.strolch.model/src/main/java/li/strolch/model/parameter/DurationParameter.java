@@ -96,6 +96,11 @@ public class DurationParameter extends AbstractParameter<Long> {
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.DURATION;
+	}
+
+	@Override
 	public DurationParameter getClone() {
 		DurationParameter clone = new DurationParameter();
 
@@ -121,8 +126,4 @@ public class DurationParameter extends AbstractParameter<Long> {
 		return this.getValue().compareTo(((DurationParameter) o).getValue());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.DURATION;
-	}
 }

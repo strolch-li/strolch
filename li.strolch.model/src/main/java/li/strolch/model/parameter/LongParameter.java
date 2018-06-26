@@ -95,6 +95,11 @@ public class LongParameter extends AbstractParameter<Long> {
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.LONG;
+	}
+
+	@Override
 	public LongParameter getClone() {
 		LongParameter clone = new LongParameter();
 
@@ -120,8 +125,4 @@ public class LongParameter extends AbstractParameter<Long> {
 		return this.getValue().compareTo(((LongParameter) o).getValue());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.LONG;
-	}
 }

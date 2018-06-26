@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,10 +38,13 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 
 	/**
 	 * Default constructors
-	 * 
-	 * @param id the id
-	 * @param name the name
-	 * @param value the value
+	 *
+	 * @param id
+	 * 		the id
+	 * @param name
+	 * 		the name
+	 * @param value
+	 * 		the value
 	 */
 	public BooleanParameter(String id, String name, Boolean value) {
 		super(id, name);
@@ -73,7 +76,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 
 	/**
 	 * Sets the value to false
-	 * 
+	 *
 	 * @see Parameter#clear()
 	 */
 	@Override
@@ -90,6 +93,11 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	@Override
 	public String getType() {
 		return StrolchValueType.BOOLEAN.getType();
+	}
+
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.BOOLEAN;
 	}
 
 	@Override
@@ -118,8 +126,4 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 		return this.getValue().compareTo(((BooleanParameter) o).getValue());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.BOOLEAN;
-	}
 }

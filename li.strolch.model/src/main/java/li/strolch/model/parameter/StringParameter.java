@@ -55,6 +55,11 @@ public class StringParameter extends AbstractParameter<String> {
 		return StrolchValueType.STRING.getType();
 	}
 
+	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.STRING;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public String getValue() {
@@ -118,8 +123,4 @@ public class StringParameter extends AbstractParameter<String> {
 		return this.getValue().compareToIgnoreCase(((StringParameter) o).getValue());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.STRING;
-	}
 }

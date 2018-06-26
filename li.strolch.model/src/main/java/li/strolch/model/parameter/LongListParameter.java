@@ -135,6 +135,11 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.LONG_LIST;
+	}
+
+	@Override
 	public LongListParameter getClone() {
 		LongListParameter clone = new LongListParameter();
 
@@ -174,8 +179,4 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 		return Integer.compare(this.getValue().size(), ((LongListParameter) o).getValue().size());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.LONG_LIST;
-	}
 }

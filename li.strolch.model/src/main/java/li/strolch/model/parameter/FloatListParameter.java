@@ -135,6 +135,11 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.FLOAT_LIST;
+	}
+
+	@Override
 	public FloatListParameter getClone() {
 		FloatListParameter clone = new FloatListParameter();
 
@@ -174,8 +179,4 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 		return Integer.compare(this.getValue().size(), ((FloatListParameter) o).getValue().size());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.FLOAT_LIST;
-	}
 }

@@ -56,6 +56,11 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.INTEGER;
+	}
+
+	@Override
 	public String getValueAsString() {
 		return Integer.toString(this.value);
 	}
@@ -120,8 +125,4 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		return this.getValue().compareTo(((IntegerParameter) o).getValue());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.INTEGER;
-	}
 }

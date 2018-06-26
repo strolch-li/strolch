@@ -135,6 +135,11 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.STRING_LIST;
+	}
+
+	@Override
 	public StringListParameter getClone() {
 		StringListParameter clone = new StringListParameter();
 
@@ -174,8 +179,4 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 		return Integer.compare(this.getValue().size(), ((StringListParameter) o).getValue().size());
 	}
 
-	@Override
-	public StrolchValueType getValueType() {
-		return StrolchValueType.STRING_LIST;
-	}
 }
