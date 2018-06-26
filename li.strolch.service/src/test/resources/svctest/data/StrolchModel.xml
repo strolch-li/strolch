@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<StrolchModel>
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
+              xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel-1.6.xsd">
 
-	<IncludeFile file="Enums.xml" />
-	<IncludeFile file="Resources.xml" />
-	<IncludeFile file="Orders.xml" />
-	<IncludeFile file="Activities.xml" />
+    <IncludeFile file="Enums.xml"/>
+    <IncludeFile file="Resources.xml"/>
+    <IncludeFile file="Orders.xml"/>
+    <IncludeFile file="Activities.xml"/>
 
 </StrolchModel>

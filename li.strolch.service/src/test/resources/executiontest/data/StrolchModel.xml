@@ -1,143 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<StrolchModel xmlns="https://strolch.li/xsd/StrolchModel-1.4.xsd">
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
+              xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel-1.6.xsd">
 
-	<Resource Id="bicycle" Name="Bicycle" Type="Product">
-		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
-		<Policies>
-			<Policy Type="ExecutionPolicy" Value="key:DurationExecution" />
-			<Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" />
-		</Policies>
-	</Resource>
+    <Resource Id="bicycle" Name="Bicycle" Type="Product">
+        <TimedState Id="quantity" Name="Quantity" Type="Integer"/>
+        <Policies>
+            <Policy Type="ExecutionPolicy" Value="key:DurationExecution"/>
+            <Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation"/>
+        </Policies>
+    </Resource>
 
-	<Resource Id="article1" Name="Article 1" Type="Article">
-		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
-		<Policies>
-			<Policy Type="ExecutionPolicy" Value="key:DurationExecution" />
-			<Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" />
-		</Policies>
-	</Resource>
+    <Resource Id="article1" Name="Article 1" Type="Article">
+        <TimedState Id="quantity" Name="Quantity" Type="Integer"/>
+        <Policies>
+            <Policy Type="ExecutionPolicy" Value="key:DurationExecution"/>
+            <Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation"/>
+        </Policies>
+    </Resource>
 
-	<Resource Id="article2" Name="Article 2" Type="Article">
-		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
-		<Policies>
-			<Policy Type="ExecutionPolicy" Value="key:DurationExecution" />
-			<Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" />
-		</Policies>
-	</Resource>
+    <Resource Id="article2" Name="Article 2" Type="Article">
+        <TimedState Id="quantity" Name="Quantity" Type="Integer"/>
+        <Policies>
+            <Policy Type="ExecutionPolicy" Value="key:DurationExecution"/>
+            <Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation"/>
+        </Policies>
+    </Resource>
 
-	<Resource Id="article3" Name="Article 3" Type="Article">
-		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
-		<Policies>
-			<Policy Type="ExecutionPolicy" Value="key:DurationExecution" />
-			<Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" />
-		</Policies>
-	</Resource>
+    <Resource Id="article3" Name="Article 3" Type="Article">
+        <TimedState Id="quantity" Name="Quantity" Type="Integer"/>
+        <Policies>
+            <Policy Type="ExecutionPolicy" Value="key:DurationExecution"/>
+            <Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation"/>
+        </Policies>
+    </Resource>
 
-	<Resource Id="conveyor1" Name="Conveyor 1" Type="Conveyor">
-		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
-		<Policies>
-			<Policy Type="ExecutionPolicy" Value="key:DurationExecution" />
-			<Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" />
-		</Policies>
-	</Resource>
+    <Resource Id="conveyor1" Name="Conveyor 1" Type="Conveyor">
+        <TimedState Id="quantity" Name="Quantity" Type="Integer"/>
+        <Policies>
+            <Policy Type="ExecutionPolicy" Value="key:DurationExecution"/>
+            <Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation"/>
+        </Policies>
+    </Resource>
 
-	<Resource Id="conveyor2" Name="Conveyor 2" Type="Conveyor">
-		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
-		<Policies>
-			<Policy Type="ExecutionPolicy" Value="key:DurationExecution" />
-			<Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" />
-		</Policies>
-	</Resource>
+    <Resource Id="conveyor2" Name="Conveyor 2" Type="Conveyor">
+        <TimedState Id="quantity" Name="Quantity" Type="Integer"/>
+        <Policies>
+            <Policy Type="ExecutionPolicy" Value="key:DurationExecution"/>
+            <Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation"/>
+        </Policies>
+    </Resource>
 
-	<Resource Id="machine1" Name="Machine" Type="Machine">
-		<ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
-			<Parameter Id="reserved" Name="Reservation" Type="Boolean" Value="false" />
-		</ParameterBag>
-		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
-		<Policies>
-			<Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.ReservationExection" />
-			<Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" />
-		</Policies>
-	</Resource>
+    <Resource Id="machine1" Name="Machine" Type="Machine">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="reserved" Name="Reservation" Type="Boolean" Value="false"/>
+        </ParameterBag>
+        <TimedState Id="quantity" Name="Quantity" Type="Integer"/>
+        <Policies>
+            <Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.ReservationExection"/>
+            <Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation"/>
+        </Policies>
+    </Resource>
 
-	<Resource Id="conveyor3" Name="Conveyor 3" Type="Conveyor">
-		<TimedState Id="quantity" Name="Quantity" Type="Integer" />
-		<Policies>
-			<Policy Type="ExecutionPolicy" Value="key:DurationExecution" />
-			<Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation" />
-		</Policies>
-	</Resource>
+    <Resource Id="conveyor3" Name="Conveyor 3" Type="Conveyor">
+        <TimedState Id="quantity" Name="Quantity" Type="Integer"/>
+        <Policies>
+            <Policy Type="ExecutionPolicy" Value="key:DurationExecution"/>
+            <Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation"/>
+        </Policies>
+    </Resource>
 
-	<Activity Id="produceMachine1" Name="Activity" Type="ToStock" TimeOrdering="Series">
-		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
-			<Parameter Name="Duration" Id="duration" Value="PT0.3S" Type="Duration" />
-		</ParameterBag>
-		<Action Id="reserve" Name="Reserve" ResourceId="machine1" ResourceType="Machine" Type="Reserve" />
-		<Action Id="produce" Name="Produce" ResourceId="machine1" ResourceType="Machine" Type="Produce" />
-		<Action Id="release" Name="Release" ResourceId="machine1" ResourceType="Machine" Type="Release" />
-	</Activity>
+    <Activity Id="produceMachine1" Name="Activity" Type="ToStock" TimeOrdering="Series">
+        <ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
+            <Parameter Name="Duration" Id="duration" Value="PT0.3S" Type="Duration"/>
+        </ParameterBag>
+        <Action Id="reserve" Name="Reserve" ResourceId="machine1" ResourceType="Machine" Type="Reserve"/>
+        <Action Id="produce" Name="Produce" ResourceId="machine1" ResourceType="Machine" Type="Produce"/>
+        <Action Id="release" Name="Release" ResourceId="machine1" ResourceType="Machine" Type="Release"/>
+    </Activity>
 
-	<Activity Id="produceMachine2" Name="Activity" Type="ToStock" TimeOrdering="Series">
-		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
-			<Parameter Name="Duration" Id="duration" Value="PT0.1S" Type="Duration" />
-		</ParameterBag>
-		<Action Id="reserve" Name="Reserve" ResourceId="machine1" ResourceType="Machine" Type="Reserve" />
-		<Action Id="produce" Name="Produce" ResourceId="machine1" ResourceType="Machine" Type="Produce" />
-		<Action Id="release" Name="Release" ResourceId="machine1" ResourceType="Machine" Type="Release" />
-	</Activity>
+    <Activity Id="produceMachine2" Name="Activity" Type="ToStock" TimeOrdering="Series">
+        <ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
+            <Parameter Name="Duration" Id="duration" Value="PT0.1S" Type="Duration"/>
+        </ParameterBag>
+        <Action Id="reserve" Name="Reserve" ResourceId="machine1" ResourceType="Machine" Type="Reserve"/>
+        <Action Id="produce" Name="Produce" ResourceId="machine1" ResourceType="Machine" Type="Produce"/>
+        <Action Id="release" Name="Release" ResourceId="machine1" ResourceType="Machine" Type="Release"/>
+    </Activity>
 
-	<Activity Id="produceBicycle" Name="Activity" Type="ToStock" TimeOrdering="Series">
-		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
-			<Parameter Name="Duration" Id="duration" Value="PT0.2S" Type="Duration" />
-		</ParameterBag>
-		<Action Id="produce" Name="Produce" ResourceId="bicycle" ResourceType="Product" Type="Produce" />
-	</Activity>
+    <Activity Id="produceBicycle" Name="Activity" Type="ToStock" TimeOrdering="Series">
+        <ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
+            <Parameter Name="Duration" Id="duration" Value="PT0.2S" Type="Duration"/>
+        </ParameterBag>
+        <Action Id="produce" Name="Produce" ResourceId="bicycle" ResourceType="Product" Type="Produce"/>
+    </Activity>
 
-	<Activity Id="conveyors" Name="Activity" Type="ToStock" TimeOrdering="Series">
-		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
-			<Parameter Name="Duration" Id="duration" Value="PT0.3S" Type="Duration" />
-		</ParameterBag>
-		<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />
-		<Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use" />
-		<Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use" />
-	</Activity>
+    <Activity Id="conveyors" Name="Activity" Type="ToStock" TimeOrdering="Series">
+        <ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
+            <Parameter Name="Duration" Id="duration" Value="PT0.3S" Type="Duration"/>
+        </ParameterBag>
+        <Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use"/>
+        <Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use"/>
+        <Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use"/>
+    </Activity>
 
-	<Activity Id="parallel" Name="Activity" Type="ToStock" TimeOrdering="Parallel">
-		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
-			<Parameter Name="Duration" Id="duration" Value="PT0.2S" Type="Duration" />
-		</ParameterBag>
-		<Activity Id="sub1" Name="Sub Activity 1" Type="Sub" TimeOrdering="Parallel">
-			<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />
-			<Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use" />
-			<Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use" />
-		</Activity>
-		<Activity Id="sub2" Name="Sub Activity 2" Type="Sub" TimeOrdering="Series">
-			<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />
-			<Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use" />
-			<Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use" />
-		</Activity>
-		<Action Id="action_1" Name="Action 1" ResourceId="article1" ResourceType="Article" Type="Use" />
-		<Action Id="action_2" Name="Action 2" ResourceId="article2" ResourceType="Article" Type="Use" />
-		<Action Id="action_3" Name="Action 3" ResourceId="article3" ResourceType="Article" Type="Use" />
-	</Activity>
+    <Activity Id="parallel" Name="Activity" Type="ToStock" TimeOrdering="Parallel">
+        <ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
+            <Parameter Name="Duration" Id="duration" Value="PT0.2S" Type="Duration"/>
+        </ParameterBag>
+        <Activity Id="sub1" Name="Sub Activity 1" Type="Sub" TimeOrdering="Parallel">
+            <Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use"/>
+            <Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use"/>
+            <Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use"/>
+        </Activity>
+        <Activity Id="sub2" Name="Sub Activity 2" Type="Sub" TimeOrdering="Series">
+            <Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use"/>
+            <Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use"/>
+            <Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use"/>
+        </Activity>
+        <Action Id="action_1" Name="Action 1" ResourceId="article1" ResourceType="Article" Type="Use"/>
+        <Action Id="action_2" Name="Action 2" ResourceId="article2" ResourceType="Article" Type="Use"/>
+        <Action Id="action_3" Name="Action 3" ResourceId="article3" ResourceType="Article" Type="Use"/>
+    </Activity>
 
-	<Activity Id="deep" Name="Activity" Type="ToStock" TimeOrdering="Series">
-		<ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
-			<Parameter Name="Duration" Id="duration" Value="PT0.1S" Type="Duration" />
-		</ParameterBag>
-		<Activity Id="sub1" Name="Sub Activity 1" Type="Sub" TimeOrdering="Series">
-			<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />
-			<Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use" />
-			<Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use" />
-		</Activity>
-		<Activity Id="sub2" Name="Sub Activity 2" Type="Sub" TimeOrdering="Series">
-			<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />
-			<Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use" />
-			<Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use" />
-		</Activity>
-		<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />
-		<Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use" />
-		<Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use" />
-	</Activity>
+    <Activity Id="deep" Name="Activity" Type="ToStock" TimeOrdering="Series">
+        <ParameterBag Name="objectives" Id="Objectives" Type="Objectives">
+            <Parameter Name="Duration" Id="duration" Value="PT0.1S" Type="Duration"/>
+        </ParameterBag>
+        <Activity Id="sub1" Name="Sub Activity 1" Type="Sub" TimeOrdering="Series">
+            <Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use"/>
+            <Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use"/>
+            <Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use"/>
+        </Activity>
+        <Activity Id="sub2" Name="Sub Activity 2" Type="Sub" TimeOrdering="Series">
+            <Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use"/>
+            <Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use"/>
+            <Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use"/>
+        </Activity>
+        <Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use"/>
+        <Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use"/>
+        <Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use"/>
+    </Activity>
 
 </StrolchModel>

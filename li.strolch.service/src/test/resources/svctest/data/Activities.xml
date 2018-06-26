@@ -1,86 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<StrolchModel>
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
+              xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel-1.6.xsd">
 
-	<Activity Id="produceBicycle" Name="Activity" Type="ToStock" TimeOrdering="Series">
-		<Action Id="produce" Name="Produce" ResourceId="bicycle" ResourceType="Product" Type="Produce" />
-	</Activity>
+    <Activity Id="produceBicycle" Name="Activity" Type="ToStock" TimeOrdering="Series">
+        <Action Id="produce" Name="Produce" ResourceId="bicycle" ResourceType="Product" Type="Produce"/>
+    </Activity>
 
-	<Activity Id="conveyors" Name="Activity" Type="ToStock" TimeOrdering="Series">
-		<Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use" />
-		<Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use" />
-		<Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use" />
-	</Activity>
+    <Activity Id="conveyors" Name="Activity" Type="ToStock" TimeOrdering="Series">
+        <Action Id="action_1" Name="Action 1" ResourceId="conveyor1" ResourceType="Conveyor" Type="Use"/>
+        <Action Id="action_2" Name="Action 2" ResourceId="conveyor2" ResourceType="Conveyor" Type="Use"/>
+        <Action Id="action_3" Name="Action 3" ResourceId="conveyor3" ResourceType="Conveyor" Type="Use"/>
+    </Activity>
 
-	<Activity Id="parallel" Name="Activity" Type="ToStock" TimeOrdering="Parallel">
-		<Action Id="action_1" Name="Action 1" ResourceId="article1" ResourceType="Article" Type="Use" />
-		<Action Id="action_2" Name="Action 2" ResourceId="article2" ResourceType="Article" Type="Use" />
-		<Action Id="action_3" Name="Action 3" ResourceId="article3" ResourceType="Article" Type="Use" />
-	</Activity>
+    <Activity Id="parallel" Name="Activity" Type="ToStock" TimeOrdering="Parallel">
+        <Action Id="action_1" Name="Action 1" ResourceId="article1" ResourceType="Article" Type="Use"/>
+        <Action Id="action_2" Name="Action 2" ResourceId="article2" ResourceType="Article" Type="Use"/>
+        <Action Id="action_3" Name="Action 3" ResourceId="article3" ResourceType="Article" Type="Use"/>
+    </Activity>
 
-	<Activity Id="activity_1" Name="Activity" Type="ActivityType" TimeOrdering="Series">
-		<Policies>
-			<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-		</Policies>
-		<Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
-			<Policies>
-				<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-				<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-			</Policies>
-			<ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer" />
-		</Action>
-		<Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
-			<Policies>
-				<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-				<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-			</Policies>
-			<Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use" />
-			<Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use" />
-		</Activity>
-	</Activity>
+    <Activity Id="activity_1" Name="Activity" Type="ActivityType" TimeOrdering="Series">
+        <Policies>
+            <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+            <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+        </Policies>
+        <Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
+            <Policies>
+                <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+                <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+            </Policies>
+            <ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer"/>
+        </Action>
+        <Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
+            <Policies>
+                <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+                <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+            </Policies>
+            <Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use"/>
+            <Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use"/>
+        </Activity>
+    </Activity>
 
-	<Activity Id="activity_2" Name="Activity" Type="ActivityType" TimeOrdering="Series">
-		<Policies>
-			<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-		</Policies>
-		<Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
-			<Policies>
-				<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-				<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-			</Policies>
-			<ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer" />
-		</Action>
-		<Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
-			<Policies>
-				<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-				<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-			</Policies>
-			<Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use" />
-			<Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use" />
-		</Activity>
-	</Activity>
+    <Activity Id="activity_2" Name="Activity" Type="ActivityType" TimeOrdering="Series">
+        <Policies>
+            <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+            <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+        </Policies>
+        <Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
+            <Policies>
+                <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+                <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+            </Policies>
+            <ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer"/>
+        </Action>
+        <Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
+            <Policies>
+                <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+                <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+            </Policies>
+            <Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use"/>
+            <Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use"/>
+        </Activity>
+    </Activity>
 
-	<Activity Id="activity_3" Name="Activity" Type="ActivityType" TimeOrdering="Series">
-		<Policies>
-			<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-		</Policies>
-		<Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
-			<Policies>
-				<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-				<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-			</Policies>
-			<ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer" />
-		</Action>
-		<Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
-			<Policies>
-				<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-				<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-			</Policies>
-			<Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use" />
-			<Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use" />
-		</Activity>
-	</Activity>
+    <Activity Id="activity_3" Name="Activity" Type="ActivityType" TimeOrdering="Series">
+        <Policies>
+            <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+            <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+        </Policies>
+        <Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
+            <Policies>
+                <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+                <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+            </Policies>
+            <ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer"/>
+        </Action>
+        <Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
+            <Policies>
+                <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+                <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+            </Policies>
+            <Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use"/>
+            <Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use"/>
+        </Activity>
+    </Activity>
 
 </StrolchModel>
