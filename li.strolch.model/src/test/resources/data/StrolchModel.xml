@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.4.xsd" xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.4.xsd StrolchModel-1.4.xsd">
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="StrolchModel-1.6.xsd" xsi:schemaLocation="StrolchModel-1.6.xsd">
 
 	<Order Id="@test1" Name="Test Order" Type="Order">
 		<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">

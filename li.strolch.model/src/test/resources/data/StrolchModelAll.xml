@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.4.xsd" xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.4.xsd StrolchModel-1.4.xsd">
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd" xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel-1.6.xsd">
 
 	<IncludeFile file="Include1.xml" />
 	<IncludeFile file="Include2.xml" />
@@ -56,7 +56,7 @@
 		</Policies>
 	</Resource>
 
-	<Activity Id="activity_1" Name="Activity" Type="parentType">
+	<Activity Id="activity_1" Name="Activity" Type="parentType" TimeOrdering="Series">
 		<Version Version="0" CreatedBy="test" CreatedAt="2012-11-30T18:12:05.628+01:00" Deleted="false" />
 		<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
 			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
@@ -76,7 +76,7 @@
 			<ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer" />
 			<ValueChange StateId="dummyId" Time="2012-11-30T18:12:06.628+01:00" Value="6" Type="Integer" />
 		</Action>
-		<Activity Id="child_activity" Name="Child Activity" Type="childType">
+		<Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
 			<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
 				<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
 			</ParameterBag>

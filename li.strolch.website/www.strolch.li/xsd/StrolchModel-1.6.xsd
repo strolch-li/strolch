@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="https://strolch.li/xsd/StrolchModel-1.4.xsd" xmlns="https://strolch.li/xsd/StrolchModel-1.4.xsd"
-	elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="https://strolch.li/xsd/StrolchModel-1.6.xsd" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
+		   elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	<xs:annotation>
-		<xs:documentation>This is Version 1.4.x of the StrolchModel XSD.</xs:documentation>
+		<xs:documentation>This is Version 1.6.x of the StrolchModel XSD.</xs:documentation>
 	</xs:annotation>
 
 	<xs:element name="StrolchModel" type="StrolchModelType" />
@@ -39,6 +39,7 @@
 		<xs:attribute type="xs:string" name="Id" use="required" />
 		<xs:attribute type="xs:string" name="Name" use="required" />
 		<xs:attribute type="xs:string" name="Type" use="required" />
+		<xs:attribute type="xs:dateTime" name="Date" use="optional" />
 		<xs:attribute type="StateType" name="State" use="optional" />
 	</xs:complexType>
 

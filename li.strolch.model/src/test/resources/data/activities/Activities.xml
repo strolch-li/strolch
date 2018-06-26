@@ -1,120 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<StrolchModel>
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
+              xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel-1.6.xsd">
 
-	<Activity Id="activity_1" Name="Activity" Type="parentType" TimeOrdering="Series">
-		<Policies>
-			<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-			<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-		</Policies>
-		<Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
-			<Policies>
-				<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-				<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-			</Policies>
-			<ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer" />
-		</Action>
-		<Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
-			<Policies>
-				<Policy Type="PlanningPolicy" Value="key:SimplePlanning" />
-				<Policy Type="ConfirmationPolicy" Value="key:NoConfirmation" />
-			</Policies>
-			<Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use" />
-			<Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use" />
-		</Activity>
-	</Activity>
+    <Activity Id="activity_1" Name="Activity" Type="parentType" TimeOrdering="Series">
+        <Policies>
+            <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+            <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+        </Policies>
+        <Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
+            <Policies>
+                <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+                <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+            </Policies>
+            <ValueChange StateId="dummyId" Time="2012-11-30T18:12:05.628+01:00" Value="5" Type="Integer"/>
+        </Action>
+        <Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
+            <Policies>
+                <Policy Type="PlanningPolicy" Value="key:SimplePlanning"/>
+                <Policy Type="ConfirmationPolicy" Value="key:NoConfirmation"/>
+            </Policies>
+            <Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use"/>
+            <Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use"/>
+        </Activity>
+    </Activity>
 
-	<Activity Id="activity_2" Name="Activity" Type="parentType" TimeOrdering="Series">
-		<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-			<Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D" />
-			<Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World" />
-			<Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00" />
-			<Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch" />
-			<Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566" />
-			<Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77" />
-			<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
-			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-		</ParameterBag>
-		<Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
-			<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-				<Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D" />
-				<Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World" />
-				<Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00" />
-				<Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch" />
-				<Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566" />
-				<Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77" />
-				<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
-				<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-			</ParameterBag>
-		</Action>
-		<Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
-			<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-				<Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D" />
-				<Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World" />
-				<Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00" />
-				<Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch" />
-				<Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566" />
-				<Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77" />
-				<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
-				<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-			</ParameterBag>
-			<Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use">
-				<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-					<Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D" />
-					<Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World" />
-					<Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00" />
-					<Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch" />
-					<Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566" />
-					<Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77" />
-					<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
-					<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-				</ParameterBag>
-			</Action>
-			<Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
-				<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-					<Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D" />
-					<Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World" />
-					<Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00" />
-					<Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch" />
-					<Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566" />
-					<Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77" />
-					<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
-					<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-				</ParameterBag>
-			</Action>
-		</Activity>
-	</Activity>
+    <Activity Id="activity_2" Name="Activity" Type="parentType" TimeOrdering="Series">
+        <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+            <Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D"/>
+            <Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World"/>
+            <Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00"/>
+            <Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch"/>
+            <Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566"/>
+            <Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77"/>
+            <Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3"/>
+            <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+        </ParameterBag>
+        <Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
+            <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+                <Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D"/>
+                <Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World"/>
+                <Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00"/>
+                <Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch"/>
+                <Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566"/>
+                <Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77"/>
+                <Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3"/>
+                <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+            </ParameterBag>
+        </Action>
+        <Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
+            <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+                <Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D"/>
+                <Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World"/>
+                <Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00"/>
+                <Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch"/>
+                <Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566"/>
+                <Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77"/>
+                <Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3"/>
+                <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+            </ParameterBag>
+            <Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use">
+                <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+                    <Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D"/>
+                    <Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World"/>
+                    <Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00"/>
+                    <Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch"/>
+                    <Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566"/>
+                    <Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77"/>
+                    <Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3"/>
+                    <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+                </ParameterBag>
+            </Action>
+            <Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
+                <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+                    <Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D"/>
+                    <Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World"/>
+                    <Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00"/>
+                    <Parameter Id="@param5" Name="String Param" Type="String" Value="Strolch"/>
+                    <Parameter Id="@param4" Name="Long Param" Type="Long" Value="4453234566"/>
+                    <Parameter Id="@param3" Name="Integer Param" Type="Integer" Value="77"/>
+                    <Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3"/>
+                    <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+                </ParameterBag>
+            </Action>
+        </Activity>
+    </Activity>
 
-	<Activity Id="activity_3" Name="Activity" Type="parentType" TimeOrdering="Series">
-		<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-			<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
-			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-		</ParameterBag>
-		<Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
-			<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-				<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
-				<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-			</ParameterBag>
-		</Action>
-		<Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
-			<Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use">
-				<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-					<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
-					<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-				</ParameterBag>
-			</Action>
-			<Activity Id="child_child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
-				<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-					<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
-					<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-				</ParameterBag>
-				<Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
-					<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-						<Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3" />
-						<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-					</ParameterBag>
-				</Action>
-			</Activity>
-		</Activity>
-	</Activity>
+    <Activity Id="activity_3" Name="Activity" Type="parentType" TimeOrdering="Series">
+        <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+            <Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3"/>
+            <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+        </ParameterBag>
+        <Action Id="action_1" Name="Action 1" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
+            <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+                <Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3"/>
+                <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+            </ParameterBag>
+        </Action>
+        <Activity Id="child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
+            <Action Id="action_2" Name="Action 2" ResourceId="dummyId" ResourceType="dummyType" State="Planned" Type="Use">
+                <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+                    <Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3"/>
+                    <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+                </ParameterBag>
+            </Action>
+            <Activity Id="child_child_activity" Name="Child Activity" Type="childType" TimeOrdering="Series">
+                <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+                    <Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3"/>
+                    <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+                </ParameterBag>
+                <Action Id="action_3" Name="Action 3" ResourceId="dummyId" ResourceType="dummyType" State="Created" Type="Use">
+                    <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+                        <Parameter Id="@param2" Name="Float Param" Type="Float" Value="44.3"/>
+                        <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+                    </ParameterBag>
+                </Action>
+            </Activity>
+        </Activity>
+    </Activity>
 
 </StrolchModel>
