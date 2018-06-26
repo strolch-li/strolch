@@ -1,40 +1,20 @@
 package li.strolch.report.policy;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.utils.ObjectHelper;
 
 public class EqualsReportFilter extends ReportFilterPolicy {
-
-	private boolean negate;
-	private String value;
 
 	public EqualsReportFilter(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
 	@Override
-	public void init(String value) {
-		if (value.startsWith("!")) {
-			this.negate = true;
-			this.value = value.substring(1);
-		} else {
-			this.value = value;
-		}
-	}
-
-	@Override
-	public boolean filter(Parameter<?> parameter) {
-		String value = parameter.getValueAsString();
-		return filter(value);
-	}
-
-	@Override
-	public boolean filter(String value) {
-		if (this.negate)
-			return !this.value.equals(value);
+	protected boolean filter(Object left, Object right, boolean negate) {
+		if (negate)
+			return !ObjectHelper.equals(left, right, false);
 		else
-			return this.value.equals(value);
-
+			return ObjectHelper.equals(left, right, false);
 	}
 }

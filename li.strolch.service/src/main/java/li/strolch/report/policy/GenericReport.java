@@ -267,16 +267,7 @@ public class GenericReport extends ReportPolicy {
 
 			if (fieldRefP.getValue().startsWith("$")) {
 				Object value = evaluateColumnValue(fieldRefP, row);
-
-				String columnValue;
-				if (value instanceof Date)
-					columnValue = ISO8601FormatFactory.getInstance().formatDate((Date) value);
-				else if (value instanceof Parameter)
-					columnValue = ((Parameter) value).getValueAsString();
-				else
-					columnValue = value.toString();
-
-				if (!filterPolicy.filter(columnValue))
+				if (!filterPolicy.filter(value))
 					return false;
 			} else {
 				Optional<Parameter<?>> param = lookupParameter(fieldRefP, column);
