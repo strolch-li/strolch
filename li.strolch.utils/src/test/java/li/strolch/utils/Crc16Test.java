@@ -33,4 +33,11 @@ public class Crc16Test {
 		byte[] expected = { 0x77, (byte) 0x83 };
 		assertArrayEquals(expected, Crc.crcCcitt(data));
 	}
+
+	@Test
+	public void shouldCrc16_4() {
+		byte[] data = { 0x20, (byte) 0x80, 0x00, 0x00, 0x03, 0x00, 0x30 };
+		byte[] expected = { 0x77, (byte) 0x83 };
+		assertArrayEquals(expected, Crc.crcCcitt(data, 1, data.length - 1));
+	}
 }
