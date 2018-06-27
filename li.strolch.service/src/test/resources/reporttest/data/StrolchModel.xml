@@ -62,6 +62,11 @@
             <Parameter Id="quantity" Name="Quantity" Type="String" Interpretation="Order-Ref" Uom="FromStock" Value="Bags/parameters/quantity"/>
         </ParameterBag>
 
+        <ParameterBag Id="threeMonthsAgoFilter" Name="Filter" Type="Filter">
+            <Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:LessThan" Value="now(-P3M)"/>
+            <Parameter Id="fieldRef" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="FromStock" Value="$date"/>
+        </ParameterBag>
+
         <ParameterBag Id="columns" Name="Display Columns" Type="Display">
             <Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="$name"/>
             <Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="$name"/>
@@ -93,7 +98,7 @@
         </ParameterBag>
     </Resource>
 
-    <Order Id="fromStock01" Name="From Stock" Type="FromStock" Date="2017-02-01T10:00:00.000+01:00" State="EXECUTED">
+    <Order Id="fromStock01" Name="From Stock" Type="FromStock" Date="2017-02-01T10:00:00.000+01:00" State="Executed">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="quantity" Type="Float" Value="4.0"/>
         </ParameterBag>
@@ -102,7 +107,7 @@
             <Parameter Id="product" Name="Product" Type="String" Value="product01" Interpretation="Resource-Ref" Uom="Product"/>
         </ParameterBag>
     </Order>
-    <Order Id="fromStock02" Name="From Stock" Type="FromStock" Date="2017-02-01T10:00:00.000+01:00" State="EXECUTED">
+    <Order Id="fromStock02" Name="From Stock" Type="FromStock" Date="2017-02-01T10:00:00.000+01:00" State="Executed">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="quantity" Type="Float" Value="6.0"/>
         </ParameterBag>
@@ -111,7 +116,7 @@
             <Parameter Id="product" Name="Product" Type="String" Value="product01" Interpretation="Resource-Ref" Uom="Product"/>
         </ParameterBag>
     </Order>
-    <Order Id="fromStock03" Name="From Stock" Type="FromStock" Date="2017-03-01T10:00:00.000+01:00" State="CREATED">
+    <Order Id="fromStock03" Name="From Stock" Type="FromStock" Date="2017-03-01T10:00:00.000+01:00" State="Created">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="quantity" Type="Float" Value="8.0"/>
         </ParameterBag>
@@ -120,7 +125,7 @@
             <Parameter Id="product" Name="Product" Type="String" Value="product02" Interpretation="Resource-Ref" Uom="Product"/>
         </ParameterBag>
     </Order>
-    <Order Id="fromStock04" Name="From Stock" Type="FromStock" Date="2017-03-01T10:00:00.000+01:00" State="CREATED">
+    <Order Id="fromStock04" Name="From Stock" Type="FromStock" Date="2017-03-01T10:00:00.000+01:00" State="Created">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="quantity" Type="Float" Value="12.0"/>
         </ParameterBag>
