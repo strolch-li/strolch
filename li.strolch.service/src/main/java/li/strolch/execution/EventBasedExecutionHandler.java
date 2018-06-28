@@ -106,6 +106,9 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				// iterate all activities
 				tx.streamActivities().forEach(activity -> {
 
+					if (activity.isReadOnly())
+						activity = activity.getClone(true);
+
 					// we only want to restart activities which were in execution
 					State state = activity.getState();
 					if (!state.inExecutionPhase())
