@@ -10,6 +10,7 @@ import li.strolch.model.activity.Activity;
  *
  * @param <T>
  */
+@FunctionalInterface
 public interface SearchExpression<T extends StrolchRootElement> {
 
 	/**

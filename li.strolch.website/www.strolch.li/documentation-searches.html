@@ -120,6 +120,11 @@ search.where(id(isEqualTo("myId")) //
         <p>Note how the predicates can be chained to the search expression, or passed as a parameter to the
            expression.</p>
 
+        <p>In addition to using predefined search search expressions, one can also just pass a lambda expression which
+           performs a custom filter:</p>
+        <pre>
+personSearch.where(person -> person.getName().length() == 3);</pre>
+
         <p>See the
             <a href="https://github.com/4treesCH/strolch/blob/develop/li.strolch.agent/src/test/java/li/strolch/search/StrolchSearchTest.java"
                target="_blank">StrolchSearchTest</a> for many ways in which you can implement tests.</p>
