@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.policy.PolicyDef;
@@ -22,12 +21,12 @@ public class Report {
 
 	private final ReportPolicy reportPolicy;
 
-	public Report(ComponentContainer container, StrolchTransaction tx, String reportId) {
+	public Report(StrolchTransaction tx, String reportId) {
 
 		Resource reportRes = tx.getResourceBy(TYPE_REPORT, reportId, true);
 		PolicyDef reportPolicyDef = reportRes.getPolicyDef(ReportPolicy.class.getSimpleName());
 
-		PolicyHandler policyHandler = container.getComponent(PolicyHandler.class);
+		PolicyHandler policyHandler = tx.getContainer().getComponent(PolicyHandler.class);
 		this.reportPolicy = policyHandler.getPolicy(reportPolicyDef, tx);
 		this.reportPolicy.initialize(reportId);
 	}
