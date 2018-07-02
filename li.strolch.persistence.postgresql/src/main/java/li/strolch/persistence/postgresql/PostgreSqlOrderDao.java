@@ -18,22 +18,22 @@ package li.strolch.persistence.postgresql;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.sax.SAXResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.Calendar;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import li.strolch.model.Order;
 import li.strolch.model.Tags;
+import li.strolch.model.json.OrderFromJsonVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
-import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionResult;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
@@ -41,8 +41,17 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 	public static final String ORDERS = "orders";
 
-	public PostgreSqlOrderDao(Connection connection, TransactionResult txResult, boolean versioningEnabled) {
-		super(connection, txResult, versioningEnabled);
+	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
+	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, state, date, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
+
+	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? and version = ?";
+	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asjson = ? where id = ? and version = ?";
+
+	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE id = ? AND version = ?";
+
+	public PostgreSqlOrderDao(DataType dataType, Connection connection, TransactionResult txResult,
+			boolean versioningEnabled) {
+		super(dataType, connection, txResult, versioningEnabled);
 	}
 
 	@Override
@@ -76,21 +85,23 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 		return listener.getOrders().get(0);
 	}
 
-	protected SQLXML createSqlXml(Order order, PreparedStatement preparedStatement) throws SQLException, SAXException {
-		SQLXML sqlxml = this.connection.createSQLXML();
-		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
-		ContentHandler contentHandler = saxResult.getHandler();
-		contentHandler.startDocument();
-		order.accept(new StrolchElementToSaxVisitor(contentHandler));
-		contentHandler.endDocument();
-		return sqlxml;
+	@Override
+	protected Order parseFromJson(String id, String type, String json) {
+		JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+		return new OrderFromJsonVisitor().visit(jsonObject);
 	}
 
 	@Override
 	protected void internalSave(final Order order) {
 
-		String sql = "insert into " + getTableName()
-				+ " (id, version, created_by, created_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = insertAsXmlSqlS;
+		else if (this.dataType == DataType.json)
+			sql = insertAsJsonSqlS;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		sql = MessageFormat.format(sql, getTableName());
 
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
@@ -112,8 +123,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			preparedStatement.setString(9, order.getState().name());
 			preparedStatement.setTimestamp(10, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 
-			SQLXML sqlxml = createSqlXml(order, preparedStatement);
-			preparedStatement.setSQLXML(11, sqlxml);
+			SQLXML sqlxml = writeObject(preparedStatement, order, 11);
 
 			try {
 				int modCount = preparedStatement.executeUpdate();
@@ -123,7 +133,8 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 					throw new StrolchPersistenceException(msg);
 				}
 			} finally {
-				sqlxml.free();
+				if (sqlxml != null)
+					sqlxml.free();
 			}
 
 		} catch (SQLException | SAXException e) {
@@ -136,7 +147,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 		}
 
 		// and set the previous version to not be latest anymore
-		sql = "update " + getTableName() + " SET latest = false WHERE id = ? AND version = ?";
+		sql = MessageFormat.format(updateLatestSqlS, getTableName());
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// primary key
@@ -180,9 +191,16 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 							order.getVersion()));
 		}
 
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = updateAsXmlSqlS;
+		else if (this.dataType == DataType.json)
+			sql = updateAsJsonSqlS;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		sql = MessageFormat.format(sql, getTableName());
+
 		// now we update the existing object
-		String sql = "update " + getTableName()
-				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? and version = ?";
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// version
@@ -199,8 +217,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			preparedStatement.setString(7, order.getState().name());
 			preparedStatement.setTimestamp(8, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 
-			SQLXML sqlxml = createSqlXml(order, preparedStatement);
-			preparedStatement.setSQLXML(9, sqlxml);
+			SQLXML sqlxml = writeObject(preparedStatement, order, 9);
 
 			// primary key
 			preparedStatement.setString(10, order.getId());
@@ -214,7 +231,8 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 					throw new StrolchPersistenceException(msg);
 				}
 			} finally {
-				sqlxml.free();
+				if (sqlxml != null)
+					sqlxml.free();
 			}
 
 		} catch (SQLException | SAXException e) {

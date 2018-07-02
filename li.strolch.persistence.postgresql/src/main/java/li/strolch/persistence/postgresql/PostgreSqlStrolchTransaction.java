@@ -80,19 +80,22 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 
 	OrderDao getOrderDao() {
 		if (this.orderDao == null)
-			this.orderDao = new PostgreSqlOrderDao(getConnection(), getTxResult(), isVersioningEnabled());
+			this.orderDao = new PostgreSqlOrderDao(this.persistenceHandler.getDataType(), getConnection(),
+					getTxResult(), isVersioningEnabled());
 		return this.orderDao;
 	}
 
 	ResourceDao getResourceDao() {
 		if (this.resourceDao == null)
-			this.resourceDao = new PostgreSqlResourceDao(getConnection(), getTxResult(), isVersioningEnabled());
+			this.resourceDao = new PostgreSqlResourceDao(this.persistenceHandler.getDataType(), getConnection(),
+					getTxResult(), isVersioningEnabled());
 		return this.resourceDao;
 	}
 
 	ActivityDao getActivityDao() {
 		if (this.activityDao == null)
-			this.activityDao = new PostgreSqlActivityDao(getConnection(), getTxResult(), isVersioningEnabled());
+			this.activityDao = new PostgreSqlActivityDao(this.persistenceHandler.getDataType(), getConnection(),
+					getTxResult(), isVersioningEnabled());
 		return this.activityDao;
 	}
 

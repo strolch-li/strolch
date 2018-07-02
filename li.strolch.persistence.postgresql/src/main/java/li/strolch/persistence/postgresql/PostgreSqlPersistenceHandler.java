@@ -43,10 +43,19 @@ import org.postgresql.Driver;
 public class PostgreSqlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
 	public static final String SCRIPT_PREFIX = "strolch"; //$NON-NLS-1$
+	public static final String PROP_DATA_TYPE = "dataType"; //$NON-NLS-1$
+	public static final String DATA_TYPE_XML = "xml"; //$NON-NLS-1$
+	public static final String DATA_TYPE_JSON = "json"; //$NON-NLS-1$
+
 	private Map<String, DataSource> dsMap;
+	private DataType dataType;
 
 	public PostgreSqlPersistenceHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
+	}
+
+	public DataType getDataType() {
+		return this.dataType;
 	}
 
 	@Override
@@ -58,6 +67,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		DbConnectionBuilder connectionBuilder = new PostgreSqlDbConnectionBuilder(getContainer(),
 				componentConfiguration);
 		this.dsMap = connectionBuilder.build();
+		this.dataType = DataType.valueOf(componentConfiguration.getString(PROP_DATA_TYPE, DATA_TYPE_XML).toLowerCase());
 		super.initialize(componentConfiguration);
 	}
 

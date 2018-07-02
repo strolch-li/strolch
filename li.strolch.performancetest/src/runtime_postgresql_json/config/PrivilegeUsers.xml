@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Users>
+	<User userId="1" username="agent">
+		<State>SYSTEM</State>
+		<Roles>
+			<Role>agent</Role>
+		</Roles>
+	</User>
+	<User userId="2" username="cached" password="14df65e4ec6adae5e426dff1248f8a4bafc9791b7d5a4dfad89b00e06803e679" salt="636163686564">
+		<Firstname>Application</Firstname>
+		<Lastname>Administrator</Lastname>
+		<State>ENABLED</State>
+		<Locale>en_GB</Locale>
+		<Roles>
+			<Role>AppUser</Role>
+		</Roles>
+		<Properties>
+			<Property name="realm" value="cached" />
+		</Properties>
+	</User>
+	<User userId="2" username="transactional" password="67252256c67e43fd6674cfd5e5d47536af5b8bc40eb297c1e9edf5da5fc1c2a6" salt="7472616e73616374696f6e616c">
+		<Firstname>Application</Firstname>
+		<Lastname>Administrator</Lastname>
+		<State>ENABLED</State>
+		<Locale>en_GB</Locale>
+		<Roles>
+			<Role>AppUser</Role>
+		</Roles>
+		<Properties>
+			<Property name="realm" value="transactional" />
+		</Properties>
+	</User>
+</Users>

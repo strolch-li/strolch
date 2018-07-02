@@ -36,17 +36,17 @@ import org.postgresql.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CachedVersioningDaoTest extends AbstractModelTest {
+public class CachedJsonDaoTest extends AbstractModelTest {
 
-	public static final String RUNTIME_PATH = "target/cachedRuntimeVersioning/"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/cachedJsonRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/cachedRuntimeVersioning"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/test/resources/cachedJsonRuntime"; //$NON-NLS-1$
 
 	public static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
 	public static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
 	public static final String DB_PASSWORD = "test"; //$NON-NLS-1$
 
-	private static final Logger logger = LoggerFactory.getLogger(CachedVersioningDaoTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(CachedJsonDaoTest.class);
 
 	protected static RuntimeMock runtimeMock;
 
@@ -69,7 +69,7 @@ public class CachedVersioningDaoTest extends AbstractModelTest {
 
 		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
 				.getComponent(PersistenceHandler.class);
-		assertEquals(DataType.xml, persistenceHandler.getDataType());
+		assertEquals(DataType.json, persistenceHandler.getDataType());
 	}
 
 	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,8 +33,11 @@ import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.AbstractTransaction;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.postgresql.DataType;
 import li.strolch.persistence.postgresql.PostgreSqlAuditQueryVisitor;
+import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.testbase.runtime.RuntimeMock;
@@ -71,6 +74,10 @@ public class AuditQueryTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
 		runtimeMock.startContainer();
+
+		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
+				.getComponent(PersistenceHandler.class);
+		assertEquals(DataType.xml, persistenceHandler.getDataType());
 
 		Calendar cal = Calendar.getInstance();
 		cal.clear();
@@ -176,7 +183,7 @@ public class AuditQueryTest {
 		performQuery(query, Arrays.asList("0", "1", "3", "4"));
 
 		query = new AuditQuery<>(visitor, Tags.RESOURCE, new DateRange().from(past, true).to(future, true));
-		performQuery(query, Arrays.<String> asList());
+		performQuery(query, Arrays.<String>asList());
 	}
 
 	@Test
@@ -194,13 +201,13 @@ public class AuditQueryTest {
 		performQuery(query, Arrays.asList("0", "4"));
 
 		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
-		query.action().accessTypes(AccessType.CREATE, AccessType.READ).actions(StringMatchMode.EQUALS_CASE_SENSITIVE,
-				"create", "read");
+		query.action().accessTypes(AccessType.CREATE, AccessType.READ)
+				.actions(StringMatchMode.EQUALS_CASE_SENSITIVE, "create", "read");
 		performQuery(query, Arrays.asList("0", "1", "4"));
 
 		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
-		query.action().accessTypes(AccessType.CREATE, AccessType.READ).actions(StringMatchMode.EQUALS_CASE_SENSITIVE,
-				"read");
+		query.action().accessTypes(AccessType.CREATE, AccessType.READ)
+				.actions(StringMatchMode.EQUALS_CASE_SENSITIVE, "read");
 		performQuery(query, Arrays.asList("1"));
 
 		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
@@ -209,7 +216,7 @@ public class AuditQueryTest {
 
 		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.element().elementAccessed(StringMatchMode.CONTAINS_CASE_SENSITIVE, "crea");
-		performQuery(query, Arrays.<String> asList());
+		performQuery(query, Arrays.<String>asList());
 
 		query = new AuditQuery<>(visitor, Tags.AUDIT, new DateRange().from(past, true).to(future, true));
 		query.element().elementAccessed(StringMatchMode.EQUALS_CASE_INSENSITIVE, "create");

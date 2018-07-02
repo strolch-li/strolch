@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,10 +17,7 @@ package li.strolch.persistence.postgresql.dao.test;
 
 import static li.strolch.model.ModelGenerator.createOrder;
 import static li.strolch.model.ModelGenerator.createResource;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_PASSWORD;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_URL;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_USERNAME;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -29,23 +26,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.model.Order;
-import li.strolch.model.Resource;
-import li.strolch.model.State;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
+import li.strolch.model.*;
 import li.strolch.persistence.api.ModificationResult;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.postgresql.DataType;
+import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -54,7 +49,7 @@ public class ObserverUpdateTest {
 
 	public static final String RUNTIME_PATH = "target/observerUpdateStrolchRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/cachedruntime"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/test/resources/cachedRuntime"; //$NON-NLS-1$
 
 	protected static RuntimeMock runtimeMock;
 
@@ -73,6 +68,10 @@ public class ObserverUpdateTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
 		runtimeMock.startContainer();
+
+		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
+				.getComponent(PersistenceHandler.class);
+		assertEquals(DataType.xml, persistenceHandler.getDataType());
 	}
 
 	@AfterClass
@@ -120,17 +119,20 @@ public class ObserverUpdateTest {
 		realm.getObserverHandler().registerObserver(Tags.RESOURCE, observer);
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
-		Certificate certificate = privilegeHandler.authenticate("test", "test".toCharArray()); //$NON-NLS-1$ //$NON-NLS-2$
+		Certificate certificate = privilegeHandler
+				.authenticate("test", "test".toCharArray()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// create order
-		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(),
+				State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = realm.openTx(certificate, "test")) { //$NON-NLS-1$
 			tx.add(newOrder);
 			tx.commitOnClose();
 		}
 
 		// create resource
-		Resource newResource = createResource("MyTestResource", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Resource newResource = createResource("MyTestResource", "Test Name",
+				"TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = realm.openTx(certificate, "test");) { //$NON-NLS-1$
 			tx.add(newResource);
 			tx.commitOnClose();

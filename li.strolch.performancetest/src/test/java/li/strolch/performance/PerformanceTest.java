@@ -1,5 +1,7 @@
 package li.strolch.performance;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,6 +12,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 
 import li.strolch.db.DbSchemaVersionCheck;
+import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.persistence.postgresql.DataType;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.service.api.ServiceHandler;
@@ -25,7 +29,7 @@ public abstract class PerformanceTest {
 
 	protected static final Logger logger = LoggerFactory.getLogger(PerformanceTest.class);
 
-	private static RuntimeMock runtimeMock;
+	protected static RuntimeMock runtimeMock;
 
 	protected RuntimeMock runtime() {
 		return runtimeMock;
@@ -37,12 +41,16 @@ public abstract class PerformanceTest {
 		return arg;
 	}
 
-	public static void buildRuntime(String sourcePath, String targetPath) {
+	public static void buildRuntime(String sourcePath, String targetPath, DataType dataType) {
 		File configSrc = new File(sourcePath);
 		File rootPath = new File(targetPath);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
+
+		assertEquals(dataType,
+				((PostgreSqlPersistenceHandler) runtimeMock.getContainer().getComponent(PersistenceHandler.class))
+						.getDataType());
 	}
 
 	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {

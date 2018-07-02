@@ -15,6 +15,7 @@
  */
 package li.strolch.performance;
 
+import li.strolch.persistence.postgresql.DataType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -35,7 +36,7 @@ public class PerformancePostgreVersioningSqlTest extends PerformanceTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
-		buildRuntime(CONFIG_SRC, RUNTIME_PATH);
+		buildRuntime(CONFIG_SRC, RUNTIME_PATH, DataType.xml);
 	}
 
 	@AfterClass

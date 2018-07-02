@@ -15,6 +15,7 @@
  */
 package li.strolch.persistence.postgresql;
 
+import javax.xml.transform.sax.SAXResult;
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -24,23 +25,56 @@ import java.util.Set;
 
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Version;
+import li.strolch.model.json.StrolchRootElementToJsonVisitor;
+import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionResult;
+import org.postgresql.util.PGobject;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
 public abstract class PostgresqlDao<T extends StrolchRootElement> implements StrolchDao<T> {
 
+	private static final String querySizeSqlS = "select count(*) from {0} where latest = true";
+	private static final String querySizeOfTypeSqlS = "select count(*) from {0} where type = ? and latest = true";
+	private static final String querySizeOfElementSqlS = "select count(*) from {0} where type = ? and id = ?";
+	private static final String queryTypesSqlS = "select distinct type from {0} where latest = true";
+	private static final String queryLatestVersionNumberForSqlS = "select count(*), max(version) from {0} where type = ? and id = ?";
+	private static final String queryVersionsSizeForSqlS = "select count(*) from {0} where type = ? and id = ?";
+	private static final String deleteElementSqlS = "delete from {0} where id = ?";
+	private static final String deleteVersionSqlS = "delete from {0} where type = ? and id = ? and version = ? and latest = true";
+	private static final String updateLatestSqlS = "update {0} set latest = true where type = ? and id = ? and version = ?";
+	private static final String deleteAllSqlS = "delete from {0}";
+	private static final String deleteAllByTypeSqlS = "delete from {0} where type = ?";
+
+	private static final String queryByVersionAsXmlSqlS = "select id, name, type, version, created_by, created_at, deleted, asxml from {0} where type = ? and id = ? and version = ?";
+	private static final String queryByVersionAsJsonSqlS = "select id, name, type, version, created_by, created_at, deleted, asjson from {0} where type = ? and id = ? and version = ?";
+	private static final String queryVersionsAsXmlForSqlS = "select id, name, type, version, created_by, created_at, deleted, asxml from {0} where type = ? and id = ? order by version";
+	private static final String queryVersionsAsJsonForSqlS = "select id, name, type, version, created_by, created_at, deleted, asjson from {0} where type = ? and id = ? order by version";
+	private static final String queryAllAsXmlSqlS = "select id, name, type, version, created_by, created_at, deleted, asxml from {0} where latest = true";
+	private static final String queryAllAsJsonSqlS = "select id, name, type, version, created_by, created_at, deleted, asjson from {0} where latest = true";
+	private static final String queryAllByTypeAsXmlSqlS = "select id, name, type, version, created_by, created_at, deleted, asxml from {0} where type = ? and latest = true";
+	private static final String queryAllByTypeAsJsonSqlS = "select id, name, type, version, created_by, created_at, deleted, asjson from {0} where type = ? and latest = true";
+
+	protected final DataType dataType;
 	protected Connection connection;
 	protected final TransactionResult txResult;
 	protected final boolean versioningEnabled;
 	protected List<DaoCommand> commands;
 
-	public PostgresqlDao(Connection connection, TransactionResult txResult, boolean versioningEnabled) {
+	public PostgresqlDao(DataType dataType, Connection connection, TransactionResult txResult,
+			boolean versioningEnabled) {
+		this.dataType = dataType;
 		this.connection = connection;
 		this.txResult = txResult;
 		this.versioningEnabled = versioningEnabled;
 		this.commands = new ArrayList<>();
+	}
+
+	public DataType getDataType() {
+		return this.dataType;
 	}
 
 	protected abstract String getClassName();
@@ -49,9 +83,54 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	protected abstract T parseFromXml(String id, String type, SQLXML xml);
 
+	protected abstract T parseFromJson(String id, String type, String json);
+
+	protected SQLXML createSqlXml(T t) throws SQLException, SAXException {
+		SQLXML sqlxml = this.connection.createSQLXML();
+		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
+		ContentHandler contentHandler = saxResult.getHandler();
+		contentHandler.startDocument();
+		t.accept(new StrolchElementToSaxVisitor(contentHandler));
+		contentHandler.endDocument();
+		return sqlxml;
+	}
+
+	protected SQLXML writeObject(PreparedStatement preparedStatement, T t, int index) throws SQLException, SAXException {
+
+		SQLXML sqlxml = null;
+		if (this.dataType == DataType.xml) {
+			sqlxml = createSqlXml(t);
+			preparedStatement.setSQLXML(index, sqlxml);
+		} else {
+			PGobject jsonObj = new PGobject();
+			jsonObj.setType("json");
+			jsonObj.setValue(t.accept(new StrolchRootElementToJsonVisitor()).toString());
+			preparedStatement.setObject(index, jsonObj);
+		}
+
+		return sqlxml;
+	}
+
+	protected T parseDbObject(ResultSet result, String id, String type) throws SQLException {
+		if (this.dataType == DataType.xml) {
+
+			SQLXML sqlxml = result.getSQLXML("asxml");
+			return parseFromXml(id, type, sqlxml);
+
+		} else if (this.dataType == DataType.json) {
+
+			PGobject pGobject = (PGobject) result.getObject("asjson");
+			String json = pGobject.getValue();
+			return parseFromJson(id, type, json);
+
+		} else {
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		}
+	}
+
 	@Override
 	public long querySize() {
-		String sql = "select count(*) from " + getTableName() + " where latest = true";
+		String sql = MessageFormat.format(querySizeSqlS, getTableName());
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 
 			try (ResultSet result = statement.executeQuery()) {
@@ -66,7 +145,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	@Override
 	public long querySize(String type) {
-		String sql = "select count(*) from " + getTableName() + " where type = ? and latest = true";
+		String sql = MessageFormat.format(querySizeOfTypeSqlS, getTableName());
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
 
@@ -84,7 +163,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	public Set<String> queryTypes() {
 		Set<String> keySet = new HashSet<>();
 
-		String sql = "select distinct type from " + getTableName() + " where latest = true";
+		String sql = MessageFormat.format(queryTypesSqlS, getTableName());
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 
 			try (ResultSet result = statement.executeQuery()) {
@@ -103,20 +182,25 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	@Override
 	public T queryBy(String type, String id, int versionNr) {
 
-		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
-				+ " where type = ? and id = ? and version = ?";
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = queryByVersionAsXmlSqlS;
+		else if (this.dataType == DataType.json)
+			sql = queryByVersionAsJsonSqlS;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		sql = MessageFormat.format(sql, getTableName());
+
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
 			statement.setString(2, id);
 			statement.setInt(3, versionNr);
 
 			try (ResultSet result = statement.executeQuery()) {
-				if (!result.next()) {
+				if (!result.next())
 					return null;
-				}
 
-				SQLXML sqlxml = result.getSQLXML("asxml");
-				T t = parseFromXml(id, type, sqlxml);
+				T t = parseDbObject(result, id, type);
 
 				int v = result.getInt(4);
 				if (v != versionNr)
@@ -141,10 +225,16 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	@Override
 	public List<T> queryVersionsFor(String type, String id) {
 
-		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
-				+ " where type = ? and id = ? order by version";
-
 		List<T> list = new ArrayList<>(1);
+
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = queryVersionsAsXmlForSqlS;
+		else if (this.dataType == DataType.json)
+			sql = queryVersionsAsJsonForSqlS;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		sql = MessageFormat.format(sql, getTableName());
 
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
@@ -153,8 +243,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			try (ResultSet result = statement.executeQuery()) {
 
 				while (result.next()) {
-					SQLXML sqlxml = result.getSQLXML("asxml");
-					T t = parseFromXml(id, type, sqlxml);
+
+					T t = parseDbObject(result, id, type);
 
 					int v = result.getInt(4);
 					String createdBy = result.getString(5);
@@ -177,7 +267,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	@Override
 	public int queryLatestVersionFor(String type, String id) {
 
-		String sql = "select count(*), max(version) from " + getTableName() + " where type = ? and id = ?";
+		String sql = MessageFormat.format(queryLatestVersionNumberForSqlS, getTableName());
 
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
@@ -201,7 +291,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	@Override
 	public long queryVersionsSizeFor(String type, String id) {
 
-		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ?";
+		String sql = MessageFormat.format(queryVersionsSizeForSqlS, getTableName());
 
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
@@ -222,16 +312,23 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		List<T> list = new ArrayList<>();
 
-		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
-				+ " where latest = true";
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = queryAllAsXmlSqlS;
+		else if (this.dataType == DataType.json)
+			sql = queryAllAsJsonSqlS;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		sql = MessageFormat.format(sql, getTableName());
+
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					String id = result.getString("id");
 					String type = result.getString("type");
-					SQLXML sqlxml = result.getSQLXML("asxml");
-					T t = parseFromXml(id, type, sqlxml);
+
+					T t = parseDbObject(result, id, type);
 
 					int v = result.getInt(4);
 					String createdBy = result.getString(5);
@@ -256,16 +353,23 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		List<T> list = new ArrayList<>();
 
-		String sql = "select id, name, type, version, created_by, created_at, deleted, asxml from " + getTableName()
-				+ " where type = ? and latest = true";
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = queryAllByTypeAsXmlSqlS;
+		else if (this.dataType == DataType.json)
+			sql = queryAllByTypeAsJsonSqlS;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		sql = MessageFormat.format(sql, getTableName());
+
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, type);
 
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					String id = result.getString("id");
-					SQLXML sqlxml = result.getSQLXML("asxml");
-					T t = parseFromXml(id, type, sqlxml);
+
+					T t = parseDbObject(result, id, type);
 
 					int v = result.getInt(4);
 					String createdBy = result.getString(5);
@@ -381,7 +485,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		// first find out how many there are
 		long count = 0;
-		String sql = "select count(*) from " + getTableName() + " where type = ? and id = ?";
+		String sql = MessageFormat.format(querySizeOfElementSqlS, getTableName());
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, element.getType());
 			statement.setString(2, element.getId());
@@ -401,7 +505,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					MessageFormat.format("Failed to remove {0} as it does not exist!", element.getLocator()));
 		}
 
-		sql = "delete from " + getTableName() + " where id = ?";
+		sql = MessageFormat.format(deleteElementSqlS, getTableName());
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, element.getId());
 
@@ -419,7 +523,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	private void internalRemoveVersion(T element) {
-		String sql = "delete from " + getTableName() + " where type = ? and id = ? and version = ? and latest = true";
+		String sql = MessageFormat.format(deleteVersionSqlS, getTableName());
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, element.getType());
 			preparedStatement.setString(2, element.getId());
@@ -433,7 +537,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			}
 
 			if (!element.getVersion().isFirstVersion()) {
-				sql = "update " + getTableName() + " set latest = true where type = ? and id = ? and version = ?";
+				sql = MessageFormat.format(updateLatestSqlS, getTableName());
 				try (PreparedStatement updateStmt = this.connection.prepareStatement(sql)) {
 					int previousVersion = element.getVersion().getPreviousVersion();
 					updateStmt.setString(1, element.getType());
@@ -459,7 +563,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	protected void internalRemoveAll() {
-		String sql = "delete from " + getTableName();
+		String sql = MessageFormat.format(deleteAllSqlS, getTableName());
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			preparedStatement.executeUpdate();
@@ -471,7 +575,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	}
 
 	protected void internalRemoveAllBy(String type) {
-		String sql = "delete from " + getTableName() + " where type = ?";
+		String sql = MessageFormat.format(deleteAllByTypeSqlS, getTableName());
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 			preparedStatement.setString(1, type);
 

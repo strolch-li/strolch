@@ -18,22 +18,22 @@ package li.strolch.persistence.postgresql;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.sax.SAXResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.Calendar;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
+import li.strolch.model.json.ResourceFromJsonVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
-import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionResult;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
@@ -41,8 +41,17 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 	public static final String RESOURCES = "resources";
 
-	protected PostgreSqlResourceDao(Connection connection, TransactionResult txResult, boolean versioningEnabled) {
-		super(connection, txResult, versioningEnabled);
+	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asxml = ? where id = ? and version = ?";
+	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asjson = ? where id = ? and version = ?";
+
+	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE id = ? AND version = ?";
+
+	protected PostgreSqlResourceDao(DataType dataType, Connection connection, TransactionResult txResult,
+			boolean versioningEnabled) {
+		super(dataType, connection, txResult, versioningEnabled);
 	}
 
 	@Override
@@ -76,78 +85,85 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 		return listener.getResources().get(0);
 	}
 
-	protected SQLXML createSqlXml(Resource res, PreparedStatement preparedStatement) throws SQLException, SAXException {
-		SQLXML sqlxml = this.connection.createSQLXML();
-		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
-		ContentHandler contentHandler = saxResult.getHandler();
-		contentHandler.startDocument();
-		res.accept(new StrolchElementToSaxVisitor(contentHandler));
-		contentHandler.endDocument();
-		return sqlxml;
+	@Override
+	protected Resource parseFromJson(String id, String type, String json) {
+		JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+		return new ResourceFromJsonVisitor().visit(jsonObject);
 	}
 
 	@Override
-	protected void internalSave(final Resource res) {
-		String sql = "insert into " + getTableName()
-				+ " (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	protected void internalSave(final Resource resource) {
+
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = insertAsXmlSqlS;
+		else if (this.dataType == DataType.json)
+			sql = insertAsJsonSqlS;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		sql = MessageFormat.format(sql, getTableName());
+
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// id
-			preparedStatement.setString(1, res.getId());
+			preparedStatement.setString(1, resource.getId());
 
 			// version
-			preparedStatement.setInt(2, res.getVersion().getVersion());
-			preparedStatement.setString(3, res.getVersion().getCreatedBy());
-			preparedStatement
-					.setTimestamp(4, new Timestamp(res.getVersion().getCreatedAt().getTime()), Calendar.getInstance());
-			preparedStatement.setBoolean(5, res.getVersion().isDeleted());
+			preparedStatement.setInt(2, resource.getVersion().getVersion());
+			preparedStatement.setString(3, resource.getVersion().getCreatedBy());
+			preparedStatement.setTimestamp(4, new Timestamp(resource.getVersion().getCreatedAt().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(5, resource.getVersion().isDeleted());
 
-			preparedStatement.setBoolean(6, !res.getVersion().isDeleted());
+			preparedStatement.setBoolean(6, !resource.getVersion().isDeleted());
 
 			// attributes
-			preparedStatement.setString(7, res.getName());
-			preparedStatement.setString(8, res.getType());
+			preparedStatement.setString(7, resource.getName());
+			preparedStatement.setString(8, resource.getType());
 
-			SQLXML sqlxml = createSqlXml(res, preparedStatement);
-			preparedStatement.setSQLXML(9, sqlxml);
+			SQLXML sqlxml = writeObject(preparedStatement, resource, 9);
+
 			try {
 				int modCount = preparedStatement.executeUpdate();
 				if (modCount != 1) {
 					String msg = "Expected to save 1 element with id {0} but SQL statement modified {1} elements!";
-					msg = MessageFormat.format(msg, res.getId(), modCount);
+					msg = MessageFormat.format(msg, resource.getId(), modCount);
 					throw new StrolchPersistenceException(msg);
 				}
 			} finally {
-				sqlxml.free();
+				if (sqlxml != null)
+					sqlxml.free();
 			}
 
 		} catch (SQLException | SAXException e) {
 			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to insert Resource {0} due to {1}", res.getLocator(), e.getLocalizedMessage()), e);
+					.format("Failed to insert Resource {0} due to {1}", resource.getLocator(), e.getLocalizedMessage()),
+					e);
 		}
 
-		if (res.getVersion().isFirstVersion()) {
+		if (resource.getVersion().isFirstVersion()) {
 			return;
 		}
 
 		// and set the previous version to not be latest anymore
-		sql = "update " + getTableName() + " SET latest = false WHERE id = ? AND version = ?";
+		sql = MessageFormat.format(updateLatestSqlS, getTableName());
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// primary key
-			preparedStatement.setString(1, res.getId());
-			preparedStatement.setInt(2, res.getVersion().getPreviousVersion());
+			preparedStatement.setString(1, resource.getId());
+			preparedStatement.setInt(2, resource.getVersion().getPreviousVersion());
 
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != 1) {
 				String msg = "Expected to update 1 previous element with id {0} and version {1} but SQL statement modified {2} elements!";
-				msg = MessageFormat.format(msg, res.getId(), res.getVersion().getPreviousVersion(), modCount);
+				msg = MessageFormat.format(msg, resource.getId(), resource.getVersion().getPreviousVersion(), modCount);
 				throw new StrolchPersistenceException(msg);
 			}
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to insert Resource {0} due to {1}", res.getLocator(), e.getLocalizedMessage()), e);
+					.format("Failed to insert Resource {0} due to {1}", resource.getLocator(), e.getLocalizedMessage()),
+					e);
 		}
 	}
 
@@ -175,8 +191,15 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 		}
 
 		// now we update the existing object
-		String sql = "update " + getTableName()
-				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asxml = ? where id = ? and version = ?";
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = updateAsXmlSqlS;
+		else if (this.dataType == DataType.json)
+			sql = updateAsJsonSqlS;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		sql = MessageFormat.format(sql, getTableName());
+
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// version
@@ -191,8 +214,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			preparedStatement.setString(5, resource.getName());
 			preparedStatement.setString(6, resource.getType());
 
-			SQLXML sqlxml = createSqlXml(resource, preparedStatement);
-			preparedStatement.setSQLXML(7, sqlxml);
+			SQLXML sqlxml = writeObject(preparedStatement, resource, 7);
 
 			// primary key
 			preparedStatement.setString(8, resource.getId());
@@ -206,7 +228,8 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 					throw new StrolchPersistenceException(msg);
 				}
 			} finally {
-				sqlxml.free();
+				if (sqlxml != null)
+					sqlxml.free();
 			}
 
 		} catch (SQLException | SAXException e) {

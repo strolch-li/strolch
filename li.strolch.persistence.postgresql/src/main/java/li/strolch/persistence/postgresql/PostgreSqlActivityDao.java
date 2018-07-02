@@ -18,22 +18,22 @@ package li.strolch.persistence.postgresql;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.sax.SAXResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.Calendar;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.json.ActivityFromJsonVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
-import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionResult;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
@@ -41,8 +41,17 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 
 	public static final String ACTIVITIES = "activities";
 
-	public PostgreSqlActivityDao(Connection connection, TransactionResult txResult, boolean versioningEnabled) {
-		super(connection, txResult, versioningEnabled);
+	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, state, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
+	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, state, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
+
+	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, asxml = ? where id = ? and version = ?";
+	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, asjson = ? where id = ? and version = ?";
+
+	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE id = ? AND version = ?";
+
+	public PostgreSqlActivityDao(DataType dataType, Connection connection, TransactionResult txResult,
+			boolean versioningEnabled) {
+		super(dataType, connection, txResult, versioningEnabled);
 	}
 
 	@Override
@@ -76,22 +85,23 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 		return listener.getActivities().get(0);
 	}
 
-	protected SQLXML createSqlXml(Activity activity, PreparedStatement preparedStatement)
-			throws SQLException, SAXException {
-		SQLXML sqlxml = this.connection.createSQLXML();
-		SAXResult saxResult = sqlxml.setResult(SAXResult.class);
-		ContentHandler contentHandler = saxResult.getHandler();
-		contentHandler.startDocument();
-		activity.accept(new StrolchElementToSaxVisitor(contentHandler));
-		contentHandler.endDocument();
-		return sqlxml;
+	@Override
+	protected Activity parseFromJson(String id, String type, String json) {
+		JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+		return new ActivityFromJsonVisitor().visit(jsonObject);
 	}
 
 	@Override
 	protected void internalSave(final Activity activity) {
 
-		String sql = "insert into " + getTableName()
-				+ " (id, version, created_by, created_at, deleted, latest, name, type, state, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = insertAsXmlSqlS;
+		else if (this.dataType == DataType.json)
+			sql = insertAsJsonSqlS;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		sql = MessageFormat.format(sql, getTableName());
 
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
@@ -112,8 +122,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 			preparedStatement.setString(8, activity.getType());
 			preparedStatement.setString(9, activity.getState().name());
 
-			SQLXML sqlxml = createSqlXml(activity, preparedStatement);
-			preparedStatement.setSQLXML(10, sqlxml);
+			SQLXML sqlxml = writeObject(preparedStatement, activity, 10);
 
 			try {
 				int modCount = preparedStatement.executeUpdate();
@@ -123,7 +132,8 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 					throw new StrolchPersistenceException(msg);
 				}
 			} finally {
-				sqlxml.free();
+				if (sqlxml != null)
+					sqlxml.free();
 			}
 
 		} catch (SQLException | SAXException e) {
@@ -137,7 +147,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 		}
 
 		// and set the previous version to not be latest anymore
-		sql = "update " + getTableName() + " SET latest = false WHERE id = ? AND version = ?";
+		sql = MessageFormat.format(updateLatestSqlS, getTableName());
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// primary key
@@ -181,8 +191,14 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 							activity.getVersion()));
 		}
 
-		String sql = "update " + getTableName()
-				+ " set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, asxml = ? where id = ? and version = ?";
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = updateAsXmlSqlS;
+		else if (this.dataType == DataType.json)
+			sql = updateAsJsonSqlS;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+		sql = MessageFormat.format(sql, getTableName());
 
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
@@ -199,8 +215,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 			preparedStatement.setString(6, activity.getType());
 			preparedStatement.setString(7, activity.getState().name());
 
-			SQLXML sqlxml = createSqlXml(activity, preparedStatement);
-			preparedStatement.setSQLXML(8, sqlxml);
+			SQLXML sqlxml = writeObject(preparedStatement, activity, 8);
 
 			// primary key
 			preparedStatement.setString(9, activity.getId());
@@ -214,7 +229,8 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 					throw new StrolchPersistenceException(msg);
 				}
 			} finally {
-				sqlxml.free();
+				if (sqlxml != null)
+					sqlxml.free();
 			}
 
 		} catch (SQLException | SAXException e) {

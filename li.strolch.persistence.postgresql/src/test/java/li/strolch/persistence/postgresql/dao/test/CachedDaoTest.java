@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,29 +15,32 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.text.MessageFormat;
 
+import li.strolch.db.DbSchemaVersionCheck;
+import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.persistence.postgresql.DataType;
+import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
+import li.strolch.testbase.runtime.AbstractModelTest;
+import li.strolch.testbase.runtime.RuntimeMock;
+import li.strolch.utils.Version;
+import li.strolch.utils.helper.StringHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.postgresql.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import li.strolch.db.DbSchemaVersionCheck;
-import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
-import li.strolch.testbase.runtime.AbstractModelTest;
-import li.strolch.testbase.runtime.RuntimeMock;
-import li.strolch.utils.Version;
-import li.strolch.utils.helper.StringHelper;
-
 public class CachedDaoTest extends AbstractModelTest {
 
-	public static final String RUNTIME_PATH = "target/cachedStrolchRuntime/"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/cachedRuntime/"; //$NON-NLS-1$
 	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/cachedruntime"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/test/resources/cachedRuntime"; //$NON-NLS-1$
 
 	public static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
 	public static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
@@ -63,6 +66,10 @@ public class CachedDaoTest extends AbstractModelTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
 		runtimeMock.startContainer();
+
+		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
+				.getComponent(PersistenceHandler.class);
+		assertEquals(DataType.xml, persistenceHandler.getDataType());
 	}
 
 	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {
@@ -70,11 +77,12 @@ public class CachedDaoTest extends AbstractModelTest {
 		if (!Driver.isRegistered())
 			Driver.register();
 
-		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
-				PostgreSqlPersistenceHandler.class);
+		Version dbVersion = DbSchemaVersionCheck
+				.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX, PostgreSqlPersistenceHandler.class);
 		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
-		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
-				PostgreSqlPersistenceHandler.class, dbVersion, "drop"); //$NON-NLS-1$
+		String sql = DbSchemaVersionCheck
+				.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX, PostgreSqlPersistenceHandler.class, dbVersion,
+						"drop"); //$NON-NLS-1$
 		logger.info(StringHelper.NEW_LINE + sql);
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();

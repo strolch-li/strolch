@@ -15,6 +15,7 @@
  */
 package li.strolch.performance;
 
+import li.strolch.persistence.postgresql.DataType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +30,7 @@ public class PerformanceXmlTest extends PerformanceTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		buildRuntime(CONFIG_SRC, RUNTIME_PATH);
+		buildRuntime(CONFIG_SRC, RUNTIME_PATH, DataType.xml);
 	}
 
 	@AfterClass

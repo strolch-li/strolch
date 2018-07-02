@@ -23,10 +23,10 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PerformancePostgreSqlTest extends PerformanceTest {
+public class PerformancePostgreSqlJsonTest extends PerformanceTest {
 
 	public static final String RUNTIME_PATH = "target/runtime_postgresql_test/"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/runtime_postgresql"; //$NON-NLS-1$
+	public static final String CONFIG_SRC = "src/runtime_postgresql_json"; //$NON-NLS-1$
 
 	public static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
 	public static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
@@ -35,7 +35,7 @@ public class PerformancePostgreSqlTest extends PerformanceTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
-		buildRuntime(CONFIG_SRC, RUNTIME_PATH, DataType.xml);
+		buildRuntime(CONFIG_SRC, RUNTIME_PATH, DataType.json);
 	}
 
 	@AfterClass

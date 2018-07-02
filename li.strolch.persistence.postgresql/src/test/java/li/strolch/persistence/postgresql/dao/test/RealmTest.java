@@ -25,7 +25,10 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.postgresql.DataType;
+import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.AbstractModelTest;
@@ -66,6 +69,10 @@ public class RealmTest extends AbstractModelTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
 		runtimeMock.startContainer();
+
+		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
+				.getComponent(PersistenceHandler.class);
+		assertEquals(DataType.xml, persistenceHandler.getDataType());
 	}
 
 	@Before
