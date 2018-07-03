@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8"/>
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -53,54 +53,92 @@
     <div class="content">
 
         <p>Strolch Transactions play a central role in a Strolch agent. A transaction is opened for a realm, and grants
-            access to the model of the agent. Transactions are implemented as a Java <code>try-with-resources</code> by
-            implementing the <code>AutoCloseable</code> interface. This makes it trivial to understand the scope of a
-            transaction.
-        </p>
+           access to the model of the agent. Transactions are implemented as a Java <code>try-with-resources</code> by
+           implementing the <code>AutoCloseable</code> interface. This makes it trivial to understand the scope of a
+           transaction. </p>
 
         <p>Transactions handle the following:</p>
         <ul>
             <li>Opening and closing database connections</li>
-            <li>Releasing locks to strolch elements, if <code>tx.lock(StrolchRootElement)</code></li>
-            <li>Performing Commands correctly</li>
-            <li>exception handling</li>
-            <li>auditing</li>
-            <li>updating observers</li>
+            <li>Releasing locks to strolch elements, if <code>tx.lock(StrolchRootElement)</code> was called</li>
+            <li>Performing Commands by executing them in the added order, and validating them first.</li>
+            <li>Exception handling</li>
+            <li>Auditing</li>
+            <li>Updating observers</li>
         </ul>
 
         <p>When a transaction is opened, it is by default read-only, i.e. does not perform any commands when it is
-            closed. Should the TX perform commands, then it is important to call <code>tx.commitOnClose()</code>, but
-            only at the end of the work, so that exception handling can properly work if something goes wrong.</p>
+           closed. Should the TX perform commands, then it is important to call <code>tx.commitOnClose()</code>, but
+           only at the end of the work, so that exception handling can properly work if something goes wrong.</p>
 
         <p><code>StrolchTransaction</code> offers a myriad of methods:</p>
         <ul>
-            <li>accessing the Resources, Orders and Activities</li>
-            <li>accessing the element maps</li>
-            <li>do queries</li>
-            <li>get copies of templates</li>
+            <li>find element by its <code>Locator</code></li>
+            <li>get methods for elements by type and id, or using a <code>StringParameter</code> or <code>StringListParameter</code>
+                references
+            </li>
+            <li>methods to add, update or remove elements</li>
+            <li>assert privilege access</li>
+            <li>get a new element by its template</li>
+            <li>check if an element exists by type and id</li>
+            <li>get streams for elements</li>
             <li>add commands for execution</li>
         </ul>
 
         <p>Transactions are opened by accessing the realm, but there are convenience methods depending on the
-            use-case:</p>
+           use-case:</p>
         <ul>
             <li>In Services: by calling one of the <code>openTx()</code>-methods</li>
-            <li>In Commands: Transactions are already open, use method <code>tx()</code> to get instance</li>
+            <li>In Commands: Transactions are already open, use method <code>tx()</code> to get instance. <b>Note:</b>
+                don't open a new TX inside a TX for the same realm!
+            </li>
             <li>REST API: <code>RestfulStrolchComponent.openTx()</code></li>
         </ul>
 
         <p>Important is to always open the transaction as a try-with-resource block and to define if the TX should
-            commit, or not:</p>
+           commit, or not:</p>
         <pre>
 try (StrolchTransaction tx = openTx(...)) {
 
-  // do work
+  // find a car by locator
+  Locator ferrariLoc = Resource.locatorFor("Car", "ferrari");
+  Resource ferrari = tx.findElement(ferrariLoc);
 
-  // either or:
-  tx.doNothingOnClose(); // can also be omitted, as default
-  tx.commitOnClose();
-}
-</pre>
+  // get a car by ID
+  Resource opel = tx.getResourceBy("Car", "opel", true);
+
+  // modify ball
+  opel.setName("Opel Corsa");
+  tx.update(opel);
+
+  // get by string reference
+  StringParameter ownerP = ferrari.getParameter("relations", "owner", true);
+  Resource owner = tx.getResourceBy(ownerP, true);
+
+  // get by string list reference
+  StringListParameter previousOwnersP = opel.getParameter("relations", "previousOwners", true);
+  List&lt;Resource&gt; previousOwners = tx.getResourcesBy(previousOwnersP, true);
+
+  // check resource exists
+  if (tx.hasResource("Car", "audi")) {
+  	Resource audi = tx.getResourceBy("Car", "audi", true);
+
+  	// assert has privilege to remove a car
+  	tx.assertHasPrivilege(Operation.REMOVE, audi);
+
+  	// remove the car
+  	tx.remove(audi);
+  }
+
+  // iterate all cars
+  tx.streamResources("Car").forEach(car -> {
+  	logger.info("Car: " + car.getId());
+  });
+
+  // commit if TX was changed
+  if (tx.needsCommit())
+  	tx.commitOnClose();
+}</pre>
 
 
         <!-- content here -->
@@ -140,7 +178,7 @@ try (StrolchTransaction tx = openTx(...)) {
         s.parentNode.insertBefore(g, s);
     })();
 </script>
-<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt=""/></p></noscript>
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
 <!-- End Piwik Code -->
 
 </body>
