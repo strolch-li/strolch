@@ -1255,7 +1255,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @throws InvalidCredentialsException
 	 * 		if the given credentials are invalid, the user does not exist, or has no password set
 	 */
-	private synchronized User checkCredentialsAndUserState(String username, char[] password)
+	protected synchronized User checkCredentialsAndUserState(String username, char[] password)
 			throws InvalidCredentialsException, AccessDeniedException {
 
 		// and validate the password
@@ -1519,7 +1519,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
-	 * Initializes the concrete {@link EncryptionHandler}. The passed parameter map contains any configuration this
+	 * Initializes the concrete {@link PrivilegeHandler}. The passed parameter map contains any configuration this
 	 * {@link PrivilegeHandler} might need. This method may only be called once and this must be enforced by the
 	 * concrete implementation
 	 *

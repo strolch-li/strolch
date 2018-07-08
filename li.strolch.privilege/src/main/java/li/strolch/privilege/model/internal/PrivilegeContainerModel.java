@@ -40,11 +40,13 @@ public class PrivilegeContainerModel {
 	private String persistenceHandlerClassName;
 	private String userChallengeHandlerClassName;
 	private String ssoHandlerClassName;
+	private String privilegeHandlerClassName;
 
 	private Map<String, String> encryptionHandlerParameterMap;
 	private Map<String, String> persistenceHandlerParameterMap;
 	private Map<String, String> challengeHandlerParameterMap;
 	private Map<String, String> ssoHandlerParameterMap;
+	private Map<String, String> privilegeHandlerParameterMap;
 
 	private Map<String, String> parameterMap;
 
@@ -56,6 +58,7 @@ public class PrivilegeContainerModel {
 		this.persistenceHandlerParameterMap = new HashMap<>();
 		this.challengeHandlerParameterMap = new HashMap<>();
 		this.ssoHandlerParameterMap = new HashMap<>();
+		this.privilegeHandlerParameterMap = new HashMap<>();
 	}
 
 	public Map<String, String> getParameterMap() {
@@ -113,6 +116,14 @@ public class PrivilegeContainerModel {
 	public void setSsoHandlerClassName(String ssoHandlerClassName) {
 		this.ssoHandlerClassName = ssoHandlerClassName;
 	}
+	
+	public String getPrivilegeHandlerClassName() {
+		return this.privilegeHandlerClassName;
+	}
+
+	public void setPrivilegeHandlerClassName(String privilegeHandlerClassName) {
+		this.privilegeHandlerClassName = privilegeHandlerClassName;
+	}
 
 	public Map<String, String> getUserChallengeHandlerParameterMap() {
 		return this.challengeHandlerParameterMap;
@@ -128,6 +139,14 @@ public class PrivilegeContainerModel {
 
 	public void setSsoHandlerParameterMap(Map<String, String> ssoHandlerParameterMap) {
 		this.ssoHandlerParameterMap = ssoHandlerParameterMap;
+	}
+	
+	public Map<String, String> getPrivilegeHandlerParameterMap() {
+		return this.privilegeHandlerParameterMap;
+	}
+
+	public void setPrivilegeHandlerParameterMap(Map<String, String> privilegeHandlerParameterMap) {
+		this.privilegeHandlerParameterMap = privilegeHandlerParameterMap;
 	}
 
 	public void addPolicy(String privilegeName, String policyClassName) {
@@ -181,6 +200,8 @@ public class PrivilegeContainerModel {
 		builder.append(this.challengeHandlerParameterMap.size());
 		builder.append(", ssoHandlerParameterMap=");
 		builder.append(this.ssoHandlerParameterMap.size());
+		builder.append(", privilegeHandlerParameterMap=");
+		builder.append(this.privilegeHandlerParameterMap.size());
 		builder.append(", parameterMap=");
 		builder.append(this.parameterMap.size());
 		builder.append(", policies=");

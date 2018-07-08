@@ -22,7 +22,12 @@ import java.text.MessageFormat;
 import java.util.Map;
 
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.handler.*;
+import li.strolch.privilege.handler.DefaultPrivilegeHandler;
+import li.strolch.privilege.handler.EncryptionHandler;
+import li.strolch.privilege.handler.PersistenceHandler;
+import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.handler.SingleSignOnHandler;
+import li.strolch.privilege.handler.UserChallengeHandler;
 import li.strolch.privilege.model.internal.PrivilegeContainerModel;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.privilege.xml.PrivilegeConfigSaxReader;
@@ -149,10 +154,19 @@ public class PrivilegeInitializationHelper {
 				throw new PrivilegeException(msg, e);
 			}
 		}
-
+		
 		// initialize privilege handler
-		DefaultPrivilegeHandler privilegeHandler = new DefaultPrivilegeHandler();
+		DefaultPrivilegeHandler privilegeHandler;
 		parameterMap = containerModel.getParameterMap();
+		
+		if (containerModel.getPrivilegeHandlerClassName() == null) {
+			privilegeHandler = new DefaultPrivilegeHandler();
+		} else {
+			String privilegeHandlerClassName = containerModel.getPrivilegeHandlerClassName();
+			privilegeHandler = ClassHelper.instantiateClass(privilegeHandlerClassName);
+			parameterMap.putAll(containerModel.getPrivilegeHandlerParameterMap());
+		}
+		
 		Map<String, Class<PrivilegePolicy>> policyMap = containerModel.getPolicies();
 		try {
 			privilegeHandler

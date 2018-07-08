@@ -88,6 +88,15 @@ public class PrivilegeConfigDomWriter {
 			// Parameters
 			fillParameterMap(doc, ssoHandlerElem, this.containerModel.getSsoHandlerParameterMap());
 		}
+		
+		// create PrivilegeHandler
+		if (this.containerModel.getSsoHandlerClassName() != null) {
+			Element privilegeHandlerElem = doc.createElement(XML_HANDLER_PRIVILEGE);
+			containerElement.appendChild(privilegeHandlerElem);
+			privilegeHandlerElem.setAttribute(XML_ATTR_CLASS, this.containerModel.getPrivilegeHandlerClassName());
+			// Parameters
+			fillParameterMap(doc, privilegeHandlerElem, this.containerModel.getPrivilegeHandlerParameterMap());
+		}
 
 		// Policies
 		Element policiesElem = doc.createElement(XML_POLICIES);
