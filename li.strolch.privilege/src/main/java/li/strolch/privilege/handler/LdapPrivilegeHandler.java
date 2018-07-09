@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
@@ -97,21 +98,28 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 				SearchResult sr = (SearchResult) answer.next();
 
 				Attributes attrs = sr.getAttributes();
-				memberOfLdapString = (attrs.get("memberOf") != null) ? attrs.get("memberOf").get().toString() : "";
+				Attribute groupMembers = attrs.get("memberOf");
 
-				// extract group name from ldap string -> CN=groupname,OU=company,DC=domain,DC=country
-				LdapName memberOfName = new LdapName(memberOfLdapString);
-				for (Rdn rdn : memberOfName.getRdns()) {
-					if (rdn.getType().equalsIgnoreCase("CN")) {
-						String groupName = rdn.getValue().toString();
-						Set<String> foundStrolchRoles = rolesForLdapGroups.get(groupName);
-						if (foundStrolchRoles != null)
-							strolchRoles.addAll(foundStrolchRoles);
-						break;
+				if (groupMembers != null) {
+					for (int i = 0; i < groupMembers.size(); i++) {
+
+						memberOfLdapString = attrs.get("memberOf").get(i).toString();
+
+						// extract group name from ldap string -> CN=groupname,OU=company,DC=domain,DC=country
+						LdapName memberOfName = new LdapName(memberOfLdapString);
+						for (Rdn rdn : memberOfName.getRdns()) {
+							if (rdn.getType().equalsIgnoreCase("CN")) {
+								String groupName = rdn.getValue().toString();
+								Set<String> foundStrolchRoles = rolesForLdapGroups.get(groupName);
+								if (foundStrolchRoles != null)
+									strolchRoles.addAll(foundStrolchRoles);
+								break;
+							}
+						}
+
+						logger.info("User " + username + " is member of groups: " + memberOfLdapString);
 					}
 				}
-
-				logger.info("User " + username + " is member of groups: " + memberOfLdapString);
 			}
 
 			ctx.close();
