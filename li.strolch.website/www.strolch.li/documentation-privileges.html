@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="ico/favicon.ico">
+
+    <title>Strolch: Privileges</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries --><!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script><![endif]-->
+</head>
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="index.html">Strolch</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="api.html">API</a></li>
+                <li class="active"><a href="documentation.html">Documentation</a></li>
+                <li><a href="tutorial.html">Tutorial</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+                <li><a href="development.html">Development</a></li>
+                <li><a href="blog.html">Blog</a></li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="page-header">
+        <h1 class="page-title">Documentation: Privileges</h1>
+
+        <p class="lead page-description">This page discusses Privilege management in Strolch.</p>
+    </div>
+
+    <div class="content">
+
+        <!-- content here -->
+        <p>No framework is complete without user management and privilege validation. The basic form would be Users and
+           Roles, and then validating that an authenticated user has a given role. In Strolch we go a step further: A
+           User has roles assigned, and each role has a set of Privileges. The privileges can overlap, a validation is
+           performed to make sure that the one role doesn't deny and another role allows a specific action.</p>
+
+        <p>As explained in the <a href="documentation-runtime.html#privilegeConfig">Privilege Configuration</a> section,
+           users are defined in the <code>PrivilegeUsers.xml</code> file, and roles are defined in the <code>PrivilegeRoles.xml</code>
+           file.</p>
+
+        <p>Let's assume the following user and role definition:</p>
+
+        <pre>
+&lt;Users&gt;
+  &lt;User userId="1" username="jill" password="$PBKDF2WithHmacSHA512,10000,256$61646d696e$cb69962946617da006a2f95776d78b49e5ec7941d2bdb2d25cdb05f957f64344"&gt;
+    &lt;Firstname&gt;Jill&lt;/Firstname&gt;
+    &lt;Lastname&gt;Someone&lt;/Lastname&gt;
+    &lt;State&gt;ENABLED&lt;/State&gt;
+    &lt;Locale&gt;en_GB&lt;/Locale&gt;
+    &lt;Roles&gt;
+      &lt;Role&gt;AppUser&lt;/Role&gt;
+    &lt;/Roles&gt;
+    &lt;Properties&gt;
+      &lt;Property name="realm" value="execution" /&gt;
+    &lt;/Properties&gt;
+  &lt;/User&gt;
+&lt;/Users&gt;
+
+&lt;Roles&gt;
+  &lt;Role name="AppUser"&gt;
+    &lt;Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege"&gt;
+      &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege"&gt;
+      &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+    &lt;Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege"&gt;
+      &lt;AllAllowed&gt;true&lt;/AllAllowed&gt;
+    &lt;/Privilege&gt;
+  &lt;Role&gt;
+&lt;Roles&gt;
+</pre>
+
+        <p>This configuration contains one user and one role. The user <code>jill</code> has the role
+            <code>AppUser</code> and the role <code>AppUser</code> has three privileges assigned.</p>
+
+        <p>Note how the user's password is configured similar to a unix password definition: Using the dollar sign
+            <code>&amp;</code> first the hashing algorithm is configured (algorithm, iterations, key length), then the
+           salt, followed by the password hash.</p>
+
+        <p><code>Note:</code> The password can also still be saved using two separate fields: a salt and password field.
+                              This configuration will be immediately changed to the unix form, so won't be described
+                              further here.</p>
+
+        <p>Further a user always has a firstname and last name. Optionally a locale can be set, otherwise the system
+           locale is used. The user's state must be defined as one of <code>NEW</code>, <code>ENABLED</code>, <code>DISABLED</code>,
+            <code>EXPIRED</code> or <code>SYSTEM</code>. A user can only authenticate/login with the state
+            <code>ENABLED</code>. A user can have any number of properties, which can then be used at runtime. A user
+           can also reference any number of roles, the assigned privilege can overlap, a global configuration mode
+           defines how duplicate privileges are handled.</p>
+
+        <p>Roles have a name and any number of <code>Privilege</code> definitions. A Privilege has a name, which in many
+           cases is the name of Java class/interface on which an action is being invoked. The <code>policy</code> value
+           defines which policy to use when evaluating the privilege access. The privilege definition is defined in the
+            <code>PrivilegeConfig.xml</code> and is the name of a class to call for privilege validation.</p>
+
+        <p>Further the privilege definitions can have a <code>AllAllowed</code> boolean flag, or any number of <code>Allow</code>
+           or <code>Deny</code> values. How these values are interpreted is defined in the policy implementation. A
+           policy takes three input parameters: </p>
+        <ul>
+            <li><code>PrivilegeContext</code> &rarr; supplied by privilege and gives access to the
+                <code>Certificate</code>, thus identifying the user for which privilege access is to be validated.
+            </li>
+            <li><code>IPrivilege</code> &rarr; Contains the privilege values: <code>AllAllowed</code>,
+                <code>Allow</code> and <code>Deny</code></li>
+            <li><code>Restrictable</code> &rarr; An interface from which the privilege name is retrieved, and the
+                                          associated value. The value is an object, and is cast to the relevant input in
+                                          the concrete privilege policy.
+            </li>
+        </ul>
+
+        <p>The following privilege policies are already implemented:</p>
+        <ul>
+
+            <li>DefaultPrivilege &rarr; simple policy where the passed <code>Restrictable</code> is expected to return a
+                String value, which is compared with allow and deny values.
+            </li>
+
+
+            <li style="margin-top: 1.0em"><i>Internal:</i> RoleAccessPrivilege &rarr; policy used for the internal privileges <code>PrivilegeGetRole</code>,
+                <code>PrivilegeAddRole</code>, <code>PrivilegeModifyRole</code> or <code>PrivilegeModifyRole</code></li>
+            <li><i>Internal:</i> UserAccessPrivilege &rarr; policy used for the internal privileges <code>PrivilegeGetUser</code>,
+                <code>PrivilegeAddUser</code>, <code>PrivilegeRemoveUser</code>, <code>PrivilegeModifyUser</code>,
+                <code>PrivilegeAddRoleToUser</code>, <code>PrivilegeRemoveRoleFromUser</code>, <code>PrivilegeSetUserState</code>,
+                <code>PrivilegeSetUserLocale</code> or <code>PrivilegeSetUserPassword</code></li>
+            <li><i>Internal:</i> UserAccessWithSameOrganisationPrivilege &rarr; Same as the
+                <code>UserAccessPrivilege</code> but expects the authenticated user to have a property <code>organisation</code>
+                                 and validates that the user being modified is in the same organisation.
+            </li>
+            <li><i>Internal:</i> UsernameFromCertificatePrivilege &rarr; This policy expects a <code>Restrictable</code>
+                                 to return the certificate of another authenticated user and is used when modifying an
+                                 authenticated user, i.e. killing a session, or modifying its current state, e.g. locale
+                                 etc.
+            </li>
+            <li><i>Internal:</i> UsernameFromCertificateWithSameOrganisationPrivilege &rarr; Same as <code>UsernameFromCertificatePrivilege</code>
+                                 but expects the authenticated user to have a property <code>organisation</code> and
+                                 validates that the user being modified is in the same organisation.
+            </li>
+        </ul>
+
+        <p><b>Note:</b> As a rule, the sequence is <code>AllAllowed</code> &rarr; <code>Allow</code> &rarr;
+            <code>Deny</code> &rarr; <code>default deny</code></p>
+
+        <p></p>
+
+    </div>
+    <!-- /.content -->
+
+    <div id="footer">
+        <div class="container">
+            <p class="text-muted">&copy; Strolch / <a href="mailto:eitch@eitchnet.ch">Robert von Burg</a> / Hosting by
+                <a href="http://www.eitchnet.ch">eitchnet.ch</a></p>
+        </div>
+    </div>
+
+</div>
+<!-- /.container -->
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual xsd as needed -->
+<script src="js/bootstrap.min.js"></script>
+
+<!-- Piwik -->
+<script type="text/javascript">
+    var _paq = _paq || [];
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function () {
+        var u = (("https:" == document.location.protocol) ? "https" : "http") + "://piwik.eitchnet.ch/";
+        _paq.push(['setTrackerUrl', u + 'piwik.php']);
+        _paq.push(['setSiteId', 2]);
+        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript';
+        g.defer = true;
+        g.async = true;
+        g.src = u + 'piwik.js';
+        s.parentNode.insertBefore(g, s);
+    })();
+</script>
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+
+</body>
+</html>

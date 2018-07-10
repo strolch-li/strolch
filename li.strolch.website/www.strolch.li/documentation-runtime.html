@@ -144,7 +144,7 @@
                         moment to read the JavaDoc (or source code) for the component in question to see how it is
                         configured.</p>
 
-        <h2>Privilege Configuration</h2>
+        <h2 id="privilegeConfig">Privilege Configuration</h2>
 
         <p>In Strolch authentication and authorization is baked in. To open a transaction, and thus access the Strolch
            model, a Certificate object is required, which means the user has been authenticated and possibly
@@ -162,6 +162,17 @@
                             </li>
                             <li><code>&lt;PersistenceHandler&gt;</code> configures the persistence of the roles and
                                                                         users
+                            </li>
+                            <li><code>&lt;UserChallengeHandler&gt;</code> configures a challenge handler so that a user
+                                                                          can reset their password. The default
+                                                                          challenge handler is the <code>li.strolch.privilege.handler.MailUserChallengeHandler</code>
+                                                                          which sends a challenge to the user's defined
+                                                                          e-mail address.
+                            </li>
+                            <li><code>&lt;SsoHandler&gt;</code> the SSO Handler is used to implement a SingleSignOn and
+                                                                can be used to start a session using a LDAP token, etc.
+                                                                There is no default implementation as this is project
+                                                                specific.
                             </li>
                         </ul>
                     </li>
