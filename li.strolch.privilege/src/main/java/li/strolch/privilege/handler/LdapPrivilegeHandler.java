@@ -61,6 +61,11 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	@Override
 	protected synchronized User checkCredentialsAndUserState(String username, char[] password)
 			throws InvalidCredentialsException, AccessDeniedException {
+
+		// first see if this is a local user
+		if (this.persistenceHandler.getUser(username) != null)
+			return super.checkCredentialsAndUserState(username, password);
+
 		// Set up the environment for creating the initial context
 		Hashtable<String, String> env = new Hashtable<>();
 
@@ -87,8 +92,8 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			//Specify the search scope
 			searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-			String searchFilter = "(&(objectCategory=person)(objectClass=user)(userPrincipalName=" + username + domain
-					+ "))";
+			String searchFilter =
+					"(&(objectCategory=person)(objectClass=user)(userPrincipalName=" + username + domain + "))";
 
 			// Search for objects using the filter
 			NamingEnumeration<SearchResult> answer = ctx.search(searchBase, searchFilter, searchCtls);

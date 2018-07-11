@@ -69,60 +69,60 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * Map keeping a reference to all active sessions
 	 */
-	private Map<String, PrivilegeContext> privilegeContextMap;
+	protected Map<String, PrivilegeContext> privilegeContextMap;
 
 	/**
 	 * Map of {@link PrivilegePolicy} classes
 	 */
-	private Map<String, Class<PrivilegePolicy>> policyMap;
+	protected Map<String, Class<PrivilegePolicy>> policyMap;
 
 	/**
 	 * The persistence handler is used for getting objects and saving changes
 	 */
-	private PersistenceHandler persistenceHandler;
+	protected PersistenceHandler persistenceHandler;
 
 	/**
 	 * The encryption handler is used for generating hashes and tokens
 	 */
-	private EncryptionHandler encryptionHandler;
+	protected EncryptionHandler encryptionHandler;
 
 	/**
 	 * The Single Sign On Handler
 	 */
-	private SingleSignOnHandler ssoHandler;
+	protected SingleSignOnHandler ssoHandler;
 
 	/**
 	 * The {@link UserChallengeHandler} is used to challenge a user which tries to authenticate and/or change their
 	 * password
 	 */
-	private UserChallengeHandler userChallengeHandler;
+	protected UserChallengeHandler userChallengeHandler;
 
 	/**
 	 * flag to define if already initialized
 	 */
-	private boolean initialized;
+	protected boolean initialized;
 
 	/**
 	 * flag to define if a persist should be performed after a user changes their own data
 	 */
-	private boolean autoPersistOnUserChangesData;
+	protected boolean autoPersistOnUserChangesData;
 
 	/**
 	 * flag to define if sessions should be persisted
 	 */
-	private boolean persistSessions;
+	protected boolean persistSessions;
 
 	/**
 	 * Path to sessions file for persistence
 	 */
-	private File persistSessionsPath;
+	protected File persistSessionsPath;
 
 	/**
 	 * Secret key
 	 */
-	private SecretKey secretKey;
+	protected SecretKey secretKey;
 
-	private PrivilegeConflictResolution privilegeConflictResolution;
+	protected PrivilegeConflictResolution privilegeConflictResolution;
 
 	@Override
 	public EncryptionHandler getEncryptionHandler() throws PrivilegeException {
