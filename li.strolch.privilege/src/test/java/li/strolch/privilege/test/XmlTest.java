@@ -143,7 +143,7 @@ public class XmlTest {
 		configSaxWriter.write();
 
 		String fileHash = StringHelper.toHexString(FileHelper.hashFileSha256(configFile));
-		assertEquals("55c1212446707563877009f2090a39ad2fdf5462108109bbe0c10759d100a482", fileHash);
+		assertEquals("dcb6b3ed7198e0a7c88bf5c61c0bd6f0d684415f2a2f29429879edc6bc795f06", fileHash);
 	}
 
 	@Test
