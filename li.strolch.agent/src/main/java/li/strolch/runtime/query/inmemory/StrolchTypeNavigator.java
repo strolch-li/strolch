@@ -15,25 +15,20 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import java.util.List;
-
-import li.strolch.agent.api.ElementMap;
 import li.strolch.model.StrolchRootElement;
-import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class StrolchTypeNavigator<T extends StrolchRootElement> implements Navigator<T> {
 
-	private String type;
+	protected String type;
 
 	public StrolchTypeNavigator(String type) {
 		this.type = type;
 	}
 
-	@Override
-	public <U extends ElementMap<T>> List<T> navigate(StrolchTransaction tx, U elementMap) {
-		return elementMap.getElementsBy(tx, this.type);
+	public String getType() {
+		return this.type;
 	}
 }

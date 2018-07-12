@@ -48,9 +48,11 @@ public abstract class PerformanceTest {
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
 
-		assertEquals(dataType,
-				((PostgreSqlPersistenceHandler) runtimeMock.getContainer().getComponent(PersistenceHandler.class))
-						.getDataType());
+		if (runtimeMock.getContainer().hasComponent(PersistenceHandler.class)) {
+			assertEquals(dataType,
+					((PostgreSqlPersistenceHandler) runtimeMock.getContainer().getComponent(PersistenceHandler.class))
+							.getDataType());
+		}
 	}
 
 	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {

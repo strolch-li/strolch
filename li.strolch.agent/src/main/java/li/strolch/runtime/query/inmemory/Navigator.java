@@ -15,7 +15,7 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 import li.strolch.agent.api.ElementMap;
 import li.strolch.model.StrolchRootElement;
@@ -26,5 +26,5 @@ import li.strolch.persistence.api.StrolchTransaction;
  */
 public interface Navigator<T extends StrolchRootElement> {
 
-	public <U extends ElementMap<T>> List<T> navigate(StrolchTransaction tx, U elementMap);
+	public <U extends ElementMap<T>> Stream<T> navigate(StrolchTransaction tx, U elementMap);
 }

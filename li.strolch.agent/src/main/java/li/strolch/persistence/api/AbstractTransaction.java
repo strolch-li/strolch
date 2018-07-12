@@ -589,11 +589,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (element != null)
 			return element;
 
-		if (this.orderCache != null) {
-			element = this.orderCache.getElement(type, id);
-			if (element != null)
-				return element;
-		}
+		element = getCachedOrder(type, id);
+		if (element != null)
+			return element;
 
 		element = getOrderMap().getBy(this, type, id, assertExists);
 		if (element != null) {
@@ -619,11 +617,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (element != null)
 			return element;
 
-		if (this.orderCache != null) {
-			element = this.orderCache.getElement(refP.getUom(), refP.getValue());
-			if (element != null)
-				return element;
-		}
+		element = getCachedOrder(refP.getUom(), refP.getValue());
+		if (element != null)
+			return element;
 
 		element = getOrderMap().getBy(this, refP, assertExists);
 		if (element != null) {
@@ -664,11 +660,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (element != null)
 			return element;
 
-		if (this.resourceCache != null) {
-			element = this.resourceCache.getElement(type, id);
-			if (element != null)
-				return element;
-		}
+		element = getCachedResource(type, id);
+		if (element != null)
+			return element;
 
 		element = getResourceMap().getBy(this, type, id, assertExists);
 		if (element != null) {
@@ -694,11 +688,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (element != null)
 			return element;
 
-		if (this.resourceCache != null) {
-			element = this.resourceCache.getElement(refP.getUom(), refP.getValue());
-			if (element != null)
-				return element;
-		}
+		element = getCachedResource(refP.getUom(), refP.getValue());
+		if (element != null)
+			return element;
 
 		element = getResourceMap().getBy(this, refP, assertExists);
 		if (element != null) {
@@ -751,11 +743,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (element != null)
 			return element;
 
-		if (this.activityCache != null) {
-			element = this.activityCache.getElement(type, id);
-			if (element != null)
-				return element;
-		}
+		element = getCachedActivity(type, id);
+		if (element != null)
+			return element;
 
 		element = getActivityMap().getBy(this, type, id, assertExists);
 		if (element != null) {
@@ -781,11 +771,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (element != null)
 			return element;
 
-		if (this.activityCache != null) {
-			element = this.activityCache.getElement(refP.getUom(), refP.getValue());
-			if (element != null)
-				return element;
-		}
+		element = getCachedActivity(refP.getUom(), refP.getValue());
+		if (element != null)
+			return element;
 
 		element = getActivityMap().getBy(this, refP, assertExists);
 		if (element != null) {
@@ -813,6 +801,27 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				elements.add(element);
 		}
 		return elements;
+	}
+
+	@Override
+	public Resource getCachedResource(String type, String id) {
+		if (this.resourceCache == null)
+			return null;
+		return this.resourceCache.getElement(type, id);
+	}
+
+	@Override
+	public Order getCachedOrder(String type, String id) {
+		if (this.orderCache == null)
+			return null;
+		return this.orderCache.getElement(type, id);
+	}
+
+	@Override
+	public Activity getCachedActivity(String type, String id) {
+		if (this.activityCache == null)
+			return null;
+		return this.activityCache.getElement(type, id);
 	}
 
 	@Override

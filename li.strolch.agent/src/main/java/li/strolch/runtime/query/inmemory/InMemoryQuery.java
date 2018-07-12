@@ -15,7 +15,11 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import li.strolch.agent.api.ElementMap;
 import li.strolch.model.StrolchRootElement;
@@ -65,28 +69,22 @@ public class InMemoryQuery<T extends StrolchRootElement, U> {
 		this.elementVisitor = elementVisitor;
 	}
 
-	public  List<U> doQuery(StrolchTransaction tx, ElementMap<T> elementMap) {
+	public List<U> doQuery(StrolchTransaction tx, ElementMap<T> elementMap) {
 
 		if (this.selector == null)
 			return Collections.emptyList();
 
-		List<T> elements = this.navigator.navigate(tx, elementMap);
+		Stream<T> elements = this.navigator.navigate(tx, elementMap);
 		if (this.comparator != null)
-			elements.sort(this.comparator);
+			elements = elements.sorted(this.comparator);
 
-		List<U> result = new ArrayList<>();
-		Iterator<T> iter = elements.iterator();
-		while (iter.hasNext()) {
-			T element = iter.next();
-			if (this.selector.select(element)) {
-				U returnValue = element.accept(this.elementVisitor);
-				DBC.INTERIM.assertNotNull("Visitor may not return null in query!", returnValue); //$NON-NLS-1$
-				result.add(returnValue);
-			}
-		}
+		return elements.filter(element -> this.selector.select(element)).map(element -> {
+			U returnValue = element.accept(this.elementVisitor);
+			DBC.INTERIM.assertNotNull("Visitor may not return null in query!", returnValue); //$NON-NLS-1$
 
-		// TODO The ElementMaps return a clone, but here we don't...
-
-		return result;
+			if (returnValue instanceof StrolchRootElement)
+				returnValue = (U) ((StrolchRootElement) returnValue).getClone(true);
+			return returnValue;
+		}).collect(Collectors.toList());
 	}
 }
