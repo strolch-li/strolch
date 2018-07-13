@@ -332,9 +332,11 @@ public class GenericReport extends ReportPolicy {
 
 		Object columnValue;
 
-		if (column == null)
+		if (column == null) {
 			columnValue = EMPTY;
-		else if (columnDef.equals(COL_ID)) {
+		} else if (columnDef.equals(COL_OBJECT)) {
+			columnValue = column;
+		} else if (columnDef.equals(COL_ID)) {
 			columnValue = column.getId();
 		} else if (columnDef.equals(COL_NAME)) {
 			columnValue = column.getName();

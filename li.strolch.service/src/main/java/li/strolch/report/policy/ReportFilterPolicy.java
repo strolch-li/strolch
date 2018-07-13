@@ -19,9 +19,9 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 		super(container, tx);
 	}
 
-	private boolean negate;
-	private String filterValue;
-	private Object left;
+	protected boolean negate;
+	protected String filterValue;
+	protected Object left;
 
 	public boolean isNegate() {
 		return this.negate;

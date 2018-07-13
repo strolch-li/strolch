@@ -19,6 +19,7 @@ public class ReportConstants {
 	public static final String PARAM_POLICY = "policy";
 	public static final String PARAM_ALLOW_MISSING_COLUMNS = "allowMissingColumns";
 
+	public static final String COL_OBJECT = "$object";
 	public static final String COL_ID = "$id";
 	public static final String COL_NAME = "$name";
 	public static final String COL_TYPE = "$type";
