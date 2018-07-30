@@ -59,13 +59,13 @@
 		<xs:sequence>
 			<xs:element type="VersionType" name="Version" maxOccurs="1" minOccurs="0" />
 			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0" />
-			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0" />
 			<xs:sequence maxOccurs="unbounded" minOccurs="0">
 				<xs:choice>
 					<xs:element type="ActionType" name="Action" maxOccurs="unbounded" minOccurs="0" />
 					<xs:element type="ActivityType" name="Activity" maxOccurs="unbounded" minOccurs="0" />
 				</xs:choice>
 			</xs:sequence>
+			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0" />
 		</xs:sequence>
 		<xs:attribute type="xs:string" name="Id" use="required" />
 		<xs:attribute type="xs:string" name="Name" use="required" />
@@ -137,7 +137,7 @@
 	</xs:complexType>
 
 	<xs:complexType name="ValueChangeType">
-		<xs:attribute type="xs:string" name="StateId" use="required" />
+		<xs:attribute type="xs:string" name="StateId" use="optional" />
 		<xs:attribute type="xs:dateTime" name="Time" use="required" />
 		<xs:attribute type="xs:string" name="Value" use="required" />
 		<xs:attribute type="TimedStateTypeType" name="Type" use="required" />
