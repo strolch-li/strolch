@@ -1,18 +1,21 @@
 package li.strolch.rest.endpoint;
 
-import java.util.List;
+import static java.util.Comparator.comparing;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.ResponseUtil;
@@ -24,15 +27,47 @@ public class OperationsLogResource {
 	@GET
 	@Path("{realm}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getOperationLog(@Context HttpServletRequest request, @QueryParam("offset") int offset,
-			@QueryParam("limit") int limit, @PathParam("realm") String realm) {
+	public Response getOperationLog(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("severity") String severityS,
+			@QueryParam("from") String fromS, @QueryParam("to") String toS, @QueryParam("query") String query) {
 
 		// TODO do privilege check
 
 		OperationsLog operationsLog = RestfulStrolchComponent.getInstance().getComponent(OperationsLog.class);
-		List<LogMessage> messages = operationsLog.getMessages(realm);
+		Stream<LogMessage> messages = operationsLog.getMessages(realm).stream();
 
-		Paging<LogMessage> paging = Paging.asPage(messages, offset, limit);
+		if (isNotEmpty(severityS)) {
+			LogSeverity severity = LogSeverity.valueOf(severityS);
+			messages = messages.filter(logMessage -> logMessage.getSeverity() == severity);
+		}
+
+		if (isNotEmpty(query)) {
+			messages = messages.filter(logMessage -> logMessage.getMessage().toLowerCase().contains(query) //
+					|| logMessage.getLocator().getPathElements().contains(query));
+		}
+
+		if (isNotEmpty(fromS) && isNotEmpty(toS)) {
+
+			ZonedDateTime from = LocalDate.parse(fromS).atStartOfDay(ZoneId.systemDefault());
+			ZonedDateTime to = LocalDate.parse(toS).plusDays(1).atStartOfDay(ZoneId.systemDefault());
+			messages = messages.filter(logMessage -> from.isBefore(logMessage.getZonedDateTime()) && to
+					.isAfter(logMessage.getZonedDateTime()));
+
+		} else if (isNotEmpty(fromS)) {
+
+			ZonedDateTime from = LocalDate.parse(fromS).atStartOfDay(ZoneId.systemDefault());
+			messages = messages.filter(logMessage -> from.isBefore(logMessage.getZonedDateTime()));
+
+		} else if (isNotEmpty(toS)) {
+
+			ZonedDateTime to = LocalDate.parse(toS).plusDays(1).atStartOfDay(ZoneId.systemDefault());
+			messages = messages.filter(logMessage -> to.isAfter(logMessage.getZonedDateTime()));
+
+		}
+
+		messages = messages.sorted(comparing(LogMessage::getId).reversed());
+
+		Paging<LogMessage> paging = Paging.asPage(messages.collect(Collectors.toList()), offset, limit);
 		return ResponseUtil.toResponse(paging, LogMessage::toJson);
 	}
 }

@@ -1,9 +1,10 @@
 package li.strolch.handler.operationslog;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import com.google.gson.JsonObject;
-
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.Locator;
 import li.strolch.model.Tags.Json;
@@ -13,6 +14,7 @@ import li.strolch.utils.helper.ExceptionHelper;
 public class LogMessage extends I18nMessage {
 
 	private final String id;
+	private ZonedDateTime zonedDateTime;
 	private final String realm;
 	private final Locator locator;
 	private final LogSeverity severity;
@@ -20,6 +22,7 @@ public class LogMessage extends I18nMessage {
 	public LogMessage(String realm, Locator locator, LogSeverity logSeverity, ResourceBundle bundle, String key) {
 		super(bundle, key);
 		this.id = StrolchAgent.getUniqueId();
+		this.zonedDateTime = ZonedDateTime.now();
 		this.realm = realm;
 		this.locator = locator;
 		this.severity = logSeverity;
@@ -27,6 +30,10 @@ public class LogMessage extends I18nMessage {
 
 	public String getId() {
 		return this.id;
+	}
+
+	public ZonedDateTime getZonedDateTime() {
+		return this.zonedDateTime;
 	}
 
 	public String getRealm() {
@@ -57,9 +64,10 @@ public class LogMessage extends I18nMessage {
 		JsonObject jsonObject = new JsonObject();
 
 		jsonObject.addProperty(Json.ID, this.id);
+		jsonObject.addProperty(Json.DATE, this.zonedDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 		jsonObject.addProperty(Json.KEY, getKey());
 		jsonObject.addProperty(Json.MESSAGE, formatMessage());
-		jsonObject.addProperty(Json.SEVERITY, this.severity.getSeverity());
+		jsonObject.addProperty(Json.SEVERITY, this.severity.name());
 		jsonObject.addProperty(Json.REALM, this.realm);
 		jsonObject.addProperty(Json.LOCATOR, this.locator.toString());
 		JsonObject values = new JsonObject();

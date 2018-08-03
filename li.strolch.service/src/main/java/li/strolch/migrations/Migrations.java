@@ -145,7 +145,7 @@ public class Migrations {
 				List<Version> list = migrationsRan.getList(realm);
 				for (Version version : list) {
 					LogMessage logMessage = new LogMessage(realm, locator.append(StrolchAgent.getUniqueId()),
-							LogSeverity.INFO, ResourceBundle.getBundle("strolch-service"),
+							LogSeverity.Info, ResourceBundle.getBundle("strolch-service"),
 							"execution.handler.migrations.version").value("version", version.toString());
 					operationsLog.addMessage(logMessage);
 				}

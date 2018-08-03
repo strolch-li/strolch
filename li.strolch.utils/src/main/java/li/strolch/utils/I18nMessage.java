@@ -18,6 +18,7 @@ public class I18nMessage {
 	private ResourceBundle bundle;
 	private String key;
 	private Properties values;
+	private String message;
 
 	public I18nMessage(ResourceBundle bundle, String key) {
 		DBC.INTERIM.assertNotNull("bundle must be set!", bundle);
@@ -35,6 +36,10 @@ public class I18nMessage {
 		return this.values;
 	}
 
+	public String getMessage() {
+		return formatMessage();
+	}
+
 	public I18nMessage value(String key, String value) {
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
 		this.values.setProperty(key, value == null ? "-" : value);
@@ -42,13 +47,18 @@ public class I18nMessage {
 	}
 
 	public String formatMessage() {
+		if (this.message != null)
+			return this.message;
+
 		try {
 			String string = this.bundle.getString(this.key);
-			return StringHelper.replacePropertiesIn(this.values, EMPTY, string);
+			this.message = StringHelper.replacePropertiesIn(this.values, EMPTY, string);
 		} catch (MissingResourceException e) {
 			logger.error("Key " + this.key + " is missing in bundle " + this.bundle.getBaseBundleName());
-			return this.key;
+			this.message = this.key;
 		}
+
+		return this.message;
 	}
 
 	@Override

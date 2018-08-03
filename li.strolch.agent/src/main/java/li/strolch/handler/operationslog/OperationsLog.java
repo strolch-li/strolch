@@ -1,14 +1,6 @@
 package li.strolch.handler.operationslog;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -36,7 +28,7 @@ public class OperationsLog extends StrolchComponent {
 		super.initialize(configuration);
 	}
 
-	public void addMessage(LogMessage logMessage) {
+	public synchronized void addMessage(LogMessage logMessage) {
 
 		// store in global list
 		LinkedHashMap<LogMessage, LogMessage> logMessages = this.logMessagesByRealmAndId
@@ -46,25 +38,25 @@ public class OperationsLog extends StrolchComponent {
 		// store under locator
 		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesLocator = this.logMessagesByLocator
 				.computeIfAbsent(logMessage.getRealm(), this::newBoundedLocatorMap);
-		LinkedHashSet<LogMessage> messages = logMessagesLocator.computeIfAbsent(logMessage.getLocator(),
-				(l) -> new LinkedHashSet<LogMessage>());
+		LinkedHashSet<LogMessage> messages = logMessagesLocator
+				.computeIfAbsent(logMessage.getLocator(), (l) -> new LinkedHashSet<>());
 		messages.add(logMessage);
 	}
 
-	public void clearMessages(String realm, Locator locator) {
+	public synchronized void clearMessages(String realm, Locator locator) {
 		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
 		if (logMessages != null)
 			logMessages.remove(locator);
 	}
 
-	public Optional<Set<LogMessage>> getMessagesFor(String realm, Locator locator) {
+	public synchronized Optional<Set<LogMessage>> getMessagesFor(String realm, Locator locator) {
 		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
 		if (logMessages == null)
 			return Optional.empty();
 		return Optional.ofNullable(logMessages.get(locator));
 	}
 
-	public List<LogMessage> getMessages(String realm) {
+	public synchronized List<LogMessage> getMessages(String realm) {
 		LinkedHashMap<LogMessage, LogMessage> logMessages = this.logMessagesByRealmAndId.get(realm);
 		if (logMessages == null)
 			return Collections.emptyList();

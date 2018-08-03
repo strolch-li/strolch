@@ -163,7 +163,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
-					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
+					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.Exception,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.execution")
 							.value("reason", e));
 				}
@@ -186,7 +186,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
-					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
+					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.Exception,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
 							.value("reason", e));
 				}
@@ -205,7 +205,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				logger.error("Failed to set " + locator + " to stopped due to " + e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
-					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
+					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.Exception,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.stopped")
 							.value("reason", e));
 				}
@@ -224,7 +224,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				logger.error("Failed to set " + locator + " to error due to " + e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
-					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
+					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.Exception,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.error")
 							.value("reason", e));
 				}
@@ -243,7 +243,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				logger.error("Failed to set " + locator + " to warning due to " + e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
-					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.EXCEPTION,
+					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.Exception,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.warning")
 							.value("reason", e));
 				}
@@ -283,7 +283,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
-							new LogMessage(realm, activityLoc, LogSeverity.EXCEPTION,
+							new LogMessage(realm, activityLoc, LogSeverity.Exception,
 									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.archive")
 									.value("reason", e));
 				}

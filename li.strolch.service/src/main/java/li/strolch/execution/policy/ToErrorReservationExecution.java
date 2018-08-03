@@ -10,9 +10,9 @@ import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 
 /**
- * The {@link ToErrorReservationExecution} executes same as {@link ReservationExection} with the difference that
- * {@link #isExecutable(Action)} always returns true, and if the action's resource is currently reserved, the execution
- * fails and the state is set to ERROR
+ * The {@link ToErrorReservationExecution} executes same as {@link ReservationExection} with the difference that {@link
+ * #isExecutable(Action)} always returns true, and if the action's resource is currently reserved, the execution fails
+ * and the state is set to ERROR
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -44,7 +44,7 @@ public class ToErrorReservationExecution extends ReservationExection {
 
 		if (action.getType().equals(TYPE_RESERVE) && isReserved(action)) {
 			setActionState(action, State.EXECUTION);
-			toError(new LogMessage(tx().getRealmName(), action.getLocator(), LogSeverity.ERROR,
+			toError(new LogMessage(tx().getRealmName(), action.getLocator(), LogSeverity.Error,
 					ResourceBundle.getBundle("strolch-service"), "execution.policy.reservation.alreadyReserved")
 					.value("resourceLoc", getResource(action).getLocator().toString()));
 		} else {

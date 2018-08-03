@@ -1321,7 +1321,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (this.operationsLog != null) {
 			this.operationsLog.addMessage(
 					new LogMessage(this.realm.getRealm(), Locator.valueOf(AGENT, "tx", StrolchAgent.getUniqueId()),
-							LogSeverity.EXCEPTION, ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed")
+							LogSeverity.Exception, ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed")
 							.value("reason", e));
 		}
 
