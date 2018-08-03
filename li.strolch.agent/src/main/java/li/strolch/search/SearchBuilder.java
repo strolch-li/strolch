@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * <li>format <code>param:&lt;bagId&gt;:&lt;paramId&gt;:&lt;value&gt;</code> adds search expression for given
  * bag/param</li>
  * <li>otherwise search expression for id and name are added</li>
- * <li>all added search expressions are ORed</li>
+ * <li>all added search expressions are ANDed</li>
  * </ul>
  */
 public class SearchBuilder {
@@ -87,18 +87,18 @@ public class SearchBuilder {
 			if (!part.startsWith("param:")) {
 
 				if (se == null)
-					se = (SearchExpression<T>) id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
+					se = (SearchExpression<T>) id(containsIgnoreCase(part)).and(name(containsIgnoreCase(part)));
 				else
-					se = se.or(id(containsIgnoreCase(part))).or(name(containsIgnoreCase(part)));
+					se = se.and(id(containsIgnoreCase(part))).and(name(containsIgnoreCase(part)));
 
 			} else {
 				String[] paramParts = part.split(":");
 				if (paramParts.length != 4) {
 
 					if (se == null)
-						se = (SearchExpression<T>) id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
+						se = (SearchExpression<T>) id(containsIgnoreCase(part)).and(name(containsIgnoreCase(part)));
 					else
-						se = se.or(id(containsIgnoreCase(part))).or(name(containsIgnoreCase(part)));
+						se = se.and(id(containsIgnoreCase(part))).and(name(containsIgnoreCase(part)));
 
 				} else {
 
@@ -109,7 +109,7 @@ public class SearchBuilder {
 					if (se == null)
 						se = param(bagId, paramId, containsIgnoreCase(value));
 					else
-						se = se.or(param(bagId, paramId, containsIgnoreCase(value)));
+						se = se.and(param(bagId, paramId, containsIgnoreCase(value)));
 				}
 			}
 		}
