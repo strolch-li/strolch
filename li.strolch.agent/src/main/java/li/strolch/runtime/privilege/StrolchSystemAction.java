@@ -14,7 +14,7 @@ public class StrolchSystemAction extends SystemAction {
 
 	public static final Logger logger = LoggerFactory.getLogger(StrolchSystemAction.class);
 
-	private PrivilegedRunnable runnable;
+	private final PrivilegedRunnable runnable;
 
 	public StrolchSystemAction(PrivilegedRunnable runnable) {
 		this.runnable = runnable;
