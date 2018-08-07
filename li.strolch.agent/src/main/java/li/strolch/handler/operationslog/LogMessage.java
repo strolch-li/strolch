@@ -18,6 +18,7 @@ public class LogMessage extends I18nMessage {
 	private final String realm;
 	private final Locator locator;
 	private final LogSeverity severity;
+	private String stackTrace;
 
 	public LogMessage(String realm, Locator locator, LogSeverity logSeverity, ResourceBundle bundle, String key) {
 		super(bundle, key);
@@ -48,6 +49,15 @@ public class LogMessage extends I18nMessage {
 		return this.severity;
 	}
 
+	public LogMessage withException(Throwable t) {
+		this.stackTrace = ExceptionHelper.formatException(t);
+		return this;
+	}
+
+	public String getStackTrace() {
+		return this.stackTrace;
+	}
+
 	@Override
 	public LogMessage value(String key, String value) {
 		super.value(key, value);
@@ -70,6 +80,7 @@ public class LogMessage extends I18nMessage {
 		jsonObject.addProperty(Json.SEVERITY, this.severity.name());
 		jsonObject.addProperty(Json.REALM, this.realm);
 		jsonObject.addProperty(Json.LOCATOR, this.locator.toString());
+		jsonObject.addProperty(Json.EXCEPTION, this.stackTrace);
 		JsonObject values = new JsonObject();
 		for (String key : getValues().stringPropertyNames()) {
 			values.addProperty(key, getValues().getProperty(key));

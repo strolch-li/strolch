@@ -203,7 +203,7 @@ public class MigrationsHandler extends StrolchComponent {
 					getComponent(OperationsLog.class).addMessage(
 							new LogMessage(Tags.AGENT, getLocator().append(StrolchAgent.getUniqueId()),
 									LogSeverity.Exception, ResourceBundle.getBundle("strolch-service"),
-									"execution.handler.failed.executed").value("reason", e));
+									"execution.handler.failed.executed").withException(e).value("reason", e));
 				}
 			}
 		}

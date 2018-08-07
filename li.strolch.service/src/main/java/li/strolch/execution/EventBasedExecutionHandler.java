@@ -165,7 +165,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.Exception,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.execution")
-							.value("reason", e));
+							.withException(e).value("reason", e));
 				}
 			}
 		});
@@ -188,7 +188,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.Exception,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
-							.value("reason", e));
+							.withException(e).value("reason", e));
 				}
 			}
 		});
@@ -207,7 +207,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.Exception,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.stopped")
-							.value("reason", e));
+							.withException(e).value("reason", e));
 				}
 			}
 		});
@@ -226,7 +226,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.Exception,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.error")
-							.value("reason", e));
+							.withException(e).value("reason", e));
 				}
 			}
 		});
@@ -245,7 +245,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(realm, locator, LogSeverity.Exception,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.warning")
-							.value("reason", e));
+							.withException(e).value("reason", e));
 				}
 			}
 		});
@@ -285,7 +285,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, activityLoc, LogSeverity.Exception,
 									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.archive")
-									.value("reason", e));
+									.withException(e).value("reason", e));
 				}
 			}
 		});

@@ -1,14 +1,22 @@
 package li.strolch.job;
 
+import static li.strolch.model.Tags.AGENT;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ResourceBundle;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.StrolchRealm;
+import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
@@ -23,6 +31,7 @@ public abstract class StrolchJob implements Runnable {
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchJob.class);
 
 	private StrolchAgent agent;
+	private String realmName;
 	private boolean first;
 	private Future<?> future;
 
@@ -72,15 +81,27 @@ public abstract class StrolchJob implements Runnable {
 	 * @return the newly created transaction
 	 */
 	protected StrolchTransaction openTx(Certificate cert) {
-		return getContainer().getRealm(cert).openTx(cert, this.getClass());
+		StrolchRealm realm = getContainer().getRealm(cert);
+		this.realmName = realm.getRealm();
+		return realm.openTx(cert, this.getClass());
 	}
 
 	@Override
 	public final void run() {
 		try {
 			runAsAgent(this::execute);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.error("Execution of Job " + this.getClass().getSimpleName() + " failed.", e);
+
+			OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
+			if (operationsLog != null) {
+				operationsLog.addMessage(
+						new LogMessage(this.realmName == null ? StrolchConstants.DEFAULT_REALM : this.realmName,
+								Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()),
+								LogSeverity.Exception, ResourceBundle.getBundle("strolch-agent"),
+								"strolchjob.failed").withException(e).value("jobName", getClass().getName())
+								.value("reason", e));
+			}
 		}
 
 		this.first = false;
