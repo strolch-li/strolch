@@ -22,6 +22,15 @@ import li.strolch.soql.core.QueryResponse;
 @Path("strolch/model")
 public class ModelQuery {
 
+	private static String getContext() {
+		StackTraceElement element = new Throwable().getStackTrace()[2];
+		return element.getClassName() + "." + element.getMethodName();
+	}
+
+	private StrolchTransaction openTx(Certificate certificate, String realm) {
+		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm).openTx(certificate, getContext());
+	}
+
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("soql")
@@ -42,8 +51,4 @@ public class ModelQuery {
 				.build();
 	}
 
-	private StrolchTransaction openTx(Certificate certificate, String realm) {
-		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm)
-				.openTx(certificate, ModelQuery.class);
-	}
 }

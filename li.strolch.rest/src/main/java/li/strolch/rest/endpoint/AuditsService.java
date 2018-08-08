@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,6 +35,11 @@ import li.strolch.rest.model.visitor.ToAuditQueryVisitor;
 @Path("strolch/audits")
 public class AuditsService {
 
+	private static String getContext() {
+		StackTraceElement element = new Throwable().getStackTrace()[1];
+		return element.getClassName() + "." + element.getMethodName();
+	}
+
 	@GET
 	@Path("types")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -43,7 +48,7 @@ public class AuditsService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		StrolchRealm realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert);
 
-		try (StrolchTransaction tx = realm.openTx(cert, AuditsService.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, getContext())) {
 			JsonArray dataJ = new JsonArray();
 			tx.getAuditTrail().getTypes(tx).forEach(dataJ::add);
 			return Response.ok(dataJ.toString(), MediaType.APPLICATION_JSON).build();
@@ -58,7 +63,7 @@ public class AuditsService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		StrolchRealm realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert);
 
-		try (StrolchTransaction tx = realm.openTx(cert, AuditsService.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, getContext())) {
 
 			li.strolch.model.query.AuditQuery<Audit> auditQuery = new ToAuditQueryVisitor().create(query);
 			JsonArray dataJ = new JsonArray();

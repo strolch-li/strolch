@@ -86,9 +86,14 @@ public class Inspector {
 
 	private static final Logger logger = LoggerFactory.getLogger(Inspector.class);
 
+	private static String getContext() {
+		StackTraceElement element = new Throwable().getStackTrace()[2];
+		return element.getClassName() + "." + element.getMethodName();
+	}
+
 	private StrolchTransaction openTx(Certificate certificate, String realm) {
 		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm)
-				.openTx(certificate, Inspector.class);
+				.openTx(certificate, getContext());
 	}
 
 	private String toString(JsonElement jsonElement) {
