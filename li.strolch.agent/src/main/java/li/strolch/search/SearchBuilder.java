@@ -87,18 +87,19 @@ public class SearchBuilder {
 			if (!part.startsWith("param:")) {
 
 				if (se == null)
-					se = (SearchExpression<T>) id(containsIgnoreCase(part)).and(name(containsIgnoreCase(part)));
+					se = (SearchExpression<T>) id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
 				else
-					se = se.and(id(containsIgnoreCase(part))).and(name(containsIgnoreCase(part)));
+					se = se.and((SearchExpression<T>) id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part))));
 
 			} else {
 				String[] paramParts = part.split(":");
 				if (paramParts.length != 4) {
 
 					if (se == null)
-						se = (SearchExpression<T>) id(containsIgnoreCase(part)).and(name(containsIgnoreCase(part)));
+						se = (SearchExpression<T>) id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
 					else
-						se = se.and(id(containsIgnoreCase(part))).and(name(containsIgnoreCase(part)));
+						se = se.and(
+								(SearchExpression<T>) id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part))));
 
 				} else {
 
