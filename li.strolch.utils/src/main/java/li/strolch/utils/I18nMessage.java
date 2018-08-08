@@ -42,7 +42,7 @@ public class I18nMessage {
 
 	public I18nMessage value(String key, String value) {
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
-		this.values.setProperty(key, value == null ? "-" : value);
+		this.values.setProperty(key, value == null ? "(null)" : value);
 		return this;
 	}
 
