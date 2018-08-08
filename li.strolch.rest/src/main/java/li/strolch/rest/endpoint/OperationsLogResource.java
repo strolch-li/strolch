@@ -17,8 +17,12 @@ import java.util.stream.Stream;
 import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.rest.RestfulStrolchComponent;
+import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.collections.Paging;
 
 @Path("strolch/operations-log")
@@ -31,7 +35,10 @@ public class OperationsLogResource {
 			@QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("severity") String severityS,
 			@QueryParam("from") String fromS, @QueryParam("to") String toS, @QueryParam("query") String query) {
 
-		// TODO do privilege check
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getContainer().getPrivilegeHandler();
+		PrivilegeContext ctx = privilegeHandler.getPrivilegeHandler().validate(cert);
+		ctx.assertHasPrivilege(OperationsLog.class.getName());
 
 		OperationsLog operationsLog = RestfulStrolchComponent.getInstance().getComponent(OperationsLog.class);
 		Stream<LogMessage> messages = operationsLog.getMessages(realm).stream();
