@@ -1180,7 +1180,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	private void loadSessions() {
 		if (!this.persistSessions) {
-			logger.info("Persisteding of sessions not enabled, so not loading!.");
+			logger.info("Persisting of sessions not enabled, so not loading!.");
 			return;
 		}
 
