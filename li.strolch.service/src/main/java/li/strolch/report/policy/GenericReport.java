@@ -18,6 +18,7 @@ import li.strolch.model.visitor.ElementDateVisitor;
 import li.strolch.model.visitor.ElementStateVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
+import li.strolch.report.ReportConstants;
 import li.strolch.report.ReportElement;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.utils.ObjectHelper;
@@ -26,6 +27,9 @@ import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
+ * A Generic Report defines a report as is described at <a href="https://strolch.li/documentation-reports.html">Strolch
+ * Reports</a>
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class GenericReport extends ReportPolicy {
@@ -50,6 +54,13 @@ public class GenericReport extends ReportPolicy {
 		super(container, tx);
 	}
 
+	/**
+	 * Retrieves the <code>Resource</code> with the given ID, and initializes this instance with the data specified on
+	 * the report
+	 *
+	 * @param reportId
+	 * 		the report to use
+	 */
 	public void initialize(String reportId) {
 
 		// get the reportRes
@@ -105,19 +116,47 @@ public class GenericReport extends ReportPolicy {
 		}
 	}
 
+	/**
+	 * Returns true if the report has a date range selector specified
+	 *
+	 * @return
+	 */
 	public boolean hasDateRangeSelector() {
 		return this.dateRangeSelP != null;
 	}
 
+	/**
+	 * Sets the given date range
+	 *
+	 * @param dateRange
+	 * 		the date range to set
+	 *
+	 * @return this for chaining
+	 */
 	public GenericReport dateRange(DateRange dateRange) {
 		this.dateRange = dateRange;
 		return this;
 	}
 
+	/**
+	 * The keys for the header of this report, as is defined on the {@link ReportConstants#BAG_COLUMNS} parameter bag
+	 *
+	 * @return the keys for the header
+	 */
 	public List<String> getColumnKeys() {
 		return this.columnIds;
 	}
 
+	/**
+	 * Applies the given filter for the given element type
+	 *
+	 * @param type
+	 * 		the type of element to filter
+	 * @param ids
+	 * 		the IDs of the elements to filter to
+	 *
+	 * @return this for chaining
+	 */
 	public GenericReport filter(String type, String... ids) {
 		if (this.filtersById == null)
 			this.filtersById = new MapOfSets<>();
@@ -127,6 +166,16 @@ public class GenericReport extends ReportPolicy {
 		return this;
 	}
 
+	/**
+	 * Applies the given filter for the given element type
+	 *
+	 * @param type
+	 * 		the type of element to filter
+	 * @param ids
+	 * 		the IDs of the elements to filter to
+	 *
+	 * @return this for chaining
+	 */
 	public GenericReport filter(String type, List<String> ids) {
 		if (this.filtersById == null)
 			this.filtersById = new MapOfSets<>();
@@ -136,6 +185,16 @@ public class GenericReport extends ReportPolicy {
 		return this;
 	}
 
+	/**
+	 * Applies the given filter for the given element type
+	 *
+	 * @param type
+	 * 		the type of element to filter
+	 * @param ids
+	 * 		the IDs of the elements to filter to
+	 *
+	 * @return this for chaining
+	 */
 	public GenericReport filter(String type, Set<String> ids) {
 		if (this.filtersById == null)
 			this.filtersById = new MapOfSets<>();
@@ -145,6 +204,12 @@ public class GenericReport extends ReportPolicy {
 		return this;
 	}
 
+	/**
+	 * Builds the stream of rows on which further transformations can be performed. Each row is a {@link Map} for where
+	 * the key is an element type, and the value is the associated element
+	 *
+	 * @return this for chaining
+	 */
 	public Stream<Map<String, StrolchRootElement>> buildStream() {
 
 		// query the main objects and return a stream
@@ -159,6 +224,11 @@ public class GenericReport extends ReportPolicy {
 		return stream;
 	}
 
+	/**
+	 * Performs the report, returning a stream of {@link ReportElement}
+	 *
+	 * @return this for chaining
+	 */
 	public Stream<ReportElement> doReport() {
 
 		return buildStream().map(e -> new ReportElement(this.columnIds, columnId -> {
@@ -172,12 +242,31 @@ public class GenericReport extends ReportPolicy {
 		}));
 	}
 
+	/**
+	 * <p>Check to see if the given element is to be filtered, i.e. is to be kept in the stream</p>
+	 *
+	 * <p>This implementation checks if {@link ReportConstants#PARAM_HIDE_OBJECT_TYPE_FROM_FILTER_CRITERIA} is set, and
+	 * returns false if the given element is the type defined in {@link ReportConstants#PARAM_OBJECT_TYPE}</p>
+	 *
+	 * <p>This method can be overridden for further filtering</p>
+	 *
+	 * @param element
+	 * 		the element to filter
+	 *
+	 * @return true if the element is to be kept, false if not
+	 */
 	protected boolean filterCriteria(StrolchRootElement element) {
 		if (this.hideObjectTypeFromFilterCriteria)
 			return !element.getType().equals(this.objectType);
 		return true;
 	}
 
+	/**
+	 * Generates the filter criteria for this report, i.e. it return a {@link MapOfSets} which defines the type of
+	 * elements on which a filter can be set and the {@link Set} of IDs which can be used for filtering.
+	 *
+	 * @return the filter criteria as a map of sets
+	 */
 	public MapOfSets<String, StrolchRootElement> generateFilterCriteria() {
 		return buildStream() //
 
@@ -191,10 +280,26 @@ public class GenericReport extends ReportPolicy {
 								m -> m));
 	}
 
+	/**
+	 * Returns true if an ordering is defined by means of {@link ReportConstants#BAG_ORDERING}
+	 *
+	 * @return true if an ordering is defined
+	 */
 	protected boolean hasOrdering() {
 		return this.orderingParams != null && !this.orderingParams.isEmpty();
 	}
 
+	/**
+	 * Implements a sorting of the given two rows. This implementation using the ordering as is defined in {@link
+	 * ReportConstants#BAG_ORDERING}
+	 *
+	 * @param row1
+	 * 		the left side
+	 * @param row2
+	 * 		the right side
+	 *
+	 * @return the value {@code -1}, {@code 0} or {@code 1}, depending on the defined ordering
+	 */
 	protected int sort(Map<String, StrolchRootElement> row1, Map<String, StrolchRootElement> row2) {
 
 		for (StringParameter fieldRefP : this.orderingParams) {
@@ -246,11 +351,25 @@ public class GenericReport extends ReportPolicy {
 		return 0;
 	}
 
+	/**
+	 * Returns true if a filter is defined, i.e. {@link ParameterBag ParameterBags} of type {@link
+	 * ReportConstants#TYPE_FILTER}, a date range
+	 *
+	 * @return true if a filter is defined
+	 */
 	protected boolean hasFilter() {
 		return !this.filtersByPolicy.isEmpty() || this.dateRange != null || (this.filtersById != null
 				&& !this.filtersById.isEmpty());
 	}
 
+	/**
+	 * Returns true if the element is filtered, i.e. is to be kep, false if it should not be kept in the stream
+	 *
+	 * @param row
+	 * 		the row to check if it is filtered
+	 *
+	 * @return if the element is filtered
+	 */
 	protected boolean filter(Map<String, StrolchRootElement> row) {
 
 		// do filtering by policies
@@ -322,6 +441,16 @@ public class GenericReport extends ReportPolicy {
 		return true;
 	}
 
+	/**
+	 * Evaluates the column value from the given column definition and row
+	 *
+	 * @param columnDefP
+	 * 		the column definition
+	 * @param row
+	 * 		the row
+	 *
+	 * @return the column value
+	 */
 	protected Object evaluateColumnValue(StringParameter columnDefP, Map<String, StrolchRootElement> row) {
 
 		String columnDef = columnDefP.getValue();
@@ -359,6 +488,16 @@ public class GenericReport extends ReportPolicy {
 		return columnValue;
 	}
 
+	/**
+	 * Finds a parameter given the column definition
+	 *
+	 * @param columnDefP
+	 * 		the column definition
+	 * @param column
+	 * 		the element from which the parameter is to be retrieved
+	 *
+	 * @return the parameter, or null if it does not exist
+	 */
 	protected Parameter<?> findParameter(StringParameter columnDefP, StrolchRootElement column) {
 
 		String columnDef = columnDefP.getValue();
@@ -384,6 +523,21 @@ public class GenericReport extends ReportPolicy {
 		return findParameter(column, parentParamId, bagKey, paramKey);
 	}
 
+	/**
+	 * Performs a given parameter recursively by searching for the given parameter by parameter ID and bag. The parent
+	 * is queried by the parentParamId
+	 *
+	 * @param element
+	 * 		the element from which to find the parameter
+	 * @param parentParamId
+	 * 		the parent parameter to find a parent, if the parameter was not found on the element
+	 * @param bagKey
+	 * 		the {@link ParameterBag} on which to get the parameter
+	 * @param paramKey
+	 * 		the ID of the parameter to fetch from the {@link ParameterBag}
+	 *
+	 * @return the parameter, or null if it does not exist and was not found on any parent
+	 */
 	protected Parameter<?> findParameter(StrolchRootElement element, String parentParamId, String bagKey,
 			String paramKey) {
 
@@ -402,6 +556,16 @@ public class GenericReport extends ReportPolicy {
 		return findParameter(parent, parentParamId, bagKey, paramKey);
 	}
 
+	/**
+	 * Retrieves the given parameter with the given parameter reference from the given column
+	 *
+	 * @param paramRefP
+	 * 		the parameter reference
+	 * @param column
+	 * 		the column
+	 *
+	 * @return the {@link Optional} with the parameter
+	 */
 	protected Optional<Parameter<?>> lookupParameter(StringParameter paramRefP, StrolchRootElement column) {
 		String paramRef = paramRefP.getValue();
 
@@ -423,6 +587,12 @@ public class GenericReport extends ReportPolicy {
 		return Optional.ofNullable(param);
 	}
 
+	/**
+	 * Returns a stream of {@link StrolchRootElement} which denote the rows of the report. This implementation uses
+	 * {@link ReportConstants#PARAM_OBJECT_TYPE} to stream the initial rows
+	 *
+	 * @return the stream of {@link StrolchRootElement StrolchRootElement}
+	 */
 	protected Stream<? extends StrolchRootElement> queryRows() {
 
 		StringParameter objectTypeP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
@@ -448,7 +618,16 @@ public class GenericReport extends ReportPolicy {
 		}
 	}
 
-	protected Map<String, StrolchRootElement> evaluateRow(StrolchRootElement resource) {
+	/**
+	 * Evaluates the row for the given element. The resulting {@link Map} contains the joins on all elements and the
+	 * keys are the type of elements and values are the actual elements
+	 *
+	 * @param element
+	 * 		the element from which the row is evaluated
+	 *
+	 * @return the {@link Map} of elements denoting the row for the given element
+	 */
+	protected Map<String, StrolchRootElement> evaluateRow(StrolchRootElement element) {
 
 		// interpretation -> Resource-Ref, etc.
 		// uom -> object type
@@ -457,7 +636,7 @@ public class GenericReport extends ReportPolicy {
 		// create the refs element
 		HashMap<String, StrolchRootElement> refs = new HashMap<>();
 		// and add the starting point
-		refs.put(resource.getType(), resource);
+		refs.put(element.getType(), element);
 
 		if (!this.reportRes.hasParameterBag(BAG_JOINS))
 			return refs;
@@ -471,6 +650,20 @@ public class GenericReport extends ReportPolicy {
 		return refs;
 	}
 
+	/**
+	 * Finds the join with the given elements
+	 *
+	 * @param refs
+	 * 		the current row, with any already retrieved joins
+	 * @param joinBag
+	 * 		the {@link ReportConstants#BAG_JOINS} {@link ParameterBag}
+	 * @param joinP
+	 * 		the join definition
+	 * @param optional
+	 * 		a boolean defining if the join my be missing
+	 *
+	 * @return the joined element, or null if it does not exist and {@code optional} is false
+	 */
 	protected StrolchRootElement addColumnJoin(Map<String, StrolchRootElement> refs, ParameterBag joinBag,
 			StringParameter joinP, boolean optional) {
 
