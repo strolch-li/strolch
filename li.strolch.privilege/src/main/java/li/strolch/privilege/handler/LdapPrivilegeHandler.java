@@ -115,6 +115,7 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 			ctx.close();
 		} catch (Exception e) {
+			logger.error("Could not login with user: " + username + domain + " on Ldap", e);
 			throw new AccessDeniedException("Could not login with user: " + username + domain + " on Ldap", e);
 		}
 
