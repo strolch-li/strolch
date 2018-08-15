@@ -1,27 +1,11 @@
 package li.strolch.privilege.handler;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
+import javax.naming.directory.*;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
@@ -29,6 +13,8 @@ import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.dbc.DBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
@@ -128,8 +114,8 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			}
 
 			ctx.close();
-		} catch (NamingException e) {
-			throw new AccessDeniedException("Could not login with user: " + username + domain + " on Ldap");
+		} catch (Exception e) {
+			throw new AccessDeniedException("Could not login with user: " + username + domain + " on Ldap", e);
 		}
 
 		Map<String, String> properties = new HashMap<>();
