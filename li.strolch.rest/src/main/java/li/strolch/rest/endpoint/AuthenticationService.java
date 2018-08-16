@@ -330,12 +330,13 @@ public class AuthenticationService {
 		}
 
 		boolean secureCookie = RestfulStrolchComponent.getInstance().isSecureCookie();
+		int cookieMaxAge = RestfulStrolchComponent.getInstance().getCookieMaxAge();
 		if (secureCookie && !request.getScheme().equals("https")) {
 			logger.warn(
 					"Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!");
 		}
 		NewCookie cookie = new NewCookie(StrolchRestfulConstants.STROLCH_AUTHORIZATION, certificate.getAuthToken(), "/",
-				null, "Authorization header", (int) TimeUnit.DAYS.toSeconds(1), secureCookie);
+				null, "Authorization header", cookieMaxAge, secureCookie);
 
 		return Response.ok().entity(loginResult.toString())//
 				.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken()).cookie(cookie).build();

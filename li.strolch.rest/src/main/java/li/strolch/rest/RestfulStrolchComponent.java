@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@
 package li.strolch.rest;
 
 import java.text.MessageFormat;
+import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
@@ -39,6 +40,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private static final String PARAM_REST_LOGGING_ENTITY = "restLoggingEntity"; //$NON-NLS-1$
 	private static final String PARAM_HTTP_CACHE_MODE = "httpCacheMode"; //$NON-NLS-1$
 	private static final String PARAM_SECURE_COOKIE = "secureCookie"; //$NON-NLS-1$
+	private static final String PARAM_COOKIE_MAX_AGE = "cookieMaxAge"; //$NON-NLS-1$
 
 	/**
 	 * Allowed values:
@@ -48,7 +50,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 * HTTP header</li>
 	 * <li>{@code ALL} - tracing support is enabled for every request.</li>
 	 * </ul>
-	 * 
+	 *
 	 * @see org.glassfish.jersey.server.ServerProperties#TRACING
 	 */
 	private static final String PARAM_REST_TRACING = "restTracing"; //$NON-NLS-1$
@@ -60,7 +62,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 * <li>{@code TRACE}</li>
 	 * <li>{@code VERBOSE}</li>
 	 * </ul>
-	 * 
+	 *
 	 * @see org.glassfish.jersey.server.ServerProperties#TRACING_THRESHOLD
 	 */
 	private static final String PARAM_REST_TRACING_THRESHOLD = "restTracingThreshold"; //$NON-NLS-1$
@@ -75,6 +77,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private boolean restLoggingEntity;
 	private String cacheMode;
 	private boolean secureCookie;
+	private int cookieMaxAge;
 
 	/**
 	 * @param container
@@ -133,6 +136,13 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return this.secureCookie;
 	}
 
+	/**
+	 * @return the secureCookie
+	 */
+	public int getCookieMaxAge() {
+		return this.cookieMaxAge;
+	}
+
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 
@@ -151,14 +161,15 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "TRACE"); //$NON-NLS-1$
 
 		String msg = "Set restLogging={0} with logEntities={1} restTracing={2} with threshold={3}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, this.restLogging, this.restLoggingEntity, this.restTracing,
-				this.restTracingThreshold));
+		logger.info(MessageFormat
+				.format(msg, this.restLogging, this.restLoggingEntity, this.restTracing, this.restTracingThreshold));
 
 		// set http cache mode
 		this.cacheMode = configuration.getString(PARAM_HTTP_CACHE_MODE, HttpCacheResponseFilter.NO_CACHE);
 		logger.info("HTTP header cache mode is set to {}", cacheMode);
 
 		this.secureCookie = configuration.getBoolean(PARAM_SECURE_COOKIE, true);
+		this.cookieMaxAge = configuration.getInt(PARAM_COOKIE_MAX_AGE, (int) TimeUnit.DAYS.toSeconds(1));
 
 		super.initialize(configuration);
 	}
