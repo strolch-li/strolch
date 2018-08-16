@@ -31,6 +31,10 @@ public class Report {
 		this.reportPolicy.initialize(reportId);
 	}
 
+	public ReportPolicy getReportPolicy() {
+		return this.reportPolicy;
+	}
+
 	public boolean hasDateRangeSelector() {
 		return this.reportPolicy.hasDateRangeSelector();
 	}
