@@ -1,24 +1,82 @@
 package li.strolch.utils;
 
 import java.util.Collection;
-import java.util.Objects;
+import java.util.Iterator;
 
 public class ObjectHelper {
 
 	public static boolean equals(Object left, Object right, boolean ignoreCase) {
+		if (left == null && right == null)
+			return true;
 		if (left == right)
 			return true;
+		if (left == null || right == null)
+			return false;
 
-		if (left != null && right != null) {
-			if (ignoreCase && left instanceof String && right instanceof String)
-				return ((String) left).equalsIgnoreCase((String) right);
+		if (left instanceof Collection) {
+			Collection<?> leftCollection = (Collection) left;
 
-			boolean leftIsArray = left.getClass().isArray();
-			boolean rightIsArray = right.getClass().isArray();
-			return leftIsArray && rightIsArray ? Objects.deepEquals(left, right) : left.equals(right);
+			if (right instanceof Collection) {
+				Collection<?> rightCollection = (Collection) right;
+				if (leftCollection.size() != rightCollection.size())
+					return false;
+
+				Iterator<?> leftIter = leftCollection.iterator();
+				Iterator<?> rightIter = rightCollection.iterator();
+
+				while (leftIter.hasNext()) {
+					Object l = leftIter.next();
+					Object r = rightIter.next();
+
+					// since we ignore case, we can toString()
+					if (ignoreCase) {
+						if (!l.toString().equalsIgnoreCase(r.toString()))
+							return false;
+					} else {
+						if (!l.equals(r))
+							return false;
+					}
+				}
+
+				return true;
+			}
+
+			if (right instanceof String[]) {
+				String[] rightArr = (String[]) right;
+
+				int i = 0;
+				Iterator<?> leftIter = leftCollection.iterator();
+				while (leftIter.hasNext()) {
+					Object l = leftIter.next();
+					Object r = rightArr[i];
+
+					// since we ignore case, we can toString()
+					if (ignoreCase) {
+						if (!l.toString().equalsIgnoreCase(r.toString()))
+							return false;
+					} else {
+						if (!l.equals(r))
+							return false;
+					}
+
+					i++;
+				}
+
+				return true;
+			}
+
+			// since right is neither a collection nor an array, we can't check for equals!
+			return false;
 		}
 
-		return false;
+		if (left.getClass() != right.getClass())
+			return false;
+
+		// since we ignore case, we can toString()
+		if (ignoreCase)
+			return left.toString().equalsIgnoreCase(right.toString());
+
+		return left.equals(right);
 	}
 
 	public static int compare(Object left, Object right, boolean ignoreCase) {
@@ -33,11 +91,10 @@ public class ObjectHelper {
 			return ((String) left).compareToIgnoreCase((String) right);
 
 		if (left instanceof Comparable) {
-			Comparable comparable = (Comparable) left;
-
 			@SuppressWarnings("unchecked")
-			int i = comparable.compareTo(right);
-			return i;
+			Comparable<Object> comparable = (Comparable<Object>) left;
+
+			return comparable.compareTo(right);
 		}
 
 		int answer = left.getClass().getName().compareTo(right.getClass().getName());
@@ -53,30 +110,58 @@ public class ObjectHelper {
 			return false;
 
 		if (left instanceof Collection) {
-			Collection<?> collection = (Collection) left;
-			if (right instanceof Collection)
-				return collection.containsAll((Collection) right);
-			return collection.contains(right);
+			Collection<?> leftCollection = (Collection) left;
+
+			if (right instanceof Collection) {
+				Collection<?> rightCollection = (Collection) right;
+				for (Object l : leftCollection) {
+					for (Object r : rightCollection) {
+						if (contains(l, r, ignoreCase))
+							return true;
+					}
+				}
+
+				return false;
+			}
+
+			if (right instanceof String[]) {
+				String[] rightArr = (String[]) right;
+				for (Object l : leftCollection) {
+					for (Object r : rightArr) {
+						if (contains(l, r, ignoreCase))
+							return true;
+					}
+				}
+
+				return false;
+			}
+
+			for (Object l : leftCollection) {
+				if (contains(l, right, ignoreCase))
+					return true;
+			}
+
+			return false;
 		}
 
 		if (left instanceof String) {
-			String str = (String) left;
+			String leftString = (String) left;
 
 			if (right instanceof String[]) {
-				String[] arr = (String[]) right;
+				String[] rightArr = (String[]) right;
 
 				if (ignoreCase) {
-					str = str.toLowerCase();
-					for (String s : arr) {
-						if (!str.contains(s.toLowerCase()))
+					leftString = leftString.toLowerCase();
+					for (String s : rightArr) {
+						if (!leftString.contains(s.toLowerCase()))
 							return false;
 					}
 
 					return true;
 
 				} else {
-					for (String s : arr) {
-						if (!str.contains(s))
+					for (String s : rightArr) {
+						if (!leftString.contains(s))
 							return false;
 					}
 
@@ -85,12 +170,12 @@ public class ObjectHelper {
 			}
 
 			if (right instanceof String) {
-				String subStr = (String) right;
+				String rightString = (String) right;
 
 				if (ignoreCase)
-					return str.toLowerCase().contains(subStr.toLowerCase());
+					return leftString.toLowerCase().contains(rightString.toLowerCase());
 				else
-					return str.contains(subStr);
+					return leftString.contains(rightString);
 			}
 		}
 
