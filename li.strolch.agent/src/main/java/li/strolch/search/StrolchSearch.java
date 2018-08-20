@@ -1,5 +1,6 @@
 package li.strolch.search;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchAccessDeniedException;
@@ -98,6 +99,42 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 		DBC.PRE.assertNotNull("navigation not set! Call types()", getNavigator());
 
 		Stream<T> stream = getNavigator().navigate(tx);
+
+		if (this.expression != null)
+			stream = stream.filter(e -> this.expression.matches(e));
+
+		return new RootElementSearchResult<>(stream);
+	}
+
+	/**
+	 * Performs the actual search on the given input list
+	 *
+	 * @return the search result
+	 */
+	public RootElementSearchResult<T> search(List<T> input) {
+
+		// first prepare
+		define();
+
+		Stream<T> stream = input.stream();
+
+		if (this.expression != null)
+			stream = stream.filter(e -> this.expression.matches(e));
+
+		return new RootElementSearchResult<>(stream);
+	}
+
+	/**
+	 * Performs the actual search on the given input stream
+	 *
+	 * @return the search result
+	 */
+	public RootElementSearchResult<T> search(Stream<T> input) {
+
+		// first prepare
+		define();
+
+		Stream<T> stream = input;
 
 		if (this.expression != null)
 			stream = stream.filter(e -> this.expression.matches(e));
