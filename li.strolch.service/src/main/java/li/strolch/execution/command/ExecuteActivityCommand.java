@@ -21,6 +21,7 @@ public class ExecuteActivityCommand extends ExecutionCommand {
 	@Override
 	public void validate() {
 		DBC.PRE.assertNotNull("activity can not be null!", this.activity);
+		tx().lock(this.activity.getRootElement());
 	}
 
 	@Override

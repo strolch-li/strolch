@@ -26,6 +26,8 @@ public class SetActionToStoppedCommand extends ExecutionCommand {
 	public void validate() {
 		DBC.PRE.assertNotNull("action can not be null", this.action);
 
+		tx().lock(this.action.getRootElement());
+
 		if (!this.action.getState().canSetToStopped()) {
 			String msg = "State {0} and canot be changed to {1} for action {2}";
 			msg = MessageFormat.format(msg, this.action.getState(), State.STOPPED, this.action.getLocator());

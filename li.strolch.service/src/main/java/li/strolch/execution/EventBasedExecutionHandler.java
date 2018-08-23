@@ -308,6 +308,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			ExecuteActivityCommand command = new ExecuteActivityCommand(getContainer(), tx);
 			command.setActivity(activity);
+			command.validate();
 			command.doCommand();
 
 			tx.commitOnClose();
@@ -327,9 +328,10 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			// set this action to executed
 			SetActionToExecutedCommand command = new SetActionToExecutedCommand(getContainer(), tx);
 			command.setAction(action);
+			command.validate();
 			command.doCommand();
 
-			// flush so we can see that changes performed
+			// flush so we can see the changes performed
 			tx.flush();
 
 			// if the activity is now executed, remove it from the registered activities
@@ -349,6 +351,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				ExecuteActivityCommand execCommand = new ExecuteActivityCommand(getContainer(), tx);
 				execCommand.setActivity(activity);
+				execCommand.validate();
 				execCommand.doCommand();
 
 				// flush so we can see the changes performed
@@ -372,6 +375,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			SetActionToWarningCommand command = new SetActionToWarningCommand(getContainer(), tx);
 			command.setAction((Action) elem);
+			command.validate();
 			command.doCommand();
 
 			tx.commitOnClose();
@@ -388,6 +392,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			SetActionToErrorCommand command = new SetActionToErrorCommand(getContainer(), tx);
 			command.setAction((Action) elem);
+			command.validate();
 			command.doCommand();
 
 			tx.commitOnClose();
@@ -404,6 +409,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			SetActionToStoppedCommand command = new SetActionToStoppedCommand(getContainer(), tx);
 			command.setAction((Action) elem);
+			command.validate();
 			command.doCommand();
 
 			tx.commitOnClose();
