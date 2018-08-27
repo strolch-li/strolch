@@ -1493,7 +1493,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	 * so chance of a runtime exception should be small
 	 */
 	private void doCommands() {
-		ListIterator<Command> iter = this.commands.listIterator();
+
+		// keep track of the current list of commands
+		List<Command> commands = this.commands;
+
+		// assign a new list for in case a command adds new commands
+		this.commands = new ArrayList<>();
+
+		ListIterator<Command> iter = commands.listIterator();
 		while (iter.hasNext()) {
 			Command command = iter.next();
 			this.flushedCommands.add(command);
