@@ -1,12 +1,12 @@
 /*
  * Copyright 2016 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,12 +15,8 @@
  */
 package li.strolch.utils.collections;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
@@ -33,6 +29,10 @@ public class MapOfSets<T, U> {
 		this.mapOfSets = new HashMap<>();
 	}
 
+	public MapOfSets(Map<T, Set<U>> mapOfSets) {
+		this.mapOfSets = mapOfSets;
+	}
+
 	public Set<T> keySet() {
 		return this.mapOfSets.keySet();
 	}
@@ -42,21 +42,11 @@ public class MapOfSets<T, U> {
 	}
 
 	public boolean addElement(T t, U u) {
-		Set<U> set = this.mapOfSets.get(t);
-		if (set == null) {
-			set = new HashSet<>();
-			this.mapOfSets.put(t, set);
-		}
-		return set.add(u);
+		return this.mapOfSets.computeIfAbsent(t, k -> new HashSet<>()).add(u);
 	}
 
 	public boolean addSet(T t, Set<U> u) {
-		Set<U> set = this.mapOfSets.get(t);
-		if (set == null) {
-			set = new HashSet<>();
-			this.mapOfSets.put(t, set);
-		}
-		return set.addAll(u);
+		return this.mapOfSets.computeIfAbsent(t, k -> new HashSet<>()).addAll(u);
 	}
 
 	public boolean removeElement(T t, U u) {

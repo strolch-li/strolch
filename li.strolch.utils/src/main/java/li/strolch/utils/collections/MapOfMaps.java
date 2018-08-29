@@ -15,13 +15,8 @@
  */
 package li.strolch.utils.collections;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * <p>
@@ -54,6 +49,10 @@ public class MapOfMaps<T, U, V> {
 		this.mapOfMaps = new HashMap<>();
 	}
 
+	public MapOfMaps(Map<T, Map<U, V>> mapOfMaps) {
+		this.mapOfMaps = mapOfMaps;
+	}
+
 	public MapOfMaps(int initialSize) {
 		this.mapOfMaps = new HashMap<>(initialSize);
 	}
@@ -74,8 +73,7 @@ public class MapOfMaps<T, U, V> {
 	}
 
 	public V addElement(T t, U u, V v) {
-		Map<U, V> map = this.mapOfMaps.computeIfAbsent(t, k -> new HashMap<>());
-		return map.put(u, v);
+		return this.mapOfMaps.computeIfAbsent(t, k -> new HashMap<>()).put(u, v);
 	}
 
 	public List<V> getAllElements() {
@@ -96,8 +94,7 @@ public class MapOfMaps<T, U, V> {
 	}
 
 	public void addMap(T t, Map<U, V> u) {
-		Map<U, V> map = this.mapOfMaps.computeIfAbsent(t, k -> new HashMap<>());
-		map.putAll(u);
+		this.mapOfMaps.computeIfAbsent(t, k -> new HashMap<>()).putAll(u);
 	}
 
 	public V removeElement(T t, U u) {
