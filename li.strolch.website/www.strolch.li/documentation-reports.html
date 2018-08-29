@@ -70,7 +70,7 @@
 &lt;Resource Id="stockReport" Name="Stock Report" Type="Report"&gt;
 
   &lt;ParameterBag Id="parameters" Name="parameters" Type="Parameters"&gt;
-    &lt;Parameter Id="objectType" Name="Object Type" Type="String" Interpretation="Resource-Ref" Uom="Player" Value="Player"/&gt;
+    &lt;Parameter Id="objectType" Index="20" Hidden="false" Name="Object Type" Type="String" Interpretation="Resource-Ref" Uom="Player" Value="Player"/&gt;
     &lt;Parameter Id="descending" Name="Descending order" Type="Boolean" Value="true"/&gt;
   &lt;/ParameterBag&gt;
 
@@ -90,7 +90,7 @@
   &lt;/ParameterBag&gt;
 
   &lt;ParameterBag Id="joins" Name="Joins" Type="Joins"&gt;
-    &lt;Parameter Id="Team" Name="Team" Type="String" Interpretation="Resource-Ref" Uom="Team" Value="Player"/&gt;
+    &lt;Parameter Id="Team" Index="10" Hidden="false" Name="Team" Type="String" Interpretation="Resource-Ref" Uom="Team" Value="Player"/&gt;
   &lt;/ParameterBag&gt;
 
   &lt;Policies&gt;
@@ -101,7 +101,9 @@
 
         <p>This report</p>
         <ul>
-            <li>shows all Resources of type player (parameter <code>objectType</code>)</li>
+            <li>shows all Resources of type player (parameter <code>objectType</code>) &rarr; marks the object type to
+                be show in the filter criteria (default), and that its sorting index is at 20.
+            </li>
             <li>orders the report by player's name (parameter bag <code>ordering</code>)</li>
             <li>filters out all players with no team assigned (parameter bag <code>noTeamFilter</code>)</li>
             <li>defines three columns: Player, Birth date, Team (paramger bag <code>columns</code>)</li>
@@ -124,12 +126,11 @@
                     <li>Activity-Ref</li>
                 </ul>
                                         and that the <code>UOM</code> and <code>value</code> of the parameter is set to
-                                        the type of element with which to retrieve the elements from the strolch model
+                                        the type of element with which to retrieve the elements from the strolch model.
+                <br /> <b>Note:</b> that the attributes <code>Hidden</code> and <code>Index</code> define the visibility
+                                        and sorting index as filter criteria respectively.
             </li>
             <li><code>descending</code> &rarr; boolean flag to define if sorting is in descending order</li>
-            <li><code>hideObjectTypeFromFilterCriteria</code> &rarr; flag to hide the base object type from the filter
-                                                              criteria
-            </li>
             <li><code>allowMissingColumns</code> &rarr; flag to define if no exception should be thrown if a column is
                                                  missing
             </li>
@@ -237,14 +238,17 @@
             <li>The lookup of the join is done by finding a parameter with any ID, which has the same <code>Interpretation</code>
                 and <code>UOM</code> as the join definition
             </li>
+            <li>The attributes <code>Hidden</code> and <code>Index</code> define the visibility and sorting index as
+                filter criteria respectively.
+            </li>
         </ul>
 
         <p>Thus the following:</p>
 
         <pre>
 &lt;ParameterBag Id="joins" Name="Joins" Type="Joins"&gt;
-  &lt;Parameter Id="Team" Name="Team" Type="String" Interpretation="Resource-Ref" Uom="Team" Value="Player"/&gt;
-  &lt;Parameter Id="Country" Name="Team" Type="String" Interpretation="Resource-Ref" Uom="Country" Value="Team"/&gt;
+  &lt;Parameter Id="Team" Index="10" Hidden="false" Name="Team" Type="String" Interpretation="Resource-Ref" Uom="Team" Value="Player"/&gt;
+  &lt;Parameter Id="Country" Index="5" Hidden="false" Name="Team" Type="String" Interpretation="Resource-Ref" Uom="Country" Value="Team"/&gt;
 &lt;/ParameterBag&gt;</pre>
 
         <p>Performs two joins: First we join a resource of type <code>Team</code> by finding the relevant parameter on
