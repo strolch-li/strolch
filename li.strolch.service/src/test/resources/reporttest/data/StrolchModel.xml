@@ -5,8 +5,7 @@
     <Resource Id="stockReport" Name="Stock Report" Type="Report">
 
         <ParameterBag Id="parameters" Name="parameters" Type="Parameters">
-            <Parameter Id="objectType" Name="Object Type" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Slot"/>
-            <Parameter Id="hideObjectTypeFromFilterCriteria" Name="Hide objectType from filter criteria" Type="Boolean" Value="true"/>
+            <Parameter Id="objectType" Hidden="true" Name="Object Type" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Slot"/>
             <Parameter Id="dateRangeSel" Name="Date Range Selector" Type="String" Interpretation="Resource-Ref" Uom="Product"
                        Value="Bags/parameters/expirationDate"/>
             <Parameter Id="descending" Name="Descending order" Type="Boolean" Value="true"/>
