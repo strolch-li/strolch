@@ -12,7 +12,10 @@ import java.util.stream.Stream;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.*;
-import li.strolch.model.parameter.*;
+import li.strolch.model.parameter.AbstractParameter;
+import li.strolch.model.parameter.DateParameter;
+import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.ElementDateVisitor;
 import li.strolch.model.visitor.ElementStateVisitor;
@@ -36,11 +39,11 @@ public class GenericReport extends ReportPolicy {
 
 	private Resource reportRes;
 
-	private boolean hideObjectTypeFromFilterCriteria;
 	private String objectType;
 
 	private ParameterBag columnsBag;
 	private List<StringParameter> orderingParams;
+	private Map<String, StringParameter> filterCriteriaParams;
 	private boolean descending;
 	private boolean allowMissingColumns;
 	private List<String> columnIds;
@@ -66,13 +69,8 @@ public class GenericReport extends ReportPolicy {
 		// get the reportRes
 		this.reportRes = tx().getResourceBy(TYPE_REPORT, reportId, true);
 
-		BooleanParameter hideObjectTypeFromFilterCriteriaP = this.reportRes
-				.getParameter(BAG_PARAMETERS, PARAM_HIDE_OBJECT_TYPE_FROM_FILTER_CRITERIA);
-		this.hideObjectTypeFromFilterCriteria =
-				hideObjectTypeFromFilterCriteriaP != null && hideObjectTypeFromFilterCriteriaP.getValue();
-		if (this.hideObjectTypeFromFilterCriteria) {
-			this.objectType = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE).getValue();
-		}
+		StringParameter objectTypeP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
+		this.objectType = objectTypeP.getValue();
 
 		this.columnsBag = this.reportRes.getParameterBag(BAG_COLUMNS, true);
 
@@ -88,6 +86,17 @@ public class GenericReport extends ReportPolicy {
 					.getValue();
 
 		this.dateRangeSelP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
+
+		// evaluate filter criteria params
+		this.filterCriteriaParams = new HashMap<>();
+		StringParameter objectTypeFilterCriteriaP = objectTypeP.getClone();
+		objectTypeFilterCriteriaP.setId(this.objectType);
+		this.filterCriteriaParams.put(this.objectType, objectTypeFilterCriteriaP);
+		if (this.reportRes.hasParameterBag(BAG_JOINS)) {
+			ParameterBag joinBag = this.reportRes.getParameterBag(BAG_JOINS);
+			joinBag.getParameters()
+					.forEach(parameter -> filterCriteriaParams.put(parameter.getId(), (StringParameter) parameter));
+		}
 
 		// evaluate ordering params
 		if (this.reportRes.hasParameterBag(BAG_ORDERING)) {
@@ -245,8 +254,8 @@ public class GenericReport extends ReportPolicy {
 	/**
 	 * <p>Check to see if the given element is to be filtered, i.e. is to be kept in the stream</p>
 	 *
-	 * <p>This implementation checks if {@link ReportConstants#PARAM_HIDE_OBJECT_TYPE_FROM_FILTER_CRITERIA} is set, and
-	 * returns false if the given element is the type defined in {@link ReportConstants#PARAM_OBJECT_TYPE}</p>
+	 * <p>This implementation checks if a join parameters is set as hidden, including if the parameter {@link
+	 * ReportConstants#PARAM_OBJECT_TYPE} is defined as hidden</p>
 	 *
 	 * <p>This method can be overridden for further filtering</p>
 	 *
@@ -256,9 +265,7 @@ public class GenericReport extends ReportPolicy {
 	 * @return true if the element is to be kept, false if not
 	 */
 	protected boolean filterCriteria(StrolchRootElement element) {
-		if (this.hideObjectTypeFromFilterCriteria)
-			return !element.getType().equals(this.objectType);
-		return true;
+		return !this.filterCriteriaParams.get(element.getType()).isHidden();
 	}
 
 	/**
@@ -272,9 +279,27 @@ public class GenericReport extends ReportPolicy {
 
 				.flatMap(e -> e.values().stream().filter(this::filterCriteria)) //
 
+				.sorted((o1, o2) -> {
+					String type1 = o1.getType();
+					String type2 = o2.getType();
+					if (type1.equals(type2))
+						return 0;
+					StringParameter p1 = this.filterCriteriaParams.get(type1);
+					StringParameter p2 = this.filterCriteriaParams.get(type2);
+					if (p1 == null && p2 == null)
+						return type1.compareTo(type2);
+					if (p1 == null)
+						return 1;
+					if (p2 == null)
+						return -1;
+
+					return Integer.compare(p1.getIndex(), p2.getIndex());
+				}) //
+
 				.collect( //
 						Collector.of( //
-								(Supplier<MapOfSets<String, StrolchRootElement>>) MapOfSets::new, //
+								(Supplier<MapOfSets<String, StrolchRootElement>>) () -> new MapOfSets<>(
+										new LinkedHashMap<>()), //
 								(m, e) -> m.addElement(e.getType(), e), //
 								MapOfSets::addAll, //
 								m -> m));

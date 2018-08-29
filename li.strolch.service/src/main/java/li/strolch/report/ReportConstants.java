@@ -12,7 +12,6 @@ public class ReportConstants {
 	public static final String BAG_ORDERING = "ordering";
 
 	public static final String PARAM_OBJECT_TYPE = "objectType";
-	public static final String PARAM_HIDE_OBJECT_TYPE_FROM_FILTER_CRITERIA = "hideObjectTypeFromFilterCriteria";
 	public static final String PARAM_DESCENDING = "descending";
 	public static final String PARAM_DATE_RANGE_SEL = "dateRangeSel";
 	public static final String PARAM_FIELD_REF = "fieldRef";
