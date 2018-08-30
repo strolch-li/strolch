@@ -13,8 +13,8 @@ public class LessThanReportFilter extends ReportFilterPolicy {
 	@Override
 	protected boolean filter(Object left, Object right, boolean negate) {
 		if (negate)
-			return ObjectHelper.compare(left, right, false) < 0;
-		else
 			return ObjectHelper.compare(right, left, false) < 0;
+		else
+			return ObjectHelper.compare(left, right, false) < 0;
 	}
 }

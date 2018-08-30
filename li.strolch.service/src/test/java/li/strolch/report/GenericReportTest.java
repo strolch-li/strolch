@@ -1,30 +1,26 @@
 package li.strolch.report;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import li.strolch.model.StrolchElement;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.google.gson.JsonObject;
-
+import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.testbase.runtime.RuntimeMock;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class GenericReportTest {
 
@@ -172,7 +168,7 @@ public class GenericReportTest {
 					.filter("Product", "product01") //
 					.dateRange(dateRange) //
 					.doReportAsJson() //
-					.collect(Collectors.toList());
+					.collect(toList());
 			assertTrue(result.isEmpty());
 
 			// expect 2 slots, as in date range
@@ -182,7 +178,7 @@ public class GenericReportTest {
 					.filter("Product", "product01") //
 					.dateRange(dateRange) //
 					.doReportAsJson() //
-					.collect(Collectors.toList());
+					.collect(toList());
 			assertEquals(2, result.size());
 		}
 	}
@@ -199,15 +195,14 @@ public class GenericReportTest {
 			// expect no orders as all not in date range
 			Report report = new Report(tx, "fromStockReport");
 			List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
-					.collect(Collectors.toList());
+					.collect(toList());
 			assertTrue(result.isEmpty());
 
 			// expect 2 orders, as in date range
 			to = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
 			dateRange = new DateRange().from(from, true).to(to, false);
 			report = new Report(tx, "fromStockReport");
-			result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
-					.collect(Collectors.toList());
+			result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson().collect(toList());
 			assertEquals(2, result.size());
 
 			// expect 4 orders, as all in date range
@@ -215,7 +210,7 @@ public class GenericReportTest {
 			dateRange = new DateRange().from(from, true).to(to, false);
 			report = new Report(tx, "fromStockReport");
 			result = report.filter("Product", "product01", "product02").dateRange(dateRange).doReportAsJson()
-					.collect(Collectors.toList());
+					.collect(toList());
 			assertEquals(4, result.size());
 		}
 	}
@@ -228,16 +223,14 @@ public class GenericReportTest {
 			Report report = new Report(tx, "stockReport");
 			MapOfSets<String, StrolchRootElement> filterCriteria = report.generateFilterCriteria();
 
+			assertFalse(filterCriteria.containsSet("Location"));
+			assertFalse(filterCriteria.containsSet("Slot"));
 			assertThat(filterCriteria.getSet("Product").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
 					containsInAnyOrder("product01", "product02"));
-			assertThat(
-					filterCriteria.getSet("Location").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
-					containsInAnyOrder("location01", "location02"));
 			assertThat(filterCriteria.getSet("Storage").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
 					containsInAnyOrder("storage01", "storage02"));
 			assertThat(filterCriteria.getSet("Section").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
 					containsInAnyOrder("section001", "section002"));
-			assertFalse(filterCriteria.containsSet("Slot"));
 		}
 	}
 
@@ -247,20 +240,24 @@ public class GenericReportTest {
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
 
 			Report report = new Report(tx, "stockReport");
-			MapOfSets<String, StrolchRootElement> filterCriteria = report //
-					.filter("Product", "product01") //
+			MapOfSets<String, StrolchRootElement> filterCriteria = report.filter("Product", "product01")
 					.generateFilterCriteria();
 
+			// assert sequence of filter criteria is correct
+			List<String> types = new ArrayList<>(filterCriteria.keySet());
+			assertEquals(3, types.size());
+			assertEquals("Product", types.get(0));
+			assertEquals("Storage", types.get(1));
+			assertEquals("Section", types.get(2));
+
+			assertFalse(filterCriteria.containsSet("Location"));
+			assertFalse(filterCriteria.containsSet("Slot"));
 			assertThat(filterCriteria.getSet("Product").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
 					containsInAnyOrder("product01"));
-			assertThat(
-					filterCriteria.getSet("Location").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
-					containsInAnyOrder("location01", "location02"));
 			assertThat(filterCriteria.getSet("Storage").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
 					containsInAnyOrder("storage01", "storage02"));
 			assertThat(filterCriteria.getSet("Section").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
 					containsInAnyOrder("section001", "section002"));
-			assertFalse(filterCriteria.containsSet("Slot"));
 		}
 	}
 

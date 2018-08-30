@@ -21,7 +21,7 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 
 	protected boolean negate;
 	protected String filterValue;
-	protected Object left;
+	protected Object right;
 
 	public boolean isNegate() {
 		return this.negate;
@@ -35,14 +35,6 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 		this.filterValue = filterValue;
 	}
 
-	public Object getLeft() {
-		return this.left;
-	}
-
-	public void setLeft(Object left) {
-		this.left = left;
-	}
-
 	public void init(String value) {
 		if (value.startsWith("!")) {
 			setNegate(true);
@@ -54,38 +46,38 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 
 	public boolean filter(Object value) {
 
-		Object right;
+		Object left;
 		if (value instanceof Date) {
 
-			if (this.left == null)
-				this.left = parseFilterValueToDate(this.filterValue);
+			if (this.right == null)
+				this.right = parseFilterValueToDate(this.filterValue);
 
-			right = value;
+			left = value;
 
 		} else if (value instanceof Parameter) {
 
 			Parameter parameter = (Parameter) value;
-			if (this.left == null) {
+			if (this.right == null) {
 				StrolchValueType valueType = parameter.getValueType();
 				if (valueType == StrolchValueType.DATE)
-					this.left = parseFilterValueToDate(this.filterValue);
+					this.right = parseFilterValueToDate(this.filterValue);
 				else
-					this.left = valueType.parseValue(this.filterValue);
+					this.right = valueType.parseValue(this.filterValue);
 			}
 
-			right = parameter.getValue();
+			left = parameter.getValue();
 
 		} else {
-			if (this.left == null)
-				this.left = this.filterValue;
+			if (this.right == null)
+				this.right = this.filterValue;
 
-			right = value.toString();
+			left = value.toString();
 		}
 
-		return filter(this.left, right, this.negate);
+		return filter(left, this.right, this.negate);
 	}
 
-	private Date parseFilterValueToDate(String filterValue) {
+	protected Date parseFilterValueToDate(String filterValue) {
 		DBC.INTERIM.assertNotEmpty("filterValue must not be empty for date comparisons!", filterValue);
 
 		if (!filterValue.startsWith("now"))

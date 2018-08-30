@@ -15,6 +15,10 @@
             <Parameter Id="quantity" Name="Quantity" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/quantity"/>
         </ParameterBag>
 
+        <ParameterBag Id="stateFilter" Name="Filter" Type="Filter">
+            <Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:IsIn" Value="valid, invalid"/>
+            <Parameter Id="fieldRef" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/state"/>
+        </ParameterBag>
         <ParameterBag Id="quantityFilter" Name="Filter" Type="Filter">
             <Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:GreaterThan" Value="0.0"/>
             <Parameter Id="fieldRef" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/quantity"/>
@@ -37,10 +41,10 @@
         </ParameterBag>
 
         <ParameterBag Id="joins" Name="Joins" Type="Joins">
-            <Parameter Id="Product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="Slot"/>
-            <Parameter Id="Section" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="Slot"/>
-            <Parameter Id="Storage" Name="Storage" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="Section"/>
-            <Parameter Id="Location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="Storage"/>
+            <Parameter Id="Product" Index="0" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="Slot"/>
+            <Parameter Id="Section" Index="10" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="Slot"/>
+            <Parameter Id="Storage" Index="5" Name="Storage" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="Section"/>
+            <Parameter Id="Location" Hidden="true" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="Storage"/>
         </ParameterBag>
 
         <Policies>
@@ -184,6 +188,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="20.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="40.0"/>
+            <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
             <Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section001"/>
@@ -195,6 +200,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="18.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0"/>
+            <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
             <Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section001"/>
@@ -206,6 +212,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="11.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="40.0"/>
+            <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
             <Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section002"/>
@@ -217,6 +224,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="16.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0"/>
+            <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
             <Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section002"/>
@@ -228,6 +236,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="0.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0"/>
+            <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
             <Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section002"/>
@@ -239,6 +248,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="22.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0"/>
+            <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
             <Parameter Id="parentSection" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="section002"/>
