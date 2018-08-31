@@ -407,6 +407,10 @@ public class StrolchSearchTest {
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isIn(asList("Hello", "World"))))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isIn(asList("Hello", "World", "Extra"))))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isIn(asList("Extra", "Sauce")).not()))
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, listContains("Hello")))
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, listContains("Hello1")).not())
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, listContains("World")))
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, listContains("World1")).not())
 
 							.and(paramNull(BAG_ID, "non-existant"))
 					//

@@ -43,6 +43,10 @@ public class PredicatesSupport {
 	public static SearchPredicate contains(Object right) {
 		return new ContainsPredicate(right, false);
 	}
+	
+	public static SearchPredicate listContains(Object right) {
+		return new ListContainsPredicate(right, false);
+	}
 
 	public static SearchPredicate containsIgnoreCase(Object right) {
 		return new ContainsPredicate(right, true);

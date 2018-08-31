@@ -51,6 +51,10 @@ public interface ExpressionBuilder<T extends StrolchRootElement> {
 	default SearchExpression<T> contains(Object right) {
 		return element -> PredicatesSupport.contains(right).matches(extract(element));
 	}
+	
+	default SearchExpression<T> listContains(Object right) {
+		return element -> PredicatesSupport.listContains(right).matches(extract(element));
+	}
 
 	default SearchExpression<T> containsIgnoreCase(Object right) {
 		return element -> PredicatesSupport.containsIgnoreCase(right).matches(extract(element));
