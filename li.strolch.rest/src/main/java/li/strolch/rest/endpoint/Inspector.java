@@ -42,6 +42,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
@@ -77,7 +78,8 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 /**
- * The RESTful inspector for Strolch. It allows to inspect the realms, and their respective elements. Supporting querying and retrieving, in multiple formats: XML, JSON and flat JSON
+ * The RESTful inspector for Strolch. It allows to inspect the realms, and their respective elements. Supporting
+ * querying and retrieving, in multiple formats: XML, JSON and flat JSON
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -92,8 +94,7 @@ public class Inspector {
 	}
 
 	private StrolchTransaction openTx(Certificate certificate, String realm) {
-		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm)
-				.openTx(certificate, getContext());
+		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm).openTx(certificate, getContext());
 	}
 
 	private String toString(JsonElement jsonElement) {
@@ -1270,6 +1271,69 @@ public class Inspector {
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
 		}
 
+		return ResponseUtil.toResponse(result);
+	}
+
+	@DELETE
+	@Path("{realm}/resources/{type}")
+	public Response removeResourcesByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
+			@PathParam("realm") String realm, @PathParam("type") String type, @QueryParam("ids") String ids) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		RemoveResourcesService svc = new RemoveResourcesService();
+		LocatorListArgument arg = svc.getArgumentInstance();
+		arg.locators = new ArrayList<>();
+		arg.realm = realm;
+
+		for (String id : ids.split(",")) {
+			Locator locator = Resource.locatorFor(type, id.trim());
+			arg.locators.add(locator);
+		}
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		return ResponseUtil.toResponse(result);
+	}
+
+	@DELETE
+	@Path("{realm}/orders/{type}")
+	public Response removeOrdersByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
+			@PathParam("realm") String realm, @PathParam("type") String type, @QueryParam("ids") String ids) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		RemoveOrdersService svc = new RemoveOrdersService();
+		LocatorListArgument arg = svc.getArgumentInstance();
+		arg.locators = new ArrayList<>();
+		arg.realm = realm;
+
+		for (String id : ids.split(",")) {
+			Locator locator = Order.locatorFor(type, id.trim());
+			arg.locators.add(locator);
+		}
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		return ResponseUtil.toResponse(result);
+	}
+
+	@DELETE
+	@Path("{realm}/activities/{type}")
+	public Response removeActivitiesByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
+			@PathParam("realm") String realm, @PathParam("type") String type, @QueryParam("ids") String ids) {
+
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		RemoveActivitiesService svc = new RemoveActivitiesService();
+		LocatorListArgument arg = svc.getArgumentInstance();
+		arg.locators = new ArrayList<>();
+		arg.realm = realm;
+
+		for (String id : ids.split(",")) {
+			Locator locator = Activity.locatorFor(type, id.trim());
+			arg.locators.add(locator);
+		}
+
+		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		return ResponseUtil.toResponse(result);
 	}
 
