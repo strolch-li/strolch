@@ -16,7 +16,6 @@
 package li.strolch.service;
 
 import li.strolch.model.Resource;
-import li.strolch.persistence.api.RemoveResourceCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
@@ -43,13 +42,8 @@ public class RemoveResourceService extends AbstractService<LocatorArgument, Serv
 	protected ServiceResult internalDoService(LocatorArgument arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-
 			Resource resource = tx.findElement(arg.locator);
-
-			RemoveResourceCommand command = new RemoveResourceCommand(getContainer(), tx);
-			command.setResource(resource);
-
-			tx.addCommand(command);
+			tx.remove(resource);
 			tx.commitOnClose();
 		}
 

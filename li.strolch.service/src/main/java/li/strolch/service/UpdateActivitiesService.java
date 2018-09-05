@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Reto Breitenmoser <reto.breitenmoser@gmail.com>
+ * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,49 +15,47 @@
  */
 package li.strolch.service;
 
-import li.strolch.model.Resource;
+import java.util.List;
+
+import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
-import li.strolch.service.api.ServiceResultState;
 
 /**
- * @author Reto Breitenmoser <reto.breitenmoser@gmail.com>
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrUpdateResourceService
-		extends AbstractService<AddOrUpdateResourceService.AddOrUpdateResourceArg, ServiceResult> {
+public class UpdateActivitiesService
+		extends AbstractService<UpdateActivitiesService.UpdateActivityCollectionArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult(ServiceResultState.FAILED);
+		return new ServiceResult();
 	}
 
 	@Override
-	public AddOrUpdateResourceArg getArgumentInstance() {
-		return new AddOrUpdateResourceArg();
+	public UpdateActivityCollectionArg getArgumentInstance() {
+		return new UpdateActivityCollectionArg();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddOrUpdateResourceArg arg) {
+	protected ServiceResult internalDoService(UpdateActivityCollectionArg arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			if (tx.hasResource(arg.resource.getType(), arg.resource.getId())) {
-				tx.update(arg.resource);
-			} else {
-				tx.add(arg.resource);
+			for (Activity activity : arg.activities) {
+				tx.update(activity);
 			}
-
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
 	}
 
-	public static class AddOrUpdateResourceArg extends ServiceArgument {
+	public static class UpdateActivityCollectionArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
-		public Resource resource;
+		public List<Activity> activities;
 	}
 }

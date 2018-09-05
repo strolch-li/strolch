@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
-import li.strolch.service.UpdateResourceCollectionService.UpdateResourceCollectionArg;
+import li.strolch.service.UpdateResourcesService.UpdateResourceCollectionArg;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
@@ -39,7 +39,7 @@ public class UpdateResourceCollectionServiceTest
 
 	@Override
 	protected Class<? extends Service<UpdateResourceCollectionArg, ServiceResult>> getSvcClass() {
-		return UpdateResourceCollectionService.class;
+		return UpdateResourcesService.class;
 	}
 
 	@Override

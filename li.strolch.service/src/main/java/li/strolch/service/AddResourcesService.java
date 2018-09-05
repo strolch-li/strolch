@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Reto Breitenmoser <reto.breitenmoser@gmail.com>
+ * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,49 +15,47 @@
  */
 package li.strolch.service;
 
+import java.util.List;
+
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.service.AddResourcesService.AddResourceCollectionArg;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
-import li.strolch.service.api.ServiceResultState;
 
 /**
- * @author Reto Breitenmoser <reto.breitenmoser@gmail.com>
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrUpdateResourceService
-		extends AbstractService<AddOrUpdateResourceService.AddOrUpdateResourceArg, ServiceResult> {
+public class AddResourcesService extends AbstractService<AddResourceCollectionArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult(ServiceResultState.FAILED);
+		return new ServiceResult();
 	}
 
 	@Override
-	public AddOrUpdateResourceArg getArgumentInstance() {
-		return new AddOrUpdateResourceArg();
+	public AddResourceCollectionArg getArgumentInstance() {
+		return new AddResourceCollectionArg();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddOrUpdateResourceArg arg) {
+	protected ServiceResult internalDoService(AddResourceCollectionArg arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			if (tx.hasResource(arg.resource.getType(), arg.resource.getId())) {
-				tx.update(arg.resource);
-			} else {
-				tx.add(arg.resource);
+			for (Resource resource : arg.resources) {
+				tx.add(resource);
 			}
-
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
 	}
 
-	public static class AddOrUpdateResourceArg extends ServiceArgument {
+	public static class AddResourceCollectionArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
-		public Resource resource;
+		public List<Resource> resources;
 	}
 }

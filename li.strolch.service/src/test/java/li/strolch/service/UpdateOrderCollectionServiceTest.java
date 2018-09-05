@@ -20,7 +20,7 @@ import java.util.List;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
-import li.strolch.service.UpdateOrderCollectionService.UpdateOrderCollectionArg;
+import li.strolch.service.UpdateOrdersService.UpdateOrderCollectionArg;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
@@ -40,7 +40,7 @@ public class UpdateOrderCollectionServiceTest
 
 	@Override
 	protected Class<? extends Service<UpdateOrderCollectionArg, ServiceResult>> getSvcClass() {
-		return UpdateOrderCollectionService.class;
+		return UpdateOrdersService.class;
 	}
 
 	@Override

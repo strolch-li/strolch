@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
-import li.strolch.service.AddOrderCollectionService.AddOrderCollectionArg;
+import li.strolch.service.AddOrdersService.AddOrderCollectionArg;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
@@ -29,7 +29,7 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrderCollectionServiceTest extends AbstractRealmServiceTest<AddOrderCollectionArg, ServiceResult> {
+public class AddOrdersServiceTest extends AbstractRealmServiceTest<AddOrderCollectionArg, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -39,7 +39,7 @@ public class AddOrderCollectionServiceTest extends AbstractRealmServiceTest<AddO
 
 	@Override
 	protected Class<? extends Service<AddOrderCollectionArg, ServiceResult>> getSvcClass() {
-		return AddOrderCollectionService.class;
+		return AddOrdersService.class;
 	}
 
 	@Override

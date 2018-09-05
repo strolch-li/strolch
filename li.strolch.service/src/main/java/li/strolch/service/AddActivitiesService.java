@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,10 +17,8 @@ package li.strolch.service;
 
 import java.util.List;
 
-import li.strolch.command.UpdateResourceCollectionCommand;
-import li.strolch.model.Resource;
+import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.service.UpdateResourceCollectionService.UpdateResourceCollectionArg;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
@@ -28,7 +26,8 @@ import li.strolch.service.api.ServiceResult;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateResourceCollectionService extends AbstractService<UpdateResourceCollectionArg, ServiceResult> {
+public class AddActivitiesService
+		extends AbstractService<AddActivitiesService.AddActivityCollectionArg, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,26 +37,25 @@ public class UpdateResourceCollectionService extends AbstractService<UpdateResou
 	}
 
 	@Override
-	public UpdateResourceCollectionArg getArgumentInstance() {
-		return new UpdateResourceCollectionArg();
+	public AddActivityCollectionArg getArgumentInstance() {
+		return new AddActivityCollectionArg();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(UpdateResourceCollectionArg arg) {
+	protected ServiceResult internalDoService(AddActivityCollectionArg arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			UpdateResourceCollectionCommand command = new UpdateResourceCollectionCommand(getContainer(), tx);
-			command.setResources(arg.resources);
-
-			tx.addCommand(command);
+			for (Activity activity : arg.activities) {
+				tx.add(activity);
+			}
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
 	}
 
-	public static class UpdateResourceCollectionArg extends ServiceArgument {
+	public static class AddActivityCollectionArg extends ServiceArgument {
 		private static final long serialVersionUID = 1L;
-		public List<Resource> resources;
+		public List<Activity> activities;
 	}
 }

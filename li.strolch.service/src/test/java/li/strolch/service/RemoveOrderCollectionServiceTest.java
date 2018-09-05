@@ -38,7 +38,7 @@ public class RemoveOrderCollectionServiceTest extends AbstractRealmServiceTest<L
 
 	@Override
 	protected Class<? extends Service<LocatorListArgument, ServiceResult>> getSvcClass() {
-		return RemoveOrderCollectionService.class;
+		return RemoveOrdersService.class;
 	}
 
 	@Override
