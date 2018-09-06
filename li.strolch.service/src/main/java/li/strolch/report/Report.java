@@ -75,6 +75,10 @@ public class Report {
 		return this.reportPolicy.generateFilterCriteria();
 	}
 
+	public long getCounter() {
+		return this.reportPolicy.getCounter();
+	}
+
 	public Stream<JsonObject> doReportAsJson() {
 
 		return doReport().map(e -> {

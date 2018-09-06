@@ -53,6 +53,8 @@ public class GenericReport extends ReportPolicy {
 	private Map<ReportFilterPolicy, StringParameter> filtersByPolicy;
 	private MapOfSets<String, String> filtersById;
 
+	private long counter;
+
 	public GenericReport(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
@@ -123,6 +125,10 @@ public class GenericReport extends ReportPolicy {
 			StringParameter fieldRefP = filterBag.getParameter(PARAM_FIELD_REF);
 			this.filtersByPolicy.put(filterFunction, fieldRefP);
 		}
+	}
+
+	public long getCounter() {
+		return this.counter;
 	}
 
 	/**
@@ -213,6 +219,10 @@ public class GenericReport extends ReportPolicy {
 		return this;
 	}
 
+	protected void incrementCounter() {
+		this.counter++;
+	}
+
 	/**
 	 * Builds the stream of rows on which further transformations can be performed. Each row is a {@link Map} for where
 	 * the key is an element type, and the value is the associated element
@@ -222,7 +232,8 @@ public class GenericReport extends ReportPolicy {
 	public Stream<Map<String, StrolchRootElement>> buildStream() {
 
 		// query the main objects and return a stream
-		Stream<Map<String, StrolchRootElement>> stream = queryRows().map(this::evaluateRow);
+		Stream<Map<String, StrolchRootElement>> stream = queryRows().map(this::evaluateRow)
+				.peek(e -> this.incrementCounter());
 
 		if (hasFilter())
 			stream = stream.filter(this::filter);

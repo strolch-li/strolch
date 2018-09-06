@@ -39,6 +39,8 @@ public abstract class ReportPolicy extends StrolchPolicy {
 
 	public abstract MapOfSets<String, StrolchRootElement> generateFilterCriteria();
 
+	public abstract long getCounter();
+
 	@Override
 	public void undo() {
 		// can't be undone
