@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,17 +19,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import li.strolch.rest.endpoint.AuditsService;
-import li.strolch.rest.endpoint.AuthenticationService;
-import li.strolch.rest.endpoint.EnumQuery;
-import li.strolch.rest.endpoint.Inspector;
-import li.strolch.rest.endpoint.ModelQuery;
-import li.strolch.rest.endpoint.OperationsLogResource;
-import li.strolch.rest.endpoint.PrivilegePoliciesService;
-import li.strolch.rest.endpoint.PrivilegeRolesService;
-import li.strolch.rest.endpoint.PrivilegeUsersService;
-import li.strolch.rest.endpoint.UserSessionsService;
-import li.strolch.rest.endpoint.VersionQuery;
+import li.strolch.rest.endpoint.*;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.AuthenticationRequestFilter;
 import li.strolch.rest.filters.AuthenticationResponseFilter;
@@ -47,6 +37,7 @@ public class StrolchRestfulClasses {
 		Set<Class<?>> restfulClasses = new HashSet<>();
 
 		restfulClasses.add(AuthenticationService.class);
+		restfulClasses.add(StrolchJobsResource.class);
 		restfulClasses.add(Inspector.class);
 		restfulClasses.add(VersionQuery.class);
 		restfulClasses.add(ModelQuery.class);
