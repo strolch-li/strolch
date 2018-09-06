@@ -232,11 +232,12 @@ public class GenericReport extends ReportPolicy {
 	public Stream<Map<String, StrolchRootElement>> buildStream() {
 
 		// query the main objects and return a stream
-		Stream<Map<String, StrolchRootElement>> stream = queryRows().map(this::evaluateRow)
-				.peek(e -> this.incrementCounter());
+		Stream<Map<String, StrolchRootElement>> stream = queryRows().map(this::evaluateRow);
 
 		if (hasFilter())
 			stream = stream.filter(this::filter);
+
+		stream = stream.peek(e -> this.incrementCounter());
 
 		if (hasOrdering())
 			stream = stream.sorted(this::sort);
