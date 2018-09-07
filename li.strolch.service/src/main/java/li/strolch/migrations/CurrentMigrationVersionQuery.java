@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +15,8 @@
  */
 package li.strolch.migrations;
 
-import static li.strolch.migrations.Migration.BAG_PARAMETERS;
-import static li.strolch.migrations.Migration.MIGRATIONS_ID;
-import static li.strolch.migrations.Migration.MIGRATIONS_TYPE;
-import static li.strolch.migrations.Migration.PARAM_CURRENT_DATA_VERSION;
-import static li.strolch.migrations.Migration.PARAM_CURRENT_CODE_VERSION;
+import static li.strolch.migrations.Migration.*;
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +35,6 @@ public class CurrentMigrationVersionQuery {
 	private ComponentContainer container;
 	private Map<String, MigrationVersion> currentVersions;
 
-	/**
-	 * @param container
-	 */
 	public CurrentMigrationVersionQuery(ComponentContainer container) {
 		this.container = container;
 	}
@@ -56,47 +50,45 @@ public class CurrentMigrationVersionQuery {
 
 				Resource migrationsRes = tx.getResourceBy(MIGRATIONS_TYPE, MIGRATIONS_ID);
 				if (migrationsRes == null) {
-					this.currentVersions.put(realmName, new MigrationVersion(Version.emptyVersion,Version.emptyVersion));
+					this.currentVersions
+							.put(realmName, new MigrationVersion(Version.emptyVersion, Version.emptyVersion));
 					continue;
 				}
 
-				StringParameter currentDataVersionP = migrationsRes.getParameter(BAG_PARAMETERS, PARAM_CURRENT_DATA_VERSION);
-				StringParameter currentCodeVersionP = migrationsRes.getParameter(BAG_PARAMETERS, PARAM_CURRENT_CODE_VERSION);
-				
+				StringParameter currentDataVersionP = migrationsRes
+						.getParameter(BAG_PARAMETERS, PARAM_CURRENT_DATA_VERSION);
+				StringParameter currentCodeVersionP = migrationsRes
+						.getParameter(BAG_PARAMETERS, PARAM_CURRENT_CODE_VERSION);
+
 				if (currentDataVersionP == null && currentCodeVersionP == null) {
-					this.currentVersions.put(realmName, new MigrationVersion(Version.emptyVersion,Version.emptyVersion));
-				} else if(currentDataVersionP == null && currentCodeVersionP != null) {
+					this.currentVersions
+							.put(realmName, new MigrationVersion(Version.emptyVersion, Version.emptyVersion));
+				} else if (currentDataVersionP == null) {
 					Version codeVersion = getVersionFromParam(currentCodeVersionP);
-					this.currentVersions.put(realmName, new MigrationVersion(Version.emptyVersion,codeVersion));
-				} else if (currentDataVersionP != null && currentCodeVersionP == null) {
+					this.currentVersions.put(realmName, new MigrationVersion(Version.emptyVersion, codeVersion));
+				} else if (currentCodeVersionP == null) {
 					Version dataVersion = getVersionFromParam(currentDataVersionP);
-					this.currentVersions.put(realmName, new MigrationVersion(dataVersion,Version.emptyVersion));
+					this.currentVersions.put(realmName, new MigrationVersion(dataVersion, Version.emptyVersion));
 				} else {
 					Version dataVersion = getVersionFromParam(currentDataVersionP);
 					Version codeVersion = getVersionFromParam(currentCodeVersionP);
-					this.currentVersions.put(realmName, new MigrationVersion(dataVersion,codeVersion));	
+					this.currentVersions.put(realmName, new MigrationVersion(dataVersion, codeVersion));
 				}
 			}
 		}
 	}
 
-	/**
-	 * @param versionS
-	 * @return
-	 */
 	private Version getVersionFromParam(StringParameter versionP) {
 		String versionS = versionP.getValue();
 		if (!Version.isParseable(versionS)) {
-			throw new StrolchConfigurationException("Version value " + versionS + " is not valid for "
-					+ versionP.getLocator());
+			throw new StrolchConfigurationException(
+					"Version value " + versionS + " is not valid for " + versionP.getLocator());
 		}
 
-		Version version = Version.valueOf(versionS);
-		return version;
+		return Version.valueOf(versionS);
 	}
 
 	public Map<String, MigrationVersion> getCurrentVersions() {
 		return this.currentVersions;
 	}
-
 }

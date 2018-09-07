@@ -15,6 +15,8 @@
  */
 package li.strolch.migrations;
 
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Collections;

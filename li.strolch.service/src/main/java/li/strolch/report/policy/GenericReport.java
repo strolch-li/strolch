@@ -1,6 +1,7 @@
 package li.strolch.report.policy;
 
 import static java.util.Comparator.comparingInt;
+import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.report.ReportConstants.*;
 import static li.strolch.utils.helper.StringHelper.EMPTY;
 
@@ -10,6 +11,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.gson.JsonObject;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.*;
 import li.strolch.model.parameter.AbstractParameter;
@@ -39,8 +41,6 @@ public class GenericReport extends ReportPolicy {
 
 	private Resource reportRes;
 
-	private String objectType;
-
 	private ParameterBag columnsBag;
 	private List<StringParameter> orderingParams;
 	private Map<String, StringParameter> filterCriteriaParams;
@@ -55,13 +55,15 @@ public class GenericReport extends ReportPolicy {
 
 	private long counter;
 
+	protected JsonObject i18nData;
+
 	public GenericReport(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
 	/**
-	 * Retrieves the <code>Resource</code> with the given ID, and initializes this instance with the data specified on
-	 * the report
+	 * Retrieves the {@code Resource} with the given ID, and initializes this instance with the data specified on the
+	 * report
 	 *
 	 * @param reportId
 	 * 		the report to use
@@ -72,7 +74,7 @@ public class GenericReport extends ReportPolicy {
 		this.reportRes = tx().getResourceBy(TYPE_REPORT, reportId, true);
 
 		StringParameter objectTypeP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
-		this.objectType = objectTypeP.getValue();
+		String objectType = objectTypeP.getValue();
 
 		this.columnsBag = this.reportRes.getParameterBag(BAG_COLUMNS, true);
 
@@ -92,8 +94,8 @@ public class GenericReport extends ReportPolicy {
 		// evaluate filter criteria params
 		this.filterCriteriaParams = new HashMap<>();
 		StringParameter objectTypeFilterCriteriaP = objectTypeP.getClone();
-		objectTypeFilterCriteriaP.setId(this.objectType);
-		this.filterCriteriaParams.put(this.objectType, objectTypeFilterCriteriaP);
+		objectTypeFilterCriteriaP.setId(objectType);
+		this.filterCriteriaParams.put(objectType, objectTypeFilterCriteriaP);
 		if (this.reportRes.hasParameterBag(BAG_JOINS)) {
 			ParameterBag joinBag = this.reportRes.getParameterBag(BAG_JOINS);
 			joinBag.getParameters()
@@ -127,6 +129,10 @@ public class GenericReport extends ReportPolicy {
 		}
 	}
 
+	public void setI18nData(JsonObject i18nData) {
+		this.i18nData = i18nData;
+	}
+
 	public long getCounter() {
 		return this.counter;
 	}
@@ -134,7 +140,7 @@ public class GenericReport extends ReportPolicy {
 	/**
 	 * Returns true if the report has a date range selector specified
 	 *
-	 * @return
+	 * @return true if the report has a date range selector specified
 	 */
 	public boolean hasDateRangeSelector() {
 		return this.dateRangeSelP != null;

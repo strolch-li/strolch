@@ -15,7 +15,9 @@
  */
 package li.strolch.model;
 
-@SuppressWarnings("nls")
+/**
+ * This class contains all constants used to marshall strolch objects to XML and JSON.
+ */
 public class Tags {
 
 	public static final String AGENT = "Agent";

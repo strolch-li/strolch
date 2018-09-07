@@ -50,6 +50,12 @@
             <artifactId>javax.mail-api</artifactId>
         </dependency>
 
+        <!-- utils -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+        </dependency>
+
         <!-- Web -->
         <dependency>
             <groupId>javax.servlet</groupId>

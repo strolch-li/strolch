@@ -15,6 +15,8 @@
  */
 package li.strolch.migrations;
 
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+
 import java.io.File;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -31,7 +33,6 @@ public abstract class Migration {
 
 	public static final String MIGRATIONS_TYPE = "Migrations";
 	public static final String MIGRATIONS_ID = "migrations";
-	public static final String BAG_PARAMETERS = "parameters";
 	public static final String PARAM_CURRENT_DATA_VERSION = "currentDataVersion";
 	public static final String PARAM_CURRENT_CODE_VERSION = "currentCodeVersion";
 

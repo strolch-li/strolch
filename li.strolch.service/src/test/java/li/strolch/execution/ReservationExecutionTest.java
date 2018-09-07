@@ -1,16 +1,11 @@
 package li.strolch.execution;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static li.strolch.execution.policy.ReservationExection.PARAM_RESERVED;
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static org.junit.Assert.*;
 
 import java.io.File;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import li.strolch.execution.policy.ReservationExection;
 import li.strolch.execution.service.StartActivityExecutionService;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
@@ -25,6 +20,9 @@ import li.strolch.service.LocatorArgument;
 import li.strolch.service.parameter.SetParameterService;
 import li.strolch.service.parameter.SetParameterService.SetParameterArg;
 import li.strolch.testbase.runtime.RuntimeMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ReservationExecutionTest extends RuntimeMock {
 
@@ -50,8 +48,8 @@ public class ReservationExecutionTest extends RuntimeMock {
 		// before we execute, we reserve, so execution can't be done
 		SetParameterService setParamSvc = new SetParameterService();
 		SetParameterArg setParamArg = new SetParameterArg();
-		setParamArg.locator = Locator.valueOf(Tags.RESOURCE, "Machine", "machine1", Tags.BAG,
-				ReservationExection.BAG_PARAMETERS, ReservationExection.PARAM_RESERVED);
+		setParamArg.locator = Locator
+				.valueOf(Tags.RESOURCE, "Machine", "machine1", Tags.BAG, BAG_PARAMETERS, PARAM_RESERVED);
 		setParamArg.valueAsString = "true";
 
 		doServiceAssertResult(cert, setParamSvc, setParamArg);
@@ -84,8 +82,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 
 			// verify that the machine is not reserved
 			Resource machine = tx.getResourceBy("Machine", "machine1");
-			BooleanParameter reservedP = machine.getParameter(ReservationExection.BAG_PARAMETERS,
-					ReservationExection.PARAM_RESERVED);
+			BooleanParameter reservedP = machine.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
 			assertFalse(reservedP.getValue());
 		}
 
@@ -107,8 +104,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 
 			// verify that the machine is reserved
 			Resource machine = tx.getResourceBy("Machine", "machine1");
-			BooleanParameter reservedP = machine.getParameter(ReservationExection.BAG_PARAMETERS,
-					ReservationExection.PARAM_RESERVED);
+			BooleanParameter reservedP = machine.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
 			assertTrue(reservedP.getValue());
 		}
 
@@ -123,8 +119,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 
 			// verify that the machine is not reserved anymore
 			Resource machine = tx.getResourceBy("Machine", "machine1");
-			BooleanParameter reservedP = machine.getParameter(ReservationExection.BAG_PARAMETERS,
-					ReservationExection.PARAM_RESERVED);
+			BooleanParameter reservedP = machine.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
 			assertFalse(reservedP.getValue());
 		}
 	}

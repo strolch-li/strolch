@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.google.gson.JsonObject;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -18,6 +19,8 @@ public abstract class ReportPolicy extends StrolchPolicy {
 	public ReportPolicy(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
+
+	public abstract void setI18nData(JsonObject i18nData);
 
 	public abstract void initialize(String reportId);
 
