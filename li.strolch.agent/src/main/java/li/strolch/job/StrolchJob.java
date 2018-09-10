@@ -41,6 +41,7 @@ public abstract class StrolchJob implements Runnable {
 	private StrolchAgent agent;
 	private String realmName;
 
+	private final JobMode mode;
 	private long initialDelay;
 	private TimeUnit initialDelayTimeUnit;
 	private long delay;
@@ -51,9 +52,10 @@ public abstract class StrolchJob implements Runnable {
 	private ScheduledFuture<?> future;
 	private Throwable lastException;
 
-	public StrolchJob(StrolchAgent agent, long initialDelay, TimeUnit initialDelayTimeUnit, long delay,
+	public StrolchJob(StrolchAgent agent, JobMode jobMode, long initialDelay, TimeUnit initialDelayTimeUnit, long delay,
 			TimeUnit delayTimeUnit) {
 		this.agent = agent;
+		this.mode = jobMode;
 
 		this.initialDelay = initialDelay;
 		this.initialDelayTimeUnit = initialDelayTimeUnit;
@@ -61,6 +63,10 @@ public abstract class StrolchJob implements Runnable {
 		this.delayTimeUnit = delayTimeUnit;
 
 		this.first = true;
+	}
+
+	public JobMode getMode() {
+		return this.mode;
 	}
 
 	public String getName() {
@@ -170,8 +176,19 @@ public abstract class StrolchJob implements Runnable {
 		}
 
 		this.nrOfExecutions++;
-		this.first = false;
-		schedule();
+
+		if (this.first) {
+			this.first = false;
+
+			if (this.mode == JobMode.Recurring) {
+				schedule();
+			} else {
+				logger.info("Not scheduling " + getName() + " after first execution as mode is " + this.mode);
+			}
+
+		} else {
+			schedule();
+		}
 	}
 
 	/**
@@ -197,6 +214,10 @@ public abstract class StrolchJob implements Runnable {
 	 * @return this instance for chaining
 	 */
 	public StrolchJob schedule() {
+		if (this.mode == JobMode.Manual) {
+			logger.info("Not scheduling " + getName() + " as mode is " + this.mode);
+			return this;
+		}
 
 		// first cancel a possibly already scheduled task
 		cancel(false);
